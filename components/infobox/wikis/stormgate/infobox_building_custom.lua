@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -30,8 +31,8 @@ local CustomBuilding = Class.new(Building)
 
 local CustomInjector = Class.new(Injector)
 
-local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 
 ---@param frame Frame
@@ -51,6 +52,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
+	local SEP = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 	if id == 'custom' then
 		Array.appendWith(
@@ -58,9 +60,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', content = {args.size}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedStringWithBreaks(args.upgrades_to)}
 		)
-		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
@@ -82,28 +83,35 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedString(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = caller:_displayCommaSeparatedString(args.building_requirement)},
+			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedStringWithBreaks(args.tech_requirement)},
+			Cell{name = 'Building Requirements', content = caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		return {
-			Cell{name = 'Hotkeys', content = {CustomBuilding._hotkeys(args.hotkey, args.hotkey2)}},
-			Cell{name = 'Macrokeys', content = {CustomBuilding._hotkeys(args.macro_key, args.macro_key2)}},
-		}
+			Cell{
+				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys', 
+				content = {
+					args.hotkey and args.macro_key and 
+						CustomBuilding._hotkeys(args.hotkey, args.hotkey2) .. SEP .. 
+						CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or 
+					args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2) or 
+					args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or nil
+				}
+			},
+		}			
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_displayCommaSeparatedString(args.builds)},
+			Cell{name = 'Builds', content = caller:_displayCommaSeparatedStringWithBreaks(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_displayCommaSeparatedString(args.unlocks)},
-			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
+			Cell{name = 'Unlocks', content = caller:_displayCommaSeparatedStringWithBreaks(args.unlocks)},
 			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply)},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Health', content = {args.health and (ICON_HP .. ' ' .. args.health) or nil}},
-			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
+			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', content = {caller:_displayCommaSeparatedString(args.armor_type)}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -195,21 +203,37 @@ function CustomBuilding:setLpdbData(args)
 end
 
 ---@return string[]
-function CustomBuilding:_getArmorDisplay()
-	local armorTypes = self:_displayCommaSeparatedString(self.args.armor_type)
+function CustomBuilding:_getDefenseDisplay()
+	if not Logic.isNumeric(self.args.health) then return end
+	local armor = self.args.armor or '0'
 
-	return Array.append({},
+	local health = table.concat({
+		ICON_HP .. ' ' .. self.args.health,
+		Logic.isNumeric(self.args.extra_health) and ('(+' .. self.args.extra_health .. ')') or nil,
+	}, '&nbsp;')
+
+	return table.concat({
+		health, 
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
-		String.nilIfEmpty(table.concat(armorTypes, ', '))
-	)
+	}, '&nbsp;')
 end
 
 ---@param inputString string?
 ---@return string[]
-function CustomBuilding:_displayCommaSeparatedString(inputString)
+function CustomBuilding:_displayCommaSeparatedString(inputString)	
+	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString), 
+		function(value)
+			return Page.makeInternalLink(value)
+		end	
+	), ', ')
+end	
+
+---@param inputString string?
+---@return string[]
+function CustomBuilding:_displayCommaSeparatedStringWithBreaks(inputString)
 	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
 		return Page.makeInternalLink({}, value)
 	end)
 end
-
+	
 return CustomBuilding
