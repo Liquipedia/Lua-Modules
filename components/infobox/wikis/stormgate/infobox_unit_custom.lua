@@ -78,7 +78,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'cost' then
 		return {
 			Cell{
-				name = 'Cost', 
+				name = 'Cost',
 				content = {
 					args.informationType ~= 'Hero' and CostDisplay.run{
 						faction = caller.faction,
@@ -97,20 +97,20 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{
-				name = args.charge_time and 'Built' .. SEP .. 'Recharge Time' or 'Built Time', 
+				name = args.charge_time and 'Built' .. SEP .. 'Recharge Time' or 'Built Time',
 				content = {
-					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or 
+					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or
 					args.buildtime and args.buildtime .. 's' or nil
 				}
-			},		
+			},
 		}
 	elseif id == 'hotkey' then
 		return {
 			Cell{
-				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys', 
+				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys',
 				content = {
-					args.hotkey and args.macro_key and 
-						CustomUnit._hotkeys(args.hotkey, args.hotkey2) .. SEP .. CustomUnit._hotkeys(args.macro_key, args.macro_key2) or 
+					args.hotkey and args.macro_key and
+						CustomUnit._hotkeys(args.hotkey, args.hotkey2) .. SEP .. CustomUnit._hotkeys(args.macro_key, args.macro_key2) or
 					args.hotkey and {CustomUnit._hotkeys(args.hotkey, args.hotkey2)} or nil
 				}
 			},
@@ -148,7 +148,7 @@ function CustomUnit:_getHealthDisplay()
 	}, '&nbsp;')
 
 	return table.concat({
-		health, 
+		health,
 		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
 	}, '&nbsp;')
 end
@@ -280,11 +280,11 @@ end
 
 ---@param inputString string?
 ---@return string[]
-function CustomUnit:_displayCommaSeparatedString(inputString)	
-	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString), 
+function CustomUnit:_displayCommaSeparatedString(inputString)
+	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
 		function(value)
 			return Page.makeInternalLink(value)
-		end	
+		end
 	), ', ')
 end
 
