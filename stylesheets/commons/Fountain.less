@@ -344,7 +344,7 @@ The smaller sizes are for sub-sections. */
 .spellvalueTableCell {
 	display: table-cell;
 	text-align: center;
-	padding: 3px;
+	padding: 0.1875rem;
 	border-bottom: 1px solid;
 	height: 35px;
 }
@@ -457,197 +457,201 @@ The smaller sizes are for sub-sections. */
 }
 
 /* Aghcard-related */
-.aghupgBody {
-	display: inline-block;
-	max-width: 28.75rem; // 460px
-	width: 100%;
-	font-size: 90%; // convert to rem
-	background: rgba( 35, 46, 52, 0.75 );
-	text-align: left;
-	padding-left: 0.3125rem;
-	padding-right: 0.3125rem;
-	padding-top: 0.3125rem;
-	border: 0.0625rem solid #505050;
-	color: #d9e0e8;
-}
-
-.aghupgTitle {
-	font-weight: bold;
-	color: #a885ff;
-	text-shadow: 1px 1px 2px #000000;
-	flex-grow: 1;
-}
-
-.aghupgNew {
-	text-align: center;
-	border-radius: 3px;
-	font-weight: bold;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-	background-color: #1c2e50;
-	text-shadow: 1px 1px 2px #000000;
-	border: 2px solid #505050;
-	padding-left: 2px;
-	padding-right: 2px;
-}
-
-.aghupgShadow {
-	display: inline-block;
-	background: rgba( 18, 26, 33, 0.7 );
-	text-align: left;
-	margin-top: 0;
-	margin-bottom: 5px;
-	padding: 5px;
-	border: 1px solid #505050;
-	width: 100%;
-
-	&:hover {
-		background-color: rgba( 9, 13, 17, 1 );
-		transition: 0.15s;
+.aghupg {
+	&Body {
+		display: inline-block;
+		max-width: 28.75rem; // 460px
+		width: 100%;
+		font-size: 90%; // convert to rem
+		background: rgba( 35, 46, 52, 0.75 );
+		text-align: left;
+		padding-left: 0.3125rem;
+		padding-right: 0.3125rem;
+		padding-top: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		color: #d9e0e8;
 	}
-}
 
-.aghupgDesc {
-	vertical-align: top;
-	padding: 0;
+	&Title {
+		font-weight: bold;
+		color: #a885ff;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		flex-grow: 1;
+	}
+
+	&New {
+		text-align: center;
+		border-radius: 0.1875rem;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		background-color: #1c2e50;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		border: 0.125rem solid #505050;
+		padding-left: 0.125rem;
+		padding-right: 0.125rem;
+	}
+
+	&Shadow {
+		display: inline-block;
+		background: rgba( 18, 26, 33, 0.7 );
+		text-align: left;
+		margin-top: 0;
+		margin-bottom: 0.3125rem;
+		padding: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		width: 100%;
+
+		&:hover {
+			background-color: rgba( 9, 13, 17, 1 );
+			transition: 0.15s;
+		}
+	}
+
+	&Desc {
+		vertical-align: top;
+		padding: 0;
+	}
 }
 
 /* HeroGameplay-related */
 .gameplay_ {
 	color: #227722;
 	font-weight: bold;
-}
 
-.gameplay_agh {
-	color: #a50f79;
-	font-weight: bold;
-}
-
-.gameplay_shd {
-	color: #4b69ff;
-	font-weight: bold;
-}
-
-.gameplay_tal {
-	color: #cf6a32;
-	font-weight: bold;
-}
-
-.gameplay_talbutton {
-	color: #f3e494;
-
-	&:hover {
-		text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
-		cursor: default;
+	&_agh {
+		color: #a50f79;
+		font-weight: bold;
 	}
-}
 
-.gameplay_tallvl {
-	max-width: 450px;
-	color: #f3e494;
-	text-shadow: 1px 1px 8px transparent, -1px -1px 8px transparent;
-	border-left: 2px solid #131313;
-	border-right: 2px solid #131313;
-
-	&:hover {
-		text-shadow: 1px 1px 8px #ff751b, -1px -1px 8px #ff751b;
-		cursor: default;
-		border-left: 2px solid #f3e494;
-		border-right: 2px solid #f3e494;
+	&_shd {
+		color: #4b69ff;
+		font-weight: bold;
 	}
-}
 
-.gameplay_taldesc {
-	color: #e2e2e6;
-	display: table-cell;
-	min-width: 200px;
-	text-shadow: initial;
-	font-weight: initial;
+	&_tal {
+		color: #cf6a32;
+		font-weight: bold;
+	}
 
-	&:hover {
+	&_talbutton {
+		color: #f3e494;
+
+		&:hover {
+			text-shadow: 0.0625rem 0.0625rem 0.5rem #ff751b, -0.0625rem -0.0625rem 0.5rem #ff751b;
+			cursor: default;
+		}
+	}
+
+	&_tallvl {
+		max-width: 28.125rem; // 450px
+		color: #f3e494;
+		text-shadow: 0.0625rem 0.0625rem 0.5rem transparent, -0.0625rem -0.0625rem 0.5rem transparent;
+		border-left: 0.125rem solid #131313;
+		border-right: 0.125rem solid #131313;
+
+		&:hover {
+			text-shadow: 0.0625rem 0.0625rem 0.5rem #ff751b, -0.0625rem -0.0625rem 0.5rem #ff751b;
+			cursor: default;
+			border-left: 0.125rem solid #f3e494;
+			border-right: 0.125rem solid #f3e494;
+		}
+	}
+
+	&_taldesc {
 		color: #e2e2e6;
+		display: table-cell;
+		min-width: 12.5rem; // 200px;
 		text-shadow: initial;
 		font-weight: initial;
+
+		&:hover {
+			color: #e2e2e6;
+			text-shadow: initial;
+			font-weight: initial;
+		}
 	}
 }
 
 /* these two styles are same for the talent level hover glow */
 div.gameplay_nav {
 	display: block;
-	font-size: 24px;
-}
+	font-size: 1.5rem; // 24px
 
-div.gameplay_nav ul {
-	margin: 0 !important;
-}
+	ul {
+		margin: 0 !important; // is important necessary?
 
-div.gameplay_nav ul li {
-	list-style: none;
-	display: inline-block;
-	padding: 5px;
-	position: relative;
-	text-decoration: none;
-	text-align: center;
-}
+		li {
+			list-style: none;
+			display: inline-block;
+			padding: 0.3125rem;
+			position: relative;
+			text-decoration: none;
+			text-align: center;
 
-div.gameplay_nav li:hover {
-	background-color: rgba( 78, 85, 87, 0.5 );
-}
+			&:hover {
+				background-color: rgba( 78, 85, 87, 0.5 );
+			}
 
-div.gameplay_nav ul li ul {
-	opacity: 0;
-	position: absolute;
-	padding-left: 0;
-	left: 0;
-	display: inline-block;
+			ul {
+				opacity: 0;
+				position: absolute;
+				padding-left: 0;
+				left: 0;
+				display: inline-block;
+			}
+		}
+	}
 }
 
 div.gameplay_nav ul li:hover > ul,
 div.gameplay_nav ul li ul:hover {
 	opacity: 1;
 	display: block;
-	min-width: 450px;
-	padding: 5px;
-	box-shadow: 0 3px 5px -1px rgba( 88, 88, 88, 0.5 );
+	min-width: 28.125rem; // 450px
+	padding: 0.3125rem;
+	box-shadow: 0 0.1875rem 0.3125rem -0.0625rem rgba( 88, 88, 88, 0.5 );
 	background-color: #131313;
 	color: #e2e2e6;
-	font-size: 13px;
+	font-size: 0.8125rem; // 13px
 }
 
 div.gameplay_nav ul li ul li {
 	clear: both;
 	width: 100%;
 	text-align: center;
-	padding: 5px;
+	padding: 0.3125rem;
 	border-style: hidden;
 }
 
 /* {{pp-template}} */
-.treeview ul {
-	padding: 0 !important;
-	margin: 0 !important;
-}
-
-.treeview li {
-	padding: 0;
-	margin: 0;
-	list-style-type: none;
-	list-style-image: none;
-
-	&::after {
-		display: block;
-		content: "";
-		clear: both;
+.treeview {
+	ul {
+		padding: 0 !important; // is important necessary?
+		margin: 0 !important; // is important necessary?
 	}
-}
 
-.treeview li li {
-	/* @noflip */
-	padding-left: 21px;
-	text-indent: 0.3em;
+	li {
+		padding: 0;
+		margin: 0;
+		list-style-type: none;
+		list-style-image: none;
 
-	&:last-child {
-		background-position: 0 -5971px;
+		&::after {
+			display: block;
+			content: "";
+			clear: both;
+		}
+
+		li {
+			/* @noflip */
+			padding-left: 1.3125rem; // 21px
+			text-indent: 0.3em;
+
+			&:last-child {
+				background-position: 0 -5971px;
+			}
+		}
 	}
 }
 
@@ -656,7 +660,7 @@ div.gameplay_nav ul li ul li {
  */
 .treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
 .treeview li.emptyline > ul > li:first-child {
-	background-position: 0 9px;
+	background-position: 0 0.5625rem;
 }
 
 /***************************
@@ -665,20 +669,20 @@ div.gameplay_nav ul li ul li {
 .key {
 	display: inline-block;
 	white-space: nowrap;
-}
 
-.key kbd {
-	padding: 0.1em 0.6em 0.1em 0.6em;
-	margin-right: 2px;
-	font-size: 85%;
-	font-family: inherit;
-	font-style: normal;
-	border-radius: 0.4em;
+	kbd {
+		padding: 0.1em 0.6em 0.1em 0.6em; // convert to rem
+		margin-right: 0.125rem;
+		font-size: 85%; // convert to rem
+		font-family: inherit;
+		font-style: normal;
+		border-radius: 0.4em; // convert to rem
+	}
 }
 
 .keys {
-	border: 1px solid #111111;
-	box-shadow: 0 0.2em rgba( 0, 0, 0, 0.5 );
+	border: 0.0625rem solid #111111;
+	box-shadow: 0 0.2em rgba( 0, 0, 0, 0.5 ); // convert to rem
 	background-color: #505459;
 	background-image: linear-gradient( to bottom, #505459, #282828 );
 	color: #eeeeee;
@@ -690,15 +694,15 @@ div.gameplay_nav ul li ul li {
 
 /* Recent Changes */
 .mw-rcfilters-ui-changesListWrapperWidget {
-	right: 50px;
+	right: 3.125rem; // 50px
 }
 
 .mw-rcfilters-ui-changesListWrapperWidget h4 {
-	padding-left: 50px;
+	padding-left: 3.125rem; // 50px
 }
 
 .mw-rcfilters-ui-changesListWrapperWidget-previousChangesIndicator {
-	margin-left: 50px;
+	margin-left: 3.125rem; // 50px
 }
 
 .cosm-inf-setname {
@@ -707,19 +711,17 @@ div.gameplay_nav ul li ul li {
 
 /* Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]] */
 .updatetablehead {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
-	border-top: 1px solid #aaaaaa;
-	border-right: 1px solid #aaaaaa;
-	border-left: 1px solid #aaaaaa;
+	border-top: 0.0625rem solid #aaaaaa;
+	border-right: 0.0625rem solid #aaaaaa;
+	border-left: 0.0625rem solid #aaaaaa;
 	text-align: center;
 	font-weight: bold;
 }
 
 .updatetablebody {
 	overflow-x: auto;
-	border: 1px solid #aaaaaa;
+	border: 0.0625rem solid #aaaaaa;
 	border-top: 0;
 }
 
@@ -729,54 +731,50 @@ div.gameplay_nav ul li ul li {
 .updatetablebody #patch,
 .updatetablebody #version {
 	-webkit-box-flex: 0;
-	-ms-flex: 0 0 120px;
-	flex: 0 0 120px;
+	-ms-flex: 0 0 7.5rem;
+	flex: 0 0 7.5rem;
 	text-align: center;
 	font-weight: bold;
 }
 
 .updatetablebody #date {
-	max-width: 100px;
+	max-width: 6.25rem; // 100px
 	text-align: center;
-	font-size: 85%;
+	font-size: 85%; // convert to rem
 }
 
 .updatetablehead #description,
 .updatetablebody #description {
-	-webkit-box-flex: 1;
-	-ms-flex: 1 1 auto;
 	flex: 1 1 auto;
 }
 
 .updatetablebody #description {
-	padding: 4px 0;
+	padding: 0.25rem 0;
 }
 
 .updatetablebody #entry {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
 	-webkit-box-align: center;
 	-ms-flex-align: center;
 	align-items: center;
-	border-top: 1px solid #aaaaaa;
+	border-top: 0.0625rem solid #aaaaaa;
 }
 
 .updatetablebody ul {
-	margin: 0 0 0 1.6em;
+	margin: 0 0 0 1.6em; // convert to rem
 }
 
 /* Template:GameVersionTableElement */
 .gvt-el-significant {
-	background: #ffffcc !important;
+	background: #ffffcc !important; // is important necessary?
 }
 
 /* Template:Talent table el */
 .tte-right-tal-slot {
-	height: 40px;
+	height: 2.5rem; // 40px
 	padding: 0;
-	border-bottom: solid 2px #000000;
-	background: #eff5ff !important;
+	border-bottom: solid 0.125rem #000000;
+	background: #eff5ff !important; // is important necessary?
 }
 
 /* Item Grid Styling on [[Item Grid]] */
@@ -787,46 +785,35 @@ ul.shopnav {
 }
 
 ul.shopnav li {
-	margin: 4px;
-	-webkit-box-shadow: 0 0 1px 2px #008000;
-	box-shadow: 0 0 1px 2px #008000;
+	margin: 0.25rem;
+	box-shadow: 0 0 0.0625rem 0.125rem #008000;
 }
 
 /* Item List Styling on [[Items]] */
 
 div.itemlist {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
-	-ms-flex-wrap: wrap;
 	flex-wrap: wrap;
 	font-weight: 500;
 }
 
 div.itemlist > div {
-	-ms-flex-preferred-size: 400px;
-	flex-basis: 400px;
-	padding: 3px 0;
+	flex-basis: 25rem; // 400px;
+	padding: 0.1875rem 0;
 }
 
 /* Hero Infostrip */
 
 div.infostripe {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
 	overflow: hidden;
-	-webkit-box-align: stretch;
-	-ms-flex-align: stretch;
 	align-items: stretch;
-	-webkit-box-pack: center;
-	-ms-flex-pack: center;
 	justify-content: center;
 	color: #ffffff;
 	vertical-align: top;
 	text-align: center;
-	text-shadow: 0 0 5px #000000;
-	font-size: 20px;
+	text-shadow: 0 0 0.3125rem #000000;
+	font-size: 1.25rem;
 }
 
 div.infostripe a,
@@ -857,10 +844,10 @@ div.infostripe a:active {
 }
 
 div.infostripe div {
-	margin: 0 -2px;
-	padding: 15px 25px 10px;
-	border-right: 4px solid rgba( 75, 75, 75, 0.5 );
-	border-left: 4px solid rgba( 75, 75, 75, 0.5 );
+	margin: 0 -0.125rem;
+	padding: 0.9375rem 1.5625rem 0.625rem;
+	border-right: 0.25rem solid rgba( 75, 75, 75, 0.5 );
+	border-left: 0.25rem solid rgba( 75, 75, 75, 0.5 );
 }
 
 /* Hero entry - used in hero tables and cosmetic infoboxes */
@@ -869,18 +856,16 @@ div.heroentry {
 	position: relative;
 	display: inline-block;
 	overflow: hidden;
-	margin: 1px;
-	width: 110px;
-	height: 62px;
-}
+	margin: 0.0625rem;
+	width: 6.875rem; // 110px
+	height: 3.875rem; // 62px
 
-div.heroentry div {
-	position: absolute;
+	div {
+		position: absolute;
+	}
 }
 
 div.heroentrytext {
-	display: -webkit-box;
-	display: -ms-flexbox;
 	display: flex;
 	-webkit-box-align: end;
 	-ms-flex-align: end;
@@ -888,12 +873,12 @@ div.heroentrytext {
 	-webkit-box-pack: center;
 	-ms-flex-pack: center;
 	justify-content: center;
-	margin: 1px 2px;
+	margin: 0.0625rem 0.125rem;
 	width: 106px;
 	height: 60px;
 	color: #ffffff;
 	text-align: center;
-	text-shadow: -1px 0 0.2em #000000, 0 1px 0.2em #000000, 1px 0 0.2em #000000, 0 -1px 0.2em #000000;
+	text-shadow: -0.0625rem 0 0.2em #000000, 0 0.0625rem 0.2em #000000, 0.0625rem 0 0.2em #000000, 0 -0.0625rem 0.2em #000000;
 	font-size: 11px;
 	line-height: 15px;
 	pointer-events: none;
@@ -906,7 +891,7 @@ div.heroentrytext {
 	margin: 0.5em 0;
 	width: 100%;
 	/* Body background color	*/
-	border: 1px solid #b44335;
+	border: 0.0625rem solid #b44335;
 	background: #fefeff;
 }
 
@@ -914,7 +899,7 @@ div.heroentrytext {
 	padding: 0.5em 0;
 	/* Header background color */
 	border: 0;
-	border-bottom: 1px solid #b44335;
+	border-bottom: 0.0625rem solid #b44335;
 	background: #b44335;
 	color: #ffffff;
 	font-size: 140%;
@@ -942,7 +927,7 @@ div.heroentrytext {
 	margin: -0.5em -0.5em 0;
 	padding: 0.5em 0.75em 0.5em  0.5em;
 	border: 0;
-	border-bottom: 1px solid #b44335;
+	border-bottom: 0.0625rem solid #b44335;
 	color: #ffffff;
 	/* Main border color		*/
 	text-align: left;
@@ -1006,7 +991,7 @@ div.heroentrytext {
 #mp-layout .mp-block {
 	margin-bottom: 1em;
 	padding: 1em;
-	border: solid 1px #660000;
+	border: solid 0.0625rem #660000;
 }
 
 #mp-layout .mp-block#battle-pass {
@@ -1018,7 +1003,7 @@ div.heroentrytext {
 
 #mp-layout .mp-heading {
 	height: 50px;
-	border-bottom: solid 1px #cccccc;
+	border-bottom: solid 0.0625rem #cccccc;
 	text-align: center;
 	font-weight: bold;
 	font-size: 170%;
@@ -1078,14 +1063,14 @@ table.quotation {
 
 .cosmetic-label {
 	display: inline-block;
-	margin: 7px 5px 0;
+	margin: 0.4375rem 0.3125rem 0;
 	vertical-align: top;
 	text-align: center;
 	line-height: normal;
 }
 
 .cosmetic-label > div {
-	margin-bottom: 5px;
+	margin-bottom: 0.3125rem;
 }
 
 /* Skill list styles [[Template:SkillListRich]] */
@@ -1095,7 +1080,7 @@ div.skilllist {
 }
 
 div.skilllist-title {
-	border: 1px solid #aaaaaa;
+	border: 0.0625rem solid #aaaaaa;
 	background-color: #ffaea3;
 	color: #000000;
 	text-align: center;
@@ -1119,8 +1104,8 @@ li.skilllist-lite {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 0;
-	padding: 3px;
-	border: 1px solid #aaaaaa;
+	padding: 0.1875rem;
+	border: 0.0625rem solid #aaaaaa;
 	color: #ffffff;
 	list-style: none;
 	vertical-align: top;
@@ -1135,16 +1120,16 @@ li.skilllist-rich {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 0;
-	padding: 3px;
-	border: 1px solid #aaaaaa;
+	padding: 0.1875rem;
+	border: 0.0625rem solid #aaaaaa;
 	list-style: none;
 	vertical-align: top;
 	text-align: left;
 }
 
 div.skilllist-rich-head {
-	padding: 3px 5px;
-	border-bottom: 1px solid #000000;
+	padding: 0.1875rem 0.3125rem;
+	border-bottom: 0.0625rem solid #000000;
 	color: #ffffff;
 	text-decoration: none;
 	font-weight: bold;
@@ -1159,7 +1144,7 @@ div.skilllist-rich-image {
 
 div.skilllist-rich-desc {
 	display: inline-block;
-	padding: 3px 5px;
+	padding: 0.1875rem 0.3125rem;
 	max-width: calc( ~"100% - 74px" );
 	vertical-align: top;
 }
@@ -1237,11 +1222,11 @@ div.skilllist-col5 ul li {
 }
 
 #context-menu {
-	border: solid 1px #cccccc;
+	border: solid 0.0625rem #cccccc;
 }
 
 #context-menu li {
-	border-bottom: solid 1px #cccccc;
+	border-bottom: solid 0.0625rem #cccccc;
 
 	&:last-child {
 		border: 0;
@@ -1250,7 +1235,7 @@ div.skilllist-col5 ul li {
 
 #context-menu li a {
 	display: block;
-	padding: 2px 5px;
+	padding: 0.125rem 0.3125rem;
 	text-decoration: none;
 	color: #000000;
 	font-family: sans-serif;
@@ -1280,8 +1265,8 @@ div.skilllist-col5 ul li {
 	display: inline-block;
 	vertical-align: top;
 	background-color: #151515;
-	box-shadow: 1px 1px 1.5px #000000;
-	border-width: 1px;
+	box-shadow: 0.0625rem 0.0625rem 1.5px #000000;
+	border-width: 0.0625rem;
 	border-radius: 50%;
 	padding: 0 0;
 	margin: 0 0;
@@ -1368,8 +1353,8 @@ div.skilllist-col5 ul li {
 */
 .relics {
 	width: 140px;
-	margin: 5px;
-	border: 1px solid #111111;
+	margin: 0.3125rem;
+	border: 0.0625rem solid #111111;
 	font-size: 80%;
 }
 
@@ -1475,7 +1460,7 @@ img.pixelart {
 /* Highlight the primary attribute icon */
 #primaryAttribute img,
 .primaryAttribute img {
-	border: 2px solid #ffffff;
+	border: 0.125rem solid #ffffff;
 	border-radius: 50%;
 }
 
@@ -1484,7 +1469,7 @@ img.pixelart {
 */
 
 .buynow_wrapper {
-	height: 24px;
+	height: 1.5rem; // 24px
 }
 
 .buynow_wrapper > a {
@@ -1496,13 +1481,13 @@ img.pixelart {
 .buynow_button {
 	display: block;
 	padding-left: 30px;
-	height: 24px;
+	height: 1.5rem; // 24px
 	background: linear-gradient( 0deg, #000000 0%, #666666 100% );
 	color: #ffffff;
 	text-align: left;
 	text-decoration: none;
 	font-size: 90%;
-	line-height: 24px;
+	line-height: 1.5rem; // 24px
 
 	&:hover {
 		background: linear-gradient( 0deg, #000000 0%, #999999 100% );
@@ -1512,8 +1497,8 @@ img.pixelart {
 .buynow_store:before {
 	position: absolute;
 	margin-left: -31px;
-	width: 24px;
-	height: 24px;
+	width: 1.5rem; // 24px
+	height: 1.5rem; // 24px
 	// TODO: Steam icon
 	content: "";
 	pointer-events: none;
@@ -1522,8 +1507,8 @@ img.pixelart {
 .buynow_market:before {
 	position: absolute;
 	margin-left: -31px;
-	width: 24px;
-	height: 24px;
+	width: 1.5rem; // 24px
+	height: 1.5rem; // 24px
 	// TODO: Steam icon
 	content: "";
 	pointer-events: none;
@@ -1534,12 +1519,12 @@ img.pixelart {
 */
 
 html.theme--dark .patch-layout {
-	border: 1px solid #555555;
+	border: 0.0625rem solid #555555;
 }
 
 .patch-layout {
 	width: 100%;
-	border: 1px solid #aaaaaa;
+	border: 0.0625rem solid #aaaaaa;
 	border-collapse: unset;
 	text-align: center;
 }
@@ -1563,12 +1548,12 @@ html.theme--dark .patch-layout-all {
 
 html.theme--dark .patch-layout-background {
 	background-color: rgba( 41, 41, 41, 0.7 );
-	border: 1px solid #555555;
+	border: 0.0625rem solid #555555;
 }
 
 .patch-layout-background {
 	background-color: #fdfaf8;
-	border: 1px solid #aaaaaa;
+	border: 0.0625rem solid #aaaaaa;
 	margin: 0.75em 0;
 	padding: 0.75em 1em;
 	padding-bottom: 1em;
