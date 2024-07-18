@@ -90,7 +90,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Signature Agent' .. (#icons > 1 and 's' or ''), content = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
-		table.insert(widgets, Cell{name = 'Years Active (Player)', content = {args.years_active}})
+		Array.appendWith(widgets,
+			Cell{name = 'Years Active (Player)', content = {args.years_active}},
+			Cell{name = 'Years Active (' .. Abbreviation.make('Org', 'Organisation") .. ')', content = {args.years_active_org}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
+		)
 		table.insert(widgets, Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}})
 		table.insert(widgets, Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}})
 		table.insert(widgets, Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}})
