@@ -97,12 +97,12 @@ function CustomInjector:parse(id, widgets)
 				}
 			},
 			Cell{
-				name = 
+				name =
 					args.buildtime and args.charge_time and 'Built' .. SEP .. 'Recharge Time' or
 					args.charge_time and 'Recharge Time' or
-					'Built Time',					
+					'Built Time',
 				content = {
-					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or 
+					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or
 					args.charge_time and args.charge_time .. 's' or
 					args.buildtime and args.buildtime .. 's' or nil
 				}
