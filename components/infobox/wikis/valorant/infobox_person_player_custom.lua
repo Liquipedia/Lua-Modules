@@ -95,9 +95,9 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Years Active (' .. Abbreviation.make('Org', 'Organisation') .. ')', content = {args.years_active_org}},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
-		Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}},
-		Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-		Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
+			Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}},
+			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
 	)
 
 	elseif id == 'role' then
