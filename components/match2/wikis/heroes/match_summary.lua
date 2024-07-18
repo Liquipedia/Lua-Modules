@@ -375,7 +375,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	-- Add Comment
 	if Logic.isNotEmpty(game.length) then
-		local lengthComment = '<small>Match Duration: '.. game.length ..'</small>'
+		local lengthComment = '<small>Match Duration: ' .. game.length .. '</small>'
 		game.comment = game.comment and (lengthComment .. '<br>' .. game.comment) or lengthComment
 	end
 	if not Logic.isEmpty(game.comment) then
