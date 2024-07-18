@@ -84,7 +84,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'requirements' then
 		return {
 			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedStringWithBreaks(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = 
+			Cell{name = 'Building Requirements', content =
 					caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
