@@ -49,21 +49,21 @@ function Attack.run(argsJson, attackIndex, faction)
 		Title{name = 'Attack' .. attackIndex .. ': ' .. args.name},
 		Cell{name = 'Target', content = {Attack._displayCommaSeparatedString(args.target)}},
 		Cell{
-			name = 'Damage', 
+			name = 'Damage',
 			content = {
-				data.damagePercentage and data.damagePercentage .. '%' or 
-				data.bonus and data.bonusDamage and data.damage .. ' (+' .. data.bonusDamage .. 
-				' vs ' .. Attack._displayCommaSeparatedString(args.bonus) .. ')'  or 
+				data.damagePercentage and data.damagePercentage .. '%' or
+				data.bonus and data.bonusDamage and data.damage .. ' (+' .. data.bonusDamage ..
+				' vs ' .. Attack._displayCommaSeparatedString(args.bonus) .. ')'  or
 				data.damage
 			}
 		},
 		Cell{name = 'Effect', content = {Attack._displayCommaSeparatedString(args.effect)}},
 		Cell{name = 'Attack Speed', content = {data.speed}},
 		Cell{
-			name = 'DPS', 
+			name = 'DPS',
 			content = {
-				data.bonus and data.bonusDps and data.dps and 
-				data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayCommaSeparatedString(args.bonus) .. ')' or 
+				data.bonus and data.bonusDps and data.dps and
+				data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayCommaSeparatedString(args.bonus) .. ')' or
 				data.dps
 			}
 		},
@@ -75,7 +75,7 @@ end
 ---@return StormgateAttackData
 function Attack._parse(args)
 	return {
-		targets = Array.map(args.target and mw.text.split(args.target or '', ','), 
+		targets = Array.map(args.target and mw.text.split(args.target or '', ','),
 			function(target)
 				return mw.getContentLanguage():ucfirst(String.trim(target):lower())
 			end
@@ -113,11 +113,11 @@ end
 
 ---@param inputString string?
 ---@return string[]
-function Attack._displayCommaSeparatedString(inputString)	
-	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString), 
+function Attack._displayCommaSeparatedString(inputString)
+	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
 		function(value)
 			return Page.makeInternalLink(value)
-		end	
+		end
 	), ', ')
 end
 
