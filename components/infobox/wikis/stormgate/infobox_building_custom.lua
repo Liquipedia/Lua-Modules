@@ -53,7 +53,6 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
-	local SEP = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 	if id == 'custom' then
 		Array.appendWith(
