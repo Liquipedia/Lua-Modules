@@ -482,8 +482,10 @@ end
 ---@param args table
 ---@param links table
 function League:_setLpdbData(args, links)
+	---@param name string
+	---@return string
 	local function pageifyLink(name)
-		return name:gsub(' ', '_')
+		return (name:gsub(' ', '_'))
 	end
 
 	local lpdbData = {
