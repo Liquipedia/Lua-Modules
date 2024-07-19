@@ -482,6 +482,10 @@ end
 ---@param args table
 ---@param links table
 function League:_setLpdbData(args, links)
+	local function pageifyLink(name)
+		return name:gsub(' ', '_')
+	end
+
 	local lpdbData = {
 		name = self.name,
 		tickername = self.data.tickerName,
@@ -491,7 +495,11 @@ function League:_setLpdbData(args, links)
 		icon = self.data.icon,
 		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
+		seriespage = pageifyLink(mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or '')),
+		serieses = {
+			pageifyLink(mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or '')),
+			pageifyLink(mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2 or '')),
+		},
 		previous = self:_getPageNameFromChronology(args.previous),
 		previous2 = self:_getPageNameFromChronology(args.previous2),
 		next = self:_getPageNameFromChronology(args.next),
