@@ -311,10 +311,6 @@ end
 ---@param key string
 ---@return Html?
 function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
-	local charactersDiv = mw.html.create('div')
-		:addClass(self:getSideClass(game.extradata, opponentIndex))
-		:css('display', 'flex')
-
 	local makeIcon = function(character)
 		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
 	end
@@ -322,7 +318,8 @@ function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local icons = Array.map(game[key][opponentIndex] or {}, makeIcon)
 
 	return mw.html.create('td')
-		:node(#icons > 0 and charactersDiv:node(table.concat(icons, '')) or nil)
+		:addClass(self:getSideClass(game.extradata, opponentIndex))
+		:node(#icons > 0 and table.concat(icons, '') or nil)
 end
 
 ---@param match GameTableMatch

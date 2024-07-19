@@ -65,6 +65,8 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field queryHistoricalAliases boolean
 ---@field showType boolean
 ---@field showYearHeaders boolean
+---@field useTickerName boolean
+---@field teamStyle teamStyle
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -73,6 +75,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field liquipediatier string?
 ---@field liquipediatiertype string?
 ---@field displayName string
+---@field tickerName string?
 ---@field icon string?
 ---@field iconDark string?
 ---@field pageName string
@@ -149,6 +152,8 @@ function MatchTable:_readDefaultConfig()
 		showOnlyGameStats = Logic.nilOr(Logic.readBool(args.showOnlyGameStats), false),
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
+		useTickerName = Logic.readBool(args.useTickerName),
+		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short'
 	}
 end
 
@@ -283,7 +288,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, vod, winner, walkover, resulttype, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, resulttype, extradata',
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -396,6 +401,7 @@ function MatchTable:matchFromRecord(record)
 		liquipediatier = record.liquipediatier,
 		liquipediatiertype = record.liquipediatiertype,
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
+		tickerName = String.nilIfEmpty(record.tickername),
 		icon = String.nilIfEmpty(record.icon),
 		iconDark = String.nilIfEmpty(record.icondark),
 		pageName = record.pagename,
@@ -695,9 +701,10 @@ end
 ---@param match MatchTableMatch
 ---@return Html
 function MatchTable:_displayTournament(match)
+	local displayName = (self.config.useTickerName and match.tickerName) or match.displayName
 	return mw.html.create('td')
 		:css('text-align', 'left')
-		:wikitext(Page.makeInternalLink(match.displayName, match.pageName))
+		:wikitext(Page.makeInternalLink(displayName, match.pageName))
 end
 
 ---@param match MatchTableMatch
@@ -737,7 +744,7 @@ function MatchTable:_displayOpponent(opponentRecord, flipped)
 			opponent = opponent,
 			flip = flipped,
 			overflow = 'wrap',
-			teamStyle = 'short',
+			teamStyle = self.config.teamStyle,
 		})
 		:attr('data-sort-value', opponent.name)
 end
@@ -817,13 +824,21 @@ function MatchTable:displayStats()
 		return table.concat(parts, ' ')
 	end
 
-	local startDate = DateExt.formatTimestamp('M d, Y', startTimeStamp)
-	local endDate = DateExt.formatTimestamp('M d, Y', endTimeStamp)
-	local titleText = 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
+	local makeStatsTitle = function()
+		if startTimeStamp == DateExt.defaultTimestamp and endTimeStamp == DateExt.defaultTimestamp then
+			return 'For all matches:'
+		elseif startTimeStamp == DateExt.defaultTimestamp then
+			return 'For all matches before '.. DateExt.formatTimestamp('M d, Y', endTimeStamp) .. ':'
+		end
+
+		local startDate = DateExt.formatTimestamp('M d, Y', startTimeStamp)
+		local endDate = DateExt.formatTimestamp('M d, Y', endTimeStamp)
+		return 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
+	end
 
 	local titleNode = mw.html.create('div')
 		:css('font-weight', 'bold')
-		:wikitext(titleText)
+		:wikitext(makeStatsTitle())
 
 	local stats = Array.append({},
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.matches, 'matches'),
