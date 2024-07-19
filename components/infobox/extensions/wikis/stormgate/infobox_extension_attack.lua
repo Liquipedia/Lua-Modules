@@ -59,17 +59,26 @@ end
 ---@param data table?
 ---@return string
 function Attack._displayDamage(data)
-	return data.damagePercentage and data.damagePercentage .. '%' or
-		data.bonus and data.bonusDamage and data.damage .. ' (+' .. data.bonusDamage ..
-		' vs ' .. Attack._displayCommaSeparatedString(data.bonus) .. ')'  or data.damage
+	if data.damagePercentage then
+		return (data.damagePercentage .. '%')
+	elseif not data.damage then
+		return
+	elseif Logic.isEmpty(data.bonus) or not data.bonusDamage then
+		return data.damage
+	end
+
+	return data.damage .. ' (+' .. data.bonusDamage .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
 end
 
 ---@param data table?
 ---@return string
 function Attack._displayDPS(data)
-	return data.bonus and data.bonusDps and data.dps and
-		data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayCommaSeparatedString(data.bonus) .. ')' or
-		data.dps
+	if not data.dps then
+		return
+	elseif Logic.isEmpty(data.bonus) or not data.bonusDps then
+		return data.dps
+	end
+	return data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
 end
 
 ---@param args table
