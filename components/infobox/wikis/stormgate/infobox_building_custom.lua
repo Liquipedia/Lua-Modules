@@ -202,16 +202,18 @@ end
 
 ---@return string?
 function CustomBuilding:_getDefenseDisplay()
-	if not Logic.isNumeric(self.args.health) then return end
-	local health = table.concat({
-		ICON_HP .. ' ' .. self.args.health,
-		Logic.isNumeric(self.args.extra_health) and ('(+' .. self.args.extra_health .. ')') or nil,
-	}, '&nbsp;')
+	local args = self.args
+	local health = tonumber(args.health)
+	local extraHealth = health and tonumber(args.extra_health)
+	local armor = tonumber(args.armor)
 
-	return table.concat({
+	return table.concat(Array.append({},
+		health and ICON_HP or nil,
 		health,
-		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
-	}, '&nbsp;')
+		extraHealth and ('(+' .. extraHealth .. ')') or nil,
+		armor and ICON_ARMOR or nil,
+		armor
+	), '&nbsp;')
 end
 
 ---@param inputString string?
