@@ -121,7 +121,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'attack' then return {}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Defense', content = {caller:_getHealthDisplay()}},
+			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
 			Cell{name = 'Attributes', content = {caller:_displayCommaSeparatedString(args.armor_type)}}
 		}
 	elseif id == 'custom' then
@@ -141,17 +141,19 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@return string?
-function CustomUnit:_getHealthDisplay()
-	if not Logic.isNumeric(self.args.health) then return end
-	local health = table.concat({
-		ICON_HP .. ' ' .. self.args.health,
-		Logic.isNumeric(self.args.extra_health) and ('(+' .. self.args.extra_health .. ')') or nil,
-	}, '&nbsp;')
+function CustomUnit:_getDefenseDisplay()
+	local args = self.args
+	local health = tonumber(args.health)
+	local extraHealth = health and tonumber(args.extra_health)
+	local armor = tonumber(args.armor)
 
-	return table.concat({
+	return table.concat(Array.append({},
+		health and ICON_HP or nil,
 		health,
-		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
-	}, '&nbsp;')
+		extraHealth and ('(+' .. extraHealth .. ')') or nil,
+		armor and ICON_ARMOR or nil,
+		armor
+	), '&nbsp;')
 end
 
 ---@param args table
