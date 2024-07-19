@@ -34,6 +34,7 @@ local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
+local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 ---@param frame Frame
 ---@return Html
@@ -60,7 +61,6 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
-	local SEP = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 	if id == 'type' then
 		return {
@@ -98,27 +98,25 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name =
-					args.buildtime and args.charge_time and 'Built' .. SEP .. 'Recharge Time' or
+					args.buildtime and args.charge_time and 'Built' .. HOTKEY_SEPERATOR .. 'Recharge Time' or
 					args.charge_time and 'Recharge Time' or
 					'Built Time',
 				content = {
-					args.buildtime and args.charge_time and args.buildtime .. 's' .. SEP .. args.charge_time .. 's' or
+					args.buildtime and args.charge_time and args.buildtime .. 's' .. HOTKEY_SEPERATOR .. args.charge_time .. 's' or
 					args.charge_time and args.charge_time .. 's' or
 					args.buildtime and args.buildtime .. 's' or nil
 				}
 			},
 		}
 	elseif id == 'hotkey' then
-		return {
-			Cell{
-				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys',
-				content = {
-					args.hotkey and args.macro_key and
-						CustomUnit._hotkeys(args.hotkey, args.hotkey2) .. SEP .. CustomUnit._hotkeys(args.macro_key, args.macro_key2) or
-					args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2) or nil
-				}
-			},
-		}
+		local hotkeyName = table.concat(Array.append({},
+			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+		), HOTKEY_SEPERATOR)
+		local hotkeys = table.concat(Array.append({},
+			args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2),
+			args.macro_key and CustomUnit._hotkeys(args.macro_key, args.macro_key2)
+		), HOTKEY_SEPERATOR)
+		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'attack' then return {}
 	elseif id == 'defense' then
 		return {
