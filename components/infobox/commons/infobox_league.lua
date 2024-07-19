@@ -496,7 +496,7 @@ function League:_setLpdbData(args, links)
 		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
 		seriespage = pageifyLink(mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or '')),
-		serieses = {
+		serieslist = {
 			pageifyLink(mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or '')),
 			pageifyLink(mw.ext.TeamLiquidIntegration.resolve_redirect(args.series2 or '')),
 		},
