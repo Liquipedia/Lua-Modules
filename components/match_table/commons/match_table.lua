@@ -828,12 +828,12 @@ function MatchTable:displayStats()
 		if startTimeStamp == DateExt.defaultTimestamp and endTimeStamp == DateExt.defaultTimestamp then
 			return 'For all matches:'
 		elseif startTimeStamp == DateExt.defaultTimestamp then
-			return 'For all matches until '.. DateExt.formatTimestamp('M d, Y', endTimeStamp) .. ':'
+			return 'For all matches before '.. DateExt.formatTimestamp('M d, Y', endTimeStamp) .. ':'
 		end
 
 		local startDate = DateExt.formatTimestamp('M d, Y', startTimeStamp)
 		local endDate = DateExt.formatTimestamp('M d, Y', endTimeStamp)
-		return'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
+		return 'For matches between ' .. startDate .. ' and ' .. endDate .. ':'
 	end
 
 	local titleNode = mw.html.create('div')
