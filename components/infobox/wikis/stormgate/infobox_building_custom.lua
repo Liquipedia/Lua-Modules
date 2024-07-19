@@ -34,6 +34,7 @@ local CustomInjector = Class.new(Injector)
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
+local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 ---@param frame Frame
 ---@return Html
@@ -88,18 +89,14 @@ function CustomInjector:parse(id, widgets)
 					caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
-		return {
-			Cell{
-				name = args.hotkey and args.macro_key and 'Hotkeys' .. SEP .. 'Macrokeys' or 'Hotkeys',
-				content = {
-					args.hotkey and args.macro_key and
-						CustomBuilding._hotkeys(args.hotkey, args.hotkey2) .. SEP ..
-						CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or
-					args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2) or
-					args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2) or nil
-				}
-			},
-		}
+		local hotkeyName = table.concat(Array.append({},
+			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+		), HOTKEY_SEPERATOR)
+		local hotkeys = table.concat(Array.append({},
+			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
+			args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2)
+		), HOTKEY_SEPERATOR)
+		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
 			Cell{name = 'Builds', content = caller:_displayCommaSeparatedStringWithBreaks(args.builds)},
