@@ -88,6 +88,7 @@ function CustomInjector:parse(id, widgets)
 					caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
+		if not args.hotkey and not args.macro_key then return {} end
 		local hotkeyName = table.concat(Array.append({},
 			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
 		), HOTKEY_SEPERATOR)
