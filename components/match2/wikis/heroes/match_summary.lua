@@ -83,7 +83,7 @@ function ChampionBan:banRow(banData, gameNumber, date)
 			:node(mw.html.create('div')
 				:wikitext(Abbreviation.make(
 							'Game ' .. gameNumber,
-							(self.isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
+							'Bans in game ' .. gameNumber
 						)
 					)
 				)
