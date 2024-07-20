@@ -329,7 +329,9 @@ function mapFunctions.getExtraData(map)
 	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
 		map.extradata['t' .. opponentIndex .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function (banIndex)
 			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
-			return getCharacterName(ban) or ''
+			if ban~=nil and CharacterNames[ban:lower()]~=nil then
+				return getCharacterName(ban) or ''
+			return ''
 		end)
 	end)
 	return map
