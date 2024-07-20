@@ -331,6 +331,7 @@ function mapFunctions.getExtraData(map)
 			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
 			if ban~=nil and CharacterNames[ban:lower()]~=nil then
 				return getCharacterName(ban) or ''
+			mw.ext.TeamLiquidIntegration.add_category('Pages with Invalid Character Input')
 			return ''
 		end)
 	end)
