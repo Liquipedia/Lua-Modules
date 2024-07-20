@@ -23,6 +23,9 @@ local TLNET_STREAM = 'stream'
 
 --List of streaming platforms supported in Module:Countdown.
 StreamLinks.countdownPlatformNames = {
+	'twitch',
+	'youtube',
+	'kick',
 	'afreeca',
 	'bilibili',
 	'cc',
@@ -31,15 +34,12 @@ StreamLinks.countdownPlatformNames = {
 	'facebook',
 	'huomao',
 	'huya',
-	'kick',
 	'loco',
 	'mildom',
 	'nimo',
-	TLNET_STREAM,
 	'tl',
 	'trovo',
-	'twitch',
-	'youtube',
+	TLNET_STREAM,
 }
 
 ---@param key string
