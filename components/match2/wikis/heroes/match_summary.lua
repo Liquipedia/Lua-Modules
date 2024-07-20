@@ -373,17 +373,18 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], NUM_CHAMPIONS_PICK, date, true))
 
-	-- Add Comment
-	if Logic.isNotEmpty(game.length) then
-		local lengthComment = '<small>Match Duration: ' .. game.length .. '</small>'
-		game.comment = game.comment and (lengthComment .. '<br>' .. game.comment) or lengthComment
-	end
-	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
-		local comment = mw.html.create('div')
-		comment :wikitext(game.comment)
+	if Logic.isNotEmpty(game.comment) or Logic.isNotEmpty(game.length) then
+		game.length = Logic.nilIfEmpty(game.length)
+		local commentContents = Array.append({},
+			Logic.nilIfEmpty(game.comment),
+			game.length and tostring(mw.html.create('span'):wikitext('Match Duration: ' .. game.length)) or nil
+		)
+		row
+			:addElement(MatchSummary.Break():create())
+			:addElement(mw.html.create('div')
 				:css('margin', 'auto')
-		row:addElement(comment)
+				:wikitext(table.concat(commentContents, '<br>'))
+			)
 	end
 
 	return row
