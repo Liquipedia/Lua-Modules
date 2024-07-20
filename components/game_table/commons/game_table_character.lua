@@ -309,7 +309,7 @@ end
 ---@param game CharacterGameTableGame
 ---@param opponentIndex number
 ---@param key string
----@return Html?
+---@return Html
 function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
 	local makeIcon = function(character)
 		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
