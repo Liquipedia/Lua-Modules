@@ -45,13 +45,11 @@ local VETO_TYPE_TO_TEXT = {
 -- Champion Ban Class
 ---@class HeroesOfTheStormHeroBan: MatchSummaryRowInterface
 ---@operator call: HeroesOfTheStormHeroBan
----@field isBan boolean
 ---@field root Html
 ---@field table Html
 local ChampionBan = Class.new(
 	function(self, options)
 		options = options or {}
-		self.isBan = options.isBan
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
@@ -292,7 +290,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Champion Bans
 	if not Table.isEmpty(championBanData) then
-		local championBan = ChampionBan({isBan = true})
+		local championBan = ChampionBan()
 
 		Array.forEach(match.games,function (_, gameIndex)
 			championBan:banRow(championBanData[gameIndex], gameIndex, match.date)
