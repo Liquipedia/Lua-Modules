@@ -86,10 +86,6 @@ end
 function Attack._parse(args)
 	return {
 		targets = Array.map(Array.map(Array.parseCommaSeparatedString(args.target), string.lower), String.upperCaseFirst),
-			function(target)
-				return mw.getContentLanguage():ucfirst(String.trim(target):lower())
-			end
-		),
 		damage = tonumber(args.damage),
 		damagePercentage = tonumber(args.damage_percentage),
 		effect = Array.parseCommaSeparatedString(args.effect),
