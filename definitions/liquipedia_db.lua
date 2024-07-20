@@ -221,7 +221,7 @@ local lpdb = {}
 ---@field title string
 ---@field tournament string
 ---@field section string
----@field type 'league'|'swiss'
+---@field type 'league'|'swiss'|'double-elim'
 ---@field matches string[]
 ---@field config {hasdraw: string, hasovertime: string, haspoints: string}
 
