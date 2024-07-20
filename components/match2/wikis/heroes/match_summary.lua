@@ -70,13 +70,15 @@ end
 
 ---@param banData {numberOfBans: integer, [1]: table, [2]: table}
 ---@param gameNumber integer
----@param numberOfBans integer
 ---@param date string
 ---@return HeroesOfTheStormHeroBan
-function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
+function ChampionBan:banRow(banData, gameNumber, date)
+	if Logic.isEmpty(banData) then
+		return self
+	end
 	self.table:tag('tr')
 		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
+			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], banData.numberOfBans, date, false, true))
 		:tag('td')
 			:node(mw.html.create('div')
 				:wikitext(Abbreviation.make(
@@ -86,7 +88,7 @@ function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
 					)
 				)
 		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, date, true, true))
+			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], banData.numberOfBans, date, true, true))
 	return self
 end
 
@@ -292,12 +294,9 @@ function CustomMatchSummary.createBody(match)
 	if not Table.isEmpty(championBanData) then
 		local championBan = ChampionBan({isBan = true})
 
-		for gameIndex in ipairs(match.games) do
-			local banData = championBanData[gameIndex]
-			if banData then
-				championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
-			end
-		end
+		Array.forEach(match.games,function (_, gameIndex)
+			championBan:banRow(championBanData[gameIndex], gameIndex, match.date)
+		end)
 
 		body:addRow(championBan)
 	end
