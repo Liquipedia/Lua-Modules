@@ -48,8 +48,7 @@ local VETO_TYPE_TO_TEXT = {
 ---@field root Html
 ---@field table Html
 local ChampionBan = Class.new(
-	function(self, options)
-		options = options or {}
+	function(self)
 		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
 		self.table = self.root:tag('table')
 			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
