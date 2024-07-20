@@ -60,7 +60,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', content = {args.size}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedStringWithBreaks(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)}
 		)
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
@@ -83,9 +83,9 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedStringWithBreaks(args.tech_requirement)},
+			Cell{name = 'Tech. Requirements', content = caller:_csvToPageList(args.tech_requirement)},
 			Cell{name = 'Building Requirements', content =
-					caller:_displayCommaSeparatedStringWithBreaks(args.building_requirement)},
+					caller:_csvToPageList(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
@@ -99,17 +99,17 @@ function CustomInjector:parse(id, widgets)
 		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_displayCommaSeparatedStringWithBreaks(args.builds)},
+			Cell{name = 'Builds', content = caller:_csvToPageList(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_displayCommaSeparatedStringWithBreaks(args.unlocks)},
+			Cell{name = 'Unlocks', content = caller:_csvToPageList(args.unlocks)},
 			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply)},
 		}
 	elseif id == 'defense' then
 		return {
 			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
-			Cell{name = 'Attributes', content = {caller:_displayCommaSeparatedString(args.armor_type)}}
+			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -217,21 +217,17 @@ function CustomBuilding:_getDefenseDisplay()
 end
 
 ---@param inputString string?
----@return string
-function CustomBuilding:_displayCommaSeparatedString(inputString)
-	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
-		function(value)
-			return Page.makeInternalLink(value)
-		end
-	), ', ')
+---@return string[]
+function CustomBuilding:_csvToPageList(inputString)
+	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+		return Page.makeInternalLink(value)
+	end)
 end
 
----@param inputString string?
----@return string[]
-function CustomBuilding:_displayCommaSeparatedStringWithBreaks(inputString)
-	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
-		return Page.makeInternalLink({}, value)
-	end)
+---@param input string[]
+---@return string
+function CustomBuilding:_displayCsvAsPageCsv(input)
+	return table.concat(self:_csvToPageList(input), ', ')
 end
 
 return CustomBuilding
