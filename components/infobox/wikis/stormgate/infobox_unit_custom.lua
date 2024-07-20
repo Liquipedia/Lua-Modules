@@ -132,6 +132,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Upgrades To', content = {caller:_displayCommaSeparatedString(args.upgrades_to)}},
 			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
+		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
