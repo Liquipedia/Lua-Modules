@@ -85,7 +85,7 @@ end
 ---@return StormgateAttackData
 function Attack._parse(args)
 	return {
-		targets = Array.map(args.target and mw.text.split(args.target or '', ','),
+		targets = Array.map(Array.map(Array.parseCommaSeparatedString(args.target), string.lower), String.upperCaseFirst),
 			function(target)
 				return mw.getContentLanguage():ucfirst(String.trim(target):lower())
 			end
