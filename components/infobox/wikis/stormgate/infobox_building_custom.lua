@@ -83,8 +83,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'requirements' then
 		return {
 			Cell{name = 'Tech. Requirements', content = caller:_csvToPageList(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content =
-					caller:_csvToPageList(args.building_requirement)},
+			Cell{name = 'Building Requirements', content = caller:_csvToPageList(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
@@ -223,7 +222,7 @@ function CustomBuilding:_csvToPageList(inputString)
 	end)
 end
 
----@param input string[]
+---@param input string?
 ---@return string
 function CustomBuilding:_displayCsvAsPageCsv(input)
 	return table.concat(self:_csvToPageList(input), ', ')
