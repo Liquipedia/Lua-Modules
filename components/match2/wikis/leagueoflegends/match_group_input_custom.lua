@@ -555,10 +555,7 @@ function mapFunctions.getParticipants(map, opponents)
 			local picks, bans = {}, {}
 			for playerIndex = 1, MAX_NUM_PLAYERS do
 				table.insert(picks, map[teamShort .. 'c' .. playerIndex])
-			end
-
-			for _, ban in Table.iter.pairsByPrefix(map, teamShort .. 'b') do
-				table.insert(bans, ban)
+				table.insert(bans, map[teamShort .. 'b' .. playerIndex])
 			end
 			map[team] = {pick = picks, ban = bans}
 		end
