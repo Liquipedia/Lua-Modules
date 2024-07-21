@@ -11,6 +11,18 @@ local Json = {}
 local Arguments = require('Module:Arguments')
 local Table = require('Module:Table')
 
+local ERROR_PATTERN = '<span class="scribunto%-error" id="mw%-scribunto%-error%-%d">Lua error in .-: (.*)%.</span>'
+
+---throws if an lua script error is found in the provided string
+---@param str string?
+function Json.checkForError(str)
+	if type(str) ~= 'string' then return end
+
+	local errorMessage = string.match(str, ERROR_PATTERN)
+
+	assert(not errorMessage, errorMessage)
+end
+
 ---Json-stringifies all arguments from a supplied frame.
 ---@param frame Frame
 ---@return string
@@ -62,6 +74,7 @@ end
 ---@return table, boolean
 ---@overload fun(obj: any): {}, true
 function Json.parse(obj)
+	Json.checkForError(obj)
 	local parse = function(object) return mw.text.jsonDecode(object, mw.text.JSON_TRY_FIXING) end
 	local status, res = pcall(parse, obj);
 	if status then
@@ -95,6 +108,7 @@ end
 ---@overload fun(any: any): nil
 function Json.parseIfTable(any)
 	if type(any) == 'string' then
+		Json.checkForError(any)
 		local firstChar = any:sub(1, 1)
 		if firstChar == '{' or firstChar == '[' then
 			local result, hasError = Json.parse(any)
