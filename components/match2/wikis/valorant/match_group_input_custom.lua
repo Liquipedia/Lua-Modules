@@ -578,7 +578,7 @@ function mapFunctions.getParticipantsData(map)
 					participants[o .. '_' .. player] = participant
 
 					Table.iter.forEachPair(participant, function (key, val)
-						map.extradata[opstringNormal .. (key ~= 'player' and key or '')] = val
+						map.extradata[opstringNormal .. (key == 'player' and '' or key)] = val
 					end)
 				end
 			end
