@@ -76,36 +76,23 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'cost' then
 		return {
-			Cell{
-				name = 'Cost',
-				content = {
-					args.informationType ~= 'Hero' and CostDisplay.run{
-						faction = caller.faction,
-						luminite = args.luminite,
-						luminiteTotal = args.totalluminite,
-						luminiteForced = true,
-						therium = args.therium,
-						theriumTotal = args.totaltherium,
-						theriumForced = true,
-						supply = args.supply,
-						supplyTotal = args.totalsupply,
-						supplyForced = true,
-						animus = args.animus,
-						animusTotal = args.totalanimus,
-					} or nil
-				}
-			},
-			Cell{
-				name =
-					args.buildtime and args.charge_time and 'Built' .. HOTKEY_SEPERATOR .. 'Recharge Time' or
-					args.charge_time and 'Recharge Time' or
-					'Built Time',
-				content = {
-					args.buildtime and args.charge_time and args.buildtime .. 's' .. HOTKEY_SEPERATOR .. args.charge_time .. 's' or
-					args.charge_time and args.charge_time .. 's' or
-					args.buildtime and args.buildtime .. 's' or nil
-				}
-			},
+			Cell{name = 'Cost', content = {args.informationType ~= 'Hero' and CostDisplay.run{
+				faction = caller.faction,
+				luminite = args.luminite,
+				luminiteTotal = args.totalluminite,
+				luminiteForced = true,
+				therium = args.therium,
+				theriumTotal = args.totaltherium,
+				theriumForced = true,
+				supply = args.supply,
+				supplyTotal = args.totalsupply,
+				supplyForced = true,
+				buildTime = args.buildtime,
+				buildTimeTotal = args.totalbuildtime,
+				animus = args.animus,
+				animusTotal = args.totalanimus,
+			} or nil}},
+			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
 		}
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
