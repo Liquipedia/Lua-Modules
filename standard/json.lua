@@ -11,7 +11,8 @@ local Json = {}
 local Arguments = require('Module:Arguments')
 local Table = require('Module:Table')
 
-local ERROR_PATTERN = '<span class="scribunto%-error" id="mw%-scribunto%-error%-%d">Lua error in .-: (.*)%.</span>'
+local ERROR_PATTERN = '<span class="scribunto%-error" id="mw%-scribunto%-error%-%d">Lua error%s?i?n?%s?:? (.*)%.</span>'
+local JSON_ERROR_PATTERN = 'Module:Json/?d?e?v? at line %d+: Tried to parse Lua error &quot;(.*)&quot;'
 
 ---throws if an lua script error is found in the provided string
 ---@param str string?
@@ -20,7 +21,10 @@ function Json.checkForError(str)
 
 	local errorMessage = string.match(str, ERROR_PATTERN)
 
-	assert(not errorMessage, errorMessage)
+	if not errorMessage then return end
+
+	error('Tried to parse Lua error "' ..
+		errorMessage:gsub(JSON_ERROR_PATTERN, '%1') .. '"')
 end
 
 ---Json-stringifies all arguments from a supplied frame.
