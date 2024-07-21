@@ -576,6 +576,10 @@ function mapFunctions.getParticipantsData(map)
 
 				if not Table.isEmpty(participant) then
 					participants[o .. '_' .. player] = participant
+
+					Table.iter.forEachPair(participant, function (key, val)
+						map.extradata[opstring_normal .. (key ~= 'player' and key or '')] = val
+					end)
 				end
 			end
 		end
