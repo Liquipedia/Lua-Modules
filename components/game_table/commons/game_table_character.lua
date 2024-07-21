@@ -310,7 +310,7 @@ end
 ---@param opponentIndex number
 ---@param key string
 ---@return Html
-function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
+function CharacterGameTable:displayCharacters(game, opponentIndex, key)
 	local makeIcon = function(character)
 		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
 	end
@@ -359,9 +359,9 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 	local opponent = self:_displayOpponent(opponentRecord, flipped)
 	return mw.html.create()
 		:node((flipped and isCharTable) and opponent or nil)
-		:node(self:_displayCharacters(game, opponentIndex, 'picks'))
+		:node(self:displayCharacters(game, opponentIndex, 'picks'))
 		:node(self.config.showBans and
-			self:_displayCharacters(game, opponentIndex, 'bans'):addClass('lor-graycard') or nil
+			self:displayCharacters(game, opponentIndex, 'bans'):addClass('lor-graycard') or nil
 		)
 		:node((not flipped and isCharTable) and opponent or nil)
 end
