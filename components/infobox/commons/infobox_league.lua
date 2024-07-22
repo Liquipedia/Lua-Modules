@@ -491,7 +491,11 @@ function League:_setLpdbData(args, links)
 		icon = self.data.icon,
 		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
+		seriespage = Page.pageifyLink(args.series),
+		serieslist = {
+			Page.pageifyLink(args.series),
+			Page.pageifyLink(args.series2),
+		},
 		previous = self:_getPageNameFromChronology(args.previous),
 		previous2 = self:_getPageNameFromChronology(args.previous2),
 		next = self:_getPageNameFromChronology(args.next),

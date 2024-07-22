@@ -63,4 +63,16 @@ function Page.makeExternalLink(display, link)
 	return '[' .. link .. ' ' .. display .. ']'
 end
 
+--- Converts a link to a proper pagename format
+---@param link string?
+---@return string?
+function Page.pageifyLink(link)
+	if String.isEmpty(link) then
+		return nil
+	end
+	---@cast link -nil
+
+	return (mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_'))
+end
+
 return Class.export(Page)
