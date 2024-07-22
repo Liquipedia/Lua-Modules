@@ -13,12 +13,9 @@ local Currency = require('Module:Currency')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
