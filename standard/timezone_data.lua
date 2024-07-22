@@ -43,6 +43,10 @@ return {
 		name = 'Armenian Time',
 		offset = {4, 0},
 	},
+	AQTT = {
+		name = 'Aqtobe Time',
+		offset = {5, 0},
+	},
 	ART = {
 		name = 'Argentina Time',
 		offset = {-3, 0},
