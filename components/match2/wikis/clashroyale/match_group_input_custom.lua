@@ -32,9 +32,6 @@ local MAX_NUM_OPPONENTS = 2
 local DEFAULT_BEST_OF = 99
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
-local MAX_NUM_PLAYERS_PER_MAP = 2
-local TBD = 'tbd'
-local TBA = 'tba'
 local MAX_NUM_MAPS = 30
 
 -- containers for process helper functions
@@ -614,7 +611,7 @@ end
 ---@return integer
 function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex, map, participants)
 	local numberOfPlayersInMap = 0
-	for prefix, player, index in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
+	for prefix, player in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
 		numberOfPlayersInMap = numberOfPlayersInMap + 1
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(
 			map[prefix .. 'link'] or Variables.varDefault(player .. '_page') or player
