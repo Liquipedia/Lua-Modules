@@ -143,7 +143,7 @@ function CustomLeague:customParseArguments(args)
 		local doubleArgs = Table.copy(args)
 		doubleArgs.setvariables = false
 		doubleArgs.prizepool, doubleArgs.prizepoolusd = args.doublesprizepool, args.doublesprizepoolusd
-		self.data.doublePrizepoolDisplay = CustomLeague._parsePrizePool(doubleArgs, self.data.endDate)
+		self.doublePrizepoolDisplay = CustomLeague._parsePrizePool(doubleArgs, self.data.endDate)
 	end
 
 
