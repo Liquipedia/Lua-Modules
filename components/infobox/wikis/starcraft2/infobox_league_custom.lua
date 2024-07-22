@@ -217,8 +217,9 @@ function CustomLeague:_mapsDisplay(maps)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function CustomLeague:displayPrizePool(args)
+function CustomLeague.displayPrizePool(args, endDate)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return
 	end
@@ -238,15 +239,15 @@ function CustomLeague:displayPrizePool(args)
 	end
 
 	local hasPlus
-	prizePoolUSD, hasPlus = self:_removePlus(prizePoolUSD)
-	prizePool, hasPlus = self:_removePlus(prizePool, hasPlus)
+	prizePoolUSD, hasPlus = CustomLeague._removePlus(prizePoolUSD)
+	prizePool, hasPlus = CustomLeague._removePlus(prizePool, hasPlus)
 
 	return (hasPlus and (GREATER_EQUAL .. ' ') or '') .. InfoboxPrizePool.display{
 		prizepool = prizePool,
 		prizepoolusd = prizePoolUSD,
 		currency = localCurrency,
 		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, self.data.endDate),
+		date = Logic.emptyOr(args.currency_date, endDate),
 		displayRoundPrecision = PRIZE_POOL_ROUND_PRECISION,
 	}
 end
@@ -255,7 +256,7 @@ end
 ---@param alreadyHasPlus boolean?
 ---@return string?
 ---@return boolean?
-function CustomLeague:_removePlus(inputValue, alreadyHasPlus)
+function CustomLeague._removePlus(inputValue, alreadyHasPlus)
 	if not inputValue then
 		return inputValue, alreadyHasPlus
 	end
