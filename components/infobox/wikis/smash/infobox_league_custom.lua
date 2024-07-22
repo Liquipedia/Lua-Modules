@@ -145,8 +145,6 @@ function CustomLeague:customParseArguments(args)
 		doubleArgs.prizepool, doubleArgs.prizepoolusd = args.doublesprizepool, args.doublesprizepoolusd
 		self.doublePrizepoolDisplay = CustomLeague._parsePrizePool(doubleArgs, self.data.endDate)
 	end
-
-
 end
 
 --- @param id string
@@ -199,12 +197,12 @@ function CustomInjector:parse(id, widgets)
 
 		-- Normal prize pool
 		if args.prizepool or args.prizepoolusd then
-			table.insert(widgets, Cell{name = 'Prize pool', content = {self.prizepoolDisplay}})
+			table.insert(widgets, Cell{name = 'Prize pool', content = {league.prizepoolDisplay}})
 		end
 
 		-- Doubles prize pool
 		if args.doublesprizepool or args.doublesprizepoolusd then
-			table.insert(widgets,Cell{name = 'Doubles prize pool', content = {self.doublePrizepoolDisplay}})
+			table.insert(widgets,Cell{name = 'Doubles prize pool', content = {league.doublePrizepoolDisplay}})
 		end
 	elseif id == 'gamesettings' then
 		if not args.overview then
@@ -354,7 +352,6 @@ end
 function CustomLeague._assumedPrize(fee, participants, bonus)
 	participants = tonumber(participants) or 0
 	fee = tonumber(fee) or 0
-	participants = tonumber(participants) or 0
 	bonus = tonumber(bonus) or 0
 
 	return fee * participants + bonus
@@ -397,23 +394,6 @@ function CustomLeague:_cleanNumericInput(value)
 
 	-- remove ','
 	value = string.gsub(value, ',', '')
-
-	return value
-end
-
---- @param value string|number|nil
---- @return string?
-function CustomLeague:_cleanPrizeValue(value)
-	if Logic.isEmpty(value) then
-		return
-	end
-	--- @cast value -nil
-
-	-- remove white spaces, '&nbsp;' and ','
-	value = string.gsub(value, '%s', '')
-	value = string.gsub(value, '&nbsp;', '')
-	value = string.gsub(value, ',', '')
-	value = string.gsub(value, '%$', '')
 
 	return value
 end
