@@ -267,21 +267,18 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	-- Legacy vars
 	Variables.varDefine('tournament_tier', args.liquipediatier or '')
-	Variables.varDefine('prizepoolusd',
-		Variables.varDefault('tournament_prizepoolusd', args.prizepoolusd or args.prizepool))
+	Variables.varDefine('prizepoolusd', self.data.prizepoolUsd)
 	Variables.varDefine('tournament_entrants', string.gsub(args.player_number or '', ',', ''))
-	Variables.varDefine('localcurrency', Variables.varDefault('tournament_currency', ''):upper())
+	Variables.varDefine('localcurrency', self.data.localCurrency)
 
 	-- Legacy date vars
-	local sdate = Variables.varDefault('tournament_startdate', '')
-	local edate = Variables.varDefault('tournament_enddate', '')
-	Variables.varDefine('tournament_sdate', sdate)
-	Variables.varDefine('tournament_edate', edate)
-	Variables.varDefine('tournament_date', edate)
-	Variables.varDefine('formatted_tournament_date', sdate)
-	Variables.varDefine('date', edate)
-	Variables.varDefine('sdate', sdate)
-	Variables.varDefine('edate', edate)
+	Variables.varDefine('tournament_sdate', self.data.startDate)
+	Variables.varDefine('tournament_edate', self.data.endDate)
+	Variables.varDefine('tournament_date', self.data.endDate)
+	Variables.varDefine('formatted_tournament_date', self.data.startDate)
+	Variables.varDefine('date', self.data.endDate)
+	Variables.varDefine('sdate', self.data.startDate)
+	Variables.varDefine('edate', self.data.endDate)
 end
 
 --- @param args table
