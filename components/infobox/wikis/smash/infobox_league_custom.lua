@@ -357,15 +357,6 @@ function CustomLeague._assumedPrize(fee, participants, bonus)
 	return fee * participants + bonus
 end
 
---- @param displayText string?
---- @return string?
-function CustomLeague._makeAssumedAbbr(displayText)
-	if not displayText then
-		return
-	end
-	return Abbreviation.make(displayText, 'This prize is assumed, and has not been confirmed')
-end
-
 ---@param localPrize string|number|nil
 ---@param currency string
 ---@param exchangeDate string?
