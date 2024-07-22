@@ -64,14 +64,14 @@ function CustomLeague.run(frame)
 	args.type = args.type or DEFAULT_TYPE
 
 	-- Clean numeric inputs
-	args.prizepool = CustomLeague:_cleanNumericInput(args.prizepool)
-	args.doublesprizepool = CustomLeague:_cleanNumericInput(args.doublesprizepool)
-	args.player_number = CustomLeague:_cleanNumericInput(args.player_number)
-	args.doubles_number = CustomLeague:_cleanNumericInput(args.doubles_number)
-	args.singlesfee = CustomLeague:_cleanNumericInput(args.singlesfee)
-	args.singlesbonus = CustomLeague:_cleanNumericInput(args.singlesbonus)
-	args.doublesfee = CustomLeague:_cleanNumericInput(args.doublesfee)
-	args.doublesbonus = CustomLeague:_cleanNumericInput(args.doublesbonus)
+	args.prizepool = CustomLeague._cleanNumericInput(args.prizepool)
+	args.doublesprizepool = CustomLeague._cleanNumericInput(args.doublesprizepool)
+	args.player_number = CustomLeague._cleanNumericInput(args.player_number)
+	args.doubles_number = CustomLeague._cleanNumericInput(args.doubles_number)
+	args.singlesfee = CustomLeague._cleanNumericInput(args.singlesfee)
+	args.singlesbonus = CustomLeague._cleanNumericInput(args.singlesbonus)
+	args.doublesfee = CustomLeague._cleanNumericInput(args.doublesfee)
+	args.doublesbonus = CustomLeague._cleanNumericInput(args.doublesbonus)
 
 	-- Implicit prizepools
 	args.assumedprizepool = false
@@ -101,7 +101,7 @@ function CustomLeague.run(frame)
 		args.doublesprizepoolusd = args.doublesprizepoolusd or args.doublesprizepool
 		args.doublesprizepool = nil
 	elseif args.doublesprizepool and args.localcurrency then
-		args.doublesprizepoolusd = CustomLeague:_currencyConversion(string.gsub(args.doublesprizepool, ',', ''),
+		args.doublesprizepoolusd = CustomLeague:_currencyConversion(CustomLeague._cleanNumericInput(args.doublesprizepool),
 			args.localcurrency, League:_cleanDate(args.edate) or League:_cleanDate(args.date))
 	end
 
@@ -304,17 +304,11 @@ function CustomLeague._querySeries(page, query)
 
 	local sourcePagename = string.gsub(mw.ext.TeamLiquidIntegration.resolve_redirect(page), ' ', '_')
 
-	local data = mw.ext.LiquipediaDB.lpdb('series', {
+	return mw.ext.LiquipediaDB.lpdb('series', {
 		conditions = '[[pagename::' .. sourcePagename .. ']]',
 		query = query,
 		limit = 1,
-	})
-
-	if not data or not data[1] then
-		return
-	end
-
-	return data[1]
+	})[1]
 end
 
 --- @param page string?
@@ -361,23 +355,22 @@ end
 ---@param exchangeDate string?
 ---@return number?
 function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
-	local usdPrize
 	local currencyRate = Currency.getExchangeRate{
 		currency = currency,
 		date = exchangeDate,
 		setVariables = true,
 	}
-	if currencyRate then
-		usdPrize = currencyRate * localPrize
+	if not currencyRate then
+		return
 	end
 
-	return usdPrize
+	return currencyRate * localPrize
 end
 
 --- Removes commas from a string
 ---@param value string?
 ---@return string?
-function CustomLeague:_cleanNumericInput(value)
+function CustomLeague._cleanNumericInput(value)
 	if Logic.isEmpty(value) then
 		return nil
 	end
