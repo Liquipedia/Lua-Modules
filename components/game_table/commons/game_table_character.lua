@@ -29,10 +29,13 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class CharacterGameTableConfig: MatchTableConfig
 ---@field showGameWithoutCharacters boolean
+---@field showSideClass boolean
 ---@field showBans boolean
 ---@field showLength boolean
 ---@field numPicks number
 ---@field numBans number
+---@field iconSize string
+---@field iconSeparator string
 
 ---@class CharacterGameTableGame: match2game
 ---@field picks string[][]
@@ -42,11 +45,9 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@class CharacterGameTable: GameTable
 ---@field character string
 ---@field isCharacterTable boolean
----@field iconSize string
 ---@field config CharacterGameTableConfig
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
-	self.iconSize = self.args.iconSize or '27px'
 
 	if not self.isCharacterTable then
 		self.resultFromRecord = GameTable.resultFromRecord
@@ -90,10 +91,13 @@ function CharacterGameTable:readConfig()
 	end
 	self.config = Table.merge(self.config, {
 		showGameWithoutCharacters = Logic.readBool(args.showGameWithoutCharacters),
+		showSideClass = Logic.nilOr(Logic.readBoolOrNil(args.showSideClass), true),
 		showBans = Logic.nilOr(Logic.readBoolOrNil(args.showBans), true),
 		showLength = Logic.readBool(args.length),
 		numPicks = self:getNumberOfPicks(),
 		numBans = self:getNumberOfBans(),
+		iconSize = Logic.nilIfEmpty(self.args.iconSize) or '27px',
+		iconSeparator = Logic.nilIfEmpty(args.iconSeparator) or ''
 	})
 
 	return self
@@ -309,17 +313,18 @@ end
 ---@param game CharacterGameTableGame
 ---@param opponentIndex number
 ---@param key string
----@return Html
-function CharacterGameTable:displayCharacters(game, opponentIndex, key)
+---@return Html?
+function CharacterGameTable:_displayCharacters(game, opponentIndex, key)
+	local config = self.config
 	local makeIcon = function(character)
-		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
+		return CharacterIcon.Icon{character = character, size = config.iconSize, date = game.date}
 	end
 
 	local icons = Array.map(game[key][opponentIndex] or {}, makeIcon)
 
 	return mw.html.create('td')
-		:addClass(self:getSideClass(game.extradata, opponentIndex))
-		:node(#icons > 0 and table.concat(icons, '') or nil)
+		:addClass(config.showSideClass and self:getSideClass(game.extradata, opponentIndex) or nil)
+		:node(#icons > 0 and table.concat(icons, config.iconSeparator) or nil)
 end
 
 ---@param match GameTableMatch
@@ -359,9 +364,9 @@ function CharacterGameTable:_displayDraft(game, opponentRecord, flipped)
 	local opponent = self:_displayOpponent(opponentRecord, flipped)
 	return mw.html.create()
 		:node((flipped and isCharTable) and opponent or nil)
-		:node(self:displayCharacters(game, opponentIndex, 'picks'))
+		:node(self:_displayCharacters(game, opponentIndex, 'picks'))
 		:node(self.config.showBans and
-			self:displayCharacters(game, opponentIndex, 'bans'):addClass('lor-graycard') or nil
+			self:_displayCharacters(game, opponentIndex, 'bans'):addClass('lor-graycard') or nil
 		)
 		:node((not flipped and isCharTable) and opponent or nil)
 end
@@ -376,7 +381,7 @@ function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 	local toScore = function(opponentId)
 		local isWinner = winner == opponentId
 		return mw.html.create(isWinner and 'b' or nil)
-			:wikitext(isWinner and 'W' or 'L')
+			:wikitext(game.scores[opponentId] or (isWinner and 'W' or 'L'))
 	end
 
 	return mw.html.create('td')

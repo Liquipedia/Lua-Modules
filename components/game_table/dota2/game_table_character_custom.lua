@@ -7,14 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local GameTableCharacter = Lua.import('Module:GameTable/Character')
-
-local NONBREAKING_SPACE = '&nbsp;'
 
 local CustomGameTableCharacter = Class.new(GameTableCharacter)
 
@@ -28,21 +24,6 @@ end
 ---@return string
 function CustomGameTableCharacter:getCharacterKey(opponentIndex, playerIndex)
 	return 'team' .. opponentIndex .. 'hero' .. playerIndex
-end
-
----@param game CharacterGameTableGame
----@param opponentIndex number
----@param key string
----@return Html
-function CustomGameTableCharacter:displayCharacters(game, opponentIndex, key)
-	local makeIcon = function(character)
-		return CharacterIcon.Icon{character = character, size = self.iconSize, date = game.date}
-	end
-
-	local icons = Array.map(game[key][opponentIndex] or {}, makeIcon)
-
-	return mw.html.create('td')
-		:node(#icons > 0 and table.concat(icons, NONBREAKING_SPACE) or nil)
 end
 
 ---@param frame Frame
