@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
@@ -375,6 +374,7 @@ function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
 	return usdPrize
 end
 
+--- Removes commas from a string
 ---@param value string?
 ---@return string?
 function CustomLeague:_cleanNumericInput(value)
@@ -383,10 +383,7 @@ function CustomLeague:_cleanNumericInput(value)
 	end
 	---@cast value -nil
 
-	-- remove ','
-	value = string.gsub(value, ',', '')
-
-	return value
+	return (string.gsub(value, ',', ''))
 end
 
 --- @param widgets Widget[]
