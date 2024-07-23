@@ -94,7 +94,7 @@ end
 ---@param args table
 ---@param endDate string?
 ---@return number|string?
-function CustomLeague.displayPrizePool(args, endDate)
+function CustomLeague:displayPrizePool(args, endDate)
 	local localCurrency = args.localcurrency
 	local prizePoolUSD = args.prizepoolusd
 	local prizePool = args.prizepool --[[@as number|string|nil]]

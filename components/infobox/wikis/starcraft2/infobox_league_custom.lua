@@ -219,7 +219,7 @@ end
 ---@param args table
 ---@param endDate string?
 ---@return number|string?
-function CustomLeague.displayPrizePool(args, endDate)
+function CustomLeague:displayPrizePool(args, endDate)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return
 	end
