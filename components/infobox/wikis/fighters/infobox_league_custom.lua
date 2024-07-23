@@ -92,22 +92,23 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function CustomLeague:displayPrizePool(args)
+function CustomLeague.displayPrizePool(args, endDate)
 	local localCurrency = args.localcurrency
 	local prizePoolUSD = args.prizepoolusd
 	local prizePool = args.prizepool --[[@as number|string|nil]]
 
 	local display
 	if prizePoolUSD then
-		prizePoolUSD = self:_cleanPrizeValue(prizePoolUSD)
+		prizePoolUSD = CustomLeague._cleanPrizeValue(prizePoolUSD)
 	end
 
-	prizePool = self:_cleanPrizeValue(prizePool)
+	prizePool = CustomLeague._cleanPrizeValue(prizePool)
 
 	if not prizePoolUSD and localCurrency then
-		local exchangeDate = self.data.endDate or TODAY --[[@as string]]
-		prizePoolUSD = self:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+		local exchangeDate = endDate or TODAY --[[@as string]]
+		prizePoolUSD = CustomLeague._currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
 		if not prizePoolUSD then
 			error('Invalid local currency "' .. localCurrency .. '"')
 		end
@@ -271,9 +272,9 @@ end
 
 ---@param localPrize string|number|nil
 ---@param currency string
----@param exchangeDate string
+---@param exchangeDate string?
 ---@return number?
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
+function CustomLeague._currencyConversion(localPrize, currency, exchangeDate)
 	local usdPrize
 	local currencyRate = Currency.getExchangeRate{
 		currency = currency,
@@ -289,7 +290,7 @@ end
 
 ---@param value string|number|nil
 ---@return string?
-function CustomLeague:_cleanPrizeValue(value)
+function CustomLeague._cleanPrizeValue(value)
 	if Logic.isEmpty(value) then
 		return
 	end
