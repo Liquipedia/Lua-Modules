@@ -282,7 +282,7 @@ function League:_parseArgs()
 
 	self.data = data
 
-	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = League._parsePrizePool(args, data.endDate)
+	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = self:_parsePrizePool(args, data.endDate)
 
 	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
@@ -300,14 +300,14 @@ end
 ---@param args table
 ---@param endDate string?
 ---@return number|string?, number?, string?
-function League._parsePrizePool(args, endDate)
+function League:_parsePrizePool(args, endDate)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return
 	end
 
 	--need to get the display here since it sets variables we want/need to get the clean values
 	--overwritable since sometimes display is supposed to look a bit different
-	return League.displayPrizePool(args, endDate),
+	return self:displayPrizePool(args, endDate),
 		tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0,
 		Variables.varDefault('tournament_currency', args.localcurrency)
 end
@@ -315,7 +315,7 @@ end
 ---@param args table
 ---@param endDate string?
 ---@return number|string?
-function League.displayPrizePool(args, endDate)
+function League:displayPrizePool(args, endDate)
 	return InfoboxPrizePool.display{
 		prizepool = args.prizepool,
 		prizepoolusd = args.prizepoolusd,
