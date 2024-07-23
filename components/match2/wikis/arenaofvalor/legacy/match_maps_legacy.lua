@@ -55,7 +55,7 @@ end
 ---@return table
 function MatchMapsLegacy._handleMaps(args)
 	for matchKey, matchJson, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
-		local map = Json.parse(matchJson) or {}
+		local map = Json.parse(matchJson, {checkForError = true}) or {}
 		local mapKey = 'map' .. matchIndex
 		for key, value in pairs(map) do
 			args[mapKey .. key] = value

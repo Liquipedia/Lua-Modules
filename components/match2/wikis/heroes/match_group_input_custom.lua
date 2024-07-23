@@ -333,7 +333,7 @@ end
 function matchFunctions.getMapVeto(match)
 	if not match.mapveto then return nil end
 
-	local mapVeto = Json.parseIfString(match.mapveto)
+	local mapVeto = Json.parseIfString(match.mapveto, {checkForError = true})
 
 	local data = {
 		vetostart = mapVeto.vetostart,

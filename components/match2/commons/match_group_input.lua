@@ -97,7 +97,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 	return Array.map(matchKeys, function(matchKey, matchIndex)
 			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
-			local matchArgs = Json.parse(args[matchKey])
+			local matchArgs = Json.parse(args[matchKey], {checkForError = true})
 
 			local context = MatchGroupInput.readContext(matchArgs, args)
 			MatchGroupInput.persistContextChanges(context)
@@ -174,7 +174,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 			table.insert(missingMatchKeys, matchKey)
 		end
 
-		matchArgs = Json.parseIfString(matchArgs)
+		matchArgs = Json.parseIfString(matchArgs, {checkForError = true})
 			or Json.parse(Lua.import('Module:Match').toEncodedJson({}))
 
 		local context = MatchGroupInput.readContext(matchArgs, args)

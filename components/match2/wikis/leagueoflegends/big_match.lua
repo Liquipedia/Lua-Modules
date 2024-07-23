@@ -249,7 +249,7 @@ function BigMatch._match2Director(args)
 	end
 
 	local maps = Array.mapIndexes(function(gameIndex)
-		local mapInput = Json.parseIfString(args['map' .. gameIndex])
+		local mapInput = Json.parseIfString(args['map' .. gameIndex], {checkForError = true})
 
 		if not mapInput then
 			return
