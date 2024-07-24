@@ -63,9 +63,11 @@ function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
-	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
+	local standaloneMatchId = match.matchid and match.bracketid
+		and ('MATCH_' .. match.bracketid .. '_' .. match.matchid)
+		or nil
 	--set it already here so in winner and result type processing we know it will get enriched later on
-	match.standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
+	match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
 
 	match = matchFunctions.getBestOf(match)
 	match = matchFunctions.getScoreFromMapWinners(match)
