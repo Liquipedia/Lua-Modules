@@ -8,108 +8,56 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
 local Operator = require('Module:Operator')
+local RatingsStorageLpdb = require('Module:Ratings/Storage/Lpdb')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 --- Liquipedia Ratings (LPR) Display
 local RatingsDisplay = {}
 
--- static conditions for LPDB
-local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHOT]]'
-
 -- Settings
 local LIMIT_TEAMS_LIST = 100 -- How many teams to show in the list/table
 local LIMIT_TEAMS_GRAPH = 10 -- How many teams to show in the combined graph
 local LIMIT_TEAMS_GRAPH_SELECTED = 5 -- How many teams are preselected in the graph
-local LIMIT_LPR_SNAPSHOT = 24 -- How many months of data is fetched for graphs (graph mode and team rating history)
+local LIMIT_LPR_SNAPSHOT = 24 -- How many historic entries is fetched for graphs (graph mode and team rating history)
 
-function RatingsDisplay._getSnapshot(name, offset)
-	return mw.ext.LiquipediaDB.lpdb(
-		'datapoint',
-		{
-			query = 'extradata, date',
-			limit = 1,
-			offset = offset,
-			order = 'date DESC',
-			conditions = STATIC_CONDITIONS_LPR_SNAPSHOT .. ' AND [[name::' .. name .. ']]'
-		}
-	)[1]
+--- Entry point for the ratings display in graph display mode
+---@param frame Frame
+---@return string
+function RatingsDisplay.graph(frame)
+	local args = Arguments.getArgs(frame)
+
+	local teamRankings = RatingsDisplay._getTeamRankings(args.id, LIMIT_TEAMS_GRAPH, LIMIT_LPR_SNAPSHOT)
+
+	return RatingsDisplay._toGraph(teamRankings)
 end
 
-function RatingsDisplay._getTeamInfo(name)
-	local res = mw.ext.LiquipediaDB.lpdb(
-		'team',
-		{
-			query = 'region, template',
-			limit = 1,
-			conditions = '[[pagename::' .. string.gsub(name, ' ', '_') .. ']]'
-		}
-	)
-	if not res[1] then
-		mw.log('Cannot find teampage for ' .. name)
-		return {}
-	end
-	return res[1]
+--- Entry point for the ratings display in table list display mode
+---@param frame Frame
+---@return string
+function RatingsDisplay.list(frame)
+	local args = Arguments.getArgs(frame)
+
+	local teamRankings = RatingsDisplay._getTeamRankings(args.id, LIMIT_TEAMS_LIST, LIMIT_LPR_SNAPSHOT)
+
+	return RatingsDisplay._toList(teamRankings)
 end
 
-function RatingsDisplay._createProgressionEntry(timestamp, rating)
-	return {
-		date = os.date('%Y-%m-%d', timestamp),
-		rating = rating and math.floor(rating + 0.5) or '',
-	}
-end
+---@param id string
+---@param limit integer
+---@param progressionLimit integer
+---@return table
+function RatingsDisplay._getTeamRankings(id, limit, progressionLimit)
+	local teams = RatingsStorageLpdb.getRankings(id, limit, progressionLimit)
 
-function RatingsDisplay._getTeamRankings(id, limit)
-	local snapshot = RatingsDisplay._getSnapshot(id)
-	if not snapshot then
-		error('Could not find a Rating with this ID')
-	end
-
-	-- Merge the ranking and team data tables
-	-- Toss away teams that are lower ranked than what is interesting
-	local teams = {}
-	for rank, teamName in ipairs(snapshot.extradata.ranks) do
-		local team = snapshot.extradata.table[teamName] or {}
-		team.name = teamName
-		table.insert(teams, team)
-		if rank >= limit then
-			break
-		end
-	end
-
-	teams = RatingsDisplay._addProgressionData(teams, id)
 	teams = RatingsDisplay._enrichTeamInformation(teams)
 
 	return teams
 end
 
-function RatingsDisplay._addProgressionData(teams, id)
-	-- Build rating progression with snapshots
-	for i = 0, LIMIT_LPR_SNAPSHOT do
-		local snapshot = RatingsDisplay._getSnapshot(id, i)
-		if not snapshot then
-			break
-		end
-		local snapshotTime = os.time(Date.parseIsoDate(snapshot.date))
-
-		Array.forEach(teams, function(team)
-			local rating = (snapshot.extradata.table[team.name] or {}).rating
-			team.progression = team.progression or {}
-
-			table.insert(team.progression, RatingsDisplay._createProgressionEntry(snapshotTime, rating))
-		end)
-	end
-
-	-- Put progression in the correct order (oldest to newest)
-	Array.forEach(teams, function(team)
-		team.progression = Array.reverse(team.progression)
-	end)
-
-	return teams
-end
-
+---@param teams table
+---@return table
 function RatingsDisplay._enrichTeamInformation(teams)
 	-- Update team information from Team Tempalte and Team Page
 	Array.forEach(teams, function(team)
@@ -123,6 +71,26 @@ function RatingsDisplay._enrichTeamInformation(teams)
 	return teams
 end
 
+---@param name string
+---@return {template: string?, region: string?}
+function RatingsDisplay._getTeamInfo(name)
+	local res = mw.ext.LiquipediaDB.lpdb(
+		'team',
+		{
+			query = 'region, template',
+			limit = 1,
+			conditions = '[[pagename::' .. string.gsub(name, ' ', '_') .. ']]'
+		}
+	)
+	if not res[1] then
+		mw.log('Warning: Cannot find teampage for ' .. name)
+	end
+
+	return res[1] or {}
+end
+
+---@param teamRankings table
+---@return string
 function RatingsDisplay._toList(teamRankings)
 	local htmlTable = mw.html.create('table'):addClass('wikitable'):css('text-align', 'center')
 		:tag('tr'):css('font-weight', 'bold')
@@ -187,6 +155,8 @@ function RatingsDisplay._toList(teamRankings)
 	return tostring(mw.html.create('div'):addClass('table-responsive'):node(htmlTable))
 end
 
+---@param teamRankings table
+---@return string
 function RatingsDisplay._toGraph(teamRankings)
 	return mw.ext.Charts.chart({
 		xAxis = {
@@ -226,22 +196,6 @@ function RatingsDisplay._toGraph(teamRankings)
 			}
 		end)
 	})
-end
-
-function RatingsDisplay.graph(frame)
-	local args = Arguments.getArgs(frame)
-
-	local teamRankings = RatingsDisplay._getTeamRankings(args.id, LIMIT_TEAMS_GRAPH)
-
-	return RatingsDisplay._toGraph(teamRankings)
-end
-
-function RatingsDisplay.list(frame)
-	local args = Arguments.getArgs(frame)
-
-	local teamRankings = RatingsDisplay._getTeamRankings(args.id, LIMIT_TEAMS_LIST)
-
-	return RatingsDisplay._toList(teamRankings)
 end
 
 return RatingsDisplay
