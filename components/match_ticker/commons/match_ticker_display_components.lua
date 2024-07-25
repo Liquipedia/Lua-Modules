@@ -13,10 +13,12 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
+local Icon = require('Module:Icon')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
@@ -235,10 +237,12 @@ local Details = Class.new(
 
 ---@return Html
 function Details:create()
+	local matchPageIcon = self:_matchPageIcon()
 	local td = mw.html.create('td')
 		:addClass('match-filler')
-		:node(mw.html.create('span')
-			:node(self:countdown())
+		:node(mw.html.create('div')
+			:addClass(matchPageIcon and 'has-matchpage' or nil)
+			:node(self:countdown(matchPageIcon))
 			:node(self:tournament())
 		)
 
@@ -255,8 +259,21 @@ function Details:create()
 	return self.root:node(td)
 end
 
+---@return string?
+function Details:_matchPageIcon()
+	local matchPage = (self.match.match2bracketdata or {}).matchpage
+	if Logic.isEmpty(matchPage) then return end
+
+	local display = mw.html.create('div')
+		:addClass('btn btn-secondary')
+		:wikitext(Icon.makeIcon{iconName = 'matchpopup'})
+
+	return Page.makeInternalLink(tostring(display), matchPage)
+end
+
+---@param matchPageIcon string?
 ---@return Html
-function Details:countdown()
+function Details:countdown(matchPageIcon)
 	local match = self.match
 
 	local dateString
@@ -284,7 +301,10 @@ function Details:countdown()
 		countdownDisplay:node(VodLink.display{vod = match.vod})
 	end
 
-	return countdownDisplay
+	return mw.html.create('div')
+		:addClass('match-countdown-wrapper')
+		:node(countdownDisplay)
+		:node(matchPageIcon)
 end
 
 ---@return Html?
@@ -310,16 +330,14 @@ function Details:tournament()
 	)
 
 	return mw.html.create('div')
-		:addClass('tournament')
-		:node(mw.html.create('span')
-			:css('float', 'right')
-			:node(icon)
-		)
+		:addClass('tournament-flex')
 		:node(mw.html.create('div')
-			:addClass('tournament-text')
+			:addClass('tournament-text-flex')
 			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]&nbsp;&nbsp;')
 		)
-
+		:node(mw.html.create('span')
+			:node(icon)
+		)
 end
 
 ---Display class for matches shown within a match ticker
