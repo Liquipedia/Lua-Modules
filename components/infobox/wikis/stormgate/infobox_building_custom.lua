@@ -179,6 +179,7 @@ function CustomBuilding:setLpdbData(args)
 			animus = tonumber(args.animus),
 			totalanimus = tonumber(args.totalanimus),
 			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
+			buildingrequirement = Array.parseCommaSeparatedString(args.building_requirement),
 			builds = Array.parseCommaSeparatedString(args.builds),
 			unlocks = Array.parseCommaSeparatedString(args.unlocks),
 			passive = Array.parseCommaSeparatedString(args.passive),
