@@ -323,7 +323,9 @@ function MatchFunctions.getOpponents(match)
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
-	opponents = MatchFunctions.setBgForOpponents(opponents, match.statusSettings)
+	if match.finished then
+		opponents = MatchFunctions.setBgForOpponents(opponents, match.statusSettings)
+	end
 
 	-- Update all opponents with new values
 	for opponentIndex, opponent in pairs(opponents) do
