@@ -626,7 +626,7 @@ function CustomMatchSummary._createMatchStandings(match)
 					:addClass('panel-table__cell')
 					:addClass('cell--status')
 					:addClass('bg-' .. (opponentMatch.advanceBg or ''))
-					:node(CustomMatchSummary._getStatusIcon(opponentMatch.advanceBg))
+					:node(CustomMatchSummary._getStatusIcon(match.extradata.status[index]))
 		end
 
 		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
