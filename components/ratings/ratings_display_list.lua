@@ -10,11 +10,12 @@ local Array = require('Module:Array')
 local Operator = require('Module:Operator')
 local Template = require('Module:Template')
 
+---@class RatingsDisplayList: RatingsDisplayInterface
 local RatingsDisplayList = {}
 
 local LIMIT_TEAMS = 100 -- How many teams to show in the list/table
 
----@param teamRankings table[]
+---@param teamRankings RatingsEntry[]
 ---@return string
 function RatingsDisplayList.build(teamRankings)
 	local teams = Array.sub(teamRankings, 1, LIMIT_TEAMS)

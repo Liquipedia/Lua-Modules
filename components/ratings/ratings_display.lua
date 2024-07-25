@@ -10,11 +10,21 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local RatingsStorageLpdb = require('Module:Ratings/Storage/Lpdb')
 
---- Liquipedia Ratings (LPR) Display
 local RatingsDisplay = {}
 
--- Settings
-local LIMIT_HISTORIC_ENTRIES = 24 -- How many historic entries is fetched
+---@class RatingsEntry
+---@field matches integer
+---@field name string
+---@field rating number
+---@field region string
+---@field streak integer
+---@field shortName string
+---@field progression table[]
+
+---@class RatingsDisplayInterface
+---@field build fun(teamRankings: RatingsEntry[]):string
+
+local LIMIT_HISTORIC_ENTRIES = 24 -- How many historic entries are fetched
 
 --- Entry point for the ratings display in graph display mode
 ---@param frame Frame
@@ -33,8 +43,8 @@ function RatingsDisplay.list(frame)
 end
 
 ---@param frame Frame
----@param displayClass {build: fun(playerRankings: table[]):string}
----@return unknown
+---@param displayClass RatingsDisplayInterface
+---@return string
 function RatingsDisplay.make(frame, displayClass)
 	local args = Arguments.getArgs(frame)
 
@@ -45,33 +55,37 @@ end
 
 ---@param id string
 ---@param progressionLimit integer
----@return table[]
+---@return RatingsEntry[]
 function RatingsDisplay._getTeamRankings(id, progressionLimit)
 	local teams = RatingsStorageLpdb.getRankings(id, progressionLimit)
 
-	teams = RatingsDisplay._enrichTeamInformation(teams)
-
-	return teams
-end
-
----@param teams table[]
----@return table[]
-function RatingsDisplay._enrichTeamInformation(teams)
-	-- Update team information from Team Tempalte and Team Page
 	Array.forEach(teams, function(team)
 		local teamInfo = RatingsDisplay._getTeamInfo(team.name)
 
-		team.region = teamInfo.region or '???'
-		team.shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '')
-				and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or team.name
+		team.region = teamInfo.region
+		team.shortName = teamInfo.shortName
 	end)
 
 	return teams
 end
 
+--- Get team information from Team Template and Team Page
+---@param teamName string
+---@return {region: string?, shortName: string}
+function RatingsDisplay._getTeamInfo(teamName)
+	local teamInfo = RatingsDisplay._fetchTeamInfo(teamName)
+
+	return {
+		region = teamInfo.region or '???',
+		shortName = mw.ext.TeamTemplate.teamexists(teamInfo.template or '')
+			and mw.ext.TeamTemplate.raw(teamInfo.template).shortname or teamName
+	}
+end
+
+--- Fetch team information from Team Page
 ---@param name string
 ---@return {template: string?, region: string?}
-function RatingsDisplay._getTeamInfo(name)
+function RatingsDisplay._fetchTeamInfo(name)
 	local res = mw.ext.LiquipediaDB.lpdb(
 		'team',
 		{

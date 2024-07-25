@@ -10,12 +10,13 @@ local Array = require('Module:Array')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
+---@class RatingsDisplayGraph: RatingsDisplayInterface
 local RatingsDisplayGraph = {}
 
 local LIMIT_TEAMS = 10 -- How many teams to show in the combined graph
 local LIMIT_TEAMS_SELECTED = 5 -- How many teams are preselected in the graph
 
----@param teamRankings table[]
+---@param teamRankings RatingsEntry[]
 ---@return string
 function RatingsDisplayGraph.build(teamRankings)
 	local teams = Array.sub(teamRankings, 1, LIMIT_TEAMS)

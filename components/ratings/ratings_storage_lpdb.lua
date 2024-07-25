@@ -18,6 +18,7 @@ local LIMIT_TEAMS = 100 -- How many teams to do the calculations for
 
 ---@param id string
 ---@param progressionLimit integer
+---@return table[]
 function RatingsStorageLpdb.getRankings(id, progressionLimit)
 	local snapshot = RatingsStorageLpdb._getSnapshot(id)
 	if not snapshot then
