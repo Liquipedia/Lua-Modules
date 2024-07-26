@@ -184,6 +184,7 @@ function MatchFunctions.parseSetting(match)
 	-- Score Settings
 	match.scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
+		matchPointThreadhold = tonumber(match.matchpoint),
 	}
 
 	Table.mergeInto(match.scoreSettings, Array.mapIndexes(function(idx)
