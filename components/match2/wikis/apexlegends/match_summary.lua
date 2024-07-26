@@ -31,6 +31,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field stream table
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+local NO_SCORE = -99
 
 local MATCH_STATUS_TO_ICON = {
 	finished = 'fas fa-check icon--green',
@@ -771,6 +772,10 @@ end
 ---@param placementEnd string|number|nil
 ---@return string
 function CustomMatchSummary._displayRank(placementStart, placementEnd)
+	if NO_SCORE == placementStart then
+		return '-'
+	end
+
 	local places = {}
 
 	if placementStart then
