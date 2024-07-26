@@ -129,6 +129,31 @@ local MATCH_STANDING_COLUMNS = {
 			end,
 		},
 	},
+	{
+		sortable = true,
+		sortType = 'match-points',
+		class = 'cell--match-points',
+		iconClass = 'fad fa-diamond',
+		show = {
+			value = function(match)
+				return match.scoringTable.matchPointThreadhold
+			end
+		},
+		header = {
+			value = 'MPe Game',
+			mobileValue = 'MPe',
+		},
+		sortVal = {
+			value = function (opponent, idx)
+				return opponent.matchPointReachedIn or 999 -- High number that should not be exceeded
+			end,
+		},
+		row = {
+			value = function (opponent, idx)
+				return opponent.matchPointReachedIn and "Game " .. opponent.matchPointReachedIn or nil
+			end,
+		},
+	},
 	game = {
 		{
 			class = 'panel-table__cell__game-placement',
@@ -318,6 +343,21 @@ function CustomMatchSummary._opponents(match)
 		end)
 	end)
 
+	if match.scoringTable.matchPointThreadhold then
+		Array.forEach(match.opponents, function (opponent, idx)
+			local matchPointReachedIn
+			local sum = 0
+			for gameIdx, game in ipairs(opponent.games) do
+				if sum >= match.scoringTable.matchPointThreadhold then
+					matchPointReachedIn = gameIdx
+					break
+				end
+				sum = sum + (game.score or 0)
+			end
+			opponent.matchPointReachedIn = matchPointReachedIn
+		end)
+	end
+
 	local placementSortFunction = function(opponent1, opponent2)
 		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
 			if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
@@ -352,6 +392,7 @@ function CustomMatchSummary._createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
 	local scoreKill = Table.extract(scoreSettings, 'kill')
+	local matchPointThreadhold = Table.extract(scoreSettings, 'matchPointThreadhold')
 	local scorePlacement = {}
 
 	local points = Table.groupBy(scoreSettings, function (_, value)
@@ -372,6 +413,7 @@ function CustomMatchSummary._createScoringData(match)
 	return {
 		kill = scoreKill,
 		placement = scorePlacement,
+		matchPointThreadhold = matchPointThreadhold,
 	}
 end
 
@@ -557,6 +599,10 @@ function CustomMatchSummary._createMatchStandings(match)
 	end
 
 	Array.forEach(MATCH_STANDING_COLUMNS, function(column)
+		if column.show and not column.show.value(match) then
+			return
+		end
+
 		local cell = header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass(column.class)
@@ -640,6 +686,10 @@ function CustomMatchSummary._createMatchStandings(match)
 		end
 
 		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
+			if column.show and not column.show.value(match) then
+				return
+			end
+
 			local cell = row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
