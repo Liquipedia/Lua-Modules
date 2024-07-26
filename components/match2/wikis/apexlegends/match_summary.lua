@@ -31,6 +31,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field stream table
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+local NO_PLACEMENT = -99
 
 local MATCH_STATUS_TO_ICON = {
 	finished = 'fas fa-check icon--green',
@@ -178,7 +179,10 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.placement ~= -1 and opponent.placement or idx
+				if opponent.placement == -1 or opponent.placement == NO_PLACEMENT then
+					return idx
+				end
+				return opponent.placement
 			end,
 		},
 		row = {
@@ -321,6 +325,12 @@ function CustomMatchSummary._opponents(match)
 			else
 				return (opponent1.name or '') < (opponent2.name or '')
 			end
+		end
+		if opponent1.placement == NO_PLACEMENT then
+			return false
+		end
+		if opponent2.placement == NO_PLACEMENT then
+			return true
 		end
 		return opponent1.placement < opponent2.placement
 	end
@@ -771,6 +781,10 @@ end
 ---@param placementEnd string|number|nil
 ---@return string
 function CustomMatchSummary._displayRank(placementStart, placementEnd)
+	if NO_PLACEMENT == placementStart then
+		return '-'
+	end
+
 	local places = {}
 
 	if placementStart then
