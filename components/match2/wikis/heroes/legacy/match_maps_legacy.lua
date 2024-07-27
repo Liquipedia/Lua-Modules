@@ -83,16 +83,18 @@ end
 
 ---@param matchArgs table
 function MatchMapsLegacy._readMaps(matchArgs)
-	local getMapFromWinnerInput = function (index)
-		local key = 'map' .. index .. 'win'
-		return matchArgs[key] and {
+	local getMapFromWinnerInput = function (mapWinner)
+		return mapWinner and {
 			map = UNKNOWN_MAP,
-			winner = Table.extract(matchArgs, key)
 		} or nil
 	end
 
 	Array.mapIndexes(function (index)
-		local map = Json.parseIfTable(matchArgs['map' .. index]) or getMapFromWinnerInput(index)
+		local mapWinner = Table.extract(matchArgs, 'map' .. index .. 'win')
+		local map = Json.parseIfTable(matchArgs['map' .. index]) or getMapFromWinnerInput(mapWinner)
+		if map and Logic.isEmpty(map.winner) then
+			map.winner = mapWinner
+		end
 		matchArgs['map' .. index] = map and MatchSubobjects.luaGetMap(map) or nil
 		return map
 	end)
