@@ -95,7 +95,7 @@ function MatchGroupLegacyDefault._getMatchMapping(match, bracketData, bracketTyp
 	else
 		roundNum = id:match('R%d*'):gsub('R', '')
 		roundNum = tonumber(roundNum)
-		round = roundData[roundNum] or { R = roundNum, G = 0, D = 1, W = 1 }
+		round = roundData[roundNum] or {R = roundNum, G = 0, D = 1, W = 1}
 	end
 	round.G = round.G + 1
 
