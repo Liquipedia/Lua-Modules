@@ -42,12 +42,11 @@ end
 
 ---@param args table
 function MatchMapsLegacy._handleLocation(args)
-	if args.location then
-		local matchStatus = Logic.readBool(args.finished) and 'was' or 'being'
-		local locationComment = 'Match ' .. matchStatus .. ' played in ' .. args.location
-		args.comment = args.comment and (args.comment .. '<br>' .. locationComment) or locationComment
-		args.location = nil
-	end
+	if Logic.isEmpty(args.location) then return end
+
+	local matchStatus = Logic.readBool(args.finished) and 'was' or 'being'
+	local locationComment = 'Match ' .. matchStatus .. ' played in ' .. Table.extract(args, 'location')
+	args.comment = args.comment and (args.comment .. '<br>' .. locationComment) or locationComment
 end
 
 ---@param args table
