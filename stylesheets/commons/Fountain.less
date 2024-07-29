@@ -446,7 +446,11 @@ The smaller sizes are for sub-sections. */
 	transition: 0.35s;
 
 	&:hover {
-		border: 0.0625rem solid #f7f7f7;
+		border: 0.0625rem solid var( --clr-elm-10 );
+	}
+
+	.theme--dark &:hover {
+		border: 0.0625rem solid var( --clr-moon-90 );
 	}
 }
 
@@ -458,6 +462,14 @@ The smaller sizes are for sub-sections. */
 	font-weight: bold;
 	color: #e2e2e6;
 	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+}
+
+.facetDesc {
+	border-top: 0.125rem solid #505050;
+
+	&:hover {
+		border-top: 0.125rem solid var( --clr-moon-80 );
+	}
 }
 
 /* Aghcard-related */
