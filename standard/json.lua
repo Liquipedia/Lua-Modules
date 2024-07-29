@@ -128,7 +128,7 @@ end
 ---@overload fun(options: string): table, boolean
 ---@overload fun(options: any): any, true
 function Json.parseStringified(options, any)
-	if not any and type(options) == 'string' then
+	if not any then
 		any = options
 		options = nil
 	end
