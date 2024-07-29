@@ -109,10 +109,19 @@ end
 ---@param args table
 ---@return string[]
 function CustomMap:getWikiCategories(args)
-	local players = args.players or self:_tlpdMap(args.id, 'players')
-	if String.isEmpty(players) then return {} end
+	local categories = {}
 
-	return {'Maps (' .. players .. ' Players)'}
+	local players = args.players or self:_tlpdMap(args.id, 'players')
+	if not String.isEmpty(players) then
+		table.insert(categories, 'Maps (' .. players .. ' Players)')
+	end
+
+	local tileset = args.tileset or self:_tlpdMap(args.id, 'tileset')
+	if not String.isEmpty(tileset) then
+		table.insert(categories, tileset .. ' Tileset')
+	end
+
+	return categories
 end
 
 return CustomMap
