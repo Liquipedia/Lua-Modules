@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
@@ -54,7 +53,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if streams then
 		table.insert(lines, indent .. '|twitch=|youtube=|vod=')
 	end
-	
+
 	if mplinks then
 		table.insert(lines, indent .. '|mplink=|mplink2=|mplink3=')
 	end
@@ -68,7 +67,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		if protectVeto then
 			types = 'protect,' .. types
 		end
-			
+
 		local vetotypes = mw.text.split(types, ',', true)
 		table.insert(lines, indent .. '|mapveto={{MapVeto')
 		table.insert(lines, indent .. indent .. '|firstpick=')
