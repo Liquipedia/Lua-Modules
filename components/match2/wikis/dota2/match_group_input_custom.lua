@@ -582,6 +582,44 @@ function MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	return opponents
 end
 
+---@param match table
+---@return table
+function MatchFunctions.mergeWithStandalone(match)
+	local standaloneMatch = match.standaloneMatch
+	if not standaloneMatch then
+		return match
+	end
+
+	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
+
+	-- Update Opponents from the Standlone Match
+	match.opponent1 = standaloneMatch.match2opponents[1]
+	match.opponent2 = standaloneMatch.match2opponents[2]
+
+	-- Update Maps from the Standalone Match
+	for index, game in ipairs(standaloneMatch.match2games) do
+		game.participants = Json.parseIfString(game.participants)
+		game.extradata = Json.parseIfString(game.extradata)
+		match['map' .. index] = game
+	end
+
+	-- Remove special keys (maps/games, opponents, bracketdata etc)
+	for key, _ in pairs(standaloneMatch) do
+		if String.startsWith(key, 'match2') then
+			standaloneMatch[key] = nil
+		end
+	end
+
+	-- Copy all match level records which have value
+	for key, value in pairs(standaloneMatch) do
+		if String.isNotEmpty(value) then
+			match[key] = value
+		end
+	end
+
+	return match
+end
+
 --
 -- map related functions
 --
