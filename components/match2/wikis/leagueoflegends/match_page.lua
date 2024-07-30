@@ -85,26 +85,7 @@ function BigMatch.getByMatchId(props)
 		return site, Table.mergeInto({link = link}, MatchLinks[site])
 	end))
 
-	-- Add more opponent data field
-	Array.forEach(viewModel.opponents, function(opponent, index)
-		opponent.opponentIndex = index
-
-		if not opponent.template or not mw.ext.TeamTemplate.teamexists(opponent.template) then
-			return
-		end
-		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
-
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
-		opponent.shortname = teamTemplate.shortname
-		opponent.page = teamTemplate.page
-		opponent.name = teamTemplate.name
-
-		opponent.seriesDots = Array.map(viewModel.games, function(game)
-			return game.winner == opponent.opponentIndex and 'W' or game.winner ~= 0 and 'L' or '-'
-		end)
-	end)
-
-	-- Use information to set additional fields
+	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(TEAMS, function(teamIdx)
@@ -150,6 +131,25 @@ function BigMatch.getByMatchId(props)
 				veto.isNewGroup = lastType ~= veto.type
 				lastType = veto.type
 			end)
+		end)
+	end)
+
+	-- Add more opponent data field
+	Array.forEach(viewModel.opponents, function(opponent, index)
+		opponent.opponentIndex = index
+
+		if not opponent.template or not mw.ext.TeamTemplate.teamexists(opponent.template) then
+			return
+		end
+		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
+
+		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
+		opponent.shortname = teamTemplate.shortname
+		opponent.page = teamTemplate.page
+		opponent.name = teamTemplate.name
+
+		opponent.seriesDots = Array.map(viewModel.games, function(game)
+			return game.teams[index].scoreDisplay
 		end)
 	end)
 
