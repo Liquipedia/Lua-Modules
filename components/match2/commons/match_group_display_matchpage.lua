@@ -31,10 +31,10 @@ function MatchPageDisplay.MatchPageContainer(props)
 	local matchRecord = MatchGroupUtil.fetchMatchRecords(bracketId)[1]
 	assert(matchRecord, 'Could not find match record')
 	local match = WikiSpecific.matchFromRecord(matchRecord)
-	return MatchPageDisplay.SingleMatch({
+	return MatchPageDisplay.SingleMatch{
 			config = props.config,
 			match = match,
-		})
+		}
 end
 
 ---Display component for a singleMatch. Match data is specified in the input.

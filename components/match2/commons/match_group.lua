@@ -103,9 +103,9 @@ function MatchGroup.MatchPage(args)
 	Match.storeMatchGroup(matches, options)
 
 	local MatchPageContainer = WikiSpecific.getMatchContainer('matchpage')
-	return MatchPageContainer({
+	return MatchPageContainer{
 		matchId = fullMatchId,
-	})
+	}
 end
 
 -- Displays a matchlist or bracket specified by ID.
