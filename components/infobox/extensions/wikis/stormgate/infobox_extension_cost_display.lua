@@ -36,8 +36,8 @@ local ICONS = {
 local ORDER = {
 	'luminite',
 	'therium',
-	'buildTime',
 	'supply',
+	'buildTime',
 	'animus',
 }
 local CONCAT_VALUE = '&nbsp;'
