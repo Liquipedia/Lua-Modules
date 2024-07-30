@@ -19,9 +19,9 @@ local WikiSpecific = Table.copy(BaseWikiSpecific)
 ---@return boolean
 function WikiSpecific.matchHasDetails(match)
 	local MatchGroupDisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-	local BigMatch = Lua.import('Module:BigMatch')
+	local MatchPage = Lua.import('Module:MatchPage')
 	return MatchGroupDisplayHelper.defaultMatchHasDetails(match) or
-		BigMatch.isEnabledFor(match)
+		MatchPage.isEnabledFor(match)
 end
 
 return WikiSpecific

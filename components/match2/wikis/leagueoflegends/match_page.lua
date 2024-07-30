@@ -61,13 +61,13 @@ local TEAMS = Array.range(1, 2)
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
-local BIG_MATCH_START_TIME = 1619827201 -- May 1st 2021 midnight
+local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 ---@param match table
 ---@return boolean
 function BigMatch.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > BIG_MATCH_START_TIME)
+			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
 end
 
 ---@param props table
