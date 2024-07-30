@@ -164,8 +164,8 @@ function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
 		HiddenDataBox.run(HdbProps)
 	end
 
-
 	setMatchPageContext()
+	matchArgs.parent = globalVars:get('tournament_parent')
 	matchArgs.bracketid = bracketId
 	matchArgs.matchid = matchId
 	local match = MatchGroupInput._processMatch(matchArgs, {isMatchPage = true})
