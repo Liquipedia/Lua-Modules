@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=leagueoflegends
--- page=Module:MatchGroup/Input/Custom/BigMatch
+-- page=Module:MatchGroup/Input/Custom/MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,7 +11,7 @@ local Logic = require('Module:Logic')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
-local CustomMatchGroupInput = {}
+local CustomMatchGroupInputBigMatch = {}
 
 local ROLE_ORDER = Table.map({
 	'top',
@@ -23,7 +23,7 @@ local ROLE_ORDER = Table.map({
 	return value, idx
 end)
 
-function CustomMatchGroupInput.getMap(mapInput)
+function CustomMatchGroupInputBigMatch.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
 		return mapInput
@@ -36,7 +36,7 @@ function CustomMatchGroupInput.getMap(mapInput)
 	return map
 end
 
-function CustomMatchGroupInput.getLength(map)
+function CustomMatchGroupInputBigMatch.getLength(map)
 	if not map.length then
 		return
 	end
@@ -44,11 +44,11 @@ function CustomMatchGroupInput.getLength(map)
 	return math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)
 end
 
-function CustomMatchGroupInput.getSide(map, opponentIndex)
+function CustomMatchGroupInputBigMatch.getSide(map, opponentIndex)
 	return map['team' .. opponentIndex].color
 end
 
-function CustomMatchGroupInput.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputBigMatch.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	if not team.players then return end
@@ -72,13 +72,13 @@ function CustomMatchGroupInput.getParticipants(map, opponentIndex)
 	end)
 end
 
-function CustomMatchGroupInput.getHeroPicks(map, opponentIndex)
+function CustomMatchGroupInputBigMatch.getHeroPicks(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	return Array.map(team.players or {}, Operator.property('champion'))
 end
 
-function CustomMatchGroupInput.getHeroBans(map, opponentIndex)
+function CustomMatchGroupInputBigMatch.getHeroBans(map, opponentIndex)
 	local bans = map.championVeto
 
 	bans = Array.sortBy(bans, Operator.property('vetoNumber'))
@@ -92,8 +92,8 @@ function CustomMatchGroupInput.getHeroBans(map, opponentIndex)
 	return Array.map(bans, Operator.property('champion'))
 end
 
-function CustomMatchGroupInput.getVetoPhase(map)
+function CustomMatchGroupInputBigMatch.getVetoPhase(map)
 	return map.championVeto
 end
 
-return CustomMatchGroupInput
+return CustomMatchGroupInputBigMatch

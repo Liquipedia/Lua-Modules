@@ -6,20 +6,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchGroupInput = {}
+local CustomMatchGroupInputNormal = {}
 
 local MAX_NUM_PICKS = 5
 local MAX_NUM_BANS = 5
 
-function CustomMatchGroupInput.getMap(mapInput)
+function CustomMatchGroupInputNormal.getMap(mapInput)
 	return mapInput
 end
 
-function CustomMatchGroupInput.getLength(map)
+function CustomMatchGroupInputNormal.getLength(map)
 	return map.length
 end
 
-function CustomMatchGroupInput.getSide(map, opponentIndex)
+function CustomMatchGroupInputNormal.getSide(map, opponentIndex)
 	local side = map['team' .. opponentIndex .. 'side']
 	if not side then
 		return
@@ -27,11 +27,11 @@ function CustomMatchGroupInput.getSide(map, opponentIndex)
 	return string.lower(side)
 end
 
-function CustomMatchGroupInput.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	return
 end
 
-function CustomMatchGroupInput.getHeroPicks(map, opponentIndex)
+function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
 	local picks = {}
 	local team = map['t' .. opponentIndex]
 	for playerIndex = 1, MAX_NUM_PICKS do
@@ -40,7 +40,7 @@ function CustomMatchGroupInput.getHeroPicks(map, opponentIndex)
 	return picks
 end
 
-function CustomMatchGroupInput.getHeroBans(map, opponentIndex)
+function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
 	local bans = {}
 	local team = map['t' .. opponentIndex]
 	for playerIndex = 1, MAX_NUM_BANS do
@@ -50,8 +50,8 @@ function CustomMatchGroupInput.getHeroBans(map, opponentIndex)
 end
 
 
-function CustomMatchGroupInput.getVetoPhase(map)
+function CustomMatchGroupInputNormal.getVetoPhase(map)
 	return
 end
 
-return CustomMatchGroupInput
+return CustomMatchGroupInputNormal

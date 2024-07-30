@@ -71,7 +71,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local MatchParser
 	if options.isMatchPage then
-		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/BigMatch')
+		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/MatchPage')
 	else
 		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
