@@ -12,6 +12,7 @@ local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
 local Operator = require('Module:Operator')
+local String = require('Module:String')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
@@ -105,12 +106,16 @@ function BigMatch.getByMatchId(props)
 
 	-- Use information to set additional fields
 	Array.forEach(viewModel.games, function(game)
-		Array.forEach(TEAMS, function(teamIdx)
+		game.finished = game.winner ~= nil and game.winner ~= -1
+		game.teams = Array.map(TEAMS, function(teamIdx)
 			local team = {players = {}}
+
+			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
+			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
 				table.insert(team.players, Table.mergeInto(player, {
-					roleIcon = player.role .. ' ' .. game.extradata['team' .. teamIdx ..'side'],
+					roleIcon = player.role .. ' ' .. team.side,
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
 					end),
@@ -125,6 +130,14 @@ function BigMatch.getByMatchId(props)
 			team.kills = BigMatch._sumItem(team.players, 'kills')
 			team.deaths = BigMatch._sumItem(team.players, 'deaths')
 			team.assists = BigMatch._sumItem(team.players, 'assists')
+
+			team.picks = Array.map(team.players, Operator.property('character'))
+
+			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
+				return veto.type == 'ban' and veto.team == teamIdx
+			end)
+
+			return team
 		end)
 
 		local _
@@ -152,7 +165,7 @@ function BigMatch.getByMatchId(props)
 	viewModel.heroIcon = function(self)
 		local champion = self
 		if type(self) == 'table' then
-			champion = self.champion
+			champion = self.champion or self.character
 			---@cast champion -table
 		end
 		return CharacterIcon.Icon{
