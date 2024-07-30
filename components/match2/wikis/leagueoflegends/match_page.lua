@@ -74,7 +74,6 @@ end
 ---@return Html
 function MatchPage.getByMatchId(props)
 	local viewModel = props.match
-	mw.logObject(viewModel, 'VM')
 
 	viewModel.isBestOfOne = #viewModel.games == 1
 	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
