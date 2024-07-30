@@ -169,11 +169,19 @@ components.
 function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
-	if MatchSummaryModule.getByMatchId then
-		return MatchSummaryModule.getByMatchId(props)
-	else
-		error('DefaultMatchSummaryContainer: Expected MatchSummary.getByMatchId to be a function')
-	end
+	assert(MatchSummaryModule.getByMatchId, 'Expected MatchSummary.getByMatchId to be a function')
+
+	return MatchSummaryModule.getByMatchId(props)
+end
+
+---@param props table
+---@return Html
+function DisplayHelper.DefaultMatchPageContainer(props)
+	local MatchPageModule = Lua.import('Module:MatchPage')
+
+	assert(MatchPageModule.getByMatchId, 'Expected MatchPage.getByMatchId to be a function')
+
+	return MatchPageModule.getByMatchId(props)
 end
 
 ---Retrieves the wiki specific global bracket config specified in MediaWiki:BracketConfig.

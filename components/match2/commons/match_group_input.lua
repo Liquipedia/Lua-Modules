@@ -71,9 +71,10 @@ function MatchGroupInput._applyTournamentVarsToMaps(match)
 end
 
 ---@param matchArgs table
+---@param options? {isMatchPage: boolean?}
 ---@return table
-function MatchGroupInput._processMatch(matchArgs)
-	local match = WikiSpecific.processMatch(matchArgs)
+function MatchGroupInput._processMatch(matchArgs, options)
+	local match = WikiSpecific.processMatch(matchArgs, options)
 	MatchGroupInput._applyTournamentVarsToMaps(match)
 	return match
 end
@@ -137,6 +138,31 @@ end
 ---@return string
 function MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 	return string.format('%04d', matchIndex)
+end
+
+---@param bracketId string
+---@param matchId string
+---@param matchArgs table
+---@return table[]
+function MatchGroupInput.readMatchpage(bracketId, matchId, matchArgs)
+	local function setMatchPageContext()
+		local tournamentPage = (mw.ext.LiquipediaDB.lpdb('match2', {
+			query = 'parent',
+			conditions = '[[match2id::'.. table.concat({bracketId, matchId}, '_') .. ']]',
+			limit = 1,
+		})[1] or {}).parent
+		if not tournamentPage then return end
+
+		local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
+		HiddenDataBox.run(Table.merge({parent = tournamentPage}, matchArgs))
+	end
+
+	setMatchPageContext()
+	matchArgs.bracketid = bracketId
+	matchArgs.matchid = matchId
+	local match = MatchGroupInput._processMatch(matchArgs, {isMatchPage = true})
+	match.bracketid = 'MATCH_' .. match.bracketid
+	return {match}
 end
 
 ---@param bracketId string

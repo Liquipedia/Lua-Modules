@@ -78,6 +78,37 @@ function MatchGroup.Bracket(args)
 	return table.concat(Array.map(parts, tostring))
 end
 
+--- Sets up a MatchPage, which is a single match displayed on a standalone page. Also known as Standalone and BigMatch.
+--- The match is saved to LPDB, but does not contain complete information. The tournament page is the primary source.
+---@param args table
+---@return string
+function MatchGroup.MatchPage(args)
+	local function getBracketIdFromPage()
+		local title = mw.title.getCurrentTitle().text
+
+		-- Title format is `ID bracketID matchID`
+		local titleParts = mw.text.split(title, ' ')
+
+		-- Return bracketID and matchID
+		return titleParts[2], titleParts[3]
+	end
+
+	local bracketId, matchId = getBracketIdFromPage()
+
+	local options = {storeMatch1 = false}
+	local matches = MatchGroupInput.readMatchpage(args.bracketid or bracketId, args.matchid or matchId, args)
+	Match.storeMatchGroup(matches, options)
+
+	local MatchpagetDisplay = Lua.import('Module:MatchGroup/Display/Matchpage')
+	local Matchpagecontainer = WikiSpecific.getMatchGroupContainer('matchpage')
+	local match = Matchpagecontainer({
+		bracketId = options.bracketId,
+		config = MatchpagetDisplay.configFromArgs(args),
+	})
+
+	return tostring(match)
+end
+
 -- Displays a matchlist or bracket specified by ID.
 ---@param args table
 ---@return Html
