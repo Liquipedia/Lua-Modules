@@ -274,7 +274,7 @@ function matchFunctions.getVodStuff(match)
 	match.links = {
 		stats = match.stats,
 		smiteesports = match.smiteesports
-			and 'https://www.smiteesports.com/matches/' .. match.smiteesports or nil,
+			and ('https://www.smiteesports.com/matches/' .. match.smiteesports) or nil,
 	}
 	return match
 end
