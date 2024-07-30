@@ -11,7 +11,7 @@ local Logic = require('Module:Logic')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
-local CustomMatchGroupInputBigMatch = {}
+local CustomMatchGroupInputMatchPage = {}
 
 local ROLE_ORDER = Table.map({
 	'top',
@@ -23,7 +23,7 @@ local ROLE_ORDER = Table.map({
 	return value, idx
 end)
 
-function CustomMatchGroupInputBigMatch.getMap(mapInput)
+function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
 		return mapInput
@@ -36,7 +36,7 @@ function CustomMatchGroupInputBigMatch.getMap(mapInput)
 	return map
 end
 
-function CustomMatchGroupInputBigMatch.getLength(map)
+function CustomMatchGroupInputMatchPage.getLength(map)
 	if not map.length then
 		return
 	end
@@ -44,11 +44,11 @@ function CustomMatchGroupInputBigMatch.getLength(map)
 	return math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)
 end
 
-function CustomMatchGroupInputBigMatch.getSide(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 	return (map['team' .. opponentIndex] or {}).color
 end
 
-function CustomMatchGroupInputBigMatch.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	if not team.players then return end
@@ -73,13 +73,13 @@ function CustomMatchGroupInputBigMatch.getParticipants(map, opponentIndex)
 	end)
 end
 
-function CustomMatchGroupInputBigMatch.getHeroPicks(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	return Array.map(team.players or {}, Operator.property('champion'))
 end
 
-function CustomMatchGroupInputBigMatch.getHeroBans(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 	local bans = map.championVeto
 
 	if not bans then return end
@@ -95,11 +95,11 @@ function CustomMatchGroupInputBigMatch.getHeroBans(map, opponentIndex)
 	return Array.map(bans, Operator.property('champion'))
 end
 
-function CustomMatchGroupInputBigMatch.getVetoPhase(map)
+function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	return map.championVeto
 end
 
-function CustomMatchGroupInputBigMatch.getObjectives(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	return {
@@ -111,4 +111,4 @@ function CustomMatchGroupInputBigMatch.getObjectives(map, opponentIndex)
 	}
 end
 
-return CustomMatchGroupInputBigMatch
+return CustomMatchGroupInputMatchPage

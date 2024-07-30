@@ -219,15 +219,6 @@ function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 		))
 	end
 
-	if match.extradata.hasbigmatch then
-		local matchPageLinkRow = MatchSummary.Row()
-		matchPageLinkRow:addElement(mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:wikitext('[[Match:ID_' .. matchId .. '|More details on the match page]]')
-		)
-		body:addRow(matchPageLinkRow)
-	end
-
 	return body
 end
 
