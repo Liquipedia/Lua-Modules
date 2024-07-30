@@ -106,14 +106,17 @@ function MatchPage.getByMatchId(props)
 				}))
 			end
 
-			-- Aggregate stats
-			team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
-			team.kills = MatchPage._sumItem(team.players, 'kills')
-			team.deaths = MatchPage._sumItem(team.players, 'deaths')
-			team.assists = MatchPage._sumItem(team.players, 'assists')
+			if game.finished then
+				-- Aggregate stats
+				team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
+				team.kills = MatchPage._sumItem(team.players, 'kills')
+				team.deaths = MatchPage._sumItem(team.players, 'deaths')
+				team.assists = MatchPage._sumItem(team.players, 'assists')
 
-			-- Set fields
-			team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
+				-- Set fields
+				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
+			end
+
 			team.picks = Array.map(team.players, Operator.property('character'))
 			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx

@@ -96,9 +96,9 @@ return {
 				</div>
 				<div class="match-bm-lol-h2h-section">
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{#teams.1}}{{kills}}/{{deaths}}/{{assists}}{{/teams.1}}</div>
+						<div>{{#finished}}{{teams.1.kills}}/{{teams.1.deaths}}/{{teams.1.assists}}{{/finished}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
-						<div>{{#teams.2}}{{kills}}/{{deaths}}/{{assists}}{{/teams.2}}</div>
+						<div>{{#finished}}{{teams.2.kills}}/{{teams.2.deaths}}/{{teams.2.assists}}{{/finished}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
 						<div>{{teams.1.gold}}</div>
