@@ -99,4 +99,16 @@ function CustomMatchGroupInputBigMatch.getVetoPhase(map)
 	return map.championVeto
 end
 
+function CustomMatchGroupInputBigMatch.getObjectives(map, opponentIndex)
+	local team = map['team' .. opponentIndex]
+	if not team then return end
+	return {
+		towers = team.towerKills,
+		inhibitors = team.inhibitorKills,
+		barons = team.baronKills,
+		dragons = team.dragonKills,
+		heralds = team.heraldKills,
+	}
+end
+
 return CustomMatchGroupInputBigMatch

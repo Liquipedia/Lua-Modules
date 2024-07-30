@@ -58,6 +58,7 @@ local CustomMatchGroupInput = {}
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): string?
 ---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
@@ -553,6 +554,8 @@ function MapFunctions.getAdditionalExtraData(MatchParser, map)
 	map.extradata.comment = map.comment
 	map.extradata.team1side = MatchParser.getSide(map, 1) or ''
 	map.extradata.team2side = MatchParser.getSide(map, 2) or ''
+	map.extradata.team1objectives = MatchParser.getObjectives(map, 1) or {}
+	map.extradata.team2objectives = MatchParser.getObjectives(map, 2) or {}
 
 	return map
 end

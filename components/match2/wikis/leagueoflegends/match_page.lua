@@ -112,8 +112,9 @@ function BigMatch.getByMatchId(props)
 			team.deaths = BigMatch._sumItem(team.players, 'deaths')
 			team.assists = BigMatch._sumItem(team.players, 'assists')
 
+			-- Set fields
+			team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
 			team.picks = Array.map(team.players, Operator.property('character'))
-
 			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx
 			end)

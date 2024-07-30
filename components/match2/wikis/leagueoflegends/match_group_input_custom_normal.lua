@@ -51,8 +51,11 @@ function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
 	return bans
 end
 
-
 function CustomMatchGroupInputNormal.getVetoPhase(map)
+	return
+end
+
+function CustomMatchGroupInputNormal.getObjectives(map, opponentIndex)
 	return
 end
 

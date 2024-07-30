@@ -108,29 +108,29 @@ return {
 				</div>
 				<div class="match-bm-lol-h2h-section">
 				<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.towerKills}}</div>
+						<div>{{teams.1.objectives.towers}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon tower.png|link=]]<br>Towers</div>
-						<div>{{teams.2.towerKills}}</div>
+						<div>{{teams.2.objectives.towers}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.inhibitorKills}}</div>
+						<div>{{teams.1.objectives.inhibitors}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon inhibitor.png|link=]]<br>Inhibitors</div>
-						<div>{{teams.2.inhibitorKills}}</div>
+						<div>{{teams.2.objectives.inhibitors}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.baronKills}}</div>
+						<div>{{teams.1.objectives.barons}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon baron.png|link=]]<br>Barons</div>
-						<div>{{teams.2.baronKills}}</div>
+						<div>{{teams.2.objectives.barons}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.dragonKills}}</div>
+						<div>{{teams.1.objectives.dragons}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon dragon.png|link=]]<br>Drakes</div>
-						<div>{{teams.2.dragonKills}}</div>
+						<div>{{teams.2.objectives.dragons}}</div>
 					</div>
 					<!--<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.heraldKills}}</div>
+						<div>{{teams.1.objectives.heralds}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon herald.png|link=]]<br>Heralds</div>
-						<div>{{teams.2.heraldKills}}</div>
+						<div>{{teams.2.objectives.heralds}}</div>
 					</div>-->
 				</div>
 			</div>
