@@ -44,7 +44,7 @@ function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
 	local bans = {}
 	local teamPrefix = 't' .. opponentIndex
 	for playerIndex = 1, MAX_NUM_BANS do
-		table.insert(bans, map[teamPrefix .. 'c' .. playerIndex])
+		table.insert(bans, map[teamPrefix .. 'b' .. playerIndex])
 	end
 	return bans
 end
