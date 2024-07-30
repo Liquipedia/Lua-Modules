@@ -401,8 +401,19 @@ function MatchFunctions.getLinks(match)
 		preview = match.preview,
 		lrthread = match.lrthread,
 		recap = match.recap,
+		stratz = {},
+		dotabuff = {},
+		datdota = {},
 	}
 	if match.faceit then match.links.faceit = 'https://www.faceit.com/en/dota2/room/' .. match.faceit end
+
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if map.publisherid then
+			match.links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.publisherid
+			match.links.datdota[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
+			match.links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
+		end
+	end
 	return match
 end
 

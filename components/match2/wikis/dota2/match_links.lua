@@ -31,4 +31,17 @@ return {
 		icon = 'File:FACEIT-icon.png',
 		text = 'FACEIT match room'
 	},
+	stratz = {
+		icon = 'File:STRATZ_icon_lightmode.svg',
+		iconDark = 'File:STRATZ_icon_darkmode.svg',
+		text = 'STRATZ'
+	},
+	dotabuff = {
+		icon = 'File:DOTABUFF-icon.png',
+		text = 'DOTABUFF'
+	},
+	datdota = {
+		icon = 'File:DatDota-icon.png',
+		text = 'datDota'
+	},
 }

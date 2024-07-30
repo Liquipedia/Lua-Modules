@@ -147,6 +147,8 @@ function MatchPage.getByMatchId(props)
 		}
 	end
 
+	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', viewModel.opponents[1].name, ' vs ', viewModel.opponents[2].name, '}}'})
+
 	return MatchPage.render(viewModel)
 end
 

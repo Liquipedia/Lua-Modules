@@ -32,18 +32,6 @@ local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-tex
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
 
--- Auto generated links from Publisher ID
-local AUTO_LINKS = {
-	{icon = 'File:DOTABUFF-icon.png', url = 'https://www.dotabuff.com/matches/', name = 'DOTABUFF'},
-	{icon = 'File:DatDota-icon.png', url = 'https://www.datdota.com/matches/', name = 'datDota'},
-	{
-		icon = 'File:STRATZ_icon_lightmode.svg',
-		iconDark = 'File:STRATZ_icon_darkmode.svg',
-		url = 'https://stratz.com/matches/',
-		name = 'STRATZ'
-	},
-}
-
 -- Hero Ban Class
 ---@class DotaHeroBan: MatchSummaryRowInterface
 ---@operator call: DotaHeroBan
@@ -116,19 +104,6 @@ function CustomMatchSummary.addToFooter(match, footer)
 		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
 		'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
 	end
-
-	local publisherIds = {}
-	Array.forEach(match.games, function(game, gameIndex)
-		publisherIds[gameIndex] = Logic.emptyOr(game.extradata.publisherid)
-	end)
-
-	Array.forEach(AUTO_LINKS, function(siteData)
-		for index, publisherId in pairs(publisherIds) do
-			local link = siteData.url .. publisherId
-			local text = 'Game ' .. index .. ' on ' .. siteData.name
-			footer:addLink(link, siteData.icon, siteData.iconDark, text)
-		end
-	end)
 
 	return footer:addLinks(MatchLinks, match.links)
 end
