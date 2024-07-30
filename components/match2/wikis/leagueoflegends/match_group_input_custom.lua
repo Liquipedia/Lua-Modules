@@ -87,15 +87,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
 
 	match = MatchFunctions.getBestOf(match)
+	match = MatchFunctions.adjustMapData(MatchParser, match)
 	match = MatchFunctions.getScoreFromMapWinners(match)
 	match = MatchFunctions.getOpponents(match)
 	match = MatchFunctions.getTournamentVars(match)
 	match = MatchFunctions.getVodStuff(match)
 	match = MatchFunctions.getLinks(match)
 	match = MatchFunctions.getExtraData(match)
-
-	-- Adjust map data, especially set participants data
-	match = MatchFunctions.adjustMapData(MatchParser, match)
 
 	if not options.isMatchPage then
 		match = MatchFunctions.mergeWithStandalone(match)
@@ -112,8 +110,13 @@ function MatchFunctions.adjustMapData(MatchParser, match)
 
 	for key, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MatchParser.getMap(mapInput)
+
+		if map.map == DUMMY_MAP then
+			map.map = nil
+		end
 		map.length = MatchParser.getLength(map)
 		map = MapFunctions.getParticipants(MatchParser, map, opponents)
+		map = MapFunctions.getScoresAndWinner(map)
 
 		match[key] = map
 	end
@@ -121,17 +124,7 @@ function MatchFunctions.adjustMapData(MatchParser, match)
 	return match
 end
 
--- called from Module:Match/Subobjects
----@param map table
----@return table
-function CustomMatchGroupInput.processMap(map)
-	if map.map == DUMMY_MAP then
-		map.map = nil
-	end
-	map = MapFunctions.getScoresAndWinner(map)
-
-	return map
-end
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param record table
 ---@param timestamp integer
