@@ -23,7 +23,7 @@ local SingleMatchDisplay = {}
 ---@param props {matchId: string, config: MatchPageConfigOptions}
 ---@return Html
 function SingleMatchDisplay.MatchPageContainer(props)
-	local bracketId, matchId = MatchGroupUtil.splitMatchId(props.matchId)
+	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
 	assert(bracketId, 'Missing or invalid matchId')
 
