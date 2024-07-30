@@ -54,7 +54,7 @@ function CustomMatchGroupInputBigMatch.getParticipants(map, opponentIndex)
 	if not team.players then return end
 	local players = Array.map(team.players, function(player)
 		return {
-			name = player.name,
+			player = player.id,
 			role = player.role,
 			character = player.champion,
 			gold = player.gold,
