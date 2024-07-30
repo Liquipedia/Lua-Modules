@@ -8,7 +8,7 @@ html.theme--dark .componentsinvert {
 	filter: invert( 1 );
 }
 
-/* Infobox Hero */
+// Hero infobox-related
 .healthbar {
 	background: linear-gradient( to right, #286323, #7af03c );
 	color: #ffffff;
@@ -22,6 +22,12 @@ html.theme--dark .componentsinvert {
 	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 	font-weight: bold;
 }
+
+#primaryAttribute img,
+.primaryAttribute img {
+	border: 0.125rem solid #ffffff;
+	border-radius: 50%;
+} // Circles the Primary Attribute.
 
 /* Infobox Cosmetic */
 .infobox-cosmetic-tradeable,
@@ -42,26 +48,19 @@ html.theme--dark .componentsinvert {
 	color: #daa520;
 }
 
-/* Template:Cf */
+// Template:Cf-related
 a.cf {
 	font-weight: bold;
 	color: #ffffff;
 	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 }
 
-/* Custom Diagrams */
-.diagram svg defs g path,
-.diagram svg defs g ellipse {
-	stroke: currentcolor;
-	fill: currentcolor;
-}
-
-/* Spellcard Ability Borders
-The smaller sizes are for sub-sections. */
+// Spellcard Ability Borders
+// The smaller sizes are for sub-sections.
 .target_passive,
 .target_aura {
 	border: 0;
-} /* Passive ability will have an overlay instead. */
+} // Applies a caved-in img overlay for passive abilities instead.
 
 .target_no,
 .target_unit,
@@ -72,11 +71,11 @@ The smaller sizes are for sub-sections. */
 	border-bottom: 0.375rem solid #212f3d;
 	border-right: 0.375rem solid #595959;
 	border-left: 0.375rem solid #a7a7a7;
-}
+} // Mimics an active button.
 
 .target_toggle {
 	border: 0.375rem solid #fc9303;
-}
+} // Mimics a toggled-on state.
 
 .target_altcast {
 	outline: 0.25rem solid #f5f5f5;
@@ -85,7 +84,7 @@ The smaller sizes are for sub-sections. */
 	border-bottom: 0.375rem solid #212f3d;
 	border-right: 0.375rem solid #595959;
 	border-left: 0.375rem solid #a7a7a7;
-}
+} // Mimics an Alt-Cast-on state.
 
 @keyframes rotate {
 	100% {
@@ -97,7 +96,7 @@ The smaller sizes are for sub-sections. */
 	width: 5rem; // 80px
 	height: 5rem; // 80px
 	padding: 0.375rem;
-}
+} // Mimics an Autocast-able ability.
 
 .target_autocast1 {
 	width: 2.5rem; //40px
@@ -140,7 +139,7 @@ The smaller sizes are for sub-sections. */
 		justify-content: center;
 		align-items: center;
 	}
-}
+} // Mimics an Autocast-on state.
 
 .target_autocast-off {
 	border: 0.375rem ridge #899499;
@@ -219,19 +218,15 @@ The smaller sizes are for sub-sections. */
 	border: 0;
 }
 
-/* Spellcard-related */
-.irisbox {
-	max-width: 28.75rem; // 460px
-	width: 100%;
-}
+// Spellcard-related
 
-.spelltad { /* Spellcard Target/Affect/Damage (TAD) */
+.spelltad {
 	display: inline-block;
 	font-size: 90%; // convert to rem
 	vertical-align: top;
 	width: 13%;
 	text-align: right;
-}
+} // Spellcard Target/Affect/Damage (TAD)
 
 .spelltad_value {
 	flex: 1 0 auto;
@@ -677,7 +672,7 @@ div.gameplay_nav ul li ul li {
 .treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
 .treeview li.emptyline > ul > li:first-child {
 	background-position: 0 0.5625rem;
-}
+} // Treelist will be removed for something else in the future.
 
 /***************************
 * Used by [[Template:Key press]] *
@@ -862,7 +857,12 @@ div.infostripe div {
 	border-left: 0.25rem solid rgba( 75, 75, 75, 0.5 );
 }
 
-/* Hero entry - used in hero tables and cosmetic infoboxes */
+// Template:Hero Entry-related
+// Used in Portal:Heroes, hero tables and cosmetic infoboxes
+
+.vercheck_no {
+	filter: grayscale( 65% );
+} // Grayscales the hero portrait based on the Template:VersionControl values stored in LPDB.
 
 div.heroentry {
 	position: relative;
@@ -1419,15 +1419,6 @@ img.pixelart {
 	display: none;
 }
 
-/* Hero infobox styles ([[Template:Hero infobox]]) */
-
-/* Highlight the primary attribute icon */
-#primaryAttribute img,
-.primaryAttribute img {
-	border: 0.125rem solid #ffffff;
-	border-radius: 50%;
-}
-
 /*
 * Cosmetic Item infobox styles ([[Template:Cosmetic item infobox]])
 */
@@ -1541,7 +1532,7 @@ html.theme--dark .patch-layout {
 	color: #d37708;
 }
 
-/* AudioButton extension styles */
+// AudioButton-related styles (<ab>)
 a.ext-audiobutton {
 	/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
 	font-family: "Font Awesome 5 Pro";
@@ -1573,7 +1564,7 @@ a.ext-audiobutton {
 	}
 }
 
-/* Quote.less overrides for RU lang */
+// Template:Quote (Quote.less) style overrides for RU
 .wiki-dota2gameru & {
 	blockquote.quote::before {
 		top: -2.5rem; // -40px
