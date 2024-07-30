@@ -65,6 +65,7 @@ function CustomMatchGroupInputBigMatch.getParticipants(map, opponentIndex)
 			creepscore = player.creepScore,
 			items = player.items,
 			runes = player.runeData,
+			spells = player.spells,
 		}
 	end)
 	return Array.sortBy(players, function(player)
