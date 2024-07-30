@@ -212,7 +212,7 @@ end
 ---@return string
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
-		return game.resulttype ~= NOT_PLAYED
+		return game.resultType ~= NOT_PLAYED
 	end), function(game)
 		return TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)
