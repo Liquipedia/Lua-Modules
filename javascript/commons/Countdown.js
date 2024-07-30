@@ -70,7 +70,7 @@ liquipedia.countdown = {
 		// Reacting state switch
 		switchToggleGroup.nodes.forEach( ( switchNode ) => {
 			switchNode.addEventListener( liquipedia.switchButtons.triggerEventName, ( event ) => {
-				liquipedia.countdown.toggleCountdowns( event.detail.value );
+				liquipedia.countdown.toggleCountdowns( event.detail.data.value );
 			} );
 		} );
 	},
