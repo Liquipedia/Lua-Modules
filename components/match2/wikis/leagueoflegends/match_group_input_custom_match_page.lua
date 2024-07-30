@@ -37,7 +37,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 end
 
 function CustomMatchGroupInputMatchPage.getLength(map)
-	if not map.length then
+	if not map.length or not Logic.isNumeric(map.length) then
 		return
 	end
 	-- Convert seconds to minutes and seconds
