@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=leagueoflegends
--- page=Module:BigMatch/Template
+-- page=Module:MatchPage/Template
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
