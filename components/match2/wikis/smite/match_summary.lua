@@ -30,6 +30,15 @@ local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-tex
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
 
+local LINK_DATA = {
+	smiteesports = {
+		icon = 'File:SMITE default lightmode.png',
+		iconDark = 'File:SMITE default darkmode.png',
+		text = 'Smite Esports Match Page'
+	},
+	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
+}
+
 -- God Ban Class
 ---@class SmiteGodBan: MatchSummaryRowInterface
 ---@operator call: SmiteGodBan
@@ -261,6 +270,14 @@ function CustomMatchSummary._opponentGodsDisplay(opponentgodsData, numberOfGods,
 	end
 
 	return display
+end
+
+---@param match MatchGroupUtilMatch
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function CustomMatchSummary.addToFooter(match, footer)
+	footer = MatchSummary.addVodsToFooter(match, footer)
+	return footer:addLinks(LINK_DATA, match.links)
 end
 
 return CustomMatchSummary

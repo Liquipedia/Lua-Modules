@@ -269,6 +269,13 @@ end
 ---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
+	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
+
+	match.links = {
+		stats = match.stats,
+		smiteesports = match.smiteesports
+			and ('https://www.smiteesports.com/matches/' .. match.smiteesports) or nil,
+	}
 	return match
 end
 
