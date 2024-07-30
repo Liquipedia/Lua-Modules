@@ -29,6 +29,18 @@ html.theme--dark .componentsinvert {
 	border-radius: 50%;
 } // Circles the Primary Attribute.
 
+.ib-tooltip {
+	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
+	border-style: solid;
+	text-align: center;
+	font-size: 70%; // convert to rem
+	font-weight: bold;
+
+	&:hover {
+		background-color: rgba( 255, 215, 0, 0.5 );
+	}
+} // Mainly for Hero infobox tooltip. Can be expanded to other usage in the future.
+
 /* Infobox Cosmetic */
 .infobox-cosmetic-tradeable,
 .infobox-cosmetic-marketable {
@@ -184,9 +196,8 @@ a.cf {
 .target_downtime1 {
 	width: 5.375rem; // 86px
 	height: 5.375rem; //86px
-	box-sizing: border-box; // shouldn't be necessary?
 	border: 0;
-}
+} // Downtime should always be within the sub-section.
 
 .target_downtime1:before,
 .item_cdshare:before {
@@ -214,7 +225,6 @@ a.cf {
 .item_cdshare {
 	width: 5.5rem; // 88px
 	height: 4rem; // 64px
-	box-sizing: border-box; // is this necessary?
 	border: 0;
 }
 
@@ -348,20 +358,6 @@ a.cf {
 	height: 35px;
 }
 
-/* Infobox-related */
-.ib-tooltip {
-	padding: 0.2px; // is subpixel necessary?
-	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
-	border-style: solid;
-	text-align: center;
-	font-size: 70%; // convert to rem
-	font-weight: bold;
-
-	&:hover {
-		background-color: rgba( 255, 215, 0, 0.5 );
-	}
-}
-
 /* Spellunit-related */
 .spellunit {
 	&_link,
@@ -461,6 +457,7 @@ a.cf {
 
 .facetDesc {
 	border-top: 0.125rem solid #505050;
+	padding-top: 0.3125rem;
 
 	&:hover {
 		border-top: 0.125rem solid var( --clr-moon-80 );
@@ -720,7 +717,8 @@ div.gameplay_nav ul li ul li {
 	background-color: var( --table-green-background-color );
 }
 
-/* Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]] */
+// Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]]
+// Will revisit this soon.
 .updatetablehead {
 	display: flex;
 	border-top: 0.0625rem solid #aaaaaa;
@@ -773,7 +771,7 @@ div.gameplay_nav ul li ul li {
 
 /* Template:GameVersionTableElement */
 .gvt-el-significant {
-	background: #ffffcc !important; // is important necessary?
+	background: #ffffcc;
 }
 
 /* Template:Talent table el */
@@ -781,7 +779,7 @@ div.gameplay_nav ul li ul li {
 	height: 2.5rem; // 40px
 	padding: 0;
 	border-bottom: solid 0.125rem #000000;
-	background: #eff5ff !important; // is important necessary?
+	background: #eff5ff;
 }
 
 /* Item Grid Styling on [[Item Grid]] */
@@ -860,6 +858,7 @@ div.infostripe div {
 // Template:Hero Entry-related
 // Used in Portal:Heroes, hero tables and cosmetic infoboxes
 
+.vercheck_,
 .vercheck_no {
 	filter: grayscale( 65% );
 } // Grayscales the hero portrait based on the Template:VersionControl values stored in LPDB.
@@ -1460,10 +1459,7 @@ img.pixelart {
 	pointer-events: none;
 }
 
-/*
-* Patch styles ([[Template:Patch layout]])
-*/
-
+// Patch styles ([[Template:Patch layout]])
 html.theme--dark .patch-layout {
 	border: 0.0625rem solid #555555;
 }
