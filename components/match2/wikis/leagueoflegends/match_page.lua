@@ -21,7 +21,7 @@ local VodLink = require('Module:VodLink')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Display = Lua.import('Module:MatchPage/Template')
 
-local BigMatch = {}
+local MatchPage = {}
 
 local KEYSTONES = Table.map({
 	-- Precision
@@ -65,14 +65,14 @@ local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 ---@param match table
 ---@return boolean
-function BigMatch.isEnabledFor(match)
+function MatchPage.isEnabledFor(match)
 	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
 			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
 end
 
 ---@param props table
 ---@return Html
-function BigMatch.getByMatchId(props)
+function MatchPage.getByMatchId(props)
 	local viewModel = props.match
 	mw.logObject(viewModel, 'VM')
 
@@ -107,10 +107,10 @@ function BigMatch.getByMatchId(props)
 			end
 
 			-- Aggregate stats
-			team.gold = BigMatch._abbreviateNumber(BigMatch._sumItem(team.players, 'gold'))
-			team.kills = BigMatch._sumItem(team.players, 'kills')
-			team.deaths = BigMatch._sumItem(team.players, 'deaths')
-			team.assists = BigMatch._sumItem(team.players, 'assists')
+			team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
+			team.kills = MatchPage._sumItem(team.players, 'kills')
+			team.deaths = MatchPage._sumItem(team.players, 'deaths')
+			team.assists = MatchPage._sumItem(team.players, 'assists')
 
 			-- Set fields
 			team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
@@ -175,40 +175,40 @@ function BigMatch.getByMatchId(props)
 		}
 	end
 
-	return BigMatch.render(viewModel)
+	return MatchPage.render(viewModel)
 end
 
 ---@param tbl table
 ---@param item string
 ---@return number
-function BigMatch._sumItem(tbl, item)
+function MatchPage._sumItem(tbl, item)
 	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
 ---@param number number
 ---@return string
-function BigMatch._abbreviateNumber(number)
+function MatchPage._abbreviateNumber(number)
 	return string.format('%.1fK', number / 1000)
 end
 
 ---@param model table
 ---@return Html
-function BigMatch.render(model)
+function MatchPage.render(model)
 	return mw.html.create('div')
-		:wikitext(BigMatch.header(model))
-		:node(BigMatch.games(model))
-		:wikitext(BigMatch.footer(model))
+		:wikitext(MatchPage.header(model))
+		:node(MatchPage.games(model))
+		:wikitext(MatchPage.footer(model))
 end
 
 ---@param model table
 ---@return string
-function BigMatch.header(model)
+function MatchPage.header(model)
 	return TemplateEngine():render(Display.header, model)
 end
 
 ---@param model table
 ---@return string
-function BigMatch.games(model)
+function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
 		return game.resulttype ~= NOT_PLAYED
 	end), function(game)
@@ -235,8 +235,8 @@ end
 
 ---@param model table
 ---@return string
-function BigMatch.footer(model)
+function MatchPage.footer(model)
 	return TemplateEngine():render(Display.footer, model)
 end
 
-return BigMatch
+return MatchPage
