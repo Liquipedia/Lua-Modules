@@ -142,7 +142,7 @@ return {
 							<div class="match-bm-lol-players-player-details">
 								<div class="match-bm-lol-players-player-character">
 									<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&heroIcon}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
-									<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{champion}}</i></div>
+									<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 								</div>
 								<div class="match-bm-lol-players-player-loadout">
 									<!-- Loadout -->
@@ -172,7 +172,7 @@ return {
 							<div class="match-bm-lol-players-player-details">
 								<div class="match-bm-lol-players-player-character">
 									<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&heroIcon}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
-									<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{champion}}</i></div>
+									<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 								</div>
 								<div class="match-bm-lol-players-player-loadout">
 									<!-- Loadout -->
