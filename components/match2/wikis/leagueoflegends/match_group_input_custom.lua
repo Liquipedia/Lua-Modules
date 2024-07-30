@@ -80,12 +80,12 @@ function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
-	local standaloneMatchId = match.matchid and match.bracketid
-		and ('MATCH_' .. match.bracketid .. '_' .. match.matchid)
-		or nil
-
 	if not options.isMatchPage then
 		--set it already here so in winner and result type processing we know it will get enriched later on
+		local standaloneMatchId = match.matchid and match.bracketid
+			and ('MATCH_' .. match.bracketid .. '_' .. match.matchid)
+			or nil
+
 		match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
 	end
 
