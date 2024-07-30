@@ -125,9 +125,9 @@ function MatchPage.getByMatchId(props)
 		end)
 
 		local _
-		_, game.championVetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
+		_, game.vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
 
-		Array.forEach(game.championVetoByTeam, function(team)
+		Array.forEach(game.vetoByTeam, function(team)
 			local lastType = 'ban'
 			Array.forEach(team, function(veto)
 				veto.isBan = veto.type == 'ban'
@@ -166,13 +166,13 @@ function MatchPage.getByMatchId(props)
 	}
 
 	viewModel.heroIcon = function(self)
-		local champion = self
+		local character = self
 		if type(self) == 'table' then
-			champion = self.champion or self.character
-			---@cast champion -table
+			character = self.character
+			---@cast character -table
 		end
 		return CharacterIcon.Icon{
-			character = champion or NO_CHARACTER,
+			character = character or NO_CHARACTER,
 			date = viewModel.date
 		}
 	end

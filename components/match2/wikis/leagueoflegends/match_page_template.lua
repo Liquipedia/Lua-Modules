@@ -76,13 +76,13 @@ return {
 					<div class="match-bm-lol-game-veto-order-team">
 						<div class="match-bm-lol-game-veto-order-team-header">{{&opponents.1.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-							{{#championVetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.1.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/championVetoByTeam.1}}
+							{{#vetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.1.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/vetoByTeam.1}}
 						</div></div>
 					</div>
 					<div class="match-bm-lol-game-veto-order-team">
 						<div class="match-bm-lol-game-veto-order-team-header">{{&opponents.2.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-							{{#championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.2.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/championVetoByTeam.2}}
+							{{#vetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.2.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/vetoByTeam.2}}
 						</div></div>
 					</div>
 				</div>

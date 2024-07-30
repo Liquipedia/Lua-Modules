@@ -96,7 +96,11 @@ function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 end
 
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
-	return map.championVeto
+	return Array.map(map.championVeto, function(veto)
+		veto.character = veto.champion
+		veto.champion = nil
+		return veto
+	end)
 end
 
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
