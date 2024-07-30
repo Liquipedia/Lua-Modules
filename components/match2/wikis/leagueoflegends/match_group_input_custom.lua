@@ -83,8 +83,11 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local standaloneMatchId = match.matchid and match.bracketid
 		and ('MATCH_' .. match.bracketid .. '_' .. match.matchid)
 		or nil
-	--set it already here so in winner and result type processing we know it will get enriched later on
-	match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
+
+	if not options.isMatchPage then
+		--set it already here so in winner and result type processing we know it will get enriched later on
+		match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
+	end
 
 	match = MatchFunctions.getBestOf(match)
 	match = MatchFunctions.adjustMapData(MatchParser, match)
