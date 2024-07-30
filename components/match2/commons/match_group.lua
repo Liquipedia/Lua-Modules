@@ -81,7 +81,7 @@ end
 --- Sets up a MatchPage, which is a single match displayed on a standalone page. Also known as Standalone and BigMatch.
 --- The match is saved to LPDB, but does not contain complete information. The tournament page is the primary source.
 ---@param args table
----@return string
+---@return Html
 function MatchGroup.MatchPage(args)
 	local function getBracketIdFromPage()
 		local title = mw.title.getCurrentTitle().text
@@ -94,19 +94,18 @@ function MatchGroup.MatchPage(args)
 	end
 
 	local bracketId, matchId = getBracketIdFromPage()
+	bracketId = args.bracketid or bracketId
+	matchId = args.matchid or matchId
+	local fullMatchId = bracketId .. '_' .. matchId
 
-	local options = {storeMatch1 = false}
-	local matches = MatchGroupInput.readMatchpage(args.bracketid or bracketId, args.matchid or matchId, args)
+	local options = {storeMatch1 = false,  storeMatch2 = true, storePageVar = true, bracketId = bracketId}
+	local matches = MatchGroupInput.readMatchpage(bracketId, matchId, args)
 	Match.storeMatchGroup(matches, options)
 
-	local MatchpagetDisplay = Lua.import('Module:MatchGroup/Display/Matchpage')
-	local Matchpagecontainer = WikiSpecific.getMatchGroupContainer('matchpage')
-	local match = Matchpagecontainer({
-		bracketId = options.bracketId,
-		config = MatchpagetDisplay.configFromArgs(args),
+	local MatchPageContainer = WikiSpecific.getMatchContainer('matchpage')
+	return MatchPageContainer({
+		matchId = fullMatchId,
 	})
-
-	return tostring(match)
 end
 
 -- Displays a matchlist or bracket specified by ID.
@@ -202,6 +201,14 @@ end
 function MatchGroup.TemplateBracket(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.Bracket(args)
+end
+
+-- Entry point of Template:MatchPage
+---@param frame Frame
+---@return Html
+function MatchGroup.TemplateMatchPage(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.MatchPage(args)
 end
 
 -- Entry point of Template:ShowSingleMatch

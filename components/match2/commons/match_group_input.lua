@@ -142,9 +142,14 @@ end
 
 ---@param bracketId string
 ---@param matchId string
----@param matchArgs table
+---@param matchInput table
 ---@return table[]
-function MatchGroupInput.readMatchpage(bracketId, matchId, matchArgs)
+function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
+	local matchArgs = {}
+	for key, value in pairs(matchInput) do
+		matchArgs[key] = Json.parseIfTable(value) or value
+	end
+
 	local function setMatchPageContext()
 		local tournamentPage = (mw.ext.LiquipediaDB.lpdb('match2', {
 			query = 'parent',
@@ -154,8 +159,11 @@ function MatchGroupInput.readMatchpage(bracketId, matchId, matchArgs)
 		if not tournamentPage then return end
 
 		local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
-		HiddenDataBox.run(Table.merge({parent = tournamentPage}, matchArgs))
+		local HdbProps = Table.merge({parent = tournamentPage}, matchArgs)
+		HdbProps.date = nil
+		HiddenDataBox.run(HdbProps)
 	end
+
 
 	setMatchPageContext()
 	matchArgs.bracketid = bracketId

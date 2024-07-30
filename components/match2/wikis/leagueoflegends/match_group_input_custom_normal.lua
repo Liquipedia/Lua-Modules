@@ -34,6 +34,7 @@ end
 function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
 	local picks = {}
 	local team = map['t' .. opponentIndex]
+	if not team then return end
 	for playerIndex = 1, MAX_NUM_PICKS do
 		table.insert(picks, map[team .. 'c' .. playerIndex])
 	end
@@ -43,6 +44,7 @@ end
 function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
 	local bans = {}
 	local team = map['t' .. opponentIndex]
+	if not team then return end
 	for playerIndex = 1, MAX_NUM_BANS do
 		table.insert(bans, map[team .. 'c' .. playerIndex])
 	end

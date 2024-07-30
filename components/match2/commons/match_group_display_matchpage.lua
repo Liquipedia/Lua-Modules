@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local SingleMatchDisplay = {}
+local MatchPageDisplay = {}
 
 ---@class MatchPageConfigOptions
 ---@field MatchPageContainer function?
@@ -22,30 +24,30 @@ local SingleMatchDisplay = {}
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: MatchPageConfigOptions}
 ---@return Html
-function SingleMatchDisplay.MatchPageContainer(props)
+function MatchPageDisplay.MatchPageContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
 	assert(bracketId, 'Missing or invalid matchId')
 
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, props.matchId)
-	return match
-		and SingleMatchDisplay.SingleMatch({
+	local matchRecord = MatchGroupUtil.fetchMatchRecords(bracketId)[1]
+	assert(matchRecord, 'Could not find match record')
+	local match = WikiSpecific.matchFromRecord(matchRecord)
+	return MatchPageDisplay.SingleMatch({
 			config = props.config,
 			match = match,
 		})
-		or mw.html.create()
 end
 
 ---Display component for a singleMatch. Match data is specified in the input.
 ---@param props {config: MatchPageConfigOptions, match: MatchGroupUtilMatch}
 ---@return Html
-function SingleMatchDisplay.SingleMatch(props)
+function MatchPageDisplay.SingleMatch(props)
 	local propsConfig = props.config or {}
 	local config = {
 		MatchPageContainer = propsConfig.MatchPageContainer or DisplayHelper.DefaultMatchPageContainer,
 	}
 
-	return SingleMatchDisplay.Match{
+	return MatchPageDisplay.Match{
 		MatchPageContainer = config.MatchPageContainer,
 		match = props.match,
 	}
@@ -54,7 +56,7 @@ end
 ---Display component for a matcch. Consists of the match page.
 ---@param props {MatchPageContainer: function, match: MatchGroupUtilMatch}
 ---@return Html
-function SingleMatchDisplay.Match(props)
+function MatchPageDisplay.Match(props)
 	return DisplayUtil.TryPureComponent(props.MatchPageContainer, {
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
@@ -63,4 +65,4 @@ function SingleMatchDisplay.Match(props)
 	})
 end
 
-return Class.export(SingleMatchDisplay)
+return Class.export(MatchPageDisplay)

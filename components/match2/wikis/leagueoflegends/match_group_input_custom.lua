@@ -568,7 +568,7 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
 
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		local teamPrefix = map['team' .. opponentIndex]
+		local teamPrefix = 'team' .. opponentIndex
 		Array.forEach(MatchParser.getHeroPicks(map, opponentIndex) or {}, function (hero, idx)
 			extradata[teamPrefix .. 'champion' .. idx] = getCharacterName(hero)
 		end)

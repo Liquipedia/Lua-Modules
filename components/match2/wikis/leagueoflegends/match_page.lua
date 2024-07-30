@@ -18,7 +18,7 @@ local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local Display = Lua.import('Module:MatchPage/Display')
+local Display = Lua.import('Module:MatchPage/Template')
 
 local BigMatch = {}
 
@@ -73,6 +73,7 @@ end
 ---@return Html
 function BigMatch.getByMatchId(props)
 	local viewModel = props.match
+	mw.logObject(viewModel, 'VM')
 
 	viewModel.isBestOfOne = #viewModel.games == 1
 	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
@@ -109,11 +110,11 @@ function BigMatch.getByMatchId(props)
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
 				table.insert(team.players, Table.mergeInto(player, {
-					roleIcon = player.role .. ' ' .. team.color,
+					roleIcon = player.role .. ' ' .. game.extradata['team' .. teamIdx ..'side'],
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
 					end),
-					runeKeystone = Array.filter(player.runeData.primary.runes, function(rune)
+					runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
 						return KEYSTONES[rune]
 					end)[1]
 				}))
@@ -127,7 +128,7 @@ function BigMatch.getByMatchId(props)
 		end)
 
 		local _
-		_, game.championVetoByTeam = Array.groupBy(game.extradata.vetophase, Operator.property('team'))
+		_, game.championVetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
 
 		Array.forEach(game.championVetoByTeam, function(team)
 			local lastType = 'ban'

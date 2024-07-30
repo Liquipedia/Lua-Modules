@@ -45,7 +45,7 @@ function CustomMatchGroupInputBigMatch.getLength(map)
 end
 
 function CustomMatchGroupInputBigMatch.getSide(map, opponentIndex)
-	return map['team' .. opponentIndex].color
+	return (map['team' .. opponentIndex] or {}).color
 end
 
 function CustomMatchGroupInputBigMatch.getParticipants(map, opponentIndex)
@@ -80,6 +80,8 @@ end
 
 function CustomMatchGroupInputBigMatch.getHeroBans(map, opponentIndex)
 	local bans = map.championVeto
+
+	if not bans then return end
 
 	bans = Array.sortBy(bans, Operator.property('vetoNumber'))
 	bans = Array.filter(bans, function(veto)
