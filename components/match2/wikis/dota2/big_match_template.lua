@@ -33,19 +33,18 @@ return {
 	footer =
 		[=[
 			<h3>Additional Information</h3>
-			<div class="match-bm-match-additional">
-				{{#vods}}
+				{{#vods.1}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">VODs</div>
-						<div class="match-bm-match-additional-section-body">{{#icons}}{{&.}}{{/icons}}</div>
+						<div class="match-bm-match-additional-section-body">{{#vods}}{{&.}}{{/vods}}</div>
 					</div>
-				{{/vods}}
-				{{#externalLinks}}
+				{{/vods.1}}
+				{{#links.1}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Socials</div>
 						<div class="match-bm-match-additional-section-body">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
 					</div>
-				{{/externalLinks}}
+				{{/links.1}}
 				{{#patch}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Patch</div>
