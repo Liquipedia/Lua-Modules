@@ -347,10 +347,10 @@ function Footer:addLinks(linkData, links)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		elseif type(link) == 'table' then
-			for gameIdx, gameLink in ipairs(link) do
+			Array.forEach(link, function(gameLink, gameIdx)
 				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
 				self:addLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
-			end
+			end)
 		else
 			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end
