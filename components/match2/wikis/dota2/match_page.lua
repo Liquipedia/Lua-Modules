@@ -78,14 +78,19 @@ function MatchPage.getByMatchId(props)
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
-				table.insert(team.players, Table.mergeInto(player, {
+				local newPlayer = Table.mergeInto(player, {
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
 					end),
 					backpackitems = Array.map(Array.range(1, BACKPACK_ITEMS_TO_SHOW), function(idx)
 						return player.backpackitems[idx] or DEFAULT_BACKPACK_ITEM
 					end),
-				}))
+				})
+
+				newPlayer.damageDone = MatchPage._abbreviateNumber(newPlayer.damageDone --[[@as number]])
+				newPlayer.gold = MatchPage._abbreviateNumber(newPlayer.gold --[[@as any]])
+
+				table.insert(team.players, newPlayer)
 			end
 
 			if game.finished then
