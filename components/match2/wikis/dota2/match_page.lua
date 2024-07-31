@@ -179,7 +179,7 @@ function MatchPage.getByMatchId(props)
 		end
 	else
 		local tournamentName = viewModel.tickername
-		displayTitle = table.concat({'Match in', tournamentName, }, ' ')
+		displayTitle = table.concat({'Match in', tournamentName}, ' ')
 	end
 	if String.isNotEmpty(displayTitle) then
 		mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
