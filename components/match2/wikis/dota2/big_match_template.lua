@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+-- todo's:
+-- Team logo's are currently 50x50 => need to be 80x80. Already made preparations for this in the css.
+
 -- luacheck: ignore
 return {
 	header =
@@ -21,9 +24,9 @@ return {
 				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
 			</div>
 			{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-			<div class="match-bm-lol-game-summary-team">{{#games.1.apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/games.1.apiInfo.team1}}</div>
+			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.1.side}}[[File:Lol faction {{games.1.teams.1.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.1.side}}</div>
 			<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{games.1.length}}</div></div></div>
-			<div class="match-bm-lol-game-summary-team">{{#games.1.apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/games.1.apiInfo.team2}}</div>
+			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.2.side}}[[File:Lol faction {{games.1.teams.2.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.2.side}}</div>
 			</div></div>{{/isBestOfOne}}
 			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 		]=],
@@ -34,7 +37,7 @@ return {
 				{{#vods}}
 					<div class="match-bm-lol-match-additional-list">{{#icons}}{{&.}}{{/icons}}</div>
 				{{/vods}}
-				<div class="match-bm-lol-match-additional-list">{{#links}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
+				<div class="match-bm-lol-match-additional-list">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
 				{{#patch}}
 					<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
 				{{/patch}}
@@ -46,9 +49,9 @@ return {
 				<div class="match-bm-lol-game-summary">
 					<div class="match-bm-lol-game-summary-team">{{&opponents.1.iconDisplay}}</div>
 					<div class="match-bm-lol-game-summary-center">
-						<div class="match-bm-lol-game-summary-faction">{{#apiInfo.team1}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/apiInfo.team1}}</div>
-						<div class="match-bm-lol-game-summary-score-holder">{{#finished}}<div class="match-bm-lol-game-summary-score">{{apiInfo.team1.scoreDisplay}}&ndash;{{apiInfo.team2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div>{{/finished}}</div>
-						<div class="match-bm-lol-game-summary-faction">{{#apiInfo.team2}}[[File:Lol faction {{color}}.png|link=|{{color}} side]]{{/apiInfo.team2}}</div>
+						<div class="match-bm-lol-game-summary-faction">{{#teams.1.side}}[[File:Lol faction {{teams.1.side}}.png|link=|{{teams.1.side}} side]]{{/teams.1.side}}</div>
+						<div class="match-bm-lol-game-summary-score-holder">{{#finished}}<div class="match-bm-lol-game-summary-score">{{teams.1.scoreDisplay}}&ndash;{{teams.2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div>{{/finished}}</div>
+						<div class="match-bm-lol-game-summary-faction">{{#teams.2.side}}[[File:Lol faction {{teams.2.side}}.png|link=|{{teams.2.side}} side]]{{/teams.2.side}}</div>
 					</div>
 					<div class="match-bm-lol-game-summary-team">{{&opponents.2.iconDisplay}}</div>
 				</div>
@@ -58,14 +61,14 @@ return {
 				<div class="match-bm-lol-game-veto-overview">
 					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.team1.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team1side}}"></div></li>{{/apiInfo.team1.pick}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.team1.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/apiInfo.team1.ban}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#teams.1.picks}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{teams.1.side}}"></div></li>{{/teams.1.picks}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#teams.1.bans}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/teams.1.bans}}</ul>
 						</div>
 					</div>
 					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#apiInfo.team2.pick}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{apiInfo.team2side}}"></div></li>{{/apiInfo.team2.pick}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#apiInfo.team2.ban}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/apiInfo.team2.ban}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#teams.2.picks}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{teams.2.side}}"></div></li>{{/teams.2.picks}}</ul>
+							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#teams.2.bans}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/teams.2.bans}}</ul>
 						</div>
 					</div>
 				</div>
@@ -77,13 +80,13 @@ return {
 					<div class="match-bm-lol-game-veto-order-team">
 						<div class="match-bm-lol-game-veto-order-team-header">{{&opponents.1.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-							{{#apiInfo.championVetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team1side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/apiInfo.championVetoByTeam.1}}
+							{{#vetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.1.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/vetoByTeam.1}}
 						</div></div>
 					</div>
 					<div class="match-bm-lol-game-veto-order-team">
 						<div class="match-bm-lol-game-veto-order-team-header">{{&opponents.2.iconDisplay}}</div>
 						<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-							{{#apiInfo.championVetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{apiInfo.team2side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/apiInfo.championVetoByTeam.2}}
+							{{#vetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.2.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/vetoByTeam.2}}
 						</div></div>
 					</div>
 				</div>
@@ -97,59 +100,59 @@ return {
 				</div>
 				<div class="match-bm-lol-h2h-section">
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{#apiInfo.team1}}{{kills}}/{{deaths}}/{{assists}}{{/apiInfo.team1}}</div>
+						<div>{{#finished}}{{teams.1.kills}}/{{teams.1.deaths}}/{{teams.1.assists}}{{/finished}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
-						<div>{{#apiInfo.team2}}{{kills}}/{{deaths}}/{{assists}}{{/apiInfo.team2}}</div>
+						<div>{{#finished}}{{teams.2.kills}}/{{teams.2.deaths}}/{{teams.2.assists}}{{/finished}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{apiInfo.team1.gold}}</div>
+						<div>{{teams.1.gold}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon gold.png|link=]]<br>Gold</div>
-						<div>{{apiInfo.team2.gold}}</div>
+						<div>{{teams.2.gold}}</div>
 					</div>
 				</div>
 				<div class="match-bm-lol-h2h-section">
 				<div class="match-bm-lol-h2h-stat">
-						<div>{{apiInfo.team1.towerKills}}</div>
+						<div>{{teams.1.objectives.towers}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon tower.png|link=]]<br>Towers</div>
-						<div>{{apiInfo.team2.towerKills}}</div>
+						<div>{{teams.2.objectives.towers}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{apiInfo.team1.inhibitorKills}}</div>
+						<div>{{teams.1.objectives.inhibitors}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon inhibitor.png|link=]]<br>Inhibitors</div>
-						<div>{{apiInfo.team2.inhibitorKills}}</div>
+						<div>{{teams.2.objectives.inhibitors}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{apiInfo.team1.baronKills}}</div>
+						<div>{{teams.1.objectives.barons}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon baron.png|link=]]<br>Barons</div>
-						<div>{{apiInfo.team2.baronKills}}</div>
+						<div>{{teams.2.objectives.barons}}</div>
 					</div>
 					<div class="match-bm-lol-h2h-stat">
-						<div>{{apiInfo.team1.dragonKills}}</div>
+						<div>{{teams.1.objectives.dragons}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon dragon.png|link=]]<br>Drakes</div>
-						<div>{{apiInfo.team2.dragonKills}}</div>
+						<div>{{teams.2.objectives.dragons}}</div>
 					</div>
 					<!--<div class="match-bm-lol-h2h-stat">
-						<div>{{apiInfo.team1.heraldKills}}</div>
+						<div>{{teams.1.objectives.heralds}}</div>
 						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon herald.png|link=]]<br>Heralds</div>
-						<div>{{apiInfo.team2.heraldKills}}</div>
+						<div>{{teams.2.objectives.heralds}}</div>
 					</div>-->
 				</div>
 			</div>
 			<h3>Player Performance</h3>
 			<div class="match-bm-lol-players-wrapper">
 				<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.1.iconDisplay}}</div>
-					{{#apiInfo.team1.players}}
+					{{#teams.1.players}}
 						<div class="match-bm-lol-players-player">
 							<div class="match-bm-lol-players-player-details">
 								<div class="match-bm-lol-players-player-character">
 									<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&heroIcon}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
-									<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
+									<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 								</div>
 								<div class="match-bm-lol-players-player-loadout">
 									<!-- Loadout -->
 									<div class="match-bm-lol-players-player-loadout-rs-wrap">
 										<!-- Runes/Spells -->
-										<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
+										<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runes.secondary.tree}}.png|24px]]</div>
 										<div class="match-bm-lol-players-player-loadout-rs">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
 									</div>
 									<div class="match-bm-lol-players-player-loadout-items">
@@ -161,25 +164,25 @@ return {
 							</div>
 							<div class="match-bm-lol-players-player-stats">
 								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]] {{kills}}/{{deaths}}/{{assists}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepScore}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damageDone}}</div>
+								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepscore}}</div>
+								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damagedone}}</div>
 							</div>
 						</div>
-					{{/apiInfo.team1.players}}
+					{{/teams.1.players}}
 				</div>
 				<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.2.iconDisplay}}</div>
-					{{#apiInfo.team2.players}}
+					{{#teams.2.players}}
 						<div class="match-bm-lol-players-player">
 							<div class="match-bm-lol-players-player-details">
 								<div class="match-bm-lol-players-player-character">
 									<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&heroIcon}}</div><div class="match-bm-lol-players-player-role">[[File:Lol role {{roleIcon}}.png|link=|{{role}}]]</div></div>
-									<div class="match-bm-lol-players-player-name">[[{{id}}]]<i>{{champion}}</i></div>
+									<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 								</div>
 								<div class="match-bm-lol-players-player-loadout">
 									<!-- Loadout -->
 									<div class="match-bm-lol-players-player-loadout-rs-wrap">
 										<!-- Runes/Spells -->
-										<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runeSecondaryTree}}.png|24px]]</div>
+										<div class="match-bm-lol-players-player-loadout-rs">[[File:Rune {{runeKeystone}}.png|24px]][[File:Rune {{runes.secondary.tree}}.png|24px]]</div>
 										<div class="match-bm-lol-players-player-loadout-rs">[[File:Summoner spell {{spells.1}}.png|24px]][[File:Summoner spell {{spells.2}}.png|24px]]</div>
 									</div>
 									<div class="match-bm-lol-players-player-loadout-items">
@@ -191,11 +194,11 @@ return {
 							</div>
 							<div class="match-bm-lol-players-player-stats">
 								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]] {{kills}}/{{deaths}}/{{assists}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepScore}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damageDone}}</div>
+								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|CS]] {{creepscore}}</div>
+								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]] {{damagedone}}</div>
 							</div>
 						</div>
-					{{/apiInfo.team2.players}}
+					{{/teams.2.players}}
 				</div>
 			</div>
 		]=]
