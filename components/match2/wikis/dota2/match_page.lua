@@ -41,14 +41,32 @@ function MatchPage.isEnabledFor(match)
 			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
 end
 
----@param props table
+---@class Dota2MatchPageViewModelGame: MatchGroupUtilGame
+---@field finished boolean
+---@field teams table[]
+
+---@class Dota2MatchPageViewModelOpponent: standardOpponent
+---@field opponentIndex integer
+---@field iconDisplay string
+---@field shortname string
+---@field page string
+---@field seriesDots string[]
+
+---@param props {match: MatchGroupUtilMatch}
 ---@return Html
 function MatchPage.getByMatchId(props)
+	---@class Dota2MatchPageViewModel: MatchGroupUtilMatch
+	---@field games Dota2MatchPageViewModelGame[]
+	---@field opponents Dota2MatchPageViewModelOpponent[]
 	local viewModel = props.match
 
 	viewModel.isBestOfOne = #viewModel.games == 1
 	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
 		DisplayHelper.MatchCountdownBlock(viewModel) or nil
+
+	local isLive = not viewModel.finished and viewModel.dateIsExact and viewModel.timestamp > os.time()
+
+	viewModel.statusText = viewModel.finished and 'Finished' or isLive and 'Live' or 'Upcoming'
 
 	-- Create an object array for links
 	viewModel.links = Array.extractValues(Table.map(viewModel.links, function(site, link)
@@ -125,10 +143,10 @@ function MatchPage.getByMatchId(props)
 		end)
 	}
 
-	viewModel.heroIcon = function(self)
-		local character = self
-		if type(self) == 'table' then
-			character = self.character
+	viewModel.heroIcon = function(c)
+		local character = c
+		if type(c) == 'table' then
+			character = c.character
 			---@cast character -table
 		end
 		return CharacterIcon.Icon{
@@ -137,7 +155,13 @@ function MatchPage.getByMatchId(props)
 		}
 	end
 
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', viewModel.opponents[1].name, ' vs ', viewModel.opponents[2].name, '}}'})
+	mw.getCurrentFrame():preprocess(table.concat{
+		'{{DISPLAYTITLE:',
+		viewModel.opponents[1].name,
+		' vs ',
+		viewModel.opponents[2].name,
+		'}}',
+	})
 
 	return MatchPage.render(viewModel)
 end
