@@ -28,11 +28,11 @@ local NOT_PLAYED = 'np'
 local DEFAULT_ITEM = 'EmptyIcon'
 local DEFAULT_BACKPACK_ITEM = 'EmptyIcon'
 local TEAMS = Array.range(1, 2)
-local AVAILABLE_FOR_TIERS = {1, 2, 3}
+local AVAILABLE_FOR_TIERS = {1}
 local ITEMS_TO_SHOW = 6
 local BACKPACK_ITEMS_TO_SHOW = 3
 
-local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
+local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
 
 ---@param match table
 ---@return boolean
