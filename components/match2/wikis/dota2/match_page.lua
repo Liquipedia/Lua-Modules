@@ -70,7 +70,7 @@ function MatchPage.getByMatchId(props)
 						return player.items[idx] or DEFAULT_ITEM
 					end),
 					backpackitems = Array.map(Array.range(1, BACKPACK_ITEMS_TO_SHOW), function(idx)
-						return player.items[idx] or DEFAULT_BACKPACK_ITEM
+						return player.backpackitems[idx] or DEFAULT_BACKPACK_ITEM
 					end),
 				}))
 			end
