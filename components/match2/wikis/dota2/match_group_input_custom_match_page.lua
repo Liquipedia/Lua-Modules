@@ -463,10 +463,9 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		winner = 1,
 	}
 
-	map.matchid = mapInput.matchid
-
 	-- Match not found on the API
 	assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
+	map.matchid = mapInput.matchid
 
 	return map
 end
