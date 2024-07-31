@@ -36,7 +36,6 @@ local ALLOWED_STATUSES = {
 }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 15
-local MAX_NUM_GAMES = 7
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 local DEFAULT_GAME = 'dota2'
@@ -367,13 +366,9 @@ end
 function MatchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 
-	for index = 1, MAX_NUM_GAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local vodgame = match['vodgame' .. mapIndex]
+		map.vod = map.vod or vodgame
 	end
 
 	return match
@@ -404,7 +399,6 @@ function MatchFunctions.getLinks(match)
 	if match.faceit then match.links.faceit = 'https://www.faceit.com/en/dota2/room/' .. match.faceit end
 
 	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		mw.logObject(map)
 		if map.publisherid then
 			match.links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.publisherid
 			match.links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
