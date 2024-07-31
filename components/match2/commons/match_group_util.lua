@@ -513,6 +513,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		mode = record.mode,
 		opponents = opponents,
 		parent = record.parent,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
