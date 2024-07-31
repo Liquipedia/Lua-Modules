@@ -61,7 +61,7 @@ function MatchPage.getByMatchId(props)
 		game.teams = Array.map(TEAMS, function(teamIdx)
 			local team = {players = {}}
 
-			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
+			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
@@ -86,24 +86,14 @@ function MatchPage.getByMatchId(props)
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
 			end
 
-			team.picks = Array.map(team.players, Operator.property('character'))
+			team.picks = Array.filter(game.extradata.vetophase or {}, function(veto)
+				return veto.type == 'pick' and veto.team == teamIdx
+			end)
 			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx
 			end)
 
 			return team
-		end)
-
-		local _
-		_, game.vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
-
-		Array.forEach(game.vetoByTeam, function(team)
-			local lastType = 'ban'
-			Array.forEach(team, function(veto)
-				veto.isBan = veto.type == 'ban'
-				veto.isNewGroup = lastType ~= veto.type
-				lastType = veto.type
-			end)
 		end)
 	end)
 
