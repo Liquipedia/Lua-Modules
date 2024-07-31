@@ -37,15 +37,11 @@ return {
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">VODs</div>
 						<div class="match-bm-match-additional-section-body">{{#vods}}{{&.}}{{/vods}}</div>
-					</div>
-				{{/vods.1}}
-				{{#links.1}}
+					</div>{{/vods.1}}{{#links.1}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Socials</div>
 						<div class="match-bm-match-additional-section-body">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
-					</div>
-				{{/links.1}}
-				{{#patch}}
+					</div>{{/links.1}}{{#patch}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Patch</div>
 						<div class="match-bm-match-additional-section-body">[[Patch {{patch}}]]</div>
