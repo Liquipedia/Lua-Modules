@@ -382,13 +382,9 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getPublisherId(match)
-	for index = 1, MAX_NUM_GAMES do
-		local publisherid = match['matchid' .. index]
-		if not Logic.isEmpty(publisherid) then
-			local map = match['map' .. index] or {}
-			map.publisherid = map.matchid or publisherid
-			match['map' .. index] = map
-		end
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local publisherid = match['matchid' .. mapIndex]
+		map.publisherid = map.matchid or publisherid
 	end
 
 	return match
@@ -408,9 +404,10 @@ function MatchFunctions.getLinks(match)
 	if match.faceit then match.links.faceit = 'https://www.faceit.com/en/dota2/room/' .. match.faceit end
 
 	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		mw.logObject(map)
 		if map.publisherid then
 			match.links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.publisherid
-			match.links.datdota[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
+			match.links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
 			match.links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
 		end
 	end
