@@ -12,7 +12,7 @@ local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
 local Operator = require('Module:Operator')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
@@ -87,8 +87,8 @@ function MatchPage.getByMatchId(props)
 					end),
 				})
 
-				newPlayer.damageDone = MatchPage._abbreviateNumber(newPlayer.damageDone --[[@as number]])
-				newPlayer.gold = MatchPage._abbreviateNumber(newPlayer.gold --[[@as any]])
+				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone --[[@as number?]])
+				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold --[[@as number?]])
 
 				table.insert(team.players, newPlayer)
 			end
@@ -168,13 +168,22 @@ function MatchPage.getByMatchId(props)
 		}
 	end
 
-	mw.getCurrentFrame():preprocess(table.concat{
-		'{{DISPLAYTITLE:',
-		viewModel.opponents[1].name,
-		' vs ',
-		viewModel.opponents[2].name,
-		'}}',
-	})
+	local displayTitle
+	if viewModel.opponents[1].shortname or viewModel.opponents[2].shortname then
+		local team1name = viewModel.opponents[1].shortname or 'TBD'
+		local team2name = viewModel.opponents[2].shortname or 'TBD'
+		local tournamentName = viewModel.tickername
+		displayTitle = team1name .. ' vs. ' .. team2name
+		if tournamentName then
+			displayTitle = displayTitle .. ' @ ' .. tournamentName
+		end
+	else
+		local tournamentName = viewModel.tickername
+		displayTitle = table.concat({'Match in', tournamentName, }, ' ')
+	end
+	if String.isNotEmpty(displayTitle) then
+		mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
+	end
 
 	return MatchPage.render(viewModel)
 end
@@ -186,9 +195,12 @@ function MatchPage._sumItem(tbl, item)
 	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
 end
 
----@param number number
----@return string
+---@param number number?
+---@return string?
 function MatchPage._abbreviateNumber(number)
+	if not number then
+		return
+	end
 	return string.format('%.1fK', number / 1000)
 end
 
