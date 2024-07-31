@@ -48,7 +48,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		WikiCopyPaste._getVetoes(args, bestof),
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=}}'
-		end) or nil,
+		end),
 		'}}'
 	)
 
@@ -64,7 +64,8 @@ function WikiCopyPaste._getVetoes(args, bestof)
 	if Logic.readBool(args.protect) then
 		table.insert(vetoTypes, 1, 'protect')
 	end
-	return Array.append({},
+
+	return Array.extend({},
 		INDENT .. '|mapveto={{MapVeto',
 		INDENT .. INDENT .. '|firstpick=',
 		INDENT .. INDENT .. '|types=' .. table.concat(vetoTypes, ','),
