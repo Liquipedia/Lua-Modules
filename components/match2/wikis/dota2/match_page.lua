@@ -68,20 +68,6 @@ function MatchPage.getByMatchId(props)
 
 	viewModel.statusText = viewModel.finished and 'Finished' or isLive and 'Live' or 'Upcoming'
 
-	-- Create an object array for links
-	local function processLink(site, link)
-		return Table.mergeInto({link = link}, MatchLinks[site])
-	end
-	viewModel.links = Array.flatMap(Table.entries(viewModel.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return processLink(site, sublink)
-			end)
-		end
-		return {processLink(site, link)}
-	end)
-
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
@@ -149,6 +135,22 @@ function MatchPage.getByMatchId(props)
 				gamenum = gameIdx,
 				vod = game.vod,
 			} or ''
+		end)
+	}
+	-- Create an object array for links
+	local function processLink(site, link)
+		return Table.mergeInto({link = link}, MatchLinks[site])
+	end
+
+	viewModel.externalLinks = {
+		links = Array.flatMap(Table.entries(viewModel.links), function(linkData)
+			local site, link = unpack(linkData)
+			if type(link) == 'table' then
+				return Array.map(link, function(sublink)
+					return processLink(site, sublink)
+				end)
+			end
+			return {processLink(site, link)}
 		end)
 	}
 
