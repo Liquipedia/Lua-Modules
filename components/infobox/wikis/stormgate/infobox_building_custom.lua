@@ -30,9 +30,10 @@ local CustomBuilding = Class.new(Building)
 
 local CustomInjector = Class.new(Injector)
 
-local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
+local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 ---@param frame Frame
 ---@return Html
@@ -58,9 +59,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', content = {args.size}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)}
 		)
-		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
 		end
@@ -82,28 +82,32 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirements', content = caller:_displayCommaSeparatedString(args.tech_requirement)},
-			Cell{name = 'Building Requirements', content = caller:_displayCommaSeparatedString(args.building_requirement)},
+			Cell{name = 'Tech. Requirements', content = caller:_csvToPageList(args.tech_requirement)},
+			Cell{name = 'Building Requirements', content = caller:_csvToPageList(args.building_requirement)},
 		}
 	elseif id == 'hotkey' then
-		return {
-			Cell{name = 'Hotkeys', content = {CustomBuilding._hotkeys(args.hotkey, args.hotkey2)}},
-			Cell{name = 'Macrokeys', content = {CustomBuilding._hotkeys(args.macro_key, args.macro_key2)}},
-		}
+		if not args.hotkey and not args.macro_key then return {} end
+		local hotkeyName = table.concat(Array.append({},
+			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+		), HOTKEY_SEPERATOR)
+		local hotkeys = table.concat(Array.append({},
+			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
+			args.macro_key and CustomBuilding._hotkeys(args.macro_key, args.macro_key2)
+		), HOTKEY_SEPERATOR)
+		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_displayCommaSeparatedString(args.builds)},
+			Cell{name = 'Builds', content = caller:_csvToPageList(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_displayCommaSeparatedString(args.unlocks)},
-			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
+			Cell{name = 'Unlocks', content = caller:_csvToPageList(args.unlocks)},
 			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply)},
 		}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Health', content = {args.health and (ICON_HP .. ' ' .. args.health) or nil}},
-			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
+			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'attack' then return {}
 	end
@@ -175,6 +179,7 @@ function CustomBuilding:setLpdbData(args)
 			animus = tonumber(args.animus),
 			totalanimus = tonumber(args.totalanimus),
 			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
+			buildingrequirement = Array.parseCommaSeparatedString(args.building_requirement),
 			builds = Array.parseCommaSeparatedString(args.builds),
 			unlocks = Array.parseCommaSeparatedString(args.unlocks),
 			passive = Array.parseCommaSeparatedString(args.passive),
@@ -194,22 +199,34 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
----@return string[]
-function CustomBuilding:_getArmorDisplay()
-	local armorTypes = self:_displayCommaSeparatedString(self.args.armor_type)
+---@return string?
+function CustomBuilding:_getDefenseDisplay()
+	local args = self.args
+	local health = tonumber(args.health)
+	local extraHealth = health and tonumber(args.extra_health)
+	local armor = tonumber(args.armor)
 
-	return Array.append({},
-		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
-		String.nilIfEmpty(table.concat(armorTypes, ', '))
-	)
+	return table.concat(Array.append({},
+		health and ICON_HP or nil,
+		health,
+		extraHealth and ('(+' .. extraHealth .. ')') or nil,
+		armor and ICON_ARMOR or nil,
+		armor
+	), '&nbsp;')
 end
 
 ---@param inputString string?
 ---@return string[]
-function CustomBuilding:_displayCommaSeparatedString(inputString)
+function CustomBuilding:_csvToPageList(inputString)
 	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
-		return Page.makeInternalLink({}, value)
+		return Page.makeInternalLink(value)
 	end)
+end
+
+---@param input string?
+---@return string
+function CustomBuilding:_displayCsvAsPageCsv(input)
+	return table.concat(self:_csvToPageList(input), ', ')
 end
 
 return CustomBuilding

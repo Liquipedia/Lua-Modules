@@ -23,7 +23,10 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field games match2game[]
 
 ---@class GameTable: MatchTable
-local GameTable = Class.new(MatchTable)
+---@field countRowsDisplayed number
+local GameTable = Class.new(MatchTable, function (self)
+	self.countRowsDisplayed = 0
+end)
 
 ---@param game match2game
 ---@return match2game?
@@ -133,7 +136,9 @@ function GameTable:matchRow(match)
 	local display = mw.html.create()
 
 	Array.forEach(match.games, function(game)
+		if self.countRowsDisplayed == self.config.limit then return end
 		display:node(self:gameRow(match, game))
+		self.countRowsDisplayed = self.countRowsDisplayed + 1
 	end)
 
 	return display

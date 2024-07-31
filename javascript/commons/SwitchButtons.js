@@ -52,24 +52,15 @@
  */
 
 liquipedia.switchButtons = {
-	isInitialized: false,
-	isBeingInitialized: false,
 	baseLocalStorageKey: null,
 	triggerEventName: 'switchButtonChanged',
 	switchGroups: {},
 
 	init: function () {
-		if ( this.isBeingInitialized || this.isInitialized ) {
-			return;
-		}
-		this.isBeingInitialized = true;
-
+		this.switchGroups = {};
 		this.baseLocalStorageKey = this.buildLocalStorageKey();
 		this.initSwitchElements( 'toggle', '.switch-toggle', 'switch-toggle-active' );
 		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-active' );
-
-		this.isBeingInitialized = false;
-		this.isInitialized = true;
 	},
 
 	initSwitchElements: function ( type, selector, activeClassName ) {
