@@ -129,30 +129,27 @@ function MatchPage.getByMatchId(props)
 		end)
 	end)
 
-	viewModel.vods = {
-		icons = Array.map(viewModel.games, function(game, gameIdx)
-			return game.vod and VodLink.display{
-				gamenum = gameIdx,
-				vod = game.vod,
-			} or ''
-		end)
-	}
+	viewModel.vods = Array.map(viewModel.games, function(game, gameIdx)
+		return game.vod and VodLink.display{
+			gamenum = gameIdx,
+			vod = game.vod,
+		} or ''
+	end)
+
 	-- Create an object array for links
 	local function processLink(site, link)
 		return Table.mergeInto({link = link}, MatchLinks[site])
 	end
 
-	viewModel.externalLinks = {
-		links = Array.flatMap(Table.entries(viewModel.links), function(linkData)
-			local site, link = unpack(linkData)
-			if type(link) == 'table' then
-				return Array.map(link, function(sublink)
-					return processLink(site, sublink)
-				end)
-			end
-			return {processLink(site, link)}
-		end)
-	}
+	viewModel.links = Array.flatMap(Table.entries(viewModel.links), function(linkData)
+		local site, link = unpack(linkData)
+		if type(link) == 'table' then
+			return Array.map(link, function(sublink)
+				return processLink(site, sublink)
+			end)
+		end
+		return {processLink(site, link)}
+	end)
 
 	viewModel.heroIcon = function(c)
 		local character = c
