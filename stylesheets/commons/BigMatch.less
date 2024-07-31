@@ -873,6 +873,47 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
+.match-bm-match-additional {
+	display: flex;
+	gap: 1rem;
+
+	@media ( max-width: 767px ) {
+		flex-direction: column;
+	}
+
+	&-section {
+		flex: 1 0 auto;
+		border: 0.0625rem solid #bbbbbb;
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+		}
+
+		&-header {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			padding: 0.25rem;
+			border-bottom: 0.0625rem solid #bbbbbb;
+			background: #f5f5f5;
+			font-weight: 700;
+			height: 2.375rem;
+
+			.theme--dark & {
+				background-color: var( --clr-secondary-16 );
+				border-color: var( --clr-secondary-25 );
+			}
+		}
+
+		&-body {
+			display: flex;
+			gap: 0.5rem;
+			padding: 1rem 0.5rem;
+			justify-content: center;
+		}
+	}
+}
+
 .match-bm-lol-match-additional-list {
 	display: flex;
 	flex-direction: row;
