@@ -229,7 +229,6 @@ a.cf {
 }
 
 // Spellcard-related
-
 .spelltad {
 	display: inline-block;
 	font-size: 90%; // convert to rem
@@ -345,7 +344,7 @@ a.cf {
 	display: table;
 }
 
-.i-row,
+.i-row, // Hero infobox row uses the same value.
 .spellvalueTableRow {
 	display: table-row;
 }
@@ -358,7 +357,7 @@ a.cf {
 	height: 35px;
 }
 
-/* Spellunit-related */
+// Spellunit-related
 .spellunit {
 	&_link,
 	&_topage {
@@ -410,7 +409,34 @@ a.cf {
 	}
 }
 
-/* Invokecard */
+// $craft-related
+// This is mainly for the mini-infobox within the Spellcard.
+.craft {
+	&_base {
+		background-color: #93000d2e;
+		font-size: 15px;
+		padding: 5px;
+	}
+
+	&_title {
+		font-size: 85%;
+		border-bottom: 1px solid #333;
+	}
+
+	&_icon {
+		position: relative;
+		flex-shrink: 0;
+	}
+
+	&_overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+	} // Applies a caved-in img overlay for visual purposes.
+}
+
+// Invokecard-related
 .invokeCard {
 	font-size: 85%; // convert to rem
 	width: 6.25rem; // 100px
@@ -428,7 +454,7 @@ a.cf {
 	padding: 0.25rem;
 }
 
-/* Facetcard-related */
+// Facetcard-related
 .facetBox {
 	background: rgba( 35, 46, 52, 0.25 );
 	padding: 0.3125rem;
@@ -632,7 +658,7 @@ div.gameplay_nav ul li ul li {
 	border-style: hidden;
 }
 
-/* {{pp-template}} */
+// treeview-related
 .treeview {
 	ul {
 		padding: 0 !important; // is important necessary?
@@ -857,10 +883,9 @@ div.infostripe div {
 
 // Template:Hero Entry-related
 // Used in Portal:Heroes, hero tables and cosmetic infoboxes
-
 .vercheck_,
 .vercheck_no {
-	filter: grayscale( 65% );
+	filter: grayscale( 90% ); // Difficult for colorblind users at low percentage.
 } // Grayscales the hero portrait based on the Template:VersionControl values stored in LPDB.
 
 div.heroentry {
