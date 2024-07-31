@@ -40,12 +40,12 @@ return {
 						<div class="match-bm-match-additional-section-body">{{#icons}}{{&.}}{{/icons}}</div>
 					</div>
 				{{/vods}}
-
+				{{#externalLinks}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Socials</div>
-						<div class="match-bm-match-additional-section-body">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]
-				{{/links}}</div>
+						<div class="match-bm-match-additional-section-body">{{#links}}[[File:{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
 					</div>
+				{{/externalLinks}}
 				{{#patch}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Patch</div>
