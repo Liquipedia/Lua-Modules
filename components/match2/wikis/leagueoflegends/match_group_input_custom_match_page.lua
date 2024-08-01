@@ -73,24 +73,29 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	end)
 end
 
-function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
-	local team = map['team' .. opponentIndex]
-	if not team then return end
-	return Array.map(team.players or {}, Operator.property('champion'))
+---@param map {championVeto: table[]?}
+---@param vetoType 'pick'|'ban'
+---@param opponentIndex 1|2
+---@return table[]?
+local function getVetoesOfPick(map, vetoType, opponentIndex)
+	if not map.championVeto then return end
+	return Array.filter(map.championVeto, function(veto)
+		return veto.type == vetoType and veto.team == opponentIndex
+	end)
 end
 
-function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
-	local bans = map.championVeto
+function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
+	local bans = getVetoesOfPick(map, 'pick', opponentIndex)
 
 	if not bans then return end
 
-	bans = Array.sortBy(bans, Operator.property('vetoNumber'))
-	bans = Array.filter(bans, function(veto)
-		return veto.type == 'ban'
-	end)
-	bans = Array.filter(bans, function(veto)
-		return veto.team == opponentIndex
-	end)
+	return Array.map(bans, Operator.property('champion'))
+end
+
+function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
+	local bans = getVetoesOfPick(map, 'ban', opponentIndex)
+
+	if not bans then return end
 
 	return Array.map(bans, Operator.property('champion'))
 end
