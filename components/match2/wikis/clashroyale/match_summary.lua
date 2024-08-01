@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -79,20 +80,7 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
 	end
 
-	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
-	end
+	CustomMatchSummary._addMvp(match, body)
 
 	local extradata = match.extradata or {}
 	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
@@ -100,6 +88,21 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	return body
+end
+
+---@param match MatchGroupUtilMatch
+---@param body MatchSummaryBody
+function CustomMatchSummary._addMvp(match, body)
+	local mvpData = match.extradata.mvp
+	if Table.isEmpty(mvpData) or not mvpData.players then
+		return
+	end
+
+	local mvp = MatchSummary.Mvp()
+	Array.forEach(mvpData.players, FnUtil.curry(mvp.addPlayer, mvp))
+	mvp:setPoints(mvpData.points)
+
+	body:addRow(mvp)
 end
 
 ---@param game MatchGroupUtilGame
@@ -233,6 +236,8 @@ function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 			match.extradata
 		))
 	end
+
+	CustomMatchSummary._addMvp(match, body)
 
 	return body
 end
