@@ -13,8 +13,6 @@ local Variables = require('Module:Variables')
 
 local TransferRef = {}
 
-local _ref_counter = 0
-
 local WEB_TYPE = 'web source'
 local TOURNAMENT_TYPE = 'tournament source'
 local CONTRACT_TYPE = 'contract database'
@@ -239,16 +237,11 @@ function TransferRef.createReference(refData, date)
 	local refType = refData.refType
 
 	if refType == WEB_TYPE then
-		if not refData.title then
-			_ref_counter = _ref_counter + 1
-			refData.title = 'Transfer reference ' .. _ref_counter
-		end
-
 		local refCite = mw.getCurrentFrame():expandTemplate{
 			title = 'Cite web',
 			args = {
 				url = refData.link,
-				title = refData.title,
+				title = refData.title or 'Transfer reference',
 				trans_title = refData.transTitle,
 				language = refData.language,
 				author = refData.author,
