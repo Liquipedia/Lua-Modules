@@ -110,9 +110,12 @@ end
 ---@return string[]
 function CustomMap:getWikiCategories(args)
 	local players = args.players or self:_tlpdMap(args.id, 'players')
-	if String.isEmpty(players) then return {} end
+	local tileset = args.tileset or self:_tlpdMap(args.id, 'tileset')
 
-	return {'Maps (' .. players .. ' Players)'}
+	return Array.append({},
+		String.isNotEmpty(players) and ('Maps (' .. players .. ' Players)') or nil,
+		String.isNotEmpty(tileset) and (tileset .. ' Tileset') or nil
+	)
 end
 
 return CustomMap
