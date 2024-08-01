@@ -516,6 +516,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
