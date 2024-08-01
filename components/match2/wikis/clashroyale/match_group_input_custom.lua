@@ -8,9 +8,11 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local CardNames = mw.loadData('Module:CardNames')
@@ -51,42 +53,6 @@ function CustomMatchGroupInput.processMatch(match)
 	match = matchFunctions.getVodStuff(match)
 
 	return match
-end
-
----@param record table
----@param timestamp integer
----@return table
-function CustomMatchGroupInput.processOpponent(record, timestamp)
-	local opponent = Opponent.readOpponentArgs(record)
-		or Opponent.blank()
-
-	---@type number|string
-	local teamTemplateDate = timestamp
-	-- If date is default date, resolve using tournament dates instead
-	-- default date indicates that the match is missing a date
-	-- In order to get correct child team template, we will use an approximately date and not the default date
-	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = DateExt.getContextualDateOrNow()
-	end
-
-	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
-
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-
-	Array.forEach(record.players or {}, function (player)
-		player.name = player.name:gsub(' ', '_')
-	end)
-
-	if record.name then
-		record.name = record.name:gsub(' ', '_')
-	end
-
-	if record.type == Opponent.team then
-		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
-		record.match2players = MatchGroupInput.readPlayersOfTeam(record, record.players, opponent.template)
-	end
-
-	return record
 end
 
 ---@param template string
@@ -208,8 +174,7 @@ end
 ---@param match table
 ---@return boolean True
 function CustomMatchGroupInput._hasTeamOpponent(match)
-	return Array.any(match.opponent1.type, Opponent.team) or Array.any(match.opponent2.type, Opponent.team)
-	--return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
+	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
 ---@param match table
@@ -239,6 +204,7 @@ function matchFunctions.getExtraData(match)
 	match.extradata = {
 		t1bans = CustomMatchGroupInput._readBans(match.t1bans),
 		t2bans = CustomMatchGroupInput._readBans(match.t2bans),
+		mvp = MatchGroupInput.readMvp(match),
 	} --[[@as table]]
 
 	for subGroupIndex = 1, MAX_NUM_MAPS do
@@ -368,17 +334,17 @@ end
 function CustomMatchGroupInput._determineWinnerIfMissing(match, scores)
 	local maxScore = math.max(unpack(scores) or 0)
 	-- if we have a positive score and the match is finished we also have a winner
-	if maxScore > 0 then
-		if Array.all(scores, function(score) return score == maxScore end) then
-			match.winner = 0
-			return
-		end
+	if maxScore <= 0 then return end
 
-		for opponentIndex, score in pairs(scores) do
-			if score == maxScore then
-				match.winner = opponentIndex
-				return
-			end
+	if Array.all(scores, function(score) return score == maxScore end) then
+		match.winner = 0
+		return
+	end
+
+	for opponentIndex, score in pairs(scores) do
+		if score == maxScore then
+			match.winner = opponentIndex
+			return
 		end
 	end
 end
@@ -421,18 +387,20 @@ function CustomMatchGroupInput._subMatchStructure(match)
 		end
 	end
 
-	for subMatchIndex, subMatch in ipairs(subMatches) do
+	Array.forEach(subMatches, function(subMatch, subMatchIndex)
 		-- get winner if the submatch is finished
 		-- submatch is finished if the next submatch has a score or if the complete match is finished
-		local nextSubMatch = subMatches[subMatchIndex + 1]
-		if Logic.readBool(match.finished) or (nextSubMatch and nextSubMatch.scores[1] + nextSubMatch.scores[2] > 0) then
-			if subMatch.scores[1] > subMatch.scores[2] then
-				subMatch.winner = 1
-			elseif subMatch.scores[2] > subMatch.scores[1] then
-				subMatch.winner = 2
-			end
+		local nextSubMatch = subMatches[subMatchIndex + 1] or {scores = {0, 0}}
+		
+		if not Logic.readBool(match.finished) and (nextSubMatch.scores[1] + nextSubMatch.scores[2] <= 0) then
+			return
 		end
-	end
+		if subMatch.scores[1] > subMatch.scores[2] then
+			subMatch.winner = 1
+		elseif subMatch.scores[2] > subMatch.scores[1] then
+			subMatch.winner = 2
+		end
+	end)
 
 	match.extradata.submatches = subMatches
 
@@ -442,31 +410,58 @@ end
 ---@param match table
 ---@return table
 function CustomMatchGroupInput._opponentInput(match)
-	local opponentIndex = 1
-	local opponent = match['opponent' .. opponentIndex]
-
-	while opponentIndex <= MAX_NUM_OPPONENTS and Logic.isNotEmpty(opponent) do
-		opponent = Json.parseIfString(opponent) or Opponent.blank()
-
-		-- Convert byes to literals
-		if Opponent.isBye(opponent) then
-			opponent = {type = Opponent.literal, name = 'BYE'}
-		end
-
-		--process input
-		assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type')
-		opponent = CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
-
-		--set initial opponent sumscore
-		opponent.sumscore = 0
-
-		match['opponent' .. opponentIndex] = opponent
-
-		opponentIndex = opponentIndex + 1
-		opponent = match['opponent' .. opponentIndex]
-	end
+	Array.forEach(Array.range(1, MAX_NUM_OPPONENTS), FnUtil.curry(CustomMatchGroupInput.processOpponent, match))
 
 	return match
+end
+
+---@param match table
+---@param opponentIndex integer
+function CustomMatchGroupInput.processOpponent(match, opponentIndex)
+	local record = Json.parseIfString(match['opponent' .. opponentIndex])
+	assert(Opponent.isType(record.type), 'Unsupported Opponent Type')
+
+	local opponent = Opponent.readOpponentArgs(record) or Opponent.blank()
+
+	-- Convert byes to literals
+	if Opponent.isBye(opponent) then
+		opponent = {type = Opponent.literal, name = 'BYE'}
+	end
+
+	---@type number|string
+	local teamTemplateDate = match.timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = DateExt.getContextualDateOrNow()
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
+
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
+
+	--set initial opponent sumscore
+	record.sumscore = 0
+
+	record.name = Page.pageifyLink(record.name)
+
+	if record.type == Opponent.team then
+		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
+	end
+
+	match['opponent' .. opponentIndex] = record
+
+	if record.type == Opponent.team then
+		MatchGroupInput.readPlayersOfTeam(match, opponentIndex, record.name, {
+			resolveRedirect = true,
+			applyUnderScores = true,
+		})
+	else
+		Array.forEach(record.players or {}, function(player)
+			player.name = Page.pageifyLink(player.name)
+		end)
+	end
 end
 
 ---@param match table
@@ -499,12 +494,8 @@ function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
 	map = CustomMatchGroupInput._processPlayerMapData(map, match)
 
 	-- set sumscore to 0 if it isn't a number
-	if Logic.emptyOr(match.opponent1.sumscore) then
-		match.opponent1.sumscore = 0
-	end
-	if Logic.emptyOr(match.opponent2.sumscore) then
-		match.opponent2.sumscore = 0
-	end
+	match.opponent1.sumscore = Logic.emptyOr(match.opponent1.sumscore, 0)
+	match.opponent2.sumscore = Logic.emptyOr(match.opponent2.sumscore, 0)
 
 	--adjust sumscore for winner opponent
 	if (tonumber(map.winner) or 0) > 0 then
@@ -665,10 +656,7 @@ end
 ---@param input string
 ---@return table
 function CustomMatchGroupInput._readCards(input)
-	return Array.map(Json.parseIfString(input) or {}, function(card)
-		if String.isEmpty(card) then return nil end
-		return (assert(CardNames[card], 'Invalid Card "' .. card .. '"'))
-	end)
+	return Array.map(Json.parseIfString(input) or {}, FnUtil.curry(MatchGroupInput.getCharacterName, CardNames))
 end
 
 return CustomMatchGroupInput
