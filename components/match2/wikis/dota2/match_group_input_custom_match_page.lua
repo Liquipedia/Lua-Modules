@@ -490,6 +490,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		return {
 			player = player.id,
 			role = player.position,
+			facet = player.facet,
 			character = player.hero,
 			gold = player.gold,
 			gpm = player.gpm,
