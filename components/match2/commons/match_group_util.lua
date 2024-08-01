@@ -903,7 +903,6 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return 'finished'|'ongoing'|'upcoming'
 function MatchGroupUtil.calculateMatchPhase(match)
-	mw.logObject(match)
 	if Logic.readBool(match.finished) then
 		return 'finished'
 	elseif Logic.readBool(match.dateIsExact) and match.timestamp >= os.time() then
