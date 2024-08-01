@@ -11,17 +11,12 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 
@@ -68,8 +63,6 @@ end
 ---@param props HorizontallistBracket
 ---@return Html
 function HorizontallistDisplay.Bracket(props)
-	local defaultConfig = DisplayHelper.getGlobalConfig()
-	local propsConfig = props.config or {}
 	local config = {
 		MatchSummaryContainer = DisplayHelper.DefaultMatchSummaryContainer,
 	}
@@ -78,10 +71,11 @@ function HorizontallistDisplay.Bracket(props)
 	local sortedBracket = HorizontallistDisplay._sortMatches(props.bracket)
 
 	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
+		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
 		local nodeProps = {
 			header = header,
 			index = index,
-			status = MatchGroupUtil.calculateMatchPhase(MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])),
+			status = MatchGroupUtil.calculateMatchPhase(attachedMatch),
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
