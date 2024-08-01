@@ -123,6 +123,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	for participantKey, participantData in Table.iter.spairs(game.participants or {}) do
 		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
 		participantData.cards = participantData.cards or {}
+		---@type table
 		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
 			return participantData.cards[idx] or DEFAULT_CARD end)
 		cards.tower = participantData.cards.tower
@@ -231,15 +232,6 @@ function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 			subMatch,
 			match.extradata
 		))
-	end
-
-	if match.extradata.hasbigmatch then
-		local matchPageLinkRow = MatchSummary.Row()
-		matchPageLinkRow:addElement(mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:wikitext('[[Match:ID_' .. matchId .. '|More details on the match page]]')
-		)
-		body:addRow(matchPageLinkRow)
 	end
 
 	return body

@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -34,7 +36,6 @@ local ALLOWED_STATUSES = {
 }
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 15
-local MAX_NUM_GAMES = 7
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 local DEFAULT_GAME = 'dota2'
@@ -48,61 +49,87 @@ local MIN_EARNINGS_FOR_FEATURED = 100000
 
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
+---@class Dota2MatchParserInterface
+---@field getMap fun(mapInput: table): table
+---@field getLength fun(map: table): string?
+---@field getSide fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): string?
+---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
+---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
+---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
+---@field getVetoPhase fun(map: table): table?
+
 -- containers for process helper functions
-local matchFunctions = {}
-local mapFunctions = {}
+local MatchFunctions = {}
+local MapFunctions = {}
 
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
 ---@param match table
----@param options table?
+---@param options? {isMatchPage: boolean?}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
+	options = options or {}
+
+	local MatchParser
+	if options.isMatchPage then
+		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/MatchPage')
+	else
+		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
+	end
+
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
-	match = matchFunctions.getBestOf(match)
-	match = matchFunctions.getScoreFromMapWinners(match)
-	match = matchFunctions.getOpponents(match)
-	match = matchFunctions.getTournamentVars(match)
-	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getPublisherId(match)
-	match = matchFunctions.getLinks(match)
-	match = matchFunctions.getExtraData(match)
 
-	-- Adjust map data, especially set participants data
-	match = matchFunctions.adjustMapData(match)
+	if not options.isMatchPage then
+		--set it already here so in winner and result type processing we know it will get enriched later on
+		local standaloneMatchId = match.matchid and match.bracketid
+			and ('MATCH_' .. match.bracketid .. '_' .. match.matchid)
+			or nil
+		match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
+	end
+
+	match = MatchFunctions.getBestOf(match)
+	match = MatchFunctions.adjustMapData(MatchParser, match)
+	match = MatchFunctions.getScoreFromMapWinners(match)
+	match = MatchFunctions.getOpponents(match)
+	match = MatchFunctions.getTournamentVars(match)
+	match = MatchFunctions.getVodStuff(match)
+	match = MatchFunctions.getPublisherId(match)
+	match = MatchFunctions.getLinks(match)
+	match = MatchFunctions.getExtraData(match)
+
+	if not options.isMatchPage then
+		match = MatchFunctions.mergeWithStandalone(match)
+	end
 
 	return match
 end
 
+---@param MatchParser Dota2MatchParserInterface
 ---@param match table
 ---@return table
-function matchFunctions.adjustMapData(match)
-	local opponents = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		opponents[opponentIndex] = match['opponent' .. opponentIndex]
-	end
-	local mapIndex = 1
-	while match['map'..mapIndex] do
-		match['map'..mapIndex] = mapFunctions.getParticipants(match['map'..mapIndex], opponents)
-		mapIndex = mapIndex + 1
+function MatchFunctions.adjustMapData(MatchParser, match)
+	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
+
+	for key, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local map = MatchParser.getMap(mapInput)
+
+		if map.map == DUMMY_MAP then
+			map.map = nil
+		end
+		map.length = MatchParser.getLength(map)
+		map = MapFunctions.getParticipants(MatchParser, map, opponents)
+		map = MapFunctions.getScoresAndWinner(map)
+
+		match[key] = map
 	end
 
 	return match
 end
 
--- called from Module:Match/Subobjects
----@param map table
----@return table
-function CustomMatchGroupInput.processMap(map)
-	if map.map == DUMMY_MAP then
-		map.map = nil
-	end
-	map = mapFunctions.getScoresAndWinner(map)
-
-	return map
-end
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param record table
 ---@param timestamp integer
@@ -128,12 +155,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
+CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---@param data table
 ---@param indexedScores table[]
@@ -284,7 +306,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getBestOf(match)
+function MatchFunctions.getBestOf(match)
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof', DEFAULT_BESTOF))
 	Variables.varDefine('bestof', match.bestof)
 	return match
@@ -296,7 +318,7 @@ end
 -- 2) At least one map has a winner
 ---@param match table
 ---@return table
-function matchFunctions.getScoreFromMapWinners(match)
+function MatchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local setScores = false
 
@@ -328,7 +350,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getTournamentVars(match)
+function MatchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
 	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
@@ -341,16 +363,12 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getVodStuff(match)
+function MatchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 
-	for index = 1, MAX_NUM_GAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local vodgame = match['vodgame' .. mapIndex]
+		map.vod = map.vod or vodgame
 	end
 
 	return match
@@ -358,14 +376,10 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getPublisherId(match)
-	for index = 1, MAX_NUM_GAMES do
-		local publisherid = match['matchid' .. index]
-		if not Logic.isEmpty(publisherid) then
-			local map = match['map' .. index] or {}
-			map.publisherid = map.matchid or publisherid
-			match['map' .. index] = map
-		end
+function MatchFunctions.getPublisherId(match)
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local publisherid = match['matchid' .. mapIndex]
+		map.publisherid = map.matchid or publisherid
 	end
 
 	return match
@@ -373,25 +387,34 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getLinks(match)
+function MatchFunctions.getLinks(match)
 	match.links = {
 		preview = match.preview,
 		lrthread = match.lrthread,
-		interview = match.interview,
-		review = match.review,
 		recap = match.recap,
+		stratz = {},
+		dotabuff = {},
+		datdota = {},
 	}
 	if match.faceit then match.links.faceit = 'https://www.faceit.com/en/dota2/room/' .. match.faceit end
+
+	for _, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if map.publisherid then
+			match.links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.publisherid
+			match.links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
+			match.links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
+		end
+	end
 	return match
 end
 
 ---@param match table
 ---@return table
-function matchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match)
 	match.extradata = {
 		featured = tostring(Logic.emptyOr(
 			match.featured,
-			matchFunctions.isFeatured(match),
+			MatchFunctions.isFeatured(match),
 			''
 		)),
 		mvp = MatchGroupInput.readMvp(match),
@@ -402,7 +425,7 @@ end
 
 ---@param match table
 ---@return boolean
-function matchFunctions.isFeatured(match)
+function MatchFunctions.isFeatured(match)
 	local tier = tonumber(match.liquipediatier or '')
 	if tier == 1 or tier == 2 then
 		return true
@@ -419,10 +442,10 @@ function matchFunctions.isFeatured(match)
 
 	if
 		opponent1.type == Opponent.team and
-		matchFunctions.getEarnings(opponent1.name, year) >= MIN_EARNINGS_FOR_FEATURED
+		MatchFunctions.getEarnings(opponent1.name, year) >= MIN_EARNINGS_FOR_FEATURED
 	or
 		opponent2.type == Opponent.team and
-		matchFunctions.getEarnings(opponent2.name, year) >= MIN_EARNINGS_FOR_FEATURED
+		MatchFunctions.getEarnings(opponent2.name, year) >= MIN_EARNINGS_FOR_FEATURED
 	then
 		return true
 	end
@@ -433,7 +456,7 @@ end
 ---@param name string
 ---@param year integer
 ---@return number?
-function matchFunctions.getEarnings(name, year)
+function MatchFunctions.getEarnings(name, year)
 	if String.isEmpty(name) then
 		return 0
 	end
@@ -459,7 +482,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getOpponents(match)
+function MatchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
@@ -504,12 +527,12 @@ function matchFunctions.getOpponents(match)
 	match.walkover = string.upper(match.walkover or '')
 	if Logic.isNumeric(match.walkover) then
 		local winnerIndex = tonumber(match.walkover)
-		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, STATUS_DEFAULT_LOSS)
+		opponents = MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, STATUS_DEFAULT_LOSS)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
 	elseif Logic.isNumeric(match.winner) and Table.includes(ALLOWED_STATUSES, match.walkover) then
 		local winnerIndex = tonumber(match.winner)
-		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
+		opponents = MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
 	end
@@ -553,7 +576,7 @@ end
 ---@param opponents table[]
 ---@param walkoverType string?
 ---@return table[]
-function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
+function MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	for index, _ in pairs(opponents) do
 		opponents[index].score = NOT_PLAYED_SCORE
 		opponents[index].status = walkoverType
@@ -561,53 +584,102 @@ function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	return opponents
 end
 
+---@param match table
+---@return table
+function MatchFunctions.mergeWithStandalone(match)
+	local standaloneMatch = match.standaloneMatch
+	if not standaloneMatch then
+		return match
+	end
+
+	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
+
+	-- Update Opponents from the Standlone Match
+	match.opponent1 = standaloneMatch.match2opponents[1]
+	match.opponent2 = standaloneMatch.match2opponents[2]
+
+	-- Update Maps from the Standalone Match
+	for index, game in ipairs(standaloneMatch.match2games) do
+		game.participants = Json.parseIfString(game.participants)
+		game.extradata = Json.parseIfString(game.extradata)
+		match['map' .. index] = game
+	end
+
+	-- Remove special keys (maps/games, opponents, bracketdata etc)
+	for key, _ in pairs(standaloneMatch) do
+		if String.startsWith(key, 'match2') then
+			standaloneMatch[key] = nil
+		end
+	end
+
+	-- Copy all match level records which have value
+	for key, value in pairs(standaloneMatch) do
+		if String.isNotEmpty(value) then
+			match[key] = value
+		end
+	end
+
+	return match
+end
+
 --
 -- map related functions
 --
 
 -- Parse extradata information
+---@param MatchParser Dota2MatchParserInterface
 ---@param map table
 ---@return table
-function mapFunctions.getAdditionalExtraData(map)
+function MapFunctions.getAdditionalExtraData(MatchParser, map)
 	map.extradata.comment = map.comment
-	map.extradata.team1side = string.lower(map.team1side or '')
-	map.extradata.team2side = string.lower(map.team2side or '')
+	map.extradata.team1side = MatchParser.getSide(map, 1) or ''
+	map.extradata.team2side = MatchParser.getSide(map, 2) or ''
+	map.extradata.team1objectives = MatchParser.getObjectives(map, 1) or {}
+	map.extradata.team2objectives = MatchParser.getObjectives(map, 2) or {}
 	map.extradata.publisherid = map.publisherid or ''
 
 	return map
 end
 
 -- Parse participant information
+---@param MatchParser Dota2MatchParserInterface
 ---@param map table
 ---@param opponents table[]
 ---@return table
-function mapFunctions.getParticipants(map, opponents)
+function MapFunctions.getParticipants(MatchParser, map, opponents)
 	local participants = {}
-	local heroData = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for playerIndex = 1, MAX_NUM_PLAYERS do
-			local hero = map['t' .. opponentIndex .. 'h' .. playerIndex]
-			heroData['team' .. opponentIndex .. 'hero' .. playerIndex] = HeroNames[hero]
-		end
+	local extradata = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
 
-		local banIndex = 1
-		local nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
-		while nextBan do
-			heroData['team' .. opponentIndex .. 'ban' .. banIndex] = HeroNames[nextBan]
-			banIndex = banIndex + 1
-			nextBan = map['t' .. opponentIndex .. 'b' .. banIndex]
+	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+		local teamPrefix = 'team' .. opponentIndex
+		Array.forEach(MatchParser.getHeroPicks(map, opponentIndex) or {}, function (hero, idx)
+			extradata[teamPrefix .. 'hero' .. idx] = getCharacterName(hero)
+		end)
+		Array.forEach(MatchParser.getHeroBans(map, opponentIndex) or {}, function (hero, idx)
+			extradata[teamPrefix .. 'ban' .. idx] = getCharacterName(hero)
+		end)
+		for playerIndex, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
+			participant.character = getCharacterName(participant.character)
+			participants[opponentIndex .. '_' .. playerIndex] = participant
 		end
 	end
 
-	map.extradata = heroData
+	extradata.vetophase = MatchParser.getVetoPhase(map)
+	Array.forEach(extradata.vetophase or {}, function(veto)
+		veto.character = getCharacterName(veto.character)
+	end)
+
 	map.participants = participants
-	return mapFunctions.getAdditionalExtraData(map)
+	map.extradata = extradata
+
+	return MapFunctions.getAdditionalExtraData(MatchParser, map)
 end
 
 -- Calculate Score and Winner of the map
 ---@param map table
 ---@return table
-function mapFunctions.getScoresAndWinner(map)
+function MapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do

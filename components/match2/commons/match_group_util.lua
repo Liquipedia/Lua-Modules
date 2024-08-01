@@ -158,7 +158,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field status string?
 ---@field status2 string?
 ---@field template string?
----@field type string
+---@field type OpponentType
 ---@field team string?
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
@@ -513,8 +513,10 @@ function MatchGroupUtil.matchFromRecord(record)
 		mode = record.mode,
 		opponents = opponents,
 		parent = record.parent,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',

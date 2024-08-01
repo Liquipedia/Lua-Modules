@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fifa
+-- wiki=easportsfc
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,21 +8,21 @@
 
 return {
 	startYear = 2000,
-	wikiName = 'fifa',
-	name = 'FIFA',
-	defaultGame = 'fifa',
+	wikiName = 'easportsfc',
+	name = 'EA SPORTS FC',
+	defaultGame = 'easportsfc',
 	games = {
-		fifa = {
-			abbreviation = 'FIFA',
-			name = 'FIFA',
-			link = 'FIFA',
+		easportsfc = {
+			abbreviation = 'EA FC',
+			name = 'EA SPORTS FC',
+			link = 'EA SPORTS FC',
 			logo = {
-				darkMode = 'FIFA darkmode logo.png',
-				lightMode = 'FIFA lightmode logo.png',
+				darkMode = 'EA SPORTS FC darkmode.png',
+				lightMode = 'EA SPORTS FC lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'FIFA darkmode logo.png',
-				lightMode = 'FIFA lightmode logo.png',
+				darkMode = 'EA SPORTS FC darkmode.png',
+				lightMode = 'EA SPORTS FC lightmode.png',
 			},
 		},
 		['2000'] = {
@@ -348,6 +348,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'EA FC24 default allmode.png',
 				lightMode = 'EA FC24 default allmode.png',
+			},
+		},
+		['fc 25'] = {
+			abbreviation = '2025',
+			name = 'EA SPORTS FC 25',
+			link = 'EA SPORTS FC 25',
+			logo = {
+				darkMode = 'EA FC25 default allmode.png',
+				lightMode = 'EA FC25 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA FC25 default allmode.png',
+				lightMode = 'EA FC25 default allmode.png',
 			},
 		},
 		o2 = {

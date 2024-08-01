@@ -47,7 +47,11 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	cc = {'https://cc.163.com/'},
-	challengermode = {'https://www.challengermode.com/tournaments/'},
+	challengermode = {
+		'https://www.challengermode.com/tournaments/',
+		player = 'https://www.challengermode.com/users/',
+		team = 'https://www.challengermode.com/teams/'
+	},
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',
@@ -70,6 +74,7 @@ local PREFIXES = {
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
 	douyin = {'https://live.douyin.com/'},
+	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
@@ -286,6 +291,7 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
+	douyin_page = 'douyin',
 }
 
 ---@param links {[string]: string}
