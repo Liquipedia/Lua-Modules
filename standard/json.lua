@@ -12,7 +12,7 @@ local Arguments = require('Module:Arguments')
 local FnUtil = require('Module:FnUtil')
 local Table = require('Module:Table')
 
-local ERROR_PATTERN = '<span class="scribunto%-error" id="mw%-scribunto%-error%-%d">Lua error%s?i?n?%s?:? (.*)%.</span>'
+local ERROR_PATTERN = '<span class="scribunto%-error" id="mw%-scribunto%-error%-%d+">Lua error%s?i?n?%s?:? (.*)%.</span>'
 local JSON_ERROR_PATTERN = 'Module:Json/?d?e?v? at line %d+: Tried to parse Lua error &quot;(.*)&quot;'
 
 ---Json-stringifies all arguments from a supplied frame.
