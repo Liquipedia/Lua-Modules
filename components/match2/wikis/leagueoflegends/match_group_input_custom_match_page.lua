@@ -33,6 +33,15 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- Match not found on the API
 	assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
 
+	local function sortPlayersOnRole(team)
+		if not team.players then return end
+		team.players = Array.sortBy(team.players, function(player)
+			return ROLE_ORDER[player.role]
+		end)
+	end
+	sortPlayersOnRole(map.team1)
+	sortPlayersOnRole(map.team2)
+
 	return map
 end
 
@@ -52,7 +61,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	if not team.players then return end
-	local players = Array.map(team.players, function(player)
+	return Array.map(team.players, function(player)
 		return {
 			player = player.id,
 			role = player.role,
@@ -68,9 +77,6 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			spells = player.spells,
 		}
 	end)
-	return Array.sortBy(players, function(player)
-		return ROLE_ORDER[player.role]
-	end)
 end
 
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
@@ -80,16 +86,10 @@ function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
 end
 
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
-	local bans = map.championVeto
+	if not map.championVeto then return end
 
-	if not bans then return end
-
-	bans = Array.sortBy(bans, Operator.property('vetoNumber'))
-	bans = Array.filter(bans, function(veto)
-		return veto.type == 'ban'
-	end)
-	bans = Array.filter(bans, function(veto)
-		return veto.team == opponentIndex
+	local bans = Array.filter(map.championVeto, function(veto)
+		return veto.type == 'ban' and veto.team == opponentIndex
 	end)
 
 	return Array.map(bans, Operator.property('champion'))
