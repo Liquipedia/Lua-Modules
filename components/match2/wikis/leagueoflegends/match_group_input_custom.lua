@@ -581,7 +581,7 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 	end
 
 	extradata.vetophase = MatchParser.getVetoPhase(map)
-	Array.forEach(map.vetophase or {}, function(veto)
+	Array.forEach(extradata.vetophase or {}, function(veto)
 		veto.character = getCharacterName(veto.character)
 	end)
 
