@@ -284,6 +284,7 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 })
 
 ---@class MatchGroupUtilMatchlist
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
@@ -895,6 +896,20 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 	else
 		-- Matchlist format
 		return string.format('%04d', matchKey)
+	end
+end
+
+---Determines the phase of a match based on its properties.
+---@param match MatchGroupUtilMatch
+---@return 'finished'|'ongoing'|'upcoming'
+function MatchGroupUtil.calculateMatchPhase(match)
+	mw.logObject(match)
+	if Logic.readBool(match.finished) then
+		return 'finished'
+	elseif Logic.readBool(match.dateIsExact) and match.timestamp >= os.time() then
+		return 'ongoing'
+	else
+		return 'upcoming'
 	end
 end
 
