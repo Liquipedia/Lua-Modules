@@ -8,40 +8,40 @@
 
 return {
 	vod = {
-		icon = 'VOD Icon.png',
+		icon = 'File:VOD Icon.png',
 		text = 'Watch VOD'
 	},
 	preview = {
-		icon = 'Preview Icon32.png',
+		icon = 'File:Preview Icon32.png',
 		text = 'Preview'
 	},
 	lrthread = {
-		icon = 'LiveReport32.png',
+		icon = 'File:LiveReport32.png',
 		text = 'Live Report Thread'
 	},
 	recap = {
-		icon = 'Reviews32.png',
+		icon = 'File:Reviews32.png',
 		text = 'Recap'
 	},
 	headtohead = {
-		icon = 'Match Info Stats.png',
+		icon = 'File:Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
 	faceit = {
-		icon = 'FACEIT-icon.png',
+		icon = 'File:FACEIT-icon.png',
 		text = 'FACEIT match room'
 	},
 	stratz = {
-		icon = 'STRATZ_icon_lightmode.svg',
-		iconDark = 'STRATZ_icon_darkmode.svg',
+		icon = 'File:STRATZ_icon_lightmode.svg',
+		iconDark = 'File:STRATZ_icon_darkmode.svg',
 		text = 'STRATZ'
 	},
 	dotabuff = {
-		icon = 'DOTABUFF-icon.png',
+		icon = 'File:DOTABUFF-icon.png',
 		text = 'DOTABUFF'
 	},
 	datdota = {
-		icon = 'DatDota-icon.png',
+		icon = 'File:DatDota-icon.png',
 		text = 'datDota'
 	},
 }
