@@ -107,6 +107,7 @@ Author(s): Elysienna
 
 				& .cell--rank,
 				& .cell--team,
+				& .cell--match-points,
 				& .cell--total-points {
 					.panel-table__cell-icon {
 						@media ( max-width: 767px ) {
@@ -377,6 +378,15 @@ Author(s): Elysienna
 
 			@media ( max-width: 767px ) {
 				flex-basis: 4.25rem;
+			}
+		}
+
+		&--match-points {
+			flex-basis: 7.25rem;
+			flex-grow: 0;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.6875rem;
 			}
 		}
 

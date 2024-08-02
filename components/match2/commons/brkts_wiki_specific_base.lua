@@ -102,6 +102,12 @@ function WikiSpecificBase.getMatchContainer(displayMode)
 		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch')
 		return SingleMatch.SingleMatchContainer
 	end
+
+	if displayMode == 'matchpage' then
+		-- Single match, displayed on a standalone page
+		local MatchPage = Lua.import('Module:MatchGroup/Display/MatchPage')
+		return MatchPage.MatchPageContainer
+	end
 end
 
 return WikiSpecificBase
