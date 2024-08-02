@@ -53,7 +53,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match',
 		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-		needsWinner == 'true' and INDENT .. '|winner=' or nil,
+		needsWinner and (INDENT .. '|winner=') or nil,
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		mvps and (INDENT .. '|mvp=') or nil,
@@ -67,12 +67,13 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 function WikiCopyPaste._getOpponent(mode, showScore)
+	local score = showScore and '|score=' or ''
 	if mode == Opponent.solo then
-		return '{{SoloOpponent||flag=' .. (showScore or '') .. '}}'
+		return '{{SoloOpponent||flag=' .. score .. '}}'
 	elseif mode == Opponent.duo then
-		return '{{DuoOpponent|p1=|p1flag=|p2=|p2flag=' .. (showScore or '') .. '}}'
+		return '{{DuoOpponent|p1=|p1flag=|p2=|p2flag=' .. score .. '}}'
 	elseif mode == Opponent.team then
-		return '{{TeamOpponent|' .. (showScore or '') .. '}}'
+		return '{{TeamOpponent|' .. score .. '}}'
 	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end
