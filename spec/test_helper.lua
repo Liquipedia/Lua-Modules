@@ -64,6 +64,7 @@ return function(busted, helper, options)
 		table.insert(paths, 'components/faction/commons/?.lua')
 		table.insert(paths, 'components/faction/commons/starcraft_starcraft2/?.lua')
 		table.insert(paths, 'components/match2/commons/?.lua')
+		table.insert(paths, 'components/match2/commons/starcraft_starcraft2/?.lua')
 		table.insert(paths, 'components/prize_pool/commons/?.lua')
 		table.insert(paths, 'components/infobox/commons/?.lua')
 		table.insert(paths, 'components/infobox/extensions/commons/?.lua')
@@ -83,11 +84,26 @@ return function(busted, helper, options)
 		package.path = table.concat(paths, ';')
 	end
 
+	--[[
+	This will generate all wikis based on /Info/ files
+	local wikis = {}
+	local pfile = io.popen('ls -a "standard/info/wikis"')
+	if pfile then
+		for filename in pfile:lines() do
+			-- TODO add check for . and ..
+			table.insert(wikis, filename)
+		end
+		pfile:close()
+	else
+		error('Could not locate wikis')
+	end]]
+
+	-- Top 10 wikis based on traffic
+	local wikis = {'dota2', 'valorant', 'counterstrike', 'rocketleague', 'mobilelegends', 'leagueoflegends', 'apexlegends', 'rainbowsix', 'overwatch', 'starcraft2'}
 	-- Warnings! Extremely time consuming!
 	local function allwikis(name, funcToRun, wikiArgs)
 		busted.executors.insulate('', function ()
-			-- TODO: Build from files in /Info/
-			for _, wiki in pairs({'counterstrike', 'starcraft2', 'leagueoflegends'}) do
+			for _, wiki in pairs(wikis) do
 				busted.executors.insulate(wiki, function ()
 					busted.executors.it(name, function()
 						SetActiveWiki(wiki)

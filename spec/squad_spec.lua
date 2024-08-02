@@ -1,6 +1,10 @@
 --- Triple Comment to Enable our LLS Plugin
 insulate('Squad', function()
 	allwikis('storage', function (args, wikiName)
+		local Info = require('Module:Info')
+		if Info.config.squads.allowManual == false then
+			return
+		end
 		local LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 		local SquadCustom = require('Module:Squad/Custom')
@@ -8,10 +12,10 @@ insulate('Squad', function()
 		GoldenTest('squad_row_' .. wikiName, tostring(SquadCustom.run(args.input)))
 
 		for _, row in ipairs(args.lpdbExpected) do
-			local obName = row.objectname
-			row.objectname = nil
-			assert.stub(LpdbSquadStub).was.called_with(obName, row)
-			row.objectname = obName
+			local localRow = require('Module:Table').deepCopy(row)
+			local obName = localRow.objectname
+			localRow.objectname = nil
+			assert.stub(LpdbSquadStub).was.called_with(obName, localRow)
 		end
 
 		LpdbSquadStub:revert()
