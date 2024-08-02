@@ -56,16 +56,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		needsWinner == 'true' and INDENT .. '|winner=' or nil,
 		INDENT .. '|date=',
 		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
-		mvps and (INDENT .. '|mvp=') or nil
+		mvps and (INDENT .. '|mvp=') or nil,
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, showScore)
+		end),
+		bans and '|t1bans={{Cards|}}|t2bans={{Cards|}}' or nil
 	)
-
-	for opponentIndex = 1, opponents do
-		table.insert(lines, INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, showScore))
-	end
-
-	if bans then
-		table.insert(lines, INDENT .. '|t1bans={{Cards|}}|t2bans={{Cards|}}')
-	end
 
 	return table.concat(lines, '\n')
 end
@@ -74,7 +70,7 @@ function WikiCopyPaste._getOpponent(mode, showScore)
 	if mode == Opponent.solo then
 		return '{{SoloOpponent||flag=' .. (showScore or '') .. '}}'
 	elseif mode == Opponent.duo then
-		return '{{2v2Opponent|p1=|p1flag=|p2=|p2flag=' .. (showScore or '') .. '}}'
+		return '{{DuoOpponent|p1=|p1flag=|p2=|p2flag=' .. (showScore or '') .. '}}'
 	elseif mode == Opponent.team then
 		return '{{TeamOpponent|' .. (showScore or '') .. '}}'
 	elseif mode == Opponent.literal then
