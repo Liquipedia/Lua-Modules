@@ -83,7 +83,6 @@ function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
 end
 
----@param args table
 ---@return string?
 function CustomLeague:_createPatchCell()
 	local data = self.data

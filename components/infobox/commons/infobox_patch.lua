@@ -104,20 +104,21 @@ end
 --- Allows for overriding this functionality
 ---@param args table
 function Patch:setLpdbData(args)
+	local informationType = self:getInformationType(args):lower()
 	local lpdbData = {
 		name = self.name,
-		type = self:getInformationType(args):lower(),
+		type = informationType,
 		image = args.image,
 		imagedark = args.imagedark,
 		date = args.release,
-		information = mw.getContentLanguage():formatDate('m-d', args.release),
+		information = args.version,
 		extradata = {
 			highlights = self:getAllArgsForBase(args, 'highlight')
 		},
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.name, Json.stringifySubTables(lpdbData))
+	mw.ext.LiquipediaDB.lpdb_datapoint(informationType .. '_' .. self.name, Json.stringifySubTables(lpdbData))
 end
 
 --- Allows for overriding this functionality
