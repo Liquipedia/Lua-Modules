@@ -768,7 +768,7 @@ end
 ---@param game table
 ---@return string?
 function CustomMatchSummary._countdownIcon(game, additionalClass)
-	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)]
+	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)] or {}
 	return Icon.makeIcon{iconName = iconData.iconName, color = iconData.color, additionalClasses = {additionalClass}}
 end
 
