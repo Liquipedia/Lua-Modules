@@ -7,7 +7,7 @@ describe('Icon Maker', function()
 		local iconClass = 'fas fa-check'
 
 		it('invalid input returns nil', function()
-			assert.is_nil(Icon.makeIcon{iconName = iconName})
+			assert.is_nil(Icon.makeIcon{iconName = 'nonExistingIcon'})
 		end)
 
 		it('icon builds', function()
