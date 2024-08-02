@@ -18,9 +18,6 @@ local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = BaseCopyPaste.Indent
 local VETOES = {
-	[1] = {'ban', 'ban', 'ban', 'decider'},
-	[2] = {'ban', 'ban', 'pick', 'ban'},
-	[3] = {'ban', 'pick', 'ban', 'decider'},
 	[5] = {'ban', 'pick', 'pick', 'decider'},
 	[7] = {'ban', 'pick', 'pick', 'pick', 'decider'},
 	[9] = {'ban', 'pick', 'pick', 'pick', 'pick', 'decider'},
