@@ -391,7 +391,7 @@ function CustomMatchGroupInput._subMatchStructure(match)
 		-- get winner if the submatch is finished
 		-- submatch is finished if the next submatch has a score or if the complete match is finished
 		local nextSubMatch = subMatches[subMatchIndex + 1] or {scores = {0, 0}}
-		
+
 		if not Logic.readBool(match.finished) and (nextSubMatch.scores[1] + nextSubMatch.scores[2] <= 0) then
 			return
 		end
