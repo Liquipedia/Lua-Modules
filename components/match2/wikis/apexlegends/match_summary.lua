@@ -440,7 +440,7 @@ function CustomMatchSummary._createHeader(match)
 	local header = mw.html.create('ul')
 			:addClass('panel-tabs__list')
 			:attr('role', 'tablist')
-			:node(createHeader('Overall standings', 'fad fa-list-ol', 0))
+			:node(createHeader('Overall standings', 'fad fa-list-ol', 0)) -- TODO Fix icon
 
 	Array.forEach(match.games, function (game, idx)
 		header:node(createHeader('Game '.. idx, game, idx))
