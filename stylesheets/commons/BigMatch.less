@@ -29,6 +29,7 @@ Author(s): Rathoz
 
 	@media ( min-width: 768px ) {
 		flex-direction: row;
+		gap: 1.5rem;
 	}
 
 	&:first-child {
@@ -66,27 +67,41 @@ Author(s): Rathoz
 		}
 	}
 
-	.team-template-image-icon {
-		width: 4rem;
-		height: 4rem;
+	.team-template-team-icon {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+
+	.team-template-image-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 4rem;
+		height: 4rem;
 
 		@media ( min-width: 768px ) {
 			height: 5rem;
 			width: 5rem;
 		}
 
+		a {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
 		img {
-			width: auto;
-			height: auto;
-			max-height: 4rem;
 			max-width: 4rem;
+			max-height: 4rem;
+			width: 4rem;
+			height: 4rem;
 
 			@media ( min-width: 768px ) {
-				max-height: 5rem;
 				max-width: 5rem;
+				max-height: 5rem;
+				width: 5rem;
+				height: 5rem;
 			}
 		}
 	}
