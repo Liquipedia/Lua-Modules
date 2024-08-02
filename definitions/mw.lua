@@ -528,13 +528,18 @@ function mw.text.encode(s, charset) end
 ---@param s string
 ---@param flags number?
 ---@return table
-function mw.text.jsonDecode(s, flags) end
+function mw.text.jsonDecode(s, flags)
+	return require('3rd.jsonlua.json').decode(s)
+end
 
 ---Encode a JSON string. Errors are raised if the passed value cannot be encoded in JSON. flags is 0 or a combination (use +) of the flags mw.text.JSON_PRESERVE_KEYS and mw.text.JSON_PRETTY.
 ---@param s any
 ---@param flags number?
 ---@return string
-function mw.text.jsonEncode(s, flags) end
+function mw.text.jsonEncode(s, flags)
+	-- TODO This is not fully correct mock (should be "pretty" for pure arrays)
+	return require('3rd.jsonlua.json').encode(s)
+end
 
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
@@ -659,6 +664,7 @@ function mw.text.unstrip(s) end
 ---@field cascadingProtection table
 mw.title = {
 	namespace = 0,
+	nsText = '',
 	text = 'FakePage',
 	prefixedText = 'FakePage',
 	fullText = 'FakePage',
@@ -1051,5 +1057,12 @@ function mw.ext.SearchEngineOptimization.metadescl(desc) end
 
 ---@param image string
 function mw.ext.SearchEngineOptimization.metaimage(image) end
+
+mw.ext.Brackets = {}
+---@param idToCheck string
+---@return string
+function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
+	return 'ok'
+end
 
 return mw

@@ -319,7 +319,9 @@ local lpdb = {}
 ---@param obj table
 ---@return string
 ---Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
-function lpdb.lpdb_create_json(obj) end
+function lpdb.lpdb_create_json(obj)
+	return require('3rd.jsonlua.json').encode(obj)
+end
 
 ---@param obj any[]
 ---@return string
