@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -900,12 +901,13 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 end
 
 ---Determines the phase of a match based on its properties.
----@param match MatchGroupUtilMatch
+---@param match MatchGroupUtilMatch|MatchGroupUtilGame
 ---@return 'finished'|'ongoing'|'upcoming'
-function MatchGroupUtil.calculateMatchPhase(match)
+function MatchGroupUtil.computeMatchPhase(match)
+	local ts = match.timestamp or Date.readTimestamp(match.date)
 	if Logic.readBool(match.finished) then
 		return 'finished'
-	elseif Logic.readBool(match.dateIsExact) and match.timestamp >= os.time() then
+	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and ts >= os.time() then
 		return 'ongoing'
 	else
 		return 'upcoming'

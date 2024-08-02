@@ -65,7 +65,8 @@ function MatchPage.getByMatchId(props)
 	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
 		DisplayHelper.MatchCountdownBlock(viewModel) or nil
 
-	viewModel.statusText = MatchGroupUtil.calculateMatchPhase(props.match)
+	local phase = MatchGroupUtil.computeMatchPhase(props.match)
+	viewModel.statusText = phase == 'ongoing' and 'live' or phase
 
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)

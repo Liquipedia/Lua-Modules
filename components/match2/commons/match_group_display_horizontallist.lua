@@ -20,10 +20,10 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 
-local STATUS_ICONS = {
-	finished = Icon.makeIcon{iconName = 'concluded', color = 'icon--green', size = 'initial'},
-	live = Icon.makeIcon{iconName = 'live', color = 'icon--red', size = 'initial'},
-	upcoming = Icon.makeIcon{iconName = 'upcomingandongoing', size = 'initial'},
+local PHASE_ICONS = {
+	finished = {iconName = 'concluded', color = 'icon--green'},
+	ongoing = {iconName = 'live', color = 'icon--red'},
+	upcoming = {iconName = 'upcomingandongoing'},
 }
 
 ---@class HorizontallistConfig
@@ -75,7 +75,7 @@ function HorizontallistDisplay.Bracket(props)
 		local nodeProps = {
 			header = header,
 			index = index,
-			status = MatchGroupUtil.calculateMatchPhase(attachedMatch),
+			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
@@ -152,8 +152,15 @@ function HorizontallistDisplay.NodeHeader(props)
 
 	local isSelected = props.index == 1
 
+	local iconData = PHASE_ICONS[props.status] or {}
+	local icon = Icon.makeIcon{
+		iconName = iconData.iconName,
+		color = iconData.color,
+		additionalClasses = {'navigation-tabs__list-item-icon'}
+	}
+
 	return mw.html.create('li')
-			:node(mw.html.create('span'):addClass('navigation-tabs__list-item-icon'):node(STATUS_ICONS[props.status]))
+			:node(icon)
 			:addClass('navigation-tabs__list-item')
 			:attr('data-target-id', 'navigationContent' .. props.index)
 			:attr('role', 'tab')

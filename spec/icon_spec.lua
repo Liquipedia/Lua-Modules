@@ -37,5 +37,20 @@ describe('Icon Maker', function()
 			assert.are_equal('<i class="fas fa-check" aria-hidden="true"></i>',
 				Icon.makeIcon{iconName = 'winner', screenReaderHidden = true})
 		end)
+
+		it('no additional classes', function()
+			assert.are_equal('<i class="fas fa-check"></i>',
+				Icon.makeIcon{iconName = 'winner', additionalClasses = {}})
+		end)
+
+		it('one additional class', function()
+			assert.are_equal('<i class="fas fa-check extra-class"></i>',
+				Icon.makeIcon{iconName = 'winner', additionalClasses = {'extra-class'}})
+		end)
+
+		it('multiple additional classes', function()
+			assert.are_equal('<i class="fas fa-check class-one class-two"></i>',
+				Icon.makeIcon{iconName = 'winner', additionalClasses = {'class-one', 'class-two'}})
+		end)
 	end)
 end)
