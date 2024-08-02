@@ -31,7 +31,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
 ---@field stream table
 
-local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local NO_PLACEMENT = -99
 
 local PHASE_ICONS = {
