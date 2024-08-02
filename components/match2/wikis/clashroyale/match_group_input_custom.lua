@@ -70,13 +70,7 @@ end
 ---@param obj table
 ---@param scores table
 function walkoverProcessing.walkover(obj, scores)
-	local walkover = obj.walkover
-
-	if Logic.isNumeric(walkover) then
-		walkoverProcessing.numericWalkover(obj, walkover)
-	elseif walkover then
-		walkoverProcessing.nonNumericWalkover(obj, walkover)
-	elseif #scores ~= 2 then -- since we always have 2 opponents
+	if #scores ~= 2 then -- since we always have 2 opponents
 		error('Unexpected number of opponents when calculating winner')
 	elseif Array.all(scores, function(score)
 			return Table.includes(ALLOWED_STATUSES, score) and score ~= DEFAULT_WIN_STATUS
@@ -86,32 +80,6 @@ function walkoverProcessing.walkover(obj, scores)
 	elseif Array.any(scores, function(score) return Table.includes(ALLOWED_STATUSES, score) end) then
 		walkoverProcessing.scoreWalkover(obj, scores)
 	end
-end
-
----@param obj table
----@param walkover number
-function walkoverProcessing.numericWalkover(obj, walkover)
-	local winner = tonumber(walkover)
-
-	obj.winner = winner
-	obj.finished = true
-	obj.walkover = UNKNOWN_REASON_LOSS_STATUS
-	obj.resulttype = DEFAULT_WIN_RESULTTYPE
-end
-
----@param obj table
----@param walkover string
-function walkoverProcessing.nonNumericWalkover(obj, walkover)
-	if not Table.includes(ALLOWED_STATUSES, string.upper(walkover)) then
-		error('Invalid walkover "' .. walkover .. '"')
-	elseif not Logic.isNumeric(obj.winner) then
-		error('Walkover without winner specified')
-	end
-
-	obj.winner = tonumber(obj.winner)
-	obj.finished = true
-	obj.walkover = walkover:upper()
-	obj.resulttype = DEFAULT_WIN_RESULTTYPE
 end
 
 ---@param obj table
