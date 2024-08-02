@@ -529,7 +529,7 @@ function mw.text.encode(s, charset) end
 ---@param flags number?
 ---@return table
 function mw.text.jsonDecode(s, flags)
-	return require('3rd.jsonlua.json').decode(s)
+	return require('3rd.jsonlua.mock_json'):decode(s)
 end
 
 ---Encode a JSON string. Errors are raised if the passed value cannot be encoded in JSON. flags is 0 or a combination (use +) of the flags mw.text.JSON_PRESERVE_KEYS and mw.text.JSON_PRETTY.
@@ -537,8 +537,7 @@ end
 ---@param flags number?
 ---@return string
 function mw.text.jsonEncode(s, flags)
-	-- TODO This is not fully correct mock (should be "pretty" for pure arrays)
-	return require('3rd.jsonlua.json').encode(s)
+	return require('3rd.jsonlua.mock_json'):encode(s)
 end
 
 ---Removes all MediaWiki strip markers from a string.

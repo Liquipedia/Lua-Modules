@@ -1,2 +1,2 @@
 ## License
-This 3rd party has MIT license. [See here](https://github.com/rxi/json.lua/blob/master/LICENSE) for more information.
+This 3rd party has a Creative Commons CC-BY "Attribution. See the file for more information.

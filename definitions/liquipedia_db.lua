@@ -320,7 +320,8 @@ local lpdb = {}
 ---@return string
 ---Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
 function lpdb.lpdb_create_json(obj)
-	return require('3rd.jsonlua.json').encode(obj)
+	-- TODO This is not fully correct mock (should be {"1": ..., "2": ...} instead of [...,...])
+	return require('3rd.jsonlua.mock_json'):encode(obj)
 end
 
 ---@param obj any[]

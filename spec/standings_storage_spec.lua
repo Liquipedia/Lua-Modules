@@ -20,9 +20,9 @@ describe('Standings Storage', function()
 		}
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
-			config = '{}',
-			extradata = '{}',
-			matches = '{}',
+			config = '[]',
+			extradata = '[]',
+			matches = '[]',
 			parent = 'FakePage',
 			section = '',
 			standingsindex = 0,
@@ -51,8 +51,8 @@ describe('Standings Storage', function()
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
 			config = '{"hasdraws":false,"hasovertimes":true}',
-			extradata = '{"hasdraw":false,"finished":false,"hasovertime":true,"enddate":"2022-10-31","roundcount":7}',
-			matches = '{}',
+			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
+			matches = '[]',
 			parent = 'FakePage',
 			section = '',
 			standingsindex = 0,
@@ -75,8 +75,8 @@ describe('Standings Storage', function()
 			placementchange = 0,
 			roundindex = 7,
 			slotindex = 10,
-			scoreboard = '{"overtime":{"d":0,"w":0,"l":0},"points":0,"diff":-15,' ..
-				'"game":{"d":0,"w":27,"l":42},"match":{"d":0,"w":0,"l":0}}',
+			scoreboard = '{"diff":-15,"game":{"d":0,"l":42,"w":27},'..
+				'"match":{"d":0,"l":0,"w":0},"overtime":{"d":0,"l":0,"w":0},"points":0}',
 			standingsindex = 0,
 		})
 
