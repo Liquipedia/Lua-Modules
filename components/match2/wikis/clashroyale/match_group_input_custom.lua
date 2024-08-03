@@ -624,7 +624,11 @@ end
 ---@param input string
 ---@return table
 function CustomMatchGroupInput._readCards(input)
-	return Array.map(Json.parseIfString(input) or {}, FnUtil.curry(MatchGroupInput.getCharacterName, CardNames))
+	local cleanCard = FnUtil.curry(MatchGroupInput.getCharacterName, CardNames)
+
+	return Table.map(Json.parseIfString(input) or {}, function(key, card)
+		return key, cleanCard(card)
+	end)
 end
 
 return CustomMatchGroupInput
