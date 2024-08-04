@@ -34,5 +34,5 @@ return {
 		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 1,
+	match2 = 2,
 }
