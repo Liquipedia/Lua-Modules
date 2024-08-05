@@ -905,7 +905,7 @@ end
 ---@return 'finished'|'ongoing'|'upcoming'
 function MatchGroupUtil.computeMatchPhase(match)
 	local ts = match.timestamp or Date.readTimestamp(match.date)
-	if Logic.readBool(match.finished) then
+	if match.winner then
 		return 'finished'
 	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and ts >= os.time() then
 		return 'ongoing'
