@@ -19,6 +19,7 @@ local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Display = Lua.import('Module:MatchPage/Template')
 
 local MatchPage = {}
@@ -64,9 +65,8 @@ function MatchPage.getByMatchId(props)
 	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
 		DisplayHelper.MatchCountdownBlock(viewModel) or nil
 
-	local isLive = not viewModel.finished and viewModel.dateIsExact and viewModel.timestamp > os.time()
-
-	viewModel.statusText = viewModel.finished and 'Finished' or isLive and 'Live' or 'Upcoming'
+	local phase = MatchGroupUtil.computeMatchPhase(props.match)
+	viewModel.statusText = phase == 'ongoing' and 'live' or phase
 
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)

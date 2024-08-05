@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -284,6 +285,7 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 })
 
 ---@class MatchGroupUtilMatchlist
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
@@ -895,6 +897,20 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 	else
 		-- Matchlist format
 		return string.format('%04d', matchKey)
+	end
+end
+
+---Determines the phase of a match based on its properties.
+---@param match MatchGroupUtilMatch|MatchGroupUtilGame
+---@return 'finished'|'ongoing'|'upcoming'
+function MatchGroupUtil.computeMatchPhase(match)
+	local ts = match.timestamp or Date.readTimestamp(match.date)
+	if match.winner then
+		return 'finished'
+	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and ts >= os.time() then
+		return 'ongoing'
+	else
+		return 'upcoming'
 	end
 end
 

@@ -11,6 +11,7 @@ local CustomMatchSummary = {}
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
@@ -30,13 +31,12 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
 ---@field stream table
 
-local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 local NO_PLACEMENT = -99
 
-local MATCH_STATUS_TO_ICON = {
-	finished = 'fas fa-check icon--green',
-	live = 'fas fa-circle icon--red',
-	upcoming = 'fas fa-clock',
+local PHASE_ICONS = {
+	finished = {iconName = 'concluded', color = 'icon--green'},
+	ongoing = {iconName = 'live', color = 'icon--red'},
+	upcoming = {iconName = 'upcomingandongoing'},
 }
 
 local PLACEMENT_BG = {
@@ -433,16 +433,16 @@ function CustomMatchSummary._createHeader(match)
 				:attr('data-js-battle-royale-content-target-id', 'panel' .. idx)
 				:attr('role', 'tab')
 				:attr('tabindex', 0)
-				:tag('i'):addClass('panel-tabs__list-icon'):addClass(icon):done()
+				:node(icon)
 				:tag('h4'):addClass('panel-tabs__title'):wikitext(title):done()
 	end
 	local header = mw.html.create('ul')
 			:addClass('panel-tabs__list')
 			:attr('role', 'tablist')
-			:node(createHeader('Overall standings', 'fad fa-list-ol', 0))
+			:node(createHeader('Overall standings', Icon.makeIcon{iconName = 'standings'}, 0))
 
 	Array.forEach(match.games, function (game, idx)
-		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game), idx))
+		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game, 'panel-tabs__list-icon'), idx))
 	end)
 
 	return mw.html.create('div')
@@ -524,10 +524,7 @@ function CustomMatchSummary._createOverallPage(match)
 
 	Array.forEach(match.games, function (game, idx)
 		scheduleList:tag('li')
-				:tag('i')
-						:addClass(CustomMatchSummary._countdownIcon(game))
-						:addClass('panel-content__game-schedule__icon')
-						:done()
+				:node(CustomMatchSummary._countdownIcon(game, 'panel-content__game-schedule__icon'))
 				:tag('span')
 						:addClass('panel-content__game-schedule__title')
 						:wikitext('Game ', idx, ':')
@@ -561,10 +558,7 @@ function CustomMatchSummary._createGameTab(game, idx)
 	informationList:tag('li')
 			:tag('div')
 					:addClass('panel-content__game-schedule__container')
-					:tag('i')
-							:addClass(CustomMatchSummary._countdownIcon(game))
-							:addClass('panel-content__game-schedule__icon')
-							:done()
+					:node(CustomMatchSummary._countdownIcon(game, 'panel-content__game-schedule__icon'))
 					:node(CustomMatchSummary._gameCountdown(game))
 	if game.map then
 		informationList:tag('li')
@@ -648,10 +642,7 @@ function CustomMatchSummary._createMatchStandings(match)
 				:addClass('panel-table__cell__game-head')
 				:tag('div')
 						:addClass('panel-table__cell__game-title')
-						:tag('i')
-								:addClass(CustomMatchSummary._countdownIcon(game))
-								:addClass('panel-table__cell-icon')
-								:done()
+						:node(CustomMatchSummary._countdownIcon(game, 'panel-table__cell-icon'))
 						:tag('span')
 								:addClass('panel-table__cell-text')
 								:wikitext('Game ', idx)
@@ -769,40 +760,15 @@ end
 
 ---@param game table
 ---@return boolean
-function CustomMatchSummary._isUpcoming(game)
-	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
-		return false
-	end
-	return NOW < timestamp
-end
-
----@param game table
----@return boolean
-function CustomMatchSummary._isLive(game)
-	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
-		return false
-	end
-	return not CustomMatchSummary._isFinished(game) and NOW >= timestamp
-end
-
----@param game table
----@return boolean
 function CustomMatchSummary._isFinished(game)
 	return game.winner ~= nil
 end
 
 ---@param game table
 ---@return string?
-function CustomMatchSummary._countdownIcon(game)
-	if CustomMatchSummary._isFinished(game) then
-		return MATCH_STATUS_TO_ICON.finished
-	elseif CustomMatchSummary._isLive(game) then
-		return MATCH_STATUS_TO_ICON.live
-	elseif CustomMatchSummary._isUpcoming(game) then
-		return MATCH_STATUS_TO_ICON.upcoming
-	end
+function CustomMatchSummary._countdownIcon(game, additionalClass)
+	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)] or {}
+	return Icon.makeIcon{iconName = iconData.iconName, color = iconData.color, additionalClasses = {additionalClass}}
 end
 
 ---Creates a countdown block for a given game
