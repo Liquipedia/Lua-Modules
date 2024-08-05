@@ -346,7 +346,7 @@ function CustomMatchSummary._opponents(match)
 	if match.scoringTable.matchPointThreadhold then
 		Array.forEach(match.opponents, function (opponent, idx)
 			local matchPointReachedIn
-			local sum = 0
+			local sum = opponent.extradata.startingpoints or 0
 			for gameIdx, game in ipairs(opponent.games) do
 				if sum >= match.scoringTable.matchPointThreadhold then
 					matchPointReachedIn = gameIdx
