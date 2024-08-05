@@ -426,23 +426,23 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createHeader(match)
-	local function createHeader(title, game, idx)
+	local function createHeader(title, icon, idx)
 		return mw.html.create('li')
 				:addClass('panel-tabs__list-item')
 				:attr('data-js-battle-royale', 'panel-tab')
 				:attr('data-js-battle-royale-content-target-id', 'panel' .. idx)
 				:attr('role', 'tab')
 				:attr('tabindex', 0)
-				:node(CustomMatchSummary._countdownIcon(game, 'panel-tabs__list-icon'))
+				:node(icon)
 				:tag('h4'):addClass('panel-tabs__title'):wikitext(title):done()
 	end
 	local header = mw.html.create('ul')
 			:addClass('panel-tabs__list')
 			:attr('role', 'tablist')
-			:node(createHeader('Overall standings', 'fad fa-list-ol', 0)) -- TODO Fix icon
+			:node(createHeader('Overall standings', Icon.makeIcon{iconName = 'standings'}, 0))
 
 	Array.forEach(match.games, function (game, idx)
-		header:node(createHeader('Game '.. idx, game, idx))
+		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game, 'panel-tabs__list-icon'), idx))
 	end)
 
 	return mw.html.create('div')
