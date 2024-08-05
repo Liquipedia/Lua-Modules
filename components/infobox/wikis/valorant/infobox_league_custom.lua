@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
@@ -27,6 +28,12 @@ local Center = Widgets.Center
 ---@class ValorantLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
+
+local DEFAULT_PLATFORM = 'PC'
+local PLATFORM_ALIAS = {
+	console = 'Console',
+	pc = 'PC',
+}
 
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
@@ -57,6 +64,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
+			Cell{name = 'Platform', content = {self.caller:_createPlatformCell(args)}},
 			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 			Cell{name = 'Players', content = {args.player_number}}
 		)
@@ -91,9 +99,37 @@ function CustomLeague:getWikiCategories(args)
 
 	if Logic.readBool(args.female) then
 		table.insert(categories, 'Female Tournaments')
+		return categories
 	end
+	local platform = self:_platformLookup(args.platform)
 
-	return categories
+	return {
+		platform and (platform .. ' Tournaments') or nil,
+	}
+
+end
+
+---@param platform string?
+---@return string?
+function CustomLeague:_platformLookup(platform)
+	if String.isEmpty(platform) then
+		platform = DEFAULT_PLATFORM
+	end
+	---@cast platform -nil
+
+	return PLATFORM_ALIAS[platform:lower()]
+end
+
+---@param args table
+---@return string?
+function CustomLeague:_createPlatformCell(args)
+	local platform = self:_platformLookup(args.platform)
+
+	if String.isNotEmpty(platform) then
+		return PageLink.makeInternalLink({}, platform, ':Category:'..platform)
+	else
+		return nil
+	end
 end
 
 ---@param lpdbData table
