@@ -70,7 +70,7 @@ end
 ---@param streamValue string
 ---@return string
 function StreamLinks.resolve(platformName, streamValue)
-	platformName = StreamLinks.reaolvePlatform(platformName)
+	platformName = StreamLinks.resolvePlatform(platformName)
 	local streamLink = mw.ext.StreamPage.resolve_stream(platformName, streamValue)
 
 	return (string.gsub(streamLink, 'Special:Stream/' .. platformName, ''))
@@ -78,7 +78,7 @@ end
 
 ---@param platform string
 ---@return string
-function StreamLinks.reaolvePlatform(platform)
+function StreamLinks.resolvePlatform(platform)
 	return PLATFORM_TO_SPECIAL_PAGE[platform] or platform
 end
 
@@ -161,7 +161,7 @@ function StreamLinks.displaySingle(platform, streamValue)
 	local streamLink = StreamLinks.resolve(platform, streamValue)
 	if not streamLink then return nil end
 
-	platform = StreamLinks.reaolvePlatform(platform)
+	platform = StreamLinks.resolvePlatform(platform)
 
 	return Page.makeInternalLink({}, icon, 'Special:Stream/' .. platform .. '/' .. streamValue)
 end
