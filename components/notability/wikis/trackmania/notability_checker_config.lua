@@ -29,8 +29,8 @@ Config.PLACEMENT_QUERY =
 	'liquipediatiertype, players, extradata, mode'
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 20
-Config.NOTABILITY_THRESHOLD_NOTABLE = 25
+Config.NOTABILITY_THRESHOLD_MIN = 80
+Config.NOTABILITY_THRESHOLD_NOTABLE = 100
 
 -- Weights used for tournaments
 Config.weights = {
@@ -42,19 +42,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 25,
+				points = 100,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 25,
+				points = 100,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 25,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_CAMPAIGN,
-				points = 25,
+				points = 100,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -78,19 +78,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 20,
+				points = 80,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 20,
+				points = 80,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 20,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_CAMPAIGN,
-				points = 20,
+				points = 80,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -114,19 +114,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 10,
+				points = 40,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 10,
+				points = 40,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 10,
+				points = 0,
 			},
 			{
 				name = Config.TIER_TYPE_CAMPAIGN,
-				points = 10,
+				points = 40,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -150,19 +150,19 @@ Config.weights = {
 		tiertype = {
 			{
 				name = Config.TIER_TYPE_GENERAL,
-				points = 3,
+				points = 12,
 			},
 			{
 				name = Config.TIER_TYPE_MONTHLY,
-				points = 3,
+				points = 12,
 			},
 			{
 				name = Config.TIER_TYPE_WEEKLY,
-				points = 3
+				points = 0
 			},
 			{
 				name = Config.TIER_TYPE_CAMPAIGN,
-				points = 3,
+				points = 12,
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
@@ -198,9 +198,18 @@ function Config.placementDropOffFunction(tier, tierType)
 				or (tier == 2 and placement <= 16)
 				or (tier == 3 and placement <= 8)
 			then
-				return (2)
-			else
+				return (8)
+			
+			elseif (tier == 4 and placement > 16)
+			then
 				return (1)
+			
+			elseif (tier == 4 and placement >= 8) 
+			then
+				return (2)
+			
+			else
+				return (4)
 			end
 
 		end
