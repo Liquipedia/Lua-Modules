@@ -412,8 +412,6 @@ function CustomMatchGroupInput.processOpponent(match, opponentIndex)
 	--set initial opponent sumscore
 	record.sumscore = 0
 
-	record.name = Page.pageifyLink(record.name)
-
 	if record.type == Opponent.team then
 		record.icon, record.icondark = CustomMatchGroupInput.getIcon(opponent.template)
 	end
@@ -430,6 +428,8 @@ function CustomMatchGroupInput.processOpponent(match, opponentIndex)
 			player.name = Page.pageifyLink(player.name)
 		end)
 	end
+
+	record.name = Page.pageifyLink(record.name)
 end
 
 ---@param match table
