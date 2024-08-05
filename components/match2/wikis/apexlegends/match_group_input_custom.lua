@@ -307,7 +307,7 @@ function MatchFunctions.getOpponents(match)
 			end
 
 			opponent.extradata = opponent.extradata or {}
-			opponent.extradata = {startingpoints = tonumber(opponent.pointmodifier)}
+			opponent.extradata.startingpoints = tonumber(opponent.pointmodifier)
 
 			opponents[opponentIndex] = opponent
 		end
