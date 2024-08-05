@@ -199,15 +199,15 @@ function Config.placementDropOffFunction(tier, tierType)
 				or (tier == 3 and placement <= 8)
 			then
 				return (8)
-			
+
 			elseif (tier == 4 and placement > 16)
 			then
 				return (1)
-			
-			elseif (tier == 4 and placement >= 8) 
+
+			elseif (tier == 4 and placement >= 8)
 			then
 				return (2)
-			
+
 			else
 				return (4)
 			end
