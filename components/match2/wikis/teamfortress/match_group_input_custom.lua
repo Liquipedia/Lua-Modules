@@ -13,7 +13,6 @@ local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local DateExt = require('Module:Date/Ext')
 local Streams = require('Module:Links/Stream')
@@ -227,7 +226,7 @@ function matchFunctions.getOpponents(match)
 		CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
 		-- apply status
-		if TypeUtil.isNumeric(opponent.score) then
+		if Logic.isNumeric(opponent.score) then
 			opponent.status = 'S'
 			isScoreSet = true
 		elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
@@ -253,7 +252,7 @@ function matchFunctions.getOpponents(match)
 	end
 
 	-- apply placements and winner if finshed
-	if not String.isEmpty(match.winner) or Logic.readBool(match.finished) then
+	if String.isNotEmpty(match.winner) or Logic.readBool(match.finished) then
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
@@ -293,7 +292,7 @@ function mapFunctions.getScoresAndWinner(map)
 		local score = map['score' .. scoreIndex] or map['t' .. scoreIndex .. 'score']
 		local obj = {}
 		if not Logic.isEmpty(score) then
-			if TypeUtil.isNumeric(score) then
+			if Logic.isNumeric(score) then
 				obj.status = 'S'
 				obj.score = score
 			elseif Table.includes(ALLOWED_STATUSES, score) then
