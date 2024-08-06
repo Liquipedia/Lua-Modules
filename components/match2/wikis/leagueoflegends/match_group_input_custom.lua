@@ -73,7 +73,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
-	match = MatchFunctions.getBestOf(match)
+	match.bestof = MatchFunctions.getBestOf(match)
 	match = MatchFunctions.adjustMapData(MatchParser, match)
 	match = MatchFunctions.getScoreFromMapWinners(match)
 	match = MatchFunctions.getOpponents(match)
@@ -232,21 +232,17 @@ function CustomMatchGroupInput.placementCheckSpecialStatus(tbl)
 	)
 end
 
---
--- match related functions
---
-
 ---@param match table
----@return table
+---@return integer?
 function MatchFunctions.getBestOf(match)
 	if Logic.isNumeric(match.bestof) then
-		match.bestof = tonumber(match.bestof)
-		return match
+		return tonumber(match.bestof)
 	end
+	local mapCount
 	for _, _, index in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		match.bestof = index
+		mapCount = index
 	end
-	return match
+	return mapCount
 end
 
 -- Calculate the match scores based on the map results (counting map wins)
@@ -324,53 +320,10 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getOpponents(match)
-	-- read opponents and ignore empty ones
-	local opponents = {}
-	local isScoreSet = false
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		-- read opponent
-		local opponent = match['opponent' .. opponentIndex]
-		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
-
-			-- apply status
-			opponent.score = string.upper(opponent.score or '')
-			if Logic.isNumeric(opponent.score) then
-				opponent.score = tonumber(opponent.score)
-				opponent.status = MatchGroupInput.STATUS.SCORE
-				isScoreSet = true
-			elseif Table.includes(MatchGroupInput.STATUS_INPUTS, opponent.score) then
-				opponent.status = opponent.score
-				opponent.score = MatchGroupInput.SCORE_NOT_PLAYED
-			end
-
-			-- get players from vars for teams
-			if opponent.type == Opponent.team then
-				if not Logic.isEmpty(opponent.name) then
-					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
-						resolveRedirect = true,
-						applyUnderScores = true,
-						maxNumPlayers = MAX_NUM_PLAYERS,
-					})
-				end
-			elseif opponent.type == Opponent.solo then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
-				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
-			end
-
-			opponents[opponentIndex] = opponent
-		end
-	end
-
-	-- handle walkover
-	match = MatchFunctions._handleWalkover(match, opponents)
+	local opponents = MatchFunctions._readOpponents(match)
 
 	-- see if match should actually be finished if score is set
-	if not Logic.readBool(match.finished) then
-		match = MatchFunctions._finishMatch(match, opponents, isScoreSet)
-	end
+	match.finished = MatchFunctions._computeFinishedStatus(match, opponents)
 
 	-- apply placements and winner if finshed
 	if Logic.readBool(match.finished) then
@@ -378,51 +331,110 @@ function MatchFunctions.getOpponents(match)
 	end
 
 	-- Update all opponents with new values
-	for opponentIndex, opponent in pairs(opponents) do
+	for opponentIndex, opponent in ipairs(opponents) do
 		match['opponent' .. opponentIndex] = opponent
 	end
+
 	return match
 end
 
 ---@param match table
----@param opponents table[]
----@return table
-function MatchFunctions._handleWalkover(match, opponents)
-	match.walkover = string.upper(match.walkover or '')
-	if Logic.isNumeric(match.walkover) then
-		local winnerIndex = tonumber(match.walkover)
-		opponents = MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, MatchGroupInput.STATUS.DEFAULT_LOSS)
-		opponents[winnerIndex].status = MatchGroupInput.STATUS.DEFAULT_WIN
-		match.finished = true
-	elseif Logic.isNumeric(match.winner) and Table.includes(MatchGroupInput.STATUS_INPUTS, match.walkover) then
-		local winnerIndex = tonumber(match.winner)
-		opponents = MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
-		opponents[winnerIndex].status = MatchGroupInput.STATUS.DEFAULT_WIN
-		match.finished = true
+---@return standardOpponent[]
+function MatchFunctions._readOpponents(match)
+	-- read opponents and ignore empty ones
+	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
+		-- read opponent
+		local opponent = match['opponent' .. opponentIndex]
+		if Logic.isEmpty(opponent) then
+			return -- TODO Investigate if we need to return a blank opponent here
+		end
+
+		CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
+
+		if match.walkover then
+			opponent.score, opponent.status = MatchFunctions._opponentWalkover(
+				match.walkover,
+				(tonumber(match.walkover) or tonumber(match.winner) or 0) == opponentIndex
+			)
+		else
+			opponent.score, opponent.status = MatchFunctions._parseScoreInput(opponent.score)
+		end
+
+		assert(opponent.type == Opponent.team or opponent.type == Opponent.solo or opponent.type == Opponent.literal,
+			'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
+
+		if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
+			match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+				resolveRedirect = true,
+				applyUnderScores = true,
+				maxNumPlayers = MAX_NUM_PLAYERS,
+			})
+		elseif opponent.type == Opponent.solo then
+			opponent.match2players = Json.parseIfString(opponent.match2players) or {}
+			opponent.match2players[1].name = opponent.name
+		end
+
+		return opponent
+	end)
+end
+
+---@param scoreInput string|number|nil
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchFunctions._parseScoreInput(scoreInput)
+	if not scoreInput then
+		return
 	end
 
-	return match
+	if Logic.isNumeric(scoreInput) then
+		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
+	end
+
+	local scoreUpperCase = string.upper(scoreInput)
+	if scoreInput and Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase) then
+		return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
+	end
+end
+
+---@param walkoverInput string? #wikicode input
+---@param isWinner boolean? #nil means no winner
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
+	if not walkoverInput then
+		return
+	end
+
+	if Logic.isNumeric(walkoverInput) then
+		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or MatchGroupInput.STATUS.DEFAULT_LOSS
+	end
+
+	local walkoverUpperCase = string.upper(walkoverInput)
+	if isWinner ~= nil and Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
+		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
+	end
 end
 
 ---@param match table
 ---@param opponents table[]
----@param isScoreSet boolean
----@return table
-function MatchFunctions._finishMatch(match, opponents, isScoreSet)
+---@return boolean
+function MatchFunctions._computeFinishedStatus(match, opponents)
+	if Logic.readBool(match.finished) then
+		return true
+	end
+
 	-- If a winner has been set
 	if Logic.isNotEmpty(match.winner) then
-		match.finished = true
-		return match
+		return true
 	end
 
 	-- If special status has been applied to a team
 	if CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
-		match.finished = true
-		return match
+		return true
 	end
 
-	if not isScoreSet then
-		return match
+	if not MatchGroupInput.hasScore(opponents) then
+		return false
 	end
 
 	-- Check if all/enough games have been played. If they have, mark as finished
@@ -431,24 +443,22 @@ function MatchFunctions._finishMatch(match, opponents, isScoreSet)
 	for _, opponent in pairs(opponents) do
 		local score = tonumber(opponent.score or 0)
 		if score > firstTo then
-			match.finished = true
-			return match
+			return true
 		end
 		scoreSum = scoreSum + score
 	end
 	if scoreSum >= match.bestof then
-		match.finished = true
-		return match
+		return true
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
 	local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
 		or SECONDS_UNTIL_FINISHED_NOT_EXACT
 	if match.timestamp ~= DateExt.defaultTimestamp and match.timestamp + threshold < NOW then
-		match.finished = true
+		return true
 	end
 
-	return match
+	return false
 end
 
 ---@param opponents table[]
