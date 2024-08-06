@@ -270,11 +270,10 @@ function MatchFunctions.getOpponents(match, maps)
 
 		if match.walkover then
 			local winner = tonumber(match.walkover) or tonumber(match.winner)
-			local isWinner = nil
 			if winner then
-				isWinner = winner == opponentIndex
+				opponent.score, opponent.status = MatchFunctions._opponentWalkover(match.walkover, winner == opponentIndex)
 			end
-			opponent.score, opponent.status = MatchFunctions._opponentWalkover(match.walkover, isWinner)
+
 		else
 			opponent.score, opponent.status = MatchFunctions._parseScoreInput(opponent.score)
 		end
@@ -316,7 +315,7 @@ function MatchFunctions._parseScoreInput(scoreInput)
 end
 
 ---@param walkoverInput string? #wikicode input
----@param isWinner boolean? #nil means no winner
+---@param isWinner boolean
 ---@return integer? #SCORE
 ---@return string? #STATUS
 function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
@@ -325,11 +324,7 @@ function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
 	end
 
 	if Logic.isNumeric(walkoverInput) then
-		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or MatchGroupInput.STATUS.DEFAULT_LOSS
-	end
-
-	if isWinner == nil then
-		return
+		walkoverInput = MatchGroupInput.STATUS.DEFAULT_LOSS
 	end
 
 	local walkoverUpperCase = string.upper(walkoverInput)
