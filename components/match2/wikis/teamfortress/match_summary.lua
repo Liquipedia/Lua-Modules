@@ -84,11 +84,10 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMapRow(game))
-		end
-	end
+	Array.forEach(match.games, function(game)
+		if not game.map then return end
+		body:addRow(CustomMatchSummary._createMapRow(game))
+	end)
 
 	return body
 end
@@ -159,11 +158,10 @@ end
 ---@param icon strings?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, icon)
-	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
-	if showIcon then
-		return container:node(icon)
-	end
-	return container:node(Icons.EMPTY)
+	return mw.html.create('div')
+		:addClass('brkts-popup-spaced')
+		:css('line-height', '27px')
+		:node(showIcon and icon or Icons.EMPTY)
 end
 
 return CustomMatchSummary
