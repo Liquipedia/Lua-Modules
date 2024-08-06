@@ -55,6 +55,7 @@ MatchGroupInput.WALKOVER = {
 }
 
 MatchGroupInput.SCORE_NOT_PLAYED = -1
+MatchGroupInput.WINNER_DRAW = 0
 
 ---@class MatchGroupContext
 ---@field bracketIndex integer
