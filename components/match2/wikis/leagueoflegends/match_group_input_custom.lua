@@ -71,16 +71,16 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end
 
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
-	match.bestof = MatchFunctions.getBestOf(match)
 
-	match.games = MatchFunctions.parseMaps(MatchParser, match)
+	local games = MatchFunctions.parseMaps(MatchParser, match)
+	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
 
-	match.opponents = MatchFunctions.getOpponents(match, match.games)
-	match.finished = MatchFunctions._computeFinishedStatus(match, match.opponents)
+	local opponents = MatchFunctions.getOpponents(match, games)
+	match.finished = MatchFunctions._computeFinishedStatus(match, opponents)
 
 	if match.finished then
-		match.resulttype, match.winner, match.walkover = CustomMatchGroupInput.getResultTypeAndWinner(match.winner, match.opponents)
-		MatchGroupInput.setPlacement(match.opponents, match.winner, CustomMatchGroupInput.resultTypeToPlacements(match.resulttype))
+		match.resulttype, match.winner, match.walkover = CustomMatchGroupInput.getResultTypeAndWinner(match.winner, opponents)
+		MatchGroupInput.setPlacement(opponents, match.winner, CustomMatchGroupInput.resultTypeToPlacements(match.resulttype))
 	end
 
 	MatchFunctions.getTournamentVars(match)
@@ -88,6 +88,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
 	match.extradata = MatchFunctions.getExtraData(match)
+
+	match.games = games
+	match.opponents = opponents
 
 	return match
 end
@@ -203,17 +206,11 @@ function CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
 	)
 end
 
----@param match table
+---@param bestOfInput string|integer?
+---@param maps table[]
 ---@return integer?
-function MatchFunctions.getBestOf(match)
-	if Logic.isNumeric(match.bestof) then
-		return tonumber(match.bestof)
-	end
-	local mapCount
-	for _, _, index in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		mapCount = index
-	end
-	return mapCount
+function MatchFunctions.getBestOf(bestOfInput, maps)
+	return tonumber(bestOfInput) or #maps
 end
 
 -- Calculate the match scores based on the map results (counting map wins)
