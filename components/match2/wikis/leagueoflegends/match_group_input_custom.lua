@@ -314,15 +314,11 @@ function MatchFunctions._parseScoreInput(scoreInput)
 	end
 end
 
----@param walkoverInput string? #wikicode input
+---@param walkoverInput string #wikicode input
 ---@param isWinner boolean
 ---@return integer? #SCORE
 ---@return string? #STATUS
 function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
-	if not walkoverInput then
-		return
-	end
-
 	if Logic.isNumeric(walkoverInput) then
 		walkoverInput = MatchGroupInput.STATUS.DEFAULT_LOSS
 	end
