@@ -855,7 +855,7 @@ end
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
-	return Array.any(opponents, function (opponent) return not opponent.status == MatchGroupInput.STATUS.SCORE end)
+	return Array.any(opponents, function (opponent) return opponent.status ~= MatchGroupInput.STATUS.SCORE end)
 end
 
 ---@param opponents table[]
