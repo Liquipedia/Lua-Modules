@@ -71,10 +71,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
-	local games = MatchFunctions.parseMaps(MatchParser, match)
+	local games = MatchFunctions.extractMaps(MatchParser, match)
 	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
 
-	local opponents = MatchFunctions.getOpponents(match, games)
+	local opponents = MatchFunctions.extractOpponents(match, games)
 	match.finished = MatchFunctions._isFinished(match, opponents)
 
 	if match.finished then
@@ -97,7 +97,7 @@ end
 ---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param match table
 ---@return table
-function MatchFunctions.parseMaps(MatchParser, match)
+function MatchFunctions.extractMaps(MatchParser, match)
 	local maps = {}
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MatchParser.getMap(mapInput)
@@ -241,7 +241,7 @@ end
 ---@param match table
 ---@param maps {scores: integer[], winner: integer?}[]
 ---@return standardOpponent[]
-function MatchFunctions.getOpponents(match, maps)
+function MatchFunctions.extractOpponents(match, maps)
 	local matchHasStarted = match.dateexact and match.timestamp <= NOW
 	local mapHasWinner = Table.any(maps, function(_, map) return map.winner end)
 
