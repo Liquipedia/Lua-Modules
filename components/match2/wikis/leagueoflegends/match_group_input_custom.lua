@@ -152,14 +152,13 @@ CustomMatchGroupInput.processPlayer = FnUtil.identity
 ---@return integer? #Winner
 ---@return string? #Walkover
 function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
-	-- Map or Match wasn't played, set not played
 	if type(winner) == 'string' and CustomMatchGroupInput.isNotPlayedInput(winner) then
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 	end
 
-	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
+	-- Calculate winner, resulttype, placements and walkover as applicable
 	if MatchGroupInput.isDraw(opponents) then
-		return MatchGroupInput.RESULT_TYPE.DRAW, 0
+		return MatchGroupInput.RESULT_TYPE.DRAW, MatchGroupInput.WINNER_DRAW
 
 	elseif CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
 		local walkoverType
