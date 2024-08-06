@@ -57,7 +57,7 @@ end
 ---@return string[]?
 function WikiCopyPaste._getVetoes(args, bestof)
 	local vetoTypes = Array.copy(VETOES[bestof] or {})
-	if not Logic.readBool(args.mapVeto) or Logic.isEmpty(vetoTypes) then return nil end
+	if not Logic.readBool(args.mapVeto) or not VETOES[bestof] then return nil end
 	if Logic.readBool(args.protect) then
 		table.insert(vetoTypes, 1, 'protect')
 	end
