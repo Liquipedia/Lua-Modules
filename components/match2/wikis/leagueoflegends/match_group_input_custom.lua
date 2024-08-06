@@ -199,9 +199,9 @@ function CustomMatchGroupInput.setPlacement(opponents, winner, resultType, isFin
 				winner = scoreIndex
 			end
 			if lastScore == score then
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or lastPlacement
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or lastPlacement
 			else
-				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement or '') or counter
+				opponents[scoreIndex].placement = tonumber(opponents[scoreIndex].placement) or counter
 				lastPlacement = counter
 				lastScore = score or NO_SCORE
 			end
