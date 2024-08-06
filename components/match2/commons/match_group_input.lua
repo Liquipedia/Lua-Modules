@@ -837,7 +837,7 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
----@param opponents table[]
+---@param opponents {status: string?, score: any}[]
 ---@return boolean
 function MatchGroupInput.isDraw(opponents)
 	if Logic.isEmpty(opponents) then return true end
@@ -852,13 +852,13 @@ function MatchGroupInput.isDraw(opponents)
 end
 
 -- Check if any opponent has a none-standard status
----@param opponents table[]
+---@param opponents {status: string?}[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
 	return Array.any(opponents, function (opponent) return opponent.status ~= MatchGroupInput.STATUS.SCORE end)
 end
 
----@param opponents table[]
+---@param opponents {status: string?}[]
 ---@param status string
 ---@return integer
 function MatchGroupInput._opponentWithStatus(opponents, status)
@@ -866,28 +866,35 @@ function MatchGroupInput._opponentWithStatus(opponents, status)
 end
 
 -- function to check for forfeits
----@param opponents table[]
+---@param opponents {status: string?}[]
 ---@return boolean
 function MatchGroupInput.hasForfeit(opponents)
 	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.FORFIET) ~= 0
 end
 
 -- function to check for DQ's
----@param opponents table[]
+---@param opponents {status: string?}[]
 ---@return boolean
 function MatchGroupInput.hasDisqualified(opponents)
 	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DISQUALIFIED) ~= 0
 end
 
 -- function to check for W/L
----@param opponents table[]
+---@param opponents {status: string?}[]
 ---@return boolean
 function MatchGroupInput.hasDefaultWinLoss(opponents)
 	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DEFAULT_LOSS) ~= 0
 end
 
+-- function to check for Normal Scores
+---@param opponents {status: string?}[]
+---@return boolean
+function MatchGroupInput.hasScore(opponents)
+	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.SCORE) ~= 0
+end
+
 -- Get the winner when resulttype=default
----@param opponents table[]
+---@param opponents {status: string?}[]
 ---@return integer
 function MatchGroupInput.getDefaultWinner(opponents)
 	local idx = MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DEFAULT_WIN)
