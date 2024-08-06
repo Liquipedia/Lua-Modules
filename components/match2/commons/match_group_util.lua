@@ -900,6 +900,16 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 	end
 end
 
+---@param matchid string?
+---@param bracketid string?
+---@return string?
+function MatchGroupUtil.getStandaloneId(bracketid, matchid)
+	if not matchid or not bracketid then
+		return nil
+	end
+	return 'MATCH_' .. bracketid .. '_' .. matchid
+end
+
 ---Determines the phase of a match based on its properties.
 ---@param match MatchGroupUtilMatch|MatchGroupUtilGame
 ---@return 'finished'|'ongoing'|'upcoming'

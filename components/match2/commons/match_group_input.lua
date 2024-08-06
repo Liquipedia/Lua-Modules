@@ -32,6 +32,30 @@ local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 
 local MatchGroupInput = {}
 
+MatchGroupInput.STATUS_INPUTS = {
+	DEFAULT_WIN = 'W',
+	DEFAULT_LOSS = 'L',
+	DRAW = 'D',
+	FORFIET = 'FF',
+	DISQUALIFIED = 'DQ',
+}
+
+MatchGroupInput.STATUS = Table.copy(MatchGroupInput.STATUS_INPUTS)
+MatchGroupInput.STATUS.SCORE = 'S'
+
+MatchGroupInput.RESULT_TYPE = {
+	DEFAULT = 'default',
+	NOT_PLAYED = 'np',
+	DRAW = 'draw',
+}
+MatchGroupInput.WALKOVER = {
+	FORFIET = 'ff',
+	DISQUALIFIED = 'dq',
+	NO_SCORE = 'l',
+}
+
+MatchGroupInput.SCORE_NOT_PLAYED = -1
+
 ---@class MatchGroupContext
 ---@field bracketIndex integer
 ---@field groupRoundIndex number?
@@ -817,9 +841,13 @@ end
 ---@return boolean
 function MatchGroupInput.isDraw(opponents)
 	if Logic.isEmpty(opponents) then return true end
-	if Array.any(opponents, function (opponent) return opponent.status ~= 'S' and opponent.status ~= 'D' end) then
+	local function opponentHasFinalStatus(opponent)
+		return opponent.status ~= MatchGroupInput.STATUS.SCORE and opponent.status ~= MatchGroupInput.STATUS.DRAW
+	end
+	if Array.any(opponents, opponentHasFinalStatus) then
 		return false
 	end
+	-- Does all opponents have the same score?
 	return #Array.unique(Array.map(opponents, Operator.property('score'))) == 1
 end
 
@@ -827,35 +855,42 @@ end
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
-	return Array.any(opponents, function (opponent) return opponent.status ~= 'S' end)
+	return Array.any(opponents, function (opponent) return not opponent.status == MatchGroupInput.STATUS.SCORE end)
+end
+
+---@param opponents table[]
+---@param status string
+---@return integer
+function MatchGroupInput._opponentWithStatus(opponents, status)
+	return Array.indexOf(opponents, function (opponent) return opponent.status == status end)
 end
 
 -- function to check for forfeits
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasForfeit(opponents)
-	return Array.any(opponents, function (opponent) return opponent.status == 'FF' end)
+	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.FORFIET) ~= 0
 end
 
 -- function to check for DQ's
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasDisqualified(opponents)
-	return Array.any(opponents, function (opponent) return opponent.status == 'DQ' end)
+	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DISQUALIFIED) ~= 0
 end
 
 -- function to check for W/L
 ---@param opponents table[]
 ---@return boolean
 function MatchGroupInput.hasDefaultWinLoss(opponents)
-	return Array.any(opponents, function (opponent) return opponent.status == 'L' end)
+	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DEFAULT_LOSS) ~= 0
 end
 
 -- Get the winner when resulttype=default
 ---@param opponents table[]
 ---@return integer
 function MatchGroupInput.getDefaultWinner(opponents)
-	local idx = Array.indexOf(opponents, function(opponent) return opponent.status == 'W' end)
+	local idx = MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DEFAULT_WIN)
 	return idx > 0 and idx or -1
 end
 
