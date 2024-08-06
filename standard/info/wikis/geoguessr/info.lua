@@ -30,8 +30,8 @@ return {
 		squads = {
 			hasPosition = false,
 			hasSpecialTeam = false,
-			allowManual = true,
+			allowManual = false,
 		},
 	},
-	match2 = 1,
+	match2 = 0,
 }
