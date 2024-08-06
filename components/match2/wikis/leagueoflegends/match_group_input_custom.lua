@@ -171,17 +171,17 @@ end
 
 ---@param opponents table[]
 ---@param winner integer?
----@param specialType string?
+---@param resultType string?
 ---@param isFinished boolean|string?
 ---@return table[]
 ---@return integer?
-function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, isFinished)
-	if specialType == 'draw' then
-		for key, _ in pairs(opponents) do
+function CustomMatchGroupInput.setPlacement(opponents, winner, resultType, isFinished)
+	if resultType == MatchGroupInput.RESULT_TYPE.DRAW then
+		for key in pairs(opponents) do
 			opponents[key].placement = 1
 		end
-	elseif specialType == MatchGroupInput.RESULT_TYPE.DEFAULT then
-		for key, _ in pairs(opponents) do
+	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
+		for key in pairs(opponents) do
 			if key == winner then
 				opponents[key].placement = 1
 			else
