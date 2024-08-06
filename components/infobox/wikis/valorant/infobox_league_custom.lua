@@ -124,7 +124,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.female = args.female or 'false'
-	lpdbData.extradata.platform = args.platform
+	lpdbData.extradata.platform = self.data.platform
 
 	return lpdbData
 end
