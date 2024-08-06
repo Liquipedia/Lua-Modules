@@ -56,11 +56,8 @@ end
 ---@param bestof integer
 ---@return string[]?
 function WikiCopyPaste._getVetoes(args, bestof)
-	local vetoTypes = Array.copy(VETOES[bestof] or {})
 	if not Logic.readBool(args.mapVeto) or not VETOES[bestof] then return nil end
-	if Logic.readBool(args.protect) then
-		table.insert(vetoTypes, 1, 'protect')
-	end
+	local vetoTypes = Array.extend(Logic.readBool(args.protect) and 'protect' or nil, VETOES[bestof])
 
 	return Array.extend({},
 		INDENT .. '|mapveto={{MapVeto',
