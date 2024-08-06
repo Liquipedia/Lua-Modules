@@ -68,7 +68,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Platform', content = {PageLink.makeInternalLink(
 				caller.data.platform,
-				caller.data.platform and (':Category:' .. self.data.platform) or nil)
+				caller.data.platform and (':Category:' .. caller.data.platform) or nil)
 			}},
 			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 			Cell{name = 'Players', content = {args.player_number}}
