@@ -30,7 +30,7 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local DEFAULT_PLATFORM = 'PC'
-local PLATFORM_ALIAS = {
+local PLATFORMS = {
 	console = 'Console',
 	pc = 'PC',
 }
@@ -51,9 +51,6 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.platform = PLATFORMS[(args.platform or ''):lower()] or DEFAULT_PLATFORM
-		self.data.platform,
-		self.data.platform and (':Category:' .. self.data.platform) or nil)
-	}}
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
 	self.data.publishertier = Logic.readBool(args['riot-highlighted']) and 'highlighted'
 		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
@@ -68,6 +65,8 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
+			Cell{name = 'Platform', content = {PageLink.makeInternalLink(args.platform)
+		}},
 			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 			Cell{name = 'Players', content = {args.player_number}}
 		)
