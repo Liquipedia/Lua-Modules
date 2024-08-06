@@ -32,7 +32,6 @@ local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 
 local NOW = os.time()
 
--- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
 
@@ -76,7 +75,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
 
 	local opponents = MatchFunctions.getOpponents(match, games)
-	match.finished = MatchFunctions._computeFinishedStatus(match, opponents)
+	match.finished = MatchFunctions._isFinished(match, opponents)
 
 	if match.finished then
 		match.resulttype, match.winner, match.walkover = CustomMatchGroupInput.getResultTypeAndWinner(match.winner, opponents)
@@ -270,10 +269,12 @@ function MatchFunctions.getOpponents(match, maps)
 		end
 
 		if match.walkover then
-			opponent.score, opponent.status = MatchFunctions._opponentWalkover(
-				match.walkover,
-				(tonumber(match.walkover) or tonumber(match.winner) or 0) == opponentIndex
-			)
+			local winner = tonumber(match.walkover) or tonumber(match.winner)
+			local isWinner = nil
+			if winner then
+				isWinner = winner == opponentIndex
+			end
+			opponent.score, opponent.status = MatchFunctions._opponentWalkover(match.walkover, isWinner)
 		else
 			opponent.score, opponent.status = MatchFunctions._parseScoreInput(opponent.score)
 		end
@@ -309,7 +310,7 @@ function MatchFunctions._parseScoreInput(scoreInput)
 	end
 
 	local scoreUpperCase = string.upper(scoreInput)
-	if scoreInput and Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase) then
+	if Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase) then
 		return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
 	end
 end
@@ -327,8 +328,12 @@ function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
 		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or MatchGroupInput.STATUS.DEFAULT_LOSS
 	end
 
+	if isWinner == nil then
+		return
+	end
+
 	local walkoverUpperCase = string.upper(walkoverInput)
-	if isWinner ~= nil and Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
+	if Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
 		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
 	end
 end
@@ -336,7 +341,7 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@return boolean
-function MatchFunctions._computeFinishedStatus(match, opponents)
+function MatchFunctions._isFinished(match, opponents)
 	if Logic.readBool(match.finished) then
 		return true
 	end
