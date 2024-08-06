@@ -57,8 +57,8 @@ function Attack.run(argsJson, attackIndex, faction)
 	}
 end
 
----@param data table?
----@return string
+---@param data table
+---@return string?
 function Attack._displayDamage(data)
 	if data.damagePercentage then
 		return (data.damagePercentage .. '%')
@@ -70,8 +70,8 @@ function Attack._displayDamage(data)
 	return data.damage .. ' (+' .. data.bonusDamage .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
 end
 
----@param data table?
----@return string
+---@param data table
+---@return string?
 function Attack._displayDPS(data)
 	if not data.dps then
 		return
