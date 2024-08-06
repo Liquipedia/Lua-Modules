@@ -904,10 +904,10 @@ end
 ---@param match MatchGroupUtilMatch|MatchGroupUtilGame
 ---@return 'finished'|'ongoing'|'upcoming'
 function MatchGroupUtil.computeMatchPhase(match)
-	local ts = match.timestamp or Date.readTimestamp(match.date)
+	local matchStartTimestamp = match.timestamp or Date.readTimestamp(match.date)
 	if match.winner then
 		return 'finished'
-	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and ts >= os.time() then
+	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and matchStartTimestamp < os.time() then
 		return 'ongoing'
 	else
 		return 'upcoming'
