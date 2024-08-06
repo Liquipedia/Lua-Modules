@@ -562,7 +562,7 @@ function MapFunctions.getScoreFromWinner(map)
 		return map
 	end
 
-	map.scores = {0, 0}
+	map.scores = Array.map(Array.range(0, MAX_NUM_OPPONENTS), function() return 0 end)
 	local winner = tonumber(map.winner)
 
 	if not winner or winner < 1 or winner > MAX_NUM_OPPONENTS then
