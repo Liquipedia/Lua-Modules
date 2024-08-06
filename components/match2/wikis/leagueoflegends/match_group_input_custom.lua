@@ -212,7 +212,7 @@ function MatchFunctions.getBestOf(bestOfInput, maps)
 end
 
 -- Calculate the match scores based on the map results (counting map wins)
----@param maps table[]
+---@param maps {scores: integer[]}[]
 ---@param opponentIndex integer
 ---@return integer
 function MatchFunctions.computeMatchScoreFromMaps(maps, opponentIndex)
@@ -249,11 +249,11 @@ function MatchFunctions.getExtraData(match)
 end
 
 ---@param match table
----@param maps table[]
+---@param maps {scores: integer[], winner: integer?}[]
 ---@return standardOpponent[]
 function MatchFunctions.getOpponents(match, maps)
 	local matchHasStarted = match.dateexact and match.timestamp <= NOW
-	local hasMapWinner = Table.any(maps, function(_, map) return map.winner end)
+	local mapHasWinner = Table.any(maps, function(_, map) return map.winner end)
 
 	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
 		local opponent = match['opponent' .. opponentIndex]
@@ -264,7 +264,7 @@ function MatchFunctions.getOpponents(match, maps)
 
 		CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
 
-		if not opponent.score and matchHasStarted and hasMapWinner then
+		if not opponent.score and matchHasStarted and mapHasWinner then
 			opponent.score = MatchFunctions.computeMatchScoreFromMaps(maps, opponentIndex)
 		end
 
@@ -330,7 +330,7 @@ function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
 end
 
 ---@param match table
----@param opponents table[]
+---@param opponents {score: integer?}[]
 ---@return boolean
 function MatchFunctions._isFinished(match, opponents)
 	if Logic.readBool(match.finished) then
@@ -377,17 +377,6 @@ function MatchFunctions._isFinished(match, opponents)
 	end
 
 	return false
-end
-
----@param opponents table[]
----@param walkoverType string?
----@return table[]
-function MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
-	for _, opponent in pairs(opponents) do
-		opponent.score = MatchGroupInput.SCORE_NOT_PLAYED
-		opponent.status = walkoverType
-	end
-	return opponents
 end
 
 ---@param match table
