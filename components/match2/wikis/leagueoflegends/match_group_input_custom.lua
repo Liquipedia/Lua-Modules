@@ -263,7 +263,6 @@ function MatchFunctions.extractOpponents(match, maps)
 			if winner then
 				opponent.score, opponent.status = MatchFunctions._opponentWalkover(match.walkover, winner == opponentIndex)
 			end
-
 		else
 			opponent.score, opponent.status = MatchFunctions._parseScoreInput(opponent.score)
 		end
@@ -347,14 +346,10 @@ function MatchFunctions._isFinished(match, opponents)
 
 	-- Check if all/enough games have been played. If they have, mark as finished
 	local firstTo = math.floor(match.bestof / 2)
-	local scoreSum = 0
-	for _, opponent in pairs(opponents) do
-		local score = tonumber(opponent.score or 0)
-		if score > firstTo then
-			return true
-		end
-		scoreSum = scoreSum + score
+	if Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > firstTo end) then
+		return true
 	end
+	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
 	if scoreSum >= match.bestof then
 		return true
 	end
