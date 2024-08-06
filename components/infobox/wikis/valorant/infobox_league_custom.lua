@@ -61,14 +61,15 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Platform', content = {PageLink.makeInternalLink(
 				caller.data.platform,
 				caller.data.platform and (':Category:' .. self.data.platform) or nil)
-			)}},
+			}},
 			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 			Cell{name = 'Players', content = {args.player_number}}
 		)
