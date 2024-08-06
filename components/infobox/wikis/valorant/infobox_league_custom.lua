@@ -105,18 +105,6 @@ function CustomLeague:getWikiCategories(args)
 	)
 end
 
----@param args table
----@return string?
-function CustomLeague:_createPlatformCell(args)
-	local platform = self.data.platform(args.platform)
-
-	if String.isNotEmpty(platform) then
-		return PageLink.makeInternalLink({}, platform, ':Category:'..platform)
-	else
-		return nil
-	end
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table
