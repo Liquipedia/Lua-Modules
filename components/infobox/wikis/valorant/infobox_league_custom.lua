@@ -50,6 +50,10 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
+	Cell{name = 'Platform', content = {PageLink.makeInternalLink(
+		self.data.platform,
+		self.data.platform and (':Category:' .. self.data.platform) or nil)
+	}}
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
 	self.data.publishertier = Logic.readBool(args['riot-highlighted']) and 'highlighted'
 		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
@@ -64,7 +68,6 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Cell{name = 'Platform', content = {self.caller:_createPlatformCell(args)}},
 			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 			Cell{name = 'Players', content = {args.player_number}}
 		)
@@ -95,35 +98,15 @@ end
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if Logic.readBool(args.female) then
-		table.insert(categories, 'Female Tournaments')
-		return categories
-	end
-	local platform = self:_platformLookup(args.platform)
-
-	return {
-		platform and (platform .. ' Tournaments') or nil,
-	}
-
-end
-
----@param platform string?
----@return string?
-function CustomLeague:_platformLookup(platform)
-	if String.isEmpty(platform) then
-		platform = DEFAULT_PLATFORM
-	end
-	---@cast platform -nil
-
-	return PLATFORM_ALIAS[platform:lower()]
+	return Array.append({self.data.platform .. ' Tournaments'},
+		Logic.readBool(args.female) and 'Female Tournaments' or nil
+	)
 end
 
 ---@param args table
 ---@return string?
 function CustomLeague:_createPlatformCell(args)
-	local platform = self:_platformLookup(args.platform)
+	local platform = self.data.platform(args.platform)
 
 	if String.isNotEmpty(platform) then
 		return PageLink.makeInternalLink({}, platform, ':Category:'..platform)
@@ -137,11 +120,11 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
-
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.female = args.female or 'false'
+	lpdbData.extradata.platform = args.platform
 
 	return lpdbData
 end
