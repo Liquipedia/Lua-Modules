@@ -79,7 +79,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	if match.finished then
 		match.resulttype, match.winner, match.walkover = CustomMatchGroupInput.getResultTypeAndWinner(match.winner, opponents)
-		MatchGroupInput.setPlacement(opponents, match.winner, CustomMatchGroupInput.resultTypeToPlacements(match.resulttype))
+		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
 	end
 
 	MatchFunctions.getTournamentVars(match)
@@ -175,16 +175,6 @@ function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
 		assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
 		return nil, tonumber(winner) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
 	end
-end
-
----@param resultType string?
----@return integer
----@return integer
-function CustomMatchGroupInput.resultTypeToPlacements(resultType)
-	if resultType == MatchGroupInput.RESULT_TYPE.DRAW then
-		return 1, 1
-	end
-	return 1, 2
 end
 
 ---@param input string
