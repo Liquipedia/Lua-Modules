@@ -50,7 +50,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	Cell{name = 'Platform', content = {PageLink.makeInternalLink(
+	self.data.platform = Cell{name = 'Platform', content = {PageLink.makeInternalLink(
 		self.data.platform,
 		self.data.platform and (':Category:' .. self.data.platform) or nil)
 	}}
