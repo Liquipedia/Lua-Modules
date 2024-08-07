@@ -184,7 +184,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
 	end
 end
 
----@param input string
+---@param input string?
 ---@return boolean
 function CustomMatchGroupInput.isNotPlayedInput(input)
 	return Table.includes(NP_INPUTS, input)
@@ -420,25 +420,21 @@ end
 ---@param map {finished:string?, winner:string?}]
 ---@return {finished:boolean, winner:integer?, resulttype:string?, walkover:string?, scores:integer[]}
 function MapFunctions.getScoresAndWinner(map)
-	local winner = tonumber(map.winner)
 	local finished = Logic.readBool(map.finished)
+	local winner = map.winner
 	if winner then
 		finished = true
 	end
 
-	local scores = MapFunctions.getScoreFromWinner(finished, winner)
-
-	if not winner then
-		return {finished = finished, winner = winner, scores = scores}
-	end
+	local scores = MapFunctions.getScoreFromWinner(finished, tonumber(winner))
 
 	local resultType
-	if CustomMatchGroupInput.isNotPlayedInput(map.winner) or CustomMatchGroupInput.isNotPlayedInput(map.finished) then
+	if CustomMatchGroupInput.isNotPlayedInput(winner) or CustomMatchGroupInput.isNotPlayedInput(map.finished) then
 		resultType = MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 		winner = nil
 	end
 
-	return {finished = finished, winner = winner, resulttype = resultType, walkover = nil, scores = scores}
+	return {finished = finished, winner = winner, resulttype = resultType, scores = scores}
 end
 
 ---@param finished boolean?
