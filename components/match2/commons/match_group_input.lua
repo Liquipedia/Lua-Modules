@@ -90,8 +90,9 @@ local VALID_GSL_GROUP_STYLES = {
 
 ---@param match table
 function MatchGroupInput._applyTournamentVarsToMaps(match)
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map') do
-		match[mapKey] = MatchGroupInput.getCommonTournamentVars(map, match)
+	local maps = MatchGroupUtil.normalizeSubtype(match, 'map', match.match2games or match.games)
+	for _, map in ipairs(maps) do
+		MatchGroupInput.getCommonTournamentVars(map, match)
 	end
 end
 
@@ -285,12 +286,9 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 		bracketData.bracketreset = bracketData.bracketreset or ''
 
 		if not bracketData.loweredges then
-			local opponentCount = 0
-			for _, _ in Table.iter.pairsByPrefix(match, 'opponent') do
-				opponentCount = opponentCount + 1
-			end
+			local opponents = MatchGroupUtil.normalizeSubtype(match, 'opponent', match.match2opponents or match.opponents)
 			bracketData.loweredges = Array.map(
-				MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, opponentCount),
+				MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents),
 				MatchGroupUtil.indexTableToRecord
 			)
 		end
@@ -589,7 +587,8 @@ function MatchGroupInput.readMvp(match)
 	-- parse the players to get their information
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
-		for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+		local opponents = MatchGroupUtil.normalizeSubtype(match, 'opponent', match.match2opponents or match.opponents)
+		for _, opponent in ipairs(opponents) do
 			for _, lookUpPlayer in pairs(opponent.match2players or {}) do
 				if link == lookUpPlayer.name then
 					return Table.merge(lookUpPlayer,
