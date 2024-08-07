@@ -90,8 +90,7 @@ local VALID_GSL_GROUP_STYLES = {
 
 ---@param match table
 function MatchGroupInput._applyTournamentVarsToMaps(match)
-	local maps = MatchGroupUtil.normalizeSubtype(match, 'map')
-	for _, map in ipairs(maps) do
+	for _, map in ipairs(MatchGroupUtil.normalizeSubtype(match, 'map')) do
 		MatchGroupInput.getCommonTournamentVars(map, match)
 	end
 end
