@@ -964,6 +964,15 @@ end
 ---@param standaloneMatch table
 ---@return table
 function MatchGroupInput.mergeStandaloneIntoMatch(match, standaloneMatch)
+	local function ensureTable(input)
+		if type(input) == 'table' then
+			return input
+		end
+		if type(input) == 'string' then
+			return Json.parseIfTable(input)
+		end
+	end
+
 	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
 
 	-- Update Opponents from the Standlone Match
@@ -972,9 +981,9 @@ function MatchGroupInput.mergeStandaloneIntoMatch(match, standaloneMatch)
 	-- Update Maps from the Standalone Match
 	match.games = standaloneMatch.match2games
 	for _, game in ipairs(match.games) do
-		game.scores = Json.parseIfTable(game.scores)
-		game.participants = Json.parseIfTable(game.participants)
-		game.extradata = Json.parseIfTable(game.extradata)
+		game.scores = ensureTable(game.scores)
+		game.participants = ensureTable(game.participants)
+		game.extradata = ensureTable(game.extradata)
 	end
 
 	-- Copy all match level records which have value
