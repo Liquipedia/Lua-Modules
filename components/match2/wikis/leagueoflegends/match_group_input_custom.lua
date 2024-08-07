@@ -214,9 +214,7 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
