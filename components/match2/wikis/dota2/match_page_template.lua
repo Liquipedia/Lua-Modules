@@ -123,7 +123,7 @@ return {
 					{{#teams.1.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
-								<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&heroIcon}}</div><div class="match-bm-lol-players-player-role">[[File:Dota2 facet {{facet}}.png|link=|{{facet}}]]</div></div>
+								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 facet {{facet}}.png|link=|{{facet}}]]</div></div>
 								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
@@ -142,11 +142,11 @@ return {
 								</div>
 							</div>
 							<div class="match-bm-players-player-stats">
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]]KDA {{kills}}/{{deaths}}/{{assists}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]]DMG {{displayDamageDone}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|Last Hits / Denies]]LH/DN {{lasthits}} / {{denies}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|Net Worth]]NET {{displayGold}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|Gold per Minute]]GPM {{gpm}}</div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-skull-crossbones"></i>KDA</div><div class="match-bm-players-player-stat-data">{{kills}}<span class="slash">/</span>{{deaths}}<span class="slash">/</span>{{assists}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-sword"></i>DMG</div><div class="match-bm-players-player-stat-data">{{displayDamageDone}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-swords"></i>LH/DN</div><div class="match-bm-players-player-stat-data">{{lasthits}}<span class="slash">/</span>{{denies}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-coin"></i>NET</div><div class="match-bm-players-player-stat-data">{{displayGold}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-coins"></i>GPM</div><div class="match-bm-players-player-stat-data">{{gpm}}</div></div>
 							</div>
 						</div>
 					{{/teams.1.players}}
@@ -155,7 +155,7 @@ return {
 					{{#teams.2.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
-								<div class="match-bm-lol-players-player-avatar"><div class="match-bm-lol-players-player-icon">{{&heroIcon}}</div><div class="match-bm-lol-players-player-role">[[File:Dota2 facet {{facet}}.png|link=|{{facet}}]]</div></div>
+								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 facet {{facet}}.png|link=|{{facet}}]]</div></div>
 								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
@@ -174,11 +174,11 @@ return {
 								</div>
 							</div>
 							<div class="match-bm-players-player-stats">
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon kda.png|link=|KDA]]KDA {{kills}}/{{deaths}}/{{assists}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon dmg.png|link=|Damage]]DMG {{displayDamageDone}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|Last Hits / Denies]]LH/DN {{lasthits}} / {{denies}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|Net Worth]]NET {{displayGold}}</div>
-								<div class="match-bm-lol-players-player-stat">[[File:Lol stat icon cs.png|link=|Gold per Minute]]GPM {{gpm}}</div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-skull-crossbones"></i>KDA</div><div class="match-bm-players-player-stat-data">{{kills}}<span class="slash">/</span>{{deaths}}<span class="slash">/</span>{{assists}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-sword"></i>DMG</div><div class="match-bm-players-player-stat-data">{{displayDamageDone}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-swords"></i>LH/DN</div><div class="match-bm-players-player-stat-data">{{lasthits}}<span class="slash">/</span>{{denies}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-coin"></i>NET</div><div class="match-bm-players-player-stat-data">{{displayGold}}</div></div>
+								<div class="match-bm-players-player-stat"><div class="match-bm-players-player-stat-title"><i class="fas fa-coins"></i>GPM</div><div class="match-bm-players-player-stat-data">{{gpm}}</div></div>
 							</div>
 						</div>
 					{{/teams.2.players}}
