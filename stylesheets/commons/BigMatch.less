@@ -526,6 +526,21 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #b81414;
 }
 
+.match-bm-players-wrapper {
+	display: grid;
+	grid-template-columns: auto auto;
+	grid-gap: 1rem;
+	align-items: flex-start;
+
+	@media ( min-width: 414px ) {
+		font-size: 15px;
+	}
+
+	@media ( max-width: 413px ) {
+		font-size: 12px;
+	}
+}
+
 /* >= 834 2 column player layout */
 @media ( max-width: 833px ) {
 	.match-bm-lol-players-wrapper {
@@ -577,6 +592,82 @@ ul.match-bm-lol-game-veto-overview-pick {
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-players-player {
+	display: grid;
+	grid-template-columns: 150px auto 152px;
+	grid-gap: 1rem;
+	padding: 1rem;
+	align-items: flex-start;
+	background: #ffffff;
+	border: 1px solid #bbbbbb;
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-7 );
+		border-color: var( --clr-secondary-25 );
+	}
+
+	&-character {
+		display: flex;
+		order: 1;
+		align-items: center;
+		position: relative;
+	}
+
+	&-loadout {
+		order: 3;
+		display: flex;
+		gap: 1rem;
+
+		&-item {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 0.25rem;
+
+			img {
+				width: 2rem;
+				height: 2rem;
+				border-radius: 0.25rem;
+			}
+		}
+
+		&-items {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+
+		&-rs {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2px;
+
+			img {
+				width: 2rem;
+				height: 2rem;
+				border-radius: 100%;
+			}
+		}
+
+		&-rs-wrap {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+	}
+
+	&-stats {
+		order: 2;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		align-items: center;
 	}
 }
 
