@@ -12,8 +12,10 @@ local CharacterIcon = require('Module:CharacterIcon')
 local CharacterNames = mw.loadData('Module:CharacterNames')
 local GameAppearances = require('Module:GetGameAppearances')
 local Lua = require('Module:Lua')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Team = require('Module:Team')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
@@ -174,6 +176,17 @@ function CustomPlayer:_isPlayerOrStaff()
 		return 'staff'
 	else
 		return 'player'
+	end
+end
+
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local team2Page = Team.page(mw.getCurrentFrame(), self.args.team2)
+		return
+			tostring(MatchTicker.player{recentLimit = 3}) ..
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage}, {team2 = team2Page})
 	end
 end
 
