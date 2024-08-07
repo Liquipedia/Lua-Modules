@@ -1672,5 +1672,5 @@ return {
 		},
 	},
 	opponentLibrary = 'Opponent/Custom',
-	match2 = 0,
+	match2 = 1,
 }
