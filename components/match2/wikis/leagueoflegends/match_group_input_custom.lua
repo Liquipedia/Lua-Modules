@@ -53,6 +53,15 @@ local CustomMatchGroupInput = {}
 function CustomMatchGroupInput.processMatch(match, options)
 	options = options or {}
 
+	if not options.isMatchPage then
+		-- See if this match has a standalone match (match page), if so use the data from there
+		local standaloneMatchId = MatchGroupUtil.getStandaloneId(match.bracketid, match.matchid)
+		local standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
+		if standaloneMatch then
+			return MatchGroupInput.mergeStandaloneIntoMatch(match, standaloneMatch)
+		end
+	end
+
 	local MatchParser
 	if options.isMatchPage then
 		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/MatchPage')
@@ -60,15 +69,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	if not options.isMatchPage then
-		-- See if this match has a standalone match (match page), if so use the data from there
-		local standaloneMatchId = MatchGroupUtil.getStandaloneId(match.bracketid, match.matchid)
-		local standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
-		if standaloneMatch then
-			return MatchFunctions.mergeWithStandalone(match, standaloneMatch)
-		end
-	end
+	return CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
+end
 
+---@param MatchParser LeagueOfLegendsMatchParserInterface
+---@param match table
+---@return table
+function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
 	local games = MatchFunctions.extractMaps(MatchParser, match)
@@ -320,8 +327,9 @@ end
 ---@param opponents {score: integer?}[]
 ---@return boolean
 function MatchFunctions._isFinished(match, opponents)
-	if Logic.readBool(match.finished) then
-		return true
+	local finished = Logic.readBoolOrNil(match.finished)
+	if finished ~= nil then
+		return finished
 	end
 
 	-- If a winner has been set
@@ -331,10 +339,6 @@ function MatchFunctions._isFinished(match, opponents)
 
 	-- If special status has been applied to a team
 	if CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
-		return true
-	end
-
-	if CustomMatchGroupInput.isNotPlayedInput(match.winner) then
 		return true
 	end
 
@@ -360,33 +364,6 @@ function MatchFunctions._isFinished(match, opponents)
 	end
 
 	return false
-end
-
----@param match table
----@param standaloneMatch table
----@return table
-function MatchFunctions.mergeWithStandalone(match, standaloneMatch)
-	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
-
-	-- Update Opponents from the Standlone Match
-	match.opponents = standaloneMatch.match2opponents
-
-	-- Update Maps from the Standalone Match
-	match.games = standaloneMatch.match2games
-	for _, game in ipairs(match.games) do
-		game.scores = Json.parseIfTable(game.scores)
-		game.participants = Json.parseIfTable(game.participants)
-		game.extradata = Json.parseIfTable(game.extradata)
-	end
-
-	-- Copy all match level records which have value
-	for key, value in pairs(standaloneMatch) do
-		if Logic.isNotEmpty(value) and not String.startsWith(key, 'match2') then
-			match[key] = value
-		end
-	end
-
-	return match
 end
 
 -- Parse extradata information

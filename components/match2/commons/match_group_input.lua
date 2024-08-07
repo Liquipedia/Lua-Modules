@@ -957,4 +957,32 @@ function MatchGroupInput.getCharacterName(alias, character)
 	return (assert(alias[character:lower()], 'Invalid character:' .. character))
 end
 
+--- Warning, both match and standalone match may be mutated
+---@param match table
+---@param standaloneMatch table
+---@return table
+function MatchGroupInput.mergeStandaloneIntoMatch(match, standaloneMatch)
+	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
+
+	-- Update Opponents from the Standlone Match
+	match.opponents = standaloneMatch.match2opponents
+
+	-- Update Maps from the Standalone Match
+	match.games = standaloneMatch.match2games
+	for _, game in ipairs(match.games) do
+		game.scores = Json.parseIfTable(game.scores)
+		game.participants = Json.parseIfTable(game.participants)
+		game.extradata = Json.parseIfTable(game.extradata)
+	end
+
+	-- Copy all match level records which have value
+	for key, value in pairs(standaloneMatch) do
+		if Logic.isNotEmpty(value) and not String.startsWith(key, 'match2') then
+			match[key] = value
+		end
+	end
+
+	return match
+end
+
 return MatchGroupInput

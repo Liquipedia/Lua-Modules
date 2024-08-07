@@ -396,7 +396,7 @@ end
 ---Whether any entry of a table satisfies a predicate.
 ---@generic K, V
 ---@param tbl {[K] : V}
----@param predicate fun(key?: K, value?: V): boolean
+---@param predicate fun(key?: K, value?: V): any
 ---@return boolean
 function Table.any(tbl, predicate)
 	for key, value in pairs(tbl) do
