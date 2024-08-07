@@ -589,9 +589,9 @@ function MatchGroupInput.readMvp(match)
 	local players = mw.text.split(match.mvp, ',')
 
 	-- parse the players to get their information
+	local opponents = MatchGroupUtil.normalizeSubtype(match, 'opponent')
 	local parsedPlayers = Array.map(players, function(player, playerIndex)
 		local link = mw.ext.TeamLiquidIntegration.resolve_redirect(mw.text.split(player, '|')[1]):gsub(' ', '_')
-		local opponents = MatchGroupUtil.normalizeSubtype(match, 'opponent')
 		for _, opponent in ipairs(opponents) do
 			for _, lookUpPlayer in pairs(opponent.match2players or {}) do
 				if link == lookUpPlayer.name then
