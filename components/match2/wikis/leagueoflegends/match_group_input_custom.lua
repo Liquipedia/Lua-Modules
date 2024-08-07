@@ -252,8 +252,8 @@ function MatchFunctions.extractOpponents(match, maps)
 
 	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
 		local opponent = match['opponent' .. opponentIndex]
-		match['opponent' .. opponentIndex] = nil
 		if Logic.isEmpty(opponent) then
+			match['opponent' .. opponentIndex] = nil
 			return -- TODO Investigate if we need to return a blank opponent here
 		end
 
@@ -286,6 +286,7 @@ function MatchFunctions.extractOpponents(match, maps)
 			opponent.match2players[1].name = opponent.name
 		end
 
+		match['opponent' .. opponentIndex] = nil
 		return opponent
 	end)
 end
