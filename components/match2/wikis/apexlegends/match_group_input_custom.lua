@@ -184,6 +184,7 @@ function MatchFunctions.parseSetting(match)
 	-- Score Settings
 	match.scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
+		matchPointThreadhold = tonumber(match.matchpoint),
 	}
 
 	Table.mergeInto(match.scoreSettings, Array.mapIndexes(function(idx)
@@ -305,6 +306,9 @@ function MatchFunctions.getOpponents(match)
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
+			opponent.extradata = opponent.extradata or {}
+			opponent.extradata.startingpoints = tonumber(opponent.pointmodifier)
+
 			opponents[opponentIndex] = opponent
 		end
 	end
@@ -340,7 +344,7 @@ end
 ---@return table
 function MatchFunctions.setBgForOpponents(opponents, statusSettings)
 	Array.forEach(opponents, function(opponent)
-		opponent.extradata = {bg = statusSettings[opponent.placement]}
+		opponent.extradata.bg = statusSettings[opponent.placement]
 	end)
 	return opponents
 end
@@ -431,6 +435,7 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 			break
 		end
 		local scoreBreakdown = {}
+
 		local placement, kills = tonumber(opponentData[1]), tonumber(opponentData[2])
 		if placement and kills then
 			scoreBreakdown.placePoints = scoreSettings[placement] or 0
@@ -444,6 +449,11 @@ function MapFunctions.getScoresAndWinner(map, scoreSettings)
 			placement = placement,
 			score = scoreBreakdown.totalPoints,
 		}
+
+		if opponentData[1] == '-' then
+			opponent.placement = NO_SCORE
+		end
+
 		table.insert(map.scores, opponent.score or 0)
 		indexedScores[opponentIndex] = opponent
 	end

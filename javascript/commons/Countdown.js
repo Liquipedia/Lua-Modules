@@ -3,10 +3,11 @@
  * Author(s): FO-nTTaX, Machunki
  ******************************************************************************/
 liquipedia.countdown = {
+	timerHiddenClass: 'timer--hidden',
 	timeoutFunctions: null,
 	timerObjectNodes: null,
 	lastCountdownId: null,
-	init: function() {
+	init: function () {
 		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
 		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
 			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
@@ -45,7 +46,11 @@ liquipedia.countdown = {
 					countdownChild.classList.add( 'timer-object-countdown' );
 					timerObjectNode.appendChild( countdownChild );
 				} );
-				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
+
+				liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
+
+				// Only run when the window is actually in the front,
+				// not in background tabs (on browsers that support it)
 				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
 					liquipedia.countdown.runCountdown();
@@ -53,13 +58,35 @@ liquipedia.countdown = {
 			} );
 		}
 	},
-	parseTimerObjectNodeToDateObj: function( timerObjectNode ) {
+	setupCountdownsIfSwitchToggleExists: function () {
+		const switchToggleGroup = liquipedia.switchButtons.getSwitchGroup( 'countdown' );
+		if ( !switchToggleGroup || switchToggleGroup.type !== 'toggle' || switchToggleGroup.value === null ) {
+			return;
+		}
+
+		// Default state
+		liquipedia.countdown.toggleCountdowns( switchToggleGroup.value );
+
+		// Reacting state switch
+		switchToggleGroup.nodes.forEach( ( switchNode ) => {
+			switchNode.addEventListener( liquipedia.switchButtons.triggerEventName, ( event ) => {
+				liquipedia.countdown.toggleCountdowns( event.detail.data.value );
+			} );
+		} );
+	},
+	toggleCountdowns: function ( isCountdownToggled ) {
+		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
+			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
+			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+		} );
+	},
+	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {
 		if ( timerObjectNode.dataset.timestamp === 'error' ) {
 			return false;
 		}
 		return new Date( 1000 * parseInt( timerObjectNode.dataset.timestamp ) );
 	},
-	runCountdown: function() {
+	runCountdown: function () {
 		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 			liquipedia.countdown.setCountdownString( timerObjectNode );
 		} );
@@ -69,17 +96,22 @@ liquipedia.countdown = {
 			1000
 		);
 	},
-	setCountdownString: function( timerObjectNode ) {
-		const streamsarr = [ ];
-		let datestr = '', live = 'LIVE!';
+	setCountdownString: function ( timerObjectNode ) {
+		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
+		let datestr = '', live = 'LIVE';
+
 		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
 			live = timerObjectNode.dataset.countdownEndText;
 		}
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			const differenceInSeconds = Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
+			const differenceInSeconds = Math.floor(
+				parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 )
+			);
+
 			if ( differenceInSeconds <= 0 ) {
 				if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
-					datestr = '<span class="timer-object-countdown-live">' + live + '</span>';
+					countdownElem.classList.add( 'timer-object-countdown-live' );
+					datestr = live;
 				}
 			} else {
 				let differenceInSecondsMath = differenceInSeconds;
@@ -106,74 +138,11 @@ liquipedia.countdown = {
 		} else {
 			datestr = ''; // DATE ERROR!
 		}
-		if ( timerObjectNode.dataset.streamTwitch ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/twitch/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTwitch ) + '"><i class="lp-icon lp-icon-21 lp-twitch"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTwitch2 ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/twitch/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTwitch2 ) + '"><i class="lp-icon lp-icon-21 lp-twitch"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamYoutube ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/youtube/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamYoutube ) + '"><i class="lp-icon lp-icon-21 lp-youtube"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamAfreeca ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/afreeca/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamAfreeca ) + '"><i class="lp-icon lp-icon-21 lp-afreeca"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamAfreecatv ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/afreecatv/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamAfreecatv ) + '"><i class="lp-icon lp-icon-21 lp-afreeca"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamBilibili ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/bilibili/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamBilibili ) + '"><i class="lp-icon lp-icon-21 lp-bilibili"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamBooyah ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/booyah/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamBooyah ) + '"><i class="lp-icon lp-icon-21 lp-booyah"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamCc163 ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/cc163/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamCc163 ) + '"><i class="lp-icon lp-icon-21 lp-cc"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamDailymotion ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/dailymotion/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamDailymotion ) + '"><i class="lp-icon lp-icon-21 lp-dailymotion"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamDouyu ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/douyu/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamDouyu ) + '"><i class="lp-icon lp-icon-21 lp-douyutv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamFacebook ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/facebook/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamFacebook ) + '"><i class="lp-icon lp-icon-21 lp-facebook"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamHuomao ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huomao/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuomao ) + '"><i class="lp-icon lp-icon-21 lp-huomaotv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamHuya ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huya/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuya ) + '"><i class="lp-icon lp-icon-21 lp-huyatv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamKick ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/kick/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamKick ) + '"><i class="lp-icon lp-icon-21 lp-kick"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamLoco ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/loco/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamLoco ) + '"><i class="lp-icon lp-icon-21 lp-loco"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamMildom ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/mildom/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamMildom ) + '"><i class="lp-icon lp-icon-21 lp-mildom"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamNimo ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/nimo/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamNimo ) + '"><i class="lp-icon lp-icon-21 lp-nimotv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTrovo ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/trovo/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTrovo ) + '"><i class="lp-icon lp-icon-21 lp-trovo"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTl ) {
-			streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset.streamTl + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
-		}
 		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
-		if ( datestr.length > 0 && streamsarr.length > 0 ) {
+		if ( datestr.length > 0 && timerObjectNode.dataset.hasstreams === 'true' ) {
 			html += ' - ';
 		}
-		if ( timerObjectNode.dataset.finished !== 'finished' ) {
-			html += streamsarr.join( ' ' );
-		}
-		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
-	},
-	getStreamName: function( url ) {
-		return url.replace( /\s/g, '_' );
+		countdownElem.innerHTML = html;
 	},
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],
@@ -224,6 +193,7 @@ liquipedia.countdown = {
 		[ 'Eastern European Standard Time', 'EET' ],
 		[ 'Eastern European Summer Time', 'EEST' ],
 		[ 'Eastern Standard Time', 'EST' ],
+		[ 'Ecuador Time', 'ECT' ],
 		[ 'Fiji Standard Time', 'FJST' ],
 		[ 'French Guiana Time', 'GFT' ],
 		[ 'Georgia Standard Time', 'GET' ],
@@ -294,11 +264,11 @@ liquipedia.countdown = {
 		[ 'Yakutsk Standard Time', 'YAKT' ],
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
-	getMonthNameFromMonthNumber: function( newFutureMonth ) {
+	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
 		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 		return monthNames[ newFutureMonth ];
 	},
-	getTimeZoneNameLong: function( dateObject ) {
+	getTimeZoneNameLong: function ( dateObject ) {
 		let date;
 		let result;
 		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
@@ -319,7 +289,7 @@ liquipedia.countdown = {
 		}
 		return result;
 	},
-	getCorrectTimeZoneString: function( dateObject ) {
+	getCorrectTimeZoneString: function ( dateObject ) {
 		const userTime = {
 			localYear: dateObject.getFullYear(),
 			localMonth: dateObject.getMonth(),

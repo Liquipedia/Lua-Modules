@@ -1,5 +1,5 @@
 --- Triple Comment to Enable our LLS Plugin
-describe('Variables', function()
+describe('Locale', function()
 	local Locale = require('Module:Locale')
 
 	local NON_BREAKING_SPACE = '&nbsp;'

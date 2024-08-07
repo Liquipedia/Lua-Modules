@@ -407,9 +407,8 @@ function BasePrizePool:_parseArgs(args)
 	return parsedArgs
 end
 
----@param args table
 ---@return self
-function BasePrizePool:create(args)
+function BasePrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self:readPlacements(self.args)

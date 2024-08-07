@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fifa
+-- wiki=easportsfc
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -19,7 +19,7 @@ local League = Lua.import('Module:Infobox/League')
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
----@class FifaLeagueInfobox: InfoboxLeague
+---@class EafcLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

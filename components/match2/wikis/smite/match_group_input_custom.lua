@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local GodNames = mw.loadData('Module:GodNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -268,6 +269,13 @@ end
 ---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
+	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
+
+	match.links = {
+		stats = match.stats,
+		smiteesports = match.smiteesports
+			and ('https://www.smiteesports.com/matches/' .. match.smiteesports) or nil,
+	}
 	return match
 end
 
@@ -418,13 +426,14 @@ end
 ---@return table
 function mapFunctions.getPicksAndBans(map)
 	local godData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, GodNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
 			local god = map['t' .. opponentIndex .. 'g' .. playerIndex]
-			godData['team' .. opponentIndex .. 'god' .. playerIndex] = GodNames[god and god:lower()]
+			godData['team' .. opponentIndex .. 'god' .. playerIndex] = getCharacterName(god)
 
 			local ban = map['t' .. opponentIndex .. 'b' .. playerIndex]
-			godData['team' .. opponentIndex .. 'ban' .. playerIndex] = GodNames[ban and ban:lower()]
+			godData['team' .. opponentIndex .. 'ban' .. playerIndex] = getCharacterName(ban)
 		end
 	end
 	map.extradata = godData

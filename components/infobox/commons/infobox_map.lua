@@ -6,10 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+local Table = require('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
@@ -36,6 +38,8 @@ function Map:createInfobox()
 	local infobox = self.infobox
 	local args = self.args
 
+	self:_readCreators()
+
 	local widgets = {
 		Header{
 			name = self:getNameDisplay(args),
@@ -45,9 +49,7 @@ function Map:createInfobox()
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Map') .. ' Information'},
-		Cell{name = 'Creator', content = {
-				args.creator or args['created-by'], args.creator2 or args['created-by2']}, options = { makeLink = true }
-		},
+		Cell{name = 'Creator', content = self.creators, options = {makeLink = true}},
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}
 		}},
@@ -89,6 +91,13 @@ function Map:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+function Map:_readCreators()
+	self.creators = {}
+	for _, creator in Table.iter.pairsByPrefix(self.args, {'creator', 'created-by'}, {requireIndex = false}) do
+		table.insert(self.creators, creator)
+	end
+end
+
 ---Stores the lpdb data
 ---@param args table
 function Map:_setLpdbData(args)
@@ -97,7 +106,11 @@ function Map:_setLpdbData(args)
 		type = 'map',
 		image = args.image,
 		date = args.releasedate,
-		extradata = {creator = args.creator}
+		extradata = Table.merge(Table.map(Array.sub(self.creators, 2, #self.creators), function(index, value)
+			return 'creator' .. index, value
+		end), {
+			creator = self.creators[1],
+		})
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
