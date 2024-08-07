@@ -925,17 +925,25 @@ function MatchGroupUtil.computeMatchPhase(match)
 end
 
 ---Normalizes subtypes (opponent, map) into a list. An alternative list can be provided as override.
----@param tbl table
----@param prefix string
----@param list any[]?
+---@param match table
+---@param type 'opponent'|'map'
 ---@return any[]
-function MatchGroupUtil.normalizeSubtype(tbl, prefix, list)
-	if list then
-		return list
+function MatchGroupUtil.normalizeSubtype(match, type)
+	local listNames
+	if type == 'opponent' then
+		listNames = {'match2opponents', 'opponents'}
+	elseif type == 'map' then
+		listNames = {'match2games', 'games'}
+	else
+		error('Invalid subtype: ' .. type)
 	end
-
+	for _, listName in ipairs(listNames) do
+		if match[listName] then
+			return match[listName]
+		end
+	end
 	local newList = {}
-	for _, item in Table.iter.pairsByPrefix(tbl, prefix, {requireIndex = true}) do
+	for _, item in Table.iter.pairsByPrefix(match, type, {requireIndex = true}) do
 		table.insert(newList, item)
 	end
 
