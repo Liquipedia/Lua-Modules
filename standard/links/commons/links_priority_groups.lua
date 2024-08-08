@@ -36,6 +36,7 @@ return {
 		'faceit-hub',
 		'faceit-org',
 		'gamersclub',
+		'geoguessr',
 		'halodatahive',
 		'letsplaylive',
 		'letsplaylive-old',
