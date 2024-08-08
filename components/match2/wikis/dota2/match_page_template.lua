@@ -119,7 +119,7 @@ return {
 			</div>
 			<h3>Player Performance</h3>
 			<div class="match-bm-players-wrapper">
-				<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.1.iconDisplay}}</div>
+				<div class="match-bm-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.1.iconDisplay}}</div>
 					{{#teams.1.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
@@ -151,7 +151,7 @@ return {
 						</div>
 					{{/teams.1.players}}
 				</div>
-				<div class="match-bm-lol-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.2.iconDisplay}}</div>
+				<div class="match-bm-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.2.iconDisplay}}</div>
 					{{#teams.2.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
