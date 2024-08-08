@@ -13,7 +13,7 @@ return {
 	defaultGame = 'geoguessr',
 	games = {
 		geoguessr = {
-			abbreviation = 'Geo',
+			abbreviation = 'GeoGuessr',
 			name = 'GeoGuessr',
 			link = 'GeoGuessr',
 			logo = {
@@ -33,8 +33,6 @@ return {
 			allowManual = false,
 		},
 		match2 = {
-			matchWidthMobile = 110,
-			matchWidth = 190,
 		},
 	},
 	defaultRoundPrecision = 0,
