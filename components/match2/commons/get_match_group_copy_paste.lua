@@ -7,9 +7,10 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local BracketAlias = mw.loadData('Module:BracketAlias')
 local Class = require('Module:Class')
-local Array = require('Module:Array')
+local I18n = require('Module:I18n')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -104,8 +105,7 @@ function CopyPaste._getHeader(headerCode, customHeader)
 	local headerCodeArray = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
 	local index = Logic.isEmpty(headerCodeArray[1]) and 2 or 1
 
-	local headerMessage = mw.message.new('brkts-header-' .. headerCodeArray[index])
-		:params(headerCodeArray[index + 1] or ''):plain()
+	local headerMessage = I18n.translate('brkts-header-' .. headerCodeArray[index], {round = headerCodeArray[index + 1]})
 	local header = mw.text.split(headerMessage, ',')[1]
 	header = '\n' .. '<!-- ' .. header .. ' -->'
 
