@@ -13,6 +13,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
+local I18n = require('Module:I18n')
 local Icon = require('Module:Icon')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
@@ -388,9 +389,7 @@ function Match:_expandHeader(inheritedHeader)
 	end
 
 	local headerInput = 'brkts-header-' .. headerArray[index]
-	local expandedHeader = mw.message.new('brkts-header-' .. headerArray[index])
-			---@diagnostic disable-next-line: param-type-mismatch
-			:params(headerArray[index + 1] or ''):plain() --[[@as string]]
+	local expandedHeader = I18n.translate('brkts-header-' .. headerArray[index], {round = headerArray[index + 1]})
 	local failedExpandedHeader = '⧼' .. headerInput .. '⧽'
 	if Logic.isEmpty(expandedHeader) or failedExpandedHeader == expandedHeader then
 		return inheritedHeader
