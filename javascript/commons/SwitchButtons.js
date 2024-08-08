@@ -58,7 +58,6 @@ liquipedia.switchButtons = {
 	isInitialized: false,
 
 	init: function () {
-		this.switchGroups = {};
 		this.baseLocalStorageKey = this.buildLocalStorageKey();
 		this.initSwitchElements( 'toggle', '.switch-toggle', 'switch-toggle-active' );
 		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-active' );
