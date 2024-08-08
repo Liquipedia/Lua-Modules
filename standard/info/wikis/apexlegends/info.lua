@@ -32,6 +32,8 @@ return {
 			hasSpecialTeam = true,
 			allowManual = true,
 		},
+		match2 = {
+		},
 	},
 	match2 = 1,
 	defaultRoundPrecision = 0,

@@ -344,6 +344,10 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			matchWidthMobile = 100,
+			matchWidth = 190,
+		},
 	},
 	defaultRoundPrecision = 0,
 	match2 = 2,
