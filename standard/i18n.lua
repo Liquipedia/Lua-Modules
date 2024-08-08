@@ -13,7 +13,7 @@ local I18n = {}
 
 local LANGUAGE = mw.language.getContentLanguage():getCode()
 
----Interpolaes an i18n string with data
+---Interpolates an i18n string with data
 ---TODO Add pluralization support (https://cldr.unicode.org/index/cldr-spec/plural-rules)
 ---@param key string
 ---@param data table<string, string|number>
