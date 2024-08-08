@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local AgentNames = require('Module:AgentNames')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -548,14 +550,14 @@ end
 ---@return table
 function mapFunctions.getParticipantsData(map)
 	local participants = map.participants or {}
-
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, AgentNames)
 	-- fill in stats
 	for o = 1, MAX_NUM_OPPONENTS do
 		for player = 1, MAX_NUM_PLAYERS do
 			local participant = participants[o .. '_' .. player] or {}
-			local opstring_big = 'opponent' .. o .. '_p' .. player
-			local opstring_normal = 't' .. o .. 'p' .. player
-			local stats = map[opstring_big .. 'stats'] or map[opstring_normal]
+			local opstringBig = 'opponent' .. o .. '_p' .. player
+			local opstringNormal = 't' .. o .. 'p' .. player
+			local stats = map[opstringBig .. 'stats'] or map[opstringNormal]
 
 			if stats then
 				stats = Json.parse(stats)
@@ -575,7 +577,10 @@ function mapFunctions.getParticipantsData(map)
 				participant.player = Logic.isEmpty(playerName) and participant.player or playerName
 
 				if not Table.isEmpty(participant) then
+					participant.agent = getCharacterName(participant.agent)
 					participants[o .. '_' .. player] = participant
+					map.extradata[opstringNormal] = participant.player
+					map.extradata[opstringNormal .. 'agent'] = participant.agent
 				end
 			end
 		end

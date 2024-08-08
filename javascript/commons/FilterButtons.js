@@ -342,6 +342,7 @@ liquipedia.filterButtons = {
 
 	refreshScriptsAfterContentUpdate: function() {
 		liquipedia.countdown.init();
+		liquipedia.switchButtons.init();
 	},
 
 	buildLocalStorageKey: function() {

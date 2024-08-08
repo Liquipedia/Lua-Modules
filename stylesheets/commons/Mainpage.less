@@ -348,20 +348,20 @@ table.infobox_matches_content {
 }
 
 .infobox_matches_content .tournament-flex {
-	width: min( calc( ~"50% + 20px" ), 185px );
+	width: 185px;
 	display: flex;
 }
 
 .infobox_matches_content .has-matchpage .tournament-flex {
-	width: min( calc( ~"50% - 20px" ), 185px );
+	width: ~"min( calc( 50% - 20px ), 185px )";
 }
 
 .infobox_matches_content .tournament-text {
 	overflow: hidden;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 	max-width: 130px;
 	vertical-align: middle;
-	white-space: nowrap;
 	font-size: 11px;
 	height: 16px;
 	margin-top: 3px;
@@ -371,6 +371,7 @@ table.infobox_matches_content {
 .infobox_matches_content .tournament-text-flex {
 	overflow: hidden;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 	width: 100%;
 	font-size: 11px;
 	height: 16px;
@@ -422,7 +423,6 @@ div.match-countdown-wrapper {
 	display: flex;
 	gap: 5px;
 	align-items: center;
-	width: calc( ~"50% - 20px" );
 	justify-content: space-between;
 }
 

@@ -20,6 +20,9 @@ describe('Standings Storage', function()
 		}
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
+			config = '[]',
+			extradata = '[]',
+			matches = '[]',
 			parent = 'FakePage',
 			section = '',
 			standingsindex = 0,
@@ -47,6 +50,9 @@ describe('Standings Storage', function()
 		StandingsStorage.run(standingsData)
 
 		assert.stub(stubLpdbStandingsTable).was.called_with('standingsTable_0', {
+			config = '{"hasdraws":false,"hasovertimes":true}',
+			extradata = '{"enddate":"2022-10-31","finished":false,"hasdraw":false,"hasovertime":true,"roundcount":7}',
+			matches = '[]',
 			parent = 'FakePage',
 			section = '',
 			standingsindex = 0,
@@ -60,6 +66,7 @@ describe('Standings Storage', function()
 		assert.stub(stubLpdbStandingsEntry).was.called_with('standing_0_7_10', {
 			currentstatus = 'stay',
 			definitestatus = 'stay',
+			extradata = '{"slotindex":10}',
 			opponentname = 'tt9 esports 2022',
 			opponenttemplate = 'tt9 esports 2022',
 			opponenttype = 'team',
@@ -68,6 +75,8 @@ describe('Standings Storage', function()
 			placementchange = 0,
 			roundindex = 7,
 			slotindex = 10,
+			scoreboard = '{"diff":-15,"game":{"d":0,"l":42,"w":27},'..
+				'"match":{"d":0,"l":0,"w":0},"overtime":{"d":0,"l":0,"w":0},"points":0}',
 			standingsindex = 0,
 		})
 

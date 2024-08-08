@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -284,6 +285,7 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 })
 
 ---@class MatchGroupUtilMatchlist
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
@@ -513,8 +515,10 @@ function MatchGroupUtil.matchFromRecord(record)
 		mode = record.mode,
 		opponents = opponents,
 		parent = record.parent,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		stream = Json.parseIfString(record.stream) or {},
+		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
@@ -893,6 +897,20 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 	else
 		-- Matchlist format
 		return string.format('%04d', matchKey)
+	end
+end
+
+---Determines the phase of a match based on its properties.
+---@param match MatchGroupUtilMatch|MatchGroupUtilGame
+---@return 'finished'|'ongoing'|'upcoming'
+function MatchGroupUtil.computeMatchPhase(match)
+	local matchStartTimestamp = match.timestamp or Date.readTimestamp(match.date)
+	if match.winner then
+		return 'finished'
+	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and matchStartTimestamp < os.time() then
+		return 'ongoing'
+	else
+		return 'upcoming'
 	end
 end
 

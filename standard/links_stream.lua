@@ -42,6 +42,11 @@ StreamLinks.countdownPlatformNames = {
 	TLNET_STREAM,
 }
 
+local PLATFORM_TO_SPECIAL_PAGE = {
+	afreeca = 'afreecatv',
+	cc = 'cc163',
+}
+
 ---@param key string
 ---@return boolean
 ---@overload fun(key: any): false
@@ -65,9 +70,16 @@ end
 ---@param streamValue string
 ---@return string
 function StreamLinks.resolve(platformName, streamValue)
+	platformName = StreamLinks.resolvePlatform(platformName)
 	local streamLink = mw.ext.StreamPage.resolve_stream(platformName, streamValue)
 
 	return (string.gsub(streamLink, 'Special:Stream/' .. platformName, ''))
+end
+
+---@param platform string
+---@return string
+function StreamLinks.resolvePlatform(platform)
+	return PLATFORM_TO_SPECIAL_PAGE[platform] or platform
 end
 
 --[[
@@ -148,6 +160,8 @@ function StreamLinks.displaySingle(platform, streamValue)
 
 	local streamLink = StreamLinks.resolve(platform, streamValue)
 	if not streamLink then return nil end
+
+	platform = StreamLinks.resolvePlatform(platform)
 
 	return Page.makeInternalLink({}, icon, 'Special:Stream/' .. platform .. '/' .. streamValue)
 end

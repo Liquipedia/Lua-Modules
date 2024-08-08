@@ -58,5 +58,19 @@ Author(s): Elysienna
 		&:focus-visible {
 			outline: 0.125rem solid #212529;
 		}
+
+		&:not( .tab--active ) {
+			& .icon--green {
+				color: #1d7c1d;
+			}
+
+			& .icon--red {
+				color: #b81414;
+			}
+		}
+
+		&-icon {
+			margin-right: 0.5rem;
+		}
 	}
 }

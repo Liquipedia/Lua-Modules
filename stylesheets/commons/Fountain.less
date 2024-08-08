@@ -8,7 +8,7 @@ html.theme--dark .componentsinvert {
 	filter: invert( 1 );
 }
 
-/* Infobox Hero */
+// Hero infobox-related
 .healthbar {
 	background: linear-gradient( to right, #286323, #7af03c );
 	color: #ffffff;
@@ -22,6 +22,24 @@ html.theme--dark .componentsinvert {
 	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 	font-weight: bold;
 }
+
+#primaryAttribute img,
+.primaryAttribute img {
+	border: 0.125rem solid #ffffff;
+	border-radius: 50%;
+} // Circles the Primary Attribute.
+
+.ib-tooltip {
+	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
+	border-style: solid;
+	text-align: center;
+	font-size: 70%; // convert to rem
+	font-weight: bold;
+
+	&:hover {
+		background-color: rgba( 255, 215, 0, 0.5 );
+	}
+} // Mainly for Hero infobox tooltip. Can be expanded to other usage in the future.
 
 /* Infobox Cosmetic */
 .infobox-cosmetic-tradeable,
@@ -42,26 +60,19 @@ html.theme--dark .componentsinvert {
 	color: #daa520;
 }
 
-/* Template:Cf */
+// Template:Cf-related
 a.cf {
 	font-weight: bold;
 	color: #ffffff;
 	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
 }
 
-/* Custom Diagrams */
-.diagram svg defs g path,
-.diagram svg defs g ellipse {
-	stroke: currentcolor;
-	fill: currentcolor;
-}
-
-/* Spellcard Ability Borders
-The smaller sizes are for sub-sections. */
+// Spellcard Ability Borders
+// The smaller sizes are for sub-sections.
 .target_passive,
 .target_aura {
 	border: 0;
-} /* Passive ability will have an overlay instead. */
+} // Applies a caved-in img overlay for passive abilities instead.
 
 .target_no,
 .target_unit,
@@ -72,11 +83,11 @@ The smaller sizes are for sub-sections. */
 	border-bottom: 0.375rem solid #212f3d;
 	border-right: 0.375rem solid #595959;
 	border-left: 0.375rem solid #a7a7a7;
-}
+} // Mimics an active button.
 
 .target_toggle {
 	border: 0.375rem solid #fc9303;
-}
+} // Mimics a toggled-on state.
 
 .target_altcast {
 	outline: 0.25rem solid #f5f5f5;
@@ -85,7 +96,7 @@ The smaller sizes are for sub-sections. */
 	border-bottom: 0.375rem solid #212f3d;
 	border-right: 0.375rem solid #595959;
 	border-left: 0.375rem solid #a7a7a7;
-}
+} // Mimics an Alt-Cast-on state.
 
 @keyframes rotate {
 	100% {
@@ -97,7 +108,7 @@ The smaller sizes are for sub-sections. */
 	width: 5rem; // 80px
 	height: 5rem; // 80px
 	padding: 0.375rem;
-}
+} // Mimics an Autocast-able ability.
 
 .target_autocast1 {
 	width: 2.5rem; //40px
@@ -140,7 +151,7 @@ The smaller sizes are for sub-sections. */
 		justify-content: center;
 		align-items: center;
 	}
-}
+} // Mimics an Autocast-on state.
 
 .target_autocast-off {
 	border: 0.375rem ridge #899499;
@@ -185,9 +196,8 @@ The smaller sizes are for sub-sections. */
 .target_downtime1 {
 	width: 5.375rem; // 86px
 	height: 5.375rem; //86px
-	box-sizing: border-box; // shouldn't be necessary?
 	border: 0;
-}
+} // Downtime should always be within the sub-section.
 
 .target_downtime1:before,
 .item_cdshare:before {
@@ -215,23 +225,17 @@ The smaller sizes are for sub-sections. */
 .item_cdshare {
 	width: 5.5rem; // 88px
 	height: 4rem; // 64px
-	box-sizing: border-box; // is this necessary?
 	border: 0;
 }
 
-/* Spellcard-related */
-.irisbox {
-	max-width: 28.75rem; // 460px
-	width: 100%;
-}
-
-.spelltad { /* Spellcard Target/Affect/Damage (TAD) */
+// Spellcard-related
+.spelltad {
 	display: inline-block;
 	font-size: 90%; // convert to rem
 	vertical-align: top;
 	width: 13%;
 	text-align: right;
-}
+} // Spellcard Target/Affect/Damage (TAD)
 
 .spelltad_value {
 	flex: 1 0 auto;
@@ -343,7 +347,7 @@ The smaller sizes are for sub-sections. */
 .i-row,
 .spellvalueTableRow {
 	display: table-row;
-}
+} // Hero infobox row uses the same value.
 
 .spellvalueTableCell {
 	display: table-cell;
@@ -353,21 +357,7 @@ The smaller sizes are for sub-sections. */
 	height: 35px;
 }
 
-/* Infobox-related */
-.ib-tooltip {
-	padding: 0.2px; // is subpixel necessary?
-	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
-	border-style: solid;
-	text-align: center;
-	font-size: 70%; // convert to rem
-	font-weight: bold;
-
-	&:hover {
-		background-color: rgba( 255, 215, 0, 0.5 );
-	}
-}
-
-/* Spellunit-related */
+// Spellunit-related
 .spellunit {
 	&_link,
 	&_topage {
@@ -419,7 +409,34 @@ The smaller sizes are for sub-sections. */
 	}
 }
 
-/* Invokecard */
+// $craft-related
+// This is mainly for the mini-infobox within the Spellcard.
+.craft {
+	&_base {
+		background-color: #93000d2e;
+		font-size: 15px;
+		padding: 5px;
+	}
+
+	&_title {
+		font-size: 85%;
+		border-bottom: 1px solid #333333;
+	}
+
+	&_icon {
+		position: relative;
+		flex-shrink: 0;
+	}
+
+	&_overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+	} // Applies a caved-in img overlay for visual purposes.
+}
+
+// Invokecard-related
 .invokeCard {
 	font-size: 85%; // convert to rem
 	width: 6.25rem; // 100px
@@ -437,7 +454,7 @@ The smaller sizes are for sub-sections. */
 	padding: 0.25rem;
 }
 
-/* Facetcard-related */
+// Facetcard-related
 .facetBox {
 	background: rgba( 35, 46, 52, 0.25 );
 	padding: 0.3125rem;
@@ -446,7 +463,11 @@ The smaller sizes are for sub-sections. */
 	transition: 0.35s;
 
 	&:hover {
-		border: 0.0625rem solid #f7f7f7;
+		border: 0.0625rem solid var( --clr-elm-10 );
+	}
+
+	.theme--dark &:hover {
+		border: 0.0625rem solid var( --clr-moon-90 );
 	}
 }
 
@@ -458,6 +479,15 @@ The smaller sizes are for sub-sections. */
 	font-weight: bold;
 	color: #e2e2e6;
 	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+}
+
+.facetDesc {
+	border-top: 0.125rem solid #505050;
+	padding-top: 0.3125rem;
+
+	&:hover {
+		border-top: 0.125rem solid var( --clr-moon-80 );
+	}
 }
 
 /* Aghcard-related */
@@ -628,7 +658,7 @@ div.gameplay_nav ul li ul li {
 	border-style: hidden;
 }
 
-/* {{pp-template}} */
+// treeview-related
 .treeview {
 	ul {
 		padding: 0 !important; // is important necessary?
@@ -665,7 +695,7 @@ div.gameplay_nav ul li ul li {
 .treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
 .treeview li.emptyline > ul > li:first-child {
 	background-position: 0 0.5625rem;
-}
+} // Treelist will be removed for something else in the future.
 
 /***************************
 * Used by [[Template:Key press]] *
@@ -713,7 +743,8 @@ div.gameplay_nav ul li ul li {
 	background-color: var( --table-green-background-color );
 }
 
-/* Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]] */
+// Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]]
+// Will revisit this soon.
 .updatetablehead {
 	display: flex;
 	border-top: 0.0625rem solid #aaaaaa;
@@ -766,7 +797,7 @@ div.gameplay_nav ul li ul li {
 
 /* Template:GameVersionTableElement */
 .gvt-el-significant {
-	background: #ffffcc !important; // is important necessary?
+	background: #ffffcc;
 }
 
 /* Template:Talent table el */
@@ -774,7 +805,7 @@ div.gameplay_nav ul li ul li {
 	height: 2.5rem; // 40px
 	padding: 0;
 	border-bottom: solid 0.125rem #000000;
-	background: #eff5ff !important; // is important necessary?
+	background: #eff5ff;
 }
 
 /* Item Grid Styling on [[Item Grid]] */
@@ -850,7 +881,12 @@ div.infostripe div {
 	border-left: 0.25rem solid rgba( 75, 75, 75, 0.5 );
 }
 
-/* Hero entry - used in hero tables and cosmetic infoboxes */
+// Template:Hero Entry-related
+// Used in Portal:Heroes, hero tables and cosmetic infoboxes
+.vercheck_,
+.vercheck_no {
+	filter: grayscale( 90% ); // Difficult for colorblind users at low percentage.
+} // Grayscales the hero portrait based on the Template:VersionControl values stored in LPDB.
 
 div.heroentry {
 	position: relative;
@@ -1407,15 +1443,6 @@ img.pixelart {
 	display: none;
 }
 
-/* Hero infobox styles ([[Template:Hero infobox]]) */
-
-/* Highlight the primary attribute icon */
-#primaryAttribute img,
-.primaryAttribute img {
-	border: 0.125rem solid #ffffff;
-	border-radius: 50%;
-}
-
 /*
 * Cosmetic Item infobox styles ([[Template:Cosmetic item infobox]])
 */
@@ -1457,10 +1484,7 @@ img.pixelart {
 	pointer-events: none;
 }
 
-/*
-* Patch styles ([[Template:Patch layout]])
-*/
-
+// Patch styles ([[Template:Patch layout]])
 html.theme--dark .patch-layout {
 	border: 0.0625rem solid #555555;
 }
@@ -1529,7 +1553,7 @@ html.theme--dark .patch-layout {
 	color: #d37708;
 }
 
-/* AudioButton extension styles */
+// AudioButton-related styles (<ab>)
 a.ext-audiobutton {
 	/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
 	font-family: "Font Awesome 5 Pro";
@@ -1561,7 +1585,7 @@ a.ext-audiobutton {
 	}
 }
 
-/* Quote.less overrides for RU lang */
+// Template:Quote (Quote.less) style overrides for RU
 .wiki-dota2gameru & {
 	blockquote.quote::before {
 		top: -2.5rem; // -40px

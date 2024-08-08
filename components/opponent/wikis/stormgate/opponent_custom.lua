@@ -130,7 +130,7 @@ function CustomOpponent.resolve(opponent, date, options)
 					player.team,
 					{date = date, savePageVar = savePageVar}
 				)
-				player.faction = (hasFaction and player.faction ~= Faction.defaultFaction) and player.faction or nil
+				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else
 				PlayerExt.populatePageName(player)
 			end
