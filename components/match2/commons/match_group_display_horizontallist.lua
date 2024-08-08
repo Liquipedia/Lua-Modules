@@ -131,10 +131,12 @@ function HorizontallistDisplay.computeHeaders(sortedBracket)
 	-- Suffix when there multiple matches with the same header, in order to make a distiction between them
 	headers = Array.map(headers, function(headerGroup)
 		if #headerGroup == 1 then
-			return DisplayHelper.expandHeader(headerGroup[1].inheritedHeader)[1]
+			local header = headerGroup[1].inheritedHeader or 'Match'
+			return DisplayHelper.expandHeader(header)[1]
 		end
 		return Array.map(headerGroup, function (match, index)
-			return DisplayHelper.expandHeader(match.inheritedHeader)[1] .. ' #' .. index
+			local header = match.inheritedHeader or 'Match'
+			return DisplayHelper.expandHeader(header)[1] .. ' #' .. index
 		end)
 	end)
 
