@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
@@ -94,7 +95,7 @@ end
 ---@param match table
 function CustomMatchGroupInput._updateFinished(match)
 	match.finished = Logic.nilOr(Logic.readBoolOrNil(match.finished), Logic.isNotEmpty(match.winner))
-	if match.finished then
+	if match.finished or match.timestamp == DateExt.minTimestamp then
 		return
 	end
 
