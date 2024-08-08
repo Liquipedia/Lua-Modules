@@ -13,7 +13,7 @@ return {
 	defaultGame = 'geoguessr',
 	games = {
 		geoguessr = {
-			abbreviation = 'GeoGuessr',
+			abbreviation = 'Geo',
 			name = 'GeoGuessr',
 			link = 'GeoGuessr',
 			logo = {
@@ -30,8 +30,13 @@ return {
 		squads = {
 			hasPosition = false,
 			hasSpecialTeam = false,
-			allowManual = false,
+			allowManual = true,
+		},
+		match2 = {
+			matchWidthMobile = 110,
+			matchWidth = 190,
 		},
 	},
+	defaultRoundPrecision = 0,
 	match2 = 0,
 }
