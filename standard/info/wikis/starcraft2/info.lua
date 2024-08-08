@@ -58,6 +58,10 @@ return {
 			hasSpecialTeam = true,
 			allowManual = true,
 		},
+		match2 = {
+			matchWidthMobile = 110,
+			matchWidth = 150,
+		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',

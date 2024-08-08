@@ -45,6 +45,9 @@ return {
 			hasSpecialTeam = false,
 			allowManual = false,
 		},
+		match2 = {
+			matchWidth = 180,
+		},
 	},
 	defaultRoundPrecision = 0,
 	match2 = 2,

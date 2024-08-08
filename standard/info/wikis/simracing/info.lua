@@ -812,6 +812,8 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+		},
 	},
 	match2 = 0,
 }
