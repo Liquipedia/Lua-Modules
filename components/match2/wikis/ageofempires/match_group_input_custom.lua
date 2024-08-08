@@ -95,7 +95,7 @@ end
 ---@param match table
 function CustomMatchGroupInput._updateFinished(match)
 	match.finished = Logic.nilOr(Logic.readBoolOrNil(match.finished), Logic.isNotEmpty(match.winner))
-	if match.finished or match.timestamp == DateExt.minTimestamp then
+	if match.finished or match.timestamp == DateExt.defaultTimestamp then
 		return
 	end
 
