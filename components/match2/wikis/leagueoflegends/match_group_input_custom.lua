@@ -11,6 +11,7 @@ local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:ChampionNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
@@ -168,13 +169,13 @@ function MatchFunctions.getBestOf(bestOfInput, maps)
 end
 
 -- Calculate the match scores based on the map results (counting map wins)
----@param maps {scores: integer[]}[]
+---@param maps {winner: integer?}[]
 ---@param opponentIndex integer
 ---@return integer
 function MatchFunctions.computeMatchScoreFromMapScores(maps, opponentIndex)
-	return Array.reduce(maps, function(sumScore, map)
-		return sumScore + (map.scores[opponentIndex] or 0)
-	end, 0)
+	return Array.reduce(Array.map(maps, function(map)
+		return (map.winner == opponentIndex and 1 or 0)
+	end), Operator.add)
 end
 
 ---@param match table
