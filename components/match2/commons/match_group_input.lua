@@ -520,7 +520,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		resolveDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
 	end
 
-	Opponent.resolve(opponent, resolveDate, {syncPlayer = Logic.emptyOr(options.syncPlayer, true)})
+	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
 	opponent.name = Opponent.toName(opponent)
 
 	local substitutions
