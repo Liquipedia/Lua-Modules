@@ -268,7 +268,7 @@ end
 ---@param match table
 ---@param mapIndex integer
 function CustomMatchGroupInput._mapInput(match, mapIndex)
-	local map = Json.parseIfString(match['map' .. mapIndex])
+	local map = Json.parseIfString(match['map' .. mapIndex], {checkForError = true})
 	if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
 		map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
 	end

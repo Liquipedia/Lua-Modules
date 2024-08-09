@@ -318,7 +318,7 @@ MapInput functions
 ---@return table
 ---@return integer
 function CustomMatchGroupInput._mapInput(match, mapIndex, subGroupIndex)
-	local map = Json.parseIfString(match['map' .. mapIndex])
+	local map = Json.parseIfString(match['map' .. mapIndex], {checkForError = true})
 
 	if Table.isEmpty(map) then
 		match['map' .. mapIndex] = nil
