@@ -951,12 +951,8 @@ function MatchGroupUtil.normalizeSubtype(match, type)
 			return match[listName]
 		end
 	end
-	local newList = {}
-	for _, item in Table.iter.pairsByPrefix(match, type, {requireIndex = true}) do
-		table.insert(newList, item)
-	end
 
-	return newList
+	return Array.mapIndexes(function(index) return match[type .. index] end)
 end
 
 return MatchGroupUtil
