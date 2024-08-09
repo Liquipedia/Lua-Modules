@@ -982,7 +982,7 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 
 	-- If enough time has passed since match started, it should be marked as finished
 	local threshold = match.dateexact and FORCE_FINISH_AFTER.EXACT or FORCE_FINISH_AFTER.ESTIMATE
-	if match.timestamp ~= DateExt.defaultTimestamp and match.timestamp + threshold < NOW then
+	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
 		return true
 	end
 
