@@ -57,7 +57,7 @@ MatchGroupInput.WALKOVER = {
 MatchGroupInput.SCORE_NOT_PLAYED = -1
 MatchGroupInput.WINNER_DRAW = 0
 
-local FORCE_FINISH_AFTER = {
+local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
 	ESTIMATE = 86400,
 }
@@ -981,7 +981,7 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	local threshold = match.dateexact and FORCE_FINISH_AFTER.EXACT or FORCE_FINISH_AFTER.ESTIMATE
+	local threshold = match.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
 	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
 		return true
 	end
