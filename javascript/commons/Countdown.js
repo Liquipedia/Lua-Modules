@@ -100,9 +100,7 @@ liquipedia.countdown = {
 		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
 		let datestr = '';
 
-		if ( timerObjectNode.dataset.timestamp === 'error' ) {
-			datestr = '';
-		} else {
+		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
 			datestr = this.calculateCountdownString( timerObjectNode, countdownElem );
 		}
 
