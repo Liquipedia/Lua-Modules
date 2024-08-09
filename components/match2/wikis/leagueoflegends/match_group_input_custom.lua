@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:ChampionNames')
 local Logic = require('Module:Logic')
@@ -19,7 +18,6 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local Opponent = Lua.import('Module:Opponent')
 
 local MAX_NUM_OPPONENTS = 2
 local MAX_NUM_PLAYERS = 15
