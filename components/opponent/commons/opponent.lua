@@ -377,9 +377,6 @@ function Opponent.readOpponentArgs(args)
 	elseif partySize then
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
 			local playerTeam = args['p' .. playerIndex .. 'team']
-			if playerTeam then
-				playerTeam = playerTeam
-			end
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
