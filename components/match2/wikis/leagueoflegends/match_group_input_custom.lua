@@ -121,49 +121,6 @@ function MatchFunctions.extractMaps(MatchParser, match)
 end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
-
----@param match table
----@param opponentIndex integer
----@return standardOpponent
-function CustomMatchGroupInput.processOpponent(match, opponentIndex)
-	local record = match['opponent' .. opponentIndex]
-
-	if not record then
-		return Opponent.blank()
-	end
-
-	assert(record.type == Opponent.team or record.type == Opponent.solo or record.type == Opponent.literal,
-			'Unsupported Opponent Type "' .. (record.type or '') .. '"')
-
-	local opponent = Opponent.readOpponentArgs(record)
-		or Opponent.blank()
-
-	-- Convert byes to literals
-	if Opponent.isBye(opponent) then
-		opponent = {type = Opponent.literal, name = 'BYE'}
-	end
-
-	---@type integer|string?
-	local teamTemplateDate = match.timestamp
-	-- If date is default date, resolve using tournament date or today instead
-	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefault('tournament_enddate')
-	end
-
-	Opponent.resolve(opponent, teamTemplateDate)
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-
-	if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-		MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
-			resolveRedirect = true,
-			applyUnderScores = true,
-			maxNumPlayers = MAX_NUM_PLAYERS,
-		})
-	end
-
-	return record
-end
-
 CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---Should only be called on finished matches or maps
@@ -252,11 +209,12 @@ end
 ---@return standardOpponent[]
 function MatchFunctions.extractOpponents(match, maps)
 	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
-		local opponent = CustomMatchGroupInput.processOpponent(match, opponentIndex)
-
+		local opponent = MatchGroupInput.processOpponent(match, opponentIndex, {
+			resolveRedirect = true,
+			applyUnderScores = true,
+			maxNumPlayers = MAX_NUM_PLAYERS,
+		})
 		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, maps, opponentIndex, opponent.score)
-
-		match['opponent' .. opponentIndex] = nil
 		return opponent
 	end)
 end
