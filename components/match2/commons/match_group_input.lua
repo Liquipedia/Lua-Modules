@@ -841,7 +841,7 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
----@param opponents {status: string?, score: any}[]
+---@param opponents {status: string, score: any}[]
 ---@return boolean
 function MatchGroupInput.isDraw(opponents)
 	if Logic.isEmpty(opponents) then return true end
@@ -851,12 +851,12 @@ function MatchGroupInput.isDraw(opponents)
 	if Array.any(opponents, opponentHasFinalStatus) then
 		return false
 	end
-	-- Does all opponents have the same score?
+	-- Do all opponents have the same score?
 	return #Array.unique(Array.map(opponents, Operator.property('score'))) == 1
 end
 
 -- Check if any opponent has a none-standard status
----@param opponents {status: string?}[]
+---@param opponents {status: string}[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
 	return Array.any(opponents, function (opponent) return opponent.status ~= MatchGroupInput.STATUS.SCORE end)
