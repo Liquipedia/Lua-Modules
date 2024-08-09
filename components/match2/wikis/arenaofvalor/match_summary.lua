@@ -162,7 +162,7 @@ function CustomMatchSummary.createBody(match)
 	if not Table.isEmpty(championBanData) then
 		local championBan = ChampionBan()
 
-		for gameIndex, banData in ipairs(championBanData) do
+		for gameIndex, banData in pairs(championBanData) do
 			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
 		end
 
