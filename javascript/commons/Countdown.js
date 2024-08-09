@@ -119,21 +119,21 @@ liquipedia.countdown = {
 		const differenceInSeconds =
 			Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
 
-		if ( differenceInSeconds <= 0 ) {
-			if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
-				countdownElem.classList.add( 'timer-object-countdown-live' );
+		if ( differenceInSeconds > 0 ) {
+			return this.formatTimeDifference( differenceInSeconds );
+		}
 
-				if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
-					return timerObjectNode.dataset.countdownEndText;
-				}
-
-				return 'LIVE';
-			}
-
+		if ( differenceInSeconds <= -43200 || timerObjectNode.dataset.finished === 'finished' ) {
 			return '';
 		}
 
-		return this.formatTimeDifference( differenceInSeconds );
+		countdownElem.classList.add( 'timer-object-countdown-live' );
+
+		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
+			return timerObjectNode.dataset.countdownEndText;
+		}
+
+		return 'LIVE';
 	},
 	formatTimeDifference: function ( differenceInSeconds ) {
 		const weeks = Math.floor( differenceInSeconds / 604800 );
