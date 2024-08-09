@@ -24,6 +24,7 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---@field transform? fun(item: string): string
 ---@field expandKey string?
 ---@field expandable boolean?
+---@field additionalClass string?
 ---@field order? fun(a: string, b: string): boolean
 ---@field load? fun(cat: FilterButtonCategory): FilterButtonCategory
 
@@ -83,6 +84,10 @@ function FilterButtons.getButtonRow(category)
 			:wikitext('All')
 			:done()
 
+	if String.isNotEmpty(category.additionalClass) then
+		buttons:addClass(category.additionalClass)
+	end
+
 	for _, value in ipairs(category.items or {}) do
 		local text = category.transform and category.transform(value) or value
 		local button = mw.html.create('span')
@@ -110,6 +115,11 @@ function FilterButtons.getButtonRow(category)
 				:addClass('filter-button')
 				:css('display','none')
 				:attr('data-filter-on', 'all'))
+
+		if String.isNotEmpty(category.additionalClass) then
+			dropdownButton:addClass(category.additionalClass)
+		end
+
 		buttons:node(dropdownButton)
 	end
 
