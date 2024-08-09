@@ -90,28 +90,6 @@ function DisplayUtil.TryPureComponent(Component, props)
 	end
 end
 
----Attempts to invoke a function. If successful, returns the result. If an error is encountered,
----render the error and stack trace, and return it in the 2nd return value.
----@param f function
----@return any
----@return Html?
-function DisplayUtil.try(f)
-	local result, errorNode
-	xpcall(function()
-		result = f()
-	end, function(message)
-		local backtrace = debug.traceback()
-		mw.log('Error occured when invoking a function: (caught by DisplayUtil.try)')
-		mw.log(message)
-		mw.log(backtrace)
-		errorNode = DisplayUtil.LuaError({
-			message = message,
-			backtrace = backtrace,
-		})
-	end)
-	return result, errorNode
-end
-
 ---@alias OverflowModes 'ellipsis'|'wrap'|'hidden'
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
 
