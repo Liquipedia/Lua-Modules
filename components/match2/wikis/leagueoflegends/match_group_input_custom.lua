@@ -150,9 +150,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 			applyUnderScores = true,
 			maxNumPlayers = MAX_NUM_PLAYERS,
 		})
-	elseif opponent.type == Opponent.solo then
-		opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-		opponent.match2players[1].name = opponent.name
 	end
 end
 
