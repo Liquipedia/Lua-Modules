@@ -143,6 +143,17 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
+
+	if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
+		match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+			resolveRedirect = true,
+			applyUnderScores = true,
+			maxNumPlayers = MAX_NUM_PLAYERS,
+		})
+	elseif opponent.type == Opponent.solo then
+		opponent.match2players = Json.parseIfString(opponent.match2players) or {}
+		opponent.match2players[1].name = opponent.name
+	end
 end
 
 CustomMatchGroupInput.processPlayer = FnUtil.identity
@@ -259,17 +270,6 @@ function MatchFunctions.extractOpponents(match, maps)
 
 		assert(opponent.type == Opponent.team or opponent.type == Opponent.solo or opponent.type == Opponent.literal,
 			'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
-
-		if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-			match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
-				resolveRedirect = true,
-				applyUnderScores = true,
-				maxNumPlayers = MAX_NUM_PLAYERS,
-			})
-		elseif opponent.type == Opponent.solo then
-			opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-			opponent.match2players[1].name = opponent.name
-		end
 
 		match['opponent' .. opponentIndex] = nil
 		return opponent
