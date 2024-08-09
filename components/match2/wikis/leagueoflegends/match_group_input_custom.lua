@@ -27,10 +27,6 @@ local MAX_NUM_PLAYERS = 15
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
 local NP_INPUTS = {'skip', 'np', 'canceled', 'cancelled'}
-local SECONDS_UNTIL_FINISHED_EXACT = 30800
-local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
-
-local NOW = os.time()
 
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -82,7 +78,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
 
 	local opponents = MatchFunctions.extractOpponents(match, games)
-	match.finished = MatchFunctions._isFinished(match, opponents)
+	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
 		match.resulttype, match.winner, match.walkover = CustomMatchGroupInput.getResultTypeAndWinner(match.winner, opponents)
@@ -153,7 +149,7 @@ CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---Should only be called on finished matches or maps
 ---@param winner integer|string
----@param opponents {score: number, status: string?}[]
+---@param opponents {score: number, status: string}[]
 ---@return string? #Result Type
 ---@return integer? #Winner
 ---@return string? #Walkover
@@ -166,7 +162,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
 	if MatchGroupInput.isDraw(opponents) then
 		return MatchGroupInput.RESULT_TYPE.DRAW, MatchGroupInput.WINNER_DRAW
 
-	elseif CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
+	elseif MatchGroupInput.hasSpecialStatus(opponents) then
 		local walkoverType
 		if MatchGroupInput.hasForfeit(opponents) then
 			walkoverType = MatchGroupInput.WALKOVER.FORFIET
@@ -188,17 +184,6 @@ end
 ---@return boolean
 function CustomMatchGroupInput.isNotPlayedInput(input)
 	return Table.includes(NP_INPUTS, input)
-end
-
--- Check if any opponent has a none-standard status
----@param opponents {status: string?}[]
----@return boolean
-function CustomMatchGroupInput.placementCheckSpecialStatus(opponents)
-	return Table.any(opponents,
-		function (_, scoreinfo)
-			return scoreinfo.status ~= MatchGroupInput.STATUS.SCORE and String.isNotEmpty(scoreinfo.status)
-		end
-	)
 end
 
 ---@param bestOfInput string|integer?
@@ -247,7 +232,7 @@ end
 ---@param maps {scores: integer[], winner: integer?}[]
 ---@return standardOpponent[]
 function MatchFunctions.extractOpponents(match, maps)
-	local matchHasStarted = match.dateexact and match.timestamp <= NOW
+	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
 	local mapHasWinner = Table.any(maps, function(_, map) return map.winner end)
 
 	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
@@ -322,49 +307,6 @@ function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
 	if Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
 		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
 	end
-end
-
----@param match table
----@param opponents {score: integer?}[]
----@return boolean
-function MatchFunctions._isFinished(match, opponents)
-	local finished = Logic.readBoolOrNil(match.finished)
-	if finished ~= nil then
-		return finished
-	end
-
-	-- If a winner has been set
-	if Logic.isNotEmpty(match.winner) then
-		return true
-	end
-
-	-- If special status has been applied to a team
-	if CustomMatchGroupInput.placementCheckSpecialStatus(opponents) then
-		return true
-	end
-
-	if not MatchGroupInput.hasScore(opponents) then
-		return false
-	end
-
-	-- Check if all/enough games have been played. If they have, mark as finished
-	local firstTo = math.floor(match.bestof / 2)
-	if Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > firstTo end) then
-		return true
-	end
-	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
-	if scoreSum >= match.bestof then
-		return true
-	end
-
-	-- If enough time has passed since match started, it should be marked as finished
-	local threshold = match.dateexact and SECONDS_UNTIL_FINISHED_EXACT
-		or SECONDS_UNTIL_FINISHED_NOT_EXACT
-	if match.timestamp ~= DateExt.defaultTimestamp and match.timestamp + threshold < NOW then
-		return true
-	end
-
-	return false
 end
 
 -- Parse extradata information

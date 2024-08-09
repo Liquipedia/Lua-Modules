@@ -57,6 +57,13 @@ MatchGroupInput.WALKOVER = {
 MatchGroupInput.SCORE_NOT_PLAYED = -1
 MatchGroupInput.WINNER_DRAW = 0
 
+local FORCE_FINISH_AFTER = {
+	EXACT = 30800,
+	ESTIMATE = 86400,
+}
+
+local NOW = os.time()
+
 ---@class MatchGroupContext
 ---@field bracketIndex integer
 ---@field groupRoundIndex number?
@@ -783,10 +790,10 @@ function MatchGroupInput._getCasterInformation(name, flag, displayName)
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
 			query = 'flag, id',
 			limit = 1,
-		})
-		if type(data) == 'table' and data[1] then
-			flag = String.isNotEmpty(flag) and flag or data[1].flag
-			displayName = String.isNotEmpty(displayName) and displayName or data[1].id
+		})[1]
+		if type(data) == 'table' then
+			flag = String.isNotEmpty(flag) and flag or data.flag
+			displayName = String.isNotEmpty(displayName) and displayName or data.id
 		end
 	end
 
@@ -948,6 +955,53 @@ function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placem
 	opponents[loserIdx].placement = placementLoser
 
 	return opponents
+end
+
+---@param match table
+---@param opponents {score: integer?}[]
+---@return boolean
+function MatchGroupInput.matchIsFinished(match, opponents)
+	local finished = Logic.readBoolOrNil(match.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	-- If a winner has been set
+	if Logic.isNotEmpty(match.winner) then
+		return true
+	end
+
+	-- If special status has been applied to a team
+	if MatchGroupInput.hasSpecialStatus(opponents) then
+		return true
+	end
+
+	if not MatchGroupInput.hasScore(opponents) then
+		return false
+	end
+
+	-- If enough time has passed since match started, it should be marked as finished
+	local threshold = match.dateexact and FORCE_FINISH_AFTER.EXACT or FORCE_FINISH_AFTER.ESTIMATE
+	if match.timestamp ~= DateExt.defaultTimestamp and match.timestamp + threshold < NOW then
+		return true
+	end
+
+	-- TODO: Investigate if bestof = 0 needs to be handled
+	if not match.bestof then
+		return false
+	end
+
+	-- Check if all/enough games have been played. If they have, mark as finished
+	local firstTo = math.floor(match.bestof / 2)
+	if Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > firstTo end) then
+		return true
+	end
+	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
+	if scoreSum >= match.bestof then
+		return true
+	end
+
+	return false
 end
 
 ---@param alias table<string, string>

@@ -21,6 +21,7 @@ local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
+local NOW = os.time()
 
 local nilIfEmpty = StringUtils.nilIfEmpty
 
@@ -910,14 +911,22 @@ function MatchGroupUtil.getStandaloneId(bracketid, matchid)
 	return 'MATCH_' .. bracketid .. '_' .. matchid
 end
 
+---@class PartialMatchGameRecord
+---@field date string
+---@field dateexact boolean?
+---@field timestamp number?
+---@field finished boolean?
+---@field winner integer?
+
 ---Determines the phase of a match based on its properties.
----@param match MatchGroupUtilMatch|MatchGroupUtilGame
+---@param match MatchGroupUtilMatch|MatchGroupUtilGame|PartialMatchGameRecord
 ---@return 'finished'|'ongoing'|'upcoming'
 function MatchGroupUtil.computeMatchPhase(match)
-	local matchStartTimestamp = match.timestamp or Date.readTimestamp(match.date)
-	if match.winner then
+	local isExact = Logic.readBoolOrNil(match.dateIsExact or match.dateexact)
+	local matchStartTimestamp = match.timestamp or Date.readTimestampOrNil(match.date) or Date.defaultTimestamp
+	if match.winner or Logic.readBool(match.finished) then
 		return 'finished'
-	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and matchStartTimestamp < os.time() then
+	elseif isExact ~= false and matchStartTimestamp ~= Date.defaultTimestamp and matchStartTimestamp <= NOW then
 		return 'ongoing'
 	else
 		return 'upcoming'
