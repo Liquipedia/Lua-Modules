@@ -933,7 +933,7 @@ function MatchGroupUtil.computeMatchPhase(match)
 	end
 end
 
----Normalizes subtypes (opponent, map) into a list. An alternative list can be provided as override.
+---Normalizes subtypes (opponent, map) into a list
 ---@param match table
 ---@param type 'opponent'|'map'
 ---@return any[]
