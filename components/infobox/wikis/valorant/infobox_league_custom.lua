@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
@@ -28,6 +29,12 @@ local Center = Widgets.Center
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+local DEFAULT_PLATFORM = 'PC'
+local PLATFORMS = {
+	console = 'Console',
+	pc = 'PC',
+}
+
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
 ---@param frame Frame
@@ -43,6 +50,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
+	self.data.platform = PLATFORMS[(args.platform or ''):lower()] or DEFAULT_PLATFORM
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
 	self.data.publishertier = Logic.readBool(args['riot-highlighted']) and 'highlighted'
 		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
@@ -53,10 +61,15 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
+			Cell{name = 'Platform', content = {PageLink.makeInternalLink(
+				caller.data.platform,
+				caller.data.platform and (':Category:' .. caller.data.platform) or nil)
+			}},
 			Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 			Cell{name = 'Players', content = {args.player_number}}
 		)
@@ -87,13 +100,9 @@ end
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if Logic.readBool(args.female) then
-		table.insert(categories, 'Female Tournaments')
-	end
-
-	return categories
+	return Array.append({self.data.platform .. ' Tournaments'},
+		Logic.readBool(args.female) and 'Female Tournaments' or nil
+	)
 end
 
 ---@param lpdbData table
@@ -101,11 +110,11 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
-
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
 	lpdbData.extradata.female = args.female or 'false'
+	lpdbData.extradata.platform = self.data.platform
 
 	return lpdbData
 end
