@@ -9,7 +9,6 @@
 local ChampionNames = mw.loadData('Module:ChampionNames')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
