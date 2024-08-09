@@ -28,9 +28,9 @@ local Opponent = OpponentLibraries.Opponent
 
 local globalVars = PageVariableNamespace{cached = true}
 
-local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
-
 local MatchGroupInput = {}
+
+local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 
 MatchGroupInput.STATUS_INPUTS = {
 	DEFAULT_WIN = 'W',
