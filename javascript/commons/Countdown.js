@@ -58,8 +58,8 @@ liquipedia.countdown = {
 			} );
 		}
 	},
-	setupCountdownsIfSwitchToggleExists: function () {
-		const switchToggleGroup = liquipedia.switchButtons.getSwitchGroup( 'countdown' );
+	setupCountdownsIfSwitchToggleExists: async function () {
+		const switchToggleGroup = await liquipedia.switchButtons.getSwitchGroup( 'countdown' );
 		if ( !switchToggleGroup || switchToggleGroup.type !== 'toggle' || switchToggleGroup.value === null ) {
 			return;
 		}

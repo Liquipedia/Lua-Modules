@@ -55,12 +55,13 @@ liquipedia.switchButtons = {
 	baseLocalStorageKey: null,
 	triggerEventName: 'switchButtonChanged',
 	switchGroups: {},
+	isInitialized: false,
 
 	init: function () {
-		this.switchGroups = {};
 		this.baseLocalStorageKey = this.buildLocalStorageKey();
 		this.initSwitchElements( 'toggle', '.switch-toggle', 'switch-toggle-active' );
 		this.initSwitchElements( 'pill', '.switch-pill', 'switch-pill-active' );
+		this.isInitialized = true;
 	},
 
 	initSwitchElements: function ( type, selector, activeClassName ) {
@@ -193,10 +194,32 @@ liquipedia.switchButtons = {
 		node.dispatchEvent( customEvent );
 	},
 
-	// Accessed by other components, thus triggering init if necessary
-	getSwitchGroup: function ( groupName ) {
-		this.init();
-		return this.switchGroups[ groupName ];
+	/*
+	 * Get the switch group object by name.
+	 * This function is asynchronous, because the switch buttons are initialized asynchronously.
+	 * Waits up to 1 second for the switch buttons to be initialized, otherwise returns null.
+	 */
+	getSwitchGroup: async function ( groupName ) {
+		if ( this.isInitialized ) {
+			return this.switchGroups[ groupName ];
+		}
+
+		return new Promise( ( resolve ) => {
+			let interval = null;
+
+			const timeout = setTimeout( () => {
+				clearInterval( interval );
+				resolve( null );
+			}, 2000 );
+
+			interval = setInterval( () => {
+				if ( this.isInitialized ) {
+					clearInterval( interval );
+					clearTimeout( timeout );
+					resolve( this.switchGroups[ groupName ] );
+				}
+			}, 100 );
+		} );
 	}
 };
 
