@@ -123,14 +123,14 @@ function CustomMatchSummary._createStandardGame(game, props)
 		true
 	)
 
-	table.insert(elements, chars1:css('flex', '1 1 35%'):css('text-align', 'right'))
+	table.insert(elements, chars1:css('flex-basis', '30%'))
 	table.insert(elements, CustomMatchSummary._createCheckMark(game.winner, 1))
 	table.insert(elements, mw.html.create('div')
-			:addClass('brkts-popup-spaced')
+			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
 			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
 	)
 	table.insert(elements, CustomMatchSummary._createCheckMark(game.winner, 2))
-	table.insert(elements, chars2:css('flex', '1 1 35%'))
+	table.insert(elements, chars2:css('flex-basis', '30%'):css('text-align', 'right'))
 
 	return elements
 end
@@ -155,9 +155,9 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 			characterDisplay:css('opacity', '0.3')
 		end
 		if reverse then
-			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
-		else
 			characterDisplay:wikitext(character.name):wikitext('&nbsp;'):wikitext(CharacterIcons[character.name])
+		else
+			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
 		end
 		return characterDisplay
 	end
@@ -188,8 +188,8 @@ function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 			:addClass('brkts-popup-spaced')
 			:css('width', '16px')
 			:css('line-height', '17px')
-			:css('margin-left', '2%')
-			:css('margin-right', '2%')
+			:css('margin-left', (opponentIndex == 1) and '10%' or '1%')
+			:css('margin-right', (opponentIndex == 2) and '10%' or '1%')
 			:wikitext(
 				winner == opponentIndex and ICONS.winner
 				or winner == 0 and ICONS.draw
