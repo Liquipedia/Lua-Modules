@@ -67,15 +67,17 @@ end
 ---@param args table
 ---@return table
 function MatchMapsLegacy._handleMaps(args)
-	Array.mapIndexes(function(index)
+	Array.forEach(Array.mapIndexes(function(index)
 		local prefix = 'map' .. index
 		local map = args[prefix]
 		local winner = Table.extract(args, prefix .. 'win')
-		local score = Table.extract(args, prefix .. 'score')
 		if Logic.isEmpty(map) and Logic.isEmpty(winner) then
-			return false
+			return nil
 		end
-
+		return winner
+	end), function(mapWinner, index)
+		local prefix = 'map' .. index
+		local score = Table.extract(args, prefix .. 'score')
 		local score1
 		local score2
 		if Logic.isNotEmpty(score) then
@@ -83,16 +85,16 @@ function MatchMapsLegacy._handleMaps(args)
 			score1 = splitedScore[1]
 			score2 = splitedScore[2]
 		end
-		if not score1 and not score2 and winner ~= SKIP then
-			local winnerInt = tonumber(winner)
+		if not score1 and not score2 and mapWinner ~= SKIP then
+			local winnerInt = tonumber(mapWinner)
 			score1 = winnerInt == 1 and DEFAULT_WIN or DEFAULT_LOSS
 			score2 = winnerInt == 2 and DEFAULT_WIN or DEFAULT_LOSS
 		end
 
 		args[prefix .. 'score1'] = mw.text.trim(score1 or '')
 		args[prefix .. 'score2'] = mw.text.trim(score2 or '')
-		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
-			(not Logic.isEmpty(winner) and 'true') or 'false'
+		args[prefix .. 'finished'] = (mapWinner == SKIP and SKIP) or
+			(not Logic.isEmpty(mapWinner) and 'true') or 'false'
 
 		args[prefix .. 't1firstsideot'] = Table.extract(args, prefix .. 'o1t1firstside')
 		args[prefix .. 't1otatk'] = Table.extract(args, prefix .. 'o1t1atk')
@@ -107,7 +109,6 @@ function MatchMapsLegacy._handleMaps(args)
 		args[prefix .. 'vod'] = vod
 
 		args = MatchMapsLegacy._handlePlayersStats(prefix, args)
-		return true
 	end)
 
 	return args
@@ -148,12 +149,14 @@ end
 ---@param details table
 ---@return table, table
 function MatchMapsLegacy._handleDetails(args, details)
-	Array.mapIndexes(function(index)
+	Array.forEach(Array.mapIndexes(function(index)
 		local prefix = 'map' .. index
 		if Logic.isEmpty(details[prefix]) and Logic.isEmpty(details[prefix .. 'finished']) then
 			return false
 		end
-
+		return true
+	end), function(_, index)
+		local prefix = 'map' .. index
 		local map = {}
 		for key, value in pairs(details) do
 			if String.startsWith(key, prefix) then
@@ -169,7 +172,6 @@ function MatchMapsLegacy._handleDetails(args, details)
 		end
 
 		args[prefix] = MatchSubobjects.luaGetMap(map)
-		return true
 	end)
 
 	return args, details
