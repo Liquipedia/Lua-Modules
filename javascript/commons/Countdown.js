@@ -101,7 +101,12 @@ liquipedia.countdown = {
 		let datestr = '';
 
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			datestr = this.calculateCountdownString( timerObjectNode, countdownElem );
+			const countdownContent = this.getCountdownStringAndClassName( timerObjectNode, countdownElem );
+			datestr = countdownContent.text;
+
+			if ( countdownContent.className !== '' ) {
+				countdownElem.classList.add( countdownContent.className );
+			}
 		}
 
 		let html = `<span class="timer-object-countdown-time">${ datestr }</span>`;
@@ -110,30 +115,42 @@ liquipedia.countdown = {
 		}
 		countdownElem.innerHTML = html;
 	},
-	calculateCountdownString: function ( timerObjectNode, countdownElem ) {
+	getCountdownStringAndClassName: function ( timerObjectNode ) {
 		if ( timerObjectNode.dataset.finished === 'finished' && timerObjectNode.dataset.showCompleted === 'true' ) {
-			countdownElem.classList.add( 'timer-object-countdown-completed' );
-			return 'COMPLETED';
+			return {
+				text: 'COMPLETED',
+				className: 'timer-object-countdown-completed'
+			};
 		}
 
 		const differenceInSeconds =
 			Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
 
 		if ( differenceInSeconds > 0 ) {
-			return this.formatTimeDifference( differenceInSeconds );
+			return {
+				text: this.formatTimeDifference( differenceInSeconds ),
+				className: ''
+			};
 		}
 
 		if ( differenceInSeconds <= -43200 || timerObjectNode.dataset.finished === 'finished' ) {
-			return '';
+			return {
+				text: '',
+				className: ''
+			};
 		}
-
-		countdownElem.classList.add( 'timer-object-countdown-live' );
 
 		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
-			return timerObjectNode.dataset.countdownEndText;
+			return {
+				text: timerObjectNode.dataset.countdownEndText,
+				className: 'timer-object-countdown-live'
+			};
 		}
 
-		return 'LIVE';
+		return {
+			text: 'LIVE',
+			className: 'timer-object-countdown-live'
+		};
 	},
 	formatTimeDifference: function ( differenceInSeconds ) {
 		const weeks = Math.floor( differenceInSeconds / 604800 );
