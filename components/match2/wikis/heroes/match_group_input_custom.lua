@@ -371,16 +371,11 @@ function matchFunctions.getOpponents(match)
 		end
 
 		-- get players from vars for teams
+		assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 		if opponent.type == Opponent.team then
 			if not Logic.isEmpty(opponent.name) then
 				match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name)
 			end
-		elseif Opponent.typeIsParty(opponent) then
-			opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-			opponent.match2players[1] = opponent.match2players[1] or {}
-			opponent.match2players[1].name = opponent.match2players[1].name or opponent.name
-		elseif opponent.type ~= Opponent.literal then
-			error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 		end
 
 		opponents[opponentIndex] = opponent
