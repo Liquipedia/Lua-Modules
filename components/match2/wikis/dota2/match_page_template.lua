@@ -80,7 +80,52 @@ return {
 					</div>
 				</div>
 			</div>
-			<h3>Head-to-Head</h3>
+			<h3>Team Stats</h3>
+			<div class="match-bm-team-stats">
+				<div class="match-bm-team-stats-header">
+					<h4>Radiant Victory</h4>
+					<div class="match-bm-team-stats-time side--dire">25:55</div>
+				</div>
+				<div>
+					<div class="match-bm-team-stats-team">
+						<div class="match-bm-team-stats-team-logo">{{&opponents.1.iconDisplay}}</div>
+						<div class="match-bm-team-stats-team-side">{{&opponents.1.side}}</div>
+						<div class="match-bm-team-stats-team-state">{{teams.1.scoreDisplay}}</div>
+					</div>
+					<div class="match-bm-team-stats-list">
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{#finished}}{{teams.1.kills}}<span class="slash">/</span>{{teams.1.deaths}}<span class="slash">/</span>{{teams.1.assists}}{{/finished}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-skull-crossbones cell--icon"></i>KDA</div>
+							<div class="match-bm-stats-list-cell">{{#finished}}{{teams.2.kills}}<span class="slash">/</span>{{teams.2.deaths}}<span class="slash">/</span>{{teams.2.assists}}{{/finished}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.gold}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-coins cell--icon"></i>Gold</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.gold}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.objectives.towers}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-chess-rook cell--icon"></i>Towers</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.objectives.towers}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.objectives.barracks}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-warehouse cell--icon"></i>Barracks</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.objectives.barracks}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.objectives.roshans}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-skull-cow cell--icon"></i>Roshan</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.objectives.roshans}}</div>
+						</div>
+					</div>
+					<div class="match-bm-team-stats-team">
+						<div class="match-bm-team-stats-team-logo">{{&opponents.2.iconDisplay}}</div>
+						<div class="match-bm-team-stats-team-side">{{&opponents.2.side}}</div>
+						<div class="match-bm-team-stats-team-state">{{teams.2.scoreDisplay}}</div>
+					</div>
+				</div>
+			</div>
 			<div class="match-bm-lol-h2h">
 				<div class="match-bm-lol-h2h-header">
 					<div class="match-bm-lol-h2h-header-team">{{&opponents.1.iconDisplay}}</div>
