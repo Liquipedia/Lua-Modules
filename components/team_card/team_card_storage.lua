@@ -5,17 +5,11 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+local Standard = require('Module:Standard')
+local Opponent = Standard.Opponent
+local Variables = Standard.Variables
 
-local Json = require('Module:Json')
-local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
-
-local Custom = Lua.import('Module:TeamCard/Custom')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local Custom = Standard.Lua.import('Module:TeamCard/Custom')
 
 local TeamCardStorage = {}
 
@@ -48,16 +42,16 @@ function TeamCardStorage.saveToLpdb(args, teamObject, players, playerPrize)
 	lpdbData = Custom.adjustLpdb and Custom.adjustLpdb(lpdbData, team, args, lpdbPrefix) or lpdbData
 
 	-- Store aliases (page names) for opponenets for setting page vars
-	if Table.isNotEmpty(teamObject.aliases) then
+	if Standard.Table.isNotEmpty(teamObject.aliases) then
 		lpdbData.extradata.opponentaliases = teamObject.aliases
 	end
 
 	-- Store into the standardized lpdb fields
-	lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
+	lpdbData = Standard.Table.mergeInto(lpdbData, Opponent.toLpdbStruct(Opponent.resolve(
 		Opponent.readOpponentArgs{type = Opponent.team, template = teamTemplateName} or Opponent.tbd(Opponent.team),
 		lpdbData.date
 	)))
-	lpdbData = Json.stringifySubTables(lpdbData)
+	lpdbData = Standard.Json.stringifySubTables(lpdbData)
 	lpdbData.opponentplayers = lpdbData.players -- Until this is included in Opponent
 
 	mw.ext.LiquipediaDB.lpdb_placement(lpdbData.objectName, lpdbData)
@@ -112,7 +106,7 @@ end
 ---@return string
 function TeamCardStorage._getLpdbObjectName(team, lpdbPrefix)
 	local storageName = (team == 'TBD' and 'participant') or 'ranking'
-	if String.isNotEmpty(lpdbPrefix) then
+	if Standard.String.isNotEmpty(lpdbPrefix) then
 		storageName = storageName .. '_' .. lpdbPrefix
 	end
 	storageName = storageName .. '_' .. mw.ustring.lower(team)
@@ -162,6 +156,5 @@ function TeamCardStorage._parseQualifier(rawQualifier)
 		return rawQualifier, nil, nil
 	end
 end
-
 
 return TeamCardStorage
