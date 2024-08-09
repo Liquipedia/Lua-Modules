@@ -396,7 +396,7 @@ end
 ---Whether any entry of a table satisfies a predicate.
 ---@generic K, V
 ---@param tbl {[K] : V}
----@param predicate fun(key?: K, value?: V): boolean
+---@param predicate fun(key?: K, value?: V): any
 ---@return boolean
 function Table.any(tbl, predicate)
 	for key, value in pairs(tbl) do
@@ -563,7 +563,7 @@ will print out `p1 p2 p3`
 ---@param tbl table
 ---@param prefixes string|string[]
 ---@param options? {requireIndex: boolean}
----@return function
+---@return fun(): string?, any?, integer?
 function Table.iter.pairsByPrefix(tbl, prefixes, options)
 	options = options or {}
 
