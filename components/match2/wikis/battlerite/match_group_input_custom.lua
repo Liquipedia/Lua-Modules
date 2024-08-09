@@ -7,7 +7,6 @@
 --
 
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -330,10 +329,7 @@ function matchFunctions.getOpponents(match)
 						maxNumPlayers = MAX_NUM_PLAYERS,
 					})
 				end
-			elseif opponent.type == Opponent.solo then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
+			elseif opponent.type ~= Opponent.solo and opponent.type ~= Opponent.literal then
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
