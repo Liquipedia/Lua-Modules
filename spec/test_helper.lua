@@ -103,7 +103,7 @@ return function(busted, helper, options)
 	-- Warnings! Extremely time consuming!
 	local function allwikis(name, funcToRun, wikiArgs)
 		busted.executors.insulate('', function ()
-			for _, wiki in pairs(wikis) do
+			for _, wiki in ipairs(wikis) do
 				busted.executors.insulate(wiki, function ()
 					busted.executors.it(name, function()
 						SetActiveWiki(wiki)
