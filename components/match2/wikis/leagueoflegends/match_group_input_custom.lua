@@ -123,9 +123,19 @@ end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
 
----@param record table
----@param timestamp integer
-function CustomMatchGroupInput.processOpponent(record, timestamp)
+---@param match table
+---@param opponentIndex integer
+---@return standardOpponent
+function CustomMatchGroupInput.processOpponent(match, opponentIndex)
+	local record = match['opponent' .. opponentIndex]
+
+	if not record then
+		return Opponent.blank()
+	end
+
+	assert(record.type == Opponent.team or record.type == Opponent.solo or record.type == Opponent.literal,
+			'Unsupported Opponent Type "' .. (record.type or '') .. '"')
+
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
 
@@ -135,7 +145,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	---@type integer|string?
-	local teamTemplateDate = timestamp
+	local teamTemplateDate = match.timestamp
 	-- If date is default date, resolve using tournament date or today instead
 	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefault('tournament_enddate')
@@ -145,12 +155,14 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 
 	if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-		match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+		MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
 			resolveRedirect = true,
 			applyUnderScores = true,
 			maxNumPlayers = MAX_NUM_PLAYERS,
 		})
 	end
+
+	return record
 end
 
 CustomMatchGroupInput.processPlayer = FnUtil.identity
@@ -205,7 +217,7 @@ end
 ---@param maps {scores: integer[]}[]
 ---@param opponentIndex integer
 ---@return integer
-function MatchFunctions.computeMatchScoreFromMaps(maps, opponentIndex)
+function MatchFunctions.computeMatchScoreFromMapScores(maps, opponentIndex)
 	return Array.reduce(maps, function(sumScore, map)
 		return sumScore + (map.scores[opponentIndex] or 0)
 	end, 0)
@@ -240,37 +252,38 @@ end
 ---@param maps {scores: integer[], winner: integer?}[]
 ---@return standardOpponent[]
 function MatchFunctions.extractOpponents(match, maps)
-	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
-	local mapHasWinner = Table.any(maps, function(_, map) return map.winner end)
-
 	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
-		local opponent = match['opponent' .. opponentIndex]
-		if Logic.isEmpty(opponent) then
-			match['opponent' .. opponentIndex] = nil
-			return -- TODO Investigate if we need to return a blank opponent here
-		end
+		local opponent = CustomMatchGroupInput.processOpponent(match, opponentIndex)
 
-		CustomMatchGroupInput.processOpponent(opponent, match.timestamp)
-
-		if not opponent.score and matchHasStarted and mapHasWinner then
-			opponent.score = MatchFunctions.computeMatchScoreFromMaps(maps, opponentIndex)
-		end
-
-		if match.walkover then
-			local winner = tonumber(match.walkover) or tonumber(match.winner)
-			if winner then
-				opponent.score, opponent.status = MatchFunctions._opponentWalkover(match.walkover, winner == opponentIndex)
-			end
-		else
-			opponent.score, opponent.status = MatchFunctions._parseScoreInput(opponent.score)
-		end
-
-		assert(opponent.type == Opponent.team or opponent.type == Opponent.solo or opponent.type == Opponent.literal,
-			'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
+		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, maps, opponentIndex, opponent.score)
 
 		match['opponent' .. opponentIndex] = nil
 		return opponent
 	end)
+end
+
+---@param match table
+---@param maps {scores: integer[], winner: integer?}[]
+---@param opponentIndex integer
+---@param scoreInput string|number|nil
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchFunctions._parseOpponentScore(match, maps, opponentIndex, scoreInput)
+	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
+	local mapHasWinner = Table.any(maps, function(_, map) return map.winner end)
+
+	if match.walkover then
+		local winner = tonumber(match.walkover) or tonumber(match.winner)
+		if winner then
+			return MatchFunctions._opponentWalkover(match.walkover, winner == opponentIndex)
+		end
+	else
+		if not scoreInput and matchHasStarted and mapHasWinner then
+			scoreInput = MatchFunctions.computeMatchScoreFromMapScores(maps, opponentIndex)
+		end
+
+		return MatchFunctions._parseScoreInput(scoreInput)
+	end
 end
 
 ---@param scoreInput string|number|nil
