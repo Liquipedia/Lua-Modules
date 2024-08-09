@@ -98,56 +98,63 @@ liquipedia.countdown = {
 	},
 	setCountdownString: function ( timerObjectNode ) {
 		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
-		let datestr = '', live = 'LIVE';
+		let datestr = '';
 
-		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
-			live = timerObjectNode.dataset.countdownEndText;
-		}
-		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			if ( timerObjectNode.dataset.finished === 'finished' && timerObjectNode.dataset.showCompleted === 'true' ) {
-				countdownElem.classList.add( 'timer-object-countdown-completed' );
-				datestr = 'COMPLETED';
-			} else {
-				const differenceInSeconds = Math.floor(
-					parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 )
-				);
-
-				if ( differenceInSeconds <= 0 ) {
-					if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
-						countdownElem.classList.add( 'timer-object-countdown-live' );
-						datestr = live;
-					}
-				} else {
-					let differenceInSecondsMath = differenceInSeconds;
-					const weeks = Math.floor( differenceInSecondsMath / 604800 );
-					differenceInSecondsMath = differenceInSecondsMath % 604800;
-					const days = Math.floor( differenceInSecondsMath / 86400 );
-					differenceInSecondsMath = differenceInSecondsMath % 86400;
-					const hours = Math.floor( differenceInSecondsMath / 3600 );
-					differenceInSecondsMath = differenceInSecondsMath % 3600;
-					const minutes = Math.floor( differenceInSecondsMath / 60 );
-					const seconds = Math.floor( differenceInSecondsMath % 60 );
-					if ( differenceInSeconds >= 604800 ) {
-						datestr = weeks + 'w ' + days + 'd';
-					} else if ( differenceInSeconds >= 86400 ) {
-						datestr = days + 'd ' + hours + 'h ' + minutes + 'm';
-					} else if ( differenceInSeconds >= 3600 ) {
-						datestr = hours + 'h ' + minutes + 'm ' + seconds + 's';
-					} else if ( differenceInSeconds >= 60 ) {
-						datestr = minutes + 'm ' + seconds + 's';
-					} else {
-						datestr = seconds + 's';
-					}
-				}
-			}
+		if ( timerObjectNode.dataset.timestamp === 'error' ) {
+			datestr = '';
 		} else {
-			datestr = ''; // DATE ERROR!
+			datestr = this.calculateCountdownString( timerObjectNode, countdownElem );
 		}
-		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
+
+		let html = `<span class="timer-object-countdown-time">${ datestr }</span>`;
 		if ( datestr.length > 0 && timerObjectNode.dataset.hasstreams === 'true' ) {
 			html += ' - ';
 		}
 		countdownElem.innerHTML = html;
+	},
+	calculateCountdownString: function ( timerObjectNode, countdownElem ) {
+		if ( timerObjectNode.dataset.finished === 'finished' && timerObjectNode.dataset.showCompleted === 'true' ) {
+			countdownElem.classList.add( 'timer-object-countdown-completed' );
+			return 'COMPLETED';
+		}
+
+		const differenceInSeconds =
+			Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
+
+		if ( differenceInSeconds <= 0 ) {
+			if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
+				countdownElem.classList.add( 'timer-object-countdown-live' );
+
+				if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
+					return timerObjectNode.dataset.countdownEndText;
+				}
+
+				return 'LIVE';
+			}
+
+			return '';
+		}
+
+		return this.formatTimeDifference( differenceInSeconds );
+	},
+	formatTimeDifference: function ( differenceInSeconds ) {
+		const weeks = Math.floor( differenceInSeconds / 604800 );
+		const days = Math.floor( ( differenceInSeconds % 604800 ) / 86400 );
+		const hours = Math.floor( ( differenceInSeconds % 86400 ) / 3600 );
+		const minutes = Math.floor( ( differenceInSeconds % 3600 ) / 60 );
+		const seconds = Math.floor( differenceInSeconds % 60 );
+
+		if ( differenceInSeconds >= 604800 ) {
+			return `${ weeks }w ${ days }d`;
+		} else if ( differenceInSeconds >= 86400 ) {
+			return `${ days }d ${ hours }h ${ minutes }m`;
+		} else if ( differenceInSeconds >= 3600 ) {
+			return `${ hours }h ${ minutes }m ${ seconds }s`;
+		} else if ( differenceInSeconds >= 60 ) {
+			return `${ minutes }m ${ seconds }s`;
+		} else {
+			return `${ seconds }s`;
+		}
 	},
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],
