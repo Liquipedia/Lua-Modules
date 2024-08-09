@@ -24,9 +24,9 @@ return {
 				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
 			</div>
 			{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.1.side}}[[File:Lol faction {{games.1.teams.1.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.1.side}}</div>
+			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.1.side}}[[File:Dota2 faction {{games.1.teams.1.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.1.side}}</div>
 			<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{games.1.length}}</div></div></div>
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.2.side}}[[File:Lol faction {{games.1.teams.2.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.2.side}}</div>
+			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.2.side}}[[File:Dota2 faction {{games.1.teams.2.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.2.side}}</div>
 			</div></div>{{/isBestOfOne}}
 			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 		]=],
@@ -56,9 +56,9 @@ return {
 				<div class="match-bm-lol-game-summary">
 					<div class="match-bm-lol-game-summary-team">{{&opponents.1.iconDisplay}}</div>
 					<div class="match-bm-lol-game-summary-center">
-						<div class="match-bm-lol-game-summary-faction">{{#teams.1.side}}[[File:Lol faction {{teams.1.side}}.png|link=|{{teams.1.side}} side]]{{/teams.1.side}}</div>
+						<div class="match-bm-lol-game-summary-faction">{{#teams.1.side}}[[File:Dota2 faction {{teams.1.side}}.png|link=|{{teams.1.side}} side]]{{/teams.1.side}}</div>
 						<div class="match-bm-lol-game-summary-score-holder">{{#finished}}<div class="match-bm-lol-game-summary-score">{{teams.1.scoreDisplay}}&ndash;{{teams.2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div>{{/finished}}</div>
-						<div class="match-bm-lol-game-summary-faction">{{#teams.2.side}}[[File:Lol faction {{teams.2.side}}.png|link=|{{teams.2.side}} side]]{{/teams.2.side}}</div>
+						<div class="match-bm-lol-game-summary-faction">{{#teams.2.side}}[[File:Dota2 faction {{teams.2.side}}.png|link=|{{teams.2.side}} side]]{{/teams.2.side}}</div>
 					</div>
 					<div class="match-bm-lol-game-summary-team">{{&opponents.2.iconDisplay}}</div>
 				</div>
@@ -81,6 +81,43 @@ return {
 				</div>
 			</div>
 			<h3>Head-to-Head</h3>
+			<div class="match-bm-team-stats">
+				<div class="match-bm-team-stats-header">
+					<h4>Radiant Victory</h4>
+					<span class="match-bm-team-stats-time side--dire">25:55</span>
+				</div>
+				<div>
+					<div class="match-bm-team-stats-team">{{&opponents.1.iconDisplay}}</div>
+					<div class="match-bm-team-stats-list">
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{#finished}}{{teams.1.kills}}<span class="slash">/</span>{{teams.1.deaths}}<span class="slash">/</span>{{teams.1.assists}}{{/finished}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-skull-crossbones cell--icon"></i>KDA</div>
+							<div class="match-bm-stats-list-cell">{{#finished}}{{teams.2.kills}}<span class="slash">/</span>{{teams.2.deaths}}<span class="slash">/</span>{{teams.2.assists}}{{/finished}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.gold}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-coins cell--icon"></i>Gold</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.gold}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.objectives.towers}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-chess-rook cell--icon"></i>Towers</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.objectives.towers}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.objectives.barracks}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-warehouse cell--icon"></i>Barracks</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.objectives.barracks}}</div>
+						</div>
+						<div class="match-bm-stats-list-row">
+							<div class="match-bm-stats-list-cell">{{teams.1.objectives.roshans}}</div>
+							<div class="match-bm-stats-list-cell"><i class="fas fa-skull-cow cell--icon"></i>Roshan</div>
+							<div class="match-bm-stats-list-cell">{{teams.2.objectives.roshans}}</div>
+						</div>
+					</div>
+					<div class="match-bm-team-stats-team">{{&opponents.2.iconDisplay}}</div>
+				</div>
+			</div>
 			<div class="match-bm-lol-h2h">
 				<div class="match-bm-lol-h2h-header">
 					<div class="match-bm-lol-h2h-header-team">{{&opponents.1.iconDisplay}}</div>
@@ -130,8 +167,8 @@ return {
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
-									<div class="match-bm-players-player-loadout-item">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
+									<div class="match-bm-players-player-loadout-item">[[File:{{items.1}} itemicon dota2 gameasset.png|24px]][[File:{{items.2}} itemicon dota2 gameasset.png|24px]][[File:{{items.3}} itemicon dota2 gameasset.png|24px]]</div>
+									<div class="match-bm-players-player-loadout-item">[[File:{{items.4}} itemicon dota2 gameasset.png|24px]][[File:{{items.5}} itemicon dota2 gameasset.png|24px]][[File:{{items.6}} itemicon dota2 gameasset.png|24px]]</div>
 									<div class="match-bm-players-player-loadout-item">[[File:{{backpackitems.1}} itemicon dota2 gameasset.png|24px]][[File:{{backpackitems.2}} itemicon dota2 gameasset.png|24px]][[File:{{backpackitems.3}} itemicon dota2 gameasset.png|24px]]</div>
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
@@ -162,8 +199,8 @@ return {
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">[[File:Lol item {{items.1}}.png|24px]][[File:Lol item {{items.2}}.png|24px]][[File:Lol item {{items.3}}.png|24px]]</div>
-									<div class="match-bm-players-player-loadout-item">[[File:Lol item {{items.4}}.png|24px]][[File:Lol item {{items.5}}.png|24px]][[File:Lol item {{items.6}}.png|24px]]</div>
+									<div class="match-bm-players-player-loadout-item">[[File:{{items.1}} itemicon dota2 gameasset.png|24px]][[File:{{items.2}} itemicon dota2 gameasset.png|24px]][[File:{{items.3}} itemicon dota2 gameasset.png|24px]]</div>
+									<div class="match-bm-players-player-loadout-item">[[File:{{items.4}} itemicon dota2 gameasset.png|24px]][[File:{{items.5}} itemicon dota2 gameasset.png|24px]][[File:{{items.6}} itemicon dota2 gameasset.png|24px]]</div>
 									<div class="match-bm-players-player-loadout-item">[[File:{{backpackitems.1}} itemicon dota2 gameasset.png|24px]][[File:{{backpackitems.2}} itemicon dota2 gameasset.png|24px]][[File:{{backpackitems.3}} itemicon dota2 gameasset.png|24px]]</div>
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
