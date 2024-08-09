@@ -104,35 +104,40 @@ liquipedia.countdown = {
 			live = timerObjectNode.dataset.countdownEndText;
 		}
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			const differenceInSeconds = Math.floor(
-				parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 )
-			);
-
-			if ( differenceInSeconds <= 0 ) {
-				if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
-					countdownElem.classList.add( 'timer-object-countdown-live' );
-					datestr = live;
-				}
+			if ( timerObjectNode.dataset.finished === 'finished' && timerObjectNode.dataset.showCompleted === 'true' ) {
+				countdownElem.classList.add( 'timer-object-countdown-completed' );
+				datestr = 'COMPLETED';
 			} else {
-				let differenceInSecondsMath = differenceInSeconds;
-				const weeks = Math.floor( differenceInSecondsMath / 604800 );
-				differenceInSecondsMath = differenceInSecondsMath % 604800;
-				const days = Math.floor( differenceInSecondsMath / 86400 );
-				differenceInSecondsMath = differenceInSecondsMath % 86400;
-				const hours = Math.floor( differenceInSecondsMath / 3600 );
-				differenceInSecondsMath = differenceInSecondsMath % 3600;
-				const minutes = Math.floor( differenceInSecondsMath / 60 );
-				const seconds = Math.floor( differenceInSecondsMath % 60 );
-				if ( differenceInSeconds >= 604800 ) {
-					datestr = weeks + 'w ' + days + 'd';
-				} else if ( differenceInSeconds >= 86400 ) {
-					datestr = days + 'd ' + hours + 'h ' + minutes + 'm';
-				} else if ( differenceInSeconds >= 3600 ) {
-					datestr = hours + 'h ' + minutes + 'm ' + seconds + 's';
-				} else if ( differenceInSeconds >= 60 ) {
-					datestr = minutes + 'm ' + seconds + 's';
+				const differenceInSeconds = Math.floor(
+					parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 )
+				);
+
+				if ( differenceInSeconds <= 0 ) {
+					if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
+						countdownElem.classList.add( 'timer-object-countdown-live' );
+						datestr = live;
+					}
 				} else {
-					datestr = seconds + 's';
+					let differenceInSecondsMath = differenceInSeconds;
+					const weeks = Math.floor( differenceInSecondsMath / 604800 );
+					differenceInSecondsMath = differenceInSecondsMath % 604800;
+					const days = Math.floor( differenceInSecondsMath / 86400 );
+					differenceInSecondsMath = differenceInSecondsMath % 86400;
+					const hours = Math.floor( differenceInSecondsMath / 3600 );
+					differenceInSecondsMath = differenceInSecondsMath % 3600;
+					const minutes = Math.floor( differenceInSecondsMath / 60 );
+					const seconds = Math.floor( differenceInSecondsMath % 60 );
+					if ( differenceInSeconds >= 604800 ) {
+						datestr = weeks + 'w ' + days + 'd';
+					} else if ( differenceInSeconds >= 86400 ) {
+						datestr = days + 'd ' + hours + 'h ' + minutes + 'm';
+					} else if ( differenceInSeconds >= 3600 ) {
+						datestr = hours + 'h ' + minutes + 'm ' + seconds + 's';
+					} else if ( differenceInSeconds >= 60 ) {
+						datestr = minutes + 'm ' + seconds + 's';
+					} else {
+						datestr = seconds + 's';
+					}
 				}
 			}
 		} else {

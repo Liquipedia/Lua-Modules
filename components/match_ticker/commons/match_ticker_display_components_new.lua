@@ -118,7 +118,7 @@ function Details:create()
 	end
 
 	return self.root
-		:node(self:streams())
+			:node(self:streams())
 		:node(self:tournament())
 		:node(self:countdown())
 end
@@ -139,7 +139,8 @@ function Details:countdown()
 
 	local countdownArgs = {
 		date = dateString,
-		finished = match.finished
+		finished = match.finished,
+		showCompleted = true
 	}
 
 	local countdownDisplay = mw.html.create('span')
