@@ -502,7 +502,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
-		return return opponentIndex <= 2 and Opponent.blank() or nil
+		return opponentIndex <= 2 and Opponent.blank() or nil
 	end
 
 	local opponent = Opponent.readOpponentArgs(opponentInput)
