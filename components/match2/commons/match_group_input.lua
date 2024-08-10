@@ -30,11 +30,9 @@ local Opponent = OpponentLibraries.Opponent
 
 local globalVars = PageVariableNamespace{cached = true}
 
-local MatchGroupInput = {}
-
 local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
 
-local NOW = os.time()
+local MatchGroupInput = {}
 
 ---@class MatchGroupContext
 ---@field bracketIndex integer
@@ -503,8 +501,9 @@ end
 function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
-	-- let the custom handle empty input, some might fill it with blank opponents, some might nto fill it
-	if not opponentInput then return end
+	if not opponentInput then
+		return return opponentIndex <= 2 and Opponent.blank() or nil
+	end
 
 	local opponent = Opponent.readOpponentArgs(opponentInput)
 	if Opponent.isBye(opponent) then
@@ -517,7 +516,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if resolveDate == DateExt.defaultTimestamp then
-		resolveDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+		resolveDate = DateExt.getContextualDate()
 	end
 
 	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
