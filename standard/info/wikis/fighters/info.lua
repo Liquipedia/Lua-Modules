@@ -50,7 +50,7 @@ return {
 				darkMode = '2XKO default allmode.png',
 				lightMode = '2XKO default allmode.png',
 			},
-		},				
+		},
 		abk = {
 			abbreviation = 'ABK',
 			name = 'Akatsuki Blitzkampf',
