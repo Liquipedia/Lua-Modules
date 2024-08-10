@@ -54,6 +54,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		local grandMaster = args.grandmasters and (GM_ICON .. args.grandmasters) or nil
 		table.insert(widgets, Cell{name = 'Grandmasters', content = {grandMaster}})
+
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
@@ -118,8 +119,10 @@ end
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
 	local roleData = ROLES[(args.role or ''):lower()]
+	if roleData then
 		if roleData.talent then
 			return {store = 'talent', category = 'Talent'}
+			end
 	end
 
 	return {store = 'player', category = 'Player'}
