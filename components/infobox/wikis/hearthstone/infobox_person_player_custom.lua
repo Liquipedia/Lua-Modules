@@ -81,12 +81,6 @@ function CustomPlayer:_displayRole(roleData)
 	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
 end
 
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('role', (self.role or {}).variable)
-	Variables.varDefine('role2', (self.role2 or {}).variable)
-end
-
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
@@ -96,9 +90,9 @@ function CustomPlayer:getWikiCategories(categories)
 	)
 end
 
----@param args table
+
 ---@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
+function CustomPlayer:getPersonType()
 	if self.role.talent then
 		return {store = 'talent', category = 'Talent'}
 	end
