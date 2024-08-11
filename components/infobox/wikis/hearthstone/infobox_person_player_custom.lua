@@ -39,7 +39,6 @@ function CustomPlayer.run(frame)
 
 	player.role = ROLES[(player.args.role or ''):lower()]
 	player.role2 = ROLES[(player.args.role2 or ''):lower()]
-	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
 end
@@ -65,12 +64,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@param role string?
----@return {category: string, variable: string, talent: boolean?}?
-function CustomPlayer:_getRoleData(role)
-	return ROLES[(role or ''):lower()]
 end
 
 ---@param roleData {category: string, variable: string, talent: boolean?}?
