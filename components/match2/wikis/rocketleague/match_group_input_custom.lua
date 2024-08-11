@@ -10,7 +10,6 @@ local CustomMatchGroupInput = {}
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local getIconName = require('Module:IconName').luaGet
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -201,8 +200,6 @@ function matchFunctions.getExtraData(match)
 		and opponent2.type == Opponent.team
 
 	match.extradata = {
-		team1icon = getIconName(opponent1.template or ''),
-		team2icon = getIconName(opponent2.template or ''),
 		lastgame = Variables.varDefault('last_game'),
 		isconverted = 0,
 		showh2h = showh2h,
@@ -281,10 +278,10 @@ function matchFunctions.currentEarnings(name)
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		conditions = '[[name::' .. name .. ']]',
 		query = 'extradata'
-	})
+	})[1]
 
-	if type(data[1]) == 'table' then
-		local currentEarnings = (data[1].extradata or {})['earningsin' .. _CURRENT_YEAR]
+	if type(data) == 'table' then
+		local currentEarnings = (data.extradata or {})['earningsin' .. _CURRENT_YEAR]
 		return tonumber(currentEarnings or 0) or 0
 	end
 

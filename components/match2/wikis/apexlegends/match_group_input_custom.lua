@@ -291,6 +291,7 @@ function MatchFunctions.getOpponents(match)
 			end
 
 			-- get players from vars for teams
+			assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			if opponent.type == Opponent.team then
 				if Logic.isNotEmpty(opponent.name) then
 					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
@@ -299,12 +300,10 @@ function MatchFunctions.getOpponents(match)
 						maxNumPlayers = MAX_NUM_PLAYERS,
 					})
 				end
-			elseif Opponent.typeIsParty(opponent.type) then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
-				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
+
+			opponent.extradata = opponent.extradata or {}
+			opponent.extradata.startingpoints = tonumber(opponent.pointmodifier)
 
 			opponents[opponentIndex] = opponent
 		end
@@ -341,7 +340,7 @@ end
 ---@return table
 function MatchFunctions.setBgForOpponents(opponents, statusSettings)
 	Array.forEach(opponents, function(opponent)
-		opponent.extradata = {bg = statusSettings[opponent.placement]}
+		opponent.extradata.bg = statusSettings[opponent.placement]
 	end)
 	return opponents
 end

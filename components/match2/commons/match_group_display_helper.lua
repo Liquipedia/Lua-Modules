@@ -9,14 +9,14 @@
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
+local I18n = require('Module:I18n')
+local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
 local Opponent = Lua.import('Module:Opponent')
-
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
@@ -52,9 +52,7 @@ end
 function DisplayHelper.expandHeaderCode(headerCode)
 	headerCode = headerCode:gsub('$', '!')
 	local args = mw.text.split(headerCode, '!')
-	local response = mw.message.new('brkts-header-' .. args[2])
-		:params(args[3] or '')
-		:plain()
+	local response = I18n.translate('brkts-header-' .. args[2], {round = args[3]})
 	return mw.text.split(response, ',')
 end
 
@@ -184,7 +182,7 @@ function DisplayHelper.DefaultMatchPageContainer(props)
 	return MatchPageModule.getByMatchId(props)
 end
 
----Retrieves the wiki specific global bracket config specified in MediaWiki:BracketConfig.
+---Retrieves the wiki specific global bracket config.
 ---@return table
 DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 	local defaultConfig = {
@@ -192,17 +190,16 @@ DisplayHelper.getGlobalConfig = FnUtil.memoize(function()
 		headerHeight = 25,
 		headerMargin = 8,
 		lineWidth = 2,
-		matchHeight = 44, -- deprecated
 		matchWidth = 150,
-		matchWidthMobile = 90,
+		matchWidthMobile = 88,
 		opponentHeight = 24,
 		roundHorizontalMargin = 20,
-		scoreWidth = 20,
+		scoreWidth = 22,
 	}
-	local rawConfig = Json.parse(tostring(mw.message.new('BracketConfig')))
+	local wikiConfig = Info.config.match2
 	local config = {}
 	for paramName, defaultValue in pairs(defaultConfig) do
-		config[paramName] = tonumber(rawConfig[paramName]) or defaultValue
+		config[paramName] = wikiConfig[paramName] or defaultValue
 	end
 	return config
 end)

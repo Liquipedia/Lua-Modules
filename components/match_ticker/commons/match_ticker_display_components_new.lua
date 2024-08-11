@@ -118,8 +118,10 @@ function Details:create()
 	end
 
 	return self.root
-		:node(self:streams())
-		:node(self:tournament())
+		:node(mw.html.create('div'):addClass('match-links')
+			:node(self:tournament())
+			:node(self:streams())
+		)
 		:node(self:countdown())
 end
 

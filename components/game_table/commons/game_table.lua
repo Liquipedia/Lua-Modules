@@ -23,14 +23,15 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field games match2game[]
 
 ---@class GameTable: MatchTable
----@field countRowsDisplayed number
+---@field countGames number
 local GameTable = Class.new(MatchTable, function (self)
-	self.countRowsDisplayed = 0
+	self.countGames = 0
 end)
 
 ---@param game match2game
 ---@return match2game?
 function GameTable:gameFromRecord(game)
+	if self.countGames == self.config.limit then return nil end
 	if Table.includes(NP_STATUSES, game.resulttype) then
 		return nil
 	end
@@ -41,6 +42,7 @@ end
 ---@param record table
 ---@return GameTableMatch?
 function GameTable:matchFromRecord(record)
+	if self.countGames == self.config.limit then return nil end
 	local matchRecord = MatchTable.matchFromRecord(self, record)
 	---@cast matchRecord GameTableMatch
 	if Logic.isEmpty(record.match2games) then
@@ -50,7 +52,9 @@ function GameTable:matchFromRecord(record)
 	matchRecord.games = {}
 	--order games from last played to first
 	Array.forEach(Array.reverse(record.match2games), function (game)
-		table.insert(matchRecord.games, self:gameFromRecord(game))
+		local gameRecord = self:gameFromRecord(game)
+		if gameRecord then self.countGames = self.countGames + 1 end
+		table.insert(matchRecord.games, gameRecord)
 	end)
 
 	return matchRecord
@@ -136,9 +140,7 @@ function GameTable:matchRow(match)
 	local display = mw.html.create()
 
 	Array.forEach(match.games, function(game)
-		if self.countRowsDisplayed == self.config.limit then return end
 		display:node(self:gameRow(match, game))
-		self.countRowsDisplayed = self.countRowsDisplayed + 1
 	end)
 
 	return display

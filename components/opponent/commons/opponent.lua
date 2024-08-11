@@ -215,6 +215,13 @@ function Opponent.assertOpponent(opponent)
 	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
 end
 
+---Validates that an arbitary value is a valid representation of an opponent
+---@param opponent any
+---@return boolean
+function Opponent.isOpponent(opponent)
+	error('Opponent.isOpponent: Not Implemented')
+end
+
 ---Coerces an arbitary table into an opponent
 ---@param opponent table
 function Opponent.coerce(opponent)
@@ -377,9 +384,6 @@ function Opponent.readOpponentArgs(args)
 	elseif partySize then
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
 			local playerTeam = args['p' .. playerIndex .. 'team']
-			if playerTeam then
-				playerTeam = playerTeam
-			end
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),

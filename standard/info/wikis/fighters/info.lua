@@ -1670,7 +1670,9 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+		},
 	},
 	opponentLibrary = 'Opponent/Custom',
-	match2 = 0,
+	match2 = 1,
 }

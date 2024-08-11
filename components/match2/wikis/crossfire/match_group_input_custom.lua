@@ -25,8 +25,6 @@ local MAX_NUM_OPPONENTS = 8
 local MAX_NUM_MAPS = 9
 local DEFAULT_BESTOF = 3
 
-local GAME = mw.loadData('Module:GameVersion')
-
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
@@ -59,7 +57,6 @@ end
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
 
 	return map
 end
@@ -252,8 +249,6 @@ function matchFunctions.getTournamentVars(match)
 
 	match = MatchGroupInput.getCommonTournamentVars(match)
 
-	match.game = GAME[match.game]
-
 	return match
 end
 
@@ -375,14 +370,6 @@ function mapFunctions.getScoresAndWinner(map)
 	end
 
 	map = CustomMatchGroupInput.getResultTypeAndWinner(map, indexedScores)
-
-	return map
-end
-
----@param map table
----@return table
-function mapFunctions.getTournamentVars(map)
-	map.game = GAME[map.game]
 
 	return map
 end

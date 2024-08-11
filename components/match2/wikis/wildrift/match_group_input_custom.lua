@@ -9,7 +9,6 @@
 local ChampionNames = mw.loadData('Module:ChampionNames')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -349,6 +348,7 @@ function matchFunctions.getOpponents(match)
 			end
 
 			-- get players from vars for teams
+			assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
 					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
@@ -356,11 +356,6 @@ function matchFunctions.getOpponents(match)
 						applyUnderScores = true,
 					})
 				end
-			elseif Opponent.typeIsParty(opponent.type) then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
-				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
 			opponents[opponentIndex] = opponent
