@@ -53,6 +53,11 @@ local MatchGroupInput = {}
 ---@field resolveRedirect boolean?
 ---@field applyUnderScores boolean?
 
+---@class readOpponentOptions: MatchGroupInputReadPlayersOfTeamOptions
+---@field pagifyOpponentName boolean?
+---@field pagifyPlayerNames boolean?
+---@field syncPlayer boolean?
+
 local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
 	{default = 'Opening Matches'},
 	{},
@@ -489,11 +494,6 @@ function MatchGroupInput.fetchStandaloneMatch(matchId)
 	end)
 end
 
----@class readOpponentOptions: MatchGroupInputReadPlayersOfTeamOptions
----@field pagifyOpponentName boolean?
----@field pagifyPlayerNames boolean?
----@field syncPlayer boolean?
-
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
@@ -571,17 +571,14 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent, substitutions
 					displayname = player.displayName,
 					flag = player.flag,
 					name = player.pageName,
-					extradata = player.faction and {faction = player.faction}
+					extradata = player.faction and {faction = player.faction},
 				}
 			end)
 	end
 
 	record.name = Opponent.toName(opponent)
 	record.type = opponent.type
-	record.extradata = Table.merge(record.extradata or {}, {
-		isarchon = opponent.isArchon,
-		substitutions = substitutions,
-	})
+	record.extradata = Table.merge(record.extradata or {}, {substitutions = substitutions})
 
 	return record
 end
