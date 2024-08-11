@@ -122,13 +122,6 @@ function CustomPlayer:getPersonType(args)
 		return {store = 'talent', category = 'Talent'}
 	end
 	return {store = 'player', category = 'Player'}
-	if roleData then
-		if roleData.talent then
-			return {store = 'talent', category = 'Talent'}
-			end
-	end
-
-	return {store = 'player', category = 'Player'}
 end
 
 return CustomPlayer
