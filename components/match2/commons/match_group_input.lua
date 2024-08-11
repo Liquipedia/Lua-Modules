@@ -676,7 +676,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 			pageName = pageName,
 			flage = Flags.CountryName(player.flag),
 			displayName = Logic.nilIfEmpty(player.displayname) or player.displayName,
-			faction = player.faction and Faction.read(player.faction) or nil, -- not sure how to handle this yet ...
+			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
 		})
 	end
