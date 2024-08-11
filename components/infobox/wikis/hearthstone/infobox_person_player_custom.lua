@@ -37,7 +37,8 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.role = player:_getRoleData(player.args.role)
+	player.role = ROLES[(player.args.role or ''):lower()]
+	player.role2 = ROLES[(player.args.role2 or ''):lower()]
 	player.role2 = player:_getRoleData(player.args.role2)
 
 	return player:createInfobox()
