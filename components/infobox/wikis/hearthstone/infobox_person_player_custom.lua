@@ -118,7 +118,10 @@ end
 ---@param args table
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
-	local roleData = ROLES[(args.role or ''):lower()]
+	if self.role.talent then
+		return {store = 'talent', category = 'Talent'}
+	end
+	return {store = 'player', category = 'Player'}
 	if roleData then
 		if roleData.talent then
 			return {store = 'talent', category = 'Talent'}
