@@ -510,7 +510,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		return {type = Opponent.literal, name = 'BYE'}
 	end
 
-	---@type number|string
+	---@type number|string?
 	local resolveDate = match.timestamp
 	-- If date is default date, resolve using tournament dates instead
 	-- default date indicates that the match is missing a date
