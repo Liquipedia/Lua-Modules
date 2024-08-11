@@ -96,25 +96,6 @@ function CustomPlayer:getWikiCategories(categories)
 	)
 end
 
----@param lpdbData table
----@param args table
----@param personType string
----@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
-
-	return lpdbData
-end
-
----@param role string?
----@return boolean?
-function CustomPlayer._isNotPlayer(role)
-	local roleData = ROLES[(role or ''):lower()]
-	return roleData and (roleData.talent)
-end
-
 ---@param args table
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
