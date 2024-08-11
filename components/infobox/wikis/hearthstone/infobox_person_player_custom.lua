@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -90,9 +89,9 @@ function CustomPlayer:getWikiCategories(categories)
 	)
 end
 
-
+---@param args table
 ---@return {store: string, category: string}
-function CustomPlayer:getPersonType()
+function CustomPlayer:getPersonType(args)
 	if self.role.talent then
 		return {store = 'talent', category = 'Talent'}
 	end
