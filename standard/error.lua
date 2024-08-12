@@ -87,6 +87,7 @@ function Error:__tostring()
 	return self.message
 end
 
+--- TODO: Move to Error Display
 ---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
 ---@return string
 function Error:getErrorJson()
