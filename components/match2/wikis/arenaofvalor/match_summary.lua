@@ -163,7 +163,9 @@ function CustomMatchSummary.createBody(match)
 		local championBan = ChampionBan()
 
 		for gameIndex, banData in ipairs(championBanData) do
-			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+			if banData.numberOfBans ~= 0 then
+				championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+			end
 		end
 
 		body:addRow(championBan)
