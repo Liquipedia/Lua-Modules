@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
-local ResultOrError = require('Module:ResultOrError')
+local Logic = require('Module:Logic')
 local TypeUtil = require('Module:TypeUtil')
 
 local DisplayUtil = {propTypes = {}, types = {}}
@@ -54,18 +54,15 @@ end
 ---@param props table
 ---@return Html
 function DisplayUtil.TryPureComponent(Component, props)
-	local resultOrError = ResultOrError.try(function() return Component(props) end)
-	if resultOrError:isResult() then
-		---@cast resultOrError Result
-		return resultOrError:get()
-	else
-		---@cast resultOrError Error
-		return mw.html.create('div')
-			:tag('strong'):addClass('error')
-			:tag('span'):addClass('scribunto-error')
-			:wikitext(resultOrError:getErrorJson() .. '.')
-			:allDone()
-	end
+	return Logic.try(function() return Component(props) end)
+		:catch(function(error)
+			return mw.html.create('div')
+				:tag('strong'):addClass('error')
+				:tag('span'):addClass('scribunto-error')
+				:wikitext(error:getErrorJson() .. '.')
+				:allDone()
+		end)
+		:get()
 end
 
 ---@alias OverflowModes 'ellipsis'|'wrap'|'hidden'

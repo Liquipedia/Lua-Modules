@@ -143,16 +143,17 @@ function Logic.tryCatch(try, catch)
 end
 
 ---@param f function
----@return any?
+---@return RoEResult|RoEError
 function Logic.try(f)
-	return require('Module:ResultOrError').try(f)
+	local ResultOrError = require('Module:ResultOrError')
+	return ResultOrError.try(f)
 end
 
 ---Returns the result of a function if successful. Otherwise it returns the result of the second function.
 ---If the first function fails, its error is logged to the console and stashed away for display.
 ---@param f fun(): any
----@param other? fun(error: error): any
----@param makeError? fun(error: error): error function that allows customizing Error instance being logged and stashed.
+---@param other? fun(error: Error): any
+---@param makeError? fun(error: Error): Error function that allows customizing Error instance being logged and stashed.
 ---@return any?
 function Logic.tryOrElseLog(f, other, makeError)
 	return Logic.try(f)
@@ -178,7 +179,7 @@ end
 ---Returns the result of a function if successful. Otherwise it returns nil.
 ---If the first function fails, its error is logged to the console and stashed away for display.
 ---@param f fun(): any
----@param makeError? fun(error: error): error function that allows customizing Error instance being logged and stashed.
+---@param makeError? fun(error: Error): Error function that allows customizing Error instance being logged and stashed.
 ---@return function
 function Logic.wrapTryOrLog(f, makeError)
 	return function(...)

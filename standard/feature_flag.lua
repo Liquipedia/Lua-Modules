@@ -78,7 +78,7 @@ end
 ---@generic V
 ---@param flags? {[string]: boolean}
 ---@param f fun(): V
----@return V|error
+---@return V|Error
 function FeatureFlag.with(flags, f)
 	if Table.isEmpty(flags) then
 		return f()

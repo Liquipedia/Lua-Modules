@@ -186,12 +186,12 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	local bracketDatasById = Logic.try(function()
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
-		:catch(function(message)
-			if String.endsWith(message, 'does not exist') then
-				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
+		:catch(function(error)
+			if String.endsWith(error.message, 'does not exist') then
+				table.insert(warnings, error.message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
-				error(message)
+				error(error.message)
 			end
 		end)
 		:get()
