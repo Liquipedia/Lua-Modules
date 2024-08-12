@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -29,6 +30,8 @@ local MAX_NUM_PLAYERS = 10
 local DEFAULT_BESTOF = 99
 
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
+
+local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 local CustomMatchGroupInput = {}
 
@@ -67,9 +70,8 @@ function CustomMatchGroupInput._updateFinished(match)
 
 	-- Match is automatically marked finished upon page edit after a
 	-- certain amount of time (depending on whether the date is exact)
-	local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
 	local threshold = match.dateexact and 30800 or 86400
-	match.finished = match.timestamp + threshold < currentUnixTime
+	match.finished = match.timestamp + threshold < NOW
 end
 
 ---@param match table
@@ -84,21 +86,10 @@ end
 ---@param match table
 function CustomMatchGroupInput._verifyMaps(match)
 	for key, map in Table.iter.pairsByPrefix(match, 'map') do
-		if CustomMatchGroupInput._discardMap(map) then
-			match[key] = nil
-		elseif map.map == DUMMY_MAP_NAME then
-			match[key].map = ''
+		if map.map == DUMMY_MAP_NAME then
+			match[key].map = nil
 		end
 	end
-end
-
--- Check if a map should be discarded due to not containing anything relevant
--- DUMMY_MAP_NAME variable must the match the default value in Template:Map
----@param map table
----@return boolean
-function CustomMatchGroupInput._discardMap(map)
-	return map.map == DUMMY_MAP_NAME
-		and not map.score1 and not map.score2 and not map.winner and not map.o1p1 and not map.o2p1
 end
 
 ---@param match table
@@ -257,7 +248,8 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
-
+	
+	
 	local teamTemplateDate = timestamp
 	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
@@ -287,9 +279,7 @@ function CustomMatchGroupInput._mapInput(match, mapIndex)
 	map = CustomMatchGroupInput._mapWinnerProcessing(map)
 
 	-- Init score if match started and map info is present
-	if not match.opponent1.autoscore and not match.opponent2.autoscore
-			and map.map and map.map ~= 'TBD'
-			and match.timestamp < os.time(os.date('!*t') --[[@as osdateparam]]) then
+	if not match.opponent1.autoscore and not match.opponent2.autoscore and map.winner then
 		match.opponent1.autoscore = 0
 		match.opponent2.autoscore = 0
 	end
@@ -361,16 +351,18 @@ function CustomMatchGroupInput._mapWinnerProcessing(map)
 		map.resulttype = 'np'
 	elseif winnerInput == 1 then
 		map.scores = {1, 0}
+		map.winner = 1
 	elseif winnerInput == 2 then
 		map.scores = {0, 1}
+		map.winner = 2
 	elseif winnerInput == 0 or map.winner == 'draw' then
+		map.winner = 0
 		map.scores = {0, 0}
 		map.resulttype = 'draw'
 	end
 
 	return map
 end
-
 ---@param map table
 ---@param match table
 ---@param numberOfOpponents integer
