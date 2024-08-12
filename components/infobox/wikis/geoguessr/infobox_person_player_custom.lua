@@ -85,7 +85,7 @@ end
 ---@return Html?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) then
-		return MatchTicker.participant({player = self.pagename})
+		return MatchTicker.participant{player = self.pagename}
 	end
 end
 
