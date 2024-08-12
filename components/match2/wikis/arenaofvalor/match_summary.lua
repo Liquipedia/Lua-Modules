@@ -153,17 +153,19 @@ function CustomMatchSummary.createBody(match)
 		if numberOfBans > 0 then
 			banData[1].color = extradata.team1side
 			banData[2].color = extradata.team2side
+			banData.numberOfBans = numberOfBans
+			table.insert(championBanData, banData)
+		else
+			table.insert(championBanData, {})
 		end
-		banData.numberOfBans = numberOfBans
-		championBanData[gameIndex] = banData
 	end
 
 	-- Add the Champion Bans
-	if not Table.isEmpty(championBanData) then
+	if Array.any(championBanData, Table.isNotEmpty) then
 		local championBan = ChampionBan()
 
 		for gameIndex, banData in ipairs(championBanData) do
-			if banData.numberOfBans ~= 0 then
+			if Table.isNotEmpty(banData) then
 				championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
 			end
 		end
