@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -248,8 +247,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	if Opponent.isBye(opponent) then
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
-	
-	
+
 	local teamTemplateDate = timestamp
 	if teamTemplateDate == DateExt.defaultTimestamp then
 		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
