@@ -215,6 +215,7 @@ liquipedia.filterButtons = {
 		this.updateFromFilterStates();
 		this.setLocalStorage();
 		this.updateDOM();
+		this.refreshScriptsAfterContentUpdate();
 	},
 
 	updateFromFilterStates: function() {
@@ -313,7 +314,6 @@ liquipedia.filterButtons = {
 
 			if ( wikitext in templateExpansion.cache ) {
 				templateExpansion.element.innerHTML = templateExpansion.cache[ wikitext ];
-				this.refreshScriptsAfterContentUpdate();
 				return;
 			}
 
@@ -333,7 +333,6 @@ liquipedia.filterButtons = {
 					if ( data.parse?.text?.[ '*' ] ) {
 						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
 						templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];
-						this.refreshScriptsAfterContentUpdate();
 					}
 				} );
 			} );
