@@ -186,7 +186,11 @@ function CustomPlayer:createBottomContent()
 		local team2Page = Team.page(mw.getCurrentFrame(), self.args.team2)
 		return
 			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage}, {team2 = team2Page})
+			Template.safeExpand(
+				mw.getCurrentFrame(),
+				'Upcoming and ongoing tournaments of',
+				{team = teamPage}, {team2 = team2Page}
+			)
 	end
 end
 
