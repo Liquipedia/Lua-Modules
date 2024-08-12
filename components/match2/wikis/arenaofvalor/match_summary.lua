@@ -135,7 +135,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Pre-Process Champion Ban Data
 	local championBanData = {}
-	for gameIndex, game in ipairs(match.games) do
+	for _, game in ipairs(match.games) do
 		local extradata = game.extradata or {}
 		local banData = {{}, {}}
 		local numberOfBans = 0
