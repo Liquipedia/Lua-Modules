@@ -101,11 +101,11 @@ liquipedia.countdown = {
 		let datestr = '';
 
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			const countdownContent = this.getCountdownStringAndClassName( timerObjectNode, countdownElem );
-			datestr = countdownContent.text;
+			const { text, className } = this.getCountdownStringAndClassName( timerObjectNode, countdownElem );
+			datestr = text;
 
-			if ( countdownContent.className !== '' ) {
-				countdownElem.classList.add( countdownContent.className );
+			if ( className !== '' ) {
+				countdownElem.classList.add( className );
 			}
 		}
 
