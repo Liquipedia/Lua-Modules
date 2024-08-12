@@ -158,8 +158,9 @@ end
 function Logic.tryOrElseLog(f, other, makeError)
 	return Logic.try(f)
 		:catch(function(error)
-			if type(error) == 'string' then
-				error = require('Module:Error')(error)
+			local Error = require('Module:Error')
+			if not Error.isError(error) then
+				error = Error(error)
 			end
 
 			error.header = 'Error occured while calling a function: (caught by Logic.tryOrElseLog)'
