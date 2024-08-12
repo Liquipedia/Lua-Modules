@@ -57,7 +57,6 @@ error.noStack: Disables the stack trace
 ---@field innerError any
 ---@field originalErrors? Error[]
 ---@field stacks? string[]
----@field is_a? function
 local Error = Class.new(function(self, any)
 	-- Normalize the various ways an error can be thrown
 	if type(any) == 'string' then

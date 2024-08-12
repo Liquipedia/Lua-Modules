@@ -13,9 +13,12 @@ local Error = require('Module:Error')
 A structurally typed, immutable class that represents either a result or an
 error. Used for representing the outcome of a function that can throw.
 
+ResultOrError expects functions that return one value. Additional return values
+are ignored.
+
 Usage:
 ```
-local socketOrError = ResultOrError.try(function()
+local socketOrError = ReltOrError.try(function()
 	return socketlib.open()
 end)
 local parsedText = socketOrError
@@ -94,15 +97,7 @@ function ResultOrError.Result:get()
 	return self.result
 end
 
---[[
-Error case.
-
-The stacks argument is the stack traces for the error, so that if an error
-handler throws, then the stack trace of the error handler error can be a
-continuation of the stack trace of the error that was handled (and so on).
-This allows error handlers to rethrow the original error without losing the
-stack trace, and is needed to implement :finally().
-]]
+---Error case. The error field is an Error instance.
 ---@class RoEError: ResultOrError
 ---@field error Error
 ResultOrError.Error = Class.new(ResultOrError, function(self, error)
@@ -129,10 +124,9 @@ Invokes a function and places its outcome (result or caught error) in a
 ResultOrError. If the result is a ResultOrError, then it is flattened, so that
 a nested ResultOrError is avoided.
 
-Additional stack traces can be attached using the lowerStacks parameter. This
-can be used when rethrowing an error to include the stack trace of the existing
-error. Errors rethrown in ResultOrError:map() or ResultOrError:catch() will
-automatically include both stack traces.
+originalError is used when ResultOrError.try is invoking an error handler. It
+allows errors thrown in ResultOrError:map() or ResultOrError:catch() to include
+stack traces from both the thrown error and the error being handled.
 ]]
 ---@param f fun(): any
 ---@param originalError table?
