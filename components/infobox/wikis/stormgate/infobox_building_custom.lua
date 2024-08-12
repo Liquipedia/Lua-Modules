@@ -17,6 +17,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local MessageBox = require('Module:Message box')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
@@ -33,6 +34,7 @@ local CustomInjector = Class.new(Injector)
 local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
 local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
+local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 ---@param frame Frame
@@ -43,7 +45,14 @@ function CustomBuilding.run(frame)
 
 	building.faction = Faction.read(building.args.faction)
 
-	return building:createInfobox()
+	building:_processPatchFromId('introduced')
+	building:_processPatchFromId('deprecated')
+
+	local builtInfobox = building:createInfobox()
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(CustomBuilding._deprecatedWarning(building.args.deprecatedDisplay))
 end
 
 ---@param id string
@@ -59,7 +68,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', content = {args.size}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = caller:_csvToPageList(args.upgrades_to)},
+			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
 			Array.extendWith(widgets, Attack.run(attackArgs, attackIndex, caller.faction))
@@ -74,10 +84,14 @@ function CustomInjector:parse(id, widgets)
 				therium = args.therium,
 				theriumTotal = args.totaltherium,
 				theriumForced = true,
+				supply = args.supply,
+				supplyTotal = args.totalsupply,
 				buildTime = args.buildtime,
 				buildTimeTotal = args.totalbuildtime,
 				animus = args.animus,
 				animusTotal = args.totalanimus,
+				power = args.power,
+				powerTotal = args.totalpower,
 			}}},
 		}
 	elseif id == 'requirements' then
@@ -102,7 +116,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'unlocks' then
 		return {
 			Cell{name = 'Unlocks', content = caller:_csvToPageList(args.unlocks)},
-			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply)},
+			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply_gained)},
+			Cell{name = 'Power Gained', content = Array.parseCommaSeparatedString(args.power_gained)},
 		}
 	elseif id == 'defense' then
 		return {
@@ -168,16 +183,22 @@ function CustomBuilding:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			deprecated = args.deprecated or '',
+			introduced = args.introduced or '',
 			size = tonumber(args.size),
 			sight = tonumber(args.sight),
 			luminite = tonumber(args.luminite),
 			totalluminite = tonumber(args.totalluminite),
 			therium = tonumber(args.therium),
 			totaltherium = tonumber(args.totaltherium),
-			buildtime = tonumber(args.buildtime),
-			totalbuildtime = tonumber(args.totalbuildtime),
+			supply = tonumber(args.supply),
+			totalsupply = tonumber(args.totalsupply),
 			animus = tonumber(args.animus),
 			totalanimus = tonumber(args.totalanimus),
+			power = tonumber(args.power),
+			totalpower = tonumber(args.totalpower),
+			buildtime = tonumber(args.buildtime),
+			totalbuildtime = tonumber(args.totalbuildtime),
 			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
 			buildingrequirement = Array.parseCommaSeparatedString(args.building_requirement),
 			builds = Array.parseCommaSeparatedString(args.builds),
@@ -194,7 +215,6 @@ function CustomBuilding:setLpdbData(args)
 			energy = tonumber(args.energy),
 			energyrate = tonumber(args.energy_rate),
 			energydesc = args.energy_desc,
-			supply = args.supply,
 		},
 	})
 end
@@ -227,6 +247,37 @@ end
 ---@return string
 function CustomBuilding:_displayCsvAsPageCsv(input)
 	return table.concat(self:_csvToPageList(input), ', ')
+end
+
+---@param key string
+function CustomBuilding:_processPatchFromId(key)
+	local args = self.args
+	local input = Table.extract(args, key)
+	if String.isEmpty(input) then return end
+
+	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::patch]]',
+		limit = 5000,
+	})
+
+	args[key] = (Array.filter(patches, function(patch)
+		return String.endsWith(patch.pagename, '/' .. input)
+	end)[1] or {}).pagename
+	assert(args[key], 'Invalid patch "' .. input .. '"')
+
+	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
+end
+
+---@param patch string?
+---@return Html? -would need to check what warningbox actually returns ... am on phone ...
+function CustomBuilding._deprecatedWarning(patch)
+	if not patch then return end
+
+	return MessageBox.main('ambox', {
+		image= ICON_DEPRECATED,
+		class='ambox-red',
+		text= 'This has been removed from 1v1 with Patch ' .. patch,
+	})
 end
 
 return CustomBuilding
