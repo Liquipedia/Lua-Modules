@@ -110,8 +110,10 @@ end
 function CustomMatchSummary._createGame(row, game, props)
 	game.extradata = game.extradata or {}
 
-	local char1 = CustomMatchSummary._createCharacterDisplay(CustomMatchSummary._getPlayerData(game, '1_1').character, false)
-	local char2 = CustomMatchSummary._createCharacterDisplay(CustomMatchSummary._getPlayerData(game, '2_1').character, true)
+	local char1 = 
+		CustomMatchSummary._createCharacterDisplay(CustomMatchSummary._getPlayerData(game, '1_1').character, false)
+	local char2 = 
+		CustomMatchSummary._createCharacterDisplay(CustomMatchSummary._getPlayerData(game, '2_1').character, true)
 
 	row:addElement(char1:css('flex', '1 1 35%'):css('text-align', 'right'))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
