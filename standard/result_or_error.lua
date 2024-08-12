@@ -36,8 +36,8 @@ local ResultOrError = Class.new(function(self)
 end)
 
 -- Applies a function to the result, or handles the error
----@param f? fun(any): any
----@param onError? fun(Error): any
+---@param f? fun(any: any): any
+---@param onError? fun(error: Error?): any
 ---@return ResultOrError
 function ResultOrError:map(f, onError) error('Abstract method') end
 
@@ -45,13 +45,13 @@ function ResultOrError:map(f, onError) error('Abstract method') end
 ---@return any
 function ResultOrError:get() error('Abstract method') end
 
----@param onError fun(error: Error): any
+---@param onError fun(error: Error?): any
 ---@return ResultOrError
 function ResultOrError:catch(onError)
 	return self:map(nil, onError)
 end
 
----@param f fun(Error?): any
+---@param f fun(error: Error?): any
 ---@return ResultOrError
 function ResultOrError:finally(f)
 	local ret = self:map(f, f)
@@ -80,7 +80,7 @@ ResultOrError.Result = Class.new(ResultOrError, function(self, result)
 	self.result = result
 end)
 
----@param f? fun(any): any
+---@param f? fun(any: any): any
 ---@param _ any
 ---@return RoEResult|RoEError
 function ResultOrError.Result:map(f, _)
@@ -110,7 +110,7 @@ ResultOrError.Error = Class.new(ResultOrError, function(self, error)
 end)
 
 ---@param _ any
----@param onError? fun(Error): any
+---@param onError? fun(error: Error?): any
 ---@return RoEResult|RoEError
 function ResultOrError.Error:map(_, onError)
 	return onError
@@ -134,7 +134,7 @@ can be used when rethrowing an error to include the stack trace of the existing
 error. Errors rethrown in ResultOrError:map() or ResultOrError:catch() will
 automatically include both stack traces.
 ]]
----@param f function
+---@param f fun(): any
 ---@param originalError table?
 ---@return RoEResult|RoEError
 function ResultOrError.try(f, originalError)
