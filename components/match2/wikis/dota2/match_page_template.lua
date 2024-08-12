@@ -83,8 +83,8 @@ return {
 			<h3>Team Stats</h3>
 			<div class="match-bm-team-stats">
 				<div class="match-bm-team-stats-header">
-					<h4>Radiant Victory</h4>
-					<span class="match-bm-team-stats-time side--dire">25:55</span>
+					<h4 class="match-bm-team-stats-header-title">Radiant Victory</h4>
+					<div class="match-bm-team-stats-header-time><i class="fas fa-caret-left icon--left"></i><div>25:55</div><i class="fas fa-caret-right icon--right"></i></div>
 				</div>
 				<div class="match-bm-team-stats-container">
 					<div class="match-bm-team-stats-team">
