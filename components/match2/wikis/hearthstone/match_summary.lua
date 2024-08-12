@@ -132,7 +132,7 @@ function CustomMatchSummary._createCharacterDisplay(character, reverse)
 	local characterDisplay = mw.html.create('span'):addClass('draft faction')
 	local charIcon = CharacterIcon.Icon{
 		character = character,
-		size = '18px',
+		size = '64px',
 	}
 	if reverse then
 		characterDisplay:wikitext(charIcon):wikitext('&nbsp;'):wikitext(character)
