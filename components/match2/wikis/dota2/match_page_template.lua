@@ -64,18 +64,50 @@ return {
 				</div>
 			</div>{{/isBestOfOne}}
 			<h3>Picks and Bans</h3>
-			<div class="match-bm-lol-game-veto collapsed general-collapsible">
+			<div class="match-bm-game-veto-wrapper">
 				<div class="match-bm-lol-game-veto-overview">
-					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
-						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#teams.1.picks}}<li class="match-bm-lol-game-veto-overview-item">{{vetoNumber}}{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{teams.1.side}}"></div></li>{{/teams.1.picks}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#teams.1.bans}}<li class="match-bm-lol-game-veto-overview-item">{{vetoNumber}}{{&heroIcon}}</li>{{/teams.1.bans}}</ul>
+					<div class="match-bm-lol-game-veto-overview-team">
+						<div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
+							<div class="match-bm-game-veto-overview-team-veto">
+								<div class="match-bm-game-veto-overview match-bm-game-veto-overview-pick--{{teams.1.side}}" aria-labelledby="picks">
+									{{#teams.1.picks}}
+									<div class="match-bm-game-veto-overview-item">
+										<div class="match-bm-game-veto-overview-item-icon">{{&heroIcon}}</div>
+										<div class="match-bm-game-veto-overview-item-text">#{{vetoNumber}}</div>
+									</div>
+									{{/teams.1.picks}}
+								</div>
+								<div class="match-bm-game-veto-overview  match-bm-game-veto-overview-ban" aria-labelledby="bans">
+									{{#teams.1.bans}}
+									<div class="match-bm-game-veto-overview-item">
+										<div class="match-bm-game-veto-overview-item-icon">{{&heroIcon}}</div>
+										<div class="match-bm-game-veto-overview-item-text">#{{vetoNumber}}</div>
+									</div>
+									{{/teams.1.bans}}
+								</div>
+							</div>
 						</div>
 					</div>
-					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
-						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#teams.2.picks}}<li class="match-bm-lol-game-veto-overview-item">{{vetoNumber}}{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{teams.2.side}}"></div></li>{{/teams.2.picks}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#teams.2.bans}}<li class="match-bm-lol-game-veto-overview-item">{{vetoNumber}}{{&heroIcon}}</li>{{/teams.2.bans}}</ul>
+					<div class="match-bm-lol-game-veto-overview-team">
+						<div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
+							<div class="match-bm-game-veto-overview-team-veto">
+								<div class="match-bm-game-veto-overview match-bm-game-veto-overview-pick--{{teams.2.side}}" aria-labelledby="picks">
+									{{#teams.2.picks}}
+									<div class="match-bm-game-veto-overview-item">
+										<div class="match-bm-game-veto-overview-item-icon">{{&heroIcon}}</div>
+										<div class="match-bm-game-veto-overview-item-text">#{{vetoNumber}}</div>
+									</div>
+									{{/teams.2.picks}}
+								</div>
+								<div class="match-bm-game-veto-overview  match-bm-game-veto-overview-ban" aria-labelledby="bans">
+									{{#teams.2.bans}}
+									<div class="match-bm-game-veto-overview-item">
+										<div class="match-bm-game-veto-overview-item-icon">{{&heroIcon}}</div>
+										<div class="match-bm-game-veto-overview-item-text">#{{vetoNumber}}</div>
+									</div>
+									{{/teams.2.bans}}
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>

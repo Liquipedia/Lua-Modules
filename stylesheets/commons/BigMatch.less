@@ -526,6 +526,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #b81414;
 }
 
+.match-bm-game-veto-wrapper,
 .match-bm-players-wrapper {
 	display: grid;
 	grid-template-columns: auto;
@@ -791,6 +792,73 @@ ul.match-bm-lol-game-veto-overview-pick {
 		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 			order: 2;
 			margin-top: unset;
+		}
+	}
+}
+
+.match-bm-game-veto-overview-team-veto {
+	padding: 1rem 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+
+	.match-bm-game-veto-overview {
+		display: flex;
+		gap: 0.125rem;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+
+		.match-bm-game-veto-overview-item {
+			display: flex;
+			flex-direction: column;
+
+			img {
+				border-radius: 0.25rem 0.25rem 0 0;
+				width: 3.75rem;
+				height: 2.5rem;
+
+				@media ( min-width: 834px ) {
+					width: 4.5rem;
+					height: 3rem;
+				}
+			}
+
+			.match-bm-game-veto-overview-item-text {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: bold;
+				border-radius: 0 0 0.25rem 0.25rem;
+			}
+		}
+
+		&.match-bm-game-veto-overview-pick--radiant {
+			.match-bm-game-veto-overview-item {
+				.match-bm-game-veto-overview-item-text {
+					background-color: #7eac20;
+				}
+			}
+		}
+
+		&.match-bm-game-veto-overview-pick--dire {
+			.match-bm-game-veto-overview-item {
+				.match-bm-game-veto-overview-item-text {
+					background-color: #cc6500;
+				}
+			}
+		}
+
+		&.match-bm-game-veto-overview-ban {
+			opacity: 0.5;
+
+			.match-bm-game-veto-overview-item {
+				.match-bm-game-veto-overview-item-text {
+					background-color: #121212;
+				}
+			}
 		}
 	}
 }
