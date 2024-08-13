@@ -182,7 +182,7 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = String.isNotEmpty(self.args.team) and Team.page(mw.getCurrentFrame(), self.args.team) or nil
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
 		local team2Page = String.isNotEmpty(self.args.team2) and Team.page(mw.getCurrentFrame(), self.args.team2) or nil
 		return
 			tostring(MatchTicker.player{recentLimit = 3}) ..
