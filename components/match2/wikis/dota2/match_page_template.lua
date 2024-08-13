@@ -63,7 +63,7 @@ return {
 					<div class="match-bm-lol-game-summary-team">{{&opponents.2.iconDisplay}}</div>
 				</div>
 			</div>{{/isBestOfOne}}
-			<h3>Picks and Bans</h3>
+			<h3>Draft</h3>
 			<div class="match-bm-game-veto-wrapper">
 				<div class="match-bm-lol-game-veto-overview">
 					<div class="match-bm-lol-game-veto-overview-team">
