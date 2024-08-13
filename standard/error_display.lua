@@ -12,7 +12,7 @@ local TypeUtil = require('Module:TypeUtil')
 
 local ErrorDisplay = {types = {}, propTypes = {}}
 
----@param props {limit: integer?, errors: error[]}
+---@param props {limit: integer?, errors: Error[]}
 ---@return Html
 function ErrorDisplay.ErrorList(props)
 	local defaultLimit = 5
@@ -80,7 +80,7 @@ function ErrorDisplay.Box(props)
 	return div:node(tbl)
 end
 
----@param error error
+---@param error Error
 ---@return Html
 function ErrorDisplay.ErrorBox(error)
 	return ErrorDisplay.Box{
@@ -90,7 +90,7 @@ function ErrorDisplay.ErrorBox(error)
 end
 
 ---Shows the message and stack trace of a lua error. Suitable for use in a popup.
----@param error error
+---@param error Error
 ---@return Html
 function ErrorDisplay.ErrorDetails(error)
 	local errorDetailsNode = mw.html.create('div'):addClass('error-details')
