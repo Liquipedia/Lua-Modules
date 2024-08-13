@@ -117,7 +117,7 @@ function Error:getErrorJson()
 		table.insert(stackTrace, stackEntry)
 	end
 
-	Array.forEach(self.stacks, function(stack)
+	Array.forEach(self.stacks or {}, function(stack)
 		local stackFrames = mw.text.split(stack, '\n')
 		stackFrames = Array.filter(
 			Array.map(
