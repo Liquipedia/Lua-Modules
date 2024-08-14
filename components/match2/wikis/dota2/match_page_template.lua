@@ -125,42 +125,6 @@ return {
 					</div>
 				</div>
 			</div>
-			<div class="match-bm-lol-h2h">
-				<div class="match-bm-lol-h2h-header">
-					<div class="match-bm-lol-h2h-header-team">{{&opponents.1.iconDisplay}}</div>
-					<div class="match-bm-lol-h2h-stat-title"></div>
-					<div class="match-bm-lol-h2h-header-team">{{&opponents.2.iconDisplay}}</div>
-				</div>
-				<div class="match-bm-lol-h2h-section">
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{#finished}}{{teams.1.kills}}/{{teams.1.deaths}}/{{teams.1.assists}}{{/finished}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
-						<div>{{#finished}}{{teams.2.kills}}/{{teams.2.deaths}}/{{teams.2.assists}}{{/finished}}</div>
-					</div>
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.gold}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon gold.png|link=]]<br>Gold</div>
-						<div>{{teams.2.gold}}</div>
-					</div>
-				</div>
-				<div class="match-bm-lol-h2h-section">
-				<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.objectives.towers}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon tower.png|link=]]<br>Towers</div>
-						<div>{{teams.2.objectives.towers}}</div>
-					</div>
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.objectives.barracks}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon inhibitor.png|link=]]<br>Barracks</div>
-						<div>{{teams.2.objectives.barracks}}</div>
-					</div>
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.objectives.roshans}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon baron.png|link=]]<br>Roshan</div>
-						<div>{{teams.2.objectives.roshans}}</div>
-					</div>
-				</div>
-			</div>
 			<h3>Player Performance</h3>
 			<div class="match-bm-players-wrapper">
 				<div class="match-bm-players-team"><div class="match-bm-lol-players-team-header">{{&opponents.1.iconDisplay}}</div>
