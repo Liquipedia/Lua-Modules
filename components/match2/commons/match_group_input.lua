@@ -52,6 +52,8 @@ local MatchGroupInput = {}
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
 ---@field applyUnderScores boolean?
+---@field timestamp integer?
+---@field timezoneOffset string?
 
 ---@class readOpponentOptions: MatchGroupInputReadPlayersOfTeamOptions
 ---@field pagifyOpponentName boolean?
@@ -524,13 +526,12 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 
 	local substitutions
 	if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
+		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array and the substitutions data
 		opponent.players, substitutions = MatchGroupInput.readPlayersOfTeamNew(
-			match,
-			opponentIndex,
 			opponent,
-			options,
-			opponentInput.substitutes
+			manualPlayersInput,
+			Table.merge(options, {timestamp = match.timestamp, timezoneOffset = match.timezoneOffset})
 		)
 	end
 
@@ -646,15 +647,41 @@ function MatchGroupInput.readMvp(match)
 	return {players = parsedPlayers, points = mvppoints}
 end
 
----reads the players of a team from input and wiki variables
 ---@param match table
 ---@param opponentIndex integer
+---@param opponentInput table
+---@return {players: table[], substitutions: string?}
+function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
+	--players from manual input as `opponnetX_pY`
+	local players = Array.mapIndexes(function(playerIndex)
+		return Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex])
+	end)
+	local manualInput = {players = players, substitutions = opponentInput.substitutes, timestamp = match.timestamp}
+
+	--players from manual input in `opponent.players`
+	local playersData = Json.parseIfString(opponentInput.players)
+
+	if not playersData then return manualInput end
+
+	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+		table.insert(players, {
+			pageName = playerName,
+			displayName = playersData[playerPrefix .. 'dn'],
+			flag = playersData[playerPrefix .. 'flag'],
+			faction = playersData[playerPrefix .. 'faction'] or playersData[playerPrefix .. 'race'],
+		})
+	end
+
+	return manualInput
+end
+
+---reads the players of a team from input and wiki variables
 ---@param opponent standardOpponent
+---@param manualPlayersInput {players: table[], substitutions: string?}
 ---@param options MatchGroupInputReadPlayersOfTeamOptions
----@param substitutionsInput string?
 ---@return standardPlayer[]
 ---@return table
-function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, options, substitutionsInput)
+function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, options)
 	---@type string
 	local teamName = opponent.name
 
@@ -693,7 +720,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 
 		local wasPresentInMatch = function()
-			if not match.timestamp then return true end
+			if not options.timestamp then return true end
 
 			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
 			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
@@ -701,7 +728,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 			if (not joinDate) and (not leaveDate) then return true end
 
 			-- need to offset match time to correct timezone as transfers do not have a time associated with them
-			local timestampLocal = match.timestamp + DateExt.getOffsetSeconds(match.timezoneOffset or '')
+			local timestampLocal = options.timestamp + DateExt.getOffsetSeconds(options.timezoneOffset or '')
 
 			return (not joinDate or (joinDate <= timestampLocal)) and
 				(not leaveDate or (leaveDate > timestampLocal))
@@ -720,22 +747,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 		name = Variables.varDefault(varPrefix)
 	end
 
-	--players from manual input as `opponnetX_pY`
-	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
-		local playerTable = Json.parseIfString(player) or {}
-		insertIntoPlayers(playerTable)
-	end
-
-	--players from manual input in `opponent.players`
-	local playersData = Json.parseIfString(opponent.players) or {}
-	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
-		insertIntoPlayers{
-			pageName = playerName,
-			displayName = playersData[playerPrefix .. 'dn'],
-			flag = playersData[playerPrefix .. 'flag'],
-			faction = playersData[playerPrefix .. 'faction'] or playersData[playerPrefix .. 'race'],
-		}
-	end
+	Array.forEach(manualPlayersInput.players, insertIntoPlayers)
 
 	---@param playerData table|string|nil
 	---@return standardPlayer?
@@ -746,7 +758,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
 			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
 			flag = playerData.flag,
-			faction = playersData.faction or playerData.race,
+			faction = playerData.faction or playerData.race,
 		}
 		if Logic.isEmpty(player.displayName) then return end
 		player = PlayerExt.populatePlayer(player)
@@ -754,7 +766,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 		return player
 	end
 
-	local substitutions, parseFailure = Json.parseStringified(substitutionsInput)
+	local substitutions, parseFailure = Json.parseStringified(manualPlayersInput.substitutions)
 	if parseFailure then
 		substitutions = {}
 	end
@@ -777,7 +789,7 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 			substitute = substitute,
 			player = player,
 			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
-			reason = substitution['reason'],
+			reason = substitution.reason,
 		})
 
 		insertIntoPlayers(substitute)
