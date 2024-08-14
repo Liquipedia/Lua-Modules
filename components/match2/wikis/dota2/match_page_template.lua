@@ -83,8 +83,7 @@ return {
 			<h3>Team Stats</h3>
 			<div class="match-bm-team-stats">
 				<div class="match-bm-team-stats-header">
-					<h4 class="match-bm-team-stats-header-title">Radiant Victory</h4>
-					<div class="match-bm-team-stats-header-time"><i class="fas fa-caret-left"></i><div>Insert time here</div><i class="fas fa-caret-right"></i></div>
+					<h4 class="match-bm-team-stats-header-title">{{opponents.{{winner}}.name}} Victory</h4>
 				</div>
 				<div class="match-bm-team-stats-container">
 					<div class="match-bm-team-stats-team">

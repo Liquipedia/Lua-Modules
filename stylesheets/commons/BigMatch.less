@@ -1164,6 +1164,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 	border: 0.0625rem solid #bbbbbb;
 	margin-bottom: 1rem;
 
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
+
 	&-header {
 		display: flex;
 		flex-direction: column;
@@ -1172,6 +1176,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 		border-bottom: 0.0625rem solid #bbbbbb;
 		padding: 1rem 0;
 		gap: 0.5rem;
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-secondary-25 );
+		}
 
 		html h4&-title {
 			font-weight: bold;
@@ -1248,6 +1257,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 			&:not(:last-child) {
 				border-bottom: 0.0625rem solid #bbbbbb;
+
+				.theme--dark & {
+					border-color: var( --clr-secondary-25 );
+				}
 			}
 		}
 
