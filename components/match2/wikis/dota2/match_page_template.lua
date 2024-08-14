@@ -83,7 +83,7 @@ return {
 			<h3>Team Stats</h3>
 			<div class="match-bm-team-stats">
 				<div class="match-bm-team-stats-header">
-					<h4 class="match-bm-team-stats-header-title">{{opponents.{{winner}}.name}} Victory</h4>
+					<h4 class="match-bm-team-stats-header-title">{{winnerName}} Victory</h4>
 				</div>
 				<div class="match-bm-team-stats-container">
 					<div class="match-bm-team-stats-team">
@@ -94,7 +94,7 @@ return {
 					<div class="match-bm-team-stats-list">
 						<div class="match-bm-team-stats-list-row">
 							<div class="match-bm-team-stats-list-cell">{{#finished}}{{teams.1.kills}}<span class="slash">/</span>{{teams.1.deaths}}<span class="slash">/</span>{{teams.1.assists}}{{/finished}}</div>
-							<div class="match-bm-team-stats-list-cell"><i class="fas fa-skull-crossbones cell--icon"></i>KDA</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><i class="fas fa-skull-crossbones cell--icon"></i>KDA</div>
 							<div class="match-bm-team-stats-list-cell">{{#finished}}{{teams.2.kills}}<span class="slash">/</span>{{teams.2.deaths}}<span class="slash">/</span>{{teams.2.assists}}{{/finished}}</div>
 						</div>
 						<div class="match-bm-team-stats-list-row">
@@ -114,7 +114,7 @@ return {
 						</div>
 						<div class="match-bm-team-stats-list-row">
 							<div class="match-bm-team-stats-list-cell">{{teams.1.objectives.roshans}}</div>
-							<div class="match-bm-team-stats-list-cell cell--middle"><i class="fas fa-skull-cow cell--icon"></i>Roshan</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><span class="liquipedia-custom-icon liquipedia-custom-icon-roshan"></span>Roshan</div>
 							<div class="match-bm-team-stats-list-cell">{{teams.2.objectives.roshans}}</div>
 						</div>
 					</div>
