@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local ErrorDisplay = require('Module:Error/Display')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
@@ -48,21 +49,20 @@ DisplayUtil.assertPropTypes = function(props, propTypes, options)
 	end
 end
 
----Attempts to render a component written in the pure function style. If an error is encountered when rendering the
----component, show the error and stack trace instead of the component.
+---Attempts to render a display component in the pure function style.
+---The error is caught and displayed using classic error style.
 ---@param Component function
 ---@param props table
 ---@return Html
 function DisplayUtil.TryPureComponent(Component, props)
-	return Logic.try(function() return Component(props) end)
-		:catch(function(error)
-			return mw.html.create('div')
-				:tag('strong'):addClass('error')
-				:tag('span'):addClass('scribunto-error')
-				:wikitext(error:getErrorJson() .. '.')
-				:allDone()
-		end)
-		:get()
+	return Logic.tryOrElseLog(
+		function() return Component(props) end,
+		ErrorDisplay.ClassicError,
+		function(error)
+			error.header = 'Error occured in display component: (caught by DisplayUtil.TryPureComponent)'
+			return error
+		end
+	)
 end
 
 ---@alias OverflowModes 'ellipsis'|'wrap'|'hidden'
