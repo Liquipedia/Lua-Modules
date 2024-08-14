@@ -66,7 +66,7 @@ return {
 			<h3>Draft</h3>
 			<div class="match-bm-game-veto-wrapper">
 				<div class="match-bm-lol-game-veto-overview-team">
-					<div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
+					<div class="match-bm-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
 					<div class="match-bm-game-veto-overview-team-veto">
 						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--{{teams.1.side}}" aria-labelledby="picks">
 							{{#teams.1.picks}}
@@ -87,7 +87,7 @@ return {
 					</div>
 				</div>
 				<div class="match-bm-lol-game-veto-overview-team">
-					<div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
+					<div class="match-bm-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
 					<div class="match-bm-game-veto-overview-team-veto">
 						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--{{teams.2.side}}" aria-labelledby="picks">
 							{{#teams.2.picks}}
