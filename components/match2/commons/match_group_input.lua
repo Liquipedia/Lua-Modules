@@ -563,17 +563,17 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent, substitutions
 		record.template = opponent.template or record.template
 		record.icon = opponent.icon or record.icon
 		record.icondark = opponent.icondark or record.icondark
+	end
 
-	elseif Opponent.typeIsParty(opponent.type) then
-		record.match2players = record.match2players
-			or Array.map(opponent.players, function(player)
-				return {
-					displayname = player.displayName,
-					flag = player.flag,
-					name = player.pageName,
-					extradata = player.faction and {faction = player.faction},
-				}
-			end)
+	if not record.match2players and Logic.isNotEmpty(opponent.players) then
+		record.match2players = Array.map(opponent.players, function(player)
+			return {
+				displayname = player.displayName,
+				flag = player.flag,
+				name = player.pageName,
+				extradata = player.faction and {faction = player.faction}
+			}
+		end)
 	end
 
 	record.name = Opponent.toName(opponent)
