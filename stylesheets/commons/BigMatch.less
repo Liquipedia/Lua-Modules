@@ -804,14 +804,14 @@ ul.match-bm-lol-game-veto-overview-pick {
 	align-items: center;
 	gap: 0.5rem;
 
-	.match-bm-game-veto-overview {
+	&-row {
 		display: flex;
 		gap: 0.125rem;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
 
-		.match-bm-game-veto-overview-item {
+		&-item {
 			display: flex;
 			flex-direction: column;
 
@@ -826,7 +826,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 				}
 			}
 
-			.match-bm-game-veto-overview-item-text {
+			&-text {
 				display: flex;
 				justify-content: center;
 				align-items: center;
@@ -835,29 +835,23 @@ ul.match-bm-lol-game-veto-overview-pick {
 			}
 		}
 
-		&.match-bm-game-veto-overview-pick--radiant {
-			.match-bm-game-veto-overview-item {
-				.match-bm-game-veto-overview-item-text {
-					background-color: #7eac20;
-				}
+		&--radiant {
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #7eac20;
 			}
 		}
 
-		&.match-bm-game-veto-overview-pick--dire {
-			.match-bm-game-veto-overview-item {
-				.match-bm-game-veto-overview-item-text {
-					background-color: #cc6500;
-				}
+		&--dire {
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #cc6500;
 			}
 		}
 
-		&.match-bm-game-veto-overview-ban {
+		&--ban {
 			opacity: 0.5;
 
-			.match-bm-game-veto-overview-item {
-				.match-bm-game-veto-overview-item-text {
-					background-color: #121212;
-				}
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #121212;
 			}
 		}
 	}
