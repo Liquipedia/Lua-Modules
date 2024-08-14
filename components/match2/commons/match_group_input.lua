@@ -650,13 +650,12 @@ end
 ---@param match table
 ---@param opponentIndex integer
 ---@param opponent standardOpponent
----@param options MatchGroupInputReadPlayersOfTeamOptions?
+---@param options MatchGroupInputReadPlayersOfTeamOptions
 ---@param substitutionsInput string?
 ---@return standardPlayer[]
 ---@return table
 function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, options, substitutionsInput)
-	options = options or {}
-
+	---@type string
 	local teamName = opponent.name
 
 	local players = {}
@@ -684,6 +683,12 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 	local playerIndex = 1
 	local varPrefix = teamName .. '_p' .. playerIndex
 	local name = Variables.varDefault(varPrefix)
+	-- if we do not find a player for the teamName try to find them for the teamName with underscores
+	if not name then
+		teamName = teamName:gsub(' ', '_')
+		varPrefix = teamName .. '_p' .. playerIndex
+	end
+
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 
@@ -761,9 +766,9 @@ function MatchGroupInput.readPlayersOfTeamNew(match, opponentIndex, opponent, op
 		if type(substitution) ~= 'table' or not substitution['in'] then return end
 		local substitute = getStandardPlayer(substitution['in'])
 
-		local subbedGames = substitution['games']
+		local subbedGames = substitution.games
 
-		local player = getStandardPlayer(substitution['out'])
+		local player = getStandardPlayer(substitution.out)
 		if player then
 			players[player.pageName] = subbedGames and players[player.pageName] or nil
 		end
