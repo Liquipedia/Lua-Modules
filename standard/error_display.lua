@@ -44,18 +44,6 @@ function ErrorDisplay.ErrorList(props)
 	return boxesNode
 end
 
----Entry point of Template:StashedErrors
----@deprecated # I think the template is not used anymore
----@param frame Frame
----@return Html
-function ErrorDisplay.TemplateStashedErrors(frame)
-	local args = Arguments.getArgs(frame)
-	return ErrorDisplay.ErrorList{
-		errors = ErrorExt.Stash.retrieve(),
-		limit = tonumber(args.limit),
-	}
-end
-
 ---@param props {hasDetails: boolean?, loggedInOnly: boolean?, text: string}
 ---@return Html
 function ErrorDisplay.Box(props)
