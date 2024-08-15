@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local ErrorExt = require('Module:Error/Ext')
 local Json = require('Module:Json')
@@ -42,17 +41,6 @@ function ErrorDisplay.ErrorList(props)
 	end
 
 	return boxesNode
-end
-
----Entry point of Template:StashedErrors
----@param frame Frame
----@return Html
-function ErrorDisplay.TemplateStashedErrors(frame)
-	local args = Arguments.getArgs(frame)
-	return ErrorDisplay.ErrorList{
-		errors = ErrorExt.Stash.retrieve(),
-		limit = tonumber(args.limit),
-	}
 end
 
 ---@param props {hasDetails: boolean?, loggedInOnly: boolean?, text: string}

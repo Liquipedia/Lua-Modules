@@ -135,11 +135,38 @@ function Lua.invoke(frame)
 		end
 	end
 
-	local flags = {dev = devEnabled(frame)}
+	local devActive = devEnabled(frame)
+	local flags = {dev = devActive}
 	return require('Module:FeatureFlag').with(flags, function()
 		local module = Lua.import('Module:' .. moduleName)
-		return module[fnName](frame)
+		return Lua.callAndDisplayErrors(module[fnName], frame, devActive)
 	end)
+end
+
+---@param fn function
+---@param frame Frame
+---@param hardErrors boolean?
+---@return string
+function Lua.callAndDisplayErrors(fn, frame, hardErrors)
+	local ErrorDisplay = require('Module:Error/Display')
+	local ErrorExt = require('Module:Error/Ext')
+
+	local result = Logic.tryOrElseLog(function() return fn(frame) end)
+	local parts = {tostring(result)}
+
+	local errors = ErrorExt.Stash.retrieve()
+	if #errors > 0 then
+		if hardErrors then
+			for _, error in ipairs(errors) do
+				table.insert(parts, ErrorDisplay.ClassicError(error))
+			end
+		else
+			table.insert(parts, tostring(ErrorDisplay.ErrorList{errors = errors}))
+		end
+		mw.ext.TeamLiquidIntegration.add_category('Pages with script errors')
+	end
+
+	return table.concat(parts)
 end
 
 --[[
