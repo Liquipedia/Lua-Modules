@@ -61,7 +61,6 @@ function CustomInjector:parse(id, widgets)
 	)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
-			table.insert(widgets, Title{name = 'Maps'})
 			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('map')})
 		end
 	elseif id == 'liquipediatier' then
