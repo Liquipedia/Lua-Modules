@@ -19,7 +19,6 @@ local Page = require('Module:Page')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
@@ -418,7 +417,13 @@ function MatchGroupInput.readDate(dateString, dateFallbacks)
 
 	elseif dateFallbacks then
 		table.insert(dateFallbacks, DateExt.defaultDate)
-		local suggestedDate = Variables.varDefaultMulti(unpack(dateFallbacks))
+		local suggestedDate
+		for _, fallbackDate in ipairs(dateFallbacks) do
+			if globalVars:get(fallbackDate) then
+				suggestedDate = fallbackDate
+				break
+			end
+		end
 		local missingDateCount = globalVars:get('num_missing_dates') or 0
 		globalVars:set('num_missing_dates', missingDateCount + 1)
 		local inexactDateString = (suggestedDate or '') .. ' + ' .. missingDateCount .. ' second'
@@ -598,25 +603,25 @@ end
 ---@return table
 function MatchGroupInput.getCommonTournamentVars(obj, parent)
 	parent = parent or {}
-	obj.game = Logic.emptyOr(obj.game, parent.game, Variables.varDefault('tournament_game'))
-	obj.icon = Logic.emptyOr(obj.icon, parent.icon, Variables.varDefault('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, Variables.varDefault('tournament_icondark'))
+	obj.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
+	obj.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
+	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
 	obj.liquipediatier = Logic.emptyOr(
 		obj.liquipediatier,
 		parent.liquipediatier,
-		Variables.varDefault('tournament_liquipediatier')
+		globalVars:get('tournament_liquipediatier')
 	)
 	obj.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
 		parent.liquipediatiertype,
-		Variables.varDefault('tournament_liquipediatiertype')
+		globalVars:get('tournament_liquipediatiertype')
 	)
-	obj.series = Logic.emptyOr(obj.series, parent.series, Variables.varDefault('tournament_series'))
-	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, Variables.varDefault('tournament_shortname'))
-	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, Variables.varDefault('tournament_tickername'))
-	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, Variables.varDefault('tournament_name'))
-	obj.type = Logic.emptyOr(obj.type, parent.type, Variables.varDefault('tournament_type'))
-	obj.patch = Logic.emptyOr(obj.patch, parent.patch, Variables.varDefault('tournament_patch'))
+	obj.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
+	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
+	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
+	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
+	obj.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
+	obj.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
 	obj.date = Logic.emptyOr(obj.date, parent.date)
 	obj.mode = Logic.emptyOr(obj.mode, parent.mode)
 
@@ -746,8 +751,8 @@ function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, opti
 	local wasPresentInMatch = function(varPrefix)
 		if not dateTimeInfo.timestamp then return true end
 
-		local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate'))
-		local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate'))
+		local joinDate = DateExt.readTimestamp(globalVars:get(varPrefix .. 'joindate'))
+		local leaveDate = DateExt.readTimestamp(globalVars:get(varPrefix .. 'leavedate'))
 
 		if (not joinDate) and (not leaveDate) then return true end
 
@@ -760,7 +765,7 @@ function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, opti
 
 	local playerIndex = 1
 	local varPrefix = teamName .. '_p' .. playerIndex
-	local name = Variables.varDefault(varPrefix)
+	local name = globalVars:get(varPrefix)
 	-- if we do not find a player for the teamName try to find them for the teamName with underscores
 	if not name then
 		teamName = teamName:gsub(' ', '_')
@@ -773,14 +778,14 @@ function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, opti
 		if wasPresentInMatch(varPrefix) then
 			insertIntoPlayers{
 				pageName = name,
-				displayName = Variables.varDefault(varPrefix .. 'dn'),
-				flag = Variables.varDefault(varPrefix .. 'flag'),
-				faction = Variables.varDefault(varPrefix .. 'faction'),
+				displayName = globalVars:get(varPrefix .. 'dn'),
+				flag = globalVars:get(varPrefix .. 'flag'),
+				faction = globalVars:get(varPrefix .. 'faction'),
 			}
 		end
 		playerIndex = playerIndex + 1
 		varPrefix = teamName .. '_p' .. playerIndex
-		name = Variables.varDefault(varPrefix)
+		name = globalVars:get(varPrefix)
 	end
 
 	Array.forEach(manualPlayersInput.players, insertIntoPlayers)
@@ -836,15 +841,15 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 
 	local playerIndex = 1
 	local varPrefix = teamName .. '_p' .. playerIndex
-	local name = Variables.varDefault(varPrefix)
+	local name = globalVars:get(varPrefix)
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 
 		local wasPresentInMatch = function()
 			if not match.timestamp then return true end
 
-			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
-			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
+			local joinDate = DateExt.readTimestamp(globalVars:get(varPrefix .. 'joindate') or '')
+			local leaveDate = DateExt.readTimestamp(globalVars:get(varPrefix .. 'leavedate') or '')
 
 			if (not joinDate) and (not leaveDate) then return true end
 
@@ -858,13 +863,13 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 		if wasPresentInMatch() then
 			insertIntoPlayers{
 				pageName = name,
-				displayName = Variables.varDefault(varPrefix .. 'dn'),
-				flag = Variables.varDefault(varPrefix .. 'flag'),
+				displayName = globalVars:get(varPrefix .. 'dn'),
+				flag = globalVars:get(varPrefix .. 'flag'),
 			}
 		end
 		playerIndex = playerIndex + 1
 		varPrefix = teamName .. '_p' .. playerIndex
-		name = Variables.varDefault(varPrefix)
+		name = globalVars:get(varPrefix)
 	end
 
 	--players from manual input as `opponnetX_pY`
@@ -963,14 +968,11 @@ end
 ---@param displayName string?
 ---@return {name:string, displayName: string, flag: string?}
 function MatchGroupInput._getCasterInformation(name, flag, displayName)
-	flag = Logic.emptyOr(flag, Variables.varDefault(name .. '_flag'))
-	displayName = Logic.emptyOr(displayName, Variables.varDefault(name .. 'dn'))
+	flag = Logic.emptyOr(flag, globalVars:get(name .. '_flag'))
+	displayName = Logic.emptyOr(displayName, globalVars:get(name .. 'dn'))
 
 	if String.isEmpty(flag) or String.isEmpty(displayName) then
-		local parent = Variables.varDefault(
-			'tournament_parent',
-			mw.title.getCurrentTitle().text
-		)
+		local parent = globalVars:get('tournament_parent') or mw.title.getCurrentTitle().text
 		local pageName = mw.ext.TeamLiquidIntegration.resolve_redirect(name):gsub(' ', '_')
 		local data = mw.ext.LiquipediaDB.lpdb('broadcasters', {
 			conditions = '[[page::' .. pageName .. ']] AND [[parent::' .. parent .. ']]',
@@ -984,13 +986,13 @@ function MatchGroupInput._getCasterInformation(name, flag, displayName)
 	end
 
 	if String.isNotEmpty(flag) then
-		Variables.varDefine(name .. '_flag', flag)
+		globalVars:set(name .. '_flag', flag)
 	end
 
 	if String.isEmpty(displayName) then
 		displayName = name
 	end
-	Variables.varDefine(name .. '_dn', displayName)
+	globalVars:set(name .. '_dn', displayName)
 
 	return {
 		name = name,
