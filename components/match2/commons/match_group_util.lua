@@ -244,6 +244,8 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field opponents standardOpponent[]
 ---@field resultType ResultType?
 ---@field stream table
+---@field tickername string?
+---@field tournament string?
 ---@field type string?
 ---@field vod string?
 ---@field walkover WalkoverType?
@@ -265,6 +267,8 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
 	resultType = 'string?',
 	stream = 'table',
+	tickername = 'string?',
+	tournament = 'string?',
 	type = 'string?',
 	vod = 'string?',
 	walkover = 'string?',

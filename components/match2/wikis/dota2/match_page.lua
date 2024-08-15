@@ -29,10 +29,10 @@ local NOT_PLAYED = 'np'
 local DEFAULT_ITEM = 'EmptyIcon'
 local DEFAULT_BACKPACK_ITEM = 'EmptyIcon'
 local TEAMS = Array.range(1, 2)
-local AVAILABLE_FOR_TIERS = {1}
 local ITEMS_TO_SHOW = 6
 local BACKPACK_ITEMS_TO_SHOW = 3
 
+local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
 
 ---@param match table
@@ -44,6 +44,7 @@ end
 
 ---@class Dota2MatchPageViewModelGame: MatchGroupUtilGame
 ---@field finished boolean
+---@field winnerName string?
 ---@field teams table[]
 
 ---@class Dota2MatchPageViewModelOpponent: standardOpponent
@@ -113,6 +114,9 @@ function MatchPage.getByMatchId(props)
 
 			return team
 		end)
+		if game.finished and viewModel.opponents[game.winner] then
+			game.winnerName = viewModel.opponents[game.winner].name
+		end
 	end)
 
 	-- Add more opponent data field
@@ -168,24 +172,28 @@ function MatchPage.getByMatchId(props)
 		}
 	end
 
-	local displayTitle
-	if viewModel.opponents[1].shortname or viewModel.opponents[2].shortname then
-		local team1name = viewModel.opponents[1].shortname or 'TBD'
-		local team2name = viewModel.opponents[2].shortname or 'TBD'
-		local tournamentName = viewModel.tickername
-		displayTitle = team1name .. ' vs. ' .. team2name
-		if tournamentName then
-			displayTitle = displayTitle .. ' @ ' .. tournamentName
-		end
-	else
-		local tournamentName = viewModel.tickername
-		displayTitle = table.concat({'Match in', tournamentName}, ' ')
-	end
+	local displayTitle = MatchPage.makeDisplayTitle(viewModel)
 	if String.isNotEmpty(displayTitle) then
 		mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
 	end
 
 	return MatchPage.render(viewModel)
+end
+
+function MatchPage.makeDisplayTitle(viewModel)
+	if not viewModel.opponents[1].shortname and viewModel.opponents[2].shortname then
+		return table.concat({'Match in', viewModel.tickername}, ' ')
+	end
+
+	local team1name = viewModel.opponents[1].shortname or 'TBD'
+	local team2name = viewModel.opponents[2].shortname or 'TBD'
+	local tournamentName = viewModel.tickername
+	local displayTitle = team1name .. ' vs. ' .. team2name
+	if not tournamentName then
+		return displayTitle
+	end
+
+	return displayTitle .. ' @ ' .. tournamentName
 end
 
 ---@param tbl table
