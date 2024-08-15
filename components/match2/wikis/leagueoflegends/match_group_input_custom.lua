@@ -21,7 +21,12 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_PLAYERS = 15
+local OPPONENT_CONFIG = {
+	resolveRedirect = true,
+	pagifyOpponentName = true,
+	pagifyPlayerNames = true,
+	maxNumPlayers = 15,
+}
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
 local NP_INPUTS = {'skip', 'np', 'canceled', 'cancelled'}
@@ -75,7 +80,12 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	local games = MatchFunctions.extractMaps(MatchParser, match)
 	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
 
-	local opponents = MatchFunctions.extractOpponents(match, games)
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
+	end)
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, games, opponentIndex, opponent.score)
+	end)
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
@@ -200,25 +210,6 @@ function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInput.readMvp(match),
 	}
-end
-
----@param match table
----@param maps {scores: integer[], winner: integer?}[]
----@return standardOpponent[]
-function MatchFunctions.extractOpponents(match, maps)
-	return Array.mapIndexes(function(opponentIndex)
-		local opponent = MatchGroupInput.readOpponent(match, opponentIndex, {
-			resolveRedirect = true,
-			pagifyOpponentName = true,
-			pagifyPlayerNames = true,
-			maxNumPlayers = MAX_NUM_PLAYERS,
-		})
-		if not opponent then
-			return
-		end
-		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, maps, opponentIndex, opponent.score)
-		return opponent
-	end)
 end
 
 ---@param match table
