@@ -702,7 +702,7 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 
 	if not playersData then return manualInput end
 
-	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
 		table.insert(players, {
 			pageName = playerName,
 			displayName = playersData[playerPrefix .. 'dn'],
