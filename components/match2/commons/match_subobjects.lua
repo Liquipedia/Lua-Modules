@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local ENTRY_POINT_NAMES = {'getMap', 'getPlayer', 'getRound'}
+local ENTRY_POINT_NAMES = {'getMap'}
 
 local MatchSubobjects = {}
 
@@ -45,20 +45,6 @@ function MatchSubobjects.luaGetMap(args)
 
 		return args
 	end
-end
-
----@param frame Frame
----@return string
-function MatchSubobjects.getRound(frame)
-	local args = Arguments.getArgs(frame)
-	return Json.stringify(MatchSubobjects.luaGetRound(frame, args))
-end
-
----@param frame Frame
----@param args table
----@return table
-function MatchSubobjects.luaGetRound(frame, args)
-	return args
 end
 
 if FeatureFlag.get('perf') then
