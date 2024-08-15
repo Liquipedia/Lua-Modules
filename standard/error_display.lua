@@ -45,6 +45,7 @@ function ErrorDisplay.ErrorList(props)
 end
 
 ---Entry point of Template:StashedErrors
+---@deprecated # I think the template is not used anymore
 ---@param frame Frame
 ---@return Html
 function ErrorDisplay.TemplateStashedErrors(frame)
