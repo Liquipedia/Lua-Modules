@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local ErrorDisplay = require('Module:Error/Display')
 local FeatureFlag = require('Module:FeatureFlag')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
@@ -53,11 +52,12 @@ end
 ---The error is caught and displayed using classic error style.
 ---@param Component function
 ---@param props table
+---@param other? fun(error: Error): any
 ---@return Html
-function DisplayUtil.TryPureComponent(Component, props)
+function DisplayUtil.TryPureComponent(Component, props, other)
 	return Logic.tryOrElseLog(
 		function() return Component(props) end,
-		ErrorDisplay.ClassicError,
+		other,
 		function(error)
 			error.header = 'Error occured in display component: (caught by DisplayUtil.TryPureComponent)'
 			return error
