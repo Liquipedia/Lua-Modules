@@ -22,7 +22,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
-	pagifyOpponentName = true,
+	pagifyOpponentName = false,
 	pagifyPlayerNames = true,
 	maxNumPlayers = 15,
 }
