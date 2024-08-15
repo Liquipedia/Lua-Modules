@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local ErrorExt = require('Module:Error/Ext')
 local Json = require('Module:Json')
