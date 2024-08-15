@@ -64,6 +64,9 @@ function DisplayUtil.TryPureComponent(Component, props)
 		end
 	)
 end
+DisplayUtil.tryOrLog = DisplayUtil.TryPureComponent
+DisplayUtil.tryOrElseLog = DisplayUtil.TryPureComponent
+
 
 ---@alias OverflowModes 'ellipsis'|'wrap'|'hidden'
 DisplayUtil.types.OverflowModes = TypeUtil.literalUnion('ellipsis', 'wrap', 'hidden')
