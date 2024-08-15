@@ -798,7 +798,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 }
 
 .match-bm-game-veto-overview-team-header {
-	border-bottom: 0.0625rem solid var( --clr-secondary-25 );
+	border-bottom: 0.0625rem solid #bbbbbb;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
 }
 
 .match-bm-game-veto-overview-team-veto {
