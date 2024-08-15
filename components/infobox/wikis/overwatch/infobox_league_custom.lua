@@ -94,26 +94,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
----@param base string
----@return string[]
-function CustomLeague:_makeBasedListFromArgs(base)
-	local firstArg = self.args[base .. '1']
-	local foundArgs = {PageLink.makeInternalLink({}, firstArg)}
-	local index = 2
-
-	while String.isNotEmpty(self.args[base .. index]) do
-		local currentArg = self.args[base .. index]
-		table.insert(foundArgs, '&nbsp;• ' ..
-			tostring(self:_createNoWrappingSpan(
-				PageLink.makeInternalLink({}, currentArg)
-			))
-		)
-		index = index + 1
-	end
-
-	return foundArgs
-end
-
 ---@param publishertier string?
 ---@return string?
 function CustomLeague:_validPublisherTier(publishertier)
