@@ -229,7 +229,6 @@ end
 
 if FeatureFlag.get('perf') then
 	MatchGroup.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
-	require('Module:Performance/Util').setupEntryPoints(MatchGroup)
 end
 
 Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')

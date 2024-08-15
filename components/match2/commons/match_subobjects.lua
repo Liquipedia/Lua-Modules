@@ -50,7 +50,6 @@ end
 if FeatureFlag.get('perf') then
 	local Match = Lua.import('Module:Match')
 	MatchSubobjects.perfConfig = Match.perfConfig
-	require('Module:Performance/Util').setupEntryPoints(MatchSubobjects, ENTRY_POINT_NAMES)
 end
 
 Lua.autoInvokeEntryPoints(MatchSubobjects, 'Module:Match/Subobjects', ENTRY_POINT_NAMES)
