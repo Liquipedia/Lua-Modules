@@ -189,11 +189,11 @@ function MatchPage.makeDisplayTitle(viewModel)
 	local team2name = viewModel.opponents[2].shortname or 'TBD'
 	local tournamentName = viewModel.tickername
 	local displayTitle = team1name .. ' vs. ' .. team2name
-	if tournamentName then
-		displayTitle = displayTitle .. ' @ ' .. tournamentName
+	if not tournamentName then
+		return displayTitle
 	end
 
-	return displayTitle
+	return displayTitle .. ' @ ' .. tournamentName
 end
 
 ---@param tbl table
