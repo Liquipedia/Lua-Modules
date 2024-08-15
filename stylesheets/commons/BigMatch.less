@@ -526,6 +526,25 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #b81414;
 }
 
+.match-bm-players-wrapper {
+	display: grid;
+	grid-template-columns: auto;
+	grid-gap: 1rem;
+	align-items: flex-start;
+
+	@media ( min-width: 414px ) {
+		font-size: 15px;
+	}
+
+	@media ( max-width: 413px ) {
+		font-size: 12px;
+	}
+
+	@media ( min-width: 768px ) {
+		grid-template-columns: auto auto;
+	}
+}
+
 /* >= 834 2 column player layout */
 @media ( max-width: 833px ) {
 	.match-bm-lol-players-wrapper {
@@ -557,6 +576,12 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
+.match-bm-players-team {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
 .match-bm-lol-players-team {
 	display: flex;
 	flex-direction: column;
@@ -577,6 +602,196 @@ ul.match-bm-lol-game-veto-overview-pick {
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-players-player {
+	display: flex;
+	padding: 1rem;
+	align-items: stretch;
+	background: #ffffff;
+	border: 0.0625rem solid #bbbbbb;
+
+	@media ( max-width: 1199px ), ( min-width: 1320px ) {
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+		display: grid;
+		grid-template-columns: 9.375rem auto 9.5rem;
+		grid-gap: 1rem;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-7 );
+		border-color: var( --clr-secondary-25 );
+	}
+
+	&-role {
+		width: 1.25rem;
+		height: 1.25rem;
+		position: absolute;
+		inset: auto 0 0 auto;
+		border-radius: 0.25rem;
+		background-color: var( --on-background );
+		overflow: hidden;
+
+		&.role--radiant {
+			background-color: var( --clr-atlantis-40 );
+		}
+
+		&.role--dire {
+			background-color: var( --clr-california-40 );
+		}
+	}
+
+	&-character {
+		display: flex;
+		align-items: center;
+		position: relative;
+
+		@media ( max-width: 1199px ), ( min-width: 1320px ) {
+			flex: 1 0 auto;
+		}
+
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			order: 1;
+		}
+	}
+
+	&-avatar {
+		width: 3rem;
+		height: 3rem;
+		margin-right: 0.5rem;
+		position: relative;
+
+		@media ( min-width: 768px ) {
+			width: 4rem;
+			height: 4rem;
+		}
+	}
+
+	&-icon img {
+		width: 3rem;
+		height: 3rem;
+		border-radius: 100%;
+
+		@media ( min-width: 768px ) {
+			width: 4rem;
+			height: 4rem;
+		}
+	}
+
+	&-loadout {
+		display: flex;
+		gap: 1rem;
+
+		@media ( max-width: 1199px ), ( min-width: 1320px ) {
+			flex: 0 0 7.5rem;
+		}
+
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			order: 3;
+		}
+
+		&-item {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 0.25rem;
+
+			img {
+				width: 1.5rem;
+				height: 1.5rem;
+				border-radius: 0.25rem;
+
+				@media ( min-width: 768px ) {
+					width: 2rem;
+					height: 2rem;
+				}
+			}
+		}
+
+		&-items {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+
+		&-rs {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.125rem;
+
+			img {
+				width: 1.5rem;
+				height: 1.5rem;
+				border-radius: 100%;
+
+				@media ( min-width: 768px ) {
+					width: 2rem;
+					height: 2rem;
+				}
+			}
+		}
+
+		&-rs-wrap {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+	}
+
+	&-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+
+		&-title {
+			display: flex;
+			align-items: center;
+			font-size: 0.875rem;
+
+			i {
+				margin-right: 0.5rem;
+			}
+		}
+
+		&-data {
+			font-weight: bold;
+			font-size: 1rem;
+
+			@media ( min-width: 1024px ) {
+				font-size: 1.125rem;
+			}
+
+			.slash {
+				margin: 0 0.125rem;
+				opacity: 0.4;
+			}
+		}
+	}
+
+	&-stats {
+		display: grid;
+		grid-gap: 0.5rem;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-rows: 1fr 1fr;
+
+		@media ( max-width: 1199px ), ( min-width: 1320px ) {
+			flex: 1 0 100%;
+			margin-top: 1rem;
+		}
+
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			order: 2;
+			margin-top: unset;
+		}
 	}
 }
 

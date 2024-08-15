@@ -297,6 +297,7 @@ liquipedia.filterButtons = {
 			} );
 			if ( isDefault ) {
 				templateExpansion.element.innerHTML = templateExpansion.cache.default;
+				this.refreshScriptsAfterContentUpdate();
 				return;
 			}
 			const parameters = templateExpansion.groups.map( ( group ) => {

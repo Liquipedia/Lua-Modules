@@ -215,6 +215,13 @@ function Opponent.assertOpponent(opponent)
 	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
 end
 
+---Validates that an arbitary value is a valid representation of an opponent
+---@param opponent any
+---@return boolean
+function Opponent.isOpponent(opponent)
+	error('Opponent.isOpponent: Not Implemented')
+end
+
 ---Coerces an arbitary table into an opponent
 ---@param opponent table
 function Opponent.coerce(opponent)

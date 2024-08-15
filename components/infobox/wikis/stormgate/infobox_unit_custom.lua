@@ -63,16 +63,16 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'type' then
 		return {
-			Cell{name = 'Type', content = {caller:_displayCommaSeparatedString(args.type)}},
+			Cell{name = 'Type', content = {caller:_displayCsvAsPageCsv(args.type)}},
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = {caller:_displayCommaSeparatedString(args.built)}},
+			Cell{name = 'Built From', content = caller:_csvToPageList(args.built)},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirement', content = {caller:_displayCommaSeparatedString(args.tech_requirement)}},
-			Cell{name = 'Building Requirement', content = {caller:_displayCommaSeparatedString(args.building_requirement)}},
+			Cell{name = 'Tech. Requirement', content = {caller:_displayCsvAsPageCsv(args.tech_requirement)}},
+			Cell{name = 'Building Requirement', content = {caller:_displayCsvAsPageCsv(args.building_requirement)}},
 		}
 	elseif id == 'cost' then
 		return {
@@ -108,14 +108,14 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'defense' then
 		return {
 			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
-			Cell{name = 'Attributes', content = {caller:_displayCommaSeparatedString(args.armor_type)}}
+			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Upgrades To', content = {caller:_displayCommaSeparatedString(args.upgrades_to)}},
+			Cell{name = 'Upgrades To', content = {caller:_displayCsvAsPageCsv(args.upgrades_to)}},
 			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
@@ -135,11 +135,11 @@ function CustomUnit:_getDefenseDisplay()
 	local armor = tonumber(args.armor)
 
 	return table.concat(Array.append({},
-		health and ICON_HP or nil,
-		health,
+		ICON_HP,
+		health or 0,
 		extraHealth and ('(+' .. extraHealth .. ')') or nil,
-		armor and ICON_ARMOR or nil,
-		armor
+		ICON_ARMOR,
+		armor or 0
 	), '&nbsp;')
 end
 
@@ -158,7 +158,7 @@ function CustomUnit:subHeaderDisplay(args)
 	if string.find(args.subfaction, '1v1') or string.find(args.subfaction, self.pagename) then return end
 	return tostring(mw.html.create('span')
 		:css('font-size', '90%')
-		:wikitext('Hero: ' .. self:_displayCommaSeparatedString(args.subfaction))
+		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
 	)
 end
 
@@ -205,7 +205,7 @@ function CustomUnit:setLpdbData(args)
 			subfaction = Array.parseCommaSeparatedString(args.subfaction),
 			veterancybonushealth = Array.parseCommaSeparatedString(args.veterancybonushealth),
 			veterancybonusdamage = Array.parseCommaSeparatedString(args.veterancybonusdamage),
-			veterancybonusattackspeed = Array.parseCommaSeparatedString(args.veterancybonusattackspeed),
+			veterancyspecialbonus = Array.parseCommaSeparatedString(args.veterancyspecialbonus),
 			veterancyxp = Array.parseCommaSeparatedString(args.veterancyxp),
 			type = Array.parseCommaSeparatedString(args.type),
 			builtfrom = Array.parseCommaSeparatedString(args.built),
@@ -269,13 +269,17 @@ function CustomUnit._hotkeys(hotkey1, hotkey2)
 end
 
 ---@param inputString string?
+---@return string[]
+function CustomUnit:_csvToPageList(inputString)
+	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+		return Page.makeInternalLink(value)
+	end)
+end
+
+---@param input string?
 ---@return string
-function CustomUnit:_displayCommaSeparatedString(inputString)
-	return table.concat(Array.map(Array.parseCommaSeparatedString(inputString),
-		function(value)
-			return Page.makeInternalLink(value)
-		end
-	), ', ')
+function CustomUnit:_displayCsvAsPageCsv(input)
+	return table.concat(self:_csvToPageList(input), ', ')
 end
 
 ---@param key string

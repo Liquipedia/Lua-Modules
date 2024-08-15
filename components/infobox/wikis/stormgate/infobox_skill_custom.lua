@@ -80,6 +80,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {caller:_costDisplay()}},
+			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
 		}
 	elseif id == 'duration' then
 		return {
@@ -189,8 +190,11 @@ function CustomSkill:addToLpdb(lpdbData, args)
 		totaltherium = tonumber(args.totaltherium),
 		buildtime = tonumber(args.buildtime),
 		totalbuildtime = tonumber(args.totalbuildtime),
+		rechargetime = tonumber(args.charge_time),
 		animus = tonumber(args.animus),
 		totalanimus = tonumber(args.totalanimus),
+		power = tonumber(args.power),
+		totalpower = tonumber(args.totalpower),
 		techrequirements = Array.parseCommaSeparatedString(args.tech_requirement),
 		buildingrequirements = Array.parseCommaSeparatedString(args.building_requirement),
 		targets = Array.parseCommaSeparatedString(args.target),
@@ -243,6 +247,8 @@ function CustomSkill:_costDisplay()
 			animusTotal = args.totalanimus,
 			buildTime = args.buildtime,
 			buildTimeTotal = args.totalbuildtime,
+			power = args.power,
+			powerTotal = args.totalpower,
 		},
 		energy ~= 0 and (ENERGY_ICON .. '&nbsp;' .. energy) or nil,
 		args.special_cost
