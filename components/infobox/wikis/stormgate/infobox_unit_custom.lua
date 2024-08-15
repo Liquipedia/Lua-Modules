@@ -135,11 +135,11 @@ function CustomUnit:_getDefenseDisplay()
 	local armor = tonumber(args.armor)
 
 	return table.concat(Array.append({},
-		health and ICON_HP or nil,
-		health,
+		ICON_HP,
+		health or 0,
 		extraHealth and ('(+' .. extraHealth .. ')') or nil,
-		armor and ICON_ARMOR or nil,
-		armor
+		ICON_ARMOR,
+		armor or 0
 	), '&nbsp;')
 end
 
@@ -158,7 +158,7 @@ function CustomUnit:subHeaderDisplay(args)
 	if string.find(args.subfaction, '1v1') or string.find(args.subfaction, self.pagename) then return end
 	return tostring(mw.html.create('span')
 		:css('font-size', '90%')
-		:wikitext('Hero: ' .. self:_displayCommaSeparatedString(args.subfaction))
+		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
 	)
 end
 
