@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Streams = require('Module:Links/Stream')
@@ -87,9 +86,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
-
--- called from Module:Match/Subobjects
-CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---@param data table
 ---@param indexedScores table[]

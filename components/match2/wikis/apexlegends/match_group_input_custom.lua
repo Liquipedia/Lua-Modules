@@ -70,7 +70,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
-CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---@param record table
 ---@param timestamp number
