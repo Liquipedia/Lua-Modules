@@ -61,19 +61,6 @@ function MatchSubobjects.luaGetRound(frame, args)
 	return args
 end
 
----@param frame Frame
----@return table
-function MatchSubobjects.getPlayer(frame)
-	local args = Arguments.getArgs(frame)
-	return Json.stringify(MatchSubobjects.luaGetPlayer(args))
-end
-
----@param args table
----@return table
-function MatchSubobjects.luaGetPlayer(args)
-	return WikiSpecific.processPlayer(args)
-end
-
 if FeatureFlag.get('perf') then
 	local Match = Lua.import('Module:Match')
 	MatchSubobjects.perfConfig = Match.perfConfig

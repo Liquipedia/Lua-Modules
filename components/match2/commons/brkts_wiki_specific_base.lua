@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
--- called after processMap/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
 -- @parameter match - a match
 -- @returns the match after changes have been applied
@@ -33,17 +32,6 @@ WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
 	return InputModule and InputModule.processMap
 		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
-end)
-
--- called from Module:Match/Subobjects
--- used to transform wiki-specific input of templates to the generalized
--- format that is required by Module:MatchGroup
--- @parameter player - a player
--- @returns the player after changes have been applied
-WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
-	return InputModule and InputModule.processPlayer
-		or error('Function "processPlayer" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 --[[
