@@ -667,6 +667,8 @@ ul.match-bm-lol-game-veto-overview-pick {
 		height: 3rem;
 		margin-right: 0.5rem;
 		position: relative;
+		overflow: hidden;
+		border-radius: 100%;
 
 		@media ( min-width: 768px ) {
 			width: 4rem;
@@ -675,12 +677,13 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 
 	&-icon img {
-		width: 3rem;
+		width: auto;
 		height: 3rem;
-		border-radius: 100%;
+		position: relative;
+		left: 50%;
+		transform: translateX( -50% );
 
 		@media ( min-width: 768px ) {
-			width: 4rem;
 			height: 4rem;
 		}
 	}
