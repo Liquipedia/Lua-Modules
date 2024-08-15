@@ -535,7 +535,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array and the substitutions data
 		opponent.players, substitutions = MatchGroupInput.readPlayersOfTeamNew(
-			opponent,
+			opponent.name,
 			manualPlayersInput,
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
@@ -659,20 +659,11 @@ end
 ---@param opponentInput table
 ---@return {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
 function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
-	--players from manual input as `opponnetX_pY`
-	local players = Array.mapIndexes(function(playerIndex)
-		return Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex])
-	end)
-	local manualInput = {players = players}
-
-	local substitutions, parseFailure = Json.parseStringified(opponentInput.substitutes)
-	if parseFailure then
-		substitutions = {}
-	end
+	local manualInput = {players = {}}
 
 	---@param playerData table|string|nil
 	---@return standardPlayer?
-	local getStandardPlayer = function(playerData)
+	local makeStandardPlayer = function(playerData)
 		if not playerData then return end
 		playerData = type(playerData) == 'string' and {playerData} or playerData
 		local player = {
@@ -686,12 +677,17 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 		return player
 	end
 
+	local substitutions, parseFailure = Json.parseStringified(opponentInput.substitutes)
+	if parseFailure then
+		substitutions = {}
+	end
+
 	manualInput.substitutions = Array.map(substitutions, function(substitution)
 		if type(substitution) ~= 'table' or not substitution['in'] then return end
 
 		return {
-			substitute = getStandardPlayer(substitution['in']),
-			player = getStandardPlayer(substitution.out),
+			substitute = makeStandardPlayer(substitution['in']),
+			player = makeStandardPlayer(substitution.out),
 			games = Logic.nilIfEmpty(Array.parseCommaSeparatedString(substitution.games, ';')),
 			reason = substitution.reason,
 		}
@@ -703,7 +699,7 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 	if not playersData then return manualInput end
 
 	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
-		table.insert(players, {
+		table.insert(manualInput.players, {
 			pageName = playerName,
 			displayName = playersData[playerPrefix .. 'dn'],
 			flag = playersData[playerPrefix .. 'flag'],
@@ -715,25 +711,23 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 end
 
 ---reads the players of a team from input and wiki variables
----@param opponent standardOpponent
+---@param teamName string
 ---@param manualPlayersInput {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
 ---@param options readOpponentOptions
 ---@param dateTimeInfo {timestamp: integer?, timezoneOffset: string?}
 ---@return standardPlayer[]
 ---@return table
-function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, options, dateTimeInfo)
-	---@type string
-	local teamName = opponent.name
-
+function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, options, dateTimeInfo)
 	local players = {}
 	local playersIndex = 0
 
+	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?}
 	local insertIntoPlayers = function(player)
-		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name or player.pageName) then
+		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.pageName) then
 			return
 		end
 
-		local pageName = Logic.nilIfEmpty(player.name) or player.pageName
+		local pageName = player.pageName
 		pageName = options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(pageName) or pageName
 		local normalizedPageName = pageName:gsub(' ', '_')
 
@@ -741,10 +735,27 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 		players[normalizedPageName] = Table.merge(players[normalizedPageName] or {}, {
 			pageName = pageName,
 			flag = Flags.CountryName(player.flag),
-			displayName = Logic.nilIfEmpty(player.displayname) or player.displayName,
+			displayName = player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
 		})
+	end
+
+	---@param varPrefix string
+	---@return boolean
+	local wasPresentInMatch = function(varPrefix)
+		if not dateTimeInfo.timestamp then return true end
+
+		local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate'))
+		local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate'))
+
+		if (not joinDate) and (not leaveDate) then return true end
+
+		-- need to offset match time to correct timezone as transfers do not have a time associated with them
+		local timestampLocal = dateTimeInfo.timestamp + DateExt.getOffsetSeconds(dateTimeInfo.timezoneOffset or '')
+
+		return (not joinDate or (joinDate <= timestampLocal)) and
+			(not leaveDate or (leaveDate > timestampLocal))
 	end
 
 	local playerIndex = 1
@@ -759,22 +770,7 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 
-		local wasPresentInMatch = function()
-			if not dateTimeInfo.timestamp then return true end
-
-			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
-			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
-
-			if (not joinDate) and (not leaveDate) then return true end
-
-			-- need to offset match time to correct timezone as transfers do not have a time associated with them
-			local timestampLocal = dateTimeInfo.timestamp + DateExt.getOffsetSeconds(dateTimeInfo.timezoneOffset or '')
-
-			return (not joinDate or (joinDate <= timestampLocal)) and
-				(not leaveDate or (leaveDate > timestampLocal))
-		end
-
-		if wasPresentInMatch() then
+		if wasPresentInMatch(varPrefix) then
 			insertIntoPlayers{
 				pageName = name,
 				displayName = Variables.varDefault(varPrefix .. 'dn'),
