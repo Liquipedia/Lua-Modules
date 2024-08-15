@@ -740,7 +740,7 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 		playersIndex = playersIndex + 1
 		players[normalizedPageName] = Table.merge(players[normalizedPageName] or {}, {
 			pageName = pageName,
-			flage = Flags.CountryName(player.flag),
+			flag = Flags.CountryName(player.flag),
 			displayName = Logic.nilIfEmpty(player.displayname) or player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
