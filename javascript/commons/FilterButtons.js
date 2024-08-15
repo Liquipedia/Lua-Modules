@@ -239,8 +239,10 @@ liquipedia.filterButtons = {
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
 				if ( filterGroup.curated ) {
 					filterableItem.hidden = !filterableItem.curated;
-				} else {
+				} else if ( filterableItem.value in filterGroup.filterStates ) {
 					filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
+				} else {
+					filterableItem.hidden = false;
 				}
 			} );
 		} );
