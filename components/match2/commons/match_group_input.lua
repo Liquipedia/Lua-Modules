@@ -1082,6 +1082,73 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
+---@param match table
+---@param maps {scores: integer[], winner: integer?}[]
+---@param opponentIndex integer
+---@param scoreInput string|number|nil
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchGroupInput.computeOpponentScore(match, maps, opponentIndex, scoreInput)
+	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
+	local anyMapHasWinner = Table.any(maps, function(_, map) return map.winner end)
+
+	if match.walkover then
+		local winner = tonumber(match.walkover) or tonumber(match.winner)
+		if winner then
+			return MatchGroupInput.opponentWalkover(match.walkover, winner == opponentIndex)
+		end
+	else
+		if not scoreInput and (matchHasStarted or anyMapHasWinner) then
+			scoreInput = MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+		end
+
+		return MatchGroupInput.parseScoreInput(scoreInput)
+	end
+end
+
+---@param scoreInput string|number|nil
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchGroupInput.parseScoreInput(scoreInput)
+	if not scoreInput then
+		return
+	end
+
+	if Logic.isNumeric(scoreInput) then
+		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
+	end
+
+	local scoreUpperCase = string.upper(scoreInput)
+	if Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase) then
+		return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
+	end
+end
+
+---@param walkoverInput string #wikicode input
+---@param isWinner boolean
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchGroupInput.opponentWalkover(walkoverInput, isWinner)
+	if Logic.isNumeric(walkoverInput) then
+		walkoverInput = MatchGroupInput.STATUS.DEFAULT_LOSS
+	end
+
+	local walkoverUpperCase = string.upper(walkoverInput)
+	if Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
+		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
+	end
+end
+
+-- Calculate the match scores based on the map results (counting map wins)
+---@param maps {winner: integer?}[]
+---@param opponentIndex integer
+---@return integer
+function MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+	return Array.reduce(Array.map(maps, function(map)
+		return (map.winner == opponentIndex and 1 or 0)
+	end), Operator.add)
+end
+
 ---@param input string?
 ---@return boolean
 function MatchGroupInput.isNotPlayedInput(input)

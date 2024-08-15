@@ -81,7 +81,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, games, opponentIndex, opponent.score)
+		opponent.score, opponent.status = MatchGroupInput.computeOpponentScore(match, games, opponentIndex, opponent.score)
 	end)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
@@ -171,16 +171,6 @@ function MatchFunctions.getBestOf(bestOfInput, maps)
 	return tonumber(bestOfInput) or #maps
 end
 
--- Calculate the match scores based on the map results (counting map wins)
----@param maps {winner: integer?}[]
----@param opponentIndex integer
----@return integer
-function MatchFunctions.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	return Array.reduce(Array.map(maps, function(map)
-		return (map.winner == opponentIndex and 1 or 0)
-	end), Operator.add)
-end
-
 ---@param match table
 ---@return table
 function MatchFunctions.getTournamentVars(match)
@@ -204,63 +194,6 @@ function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInput.readMvp(match),
 	}
-end
-
----@param match table
----@param maps {scores: integer[], winner: integer?}[]
----@param opponentIndex integer
----@param scoreInput string|number|nil
----@return integer? #SCORE
----@return string? #STATUS
-function MatchFunctions._parseOpponentScore(match, maps, opponentIndex, scoreInput)
-	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
-	local mapHasWinner = Table.any(maps, function(_, map) return map.winner end)
-
-	if match.walkover then
-		local winner = tonumber(match.walkover) or tonumber(match.winner)
-		if winner then
-			return MatchFunctions._opponentWalkover(match.walkover, winner == opponentIndex)
-		end
-	else
-		if not scoreInput and matchHasStarted and mapHasWinner then
-			scoreInput = MatchFunctions.computeMatchScoreFromMapWinners(maps, opponentIndex)
-		end
-
-		return MatchFunctions._parseScoreInput(scoreInput)
-	end
-end
-
----@param scoreInput string|number|nil
----@return integer? #SCORE
----@return string? #STATUS
-function MatchFunctions._parseScoreInput(scoreInput)
-	if not scoreInput then
-		return
-	end
-
-	if Logic.isNumeric(scoreInput) then
-		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
-	end
-
-	local scoreUpperCase = string.upper(scoreInput)
-	if Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase) then
-		return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
-	end
-end
-
----@param walkoverInput string #wikicode input
----@param isWinner boolean
----@return integer? #SCORE
----@return string? #STATUS
-function MatchFunctions._opponentWalkover(walkoverInput, isWinner)
-	if Logic.isNumeric(walkoverInput) then
-		walkoverInput = MatchGroupInput.STATUS.DEFAULT_LOSS
-	end
-
-	local walkoverUpperCase = string.upper(walkoverInput)
-	if Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
-		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
-	end
 end
 
 -- Parse extradata information
