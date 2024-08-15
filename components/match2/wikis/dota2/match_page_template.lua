@@ -83,7 +83,8 @@ return {
 			<h3>Team Stats</h3>
 			<div class="match-bm-team-stats">
 				<div class="match-bm-team-stats-header">
-					<h4 class="match-bm-team-stats-header-title">{{winnerName}} Victory</h4>
+					{{#winnerName}}<h4 class="match-bm-team-stats-header-title">{{winnerName}} Victory</h4>{{/winnerName}}
+					{{^winnerName}}<h4 class="match-bm-team-stats-header-title">No winner determined yet</h4>{{/winnerName}}
 				</div>
 				<div class="match-bm-team-stats-container">
 					<div class="match-bm-team-stats-team">
