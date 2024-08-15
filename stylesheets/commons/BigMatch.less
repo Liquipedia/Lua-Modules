@@ -320,6 +320,7 @@ Author(s): Rathoz
 	}
 }
 
+.match-bm-game-veto-overview-team-header,
 .match-bm-lol-game-veto-overview-team-header {
 	display: flex;
 	flex-direction: row;
@@ -526,6 +527,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #b81414;
 }
 
+.match-bm-game-veto-wrapper,
 .match-bm-players-wrapper {
 	display: grid;
 	grid-template-columns: auto;
@@ -791,6 +793,76 @@ ul.match-bm-lol-game-veto-overview-pick {
 		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 			order: 2;
 			margin-top: unset;
+		}
+	}
+}
+
+.match-bm-game-veto-overview-team-header {
+	border-bottom: 0.0625rem solid #bbbbbb;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-game-veto-overview-team-veto {
+	padding: 1rem 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	color: #ffffff;
+
+	&-row {
+		display: flex;
+		gap: 0.125rem;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+
+		&-item {
+			display: flex;
+			flex-direction: column;
+
+			img {
+				border-radius: 0.25rem 0.25rem 0 0;
+				width: 3.75rem;
+				height: 2.5rem;
+
+				@media ( min-width: 834px ) {
+					width: 4.5rem;
+					height: 3rem;
+				}
+			}
+
+			&-text {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: bold;
+				border-radius: 0 0 0.25rem 0.25rem;
+			}
+		}
+
+		&--radiant {
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #7eac20;
+			}
+		}
+
+		&--dire {
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #cc6500;
+			}
+		}
+
+		&--ban {
+			opacity: 0.5;
+
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #121212;
+			}
 		}
 	}
 }
