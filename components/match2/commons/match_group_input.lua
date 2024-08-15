@@ -547,7 +547,7 @@ end
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
----@return standardOpponent?
+---@return table?
 function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
