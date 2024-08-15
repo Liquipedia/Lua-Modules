@@ -108,40 +108,49 @@ return {
 					</div>
 				</div>
 			</div>
-			<h3>Head-to-Head</h3>
-			<div class="match-bm-lol-h2h">
-				<div class="match-bm-lol-h2h-header">
-					<div class="match-bm-lol-h2h-header-team">{{&opponents.1.iconDisplay}}</div>
-					<div class="match-bm-lol-h2h-stat-title"></div>
-					<div class="match-bm-lol-h2h-header-team">{{&opponents.2.iconDisplay}}</div>
+			<h3>Team Stats</h3>
+			<div class="match-bm-team-stats">
+				<div class="match-bm-team-stats-header">
+					{{#winnerName}}<h4 class="match-bm-team-stats-header-title">{{winnerName}} Victory</h4>{{/winnerName}}
+					{{^winnerName}}<h4 class="match-bm-team-stats-header-title">No winner determined yet</h4>{{/winnerName}}
 				</div>
-				<div class="match-bm-lol-h2h-section">
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{#finished}}{{teams.1.kills}}/{{teams.1.deaths}}/{{teams.1.assists}}{{/finished}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon kda.png|link=]]<br>KDA</div>
-						<div>{{#finished}}{{teams.2.kills}}/{{teams.2.deaths}}/{{teams.2.assists}}{{/finished}}</div>
+				<div class="match-bm-team-stats-container">
+					<div class="match-bm-team-stats-team">
+						<div class="match-bm-team-stats-team-logo">{{&opponents.1.iconDisplay}}</div>
+						<div class="match-bm-team-stats-team-side">{{&teams.1.side}}</div>
+						<div class="match-bm-team-stats-team-state state--{{teams.1.scoreDisplay}}">{{teams.1.scoreDisplay}}</div>
 					</div>
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.gold}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon gold.png|link=]]<br>Gold</div>
-						<div>{{teams.2.gold}}</div>
+					<div class="match-bm-team-stats-list">
+						<div class="match-bm-team-stats-list-row">
+							<div class="match-bm-team-stats-list-cell">{{#finished}}{{teams.1.kills}}<span class="slash">/</span>{{teams.1.deaths}}<span class="slash">/</span>{{teams.1.assists}}{{/finished}}</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><i class="fas fa-skull-crossbones cell--icon"></i>KDA</div>
+							<div class="match-bm-team-stats-list-cell">{{#finished}}{{teams.2.kills}}<span class="slash">/</span>{{teams.2.deaths}}<span class="slash">/</span>{{teams.2.assists}}{{/finished}}</div>
+						</div>
+						<div class="match-bm-team-stats-list-row">
+							<div class="match-bm-team-stats-list-cell">{{teams.1.gold}}</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><i class="fas fa-coins cell--icon"></i>Gold</div>
+							<div class="match-bm-team-stats-list-cell">{{teams.2.gold}}</div>
+						</div>
+						<div class="match-bm-team-stats-list-row">
+							<div class="match-bm-team-stats-list-cell">{{teams.1.objectives.towers}}</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><i class="fas fa-chess-rook cell--icon"></i>Towers</div>
+							<div class="match-bm-team-stats-list-cell">{{teams.2.objectives.towers}}</div>
+						</div>
+						<div class="match-bm-team-stats-list-row">
+							<div class="match-bm-team-stats-list-cell">{{teams.1.objectives.barracks}}</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><i class="fas fa-warehouse cell--icon"></i>Barracks</div>
+							<div class="match-bm-team-stats-list-cell">{{teams.2.objectives.barracks}}</div>
+						</div>
+						<div class="match-bm-team-stats-list-row">
+							<div class="match-bm-team-stats-list-cell">{{teams.1.objectives.roshans}}</div>
+							<div class="match-bm-team-stats-list-cell cell--middle"><span class="liquipedia-custom-icon liquipedia-custom-icon-roshan"></span>Roshan</div>
+							<div class="match-bm-team-stats-list-cell">{{teams.2.objectives.roshans}}</div>
+						</div>
 					</div>
-				</div>
-				<div class="match-bm-lol-h2h-section">
-				<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.objectives.towers}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon tower.png|link=]]<br>Towers</div>
-						<div>{{teams.2.objectives.towers}}</div>
-					</div>
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.objectives.barracks}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon inhibitor.png|link=]]<br>Barracks</div>
-						<div>{{teams.2.objectives.barracks}}</div>
-					</div>
-					<div class="match-bm-lol-h2h-stat">
-						<div>{{teams.1.objectives.roshans}}</div>
-						<div class="match-bm-lol-h2h-stat-title">[[File:Lol stat icon baron.png|link=]]<br>Roshan</div>
-						<div>{{teams.2.objectives.roshans}}</div>
+					<div class="match-bm-team-stats-team">
+						<div class="match-bm-team-stats-team-logo">{{&opponents.2.iconDisplay}}</div>
+						<div class="match-bm-team-stats-team-side">{{&teams.2.side}}</div>
+						<div class="match-bm-team-stats-team-state state--{{teams.2.scoreDisplay}}">{{teams.2.scoreDisplay}}</div>
 					</div>
 				</div>
 			</div>
