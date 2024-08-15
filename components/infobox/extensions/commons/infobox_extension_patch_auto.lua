@@ -24,7 +24,7 @@ function PatchAuto.run(data, args)
 
 	local endDate = data.endDate or TODAY --[[@as string]]
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::patch]] OR ([[date::<' .. endDate .. ']] OR [[date::' .. endDate .. ']])',
+		conditions = '[[type::patch]] AND ([[date::<' .. endDate .. ']] OR [[date::' .. endDate .. ']])',
 		query = 'name, pagename, date',
 		limit = 5000,
 		order = 'date desc',
