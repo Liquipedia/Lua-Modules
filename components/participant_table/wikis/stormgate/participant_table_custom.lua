@@ -56,6 +56,7 @@ function StormgateParticipantTable.run(frame)
 	participantTable._displaySoloFactionTableSection = StormgateParticipantTable._displaySoloFactionTableSection
 	participantTable._displayHeader = StormgateParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StormgateParticipantTable._getFactionNumbers
+	participantTable.setCustomPageVariables = StormgateParticipantTable.setCustomPageVariables
 
 	participantTable:read():store()
 
@@ -76,7 +77,7 @@ function StormgateParticipantTable.readConfig(args, parentConfig)
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
 	config.showCountByFaction = Logic.readBool(args.showCountByFaction or args.count)
-	config.isRandomEvent = Logic.readBool(args.is_random_event)
+	config.isRandomEvent = Logic.nilOr(Logic.readBoolOrNil(args.is_random_event), parentConfig.isRandomEvent)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortPlayers = true
 	--only relevant for solo case since there we need columnWidth in px since colSpan is calculated dynamically
@@ -118,6 +119,11 @@ function StormgateParticipantTable:readEntry(sectionArgs, key, index, config)
 	assert(Opponent.isType(opponentArgs.type) and opponentArgs.type ~= Opponent.team,
 		'Missing or unsupported opponent type for "' .. sectionArgs[key] .. '"')
 
+	--unset wiki var for random events to not read players as random if prize pool already sets them as random
+	if config.isRandomEvent and opponentArgs.type == Opponent.solo then
+		Variables.varDefine(opponentArgs.name .. '_faction', '')
+	end
+
 	local opponent = Opponent.readOpponentArgs(opponentArgs) or {}
 
 	if config.sortPlayers and opponent.players then
@@ -141,6 +147,10 @@ end
 ---@param entry StormgateParticipantTableEntry
 ---@param config StormgateParticipantTableConfig
 function StormgateParticipantTable:adjustLpdbData(lpdbData, entry, config)
+	if config.isRandomEvent then
+		lpdbData.opponentplayers.p1faction = Faction.read('r')
+	end
+
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	local isQualified = entry.isQualified or config.isQualified
 
@@ -281,6 +291,14 @@ function StormgateParticipantTable:_displaySoloFactionTableSection(section, fact
 		end)
 		self.display:node(sectionNode)
 	end)
+end
+
+---@param entry StormgateParticipantTableEntry
+---@param config StormgateParticipantTableConfig
+function StormgateParticipantTable:setCustomPageVariables(entry, config)
+	if config.isRandomEvent then
+		Variables.varDefine(entry.opponent.players[1].displayName .. '_faction', Faction.read('r'))
+	end
 end
 
 return StormgateParticipantTable

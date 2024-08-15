@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Game = require('Module:Game')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -91,22 +92,23 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function CustomLeague:displayPrizePool(args)
+function CustomLeague:displayPrizePool(args, endDate)
 	local localCurrency = args.localcurrency
 	local prizePoolUSD = args.prizepoolusd
 	local prizePool = args.prizepool --[[@as number|string|nil]]
 
 	local display
 	if prizePoolUSD then
-		prizePoolUSD = self:_cleanPrizeValue(prizePoolUSD)
+		prizePoolUSD = CustomLeague._cleanPrizeValue(prizePoolUSD)
 	end
 
-	prizePool = self:_cleanPrizeValue(prizePool)
+	prizePool = CustomLeague._cleanPrizeValue(prizePool)
 
 	if not prizePoolUSD and localCurrency then
-		local exchangeDate = self.data.endDate or TODAY --[[@as string]]
-		prizePoolUSD = self:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+		local exchangeDate = endDate or TODAY --[[@as string]]
+		prizePoolUSD = CustomLeague._currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
 		if not prizePoolUSD then
 			error('Invalid local currency "' .. localCurrency .. '"')
 		end
@@ -122,6 +124,7 @@ function CustomLeague:displayPrizePool(args)
 	Variables.varDefine('usd prize', prizePoolUSD or prizePool)
 	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 	Variables.varDefine('local prize', prizePool)
+	Variables.varDefine('tournament_prizepoollocal', prizePool)
 	Variables.varDefine('tournament_currency',
 		string.upper(Variables.varDefault('tournament_currency', localCurrency) or ''))
 
@@ -182,6 +185,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.circuittier = args.circuittier
 	lpdbData.extradata.circuit2 = args.circuit2
 	lpdbData.extradata.circuit2tier = args.circuit2tier
+
+	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
 	return lpdbData
 end
@@ -267,9 +272,9 @@ end
 
 ---@param localPrize string|number|nil
 ---@param currency string
----@param exchangeDate string
+---@param exchangeDate string?
 ---@return number?
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
+function CustomLeague._currencyConversion(localPrize, currency, exchangeDate)
 	local usdPrize
 	local currencyRate = Currency.getExchangeRate{
 		currency = currency,
@@ -285,7 +290,7 @@ end
 
 ---@param value string|number|nil
 ---@return string?
-function CustomLeague:_cleanPrizeValue(value)
+function CustomLeague._cleanPrizeValue(value)
 	if Logic.isEmpty(value) then
 		return
 	end

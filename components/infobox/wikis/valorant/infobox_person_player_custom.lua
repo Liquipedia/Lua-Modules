@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
@@ -87,16 +88,16 @@ function CustomInjector:parse(id, widgets)
 			return CharacterIcon.Icon{character = agent, size = SIZE_AGENT}
 		end)
 		return {
-			Cell{name = 'Signature Agent', content = {table.concat(icons, '&nbsp;')}}
+			Cell{name = 'Signature Agent' .. (#icons > 1 and 's' or ''), content = {table.concat(icons, '&nbsp;')}}
 		}
 	elseif id == 'status' then
-		return {
-			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
+		Array.appendWith(widgets,
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (<abbr title="Organisation">Org</abbr>)', content = {args.years_active_org}},
+			Cell{name = 'Years Active (' .. Abbreviation.make('Org', 'Organisation') .. ')', content = {args.years_active_org}},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
-			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}},
-		}
+			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
+		)
+
 	elseif id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
@@ -157,15 +158,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.region = Region.name({region = args.region, country = args.country})
 
 	return lpdbData
-end
-
----@param args table
----@return string[]
-function CustomPlayer._getStatusContents(args)
-	if String.isEmpty(args.status) then
-		return {}
-	end
-	return {Page.makeInternalLink({onlyIfExists = true}, args.status) or args.status}
 end
 
 ---@param role string?

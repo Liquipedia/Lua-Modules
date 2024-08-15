@@ -58,6 +58,17 @@ local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local DEFAULT_LIVE_HOURS = 8
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
+--- Extract externally if it grows
+---@param matchTickerConfig MatchTickerConfig
+---@return unknown # Todo: Add interface for MatchTickerDisplay
+local MatchTickerDisplayFactory = function (matchTickerConfig)
+	if matchTickerConfig.newStyle then
+		return Lua.import('Module:MatchTicker/DisplayComponents/New')
+	else
+		return Lua.import('Module:MatchTicker/DisplayComponents')
+	end
+end
+
 ---@class MatchTickerConfig
 ---@field tournaments string[]
 ---@field limit integer
@@ -80,6 +91,7 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field onlyHighlightOnValue string?
 ---@field tiers string[]?
 ---@field tierTypes string[]?
+---@field newStyle boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -87,8 +99,6 @@ local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam
 ---@field config MatchTickerConfig
 ---@field matches table[]?
 local MatchTicker = Class.new(function(self, args) self:init(args) end)
-
-MatchTicker.DisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 
 ---@param args table?
 ---@return table
@@ -124,6 +134,7 @@ function MatchTicker:init(args)
 		tierTypes = args.tiertypes and Array.filter(
 					Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)
 				) or nil,
+		newStyle = Logic.readBool(args.newStyle),
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -163,6 +174,8 @@ function MatchTicker:init(args)
 		end
 	end
 	config.wrapperClasses = wrapperClasses
+
+	MatchTicker.DisplayComponents = MatchTickerDisplayFactory(config)
 
 	self.config = config
 
@@ -280,7 +293,12 @@ function MatchTicker:dateConditions()
 
 		if config.upcoming then return dateConditions end
 
-		return dateConditions:add{ConditionNode(ColumnName('date'), Comparator.lt, NOW)}
+		return dateConditions:add{
+			ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('date'), Comparator.lt, NOW),
+				ConditionNode(ColumnName('date'), Comparator.eq, NOW),
+			}
+		}
 	end
 
 	--case upcoming

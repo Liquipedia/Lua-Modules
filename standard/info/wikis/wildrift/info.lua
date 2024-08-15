@@ -32,6 +32,10 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			matchWidthMobile = 110,
+			matchWidth = 200,
+		},
 	},
 	match2 = 2,
 }

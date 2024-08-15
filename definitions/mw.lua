@@ -334,6 +334,18 @@ function mw.language:formatDate(format, timestamp, localTime)
 		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
 	end
 
+	local function parseDateString(timeString)
+		local year, month, day = timeString:match('(%d%d%d%d)-?(%d%d)-?(%d%d)')
+		local hour = timeString:match('%d%d%d%d%-?%d%d%-?%d%d[ T]?(%d%d)')
+		local minute = timeString:match('%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?(%d%d)')
+		local second = timeString:match('%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)')
+
+		return year, month, day, hour, minute, second
+	end
+
+	local function makeOsdateParam(year, month, day, hour, minute, second)
+		return {year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second}
+	end
 
 	if format == 'U' then
 		if not timestamp then
@@ -348,27 +360,30 @@ function mw.language:formatDate(format, timestamp, localTime)
 			offset = tonumber(tzHour) * 3600 + tonumber(tzMinutes) * 60
 		end
 
-		local year, month, day, hour, minute, second
-
-		local pattern = '(%d%d%d%d)-?(%d%d)-?(%d%d)'
-		year, month, day = timestamp:match(pattern)
-
+		local year, month, day, hour, minute, second = parseDateString(timestamp)
 		if not year then
 			return ''
 		end
 
-		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?(%d%d)'
-		hour = timestamp:match(pattern)
-
-		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?(%d%d)'
-		minute = timestamp:match(pattern)
-
-		pattern = '%d%d%d%d%-?%d%d%-?%d%d[ T]?%d%d:?%d%d:?(%d%d)'
-		second = timestamp:match(pattern)
-
-		local ts = os.time{year = year, month = month or 1, day = day or 1, hour = hour or 0, min = minute, sec = second} - offset
+		local ts = os.time(makeOsdateParam(year, month, day, hour, minute, second)) - offset
 
 		return ts + localTimezoneOffset(ts)
+	elseif format == 'c' then
+		local outFormat = '%Y-%m-%dT%H:%M:%S'
+		if not timestamp then
+			return os.date(outFormat) --[[@as string]]
+		end
+		if type(timestamp) == 'string' and string.sub(timestamp, 1, 1) == '@' then
+			return os.date(outFormat, tonumber(string.sub(timestamp, 2))) --[[@as string]]
+		end
+		if type(timestamp) == 'string' then
+			local year, month, day, hour, minute, second = parseDateString(timestamp)
+			if not year then
+				return ''
+			end
+			return os.date(outFormat, os.time(makeOsdateParam(year, month, day, hour, minute, second))) --[[@as string]]
+		end
+		return os.date(outFormat, os.time(timestamp)) --[[@as string]]
 	end
 	return ''
 end
@@ -528,13 +543,17 @@ function mw.text.encode(s, charset) end
 ---@param s string
 ---@param flags number?
 ---@return table
-function mw.text.jsonDecode(s, flags) end
+function mw.text.jsonDecode(s, flags)
+	return require('3rd.jsonlua.mock_json'):decode(s)
+end
 
 ---Encode a JSON string. Errors are raised if the passed value cannot be encoded in JSON. flags is 0 or a combination (use +) of the flags mw.text.JSON_PRESERVE_KEYS and mw.text.JSON_PRETTY.
 ---@param s any
 ---@param flags number?
 ---@return string
-function mw.text.jsonEncode(s, flags) end
+function mw.text.jsonEncode(s, flags)
+	return require('3rd.jsonlua.mock_json'):encode(s)
+end
 
 ---Removes all MediaWiki strip markers from a string.
 ---@param s string
@@ -667,6 +686,7 @@ function mw.text.unstrip(s) end
 ---@field cascadingProtection table
 mw.title = {
 	namespace = 0,
+	nsText = '',
 	text = 'FakePage',
 	prefixedText = 'FakePage',
 	fullText = 'FakePage',
@@ -1059,5 +1079,12 @@ function mw.ext.SearchEngineOptimization.metadescl(desc) end
 
 ---@param image string
 function mw.ext.SearchEngineOptimization.metaimage(image) end
+
+mw.ext.Brackets = {}
+---@param idToCheck string
+---@return string
+function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
+	return 'ok'
+end
 
 return mw

@@ -74,6 +74,7 @@ local PREFIXES = {
 		team = 'https://www.dotabuff.com/esports/teams/'
 	},
 	douyin = {'https://live.douyin.com/'},
+	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
 	esea = {
 		'https://play.esea.net/events/',
@@ -103,6 +104,7 @@ local PREFIXES = {
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
 	fanclub = {''},
+	geoguessr = {'https://www.geoguessr.com/'},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
@@ -167,7 +169,6 @@ local PREFIXES = {
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
 	},
-	sgworld = {'https://stormgateworld.com/players/'},
 	sk = {'https://sk-gaming.com/member/'},
 	smashboards = {'https://smashboards.com/'},
 	snapchat = {'https://www.snapchat.com/add/'},
@@ -290,6 +291,7 @@ local ICON_KEYS_TO_RENAME = {
 	tlpdint = 'tlpd',
 	tlpdkr = 'tlpd-wol-korea',
 	tlpdsospa = 'tlpd-sospa',
+	douyin_page = 'douyin',
 }
 
 ---@param links {[string]: string}

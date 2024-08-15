@@ -2,7 +2,9 @@
 Template(s): Filter buttons
 Author(s): Elysienna, Nadox
 *******************************************************************************/
-.filter-category--hidden {
+.filter-category--hidden,
+.filter-category--hidden-group > :not( [ data-filter-hideable-group-fallback ] ),
+:not( .filter-category--hidden-group ) > [ data-filter-hideable-group-fallback ] {
 	clip: rect( 0 0 0 0 );
 	clip-path: inset( 50% );
 	height: 1px;
@@ -20,6 +22,14 @@ Author(s): Elysienna, Nadox
 	justify-content: center;
 	align-items: center;
 	flex-flow: row wrap;
+
+	&.filter-buttons--left {
+		justify-content: left;
+	}
+
+	&.filter-buttons--right {
+		justify-content: right;
+	}
 }
 
 .filter-button {

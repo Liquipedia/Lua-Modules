@@ -215,8 +215,12 @@ function Legacy._convertSingle(realKey, val, match, mapping, flattened, source)
 
 		if val['$notEmpty$'] == nil or not Logic.isEmpty(_args[val['$notEmpty$']] or flattened[val['$notEmpty$']]) then
 			local nestedArgs = {}
-			for innerKey, innerVal in pairs(val) do
-				nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
+			if val['$parse$'] then
+				nestedArgs = Json.parseIfTable(_args[val['$parse$']]) or Json.parseIfTable(flattened[val['$parse$']]) or {}
+			else
+				for innerKey, innerVal in pairs(val) do
+					nestedArgs[innerKey] = _args[innerVal] or flattened[innerVal]
+				end
 			end
 			if String.startsWith(realKey, 'opponent') then
 				match[realKey] = nestedArgs

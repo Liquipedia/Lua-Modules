@@ -350,6 +350,19 @@ return {
 				lightMode = 'EA FC24 default allmode.png',
 			},
 		},
+		['fc 25'] = {
+			abbreviation = '2025',
+			name = 'EA SPORTS FC 25',
+			link = 'EA SPORTS FC 25',
+			logo = {
+				darkMode = 'EA FC25 default allmode.png',
+				lightMode = 'EA FC25 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA FC25 default allmode.png',
+				lightMode = 'EA FC25 default allmode.png',
+			},
+		},
 		o2 = {
 			abbreviation = 'FO2',
 			name = 'FIFA Online 2',
@@ -421,6 +434,10 @@ return {
 			hasPosition = false,
 			hasSpecialTeam = false,
 			allowManual = true,
+		},
+		match2 = {
+			matchWidthMobile = 110,
+			matchWidth = 180,
 		},
 	},
 	defaultRoundPrecision = 0,

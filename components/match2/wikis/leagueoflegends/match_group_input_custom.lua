@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:ChampionNames')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -48,65 +49,85 @@ local SECONDS_UNTIL_FINISHED_NOT_EXACT = 86400
 local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
 
 -- containers for process helper functions
-local matchFunctions = {}
-local mapFunctions = {}
+local MatchFunctions = {}
+local MapFunctions = {}
 
 local CustomMatchGroupInput = {}
 
--- called from Module:MatchGroup
+---@class LeagueOfLegendsMatchParserInterface
+---@field getMap fun(mapInput: table): table
+---@field getLength fun(map: table): string?
+---@field getSide fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): string?
+---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
+---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
+---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
+---@field getVetoPhase fun(map: table): table?
+
 ---@param match table
----@param options table?
+---@param options? {isMatchPage: boolean?}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	options = options or {}
+
+	local MatchParser
+	if options.isMatchPage then
+		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/MatchPage')
+	else
+		MatchParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
+	end
+
 	-- process match
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
-	match = matchFunctions.getBestOf(match)
-	match = matchFunctions.getScoreFromMapWinners(match)
-	match = matchFunctions.getOpponents(match)
-	match = matchFunctions.getTournamentVars(match)
-	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getLinks(match)
-	match = matchFunctions.getExtraData(match)
+	if not options.isMatchPage then
+		--set it already here so in winner and result type processing we know it will get enriched later on
+		local standaloneMatchId = match.matchid and match.bracketid
+			and ('MATCH_' .. match.bracketid .. '_' .. match.matchid)
+			or nil
 
-	-- Adjust map data, especially set participants data
-	match = matchFunctions.adjustMapData(match)
+		match.standaloneMatch = standaloneMatchId and MatchGroupInput.fetchStandaloneMatch(standaloneMatchId) or nil
+	end
 
-	if not options.isStandalone then
-		match = matchFunctions.mergeWithStandalone(match)
+	match = MatchFunctions.getBestOf(match)
+	match = MatchFunctions.adjustMapData(MatchParser, match)
+	match = MatchFunctions.getScoreFromMapWinners(match)
+	match = MatchFunctions.getOpponents(match)
+	match = MatchFunctions.getTournamentVars(match)
+	match = MatchFunctions.getVodStuff(match)
+	match = MatchFunctions.getLinks(match)
+	match = MatchFunctions.getExtraData(match)
+
+	if not options.isMatchPage then
+		match = MatchFunctions.mergeWithStandalone(match)
 	end
 
 	return match
 end
 
+---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param match table
 ---@return table
-function matchFunctions.adjustMapData(match)
-	local opponents = {}
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		opponents[opponentIndex] = match['opponent' .. opponentIndex]
-	end
-	local mapIndex = 1
-	while match['map'..mapIndex] do
-		match['map'..mapIndex] = mapFunctions.getParticipants(match['map'..mapIndex], opponents)
-		mapIndex = mapIndex + 1
+function MatchFunctions.adjustMapData(MatchParser, match)
+	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
+
+	for key, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local map = MatchParser.getMap(mapInput)
+
+		if map.map == DUMMY_MAP then
+			map.map = nil
+		end
+		map.length = MatchParser.getLength(map)
+		map = MapFunctions.getParticipants(MatchParser, map, opponents)
+		map = MapFunctions.getScoresAndWinner(map)
+
+		match[key] = map
 	end
 
 	return match
 end
 
--- called from Module:Match/Subobjects
----@param map table
----@return table
-function CustomMatchGroupInput.processMap(map)
-	if map.map == DUMMY_MAP then
-		map.map = nil
-	end
-	map = mapFunctions.getScoresAndWinner(map)
-
-	return map
-end
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param record table
 ---@param timestamp integer
@@ -132,12 +153,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
+CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---@param data table
 ---@param indexedScores table[]
@@ -255,7 +271,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getBestOf(match)
+function MatchFunctions.getBestOf(match)
 	if tonumber(match.bestof) then
 		match.bestof = tonumber(match.bestof)
 	else
@@ -278,7 +294,7 @@ end
 -- 2) At least one map has a winner
 ---@param match table
 ---@return table
-function matchFunctions.getScoreFromMapWinners(match)
+function MatchFunctions.getScoreFromMapWinners(match)
 	local newScores = {}
 	local setScores = false
 
@@ -310,7 +326,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getTournamentVars(match)
+function MatchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.game = Logic.emptyOr(match.game, Variables.varDefault('tournament_game'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
@@ -320,7 +336,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getVodStuff(match)
+function MatchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 
 	for index = 1, MAX_NUM_GAMES do
@@ -337,7 +353,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getLinks(match)
+function MatchFunctions.getLinks(match)
 	match.links = {}
 	if match.reddit then match.links.reddit = 'https://redd.it/' .. match.reddit end
 	if match.gol then match.links.gol = 'https://gol.gg/game/stats/' .. match.gol .. '/page-game/' end
@@ -347,7 +363,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match)
 	match.extradata = {
 		mvp = MatchGroupInput.readMvp(match),
 	}
@@ -357,7 +373,7 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.getOpponents(match)
+function MatchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents = {}
 	local isScoreSet = false
@@ -387,10 +403,7 @@ function matchFunctions.getOpponents(match)
 						maxNumPlayers = MAX_NUM_PLAYERS,
 					})
 				end
-			elseif opponent.type == Opponent.solo then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
+			elseif opponent.type ~= Opponent.solo and opponent.type ~= Opponent.literal then
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
@@ -402,23 +415,23 @@ function matchFunctions.getOpponents(match)
 	match.walkover = string.upper(match.walkover or '')
 	if Logic.isNumeric(match.walkover) then
 		local winnerIndex = tonumber(match.walkover)
-		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, STATUS_DEFAULT_LOSS)
+		opponents = MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, STATUS_DEFAULT_LOSS)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
 	elseif Logic.isNumeric(match.winner) and Table.includes(ALLOWED_STATUSES, match.walkover) then
 		local winnerIndex = tonumber(match.winner)
-		opponents = matchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
+		opponents = MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, match.walkover)
 		opponents[winnerIndex].status = STATUS_DEFAULT_WIN
 		match.finished = true
 	end
 
 	-- see if match should actually be finished if score is set
 	if not Logic.readBool(match.finished) then
-		matchFunctions._finishMatch(match, opponents, isScoreSet)
+		MatchFunctions._finishMatch(match, opponents, isScoreSet)
 	end
 
 	-- apply placements and winner if finshed
-	if Logic.readBool(match.finished) then
+	if Logic.readBool(match.finished) and not match.standaloneMatch then
 		match, opponents = CustomMatchGroupInput.getResultTypeAndWinner(match, opponents)
 	end
 
@@ -433,7 +446,7 @@ end
 ---@param opponents table[]
 ---@param isScoreSet boolean
 ---@return table
-function matchFunctions._finishMatch(match, opponents, isScoreSet)
+function MatchFunctions._finishMatch(match, opponents, isScoreSet)
 	-- If a winner has been set
 	if Logic.isNotEmpty(match.winner) then
 		match.finished = true
@@ -476,7 +489,7 @@ end
 ---@param opponents table[]
 ---@param walkoverType string?
 ---@return table[]
-function matchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
+function MatchFunctions._makeAllOpponentsLoseByWalkover(opponents, walkoverType)
 	for index, _ in pairs(opponents) do
 		opponents[index].score = NOT_PLAYED_SCORE
 		opponents[index].status = walkoverType
@@ -486,16 +499,15 @@ end
 
 ---@param match table
 ---@return table
-function matchFunctions.mergeWithStandalone(match)
-	local standaloneMatchId = 'MATCH_' .. match.bracketid .. '_' .. match.matchid
-	local standaloneMatch = MatchGroupInput.fetchStandaloneMatch(standaloneMatchId)
+function MatchFunctions.mergeWithStandalone(match)
+	local standaloneMatch = match.standaloneMatch
 	if not standaloneMatch then
 		return match
 	end
 
 	match.matchPage = 'Match:ID_' .. match.bracketid .. '_' .. match.matchid
 
-	-- Update Opponents from the Stanlone Match
+	-- Update Opponents from the Standlone Match
 	match.opponent1 = standaloneMatch.match2opponents[1]
 	match.opponent2 = standaloneMatch.match2opponents[2]
 
@@ -523,61 +535,63 @@ function matchFunctions.mergeWithStandalone(match)
 	return match
 end
 
-
 --
 -- map related functions
 --
 
 -- Parse extradata information
+---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param map table
 ---@return table
-function mapFunctions.getAdditionalExtraData(map)
+function MapFunctions.getAdditionalExtraData(MatchParser, map)
 	map.extradata.comment = map.comment
-	map.extradata.team1side = string.lower(map.team1side or '')
-	map.extradata.team2side = string.lower(map.team2side or '')
+	map.extradata.team1side = MatchParser.getSide(map, 1) or ''
+	map.extradata.team2side = MatchParser.getSide(map, 2) or ''
+	map.extradata.team1objectives = MatchParser.getObjectives(map, 1) or {}
+	map.extradata.team2objectives = MatchParser.getObjectives(map, 2) or {}
 
 	return map
 end
 
 -- Parse participant information
+---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param map table
 ---@param opponents table[]
 ---@return table
-function mapFunctions.getParticipants(map, opponents)
+function MapFunctions.getParticipants(MatchParser, map, opponents)
 	local participants = {}
-	local heroData = {}
+	local extradata = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
+
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		local teamShort = 't' .. opponentIndex
-		local team = 'team' .. opponentIndex
-		if not map[team] then
-			local picks, bans = {}, {}
-			for playerIndex = 1, MAX_NUM_PLAYERS do
-				table.insert(picks, map[teamShort .. 'c' .. playerIndex])
-			end
-
-			for _, ban in Table.iter.pairsByPrefix(map, teamShort .. 'b') do
-				table.insert(bans, ban)
-			end
-			map[team] = {pick = picks, ban = bans}
+		local teamPrefix = 'team' .. opponentIndex
+		Array.forEach(MatchParser.getHeroPicks(map, opponentIndex) or {}, function (hero, idx)
+			extradata[teamPrefix .. 'champion' .. idx] = getCharacterName(hero)
+		end)
+		Array.forEach(MatchParser.getHeroBans(map, opponentIndex) or {}, function (hero, idx)
+			extradata[teamPrefix .. 'ban' .. idx] = getCharacterName(hero)
+		end)
+		for playerIndex, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
+			participant.character = getCharacterName(participant.character)
+			participants[opponentIndex .. '_' .. playerIndex] = participant
 		end
-
-		Array.forEach(map[team].pick, function (hero, idx)
-			heroData[team .. 'champion' .. idx] = HeroNames[hero and hero:lower()]
-		end)
-		Array.forEach(map[team].ban, function (hero, idx)
-			heroData[team .. 'ban' .. idx] = HeroNames[hero and hero:lower()]
-		end)
 	end
 
-	map.extradata = heroData
+	extradata.vetophase = MatchParser.getVetoPhase(map)
+	Array.forEach(extradata.vetophase or {}, function(veto)
+		veto.character = getCharacterName(veto.character)
+	end)
+
 	map.participants = participants
-	return mapFunctions.getAdditionalExtraData(map)
+	map.extradata = extradata
+
+	return MapFunctions.getAdditionalExtraData(MatchParser, map)
 end
 
 -- Calculate Score and Winner of the map
 ---@param map table
 ---@return table
-function mapFunctions.getScoresAndWinner(map)
+function MapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
 	for scoreIndex = 1, MAX_NUM_OPPONENTS do

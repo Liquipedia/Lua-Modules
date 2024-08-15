@@ -8,7 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -349,6 +349,7 @@ function matchFunctions.getOpponents(match)
 			end
 
 			-- get players from vars for teams
+			assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
 					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
@@ -357,11 +358,6 @@ function matchFunctions.getOpponents(match)
 						maxNumPlayers = MAX_NUM_PLAYERS,
 					})
 				end
-			elseif Opponent.typeIsParty(opponent.type) then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
-				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 
 			opponents[opponentIndex] = opponent
@@ -440,18 +436,6 @@ function mapFunctions.getAdditionalExtraData(map)
 	return map
 end
 
----@param champion string?
----@return string?
-function mapFunctions.getChampionName(champion)
-	if Logic.isNotEmpty(champion) then
-		local championName = ChampionNames[champion and champion:lower()]
-		assert(championName, 'Invalid hero:' .. champion)
-		return championName
-	end
-
-	return nil
-end
-
 -- Parse participant information
 ---@param map table
 ---@param opponents table[]
@@ -459,11 +443,12 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local championData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, ChampionNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
-			local pick = mapFunctions.getChampionName(map['t' .. opponentIndex .. 'h' .. playerIndex])
+			local pick = getCharacterName(map['t' .. opponentIndex .. 'h' .. playerIndex])
 			championData['team' .. opponentIndex .. 'champion' .. playerIndex] = pick
-			local ban = mapFunctions.getChampionName(map['t' .. opponentIndex .. 'b' .. playerIndex])
+			local ban = getCharacterName(map['t' .. opponentIndex .. 'b' .. playerIndex])
 			championData['team' .. opponentIndex .. 'ban' .. playerIndex] = ban
 
 			championData['t' .. opponentIndex .. 'kda' .. playerIndex] =

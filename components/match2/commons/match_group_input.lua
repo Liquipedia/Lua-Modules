@@ -71,9 +71,10 @@ function MatchGroupInput._applyTournamentVarsToMaps(match)
 end
 
 ---@param matchArgs table
+---@param options? {isMatchPage: boolean?}
 ---@return table
-function MatchGroupInput._processMatch(matchArgs)
-	local match = WikiSpecific.processMatch(matchArgs)
+function MatchGroupInput._processMatch(matchArgs, options)
+	local match = WikiSpecific.processMatch(matchArgs, options)
 	MatchGroupInput._applyTournamentVarsToMaps(match)
 	return match
 end
@@ -140,6 +141,39 @@ function MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 end
 
 ---@param bracketId string
+---@param matchId string
+---@param matchInput table
+---@return table[]
+function MatchGroupInput.readMatchpage(bracketId, matchId, matchInput)
+	local matchArgs = {}
+	for key, value in pairs(matchInput) do
+		matchArgs[key] = Json.parseIfTable(value) or value
+	end
+
+	local function setMatchPageContext()
+		local tournamentPage = (mw.ext.LiquipediaDB.lpdb('match2', {
+			query = 'parent',
+			conditions = '[[match2id::'.. table.concat({bracketId, matchId}, '_') .. ']]',
+			limit = 1,
+		})[1] or {}).parent
+		if not tournamentPage then return end
+
+		local HiddenDataBox = Lua.import('Module:HiddenDataBox/Custom')
+		local HdbProps = Table.merge({parent = tournamentPage}, matchArgs)
+		HdbProps.date = nil
+		HiddenDataBox.run(HdbProps)
+	end
+
+	setMatchPageContext()
+	matchArgs.parent = globalVars:get('tournament_parent')
+	matchArgs.bracketid = bracketId
+	matchArgs.matchid = matchId
+	local match = MatchGroupInput._processMatch(matchArgs, {isMatchPage = true})
+	match.bracketid = 'MATCH_' .. match.bracketid
+	return {match}
+end
+
+---@param bracketId string
 ---@param args table
 ---@param options MatchGroupBaseOptions
 ---@return table[]
@@ -152,12 +186,12 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	local bracketDatasById = Logic.try(function()
 		return MatchGroupInput._fetchBracketDatas(templateId, bracketId)
 	end)
-		:catch(function(message)
-			if String.endsWith(message, 'does not exist') then
-				table.insert(warnings, message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
+		:catch(function(error)
+			if String.endsWith(error.message, 'does not exist') then
+				table.insert(warnings, error.message .. ' (Maybe [[Template:' .. templateId .. ']] needs to be purged?)')
 				return {}
 			else
-				error(message)
+				error(error.message)
 			end
 		end)
 		:get()
@@ -250,7 +284,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 	return matches, warnings
 end
 
----@param bracketData MatchGroupUtilBracketData
+---@param bracketData table
 ---@param args table
 ---@param matchKey string
 ---@return string?
@@ -868,6 +902,15 @@ function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placem
 	opponents[loserIdx].placement = placementLoser
 
 	return opponents
+end
+
+---@param alias table<string, string>
+---@param character string?
+---@return string?
+function MatchGroupInput.getCharacterName(alias, character)
+	if Logic.isEmpty(character) then return nil end
+	---@cast character -nil
+	return (assert(alias[character:lower()], 'Invalid character:' .. character))
 end
 
 return MatchGroupInput

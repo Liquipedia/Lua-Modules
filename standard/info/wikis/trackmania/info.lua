@@ -149,6 +149,8 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+		},
 	},
 	opponentLibrary = 'Opponent',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',

@@ -30,7 +30,7 @@ end
 ---Display component for a singleMatch. The singleMatch is specified by matchID.
 ---The component fetches the match data from LPDB or page variables.
 ---@param props {matchId: string, config: SingleMatchConfigOptions}
----@return string|Html
+---@return Html
 function SingleMatchDisplay.SingleMatchContainer(props)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(props.matchId)
 
@@ -42,7 +42,7 @@ function SingleMatchDisplay.SingleMatchContainer(props)
 			config = props.config,
 			match = match,
 		})
-		or ''
+		or mw.html.create()
 end
 
 ---Display component for a singleMatch. Match data is specified in the input.

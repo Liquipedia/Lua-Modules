@@ -369,10 +369,9 @@ end
 ---@return table<string, table>
 function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
 	local char = map['char' .. opponentIndex] or ''
-	char = CharacterStandardization[char:lower()]
 
 	participants[opponentIndex .. '_1'] = {
-		char = char,
+		char = MatchGroupInput.getCharacterName(CharacterStandardization, char),
 		player = player.name,
 	}
 

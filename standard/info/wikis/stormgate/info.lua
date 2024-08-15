@@ -30,7 +30,11 @@ return {
 		squads = {
 			hasPosition = false,
 			hasSpecialTeam = false,
-			allowManual = true,
+			allowManual = false,
+		},
+		match2 = {
+			matchWidthMobile = 110,
+			matchWidth = 150,
 		},
 	},
 	defaultRoundPrecision = 0,

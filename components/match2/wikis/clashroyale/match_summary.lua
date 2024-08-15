@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -79,12 +80,29 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
 	end
 
+	CustomMatchSummary._addMvp(match, body)
+
 	local extradata = match.extradata or {}
 	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
 		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))
 	end
 
 	return body
+end
+
+---@param match MatchGroupUtilMatch
+---@param body MatchSummaryBody
+function CustomMatchSummary._addMvp(match, body)
+	local mvpData = match.extradata.mvp
+	if Table.isEmpty(mvpData) or not mvpData.players then
+		return
+	end
+
+	local mvp = MatchSummary.Mvp()
+	Array.forEach(mvpData.players, FnUtil.curry(mvp.addPlayer, mvp))
+	mvp:setPoints(mvpData.points)
+
+	body:addRow(mvp)
 end
 
 ---@param game MatchGroupUtilGame
@@ -108,6 +126,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	for participantKey, participantData in Table.iter.spairs(game.participants or {}) do
 		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
 		participantData.cards = participantData.cards or {}
+		---@type table
 		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
 			return participantData.cards[idx] or DEFAULT_CARD end)
 		cards.tower = participantData.cards.tower
@@ -218,14 +237,7 @@ function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 		))
 	end
 
-	if match.extradata.hasbigmatch then
-		local matchPageLinkRow = MatchSummary.Row()
-		matchPageLinkRow:addElement(mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:wikitext('[[Match:ID_' .. matchId .. '|More details on the match page]]')
-		)
-		body:addRow(matchPageLinkRow)
-	end
+	CustomMatchSummary._addMvp(match, body)
 
 	return body
 end
