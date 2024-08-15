@@ -47,25 +47,6 @@ function CustomLeague:customParseArguments(args)
 	self.data.publishertier = self:_validPublisherTier(args.blizzardtier) and args.blizzardtier:lower()
 end
 
----@param date string
----@return string
-function compareDates(date1, date2)
-    return date1 > date2
-end
-
-function getGame(args)
-    local endDate = Variables.varDefault('tournament_enddate')
-    if String.isNotEmpty(args.game) then
-        return args.game
-    else
-        if compareDates(endDate, '2022-10-04') then
-            return 'overwatch2'
-        else
-            return 'overwatch'
-        end
-    end
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
