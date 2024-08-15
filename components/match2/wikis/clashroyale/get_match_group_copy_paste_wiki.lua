@@ -8,10 +8,14 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 ---@class ClashroyaleMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
@@ -42,10 +46,45 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		bans and '|t1bans={{Cards|}}|t2bans={{Cards|}}' or nil
+		bans and '|t1bans={{Cards|}}|t2bans={{Cards|}}' or nil,
+		Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste.getMapCode, mode))
 	)
 
 	return table.concat(lines, '\n')
+end
+
+---@param mode any
+---@param mapIndex any
+---@return string?
+function WikiCopyPaste.getMapCode(mode, mapIndex)
+	if mode == Opponent.solo then
+		return table.concat({
+			INDENT .. '|map' .. mapIndex .. '={{Map|winner=',
+			INDENT .. INDENT .. '<!-- Card picks -->',
+			INDENT .. INDENT .. '|t1p1c={{Cards| | | | | | | | }}',
+			INDENT .. INDENT .. '|t2p1c={{Cards| | | | | | | | }}',
+			INDENT .. '}}',
+		}, '\n')
+	elseif mode == Opponent.duo then
+		return table.concat({
+			INDENT .. '|map' .. mapIndex .. '={{Map|winner=',
+			INDENT .. INDENT .. '<!-- Card picks -->',
+			INDENT .. INDENT .. '|t1p1c={{Cards| | | | | | | | }}',
+			INDENT .. INDENT .. '|t1p2c={{Cards| | | | | | | | }}',
+			INDENT .. INDENT .. '|t2p1c={{Cards| | | | | | | | }}',
+			INDENT .. INDENT .. '|t2p2c={{Cards| | | | | | | | }}',
+			INDENT .. '}}',
+		}, '\n')
+	elseif mode == Opponent.team then
+		return table.concat({
+			INDENT .. '|map' .. mapIndex .. '={{Map|winner=|subgroup=',
+			INDENT .. INDENT .. '<!-- Players -->',
+			INDENT .. INDENT .. '|t1p1=',
+			INDENT .. INDENT .. '|t2p1=',
+			INDENT .. '}}',
+		}, '\n')
+	end
+	return nil
 end
 
 return WikiCopyPaste
