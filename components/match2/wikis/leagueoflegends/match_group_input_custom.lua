@@ -20,7 +20,6 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local MAX_NUM_OPPONENTS = 2
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyOpponentName = true,
@@ -76,15 +75,16 @@ end
 function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
-	local games = MatchFunctions.extractMaps(MatchParser, match)
-	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
-
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
+	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
+
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, games, opponentIndex, opponent.score)
 	end)
+
+	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
@@ -106,8 +106,9 @@ end
 
 ---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param match table
+---@param opponentCount integer
 ---@return table
-function MatchFunctions.extractMaps(MatchParser, match)
+function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 	local maps = {}
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MatchParser.getMap(mapInput)
@@ -116,8 +117,8 @@ function MatchFunctions.extractMaps(MatchParser, match)
 			map.map = nil
 		end
 		map.length = MatchParser.getLength(map)
-		map.participants, map.extradata = MapFunctions.getParticipants(MatchParser, map)
-		Table.mergeInto(map, MapFunctions.getScoresAndWinner(map))
+		map.participants, map.extradata = MapFunctions.getParticipants(MatchParser, map, opponentCount)
+		Table.mergeInto(map, MapFunctions.getScoresAndWinner(map, opponentCount))
 
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 
@@ -279,13 +280,14 @@ end
 -- Parse participant information
 ---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param map table
+---@param opponentCount integer
 ---@return table, table
-function MapFunctions.getParticipants(MatchParser, map)
+function MapFunctions.getParticipants(MatchParser, map, opponentCount)
 	local participants = {}
 	local extradata = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
 
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	for opponentIndex = 1, opponentCount do
 		local teamPrefix = 'team' .. opponentIndex
 
 		Array.forEach(MatchParser.getHeroPicks(map, opponentIndex) or {}, function (hero, idx)
@@ -313,15 +315,16 @@ end
 
 -- Calculate Score and Winner of the map
 ---@param map {finished:string?, winner:string?}]
+---@param opponentCount integer
 ---@return {finished:boolean, winner:integer?, resulttype:string?, walkover:string?, scores:integer[]}
-function MapFunctions.getScoresAndWinner(map)
+function MapFunctions.getScoresAndWinner(map, opponentCount)
 	local finished = Logic.readBool(map.finished)
 	local winner = map.winner
 	if winner then
 		finished = true
 	end
 
-	local scores = MapFunctions.getScoreFromWinner(finished, tonumber(winner))
+	local scores = MapFunctions.getScoreFromWinner(finished, tonumber(winner), opponentCount)
 
 	local resultType
 	if MatchGroupInput.isNotPlayedInput(winner) or MatchGroupInput.isNotPlayedInput(map.finished) then
@@ -334,14 +337,15 @@ end
 
 ---@param finished boolean?
 ---@param winner integer?
+---@param opponentCount integer
 ---@return table
-function MapFunctions.getScoreFromWinner(finished, winner)
+function MapFunctions.getScoreFromWinner(finished, winner, opponentCount)
 	if not finished then
 		return {}
 	end
 
-	local scores = Array.map(Array.range(1, MAX_NUM_OPPONENTS), function() return 0 end)
-	if not winner or winner < 1 or winner > MAX_NUM_OPPONENTS then
+	local scores = Array.map(Array.range(1, opponentCount), function() return 0 end)
+	if not winner or winner < 1 or winner > opponentCount then
 		return scores
 	end
 
