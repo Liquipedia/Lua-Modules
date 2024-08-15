@@ -1082,6 +1082,39 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
+---Should only be called on finished matches or maps
+---@param winner integer|string
+---@param opponents {score: number, status: string}[]
+---@return string? #Result Type
+---@return integer? #Winner
+---@return string? #Walkover
+function MatchGroupInput.getResultTypeAndWinner(winner, opponents)
+	if type(winner) == 'string' and MatchGroupInput.isNotPlayedInput(winner) then
+		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
+  end
+
+	-- Calculate winner, resulttype, placements and walkover as applicable
+	if MatchGroupInput.isDraw(opponents) then
+		return MatchGroupInput.RESULT_TYPE.DRAW, MatchGroupInput.WINNER_DRAW
+
+	elseif MatchGroupInput.hasSpecialStatus(opponents) then
+		local walkoverType
+		if MatchGroupInput.hasForfeit(opponents) then
+			walkoverType = MatchGroupInput.WALKOVER.FORFIET
+		elseif MatchGroupInput.hasDisqualified(opponents) then
+			walkoverType = MatchGroupInput.WALKOVER.DISQUALIFIED
+		elseif MatchGroupInput.hasDefaultWinLoss(opponents) then
+			walkoverType = MatchGroupInput.WALKOVER.NO_SCORE
+		end
+
+		return MatchGroupInput.RESULT_TYPE.DEFAULT, MatchGroupInput.getDefaultWinner(opponents), walkoverType
+
+	else
+		assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
+		return nil, tonumber(winner) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
+	end
+end
+
 ---@param match table
 ---@param maps {scores: integer[], winner: integer?}[]
 ---@param opponentIndex integer
