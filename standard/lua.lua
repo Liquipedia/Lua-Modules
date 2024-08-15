@@ -156,7 +156,7 @@ function Lua.callAndDisplayErrors(fn, frame, hardErrors)
 	local ErrorExt = require('Module:Error/Ext')
 
 	local result = Logic.tryOrElseLog(function() return fn(frame) end)
-	local parts = {tostring(result)}
+	local parts = result and {tostring(result)} or {}
 
 	local errors = ErrorExt.Stash.retrieve()
 	if #errors > 0 then
