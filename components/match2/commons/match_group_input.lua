@@ -531,10 +531,11 @@ function MatchGroupInput.fetchStandaloneMatch(matchId)
 	end)
 end
 
+---Warning, mutates first argument by removing the key `opponentX` where X is the second argument
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
----@return table?
+---@return standardOpponent?
 function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
@@ -1223,46 +1224,6 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 	end
 
 	return false
-end
-
----Warning, mutates first argument by removing the key `opponentX` where X is the second argument
----@param match table
----@param opponentIndex integer
----@param readPlayerOptions MatchGroupInputReadPlayersOfTeamOptions
----@return standardOpponent
-function MatchGroupInput.processOpponent(match, opponentIndex, readPlayerOptions)
-	local record = Table.extract(match, 'opponent' .. opponentIndex)
-
-	if not record then
-		return Opponent.blank()
-	end
-
-	assert(record.type == Opponent.team or record.type == Opponent.solo or record.type == Opponent.literal,
-			'Unsupported Opponent Type "' .. (record.type or '') .. '"')
-
-	local opponent = Opponent.readOpponentArgs(record)
-		or Opponent.blank() -- This is only needed because readOpponentArgs team parsing can return false...
-
-	-- Convert byes to literals
-	if Opponent.isBye(opponent) then
-		opponent = {type = Opponent.literal, name = 'BYE'}
-	end
-
-	---@type integer|string?
-	local teamTemplateDate = match.timestamp
-	-- If date is default date, resolve using tournament date or today instead
-	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefault('tournament_enddate')
-	end
-
-	Opponent.resolve(opponent, teamTemplateDate)
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-
-	if opponent.type == Opponent.team and not Logic.isEmpty(opponent.name) then
-		MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, readPlayerOptions)
-	end
-
-	return record
 end
 
 ---@param alias table<string, string>

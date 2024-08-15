@@ -206,12 +206,16 @@ end
 ---@param maps {scores: integer[], winner: integer?}[]
 ---@return standardOpponent[]
 function MatchFunctions.extractOpponents(match, maps)
-	return Array.map(Array.range(1, MAX_NUM_OPPONENTS), function(opponentIndex)
-		local opponent = MatchGroupInput.processOpponent(match, opponentIndex, {
+	return Array.mapIndexes(function(opponentIndex)
+		local opponent = MatchGroupInput.readOpponent(match, opponentIndex, {
 			resolveRedirect = true,
-			applyUnderScores = true,
+			pagifyOpponentName = true,
+			pagifyPlayerNames = true,
 			maxNumPlayers = MAX_NUM_PLAYERS,
 		})
+		if not opponent then
+			return
+		end
 		opponent.score, opponent.status = MatchFunctions._parseOpponentScore(match, maps, opponentIndex, opponent.score)
 		return opponent
 	end)
