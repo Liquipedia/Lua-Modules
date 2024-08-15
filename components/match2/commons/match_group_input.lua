@@ -32,7 +32,19 @@ local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInput = {}
 
-local DEFAULT_ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban'}
+local DEFAULT_ALLOWED_VETOES = {
+	'decider',
+	'pick',
+	'ban',
+	'defaultban',
+}
+
+local NOT_PLAYER_INPUTS = {
+	'skip',
+	'np',
+	'canceled',
+	'cancelled',
+}
 
 MatchGroupInput.STATUS_INPUTS = {
 	DEFAULT_WIN = 'W',
@@ -1068,6 +1080,12 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 		data[1].vetostart = vetoStart
 	end
 	return data
+end
+
+---@param input string?
+---@return boolean
+function MatchGroupInput.isNotPlayedInput(input)
+	return Table.includes(NOT_PLAYER_INPUTS, input)
 end
 
 ---@param opponents {status: string, score: string|number?}[]

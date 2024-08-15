@@ -29,7 +29,6 @@ local OPPONENT_CONFIG = {
 }
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
-local NP_INPUTS = {'skip', 'np', 'canceled', 'cancelled'}
 
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -138,7 +137,7 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 ---@return integer? #Winner
 ---@return string? #Walkover
 function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
-	if type(winner) == 'string' and CustomMatchGroupInput.isNotPlayedInput(winner) then
+	if type(winner) == 'string' and MatchGroupInput.isNotPlayedInput(winner) then
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
   end
 
@@ -162,12 +161,6 @@ function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
 		assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
 		return nil, tonumber(winner) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
 	end
-end
-
----@param input string?
----@return boolean
-function CustomMatchGroupInput.isNotPlayedInput(input)
-	return Table.includes(NP_INPUTS, input)
 end
 
 ---@param bestOfInput string|integer?
@@ -331,7 +324,7 @@ function MapFunctions.getScoresAndWinner(map)
 	local scores = MapFunctions.getScoreFromWinner(finished, tonumber(winner))
 
 	local resultType
-	if CustomMatchGroupInput.isNotPlayedInput(winner) or CustomMatchGroupInput.isNotPlayedInput(map.finished) then
+	if MatchGroupInput.isNotPlayedInput(winner) or MatchGroupInput.isNotPlayedInput(map.finished) then
 		resultType = MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 		winner = nil
 	end
