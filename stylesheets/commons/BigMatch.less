@@ -674,14 +674,20 @@ ul.match-bm-lol-game-veto-overview-pick {
 		}
 	}
 
-	&-icon img {
-		width: 3rem;
-		height: 3rem;
+	&-icon {
+		overflow: hidden;
 		border-radius: 100%;
 
-		@media ( min-width: 768px ) {
-			width: 4rem;
-			height: 4rem;
+		img {
+			width: auto;
+			height: 3rem;
+			position: relative;
+			left: 50%;
+			transform: translateX( -50% );
+
+			@media ( min-width: 768px ) {
+				height: 4rem;
+			}
 		}
 	}
 
