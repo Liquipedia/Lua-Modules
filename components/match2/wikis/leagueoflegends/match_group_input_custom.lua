@@ -181,7 +181,7 @@ end
 ---@param maps {winner: integer?}[]
 ---@param opponentIndex integer
 ---@return integer
-function MatchFunctions.computeMatchScoreFromMapScores(maps, opponentIndex)
+function MatchFunctions.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	return Array.reduce(Array.map(maps, function(map)
 		return (map.winner == opponentIndex and 1 or 0)
 	end), Operator.add)
@@ -229,7 +229,7 @@ function MatchFunctions._parseOpponentScore(match, maps, opponentIndex, scoreInp
 		end
 	else
 		if not scoreInput and matchHasStarted and mapHasWinner then
-			scoreInput = MatchFunctions.computeMatchScoreFromMapScores(maps, opponentIndex)
+			scoreInput = MatchFunctions.computeMatchScoreFromMapWinners(maps, opponentIndex)
 		end
 
 		return MatchFunctions._parseScoreInput(scoreInput)
