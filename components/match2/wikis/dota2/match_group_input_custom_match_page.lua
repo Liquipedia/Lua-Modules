@@ -479,7 +479,7 @@ function CustomMatchGroupInputMatchPage.getLength(map)
 end
 
 function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
-	return (map['team' .. opponentIndex] or {}).color
+	return (map['team' .. opponentIndex] or {}).side
 end
 
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
