@@ -60,6 +60,12 @@ local MatchGroupInput = {}
 ---@field pagifyPlayerNames boolean?
 ---@field syncPlayer boolean?
 
+---@class MatchGroupInputSubstituteInformation
+---@field substitute standardPlayer
+---@field player standardPlayer?
+---@field games string[]
+---@field reason string?
+
 local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
 	{default = 'Opening Matches'},
 	{},
@@ -650,13 +656,45 @@ end
 ---@param match table
 ---@param opponentIndex integer
 ---@param opponentInput table
----@return {players: table[], substitutions: string?}
+---@return {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
 function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
 	--players from manual input as `opponnetX_pY`
 	local players = Array.mapIndexes(function(playerIndex)
 		return Json.parseIfString(match['opponent' .. opponentIndex .. '_p' .. playerIndex])
 	end)
-	local manualInput = {players = players, substitutions = opponentInput.substitutes, timestamp = match.timestamp}
+	local manualInput = {players = players}
+
+	local substitutions, parseFailure = Json.parseStringified(opponentInput.substitutes)
+	if parseFailure then
+		substitutions = {}
+	end
+
+	---@param playerData table|string|nil
+	---@return standardPlayer?
+	local getStandardPlayer = function(playerData)
+		if not playerData then return end
+		playerData = type(playerData) == 'string' and {playerData} or playerData
+		local player = {
+			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
+			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
+			flag = playerData.flag,
+			faction = playerData.faction or playerData.race,
+		}
+		if Logic.isEmpty(player.displayName) then return end
+		player = PlayerExt.populatePlayer(player)
+		return player
+	end
+
+	manualInput.substitutions = Array.map(substitutions, function(substitution)
+		if type(substitution) ~= 'table' or not substitution['in'] then return end
+
+		return {
+			substitute = getStandardPlayer(substitution['in']),
+			player = getStandardPlayer(substitution.out),
+			games = Logic.nilIfEmpty(Array.parseCommaSeparatedString(substitution.games, ';')),
+			reason = substitution.reason,
+		}
+	end)
 
 	--players from manual input in `opponent.players`
 	local playersData = Json.parseIfString(opponentInput.players)
@@ -677,7 +715,7 @@ end
 
 ---reads the players of a team from input and wiki variables
 ---@param opponent standardOpponent
----@param manualPlayersInput {players: table[], substitutions: string?}
+---@param manualPlayersInput {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
 ---@param options MatchGroupInputReadPlayersOfTeamOptions
 ---@return standardPlayer[]
 ---@return table
@@ -695,10 +733,10 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 
 		local pageName = Logic.nilIfEmpty(player.name) or player.pageName
 		pageName = options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(pageName) or pageName
-		pageName = options.applyUnderScores and pageName:gsub(' ', '_') or pageName
+		local normalizedPageName = pageName:gsub(' ', '_')
 
 		playersIndex = playersIndex + 1
-		players[pageName] = Table.merge(players[pageName] or {}, {
+		players[normalizedPageName] = Table.merge(players[normalizedPageName] or {}, {
 			pageName = pageName,
 			flage = Flags.CountryName(player.flag),
 			displayName = Logic.nilIfEmpty(player.displayname) or player.displayName,
@@ -749,50 +787,14 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 
 	Array.forEach(manualPlayersInput.players, insertIntoPlayers)
 
-	---@param playerData table|string|nil
-	---@return standardPlayer?
-	local getStandardPlayer = function(playerData)
-		if not playerData then return end
-		playerData = type(playerData) == 'string' and {playerData} or playerData
-		local player = {
-			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
-			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
-			flag = playerData.flag,
-			faction = playerData.faction or playerData.race,
-		}
-		if Logic.isEmpty(player.displayName) then return end
-		player = PlayerExt.populatePlayer(player)
-		player.pageName = options.applyUnderScores and player.pageName:gsub(' ', '_') or player.pageName
-		return player
-	end
-
-	local substitutions, parseFailure = Json.parseStringified(manualPlayersInput.substitutions)
-	if parseFailure then
-		substitutions = {}
-	end
-
-	local parsedSubstitutions = {}
-
 	--handle `substitutes` input for opponenets
-	Array.forEach(substitutions, function(substitution)
-		if type(substitution) ~= 'table' or not substitution['in'] then return end
-		local substitute = getStandardPlayer(substitution['in'])
-
-		local subbedGames = substitution.games
-
-		local player = getStandardPlayer(substitution.out)
-		if player then
-			players[player.pageName] = subbedGames and players[player.pageName] or nil
+	Array.forEach(manualPlayersInput.substitutions, function(sub)
+		if sub.player and not sub.games then
+			local normalizedPageName = sub.player.pageName:gsub(' ', '_')
+			players[normalizedPageName] = nil
 		end
 
-		table.insert(parsedSubstitutions, {
-			substitute = substitute,
-			player = player,
-			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
-			reason = substitution.reason,
-		})
-
-		insertIntoPlayers(substitute)
+		insertIntoPlayers(sub.substitute)
 	end)
 
 	local playersArray = Array.extractValues(players)
@@ -800,7 +802,7 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 		return player.index
 	end)
 
-	return playersArray, parsedSubstitutions
+	return playersArray, manualPlayersInput.substitutions
 end
 
 ---reads the players of a team from input and wiki variables
