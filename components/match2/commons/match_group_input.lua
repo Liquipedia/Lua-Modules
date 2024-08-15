@@ -876,7 +876,7 @@ function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, optio
 
 	--players from manual input in `opponent.players`
 	local playersData = Json.parseIfString(opponent.players) or {}
-	for _, playerName, playerPrefix in Table.iter.pairsByPrefix(playersData, 'p') do
+	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
 		insertIntoPlayers{
 			pageName = playerName,
 			displayName = playersData[playerPrefix .. 'dn'],
