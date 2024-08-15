@@ -533,8 +533,9 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	local substitutions
 	if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
 		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
+		substitutions = manualPlayersInput.substitutions
 		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array and the substitutions data
-		opponent.players, substitutions = MatchGroupInput.readPlayersOfTeamNew(
+		opponent.players = MatchGroupInput.readPlayersOfTeamNew(
 			opponent.name,
 			manualPlayersInput,
 			options,
@@ -564,7 +565,7 @@ Using the team template extension, the opponent struct is standardised and not u
 ]]
 ---@param record table
 ---@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
----@param substitutions table?
+---@param substitutions MatchGroupInputSubstituteInformation[]?
 ---@return table
 function MatchGroupInput.mergeRecordWithOpponent(record, opponent, substitutions)
 	if opponent.type == Opponent.team then
@@ -715,7 +716,6 @@ end
 ---@param manualPlayersInput {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
 ---@param options readOpponentOptions
 ---@param dateTimeInfo {timestamp: integer?, timezoneOffset: string?}
----@return standardPlayer[]
 ---@return table
 function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, options, dateTimeInfo)
 	local players = {}
@@ -800,7 +800,7 @@ function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, opti
 		return player.index
 	end)
 
-	return playersArray, manualPlayersInput.substitutions
+	return playersArray
 end
 
 ---reads the players of a team from input and wiki variables
