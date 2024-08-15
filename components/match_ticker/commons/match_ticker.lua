@@ -293,7 +293,12 @@ function MatchTicker:dateConditions()
 
 		if config.upcoming then return dateConditions end
 
-		return dateConditions:add{ConditionNode(ColumnName('date'), Comparator.lt, NOW)}
+		return dateConditions:add{
+			ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('date'), Comparator.lt, NOW),
+				ConditionNode(ColumnName('date'), Comparator.eq, NOW),
+			}
+		}
 	end
 
 	--case upcoming

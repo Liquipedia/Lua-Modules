@@ -32,13 +32,17 @@ local ICONS = {
 	animus = {
 		default = Abbreviation.make('Ani', 'Animus'),
 	},
+	power = {
+		default = Abbreviation.make('Pow', 'Power'),
+	},
 }
 local ORDER = {
 	'luminite',
 	'therium',
 	'supply',
-	'buildTime',
 	'animus',
+	'power',
+	'buildTime',
 }
 local CONCAT_VALUE = '&nbsp;'
 
@@ -49,16 +53,19 @@ local CONCAT_VALUE = '&nbsp;'
 ---@field buildTime string|number?
 ---@field supply string|number?
 ---@field animus string|number?
+---@field power string|number?
 ---@field luminiteForced boolean?
 ---@field theriumForced boolean?
 ---@field buildTimeForced boolean?
 ---@field supplyForced boolean?
 ---@field animusForced boolean?
+---@field powerForced boolean?
 ---@field luminiteTotal string|number?
 ---@field theriumTotal string|number?
 ---@field buildTimeTotal string|number?
 ---@field supplyTotal string|number?
 ---@field animusTotal string|number?
+---@field powerTotal string|number?
 
 ---@param args StormgateCostDisplayArgsValues
 ---@return string?

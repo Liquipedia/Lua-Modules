@@ -99,13 +99,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 end
 
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
-
 ---@param op1 table
 ---@param op2 table
 ---@param op1norm boolean

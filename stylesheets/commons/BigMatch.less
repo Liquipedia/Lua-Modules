@@ -320,6 +320,7 @@ Author(s): Rathoz
 	}
 }
 
+.match-bm-game-veto-overview-team-header,
 .match-bm-lol-game-veto-overview-team-header {
 	display: flex;
 	flex-direction: row;
@@ -526,6 +527,26 @@ ul.match-bm-lol-game-veto-overview-pick {
 	background: #b81414;
 }
 
+.match-bm-game-veto-wrapper,
+.match-bm-players-wrapper {
+	display: grid;
+	grid-template-columns: auto;
+	grid-gap: 1rem;
+	align-items: flex-start;
+
+	@media ( min-width: 414px ) {
+		font-size: 15px;
+	}
+
+	@media ( max-width: 413px ) {
+		font-size: 12px;
+	}
+
+	@media ( min-width: 768px ) {
+		grid-template-columns: auto auto;
+	}
+}
+
 /* >= 834 2 column player layout */
 @media ( max-width: 833px ) {
 	.match-bm-lol-players-wrapper {
@@ -557,6 +578,12 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
+.match-bm-players-team {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
 .match-bm-lol-players-team {
 	display: flex;
 	flex-direction: column;
@@ -577,6 +604,272 @@ ul.match-bm-lol-game-veto-overview-pick {
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-players-player {
+	display: flex;
+	padding: 1rem;
+	align-items: stretch;
+	background: #ffffff;
+	border: 0.0625rem solid #bbbbbb;
+
+	@media ( max-width: 1199px ), ( min-width: 1320px ) {
+		flex-wrap: wrap;
+		justify-content: space-between;
+	}
+
+	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+		display: grid;
+		grid-template-columns: 9.375rem auto 9.5rem;
+		grid-gap: 1rem;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-7 );
+		border-color: var( --clr-secondary-25 );
+	}
+
+	&-role {
+		width: 1.25rem;
+		height: 1.25rem;
+		position: absolute;
+		inset: auto 0 0 auto;
+		border-radius: 0.25rem;
+		background-color: var( --on-background );
+		overflow: hidden;
+
+		&.role--radiant {
+			background-color: var( --clr-atlantis-40 );
+		}
+
+		&.role--dire {
+			background-color: var( --clr-california-40 );
+		}
+	}
+
+	&-character {
+		display: flex;
+		align-items: center;
+		position: relative;
+
+		@media ( max-width: 1199px ), ( min-width: 1320px ) {
+			flex: 1 0 auto;
+		}
+
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			order: 1;
+		}
+	}
+
+	&-avatar {
+		width: 3rem;
+		height: 3rem;
+		margin-right: 0.5rem;
+		position: relative;
+
+		@media ( min-width: 768px ) {
+			width: 4rem;
+			height: 4rem;
+		}
+	}
+
+	&-icon {
+		overflow: hidden;
+		border-radius: 100%;
+
+		img {
+			width: auto;
+			height: 3rem;
+			position: relative;
+			left: 50%;
+			transform: translateX( -50% );
+
+			@media ( min-width: 768px ) {
+				height: 4rem;
+			}
+		}
+	}
+
+	&-loadout {
+		display: flex;
+		gap: 1rem;
+
+		@media ( max-width: 1199px ), ( min-width: 1320px ) {
+			flex: 0 0 7.5rem;
+		}
+
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			order: 3;
+		}
+
+		&-item {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 0.25rem;
+
+			img {
+				width: 1.5rem;
+				height: 1.5rem;
+				border-radius: 0.25rem;
+
+				@media ( min-width: 768px ) {
+					width: 2rem;
+					height: 2rem;
+				}
+			}
+		}
+
+		&-items {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+
+		&-rs {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.125rem;
+
+			img {
+				width: 1.5rem;
+				height: 1.5rem;
+				border-radius: 100%;
+
+				@media ( min-width: 768px ) {
+					width: 2rem;
+					height: 2rem;
+				}
+			}
+		}
+
+		&-rs-wrap {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 0.25rem;
+		}
+	}
+
+	&-stat {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.25rem;
+
+		&-title {
+			display: flex;
+			align-items: center;
+			font-size: 0.875rem;
+
+			i {
+				margin-right: 0.5rem;
+			}
+		}
+
+		&-data {
+			font-weight: bold;
+			font-size: 1rem;
+
+			@media ( min-width: 1024px ) {
+				font-size: 1.125rem;
+			}
+
+			.slash {
+				margin: 0 0.125rem;
+				opacity: 0.4;
+			}
+		}
+	}
+
+	&-stats {
+		display: grid;
+		grid-gap: 0.5rem;
+		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-rows: 1fr 1fr;
+
+		@media ( max-width: 1199px ), ( min-width: 1320px ) {
+			flex: 1 0 100%;
+			margin-top: 1rem;
+		}
+
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			order: 2;
+			margin-top: unset;
+		}
+	}
+}
+
+.match-bm-game-veto-overview-team-header {
+	border-bottom: 0.0625rem solid #bbbbbb;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-game-veto-overview-team-veto {
+	padding: 1rem 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	color: #ffffff;
+
+	&-row {
+		display: flex;
+		gap: 0.125rem;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: center;
+
+		&-item {
+			display: flex;
+			flex-direction: column;
+
+			img {
+				border-radius: 0.25rem 0.25rem 0 0;
+				width: 3.75rem;
+				height: 2.5rem;
+
+				@media ( min-width: 834px ) {
+					width: 4.5rem;
+					height: 3rem;
+				}
+			}
+
+			&-text {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				font-weight: bold;
+				border-radius: 0 0 0.25rem 0.25rem;
+			}
+		}
+
+		&--radiant {
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #7eac20;
+			}
+		}
+
+		&--dire {
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #cc6500;
+			}
+		}
+
+		&--ban {
+			opacity: 0.5;
+
+			.match-bm-game-veto-overview-team-veto-row-item-text {
+				background-color: #121212;
+			}
+		}
 	}
 }
 
@@ -942,5 +1235,129 @@ ul.match-bm-lol-game-veto-overview-pick {
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-team-stats {
+	border: 0.0625rem solid #bbbbbb;
+	margin-bottom: 1rem;
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-25 );
+	}
+
+	&-header {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		background: #eaecf0;
+		border-bottom: 0.0625rem solid #bbbbbb;
+		padding: 1rem 0;
+		gap: 0.5rem;
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-secondary-25 );
+		}
+
+		html h4&-title {
+			font-weight: bold;
+			text-transform: uppercase;
+			color: var( --clr-on-background ) !important;
+			margin: 0;
+			padding: 0;
+		}
+
+		&-time {
+			display: flex;
+			gap: 0.5rem;
+			align-items: center;
+			justify-content: center;
+		}
+	}
+
+	&-container {
+		display: flex;
+		padding: 1rem 0;
+		flex-wrap: wrap;
+	}
+
+	&-team {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		padding: 1rem 0;
+
+		@media ( max-width: 767px ) {
+			flex: 1 0 50%;
+			order: 1;
+		}
+
+		&-side {
+			font-weight: bold;
+			text-transform: uppercase;
+		}
+
+		&-state {
+			background-color: var( --clr-on-background );
+			border-radius: 0.75rem;
+			min-height: 1.5rem;
+			color: #ffffff;
+			padding: 0 0.5rem;
+			text-transform: uppercase;
+			font-weight: bold;
+
+			&.state--winner {
+				background-color: var( --clr-semantic-positive-40 );
+			}
+
+			&.state--loser {
+				background-color: var( --clr-semantic-negative-40 );
+			}
+		}
+	}
+
+	&-list {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+
+		@media ( max-width: 767px ) {
+			flex: 1 0 100%;
+			order: 2;
+		}
+
+		&-row {
+			display: flex;
+
+			&:not( :last-child ) {
+				border-bottom: 0.0625rem solid #bbbbbb;
+
+				.theme--dark & {
+					border-color: var( --clr-secondary-25 );
+				}
+			}
+		}
+
+		&-cell {
+			display: flex;
+			justify-content: center;
+			flex: 1;
+			align-items: center;
+			min-height: 2.75rem;
+			gap: 0.5rem;
+			font-weight: bold;
+
+			&.cell--middle {
+				font-weight: normal;
+			}
+
+			.slash {
+				opacity: 0.4;
+			}
+		}
 	}
 }

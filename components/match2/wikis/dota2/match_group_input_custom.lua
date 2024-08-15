@@ -155,8 +155,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
-CustomMatchGroupInput.processPlayer = FnUtil.identity
-
 ---@param data table
 ---@param indexedScores table[]
 ---@return table

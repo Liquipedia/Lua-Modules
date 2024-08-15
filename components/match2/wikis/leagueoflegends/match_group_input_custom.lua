@@ -120,7 +120,6 @@ function MatchFunctions.extractMaps(MatchParser, match)
 end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
-CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---Should only be called on finished matches or maps
 ---@param winner integer|string
@@ -131,7 +130,7 @@ CustomMatchGroupInput.processPlayer = FnUtil.identity
 function CustomMatchGroupInput.getResultTypeAndWinner(winner, opponents)
 	if type(winner) == 'string' and CustomMatchGroupInput.isNotPlayedInput(winner) then
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
-	end
+  end
 
 	-- Calculate winner, resulttype, placements and walkover as applicable
 	if MatchGroupInput.isDraw(opponents) then

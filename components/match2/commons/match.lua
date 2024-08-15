@@ -117,7 +117,7 @@ function Match.storeMatchGroup(matchRecords, options)
 
 	if LegacyMatch then
 		Array.forEach(matchRecordsCopy, function(matchRecord)
-			LegacyMatch.storeMatch(matchRecord, options)
+			Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
 		end)
 	end
 end
@@ -473,7 +473,6 @@ end
 
 if FeatureFlag.get('perf') then
 	Match.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'subobjectPerf'})
-	require('Module:Performance/Util').setupEntryPoints(Match, {'toEncodedJson'})
 end
 
 Lua.autoInvokeEntryPoints(Match, 'Module:Match', {'toEncodedJson'})

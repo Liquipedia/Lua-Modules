@@ -99,13 +99,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
-
 -- Set the field 'placement' for the two participants in the opponenets list.
 -- Set the placementWinner field to the winner, and placementLoser to the other team
 -- Special cases:
