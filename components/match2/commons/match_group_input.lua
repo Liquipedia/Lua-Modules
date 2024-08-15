@@ -48,17 +48,17 @@ local MatchGroupInput = {}
 ---@field team string?
 ---@field template string
 
+---@deprecated
 ---@class MatchGroupInputReadPlayersOfTeamOptions
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
 ---@field applyUnderScores boolean?
----@field timestamp integer?
----@field timezoneOffset string?
 
----@class readOpponentOptions: MatchGroupInputReadPlayersOfTeamOptions
+---@class readOpponentOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
 ---@field pagifyOpponentName boolean?
 ---@field pagifyPlayerNames boolean?
----@field syncPlayer boolean?
 
 ---@class MatchGroupInputSubstituteInformation
 ---@field substitute standardPlayer
@@ -537,7 +537,8 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		opponent.players, substitutions = MatchGroupInput.readPlayersOfTeamNew(
 			opponent,
 			manualPlayersInput,
-			Table.merge(options, {timestamp = match.timestamp, timezoneOffset = match.timezoneOffset})
+			options,
+			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
 		)
 	end
 
@@ -716,10 +717,11 @@ end
 ---reads the players of a team from input and wiki variables
 ---@param opponent standardOpponent
 ---@param manualPlayersInput {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
----@param options MatchGroupInputReadPlayersOfTeamOptions
+---@param options readOpponentOptions
+---@param dateTimeInfo {timestamp: integer?, timezoneOffset: string?}
 ---@return standardPlayer[]
 ---@return table
-function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, options)
+function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, options, dateTimeInfo)
 	---@type string
 	local teamName = opponent.name
 
@@ -758,7 +760,7 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 
 		local wasPresentInMatch = function()
-			if not options.timestamp then return true end
+			if not dateTimeInfo.timestamp then return true end
 
 			local joinDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'joindate', ''))
 			local leaveDate = DateExt.readTimestamp(Variables.varDefault(varPrefix .. 'leavedate', ''))
@@ -766,7 +768,7 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 			if (not joinDate) and (not leaveDate) then return true end
 
 			-- need to offset match time to correct timezone as transfers do not have a time associated with them
-			local timestampLocal = options.timestamp + DateExt.getOffsetSeconds(options.timezoneOffset or '')
+			local timestampLocal = dateTimeInfo.timestamp + DateExt.getOffsetSeconds(dateTimeInfo.timezoneOffset or '')
 
 			return (not joinDate or (joinDate <= timestampLocal)) and
 				(not leaveDate or (leaveDate > timestampLocal))
@@ -806,6 +808,7 @@ function MatchGroupInput.readPlayersOfTeamNew(opponent, manualPlayersInput, opti
 end
 
 ---reads the players of a team from input and wiki variables
+---@deprecated
 ---@param match table
 ---@param opponentIndex integer
 ---@param teamName string
