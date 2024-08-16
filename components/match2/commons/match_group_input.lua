@@ -1201,9 +1201,8 @@ function MatchGroupInput.opponentWalkover(walkoverInput, isWinner)
 	end
 
 	local walkoverUpperCase = string.upper(walkoverInput)
-	if Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase) then
-		return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
-	end
+	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase), 'Invalid walkover input')
+	return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
 end
 
 -- Calculate the match scores based on the map results (counting map wins)
