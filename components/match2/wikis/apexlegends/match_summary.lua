@@ -173,7 +173,7 @@ function CustomMatchSummary.getByMatchId(props)
 	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	match.matchPointThreadhold = Table.extract(match.extradata.scoring, 'matchPointThreadhold')
-	match = CustomMatchSummary._opponents(match)
+	CustomMatchSummary._opponents(match)
 
 	local matchSummary = mw.html.create()
 
@@ -202,8 +202,6 @@ function CustomMatchSummary._opponents(match)
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
-
-	return match
 end
 
 ---@param match table

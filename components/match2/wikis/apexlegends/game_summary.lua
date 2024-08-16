@@ -137,7 +137,7 @@ function CustomGameSummary.getGameByMatchId(props)
 
 	game.stream = match.stream
 
-	match = CustomGameSummary._opponents(match)
+	CustomGameSummary._opponents(match)
 
 	local gameSummary = mw.html.create()
 	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameIdx))
@@ -249,8 +249,6 @@ function CustomGameSummary._opponents(match)
 	Array.forEach(match.games, function (game)
 		Array.sortInPlaceBy(game.extradata.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
 	end)
-
-	return match
 end
 
 return CustomGameSummary
