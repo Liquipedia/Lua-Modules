@@ -1083,7 +1083,7 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 end
 
 ---Should only be called on finished matches or maps
----@param winnerInput integer|string
+---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@param opponents {score: number, status: string}[]
 ---@return string? #Result Type
@@ -1350,6 +1350,26 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 
 	return false
 end
+
+---@param map {winner: string|nil, finished: string?}
+---@return boolean
+function MatchGroupInput.mapIsFinished(map)
+	local finished = Logic.readBoolOrNil(map.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	if Logic.isNotEmpty(map.winner) then
+		return true
+	end
+
+	if Logic.isNotEmpty(map.finished) then
+		return true
+	end
+
+	return false
+end
+
 
 ---@param alias table<string, string>
 ---@param character string?

@@ -11,6 +11,7 @@ local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:ChampionNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
@@ -84,10 +85,11 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	end)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
+	local finishedInput = match.finished --[[@as string?]]
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype, match.winner, match.walkover = MatchGroupInput.getResultTypeAndWinner(match.winner, opponents)
+		match.resulttype, match.winner, match.walkover = MatchGroupInput.getResultTypeAndWinner(match.winner, finishedInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
 	end
 
@@ -115,9 +117,17 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		if map.map == DUMMY_MAP then
 			map.map = nil
 		end
+
 		map.length = MatchParser.getLength(map)
 		map.participants, map.extradata = MapFunctions.getParticipants(MatchParser, map, opponentCount)
-		Table.mergeInto(map, MapFunctions.getScoresAndWinner(map, opponentCount))
+
+		local finishedInput = map.finished --[[@as string?]]
+		map.finished = MatchGroupInput.mapIsFinished(map)
+		if map.finished then
+			local opponentInfo = MapFunctions.makeOpponentInfoFromWinner(tonumber(map.winner), opponentCount)
+			map.scores = Array.map(opponentInfo, Operator.property('score'))
+			map.resulttype, map.winner, map.walkover = MatchGroupInput.getResultTypeAndWinner(map.winner, finishedInput, opponentInfo)
+		end
 
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 
@@ -212,43 +222,21 @@ function MapFunctions.getParticipants(MatchParser, map, opponentCount)
 	return participants, extradata
 end
 
--- Calculate Score and Winner of the map
----@param map {finished:string?, winner:string?}]
----@param opponentCount integer
----@return {finished:boolean, winner:integer?, resulttype:string?, walkover:string?, scores:integer[]}
-function MapFunctions.getScoresAndWinner(map, opponentCount)
-	local finished = Logic.readBool(map.finished)
-	local winner = map.winner
-	if winner then
-		finished = true
-	end
-
-	local scores = MapFunctions.getScoreFromWinner(finished, tonumber(winner), opponentCount)
-
-	local resultType
-	if MatchGroupInput.isNotPlayedInput(winner) or MatchGroupInput.isNotPlayedInput(map.finished) then
-		resultType = MatchGroupInput.RESULT_TYPE.NOT_PLAYED
-		winner = nil
-	end
-
-	return {finished = finished, winner = winner, resulttype = resultType, scores = scores}
-end
-
----@param finished boolean?
 ---@param winner integer?
 ---@param opponentCount integer
----@return table
-function MapFunctions.getScoreFromWinner(finished, winner, opponentCount)
-	if not finished then
+---@return {score: integer, status: string}[]
+function MapFunctions.makeOpponentInfoFromWinner(winner, opponentCount)
+	if not winner or winner > opponentCount or winner < 0 then
 		return {}
 	end
 
-	local scores = Array.map(Array.range(1, opponentCount), function() return 0 end)
-	if not winner or winner < 1 or winner > opponentCount then
-		return scores
-	end
+	local scores = Array.map(Array.range(1, opponentCount), function()
+		return {score = 0, status = MatchGroupInput.STATUS.SCORE}
+	end)
 
-	scores[winner] = 1
+	if winner > 0 then
+		scores[winner].score = 1
+	end
 
 	return scores
 end
