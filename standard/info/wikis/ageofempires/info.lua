@@ -93,8 +93,6 @@ return {
 		},
 	},
 
-	opponentLibrary = 'Opponent/Custom',
-
 	config = {
 		squads = {
 			hasPosition = false,
