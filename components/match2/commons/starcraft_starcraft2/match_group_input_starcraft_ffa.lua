@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft')
+local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/deprecated')
 local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L'}
