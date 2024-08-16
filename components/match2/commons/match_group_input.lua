@@ -1167,7 +1167,7 @@ function MatchGroupInput.computeOpponentScore(props, autoScore)
 		return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
 	end
 	local score = props.score
-	if score and autoScore then
+	if not score and autoScore then
 		score = autoScore(props.opponentIndex)
 	end
 
