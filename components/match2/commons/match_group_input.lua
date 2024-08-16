@@ -1116,13 +1116,25 @@ function MatchGroupInput.getWinner(resultType, winnerInput,  opponents)
 		return MatchGroupInput.WINNER_DRAW
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
 		return MatchGroupInput.getDefaultWinner(opponents)
+	elseif Logic.isNumeric(winnerInput) then
+		return tonumber(winnerInput)
 	else
-		return tonumber(winnerInput) or (tonumber(opponents[1].score) > tonumber(opponents[2].score)) and 1 or 2
+		return MatchGroupInput.getHighestScoringOpponent(opponents)
 	end
 end
 
+---Find the opponent with the highest score
+---If multiple opponents share the highest score, the first one is returned
+---@param opponents {score: number}[]
+---@return integer
+function MatchGroupInput.getHighestScoringOpponent(opponents)
+	local scores = Array.map(opponents, Operator.property('score'))
+	local maxScore = Array.max(scores)
+	return Array.indexOf(scores, function(score) return score == maxScore end)
+end
+
 ---@param resultType string?
----@param opponents {score: number, status: string}[]
+---@param opponents {status: string}[]
 ---@return string? # Walkover Type
 function MatchGroupInput.getWalkover(resultType, opponents)
 	if resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
@@ -1130,7 +1142,7 @@ function MatchGroupInput.getWalkover(resultType, opponents)
 	end
 end
 
----@param opponents {score: number, status: string}[]
+---@param opponents {status: string}[]
 ---@return string?
 function MatchGroupInput.getWalkoverType(opponents)
 	if MatchGroupInput.hasForfeit(opponents) then
@@ -1143,7 +1155,7 @@ function MatchGroupInput.getWalkoverType(opponents)
 end
 
 ---@param match table
----@param maps {scores: integer[], winner: integer?}[]
+---@param maps {scores: integer[]?, winner: integer?}[]
 ---@return boolean
 function MatchGroupInput.canUseAutoScore(match, maps)
 	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
