@@ -555,7 +555,8 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		return opponentIndex <= 2 and Opponent.blank() or nil
 	end
 
-	local opponent = Opponent.readOpponentArgs(opponentInput)
+	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
+	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
 	if Opponent.isBye(opponent) then
 		return {type = Opponent.literal, name = 'BYE'}
 	end
