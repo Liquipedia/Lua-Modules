@@ -24,6 +24,7 @@ local Building = Lua.import('Module:Infobox/Building')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 ---@class StormgateBuildingInfobox: BuildingInfobox
 ---@field faction string?
@@ -36,6 +37,7 @@ local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
+local CREEP = 'Camp'
 
 ---@param frame Frame
 ---@return Html
@@ -61,6 +63,10 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
+
+	if args.informationType == CREEP then
+		return caller:_parseForCreeps(id, widgets)
+	end
 
 	if id == 'custom' then
 		Array.appendWith(
@@ -167,15 +173,34 @@ end
 ---@param args table
 ---@return string[]
 function CustomBuilding:getWikiCategories(args)
-	if not self.faction then
-		return {}
-	end
-
-	return {Faction.toName(self.faction) .. ' Buildings'}
+	local factionName = Faction.toName(self.faction)
+	return Array.append({},
+		factionName and (factionName .. ' Buildings') or nil,
+		args.informationType == CREEP and 'Camps' or nil
+	)
 end
 
 ---@param args table
 function CustomBuilding:setLpdbData(args)
+	
+	if args.informationType == CREEP then
+		mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. self.pagename, {
+			name = args.name or self.pagename,
+			type = (args.informationType or 'building'):lower(),
+			information = self.faction,
+			image = args.image,
+			imagedark = args.imagedark,
+			extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+				startlevel = tonumber(args.start_level),
+				respawn = tonumber(args.respawn),
+				creeps = Array.parseCommaSeparatedString(args.creeps),
+				capturepoint = args.capture_point,
+				globalbuff =  args.global_buff,
+			},
+		})
+		return
+	end
+	
 	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. self.pagename, {
 		name = args.name or self.pagename,
 		type = 'building',
@@ -227,11 +252,11 @@ function CustomBuilding:_getDefenseDisplay()
 	local armor = tonumber(args.armor)
 
 	return table.concat(Array.append({},
-		health and ICON_HP or nil,
-		health,
+		ICON_HP,
+		health or 0,
 		extraHealth and ('(+' .. extraHealth .. ')') or nil,
-		armor and ICON_ARMOR or nil,
-		armor
+		ICON_ARMOR,
+		armor or 0
 	), '&nbsp;')
 end
 
@@ -278,6 +303,54 @@ function CustomBuilding._deprecatedWarning(patch)
 		class='ambox-red',
 		text= 'This has been removed from 1v1 with Patch ' .. patch,
 	})
+end
+
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomBuilding:_parseForCreeps(id, widgets)
+	local args = self.args
+	local startLevel = args.start_level == '1' and args.start_level or args.start_level and "'''" .. args.start_level .. "'''"
+
+	local creeps = {}
+	Array.forEach(Array.parseCommaSeparatedString(args.creeps), function(creep)
+		local unit = mw.ext.LiquipediaDB.lpdb('datapoint', {
+			conditions = '[[information::n]] AND [[type::Unit]] AND [[name::' .. creep .. ']]',
+			limit = 1,
+		})[1] or {}
+		Array.appendWith(creeps, unit)
+	end)
+
+	if id ~= 'custom' then return end
+
+	return {
+		Cell{name = 'Start Level', content = {startLevel}},
+		Cell{name = 'Defenders', content = {self._displayCreepDefenders(creeps)}},
+		Cell{name = 'Respawn', content = {args.respawn and args.respawn .. 's'}},
+		Title{name = 'Tower Rewards'},
+		Cell{name = 'Capture Point', content = {args.capture_point}},
+		Cell{name = 'Global Buff', content = {args.global_buff}},
+	}
+end
+
+---@param creeps table
+---@return string
+function CustomBuilding._displayCreepDefenders(creeps)
+	local display = {}
+	local groupedCreeps = Array.groupBy(creeps, function(creep) return creep.name end)
+
+	Array.forEach(groupedCreeps, function(group)
+		local bounty = CostDisplay.run{
+			luminite = group[1].extradata.bountyluminite or 0,
+			therium = group[1].extradata.bountytherium or 0,
+		}
+		Array.appendWith(display,
+			Page.makeInternalLink(group[1].name) ..
+			(bounty and (' (' .. bounty .. ')') or '') ..
+			(#group > 1 and ' x' .. #group or ''))
+	end)
+
+	return table.concat(display, '<br>')
 end
 
 return CustomBuilding
