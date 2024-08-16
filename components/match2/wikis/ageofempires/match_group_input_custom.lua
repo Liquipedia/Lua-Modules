@@ -131,6 +131,7 @@ function CustomMatchGroupInput._getExtraData(match)
 		headtohead = match.headtohead,
 		civdraft = match.civdraft,
 		mapdraft = match.mapdraft,
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 end
 
