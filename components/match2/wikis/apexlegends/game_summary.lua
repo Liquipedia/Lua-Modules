@@ -126,21 +126,21 @@ local GAME_STANDINGS_COLUMNS = {
 	},
 }
 
----@param props {bracketId: string, matchId: string, gameId: integer}
+---@param props {bracketId: string, matchId: string, gameIdx: integer}
 ---@return string
 function CustomGameSummary.getGameByMatchId(props)
 	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 
-	local game = match.games[props.gameId]
-	assert(game, 'Error Game ID ' .. tostring(props.gameId) .. ' not found')
+	local game = match.games[props.gameIdx]
+	assert(game, 'Error Game ID ' .. tostring(props.gameIdx) .. ' not found')
 
 	game.stream = match.stream
 
 	match = CustomGameSummary._opponents(match)
 
 	local gameSummary = mw.html.create()
-	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameId))
+	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameIdx))
 
 	return tostring(gameSummary)
 end
