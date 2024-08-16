@@ -99,7 +99,7 @@ return {
 		},
 		points = {
 			value = 'Points',
-			sort = 'B2',
+			sort = 'B3',
 			name = 'Points',
 			short = 'Points',
 			link = 'Point Rankings',
