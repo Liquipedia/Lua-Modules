@@ -20,6 +20,7 @@ local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local MAX_NUM_BANS = 2
 local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
+local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -124,7 +125,7 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
