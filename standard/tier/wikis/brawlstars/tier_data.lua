@@ -97,5 +97,13 @@ return {
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
 		},
+		points = {
+			value = 'Points',
+			sort = 'B2',
+			name = 'Points',
+			short = 'Points',
+			link = 'Point Rankings',
+			category = 'Point Rankings',
+		},
 	},
 }
