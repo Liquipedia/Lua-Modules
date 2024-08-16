@@ -1088,9 +1088,7 @@ end
 ---@param finishedInput string?
 ---@param opponents {score: number, status: string}[]
 ---@return string? #Result Type
----@return integer? #Winner
----@return string? #Walkover
-function MatchGroupInput.getResultTypeAndWinner(winnerInput, finishedInput, opponents)
+function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
 	if (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
 		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput)) then
 
@@ -1099,16 +1097,37 @@ function MatchGroupInput.getResultTypeAndWinner(winnerInput, finishedInput, oppo
 
 	-- Calculate winner, resulttype, placements and walkover as applicable
 	if MatchGroupInput.isDraw(opponents) then
-		return MatchGroupInput.RESULT_TYPE.DRAW, MatchGroupInput.WINNER_DRAW
+		return MatchGroupInput.RESULT_TYPE.DRAW
 	end
 
 	if MatchGroupInput.hasSpecialStatus(opponents) then
-		local walkoverType = MatchGroupInput.getWalkoverType(opponents)
-		return MatchGroupInput.RESULT_TYPE.DEFAULT, MatchGroupInput.getDefaultWinner(opponents), walkoverType
+		return MatchGroupInput.RESULT_TYPE.DEFAULT
 	end
+end
 
-	assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
-	return nil, tonumber(winnerInput) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
+---@param resultType string?
+---@param winnerInput integer|string|nil
+---@param opponents {score: number, status: string}[]
+---@return integer? # Winner
+function MatchGroupInput.getWinner(resultType, winnerInput,  opponents)
+	if resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then
+		return nil
+	elseif resultType == MatchGroupInput.RESULT_TYPE.DRAW then
+		return MatchGroupInput.WINNER_DRAW
+	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
+		return MatchGroupInput.getDefaultWinner(opponents)
+	else
+		return tonumber(winnerInput) or (tonumber(opponents[1].score) > tonumber(opponents[2].score)) and 1 or 2
+	end
+end
+
+---@param resultType string?
+---@param opponents {score: number, status: string}[]
+---@return string? # Walkover Type
+function MatchGroupInput.getWalkover(resultType, opponents)
+	if resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
+		return MatchGroupInput.getWalkoverType(opponents)
+	end
 end
 
 ---@param opponents {score: number, status: string}[]

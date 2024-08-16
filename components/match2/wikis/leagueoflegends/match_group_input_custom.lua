@@ -73,6 +73,8 @@ end
 ---@param match table
 ---@return table
 function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
+	local finishedInput = match.finished --[[@as string?]]
+	local winnerInput = match.winner --[[@as string?]]
 	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
@@ -92,12 +94,12 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	end)
 
 	match.bestof = MatchGroupInput.getBestOf(match.bestof, games)
-	local finishedInput = match.finished --[[@as string?]]
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype, match.winner, match.walkover =
-			MatchGroupInput.getResultTypeAndWinner(match.winner, finishedInput, opponents)
+		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
+		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
+		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
 	end
 
@@ -121,6 +123,8 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 	local maps = {}
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MatchParser.getMap(mapInput)
+		local finishedInput = map.finished --[[@as string?]]
+		local winnerInput = map.winner --[[@as string?]]
 
 		if map.map == DUMMY_MAP then
 			map.map = nil
@@ -130,7 +134,6 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		map.participants = MapFunctions.getParticipants(MatchParser, map, opponentCount)
 		map.extradata = MapFunctions.getExtraData(MatchParser, map, opponentCount)
 
-		local finishedInput = map.finished --[[@as string?]]
 		map.finished = MatchGroupInput.mapIsFinished(map)
 		if map.finished then
 			local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
@@ -143,8 +146,9 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 				return {score = score, status = status}
 			end)
 			map.scores = Array.map(opponentInfo, Operator.property('score'))
-			map.resulttype, map.winner, map.walkover =
-				MatchGroupInput.getResultTypeAndWinner(map.winner, finishedInput, opponentInfo)
+			map.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponentInfo)
+			map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
+			map.winner = MatchGroupInput.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
 
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
