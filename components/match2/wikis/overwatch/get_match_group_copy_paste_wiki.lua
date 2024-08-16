@@ -27,9 +27,9 @@ local INDENT = WikiCopyPaste.Indent
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local casters = Logic.readBool(args.casters)
-	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), bestof == 0)
 	local streams = Logic.readBool(args.streams)
+	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
 	local lines = Array.extendWith({},
 		'{{Match',
@@ -43,7 +43,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		end),
 		bestof ~= 0 and Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=}}'
-		end) or nil,		
+		end) or nil,
 		Logic.readBool(args.faceit) and (INDENT .. '|faceit=') or nil,
 		INDENT .. '}}'
 	)
