@@ -81,8 +81,9 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
+	match.bestof = MatchGroupInput.getBestOf(match.bestof, games)
 
-	local canUseAutoScore = MatchGroupInput.canUseAutoScore(match, opponents)
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents) and MatchFunctions.calculateMatchScore(games) or nil
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInput.computeOpponentScore({
@@ -90,10 +91,9 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 			winner = match.winner,
 			opponentIndex = opponentIndex,
 			score = opponent.score,
-		}, canUseAutoScore and MatchFunctions.calculateMatchScore(games) or nil)
+		}, autoScoreFunction)
 	end)
 
-	match.bestof = MatchGroupInput.getBestOf(match.bestof, games)
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
@@ -131,6 +131,7 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		end
 
 		map.length = MatchParser.getLength(map)
+		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.participants = MapFunctions.getParticipants(MatchParser, map, opponentCount)
 		map.extradata = MapFunctions.getExtraData(MatchParser, map, opponentCount)
 
@@ -142,7 +143,7 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 					winner = map.winner,
 					opponentIndex = opponentIndex,
 					score = map['score' .. opponentIndex],
-				}, map.finished and MapFunctions.calculateMapScore(map.winner) or nil)
+				}, MapFunctions.calculateMapScore(map.winner))
 				return {score = score, status = status}
 			end)
 			map.scores = Array.map(opponentInfo, Operator.property('score'))
@@ -150,8 +151,6 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 			map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 			map.winner = MatchGroupInput.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
-
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 
 		table.insert(maps, map)
 		match[key] = nil
