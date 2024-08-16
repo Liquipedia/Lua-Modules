@@ -140,7 +140,7 @@ function MatchFunctions.addOpponentExtradata(opponent)
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
 		score2 = opponent.score2,
-		isarchon = opponent.isarchon
+		isarchon = opponent.isarchon,
 	})
 end
 
@@ -280,8 +280,15 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 		players[opponetIndex] = participant
 	end
 
+	---@param opponentIndex integer
+	---@return boolean
+	local isArchon = function(opponentIndex)
+		return Logic.readBool(mapInput['opponent' .. opponentIndex .. 'archon']) or
+			Logic.readBool(opponents[opponentIndex].extradata.isarchon)
+	end
+
 	playerCounts = Array.map(playerCounts, function(count, opponentIndex)
-		if count == 2 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'archon']) then
+		if count == 2 and isArchon(opponentIndex) then
 			return 'Archon'
 		elseif count == 2 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'duoSpecial']) then
 			return '2S'
