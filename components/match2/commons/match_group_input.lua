@@ -577,7 +577,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
 		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
-		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array and the substitutions data
+		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
 		opponent.players = MatchGroupInput.readPlayersOfTeamNew(
 			opponent.name,
 			manualPlayersInput,
