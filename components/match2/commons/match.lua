@@ -287,12 +287,17 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 
 	local opponentIndexes = Array.map(records.opponentRecords, function(opponentRecord, opponentIndex)
 		local playerIndexes = Array.map(records.playerRecords[opponentIndex], function(player, playerIndex)
+
+			player.extradata = Logic.nilIfEmpty(player.extradata)
+
 			return mw.ext.LiquipediaDB.lpdb_match2player(
 				matchRecord.match2id .. '_m2o_' .. string.format('%02d', opponentIndex)
 						.. '_m2p_' .. string.format('%02d', playerIndex),
 				player
 			)
 		end)
+
+		opponentRecord.extradata = Logic.nilIfEmpty(opponentRecord.extradata)
 
 		opponentRecord.match2players = table.concat(playerIndexes)
 		return mw.ext.LiquipediaDB.lpdb_match2opponent(
