@@ -1130,7 +1130,7 @@ end
 function MatchGroupInput.getHighestScoringOpponent(opponents)
 	local scores = Array.map(opponents, Operator.property('score'))
 	local maxScore = Array.max(scores)
-	return Array.indexOf(scores, function(score) return score == maxScore end)
+	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
 end
 
 ---@param resultType string?
