@@ -89,7 +89,8 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype, match.winner, match.walkover = MatchGroupInput.getResultTypeAndWinner(match.winner, finishedInput, opponents)
+		match.resulttype, match.winner, match.walkover =
+			MatchGroupInput.getResultTypeAndWinner(match.winner, finishedInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
 	end
 
@@ -126,7 +127,8 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		if map.finished then
 			local opponentInfo = MapFunctions.makeOpponentInfoFromWinner(tonumber(map.winner), opponentCount)
 			map.scores = Array.map(opponentInfo, Operator.property('score'))
-			map.resulttype, map.winner, map.walkover = MatchGroupInput.getResultTypeAndWinner(map.winner, finishedInput, opponentInfo)
+			map.resulttype, map.winner, map.walkover =
+				MatchGroupInput.getResultTypeAndWinner(map.winner, finishedInput, opponentInfo)
 		end
 
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
