@@ -1128,27 +1128,31 @@ end
 ---@return boolean
 function MatchGroupInput.canUseAutoScore(match, maps)
 	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
-	local anyMapHasWinner = Table.any(maps, function(_, map) return map.winner end)
-	return matchHasStarted or anyMapHasWinner
+	local anyMapHasWinner = Table.any(maps, function(_, map)
+		return Logic.isNotEmpty(map.winner)
+	end)
+	local anyMapHasScores = Table.any(maps, function(_, map)
+		return Logic.isNotEmpty(map.scores)
+	end)
+	return matchHasStarted or anyMapHasWinner or anyMapHasScores
 end
 
----@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex :integer}
+---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
 ---@param autoScore? fun(opponentIndex: integer): integer?
 ---@return integer? #SCORE
 ---@return string? #STATUS
 function MatchGroupInput.computeOpponentScore(props, autoScore)
 	if props.walkover then
 		local winner = tonumber(props.walkover) or tonumber(props.winner)
-		if winner then
-			return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
-		end
-	else
-		if not props.score and autoScore then
-			props.score = autoScore(props.opponentIndex)
-		end
-
-		return MatchGroupInput.parseScoreInput(props.score)
+		assert(winner, 'Failed to parse walkover input')
+		return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
 	end
+	local score = props.score
+	if score and autoScore then
+		score = autoScore(props.opponentIndex)
+	end
+
+	return MatchGroupInput.parseScoreInput(score)
 end
 
 ---@param scoreInput string|number|nil
