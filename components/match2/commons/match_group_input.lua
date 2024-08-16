@@ -1102,20 +1102,24 @@ function MatchGroupInput.getResultTypeAndWinner(winnerInput, finishedInput, oppo
 	end
 
 	if MatchGroupInput.hasSpecialStatus(opponents) then
-		local walkoverType
-		if MatchGroupInput.hasForfeit(opponents) then
-			walkoverType = MatchGroupInput.WALKOVER.FORFIET
-		elseif MatchGroupInput.hasDisqualified(opponents) then
-			walkoverType = MatchGroupInput.WALKOVER.DISQUALIFIED
-		elseif MatchGroupInput.hasDefaultWinLoss(opponents) then
-			walkoverType = MatchGroupInput.WALKOVER.NO_SCORE
-		end
-
+		local walkoverType = MatchGroupInput.getWalkoverType(opponents)
 		return MatchGroupInput.RESULT_TYPE.DEFAULT, MatchGroupInput.getDefaultWinner(opponents), walkoverType
 	end
 
 	assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
 	return nil, tonumber(winnerInput) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
+end
+
+---@param opponents {score: number, status: string}[]
+---@return string?
+function MatchGroupInput.getWalkoverType(opponents)
+	if MatchGroupInput.hasForfeit(opponents) then
+		return MatchGroupInput.WALKOVER.FORFIET
+	elseif MatchGroupInput.hasDisqualified(opponents) then
+		return MatchGroupInput.WALKOVER.DISQUALIFIED
+	elseif MatchGroupInput.hasDefaultWinLoss(opponents) then
+		return MatchGroupInput.WALKOVER.NO_SCORE
+	end
 end
 
 ---@param match table
