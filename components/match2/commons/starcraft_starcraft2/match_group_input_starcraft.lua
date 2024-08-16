@@ -239,6 +239,7 @@ function MapFunctions.readMap(rawMapInput, subGroup)
 	todo
 	-- TODO: determine score, resulttype, walkover and winner
 	-- old function: StarcraftMatchGroupInput._mapWinnerProcessing(map)
+	-- TODO: determine if map is finished
 
 	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
@@ -315,10 +316,12 @@ end
 
 --[[
 
-bot run under way for cleanup:
-python pwb.py replace -lang:starcraft2 -file:"C:\Users\Andi\Desktop\subheader.txt" -regex -summary:"cleanup" "\|subgroup(\d+)header\s*=" "|submatch\1header=" "\|subGroup(\d+)header\s*=" "|submatch\1header="
+additionally needed refactor due to changes in "base"
+- computeOpponentScore changed significantly
+- getResultTypeAndWinner changed significantly (split into several functions)
 
 ]]
+
 
 
 
