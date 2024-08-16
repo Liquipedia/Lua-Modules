@@ -39,7 +39,7 @@ local DEFAULT_ALLOWED_VETOES = {
 	'defaultban',
 }
 
-local NOT_PLAYER_INPUTS = {
+local NOT_PLAYED_INPUTS = {
 	'skip',
 	'np',
 	'canceled',
@@ -1083,21 +1083,25 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 end
 
 ---Should only be called on finished matches or maps
----@param winner integer|string
+---@param winnerInput integer|string
+---@param finishedInput string?
 ---@param opponents {score: number, status: string}[]
 ---@return string? #Result Type
 ---@return integer? #Winner
 ---@return string? #Walkover
-function MatchGroupInput.getResultTypeAndWinner(winner, opponents)
-	if type(winner) == 'string' and MatchGroupInput.isNotPlayedInput(winner) then
+function MatchGroupInput.getResultTypeAndWinner(winnerInput, finishedInput, opponents)
+	if (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
+		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput)) then
+
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
-  end
+	end
 
 	-- Calculate winner, resulttype, placements and walkover as applicable
 	if MatchGroupInput.isDraw(opponents) then
 		return MatchGroupInput.RESULT_TYPE.DRAW, MatchGroupInput.WINNER_DRAW
+	end
 
-	elseif MatchGroupInput.hasSpecialStatus(opponents) then
+	if MatchGroupInput.hasSpecialStatus(opponents) then
 		local walkoverType
 		if MatchGroupInput.hasForfeit(opponents) then
 			walkoverType = MatchGroupInput.WALKOVER.FORFIET
@@ -1108,11 +1112,10 @@ function MatchGroupInput.getResultTypeAndWinner(winner, opponents)
 		end
 
 		return MatchGroupInput.RESULT_TYPE.DEFAULT, MatchGroupInput.getDefaultWinner(opponents), walkoverType
-
-	else
-		assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
-		return nil, tonumber(winner) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
 	end
+
+	assert(#opponents == 2, 'Unexpected number of opponents when calculating winner')
+	return nil, tonumber(winnerInput) or tonumber(opponents[1].score) > tonumber(opponents[2].score) and 1 or 2
 end
 
 ---@param match table
@@ -1185,7 +1188,7 @@ end
 ---@param input string?
 ---@return boolean
 function MatchGroupInput.isNotPlayedInput(input)
-	return Table.includes(NOT_PLAYER_INPUTS, input)
+	return Table.includes(NOT_PLAYED_INPUTS, input)
 end
 
 ---@param opponents {status: string, score: string|number?}[]
