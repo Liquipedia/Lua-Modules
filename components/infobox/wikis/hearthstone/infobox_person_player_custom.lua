@@ -38,7 +38,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.role = ROLES[(player.args.role or ''):lower()]
-	player.role2 = ROLES[(player.args.role2 or ''):lower()]
 
 	return player:createInfobox()
 end
@@ -58,7 +57,6 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Role', content = {
 				caller:_displayRole(caller.role),
-				caller:_displayRole(caller.role2),
 			}},
 		}
 	end
@@ -78,8 +76,7 @@ end
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
 	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
+		(self.role or {}).category
 	)
 end
 
