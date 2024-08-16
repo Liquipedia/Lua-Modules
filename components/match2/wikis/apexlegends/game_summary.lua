@@ -138,17 +138,19 @@ function CustomGameSummary.getGameByMatchId(props)
 	game.stream = match.stream
 
 	CustomGameSummary._opponents(match)
+	local scoringData = SummaryHelper.createScoringData(match)
 
 	local gameSummary = mw.html.create()
-	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameIdx))
+	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameIdx, scoringData))
 
 	return tostring(gameSummary)
 end
 
 ---@param game table
 ---@param idx integer
+---@param scoreData table
 ---@return Html
-function CustomGameSummary._createGameTab(game, idx)
+function CustomGameSummary._createGameTab(game, idx, scoreData)
 	local page = mw.html.create('div')
 			:addClass('panel-content')
 			:attr('data-js-battle-royale', 'panel-content')
@@ -174,7 +176,7 @@ function CustomGameSummary._createGameTab(game, idx)
 				:tag('span'):wikitext(Page.makeInternalLink(game.map))
 	end
 
-	page:node(SummaryHelper.createPointsDistributionTable(SummaryHelper.createScoringData(match)))
+	page:node(SummaryHelper.createPointsDistributionTable(scoreData))
 
 	return page:node(CustomGameSummary._createGameStandings(game))
 end
