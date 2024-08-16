@@ -178,7 +178,7 @@ function StarcraftMatchSummary.createBody(match)
 	end)
 
 	if match.casters then
-		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-comment'):addElement('Caster(s): ' .. match.casters))
+		body:addRow(MatchSummary.makeCastersRow(match.casters))
 	end
 
 	return body

@@ -159,7 +159,7 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	end
 
 	extradata = {
-		casters = match.casters,
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 		headtohead = match.headtohead,
 		ffa = 'false',
 	}
