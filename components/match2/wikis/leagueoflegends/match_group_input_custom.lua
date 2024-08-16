@@ -128,7 +128,7 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 
 		map.length = MatchParser.getLength(map)
 		map.participants = MapFunctions.getParticipants(MatchParser, map, opponentCount)
-		map.extradata = MapFunctions.getExtradata(MatchParser, map, opponentCount)
+		map.extradata = MapFunctions.getExtraData(MatchParser, map, opponentCount)
 
 		local finishedInput = map.finished --[[@as string?]]
 		map.finished = MatchGroupInput.mapIsFinished(map)
@@ -195,8 +195,8 @@ end
 ---@param map table
 ---@param opponentCount integer
 ---@return table
-function MapFunctions.getExtradata(MatchParser, map, opponentCount)
-	local extradata = {
+function MapFunctions.getExtraData(MatchParser, map, opponentCount)
+	local extraData = {
 		comment = map.comment,
 	}
 	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
@@ -219,17 +219,17 @@ function MapFunctions.getExtradata(MatchParser, map, opponentCount)
 			end)
 		)
 
-		Table.mergeInto(extradata, Table.map(opponentData, function(key, value)
+		Table.mergeInto(extraData, Table.map(opponentData, function(key, value)
 			return prefixKeyWithTeam(key, opponentIndex), value
 		end))
 	end
 
-	extradata.vetophase = MatchParser.getVetoPhase(map)
-	Array.forEach(extradata.vetophase or {}, function(veto)
+	extraData.vetophase = MatchParser.getVetoPhase(map)
+	Array.forEach(extraData.vetophase or {}, function(veto)
 		veto.character = getCharacterName(veto.character)
 	end)
 
-	return extradata
+	return extraData
 end
 
 -- Parse participant information
