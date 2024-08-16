@@ -164,7 +164,7 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
-	return function (opponentIndex)
+	return function(opponentIndex)
 		return MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
 end
@@ -258,7 +258,7 @@ end
 ---@return fun(opponentIndex: integer): integer
 function MapFunctions.calculateMapScore(winnerInput)
 	local winner = tonumber(winnerInput)
-	return function (opponentIndex)
+	return function(opponentIndex)
 		return winner == opponentIndex and 1 or 0
 	end
 end
