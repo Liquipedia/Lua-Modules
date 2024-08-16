@@ -1187,9 +1187,8 @@ function MatchGroupInput.parseScoreInput(scoreInput)
 	end
 
 	local scoreUpperCase = string.upper(scoreInput)
-	if Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase) then
-		return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
-	end
+	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase), 'Invalid score input')
+	return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
 end
 
 ---@param walkoverInput string|integer #wikicode input
