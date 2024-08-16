@@ -237,6 +237,8 @@ function CustomUnit:setLpdbData(args)
 			passive = Array.parseCommaSeparatedString(args.passive),
 			armortypes = Array.parseCommaSeparatedString(args.armor_type),
 			upgradesto = Array.parseCommaSeparatedString(args.upgrades_to),
+			bountyluminite = tonumber(args.bounty_luminite),
+			bountytherium = tonumber(args.bounty_therium),
 		},
 	})
 end
