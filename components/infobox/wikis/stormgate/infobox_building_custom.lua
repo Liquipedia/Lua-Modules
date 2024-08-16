@@ -182,7 +182,6 @@ end
 
 ---@param args table
 function CustomBuilding:setLpdbData(args)
-	
 	if args.informationType == CREEP then
 		mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. self.pagename, {
 			name = args.name or self.pagename,
@@ -200,7 +199,7 @@ function CustomBuilding:setLpdbData(args)
 		})
 		return
 	end
-	
+
 	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. self.pagename, {
 		name = args.name or self.pagename,
 		type = 'building',
@@ -310,8 +309,8 @@ end
 ---@return Widget[]
 function CustomBuilding:_parseForCreeps(id, widgets)
 	local args = self.args
-	local startLevel = args.start_level == '1' and args.start_level or args.start_level and "'''" .. args.start_level .. "'''"
-
+	local startLevel = args.start_level == '1' and args.start_level or
+		args.start_level and "'''" .. args.start_level .. "'''"
 	local creeps = {}
 	Array.forEach(Array.parseCommaSeparatedString(args.creeps), function(creep)
 		local unit = mw.ext.LiquipediaDB.lpdb('datapoint', {
