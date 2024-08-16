@@ -1125,25 +1125,29 @@ end
 
 ---@param match table
 ---@param maps {scores: integer[], winner: integer?}[]
----@param opponentIndex integer
----@param scoreInput string|number|nil
----@return integer? #SCORE
----@return string? #STATUS
-function MatchGroupInput.computeOpponentScore(match, maps, opponentIndex, scoreInput)
+---@return boolean
+function MatchGroupInput.canUseAutoScore(match, maps)
 	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
 	local anyMapHasWinner = Table.any(maps, function(_, map) return map.winner end)
+	return matchHasStarted or anyMapHasWinner
+end
 
-	if match.walkover then
-		local winner = tonumber(match.walkover) or tonumber(match.winner)
+---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex :integer}
+---@param autoScore? fun(opponentIndex: integer): integer?
+---@return integer? #SCORE
+---@return string? #STATUS
+function MatchGroupInput.computeOpponentScore(props, autoScore)
+	if props.walkover then
+		local winner = tonumber(props.walkover) or tonumber(props.winner)
 		if winner then
-			return MatchGroupInput.opponentWalkover(match.walkover, winner == opponentIndex)
+			return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
 		end
 	else
-		if not scoreInput and (matchHasStarted or anyMapHasWinner) then
-			scoreInput = MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+		if not props.score and autoScore then
+			props.score = autoScore(props.opponentIndex)
 		end
 
-		return MatchGroupInput.parseScoreInput(scoreInput)
+		return MatchGroupInput.parseScoreInput(props.score)
 	end
 end
 
@@ -1165,7 +1169,7 @@ function MatchGroupInput.parseScoreInput(scoreInput)
 	end
 end
 
----@param walkoverInput string #wikicode input
+---@param walkoverInput string|integer #wikicode input
 ---@param isWinner boolean
 ---@return integer? #SCORE
 ---@return string? #STATUS
@@ -1371,6 +1375,12 @@ function MatchGroupInput.mapIsFinished(map)
 	return false
 end
 
+---@param bestOfInput string|integer?
+---@param maps table[]
+---@return integer?
+function MatchGroupInput.getBestOf(bestOfInput, maps)
+	return tonumber(bestOfInput) or #maps
+end
 
 ---@param alias table<string, string>
 ---@param character string?

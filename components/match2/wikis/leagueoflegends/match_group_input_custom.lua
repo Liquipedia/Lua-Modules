@@ -80,11 +80,18 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	end)
 	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
 
+	local canUseAutoScore = MatchGroupInput.canUseAutoScore(match, opponents)
+
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInput.computeOpponentScore(match, games, opponentIndex, opponent.score)
+		opponent.score, opponent.status = MatchGroupInput.computeOpponentScore({
+			walkover = match.walkover,
+			winner = match.winner,
+			opponentIndex = opponentIndex,
+			score = opponent.score,
+		}, canUseAutoScore and MatchFunctions.calculateMatchScore(games) or nil)
 	end)
 
-	match.bestof = MatchFunctions.getBestOf(match.bestof, games)
+	match.bestof = MatchGroupInput.getBestOf(match.bestof, games)
 	local finishedInput = match.finished --[[@as string?]]
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
@@ -109,7 +116,7 @@ end
 ---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param match table
 ---@param opponentCount integer
----@return table
+---@return table[]
 function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 	local maps = {}
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
@@ -120,12 +127,21 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		end
 
 		map.length = MatchParser.getLength(map)
-		map.participants, map.extradata = MapFunctions.getParticipants(MatchParser, map, opponentCount)
+		map.participants = MapFunctions.getParticipants(MatchParser, map, opponentCount)
+		map.extradata = MapFunctions.getExtradata(MatchParser, map, opponentCount)
 
 		local finishedInput = map.finished --[[@as string?]]
 		map.finished = MatchGroupInput.mapIsFinished(map)
 		if map.finished then
-			local opponentInfo = MapFunctions.makeOpponentInfoFromWinner(tonumber(map.winner), opponentCount)
+			local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+				local score, status = MatchGroupInput.computeOpponentScore({
+					walkover = map.walkover,
+					winner = map.winner,
+					opponentIndex = opponentIndex,
+					score = map['score' .. opponentIndex],
+				}, map.finished and MapFunctions.calculateMapScore(map.winner) or nil)
+				return {score = score, status = status}
+			end)
 			map.scores = Array.map(opponentInfo, Operator.property('score'))
 			map.resulttype, map.winner, map.walkover =
 				MatchGroupInput.getResultTypeAndWinner(map.winner, finishedInput, opponentInfo)
@@ -142,11 +158,12 @@ end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
 
----@param bestOfInput string|integer?
 ---@param maps table[]
----@return integer?
-function MatchFunctions.getBestOf(bestOfInput, maps)
-	return tonumber(bestOfInput) or #maps
+---@return fun(opponentIndex: integer): integer
+function MatchFunctions.calculateMatchScore(maps)
+	return function (opponentIndex)
+		return MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+	end
 end
 
 ---@param match table
@@ -174,44 +191,37 @@ function MatchFunctions.getExtraData(match)
 	}
 end
 
--- Parse extradata information
----@param MatchParser LeagueOfLegendsMatchParserInterface
----@param map table
----@return table
-function MapFunctions.getAdditionalExtraData(MatchParser, map)
-	return {
-		comment = map.comment,
-		team1side = MatchParser.getSide(map, 1) or '',
-		team2side = MatchParser.getSide(map, 2) or '',
-		team1objectives = MatchParser.getObjectives(map, 1) or {},
-		team2objectives = MatchParser.getObjectives(map, 2) or {},
-	}
-end
-
--- Parse participant information
 ---@param MatchParser LeagueOfLegendsMatchParserInterface
 ---@param map table
 ---@param opponentCount integer
----@return table, table
-function MapFunctions.getParticipants(MatchParser, map, opponentCount)
-	local participants = {}
-	local extradata = {}
+---@return table
+function MapFunctions.getExtradata(MatchParser, map, opponentCount)
+	local extradata = {
+		comment = map.comment,
+	}
 	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
 
+	local function prefixKeyWithTeam(key, opponentIndex)
+		return 'team' .. opponentIndex .. key
+	end
+
 	for opponentIndex = 1, opponentCount do
-		local teamPrefix = 'team' .. opponentIndex
+		local opponentData = {
+			objectives = MatchParser.getObjectives(map, opponentIndex),
+			side = MatchParser.getSide(map, opponentIndex),
+		}
+		opponentData = Table.merge(opponentData,
+			Table.map(MatchParser.getHeroPicks(map, opponentIndex) or {}, function(idx, hero)
+				return 'champion' .. idx, getCharacterName(hero)
+			end),
+			Table.map(MatchParser.getHeroBans(map, opponentIndex) or {}, function(idx, hero)
+				return 'ban' .. idx, getCharacterName(hero)
+			end)
+		)
 
-		Array.forEach(MatchParser.getHeroPicks(map, opponentIndex) or {}, function (hero, idx)
-			extradata[teamPrefix .. 'champion' .. idx] = getCharacterName(hero)
-		end)
-		Array.forEach(MatchParser.getHeroBans(map, opponentIndex) or {}, function (hero, idx)
-			extradata[teamPrefix .. 'ban' .. idx] = getCharacterName(hero)
-		end)
-
-		for playerIndex, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
-			participant.character = getCharacterName(participant.character)
-			participants[opponentIndex .. '_' .. playerIndex] = participant
-		end
+		Table.mergeInto(extradata, Table.map(opponentData, function(key, value)
+			return prefixKeyWithTeam(key, opponentIndex), value
+		end))
 	end
 
 	extradata.vetophase = MatchParser.getVetoPhase(map)
@@ -219,28 +229,35 @@ function MapFunctions.getParticipants(MatchParser, map, opponentCount)
 		veto.character = getCharacterName(veto.character)
 	end)
 
-	Table.mergeInto(extradata, MapFunctions.getAdditionalExtraData(MatchParser, map))
-
-	return participants, extradata
+	return extradata
 end
 
----@param winner integer?
+-- Parse participant information
+---@param MatchParser LeagueOfLegendsMatchParserInterface
+---@param map table
 ---@param opponentCount integer
----@return {score: integer, status: string}[]
-function MapFunctions.makeOpponentInfoFromWinner(winner, opponentCount)
-	if not winner or winner > opponentCount or winner < 0 then
-		return {}
+---@return table
+function MapFunctions.getParticipants(MatchParser, map, opponentCount)
+	local participants = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, HeroNames)
+
+	for opponentIndex = 1, opponentCount do
+		for playerIndex, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
+			participant.character = getCharacterName(participant.character)
+			participants[opponentIndex .. '_' .. playerIndex] = participant
+		end
 	end
 
-	local scores = Array.map(Array.range(1, opponentCount), function()
-		return {score = 0, status = MatchGroupInput.STATUS.SCORE}
-	end)
+	return participants
+end
 
-	if winner > 0 then
-		scores[winner].score = 1
+---@param winnerInput string|integer|nil
+---@return fun(opponentIndex: integer): integer
+function MapFunctions.calculateMapScore(winnerInput)
+	local winner = tonumber(winnerInput)
+	return function (opponentIndex)
+		return winner == opponentIndex and 1 or 0
 	end
-
-	return scores
 end
 
 return CustomMatchGroupInput
