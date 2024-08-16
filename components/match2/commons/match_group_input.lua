@@ -1086,7 +1086,7 @@ end
 ---Should only be called on finished matches or maps
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
----@param opponents {score: number, status: string}[]
+---@param opponents {score: number?, status: string}[]
 ---@return string? #Result Type
 function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
 	if (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
@@ -1221,7 +1221,7 @@ function MatchGroupInput.isNotPlayedInput(input)
 	return Table.includes(NOT_PLAYED_INPUTS, input)
 end
 
----@param opponents {status: string, score: string|number?}[]
+---@param opponents {status: string, score: number?}[]
 ---@return boolean
 function MatchGroupInput.isDraw(opponents)
 	if Logic.isEmpty(opponents) then return true end

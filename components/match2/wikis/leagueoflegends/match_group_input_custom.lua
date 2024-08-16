@@ -138,17 +138,18 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		map.extradata = MapFunctions.getExtraData(MatchParser, map, opponentCount)
 
 		map.finished = MatchGroupInput.mapIsFinished(map)
+		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+			local score, status = MatchGroupInput.computeOpponentScore({
+				walkover = map.walkover,
+				winner = map.winner,
+				opponentIndex = opponentIndex,
+				score = map['score' .. opponentIndex],
+			}, MapFunctions.calculateMapScore(map.winner))
+			return {score = score, status = status}
+		end)
+
+		map.scores = Array.map(opponentInfo, Operator.property('score'))
 		if map.finished then
-			local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-				local score, status = MatchGroupInput.computeOpponentScore({
-					walkover = map.walkover,
-					winner = map.winner,
-					opponentIndex = opponentIndex,
-					score = map['score' .. opponentIndex],
-				}, MapFunctions.calculateMapScore(map.winner))
-				return {score = score, status = status}
-			end)
-			map.scores = Array.map(opponentInfo, Operator.property('score'))
 			map.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponentInfo)
 			map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 			map.winner = MatchGroupInput.getWinner(map.resulttype, winnerInput, opponentInfo)
@@ -257,10 +258,13 @@ function MapFunctions.getParticipants(MatchParser, map, opponentCount)
 end
 
 ---@param winnerInput string|integer|nil
----@return fun(opponentIndex: integer): integer
+---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(winnerInput)
 	local winner = tonumber(winnerInput)
 	return function(opponentIndex)
+		if not winner then
+			return
+		end
 		return winner == opponentIndex and 1 or 0
 	end
 end
