@@ -88,7 +88,7 @@ function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, l
 	end
 
 	local match1Keys = {}
-	for opponentIndex = 1, MAX_NUMBER_OF_OPPONENTS do
+	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
 		local prefix
 		if not isReset and
 			(Logic.isEmpty(bd.toupper) and opponentIndex == 1 or
@@ -102,7 +102,7 @@ function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, l
 		end
 
 		match1Keys['opp' .. opponentIndex] = prefix
-	end
+	end)
 	match1Keys['details'] = 'R' .. round.R .. 'G' .. round.G
 
 	match2mapping[id] = match1Keys
