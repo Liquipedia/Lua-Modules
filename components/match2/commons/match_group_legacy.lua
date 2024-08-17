@@ -246,7 +246,7 @@ function MatchGroupLegacy:handleMap(details, mapIndex)
 
 	local map
 	if details[blueprint['$parse$']] then
-		map = Json.parseIfTable(details[blueprint['$parse$']]) or {}
+		map = Json.parseIfTable(Table.extract(details, blueprint['$parse$'])) or {}
 	else
 		blueprint = Table.copy(blueprint)
 		blueprint['$notEmpty$'] = nil
