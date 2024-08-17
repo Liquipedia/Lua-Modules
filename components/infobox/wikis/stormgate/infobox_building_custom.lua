@@ -182,27 +182,9 @@ end
 
 ---@param args table
 function CustomBuilding:setLpdbData(args)
-	if args.informationType == CREEP then
-		mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. self.pagename, {
-			name = args.name or self.pagename,
-			type = (args.informationType or 'building'):lower(),
-			information = self.faction,
-			image = args.image,
-			imagedark = args.imagedark,
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-				startlevel = tonumber(args.start_level),
-				respawn = tonumber(args.respawn),
-				creeps = Array.parseCommaSeparatedString(args.creeps),
-				capturepoint = args.capture_point,
-				globalbuff =  args.global_buff,
-			},
-		})
-		return
-	end
-
 	mw.ext.LiquipediaDB.lpdb_datapoint('building_' .. self.pagename, {
 		name = args.name or self.pagename,
-		type = 'building',
+		type = (args.informationType or 'building'):lower(),
 		information = self.faction,
 		image = args.image,
 		imagedark = args.imagedark,
@@ -239,6 +221,12 @@ function CustomBuilding:setLpdbData(args)
 			energy = tonumber(args.energy),
 			energyrate = tonumber(args.energy_rate),
 			energydesc = args.energy_desc,
+			--extradata for creep camps
+			startlevel = tonumber(args.start_level),
+			respawn = tonumber(args.respawn),
+			creeps = Array.parseCommaSeparatedString(args.creeps),
+			capturepoint = args.capture_point,
+			globalbuff =  args.global_buff,
 		},
 	})
 end
