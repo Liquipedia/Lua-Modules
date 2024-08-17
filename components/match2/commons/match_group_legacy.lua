@@ -17,6 +17,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroup = Lua.import('Module:MatchGroup')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
@@ -45,15 +46,6 @@ local MatchGroupLegacy = Class.new(function(self, frame)
 	self.args = args
 end)
 
----@param match2id string
----@return string
-function MatchGroupLegacy._getSimplifiedId(match2id)
-	local id = String.split(match2id, '_')[2] or match2id
-	--remove 0's and dashes from the match param
-	--e.g. R01-M001 --> R1M1
-	return (id:gsub('0*([1-9])', '%1'):gsub('%-', ''))
-end
-
 ---@param match match2
 ---@param match2mapping match2mapping
 ---@param lowerHeaders {[number] : number}
@@ -61,7 +53,9 @@ end
 ---@param roundData {[number]: roundKeys}
 ---@return roundKeys, number
 function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, lastRound, roundData)
-	local id = MatchGroupLegacy._getSimplifiedId(match.match2id)
+	local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)
+	---@cast baseMatchId -nil
+	local id = MatchGroupUtil.matchIdToKey(baseMatchId)
 	local bd = match.match2bracketdata
 
 	local roundNum
