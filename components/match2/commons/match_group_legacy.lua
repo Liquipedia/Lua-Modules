@@ -56,7 +56,6 @@ function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, l
 	local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)
 	---@cast baseMatchId -nil
 	local id = MatchGroupUtil.matchIdToKey(baseMatchId)
-	local bd = match.match2bracketdata
 
 	local roundNum
 	local round
@@ -76,6 +75,7 @@ function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, l
 	end
 	round.G = round.G + 1
 
+	local bd = match.match2bracketdata
 	--if bd.header starts with '!l'
 	if string.match(bd.header or '', '^!l') then
 		lowerHeaders[roundNum or ''] = round.G
