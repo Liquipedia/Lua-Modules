@@ -346,7 +346,7 @@ function CustomBuilding._displayCreepDefenders(creeps)
 		Array.appendWith(display,
 			Page.makeInternalLink(group[1].name) ..
 			(bounty and (' (' .. bounty .. ')') or '') ..
-			(#group > 1 and ' x' .. #group or ''))
+			(#group > 1 and (' x' .. #group) or ''))
 	end)
 
 	return table.concat(display, '<br>')
