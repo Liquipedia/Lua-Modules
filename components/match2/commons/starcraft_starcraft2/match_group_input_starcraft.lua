@@ -468,7 +468,8 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 	local playerCounts = {}
 	local players = {}
 	for key, participant in pairs(participants) do
-		local opponetIndex = key:match('(%d+)_%d+')
+		local parsedOpponentIndex = key:match('(%d+)_%d+')
+		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]
 		playerCounts[opponetIndex] = (playerCounts[opponetIndex] or 0) + 1
 		-- only relevant for 1v1 maps, hence irrelevant if we overwrite it for other map types over and over
 		players[opponetIndex] = participant
@@ -495,11 +496,11 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 	map.extradata.opponent1 = opponents[1].name
 	map.extradata.opponent2 = opponents[2].name
 
-	local winner = tonumber(map.winner)
+	if map.winner ~= 1 and map.winner ~= 2 then return end
+	local loser = 3 - map.winner
 
-	if winner == 1 or winner == 2 then return end
-
-	map.extradata.winnerfaction = players[winner].faction
+	map.extradata.winnerfaction = players[map.winner].faction
+	map.extradata.loserfaction = players[loser].faction
 end
 
 ---@param mapInput table
