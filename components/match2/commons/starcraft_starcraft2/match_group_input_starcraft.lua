@@ -354,16 +354,32 @@ function MapFunctions.getParticipants(mapInput, opponents)
 		)
 
 		if opponent.type == Opponent.team then
-			todo
-			participants = Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
+			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
 			return
 		elseif opponent.type == Opponent.literal then
 			return
 		end
-		todo: process for normal and archons ...
+		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
 	end)
 
 	return participants
+end
+
+---@param mapInput table
+---@param opponent table
+---@param opponentIndex integer
+---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
+function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+	todo
+end
+
+---@param mapInput table
+---@param opponent table
+---@param opponentIndex integer
+---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
+function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
+	-- have to account for archon stuff ...
+	todo
 end
 
 ---@param opponent table
