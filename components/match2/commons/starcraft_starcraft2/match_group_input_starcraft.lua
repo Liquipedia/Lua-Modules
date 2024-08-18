@@ -265,9 +265,12 @@ end
 function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 	local mapInput = Json.parseIfString(rawMapInput)
 
+	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
+
 	local map = {
 		map = mapInput.map and mapInput.map ~= TBD and mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map) or nil,
 		patch = Variables.varDefault('tournament_patch', ''),
+		subgroup = subGroup,
 		extradata = {
 			comment = mapInput.comment,
 			displayname = mapInput.mapDisplayName,
@@ -294,8 +297,6 @@ function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 		map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInput.getWinner(map.resulttype, mapInput.winner, opponentInfo)
 	end
-
-	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
 	return map, subGroup
 end
