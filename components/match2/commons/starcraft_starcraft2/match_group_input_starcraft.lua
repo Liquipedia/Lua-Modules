@@ -151,6 +151,14 @@ function MatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer
+function MatchFunctions.calculateMatchScore(maps)
+	return function(opponentIndex)
+		return MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+	end
+end
+
 ---@param opponent table
 function MatchFunctions.addOpponentExtradata(opponent)
 	opponent.extradata = Table.merge(opponent.extradata or {}, {
