@@ -270,8 +270,8 @@ function CustomMatchGroupInput._getOpponents(match)
 		end
 		match['opponent' .. opponentIndex] = opponent
 
-		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
-			MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.template) then
+			MatchGroupInput.readPlayersOfTeam(match, opponentIndex, mw.ext.TeamTemplate.raw(opponent.template).page, {
 				resolveRedirect = true,
 				applyUnderScores = true,
 				maxNumPlayers = MAX_NUM_PLAYERS,
