@@ -282,8 +282,7 @@ function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 			walkover = map.walkover,
 			winner = map.winner,
 			opponentIndex = opponentIndex,
-			-- no idea why in the line below the annos think it could be a table ...
-			score = map['score' .. opponentIndex] --[[@as string|integer?]],
+			score = map['score' .. opponentIndex],
 		}, MapFunctions.calculateMapScore(map.winner, map.finished))
 		return {score = score, status = status}
 	end)
