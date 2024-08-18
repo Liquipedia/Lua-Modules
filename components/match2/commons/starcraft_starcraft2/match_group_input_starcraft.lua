@@ -31,6 +31,7 @@ local OPPONENT_CONFIG = {
 }
 local TBD = 'TBD'
 local TBA = 'TBA'
+local MODE_MIXED = 'mixed'
 
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
@@ -73,6 +74,8 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 			score = opponent.score,
 		}, opponent, autoScoreFunction)
 	end)
+
+	match.mode = MatchFunctions.getMode(opponents)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament')))
@@ -183,6 +186,14 @@ function MatchFunctions.computeOpponentScore(props, opponent, autoScore)
 	if opponent.status == MatchGroupInput.STATUS.SCORE and (props.winner == 'draw' or tonumber(props.winner) == 0) then
 		opponent.status = MatchGroupInput.STATUS.DRAW
 	end
+end
+
+---@param opponents {type: OpponentType}
+---@return integer?
+function MatchFunctions.getMode(opponents)
+	local firstOpponentType = opponents[1].type
+	return Array.all(opponents, function(opponent) return opponent.type == firstOpponentType end)
+		and firstOpponentType or MODE_MIXED
 end
 
 ---@param bestofInput string|integer?
