@@ -44,9 +44,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		return DeprecatedCustomMatchGroupInput.processMatch(match, options)
 	end
 
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
 	Table.mergeInto(match, MatchFunctions.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
@@ -83,6 +80,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.finished = match.finished or 'skip'
 	end
 
+	local winnerInput = match.winner --[[@as string?]]
 	local finishedInput = match.finished --[[@as string?]]
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
