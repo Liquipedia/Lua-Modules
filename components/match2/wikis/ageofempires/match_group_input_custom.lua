@@ -275,9 +275,9 @@ function CustomMatchGroupInput._getOpponents(match)
 			if template then
 				MatchGroupInput.readPlayersOfTeam(match, opponentIndex, template.page, {
 					resolveRedirect = true,
-					applyUnderScores = true,	
-					maxNumPlayers = MAX_NUM_PLAYERS,	
-				})	
+					applyUnderScores = true,
+					maxNumPlayers = MAX_NUM_PLAYERS,
+				})
 			end
 		end
 	end
