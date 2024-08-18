@@ -171,7 +171,8 @@ end
 ---@param opponent table
 ---@param autoScore? fun(opponentIndex: integer): integer?
 function MatchFunctions.computeOpponentScore(props, opponent, autoScore)
-	local calculatedScore, status = MatchGroupInput.computeOpponentScore(props, autoScore)
+	local calculatedScore
+	calculatedScore, opponent.status = MatchGroupInput.computeOpponentScore(props, autoScore)
 
 	if Logic.isNumeric(calculatedScore) and not opponent.score then
 		calculatedScore = calculatedScore + (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
