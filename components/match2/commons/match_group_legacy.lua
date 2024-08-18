@@ -332,6 +332,7 @@ end
 function MatchGroupLegacy:handleOtherBracketParams()
 end
 
+---@return string
 function MatchGroupLegacy:build()
 	mw.addWarning('You are editing a page that uses a Legacy Bracket. '
 		.. 'Please use the new Bracket System on new pages.')

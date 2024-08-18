@@ -47,6 +47,7 @@ function MatchGroupLegacyDefault:getMap()
 end
 
 ---@param frame Frame
+---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
 end
