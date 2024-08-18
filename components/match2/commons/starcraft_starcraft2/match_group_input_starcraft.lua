@@ -50,6 +50,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
+
 	local games = MatchFunctions.extractMaps(match, opponents)
 
 	-- TODO: check how we can get rid of this legacy stuff ...
@@ -59,12 +60,12 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.winner = match.winner or opponentIndex
 	end)
 
+	Array.forEach(opponents, MatchFunctions.addOpponentExtradata)
+	Array.forEach(opponents, MatchFunctions.applyDefaultFactionIfEmpty)
+
 	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
 		and MatchFunctions.calculateMatchScore(games)
 		or nil
-
-	Array.forEach(opponents, MatchFunctions.addOpponentExtradata)
-	Array.forEach(opponents, MatchFunctions.applyDefaultFactionIfEmpty)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		MatchFunctions.computeOpponentScore({
@@ -166,7 +167,8 @@ end
 ---@param opponent table
 function MatchFunctions.applyDefaultFactionIfEmpty(opponent)
 	Array.forEach(opponent.match2players, function(player)
-		player.extradata = Table.merge(player.extradata or {}, {faction = player.faction or Faction.defaultFaction})
+		player.extradata = Table.merge(player.extradata or {}, {
+			faction = (player.extradata or {}).faction or Faction.defaultFaction})
 	end)
 end
 
@@ -189,7 +191,7 @@ function MatchFunctions.computeOpponentScore(props, opponent, autoScore)
 end
 
 ---@param opponents {type: OpponentType}
----@return integer?
+---@return string
 function MatchFunctions.getMode(opponents)
 	local firstOpponentType = opponents[1].type
 	return Array.all(opponents, function(opponent) return opponent.type == firstOpponentType end)
