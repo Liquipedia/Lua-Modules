@@ -332,16 +332,21 @@ end
 function MatchGroupLegacy:handleOtherBracketParams()
 end
 
+---@param args table
+---@return boolean
+function MatchGroupLegacy:shouldStoreData(args)
+	return Logic.nilOr(
+		Logic.readBoolOrNil(args.store),
+		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
+	)
+end
+
 ---@return string
 function MatchGroupLegacy:build()
 	mw.addWarning('You are editing a page that uses a Legacy Bracket. '
 		.. 'Please use the new Bracket System on new pages.')
 
 	local args = self.args
-	local store = Logic.nilOr(
-		Logic.readBoolOrNil(args.store),
-		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
-	)
 
 	local match2mapping = MatchGroupLegacy._get(args.template, args.templateOld)
 
@@ -349,7 +354,7 @@ function MatchGroupLegacy:build()
 	self.newArgs = {
 		args.template,
 		id = args.id,
-		store = store,
+		store = self:shouldStoreData(args),
 		noDuplicateCheck = args.noDuplicateCheck,
 		isLegacy = true
 	}
