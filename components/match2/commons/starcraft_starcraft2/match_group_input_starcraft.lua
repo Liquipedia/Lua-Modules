@@ -31,14 +31,6 @@ local OPPONENT_CONFIG = {
 }
 local TBD = 'TBD'
 local TBA = 'TBA'
-local OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
-	solo = '1',
-	duo = '2',
-	trio = '3',
-	quad = '4',
-	team = 'team',
-	literal = 'literal',
-}
 
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
