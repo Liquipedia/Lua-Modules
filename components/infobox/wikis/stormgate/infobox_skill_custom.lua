@@ -33,6 +33,7 @@ local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_SKILLS = {
 	'Spell',
 	'Ability',
+	'Trait',
 	'Upgrade',
 	'Effect',
 }
