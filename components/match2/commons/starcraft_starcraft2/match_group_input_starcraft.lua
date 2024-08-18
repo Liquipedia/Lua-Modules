@@ -395,7 +395,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		local link = participantInput.link or Variables.varDefault(nameInput .. '_page') or nameInput
 		link = Page.pageifyLink(link) --[[@as string -- can't be nil as input isn't nil]]
 
-		local playerIndex =  MapFunctions.getPlayerIndex(players, link)
+		local playerIndex =  Array.indexOf(players, function(player) return player.name == link end)
 		-- in case we have a TBD or a player not known in match2players inster a new player in match2players
 		if isTBD or not playerIndex then
 			table.insert(players, {
@@ -447,17 +447,6 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	end)
 
 	return participants
-end
-
----@param players table[]
----@param playerName string
----@return integer?
-function MapFunctions.getPlayerIndex(players, playerName)
-	for playerIndex, player in ipairs(players) do
-		if player.name == playerName then
-			return playerIndex
-		end
-	end
 end
 
 ---@param map table # the parsed map into which we fill the parse informations
