@@ -13,6 +13,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate/Named')
@@ -30,6 +31,7 @@ local OPPONENT_CONFIG = {
 	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
+local TBA = 'TBA'
 local OPPONENT_MODE_TO_PARTIAL_MATCH_MODE = {
 	solo = '1',
 	duo = '2',
@@ -136,7 +138,7 @@ function MatchFunctions.extractMaps(match, opponents)
 	for mapKey, rawMapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local mapInput = Json.parseIfString(rawMapInput)
 		local map
-		map, subGroup = MapFunctions.readMap(mapInput, subGroup)
+		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
 		MapFunctions.getParticipants(map, mapInput, opponents)
 
@@ -254,9 +256,10 @@ end
 
 ---@param rawMapInput string
 ---@param subGroup integer
+---@param opponentCount integer
 ---@return table
 ---@return integer
-function MapFunctions.readMap(rawMapInput, subGroup)
+function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 	local mapInput = Json.parseIfString(rawMapInput)
 
 	local map = {
@@ -270,14 +273,73 @@ function MapFunctions.readMap(rawMapInput, subGroup)
 		}
 	}
 
-	todo
-	-- TODO: determine score, resulttype, walkover and winner
-	-- old function: StarcraftMatchGroupInput._mapWinnerProcessing(map)
-	-- TODO: determine if map is finished
+	---@type string?
+	local finishedInput = mapInput.finished
+
+	map.finished = MapFunctions.isFinished(map, opponentCount)
+	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local score, status = MatchGroupInput.computeOpponentScore({
+			walkover = map.walkover,
+			winner = map.winner,
+			opponentIndex = opponentIndex,
+			-- no idea why in the line below the annos think it could be a table ...
+			score = map['score' .. opponentIndex] --[[@as string|integer?]],
+		}, MapFunctions.calculateMapScore(map.winner, map.finished))
+		return {score = score, status = status}
+	end)
+
+	map.scores = Array.map(opponentInfo, Operator.property('score'))
+
+	if map.finished then
+		map.resulttype = MatchGroupInput.getResultType(mapInput.winner, finishedInput, opponentInfo)
+		map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
+		map.winner = MatchGroupInput.getWinner(map.resulttype, mapInput.winner, opponentInfo)
+	end
 
 	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
 	return map, subGroup
+end
+
+---@param map table
+---@param opponentCount integer
+---@return boolean
+function MapFunctions.isFinished(map, opponentCount)
+	local finished = Logic.readBoolOrNil(map.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	if Logic.isNotEmpty(map.winner) then
+		return true
+	end
+
+	if Logic.isNotEmpty(map.finished) then
+		return true
+	end
+
+	-- check for manual score inputs
+	for opponentIndex = 1, opponentCount do
+		if String.isNotEmpty(map['score' .. opponentIndex]) then
+			return true
+		end
+	end
+
+	return false
+end
+
+---@param winnerInput string|integer|nil
+---@param finished boolean
+---@return fun(opponentIndex: integer): integer?
+function MapFunctions.calculateMapScore(winnerInput, finished)
+	local winner = tonumber(winnerInput)
+	return function(opponentIndex)
+		-- TODO Better to check if map has started, rather than finished, for a more correct handling
+		if not winner and not finished then
+			return
+		end
+		return winner == opponentIndex and 1 or 0
+	end
 end
 
 ---@param map table # the parsed map into which we fill the parse informations
@@ -356,72 +418,6 @@ end
 old functions (partly still to port to new stuff)
 
 ]]
----@param map table
----@return table
-function StarcraftMatchGroupInput._mapWinnerProcessing(map)
-	map.scores = {}
-	local hasManualScores = false
-	local indexedScores = {}
-	for scoreIndex = 1, MAX_NUM_OPPONENTS do
-		-- read scores
-		local score = map['score' .. scoreIndex]
-		local obj = {}
-		if Logic.isNotEmpty(score) then
-			hasManualScores = true
-			score = CONVERT_STATUS_INPUT[score] or score
-			if Logic.isNumeric(score) then
-				obj.status = 'S'
-				obj.score = score
-			elseif Table.includes(ALLOWED_STATUSES, score) then
-				obj.status = score
-				obj.score = -1
-			end
-			table.insert(map.scores, score)
-			indexedScores[scoreIndex] = obj
-		else
-			break
-		end
-	end
-
-	if hasManualScores then
-		for scoreIndex, _ in Table.iter.spairs(indexedScores, StarcraftMatchGroupInput._placementSortFunction) do
-			if not tonumber(map.winner or '') then
-				map.winner = scoreIndex
-			else
-				break
-			end
-		end
-	else
-		local winnerInput = tonumber(map.winner)
-		if Logic.isNotEmpty(map.walkover) then
-			local walkoverInput = tonumber(map.walkover)
-			if walkoverInput == 1 then
-				map.winner = 1
-			elseif walkoverInput == 2 then
-				map.winner = 2
-			elseif walkoverInput == 0 then
-				map.winner = 0
-			end
-			map.walkover = Table.includes(ALLOWED_STATUSES, map.walkover) and map.walkover or 'L'
-			map.scores = {-1, -1}
-			map.resulttype = 'default'
-		elseif map.winner == 'skip' then
-			map.scores = {0, 0}
-			map.scores = {-1, -1}
-			map.resulttype = 'np'
-		elseif winnerInput == 1 then
-			map.scores = {1, 0}
-		elseif winnerInput == 2 then
-			map.scores = {0, 1}
-		elseif winnerInput == 0 or map.winner == 'draw' then
-			map.scores = {0.5, 0.5}
-			map.resulttype = 'draw'
-		end
-	end
-
-	return map
-end
-
 ---@param map table
 ---@param match table
 ---@param numberOfOpponents integer
