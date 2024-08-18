@@ -11,11 +11,11 @@ local Lua = require('Module:Lua')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
----@class MatchGroupLegacyDefault: MatchGroupLegacy
-local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
+---@class LoLMatchGroupLegacyDefault: MatchGroupLegacy
+local LoLMatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@return table
-function MatchGroupLegacyDefault:getMap()
+function LoLMatchGroupLegacyDefault:getMap()
 	return {
 		['$notEmpty$'] = 'map$1$',
 		map = 'map$1$',
@@ -48,8 +48,8 @@ end
 
 ---@param frame Frame
 ---@return string
-function MatchGroupLegacyDefault.run(frame)
-	return MatchGroupLegacyDefault(frame):build()
+function LoLMatchGroupLegacyDefault.run(frame)
+	return LoLMatchGroupLegacyDefault(frame):build()
 end
 
-return MatchGroupLegacyDefault
+return LoLMatchGroupLegacyDefault
