@@ -140,7 +140,7 @@ function MatchFunctions.extractMaps(match, opponents)
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
-		MapFunctions.getParticipants(map, mapInput, opponents)
+		map.participants = MapFunctions.getParticipants(map, mapInput, opponents)
 
 		MapFunctions.getModeAndEnrichExtradata(map, mapInput, map.participants, opponents)
 
@@ -341,13 +341,29 @@ function MapFunctions.calculateMapScore(winnerInput, finished)
 	end
 end
 
----@param map table # the parsed map into which we fill the parse informations
----@param mapInput table # the input data
+---@param mapInput table
 ---@param opponents table[]
-function MapFunctions.getParticipants(map, mapInput, opponents)
-	todo
+---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
+function MapFunctions.getParticipants(mapInput, opponents)
+	local participants = {}
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		-- resolve the `raceX` alias if used
+		mapInput['t' .. opponentIndex .. 'p1race'] = Logic.emptyOr(
+			mapInput['t' .. opponentIndex .. 'p1race'],
+			mapInput['race' .. opponentIndex]
+		)
 
-	--set: map.participants,
+		if opponent.type == Opponent.team then
+			todo
+			participants = Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
+			return
+		elseif opponent.type == Opponent.literal then
+			return
+		end
+		todo: process for normal and archons ...
+	end)
+
+	return participants
 end
 
 ---@param opponent table
@@ -383,8 +399,10 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 			Logic.readBool(opponents[opponentIndex].extradata.isarchon)
 	end
 
-	playerCounts = Array.map(playerCounts, function(count, opponentIndex)
-		if count == 2 and isArchon(opponentIndex) then
+	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
+		if count == 0 then
+			return Opponent.literal
+		elseif count == 2 and isArchon(opponentIndex) then
 			return 'Archon'
 		elseif count == 2 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'duoSpecial']) then
 			return '2S'
@@ -395,7 +413,7 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 		return count
 	end)
 
-	map.mode = table.concat(playerCounts, 'v')
+	map.mode = table.concat(modeParts, 'v')
 
 	if map.mode ~= '1v1' then return end
 
