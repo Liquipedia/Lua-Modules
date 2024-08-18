@@ -140,7 +140,7 @@ function MatchFunctions.extractMaps(match, opponents)
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
-		map.participants = MapFunctions.getParticipants(map, mapInput, opponents)
+		map.participants = MapFunctions.getParticipants(mapInput, opponents)
 
 		MapFunctions.getModeAndEnrichExtradata(map, mapInput, map.participants, opponents)
 
@@ -347,12 +347,6 @@ end
 function MapFunctions.getParticipants(mapInput, opponents)
 	local participants = {}
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		-- resolve the `raceX` alias if used
-		mapInput['t' .. opponentIndex .. 'p1race'] = Logic.emptyOr(
-			mapInput['t' .. opponentIndex .. 'p1race'],
-			mapInput['race' .. opponentIndex]
-		)
-
 		if opponent.type == Opponent.team then
 			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
 			return
@@ -378,8 +372,31 @@ end
 ---@param opponentIndex integer
 ---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
-	-- have to account for archon stuff ...
-	todo
+	local players = opponent.match2players
+
+	-- resolve the aliases in case they are used
+	mapInput['t' .. opponentIndex .. 'p1race'] = Logic.emptyOr(
+		mapInput['t' .. opponentIndex .. 'p1race'],
+		mapInput['race' .. opponentIndex],
+		mapInput['opponent' .. opponentIndex .. 'race']
+	)
+
+	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race']) or players[1].extradata.faction
+	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
+
+	local participants = {}
+
+	Array.forEach(players, function(player, playerIndex)
+		local faction = isArchon and archonFaction or
+			Logic.emptyOr(Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']), player.Faction)
+
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			faction = Faction.read(faction or player.extradata.faction),
+			player = player.name
+		}
+	end)
+
+	return participants
 end
 
 ---@param opponent table
@@ -408,17 +425,10 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 		players[opponetIndex] = participant
 	end
 
-	---@param opponentIndex integer
-	---@return boolean
-	local isArchon = function(opponentIndex)
-		return Logic.readBool(mapInput['opponent' .. opponentIndex .. 'archon']) or
-			Logic.readBool(opponents[opponentIndex].extradata.isarchon)
-	end
-
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
 			return Opponent.literal
-		elseif count == 2 and isArchon(opponentIndex) then
+		elseif count == 2 and MapFunctions.isArchon(mapInput, opponents[opponentIndex], opponentIndex) then
 			return 'Archon'
 		elseif count == 2 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'duoSpecial']) then
 			return '2S'
@@ -441,6 +451,15 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 	if winner == 1 or winner == 2 then return end
 
 	map.extradata.winnerfaction = players[winner].faction
+end
+
+---@param mapInput table
+---@param opponent table
+---@param opponentIndex integer
+---@return boolean
+function MapFunctions.isArchon(mapInput, opponent, opponentIndex)
+	return Logic.readBool(mapInput['opponent' .. opponentIndex .. 'archon']) or
+		Logic.readBool(opponent.extradata.isarchon)
 end
 
 return StarcraftMatchGroupInput
