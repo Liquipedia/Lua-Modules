@@ -51,6 +51,9 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		return DeprecatedCustomMatchGroupInput.processMatch(match, options)
 	end
 
+	local finishedInput = match.finished --[[@as string?]]
+	local winnerInput = match.winner --[[@as string?]]
+
 	Table.mergeInto(match, MatchFunctions.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
@@ -60,13 +63,26 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 
 	-- TODO: check how we can get rid of this legacy stuff ...
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		if not Logic.readBool(opponent.win) then return end
-		opponent.win = nil
+		local opponentHasWon = Table.extract(opponent, 'win')
+		if not Logic.readBool(opponentHasWon) then return end
 		match.winner = match.winner or opponentIndex
 	end)
 
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
+		and MatchFunctions.calculateMatchScore(games)
+		or nil
+
 	Array.forEach(opponents, MatchFunctions.addOpponentExtradata)
-	Array.forEach(opponents, FnUtil.curry(FnUtil.curry(MatchFunctions.computeOpponentScore, games), match))
+	Array.forEach(opponents, MatchFunctions.applyDefaultFactionIfEmpty)
+
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		MatchFunctions.computeOpponentScore({
+			walkover = match.walkover,
+			winner = match.winner,
+			opponentIndex = opponentIndex,
+			score = opponent.score,
+		}, opponent, autoScoreFunction)
+	end)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament')))
@@ -78,8 +94,9 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInput.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype, match.winner, match.walkover =
-			MatchGroupInput.getResultTypeAndWinner(match.winner, finishedInput, opponents)
+		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
+		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
+		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
 	end
 
@@ -136,7 +153,7 @@ end
 
 ---@param opponent table
 function MatchFunctions.addOpponentExtradata(opponent)
-	opponent.extradata = Table.merge(opponent.extradata, {
+	opponent.extradata = Table.merge(opponent.extradata or {}, {
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
 		score2 = opponent.score2,
@@ -144,9 +161,18 @@ function MatchFunctions.addOpponentExtradata(opponent)
 	})
 end
 
-function MatchFunctions.computeOpponentScore(match, games, opponent, opponentIndex)
-	local calculatedScore
-	calculatedScore, opponent.status = MatchGroupInput.computeOpponentScore(match, games, opponentIndex, opponent.score)
+---@param opponent table
+function MatchFunctions.applyDefaultFactionIfEmpty(opponent)
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata = Table.merge(player.extradata or {}, {faction = player.faction or Faction.defaultFaction})
+	end)
+end
+
+---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
+---@param opponent table
+---@param autoScore? fun(opponentIndex: integer): integer?
+function MatchFunctions.computeOpponentScore(props, opponent, autoScore)
+	local calculatedScore, status = MatchGroupInput.computeOpponentScore(props, autoScore)
 
 	if Logic.isNumeric(calculatedScore) and not opponent.score then
 		calculatedScore = calculatedScore + (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
@@ -154,7 +180,7 @@ function MatchFunctions.computeOpponentScore(match, games, opponent, opponentInd
 
 	opponent.score = calculatedScore
 
-	if opponent.status == MatchGroupInput.STATUS.SCORE and (match.winner == 'draw' or tonumber(match.winner) == 0) then
+	if opponent.status == MatchGroupInput.STATUS.SCORE and (props.winner == 'draw' or tonumber(props.winner) == 0) then
 		opponent.status = MatchGroupInput.STATUS.DRAW
 	end
 end
@@ -313,14 +339,6 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 
 	map.extradata.winnerfaction = players[winner].faction
 end
-
---[[
-
-additionally needed refactor due to changes in "base"
-- computeOpponentScore changed significantly
-- getResultTypeAndWinner changed significantly (split into several functions)
-
-]]
 
 
 
