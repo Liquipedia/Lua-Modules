@@ -17,10 +17,10 @@ local MAX_NUMBER_OF_PICKS = 5
 local MAX_NUMBER_OF_BANS = 7
 
 ---@class Dota2MatchGroupLegacyDefault: MatchGroupLegacy
-local Dota2MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
+local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@return table
-function Dota2MatchGroupLegacyDefault:getMap()
+function MatchGroupLegacyDefault:getMap()
 	local map = {
 		['$notEmpty$'] = 'map$1$',
 		map = 'map$1$',
@@ -45,8 +45,8 @@ end
 
 ---@param frame Frame
 ---@return string
-function Dota2MatchGroupLegacyDefault.run(frame)
-	return Dota2MatchGroupLegacyDefault(frame):build()
+function MatchGroupLegacyDefault.run(frame)
+	return MatchGroupLegacyDefault(frame):build()
 end
 
-return Dota2MatchGroupLegacyDefault
+return MatchGroupLegacyDefault
