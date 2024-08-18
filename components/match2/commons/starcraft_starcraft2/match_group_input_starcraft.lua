@@ -276,24 +276,21 @@ function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 		}
 	}
 
-	---@type string?
-	local finishedInput = mapInput.finished
-
-	map.finished = MapFunctions.isFinished(map, opponentCount)
+	map.finished = MapFunctions.isFinished(mapInput, opponentCount)
 	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		local score, status = MatchGroupInput.computeOpponentScore({
-			walkover = map.walkover,
-			winner = map.winner,
+			walkover = mapInput.walkover,
+			winner = mapInput.winner,
 			opponentIndex = opponentIndex,
-			score = map['score' .. opponentIndex],
-		}, MapFunctions.calculateMapScore(map.winner, map.finished))
+			score = mapInput['score' .. opponentIndex],
+		}, MapFunctions.calculateMapScore(mapInput.winner, map.finished))
 		return {score = score, status = status}
 	end)
 
 	map.scores = Array.map(opponentInfo, Operator.property('score'))
 
 	if map.finished then
-		map.resulttype = MatchGroupInput.getResultType(mapInput.winner, finishedInput, opponentInfo)
+		map.resulttype = MatchGroupInput.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
 		map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInput.getWinner(map.resulttype, mapInput.winner, opponentInfo)
 	end
@@ -303,26 +300,26 @@ function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 	return map, subGroup
 end
 
----@param map table
+---@param mapInput table
 ---@param opponentCount integer
 ---@return boolean
-function MapFunctions.isFinished(map, opponentCount)
-	local finished = Logic.readBoolOrNil(map.finished)
+function MapFunctions.isFinished(mapInput, opponentCount)
+	local finished = Logic.readBoolOrNil(mapInput.finished)
 	if finished ~= nil then
 		return finished
 	end
 
-	if Logic.isNotEmpty(map.winner) then
+	if Logic.isNotEmpty(mapInput.winner) then
 		return true
 	end
 
-	if Logic.isNotEmpty(map.finished) then
+	if Logic.isNotEmpty(mapInput.finished) then
 		return true
 	end
 
 	-- check for manual score inputs
 	for opponentIndex = 1, opponentCount do
-		if String.isNotEmpty(map['score' .. opponentIndex]) then
+		if String.isNotEmpty(mapInput['score' .. opponentIndex]) then
 			return true
 		end
 	end
