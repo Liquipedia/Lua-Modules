@@ -81,6 +81,10 @@ end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
 
+--
+-- match related functions
+--
+
 ---@param match table
 ---@param opponentCount integer
 ---@return table[]
@@ -116,10 +120,6 @@ function MatchFunctions.extractMaps(match, opponentCount)
 
 	return maps
 end
-
---
--- match related functions
---
 
 --- Fetch information about the tournament
 ---@param match table
