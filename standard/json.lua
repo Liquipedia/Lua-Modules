@@ -35,7 +35,7 @@ function Json.stringify(obj, options)
 		return mw.text.jsonEncode(obj, options.pretty and mw.text.JSON_PRETTY or nil)
 	end
 
-	return mw.ext.LiquipediaDB.lpdb_create_json(obj)
+	return Table.isEmpty(obj) and '{}' or mw.ext.LiquipediaDB.lpdb_create_json(obj)
 end
 
 ---Json-stringifies subtables of a given table.
