@@ -467,7 +467,7 @@ function BracketDisplay.NodeBody(props)
 	local bracketResetMatch = match.bracketData.bracketResetMatchId
 		and props.matchesById[match.bracketData.bracketResetMatchId]
 	if bracketResetMatch then
-		match = MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		match = Logic.wrapTryOrLog(MatchGroupUtil.mergeBracketResetMatch)(match, bracketResetMatch)
 	end
 
 	-- Current match
