@@ -7,7 +7,6 @@
 --
 
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local MatchGroupBase = {}
