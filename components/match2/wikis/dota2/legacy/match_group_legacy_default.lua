@@ -32,12 +32,12 @@ function MatchGroupLegacyDefault:getMap()
 
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (oppIndex)
 		local teamKey = 't' .. oppIndex
-		for pIndex = 1, MAX_NUMBER_OF_BANS do
+		Array.forEach(Array.range(1, MAX_NUMBER_OF_BANS), function (pIndex)
 			if pIndex <= MAX_NUMBER_OF_PICKS then
 				map[teamKey .. 'h' .. pIndex] = 'map$1$' .. teamKey .. 'h' .. pIndex
 			end
 			map[teamKey .. 'b' .. pIndex] = 'map$1$' .. teamKey .. 'b' .. pIndex
-		end
+		end)
 	end)
 
 	return map
