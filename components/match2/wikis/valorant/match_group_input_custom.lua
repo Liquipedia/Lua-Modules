@@ -213,33 +213,20 @@ function MapFunctions.getParticipantsData(map, opponentCount)
 	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, AgentNames)
 
 	for opponentIdx = 1, opponentCount do
-		Array.forEach(Array.mapIndexes(function(playerIdx)
-			local stats = map['t' .. opponentIdx .. 'p' .. playerIdx]
+		for _, stats, playerIdx in Table.iter.pairsByPrefix(map, 't' .. opponentIdx .. 'p', {requireIndex = true}) do
+			stats = Json.parseIfString(stats)
 
-			if not stats then
-				return
-			end
-
-			return Json.parseIfString(stats)
-		end), function(stats, playerIdx)
-			---@cast stats -nil
-			local participant = participants[opponentIdx .. '_' .. playerIdx] or {}
-
-			local function addProperty(key, value)
-				participant[key] = Logic.isNotEmpty(stats[key]) and stats[key] or value
-			end
-
-			addProperty('kills', participant.kills)
-			addProperty('deaths', participant.deaths)
-			addProperty('assists', participant.assists)
-			addProperty('agent', participant.agent)
-			addProperty('acs', participant.averagecombatscore)
-			addProperty('player', participant.player)
-
-			participant.agent = getCharacterName(participant.agent)
+			local participant = {
+				kills = stats.kills,
+				deaths = stats.deaths,
+				assists = stats.assists,
+				asc = stats.acs,
+				player = stats.player,
+				agent = getCharacterName(stats.agent),
+			}
 
 			participants[opponentIdx .. '_' .. playerIdx] = participant
-		end)
+		end
 	end
 
 	return participants
