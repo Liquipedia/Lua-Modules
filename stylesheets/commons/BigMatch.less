@@ -638,6 +638,8 @@ ul.match-bm-lol-game-veto-overview-pick {
 		border-radius: 0.25rem;
 		background-color: var( --on-background );
 		overflow: hidden;
+		padding: 0.25rem;
+		display: flex;
 
 		&.role--radiant {
 			background-color: var( --clr-atlantis-40 );
@@ -645,6 +647,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 		&.role--dire {
 			background-color: var( --clr-california-40 );
+		}
+
+		> img {
+			width: 100%;
+			height: auto;
 		}
 	}
 
