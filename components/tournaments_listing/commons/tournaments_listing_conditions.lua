@@ -20,7 +20,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local NON_TIER_TYPE_INPUT = 'none'
-local DEFAULT_MAX_COUNTRIES = 2
 
 local TournamentsListingConditions = {}
 
