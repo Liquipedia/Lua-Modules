@@ -87,6 +87,9 @@ function CustomMatchSummary.createBody(match)
 
 	end
 
+	-- casters
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+
 	return body
 end
 

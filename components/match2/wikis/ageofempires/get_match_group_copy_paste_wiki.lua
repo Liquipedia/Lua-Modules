@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -35,6 +36,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|bestof=' .. bestof,
 		INDENT .. '|twitch=|vod=',
 		INDENT .. '|mapdraft=|civdraft=',
+		Logic.readBool(args.casters) and (INDENT .. '|caster1= |caster2=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
 		end),
