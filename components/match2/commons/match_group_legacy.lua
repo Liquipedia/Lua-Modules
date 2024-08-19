@@ -27,7 +27,7 @@ local RESET_MATCH = 'RxMBR'
 local THIRD_PLACE_MATCH = 'RxMTP'
 
 ---@alias roundKeys {R: number, G: number, W: number, D: number}
----@alias match1Keys {opp1: string, opp2: string, details: string}
+---@alias match1Keys {opp1: string, opp2: string, details: string, header: string?}
 ---@alias match2mapping {[string]: match1Keys}|{[string] : string}
 
 ---@class MatchGroupLegacy
@@ -308,9 +308,12 @@ function MatchGroupLegacy:_populateNewArgs(match2mapping)
 	Table.iter.forEachPair(match2mapping, function (match2key, val)
 		if String.contains(match2key, 'header') then
 			---@cast val string
-			self.newArgs[match2key] = self.args[val]
+			self.newArgs[match2key] = self.newArgs[match2key] or self.args[val]
 		else
 			---@cast val match1Keys
+			if val.header then
+				self.newArgs[match2key .. 'header'] = self.args[val.header]
+			end
 			self.newArgs[match2key] = self:getMatch(match2key, val)
 		end
 	end)
