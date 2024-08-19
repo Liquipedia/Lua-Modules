@@ -198,7 +198,7 @@ end
 ---@param prefix string
 ---@return table
 function MatchGroupLegacy:getDetails(isReset, prefix)
-	local detailsKey = isReset and '' or prefix .. 'details'
+	local detailsKey = isReset and 'resetDetails' or prefix .. 'details'
 	local details = Table.extract(self.args, detailsKey)
 	if details then
 		return (Json.parse(details))
