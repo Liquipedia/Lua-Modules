@@ -290,6 +290,7 @@ function MatchGroupLegacy:getMatch(match2key, match1params)
 	self:handleOtherMatchParams(isReset, match)
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
 		local opponent =  match['opponent' .. opponentIndex] or {}
+		match.winner = match.winner or opponent.win and opponentIndex or nil
 		isValidReset = isValidReset or Logic.isNotEmpty(opponent.score)
 	end)
 
