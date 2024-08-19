@@ -261,7 +261,7 @@ end
 function MapFunctions.getExtraData(map)
 	local timeouts = Array.extractValues(Table.mapValues(mw.text.split(map.timeout or '', ','), tonumber))
 
-	map.extradata = {
+	return {
 		ot = map.ot,
 		otlength = map.otlength,
 		comment = map.comment,
@@ -271,7 +271,6 @@ function MapFunctions.getExtraData(map)
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
 	}
-	return map
 end
 
 return CustomMatchGroupInput
