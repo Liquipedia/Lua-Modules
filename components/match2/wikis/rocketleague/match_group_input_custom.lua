@@ -251,7 +251,6 @@ function MatchFunctions.currentEarnings(name)
 	return tonumber(currentEarnings) or 0
 end
 
-
 --
 -- map related functions
 --
