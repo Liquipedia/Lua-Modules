@@ -40,7 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, {})
 	end)
-	local games = MatchFunctions.CustomMatchGroupInput(match, #opponents)
+	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchGroupInput.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 
