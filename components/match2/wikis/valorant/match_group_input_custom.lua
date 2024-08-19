@@ -159,7 +159,7 @@ end
 
 ---@param match table
 ---@return table
-function MatchFunctions.getVodStuff(match)
+function MatchFunctions.getLinks(match)
 	return {
 		vlr = match.vlr and 'https://vlr.gg/' .. match.vlr or nil,
 	}
