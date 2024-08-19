@@ -12,6 +12,7 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -39,7 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, {})
 	end)
-	local games = MatchFunctions.extractMaps(match, #opponents)
+	local games = MatchFunctions.CustomMatchGroupInput(match, #opponents)
 	match.bestof = MatchGroupInput.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 
@@ -75,6 +76,43 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.opponents = opponents
 
 	return match
+end
+
+
+---@param match table
+---@param opponentCount integer
+---@return table[]
+function CustomMatchGroupInput.extractMaps(match, opponentCount)
+	local maps = {}
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local finishedInput = map.finished --[[@as string?]]
+		local winnerInput = map.winner --[[@as string?]]
+
+		map.extradata = MapFunctions.getExtraData(map, opponentCount)
+		map.finished = MatchGroupInput.mapIsFinished(map)
+
+		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+			local score, status = MatchGroupInput.computeOpponentScore({
+				walkover = map.walkover,
+				winner = map.winner,
+				opponentIndex = opponentIndex,
+				score = map['score' .. opponentIndex],
+			}, MapFunctions.calculateMapScore(map))
+			return {score = score, status = status}
+		end)
+
+		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		if map.finished then
+			map.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponentInfo)
+			map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
+			map.winner = MatchGroupInput.getWinner(map.resulttype, winnerInput, opponentInfo)
+		end
+
+		table.insert(maps, map)
+		match[key] = nil
+	end
+
+	return maps
 end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
