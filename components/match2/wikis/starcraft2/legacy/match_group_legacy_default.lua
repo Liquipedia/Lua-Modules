@@ -17,7 +17,7 @@ local globalVars = PageVariableNamespace()
 
 local USER_SPACE = 2
 
----@class MatchGroupLegacyDefault: MatchGroupLegacy
+---@class Starcraft2MatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@param prefix string
