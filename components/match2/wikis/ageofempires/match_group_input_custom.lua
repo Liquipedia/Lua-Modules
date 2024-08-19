@@ -301,7 +301,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	-- default date indicates that the match is missing a date
 	-- In order to get correct child team template, we will use an approximately date and not the default date
 	if teamTemplateDate == DateExt.defaultTimestamp then
-		teamTemplateDate = Variables.varDefaultMulti('tournament_enddate', 'tournament_startdate', NOW)
+		teamTemplateDate = DateExt.getContextualDateOrNow()
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
