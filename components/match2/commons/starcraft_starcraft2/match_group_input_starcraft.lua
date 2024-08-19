@@ -51,8 +51,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
-	local games = MatchFunctions.extractMaps(match, opponents)
-
 	-- TODO: check how we can get rid of this legacy stuff ...
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local opponentHasWon = Table.extract(opponent, 'win')
@@ -60,8 +58,14 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.winner = match.winner or opponentIndex
 	end)
 
+	-- make sure match2players is not nil to avoid indexing nil
+	Array.forEach(opponents, function(opponent)
+		opponent.match2players = opponent.match2players or {}
+	end)
 	Array.forEach(opponents, MatchFunctions.addOpponentExtradata)
 	Array.forEach(opponents, MatchFunctions.applyDefaultFactionIfEmpty)
+
+	local games = MatchFunctions.extractMaps(match, opponents)
 
 	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
 		and MatchFunctions.calculateMatchScore(games)
