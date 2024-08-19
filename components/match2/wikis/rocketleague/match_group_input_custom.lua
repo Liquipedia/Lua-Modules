@@ -86,11 +86,12 @@ end
 ---@return table
 function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.extradata = MapFunctions.getExtraData(map)
+		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.finished = MatchGroupInput.mapIsFinished(map)
 
 		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
