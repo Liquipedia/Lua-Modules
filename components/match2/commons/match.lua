@@ -262,20 +262,26 @@ end
 
 ---@param matchRecord table
 function Match.encodeJson(matchRecord)
+	---@param obj any
+	---@return string
+	local makeJsonTabelNotList = function(obj)
+		return Logic.isEmpty(obj) and '{}' or Json.stringify(obj)
+	end
+
 	matchRecord.match2bracketdata = Json.stringify(matchRecord.match2bracketdata, {asArray = true})
 	matchRecord.stream = Json.stringify(matchRecord.stream)
 	matchRecord.links = Json.stringify(matchRecord.links)
-	matchRecord.extradata = Json.stringify(matchRecord.extradata)
+	matchRecord.extradata = makeJsonTabelNotList(matchRecord.extradata)
 
 	for _, opponentRecord in ipairs(matchRecord.match2opponents) do
 		opponentRecord.extradata = Json.stringify(opponentRecord.extradata)
 		for _, playerRecord in ipairs(opponentRecord.match2players) do
-			playerRecord.extradata = Json.stringify(playerRecord.extradata)
+			playerRecord.extradata = makeJsonTabelNotList(playerRecord.extradata)
 		end
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
-		gameRecord.extradata = Json.stringify(gameRecord.extradata)
-		gameRecord.participants = Json.stringify(gameRecord.participants)
+		gameRecord.extradata = makeJsonTabelNotList(gameRecord.extradata)
+		gameRecord.participants = makeJsonTabelNotList(gameRecord.participants)
 		gameRecord.scores = Json.stringify(gameRecord.scores, {asArray = true})
 	end
 end
@@ -288,16 +294,12 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 	local opponentIndexes = Array.map(records.opponentRecords, function(opponentRecord, opponentIndex)
 		local playerIndexes = Array.map(records.playerRecords[opponentIndex], function(player, playerIndex)
 
-			player.extradata = Logic.nilIfEmpty(player.extradata)
-
 			return mw.ext.LiquipediaDB.lpdb_match2player(
 				matchRecord.match2id .. '_m2o_' .. string.format('%02d', opponentIndex)
 						.. '_m2p_' .. string.format('%02d', playerIndex),
 				player
 			)
 		end)
-
-		opponentRecord.extradata = Logic.nilIfEmpty(opponentRecord.extradata)
 
 		opponentRecord.match2players = table.concat(playerIndexes)
 		return mw.ext.LiquipediaDB.lpdb_match2opponent(
