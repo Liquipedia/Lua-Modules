@@ -88,6 +88,7 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		map.participants = MapFunctions.getParticipants(map, opponentCount)
 		map.extradata = MapFunctions.getExtraData(map, opponentCount)
 		map.finished = MatchGroupInput.mapIsFinished(map)
 
@@ -208,7 +209,7 @@ end
 ---@param map table
 ---@param opponentCount integer
 ---@return table
-function MapFunctions.getParticipantsData(map, opponentCount)
+function MapFunctions.getParticipants(map, opponentCount)
 	local participants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, AgentNames)
 
