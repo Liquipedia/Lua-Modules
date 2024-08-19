@@ -45,7 +45,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		return MatchGroupInput.readOpponent(match, opponentIndex, {})
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
-	games = MatchFunctions.removeUnsetMaps(games)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
