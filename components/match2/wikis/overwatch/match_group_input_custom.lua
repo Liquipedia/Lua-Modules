@@ -39,7 +39,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
-	games = MatchFunctions.removeUnsetMaps(games)
 
 	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
 		and MatchFunctions.calculateMatchScore(games, match.bestof)
