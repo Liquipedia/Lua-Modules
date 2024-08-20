@@ -242,7 +242,7 @@ function MatchFunctions.currentEarnings(name)
 		query = 'extradata'
 	})[1]
 
-	if not data[1] then
+	if not data then
 		return 0
 	end
 
