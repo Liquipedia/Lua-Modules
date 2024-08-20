@@ -1061,7 +1061,6 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 
 	local vetoTypes = Array.parseCommaSeparatedString(match.mapveto.types)
 	local deciders = Array.parseCommaSeparatedString(match.mapveto.decider)
-	local vetoStart = match.mapveto.firstpick or ''
 	local deciderIndex = 1
 
 	local data = {}
@@ -1078,7 +1077,8 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 		end
 	end
 	if data[1] then
-		data[1].vetostart = vetoStart
+		data[1].vetostart = match.mapveto.firstpick or ''
+		data[1].format = match.mapveto.format
 	end
 	return data
 end
