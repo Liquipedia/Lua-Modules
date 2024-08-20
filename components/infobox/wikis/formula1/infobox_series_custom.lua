@@ -44,7 +44,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Span', content = {args.span}}
 		)
 	end
-	
 	return widgets
 end
 
