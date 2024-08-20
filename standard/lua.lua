@@ -167,7 +167,11 @@ function Lua.callAndDisplayErrors(fn, frame, hardErrors)
 		else
 			table.insert(parts, tostring(ErrorDisplay.ErrorList{errors = errors}))
 		end
-		mw.ext.TeamLiquidIntegration.add_category('Pages with script errors')
+		if mw.title.getCurrentTitle().namespace == 2 then
+			mw.ext.TeamLiquidIntegration.add_category('User pages with script errors')
+		else
+			mw.ext.TeamLiquidIntegration.add_category('Pages with script errors')
+		end
 	end
 
 	return table.concat(parts)
