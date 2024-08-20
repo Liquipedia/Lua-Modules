@@ -156,7 +156,6 @@ end
 ---@return table
 function MatchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	match.showh2h = Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
@@ -167,7 +166,7 @@ function MatchFunctions.getExtraData(match, opponents)
 	local opponent1 = opponents[1]
 	local opponent2 = opponents[2]
 
-	local showh2h = Logic.readBool(match.showh2h)
+	local showh2h = Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h')))
 		and opponent1.type == Opponent.team
 		and opponent2.type == Opponent.team
 
