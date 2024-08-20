@@ -189,7 +189,7 @@ function MapFunctions.getExtraData(map, opponentCount)
 	for opponentIndex = 1, opponentCount do
 		extraData['team' .. opponentIndex .. 'side'] = string.lower(map['team' .. opponentIndex .. 'side'] or '')
 		for playerIndex = 1, MAX_NUM_PLAYERS do
-			local pick = getCharacterName(map['t' .. opponentIndex .. 'h' .. playerIndex])
+			local pick = getCharacterName(map['t' .. opponentIndex .. 'c' .. playerIndex])
 			extraData['team' .. opponentIndex .. 'champion' .. playerIndex] = pick
 			local ban = getCharacterName(map['t' .. opponentIndex .. 'b' .. playerIndex])
 			extraData['team' .. opponentIndex .. 'ban' .. playerIndex] = ban
