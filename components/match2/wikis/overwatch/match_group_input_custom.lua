@@ -87,11 +87,15 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 		map.finished = MatchGroupInput.mapIsFinished(map)
 
 		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+			local scoreInput = map['score' .. opponentIndex]
+			if map.mode == 'Push' and scoreInput then
+				scoreInput = scoreInput:gsub('m', '')
+			end
 			local score, status = MatchGroupInput.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
+				score = scoreInput,
 			})
 			return {score = score, status = status}
 		end)
