@@ -239,7 +239,7 @@ end
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
 	return function(opponentIndex)
-		if not map['t'.. opponentIndex ..'atk'] and map['t'.. opponentIndex ..'def'] then
+		if not map['t'.. opponentIndex ..'atk'] and not map['t'.. opponentIndex ..'def'] then
 			return
 		end
 		return (tonumber(map['t'.. opponentIndex ..'atk']) or 0)
