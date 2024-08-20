@@ -1095,8 +1095,7 @@ function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 	end
 
-	-- Calculate winner, resulttype, placements and walkover as applicable
-	if MatchGroupInput.isDraw(opponents) then
+	if MatchGroupInput.isDraw(opponents, winnerInput) then
 		return MatchGroupInput.RESULT_TYPE.DRAW
 	end
 
@@ -1234,9 +1233,13 @@ function MatchGroupInput.isNotPlayedInput(input)
 end
 
 ---@param opponents {status: string, score: number?}[]
+---@param winnerInput integer|string|nil
 ---@return boolean
-function MatchGroupInput.isDraw(opponents)
+function MatchGroupInput.isDraw(opponents, winnerInput)
 	if Logic.isEmpty(opponents) then return true end
+	if tonumber(winnerInput) == 0 then
+		return true
+	end
 	local function opponentHasFinalStatus(opponent)
 		return opponent.status ~= MatchGroupInput.STATUS.SCORE and opponent.status ~= MatchGroupInput.STATUS.DRAW
 	end
