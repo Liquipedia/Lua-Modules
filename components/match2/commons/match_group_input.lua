@@ -659,7 +659,7 @@ function MatchGroupInput.getCommonTournamentVars(obj, parent)
 		parent.liquipediatiertype,
 		globalVars:get('tournament_liquipediatiertype')
 	)
-  obj.publishertier = Logic.emptyOr(
+	obj.publishertier = Logic.emptyOr(
 		obj.publishertier,
 		parent.publishertier,
 		globalVars:get('tournament_publishertier')
