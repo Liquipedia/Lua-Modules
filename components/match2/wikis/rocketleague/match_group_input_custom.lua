@@ -73,7 +73,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
 
-	match.extradata = MatchFunctions.getExtraData(match)
+	match.extradata = MatchFunctions.getExtraData(match, opponents)
 
 	match.games = games
 	match.opponents = opponents
@@ -161,10 +161,11 @@ function MatchFunctions.getTournamentVars(match)
 end
 
 ---@param match table
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
+function MatchFunctions.getExtraData(match, opponents)
+	local opponent1 = opponents[1]
+	local opponent2 = opponents[2]
 
 	local showh2h = Logic.readBool(match.showh2h)
 		and opponent1.type == Opponent.team
@@ -172,7 +173,7 @@ function MatchFunctions.getExtraData(match)
 
 	return {
 		showh2h = showh2h,
-		isfeatured = MatchFunctions.isFeatured(match),
+		isfeatured = MatchFunctions.isFeatured(opponents),
 		casters = MatchGroupInput.readCasters(match),
 		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponent1),
 		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponent2),
@@ -211,11 +212,11 @@ function MatchFunctions.getLinks(match)
 	return links
 end
 
----@param match table
+---@param opponents table[]
 ---@return boolean
-function MatchFunctions.isFeatured(match)
-	local opponent1 = match.opponent1
-	local opponent2 = match.opponent2
+function MatchFunctions.isFeatured(opponents)
+	local opponent1 = opponents[1]
+	local opponent2 = opponents[2]
 	if opponent1.type ~= Opponent.team or opponent2.type ~= Opponent.team then
 		return false
 	end
