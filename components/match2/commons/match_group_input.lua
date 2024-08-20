@@ -1251,7 +1251,8 @@ end
 ---@param opponents {status: string}[]
 ---@return boolean
 function MatchGroupInput.hasSpecialStatus(opponents)
-	return Array.any(opponents, function (opponent) return opponent.status ~= MatchGroupInput.STATUS.SCORE end)
+	return Array.any(opponents, function (opponent)
+			return opponent.status and opponent.status ~= MatchGroupInput.STATUS.SCORE end)
 end
 
 ---@param opponents {status: string?}[]
