@@ -276,8 +276,15 @@ function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
 
 	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
+	local mapName = mapInput.map
+	if mapName and mapName:upper() ~= TBD then
+		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
+	elseif mapName then
+		mapName = TBD
+	end
+
 	local map = {
-		map = mapInput.map and mapInput.map ~= TBD and mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map) or nil,
+		map = mapName,
 		patch = Variables.varDefault('tournament_patch', ''),
 		subgroup = subGroup,
 		extradata = {
