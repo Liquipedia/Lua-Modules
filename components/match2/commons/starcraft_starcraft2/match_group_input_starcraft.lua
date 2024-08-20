@@ -323,6 +323,10 @@ function MapFunctions.isFinished(mapInput, opponentCount)
 		return true
 	end
 
+	if Logic.isNotEmpty(mapInput.walkover) then
+		return true
+	end
+
 	if Logic.isNotEmpty(mapInput.finished) then
 		return true
 	end
