@@ -143,7 +143,9 @@ function MatchFunctions.extractMaps(match, opponents)
 
 		map.participants = MapFunctions.getParticipants(mapInput, opponents)
 
-		MapFunctions.getModeAndEnrichExtradata(map, mapInput, map.participants, opponents)
+		map.mode = MapFunctions.getMode(mapInput, map.participants, opponents)
+
+		Table.mergeInto(map.extradata, MapFunctions.getAdditionalExtraData(map, map.participants))
 
 		map.vod = Logic.emptyOr(mapInput.vod, match['vodgame' .. mapIndex])
 
@@ -488,20 +490,17 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	return participants
 end
 
----@param map table # the parsed map into which we fill the parse informations
 ---@param mapInput table # the input data
 ---@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
 ---@param opponents table[]
-function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opponents)
+---@return string
+function MapFunctions.getMode(mapInput, participants, opponents)
 	---@type (string|integer)[]
 	local playerCounts = {}
-	local players = {}
-	for key, participant in pairs(participants) do
+	for key in pairs(participants) do
 		local parsedOpponentIndex = key:match('(%d+)_%d+')
 		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]
 		playerCounts[opponetIndex] = (playerCounts[opponetIndex] or 0) + 1
-		-- only relevant for 1v1 maps, hence irrelevant if we overwrite it for other map types over and over
-		players[opponetIndex] = participant
 	end
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
@@ -518,18 +517,33 @@ function MapFunctions.getModeAndEnrichExtradata(map, mapInput, participants, opp
 		return count
 	end)
 
-	map.mode = table.concat(modeParts, 'v')
+	return table.concat(modeParts, 'v')
+end
 
+---@param map table
+---@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
+---@return {}?
+function MapFunctions.getAdditionalExtraData(map, participants)
 	if map.mode ~= '1v1' then return end
 
-	map.extradata.opponent1 = opponents[1].name
-	map.extradata.opponent2 = opponents[2].name
+	local players = {}
+	for _, player in Table.iter.spairs(participants) do
+		table.insert(players, player)
+	end
 
-	if map.winner ~= 1 and map.winner ~= 2 then return end
+	local extradata = {}
+	extradata.opponent1 = players[1].player
+	extradata.opponent2 = players[2].player
+
+	if map.winner ~= 1 and map.winner ~= 2 then
+		return extradata
+	end
 	local loser = 3 - map.winner
 
-	map.extradata.winnerfaction = players[map.winner].faction
-	map.extradata.loserfaction = players[loser].faction
+	extradata.winnerfaction = players[map.winner].faction
+	extradata.loserfaction = players[loser].faction
+
+	return extradata
 end
 
 ---@param mapInput table
