@@ -220,7 +220,7 @@ function MatchFunctions.isFeatured(opponents, tier)
 
 	if
 		tier == 1
-		or tier== 2
+		or tier == 2
 		or Logic.readBool(Variables.varDefault('tournament_rlcs_premier'))
 		or not String.isEmpty(Variables.varDefault('match_featured_override'))
 	then
