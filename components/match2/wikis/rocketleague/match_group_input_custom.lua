@@ -185,12 +185,9 @@ end
 function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	if Opponent.typeIsParty(opponent.type) then
 		return not Array.all(opponent.match2players, Opponent.playerIsTbd)
-	elseif opponent.type == Opponent.team then
-		return not Opponent.isTbd(opponent)
 	end
-
-	-- Literal case
-	return false
+	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
+	return not Opponent.isTbd(opponent)
 end
 
 ---@param match table
