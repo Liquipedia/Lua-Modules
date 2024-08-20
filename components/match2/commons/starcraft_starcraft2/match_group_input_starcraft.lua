@@ -136,8 +136,7 @@ end
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	local subGroup = 0
-	for mapKey, rawMapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local mapInput = Json.parseIfString(rawMapInput)
+	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
@@ -207,9 +206,8 @@ end
 ---@param opponents {type: OpponentType}
 ---@return string
 function MatchFunctions.getMode(opponents)
-	local firstOpponentType = opponents[1].type
-	return Array.all(opponents, function(opponent) return opponent.type == firstOpponentType end)
-		and firstOpponentType or MODE_MIXED
+	local opponentTypes = Array.map(opponents, Operator.property('type'))
+	return #Array.unique(opponentTypes) == 1 and opponents[1].type or MODE_MIXED
 end
 
 ---@param bestofInput string|integer?
@@ -271,14 +269,12 @@ function MatchFunctions.getVeto(extradata, map, match, prefix, vetoIndex)
 	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
----@param rawMapInput string
+---@param mapInput table
 ---@param subGroup integer
 ---@param opponentCount integer
 ---@return table
 ---@return integer
-function MapFunctions.readMap(rawMapInput, subGroup, opponentCount)
-	local mapInput = Json.parseIfString(rawMapInput)
-
+function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
 	local mapName = mapInput.map
