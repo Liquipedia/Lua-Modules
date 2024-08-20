@@ -378,7 +378,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 
 	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race'])
 		or Faction.read(mapInput['opponent' .. opponentIndex .. 'race'])
-		or players[1].extradata.faction
+		or ((players[1] or {}).extradata or {}).faction
 	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 
 	---@type {input: string, faction: string?, link: string?}[]
@@ -404,9 +404,10 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		local link = participantInput.link or Variables.varDefault(nameInput .. '_page') or nameInput
 		link = Page.pageifyLink(link) --[[@as string -- can't be nil as input isn't nil]]
 
-		local playerIndex =  Array.indexOf(players, function(player) return player.name == link end)
+		local playerIndex = MapFunctions.getPlayerIndex(players, link, nameInput)
+
 		-- in case we have a TBD or a player not known in match2players inster a new player in match2players
-		if isTBD or not playerIndex then
+		if isTBD or playerIndex == 0 then
 			table.insert(players, {
 				name = isTBD and TBD or link,
 				displayname = isTBD and TBD or nameInput,
@@ -426,6 +427,20 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	return participants
 end
 
+---@param players {name: string, displayname: string}
+---@param name string
+---@param displayName string
+---@return integer
+function MapFunctions.getPlayerIndex(players, name, displayName)
+	local playerIndex =  Array.indexOf(players, function(player) return player.name == name end)
+
+	if playerIndex ~= 0 then
+		return playerIndex
+	end
+
+	return Array.indexOf(players, function(player) return player.displayname == displayName end)
+end
+
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
@@ -440,7 +455,8 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 		mapInput['opponent' .. opponentIndex .. 'race']
 	)
 
-	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race']) or players[1].extradata.faction
+	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race'])
+		or ((players[1] or {}).extradata or {}).faction
 	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 
 	local participants = {}
