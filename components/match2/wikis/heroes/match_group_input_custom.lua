@@ -184,11 +184,11 @@ function MapFunctions.getExtraData(map, opponentCount)
 
 	for opponentIndex = 1, opponentCount do
 		extraData['team' .. opponentIndex .. 'side'] = string.lower(map['team' .. opponentIndex .. 'side'] or '')
-		for _, heroInput, heroIndex in Table.iter.iterateMapPairs(map, 't' .. opponentIndex .. 'b') do
+		for _, heroInput, heroIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h') do
 			extraData['team' .. opponentIndex .. 'champion' .. heroIndex] = getCharacterName(heroInput)
 		end
 
-		for _, banInput, banIndex in Table.iter.iterateMapPairs(map, 't' .. opponentIndex .. 'b') do
+		for _, banInput, banIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
 			extraData['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(banInput)
 		end
 	end
