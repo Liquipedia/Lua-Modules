@@ -1237,7 +1237,7 @@ end
 ---@return boolean
 function MatchGroupInput.isDraw(opponents, winnerInput)
 	if Logic.isEmpty(opponents) then return true end
-	if tonumber(winnerInput) == 0 or string.lower(winnerInput or '') == 'draw' then
+	if tonumber(winnerInput) == 0 then
 		return true
 	end
 	local function opponentHasFinalStatus(opponent)

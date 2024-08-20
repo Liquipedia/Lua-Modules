@@ -34,6 +34,7 @@ local MODE_MIXED = 'mixed'
 
 --- only temp needed until bot job finishes
 local TEMP_WORKAROUND = {['-'] = 'L'}
+local TEMP_WORKAROUND2 = {['draw'] = 0}
 
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
@@ -52,6 +53,8 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
+
+	match.winner = TEMP_WORKAROUND2[string.lower(match.winner or '')] or match.winner
 
 	-- TODO: check how we can get rid of this legacy stuff ...
 	Array.forEach(opponents, function(opponent, opponentIndex)
