@@ -173,7 +173,7 @@ function MatchFunctions.getExtraData(match, opponents)
 
 	return {
 		showh2h = showh2h,
-		isfeatured = MatchFunctions.isFeatured(opponents),
+		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
 		casters = MatchGroupInput.readCasters(match),
 		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponent1),
 		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponent2),
@@ -213,8 +213,9 @@ function MatchFunctions.getLinks(match)
 end
 
 ---@param opponents table[]
+---@param tier integer?
 ---@return boolean
-function MatchFunctions.isFeatured(opponents)
+function MatchFunctions.isFeatured(opponents, tier)
 	local opponent1 = opponents[1]
 	local opponent2 = opponents[2]
 	if opponent1.type ~= Opponent.team or opponent2.type ~= Opponent.team then
@@ -222,8 +223,8 @@ function MatchFunctions.isFeatured(opponents)
 	end
 
 	if
-		tonumber(match.liquipediatier) == 1
-		or tonumber(match.liquipediatier) == 2
+		tier == 1
+		or tier== 2
 		or Logic.readBool(Variables.varDefault('tournament_rlcs_premier'))
 		or not String.isEmpty(Variables.varDefault('match_featured_override'))
 	then
