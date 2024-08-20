@@ -221,7 +221,7 @@ function CustomMatchSummary.createBody(match)
 		end
 
 		if index > 1 then
-			pickData.numberOfPick = index - 1
+			pickData.numberOfPicks = index - 1
 			showGamePicks[gameIndex] = pickData
 		end
 	end
