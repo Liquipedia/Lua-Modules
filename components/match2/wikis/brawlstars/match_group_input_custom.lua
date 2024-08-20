@@ -35,7 +35,6 @@ local MapFunctions = {}
 
 local CustomMatchGroupInput = {}
 
-
 ---@param match table
 ---@param options table?
 ---@return table
