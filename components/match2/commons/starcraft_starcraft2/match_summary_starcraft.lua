@@ -328,10 +328,13 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 	end
 
 	local renderScore = function(opponentIndex)
+		if submatch.resultType == 'np' then
+			return
+		end
 		local isWinner = opponentIndex == submatch.winner
 		local text
 		if submatch.resultType == 'default' then
-			text = isWinner and 'W' or submatch.walkover
+			text = isWinner and 'W' or submatch.walkover:upper()
 		else
 			local score = submatch.scores[opponentIndex]
 			text = score and tostring(score) or ''
