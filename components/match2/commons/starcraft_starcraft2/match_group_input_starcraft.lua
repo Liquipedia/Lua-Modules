@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -32,6 +31,9 @@ local OPPONENT_CONFIG = {
 local TBD = 'TBD'
 local TBA = 'TBA'
 local MODE_MIXED = 'mixed'
+
+--- only temp needed until bot job finishes
+local TEMP_WORKAROUND = {['-'] = 'L'}
 
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
@@ -72,16 +74,16 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, opponents)
 
 	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
-		and MatchFunctions.calculateMatchScore(games)
+		and MatchFunctions.calculateMatchScore(games, opponents)
 		or nil
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		MatchFunctions.computeOpponentScore({
+		opponent.score, opponent.status = MatchGroupInput.computeOpponentScore({
 			walkover = match.walkover,
 			winner = match.winner,
 			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, opponent, autoScoreFunction)
+			score = TEMP_WORKAROUND[opponent.score] or opponent.score,
+		}, autoScoreFunction)
 	end)
 
 	match.mode = MatchFunctions.getMode(opponents)
@@ -156,10 +158,13 @@ function MatchFunctions.extractMaps(match, opponents)
 end
 
 ---@param maps table[]
+---@param opponents table[]
 ---@return fun(opponentIndex: integer): integer
-function MatchFunctions.calculateMatchScore(maps)
+function MatchFunctions.calculateMatchScore(maps, opponents)
 	return function(opponentIndex)
-		return MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+		local calculatedScore = MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+		local opponent = opponents[opponentIndex]
+		return calculatedScore + (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
 	end
 end
 
@@ -178,29 +183,6 @@ end
 ---@return string
 function MatchFunctions.getPlayerFaction(player)
 	return player.extradata.faction or Faction.defaultFaction
-end
-
----@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
----@param opponent table
----@param autoScore? fun(opponentIndex: integer): integer?
-function MatchFunctions.computeOpponentScore(props, opponent, autoScore)
-	-- TODO: bot the usage away
-	if props.score == '-' then
-		props.score = 'L'
-	end
-
-	local calculatedScore
-	calculatedScore, opponent.status = MatchGroupInput.computeOpponentScore(props, autoScore)
-
-	if Logic.isNumeric(calculatedScore) and not opponent.score then
-		calculatedScore = calculatedScore + (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
-	end
-
-	opponent.score = calculatedScore
-
-	if opponent.status == MatchGroupInput.STATUS.SCORE and (props.winner == 'draw' or tonumber(props.winner) == 0) then
-		opponent.status = MatchGroupInput.STATUS.DRAW
-	end
 end
 
 ---@param opponents {type: OpponentType}
