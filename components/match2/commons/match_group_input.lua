@@ -1095,7 +1095,6 @@ function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 	end
 
-	-- Calculate winner, resulttype, placements and walkover as applicable
 	if MatchGroupInput.isDraw(opponents, winnerInput) then
 		return MatchGroupInput.RESULT_TYPE.DRAW
 	end
