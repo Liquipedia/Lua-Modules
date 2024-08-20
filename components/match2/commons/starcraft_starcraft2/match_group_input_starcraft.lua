@@ -58,12 +58,16 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.winner = match.winner or opponentIndex
 	end)
 
-	-- make sure match2players is not nil to avoid indexing nil
 	Array.forEach(opponents, function(opponent)
+		opponent.extradata = opponent.extradata or {}
+		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+		-- make sure match2players is not nil to avoid indexing nil
 		opponent.match2players = opponent.match2players or {}
+		Array.forEach(opponent.match2players, function(player)
+			player.extradata = player.extradata or {}
+			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+		end)
 	end)
-	Array.forEach(opponents, MatchFunctions.addOpponentExtradata)
-	Array.forEach(opponents, MatchFunctions.applyDefaultFactionIfEmpty)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
 
@@ -159,21 +163,20 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param opponent table
-function MatchFunctions.addOpponentExtradata(opponent)
-	opponent.extradata = Table.merge(opponent.extradata or {}, {
+---@return table
+function MatchFunctions.getOpponentExtradata(opponent)
+	return {
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
 		score2 = opponent.score2,
 		isarchon = opponent.isarchon,
-	})
+	}
 end
 
----@param opponent table
-function MatchFunctions.applyDefaultFactionIfEmpty(opponent)
-	Array.forEach(opponent.match2players, function(player)
-		player.extradata = Table.merge(player.extradata or {}, {
-			faction = (player.extradata or {}).faction or Faction.defaultFaction})
-	end)
+---@param player table
+---@return string
+function MatchFunctions.getPlayerFaction(player)
+	return player.extradata.faction or Faction.defaultFaction
 end
 
 ---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
