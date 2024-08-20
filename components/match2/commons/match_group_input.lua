@@ -1372,27 +1372,19 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 		return true
 	end
 
-	-- TODO: Investigate if bestof = 0 needs to be handled
-	if not match.bestof then
+	local bestof = match.bestof
+	if not bestof then
 		return false
 	end
+	-- TODO: Investigate if bestof = 0 needs to be handled
 
-	-- Check if all/enough games have been played. If they have, mark as finished
-	local firstTo = math.floor(match.bestof / 2)
-	if Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > firstTo end) then
-		return true
-	end
-	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
-	if scoreSum >= match.bestof then
-		return true
-	end
-
-	return false
+	return MatchGroupInput.majorityHasBeenWon(bestof, opponents)
 end
 
----@param map {winner: string|nil, finished: string?}
+---@param map {winner: string|nil, finished: string?, bestof: integer?}
+---@param opponents? {score: integer?}[]
 ---@return boolean
-function MatchGroupInput.mapIsFinished(map)
+function MatchGroupInput.mapIsFinished(map, opponents)
 	local finished = Logic.readBoolOrNil(map.finished)
 	if finished ~= nil then
 		return finished
@@ -1406,6 +1398,27 @@ function MatchGroupInput.mapIsFinished(map)
 		return true
 	end
 
+	local bestof = map.bestof
+	if not bestof or bestof == 0 or not opponents then
+		return false
+	end
+
+	return MatchGroupInput.majorityHasBeenWon(bestof, opponents)
+end
+
+-- Check if all/enough games/rounds have been played for being certain winner
+---@param bestof integer
+---@param opponents {score: integer?}[]
+---@return boolean
+function MatchGroupInput.majorityHasBeenWon(bestof, opponents)
+	local firstTo = math.floor(bestof / 2)
+	if Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > firstTo end) then
+		return true
+	end
+	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
+	if scoreSum >= bestof then
+		return true
+	end
 	return false
 end
 
