@@ -107,7 +107,7 @@ describe('prize pool', function()
 				icon = 'test.png',
 				icondark = 'test dark.png',
 				individualprizemoney = 970.97276906869001323,
-				lastvsdata = '[]',
+				lastvsdata = '{}',
 				liquipediatier = '1',
 				liquipediatiertype = 'Qualifier',
 				opponentname = 'Rathoz',
