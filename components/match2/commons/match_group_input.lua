@@ -1214,7 +1214,8 @@ function MatchGroupInput.opponentWalkover(walkoverInput, isWinner)
 	end
 
 	local walkoverUpperCase = string.upper(walkoverInput)
-	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase), 'Invalid walkover input: ' .. walkoverUpperCase)
+	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase),
+		'Invalid walkover input: ' .. walkoverUpperCase)
 	return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
 end
 
