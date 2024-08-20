@@ -50,7 +50,9 @@ function CustomMatchSummary.addToFooter(match, footer)
 
 	if
 		match.opponents[1].type == Opponent.team and
-		match.opponents[2].type == Opponent.team
+		match.opponents[2].type == Opponent.team and
+		match.opponents[1].name and
+		match.opponents[2].name
 	then
 		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
 		local buildQueryFormLink = function(form, template, arguments)
