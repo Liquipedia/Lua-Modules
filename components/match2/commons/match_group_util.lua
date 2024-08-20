@@ -21,6 +21,7 @@ local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
+local NOW = os.time()
 
 local nilIfEmpty = StringUtils.nilIfEmpty
 
@@ -191,8 +192,8 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@alias ResultType 'default'|'draw'|'np'
 MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
----@alias WalkoverType 'L'|'FF'|'DQ'
-MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
+---@alias WalkoverType 'l'|'ff'|'dq'
+MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
@@ -502,6 +503,8 @@ function MatchGroupUtil.matchFromRecord(record)
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
 
+	local walkover = nilIfEmpty(record.walkover)
+
 	return {
 		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
@@ -527,7 +530,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
-		walkover = nilIfEmpty(record.walkover),
+		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
@@ -648,6 +651,9 @@ end
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+
+	local walkover = nilIfEmpty(record.walkover)
+
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -664,7 +670,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
-		walkover = nilIfEmpty(record.walkover),
+		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
@@ -904,18 +910,58 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 	end
 end
 
+---@param matchid string?
+---@param bracketid string?
+---@return string?
+function MatchGroupUtil.getStandaloneId(bracketid, matchid)
+	if not matchid or not bracketid then
+		return nil
+	end
+	return 'MATCH_' .. bracketid .. '_' .. matchid
+end
+
+---@class PartialMatchGameRecord
+---@field date string
+---@field dateexact boolean?
+---@field timestamp number?
+---@field finished boolean?
+---@field winner integer?
+
 ---Determines the phase of a match based on its properties.
----@param match MatchGroupUtilMatch|MatchGroupUtilGame
+---@param match MatchGroupUtilMatch|MatchGroupUtilGame|PartialMatchGameRecord
 ---@return 'finished'|'ongoing'|'upcoming'
 function MatchGroupUtil.computeMatchPhase(match)
-	local matchStartTimestamp = match.timestamp or Date.readTimestamp(match.date)
-	if match.winner then
+	local isExact = Logic.readBoolOrNil(match.dateIsExact or match.dateexact)
+	local matchStartTimestamp = match.timestamp or Date.readTimestampOrNil(match.date) or Date.defaultTimestamp
+	if match.winner or Logic.readBool(match.finished) then
 		return 'finished'
-	elseif Logic.readBoolOrNil(match.dateIsExact) ~= false and matchStartTimestamp < os.time() then
+	elseif isExact ~= false and matchStartTimestamp ~= Date.defaultTimestamp and matchStartTimestamp <= NOW then
 		return 'ongoing'
 	else
 		return 'upcoming'
 	end
+end
+
+---Normalizes subtypes (opponent, map) into a list
+---@param match table
+---@param type 'opponent'|'map'
+---@return any[]
+function MatchGroupUtil.normalizeSubtype(match, type)
+	local listNames
+	if type == 'opponent' then
+		listNames = {'match2opponents', 'opponents'}
+	elseif type == 'map' then
+		listNames = {'match2games', 'games'}
+	else
+		error('Invalid subtype: ' .. type)
+	end
+	for _, listName in ipairs(listNames) do
+		if match[listName] then
+			return match[listName]
+		end
+	end
+
+	return Array.mapIndexes(function(index) return match[type .. index] end)
 end
 
 return MatchGroupUtil

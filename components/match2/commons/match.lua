@@ -214,9 +214,9 @@ end
 ---@param typePrefix string
 ---@return table[]
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
-	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
+	for key, item, index in Table.iter.pairsByPrefix(match, typePrefix) do
+		list[index] = list[index] or Json.parseIfTable(item) or item
 		match[key] = nil
-		table.insert(list, Json.parseIfTable(item) or item)
 	end
 
 	return list
@@ -287,12 +287,17 @@ function Match._storeMatch2InLpdb(unsplitMatchRecord)
 
 	local opponentIndexes = Array.map(records.opponentRecords, function(opponentRecord, opponentIndex)
 		local playerIndexes = Array.map(records.playerRecords[opponentIndex], function(player, playerIndex)
+
+			player.extradata = Logic.nilIfEmpty(player.extradata)
+
 			return mw.ext.LiquipediaDB.lpdb_match2player(
 				matchRecord.match2id .. '_m2o_' .. string.format('%02d', opponentIndex)
 						.. '_m2p_' .. string.format('%02d', playerIndex),
 				player
 			)
 		end)
+
+		opponentRecord.extradata = Logic.nilIfEmpty(opponentRecord.extradata)
 
 		opponentRecord.match2players = table.concat(playerIndexes)
 		return mw.ext.LiquipediaDB.lpdb_match2opponent(

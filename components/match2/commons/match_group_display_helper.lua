@@ -138,11 +138,11 @@ function DisplayHelper.MapAndStatus(game, config)
 
 	local statusText = nil
 	if game.resultType == 'default' then
-		if game.walkover == 'L' then
+		if game.walkover == 'l' then
 			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
-		elseif game.walkover == 'FF' then
+		elseif game.walkover == 'ff' then
 			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
-		elseif game.walkover == 'DQ' then
+		elseif game.walkover == 'dq' then
 			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
 		else
 			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'

@@ -178,7 +178,7 @@ function StarcraftMatchSummary.createBody(match)
 	end)
 
 	if match.casters then
-		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-comment'):addElement('Caster(s): ' .. match.casters))
+		body:addRow(MatchSummary.makeCastersRow(match.casters))
 	end
 
 	return body
@@ -328,10 +328,13 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 	end
 
 	local renderScore = function(opponentIndex)
+		if submatch.resultType == 'np' then
+			return
+		end
 		local isWinner = opponentIndex == submatch.winner
 		local text
 		if submatch.resultType == 'default' then
-			text = isWinner and 'W' or submatch.walkover
+			text = isWinner and 'W' or submatch.walkover:upper()
 		else
 			local score = submatch.scores[opponentIndex]
 			text = score and tostring(score) or ''

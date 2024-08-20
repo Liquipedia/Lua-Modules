@@ -229,6 +229,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')
+				:css('width', '100%')
 		row:addElement(comment)
 	end
 

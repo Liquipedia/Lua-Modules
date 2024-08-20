@@ -87,6 +87,9 @@ function CustomMatchSummary.createBody(match)
 
 	end
 
+	-- casters
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+
 	return body
 end
 
@@ -94,7 +97,10 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
+	local score = game.scores[opponentIndex] --[[@as number|string?]]
+	if score and game.mode == 'Push' then
+		score = score .. 'm'
+	end
 	return htmlCreate('div'):wikitext(score)
 end
 

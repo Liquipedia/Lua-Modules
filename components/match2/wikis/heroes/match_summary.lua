@@ -303,8 +303,8 @@ function CustomMatchSummary.createBody(match)
 		local vetoData = match.extradata.mapveto
 		if vetoData then
 			local mapVeto = MapVeto()
-			if vetoData.vetostart then
-				mapVeto:vetoStart(tonumber(vetoData.vetostart), vetoData.format)
+			if vetoData[1] and vetoData[1].vetostart then
+				mapVeto:vetoStart(tonumber(vetoData[1].vetostart), vetoData[1].format)
 			end
 
 			for _,vetoRound in ipairs(vetoData) do
