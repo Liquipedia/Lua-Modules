@@ -264,10 +264,10 @@ function MapFunctions.getExtraData(map)
 		otlength = map.otlength,
 		comment = map.comment,
 		header = map.header,
-		timeout = Table.isNotEmpty(timeouts) and Json.stringify(timeouts) or nil,
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
+		timeout = Table.isNotEmpty(timeouts) and Json.stringify(timeouts) or nil,
 	}
 end
 
