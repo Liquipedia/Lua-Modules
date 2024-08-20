@@ -185,11 +185,6 @@ end
 ---@param opponent table
 ---@param autoScore? fun(opponentIndex: integer): integer?
 function MatchFunctions.computeOpponentScore(props, opponent, autoScore)
-	-- TODO: bot the usage away
-	if props.score == '-' then
-		props.score = 'L'
-	end
-
 	local calculatedScore
 	calculatedScore, opponent.status = MatchGroupInput.computeOpponentScore(props, autoScore)
 
