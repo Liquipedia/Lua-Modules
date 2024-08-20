@@ -76,7 +76,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
 
-	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
 		or nil
 
