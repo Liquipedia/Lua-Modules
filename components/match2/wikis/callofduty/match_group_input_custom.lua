@@ -132,6 +132,7 @@ function MatchFunctions.getBestOf(match)
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF
 end
+
 ---@param match table
 ---@return table
 function MatchFunctions.getTournamentVars(match)
