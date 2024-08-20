@@ -89,7 +89,7 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.participants = MapFunctions.getParticipants(map, opponentCount)
-		map.extradata = MapFunctions.getExtraData(map, opponentCount)
+		map.extradata = MapFunctions.getExtraData(map, map.participants)
 		map.finished = MatchGroupInput.mapIsFinished(map)
 
 		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
@@ -188,8 +188,10 @@ function MapFunctions.keepMap(map)
 end
 
 ---@param map table
+---@param participants table<string, {player: string?, agent: string?}>
 ---@return table
 function MapFunctions.getExtraData(map, participants)
+	---@type table<string, any>
 	local extraData = {
 		comment = map.comment,
 		t1firstside = map.t1firstside,
