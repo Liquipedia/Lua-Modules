@@ -192,8 +192,8 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@alias ResultType 'default'|'draw'|'np'
 MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
----@alias WalkoverType 'L'|'FF'|'DQ'
-MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
+---@alias WalkoverType 'l'|'ff'|'dq'
+MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
@@ -503,6 +503,8 @@ function MatchGroupUtil.matchFromRecord(record)
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
 
+	local walkover = nilIfEmpty(record.walkover)
+
 	return {
 		bestof = tonumber(record.bestof) or 0,
 		bracketData = bracketData,
@@ -528,7 +530,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
-		walkover = nilIfEmpty(record.walkover),
+		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
@@ -649,6 +651,9 @@ end
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+
+	local walkover = nilIfEmpty(record.walkover)
+
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -665,7 +670,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
-		walkover = nilIfEmpty(record.walkover),
+		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
