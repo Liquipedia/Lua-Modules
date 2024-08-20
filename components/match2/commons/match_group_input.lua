@@ -461,7 +461,7 @@ function MatchGroupInput.readDate(dateString, dateFallbacks)
 		local suggestedDate
 		for _, fallbackDate in ipairs(dateFallbacks) do
 			if globalVars:get(fallbackDate) then
-				suggestedDate = fallbackDate
+				suggestedDate = globalVars:get(fallbackDate)
 				break
 			end
 		end
