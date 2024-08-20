@@ -69,7 +69,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 end
 
----@param MatchParser LeagueOfLegendsMatchParserInterface
+---@param MatchParser Dota2MatchParserInterface
 ---@param match table
 ---@return table
 function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
@@ -117,7 +117,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	return match
 end
 
----@param MatchParser LeagueOfLegendsMatchParserInterface
+---@param MatchParser Dota2MatchParserInterface
 ---@param match table
 ---@param opponentCount integer
 ---@return table[]
@@ -214,7 +214,7 @@ function MatchFunctions.getExtraData(match)
 	}
 end
 
----@param MatchParser LeagueOfLegendsMatchParserInterface
+---@param MatchParser Dota2MatchParserInterface
 ---@param map table
 ---@param opponentCount integer
 ---@return table
@@ -257,7 +257,7 @@ function MapFunctions.getExtraData(MatchParser, map, opponentCount)
 end
 
 -- Parse participant information
----@param MatchParser LeagueOfLegendsMatchParserInterface
+---@param MatchParser Dota2MatchParserInterface
 ---@param map table
 ---@param opponentCount integer
 ---@return table
