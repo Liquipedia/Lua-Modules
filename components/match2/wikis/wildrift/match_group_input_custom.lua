@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=arenaofvalor
+-- wiki=wildrift
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
