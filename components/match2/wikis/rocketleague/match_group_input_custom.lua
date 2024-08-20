@@ -186,7 +186,7 @@ function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	if Opponent.typeIsParty(opponent.type) then
 		return not Array.all(opponent.match2players, Opponent.playerIsTbd)
 	elseif opponent.type == Opponent.team then
-		return not Opponent.isTbd(opponent.template)
+		return not Opponent.isTbd(opponent)
 	end
 
 	-- Literal case
