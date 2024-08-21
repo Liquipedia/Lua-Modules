@@ -1401,7 +1401,7 @@ end
 ---@return boolean
 function MatchGroupInput.mapIsFinished(map, opponents)
 	if MatchGroupInput.isNotPlayed(map.winner, map.finished) then
-		return true
+		return false
 	end
 
 	local finished = Logic.readBoolOrNil(map.finished)
