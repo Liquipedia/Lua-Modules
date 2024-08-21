@@ -633,7 +633,7 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent, substitutions
 		end)
 	end
 
-	record.name = Opponent.toName(opponent)
+	record.name = opponent.name or Opponent.toName(opponent)
 	record.type = opponent.type
 	record.extradata = Table.merge(record.extradata or {}, {substitutions = Logic.nilIfEmpty(substitutions)})
 
