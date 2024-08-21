@@ -30,7 +30,7 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 
 	local score1Node = OpponentDisplay.BracketScore({
 		isWinner = extradata.set1win,
-		scoreText = CustomOpponentDisplay.InlineScore{
+		scoreText = CustomOpponentDisplay.InlineScoreSpecial{
 			opponent = opponent, score = extradata.score1
 		},
 	})
@@ -40,7 +40,7 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	if extradata.score2 or opponent.score2 then
 		score2Node = OpponentDisplay.BracketScore({
 			isWinner = extradata.set2win,
-			scoreText = CustomOpponentDisplay.InlineScore{
+			scoreText = CustomOpponentDisplay.InlineScoreSpecial{
 				opponent = opponent, score = extradata.score2
 			},
 		})
@@ -51,7 +51,7 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	if extradata.score3 then
 		score3Node = OpponentDisplay.BracketScore({
 			isWinner = extradata.set3win,
-			scoreText = CustomOpponentDisplay.InlineScore{
+			scoreText = CustomOpponentDisplay.InlineScoreSpecial{
 				opponent = opponent, score = extradata.score3
 			},
 		})
@@ -77,7 +77,7 @@ end
 ---Displays a score or status of the opponent, as a string.
 ---@param props {opponent: RocketLeagueStandardOpponent, status: string?, score: number?}
 ---@return number|string
-function CustomOpponentDisplay.InlineScore(props)
+function CustomOpponentDisplay.InlineScoreSpecial(props)
 	if props.score == -1 then
 		return ''
 	end
