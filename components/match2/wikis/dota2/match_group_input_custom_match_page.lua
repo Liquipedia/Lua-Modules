@@ -18,7 +18,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		return mapInput
 	end
 
-	local map = mw.ext.Dota2DB.getBigMatch(mapInput.matchid, Logic.readBool(mapInput.reversed))
+	local map = mw.ext.Dota2DB.getBigMatch(tonumber(mapInput.matchid), Logic.readBool(mapInput.reversed))
 
 	-- Match not found on the API
 	assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
@@ -65,8 +65,8 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			items = player.items,
 			backpackitems = player.backpackItems,
 			neutralitem = player.neutralItem,
-			scepter = Logic.readBool(player.scepter),
-			shard = Logic.readBool(player.shard),
+			scepter = Logic.readBool(player.aghanimsScepterBuff),
+			shard = Logic.readBool(player.aghanimsShardBuff),
 		}
 	end)
 	return Array.sortBy(players, function(player)
@@ -81,27 +81,35 @@ function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
 end
 
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
-	local bans = map.heroVeto
+	local teamVeto = map.heroVeto['team' .. opponentIndex]
 
-	if not bans then return end
+	if not teamVeto then return end
 
-	bans = Array.sortBy(bans, Operator.property('vetoNumber'))
-	bans = Array.filter(bans, function(veto)
-		return veto.type == 'ban'
-	end)
-	bans = Array.filter(bans, function(veto)
-		return veto.team == opponentIndex
-	end)
+	local bans = teamVeto.bans or {}
 
 	return Array.map(bans, Operator.property('hero'))
 end
 
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.heroVeto then return end
-	return Array.map(map.heroVeto, function(veto)
-		veto.character = veto.heroName
-		veto.heroName = nil
-		return veto
+	local buildVetoData = function(teamIdx, vetoType)
+		return Array.map(map.heroVeto['team' .. teamIdx][vetoType .. 's'], function(vetoData)
+			return {
+				character = vetoData.hero,
+				team = teamIdx,
+				type = vetoType,
+				vetoNumber = vetoData.order,
+			}
+		end)
+	end
+	local vetoPhase = Array.extend(
+		buildVetoData(1, 'ban'),
+		buildVetoData(2, 'ban'),
+		buildVetoData(1, 'pick'),
+		buildVetoData(2, 'pick')
+	)
+	return Array.sortBy(vetoPhase, function(veto)
+		return veto.vetoNumber
 	end)
 end
 
