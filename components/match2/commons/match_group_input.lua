@@ -1340,7 +1340,7 @@ function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placem
 		winnerIdx = 1
 		loserIdx = 2
 	else
-		error('setPlacement: Unexpected winner: ' .. (winner or 'nil'))
+		error('setPlacement: Unexpected winner: ' .. tostring(winner))
 		return opponents
 	end
 	opponents[winnerIdx].placement = placementWinner
