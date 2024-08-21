@@ -308,6 +308,10 @@ end
 ---@param opponentCount integer
 ---@return boolean
 function MapFunctions.isFinished(mapInput, opponentCount)
+	if MatchGroupInput.isNotPlayed(mapInput.winner, mapInput.finished) then
+		return true
+	end
+
 	local finished = Logic.readBoolOrNil(mapInput.finished)
 	if finished ~= nil then
 		return finished

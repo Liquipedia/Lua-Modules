@@ -1397,6 +1397,10 @@ end
 ---@param opponents? {score: integer?}[]
 ---@return boolean
 function MatchGroupInput.mapIsFinished(map, opponents)
+	if MatchGroupInput.isNotPlayed(map.winner, map.finished) then
+		return true
+	end
+
 	local finished = Logic.readBoolOrNil(map.finished)
 	if finished ~= nil then
 		return finished
