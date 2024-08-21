@@ -50,8 +50,10 @@ end
 function MatchGroupLegacyDefault:readOpponent(opponentData)
 	local opponent = self:_copyAndReplace(opponentData, self.args)
 	opponent.type = self.bracketType
+
 	local scoreAdvantage, scoreSum = string.match(opponent.score or '',
-					'<abbr title="Winner\'s bracket advantage of (%d) games?">(%d)</abbr>')
+			'<abbr title="Winners?\'s? bracket advantage of (%d+) games?">(%d+)</abbr>')
+
 	if scoreAdvantage then
 		opponent.score = scoreSum
 		opponent.advantage = scoreAdvantage
