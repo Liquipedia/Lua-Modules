@@ -198,8 +198,8 @@ function TransferRow:readPlayers()
 	local args = self.args
 	local players = {}
 	for _, _, playerIndex in Table.iter.pairsByPrefix(args, 'name', {requireIndex = false}) do
-		playerIndex = playerIndex == 1 and '' or playerIndex
-		table.insert(players, PlayerExt.syncPlayer(self:readPlayer(playerIndex)))
+		local fixedPlayerIndex = playerIndex == 1 and '' or playerIndex
+		table.insert(players, PlayerExt.syncPlayer(self:readPlayer(fixedPlayerIndex)))
 	end
 
 	return players
