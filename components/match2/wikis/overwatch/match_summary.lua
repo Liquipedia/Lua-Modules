@@ -101,7 +101,8 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 	if score and game.mode == 'Push' then
 		score = score .. 'm'
 	end
-	return htmlCreate('div'):wikitext(score)
+	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
+	return htmlCreate('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame
