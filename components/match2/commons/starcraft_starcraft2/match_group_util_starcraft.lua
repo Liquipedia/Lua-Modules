@@ -16,6 +16,9 @@ local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 --[[
 Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
 ]]
@@ -74,7 +77,9 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Determine whether the match is a team match with different players each game
-	match.opponentMode = match.mode:match('team') and 'team' or 'uniform'
+	match.opponentMode = Array.any(match.opponents, function(opponent)
+		return opponent.type == Opponent.team
+	end) and 'team' or 'uniform'
 
 	local extradata = match.extradata
 	---@cast extradata table
