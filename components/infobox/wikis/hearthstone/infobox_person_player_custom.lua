@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local ActiveYears = require('Module:YearsActive')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
