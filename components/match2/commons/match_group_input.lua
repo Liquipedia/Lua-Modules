@@ -1359,7 +1359,6 @@ end
 ---@return boolean
 function MatchGroupInput.matchIsFinished(match, opponents)
 	if MatchGroupInput.isNotPlayed(match.winner, match.finished) then
-		-- decide if true or false, personally fav false
 		return false
 	end
 
