@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2014,
+	startYear = 2013,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
 	defaultGame = 'hs',
