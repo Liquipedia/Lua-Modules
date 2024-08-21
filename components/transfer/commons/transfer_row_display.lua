@@ -6,14 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -151,33 +149,7 @@ function TransferRowDisplay:_getReferences(transfers)
 	end)
 	references = TransferRef.makeUnique(references)
 
-	return Array.map(references, function(reference)
-		local refType = reference.refType
-		local link = reference.link
-		if refType == 'web source' then
-			return Page.makeExternalLink(Icon.makeIcon{
-				iconName = 'reference',
-				color = 'wiki-color-dark',
-			}, link)
-		elseif refType == 'tournament source' then
-			return Page.makeInternalLink(Abbreviation.make(
-				Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
-				'Transfer wasn\'t formally announced, but individual represented team starting with this tournament'
-			), link)
-		elseif refType == 'inside source' then
-			return Abbreviation.make(
-				Icon.makeIcon{iconName = 'insidesource', color = 'wiki-color-dark'},
-				'Liquipedia has gained this information from a trusted inside source'
-			)
-		elseif refType == 'contract database' then
-			return Page.makeExternalLink(Abbreviation.make(
-				Icon.makeIcon{iconName = 'transferdatabase', color = 'wiki-color-dark'},
-				'This transfer was not formally announced, ' ..
-					'but was revealed by a change in the LoL Esports League-Recognized Contract Database'
-			), 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml#')
-		end
-		return nil
-	end)
+	return Array.map(references, TransferRef.createReferenceIconDisplay)
 end
 
 ---@return Html?

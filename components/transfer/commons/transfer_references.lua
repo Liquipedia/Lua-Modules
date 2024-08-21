@@ -6,9 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
+local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Page = require('Module:Page')
 local Variables = require('Module:Variables')
 
 local TransferRef = {}
@@ -262,8 +265,7 @@ function TransferRef.createReference(refData, date)
 		return mw.getCurrentFrame():callParserFunction{
 			name = '#tag:ref',
 			args = {
-				'Transfer wasn\'t formally announced, but individual represented team starting with ' ..
-					'[[' .. refData.link .. '|this tournament]].',
+				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
 				name = referenceKey
 			}
 		}
@@ -271,7 +273,7 @@ function TransferRef.createReference(refData, date)
 		return mw.getCurrentFrame():callParserFunction{
 			name = '#tag:ref',
 			args = {
-				'Liquipedia has gained this information from a trusted inside source.',
+				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
 				name = referenceKey
 			}
 		}
@@ -279,14 +281,68 @@ function TransferRef.createReference(refData, date)
 		return mw.getCurrentFrame():callParserFunction{
 			name = '#tag:ref',
 			args = {
-				'Transfer was not formally announced, but was revealed by changes in the ' ..
-					'[https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml# ' ..
-					'LoL Esports League-Recognized Contract Database].',
+				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
 				name = referenceKey
 			}
 		}
 	end
 	return ''
+end
+
+---@param reference TransferReference
+---@return string?
+function TransferRef.createReferenceIconDisplay(reference)
+	local refType = reference.refType
+	local text, link = TransferRef._getTextAndLink(reference)
+	link = link or reference.link
+
+	if refType == WEB_TYPE then
+		return Page.makeExternalLink(Icon.makeIcon{
+			iconName = 'reference',
+			color = 'wiki-color-dark',
+		}, link)
+	elseif refType == TOURNAMENT_TYPE then
+		return Page.makeInternalLink(Abbreviation.make(
+			Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
+			text
+		), link)
+	elseif refType == INSIDE_TYPE then
+		return Abbreviation.make(
+			Icon.makeIcon{iconName = 'insidesource', color = 'wiki-color-dark'},
+			text
+		)
+	elseif refType == CONTRACT_TYPE then
+		return Page.makeExternalLink(Abbreviation.make(
+			Icon.makeIcon{iconName = 'transferdatabase', color = 'wiki-color-dark'},
+			text
+		), link)
+	end
+
+	return nil
+end
+
+---@param reference {refType: RefType, link: string?}
+---@param options {linkInsideText: boolean?}?
+---@return string?, string?
+function TransferRef._getTextAndLink(reference, options)
+	options = options or {}
+	local linkInsideText = options.linkInsideText
+	local refType = reference.refType
+	local link = reference.link
+
+	if refType == TOURNAMENT_TYPE and link then
+		return 'Transfer wasn\'t formally announced, but individual represented team starting with ' ..
+			(linkInsideText and '[[' .. link .. '|this tournament]].' or 'this tournament'),
+			not linkInsideText and link or nil
+	elseif refType == INSIDE_TYPE then
+			return 'Liquipedia has gained this information from a trusted inside source.'
+	elseif refType == CONTRACT_TYPE then
+		link = 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml#'
+		local appendedText = 'LoL Esports League-Recognized Contract Database'
+		return 'Transfer was not formally announced, but was revealed by changes in the ' ..
+			(linkInsideText and '[' .. link .. '|' .. appendedText .. ']].' or appendedText),
+			not linkInsideText and link or nil
+	end
 end
 
 return TransferRef
