@@ -1085,15 +1085,21 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
+---@return boolean
+function MatchGroupInput.isNotPlayed(winnerInput, finishedInput)
+	return (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
+		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput))
+end
+
 ---Should only be called on finished matches or maps
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@param opponents {score: number?, status: string}[]
 ---@return string? #Result Type
 function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
-	if (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
-		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput)) then
-
+	if MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 	end
 
@@ -1312,9 +1318,10 @@ end
 ---@param winner integer?
 ---@param placementWinner integer
 ---@param placementLoser integer
+---@param resultType string
 ---@return table[]
-function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
-	if not opponents or #opponents ~= 2 then
+function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser, resultType)
+	if not opponents or #opponents ~= 2 or resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then
 		return opponents
 	end
 
