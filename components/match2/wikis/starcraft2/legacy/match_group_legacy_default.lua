@@ -52,7 +52,7 @@ function MatchGroupLegacyDefault:readOpponent(opponentData)
 	opponent.type = self.bracketType
 
 	local scoreAdvantage, scoreSum = string.match(opponent.score or '',
-			'<abbr title="[wW]inners?\'s? [bB]racket [Aa]dvantage of (%d+) %a+">(%d+)</abbr>')
+			'<abbr title="[wW]inners?\'?s? [bB]racket [Aa]dvantage of (%d+) %a+">(%d+)</abbr>')
 
 	if scoreAdvantage then
 		opponent.score = scoreSum
