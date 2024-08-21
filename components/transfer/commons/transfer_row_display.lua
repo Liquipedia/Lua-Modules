@@ -151,10 +151,32 @@ function TransferRowDisplay:_getReferences(transfers)
 	end)
 	references = TransferRef.makeUnique(references)
 
-	local date = transfers[1].date
-
 	return Array.map(references, function(reference)
-		TransferRef.useReference(reference, date)
+		local refType = reference.refType
+		local link = reference.link
+		if refType == 'web source' then
+			return Page.makeExternalLink(Icon.makeIcon{
+				iconName = 'reference',
+				color = 'wiki-color-dark',
+			}, link)
+		elseif refType == 'tournament source' then
+			return Page.makeInternalLink(Abbreviation.make(
+				Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
+				'Transfer wasn\'t formally announced, but individual represented team starting with this tournament'
+			), link)
+		elseif refType == 'inside source' then
+			return Abbreviation.make(
+				Icon.makeIcon{iconName = 'insidesource', color = 'wiki-color-dark'},
+				'Liquipedia has gained this information from a trusted inside source'
+			)
+		elseif refType == 'contract database' then
+			return Page.makeExternalLink(Abbreviation.make(
+				Icon.makeIcon{iconName = 'transferdatabase', color = 'wiki-color-dark'},
+				'This transfer was not formally announced, ' ..
+					'but was revealed by a change in the LoL Esports League-Recognized Contract Database'
+			), 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml#')
+		end
+		return nil
 	end)
 end
 
