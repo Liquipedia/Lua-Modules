@@ -166,6 +166,7 @@ end
 function MatchFunctions.calculateMatchScore(maps, opponents)
 	return function(opponentIndex)
 		local calculatedScore = MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+		if not calculatedScore then return end
 		local opponent = opponents[opponentIndex]
 		return calculatedScore + (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
 	end
