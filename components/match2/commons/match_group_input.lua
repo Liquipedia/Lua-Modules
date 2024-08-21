@@ -1318,7 +1318,7 @@ end
 ---@param winner integer?
 ---@param placementWinner integer
 ---@param placementLoser integer
----@param resultType string
+---@param resultType string?
 ---@return table[]
 function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser, resultType)
 	if not opponents or #opponents ~= 2 or resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then

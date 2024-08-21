@@ -63,7 +63,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
+		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
 	MatchFunctions.getTournamentVars(match)

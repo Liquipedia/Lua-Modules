@@ -66,7 +66,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
+		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
 	MatchFunctions.getTournamentVars(match)
@@ -175,6 +175,8 @@ end
 
 -- Parse extradata information
 ---@param map table
+---@param opponentCount integer
+---@return table
 function MapFunctions.getExtraData(map, opponentCount)
 	local extraData = {
 		comment = map.comment,
