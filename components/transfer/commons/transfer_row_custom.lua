@@ -24,9 +24,8 @@ end
 ---@param frame Frame
 ---@return Html?
 function CustomTransferRow.rumour(frame)
-	local args = Arguments.getArgs(frame)
-	args.isRumour = true
-	return CustomTransferRow(args):read():store():build()
+	frame.args.isRumour = true
+	return CustomTransferRow.transfer(frame)
 end
 
 return CustomTransferRow
