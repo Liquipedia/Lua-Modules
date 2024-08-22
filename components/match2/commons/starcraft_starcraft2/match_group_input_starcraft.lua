@@ -156,7 +156,7 @@ end
 
 ---@param maps table[]
 ---@param opponents table[]
----@return fun(opponentIndex: integer): integer
+---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps, opponents)
 	return function(opponentIndex)
 		local calculatedScore = MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
@@ -471,8 +471,8 @@ end
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMode(mapInput, participants, opponents)
-	---@type (string|integer)[]
-	local playerCounts = {}
+	-- assume we have a min of 2 opponents in a game
+	local playerCounts = {0, 0}
 	for key in pairs(participants) do
 		local parsedOpponentIndex = key:match('(%d+)_%d+')
 		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]
