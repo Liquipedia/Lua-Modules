@@ -18,15 +18,7 @@ local Variables = require('Module:Variables')
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
 local DEFAULT_BESTOF = 3
-
-local LINK_PREFIXES = {
-	rgl = 'https://rgl.gg/Public/Match.aspx?m=',
-	ozf = 'https://warzone.ozfortress.com/matches/',
-	etf2l = 'http://etf2l.org/matches/',
-	tftv = 'http://tf.gg/',
-	esl = 'https://play.eslgaming.com/match/',
-	esea = 'https://play.esea.net/match/',
-}
+local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -73,9 +65,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	MatchFunctions.getTournamentVars(match)
 
 	match.stream = Streams.processStreams(match)
-	match.links = Table.map(LINK_PREFIXES, function(prefix, link)
-		return prefix, match[prefix] and (link .. match[prefix]) or nil
-	end)
+	match.links = MatchFunctions.getLinks(match, games)
 
 	match.extradata = MatchFunctions.getExtraData(match)
 
@@ -147,9 +137,33 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
+
+---@param match table
+---@param games table[]
+---@return table
+function MatchFunctions.getLinks(match, games)
+	local links = {
+		rgl = match.rgl and 'https://rgl.gg/Public/Match.aspx?m=' .. match.rgl or nil,
+		ozf = match.ozf and 'https://warzone.ozfortress.com/matches/' .. match.ozf or nil,
+		etf2l = match.etf2l and 'http://etf2l.org/matches/' .. match.etf2l or nil,
+		tftv = match.tftv and'http://tf.gg/' .. match.tftv or nil,
+		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
+		esea = match.esea and 'https://play.esea.net/match/' .. match.esea or nil,
+		logstf = {},
+		logstfgold = {},
+	}
+
+	Array.forEach(games or {}, function(game, gameIndex)
+			links.logstf[gameIndex] = game.logstf and ('https://logs.tf/' .. game.logstf) or nil
+			links.logstfgold[gameIndex] = game.logstfgold and ('https://logs.tf/' .. game.logstfgold) or nil
+	end)
+
+	return links
+end
+
 
 ---@param match table
 ---@return table
@@ -170,8 +184,6 @@ function MapFunctions.getExtraData(map)
 	return {
 		comment = map.comment,
 		header = map.header,
-		logstf = Logic.isNotEmpty(map.logstf) and ('https://logs.tf/' .. map.logstf) or nil,
-		logstfgold = Logic.isNotEmpty(map.logstfgold) and ('https://logs.tf/' .. map.logstfgold) or nil,
 	}
 end
 
