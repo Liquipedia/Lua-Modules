@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -607,11 +608,9 @@ end
 function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
-	local infoConfig = (require('Module:Info/dev').config.match2 or {})
-
 	local score = tonumber(record.score)
 	local bestof = tonumber(matchRecord.bestof)
-	if bestof == 1 and infoConfig.gameScoresIfBo1 and (matchRecord.match2games or {})[1] then
+	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and (matchRecord.match2games or {})[1] then
 		score = matchRecord.match2games[1].scores[opponentIndex]
 	end
 
