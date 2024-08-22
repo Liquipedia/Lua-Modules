@@ -34,6 +34,7 @@ return {
 		},
 		match2 = {
 			matchWidth = 180,
+			gameScoresIfBo1 = true,
 		},
 	},
 	match2 = 2,

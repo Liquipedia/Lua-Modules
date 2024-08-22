@@ -47,6 +47,7 @@ return {
 		},
 		match2 = {
 			matchWidth = 180,
+			gameScoresIfBo1 = true,
 		},
 	},
 	defaultRoundPrecision = 0,

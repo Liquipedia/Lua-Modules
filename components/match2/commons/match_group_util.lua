@@ -496,7 +496,7 @@ end
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
+	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
 		bracketData.lowerEdges = bracketData.lowerEdges
@@ -600,10 +600,21 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 	}
 end
 
+---@param matchRecord table
 ---@param record table
+---@param opponentIndex integer
 ---@return standardOpponent
-function MatchGroupUtil.opponentFromRecord(record)
+function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+
+	local infoConfig = (require('Module:Info/dev').config.match2 or {})
+
+	local score = tonumber(record.score)
+	local bestof = tonumber(matchRecord.bestof)
+	if bestof == 1 and infoConfig.gameScoresIfBo1 and (matchRecord.match2games or {})[1] then
+		score = matchRecord.match2games[1].scores[opponentIndex]
+	end
+
 	return {
 		advanceBg = nilIfEmpty(Table.extract(extradata, 'bg')),
 		advances = Logic.readBoolOrNil(Table.extract(extradata, 'advances')),
@@ -612,7 +623,7 @@ function MatchGroupUtil.opponentFromRecord(record)
 		name = nilIfEmpty(record.name),
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
-		score = tonumber(record.score),
+		score = score,
 		status = record.status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
