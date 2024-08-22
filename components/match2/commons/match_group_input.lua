@@ -755,8 +755,8 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 
 	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
 		table.insert(manualInput.players, {
-			pageName = playerName,
-			displayName = playersData[playerPrefix .. 'dn'],
+			pageName = playersData[playerPrefix .. 'link'] or playerName,
+			displayName = playersData[playerPrefix .. 'dn'] or playerName,
 			flag = playersData[playerPrefix .. 'flag'],
 			faction = playersData[playerPrefix .. 'faction'] or playersData[playerPrefix .. 'race'],
 		})
