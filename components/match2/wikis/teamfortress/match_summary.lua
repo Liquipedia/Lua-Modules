@@ -61,12 +61,6 @@ function CustomMatchSummary.addToFooter(match, footer)
 		footer:addLink(link, linkData.icon, linkData.iconDark, linkData.text .. 'for game ' .. gameIndex)
 	end
 
-	Array.forEach(match.games or {}, function(game, gameIndex)
-		local extradata = game.extradata or {}
-		addLink(extradata.logstf, 'logstf', gameIndex)
-		addLink(extradata.logstfgold, 'logstfgold', gameIndex)
-	end)
-
 	return footer
 end
 
