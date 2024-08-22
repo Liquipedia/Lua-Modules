@@ -47,10 +47,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		bans and '|t1bans={{Cards|}}|t2bans={{Cards|}}' or nil,
-		Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste.getMapCode, mode))
+		Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste.getMapCode, mode)),
+		'}}'
 	)
 
-	table.insert(lines, '}}')
 	return table.concat(lines, '\n')
 end
 
