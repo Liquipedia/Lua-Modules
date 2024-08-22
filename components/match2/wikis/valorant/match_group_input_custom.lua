@@ -223,7 +223,7 @@ function MapFunctions.getParticipants(map, opponentCount)
 				kills = stats.kills,
 				deaths = stats.deaths,
 				assists = stats.assists,
-				asc = stats.acs,
+				acs = stats.acs,
 				player = stats.player,
 				agent = getCharacterName(stats.agent),
 			}
