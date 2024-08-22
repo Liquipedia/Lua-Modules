@@ -145,8 +145,8 @@ end
 function MatchFunctions.getLinks(match)
 	return {
 		reddit = match.reddit and 'https://redd.it/' .. match.reddit or nil,
-		gol = match.gol and 'https://gol.gg/game/stats/' .. match.gol .. '/page-game/' or nil,
-		factor = match.factor and 'https://www.factor.gg/match/' .. match.factor or nil,
+		cdl = match.cdl and 'https://callofdutyleague.com/en-us/match/' .. match.cdl or nil,
+		breakingpoint = match.breakingpoint and 'https://www.breakingpoint.gg/match/' .. match.breakingpoint or nil,
 	}
 end
 
