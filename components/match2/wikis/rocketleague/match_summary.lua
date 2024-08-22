@@ -277,18 +277,21 @@ function CustomMatchSummary._createGame(game)
 			centerNode:node(mw.html.create('div'):node('(' .. extradata.otlength .. ')'))
 		end
 	end
+	local function scoreDisplay(oppIdx)
+		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+	end
 
 	row:addElement(CustomMatchSummary._iconDisplay(
 		GREEN_CHECK,
 		game.winner == 1,
-		game.scores[1],
+		scoreDisplay(1),
 		1
 	))
 	row:addElement(centerNode)
 	row:addElement(CustomMatchSummary._iconDisplay(
 		GREEN_CHECK,
 		game.winner == 2,
-		game.scores[2],
+		scoreDisplay(2),
 		2
 	))
 
