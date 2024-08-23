@@ -577,35 +577,29 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 
 	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
 
-	if options.pagifyPlayerNames and opponent.type ~= Opponent.team then
+	local substitutions
+	if opponent.type == Opponent.team then
+		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
+		substitutions = manualPlayersInput.substitutions
+		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
+		opponent.players = MatchGroupInput.readPlayersOfTeamNew(
+			Opponent.toName(opponent),
+			manualPlayersInput,
+			options,
+			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
+		)
+	end
+
+	if options.pagifyPlayerNames then
 		Array.forEach(opponent.players or {}, function(player)
 			player.pageName = Page.pageifyLink(player.pageName)
 		end)
 	end
 
-	opponent.name = Opponent.toName(opponent)
-
-	local substitutions
-	if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
-		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
-		substitutions = manualPlayersInput.substitutions
-		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
-		opponent.players = MatchGroupInput.readPlayersOfTeamNew(
-			opponent.name,
-			manualPlayersInput,
-			options,
-			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
-		)
-
-		if options.pagifyPlayerNames then
-			Array.forEach(opponent.players or {}, function(player)
-				player.pageName = Page.pageifyLink(player.pageName)
-			end)
-		end
-	end
-
 	local record = MatchGroupInput.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
 
+	-- no need to pagify non opponent names as for literals it is irrelevant
+	-- and for party opponents it comes down to pagifying player names
 	if options.pagifyOpponentName and opponent.type == Opponent.team then
 		record.name = Page.pageifyLink(record.name)
 	end
