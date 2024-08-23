@@ -410,7 +410,7 @@ function CustomMatchSummary._createMap(game)
 	end
 
 
-	score1:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
+	score2:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	if team1Agents ~= nil then
