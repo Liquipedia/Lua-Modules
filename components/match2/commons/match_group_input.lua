@@ -1180,7 +1180,7 @@ function MatchGroupInput.computeOpponentScore(props, autoScore)
 		return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
 	end
 	local score = props.score
-	if not score and autoScore then
+	if Logic.isEmpty(score) and autoScore then
 		score = autoScore(props.opponentIndex)
 	end
 
@@ -1191,9 +1191,10 @@ end
 ---@return integer? #SCORE
 ---@return string? #STATUS
 function MatchGroupInput.parseScoreInput(scoreInput)
-	if not scoreInput then
+	if Logic.isEmpty(scoreInput) then
 		return
 	end
+	---@cast scoreInput -nil
 
 	if Logic.isNumeric(scoreInput) then
 		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
