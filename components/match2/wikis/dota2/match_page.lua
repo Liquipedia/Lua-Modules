@@ -68,9 +68,6 @@ function MatchPage.getByMatchId(props)
 		if String.isEmpty(item.name) then
 			return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
 		end
-		if not item.image then
-			item.image = item.name ..' itemicon dota2 gameasset.png'
-		end
 		return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
 	end
 
