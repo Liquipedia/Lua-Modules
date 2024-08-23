@@ -47,7 +47,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
 
-	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
 		or nil
 

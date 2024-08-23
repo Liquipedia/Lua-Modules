@@ -32,10 +32,6 @@ local TBD = 'TBD'
 local TBA = 'TBA'
 local MODE_MIXED = 'mixed'
 
---- only temp needed until bot job finishes
-local TEMP_WORKAROUND = {['-'] = 'L'}
-local TEMP_WORKAROUND2 = {['draw'] = 0}
-
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -53,8 +49,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-
-	match.winner = TEMP_WORKAROUND2[string.lower(match.winner or '')] or match.winner
 
 	-- TODO: check how we can get rid of this legacy stuff ...
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -85,7 +79,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 			walkover = match.walkover,
 			winner = match.winner,
 			opponentIndex = opponentIndex,
-			score = TEMP_WORKAROUND[opponent.score] or opponent.score,
+			score = opponent.score,
 		}, autoScoreFunction)
 	end)
 
@@ -484,8 +478,8 @@ end
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMode(mapInput, participants, opponents)
-	---@type (string|integer)[]
-	local playerCounts = {}
+	-- assume we have a min of 2 opponents in a game
+	local playerCounts = {0, 0}
 	for key in pairs(participants) do
 		local parsedOpponentIndex = key:match('(%d+)_%d+')
 		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]

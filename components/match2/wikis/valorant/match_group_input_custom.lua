@@ -44,7 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.bestof = MatchGroupInput.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 
-	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, match.bestof)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -226,7 +226,7 @@ function MapFunctions.getParticipants(map, opponentCount)
 				kills = stats.kills,
 				deaths = stats.deaths,
 				assists = stats.assists,
-				asc = stats.acs,
+				acs = stats.acs,
 				player = stats.player,
 				agent = getCharacterName(stats.agent),
 			}

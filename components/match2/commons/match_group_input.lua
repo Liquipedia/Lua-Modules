@@ -461,7 +461,7 @@ function MatchGroupInput.readDate(dateString, dateFallbacks)
 		local suggestedDate
 		for _, fallbackDate in ipairs(dateFallbacks) do
 			if globalVars:get(fallbackDate) then
-				suggestedDate = fallbackDate
+				suggestedDate = globalVars:get(fallbackDate)
 				break
 			end
 		end
@@ -755,8 +755,8 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 
 	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
 		table.insert(manualInput.players, {
-			pageName = playerName,
-			displayName = playersData[playerPrefix .. 'dn'],
+			pageName = playersData[playerPrefix .. 'link'] or playerName,
+			displayName = playersData[playerPrefix .. 'dn'] or playerName,
 			flag = playersData[playerPrefix .. 'flag'],
 			faction = playersData[playerPrefix .. 'faction'] or playersData[playerPrefix .. 'race'],
 		})
@@ -1119,12 +1119,12 @@ end
 function MatchGroupInput.getWinner(resultType, winnerInput,  opponents)
 	if resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then
 		return nil
+	elseif Logic.isNumeric(winnerInput) then
+		return tonumber(winnerInput)
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DRAW then
 		return MatchGroupInput.WINNER_DRAW
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
 		return MatchGroupInput.getDefaultWinner(opponents)
-	elseif Logic.isNumeric(winnerInput) then
-		return tonumber(winnerInput)
 	else
 		return MatchGroupInput.getHighestScoringOpponent(opponents)
 	end
@@ -1186,7 +1186,7 @@ function MatchGroupInput.computeOpponentScore(props, autoScore)
 		return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
 	end
 	local score = props.score
-	if not score and autoScore then
+	if Logic.isEmpty(score) and autoScore then
 		score = autoScore(props.opponentIndex)
 	end
 
@@ -1197,16 +1197,17 @@ end
 ---@return integer? #SCORE
 ---@return string? #STATUS
 function MatchGroupInput.parseScoreInput(scoreInput)
-	if not scoreInput then
+	if Logic.isEmpty(scoreInput) then
 		return
 	end
+	---@cast scoreInput -nil
 
 	if Logic.isNumeric(scoreInput) then
 		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
 	end
 
 	local scoreUpperCase = string.upper(scoreInput)
-	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase), 'Invalid score input')
+	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase), 'Invalid score input: ' .. scoreUpperCase)
 	return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
 end
 
@@ -1220,7 +1221,8 @@ function MatchGroupInput.opponentWalkover(walkoverInput, isWinner)
 	end
 
 	local walkoverUpperCase = string.upper(walkoverInput)
-	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase), 'Invalid walkover input')
+	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase),
+		'Invalid walkover input: ' .. walkoverUpperCase)
 	return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
 end
 
@@ -1345,7 +1347,7 @@ function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placem
 		winnerIdx = 1
 		loserIdx = 2
 	else
-		error('setPlacement: Unexpected winner')
+		error('setPlacement: Unexpected winner: ' .. tostring(winner))
 		return opponents
 	end
 	opponents[winnerIdx].placement = placementWinner

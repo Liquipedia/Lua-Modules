@@ -152,6 +152,19 @@ function DisplayHelper.MapAndStatus(game, config)
 	return mapText .. (statusText or '')
 end
 
+---@param score string|number|nil
+---@param opponentIndex integer
+---@param resultType string?
+---@param walkover string?
+---@param winner integer?
+---@return string
+function DisplayHelper.MapScore(score, opponentIndex, resultType,  walkover, winner)
+	if resultType == 'default' then
+		return opponentIndex == winner and 'W' or string.upper(walkover or '')
+	end
+	return score and tostring(score) or ''
+end
+
 --[[
 Display component showing the detailed summary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a

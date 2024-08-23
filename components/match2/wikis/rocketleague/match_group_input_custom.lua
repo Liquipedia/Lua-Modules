@@ -108,6 +108,11 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 		end)
 
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
+
+		if Logic.readBoolOrNil(finishedInput) == nil and Logic.isNotEmpty(map.scores) then
+			map.finished = true
+		end
+
 		if map.finished or MatchGroupInput.isNotPlayed(map.winner, finishedInput) then
 			map.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponentInfo)
 			map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)

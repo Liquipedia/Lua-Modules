@@ -83,7 +83,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
 	match.bestof = MatchGroupInput.getBestOf(match.bestof, games)
 
-	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
 		or nil
 

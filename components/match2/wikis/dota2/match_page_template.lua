@@ -23,12 +23,7 @@ return {
 				<div class="match-bm-lol-match-header-tournament">[[{{parent}}|{{tournament}}]]</div>
 				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
 			</div>
-			{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.1.side}}[[File:Dota2 faction {{games.1.teams.1.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.1.side}}</div>
-			<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{games.1.length}}</div></div></div>
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.2.side}}[[File:Dota2 faction {{games.1.teams.2.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.2.side}}</div>
-			</div></div>{{/isBestOfOne}}
-			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
+			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b>{{#players}} [[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 		]=],
 	footer =
 		[=[
@@ -149,7 +144,7 @@ return {
 					{{#teams.1.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
-								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 {{facet}} facet icon lightmode.png|link=|{{facet}}]]</div></div>
+								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
 								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
@@ -181,7 +176,7 @@ return {
 					{{#teams.2.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
-								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 {{facet}} facet icon lightmode.png|link=|{{facet}}]]</div></div>
+								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
 								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
