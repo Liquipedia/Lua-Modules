@@ -403,16 +403,18 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			table.insert(players, {
 				name = isTBD and TBD or link,
 				displayname = isTBD and TBD or nameInput,
-				extradata = {faction = participantInput.faction},
+				extradata = {faction = participantInput.faction or Faction.defaultFaction},
 			})
 			playerIndex = #players
 		end
 
+		local player = players[playerIndex]
+
 		participants[opponentIndex .. '_' .. playerIndex] = {
-			faction = participantInput.faction,
+			faction = participantInput.faction or player.extradata.faction,
 			player = link,
 			position = position,
-			flag = Flags.CountryName(players[playerIndex].flag),
+			flag = Flags.CountryName(player.flag),
 		}
 	end)
 
