@@ -591,10 +591,6 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		)
 	end
 
-	if options.pagifyOpponentName then
-		opponent.name = Page.pageifyLink(opponent.name)
-	end
-
 	if options.pagifyPlayerNames then
 		Array.forEach(opponent.players or {}, function(player)
 			player.pageName = Page.pageifyLink(player.pageName)
