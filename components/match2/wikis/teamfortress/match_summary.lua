@@ -20,7 +20,7 @@ local htmlCreate = mw.html.create
 
 ---@enum TFMatchIcons
 local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
+	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
@@ -83,7 +83,7 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] --[[@as number|string?]]
+	local score = game.scores[opponentIndex]
 	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
 	return htmlCreate('div'):wikitext(scoreDisplay)
 end
