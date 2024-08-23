@@ -134,7 +134,7 @@ function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)
 
 	-- If no games are live, we find the one closest to current time by absolute metric
 	Array.sortInPlaceBy(otherGames, Operator.property('distanceToNow'))
-	return otherGames[1].matchIdx or 1
+	return (otherGames[1] or {}).matchIdx or 1
 end
 
 ---@param bracket MatchGroupUtilMatchGroup
