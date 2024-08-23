@@ -13,6 +13,13 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+function MatchLegacy.storeMatch(match2)
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		MatchLegacy._convertParameters(match2)
+	)
+end
+
 function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
