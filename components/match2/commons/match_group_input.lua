@@ -1085,15 +1085,21 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
+---@return boolean
+function MatchGroupInput.isNotPlayed(winnerInput, finishedInput)
+	return (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
+		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput))
+end
+
 ---Should only be called on finished matches or maps
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@param opponents {score: number?, status: string}[]
 ---@return string? #Result Type
 function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
-	if (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
-		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput)) then
-
+	if MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 	end
 
@@ -1354,6 +1360,10 @@ end
 ---@param opponents {score: integer?}[]
 ---@return boolean
 function MatchGroupInput.matchIsFinished(match, opponents)
+	if MatchGroupInput.isNotPlayed(match.winner, match.finished) then
+		return false
+	end
+
 	local finished = Logic.readBoolOrNil(match.finished)
 	if finished ~= nil then
 		return finished
@@ -1392,6 +1402,10 @@ end
 ---@param opponents? {score: integer?}[]
 ---@return boolean
 function MatchGroupInput.mapIsFinished(map, opponents)
+	if MatchGroupInput.isNotPlayed(map.winner, map.finished) then
+		return false
+	end
+
 	local finished = Logic.readBoolOrNil(map.finished)
 	if finished ~= nil then
 		return finished

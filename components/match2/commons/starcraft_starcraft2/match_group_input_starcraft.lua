@@ -100,6 +100,9 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
+	elseif MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
+		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
+		match.winner = nil
 	end
 
 	MatchGroupInput.getCommonTournamentVars(match)
@@ -289,7 +292,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 
 	map.scores = Array.map(opponentInfo, Operator.property('score'))
 
-	if map.finished then
+	if map.finished or MatchGroupInput.isNotPlayed(map.winner, mapInput.finished) then
 		map.resulttype = MatchGroupInput.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
 		map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInput.getWinner(map.resulttype, mapInput.winner, opponentInfo)
@@ -302,6 +305,10 @@ end
 ---@param opponentCount integer
 ---@return boolean
 function MapFunctions.isFinished(mapInput, opponentCount)
+	if MatchGroupInput.isNotPlayed(mapInput.winner, mapInput.finished) then
+		return true
+	end
+
 	local finished = Logic.readBoolOrNil(mapInput.finished)
 	if finished ~= nil then
 		return finished
