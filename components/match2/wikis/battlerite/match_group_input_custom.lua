@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
@@ -52,7 +52,7 @@ local CustomMatchGroupInput = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	-- process match
-	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 	match = matchFunctions.getScoreFromMapWinners(match)
 	match = matchFunctions.getOpponents(match)
 	match = matchFunctions.getTournamentVars(match)
@@ -109,7 +109,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
+	MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent)
 end
 
 ---@param data table
@@ -127,18 +127,18 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if MatchGroupInput.isDraw(indexedScores) then
+		if MatchGroupInputUtil.isDraw(indexedScores) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
 		elseif CustomMatchGroupInput.placementCheckSpecialStatus(indexedScores) then
-			data.winner = MatchGroupInput.getDefaultWinner(indexedScores)
+			data.winner = MatchGroupInputUtil.getDefaultWinner(indexedScores)
 			data.resulttype = DEFAULT_RESULT_TYPE
-			if MatchGroupInput.hasForfeit(indexedScores) then
+			if MatchGroupInputUtil.hasForfeit(indexedScores) then
 				data.walkover = 'ff'
-			elseif MatchGroupInput.hasDisqualified(indexedScores) then
+			elseif MatchGroupInputUtil.hasDisqualified(indexedScores) then
 				data.walkover = 'dq'
-			elseif MatchGroupInput.hasDefaultWinLoss(indexedScores) then
+			elseif MatchGroupInputUtil.hasDefaultWinLoss(indexedScores) then
 				data.walkover = 'l'
 			end
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, DEFAULT_RESULT_TYPE)
@@ -263,7 +263,7 @@ end
 ---@param match table
 ---@return table
 function matchFunctions.getTournamentVars(match)
-	return MatchGroupInput.getCommonTournamentVars(match)
+	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table
@@ -285,7 +285,7 @@ end
 ---@return table
 function matchFunctions.getExtraData(match)
 	match.extradata = {
-		mvp = MatchGroupInput.readMvp(match),
+		mvp = MatchGroupInputUtil.readMvp(match),
 	}
 	return match
 end
@@ -316,7 +316,7 @@ function matchFunctions.getOpponents(match)
 			-- get players from vars for teams
 			if opponent.type == Opponent.team then
 				if not Logic.isEmpty(opponent.name) then
-					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+					match = MatchGroupInputUtil.readPlayersOfTeam(match, opponentIndex, opponent.name, {
 						resolveRedirect = true,
 						applyUnderScores = true,
 						maxNumPlayers = MAX_NUM_PLAYERS,

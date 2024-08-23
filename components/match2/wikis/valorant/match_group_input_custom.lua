@@ -17,7 +17,7 @@ local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 
 local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'

@@ -23,7 +23,7 @@ local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
 
 local config = Lua.requireIfExists('Module:Match/Config', {loadData = true}) or {}
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
@@ -81,7 +81,7 @@ end
 ---@param matchArgs table
 ---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function StarcraftMatchGroupInput._readDate(matchArgs)
-	local dateProps = MatchGroupInput.readDate(matchArgs.date, {
+	local dateProps = MatchGroupInputUtil.readDate(matchArgs.date, {
 		'matchDate',
 		'tournament_startdate',
 		'tournament_enddate',
@@ -126,7 +126,7 @@ function StarcraftMatchGroupInput._getTournamentVars(match)
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
 	Variables.varDefine('bestof', match.bestof)
 
-	return MatchGroupInput.getCommonTournamentVars(match)
+	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table
@@ -163,7 +163,7 @@ function StarcraftMatchGroupInput._getExtraData(match)
 	end
 
 	extradata = {
-		casters = MatchGroupInput.readCasters(match, {noSort = true}),
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		headtohead = match.headtohead,
 		ffa = 'false',
 	}

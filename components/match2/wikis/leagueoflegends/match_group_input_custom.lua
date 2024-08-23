@@ -17,7 +17,7 @@ local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local OPPONENT_CONFIG = {

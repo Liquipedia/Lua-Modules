@@ -17,7 +17,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
@@ -60,7 +60,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match = MatchFunctions.getScoreFromMaps(match)
 
 	-- process match
-	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 	match = MatchFunctions.getOpponents(match)
 	match = MatchFunctions.getTournamentVars(match)
 	match = MatchFunctions.getVodStuff(match)
@@ -87,7 +87,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate)
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
+	MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent)
 end
 
 ---@param data table
@@ -161,7 +161,7 @@ function MatchFunctions.adjustMapData(match)
 	local opponents = Array.mapIndexes(function(idx) return match['opponent' .. idx] end)
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local scores
-		Table.mergeInto(map, MatchGroupInput.readDate(map.date))
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
 		map = MapFunctions.getParticipants(map, opponents)
 		map = MapFunctions.getOpponentStats(map, opponents, mapIndex)
 		map, scores = MapFunctions.getScoresAndWinner(map, match.scoreSettings)
@@ -239,7 +239,7 @@ end
 function MatchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	return MatchGroupInput.getCommonTournamentVars(match)
+	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table
@@ -293,7 +293,7 @@ function MatchFunctions.getOpponents(match)
 			assert(Opponent.isType(opponent.type), 'Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			if opponent.type == Opponent.team then
 				if Logic.isNotEmpty(opponent.name) then
-					match = MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+					match = MatchGroupInputUtil.readPlayersOfTeam(match, opponentIndex, opponent.name, {
 						resolveRedirect = true,
 						applyUnderScores = true,
 						maxNumPlayers = MAX_NUM_PLAYERS,
