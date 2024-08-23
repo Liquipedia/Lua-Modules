@@ -1113,12 +1113,12 @@ end
 function MatchGroupInput.getWinner(resultType, winnerInput,  opponents)
 	if resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then
 		return nil
+	elseif Logic.isNumeric(winnerInput) then
+		return tonumber(winnerInput)
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DRAW then
 		return MatchGroupInput.WINNER_DRAW
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
 		return MatchGroupInput.getDefaultWinner(opponents)
-	elseif Logic.isNumeric(winnerInput) then
-		return tonumber(winnerInput)
 	else
 		return MatchGroupInput.getHighestScoringOpponent(opponents)
 	end
