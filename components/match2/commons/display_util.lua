@@ -50,7 +50,7 @@ end
 
 ---Attempts to render a display component in the pure function style.
 ---The error is caught and displayed using classic error style.
----@param Component fun(table): Html
+---@param Component fun(props: table): Html
 ---@param props table
 ---@param other fun(error: Error): Html
 ---@return Html
