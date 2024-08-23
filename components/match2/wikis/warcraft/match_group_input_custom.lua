@@ -457,12 +457,12 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	local participants = {}
 
 	Array.forEach(players, function(player, playerIndex)
-		local faction = Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']) or player.Faction
+		local faction = Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']) or player.extradata.faction
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			faction = Faction.read(faction or player.extradata.faction),
 			player = player.name,
-			heroes = CustomMatchGroupInput._readHeroes(
+			heroes = MapFunctions.readHeroes(
 				mapInput[prefix .. playerIndex .. 'heroes'],
 				faction,
 				player.name,
