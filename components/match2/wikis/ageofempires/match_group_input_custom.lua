@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
@@ -35,7 +35,7 @@ local CustomMatchGroupInput = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date))
 	CustomMatchGroupInput._getOpponents(match)
 	CustomMatchGroupInput._getTournamentVars(match)
 	CustomMatchGroupInput._processMaps(match)
@@ -50,7 +50,7 @@ end
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
-	match = MatchGroupInputUtil.getCommonTournamentVars(match)
+	match = MatchGroupInput.getCommonTournamentVars(match)
 
 	match = CustomMatchGroupInput._getMapsAndGame(match)
 	match.bestof = Logic.emptyOr(match.bestof, Variables.varDefault('bestof'))
@@ -131,7 +131,7 @@ function CustomMatchGroupInput._getExtraData(match)
 		headtohead = match.headtohead,
 		civdraft = match.civdraft,
 		mapdraft = match.mapdraft,
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -273,7 +273,7 @@ function CustomMatchGroupInput._getOpponents(match)
 		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.template) then
 			local template = mw.ext.TeamTemplate.raw(opponent.template)
 			if template then
-				MatchGroupInputUtil.readPlayersOfTeam(match, opponentIndex, template.page, {
+				MatchGroupInput.readPlayersOfTeam(match, opponentIndex, template.page, {
 					resolveRedirect = true,
 					applyUnderScores = true,
 					maxNumPlayers = MAX_NUM_PLAYERS,
@@ -305,7 +305,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
-	MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 ---@param match table

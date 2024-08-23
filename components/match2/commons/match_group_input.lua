@@ -29,31 +29,6 @@ local MatchGroupInput = {}
 ---@field sectionHeader string?
 ---@field tournamentParent string
 
----@class MatchGroupMvpPlayer
----@field displayname string
----@field name string
----@field comment string?
----@field team string?
----@field template string
-
----@deprecated
----@class MatchGroupInputReadPlayersOfTeamOptions
----@field maxNumPlayers integer?
----@field resolveRedirect boolean?
----@field applyUnderScores boolean?
-
----@class readOpponentOptions
----@field maxNumPlayers integer?
----@field resolveRedirect boolean?
----@field pagifyOpponentName boolean?
----@field pagifyPlayerNames boolean?
-
----@class MatchGroupInputSubstituteInformation
----@field substitute standardPlayer
----@field player standardPlayer?
----@field games string[]
----@field reason string?
-
 local GSL_GROUP_STYLE_DEFAULT_HEADERS = {
 	{default = 'Opening Matches'},
 	{},

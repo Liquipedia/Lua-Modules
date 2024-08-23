@@ -28,7 +28,7 @@ local Opponent = OpponentLibraries.Opponent
 
 local globalVars = PageVariableNamespace{cached = true}
 
-local MatchGroupInput = {}
+local MatchGroupInputUtil = {}
 
 local DEFAULT_ALLOWED_VETOES = {
 	'decider',
@@ -44,7 +44,7 @@ local NOT_PLAYED_INPUTS = {
 	'cancelled',
 }
 
-MatchGroupInput.STATUS_INPUTS = {
+MatchGroupInputUtil.STATUS_INPUTS = {
 	DEFAULT_WIN = 'W',
 	DEFAULT_LOSS = 'L',
 	DRAW = 'D',
@@ -52,22 +52,22 @@ MatchGroupInput.STATUS_INPUTS = {
 	DISQUALIFIED = 'DQ',
 }
 
-MatchGroupInput.STATUS = Table.copy(MatchGroupInput.STATUS_INPUTS)
-MatchGroupInput.STATUS.SCORE = 'S'
+MatchGroupInputUtil.STATUS = Table.copy(MatchGroupInputUtil.STATUS_INPUTS)
+MatchGroupInputUtil.STATUS.SCORE = 'S'
 
-MatchGroupInput.RESULT_TYPE = {
+MatchGroupInputUtil.RESULT_TYPE = {
 	DEFAULT = 'default',
 	NOT_PLAYED = 'np',
 	DRAW = 'draw',
 }
-MatchGroupInput.WALKOVER = {
+MatchGroupInputUtil.WALKOVER = {
 	FORFIET = 'ff',
 	DISQUALIFIED = 'dq',
 	NO_SCORE = 'l',
 }
 
-MatchGroupInput.SCORE_NOT_PLAYED = -1
-MatchGroupInput.WINNER_DRAW = 0
+MatchGroupInputUtil.SCORE_NOT_PLAYED = -1
+MatchGroupInputUtil.WINNER_DRAW = 0
 
 local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
@@ -77,10 +77,35 @@ local ASSUME_FINISHED_AFTER = {
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()
 
+---@class MatchGroupMvpPlayer
+---@field displayname string
+---@field name string
+---@field comment string?
+---@field team string?
+---@field template string
+
+---@deprecated
+---@class MatchGroupInputReadPlayersOfTeamOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
+---@field applyUnderScores boolean?
+
+---@class readOpponentOptions
+---@field maxNumPlayers integer?
+---@field resolveRedirect boolean?
+---@field pagifyOpponentName boolean?
+---@field pagifyPlayerNames boolean?
+
+---@class MatchGroupInputSubstituteInformation
+---@field substitute standardPlayer
+---@field player standardPlayer?
+---@field games string[]
+---@field reason string?
+
 ---@param dateString string?
 ---@param dateFallbacks string[]?
 ---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
-function MatchGroupInput.readDate(dateString, dateFallbacks)
+function MatchGroupInputUtil.readDate(dateString, dateFallbacks)
 	if dateString then
 		-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 		local timezoneOffset = dateString:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
@@ -128,7 +153,7 @@ end
 ---Standalone matches are specified from individual match pages in the Match namespace.
 ---@param bracketId string
 ---@return match2[]
-MatchGroupInput.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
+MatchGroupInputUtil.fetchStandaloneMatchGroup = FnUtil.memoize(function(bracketId)
 	return mw.ext.LiquipediaDB.lpdb('match2', {
 		conditions = '[[namespace::130]] AND [[match2bracketid::' .. bracketId .. ']]',
 		limit = 5000,
@@ -140,10 +165,10 @@ end)
 ---matchId is a full match ID, such as MATCH_wec2CbLWRx_0001
 ---@param matchId string
 ---@return match2?
-function MatchGroupInput.fetchStandaloneMatch(matchId)
+function MatchGroupInputUtil.fetchStandaloneMatch(matchId)
 	local bracketId, _ = MatchGroupUtil.splitMatchId(matchId)
 	assert(bracketId, 'Invalid matchId "' .. matchId .. '"')
-	local matches = MatchGroupInput.fetchStandaloneMatchGroup(bracketId)
+	local matches = MatchGroupInputUtil.fetchStandaloneMatchGroup(bracketId)
 	return Array.find(matches, function(match)
 		return match.match2id == matchId
 	end)
@@ -154,7 +179,7 @@ end
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
 ---@return table?
-function MatchGroupInput.readOpponent(match, opponentIndex, options)
+function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
@@ -181,10 +206,10 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 
 	local substitutions
 	if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
-		local manualPlayersInput = MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
+		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
 		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
-		opponent.players = MatchGroupInput.readPlayersOfTeamNew(
+		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
 			opponent.name,
 			manualPlayersInput,
 			options,
@@ -202,7 +227,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		end)
 	end
 
-	return MatchGroupInput.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
+	return MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
 end
 
 --[[
@@ -216,7 +241,7 @@ Using the team template extension, the opponent struct is standardised and not u
 ---@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
 ---@param substitutions MatchGroupInputSubstituteInformation[]?
 ---@return table
-function MatchGroupInput.mergeRecordWithOpponent(record, opponent, substitutions)
+function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitutions)
 	if opponent.type == Opponent.team then
 		record.template = opponent.template or record.template
 		record.icon = opponent.icon or record.icon
@@ -245,7 +270,7 @@ end
 ---@param obj table
 ---@param parent table?
 ---@return table
-function MatchGroupInput.getCommonTournamentVars(obj, parent)
+function MatchGroupInputUtil.getCommonTournamentVars(obj, parent)
 	parent = parent or {}
 	obj.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
 	obj.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
@@ -279,7 +304,7 @@ end
 
 ---@param match table
 ---@return {players: MatchGroupMvpPlayer[], points: integer}?
-function MatchGroupInput.readMvp(match)
+function MatchGroupInputUtil.readMvp(match)
 	if not match.mvp then return end
 	local mvppoints = match.mvppoints or 1
 
@@ -314,7 +339,7 @@ end
 ---@param opponentIndex integer
 ---@param opponentInput table
 ---@return {players: table[], substitutions: MatchGroupInputSubstituteInformation[]}
-function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponentInput)
+function MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 	local manualInput = {players = {}}
 
 	---@param playerData table|string|nil
@@ -372,7 +397,7 @@ end
 ---@param options readOpponentOptions
 ---@param dateTimeInfo {timestamp: integer?, timezoneOffset: string?}
 ---@return table
-function MatchGroupInput.readPlayersOfTeamNew(teamName, manualPlayersInput, options, dateTimeInfo)
+function MatchGroupInputUtil.readPlayersOfTeamNew(teamName, manualPlayersInput, options, dateTimeInfo)
 	local players = {}
 	local playersIndex = 0
 
@@ -465,7 +490,7 @@ end
 ---@param teamName string
 ---@param options MatchGroupInputReadPlayersOfTeamOptions?
 ---@return table
-function MatchGroupInput.readPlayersOfTeam(match, opponentIndex, teamName, options)
+function MatchGroupInputUtil.readPlayersOfTeam(match, opponentIndex, teamName, options)
 	options = options or {}
 
 	local opponent = match['opponent' .. opponentIndex]
@@ -594,11 +619,11 @@ end
 ---@param match table
 ---@param options {noSort: boolean?}?
 ---@return string?
-function MatchGroupInput.readCasters(match, options)
+function MatchGroupInputUtil.readCasters(match, options)
 	options = options or {}
 	local casters = {}
 	for casterKey, casterName in Table.iter.pairsByPrefix(match, 'caster') do
-		table.insert(casters, MatchGroupInput._getCasterInformation(
+		table.insert(casters, MatchGroupInputUtil._getCasterInformation(
 			casterName,
 			match[casterKey .. 'flag'],
 			match[casterKey .. 'name']
@@ -617,7 +642,7 @@ end
 ---@param flag string?
 ---@param displayName string?
 ---@return {name:string, displayName: string, flag: string?}
-function MatchGroupInput._getCasterInformation(name, flag, displayName)
+function MatchGroupInputUtil._getCasterInformation(name, flag, displayName)
 	flag = Logic.emptyOr(flag, globalVars:get(name .. '_flag'))
 	displayName = Logic.emptyOr(displayName, globalVars:get(name .. 'dn'))
 
@@ -655,7 +680,7 @@ end
 ---@param match table
 ---@param allowedVetoes string[]?
 ---@return {type:string, team1: string?, team2:string?, decider:string?, vetostart:string?}[]?
-function MatchGroupInput.getMapVeto(match, allowedVetoes)
+function MatchGroupInputUtil.getMapVeto(match, allowedVetoes)
 	if not match.mapveto then return nil end
 
 	allowedVetoes = allowedVetoes or DEFAULT_ALLOWED_VETOES
@@ -689,9 +714,9 @@ end
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@return boolean
-function MatchGroupInput.isNotPlayed(winnerInput, finishedInput)
-	return (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
-		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput))
+function MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
+	return (type(winnerInput) == 'string' and MatchGroupInputUtil.isNotPlayedInput(winnerInput))
+		or (type(finishedInput) == 'string' and MatchGroupInputUtil.isNotPlayedInput(finishedInput))
 end
 
 ---Should only be called on finished matches or maps
@@ -699,17 +724,17 @@ end
 ---@param finishedInput string?
 ---@param opponents {score: number?, status: string}[]
 ---@return string? #Result Type
-function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
-	if MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
-		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
+function MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
 	end
 
-	if MatchGroupInput.isDraw(opponents, winnerInput) then
-		return MatchGroupInput.RESULT_TYPE.DRAW
+	if MatchGroupInputUtil.isDraw(opponents, winnerInput) then
+		return MatchGroupInputUtil.RESULT_TYPE.DRAW
 	end
 
-	if MatchGroupInput.hasSpecialStatus(opponents) then
-		return MatchGroupInput.RESULT_TYPE.DEFAULT
+	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
+		return MatchGroupInputUtil.RESULT_TYPE.DEFAULT
 	end
 end
 
@@ -717,17 +742,17 @@ end
 ---@param winnerInput integer|string|nil
 ---@param opponents {score: number, status: string}[]
 ---@return integer? # Winner
-function MatchGroupInput.getWinner(resultType, winnerInput,  opponents)
-	if resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then
+function MatchGroupInputUtil.getWinner(resultType, winnerInput,  opponents)
+	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
-	elseif resultType == MatchGroupInput.RESULT_TYPE.DRAW then
-		return MatchGroupInput.WINNER_DRAW
-	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
-		return MatchGroupInput.getDefaultWinner(opponents)
+	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DRAW then
+		return MatchGroupInputUtil.WINNER_DRAW
+	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
+		return MatchGroupInputUtil.getDefaultWinner(opponents)
 	else
-		return MatchGroupInput.getHighestScoringOpponent(opponents)
+		return MatchGroupInputUtil.getHighestScoringOpponent(opponents)
 	end
 end
 
@@ -735,7 +760,7 @@ end
 ---If multiple opponents share the highest score, the first one is returned
 ---@param opponents {score: number}[]
 ---@return integer
-function MatchGroupInput.getHighestScoringOpponent(opponents)
+function MatchGroupInputUtil.getHighestScoringOpponent(opponents)
 	local scores = Array.map(opponents, Operator.property('score'))
 	local maxScore = Array.max(scores)
 	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
@@ -744,28 +769,28 @@ end
 ---@param resultType string?
 ---@param opponents {status: string}[]
 ---@return string? # Walkover Type
-function MatchGroupInput.getWalkover(resultType, opponents)
-	if resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
-		return MatchGroupInput.getWalkoverType(opponents)
+function MatchGroupInputUtil.getWalkover(resultType, opponents)
+	if resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
+		return MatchGroupInputUtil.getWalkoverType(opponents)
 	end
 end
 
 ---@param opponents {status: string}[]
 ---@return string?
-function MatchGroupInput.getWalkoverType(opponents)
-	if MatchGroupInput.hasForfeit(opponents) then
-		return MatchGroupInput.WALKOVER.FORFIET
-	elseif MatchGroupInput.hasDisqualified(opponents) then
-		return MatchGroupInput.WALKOVER.DISQUALIFIED
-	elseif MatchGroupInput.hasDefaultWinLoss(opponents) then
-		return MatchGroupInput.WALKOVER.NO_SCORE
+function MatchGroupInputUtil.getWalkoverType(opponents)
+	if MatchGroupInputUtil.hasForfeit(opponents) then
+		return MatchGroupInputUtil.WALKOVER.FORFIET
+	elseif MatchGroupInputUtil.hasDisqualified(opponents) then
+		return MatchGroupInputUtil.WALKOVER.DISQUALIFIED
+	elseif MatchGroupInputUtil.hasDefaultWinLoss(opponents) then
+		return MatchGroupInputUtil.WALKOVER.NO_SCORE
 	end
 end
 
 ---@param match table
 ---@param maps {scores: integer[]?, winner: integer?}[]
 ---@return boolean
-function MatchGroupInput.canUseAutoScore(match, maps)
+function MatchGroupInputUtil.canUseAutoScore(match, maps)
 	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
 	local anyMapHasWinner = Table.any(maps, function(_, map)
 		return Logic.isNotEmpty(map.winner)
@@ -780,58 +805,58 @@ end
 ---@param autoScore? fun(opponentIndex: integer): integer?
 ---@return integer? #SCORE
 ---@return string? #STATUS
-function MatchGroupInput.computeOpponentScore(props, autoScore)
+function MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 	if props.walkover then
 		local winner = tonumber(props.walkover) or tonumber(props.winner)
 		assert(winner, 'Failed to parse walkover input')
-		return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
+		return MatchGroupInputUtil.opponentWalkover(props.walkover, winner == props.opponentIndex)
 	end
 	local score = props.score
 	if Logic.isEmpty(score) and autoScore then
 		score = autoScore(props.opponentIndex)
 	end
 
-	return MatchGroupInput.parseScoreInput(score)
+	return MatchGroupInputUtil.parseScoreInput(score)
 end
 
 ---@param scoreInput string|number|nil
 ---@return integer? #SCORE
 ---@return string? #STATUS
-function MatchGroupInput.parseScoreInput(scoreInput)
+function MatchGroupInputUtil.parseScoreInput(scoreInput)
 	if Logic.isEmpty(scoreInput) then
 		return
 	end
 	---@cast scoreInput -nil
 
 	if Logic.isNumeric(scoreInput) then
-		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
+		return tonumber(scoreInput), MatchGroupInputUtil.STATUS.SCORE
 	end
 
 	local scoreUpperCase = string.upper(scoreInput)
-	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, scoreUpperCase), 'Invalid score input: ' .. scoreUpperCase)
-	return MatchGroupInput.SCORE_NOT_PLAYED, scoreUpperCase
+	assert(Table.includes(MatchGroupInputUtil.STATUS_INPUTS, scoreUpperCase), 'Invalid score input: ' .. scoreUpperCase)
+	return MatchGroupInputUtil.SCORE_NOT_PLAYED, scoreUpperCase
 end
 
 ---@param walkoverInput string|integer #wikicode input
 ---@param isWinner boolean
 ---@return integer? #SCORE
 ---@return string? #STATUS
-function MatchGroupInput.opponentWalkover(walkoverInput, isWinner)
+function MatchGroupInputUtil.opponentWalkover(walkoverInput, isWinner)
 	if Logic.isNumeric(walkoverInput) then
-		walkoverInput = MatchGroupInput.STATUS.DEFAULT_LOSS
+		walkoverInput = MatchGroupInputUtil.STATUS.DEFAULT_LOSS
 	end
 
 	local walkoverUpperCase = string.upper(walkoverInput)
-	assert(Table.includes(MatchGroupInput.STATUS_INPUTS, walkoverUpperCase),
+	assert(Table.includes(MatchGroupInputUtil.STATUS_INPUTS, walkoverUpperCase),
 		'Invalid walkover input: ' .. walkoverUpperCase)
-	return MatchGroupInput.SCORE_NOT_PLAYED, isWinner and MatchGroupInput.STATUS.DEFAULT_WIN or walkoverUpperCase
+	return MatchGroupInputUtil.SCORE_NOT_PLAYED, isWinner and MatchGroupInputUtil.STATUS.DEFAULT_WIN or walkoverUpperCase
 end
 
 -- Calculate the match scores based on the map results (counting map wins)
 ---@param maps {winner: integer?}[]
 ---@param opponentIndex integer
 ---@return integer
-function MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
+function MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	return Array.reduce(Array.map(maps, function(map)
 		return (map.winner == opponentIndex and 1 or 0)
 	end), Operator.add)
@@ -839,20 +864,20 @@ end
 
 ---@param input string?
 ---@return boolean
-function MatchGroupInput.isNotPlayedInput(input)
+function MatchGroupInputUtil.isNotPlayedInput(input)
 	return Table.includes(NOT_PLAYED_INPUTS, input)
 end
 
 ---@param opponents {status: string, score: number?}[]
 ---@param winnerInput integer|string|nil
 ---@return boolean
-function MatchGroupInput.isDraw(opponents, winnerInput)
+function MatchGroupInputUtil.isDraw(opponents, winnerInput)
 	if Logic.isEmpty(opponents) then return true end
 	if tonumber(winnerInput) == 0 then
 		return true
 	end
 	local function opponentHasFinalStatus(opponent)
-		return opponent.status ~= MatchGroupInput.STATUS.SCORE and opponent.status ~= MatchGroupInput.STATUS.DRAW
+		return opponent.status ~= MatchGroupInputUtil.STATUS.SCORE and opponent.status ~= MatchGroupInputUtil.STATUS.DRAW
 	end
 	if Array.any(opponents, opponentHasFinalStatus) then
 		return false
@@ -864,51 +889,51 @@ end
 -- Check if any opponent has a none-standard status
 ---@param opponents {status: string}[]
 ---@return boolean
-function MatchGroupInput.hasSpecialStatus(opponents)
+function MatchGroupInputUtil.hasSpecialStatus(opponents)
 	return Array.any(opponents, function (opponent)
-			return opponent.status and opponent.status ~= MatchGroupInput.STATUS.SCORE end)
+			return opponent.status and opponent.status ~= MatchGroupInputUtil.STATUS.SCORE end)
 end
 
 ---@param opponents {status: string?}[]
 ---@param status string
 ---@return integer
-function MatchGroupInput._opponentWithStatus(opponents, status)
+function MatchGroupInputUtil._opponentWithStatus(opponents, status)
 	return Array.indexOf(opponents, function (opponent) return opponent.status == status end)
 end
 
 -- function to check for forfeits
 ---@param opponents {status: string?}[]
 ---@return boolean
-function MatchGroupInput.hasForfeit(opponents)
-	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.FORFIET) ~= 0
+function MatchGroupInputUtil.hasForfeit(opponents)
+	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFIET) ~= 0
 end
 
 -- function to check for DQ's
 ---@param opponents {status: string?}[]
 ---@return boolean
-function MatchGroupInput.hasDisqualified(opponents)
-	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DISQUALIFIED) ~= 0
+function MatchGroupInputUtil.hasDisqualified(opponents)
+	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DISQUALIFIED) ~= 0
 end
 
 -- function to check for W/L
 ---@param opponents {status: string?}[]
 ---@return boolean
-function MatchGroupInput.hasDefaultWinLoss(opponents)
-	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DEFAULT_LOSS) ~= 0
+function MatchGroupInputUtil.hasDefaultWinLoss(opponents)
+	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DEFAULT_LOSS) ~= 0
 end
 
 -- function to check for Normal Scores
 ---@param opponents {status: string?}[]
 ---@return boolean
-function MatchGroupInput.hasScore(opponents)
-	return MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.SCORE) ~= 0
+function MatchGroupInputUtil.hasScore(opponents)
+	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.SCORE) ~= 0
 end
 
 -- Get the winner when resulttype=default
 ---@param opponents {status: string?}[]
 ---@return integer
-function MatchGroupInput.getDefaultWinner(opponents)
-	local idx = MatchGroupInput._opponentWithStatus(opponents, MatchGroupInput.STATUS.DEFAULT_WIN)
+function MatchGroupInputUtil.getDefaultWinner(opponents)
+	local idx = MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DEFAULT_WIN)
 	return idx > 0 and idx or -1
 end
 
@@ -922,7 +947,7 @@ end
 ---@param placementWinner integer
 ---@param placementLoser integer
 ---@return table[]
-function MatchGroupInput.setPlacement(opponents, winner, placementWinner, placementLoser)
+function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser)
 	if not opponents or #opponents ~= 2 then
 		return opponents
 	end
@@ -960,8 +985,8 @@ end
 ---@param match table
 ---@param opponents {score: integer?}[]
 ---@return boolean
-function MatchGroupInput.matchIsFinished(match, opponents)
-	if MatchGroupInput.isNotPlayed(match.winner, match.finished) then
+function MatchGroupInputUtil.matchIsFinished(match, opponents)
+	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return false
 	end
 
@@ -976,11 +1001,11 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 	end
 
 	-- If special status has been applied to a team
-	if MatchGroupInput.hasSpecialStatus(opponents) then
+	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return true
 	end
 
-	if not MatchGroupInput.hasScore(opponents) then
+	if not MatchGroupInputUtil.hasScore(opponents) then
 		return false
 	end
 
@@ -996,14 +1021,14 @@ function MatchGroupInput.matchIsFinished(match, opponents)
 	end
 	-- TODO: Investigate if bestof = 0 needs to be handled
 
-	return MatchGroupInput.majorityHasBeenWon(bestof, opponents)
+	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end
 
 ---@param map {winner: string|nil, finished: string?, bestof: integer?}
 ---@param opponents? {score: integer?}[]
 ---@return boolean
-function MatchGroupInput.mapIsFinished(map, opponents)
-	if MatchGroupInput.isNotPlayed(map.winner, map.finished) then
+function MatchGroupInputUtil.mapIsFinished(map, opponents)
+	if MatchGroupInputUtil.isNotPlayed(map.winner, map.finished) then
 		return false
 	end
 
@@ -1025,14 +1050,14 @@ function MatchGroupInput.mapIsFinished(map, opponents)
 		return false
 	end
 
-	return MatchGroupInput.majorityHasBeenWon(bestof, opponents)
+	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end
 
 -- Check if all/enough games/rounds have been played for being certain winner
 ---@param bestof integer
 ---@param opponents {score: integer?}[]
 ---@return boolean
-function MatchGroupInput.majorityHasBeenWon(bestof, opponents)
+function MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 	local firstTo = math.floor(bestof / 2)
 	if Array.any(opponents, function(opponent) return (tonumber(opponent.score) or 0) > firstTo end) then
 		return true
@@ -1047,14 +1072,14 @@ end
 ---@param bestOfInput string|integer?
 ---@param maps table[]
 ---@return integer?
-function MatchGroupInput.getBestOf(bestOfInput, maps)
+function MatchGroupInputUtil.getBestOf(bestOfInput, maps)
 	return tonumber(bestOfInput) or #maps
 end
 
 ---@param alias table<string, string>
 ---@param character string?
 ---@return string?
-function MatchGroupInput.getCharacterName(alias, character)
+function MatchGroupInputUtil.getCharacterName(alias, character)
 	if Logic.isEmpty(character) then return nil end
 	---@cast character -nil
 	return (assert(alias[character:lower()], 'Invalid character:' .. character))
@@ -1064,7 +1089,7 @@ end
 ---@param match table
 ---@param standaloneMatch table
 ---@return table
-function MatchGroupInput.mergeStandaloneIntoMatch(match, standaloneMatch)
+function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	local function ensureTable(input)
 		if type(input) == 'table' then
 			return input
@@ -1096,3 +1121,5 @@ function MatchGroupInput.mergeStandaloneIntoMatch(match, standaloneMatch)
 
 	return match
 end
+
+return MatchGroupInputUtil

@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
@@ -34,7 +34,7 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {
+	Table.mergeInto(match, MatchGroupInput.readDate(match.date, {
 		'match_date',
 		'tournament_enddate',
 		'tournament_startdate',
@@ -53,7 +53,7 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 function CustomMatchGroupInput._getTournamentVars(match)
-	match = MatchGroupInputUtil.getCommonTournamentVars(match)
+	match = MatchGroupInput.getCommonTournamentVars(match)
 
 	match.bestof = match.bestof
 	match.mode = Variables.varDefault('tournament_mode', 'singles')
@@ -215,7 +215,7 @@ function CustomMatchGroupInput._getOpponents(match)
 		match['opponent' .. opponentIndex] = opponent
 
 		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
-			MatchGroupInputUtil.readPlayersOfTeam(match, opponentIndex, opponent.name, {
+			MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
 				resolveRedirect = true,
 				applyUnderScores = true,
 				maxNumPlayers = MAX_NUM_PLAYERS,
@@ -237,7 +237,7 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 
 	Opponent.resolve(opponent, timestamp, {syncPlayer = true})
-	MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent)
+	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
 ---@param match table
@@ -371,7 +371,7 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, p
 	local char = map['char' .. opponentIndex] or ''
 
 	participants[opponentIndex .. '_1'] = {
-		char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
+		char = MatchGroupInput.getCharacterName(CharacterStandardization, char),
 		player = player.name,
 	}
 
