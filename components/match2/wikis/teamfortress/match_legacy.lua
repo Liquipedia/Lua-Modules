@@ -16,10 +16,14 @@ local Table = require('Module:Table')
 function MatchLegacy.storeMatch(match2, options)
 	local match = MatchLegacy._convertParameters(match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
+	if options.storeMatch1 then
+		match.games = match2
+	end
+	
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy._convertParameters(match2)
@@ -45,7 +49,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == Opponent.team then
 			match[prefix] = opponent.name
-			match[prefix..'score'] = tonumber(opponent.score) or 0 > 0 and opponent.score or 0
+			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i = 1, 6 do
 				local player = opponentmatch2players[i] or {}
@@ -57,7 +61,7 @@ function MatchLegacy._convertParameters(match2)
 		elseif opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
-			match[prefix..'score'] = tonumber(opponent.score) or 0 > 0 and opponent.score or 00
+			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix..'flag'] = player.flag
 		elseif opponent.type == Opponent.literal then
 			match[prefix] = 'TBD'
