@@ -220,9 +220,9 @@ end
 ---@param typePrefix string
 ---@return table[]
 function Match._moveRecordsFromMatchToList(match, list, typePrefix)
-	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
+	for key, item, index in Table.iter.pairsByPrefix(match, typePrefix) do
+		list[index] = list[index] or Json.parseIfTable(item) or item
 		match[key] = nil
-		table.insert(list, Json.parseIfTable(item) or item)
 	end
 
 	return list

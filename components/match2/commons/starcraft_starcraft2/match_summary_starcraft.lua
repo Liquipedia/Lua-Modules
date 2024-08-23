@@ -327,12 +327,17 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 		return node:addClass('brkts-popup-sc-submatch-opponent')
 	end
 
+	local hasNonZeroScore = Array.any(submatch.scores, function(score) return score ~= 0 end)
+	local hasPlayers = Array.any(submatch.opponents, function(opponent) return Logic.isNotEmpty(opponent.players) end)
+
 	local renderScore = function(opponentIndex)
 		local isWinner = opponentIndex == submatch.winner
 		local text
 		if submatch.resultType == 'default' then
-			text = isWinner and 'W' or submatch.walkover
-		else
+			text = isWinner and 'W' or submatch.walkover:upper()
+		elseif submatch.resultType == 'np' then
+			text = ''
+		elseif hasNonZeroScore or hasPlayers then
 			local score = submatch.scores[opponentIndex]
 			text = score and tostring(score) or ''
 		end

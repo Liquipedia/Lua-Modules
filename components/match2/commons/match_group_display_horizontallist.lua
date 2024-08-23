@@ -181,8 +181,9 @@ function HorizontallistDisplay.Match(props)
 			:addClass('navigation-content')
 			:attr('data-js-battle-royale-content-id', 'navigationContent' .. props.index)
 
+	local bracketId = MatchGroupUtil.splitMatchId(props.matchId)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = props.matchId:match('^(.*)_'), -- everything up to the final '_'
+		bracketId = bracketId,
 		matchId = props.matchId,
 	}, require('Module:Error/Display').ErrorDetails)
 	matchNode:node(matchSummaryNode)

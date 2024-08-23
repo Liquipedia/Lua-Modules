@@ -154,18 +154,18 @@ function CustomParticipantTable:createSoloFactionTable()
 
 	local factionColumns = Array.copy(Faction.coreFactions)
 
-	if config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.rDisplay > 0 then
+	if config.displayRandomColumn or config.displayRandomColumn == nil and factioNumbers.r > 0 then
 		table.insert(factionColumns, Faction.read('r'))
 	end
 
 	if config.displayUnknownColumn or
-		config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction .. 'Display'] > 0 then
+		config.displayUnknownColumn == nil and factioNumbers[Faction.defaultFaction] > 0 then
 
 		table.insert(factionColumns, Faction.defaultFaction)
 	end
 
 	if config.displayMultipleFactionColumn or
-		config.displayMultipleFactionColumn == nil and factioNumbers.mDisplay > 0 then
+		config.displayMultipleFactionColumn == nil and factioNumbers.m > 0 then
 
 		table.insert(factionColumns, Faction.read('m'))
 	end

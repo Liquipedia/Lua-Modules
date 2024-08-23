@@ -56,7 +56,11 @@ end)
 function StarcraftPlayerExt.fetchPlayerFaction(resolvedPageName, date)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
 	if lpdbPlayer and lpdbPlayer.factionHistory then
-		date = date or DateExt.getContextualDateOrNow()
+		local timestamp = DateExt.readTimestamp(date or DateExt.getContextualDateOrNow())
+		---@cast timestamp -nil
+		-- convert date to iso format to match the dates retrieved from the data points
+		-- need the time too so the below check remains the same as before
+		date = DateExt.formatTimestamp('Y-m-d H:i:s', timestamp)
 		local entry = Array.find(lpdbPlayer.factionHistory, function(entry) return date <= entry.endDate end)
 		return entry and Faction.read(entry.faction)
 	else

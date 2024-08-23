@@ -583,8 +583,9 @@ function BracketDisplay.Match(props)
 	end
 
 	if props.matchHasDetails(props.match) then
+		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+			bracketId = bracketId,
 			matchId = props.match.matchId,
 		}, require('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
