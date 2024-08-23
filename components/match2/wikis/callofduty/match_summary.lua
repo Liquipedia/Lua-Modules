@@ -92,8 +92,9 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
-	return mw.html.create('div'):wikitext(score)
+	local score = game.scores[opponentIndex]
+	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
+	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame
