@@ -27,8 +27,6 @@ local LINK_DATA = {
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
 }
 
-local DEFAULT_WINNER = 'W'
-
 ---@class ValorantAgents
 ---@operator call: ValorantAgents
 ---@field root Html
@@ -112,19 +110,14 @@ end
 ---@param opponentIndex integer
 ---@return self
 function Score:setMapScore(game, opponentIndex)
-	---@type string|number|nil
-	local score = game.scores[opponentIndex]
-	if game.walkover and game.winner == opponentIndex then
-		score = DEFAULT_WINNER
-	elseif game.walkover then
-		score = game.walkover:upper()
-	end
+	local scoreDisplay = DisplayHelper.MapScore(
+		game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
 
 	local mapScore = mw.html.create('td')
 			:attr('rowspan', '2')
 			:css('font-size', '16px')
 			:css('width', '24px')
-			:wikitext(score or '')
+			:wikitext(scoreDisplay)
 	self.top:node(mapScore)
 
 	return self
