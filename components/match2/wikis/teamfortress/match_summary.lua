@@ -16,6 +16,8 @@ local Page = require('Module:Page')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
+local htmlCreate = mw.html.create
+
 ---@enum TFMatchIcons
 local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
@@ -76,11 +78,14 @@ function CustomMatchSummary.createBody(match)
 
 	return body
 end
+
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
+	local score = game.scores[opponentIndex] --[[@as number|string?]]
+	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
+	return htmlCreate('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame
