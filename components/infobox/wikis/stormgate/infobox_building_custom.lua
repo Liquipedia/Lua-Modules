@@ -308,7 +308,7 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 		Array.appendWith(creeps, unit)
 	end)
 
-	if id ~= 'custom' then return end
+	if id ~= 'custom' then return {} end
 
 	return {
 		Cell{name = 'Start Level', content = {startLevel}},
