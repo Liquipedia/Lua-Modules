@@ -31,7 +31,7 @@ end
 ---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
-	return DisplayUtil.TryPureComponent(FnUtil.Curry(self.make, self), {injector = injector}, ErrorDisplay.InlineError)
+	return DisplayUtil.TryPureComponent(FnUtil.curry(self.make, self), {injector = injector}, ErrorDisplay.InlineError)
 end
 
 return Widget
