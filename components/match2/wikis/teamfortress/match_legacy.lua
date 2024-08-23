@@ -9,7 +9,6 @@
 local MatchLegacy = {}
 
 local Json = require('Module:Json')
-local Lua = require('Module:Lua')
 local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
