@@ -9,10 +9,12 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local MAX_NUM_PLAYERS_IN_TEAM_SUBMATCH = 4
+local SKIP = 'skip'
 
 ---@class WarcraftMatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
@@ -31,6 +33,18 @@ function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
 		score = prefix .. scoreKey,
 		win = prefix .. 'win'
 	}
+end
+
+---@param isReset boolean
+---@param match table
+function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
+	-- remove skip scores and parse them to finished input instead
+	for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
+		if string.lower(opponent.score or '') == SKIP then
+			match.finished = SKIP
+			opponent.score = nil
+		end
+	end
 end
 
 ---@return table
