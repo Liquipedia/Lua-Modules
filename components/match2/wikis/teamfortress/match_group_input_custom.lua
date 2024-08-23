@@ -66,9 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
-
-	match.extradata = MatchFunctions.getExtraData(match)
-
 	match.games = games
 	match.opponents = opponents
 
@@ -157,20 +154,11 @@ function MatchFunctions.getLinks(match, games)
 	}
 
 	Array.forEach(games or {}, function(game, gameIndex)
-			links.logstf[gameIndex] = game.logstf and ('https://logs.tf/' .. game.logstf) or nil
-			links.logstfgold[gameIndex] = game.logstfgold and ('https://logs.tf/' .. game.logstfgold) or nil
+		links.logstf[gameIndex] = game.logstf and ('https://logs.tf/' .. game.logstf) or nil
+		links.logstfgold[gameIndex] = game.logstfgold and ('https://logs.tf/' .. game.logstfgold) or nil
 	end)
 
 	return links
-end
-
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		mvp = MatchGroupInput.readMvp(match),
-	}
 end
 
 --
@@ -183,7 +171,6 @@ end
 function MapFunctions.getExtraData(map)
 	return {
 		comment = map.comment,
-		header = map.header,
 	}
 end
 
