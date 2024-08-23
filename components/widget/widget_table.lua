@@ -49,9 +49,9 @@ function Table:addClass(class)
 	return self
 end
 
----@param injector WidgetInjector?
+---@param props {injector: WidgetInjector?}
 ---@return {[1]: Html}
-function Table:make(injector)
+function Table:make(props)
 	local displayTable = mw.html.create('div'):addClass('csstable-widget')
 	displayTable:css{
 		['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)',
@@ -64,7 +64,7 @@ function Table:make(injector)
 	displayTable:css(self.css)
 
 	for _, row in ipairs(self.rows) do
-		for _, node in ipairs(WidgetFactory.work(row, injector)) do
+		for _, node in ipairs(WidgetFactory.work(row, props.injector)) do
 			displayTable:node(node)
 		end
 	end
