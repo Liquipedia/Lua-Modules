@@ -411,7 +411,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		end
 
 		local player = players[playerIndex]
-		local faction = Faction.read(participantInput.faction or player.extradata.faction)
+		local faction = participantInput.faction or player.extradata.faction
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			faction = faction,
@@ -532,7 +532,7 @@ end
 ---@param participants table<string, WarcraftParticipant>
 ---@return table
 function MapFunctions.getHeroesExtradata(participants)
-	local extradata
+	local extradata = {}
 	for participantKey, participant in Table.iter.spairs(participants) do
 		local opponentIndex = string.match(participantKey, '^(%d+)_')
 		Array.forEach(participant.heroes or {}, function(hero, heroIndex)
