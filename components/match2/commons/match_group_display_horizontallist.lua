@@ -124,17 +124,27 @@ function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)
 		end
 	end
 
+	local function sortFunction(g1, g2)
+		if g1.distanceToNow == g2.distanceToNow then
+			return g1.matchIdx < g2.matchIdx
+		end
+		return g1.distanceToNow < g2.distanceToNow
+	end
 
 	-- Live games are always considered the "closest" if there are any.
 	-- Pick the match with the game that's been live the longest.
 	if #liveGames > 0 then
-		Array.sortInPlaceBy(liveGames, Operator.property('distanceToNow'))
+		Array.sortInPlaceBy(liveGames, FnUtil.identity, sortFunction)
 		return liveGames[#liveGames].matchIdx
 	end
 
 	-- If no games are live, we find the one closest to current time by absolute metric
-	Array.sortInPlaceBy(otherGames, Operator.property('distanceToNow'))
-	return (otherGames[1] or {}).matchIdx or 1
+	if #otherGames > 0 then
+		Array.sortInPlaceBy(otherGames, FnUtil.identity, sortFunction)
+		return otherGames[1].matchIdx
+	end
+
+	return 1
 end
 
 ---@param bracket MatchGroupUtilMatchGroup
