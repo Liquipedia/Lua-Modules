@@ -27,6 +27,8 @@ local LINK_DATA = {
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
 }
 
+local DEFAULT_WINNER = 'W'
+
 ---@class ValorantAgents
 ---@operator call: ValorantAgents
 ---@field root Html
@@ -106,11 +108,20 @@ function Score:setRight()
 	return self
 end
 
----@param score string|number|nil
+---@param game MatchGroupUtilGame
+---@param opponentIndex integer
 ---@return self
-function Score:setMapScore(score)
+function Score:setMapScore(game, opponentIndex)
+	---@type string|number|nil
+	local score = game.scores[opponentIndex]
+	if game.walkover and game.winner == opponentIndex then
+		score = DEFAULT_WINNER
+	elseif game.walkover then
+		score = game.walkover:upper()
+	end
+
 	local mapScore = mw.html.create('td')
-	mapScore:attr('rowspan', '2')
+			:attr('rowspan', '2')
 			:css('font-size', '16px')
 			:css('width', '24px')
 			:wikitext(score or '')
@@ -387,7 +398,7 @@ function CustomMatchSummary._createMap(game)
 	score1 = Score():setLeft()
 	score2 = Score():setRight()
 
-	score1:setMapScore(game.scores[1])
+	score1:setMapScore(game, 1)
 
 	if not Table.isEmpty(extradata) then
 		-- Detailed scores
@@ -409,7 +420,7 @@ function CustomMatchSummary._createMap(game)
 		score2:addBottomRoundScore(firstSide, team2Halfs[firstSide])
 	end
 
-	score2:setMapScore(game.scores[2])
+	score2:setMapScore(game, 2)
 
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	if team1Agents ~= nil then
