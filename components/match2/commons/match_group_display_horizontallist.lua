@@ -184,7 +184,7 @@ function HorizontallistDisplay.Match(props)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = props.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.matchId,
-	})
+	}, require('Module:Error/Display').ErrorDetails)
 	matchNode:node(matchSummaryNode)
 
 	return matchNode

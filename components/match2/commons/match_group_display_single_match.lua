@@ -73,7 +73,7 @@ function SingleMatchDisplay.Match(props)
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
 		config = {showScore = true},
-	})
+	}, require('Module:Error/Display').ErrorDetails)
 end
 
 return Class.export(SingleMatchDisplay)

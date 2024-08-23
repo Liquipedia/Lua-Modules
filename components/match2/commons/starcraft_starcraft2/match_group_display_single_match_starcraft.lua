@@ -53,7 +53,7 @@ function StarcraftSingleMatchDisplay.Match(props)
 		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 		matchId = props.match.matchId,
 		config = {showScore = not props.match.noScore},
-	})
+	}, require('Module:Error/Display').ErrorDetails)
 
 	return matchSummaryNode
 end

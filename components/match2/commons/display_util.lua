@@ -52,7 +52,7 @@ end
 ---The error is caught and displayed using classic error style.
 ---@param Component function
 ---@param props table
----@param other? fun(error: Error): any
+---@param other? fun(error: Error): Html
 ---@return Html
 function DisplayUtil.TryPureComponent(Component, props, other)
 	return Logic.tryOrElseLog(

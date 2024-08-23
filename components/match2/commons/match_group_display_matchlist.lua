@@ -150,7 +150,7 @@ function MatchlistDisplay.Match(props)
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
 			matchId = props.match.matchId,
-		})
+		}, require('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
 	else
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')
