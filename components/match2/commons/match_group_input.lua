@@ -601,7 +601,13 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		end)
 	end
 
-	return MatchGroupInput.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
+	local record = MatchGroupInput.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
+
+	if options.pagifyOpponentName then
+		record.name = Page.pageifyLink(record.name)
+	end
+
+	return record
 end
 
 --[[
@@ -633,7 +639,7 @@ function MatchGroupInput.mergeRecordWithOpponent(record, opponent, substitutions
 		end)
 	end
 
-	record.name = opponent.name or Opponent.toName(opponent)
+	record.name = Opponent.toName(opponent)
 	record.type = opponent.type
 	record.extradata = Table.merge(record.extradata or {}, {substitutions = Logic.nilIfEmpty(substitutions)})
 
