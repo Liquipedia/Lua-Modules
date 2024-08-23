@@ -371,23 +371,27 @@ function CustomMatchSummary._submatchHeader(submatch)
 		}
 	end
 
+	---@param opponentIndex any
+	---@return Html
 	local createScore = function(opponentIndex)
 		local isWinner = opponentIndex == submatch.winner
 		if submatch.resultType == 'default' then
 			return OpponentDisplay.BlockScore{
 				isWinner = isWinner,
-				scoreText = isWinner and 'W' or submatch.walkover,
+				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
 			}
 		end
+
+		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or ''
 		return OpponentDisplay.BlockScore{
 			isWinner = isWinner,
-			scoreText = (submatch.scores or {})[opponentIndex] or '',
+			scoreText = score,
 		}
 	end
 
 	return mw.html.create('div')
 		:css('justify-content', 'center'):addClass('brkts-popup-header-dev')
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
+		:tag('div'):addClass('brkts-popup-headr-opponent'):addClass('brkts-popup-header-opponent-left')
 			:node(createOpponent(1))
 			:node(createScore(1):addClass('brkts-popup-header-opponent-score-left'))
 			:done()
