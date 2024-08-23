@@ -34,9 +34,6 @@ function MatchLegacy.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		local scores = game2.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(scores)
-		end
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
 			Json.stringifySubTables(game)
@@ -64,8 +61,7 @@ function MatchLegacy._convertParameters(match2)
 
 	-- Handle extradata fields
 	match.extradata = {}
-	local extradata = Json.parseIfString(match2.extradata)
-
+	
 	local bracketData = Json.parseIfString(match2.match2bracketdata)
 	if type(bracketData) == 'table' and bracketData.type == 'bracket' then
 		if bracketData.inheritedheader then
