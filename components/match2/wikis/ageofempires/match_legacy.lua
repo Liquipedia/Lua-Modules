@@ -18,15 +18,12 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
+	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		local match = MatchLegacy._convertParameters(match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		match.games = MatchLegacy.storeGames(match, match2)
-
-		return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
-	end
+	return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
 end
 
 function MatchLegacy.storeGames(match, match2)
