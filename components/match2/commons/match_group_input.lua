@@ -576,6 +576,13 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 	end
 
 	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
+
+	if options.pagifyPlayerNames and opponent.type ~= Opponent.team then
+		Array.forEach(opponent.players or {}, function(player)
+			player.pageName = Page.pageifyLink(player.pageName)
+		end)
+	end
+
 	opponent.name = Opponent.toName(opponent)
 
 	local substitutions
@@ -589,17 +596,17 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
 		)
-	end
 
-	if options.pagifyPlayerNames then
-		Array.forEach(opponent.players or {}, function(player)
-			player.pageName = Page.pageifyLink(player.pageName)
-		end)
+		if options.pagifyPlayerNames then
+			Array.forEach(opponent.players or {}, function(player)
+				player.pageName = Page.pageifyLink(player.pageName)
+			end)
+		end
 	end
 
 	local record = MatchGroupInput.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
 
-	if options.pagifyOpponentName then
+	if options.pagifyOpponentName and opponent.type == Opponent.team then
 		record.name = Page.pageifyLink(record.name)
 	end
 
