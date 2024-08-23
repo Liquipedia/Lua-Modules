@@ -60,9 +60,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.patch = PatchAuto.retrieve{date = match.date}
 
-	-- temp workaround until #4608 gets merged
-	Array.forEach(opponents, function(opp) opp.name = Page.pageifyLink(opp.name) end)
-
 	Array.forEach(opponents, function(opponent)
 		opponent.extradata = opponent.extradata or {}
 		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
