@@ -17,7 +17,6 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
 
-local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
@@ -39,11 +38,12 @@ function CustomMatchGroupInput.processMatch(match, options)
 		return MatchGroupInput.readOpponent(match, opponentIndex, {})
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
-	match.bestof = MatchFunctions.getBestOf(match)
+	match.bestof = MatchGroupInput.getBestOf(match.bestof, games)
 
 	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, match.bestof)
+		and MatchFunctions.calculateMatchScore(games)
 		or nil
+
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInput.computeOpponentScore({
 			walkover = match.walkover,
@@ -115,20 +115,11 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 --
 
 ---@param maps table[]
----@param bestOf integer
----@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, bestOf)
+---@return fun(opponentIndex: integer): integer
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return integer
-function MatchFunctions.getBestOf(match)
-	local bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
-	Variables.varDefine('bestof', bestof)
-	return bestof or DEFAULT_BESTOF
 end
 
 ---@param match table
