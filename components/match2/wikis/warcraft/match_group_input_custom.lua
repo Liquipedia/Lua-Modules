@@ -34,6 +34,14 @@ local TBD = 'TBD'
 local NEUTRAL_HERO_FACTION = 'neutral'
 local MODE_MIXED = 'mixed'
 
+---@class WarcraftParticipant
+---@field player string
+---@field faction string?
+---@field heroes string[]?
+---@field position integer?
+---@field flag string?
+---@field random boolean?
+
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -364,7 +372,7 @@ end
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
-	---@type {input: string, faction: string?, link: string?}[]
+	---@type {input:string,faction:string?,link:string?,heroes:string?,heroesCheckDisabled:boolean,playedRandom:boolean}[]
 	local participantsList = Array.mapIndexes(function(playerIndex)
 		local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 
@@ -374,6 +382,9 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			input = mapInput[prefix],
 			link = Logic.nilIfEmpty(mapInput[prefix .. 'link']),
 			faction = Faction.read(mapInput[prefix .. 'race']),
+			heroes = mapInput[prefix .. 'heroes'],
+			heroesCheckDisabled = Logic.readBool(mapInput[prefix .. 'heroesNoCheck']),
+			playedRandom = Logic.readBool(mapInput[prefix .. 'random']),
 		}
 	end)
 
@@ -394,16 +405,26 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			table.insert(players, {
 				name = isTBD and TBD or link,
 				displayname = isTBD and TBD or nameInput,
-				extradata = {faction = participantInput.faction},
+				extradata = {faction = participantInput.faction or Faction.defaultFaction},
 			})
 			playerIndex = #players
 		end
 
+		local player = players[playerIndex]
+		local faction = Faction.read(participantInput.faction or player.extradata.faction)
+
 		participants[opponentIndex .. '_' .. playerIndex] = {
-			faction = participantInput.faction,
+			faction = faction,
 			player = link,
 			position = position,
-			flag = Flags.CountryName(players[playerIndex].flag),
+			flag = Flags.CountryName(player.flag),
+			random = participantInput.playedRandom,
+			heroes = MapFunctions.readHeroes(
+				participantInput.heroes,
+				faction,
+				link,
+				participantInput.heroesCheckDisabled
+			),
 		}
 	end)
 
@@ -432,11 +453,9 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
 	-- resolve the aliases in case they are used
-	mapInput['t' .. opponentIndex .. 'p1race'] = Logic.emptyOr(
-		mapInput['t' .. opponentIndex .. 'p1race'],
-		mapInput['race' .. opponentIndex],
-		mapInput['opponent' .. opponentIndex .. 'race']
-	)
+	local prefix = 't' .. opponentIndex .. 'p'
+	mapInput[prefix .. '1race'] = Logic.emptyOr(mapInput[prefix .. '1race'], mapInput['race' .. opponentIndex])
+	mapInput[prefix .. '1heroes'] = Logic.emptyOr(mapInput[prefix .. '1heroes'], mapInput['heroes' .. opponentIndex])
 
 	local participants = {}
 
@@ -445,7 +464,13 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 
 		participants[opponentIndex .. '_' .. playerIndex] = {
 			faction = Faction.read(faction or player.extradata.faction),
-			player = player.name
+			player = player.name,
+			heroes = CustomMatchGroupInput._readHeroes(
+				mapInput[prefix .. playerIndex .. 'heroes'],
+				faction,
+				player.name,
+				Logic.readBool(mapInput[prefix .. playerIndex .. 'heroesNoCheck'])
+			),
 		}
 	end)
 
@@ -502,10 +527,6 @@ function MapFunctions.getAdditionalExtraData(map, participants)
 
 	return extradata
 end
-
----@class WarcraftParticipant
----@field faction string?
----@field heroes string[]
 
 --- additionally store heroes in extradata so we can condition on them
 ---@param participants table<string, WarcraftParticipant>
