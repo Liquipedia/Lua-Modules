@@ -231,7 +231,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = MatchGroupInput._processMatch(matchArgs)
+		local match = Logic.wrapTryOrLog(MatchGroupInput._processMatch)(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
