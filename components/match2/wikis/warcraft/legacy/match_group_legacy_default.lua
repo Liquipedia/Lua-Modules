@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -15,6 +16,7 @@ local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local MAX_NUM_PLAYERS_IN_TEAM_SUBMATCH = 4
 local SKIP = 'skip'
+local TBD = 'TBD'
 
 ---@class WarcraftMatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
@@ -33,6 +35,28 @@ function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
 		score = prefix .. scoreKey,
 		win = prefix .. 'win'
 	}
+end
+
+---@param isReset boolean
+---@param match1params match1Keys
+---@param match table
+function MatchGroupLegacyDefault:handleOpponents(isReset, match1params, match)
+	local scoreKey = isReset and 'score2' or 'score'
+	Array.forEach(Array.range(1, 2), function (opponentIndex)
+		local opp = self:getOpponent(match1params['opp' .. opponentIndex], scoreKey)
+		local notEmptyPrefix = opp['$notEmpty$']
+
+		if Logic.isNotEmpty(self.args[notEmptyPrefix]) then
+			match['opponent' .. opponentIndex] = self:readOpponent(opp)
+			return
+		elseif self.bracketType ~= 'solo' then
+			return
+		elseif Logic.isEmpty(self.args[notEmptyPrefix .. 'flag']) and Logic.isEmpty(self.args[notEmptyPrefix .. 'race']) then
+			return
+		end
+
+		match['opponent' .. opponentIndex] = self:readOpponent(opp)
+	end)
 end
 
 ---@param isReset boolean
@@ -85,9 +109,11 @@ end
 ---@param opponentData table
 ---@return table
 function MatchGroupLegacyDefault:readOpponent(opponentData)
+	opponentData['$notEmpty$'] = nil
+
 	local opponent = self:_copyAndReplace(opponentData, self.args)
 	if self.bracketType == 'solo' then
-		opponent[1] = opponent.name
+		opponent[1] = opponent.name or TBD
 		opponent.name = nil
 	end
 	opponent.type = self.bracketType
