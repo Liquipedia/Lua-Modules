@@ -120,11 +120,12 @@ function Match.storeMatchGroup(matchRecords, options)
 		Array.forEach(matchRecordsCopy, Logic.wrapTryOrLog(storeMatch2))
 	end
 
-	if LegacyMatch then
-		Array.forEach(matchRecordsCopy, function(matchRecord)
-			Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
-		end)
+	if not LegacyMatch then
+		return
 	end
+	Array.forEach(matchRecordsCopy, function(matchRecord)
+		Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
+	end)
 end
 
 ---Stores a single match from a match group. Used by standalone match pages.
