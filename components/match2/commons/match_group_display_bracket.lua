@@ -467,7 +467,7 @@ function BracketDisplay.NodeBody(props)
 	local bracketResetMatch = match.bracketData.bracketResetMatchId
 		and props.matchesById[match.bracketData.bracketResetMatchId]
 	if bracketResetMatch then
-		match = MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		match = Logic.wrapTryOrLog(MatchGroupUtil.mergeBracketResetMatch)(match, bracketResetMatch)
 	end
 
 	-- Current match
@@ -587,7 +587,7 @@ function BracketDisplay.Match(props)
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = bracketId,
 			matchId = props.match.matchId,
-		})
+		}, require('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
 
 		local matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')

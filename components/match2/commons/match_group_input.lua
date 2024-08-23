@@ -154,7 +154,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		end
 	end
 
-	return Array.map(matchKeys, function(matchKey, matchIndex)
+	return Array.map(matchKeys, Logic.wrapTryOrLog(function(matchKey, matchIndex)
 			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 			local matchArgs = Json.parse(args[matchKey])
 
@@ -189,7 +189,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			return match
 		end
-	)
+	))
 end
 
 ---@param matchIndex integer
@@ -274,7 +274,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = MatchGroupInput._processMatch(matchArgs)
+		local match = Logic.wrapTryOrLog(MatchGroupInput._processMatch)(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
@@ -330,7 +330,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 	local matchIds = Array.extractKeys(bracketDatasById)
 	table.sort(matchIds)
-	local matches = Array.map(matchIds, readMatch)
+	local matches = Array.map(matchIds, Logic.wrapTryOrLog(readMatch))
 
 	if #missingMatchKeys ~= 0 and options.shouldWarnMissing then
 		table.insert(warnings, 'Missing matches: ' .. table.concat(missingMatchKeys, ', '))

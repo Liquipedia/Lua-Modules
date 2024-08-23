@@ -225,7 +225,7 @@ function HorizontallistDisplay.Match(props)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 		bracketId = bracketId,
 		matchId = props.matchId,
-	})
+	}, require('Module:Error/Display').ErrorDetails)
 	matchNode:node(matchSummaryNode)
 
 	return matchNode

@@ -54,7 +54,7 @@ function StarcraftSingleMatchDisplay.Match(props)
 		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = not props.match.noScore},
-	})
+	}, require('Module:Error/Display').ErrorDetails)
 end
 
 return StarcraftSingleMatchDisplay
