@@ -391,7 +391,7 @@ function CustomMatchSummary._submatchHeader(submatch)
 
 	return mw.html.create('div')
 		:css('justify-content', 'center'):addClass('brkts-popup-header-dev')
-		:tag('div'):addClass('brkts-popup-headr-opponent'):addClass('brkts-popup-header-opponent-left')
+		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
 			:node(createOpponent(1))
 			:node(createScore(1):addClass('brkts-popup-header-opponent-score-left'))
 			:done()
