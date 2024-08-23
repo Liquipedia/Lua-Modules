@@ -106,18 +106,14 @@ function Score:setRight()
 	return self
 end
 
----@param game MatchGroupUtilGame
----@param opponentIndex integer
+---@param score string?
 ---@return self
-function Score:setMapScore(game, opponentIndex)
-	local scoreDisplay = DisplayHelper.MapScore(
-		game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
-
+function Score:setMapScore(score)
 	local mapScore = mw.html.create('td')
 			:attr('rowspan', '2')
 			:css('font-size', '16px')
 			:css('width', '24px')
-			:wikitext(scoreDisplay)
+			:wikitext(score)
 	self.top:node(mapScore)
 
 	return self
@@ -391,7 +387,7 @@ function CustomMatchSummary._createMap(game)
 	score1 = Score():setLeft()
 	score2 = Score():setRight()
 
-	score1:setMapScore(game, 1)
+	score1:setMapScore(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
 
 	if not Table.isEmpty(extradata) then
 		-- Detailed scores
@@ -413,7 +409,8 @@ function CustomMatchSummary._createMap(game)
 		score2:addBottomRoundScore(firstSide, team2Halfs[firstSide])
 	end
 
-	score2:setMapScore(game, 2)
+
+	score1:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	if team1Agents ~= nil then
