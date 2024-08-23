@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
+local DisplayUtil = require('Module:DisplayUtil')
+local ErrorDisplay = require('Module:Error/Display')
+local FnUtil = require('Module:FnUtil')
 local String = require('Module:StringUtils')
 
 ---@class Widget: BaseClass
@@ -20,30 +22,16 @@ function Widget:assertExistsAndCopy(value)
 	return assert(String.nilIfEmpty(value), 'Tried to set a nil value to a mandatory property')
 end
 
----@param injector WidgetInjector?
+---@param props {injector: WidgetInjector?}
 ---@return Widget[]|Html[]|nil
-function Widget:make(injector)
+function Widget:make(props)
 	error('A Widget must override the make() function!')
 end
 
 ---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
-	local _, output = xpcall(
-		function()
-			return self:make(injector)
-		end,
-		function(errorMessage)
-			mw.log('-----Error in Widget:tryMake()-----')
-			mw.logObject(errorMessage, 'error')
-			mw.logObject(self, 'widget')
-			mw.log(debug.traceback())
-			local ErrorWidget = Lua.import('Module:Infobox/Widget/Error')
-			return {ErrorWidget({errorMessage = errorMessage})}
-		end
-	)
-
-	return output
+	return DisplayUtil.TryPureComponent(FnUtil.Curry(self.make, self), {injector}, ErrorDisplay.InlineError)
 end
 
 return Widget

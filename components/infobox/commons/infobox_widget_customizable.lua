@@ -23,13 +23,13 @@ local Customizable = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
+---@param props {injector: WidgetInjector?}
 ---@return Widget[]?
-function Customizable:make(injector)
-	if injector == nil then
+function Customizable:make(props)
+	if props.injector == nil then
 		return self.children
 	end
-	return injector:parse(self.id, self.children)
+	return props.injector:parse(self.id, self.children)
 end
 
 return Customizable

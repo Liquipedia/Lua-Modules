@@ -24,9 +24,9 @@ local Center = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
+---@param props {injector: WidgetInjector?}
 ---@return {[1]: Html?}
-function Center:make(injector)
+function Center:make(props)
 	return {Center:_create(self.content, self.classes)}
 end
 

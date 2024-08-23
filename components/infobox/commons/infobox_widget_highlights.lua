@@ -22,9 +22,9 @@ local Highlights = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
+---@param props {injector: WidgetInjector?}
 ---@return {[1]: Html}?
-function Highlights:make(injector)
+function Highlights:make(props)
 	return Highlights:_highlights(self.list)
 end
 

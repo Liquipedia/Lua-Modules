@@ -25,9 +25,9 @@ local Breakdown = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
+---@param props {injector: WidgetInjector?}
 ---@return {[1]: Html?}
-function Breakdown:make(injector)
+function Breakdown:make(props)
 	return {Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)}
 end
 
