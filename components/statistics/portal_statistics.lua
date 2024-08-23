@@ -250,7 +250,7 @@ function StatisticsPortal._coverageMatchTableRow(args, parameters)
 	local matchCountValue
 	local gameCountValue
 
-	if Info.match2 == 2 then
+	if Info.config.match2.status == 2 then
 		matchCountValue = Count.match2gamesData(parameters)
 		gameCountValue = Count.match2(parameters)
 	else

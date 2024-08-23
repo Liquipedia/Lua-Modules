@@ -436,10 +436,10 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 180,
 		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 2,
 }
