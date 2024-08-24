@@ -53,32 +53,4 @@ function CustomInjector:parse(widgetId, widgets)
     return widgets
 end
 
----@param args table
----@return string?
-function CustomMap:getNameDisplay(args)
-	if String.isEmpty(args.name) then
-		return CustomMap:_tlpdMap(args.id, 'name')
-	end
-
-	return args.name
-end
-
----@param lpdbData table
----@param args table
----@return table
-function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.name = self:getNameDisplay(args)
-	lpdbData.extradata = {
-		}
-	return lpdbData
-end
-
----@param id string?
----@param query string
----@return string?
-function CustomMap:_tlpdMap(id, query)
-	if not id then return nil end
-	return Template.safeExpand(mw.getCurrentFrame(), 'Tlpd map', {id, query})
-end
-
 return CustomMap
