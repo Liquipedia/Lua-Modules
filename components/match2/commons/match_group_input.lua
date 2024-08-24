@@ -100,7 +100,7 @@ local NOW = os.time()
 ---@class readOpponentOptions
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
----@field pagifyOpponentName boolean?
+---@field pagifyTeamNames boolean?
 ---@field pagifyPlayerNames boolean?
 
 ---@class MatchGroupInputSubstituteInformation
@@ -600,7 +600,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 
 	-- no need to pagify non opponent names as for literals it is irrelevant
 	-- and for party opponents it comes down to pagifying player names
-	if options.pagifyOpponentName and opponent.type == Opponent.team then
+	if options.pagifyTeamNames and opponent.type == Opponent.team then
 		record.name = Page.pageifyLink(record.name)
 	end
 

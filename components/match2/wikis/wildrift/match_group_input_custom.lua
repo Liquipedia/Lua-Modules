@@ -25,7 +25,7 @@ local DUMMY_MAP = 'default'
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
-	pagifyOpponentName = false,
+	pagifyTeamNames = false,
 	pagifyPlayerNames = true,
 }
 
