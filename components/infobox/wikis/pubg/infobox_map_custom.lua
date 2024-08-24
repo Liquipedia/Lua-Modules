@@ -37,18 +37,17 @@ function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
 
 	if widgetId == 'custom' then
+		return Array.append(
+			widgets,
+			Cell{name = 'Theme', content = {args.theme}},
+			Cell{name = 'Size', content = {args.size}},
+			Cell{name = 'Competition Span', content = {args.span}},
+			Cell{name = 'Release Date', content = {args.release}},
+			Cell{name = 'Versions', content = {args.versions}}
+		)
+	end
 
-	return Array.append(
-		widgets,
-		Cell{name = 'Theme', content = {args.theme}},
-		Cell{name = 'Size', content = {args.size}},
-		Cell{name = 'Competition Span', content = {args.span}},
-		Cell{name = 'Release Date', content = {args.release}},
-		Cell{name = 'Versions', content = {args.versions}}
-    )
-    end
-
-    return widgets
+	return widgets
 end
 
 return CustomMap
