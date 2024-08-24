@@ -46,7 +46,7 @@ function CustomInjector:parse(widgetId, widgets)
 		Cell{name = 'Size', content = {args.size}},
 		Cell{name = 'Competition Span', content = {args.span}},
 		Cell{name = 'Release Date', content = {args.release}},
-        Cell{name = 'Versions', content = {args.versions}}
+		Cell{name = 'Versions', content = {args.versions}}
     )
     end
 
