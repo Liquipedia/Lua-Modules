@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local MAX_NUM_PLAYERS_IN_TEAM_SUBMATCH = 4
-local SKIP = 'skip'
+local SCORE_CONVERSION = {skip = 'L'}
 local TBD = 'TBD'
 
 ---@class WarcraftMatchGroupLegacyDefault: MatchGroupLegacy
@@ -29,9 +29,9 @@ function MatchGroupLegacyDefault:getOpponent(prefix, scoreKey)
 		['$notEmpty$'] = self.bracketType == 'team' and (prefix .. 'team') or prefix,
 		name = prefix,
 		template = prefix .. 'team',
-		p1flag = prefix .. 'flag',
-		p1race = prefix .. 'race',
-		p1link = prefix .. 'link',
+		flag = prefix .. 'flag',
+		race = prefix .. 'race',
+		link = prefix .. 'link',
 		score = prefix .. scoreKey,
 		win = prefix .. 'win'
 	}
@@ -57,18 +57,6 @@ function MatchGroupLegacyDefault:handleOpponents(isReset, match1params, match)
 
 		match['opponent' .. opponentIndex] = self:readOpponent(opp)
 	end)
-end
-
----@param isReset boolean
----@param match table
-function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
-	-- remove skip scores and parse them to finished input instead
-	for _, opponent in Table.iter.pairsByPrefix(match, 'opponent') do
-		if string.lower(opponent.score or '') == SKIP then
-			match.finished = SKIP
-			opponent.score = nil
-		end
-	end
 end
 
 ---@return table
@@ -110,13 +98,14 @@ end
 ---@return table
 function MatchGroupLegacyDefault:readOpponent(opponentData)
 	opponentData['$notEmpty$'] = nil
-
 	local opponent = self:_copyAndReplace(opponentData, self.args)
+	opponent.score = SCORE_CONVERSION[string.lower(opponent.score or '')] or opponent.score
 	if self.bracketType == 'solo' then
 		opponent[1] = opponent.name or TBD
 		opponent.name = nil
 	end
 	opponent.type = self.bracketType
+
 	return opponent
 end
 
