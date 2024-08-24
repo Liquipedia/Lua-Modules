@@ -69,7 +69,7 @@ return {
 			value = 'Daily',
 			sort = 'A7',
 			name = 'Daily',
-			short = 'Day',
+			short = 'Day.',
 			link = 'Daily Tournaments',
 			category = 'Daily Tournaments',
 		},
