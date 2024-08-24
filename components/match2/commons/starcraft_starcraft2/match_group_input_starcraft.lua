@@ -32,10 +32,6 @@ local TBD = 'TBD'
 local TBA = 'TBA'
 local MODE_MIXED = 'mixed'
 
---- only temp needed until bot job finishes
-local TEMP_WORKAROUND = {['-'] = 'L'}
-local TEMP_WORKAROUND2 = {['draw'] = 0}
-
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -53,8 +49,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-
-	match.winner = TEMP_WORKAROUND2[string.lower(match.winner or '')] or match.winner
 
 	-- TODO: check how we can get rid of this legacy stuff ...
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -85,7 +79,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 			walkover = match.walkover,
 			winner = match.winner,
 			opponentIndex = opponentIndex,
-			score = TEMP_WORKAROUND[opponent.score] or opponent.score,
+			score = opponent.score,
 		}, autoScoreFunction)
 	end)
 
@@ -106,6 +100,9 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
+	elseif MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
+		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
+		match.winner = nil
 	end
 
 	MatchGroupInput.getCommonTournamentVars(match)
@@ -162,7 +159,7 @@ end
 
 ---@param maps table[]
 ---@param opponents table[]
----@return fun(opponentIndex: integer): integer
+---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps, opponents)
 	return function(opponentIndex)
 		local calculatedScore = MatchGroupInput.computeMatchScoreFromMapWinners(maps, opponentIndex)
@@ -295,7 +292,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 
 	map.scores = Array.map(opponentInfo, Operator.property('score'))
 
-	if map.finished then
+	if map.finished or MatchGroupInput.isNotPlayed(map.winner, mapInput.finished) then
 		map.resulttype = MatchGroupInput.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
 		map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInput.getWinner(map.resulttype, mapInput.winner, opponentInfo)
@@ -308,6 +305,10 @@ end
 ---@param opponentCount integer
 ---@return boolean
 function MapFunctions.isFinished(mapInput, opponentCount)
+	if MatchGroupInput.isNotPlayed(mapInput.winner, mapInput.finished) then
+		return true
+	end
+
 	local finished = Logic.readBoolOrNil(mapInput.finished)
 	if finished ~= nil then
 		return finished
@@ -409,16 +410,18 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			table.insert(players, {
 				name = isTBD and TBD or link,
 				displayname = isTBD and TBD or nameInput,
-				extradata = {faction = participantInput.faction},
+				extradata = {faction = participantInput.faction or Faction.defaultFaction},
 			})
 			playerIndex = #players
 		end
 
+		local player = players[playerIndex]
+
 		participants[opponentIndex .. '_' .. playerIndex] = {
-			faction = participantInput.faction,
+			faction = participantInput.faction or player.extradata.faction,
 			player = link,
 			position = position,
-			flag = Flags.CountryName(players[playerIndex].flag),
+			flag = Flags.CountryName(player.flag),
 		}
 	end)
 
@@ -477,8 +480,8 @@ end
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMode(mapInput, participants, opponents)
-	---@type (string|integer)[]
-	local playerCounts = {}
+	-- assume we have a min of 2 opponents in a game
+	local playerCounts = {0, 0}
 	for key in pairs(participants) do
 		local parsedOpponentIndex = key:match('(%d+)_%d+')
 		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]

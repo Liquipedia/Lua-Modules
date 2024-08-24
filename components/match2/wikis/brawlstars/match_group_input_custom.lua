@@ -50,7 +50,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
 
-	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, opponents)
+	local autoScoreFunction = MatchGroupInput.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, match.bestof)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -69,6 +69,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
+	elseif MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
+		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
+		match.winner = nil
 	end
 
 	MatchFunctions.getTournamentVars(match)
@@ -110,7 +113,7 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 		map.finished = MatchGroupInput.mapIsFinished(map, opponentInfo)
 
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
+		if map.finished or MatchGroupInput.isNotPlayed(map.winner, finishedInput) then
 			map.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponentInfo)
 			map.walkover = MatchGroupInput.getWalkover(map.resulttype, opponentInfo)
 			map.winner = MatchGroupInput.getWinner(map.resulttype, winnerInput, opponentInfo)

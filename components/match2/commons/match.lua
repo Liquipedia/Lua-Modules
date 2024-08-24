@@ -83,43 +83,49 @@ function Match.storeMatchGroup(matchRecords, options)
 	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy')
 	local LegacyMatch = options.storeMatch1	and LegacyMatchConvert or nil
 
-	matchRecords = Array.map(matchRecords, function(matchRecord)
+	local function prepareMatchRecords(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
 		Match._prepareRecordsForStore(records)
 		Match.populateSubobjectReferences(records)
 		return records.matchRecord
-	end)
+	end
+	local preparedMatchRecords = Array.map(matchRecords, Logic.wrapTryOrLog(prepareMatchRecords))
 
 	-- Store matches in a page variable to bypass LPDB on the same page
 	if options.storePageVar then
 		assert(options.bracketId, 'Match.storeMatchGroup: Expect options.bracketId to specified')
-		globalVars:set('match2bracket_' .. options.bracketId, Json.stringify(matchRecords))
+		globalVars:set('match2bracket_' .. options.bracketId, Json.stringify(preparedMatchRecords))
 		globalVars:set('match2bracketindex', (globalVars:get('match2bracketindex') or 0) + 1)
 	end
 
-	local matchRecordsCopy
-	if LegacyMatch or options.storeMatch2 then
-		matchRecordsCopy = Array.map(matchRecords, Match.copyRecords)
-		Array.forEach(matchRecordsCopy, Match.encodeJson)
+	if not LegacyMatch and not options.storeMatch2 then
+		return
 	end
+
+	local matchRecordsCopy = Array.map(preparedMatchRecords, Match.copyRecords)
+	Array.forEach(matchRecordsCopy, Match.encodeJson)
 
 	if options.storeMatch2 then
-		local recordsList
-		if LegacyMatch then
-			recordsList = Array.map(matchRecordsCopy, Match.splitRecordsByType)
-			Array.forEach(recordsList, Match.populateSubobjectReferences)
+		local function storeMatch2(matchRecord)
+			local records
+			if LegacyMatch then
+				records = Match.splitRecordsByType(matchRecord)
+				Match.populateSubobjectReferences(records)
+			end
+			Match._storeMatch2InLpdb(matchRecord)
+			if LegacyMatch then
+				Match.populateSubobjectReferences(records)
+			end
 		end
-		Array.forEach(matchRecordsCopy, Match._storeMatch2InLpdb)
-		if LegacyMatch then
-			Array.forEach(recordsList, Match.populateSubobjectReferences)
-		end
+		Array.forEach(matchRecordsCopy, Logic.wrapTryOrLog(storeMatch2))
 	end
 
-	if LegacyMatch then
-		Array.forEach(matchRecordsCopy, function(matchRecord)
-			Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
-		end)
+	if not LegacyMatch then
+		return
 	end
+	Array.forEach(matchRecordsCopy, function(matchRecord)
+		Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
+	end)
 end
 
 ---Stores a single match from a match group. Used by standalone match pages.

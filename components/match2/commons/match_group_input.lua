@@ -154,7 +154,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 		end
 	end
 
-	return Array.map(matchKeys, function(matchKey, matchIndex)
+	return Array.map(matchKeys, Logic.wrapTryOrLog(function(matchKey, matchIndex)
 			local matchId = MatchGroupInput._matchlistMatchIdFromIndex(matchIndex)
 			local matchArgs = Json.parse(args[matchKey])
 
@@ -189,7 +189,7 @@ function MatchGroupInput.readMatchlist(bracketId, args)
 
 			return match
 		end
-	)
+	))
 end
 
 ---@param matchIndex integer
@@ -274,7 +274,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 		matchArgs.bracketid = bracketId
 		matchArgs.matchid = matchId
-		local match = MatchGroupInput._processMatch(matchArgs)
+		local match = Logic.wrapTryOrLog(MatchGroupInput._processMatch)(matchArgs)
 
 		-- Add more fields to bracket data
 		local bracketData = bracketDatasById[matchId]
@@ -330,7 +330,7 @@ function MatchGroupInput.readBracket(bracketId, args, options)
 
 	local matchIds = Array.extractKeys(bracketDatasById)
 	table.sort(matchIds)
-	local matches = Array.map(matchIds, readMatch)
+	local matches = Array.map(matchIds, Logic.wrapTryOrLog(readMatch))
 
 	if #missingMatchKeys ~= 0 and options.shouldWarnMissing then
 		table.insert(warnings, 'Missing matches: ' .. table.concat(missingMatchKeys, ', '))
@@ -758,8 +758,8 @@ function MatchGroupInput.extractManualPlayersInput(match, opponentIndex, opponen
 
 	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
 		table.insert(manualInput.players, {
-			pageName = playerName,
-			displayName = playersData[playerPrefix .. 'dn'],
+			pageName = playersData[playerPrefix .. 'link'] or playerName,
+			displayName = playersData[playerPrefix .. 'dn'] or playerName,
 			flag = playersData[playerPrefix .. 'flag'],
 			faction = playersData[playerPrefix .. 'faction'] or playersData[playerPrefix .. 'race'],
 		})
@@ -1088,15 +1088,21 @@ function MatchGroupInput.getMapVeto(match, allowedVetoes)
 	return data
 end
 
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
+---@return boolean
+function MatchGroupInput.isNotPlayed(winnerInput, finishedInput)
+	return (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
+		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput))
+end
+
 ---Should only be called on finished matches or maps
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@param opponents {score: number?, status: string}[]
 ---@return string? #Result Type
 function MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
-	if (type(winnerInput) == 'string' and MatchGroupInput.isNotPlayedInput(winnerInput))
-		or (type(finishedInput) == 'string' and MatchGroupInput.isNotPlayedInput(finishedInput)) then
-
+	if MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInput.RESULT_TYPE.NOT_PLAYED
 	end
 
@@ -1116,12 +1122,12 @@ end
 function MatchGroupInput.getWinner(resultType, winnerInput,  opponents)
 	if resultType == MatchGroupInput.RESULT_TYPE.NOT_PLAYED then
 		return nil
+	elseif Logic.isNumeric(winnerInput) then
+		return tonumber(winnerInput)
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DRAW then
 		return MatchGroupInput.WINNER_DRAW
 	elseif resultType == MatchGroupInput.RESULT_TYPE.DEFAULT then
 		return MatchGroupInput.getDefaultWinner(opponents)
-	elseif Logic.isNumeric(winnerInput) then
-		return tonumber(winnerInput)
 	else
 		return MatchGroupInput.getHighestScoringOpponent(opponents)
 	end
@@ -1183,7 +1189,7 @@ function MatchGroupInput.computeOpponentScore(props, autoScore)
 		return MatchGroupInput.opponentWalkover(props.walkover, winner == props.opponentIndex)
 	end
 	local score = props.score
-	if not score and autoScore then
+	if Logic.isEmpty(score) and autoScore then
 		score = autoScore(props.opponentIndex)
 	end
 
@@ -1194,9 +1200,10 @@ end
 ---@return integer? #SCORE
 ---@return string? #STATUS
 function MatchGroupInput.parseScoreInput(scoreInput)
-	if not scoreInput then
+	if Logic.isEmpty(scoreInput) then
 		return
 	end
+	---@cast scoreInput -nil
 
 	if Logic.isNumeric(scoreInput) then
 		return tonumber(scoreInput), MatchGroupInput.STATUS.SCORE
@@ -1356,6 +1363,10 @@ end
 ---@param opponents {score: integer?}[]
 ---@return boolean
 function MatchGroupInput.matchIsFinished(match, opponents)
+	if MatchGroupInput.isNotPlayed(match.winner, match.finished) then
+		return false
+	end
+
 	local finished = Logic.readBoolOrNil(match.finished)
 	if finished ~= nil then
 		return finished
@@ -1394,6 +1405,10 @@ end
 ---@param opponents? {score: integer?}[]
 ---@return boolean
 function MatchGroupInput.mapIsFinished(map, opponents)
+	if MatchGroupInput.isNotPlayed(map.winner, map.finished) then
+		return false
+	end
+
 	local finished = Logic.readBoolOrNil(map.finished)
 	if finished ~= nil then
 		return finished
