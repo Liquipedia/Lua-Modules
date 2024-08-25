@@ -100,7 +100,7 @@ end
 
 ---@param opponent WarcraftStandardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}
+---@param options {syncPlayer: boolean?, saveFactionPageVar: boolean?}
 ---@return WarcraftStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
@@ -111,7 +111,11 @@ function CustomOpponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
+				PlayerExt.syncPlayer(player, {
+					savePageVar = savePageVar,
+					date = date,
+					saveFactionPageVar = options.saveFactionPageVar,
+				})
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
 					player.team,
