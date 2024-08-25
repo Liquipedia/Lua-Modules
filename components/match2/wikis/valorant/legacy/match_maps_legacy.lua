@@ -26,6 +26,7 @@ local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local DECIDER = 'decider'
+local DRAW = 'draw'
 local SKIP = 'skip'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
@@ -85,7 +86,7 @@ function MatchMapsLegacy._handleMaps(args)
 		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
 			(not Logic.isEmpty(winner) and 'true') or 'false'
 
-		if Logic.isNumeric(winner) then
+		if Logic.isNumeric(winner) or winner == DRAW then
 			args[prefix .. 'winner'] = winner
 		end
 
