@@ -20,6 +20,13 @@ local PlayerExt = Lua.import('Module:Player/Ext')
 
 local globalVars = PlayerExt.globalVars
 
+---@class StormgatePlayerExtSynOptions
+---@field fetchPlayer boolean?
+---@field fetchMatch2Player boolean?
+---@field savePageVar boolean?
+---@field date string|number?
+---@field saveFactionPageVar boolean?
+
 ---@class StormgatePlayerExt: PlayerExt
 local CustomPlayerExt = Table.deepCopy(PlayerExt)
 CustomPlayerExt.globalVars = globalVars
@@ -91,7 +98,7 @@ function CustomPlayerExt.fetchFactionHistory(resolvedPageName)
 end
 
 ---@param player StormgateStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@param options StormgatePlayerExtSynOptions?
 ---@return StormgateStandardPlayer
 function CustomPlayerExt.syncPlayer(player, options)
 	options = options or {}
@@ -104,7 +111,7 @@ function CustomPlayerExt.syncPlayer(player, options)
 		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
-		CustomPlayerExt.saveToPageVars(player)
+		CustomPlayerExt.saveToPageVars(player, {saveFactionPageVar = options.saveFactionPageVar})
 	end
 
 	return player
@@ -112,15 +119,17 @@ end
 
 --Same as CustomPlayerExt.syncPlayer, except it does not save the player's flag to page variables.
 ---@param player StormgateStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, date: string?}?
+---@param options StormgatePlayerExtSynOptions?
 ---@return StormgateStandardPlayer
 function CustomPlayerExt.populatePlayer(player, options)
 	return CustomPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
 end
 
 ---@param player StormgateStandardPlayer
-function CustomPlayerExt.saveToPageVars(player)
-	if player.faction and player.faction ~= Faction.defaultFaction then
+---@param options {saveFactionPageVar: boolean?}?
+function CustomPlayerExt.saveToPageVars(player, options)
+	options = options or {}
+	if player.faction and player.faction ~= Faction.defaultFaction and options.saveFactionPageVar ~= false then
 		globalVars:set(player.displayName .. '_faction', player.faction)
 	end
 
