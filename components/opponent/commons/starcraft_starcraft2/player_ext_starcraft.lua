@@ -20,6 +20,13 @@ local PlayerExt = Lua.import('Module:Player/Ext')
 
 local globalVars = PlayerExt.globalVars
 
+---@class StarcraftPlayerExtSynOptions
+---@field fetchPlayer boolean?
+---@field fetchMatch2Player boolean?
+---@field savePageVar boolean?
+---@field date string|number|osdate?
+---@field saveFactionPageVar boolean?
+
 ---@class StarcraftPlayerExt: PlayerExt
 local StarcraftPlayerExt = Table.copy(PlayerExt)
 StarcraftPlayerExt.globalVars = globalVars
@@ -158,8 +165,9 @@ options.fetchPlayer: Whether to use the LPDB player record. Enabled by default.
 options.fetchMatch2Player: Whether to use the player's recent matches. Disabled by default.
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
+
 ---@param player StarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string|number|osdate?}?
+---@param options StarcraftPlayerExtSynOptions?
 ---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.syncPlayer(player, options)
 	options = options or {}
@@ -184,7 +192,7 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
-		StarcraftPlayerExt.saveToPageVars(player)
+		StarcraftPlayerExt.saveToPageVars(player, {saveFactionPageVar = options.saveFactionPageVar})
 	end
 
 	return player
@@ -192,7 +200,7 @@ end
 
 ---Same as StarcraftPlayerExt.syncPlayer, except it does not save the player's flag and faction to page variables.
 ---@param player StarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@param options StarcraftPlayerExtSynOptions?
 ---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.populatePlayer(player, options)
 	return StarcraftPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
@@ -201,14 +209,17 @@ end
 ---Saves the pageName, flag, and faction of a player to page variables,
 ---so that editors do not have to duplicate the same info later on.
 ---@param player StarcraftStandardPlayer
-function StarcraftPlayerExt.saveToPageVars(player)
+---@param options {saveFactionPageVar: boolean?}?
+function StarcraftPlayerExt.saveToPageVars(player, options)
+	options = options or {}
+
 	if player.pageName then
 		globalVars:set(player.displayName .. '_page', player.pageName)
 	end
 	if player.flag then
 		globalVars:set(player.displayName .. '_flag', player.flag)
 	end
-	if player.faction and player.faction ~= Faction.defaultFaction then
+	if player.faction and player.faction ~= Faction.defaultFaction and options.saveFactionPageVar ~= false then
 		globalVars:set(player.displayName .. '_faction', player.faction)
 	end
 end

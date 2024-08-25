@@ -575,7 +575,7 @@ function MatchGroupInput.readOpponent(match, opponentIndex, options)
 		resolveDate = DateExt.getContextualDate()
 	end
 
-	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
+	Opponent.resolve(opponent, resolveDate, {syncPlayer = true, saveFactionPageVar = false})
 	opponent.name = Opponent.toName(opponent)
 
 	local substitutions
