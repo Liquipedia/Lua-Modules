@@ -202,7 +202,6 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	end
 
 	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
-	opponent.name = Opponent.toName(opponent)
 
 	local substitutions
 	if opponent.type == Opponent.team then
@@ -210,7 +209,7 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		substitutions = manualPlayersInput.substitutions
 		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
-			Opponent.toName(opponent),
+			Opponent.toName(opponent) or '',
 			manualPlayersInput,
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
