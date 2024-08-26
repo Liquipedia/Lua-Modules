@@ -222,7 +222,7 @@ function MapFunctions.getParticipants(map, opponents)
 		local players = opponent.match2players or {}
 		for _, stats in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p', {requireIndex = true}) do
 			stats = Json.parseIfString(stats)
-			local playerIndex = MatchGroupInputUtil.findPlayerIndex(players, stats.player)
+			local playerIndex = MatchGroupInputUtil.findPlayerId(players, stats.player)
 			if playerIndex then
 				local participant = {
 					kills = stats.kills,

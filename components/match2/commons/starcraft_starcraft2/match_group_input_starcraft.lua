@@ -401,7 +401,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 
 		local link = participantInput.link or Variables.varDefault(nameInput .. '_page') or nameInput
 
-		local playerIndex = MatchGroupInputUtil.findPlayerIndex(players, nameInput, link, OPPONENT_CONFIG)
+		local playerIndex = MatchGroupInputUtil.findPlayerId(players, nameInput, link, OPPONENT_CONFIG)
 
 		-- in case we have a TBD or a player not known in match2players inster a new player in match2players
 		if isTBD or not playerIndex then

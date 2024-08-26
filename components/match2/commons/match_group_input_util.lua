@@ -1090,7 +1090,7 @@ end
 ---@param playerLink string?
 ---@param options {pagifyPlayerNames: boolean?}?
 ---@return integer?
-function MatchGroupInputUtil.findPlayerIndex(players, playerInput, playerLink, options)
+function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink, options)
 	if not players then
 		return
 	end
