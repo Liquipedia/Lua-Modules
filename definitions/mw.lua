@@ -1008,11 +1008,11 @@ mw.ext.TeamTemplate = {}
 
 ---@param teamteplate string
 ---@param date string|number?
----@return table
+---@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracket: string, page: string, icon: string, image: string, legacyimage: string, legacyimagedark: string}
 function mw.ext.TeamTemplate.raw(teamteplate, date) end
 
 ---@param teamteplate string
----@return table
+---@return {[string]: string} ## key is formated as `YYYY-MM-DD`and values are team template names
 function mw.ext.TeamTemplate.raw_historical(teamteplate) end
 
 ---@param teamteplate string
