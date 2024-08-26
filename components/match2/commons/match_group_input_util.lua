@@ -93,7 +93,7 @@ local contentLanguage = mw.getContentLanguage()
 ---@class readOpponentOptions
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
----@field pagifyOpponentName boolean?
+---@field pagifyTeamNames boolean?
 ---@field pagifyPlayerNames boolean?
 
 ---@class MatchGroupInputSubstituteInformation
@@ -205,20 +205,16 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	opponent.name = Opponent.toName(opponent)
 
 	local substitutions
-	if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
+	if opponent.type == Opponent.team then
 		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
 		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
 		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
-			opponent.name,
+			Opponent.toName(opponent),
 			manualPlayersInput,
 			options,
 			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
 		)
-	end
-
-	if options.pagifyOpponentName then
-		opponent.name = Page.pageifyLink(opponent.name)
 	end
 
 	if options.pagifyPlayerNames then
@@ -227,7 +223,15 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		end)
 	end
 
-	return MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
+	local record = MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
+
+	-- no need to pagify non opponent names as for literals it is irrelevant
+	-- and for party opponents it comes down to pagifying player names
+	if options.pagifyTeamNames and opponent.type == Opponent.team then
+		record.name = Page.pageifyLink(record.name)
+	end
+
+	return record
 end
 
 --[[
