@@ -1087,19 +1087,33 @@ end
 
 ---@param players {name: string?}[]?
 ---@param playerInput string?
+---@param playerLink string?
 ---@param options {pagifyPlayerNames: boolean?}?
 ---@return integer?
-function MatchGroupInputUtil.findPlayerId(players, playerInput, options)
-	if not Logic.isEmpty(playerInput) then return end
-	---@cast playerInput -nil
-	local playerName = mw.ext.TeamLiquidIntegration.resolve_redirect(playerInput)
-	if (options or {}).pagifyPlayerNames then
-		playerName = Page.pageifyLink(playerName) --[[@as string]]
+function MatchGroupInputUtil.findPlayerIndex(players, playerInput, playerLink, options)
+	if not players then
+		return
 	end
-	for playerIndex, player in pairs(players or {}) do
-		if playerName == player.name then
-			return playerIndex
+
+	if not Logic.isEmpty(playerInput) then
+		return
+	end
+	---@cast playerInput -nil
+
+	if not playerLink then
+		playerLink = mw.ext.TeamLiquidIntegration.resolve_redirect(playerInput)
+		if (options or {}).pagifyPlayerNames then
+			playerLink = Page.pageifyLink(playerLink) --[[@as string]]
 		end
+	end
+
+	local playerIndex = Array.indexOf(Array.map(players, Operator.property('name')), FnUtil.curry(Operator.eq, playerLink))
+	if playerIndex > 0 then
+		return playerIndex
+	end
+	playerIndex = Array.indexOf(Array.map(players, Operator.property('displayname')), FnUtil.curry(Operator.eq, playerInput))
+	if playerIndex > 0 then
+		return playerIndex
 	end
 	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
 end

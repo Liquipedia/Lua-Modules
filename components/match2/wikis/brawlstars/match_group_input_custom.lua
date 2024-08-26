@@ -216,7 +216,7 @@ function MapFunctions.getParticipants(map, opponents)
 				player = playerName,
 				brawler = getCharacterName(map['t' .. opponentIndex .. 'c' .. playerIndex]),
 			}
-			local playerId = MatchGroupInputUtil.findPlayerId(players, player.player)
+			local playerId = MatchGroupInputUtil.findPlayerIndex(players, player.player)
 			if playerId then
 				participants[opponentIndex .. '_' .. playerId] = player
 			end
