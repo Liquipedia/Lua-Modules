@@ -80,7 +80,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
+	local games = MatchFunctions.extractMaps(MatchParser, match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
@@ -122,9 +122,9 @@ end
 
 ---@param MatchParser Dota2MatchParserInterface
 ---@param match table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table[]
-function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
+function MatchFunctions.extractMaps(MatchParser, match, opponents)
 	local maps = {}
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MatchParser.getMap(mapInput)
@@ -138,11 +138,11 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		map.length = MatchParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.publisherid = map.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
-		map.participants = MapFunctions.getParticipants(MatchParser, map, opponentCount)
-		map.extradata = MapFunctions.getExtraData(MatchParser, map, opponentCount)
+		map.participants = MapFunctions.getParticipants(MatchParser, map, opponents)
+		map.extradata = MapFunctions.getExtraData(MatchParser, map, #opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(Array.range(1, #opponents), function(opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -262,16 +262,20 @@ end
 -- Parse participant information
 ---@param MatchParser Dota2MatchParserInterface
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getParticipants(MatchParser, map, opponentCount)
+function MapFunctions.getParticipants(MatchParser, map, opponents)
 	local participants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	for opponentIndex = 1, opponentCount do
-		for playerIndex, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
-			participant.character = getCharacterName(participant.character)
-			participants[opponentIndex .. '_' .. playerIndex] = participant
+	for opponentIndex, opponent in ipairs(opponents) do
+		local players = opponent.match2players or {}
+		for _, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
+			local playerIndex = MatchGroupInputUtil.findPlayerId(players, participant.id, OPPONENT_CONFIG)
+			if playerIndex then
+				participant.character = getCharacterName(participant.character)
+				participants[opponentIndex .. '_' .. playerIndex] = participant
+			end
 		end
 	end
 

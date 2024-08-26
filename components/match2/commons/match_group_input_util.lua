@@ -1085,6 +1085,25 @@ function MatchGroupInputUtil.getCharacterName(alias, character)
 	return (assert(alias[character:lower()], 'Invalid character:' .. character))
 end
 
+---@param players {name: string?}[]?
+---@param playerName string?
+---@param options {pagifyPlayerNames: boolean?}?
+---@return integer?
+function MatchGroupInputUtil.findPlayerId(players, playerName, options)
+	if not Logic.isEmpty(playerName) then return end
+	---@cast playerName -nil
+	local player = mw.ext.TeamLiquidIntegration.resolve_redirect(playerName)
+	if (options or {}).pagifyPlayerNames then
+		player = Page.pageifyLink(player) --[[@as string]]
+	end
+	for playerIndex, player in pairs(players or {}) do
+		if player == player.name then
+			return playerIndex
+		end
+	end
+	mw.log('Player with id ' .. playerName .. ' not found in opponent data')
+end
+
 --- Warning, both match and standalone match may be mutated
 ---@param match table
 ---@param standaloneMatch table
