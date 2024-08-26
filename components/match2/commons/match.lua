@@ -124,7 +124,7 @@ function Match.storeMatchGroup(matchRecords, options)
 		return
 	end
 	Array.forEach(matchRecordsCopy, function(matchRecord)
-		Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
+		Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord)
 	end)
 end
 

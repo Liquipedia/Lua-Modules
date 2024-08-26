@@ -13,15 +13,8 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-function MatchLegacy.storeMatch(match2, options)
-	local match, doStore = MatchLegacy.convertParameters(match2)
-
-	if options.storeMatch1 and doStore then
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+function MatchLegacy.storeMatch(match2)
+	return MatchLegacy.convertParameters(match2)
 end
 
 function MatchLegacy.convertParameters(match2)
@@ -31,7 +24,7 @@ function MatchLegacy.convertParameters(match2)
 	local opponents = match2.match2opponents
 	if #opponents ~= 2 or opponents[1].type ~= opponents[2].type or
 		(opponents[1].type ~= Opponent.solo and opponents[1].type ~= Opponent.team)
-	then return nil, false end
+	then return nil end
 
 	match.staticid = match2.match2id
 	match.extradata = Json.parseIfString(match.extradata) or {}
@@ -67,7 +60,10 @@ function MatchLegacy.convertParameters(match2)
 	match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 	match.extradata = Json.stringify(match.extradata)
 
-	return match, true
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 return MatchLegacy

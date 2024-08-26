@@ -100,7 +100,7 @@ end
 
 ---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
 ---@param error Error
----@return string
+---@return Html
 function ErrorDisplay.ClassicError(error)
 	local stackTrace = {}
 
@@ -156,11 +156,11 @@ function ErrorDisplay.ClassicError(error)
 		errorShort = errorText,
 		stackTrace = stackTrace,
 	}, {asArray = true})
-	return tostring(mw.html.create('div')
+	return mw.html.create('div')
 				:tag('strong'):addClass('error')
 				:tag('span'):addClass('scribunto-error')
 				:wikitext(jsonData):wikitext('.')
-				:allDone())
+				:allDone()
 end
 
 return ErrorDisplay

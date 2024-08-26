@@ -17,7 +17,7 @@ local Streams = require('Module:Links/Stream')
 local EarningsOf = require('Module:Earnings of')
 
 local Opponent = Lua.import('Module:Opponent')
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local NP_MATCH_STATUS = {'cancelled','canceled', 'postponed'}

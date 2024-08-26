@@ -130,17 +130,6 @@ function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	return lpdbData.objectName
 end
 
----@param opponentType OpponentType
----@param opponent StarcraftStandardOpponent
----@return string
-function CustomPrizePool._getMode(opponentType, opponent)
-	if (opponent or {}).isArchon then
-		return 'archon'
-	end
-
-	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
-end
-
 ---@return integer?
 function CustomPrizePool._defaultImportLimit()
 	if Info.wikiName ~= SC2 then
