@@ -14,8 +14,8 @@ local Lua = require('Module:Lua')
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 local MAX_NUM_PLAYERS_IN_TEAM_SUBMATCH = 4
-local SCORE_CONVERSION = {skip = 'L'}
 local TBD = 'TBD'
+local SKIP = 'skip'
 
 ---@class WarcraftMatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
@@ -98,12 +98,22 @@ end
 function MatchGroupLegacyDefault:readOpponent(opponentData)
 	opponentData['$notEmpty$'] = nil
 	local opponent = self:_copyAndReplace(opponentData, self.args)
-	opponent.score = SCORE_CONVERSION[string.lower(opponent.score or '')] or opponent.score
 	if self.bracketType == 'solo' then
 		opponent[1] = opponent.name or TBD
 		opponent.name = nil
 	end
 	opponent.type = self.bracketType
+
+	-- `score=skip` can have different meaning
+	--- walkover with it being input for winner
+	--- walkover with it being input for loser
+	--- not played with only 1 opponent in the match (usually it being input on the player that was in the match)
+	--- not played with it being input for any of the 2 players
+	--- double walkover with it being input for any of the 2 players
+	-- in the old brackets it did not have any display at all, hence nil it here
+	if string.lower(opponent.score or '') == SKIP then
+		opponent.score = nil
+	end
 
 	return opponent
 end
