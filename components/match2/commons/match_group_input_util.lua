@@ -1102,9 +1102,9 @@ function MatchGroupInputUtil.findPlayerIndex(players, playerInput, playerLink, o
 
 	if not playerLink then
 		playerLink = mw.ext.TeamLiquidIntegration.resolve_redirect(playerInput)
-		if (options or {}).pagifyPlayerNames then
-			playerLink = Page.pageifyLink(playerLink) --[[@as string]]
-		end
+	end
+	if (options or {}).pagifyPlayerNames then
+		playerLink = Page.pageifyLink(playerLink) --[[@as string]]
 	end
 
 	local playerIndex = Array.indexOf(Array.map(players, Operator.property('name')), FnUtil.curry(Operator.eq, playerLink))

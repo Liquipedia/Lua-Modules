@@ -401,12 +401,11 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		local isTBD = nameInput:upper() == TBD or nameInput:upper() == TBA
 
 		local link = participantInput.link or Variables.varDefault(nameInput .. '_page') or nameInput
-		link = Page.pageifyLink(link) --[[@as string -- can't be nil as input isn't nil]]
 
-		local playerIndex = MapFunctions.getPlayerIndex(players, link, nameInput)
+		local playerIndex = MatchGroupInputUtil.findPlayerIndex(players, nameInput, link, OPPONENT_CONFIG)
 
 		-- in case we have a TBD or a player not known in match2players inster a new player in match2players
-		if isTBD or playerIndex == 0 then
+		if isTBD or not playerIndex then
 			table.insert(players, {
 				name = isTBD and TBD or link,
 				displayname = isTBD and TBD or nameInput,
