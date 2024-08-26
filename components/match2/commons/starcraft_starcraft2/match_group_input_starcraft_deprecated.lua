@@ -19,7 +19,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate/Named')
 local Variables = require('Module:Variables')
 
 local config = Lua.requireIfExists('Module:Match/Config', {loadData = true}) or {}
@@ -653,7 +652,6 @@ function StarcraftMatchGroupInput.ProcessTeamOpponentInput(opponent, date)
 
 	name, icon, iconDark, opponent.template = StarcraftMatchGroupInput._processTeamTemplateInput(opponent.template, date)
 
-	name = TeamTemplate.resolveRedirect(name or '')
 	local players = StarcraftMatchGroupInput._getManuallyEnteredPlayers(opponent.players)
 	if Logic.isEmpty(players) then
 		players = StarcraftMatchGroupInput._getPlayersFromVariables(name)
