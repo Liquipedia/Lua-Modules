@@ -26,9 +26,8 @@ local UNKNOWNREASON_DEFAULT_LOSS = 'L'
 local TBD = 'TBD'
 
 ---@param match table
----@param options {storeMatch2:boolean, storeMatch1:boolean, storePageVar:boolean, bracketId: string}
-function MatchLegacy.storeMatch(match, options)
-	if not options.storeMatch1 or #match.match2opponents ~= 2 or not Namespace.isMain() then
+function MatchLegacy.storeMatch(match)
+	if #match.match2opponents ~= 2 or not Namespace.isMain() then
 		return
 	end
 

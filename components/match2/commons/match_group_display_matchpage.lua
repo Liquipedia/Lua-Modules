@@ -63,7 +63,7 @@ function MatchPageDisplay.Match(props)
 		matchId = props.match.matchId,
 		config = {showScore = true},
 		match = props.match,
-	})
+	}, require('Module:Error/Display').ErrorList)
 end
 
 return Class.export(MatchPageDisplay)

@@ -46,6 +46,13 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	if not team.players then return end
+
+	local function mapItem(item)
+		return {
+			name = item.name,
+			image = item.image,
+		}
+	end
 	local players = Array.map(team.players, function(player)
 		return {
 			player = player.name,
@@ -62,9 +69,9 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			damagedone = player.damage,
 			lasthits = player.lastHits,
 			denies = player.denies,
-			items = player.items,
-			backpackitems = player.backpackItems,
-			neutralitem = player.neutralItem,
+			items = Array.map(player.items or {}, mapItem),
+			backpackitems = Array.map(player.backpackItems or {} , mapItem),
+			neutralitem = mapItem(player.neutralItem or {}),
 			scepter = Logic.readBool(player.aghanimsScepterBuff),
 			shard = Logic.readBool(player.aghanimsShardBuff),
 		}
@@ -82,18 +89,15 @@ end
 
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 	local teamVeto = map.heroVeto['team' .. opponentIndex]
-
 	if not teamVeto then return end
-
-	local bans = teamVeto.bans or {}
-
-	return Array.map(bans, Operator.property('hero'))
+	return Array.map(teamVeto.bans or {}, Operator.property('hero'))
 end
 
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.heroVeto then return end
 	local buildVetoData = function(teamIdx, vetoType)
-		return Array.map(map.heroVeto['team' .. teamIdx][vetoType .. 's'], function(vetoData)
+		if not map.heroVeto['team' .. teamIdx] then return {} end
+		return Array.map(map.heroVeto['team' .. teamIdx][vetoType .. 's'] or {}, function(vetoData)
 			return {
 				character = vetoData.hero,
 				team = teamIdx,

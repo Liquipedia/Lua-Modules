@@ -176,7 +176,7 @@ function Person:createInfobox()
 				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
 			}
 		},
-		Cell{name = 'Nicknames', content = {args.nicknames}},
+		Cell{name = 'Nickname(s)', content = {args.nicknames}},
 		Builder{
 			builder = function()
 				if self.totalEarnings and self.totalEarnings ~= 0 then

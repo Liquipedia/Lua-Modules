@@ -151,7 +151,7 @@ function MatchGroup.MatchGroupById(args)
 		config.matchHasDetails = function() return false end
 	end
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
+	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
 	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({
