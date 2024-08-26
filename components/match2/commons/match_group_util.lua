@@ -198,6 +198,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
+---@field date string?
 ---@field game string?
 ---@field header string?
 ---@field length number?
@@ -215,6 +216,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
+	date = 'string?',
 	game = 'string?',
 	header = 'string?',
 	length = 'number?',

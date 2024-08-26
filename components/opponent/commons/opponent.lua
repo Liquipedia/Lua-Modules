@@ -344,6 +344,7 @@ function Opponent.toName(opponent)
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName
 		end)
+		table.sort(pageNames)
 		return table.concat(pageNames, ' / ')
 	else -- opponent.type == Opponent.literal
 		return opponent.name

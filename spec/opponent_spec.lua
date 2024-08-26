@@ -237,7 +237,7 @@ describe('opponent', function()
 			},
 				Opponent.toLpdbStruct(Opponent.fromMatch2Record(Config.exampleMatch2RecordSolo) --[[@as standardOpponent]]))
 			assert.are_same({
-				opponentname = 'Semper / Jig',
+				opponentname = 'Jig / Semper',
 				opponenttype = Opponent.duo,
 				opponentplayers = {
 					p1 = 'Semper',

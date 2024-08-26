@@ -12,7 +12,7 @@ local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	MatchLegacy.storeMatch1(match2)
 end
 

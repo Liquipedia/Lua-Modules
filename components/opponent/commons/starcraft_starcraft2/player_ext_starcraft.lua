@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
@@ -202,15 +203,27 @@ end
 ---so that editors do not have to duplicate the same info later on.
 ---@param player StarcraftStandardPlayer
 function StarcraftPlayerExt.saveToPageVars(player)
-	if player.pageName then
-		globalVars:set(player.displayName .. '_page', player.pageName)
-	end
-	if player.flag then
-		globalVars:set(player.displayName .. '_flag', player.flag)
-	end
 	if player.faction and player.faction ~= Faction.defaultFaction then
 		globalVars:set(player.displayName .. '_faction', player.faction)
 	end
+
+	PlayerExt.saveToPageVars(player)
+end
+
+---@param frame Frame
+function StarcraftPlayerExt.TemplateStorePlayerLink(frame)
+	local args = Arguments.getArgs(frame)
+
+	if not args[1] then return end
+
+	local pageName, displayName = PlayerExt.extractFromLink(args[1])
+
+	StarcraftPlayerExt.saveToPageVars{
+		displayName = displayName,
+		pageName = args.link or pageName or displayName,
+		flag = String.nilIfEmpty(Flags.CountryName(args.flag)),
+		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
+	}
 end
 
 return StarcraftPlayerExt
