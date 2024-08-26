@@ -142,7 +142,7 @@ function MatchFunctions.extractMaps(MatchParser, match, opponents)
 		map.extradata = MapFunctions.getExtraData(MatchParser, map, #opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(Array.range(1, #opponents), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
