@@ -426,20 +426,6 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	return participants
 end
 
----@param players {name: string, displayname: string}
----@param name string
----@param displayName string
----@return integer
-function MapFunctions.getPlayerIndex(players, name, displayName)
-	local playerIndex =  Array.indexOf(players, function(player) return player.name == name end)
-
-	if playerIndex ~= 0 then
-		return playerIndex
-	end
-
-	return Array.indexOf(players, function(player) return player.displayname == displayName end)
-end
-
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer

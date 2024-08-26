@@ -1095,7 +1095,7 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink, opti
 		return
 	end
 
-	if not Logic.isEmpty(playerInput) then
+	if Logic.isEmpty(playerInput) then
 		return
 	end
 	---@cast playerInput -nil
