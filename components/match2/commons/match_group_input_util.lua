@@ -1107,11 +1107,14 @@ function MatchGroupInputUtil.findPlayerIndex(players, playerInput, playerLink, o
 		playerLink = Page.pageifyLink(playerLink) --[[@as string]]
 	end
 
-	local playerIndex = Array.indexOf(Array.map(players, Operator.property('name')), FnUtil.curry(Operator.eq, playerLink))
+	local playerLinks = Array.map(players, Operator.property('name'))
+	local playerIndex = Array.indexOf(playerLinks, FnUtil.curry(Operator.eq, playerLink))
 	if playerIndex > 0 then
 		return playerIndex
 	end
-	playerIndex = Array.indexOf(Array.map(players, Operator.property('displayname')), FnUtil.curry(Operator.eq, playerInput))
+
+	local playerDisplayNames = Array.map(players, Operator.property('displayname'))
+	playerIndex = Array.indexOf(playerDisplayNames, FnUtil.curry(Operator.eq, playerInput))
 	if playerIndex > 0 then
 		return playerIndex
 	end
