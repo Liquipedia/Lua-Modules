@@ -240,8 +240,8 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 	}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
-		match.extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
-		match.extradata[prefix .. 'by'] = match[prefix .. 'by']
+		extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
+		extradata[prefix .. 'by'] = match[prefix .. 'by']
 	end
 
 	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end))
