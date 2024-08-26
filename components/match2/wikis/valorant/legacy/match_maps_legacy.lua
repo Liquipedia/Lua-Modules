@@ -87,7 +87,7 @@ function MatchMapsLegacy._handleMaps(args)
 			(not Logic.isEmpty(winner) and 'true') or 'false'
 
 		if Logic.isNumeric(winner) or winner == DRAW then
-			args[prefix .. 'winner'] = winner
+			args[prefix .. 'winner'] = winner == DRAW and 0 or winner
 		end
 
 		args[prefix .. 't1firstsideot'] = Table.extract(args, prefix .. 'o1t1firstside')
