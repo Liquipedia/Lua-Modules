@@ -290,7 +290,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 
 	map.scores = Array.map(opponentInfo, Operator.property('score'))
 
-	if map.finished or MatchGroupInputUtil.isNotPlayed(map.winner, mapInput.finished) then
+	if map.finished then
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, mapInput.winner, opponentInfo)
