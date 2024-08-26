@@ -14,17 +14,15 @@ local Table = require('Module:Table')
 
 local MAX_NUM_PLAYERS = 10
 
-function p.storeMatch(match2, options)
-	if options.storeMatch1 then
-		local match = p._convertParameters(match2)
+function p.storeMatch(match2)
+	local match = p._convertParameters(match2)
 
-		match.games = p.storeGames(match, match2)
+	match.games = p.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function p.storeGames(match, match2)

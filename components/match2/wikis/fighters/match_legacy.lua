@@ -22,11 +22,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 
-function MatchLegacy.storeMatch(match2, options)
-	if not options.storeMatch1 then
-		return
-	end
-
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 	match.games = MatchLegacy._storeGames(match, match2)
 
