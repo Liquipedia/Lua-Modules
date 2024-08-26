@@ -271,10 +271,10 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 	for opponentIndex, opponent in ipairs(opponents) do
 		local players = opponent.match2players or {}
 		for _, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
-			local playerIndex = MatchGroupInputUtil.findPlayerId(players, participant.id, OPPONENT_CONFIG)
-			if playerIndex then
+			local playerId = MatchGroupInputUtil.findPlayerId(players, participant.id, nil, OPPONENT_CONFIG)
+			if playerId then
 				participant.character = getCharacterName(participant.character)
-				participants[opponentIndex .. '_' .. playerIndex] = participant
+				participants[opponentIndex .. '_' .. playerId] = participant
 			end
 		end
 	end
