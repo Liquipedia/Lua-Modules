@@ -12,7 +12,7 @@ return {
 	name = 'Deadlock',
 	defaultGame = 'Deadlock',
 	games = {
-		geoguessr = {
+		deadlock = {
 			abbreviation = 'Deadlock',
 			name = 'Deadlock',
 			link = 'Deadlock',
