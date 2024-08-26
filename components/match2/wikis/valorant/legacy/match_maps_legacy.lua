@@ -79,8 +79,8 @@ function MatchMapsLegacy._handleMaps(args)
 
 		if Logic.isNotEmpty(score) then
 			local splitedScore = Array.parseCommaSeparatedString(score, '-')
-			args[prefix .. 'score1'] = splitedScore[1] or ''
-			args[prefix .. 'score2'] = splitedScore[2] or ''
+			args[prefix .. 'score1'] = splitedScore[1]
+			args[prefix .. 'score2'] = splitedScore[2]
 		end
 
 		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
