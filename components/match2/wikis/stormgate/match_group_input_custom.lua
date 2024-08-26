@@ -541,7 +541,8 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
 		assert(ignoreFactionHeroCheck or not isCoreFaction
 			or faction == heroData.faction or heroData.faction == DEFAULT_HERO_FACTION,
-			'Invalid hero input "' .. hero .. '" for faction "' .. Faction.toName(faction) .. '" of player "' .. playerName .. '"')
+			'Invalid hero input "' .. hero .. '" for faction "' .. Faction.toName(faction)
+				.. '" of player "' .. playerName .. '"')
 
 		return heroData.name
 	end)
