@@ -27,7 +27,8 @@ function MatchGroupLegacyDefault:getMap()
 		t1firstsideot = 'map$1$t1firstsideot',
 		finished = 'map$1$finished',
 		length = 'map$1$length',
-		vod = 'map$1$vod'
+		vod = 'map$1$vod',
+		winner = 'map$1$winner'
 	}
 
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (oppIndex)

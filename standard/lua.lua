@@ -162,7 +162,7 @@ function Lua.callAndDisplayErrors(fn, frame, hardErrors)
 	if #errors > 0 then
 		if hardErrors then
 			for _, error in ipairs(errors) do
-				table.insert(parts, ErrorDisplay.ClassicError(error))
+				table.insert(parts, tostring(ErrorDisplay.ClassicError(error)))
 			end
 		else
 			table.insert(parts, tostring(ErrorDisplay.ErrorList{errors = errors}))
