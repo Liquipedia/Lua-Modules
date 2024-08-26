@@ -20,7 +20,7 @@ local Streams = require('Module:Links/Stream')
 local StrikerNames = mw.loadData('Module:StrikerNames')
 
 local Opponent = Lua.import('Module:Opponent')
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local STATUS_TO_WALKOVER = {FF = 'ff', DQ = 'dq', L = 'l'}
