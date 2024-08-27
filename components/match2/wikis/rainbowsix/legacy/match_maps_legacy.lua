@@ -92,6 +92,7 @@ function MatchMaps._main(args, frame)
 						t2otatk = details[prefix..'o1t2atk'],
 						t2otdef = details[prefix..'o1t2def'],
 						vod = details['vod'..i],
+						winner = details[prefix .. 'win']
 					}
 					details[prefix] = nil
 					details[prefix ..'win'] = nil
