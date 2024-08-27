@@ -33,8 +33,8 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 0,
 			matchWidth = 180,
 		},
 	},
-	match2 = 0,
 }
