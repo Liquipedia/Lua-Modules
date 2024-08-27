@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Title{name = 'Attack'},
+			Title{name = 'Weapon'},
 			Cell{name = 'DPS', content = {args.dps}},
 			Cell{name = 'Bullet Damage', content = {args.damagebullet}},
 			Cell{name = 'Bullets per Seconds', content = {args.bps}},
