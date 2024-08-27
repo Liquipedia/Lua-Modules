@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local SIZE_HERO = '57x32px'
+local SIZE_HERO = '48x48px'
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
@@ -125,6 +125,7 @@ function CustomMatchSummary._createCharacterDisplay(characters, side, reverse)
 	local wrapper = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
 		:addClass('brkts-popup-body-element-thumbs-' .. (reverse and 'right' or 'left'))
+		:addClass('brkts-champion-icon')
 
 	local function makeCharacterIcon(character)
 		return CharacterIcon.Icon{
@@ -134,10 +135,7 @@ function CustomMatchSummary._createCharacterDisplay(characters, side, reverse)
 	end
 
 	local function characterDisplay(character, showName)
-		local display = mw.html.create('div')
-			:addClass('brkts-popup-side-color-' .. side)
-			:addClass('brkts-popup-side-hero')
-			:addClass('brkts-popup-side-hero-hover')
+		local display = mw.html.create('div'):addClass('brkts-popup-side-color-' .. side)
 		if not showName then
 			display:node(makeCharacterIcon(character))
 			return display
