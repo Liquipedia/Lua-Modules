@@ -31,7 +31,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local streams = Logic.readBool(args.streams)
 
 	local lines = Array.flatten({
-		'{{Match',
+		'{{Match2',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
