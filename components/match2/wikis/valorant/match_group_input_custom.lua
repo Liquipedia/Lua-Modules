@@ -218,25 +218,28 @@ function MapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
-	for opponentIndex, opponent in ipairs(opponents) do
+	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = opponent.match2players or {}
-		for _, stats in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p', {requireIndex = true}) do
-			stats = Json.parseIfString(stats)
-			local playerId = MatchGroupInputUtil.findPlayerId(players, stats.player)
-			if playerId then
-				local participant = {
-					kills = stats.kills,
-					deaths = stats.deaths,
-					assists = stats.assists,
-					acs = stats.acs,
-					player = stats.player,
-					agent = getCharacterName(stats.agent),
-				}
-
-				participants[opponentIndex .. '_' .. playerId] = participant
+		local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(map, players, 't' .. opponentIndex .. 'p', function(playerIndex)
+			local stats = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+			if not stats then
+				return
 			end
-		end
-	end
+			return {
+				kills = stats.kills,
+				deaths = stats.deaths,
+				assists = stats.assists,
+				acs = stats.acs,
+				player = stats.player,
+				name = stats.player,
+				agent = getCharacterName(stats.agent),
+			}
+		end)
+		Array.forEach(unAttachedPartcipants, function()
+			table.insert(opponentParticipants, table.remove(unAttachedPartcipants, 1))
+		end)
+		Table.mergeInto(participants, Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(1)))
+	end)
 
 	return participants
 end
