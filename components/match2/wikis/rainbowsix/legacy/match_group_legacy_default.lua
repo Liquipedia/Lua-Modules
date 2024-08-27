@@ -37,6 +37,7 @@ function MatchGroupLegacyDefault:getMap()
 		t2otatk = 'map$1$o1t2atk',
 		t2otdef = 'map$1$o1t2def',
 		vod = 'vod$1$',
+		win = 'map$1$win'
 	}
 end
 
