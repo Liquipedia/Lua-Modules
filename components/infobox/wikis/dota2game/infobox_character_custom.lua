@@ -112,113 +112,28 @@ function CustomInjector:parse(id, widgets)
 		local primaryAttr = CustomHero.shortenPrimary(args.primary)
 		local primaryIdx = primaryAttr == 'str' and 1 or primaryAttr == 'agi' and 2 or primaryAttr == 'int' and 3 or 0
 
-		local function calculateHealth(level, bonus)
-			return CustomHero.calculateStats(
-				level, args.hpbase, args.strbase, args.strgain, bonus, 'bonus health'
-			)
+		local calculator = CustomHero.statsCalculator(args)
+
+		local function floatToTheRight(mainInfo, rightInfo)
+			return tostring(mw.html.create('div'):css('position', 'relative'):wikitext(mainInfo)
+				:node(
+					mw.html.create('div'):css('position', 'absolute'):css({right = '4px', top = '0px'}):wikitext(rightInfo)
+				))
 		end
 
-		local function calculateHealthRegen(level, bonus)
-			return CustomHero.calculateStats(
-				level, args.hpregen, args.strbase, args.strgain, bonus, 'bonus health regeneration flat'
-			)
-		end
-
-		local function calculateMana(level, bonus)
-			return CustomHero.calculateStats(
-				level, args.mpbase, args.intbase, args.intgain, bonus, 'bonus mana'
-			)
-		end
-
-		local function calculateManaRegen(level, bonus)
-			return CustomHero.calculateStats(
-				level, args.mpregen, args.intbase, args.intgain, bonus, 'bonus mana regeneration flat'
-			)
-		end
-
-		local function calculateArmor(level, bonus)
-			return Math.round(
-				CustomHero.calculateStats(level, args.armor, args.agibase, args.agigain, bonus, 'bonus armor'),
-				2
-			)
-		end
-
-		local function calculateMagicRestistance(level, bonus)
-			return Math.round(
-				CustomHero.calculateStats(level, args.mr, args.intbase, args.intgain, bonus, 'bonus magic resistance'),
-				2
-			)
-		end
-
-		local function calculateDamageMin(level)
-			return CustomHero.calculateStats(level, args.atkmin, args.primarybase, args.primarygain, 0)
-		end
-
-		local function calculateDamageMax(level)
-			return CustomHero.calculateStats(level, args.atkmax, args.primarybase, args.primarygain, 0)
-		end
-
-		local breaddownContentClasses = {
-			content2 = {'infobox-center'},
-			content3 = {'infobox-center'},
-			content4 = {'infobox-center'},
-			content5 = {'infobox-center'},
-		}
 		Array.appendWith(
 			widgets,
-			-- Level Header
-			Breakdown{content = {
-				'<b>Level</b>',
-				'<b>1</b>',
-				'<b>15</b>',
-				'<b>25</b>',
-				'<b>30</b>',
-			}, contentClasses = breaddownContentClasses},
-
 			-- Health Bar
-			Breakdown{content = {
-				'<b>Health</b>',
-				calculateHealth(1, 0) .. '<br>+' .. calculateHealthRegen(1, 0),
-				calculateHealth(15, 0) .. '<br>+' .. calculateHealthRegen(15, 0),
-				calculateHealth(25, 12) .. '<br>+' .. calculateHealthRegen(25, 12),
-				calculateHealth(30, 14) .. '<br>+' .. calculateHealthRegen(30, 14),
-			}, contentClasses = breaddownContentClasses, rowClasses = {'healthbar'}},
+			Breakdown{
+				content = {floatToTheRight(calculator.health(1), '+' .. calculator.healthRegen(1))},
+				classes = {'infobox-center'}, rowClasses = {'healthbar'}
+			},
 
 			-- Mana Bar
-			Breakdown{content = {
-				'<b>Mana</b>',
-				calculateMana(1, 0) .. '<br>+' .. calculateManaRegen(1, 0),
-				calculateMana(15, 0) .. '<br>+' .. calculateManaRegen(15, 0),
-				calculateMana(25, 12) .. '<br>+' .. calculateManaRegen(25, 12),
-				calculateMana(30, 14) .. '<br>+' .. calculateManaRegen(30, 14),
-			}, contentClasses = breaddownContentClasses, rowClasses = {'manabar'}},
-
-			-- Armor
-			Breakdown{content = {
-				'<b>Armor</b><br>&nbsp;',
-				calculateArmor(1, 0),
-				calculateArmor(15, 0),
-				calculateArmor(25, 12),
-				calculateArmor(30, 14),
-			}, contentClasses = breaddownContentClasses},
-
-			-- Magic Restistance
-			Breakdown{content = {
-				'<b>Magic resistance</b>',
-				calculateMagicRestistance(1, 0),
-				calculateMagicRestistance(15, 0),
-				calculateMagicRestistance(25, 12),
-				calculateMagicRestistance(30, 14),
-			}, contentClasses = breaddownContentClasses},
-
-			-- Damage
-			Breakdown{content = {
-				'<b>Damage</b>',
-				calculateDamageMin(1) .. '<br>' ..  calculateDamageMax(1),
-				calculateDamageMin(15) .. '<br>' ..  calculateDamageMax(15),
-				calculateDamageMin(25) .. '<br>' ..  calculateDamageMax(25),
-				calculateDamageMin(30) .. '<br>' ..  calculateDamageMax(30),
-			}, contentClasses = breaddownContentClasses},
+			Breakdown{
+				content = {floatToTheRight(calculator.mana(1), '+' .. calculator.manaRegen(1))},
+				classes = {'infobox-center'}, rowClasses = {'manabar'}
+			},
 
 			-- Attribute Gain
 			Breakdown{content = {
@@ -231,21 +146,31 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Title{name = 'ATTACK'},
-			Cell{name = CustomHero.addIconToTitle('Attack Type', 'ranged'), content = {args.rangetype}},
-			Cell{name = CustomHero.addIconToTitle('Attack Time', 'attack time'), content = {args.bat .. ' BAT'}},
-			Cell{name = CustomHero.addIconToTitle('Attack Range', 'attack range'), content = {args.atkrange}},
-			Cell{name = CustomHero.addIconToTitle('Projectile Speed', 'projectile speed'), content = {args['projectile speed']}}
+			Cell{name = CustomHero.addIconToTitle('Damage'), content = {
+				calculator.damageMin(1) .. '-' .. calculator.damageMax(1)
+			}},
+			Cell{name = CustomHero.addIconToTitle('Attack Type', args.rangetype), content = {args.rangetype}},
+			Cell{name = CustomHero.addIconToTitle('Attack Time'), content = {args.bat .. ' BAT'}},
+			Cell{name = CustomHero.addIconToTitle('Attack Range'), content = {args.atkrange}},
+			Cell{name = CustomHero.addIconToTitle('Projectile Speed'), content = {args['projectile speed']}}
+		)
+
+		Array.appendWith(
+			widgets,
+			Title{name = 'DEFENCE'},
+			Cell{name = CustomHero.addIconToTitle('Armor'), content = {calculator.armor(1)}},
+			Cell{name = CustomHero.addIconToTitle('Magic Resistance'), content = {calculator.magicRestistance(1)}}
 		)
 
 		Array.appendWith(
 			widgets,
 			Title{name = 'MOBILITY'},
-			Cell{name = CustomHero.addIconToTitle('Movement Speed', 'movement speed'), content = CustomHero.dayNightContent(
+			Cell{name = CustomHero.addIconToTitle('Turn Rate'), content = {args.turnrate}},
+			Cell{name = CustomHero.addIconToTitle('Movement Speed'), content = CustomHero.dayNightContent(
 				args.movespeed,
 				args.movespeed + GameValues{'nighttime speed bonus'} * GameValues{'nighttime bonus multiplier'}
 			)},
-			Cell{name = CustomHero.addIconToTitle('Turn Rate', 'turn rate'), content = {args.turnrate}},
-			Cell{name = CustomHero.addIconToTitle('Vision', 'vision'), content = CustomHero.dayNightContent(
+			Cell{name = CustomHero.addIconToTitle('Vision'), content = CustomHero.dayNightContent(
 				args.visionday, args.visionnight
 			)}
 		)
@@ -255,7 +180,7 @@ function CustomInjector:parse(id, widgets)
 			Title{name = 'GENERAL'},
 			Cell{name = 'Released', content = {args.released}},
 			Cell{name = 'Competitive Span', content = {args.compspan}},
-			Cell{name = 'Internal Name', content = {'npc_dota_hero_' .. args.intern}}
+			Cell{name = 'Internal Name', content = {args.intern and ('npc_dota_hero_' .. args.intern) or nil}}
 		)
 
 		return widgets
@@ -266,21 +191,105 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param args any
+---@return {[string]: fun(level: integer): number}
+function CustomHero.statsCalculator(args)
+	local calculator = {}
+
+	local function levelToBonus(level)
+		local bonusLookup = {
+			[17] = 2,
+			[18] = 2,
+			[19] = 4,
+			[20] = 4,
+			[21] = 6,
+			[22] = 8,
+			[23] = 10,
+			[24] = 12,
+			[25] = 12,
+			[26] = 14,
+			[27] = 14,
+			[28] = 14,
+			[29] = 14,
+			[30] = 14,
+		}
+		return bonusLookup[level] or 0
+	end
+
+	function calculator.health(level)
+		local bonus = levelToBonus(level)
+		return CustomHero.calculateStats(
+			level, args.hpbase, args.strbase, args.strgain, bonus, 'bonus health'
+		)
+	end
+
+	function calculator.healthRegen(level)
+		local bonus = levelToBonus(level)
+		return CustomHero.calculateStats(
+			level, args.hpregen, args.strbase, args.strgain, bonus, 'bonus health regeneration flat'
+		)
+	end
+
+	function calculator.mana(level)
+		local bonus = levelToBonus(level)
+		return CustomHero.calculateStats(
+			level, args.mpbase, args.intbase, args.intgain, bonus, 'bonus mana'
+		)
+	end
+
+	function calculator.manaRegen(level)
+		local bonus = levelToBonus(level)
+		return CustomHero.calculateStats(
+			level, args.mpregen, args.intbase, args.intgain, bonus, 'bonus mana regeneration flat'
+		)
+	end
+
+	function calculator.armor(level)
+		local bonus = levelToBonus(level)
+		return Math.round(
+			CustomHero.calculateStats(level, args.armor, args.agibase, args.agigain, bonus, 'bonus armor'),
+			2
+		)
+	end
+
+	function calculator.magicRestistance(level)
+		local bonus = levelToBonus(level)
+		return Math.round(
+			CustomHero.calculateStats(level, args.mr, args.intbase, args.intgain, bonus, 'bonus magic resistance'),
+			2
+		)
+	end
+
+	function calculator.damageMin(level)
+		return CustomHero.calculateStats(level, args.atkmin, args.primarybase, args.primarygain)
+	end
+
+	function calculator.damageMax(level)
+		return CustomHero.calculateStats(level, args.atkmax, args.primarybase, args.primarygain)
+	end
+
+	return calculator
+end
+
 ---@param level integer
 ---@param heroBase integer
 ---@param attributeBase integer
 ---@param attributeGain integer
----@param abbributeBonus integer
+---@param abbributeBonus integer?
 ---@param modifierName string?
 function CustomHero.calculateStats(level, heroBase, attributeBase, attributeGain, abbributeBonus, modifierName)
 	local modifier = modifierName and GameValues{modifierName} or 1
-	return heroBase + (attributeBase + (level - 1) * attributeGain + abbributeBonus) * modifier
+	local bonus = abbributeBonus or 0
+	return heroBase + (attributeBase + (level - 1) * attributeGain + bonus) * modifier
 end
 
 ---@param title string
----@param symbol string
+---@param symbol string?
 ---@return string
 function CustomHero.addIconToTitle(title, symbol)
+	if not symbol then
+		symbol = title:lower()
+	end
 	return title .. ' ' .. Symbols{symbol, size = '20px'}
 end
 
