@@ -22,17 +22,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil, bestof == 0)
 
 	local lines = Array.extend(
-		'{{Match',
-		'|bestof=' .. (bestof ~= 0 and bestof or ''),
-		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
+		'{{Match|bestof=' .. (bestof ~= 0 and bestof or ''),
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Logic.readBool(args.hasDate) and {
-			INDENT .. '|date=',
-			INDENT .. '|finished=',
-			INDENT .. '|twitch=|youtube='
-		} or nil,
+		INDENT .. '|date=|finished=',
+		INDENT .. '|twitch=|youtube=|vod=',
 		Array.map(Array.range(1, bestof), WikiCopyPaste._getMapCode),
 		'}}'
 	)
@@ -45,9 +40,8 @@ end
 function WikiCopyPaste._getMapCode(mapIndex)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map|length=|winner=|vod=',
-		INDENT .. INDENT .. '|team1side=',
+		INDENT .. INDENT .. '|team1side=|team2side=',
 		INDENT .. INDENT .. '|t1h1=|t1h2=|t1h3=|t1h4=|t1h5=|t1h6=',
-		INDENT .. INDENT .. '|team2side=',
 		INDENT .. INDENT .. '|t2h1=|t2h2=|t2h3=|t2h4=|t2h5=|t2h6=',
 		INDENT .. '}}'
 	), '\n')
