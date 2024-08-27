@@ -236,7 +236,6 @@ end
 function MatchFunctions.getExtraData(match, numberOfGames)
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		ffa = 'false',
 	}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
