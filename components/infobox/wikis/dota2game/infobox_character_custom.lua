@@ -23,11 +23,9 @@ local Character = Lua.import('Module:Infobox/Character')
 local Widgets = require('Module:Infobox/Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Header = Widgets.Header
 local Title = Widgets.Title
 
----@class Dota2CharacterInfobox: CharacterInfobox
+---@class Dota2HeroInfobox: CharacterInfobox
 local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
@@ -48,9 +46,15 @@ local TIME_ICONS = {
 function CustomHero.run(frame)
 	local character = CustomHero(frame)
 	character:setWidgetInjector(CustomInjector(character))
+	local shortPrimary = CustomHero.shortenPrimary(character.args.primary)
+
 	character.args.informationType = 'Hero'
 	character.args.image = character.args.image or character.args.name .. ' Large.png'
-	character.args.title = ATTRIBUTE_ICONS[string.lower(character.args.primary)] .. ' ' .. string.upper(character.args.primary)
+	character.args.imageText = '#' .. (character.args.hid or '')
+	character.args.title = table.concat({
+		ATTRIBUTE_ICONS[string.lower(character.args.primary)],
+		string.upper(character.args.primary)
+	}, ' ')
 
 	character.args.hpbase = character.args.hpbase or GameValues{'health'}
 	character.args.hpregen = character.args.hpregen or GameValues{'health regen'}
@@ -69,13 +73,14 @@ function CustomHero.run(frame)
 	character.args.agibase = character.args.agibase or 0
 	character.args.intbase = character.args.intbase or 0
 
-	local param = CustomHero.shortenPrimary(character.args.primary)
-	character.args.primarybase = character.args[param .. 'base']
-	character.args.primarygain = character.args[param .. 'gain']
-
-	if param == 'uni' then
-		character.args.primarybase = (character.args.strbase + character.args.agibase + character.args.intbase) * GameValues{'bonus universal damage'}
-		character.args.primarygain = (character.args.strgain + character.args.agigain + character.args.intgain) * GameValues{'bonus universal damage'}
+	if shortPrimary == 'uni' then
+		character.args.primarybase =
+			(character.args.strbase + character.args.agibase + character.args.intbase) * GameValues{'bonus universal damage'}
+		character.args.primarygain =
+			(character.args.strgain + character.args.agigain + character.args.intgain) * GameValues{'bonus universal damage'}
+	else
+		character.args.primarybase = character.args[shortPrimary .. 'base']
+		character.args.primarygain = character.args[shortPrimary .. 'gain']
 	end
 
 	return character:createInfobox()
@@ -108,27 +113,41 @@ function CustomInjector:parse(id, widgets)
 		local primaryIdx = primaryAttr == 'str' and 1 or primaryAttr == 'agi' and 2 or primaryAttr == 'int' and 3 or 0
 
 		local function calculateHealth(level, bonus)
-			return CustomHero.calculateStats(level, args.hpbase, args.strbase, args.strgain, bonus, 'bonus health')
+			return CustomHero.calculateStats(
+				level, args.hpbase, args.strbase, args.strgain, bonus, 'bonus health'
+			)
 		end
 
 		local function calculateHealthRegen(level, bonus)
-			return CustomHero.calculateStats(level, args.hpregen, args.strbase, args.strgain, bonus, 'bonus health regeneration flat')
+			return CustomHero.calculateStats(
+				level, args.hpregen, args.strbase, args.strgain, bonus, 'bonus health regeneration flat'
+			)
 		end
 
 		local function calculateMana(level, bonus)
-			return CustomHero.calculateStats(level, args.mpbase, args.intbase, args.intgain, bonus, 'bonus mana')
+			return CustomHero.calculateStats(
+				level, args.mpbase, args.intbase, args.intgain, bonus, 'bonus mana'
+			)
 		end
 
 		local function calculateManaRegen(level, bonus)
-			return CustomHero.calculateStats(level, args.mpregen, args.intbase, args.intgain, bonus, 'bonus mana regeneration flat')
+			return CustomHero.calculateStats(
+				level, args.mpregen, args.intbase, args.intgain, bonus, 'bonus mana regeneration flat'
+			)
 		end
 
 		local function calculateArmor(level, bonus)
-			return Math.round(CustomHero.calculateStats(level, args.armor, args.agibase, args.agigain, bonus, 'bonus armor'), 2)
+			return Math.round(
+				CustomHero.calculateStats(level, args.armor, args.agibase, args.agigain, bonus, 'bonus armor'),
+				2
+			)
 		end
 
 		local function calculateMagicRestistance(level, bonus)
-			return Math.round(CustomHero.calculateStats(level, args.mr, args.intbase, args.intgain, bonus, 'bonus magic resistance'), 2)
+			return Math.round(
+				CustomHero.calculateStats(level, args.mr, args.intbase, args.intgain, bonus, 'bonus magic resistance'),
+				2
+			)
 		end
 
 		local function calculateDamageMin(level)
@@ -139,17 +158,22 @@ function CustomInjector:parse(id, widgets)
 			return CustomHero.calculateStats(level, args.atkmax, args.primarybase, args.primarygain, 0)
 		end
 
+		local breaddownContentClasses = {
+			content2 = {'infobox-center'},
+			content3 = {'infobox-center'},
+			content4 = {'infobox-center'},
+			content5 = {'infobox-center'},
+		}
 		Array.appendWith(
 			widgets,
 			-- Level Header
 			Breakdown{content = {
-				'<b>Hero Level</b>',
-				'1', -- TODO Icon
-				-- width: 48px;height: 48px;border-radius: 999px;background: #000;display: table-cell;vertical-align: middle;font-size: 200%;color: #e6d292;font-weight: bold;box-shadow: inset 0px 0px 2px 1px #aaa;
-  				'15', -- TODO Icon
-  				'25', -- TODO Icon
-  				'30', -- TODO Icon
-			}, contentClasses = {content2 = {'infobox-center'}, content3 = {'infobox-center'}, content4 = {'infobox-center'}, content5 = {'infobox-center'}}},
+				'<b>Level</b>',
+				'<b>1</b>',
+				'<b>15</b>',
+				'<b>25</b>',
+				'<b>30</b>',
+			}, contentClasses = breaddownContentClasses},
 
 			-- Health Bar
 			Breakdown{content = {
@@ -158,7 +182,7 @@ function CustomInjector:parse(id, widgets)
 				calculateHealth(15, 0) .. '<br>+' .. calculateHealthRegen(15, 0),
 				calculateHealth(25, 12) .. '<br>+' .. calculateHealthRegen(25, 12),
 				calculateHealth(30, 14) .. '<br>+' .. calculateHealthRegen(30, 14),
-			}, contentClasses = {content2 = {'infobox-center'}, content3 = {'infobox-center'}, content4 = {'infobox-center'}, content5 = {'infobox-center'}}, rowClasses = {'healthbar'}},
+			}, contentClasses = breaddownContentClasses, rowClasses = {'healthbar'}},
 
 			-- Mana Bar
 			Breakdown{content = {
@@ -167,7 +191,7 @@ function CustomInjector:parse(id, widgets)
 				calculateMana(15, 0) .. '<br>+' .. calculateManaRegen(15, 0),
 				calculateMana(25, 12) .. '<br>+' .. calculateManaRegen(25, 12),
 				calculateMana(30, 14) .. '<br>+' .. calculateManaRegen(30, 14),
-			}, contentClasses = {content2 = {'infobox-center'}, content3 = {'infobox-center'}, content4 = {'infobox-center'}, content5 = {'infobox-center'}}, rowClasses = {'manabar'}},
+			}, contentClasses = breaddownContentClasses, rowClasses = {'manabar'}},
 
 			-- Armor
 			Breakdown{content = {
@@ -176,7 +200,7 @@ function CustomInjector:parse(id, widgets)
 				calculateArmor(15, 0),
 				calculateArmor(25, 12),
 				calculateArmor(30, 14),
-			}, contentClasses = {content2 = {'infobox-center'}, content3 = {'infobox-center'}, content4 = {'infobox-center'}, content5 = {'infobox-center'}}},
+			}, contentClasses = breaddownContentClasses},
 
 			-- Magic Restistance
 			Breakdown{content = {
@@ -185,7 +209,7 @@ function CustomInjector:parse(id, widgets)
 				calculateMagicRestistance(15, 0),
 				calculateMagicRestistance(25, 12),
 				calculateMagicRestistance(30, 14),
-			}, contentClasses = {content2 = {'infobox-center'}, content3 = {'infobox-center'}, content4 = {'infobox-center'}, content5 = {'infobox-center'}}},
+			}, contentClasses = breaddownContentClasses},
 
 			-- Damage
 			Breakdown{content = {
@@ -194,7 +218,7 @@ function CustomInjector:parse(id, widgets)
 				calculateDamageMin(15) .. '<br>' ..  calculateDamageMax(15),
 				calculateDamageMin(25) .. '<br>' ..  calculateDamageMax(25),
 				calculateDamageMin(30) .. '<br>' ..  calculateDamageMax(30),
-			}, contentClasses = {content2 = {'infobox-center'}, content3 = {'infobox-center'}, content4 = {'infobox-center'}, content5 = {'infobox-center'}}},
+			}, contentClasses = breaddownContentClasses},
 
 			-- Attribute Gain
 			Breakdown{content = {
@@ -207,24 +231,30 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(
 			widgets,
 			Title{name = 'ATTACK'},
-			Cell{name = CustomHero.addIconToTitle('Attack type', 'ranged'), content = {args.rangetype}},
-			Cell{name = CustomHero.addIconToTitle('Attack time', 'attack time'), content = {args.bat .. ' BAT'}},
-			Cell{name = CustomHero.addIconToTitle('Attack range', 'attack range'), content = {args.atkrange}},
-			Cell{name = CustomHero.addIconToTitle('Projectile speed', 'projectile speed'), content = {args['projectile speed']}}
+			Cell{name = CustomHero.addIconToTitle('Attack Type', 'ranged'), content = {args.rangetype}},
+			Cell{name = CustomHero.addIconToTitle('Attack Time', 'attack time'), content = {args.bat .. ' BAT'}},
+			Cell{name = CustomHero.addIconToTitle('Attack Range', 'attack range'), content = {args.atkrange}},
+			Cell{name = CustomHero.addIconToTitle('Projectile Speed', 'projectile speed'), content = {args['projectile speed']}}
 		)
 
 		Array.appendWith(
 			widgets,
 			Title{name = 'MOBILITY'},
-			Cell{name = CustomHero.addIconToTitle('Movement speed', 'movement speed'), content = {TIME_ICONS.day .. ' ' .. args.movespeed, TIME_ICONS.night .. ' ' .. args.movespeed + GameValues{'nighttime speed bonus'} * GameValues{'nighttime bonus multiplier'}}}, -- TODO: Day/Night icon
-			Cell{name = CustomHero.addIconToTitle('Turn rate', 'turn rate'), content = {args.turnrate}},
-			Cell{name = CustomHero.addIconToTitle('Vision', 'vision'), content = {TIME_ICONS.day .. ' ' .. args.visionday, TIME_ICONS.night .. ' ' .. args.visionnight}}
+			Cell{name = CustomHero.addIconToTitle('Movement Speed', 'movement speed'), content = CustomHero.dayNightContent(
+				args.movespeed,
+				args.movespeed + GameValues{'nighttime speed bonus'} * GameValues{'nighttime bonus multiplier'}
+			)},
+			Cell{name = CustomHero.addIconToTitle('Turn Rate', 'turn rate'), content = {args.turnrate}},
+			Cell{name = CustomHero.addIconToTitle('Vision', 'vision'), content = CustomHero.dayNightContent(
+				args.visionday, args.visionnight
+			)}
 		)
 
 		Array.appendWith(
 			widgets,
 			Title{name = 'GENERAL'},
 			Cell{name = 'Released', content = {args.released}},
+			Cell{name = 'Competitive Span', content = {args.compspan}},
 			Cell{name = 'Internal Name', content = {'npc_dota_hero_' .. args.intern}}
 		)
 
@@ -252,6 +282,16 @@ end
 ---@return string
 function CustomHero.addIconToTitle(title, symbol)
 	return title .. ' ' .. Symbols{symbol, size = '20px'}
+end
+
+---@param dayContent string|number
+---@param nightContent string|number
+---@return table
+function CustomHero.dayNightContent(dayContent, nightContent)
+	return {
+		TIME_ICONS.day .. ' ' .. dayContent,
+		TIME_ICONS.night .. ' ' .. nightContent,
+	}
 end
 
 ---@param args table
