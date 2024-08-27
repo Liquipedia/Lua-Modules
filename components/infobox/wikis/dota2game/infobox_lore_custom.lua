@@ -68,7 +68,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Others', content = {args.otherlinks}},
 			Cell{name = '[[File:Artifact_allmode.png|16px]] Artifact', content = {
 				args.artifactwiki and '[[artifact:'.. args.artifactwiki ..'|'.. args.artifactwiki .. ' card]]' or nil
-		 	}}
+			}}
 		)
 	end
 
