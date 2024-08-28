@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- wiki=dota2game
 -- page=Module:Infobox/Character/Custom
