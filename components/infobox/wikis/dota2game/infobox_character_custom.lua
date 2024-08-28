@@ -138,8 +138,8 @@ function CustomInjector:parse(id, widgets)
 			-- Attribute Gain
 			Breakdown{content = {
 				ATTRIBUTE_ICONS.strength .. '<br><b>' .. args.strbase .. '</b> +' .. args.strgain,
-  				ATTRIBUTE_ICONS.agility .. '<br><b>' .. args.agibase .. '</b> +' .. args.agigain,
-  				ATTRIBUTE_ICONS.intelligence .. '<br><b>' .. args.intbase .. '</b> +' .. args.intgain,
+				ATTRIBUTE_ICONS.agility .. '<br><b>' .. args.agibase .. '</b> +' .. args.agigain,
+				ATTRIBUTE_ICONS.intelligence .. '<br><b>' .. args.intbase .. '</b> +' .. args.intgain,
 			}, classes = {'infobox-center'}, contentClasses = {['content' .. primaryIdx] = {'primaryAttribute'}}}
 		)
 
