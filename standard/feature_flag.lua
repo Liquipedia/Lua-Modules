@@ -56,7 +56,7 @@ function FeatureFlag._get(flag)
 	local config = FeatureFlag.getConfig(flag)
 	return Logic.nilOr(
 		Logic.readBoolOrNil(mw.ext.VariablesLua.var('feature_' .. flag)),
-		mw.ext.VariablesLua.var('feature_' .. flag),
+		Logic.nilIfEmpty(mw.ext.VariablesLua.var('feature_' .. flag)),
 		config.defaultValue,
 		false
 	)
