@@ -212,7 +212,7 @@ function StarcraftPlayerExt.saveToPageVars(player, options)
 	local overwrite = options.overwritePageVars
 
 	if PlayerExt.shouldWritePageVar(displayName .. '_faction', player.faction, overwrite) then
-		globalVars:set(displayName .. '_faction', player.pageName)
+		globalVars:set(displayName .. '_faction', player.faction)
 	end
 
 	PlayerExt.saveToPageVars(player, options)
