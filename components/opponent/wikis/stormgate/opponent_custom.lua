@@ -115,7 +115,7 @@ end
 
 ---@param opponent StormgateStandardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}
+---@param options {syncPlayer: boolean?, overwriteVars: boolean?}
 ---@return StormgateStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
@@ -128,7 +128,11 @@ function CustomOpponent.resolve(opponent, date, options)
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
 					player.team,
-					{date = date, savePageVar = savePageVar}
+					{
+							date = date,
+							savePageVar = savePageVar,
+							overwriteVars = options.overwriteVars,
+						}
 				)
 				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else

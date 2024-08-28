@@ -117,7 +117,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	}
 
 	if not args.novar then
-		StarcraftPlayerExt.saveToPageVars(player)
+		StarcraftPlayerExt.saveToPageVars(player, {overwritePageVars = true})
 	end
 
 	local hiddenSortNode = args.hs
@@ -169,6 +169,7 @@ function StarcraftPlayerDisplay.InlinePlayerContainer(props)
 	StarcraftPlayerExt.syncPlayer(props.player, {
 		date = props.date,
 		savePageVar = props.savePageVar,
+		overwritePageVars = true,
 	})
 
 	return StarcraftPlayerDisplay.InlinePlayer(props)
