@@ -159,7 +159,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = CustomHero.addIconToTitle('Attack Range', args.rangetype), content = {
 				args.atkrange
 			}},
-			Cell{name = CustomHero.addIconToTitle('Projectile Speed'), content = {args['projectile speed']}}
+			Cell{name = CustomHero.addIconToTitle('Projectile Speed'), content = {args['projectile speed']}},
+			Cell{name = 'Attack Animation', content = {(args.atkpoint or '') .. ' + ' .. (args.atkbacks or '')}}
 		)
 
 		Array.appendWith(
@@ -179,7 +180,9 @@ function CustomInjector:parse(id, widgets)
 			)},
 			Cell{name = CustomHero.addIconToTitle('Vision'), content = CustomHero.dayNightContent(
 				args.visionday, args.visionnight
-			)}
+			)},
+			Cell{name = 'Collision Size', content = {args.collisionsize}},
+			Cell{name = 'Bound Radius', content = {args.boundradius}}
 		)
 
 		Array.appendWith(
