@@ -75,7 +75,7 @@ function Lua.import(name, options)
 		if not devFlag then
 			return importFunction(name)
 		end
-		local devName = name .. '/' .. (devFlag == true and 'dev' or devFlag)
+		local devName = name .. '/dev' .. (type(devFlag) == 'string' and ('/' .. devFlag) or '')
 		if require('Module:Namespace').isMain() then
 			mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
 		end

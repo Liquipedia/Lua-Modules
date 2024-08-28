@@ -6,7 +6,6 @@ on:
       luadevenv:
         description: 'Lua Dev Enviroment name'
         required: true
-        default: 'dev'
 
 jobs:
   deploy:
@@ -32,5 +31,5 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-          LUA_DEV_ENV_NAME: "/${{ github.event.inputs.luadevenv }}"
+          LUA_DEV_ENV_NAME: "/dev/${{ github.event.inputs.luadevenv }}"
         run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
