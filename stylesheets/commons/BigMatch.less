@@ -679,6 +679,17 @@ ul.match-bm-lol-game-veto-overview-pick {
 		}
 	}
 
+	&-name {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		font-size: 0.9375rem;
+
+		> a {
+			font-weight: bold;
+		}
+	}
+
 	&-icon {
 		overflow: hidden;
 		border-radius: 100%;
@@ -717,8 +728,13 @@ ul.match-bm-lol-game-veto-overview-pick {
 			height: 1.5rem;
 			border-radius: 0.25rem;
 			overflow: hidden;
+			background-color: rgba( 0, 0, 0, 0.16 );
 
-			&.item--backpack {
+			.theme--dark & {
+				background-color: rgba( 255, 255, 255, 0.16 );
+			}
+
+			&.item--backpack img {
 				opacity: 0.4;
 			}
 
@@ -731,6 +747,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 				object-fit: cover;
 				height: 100%;
 				width: 100%;
+
+				&[title=Empty] {
+					opacity: 0;
+				}
 			}
 		}
 
@@ -749,10 +769,15 @@ ul.match-bm-lol-game-veto-overview-pick {
 			height: 1.5rem;
 			border-radius: 100%;
 			overflow: hidden;
+			background-color: rgba( 0, 0, 0, 0.16 );
 
 			@media ( min-width: 768px ) {
 				width: 2rem;
 				height: 2rem;
+			}
+
+			.theme--dark & {
+				background-color: rgba( 255, 255, 255, 0.16 );
 			}
 
 			img {
@@ -788,11 +813,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 		&-data {
 			font-weight: bold;
-			font-size: 1rem;
-
-			@media ( min-width: 1024px ) {
-				font-size: 1.125rem;
-			}
+			font-size: 0.9375rem;
 
 			.slash {
 				margin: 0 0.125rem;
