@@ -222,9 +222,6 @@ end
 function MatchFunctions.getLinks(match)
 	return {
 		preview = match.preview,
-		preview2 = match.preview2,
-		interview = match.interview,
-		interview2 = match.interview2,
 		review = match.review,
 		recap = match.recap,
 	}
