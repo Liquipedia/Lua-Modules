@@ -30,28 +30,19 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local stats = Logic.readBool(args.stats)
 	local streams = Logic.readBool(args.streams)
 
-	local lines = Array.flatten({
+	local lines = Array.extend({},
 		'{{Match2',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		INDENT .. '|date= |finished=',
-	})
-
-	if streams then
-		table.insert(lines, INDENT .. '|twitch=|vod=')
-	end
-
-	if stats then
-		table.insert(lines, INDENT .. '|etf2l=|rgl=|ozf=|tftv=')
-	end
-
-	Array.forEach(Array.range(1, bestof), function(mapIndex)
-		Array.appendWith(lines, INDENT .. '|map' .. mapIndex ..
-			'={{Map|map=|score1=|score2=|finished= |logstf= |logstfgold=}}')
-	end)
-
-	table.insert(lines, '}}')
+		streams and (INDENT .. '|twitch=|vod=') or nil,
+		stats and (INDENT .. '|etf2l=|rgl=|ozf=|tftv=') or nil,
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished= |logstf= |logstfgold=}}'
+		end),
+		'}}'
+	)
 
 	return table.concat(lines, '\n')
 end
