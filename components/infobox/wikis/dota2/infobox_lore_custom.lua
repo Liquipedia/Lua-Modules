@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=dota2game
+-- wiki=dota2
 -- page=Module:Infobox/Lore/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
