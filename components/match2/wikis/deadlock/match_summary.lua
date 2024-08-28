@@ -135,7 +135,7 @@ function CustomMatchSummary._createCharacterDisplay(characters, side, reverse)
 	end
 
 	local function characterDisplay(character, showName)
-		local display = mw.html.create('div'):addClass('brkts-popup-side-color-' .. side)
+		local display = mw.html.create('div')
 		if not showName then
 			display:node(makeCharacterIcon(character))
 			return display
