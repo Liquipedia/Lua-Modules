@@ -107,7 +107,6 @@ function CustomCosmetic:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			title = args.name,
 			type = args.type,
 		},
 	})

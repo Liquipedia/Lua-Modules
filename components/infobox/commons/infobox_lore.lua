@@ -51,7 +51,7 @@ function Cosmetic:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	self.infobox:categories('Cosmetics')
+	self.infobox:categories('Lore')
 	self.infobox:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
