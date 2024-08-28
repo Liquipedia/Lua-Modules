@@ -245,17 +245,6 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 	return extradata
 end
 
----@param extradata table
----@param map string
----@param match table
----@param prefix string
----@param vetoIndex integer
-function MatchFunctions.getVeto(extradata, map, match, prefix, vetoIndex)
-	extradata[prefix] = map and mw.ext.TeamLiquidIntegration.resolve_redirect(map) or nil
-	extradata[prefix .. 'by'] = match['vetoplayer' .. vetoIndex] or match['vetoopponent' .. vetoIndex]
-	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
-end
-
 ---@param mapInput table
 ---@param subGroup integer
 ---@param opponentCount integer
@@ -268,7 +257,6 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 
 	local map = {
 		map = mapName,
-		patch = Variables.varDefault('tournament_patch', ''),
 		subgroup = subGroup,
 		extradata = {
 			comment = mapInput.comment,
@@ -349,10 +337,10 @@ end
 function MapFunctions.getParticipants(mapInput, opponents)
 	local participants = {}
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		if opponent.type == Opponent.team then
-			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
+		if opponent.type == Opponent.literal then
 			return
-		elseif opponent.type == Opponent.literal then
+		elseif opponent.type == Opponent.team then
+			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
 			return
 		end
 		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
