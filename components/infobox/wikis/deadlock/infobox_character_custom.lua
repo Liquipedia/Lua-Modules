@@ -60,8 +60,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Bullet Damage', content = {args.damagebullet}},
 			Cell{name = 'Bullets per Seconds', content = {args.bps}},
 			Cell{name = 'Ammo', content = {args.ammo}},
-			Cell{name = 'Light Meele', content = {args.damagemeleelight}},
-			Cell{name = 'Heavy Meele', content = {args.damagemeleeheavy}}
+			Cell{name = 'Light Melee', content = {args.damagemeleelight}},
+			Cell{name = 'Heavy Melee', content = {args.damagemeleeheavy}}
 		)
 		return widgets
 	end
