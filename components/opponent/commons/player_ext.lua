@@ -23,6 +23,15 @@ local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 ---@class PlayerExt
 local PlayerExt = {globalVars = globalVars}
 
+---@class PlayerExtSyncOptions: PlayerExtPopulateOptions
+---@field savePageVar boolean?
+---@field overwritePageVars boolean?
+
+---@class PlayerExtPopulateOptions
+---@field fetchPlayer boolean?
+---@field fetchMatch2Player boolean?
+---@field date string|number|osdate?
+
 --[===[
 Splits a wiki link of a player into a pageName and displayName.
 
@@ -157,7 +166,7 @@ options.fetchMatch2Player: Whether to use the player's recent matches. Disabled 
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
 ---@param player standardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string|number?}?
+---@param options PlayerExtSyncOptions?
 ---@return standardPlayer
 function PlayerExt.syncPlayer(player, options)
 	options = options or {}
@@ -176,7 +185,7 @@ function PlayerExt.syncPlayer(player, options)
 		or match2Player() and match2Player().flag
 
 	if options.savePageVar ~= false then
-		PlayerExt.saveToPageVars(player)
+		PlayerExt.saveToPageVars(player, {overwritePageVars = options.overwritePageVars})
 	end
 
 	return player
@@ -184,7 +193,7 @@ end
 
 ---Same as PlayerExt.syncPlayer, except it does not save the player's flag to page variables.
 ---@param player standardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, date: string?}?
+---@param options PlayerExtPopulateOptions?
 ---@return standardPlayer
 function PlayerExt.populatePlayer(player, options)
 	return PlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
@@ -204,13 +213,35 @@ end
 ---Saves the pageName and flag of a player to page variables,
 ---so that editors do not have to duplicate the same info later on.
 ---@param player standardPlayer
-function PlayerExt.saveToPageVars(player)
-	if player.pageName then
-		globalVars:set(player.displayName .. '_page', player.pageName)
+---@param options {overwritePageVars: boolean?}?
+function PlayerExt.saveToPageVars(player, options)
+	local displayName = player.displayName
+	if not displayName then return end
+
+	options = options or {}
+	local overwrite = options.overwritePageVars
+
+	if PlayerExt.shouldWritePageVar(displayName .. '_page', player.pageName, overwrite) then
+		globalVars:set(displayName .. '_page', player.pageName)
 	end
-	if player.flag then
-		globalVars:set(player.displayName .. '_flag', player.flag)
+	if PlayerExt.shouldWritePageVar(displayName .. '_flag', player.flag, overwrite) then
+		globalVars:set(displayName .. '_flag', player.flag)
 	end
+end
+
+---@param varName string
+---@param input string?
+---@param overwrite boolean?
+---@return boolean
+function PlayerExt.shouldWritePageVar(varName, input, overwrite)
+	if not input then
+		return false
+	elseif overwrite then
+		return true
+	end
+
+	local varValue = globalVars:get(varName)
+	return Logic.isEmpty(varValue)
 end
 
 --[[
