@@ -175,7 +175,6 @@ function MatchFunctions.getOpponentExtradata(opponent)
 	return {
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
-		score2 = opponent.score2,
 	}
 end
 
@@ -247,7 +246,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 		}
 	}
 
-	map.finished = MapFunctions.isFinished(mapInput, opponentCount)
+	map.finished = MatchGroupInputUtil.mapIsFinished(map)
 	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore({
 			walkover = mapInput.walkover,
