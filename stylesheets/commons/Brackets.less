@@ -800,21 +800,24 @@
 	.skin-lakesideview & {
 		font-weight: 800;
 	}
+
+	& img {
+		[ data-darkreader-scheme="dark" ] &,
+		.theme--dark & {
+			filter: invert( 1 );
+		}
+	}
 }
 
 .brkts-popup-body-match-sidewins-overtime {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
-}
 
-[ data-darkreader-scheme="dark" ],
-.theme--dark {
-	& .brkts-popup-body-match-sidewins img {
-		filter: invert( 1 );
-	}
-
-	& .brkts-popup-body-match-sidewins-overtime img {
-		filter: invert( 1 );
+	& img {
+		[ data-darkreader-scheme="dark" ] &,
+		.theme--dark & {
+			filter: invert( 1 );
+		}
 	}
 }
 
