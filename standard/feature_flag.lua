@@ -120,4 +120,9 @@ function FeatureFlag.getConfig(flag)
 	return config
 end
 
+---Clears the cache of feature flags. This is useful for testing.
+function FeatureFlag.clearCache()
+	cachedFlags = {}
+end
+
 return FeatureFlag
