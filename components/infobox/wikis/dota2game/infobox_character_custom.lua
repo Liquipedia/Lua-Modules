@@ -1,4 +1,3 @@
----
 -- @Liquipedia
 -- wiki=dota2game
 -- page=Module:Infobox/Character/Custom
@@ -46,6 +45,7 @@ local TIME_ICONS = {
 function CustomHero.run(frame)
 	local character = CustomHero(frame)
 	character:setWidgetInjector(CustomInjector(character))
+	assert(character.args.primary, 'Primary attribute is required')
 	local shortPrimary = CustomHero.shortenPrimary(character.args.primary)
 
 	character.args.informationType = 'Hero'
@@ -62,9 +62,10 @@ function CustomHero.run(frame)
 	character.args.mpregen = character.args.mpregen or GameValues{'mana regen'}
 	character.args.atkmin = character.args.atkmin or GameValues{'attack damage min'}
 	character.args.atkmax = character.args.atkmax or GameValues{'attack damage max'}
+	character.args.atkspeed = character.args.atkspeed or GameValues{'attack speed'}
+	character.args.bat = character.args.bat or GameValues{'base attack time'}
 	character.args.armor = character.args.armor or GameValues{'armor'}
 	character.args.mr = character.args.mr or GameValues{'magic resistance'}
-	character.args.bat = character.args.bat or GameValues{'base attack time'}
 	character.args.visionday = character.args.visionday or GameValues{'vision day'}
 	character.args.visionnight = character.args.visionnight or GameValues{'vision night'}
 	character.args['turn rate'] = character.args['turn rate'] or GameValues{'turn rate'}
@@ -136,28 +137,34 @@ function CustomInjector:parse(id, widgets)
 			},
 
 			-- Attribute Gain
-			Breakdown{content = {
-				ATTRIBUTE_ICONS.strength .. '<br><b>' .. args.strbase .. '</b> +' .. args.strgain,
-				ATTRIBUTE_ICONS.agility .. '<br><b>' .. args.agibase .. '</b> +' .. args.agigain,
-				ATTRIBUTE_ICONS.intelligence .. '<br><b>' .. args.intbase .. '</b> +' .. args.intgain,
-			}, classes = {'infobox-center'}, contentClasses = {['content' .. primaryIdx] = {'primaryAttribute'}}}
+			Breakdown{
+				content = {
+					ATTRIBUTE_ICONS.strength .. '<br><b>' .. args.strbase .. '</b> + ' .. args.strgain,
+					ATTRIBUTE_ICONS.agility .. '<br><b>' .. args.agibase .. '</b> + ' .. args.agigain,
+					ATTRIBUTE_ICONS.intelligence .. '<br><b>' .. args.intbase .. '</b> + ' .. args.intgain,
+				},
+				classes = {'infobox-center'}, contentClasses = {['content' .. primaryIdx] = {'primaryAttribute'}}}
 		)
 
 		Array.appendWith(
 			widgets,
 			Title{name = 'ATTACK'},
 			Cell{name = CustomHero.addIconToTitle('Damage'), content = {
-				calculator.damageMin(1) .. '-' .. calculator.damageMax(1)
+				calculator.damageMin(1) .. ' &ndash; ' .. calculator.damageMax(1)
 			}},
-			Cell{name = CustomHero.addIconToTitle('Attack Type', args.rangetype), content = {args.rangetype}},
-			Cell{name = CustomHero.addIconToTitle('Attack Time'), content = {args.bat .. ' BAT'}},
-			Cell{name = CustomHero.addIconToTitle('Attack Range'), content = {args.atkrange}},
+			Cell{name = CustomHero.addIconToTitle('Attack Speed', 'attack time'), content = {
+				-- we should also add how the attack speed is defined in 1.7 BAT
+				calculator.attackSpeed(1) .. ' (' .. args.bat .. ' [[BAT]])'
+			}},
+			Cell{name = CustomHero.addIconToTitle('Attack Range', args.rangetype), content = {
+				args.atkrange
+			}},
 			Cell{name = CustomHero.addIconToTitle('Projectile Speed'), content = {args['projectile speed']}}
 		)
 
 		Array.appendWith(
 			widgets,
-			Title{name = 'DEFENCE'},
+			Title{name = 'DEFENSE'},
 			Cell{name = CustomHero.addIconToTitle('Armor'), content = {calculator.armor(1)}},
 			Cell{name = CustomHero.addIconToTitle('Magic Resistance'), content = {calculator.magicRestistance(1)}}
 		)
@@ -177,10 +184,14 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Title{name = 'GENERAL'},
+			Title{name = 'MISC'},
+			Cell{name = 'Gib Type', content = {args.gibtype}},
 			Cell{name = 'Released', content = {args.released}},
 			Cell{name = 'Competitive Span', content = {args.compspan}},
-			Cell{name = 'Internal Name', content = {args.intern and ('npc_dota_hero_' .. args.intern) or nil}}
+			Breakdown{
+				content = {'[[Cheats#Hero Name|npc_dota_hero_' .. args.intern .. ']]'},
+				classes = {'infobox-center'}
+			}
 		)
 
 		return widgets
@@ -268,6 +279,14 @@ function CustomHero.statsCalculator(args)
 		return CustomHero.calculateStats(level, args.atkmax, args.primarybase, args.primarygain)
 	end
 
+	function calculator.attackSpeed(level)
+		local bonus = levelToBonus(level)
+		return Math.round(
+			CustomHero.calculateStats(level, args.atkspeed, args.agibase, args.agigain, bonus, 'bonus attack speed'),
+			0
+		)
+	end
+
 	return calculator
 end
 
@@ -351,6 +370,10 @@ function CustomHero:addToLpdb(lpdbData, args)
 		movespeed = args.movespeed or '',
 
 		atkspeed = args.atkspeed or '',
+		--[[
+			projectilespeed should be entered manually later for each hero (soon), instead of checking if the hero is melee.
+			some melee heroes have no projectile speed, they cannot utilize the spell reflection mechanic.
+		]]
 		projectilespeed = args['projectile speed'] or args.rangetype == 'Melee' and GameValues{'melee projectile speed'},
 		bat = args.bat,
 		rangetype = args.rangetype or '',
