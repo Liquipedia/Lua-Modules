@@ -15,7 +15,7 @@ local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
 
@@ -60,6 +60,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.walkover = MatchGroupInput.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInput.getWinner(match.resulttype, winnerInput, opponents)
 		MatchGroupInput.setPlacement(opponents, match.winner, 1, 2)
+	elseif MatchGroupInput.isNotPlayed(winnerInput, finishedInput) then
+		match.resulttype = MatchGroupInput.getResultType(winnerInput, finishedInput, opponents)
+		match.winner = nil
 	end
 
 	MatchFunctions.getTournamentVars(match)
