@@ -29,7 +29,7 @@ function CustomHero.run(frame)
 	character:setWidgetInjector(CustomInjector(character))
 	character.args.informationType = 'Hero'
 	if character.args.damagebullet and character.args.bps then
-		character.args.dps = character.args.damagebullet * character.args.bps
+		character.args.dps = character.args.dps or character.args.damagebullet * character.args.bps
 	end
 
 	return character:createInfobox()
