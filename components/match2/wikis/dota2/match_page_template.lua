@@ -14,7 +14,7 @@ return {
 	header =
 		[=[
 			<div class="match-bm-lol-match-header">
-				<div class="match-bm-match-header-powered-by">[[File:SAP logo.svg|link=]]</div>
+				<div class="match-bm-match-header-powered-by">[[File:DataProvidedSAP.svg|link=]]</div>
 				<div class="match-bm-lol-match-header-overview">
 					<div class="match-bm-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-match-header-team-group"><div class="match-bm-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div class="match-bm-lol-match-header-round-results">{{#seriesDots}}<div class="match-bm-lol-match-header-round-result result--{{.}}"></div>{{/seriesDots}}</div>{{/opponents.1}}</div></div>
 					<div class="match-bm-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}<div class="match-bm-match-header-result-text">{{statusText}}</div></div>
@@ -151,15 +151,8 @@ return {
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">{{&items.1}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.2}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.3}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.4}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.5}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.6}}</div>
-									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.1}}</div>
-									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
-									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
+									{{#items}}<div class="match-bm-players-player-loadout-item">{{&.}}</div>{{/items}}
+									{{#backpackitems}}<div class="match-bm-players-player-loadout-item item--backpack">{{&.}}</div>{{/backpackitems}}
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
 									<!-- Special Items -->
@@ -188,16 +181,8 @@ return {
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
-									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">{{&items.1}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.2}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.3}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.4}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.5}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.6}}</div>
-									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.1}}</div>
-									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
-									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
+									{{#items}}<div class="match-bm-players-player-loadout-item">{{&.}}</div>{{/items}}
+									{{#backpackitems}}<div class="match-bm-players-player-loadout-item item--backpack">{{&.}}</div>{{/backpackitems}}
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
 									<!-- Special Items -->

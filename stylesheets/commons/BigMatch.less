@@ -847,15 +847,22 @@ ul.match-bm-lol-game-veto-overview-pick {
 			display: flex;
 			flex-direction: column;
 
-			img {
+			&-icon {
 				border-radius: 0.25rem 0.25rem 0 0;
 				width: 3.75rem;
 				height: 2.5rem;
+				overflow: hidden;
 
 				@media ( min-width: 834px ) {
 					width: 4.5rem;
 					height: 3rem;
 				}
+			}
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
 			}
 
 			&-text {
