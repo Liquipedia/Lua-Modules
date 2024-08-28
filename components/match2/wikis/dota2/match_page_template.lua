@@ -151,9 +151,15 @@ return {
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">{{&items.1}}{{&items.2}}{{&items.3}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.4}}{{&items.5}}{{&items.6}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&backpackitems.1}}{{&backpackitems.2}}{{&backpackitems.3}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.1}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.2}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.3}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.4}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.5}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.6}}</div>
+									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.1}}</div>
+									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
+									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
 									<!-- Special Items -->
@@ -183,9 +189,15 @@ return {
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">{{&items.1}}{{&items.2}}{{&items.3}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.4}}{{&items.5}}{{&items.6}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&backpackitems.1}}{{&backpackitems.2}}{{&backpackitems.3}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.1}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.2}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.3}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.4}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.5}}</div>
+									<div class="match-bm-players-player-loadout-item">{{&items.6}}</div>
+									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.1}}</div>
+									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
+									<div class="match-bm-players-player-loadout-item item--backpack">{{&backpackitems.3}}</div>
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
 									<!-- Special Items -->
