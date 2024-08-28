@@ -166,7 +166,7 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Title{name = 'DEFENSE'},
 			Cell{name = CustomHero.addIconToTitle('Armor'), content = {calculator.armor(1)}},
-			Cell{name = CustomHero.addIconToTitle('Magic Resistance'), content = {calculator.magicRestistance(1)}}
+			Cell{name = CustomHero.addIconToTitle('Magic Resistance'), content = {(calculator.magicRestistance(1) * 100) .. '%'}}
 		)
 
 		Array.appendWith(
@@ -267,7 +267,7 @@ function CustomHero.statsCalculator(args)
 		local bonus = levelToBonus(level)
 		return Math.round(
 			CustomHero.calculateStats(level, args.mr, args.intbase, args.intgain, bonus, 'bonus magic resistance'),
-			2
+			4
 		)
 	end
 
