@@ -69,9 +69,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
-	match.extradata = MatchFunctions.getExtraData(match)
 	match.games = games
 	match.opponents = opponents
+	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
