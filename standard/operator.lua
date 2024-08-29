@@ -67,11 +67,14 @@ end
 ---@param item string|number
 ---@return fun(tbl: table): any
 function Operator.property(item)
-	if string.find(item, '%.') then
-		error('Pathing not yet supported in property')
-	end
+	local pathSegments = mw.text.split(item, '.', true)
+
 	return function(tbl)
-		return tbl[item]
+		local selected = tbl
+		for _, pathSegment in ipairs(pathSegments) do
+			selected = (selected or {})[pathSegment]
+		end
+		return selected
 	end
 end
 
