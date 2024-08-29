@@ -70,10 +70,11 @@ function CustomMatchGroupInput.processMatch(match, options)
 	MatchGroupInputUtil.getCommonTournamentVars(match)
 
 	match.stream = Streams.processStreams(match)
-	match.extradata = MatchFunctions.getExtraData(match)
 
 	match.games = games
 	match.opponents = opponents
+
+	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
