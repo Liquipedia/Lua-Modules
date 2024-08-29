@@ -793,13 +793,10 @@
 	font-size: 85%;
 }
 
+.brkts-popup-body-match-sidewins-overtime,
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
-
-	.skin-lakesideview & {
-		font-weight: 800;
-	}
 
 	& img {
 		[ data-darkreader-scheme="dark" ] &,
@@ -809,16 +806,8 @@
 	}
 }
 
-.brkts-popup-body-match-sidewins-overtime {
-	padding: 0 0 3px 3px;
-	line-height: 11px;
-
-	& img {
-		[ data-darkreader-scheme="dark" ] &,
-		.theme--dark & {
-			filter: invert( 1 );
-		}
-	}
+.brkts-popup-body-match-sidewins .skin-lakesideview & {
+	font-weight: 800;
 }
 
 .brkts-popup-body-operator-bans {
