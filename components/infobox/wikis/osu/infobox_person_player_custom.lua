@@ -24,14 +24,18 @@ local ROLES = {
 	igl = {category = 'In-game leaders', variable = 'In-game leader'},
 	player = {category = 'Players', variable = 'Player'},
 
-	-- Staff and Talents
+	-- Team Staff (haven't yet actually)
 	analyst = {category = 'Analysts', variable = 'Analyst', staff = true},
+	coach = {category = 'Coaches', variable = 'Coach', staff = true},
+	manager = {category = 'Managers', variable = 'Manager', staff = true},
+
+	-- Tournament Talents
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
 	observer = {category = 'Observers', variable = 'Observer', talent = true},
 	host = {category = 'Host', variable = 'Host', talent = true},
-	coach = {category = 'Coaches', variable = 'Coach', staff = true},
 	caster = {category = 'Casters', variable = 'Caster', talent = true},
-	manager = {category = 'Managers', variable = 'Manager', staff = true},
+
+	-- Tournament Staff (osu! unique roles)
 	referee = {category = 'Referees', variable = 'Referee', staff = true},
 	mapper = {category = 'Mappers', variable = 'Mapper', staff = true},
 	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
