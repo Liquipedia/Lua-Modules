@@ -392,7 +392,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		}
 	end) --[[@as table[]]
 
-	local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
 		local player = players[playerIndex]
 
 		return {
@@ -403,7 +403,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		}
 	end)
 
-	Array.forEach(unAttachedPartcipants, function(participant)
+	Array.forEach(unattachedParticipants, function(participant)
 		local nameUpper = participant.name:upper()
 		local isTBD = nameUpper == TBD or nameUpper == TBA
 
@@ -413,10 +413,10 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			flag = participant.flag,
 			extradata = {faction = participant.faction or Faction.defaultFaction},
 		})
-		opponentParticipants[#opponent.match2players] = participant
+		participants[#opponent.match2players] = participant
 	end)
 
-	return Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
+	return Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
 end
 
 ---@param mapInput table

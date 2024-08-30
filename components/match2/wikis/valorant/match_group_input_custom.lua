@@ -215,7 +215,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getParticipants(map, opponents)
-	local participants = {}
+	local allParticipants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -224,7 +224,7 @@ function MapFunctions.getParticipants(map, opponents)
 				(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
 				nil
 		end)
-		local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
 			local stats = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
 			if not stats then
 				return
@@ -238,13 +238,13 @@ function MapFunctions.getParticipants(map, opponents)
 				agent = getCharacterName(stats.agent),
 			}
 		end)
-		Array.forEach(unAttachedPartcipants, function()
-			table.insert(opponentParticipants, table.remove(unAttachedPartcipants, 1))
+		Array.forEach(unattachedParticipants, function()
+			table.insert(participants, table.remove(unattachedParticipants, 1))
 		end)
-		Table.mergeInto(participants, Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 	end)
 
-	return participants
+	return allParticipants
 end
 
 ---@param map table

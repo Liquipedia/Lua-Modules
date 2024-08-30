@@ -207,7 +207,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getParticipants(map, opponents)
-	local participants = {}
+	local allParticipants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = Array.mapIndexes(function(playerIndex)
@@ -215,7 +215,7 @@ function MapFunctions.getParticipants(map, opponents)
 				(map['t' .. opponentIndex .. 'c' .. playerIndex] and {}) or
 				nil
 		end)
-		local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
 			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
 			local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
 			if not brawler then
@@ -226,13 +226,13 @@ function MapFunctions.getParticipants(map, opponents)
 				brawler = getCharacterName(brawler),
 			}
 		end)
-		Array.forEach(unAttachedPartcipants, function()
-			table.insert(opponentParticipants, table.remove(unAttachedPartcipants, 1))
+		Array.forEach(unattachedParticipants, function()
+			table.insert(participants, table.remove(unattachedParticipants, 1))
 		end)
-		Table.mergeInto(participants, Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 	end)
 
-	return participants
+	return allParticipants
 end
 
 return CustomMatchGroupInput

@@ -247,13 +247,13 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getParticipants(MatchParser, map, opponents)
-	local participants = {}
+	local allParticipants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = opponent.match2players or {}
 		local participantList = MatchParser.getParticipants(map, opponentIndex) or {}
-		local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
 			local participant = participantList[playerIndex]
 			if not participant then
 				return
@@ -261,13 +261,13 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 			participant.character = getCharacterName(participant.character)
 			return participant
 		end, OPPONENT_CONFIG)
-		Array.forEach(unAttachedPartcipants, function()
-			table.insert(opponentParticipants, table.remove(unAttachedPartcipants, 1))
+		Array.forEach(unattachedParticipants, function()
+			table.insert(participants, table.remove(unattachedParticipants, 1))
 		end)
-		Table.mergeInto(participants, Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 	end)
 
-	return participants
+	return allParticipants
 end
 
 ---@param winnerInput string|integer|nil
