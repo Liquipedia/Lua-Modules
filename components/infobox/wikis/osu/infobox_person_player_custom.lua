@@ -21,26 +21,25 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
-	['player'] = {category = 'Players', variable = 'Player'},
+	igl = {category = 'In-game leaders', variable = 'In-game leader'},
+	player = {category = 'Players', variable = 'Player'},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
+	analyst = {category = 'Analysts', variable = 'Analyst', staff = true},
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
-	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
-	['host'] = {category = 'Host', variable = 'Host', talent = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
-	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	['referee'] = {category = 'Referees', variable = 'Referee', staff = true},
-	['mapper'] = {category = 'Mappers', variable = 'Mapper', staff = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
+	observer = {category = 'Observers', variable = 'Observer', talent = true},
+	host = {category = 'Host', variable = 'Host', talent = true},
+	coach = {category = 'Coaches', variable = 'Coach', staff = true},
+	caster = {category = 'Casters', variable = 'Caster', talent = true},
+	manager = {category = 'Managers', variable = 'Manager', staff = true},
+	referee = {category = 'Referees', variable = 'Referee', staff = true},
+	mapper = {category = 'Mappers', variable = 'Mapper', staff = true},
+	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
 
 ---@class OsuInfoboxPlayer: Person
 ---@field role {category: string, variable: string, staff: boolean?, talent: boolean?}?
 ---@field role2 {category: string, variable: string, staff: boolean?, talent: boolean?}?
----@field role3 {category: string, variable: string, staff: boolean?, talent: boolean?}?
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -53,7 +52,6 @@ function CustomPlayer.run(frame)
 	player.args.history = TeamHistoryAuto.results{convertrole = true}
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
-    player.role3 = player:_getRoleData(player.args.role3)
 
 	return player:createInfobox()
 end
@@ -72,7 +70,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Role', content = {
 				caller:_displayRole(caller.role),
 				caller:_displayRole(caller.role2),
-                caller:_displayRole(caller.role3),
 			}},
 		}
 	elseif id == 'history' then
@@ -106,7 +103,6 @@ end
 function CustomPlayer:defineCustomPageVariables(args)
 	Variables.varDefine('role', (self.role or {}).variable)
 	Variables.varDefine('role2', (self.role2 or {}).variable)
-    Variables.varDefine('role3', (self.role3 or {}).variable)
 end
 
 ---@param categories string[]
@@ -114,8 +110,7 @@ end
 function CustomPlayer:getWikiCategories(categories)
 	return Array.append(categories,
 		(self.role or {}).category,
-		(self.role2 or {}).category,
-        (self.role3 or {}).category
+		(self.role2 or {}).category
 	)
 end
 
