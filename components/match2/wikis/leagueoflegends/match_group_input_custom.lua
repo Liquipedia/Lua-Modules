@@ -250,16 +250,22 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 	local participants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	for opponentIndex, opponent in ipairs(opponents) do
+	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = opponent.match2players or {}
-		for _, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
-			local playerId = MatchGroupInputUtil.findPlayerId(players, participant.id, nil, OPPONENT_CONFIG)
-			if playerId then
-				participant.character = getCharacterName(participant.character)
-				participants[opponentIndex .. '_' .. playerId] = participant
+		local participantList = MatchParser.getParticipants(map, opponentIndex) or {}
+		local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
+			local participant = participantList[playerIndex]
+			if not participant then
+				return
 			end
-		end
-	end
+			participant.character = getCharacterName(participant.character)
+			return participant
+		end, OPPONENT_CONFIG)
+		Array.forEach(unAttachedPartcipants, function()
+			table.insert(opponentParticipants, table.remove(unAttachedPartcipants, 1))
+		end)
+		Table.mergeInto(participants, Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	end)
 
 	return participants
 end

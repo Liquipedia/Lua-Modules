@@ -1121,12 +1121,11 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink, opti
 	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
 end
 
----@param map table
 ---@param players table[]
----@param searchKeys string|string[]
 ---@param transform fun(playerIndex: integer): table?
+---@param options {pagifyPlayerNames: boolean?}?
 ---@return table, table
-function MatchGroupInputUtil.parseParticipants(map, players, searchKeys, transform)
+function MatchGroupInputUtil.parseParticipants(players, transform, options)
 	local participants = {}
 	local unAttachedPlayers = {}
 	local function parsePlayer(_, playerIndex)
@@ -1134,7 +1133,7 @@ function MatchGroupInputUtil.parseParticipants(map, players, searchKeys, transfo
 		if not playerData then
 			return
 		end
-		local playerId = MatchGroupInputUtil.findPlayerId(players, playerData.name, playerData.link)
+		local playerId = MatchGroupInputUtil.findPlayerId(players, playerData.player, playerData.link, options)
 		if playerId then
 			participants[playerId] = playerData
 		else
@@ -1142,11 +1141,6 @@ function MatchGroupInputUtil.parseParticipants(map, players, searchKeys, transfo
 		end
 	end
 	Array.forEach(players, parsePlayer)
-	for _, _, playerIndex in Table.iter.pairsByPrefix(map, searchKeys) do
-		if playerIndex > #players then
-			parsePlayer(nil, playerIndex)
-		end
-	end
 
 	return participants, unAttachedPlayers
 end

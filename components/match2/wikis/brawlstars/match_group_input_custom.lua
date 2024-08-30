@@ -209,19 +209,28 @@ end
 function MapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
-	for opponentIndex, opponent in ipairs(opponents) do
-		local players = opponent.match2players or {}
-		for _, playerName, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
-			local player = {
-				player = playerName,
-				brawler = getCharacterName(map['t' .. opponentIndex .. 'c' .. playerIndex]),
-			}
-			local playerId = MatchGroupInputUtil.findPlayerId(players, player.player)
-			if playerId then
-				participants[opponentIndex .. '_' .. playerId] = player
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local players = Array.mapIndexes(function(playerIndex)
+			return opponent.match2players[playerIndex] or
+				(map['t' .. opponentIndex .. 'c' .. playerIndex] and {}) or
+				nil
+		end)
+		local opponentParticipants, unAttachedPartcipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
+			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
+			if not brawler then
+				return
 			end
-		end
-	end
+			return {
+				player = player,
+				brawler = getCharacterName(brawler),
+			}
+		end)
+		Array.forEach(unAttachedPartcipants, function()
+			table.insert(opponentParticipants, table.remove(unAttachedPartcipants, 1))
+		end)
+		Table.mergeInto(participants, Table.map(opponentParticipants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	end)
 
 	return participants
 end
