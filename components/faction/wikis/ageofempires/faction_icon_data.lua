@@ -7,59 +7,59 @@
 --
 
 local byFactionAoE1 = {
-    assyrians = {
+	assyrians = {
 		icon = 'File:Assyrian AOE DE ROR icon.webp',
 	},
-    babylonians = {
+	babylonians = {
 		icon = 'File:Babylonian AOE DE ROR icon.webp',
 	},
-    carthaginians = {
+	carthaginians = {
 		icon = 'File:Carthaginian AOE DE ROR icon.webp',
 	},
-    choson = {
+	choson = {
 		icon = 'File:Choson AOE DE ROR icon.webp',
 	},
-    egyptians = {
+	egyptians = {
 		icon = 'File:Egyptian AOE DE ROR icon.webp',
 	},
-    greeks = {
+	greeks = {
 		icon = 'File:Greek AOE DE ROR icon.webp',
 	},
-    hittites = {
+	hittites = {
 		icon = 'File:Hittite AOE DE ROR icon.webp',
 	},
-    macedonians = {
+	macedonians = {
 		icon = 'File:Macedonian AOE DE ROR icon.webp',
 	},
-    minoans = {
+	minoans = {
 		icon = 'File:Minoan AOE DE ROR icon.webp',
 	},
-    palmyrans = {
+	palmyrans = {
 		icon = 'File:Palmyran AOE DE ROR icon.webp',
 	},
-    persians = {
+	persians = {
 		icon = 'File:Persian AOE DE ROR icon.webp',
 	},
-    phoenicians = {
+	phoenicians = {
 		icon = 'File:Phoenician AOE DE ROR icon.webp',
 	},
-    romans = {
+	romans = {
 		icon = 'File:Roman AOE DE ROR icon.webp',
 	},
-    shang = {
+	shang = {
 		icon = 'File:Shang AOE DE ROR icon.webp',
 	},
-    sumerians = {
+	sumerians = {
 		icon = 'File:Sumerian AOE DE ROR icon.webp',
 	},
-    yamato = {
+	yamato = {
 		icon = 'File:Yamato AOE DE ROR icon.webp',
 	},
-    lacviet = {
+	lacviet = {
 		icon = 'File:Lac Viet AOE DE ROR icon.webp',
 	},
 
-    unknown = {
+	unknown = {
 		icon = 'File:Char head filler.png',
 	},
 }
@@ -210,77 +210,77 @@ local byFactionAoE2 = {
 }
 
 local byFactionAoE3 = {
-    aztecs = {
+	aztecs = {
 		icon = 'File:Aztecs AoE3 icon.png',
 	},
-    british = {
+	british = {
 		icon = 'File:British AoE3 icon.png',
 	},
-    chinese = {
+	chinese = {
 		icon = 'File:Chinese AoE3 icon.png',
 	},
-    dutch = {
+	dutch = {
 		icon = 'File:Dutch AoE3 icon.png',
 	},
-    ethiopians = {
+	ethiopians = {
 		icon = 'File:Ethiopians AoE3 icon.png',
 	},
-    french = {
+	french = {
 		icon = 'File:French AoE3 icon.png',
 	},
-    germans = {
+	germans = {
 		icon = 'File:Germans AoE3 icon.png',
 	},
-    haudenosaunee = {
+	haudenosaunee = {
 		icon = 'File:Haudenosaunee AoE3 icon.png',
 	},
-    hausa = {
+	hausa = {
 		icon = 'File:Hausa AoE3 icon.png',
 	},
-    incas = {
+	incas = {
 		icon = 'File:Incas AoE3 icon.png',
 	},
-    indians = {
+	indians = {
 		icon = 'File:Indians AoE3 icon.png',
 	},
-    italians = {
+	italians = {
 		icon = 'File:Italians AoE3 icon.png',
 	},
-    japanese = {
+	japanese = {
 		icon = 'File:Japanese AoE3 icon.png',
 	},
-    lakota = {
+	lakota = {
 		icon = 'File:Lakota AoE3 icon.png',
 	},
-    maltese = {
+	maltese = {
 		icon = 'File:Maltese AoE3 icon.png',
 	},
-    mexicans = {
+	mexicans = {
 		icon = 'File:Mexicans AoE3 icon.png',
 	},
-    ottomans = {
+	ottomans = {
 		icon = 'File:Ottomans AoE3 icon.png',
 	},
-    portuguese = {
+	portuguese = {
 		icon = 'File:Portuguese AoE3 icon.png',
 	},
-    russians = {
+	russians = {
 		icon = 'File:Russians AoE3 icon.png',
 	},
-    spanish = {
+	spanish = {
 		icon = 'File:Spanish AoE3 icon.png',
 	},
-    swedes = {
+	swedes = {
 		icon = 'File:Swedes AoE3 icon.png',
 	},
-    unitedstates = {
+	unitedstates = {
 		icon = 'File:United States AoE3 icon.png',
 	},
-    random = {
+	random = {
 		icon = 'File:Random AoE3 icon.png',
 	},
 
-    unknown = {
+	unknown = {
 		icon = 'File:Char head filler.png',
 	},
 }

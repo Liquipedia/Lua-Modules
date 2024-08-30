@@ -434,7 +434,7 @@ end
 ---@param displayName string
 ---@return integer
 function MapFunctions.getPlayerIndex(players, name, displayName)
-	local playerIndex =  Array.indexOf(players, function(player) return player.name == name end)
+	local playerIndex = Array.indexOf(players, function(player) return player.name == name end)
 
 	if playerIndex ~= 0 then
 		return playerIndex

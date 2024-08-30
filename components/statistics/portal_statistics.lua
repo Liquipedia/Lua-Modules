@@ -465,7 +465,7 @@ function StatisticsPortal.prizepoolBreakdown(args)
 	local colIndex = 1
 
 	for _, yearValue in pairs(defaultYearTable) do
-		local conditions =  StatisticsPortal._returnBaseConditions()
+		local conditions = StatisticsPortal._returnBaseConditions()
 
 		if args.game then
 			conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
@@ -782,7 +782,7 @@ function StatisticsPortal.playerAgeTable(args)
 			:tag('td')
 				:node(OpponentDisplay.BlockOpponent{
 					opponent = StatisticsPortal._toOpponent(player),
-					showPlayerTeam  = true,
+					showPlayerTeam = true,
 				}):done()
 			:tag('td')
 				:wikitext(yearAge .. ' years, ' .. dayAge .. ' days')
@@ -1042,7 +1042,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 		local placement = string.sub(item.placement, 1, 1)
 		for _, opponent in pairs(makeOpponentTable(item) or {}) do
 			if not data[opponent] then
-				data[opponent] = {['1'] = 0, ['2'] =  0, ['3'] = 0, showWins = 0, sWinData = {}}
+				data[opponent] = {['1'] = 0, ['2'] = 0, ['3'] = 0, showWins = 0, sWinData = {}}
 			end
 			if placement == FIRST and item.liquipediatier == TIER1 and item.liquipediatiertype ~= SHOWMATCH then
 				table.insert(data[opponent].sWinData, {

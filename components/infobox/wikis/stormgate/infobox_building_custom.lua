@@ -108,7 +108,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
 		local hotkeyName = table.concat(Array.append({},
-			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+			args.hotkey and 'Hotkeys', args.macro_key and 'Macrokeys'
 		), HOTKEY_SEPERATOR)
 		local hotkeys = table.concat(Array.append({},
 			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
@@ -226,7 +226,7 @@ function CustomBuilding:setLpdbData(args)
 			respawn = tonumber(args.respawn),
 			creeps = Array.parseCommaSeparatedString(args.creeps),
 			capturepoint = args.capture_point,
-			globalbuff =  args.global_buff,
+			globalbuff = args.global_buff,
 		},
 	})
 end
