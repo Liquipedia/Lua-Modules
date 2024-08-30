@@ -24,7 +24,7 @@ function RatingsDisplayGraph.build(teamRankings)
 	return mw.ext.Charts.chart({
 		xAxis = {
 			type = 'category',
-			data =  Array.map(teams[1].progression or {}, Operator.property('date'))
+			data = Array.map(teams[1].progression or {}, Operator.property('date'))
 		},
 		yAxis = {
 			name = 'Rating',
@@ -53,7 +53,7 @@ function RatingsDisplayGraph.build(teamRankings)
 		},
 		series = Array.map(teams, function(team)
 			return {
-				data =  Array.map(team.progression, Operator.property('rating')),
+				data = Array.map(team.progression, Operator.property('rating')),
 				type = 'line',
 				name = team.shortName
 			}

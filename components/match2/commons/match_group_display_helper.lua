@@ -158,7 +158,7 @@ end
 ---@param walkover string?
 ---@param winner integer?
 ---@return string
-function DisplayHelper.MapScore(score, opponentIndex, resultType,  walkover, winner)
+function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
 	if resultType == 'default' then
 		return opponentIndex == winner and 'W' or string.upper(walkover or '')
 	end

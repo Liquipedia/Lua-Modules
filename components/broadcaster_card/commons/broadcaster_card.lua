@@ -134,7 +134,7 @@ end
 function BroadcasterCard._display(broadcaster, options)
 	local displayName = broadcaster.displayName or broadcaster.name
 
-	if String.isNotEmpty(displayName)  and (options.alwaysShowName or displayName ~= broadcaster.id) then
+	if String.isNotEmpty(displayName) and (options.alwaysShowName or displayName ~= broadcaster.id) then
 		displayName = ('&nbsp;(' .. displayName ..')')
 	else
 		displayName = ''

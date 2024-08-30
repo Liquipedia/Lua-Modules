@@ -60,7 +60,7 @@ return {
 							</div>
 							{{/teams.1.picks}}
 						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row  match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
+						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
 							{{#teams.1.bans}}
 							<div class="match-bm-game-veto-overview-team-veto-row-item">
 								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
@@ -81,7 +81,7 @@ return {
 							</div>
 							{{/teams.2.picks}}
 						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row  match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
+						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
 							{{#teams.2.bans}}
 							<div class="match-bm-game-veto-overview-team-veto-row-item">
 								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>

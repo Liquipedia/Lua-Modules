@@ -745,7 +745,7 @@ end
 ---@param winnerInput integer|string|nil
 ---@param opponents {score: number, status: string}[]
 ---@return integer? # Winner
-function MatchGroupInputUtil.getWinner(resultType, winnerInput,  opponents)
+function MatchGroupInputUtil.getWinner(resultType, winnerInput, opponents)
 	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then

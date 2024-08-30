@@ -121,7 +121,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	end
 
 	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
-	local person =  Lpdb.SquadPlayer:new{
+	local person = Lpdb.SquadPlayer:new{
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = String.nilIfEmpty(args.name),
