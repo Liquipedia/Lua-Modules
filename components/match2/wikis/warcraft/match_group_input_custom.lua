@@ -264,7 +264,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 		}
 	}
 
-	map.finished = MapFunctions.isFinished(mapInput, opponentCount)
+	map.finished = MatchGroupInputUtil.mapIsFinished(map)
 	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore({
 			walkover = mapInput.walkover,
@@ -284,37 +284,6 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 	end
 
 	return map, subGroup
-end
-
----@param mapInput table
----@param opponentCount integer
----@return boolean
-function MapFunctions.isFinished(mapInput, opponentCount)
-	local finished = Logic.readBoolOrNil(mapInput.finished)
-	if finished ~= nil then
-		return finished
-	end
-
-	if Logic.isNotEmpty(mapInput.winner) then
-		return true
-	end
-
-	if Logic.isNotEmpty(mapInput.walkover) then
-		return true
-	end
-
-	if Logic.isNotEmpty(mapInput.finished) then
-		return true
-	end
-
-	-- check for manual score inputs
-	for opponentIndex = 1, opponentCount do
-		if String.isNotEmpty(mapInput['score' .. opponentIndex]) then
-			return true
-		end
-	end
-
-	return false
 end
 
 ---@param winnerInput string|integer|nil
