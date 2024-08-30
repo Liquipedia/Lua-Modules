@@ -224,22 +224,26 @@ function MapFunctions.getParticipants(map, opponents)
 				(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
 				nil
 		end)
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
-			local stats = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
-			if not stats then
-				return
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			players,
+			function(playerIndex)
+				local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+				return data and {player = data.player} or nil
+			end,
+			function(playerIndex, playerData)
+				local stats = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+				return {
+					kills = stats.kills,
+					deaths = stats.deaths,
+					assists = stats.assists,
+					acs = stats.acs,
+					player = playerData.player,
+					agent = getCharacterName(stats.agent),
+				}
 			end
-			return {
-				kills = stats.kills,
-				deaths = stats.deaths,
-				assists = stats.assists,
-				acs = stats.acs,
-				player = stats.player,
-				agent = getCharacterName(stats.agent),
-			}
-		end)
-		Array.forEach(unattachedParticipants, function()
-			table.insert(participants, table.remove(unattachedParticipants, 1))
+		)
+		Array.forEach(unattachedParticipants, function(participant)
+			table.insert(participants, participant)
 		end)
 		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 	end)

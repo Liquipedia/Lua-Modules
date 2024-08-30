@@ -253,16 +253,23 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = opponent.match2players or {}
 		local participantList = MatchParser.getParticipants(map, opponentIndex) or {}
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
-			local participant = participantList[playerIndex]
-			if not participant then
-				return
-			end
-			participant.character = getCharacterName(participant.character)
-			return participant
-		end, OPPONENT_CONFIG)
-		Array.forEach(unattachedParticipants, function()
-			table.insert(participants, table.remove(unattachedParticipants, 1))
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			players,
+			function (playerIndex)
+				local participant = participantList[playerIndex]
+				if not participant then
+					return
+				end
+				return {player = participant.player}
+			end,
+			function(playerIndex)
+				local participant = participantList[playerIndex]
+				participant.character = getCharacterName(participant.character)
+				return participant
+			end,
+			OPPONENT_CONFIG)
+		Array.forEach(unattachedParticipants, function(participant)
+			table.insert(participants, participant)
 		end)
 		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 	end)

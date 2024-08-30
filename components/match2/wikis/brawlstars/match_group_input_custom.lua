@@ -215,17 +215,23 @@ function MapFunctions.getParticipants(map, opponents)
 				(map['t' .. opponentIndex .. 'c' .. playerIndex] and {}) or
 				nil
 		end)
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
-			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
-			local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
-			if not brawler then
-				return
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			players,
+			function(playerIndex)
+				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+				if not player then
+					return
+				end
+				return {player = player}
+			end,
+			function(playerIndex, playerData)
+				local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
+				return {
+					player = playerData.player,
+					brawle = getCharacterName(brawler),
+				}
 			end
-			return {
-				player = player,
-				brawler = getCharacterName(brawler),
-			}
-		end)
+		)
 		Array.forEach(unattachedParticipants, function()
 			table.insert(participants, table.remove(unattachedParticipants, 1))
 		end)

@@ -406,7 +406,8 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 				flag = Flags.CountryName(playerData.flag),
 				position = playerIndex,
 			}
-	end)
+		end
+	)
 
 	Array.forEach(unattachedParticipants, function(participant)
 		local nameUpper = participant.name:upper()
