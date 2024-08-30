@@ -378,9 +378,6 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 
 	local players = Array.mapIndexes(function(playerIndex)
-		if opponent.match2players[playerIndex] then
-			return opponent.match2players[playerIndex]
-		end
 		local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 
 		if Logic.isEmpty(mapInput[prefix]) then return end
@@ -392,15 +389,23 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		}
 	end) --[[@as table[]]
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(players, function(playerIndex)
-		local player = players[playerIndex]
-
-		return {
-			faction = player.faction or player.extradata.faction,
-			player = player.displayname,
-			link = player.name,
-			flag = Flags.CountryName(player.flag),
-		}
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		players,
+		function(playerIndex)
+			local player = players[playerIndex]
+			return {
+				player = player.displayname,
+				link = player.name,
+				faction = player.faction,
+			}
+		end,
+		function(playerIndex, playerData)
+			return {
+				faction = playerData.faction or playerData.extradata.faction,
+				player = playerData.link,
+				flag = Flags.CountryName(playerData.flag),
+				position = playerIndex,
+			}
 	end)
 
 	Array.forEach(unattachedParticipants, function(participant)
