@@ -75,6 +75,7 @@ function MatchGroupLegacyDefault:getMap()
 		vod = 'vodgame$1$',
 		subgroup = 'map$1$subgroup',
 		walkover = 'map$1$walkover',
+		finished = 'map$1$finished',
 	}
 
 	if self.bracketType == 'team' then
