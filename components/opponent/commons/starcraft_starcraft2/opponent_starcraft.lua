@@ -126,7 +126,7 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 ]]
 ---@param opponent StarcraftStandardOpponent
 ---@param date string|number|osdate|nil
----@param options {syncPlayer: boolean?, overwriteVars: boolean?}
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}
 ---@return StarcraftStandardOpponent
 function StarcraftOpponent.resolve(opponent, date, options)
 	options = options or {}
@@ -140,7 +140,7 @@ function StarcraftOpponent.resolve(opponent, date, options)
 				StarcraftPlayerExt.syncPlayer(player, {
 					savePageVar = savePageVar,
 					date = date,
-					overwriteVars = options.overwriteVars,
+					overwritePageVars = options.overwritePageVars,
 				})
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
