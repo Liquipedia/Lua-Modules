@@ -82,6 +82,11 @@ local VALVE_TIERS = {
 	['major qualifier'] = {meta = 'Major Championship main qualifier', name = 'Major Qualifier', link = 'Majors'},
 	['minor'] = {meta = 'Regional Minor Championship', name = 'Minor Championship', link = 'Minors'},
 	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
+	['tier 1'] = {meta = 'Valve Tier 1 event', name = 'Tier 1', link = 'Valve Tier 1 Events'},
+	['tier 1 qualifier'] = {meta = 'Valve Tier 1 qualifier', name = 'Tier 1 Qualifier', link = 'Valve Tier 1 Events'},
+	['tier 2'] = {meta = 'Valve Tier 2 event', name = 'Tier 2', link = 'Valve Tier 2 Events'},
+	['tier 2 qualifier'] = {meta = 'Valve Tier 2 qualifier', name = 'Tier 2 Qualifier', link = 'Valve Tier 2 Events'},
+	['wildcard'] = {meta = 'Valve Wildcard qualifier', name = 'Wildcard', link = 'Valve Wildcard Events'},
 }
 
 local RESTRICTIONS = {
