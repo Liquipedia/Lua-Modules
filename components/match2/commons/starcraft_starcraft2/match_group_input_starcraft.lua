@@ -396,7 +396,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			return {
 				faction = playerData.faction or playerData.extradata.faction,
 				player = playerData.name,
-				flag = Flags.CuntryName(playerData.flag),
+				flag = Flags.CountryName(playerData.flag),
 				position = playerIndex,
 			}
 		end
