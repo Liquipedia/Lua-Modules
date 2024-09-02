@@ -588,7 +588,7 @@ function mw.text.nowiki(s)
 end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
----@param s string
+---@param s string|number
 ---@param pattern string?
 ---@param plain boolean?
 ---@return string[]
