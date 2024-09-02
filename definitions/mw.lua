@@ -328,7 +328,7 @@ end
 ---@return number|string
 function mw.language:formatDate(format, timestamp, localTime)
 	local function localTimezoneOffset(ts)
-		local utcDt   = os.date("!*t", ts)
+		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
 		localDt.isdst = false
 		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
@@ -794,14 +794,14 @@ mw.ustring = {}
 
 ---Returns individual bytes; identical to string.byte().
 ---@see string.byte
----@param s  string|number
+---@param s string|number
 ---@param i? integer
 ---@param j? integer
 ---@return integer ...
 function mw.ustring.byte(s, i, j) end
 
 ---Returns the byte offset of a character in the string. The default for both l and i is 1. i may be negative, in which case it counts from the end of the string.
----@param s  string|number
+---@param s string|number
 ---@param l? integer
 ---@param i? integer
 ---@return integer ...
@@ -815,7 +815,7 @@ function mw.ustring.char(...) end
 
 ---Much like string.byte(), except that the return values are codepoints and the offsets are characters rather than bytes.
 ---@see string.byte
----@param s  string|number
+---@param s string|number
 ---@param i? integer
 ---@param j? integer
 ---@return integer ...
@@ -823,10 +823,10 @@ function mw.ustring.codepoint(s, i, j) end
 
 ---Much like string.find(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.find
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
----@param init?   integer
----@param plain?  boolean
+---@param init? integer
+---@param plain? boolean
 ---@return integer|nil start
 ---@return integer|nil end
 ---@return any|nil ... captured
@@ -840,7 +840,7 @@ function mw.ustring.find(s, pattern, init, plain) end
 function mw.ustring.format(format, ...) end
 
 ---Returns three values for iterating over the codepoints in the string. i defaults to 1, and j to -1. This is intended for use in the iterator form of for:
----@param s  string|number
+---@param s string|number
 ---@param i? integer
 ---@param j? integer
 ---@return string
@@ -848,17 +848,17 @@ function mw.ustring.gcodepoint(s, i, j) end
 
 ---Much like string.gmatch(), except that the pattern is extended as described in Ustring patterns.
 ---@see string.gmatch
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
 ---@return fun():string, ...
 function mw.ustring.gmatch(s, pattern) end
 
 ---Much like string.gmatch(), except that the pattern is extended as described in Ustring patterns.
 ---@see string.gsub
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
----@param repl    string|number|table|function
----@param n?      integer
+---@param repl string|number|table|function
+---@param n? integer
 ---@return string
 ---@return integer count
 function mw.ustring.gsub(s, pattern, repl, n) end
@@ -887,44 +887,44 @@ end
 
 ---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.match
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
----@param init?   integer
+---@param init? integer
 ---@return any ...
 function mw.ustring.match(s, pattern, init) end
 
 ---Identical to string.rep().
 ---@see string.rep
----@param s    string|number
----@param n    integer
+---@param s string|number
+---@param n integer
 ---@return string
 function mw.ustring.rep(s, n) end
 
 ---Identical to string.sub().
 ---@see string.sub
----@param s  string|number
----@param i  integer
+---@param s string|number
+---@param i integer
 ---@param j? integer
 ---@return string
 function mw.ustring.sub(s, i, j) end
 
 ---Converts the string to Normalization Form C (also known as Normalization Form Canonical Composition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFC(s) return tostring(s) end
 
 ---Converts the string to Normalization Form D (also known as Normalization Form Canonical Decomposition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFD(s) return tostring(s) end
 
 ---Converts the string to Normalization Form KC (also known as Normalization Form Compatibility Composition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFKC(s) return tostring(s) end
 
 ---Converts the string to Normalization Form KD (also known as Normalization Form Compatibility Decomposition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFKD(s) return tostring(s) end
 

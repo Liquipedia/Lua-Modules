@@ -87,7 +87,7 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 
 	local matchSummary = MatchSummary():init()
 		:addClass('brkts-popup-sc')
-		:addClass(match.opponentMode ~= UNIFORM_MATCH  and 'brkts-popup-sc-team-match' or nil)
+		:addClass(match.opponentMode ~= UNIFORM_MATCH and 'brkts-popup-sc-team-match' or nil)
 
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then

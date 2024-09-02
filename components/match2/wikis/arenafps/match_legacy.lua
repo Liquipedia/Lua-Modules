@@ -14,7 +14,6 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 ---@param match2 table
----@param options table
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
