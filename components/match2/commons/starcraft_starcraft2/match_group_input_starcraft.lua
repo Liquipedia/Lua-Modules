@@ -352,7 +352,7 @@ end
 
 ---@param mapInput table
 ---@param opponents table[]
----@return table<string, {faction: string?, player: string, flag: string?}>
+---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
 function MapFunctions.getParticipants(mapInput, opponents)
 	local participants = {}
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -371,7 +371,7 @@ end
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {faction: string?, player: string, flag: string?}>
+---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race'])
 		or Faction.read(mapInput['opponent' .. opponentIndex .. 'race'])
@@ -422,7 +422,7 @@ end
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {faction: string?, player: string, flag: string?}>
+---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
@@ -453,7 +453,7 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table # the input data
----@param participants table<string, {faction: string?, player: string, flag: string?}>
+---@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMode(mapInput, participants, opponents)
@@ -483,7 +483,7 @@ function MapFunctions.getMode(mapInput, participants, opponents)
 end
 
 ---@param map table
----@param participants table<string, {faction: string?, player: string, flag: string?}>
+---@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
 ---@return {}?
 function MapFunctions.getAdditionalExtraData(map, participants)
 	if map.mode ~= '1v1' then return end
