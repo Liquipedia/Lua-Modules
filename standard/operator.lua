@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+
 local Operator = {}
 
 ---Uses the __add metamethod (a + b)
@@ -75,9 +77,9 @@ function Operator.property(item)
 	return function(tbl)
 		local selected = tbl
 		for segmentIndex, pathSegment in ipairs(pathSegments) do
-			if not selected and segmentIndex == 1 then
+			if type(selected) ~= 'table' and segmentIndex == 1 then
 				error('Nil supplied to `Operator.property(' .. item .. ')`')
-			elseif not selected then
+			elseif type(selected) ~= 'table' then
 				local pathUntilHere = Array.sub(pathSegments, 1, segmentIndex - 1)
 				error('Could not index "tbl.' .. table.concat(pathUntilHere, '.') .. '"')
 			end
