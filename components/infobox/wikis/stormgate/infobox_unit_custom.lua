@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
 		local hotkeyName = table.concat(Array.append({},
-			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+			args.hotkey and 'Hotkeys', args.macro_key and 'Macrokeys'
 		), HOTKEY_SEPERATOR)
 		local hotkeys = table.concat(Array.append({},
 			args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2),

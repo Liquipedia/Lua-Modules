@@ -119,12 +119,12 @@ local infoData = {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			opponentHeight = 26,
 			scoreWidth = 26,
 			matchWidth = 200,
 		},
 	},
-	match2 = 2,
 }
 
 infoData.games.cs16 = infoData.games.cs1

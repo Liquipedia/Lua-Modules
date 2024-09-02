@@ -22,7 +22,7 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
-	pagifyOpponentName = false,
+	pagifyTeamNames = false,
 	pagifyPlayerNames = true,
 	maxNumPlayers = 15,
 }
@@ -112,10 +112,11 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
-	match.extradata = MatchFunctions.getExtraData(match)
 
 	match.games = games
 	match.opponents = opponents
+
+	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end

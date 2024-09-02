@@ -24,7 +24,7 @@ local Streams = Lua.import('Module:Links/Stream')
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
-	pagifyOpponentName = true,
+	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
@@ -109,10 +109,11 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
 	match.links = MatchFunctions.getLinks(match)
-	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	match.games = games
 	match.opponents = opponents
+
+	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	return match
 end

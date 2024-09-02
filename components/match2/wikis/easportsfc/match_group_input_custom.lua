@@ -491,7 +491,7 @@ function CustomMatchGroupInput._processTeamPlayerMapData(players, opponentIndex,
 			playerData = Table.merge(playerData, {name = player:gsub(' ', '_'), displayname = map[playerKey] or player})
 		end
 
-		participants[opponentIndex .. '_' .. match2playerIndex] =  playerData
+		participants[opponentIndex .. '_' .. match2playerIndex] = playerData
 	end
 end
 

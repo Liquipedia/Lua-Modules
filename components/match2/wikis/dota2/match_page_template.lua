@@ -14,7 +14,7 @@ return {
 	header =
 		[=[
 			<div class="match-bm-lol-match-header">
-				<div class="match-bm-match-header-powered-by">[[File:SAP logo.svg|link=]]</div>
+				<div class="match-bm-match-header-powered-by">[[File:DataProvidedSAP.svg|link=]]</div>
 				<div class="match-bm-lol-match-header-overview">
 					<div class="match-bm-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-match-header-team-group"><div class="match-bm-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div class="match-bm-lol-match-header-round-results">{{#seriesDots}}<div class="match-bm-lol-match-header-round-result result--{{.}}"></div>{{/seriesDots}}</div>{{/opponents.1}}</div></div>
 					<div class="match-bm-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}<div class="match-bm-match-header-result-text">{{statusText}}</div></div>
@@ -60,7 +60,7 @@ return {
 							</div>
 							{{/teams.1.picks}}
 						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row  match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
+						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
 							{{#teams.1.bans}}
 							<div class="match-bm-game-veto-overview-team-veto-row-item">
 								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
@@ -81,7 +81,7 @@ return {
 							</div>
 							{{/teams.2.picks}}
 						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row  match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
+						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
 							{{#teams.2.bans}}
 							<div class="match-bm-game-veto-overview-team-veto-row-item">
 								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
@@ -97,6 +97,7 @@ return {
 				<div class="match-bm-team-stats-header">
 					{{#winnerName}}<h4 class="match-bm-team-stats-header-title">{{winnerName}} Victory</h4>{{/winnerName}}
 					{{^winnerName}}<h4 class="match-bm-team-stats-header-title">No winner determined yet</h4>{{/winnerName}}
+					{{#length}}<div>{{length}}</div>{{/length}}
 				</div>
 				<div class="match-bm-team-stats-container">
 					<div class="match-bm-team-stats-team">
@@ -145,15 +146,14 @@ return {
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
 								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
-								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
+								<div class="match-bm-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">{{&items.1}}{{&items.2}}{{&items.3}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.4}}{{&items.5}}{{&items.6}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&backpackitems.1}}{{&backpackitems.2}}{{&backpackitems.3}}</div>
+									{{#items}}<div class="match-bm-players-player-loadout-item">{{&.}}</div>{{/items}}
+									{{#backpackitems}}<div class="match-bm-players-player-loadout-item item--backpack">{{&.}}</div>{{/backpackitems}}
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
 									<!-- Special Items -->
@@ -177,15 +177,13 @@ return {
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
 								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
-								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
+								<div class="match-bm-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
-									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">{{&items.1}}{{&items.2}}{{&items.3}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&items.4}}{{&items.5}}{{&items.6}}</div>
-									<div class="match-bm-players-player-loadout-item">{{&backpackitems.1}}{{&backpackitems.2}}{{&backpackitems.3}}</div>
+									{{#items}}<div class="match-bm-players-player-loadout-item">{{&.}}</div>{{/items}}
+									{{#backpackitems}}<div class="match-bm-players-player-loadout-item item--backpack">{{&.}}</div>{{/backpackitems}}
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
 									<!-- Special Items -->

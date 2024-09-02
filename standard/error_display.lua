@@ -116,7 +116,7 @@ function ErrorDisplay.ClassicError(error)
 			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
 		elseif frameSplit[1]:sub(1, 3) == 'mw.' then
 			stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
-			stackEntry.content =  table.concat(frameSplit, ':', 3)
+			stackEntry.content = table.concat(frameSplit, ':', 3)
 		elseif frameSplit[1] == 'Module' then
 			local wiki = not Page.exists(table.concat(frameSplit, ':', 1, 2)) and 'commons'
 				or mw.text.split(mw.title.getCurrentTitle():canonicalUrl(), '/', true)[4] or 'commons'

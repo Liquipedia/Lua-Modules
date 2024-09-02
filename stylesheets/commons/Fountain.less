@@ -23,11 +23,34 @@ html.theme--dark .componentsinvert {
 	font-weight: bold;
 }
 
+.primaryAttribute {
+	&_str {
+		background: var( --clr-semantic-negative-40 ); // #b81414 (Old #b9500b)
+	}
+
+	&_agi {
+		background: var( --clr-semantic-positive-30 ); // #1d7c1d (Old #167c13)
+	}
+
+	&_int {
+		background: var( --clr-sapphire-base ); // #3a5ba9 (Old #257dae)
+	}
+
+	&_uni {
+		background: var( --clr-semantic-negative-40 ); // #732b9c (Old 5d3fd3)
+	}
+} // Colors the Attribute base + gain section
+
 #primaryAttribute img,
 .primaryAttribute img {
-	border: 0.125rem solid #ffffff;
+	border: 0.125rem solid var( --clr-primary-100 ); // #fff
 	border-radius: 50%;
 } // Circles the Primary Attribute.
+
+.secondaryAttribute img {
+	border: 0.125rem solid var( --clr-secondary-7 ); // #121212
+	border-radius: 50%;
+} // Circles the Secondary Attribute.
 
 .ib-tooltip {
 	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
@@ -408,6 +431,9 @@ a.cf {
 		text-align: left;
 	}
 }
+
+// ValueColor (Will eventually move all color-related stuff to this stylesheet.
+// ValueColor section end.
 
 // $craft-related
 // This is mainly for the mini-infobox within the Spellcard.
@@ -797,7 +823,7 @@ div.gameplay_nav ul li ul li {
 
 /* Template:GameVersionTableElement */
 .gvt-el-significant {
-	background: #ffffcc;
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
 }
 
 /* Template:Talent table el */
