@@ -64,6 +64,7 @@ describe('operator', function()
 			assert.error(function() Operator.property(nil) end)
 		end)
 		it('check wrong tbl input throws', function()
+			assert.error(Operator.property('a'))
 			-- intended type mismatch
 			---@diagnostic disable-next-line: param-type-mismatch
 			assert.error(function() return Operator.property('a')('string') end)
