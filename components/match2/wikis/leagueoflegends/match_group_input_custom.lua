@@ -257,10 +257,7 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 			participantList,
 			function (playerIndex)
 				local participant = participantList[playerIndex]
-				if not participant then
-					return
-				end
-				return {name = participant.player}
+				return participant and {name = participant.player} or nil
 			end,
 			function(playerIndex)
 				local participant = participantList[playerIndex]

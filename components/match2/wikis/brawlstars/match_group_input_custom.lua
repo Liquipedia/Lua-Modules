@@ -218,15 +218,12 @@ function MapFunctions.getParticipants(map, opponents)
 			players,
 			function(playerIndex)
 				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
-				if not player then
-					return
-				end
-				return {name = player}
+				return player and {name = player} or nil
 			end,
-			function(playerIndex, playerData)
+			function(playerIndex, playerIdData)
 				local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
 				return {
-					player = playerData.name,
+					player = playerIdData.name,
 					brawler = getCharacterName(brawler),
 				}
 			end

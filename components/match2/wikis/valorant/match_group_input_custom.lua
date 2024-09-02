@@ -231,14 +231,14 @@ function MapFunctions.getParticipants(map, opponents)
 				local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
 				return data and {name = data.player} or nil
 			end,
-			function(playerIndex, playerData)
+			function(playerIndex, playerIdData)
 				local stats = Json.parseIfString(map['t'.. opponentIndex .. 'p' .. playerIndex])
 				return {
 					kills = stats.kills,
 					deaths = stats.deaths,
 					assists = stats.assists,
 					acs = stats.acs,
-					player = playerData.player,
+					player = playerIdData.player,
 					agent = getCharacterName(stats.agent),
 				}
 			end

@@ -387,16 +387,16 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		function(playerIndex)
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 			return {
-				displayname = mapInput[prefix],
-				name = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
+				name = mapInput[prefix],
+				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
 				faction = isArchon and archonFaction or Faction.read(mapInput[prefix .. 'race']),
 			}
 		end,
-		function(playerIndex, playerData)
+		function(playerIndex, playerIdData, playerInputData)
 			return {
-				faction = playerData.faction or playerData.extradata.faction,
-				player = playerData.name,
-				flag = Flags.CountryName(playerData.flag),
+				faction = playerInputData.faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
+				player = playerIdData.name or playerInputData.link,
+				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
 			}
 		end
@@ -410,7 +410,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			name = isTBD and TBD or participant.link,
 			displayname = isTBD and TBD or nameUpper,
 			flag = participant.flag,
-			extradata = {faction = participant.faction or Faction.defaultFaction},
+			extradata = {faction = participant.faction},
 		})
 		participants[#opponent.match2players] = participant
 	end)
