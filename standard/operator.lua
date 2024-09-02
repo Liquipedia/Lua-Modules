@@ -67,12 +67,22 @@ end
 ---@param item string|number
 ---@return fun(tbl: table): any
 function Operator.property(item)
+	-- catch nil and tables
+	assert(type(item) == 'string' or type(item) == 'number', 'Invalid or missing input to `Operator.property`')
+
 	local pathSegments = mw.text.split(item, '.', true)
 
 	return function(tbl)
 		local selected = tbl
-		for _, pathSegment in ipairs(pathSegments) do
-			selected = (selected or {})[pathSegment]
+		for segmentIndex, pathSegment in ipairs(pathSegments) do
+			if not selected and segmentIndex == 1 then
+				error('Nil supplied to `Operator.property(' .. item .. ')`')
+			elseif not selected then
+				local pathUntilHere = Array.sub(pathSegments, 1, segmentIndex - 1)
+				error('Could not index "tbl.' .. table.concat(pathUntilHere, '.') .. '"')
+			end
+
+			selected = selected[pathSegment] or selected[tonumber(pathSegment)]
 		end
 		return selected
 	end
