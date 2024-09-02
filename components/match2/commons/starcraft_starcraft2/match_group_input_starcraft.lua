@@ -378,32 +378,25 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 
 	local players = Array.mapIndexes(function(playerIndex)
-		local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
-
-		if Logic.isEmpty(mapInput[prefix]) then return end
-
-		return {
-			displayname = mapInput[prefix],
-			name = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
-			faction = isArchon and archonFaction or Faction.read(mapInput[prefix .. 'race']),
-		}
-	end) --[[@as table[]]
+		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
+	end)
 
 	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
 		players,
 		function(playerIndex)
-			local player = players[playerIndex]
+			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 			return {
-				player = player.displayname,
-				link = player.name,
-				faction = player.faction,
+				displayname = mapInput[prefix],
+				name = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
+				faction = isArchon and archonFaction or Faction.read(mapInput[prefix .. 'race']),
 			}
 		end,
 		function(playerIndex, playerData)
 			return {
 				faction = playerData.faction or playerData.extradata.faction,
-				player = playerData.link,
-				flag = Flags.CountryName(playerData.flag),
+				player = playerData.name,
+				flag = Flags.CuntryName(playerData.flag),
 				position = playerIndex,
 			}
 		end

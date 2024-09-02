@@ -225,13 +225,14 @@ function MapFunctions.getParticipants(map, opponents)
 				nil
 		end)
 		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			opponent.match2players,
 			players,
 			function(playerIndex)
 				local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
-				return data and {player = data.player} or nil
+				return data and {name = data.player} or nil
 			end,
 			function(playerIndex, playerData)
-				local stats = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+				local stats = Json.parseIfString(map['t'.. opponentIndex .. 'p' .. playerIndex])
 				return {
 					kills = stats.kills,
 					deaths = stats.deaths,

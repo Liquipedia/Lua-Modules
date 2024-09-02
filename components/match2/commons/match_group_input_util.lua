@@ -1121,12 +1121,13 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink, opti
 	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
 end
 
----@param players table[]
----@param indexToPlayer fun(playerIndex: integer): {player: string?, link: string?}?
+---@param playerIds table[]
+---@param inputPlayers table[]
+---@param indexToPlayer fun(playerIndex: integer): {name: string?, link: string?}?
 ---@param transform fun(playerIndex: integer, playerData: table): table?
 ---@param options {pagifyPlayerNames: boolean?}?
 ---@return table, table
-function MatchGroupInputUtil.parseParticipants(players, indexToPlayer, transform, options)
+function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToPlayer, transform, options)
 	local participants = {}
 	local unattachedParticipants = {}
 	local function parsePlayer(_, playerIndex)
@@ -1134,15 +1135,15 @@ function MatchGroupInputUtil.parseParticipants(players, indexToPlayer, transform
 		if not playerData then
 			return
 		end
-		local playerId = MatchGroupInputUtil.findPlayerId(players, playerData.player, playerData.link, options)
-		local toStoreData = transform(playerIndex, Table.merge(players[playerId], playerData))
+		local playerId = MatchGroupInputUtil.findPlayerId(playerIds, playerData.name, playerData.link, options)
+		local toStoreData = transform(playerIndex, Table.merge(playerIds[playerId], playerData))
 		if playerId then
 			participants[playerId] = toStoreData
 		else
 			table.insert(unattachedParticipants, toStoreData)
 		end
 	end
-	Array.forEach(players, parsePlayer)
+	Array.forEach(inputPlayers, parsePlayer)
 
 	return participants, unattachedParticipants
 end

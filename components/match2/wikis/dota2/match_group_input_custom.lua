@@ -269,16 +269,16 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		local players = opponent.match2players or {}
 		local participantList = MatchParser.getParticipants(map, opponentIndex) or {}
 		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-			players,
+			opponent.match2players,
+			participantList,
 			function (playerIndex)
 				local participant = participantList[playerIndex]
 				if not participant then
 					return
 				end
-				return {player = participant.player}
+				return {name = participant.player}
 			end,
 			function(playerIndex)
 				local participant = participantList[playerIndex]

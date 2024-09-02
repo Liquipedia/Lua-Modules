@@ -211,24 +211,23 @@ function MapFunctions.getParticipants(map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = Array.mapIndexes(function(playerIndex)
-			return opponent.match2players[playerIndex] or
-				(map['t' .. opponentIndex .. 'c' .. playerIndex] and {}) or
-				nil
+			return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'c' .. playerIndex])
 		end)
 		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			opponent.match2players,
 			players,
 			function(playerIndex)
 				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
 				if not player then
 					return
 				end
-				return {player = player}
+				return {name = player}
 			end,
 			function(playerIndex, playerData)
 				local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
 				return {
-					player = playerData.player,
-					brawle = getCharacterName(brawler),
+					player = playerData.name,
+					brawler = getCharacterName(brawler),
 				}
 			end
 		)
