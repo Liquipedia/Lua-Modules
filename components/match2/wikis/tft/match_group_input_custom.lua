@@ -17,11 +17,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Streams = Lua.import('Module:Links/Stream')
 
 local DEFAULT_BESTOF = 3
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
-}
 local DEFAULT_MODE = 'team'
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 
@@ -41,7 +36,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, opponents)

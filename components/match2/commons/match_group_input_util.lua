@@ -177,7 +177,7 @@ end
 ---Warning, mutates first argument by removing the key `opponentX` where X is the second argument
 ---@param match table
 ---@param opponentIndex integer
----@param options readOpponentOptions
+---@param options readOpponentOptions?
 ---@return table?
 function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	options = options or {}
