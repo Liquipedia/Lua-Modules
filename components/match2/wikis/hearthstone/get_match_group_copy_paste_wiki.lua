@@ -12,6 +12,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 ---WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class HearthstoneMatchCopyPaste: Match2CopyPasteBase
@@ -37,12 +39,35 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|o1p1=|o2p1=|winner=}}'
+			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode, opponents)
 		end),
 		'}}'
 	)
 
 	return table.concat(lines, '\n')
+end
+
+--subfunction used to generate code for the Map template, depending on the type of opponent
+---@param mode string
+---@param opponents integer
+---@return string
+function WikiCopyPaste._getMap(mode, opponents)
+	if mode == Opponent.team then
+		return '={{Map|o1p1=|o2p1=|o1p1char=|o2p1char=|winner=}}'
+	elseif mode == Opponent.literal then
+		return '={{Map|winner=}}'
+	end
+
+	local parts = Array.extend({},
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return table.concat(Array.map(Array.range(1, Opponent.partySize(mode) --[[@as integer]]), function(playerIndex)
+				return '|o' .. opponentIndex .. 'p' .. playerIndex .. '='
+			end))
+		end),
+		'}}'
+	)
+
+	return table.concat(parts)
 end
 
 return WikiCopyPaste
