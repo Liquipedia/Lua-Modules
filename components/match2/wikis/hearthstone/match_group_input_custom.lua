@@ -8,10 +8,7 @@
 
 local Array = require('Module:Array')
 local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
-local HeroData = mw.loadData('Module:HeroData')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -30,8 +27,6 @@ local OPPONENT_CONFIG = {
 	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
-local DEFAULT_HERO_FACTION = HeroData.default.faction
-local MODE_MIXED = 'mixed'
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
