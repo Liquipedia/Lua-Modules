@@ -10,12 +10,10 @@ local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -26,7 +24,7 @@ local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts
 local NONE = '-'
 local TBD = Abbreviation.make('TBD', 'To Be Determined') --[[@as string]]
 
----@enum WoTMatchIcons
+---@enum TftMatchIcons
 local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
@@ -309,7 +307,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param showIcon boolean?
----@param iconType WoTMatchIcons?
+---@param iconType string?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
