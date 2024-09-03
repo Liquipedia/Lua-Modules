@@ -228,13 +228,9 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	)
 
 	Array.forEach(unattachedParticipants, function(participant)
-		local isTBD = participant.name:upper() == TBD
-
 		table.insert(opponent.match2players, {
-			name = isTBD and TBD or participant.link,
-			displayname = isTBD and TBD or participant.name,
-			flag = participant.flag,
-			extradata = {faction = participant.faction},
+			name = participant.player,
+			displayname = participant.player,
 		})
 		participants[#opponent.match2players] = participant
 	end)
