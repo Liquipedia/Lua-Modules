@@ -131,7 +131,6 @@ function CustomMatchSummary._createCharacterDisplay(character, reverse)
 		return characterDisplay
 	end
 
-	local characterDisplay = mw.html.create('span'):addClass('draft faction')
 	local charIcon = CharacterIcon.Icon{
 		character = character,
 		size = '64px',
