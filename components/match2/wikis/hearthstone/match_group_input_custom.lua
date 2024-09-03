@@ -141,7 +141,7 @@ function MatchFunctions.extractMaps(match, opponents)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
 
-		map.extradata = MapFunctions.getExtradata(map)
+		map.extradata = MapFunctions.getExtradata(map, opponents)
 
 		map.participants = MapFunctions.getParticipants(map, opponents)
 
@@ -153,9 +153,22 @@ function MatchFunctions.extractMaps(match, opponents)
 end
 
 ---@param mapInput table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtradata(mapInput)
-	return {comment = mapInput.comment}
+function MapFunctions.getExtradata(mapInput, opponents)
+	local extradata = {comment = mapInput.comment}
+
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local prefix = 'o' .. opponentIndex .. 'p'
+		local chars = Array.mapIndexes(function(charIndex)
+			return Logic.nilIfEmpty(mapInput[prefix .. charIndex .. 'char']) or Logic.nilIfEmpty(mapInput[prefix .. charIndex])
+		end)
+		Array.forEach(chars, function(char, charIndex)
+			extradata[prefix .. charIndex] = MapFunctions.readCharacter(char)
+		end)
+	end)
+
+	return extradata
 end
 
 ---@param winnerInput string|integer|nil
