@@ -125,8 +125,10 @@ end
 ---@param reverse boolean?
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(character, reverse)
+	local characterDisplay = mw.html.create('span'):addClass('draft faction')
+
 	if not character then
-		return
+		return characterDisplay
 	end
 
 	local characterDisplay = mw.html.create('span'):addClass('draft faction')
