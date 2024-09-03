@@ -37,19 +37,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
+			return INDENT .. '|map' .. mapIndex .. '={{Map|o1p1=|o2p1=|winner=}}'
 		end),
 		'}}'
 	)
 
 	return table.concat(lines, '\n')
-end
-
---subfunction used to generate code for the Map template, depending on the type of opponent
----@param mode string
----@return string
-function WikiCopyPaste._getMap(mode)
-	return '={{Map|o1p1=|o2p1=|winner=}}'
 end
 
 return WikiCopyPaste
