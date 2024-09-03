@@ -246,7 +246,7 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 
 	Array.forEach(players, function(player, playerIndex)
 		participants[opponentIndex .. '_' .. playerIndex] = {
-			character = MapFunctions.readCharacter(mapInput[prefix .. playerIndex .. 'char']),
+			character = MapFunctions.readCharacter(mapInput[prefix .. playerIndex]),
 			player = player.name,
 		}
 	end)
