@@ -8,18 +8,13 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
 local Streams = Lua.import('Module:Links/Stream')
-
 
 local DEFAULT_BESTOF = 3
 local OPPONENT_CONFIG = {
@@ -27,7 +22,6 @@ local OPPONENT_CONFIG = {
 	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
 }
-local TBD = 'TBD'
 local DEFAULT_MODE = 'team'
 local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 
