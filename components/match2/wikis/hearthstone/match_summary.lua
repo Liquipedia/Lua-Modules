@@ -121,7 +121,7 @@ function CustomMatchSummary._createGame(row, game, props)
 	row:addElement(char2:css('flex', '1 1 35%'))
 end
 
----@param char string?
+---@param character string?
 ---@param reverse boolean?
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(character, reverse)
