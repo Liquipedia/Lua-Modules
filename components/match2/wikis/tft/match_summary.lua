@@ -243,12 +243,6 @@ function CustomMatchSummary.createBody(match)
 
 	return body
 end
----@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
-	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
-end
 
 ---@param game MatchGroupUtilGame
 ---@return MatchSummaryRow
@@ -278,12 +272,12 @@ function CustomMatchSummary._createMapRow(game)
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icons.CHECK))
-		:node(CustomMatchSummary._gameScore(game, 1))
+		:node(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
 		:css('width', '20%')
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._gameScore(game, 2))
+		:node(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icons.CHECK))
 		:css('width', '20%')
 
