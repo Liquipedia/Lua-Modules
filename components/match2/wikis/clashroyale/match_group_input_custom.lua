@@ -8,14 +8,11 @@
 
 local Array = require('Module:Array')
 local CardNames = mw.loadData('Module:CardNames')
-local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -30,7 +27,6 @@ local OPPONENT_CONFIG = {
 	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
 }
-local TBD = 'TBD'
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 
 ---@class CRParticipant
