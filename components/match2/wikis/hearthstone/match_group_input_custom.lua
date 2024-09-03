@@ -32,6 +32,8 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
+CustomMatchGroupInput.processMap = FnUtil.identity
+
 ---@param match table
 ---@param options table?
 ---@return table
