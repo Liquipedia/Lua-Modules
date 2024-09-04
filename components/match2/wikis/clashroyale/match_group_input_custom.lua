@@ -29,13 +29,6 @@ local OPPONENT_CONFIG = {
 }
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 
----@class CRParticipant
----@field player string
----@field heroes string[]?
----@field position integer?
----@field flag string?
----@field random boolean?
-
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -44,7 +37,7 @@ local MapFunctions = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	Table.mergeInto(match, MatchFunctions.readDate(match))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
