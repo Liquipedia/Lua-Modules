@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Logic = require('Module:Logic')
@@ -19,6 +20,8 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
@@ -28,6 +31,9 @@ local OPPONENT_CONFIG = {
 }
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
+local TIER_1 = 1
+local TIER_2 = 2
+local MIN_EARNINGS_FOR_FEATURED = 100000
 
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -215,7 +221,72 @@ function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
 		headtohead = match.headtohead,
+		featured = tostring(MatchFunctions.isFeatured(match)),
 	}
+end
+
+---@param match table
+---@return boolean
+function MatchFunctions.isFeatured(match)
+	local isFeatured = Logic.readBoolOrNil(match.featured)
+	if isFeatured ~= nil then
+		return isFeatured
+	end
+
+	local tier = tonumber(match.liquipediatier)
+	if tier == TIER_1 or tier == TIER_2 then
+		return true
+	end
+
+	local year, month = match.date:match('^(%d%d%d%d)-(%d%d)')
+	if year == DateExt.defaultYear then
+		return false
+	end
+
+	if tonumber(month) < 3 then
+		year = tonumber(year) - 1
+	end
+
+	---@param opponent table
+	---@return boolean
+	local opponentIsFeatured = function(opponent)
+		return opponent.type == Opponent.team and
+			MatchFunctions.getEarnings(opponent.name, year) >= MIN_EARNINGS_FOR_FEATURED
+	end
+
+	if opponentIsFeatured(match.opponents[1] or {}) or opponentIsFeatured(match.opponents[2] or {}) then
+		return true
+	end
+
+	return false
+end
+
+---@param name string
+---@param year integer
+---@return number?
+function MatchFunctions.getEarnings(name, year)
+	if String.isEmpty(name) then
+		return 0
+	end
+
+	local featuredEarnings = tonumber(Variables.varDefault(name .. '_featured_earnings'))
+	if featuredEarnings then
+		return featuredEarnings
+	end
+
+	local data = mw.ext.LiquipediaDB.lpdb('team', {
+		conditions = '[[pagename::' .. name:gsub(' ', '_') .. ']]',
+		query = 'extradata'
+	})
+
+	local currentEarnings = 0
+	if type(data[1]) == 'table' then
+		currentEarnings = tonumber((data[1].extradata or {})['earningsin' .. year]) or 0
+	end
+
+	Variables.varDefine(name .. '_featured_earnings', currentEarnings)
+
+	return currentEarnings
 end
 
 ---@param MatchParser Dota2MatchParserInterface
