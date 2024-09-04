@@ -7,7 +7,6 @@
 --
 
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -15,7 +14,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
@@ -111,13 +110,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-end
-
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
 end
 
 ---@param data table
@@ -330,10 +322,7 @@ function matchFunctions.getOpponents(match)
 						maxNumPlayers = MAX_NUM_PLAYERS,
 					})
 				end
-			elseif opponent.type == Opponent.solo then
-				opponent.match2players = Json.parseIfString(opponent.match2players) or {}
-				opponent.match2players[1].name = opponent.name
-			elseif opponent.type ~= Opponent.literal then
+			elseif opponent.type ~= Opponent.solo and opponent.type ~= Opponent.literal then
 				error('Unsupported Opponent Type "' .. (opponent.type or '') .. '"')
 			end
 

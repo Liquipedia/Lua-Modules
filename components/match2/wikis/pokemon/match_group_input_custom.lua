@@ -7,6 +7,7 @@
 --
 
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -16,7 +17,7 @@ local Variables = require('Module:Variables')
 local ChampionNames = mw.loadData('Module:HeroNames')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
@@ -124,13 +125,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer=true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-end
-
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
 end
 
 ---@param data table
@@ -450,11 +444,11 @@ end
 function mapFunctions.getParticipants(map, opponents)
 	local participants = {}
 	local championData = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, ChampionNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for playerIndex = 1, MAX_NUM_PLAYERS do
 			local champ = map['t' .. opponentIndex .. 'h' .. playerIndex]
-			championData['team' .. opponentIndex .. 'champion' .. playerIndex] =
-				ChampionNames[champ] or champ
+			championData['team' .. opponentIndex .. 'champion' .. playerIndex] = getCharacterName(champ)
 
 			championData['t' .. opponentIndex .. 'kda' .. playerIndex] =
 				map['t' .. opponentIndex .. 'kda' .. playerIndex]
@@ -474,7 +468,7 @@ function mapFunctions.getParticipants(map, opponents)
 		local banIndex = 1
 		local currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		while currentBan do
-			championData['team' .. opponentIndex .. 'ban' .. banIndex] = ChampionNames[currentBan] or currentBan
+			championData['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(currentBan)
 			banIndex = banIndex + 1
 			currentBan = map['t' .. opponentIndex .. 'b' .. banIndex]
 		end

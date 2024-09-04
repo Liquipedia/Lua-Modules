@@ -9,11 +9,9 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Info = require('Module:Info')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
@@ -27,18 +25,14 @@ local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
-local pageVars = PageVariableNamespace('PrizePool')
-
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
 local SC2 = 'starcraft2'
 
-local _lpdb_stash = {}
 local _series
 local _tier
 local _tournament_name
-local _series_number
 
 -- Template entry point
 ---@param frame Frame
@@ -66,9 +60,6 @@ function CustomPrizePool.run(frame)
 	args.resolveRedirect = true
 	args.groupScoreDelimiter = '-'
 
-	-- stash seriesNumber
-	_series_number = CustomPrizePool._seriesNumber()
-
 	local prizePool = PrizePool(args)
 
 	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
@@ -82,11 +73,6 @@ function CustomPrizePool.run(frame)
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
 	Variables.varDefine('prize pool table id', prizePoolIndex)
-
-	if prizePool.options.storeLpdb then
-		-- stash the lpdb_placement data so teamCards can use them
-		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
-	end
 
 	return builtPrizePool
 end
@@ -117,7 +103,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = _series_number,
+		seriesnumber = CustomPrizePool._seriesNumber(),
 
 		-- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
@@ -129,8 +115,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
-
-	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
 
 	return lpdbData
 end
@@ -144,17 +128,6 @@ function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	end
 
 	return lpdbData.objectName
-end
-
----@param opponentType OpponentType
----@param opponent StarcraftStandardOpponent
----@return string
-function CustomPrizePool._getMode(opponentType, opponent)
-	if (opponent or {}).isArchon then
-		return 'archon'
-	end
-
-	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
 end
 
 ---@return integer?

@@ -169,7 +169,7 @@ function BasePlacement:parseOpponentArgs(input, date)
 		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
 	end
 
-	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
+	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers, overwritePageVars = true})
 end
 
 ---@param opponent BasePlacementOpponent

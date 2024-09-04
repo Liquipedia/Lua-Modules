@@ -15,7 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
@@ -84,13 +84,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-end
-
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
 end
 
 ---@param data table

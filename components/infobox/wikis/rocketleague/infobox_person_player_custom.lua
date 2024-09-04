@@ -221,9 +221,13 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	Array.forEach(self.locations, function(country)
 		local demonym = Flags.getLocalisation(country)
 		if demonym then
-			return
+			Array.appendWith(categories,
+				checkRole('coach', demonym .. ' Coaches'),
+				checkRole('caster', demonym .. ' Casters'),
+				checkRole('host', demonym .. ' Casters'),
+				checkRole('player', demonym .. ' Players')
+			)
 		end
-		table.insert(categories, demonym .. ' Players')
 	end)
 
 	return categories

@@ -18,8 +18,6 @@ local CustomOpponentDisplay = Table.deepCopy(OpponentDisplay)
 CustomOpponentDisplay.BracketOpponentEntry = Class.new(OpponentDisplay.BracketOpponentEntry, function(self) end)
 
 ---@class RocketLeagueStandardOpponent:standardOpponent
----@field score3 number?
----@field status3 string?
 ---@field extradata table?
 
 ---@param opponent RocketLeagueStandardOpponent
@@ -27,35 +25,42 @@ function CustomOpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
 	if not extradata.additionalScores then
 		OpponentDisplay.BracketOpponentEntry.addScores(self, opponent)
-	else
-		local score1Node = OpponentDisplay.BracketScore({
-			isWinner = extradata.set1win,
-			scoreText = OpponentDisplay.InlineScore(opponent),
+		return
+	end
+
+	local score1Node = OpponentDisplay.BracketScore({
+		isWinner = extradata.set1win,
+		scoreText = CustomOpponentDisplay.InlineScoreSpecial{
+			opponent = opponent, score = extradata.score1
+		},
+	})
+	self.root:node(score1Node)
+
+	local score2Node
+	if extradata.score2 or opponent.score2 then
+		score2Node = OpponentDisplay.BracketScore({
+			isWinner = extradata.set2win,
+			scoreText = CustomOpponentDisplay.InlineScoreSpecial{
+				opponent = opponent, score = extradata.score2
+			},
 		})
-		self.root:node(score1Node)
+	end
+	self.root:node(score2Node)
 
-		local score2Node
-		if opponent.extradata.score2 or opponent.score2 then
-			score2Node = OpponentDisplay.BracketScore({
-				isWinner = extradata.set2win,
-				scoreText = CustomOpponentDisplay.InlineScore2(opponent),
-			})
-		end
-		self.root:node(score2Node)
+	local score3Node
+	if extradata.score3 then
+		score3Node = OpponentDisplay.BracketScore({
+			isWinner = extradata.set3win,
+			scoreText = CustomOpponentDisplay.InlineScoreSpecial{
+				opponent = opponent, score = extradata.score3
+			},
+		})
+	end
+	self.root:node(score3Node)
 
-		local score3Node
-		if opponent.extradata.score3 then
-			score3Node = OpponentDisplay.BracketScore({
-				isWinner = extradata.set3win,
-				scoreText = CustomOpponentDisplay.InlineScore3(opponent),
-			})
-		end
-		self.root:node(score3Node)
-
-		if (opponent.placement2 or opponent.placement or 0) == 1
-			or opponent.advances then
-			self.content:addClass('brkts-opponent-win')
-		end
+	if (opponent.placement2 or opponent.placement or 0) == 1
+		or opponent.advances then
+		self.content:addClass('brkts-opponent-win')
 	end
 end
 
@@ -69,36 +74,17 @@ function CustomOpponentDisplay.BracketOpponentEntry:createPlayers(opponent)
 	self.content:node(playerNode)
 end
 
----Displays the second score or status of the opponent, as a string.
----@param opponent RocketLeagueStandardOpponent
+---Displays a score or status of the opponent, as a string.
+---@param props {opponent: RocketLeagueStandardOpponent, status: string?, score: number?}
 ---@return number|string
-function CustomOpponentDisplay.InlineScore2(opponent)
-	local score2 = opponent.extradata.score2
-	if opponent.status2 == 'S' then
-		if opponent.score2 == 0 and Opponent.isTbd(opponent) then
-			return ''
-		else
-			return opponent.score2 ~= -1 and tostring(opponent.score2) or ''
-		end
-	else
-		return opponent.status2 or score2 or ''
+function CustomOpponentDisplay.InlineScoreSpecial(props)
+	if props.score == -1 then
+		return ''
 	end
-end
-
----Displays the third score or status of the opponent, as a string.
----@param opponent RocketLeagueStandardOpponent
----@return number|string
-function CustomOpponentDisplay.InlineScore3(opponent)
-	local score3 = opponent.extradata.score3
-	if opponent.status3 == 'S' then
-		if opponent.score3 == 0 and Opponent.isTbd(opponent) then
-			return ''
-		else
-			return opponent.score3 ~= -1 and tostring(opponent.score3) or ''
-		end
-	else
-		return opponent.status3 or score3 or ''
+	if props.score == 0 and Opponent.isTbd(props.opponent) then
+		return ''
 	end
+	return tostring(props.score)
 end
 
 return Class.export(CustomOpponentDisplay)

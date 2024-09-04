@@ -135,7 +135,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Pre-Process Champion Ban Data
 	local championBanData = {}
-	for gameIndex, game in ipairs(match.games) do
+	for _, game in ipairs(match.games) do
 		local extradata = game.extradata or {}
 		local banData = {{}, {}}
 		local numberOfBans = 0
@@ -154,16 +154,20 @@ function CustomMatchSummary.createBody(match)
 			banData[1].color = extradata.team1side
 			banData[2].color = extradata.team2side
 			banData.numberOfBans = numberOfBans
-			championBanData[gameIndex] = banData
+			table.insert(championBanData, banData)
+		else
+			table.insert(championBanData, {})
 		end
 	end
 
 	-- Add the Champion Bans
-	if not Table.isEmpty(championBanData) then
+	if Array.any(championBanData, Table.isNotEmpty) then
 		local championBan = ChampionBan()
 
 		for gameIndex, banData in ipairs(championBanData) do
-			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+			if Table.isNotEmpty(banData) then
+				championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+			end
 		end
 
 		body:addRow(championBan)
@@ -225,6 +229,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')
+				:css('width', '100%')
 		row:addElement(comment)
 	end
 

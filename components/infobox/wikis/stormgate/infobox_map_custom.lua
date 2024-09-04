@@ -26,9 +26,12 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {
-	{key = 'resourcecamps', name = 'Resource Camp(s)'},
+	{key = 'luminitecamps', name = 'Luminite Camp(s)'},
+	{key = 'theriumcamps', name = 'Therium Camp(s)'},
 	{key = 'speedcamps', name = 'Speed Camp(s)'},
+	{key = 'visioncamps', name = 'Vision Camp(s)'},
 	{key = 'healthcamps', name = 'Health Camp(s)'},
+	{key = 'energycamps', name = 'Energy Camp(s)'},
 	{key = 'siegecamps', name = 'Siege Camp(s)'},
 }
 --currently the ingame icons are still temporary
@@ -83,7 +86,7 @@ function CustomMap._parseArgs(args)
 		local value = tonumber(args[key])
 		args[key] = value ~= 0 and value or nil
 	end)
-	args.types =  Array.map(mw.text.split((args.type or ManualMapTypes.MISC):upper(), ','), String.trim)
+	args.types = Array.map(mw.text.split((args.type or ManualMapTypes.MISC):upper(), ','), String.trim)
 
 	--check for invalid type input
 	assert(

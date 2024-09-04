@@ -141,6 +141,7 @@
 				padding-bottom: 0.25rem;
 				flex: 1;
 				justify-content: center;
+				text-align: center;
 
 				&::before {
 					content: "";
@@ -149,8 +150,13 @@
 					z-index: 1;
 				}
 
+				&:visited {
+					color: #ffffff;
+				}
+
 				@media ( hover: hover ) {
-					&:hover {
+					&:hover,
+					&:visited:hover {
 						color: #ffffff;
 						background: linear-gradient( rgba( 0, 0, 0, 0 ), rgba( 0, 0, 0, 0.5 ) );
 					}

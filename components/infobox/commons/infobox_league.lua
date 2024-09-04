@@ -282,7 +282,7 @@ function League:_parseArgs()
 
 	self.data = data
 
-	self:_parsePrizePool(args)
+	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = self:_parsePrizePool(args, data.endDate)
 
 	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
@@ -298,29 +298,31 @@ function League:_parseArgs()
 end
 
 ---@param args table
-function League:_parsePrizePool(args)
+---@param endDate string?
+---@return number|string?, number?, string?
+function League:_parsePrizePool(args, endDate)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return
 	end
 
 	--need to get the display here since it sets variables we want/need to get the clean values
 	--overwritable since sometimes display is supposed to look a bit different
-	local display = self:displayPrizePool(args)
-
-	self.prizepoolDisplay = display
-	self.data.prizepoolUsd = tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0
-	self.data.localCurrency = Variables.varDefault('tournament_currency', args.localcurrency)
+	return self:displayPrizePool(args, endDate),
+		tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0,
+		Variables.varDefault('tournament_currency', args.localcurrency)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function League:displayPrizePool(args)
+function League:displayPrizePool(args, endDate)
 	return InfoboxPrizePool.display{
 		prizepool = args.prizepool,
 		prizepoolusd = args.prizepoolusd,
 		currency = args.localcurrency,
 		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, self.data.endDate),
+		date = Logic.emptyOr(args.currency_date, endDate),
+		setvariables = args.setvariables,
 		displayRoundPrecision = args.currencyDispPrecision,
 		varRoundPrecision = args.currencyVarPrecision
 	}
@@ -491,7 +493,11 @@ function League:_setLpdbData(args, links)
 		icon = self.data.icon,
 		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
+		seriespage = Page.pageifyLink(args.series),
+		serieslist = {
+			Page.pageifyLink(args.series),
+			Page.pageifyLink(args.series2),
+		},
 		previous = self:_getPageNameFromChronology(args.previous),
 		previous2 = self:_getPageNameFromChronology(args.previous2),
 		next = self:_getPageNameFromChronology(args.next),

@@ -26,6 +26,7 @@ local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local DECIDER = 'decider'
+local DRAW = 'draw'
 local SKIP = 'skip'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
@@ -76,23 +77,18 @@ function MatchMapsLegacy._handleMaps(args)
 			return false
 		end
 
-		local score1
-		local score2
 		if Logic.isNotEmpty(score) then
-			local splitedScore = mw.text.split(score, '-')
-			score1 = splitedScore[1]
-			score2 = splitedScore[2]
-		end
-		if not score1 and not score2 and winner ~= SKIP then
-			local winnerInt = tonumber(winner)
-			score1 = winnerInt == 1 and DEFAULT_WIN or DEFAULT_LOSS
-			score2 = winnerInt == 2 and DEFAULT_WIN or DEFAULT_LOSS
+			local splitedScore = Array.parseCommaSeparatedString(score, '-')
+			args[prefix .. 'score1'] = splitedScore[1]
+			args[prefix .. 'score2'] = splitedScore[2]
 		end
 
-		args[prefix .. 'score1'] = mw.text.trim(score1 or '')
-		args[prefix .. 'score2'] = mw.text.trim(score2 or '')
 		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
 			(not Logic.isEmpty(winner) and 'true') or 'false'
+
+		if Logic.isNumeric(winner) or winner == DRAW then
+			args[prefix .. 'winner'] = winner == DRAW and 0 or winner
+		end
 
 		args[prefix .. 't1firstsideot'] = Table.extract(args, prefix .. 'o1t1firstside')
 		args[prefix .. 't1otatk'] = Table.extract(args, prefix .. 'o1t1atk')

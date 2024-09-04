@@ -27,6 +27,8 @@ local MODES = {
 	standard = 'Standard',
 	wild = 'Wild',
 	battlegrounds = 'Battlegrounds',
+	arena = 'Arena',
+	duels = 'Duels',
 }
 
 ---@param frame Frame

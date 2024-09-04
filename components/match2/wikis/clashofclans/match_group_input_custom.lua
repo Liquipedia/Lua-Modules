@@ -17,7 +17,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
@@ -100,11 +100,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
-
 function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match wasn't played, set not played
 	if Table.includes(FINISHED_INDICATORS, data.finished) or Table.includes(FINISHED_INDICATORS, data.winner) then
@@ -113,7 +108,7 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	-- Map or Match is marked as finished.
 	-- Calculate and set winner, resulttype, placements and walkover (if applicable for the outcome)
 	elseif Logic.readBool(data.finished) then
-		if MatchGroupInput.isDraw(indexedScores) then
+		if CustomMatchGroupInput.isDraw(indexedScores, tonumber(data.winner)) then
 			data.winner = 0
 			data.resulttype = 'draw'
 			indexedScores = CustomMatchGroupInput.setPlacement(indexedScores, data.winner, 'draw')
@@ -142,6 +137,15 @@ function CustomMatchGroupInput.getResultTypeAndWinner(data, indexedScores)
 	end
 
 	return data, indexedScores
+end
+
+---@param indexedScores table[]
+---@param winner integer?
+---@return boolean
+function CustomMatchGroupInput.isDraw(indexedScores, winner)
+	if winner == 0 then return true end
+	if winner then return false end
+	return MatchGroupInput.isDraw(indexedScores)
 end
 
 function CustomMatchGroupInput.setPlacement(opponents, winner, specialType, finished)

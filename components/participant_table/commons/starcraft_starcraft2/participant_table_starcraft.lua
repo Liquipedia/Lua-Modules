@@ -11,7 +11,6 @@ local Json = require('Module:Json')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -44,8 +43,6 @@ local ParticipantTable = Lua.import('Module:ParticipantTable/Base')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local prizePoolVars = PageVariableNamespace('PrizePool')
-
 local StarcraftParticipantTable = {}
 
 ---@param frame Frame
@@ -56,7 +53,6 @@ function StarcraftParticipantTable.run(frame)
 	participantTable.readConfig = StarcraftParticipantTable.readConfig
 	participantTable.readEntry = StarcraftParticipantTable.readEntry
 	participantTable.adjustLpdbData = StarcraftParticipantTable.adjustLpdbData
-	participantTable.getPlacements = StarcraftParticipantTable.getPlacements
 	participantTable._displaySoloFactionTableSection = StarcraftParticipantTable._displaySoloFactionTableSection
 	participantTable._displayHeader = StarcraftParticipantTable._displayHeader
 	participantTable._getFactionNumbers = StarcraftParticipantTable._getFactionNumbers
@@ -81,7 +77,7 @@ function StarcraftParticipantTable.readConfig(args, parentConfig)
 	config.displayUnknownColumn = Logic.readBoolOrNil(args.unknowncolumn)
 	config.displayRandomColumn = Logic.readBoolOrNil(args.randomcolumn)
 	config.showCountByFaction = Logic.readBool(args.showCountByRace or args.count)
-	config.isRandomEvent = Logic.readBool(args.is_random_event)
+	config.isRandomEvent = Logic.nilOr(Logic.readBoolOrNil(args.is_random_event), parentConfig.isRandomEvent)
 	config.isQualified = Logic.nilOr(Logic.readBoolOrNil(args.isQualified), parentConfig.isQualified)
 	config.sortPlayers = true
 	--only relevant for solo case since there we need columnWidth in px since colSpan is calculated dynamically
@@ -162,20 +158,6 @@ function StarcraftParticipantTable:adjustLpdbData(lpdbData, entry, config)
 	lpdbData.extradata.isqualified = tostring(isQualified)
 
 	lpdbData.qualified = isQualified and 1 or nil
-end
-
----@return table<string, true>
-function StarcraftParticipantTable:getPlacements()
-	local placements = {}
-	local maxPrizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
-
-	for prizePoolIndex = 1, maxPrizePoolIndex do
-		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
-			placements[placement.opponentname] = placement
-		end)
-	end
-
-	return placements
 end
 
 ---@param sections StarcraftParticipantTableSection[]

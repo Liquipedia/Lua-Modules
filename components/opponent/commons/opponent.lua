@@ -215,6 +215,13 @@ function Opponent.assertOpponent(opponent)
 	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
 end
 
+---Validates that an arbitary value is a valid representation of an opponent
+---@param opponent any
+---@return boolean
+function Opponent.isOpponent(opponent)
+	error('Opponent.isOpponent: Not Implemented')
+end
+
 ---Coerces an arbitary table into an opponent
 ---@param opponent table
 function Opponent.coerce(opponent)
@@ -294,7 +301,7 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 ]]
 ---@param opponent standardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}?
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}?
 ---@return standardOpponent
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
@@ -305,7 +312,10 @@ function Opponent.resolve(opponent, date, options)
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {savePageVar = savePageVar})
+				PlayerExt.syncPlayer(player, {
+					savePageVar = savePageVar,
+					overwritePageVars = options.overwritePageVars,
+				})
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
 					player.team,
@@ -337,6 +347,7 @@ function Opponent.toName(opponent)
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName
 		end)
+		table.sort(pageNames)
 		return table.concat(pageNames, ' / ')
 	else -- opponent.type == Opponent.literal
 		return opponent.name
@@ -377,9 +388,6 @@ function Opponent.readOpponentArgs(args)
 	elseif partySize then
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
 			local playerTeam = args['p' .. playerIndex .. 'team']
-			if playerTeam then
-				playerTeam = playerTeam
-			end
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -19,7 +20,7 @@ local Streams = require('Module:Links/Stream')
 local StrikerNames = mw.loadData('Module:StrikerNames')
 
 local Opponent = Lua.import('Module:Opponent')
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local STATUS_TO_WALKOVER = {FF = 'ff', DQ = 'dq', L = 'l'}
@@ -104,13 +105,6 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 
 	Opponent.resolve(opponent, teamTemplateDate)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-end
-
--- called from Module:Match/Subobjects
----@param player table
----@return table
-function CustomMatchGroupInput.processPlayer(player)
-	return player
 end
 
 -- function to sort out winner/placements
@@ -306,11 +300,11 @@ end
 ---@return table
 function mapFunctions.getExtraData(map)
 	local bans = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, StrikerNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			ban = mapFunctions._cleanStrikerName(ban)
-			table.insert(bans['team' .. opponentIndex], ban)
+			table.insert(bans['team' .. opponentIndex], getCharacterName(ban))
 		end
 	end
 
@@ -350,7 +344,7 @@ end
 ---@return table
 function mapFunctions.getParticipantsData(map)
 	local participants = {}
-
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, StrikerNames)
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
@@ -358,9 +352,8 @@ function mapFunctions.getParticipantsData(map)
 		end
 
 		for _, striker, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
-			striker = mapFunctions._cleanStrikerName(striker)
 			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
-			participants[opponentIndex .. '_' .. pickIndex].striker = striker
+			participants[opponentIndex .. '_' .. pickIndex].striker = getCharacterName(striker)
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
 			end
@@ -370,17 +363,6 @@ function mapFunctions.getParticipantsData(map)
 	map.extradata.maximumpickindex = maximumPickIndex
 	map.participants = participants
 	return map
-end
-
----@param strikerRaw string
----@return string
-function mapFunctions._cleanStrikerName(strikerRaw)
-	local striker = StrikerNames[string.lower(strikerRaw)]
-	if not striker then
-		error('Unsupported striker input: ' .. strikerRaw)
-	end
-
-	return striker
 end
 
 return CustomMatchGroupInput

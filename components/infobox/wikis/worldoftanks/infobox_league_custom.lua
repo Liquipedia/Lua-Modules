@@ -44,7 +44,8 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
 		return {
@@ -52,7 +53,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Number of players', content = {args.player_number}},
 		}
 	elseif id == 'gamesettings' then
-		return {Cell{name = 'Game', content = {Game.name{game = args.game}}}}
+		Array.appendWith(widgets,
+			Cell{name = 'Patch', content = {caller:_createPatchCell()}},
+			Cell{name = 'Game', content = {Game.name{game = args.game}}}
+		)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
@@ -77,6 +81,22 @@ end
 ---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.publisherpremier)
+end
+
+---@return string?
+function CustomLeague:_createPatchCell()
+	local data = self.data
+	if Logic.isEmpty(data.patch) then return end
+
+	local displayPatch = function(patch)
+		return PageLink.makeInternalLink({}, patch, 'Patch ' .. patch)
+	end
+
+	if data.endPatch == data.patch then
+		return displayPatch(data.patch)
+	end
+
+	return displayPatch(data.patch) .. ' &ndash; ' .. displayPatch(data.endPatch)
 end
 
 ---@param args table

@@ -49,13 +49,12 @@ end
 ---@param props {MatchSummaryContainer: function, match: StarcraftMatchGroupUtilMatch}
 ---@return Html
 function StarcraftSingleMatchDisplay.Match(props)
-	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+	local bracketId = StarcraftMatchGroupUtil.splitMatchId(props.match.matchId)
+	return DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = not props.match.noScore},
-	})
-
-	return matchSummaryNode
+	}, require('Module:Error/Display').ErrorDetails)
 end
 
 return StarcraftSingleMatchDisplay

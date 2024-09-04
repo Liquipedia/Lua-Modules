@@ -68,9 +68,9 @@ Example:
 local parser = FnUtil.lazilyDefineFunction(function() return constructParserFromSpec(spec) end)
 parser('')
 ]]
----@generic T:memoizableFunction
----@param getf_ T
----@return T
+---@generic V:fun(...):any
+---@param getf_ fun():V
+---@return V
 function FnUtil.lazilyDefineFunction(getf_)
 	local getf = FnUtil.memoize(getf_)
 	return function(...)

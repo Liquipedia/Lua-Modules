@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Streams = Lua.import('Module:Links/Stream')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -347,7 +347,7 @@ function CustomMatchGroupInput._readPlayersOfTeam(match, opponentIndex, opponent
 		player.name = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name):gsub(' ', '_')
 		player.flag = Flags.CountryName(player.flag)
 		player.displayname = Logic.emptyOr(player.displayname, player.displayName)
-		player.extradata = {faction = Faction.read(player.race)}
+		player.extradata = {faction = Faction.read(player.race or player.faction)}
 
 		players[player.name] = players[player.name] or {}
 		Table.deepMergeInto(players[player.name], player)

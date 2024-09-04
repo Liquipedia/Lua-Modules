@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
@@ -369,10 +369,9 @@ end
 ---@return table<string, table>
 function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex, participants)
 	local char = map['char' .. opponentIndex] or ''
-	char = CharacterStandardization[char:lower()]
 
 	participants[opponentIndex .. '_1'] = {
-		char = char,
+		char = MatchGroupInput.getCharacterName(CharacterStandardization, char),
 		player = player.name,
 	}
 

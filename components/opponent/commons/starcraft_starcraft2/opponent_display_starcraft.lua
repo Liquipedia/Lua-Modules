@@ -209,12 +209,12 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 			playerNodes = playerNodes,
 			factionNode = mw.html.create('div'):wikitext(factionIcon),
 		})
-		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+		:addClass('block-players-wrapper')
 
 	elseif showFaction and opponent.isSpecialArchon then
 		local archonsNode = mw.html.create('div')
 			:addClass('starcraft-special-archon-block-opponent')
-			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+			:addClass('block-players-wrapper')
 		for archonIx = 1, #opponent.players / 2 do
 			local primaryFaction = opponent.players[2 * archonIx - 1].faction
 			local secondaryFaction = opponent.players[2 * archonIx].faction
@@ -243,7 +243,7 @@ function StarcraftOpponentDisplay.PlayerBlockOpponent(props)
 
 	else
 		local playersNode = mw.html.create('div')
-			:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+			:addClass('block-players-wrapper')
 		for _, playerNode in ipairs(playerNodes) do
 			playersNode:node(playerNode)
 		end

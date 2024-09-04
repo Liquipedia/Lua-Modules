@@ -36,6 +36,7 @@ return {
 		'faceit-hub',
 		'faceit-org',
 		'gamersclub',
+		'geoguessr',
 		'halodatahive',
 		'letsplaylive',
 		'letsplaylive-old',
@@ -75,7 +76,8 @@ return {
 		'tiktok',
 		'twitter',
 		'vk',
-		'weibo'
+		'weibo',
+		'douyin_page',
 	},
 	streams = {
 		'twitch',
