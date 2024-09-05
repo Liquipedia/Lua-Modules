@@ -33,11 +33,11 @@ describe('operator', function()
 			{a = 5, b = 'cedf'},
 			{a = 4, b = 'sfd'},
 		}
-		it('check simple path', function()
+		it('accesses single properties', function()
 			assert.are_same({3, 5, 4}, Array.map(foo, Operator.property('a')))
 			assert.is_nil( Operator.property(5)(foo))
 		end)
-		it('check segmented path', function()
+		it('accesses properties on a given path', function()
 			local bar = {
 				{a = {b = {c = 'd1'}, e = 'f1', 's1'}, g = 'h1', 't1', ['5'] = 'q1'},
 				{a = {b = {c = 'd2'}, e = 'f2', 's2'}, g = 'h2', 't2', ['5'] = 'q2'},
@@ -51,10 +51,10 @@ describe('operator', function()
 			assert.are_same({'q1', 'q2'}, Array.map(bar, Operator.property('5')))
 			assert.are_same({'q1', 'q2'}, Array.map(bar, Operator.property(5)))
 		end)
-		it('check nil in path throws', function()
+		it('throws if an accessed table is nil', function()
 			assert.error(function() return Operator.property('a.1')(foo) end)
 		end)
-		it('check wrong item type input throws', function()
+		it('throws if path input is of unsupported type', function()
 			assert.error(Operator.property)
 			-- intended type mismatch
 			---@diagnostic disable-next-line: param-type-mismatch
@@ -63,7 +63,7 @@ describe('operator', function()
 			---@diagnostic disable-next-line: param-type-mismatch
 			assert.error(function() Operator.property(nil) end)
 		end)
-		it('check wrong tbl input throws', function()
+		it('throws if table input is of unsupported type', function()
 			assert.error(Operator.property('a'))
 			-- intended type mismatch
 			---@diagnostic disable-next-line: param-type-mismatch
