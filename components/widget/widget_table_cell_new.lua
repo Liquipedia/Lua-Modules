@@ -42,9 +42,9 @@ local TableCell = Class.new(
 	end
 )
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return {[1]: Html}
-function TableCell:make(props)
+function TableCell:make(injector)
 	local cell = mw.html.create(self.isHeader and 'th' or 'td')
 	cell:attr('colspan', self.colSpan)
 	cell:attr('rowspan', self.rowSpan)

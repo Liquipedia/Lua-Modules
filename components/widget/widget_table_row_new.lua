@@ -33,9 +33,9 @@ local TableRow = Class.new(
 	end
 )
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return {[1]: Html}
-function TableRow:make(props)
+function TableRow:make(injector)
 	local row = mw.html.create('tr')
 
 	Array.forEach(self.classes, FnUtil.curry(row.addClass, row))
@@ -43,7 +43,7 @@ function TableRow:make(props)
 	row:css(self.css)
 
 	Array.forEach(self.children, function(child)
-		Array.forEach(WidgetFactory.work(child, props.injector), FnUtil.curry(row.node, row))
+		Array.forEach(WidgetFactory.work(child, injector), FnUtil.curry(row.node, row))
 	end)
 
 	return {row}

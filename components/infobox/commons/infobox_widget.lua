@@ -6,9 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
 local ErrorDisplay = require('Module:Error/Display')
-local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 ---@class Widget: BaseClass
@@ -22,16 +21,17 @@ function Widget:assertExistsAndCopy(value)
 	return assert(String.nilIfEmpty(value), 'Tried to set a nil value to a mandatory property')
 end
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
-function Widget:make(props)
+function Widget:make(injector)
 	error('A Widget must override the make() function!')
 end
 
 ---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
-	return DisplayUtil.TryPureComponent(FnUtil.curry(self.make, self), {injector = injector}, ErrorDisplay.InlineError)
+	local f = function() return self:make(injector) end
+	return Logic.tryOrElseLog(f,  ErrorDisplay.InlineError)
 end
 
 return Widget

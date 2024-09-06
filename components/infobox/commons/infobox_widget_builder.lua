@@ -23,13 +23,13 @@ local Builder = Class.new(
 	end
 )
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return Widget[]
-function Builder:make(props)
+function Builder:make(injector)
 	local children = self.builder()
 	local widgets = {}
 	for _, child in ipairs(children or {}) do
-		Array.extendWith(widgets, WidgetFactory.work(child, props.injector))
+		Array.extendWith(widgets, WidgetFactory.work(child, injector))
 	end
 	return widgets
 end

@@ -33,9 +33,9 @@ local Table = Class.new(
 	end
 )
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return {[1]: Html}
-function Table:make(props)
+function Table:make(injector)
 	local wrapper = mw.html.create('div'):addClass('table-responsive')
 	local output = mw.html.create('table'):addClass('wikitable')
 
@@ -44,7 +44,7 @@ function Table:make(props)
 	output:css(self.css)
 
 	Array.forEach(self.children, function(child)
-		Array.forEach(WidgetFactory.work(child, props.injector), FnUtil.curry(output.node, output))
+		Array.forEach(WidgetFactory.work(child, injector), FnUtil.curry(output.node, output))
 	end)
 
 	wrapper:node(output)

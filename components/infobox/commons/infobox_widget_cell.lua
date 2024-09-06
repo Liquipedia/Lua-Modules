@@ -89,9 +89,9 @@ function Cell:_content(...)
 	return self
 end
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return {[1]: Html?}
-function Cell:make(props)
+function Cell:make(injector)
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))
 	self:_content(unpack(self.content))

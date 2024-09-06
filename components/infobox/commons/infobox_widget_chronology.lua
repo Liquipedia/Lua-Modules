@@ -22,9 +22,9 @@ local Chronology = Class.new(
 	end
 )
 
----@param props {injector: WidgetInjector?}
+---@param injector WidgetInjector?
 ---@return Html[]
-function Chronology:make(props)
+function Chronology:make(injector)
 	return Chronology:_chronology(self.links)
 end
 
