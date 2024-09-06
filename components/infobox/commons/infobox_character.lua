@@ -47,7 +47,12 @@ function Character:createInfobox()
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Character') .. ' Information'},
+		Customizable{
+			id = 'title',
+			children = {
+				Title{name = (args.informationType or 'Character') .. ' Information'}
+			},
+		},
 		Cell{name = 'Real Name', content = {args.realname}},
 		Customizable{
 			id = 'country',
@@ -103,7 +108,7 @@ end
 ---@param location string?
 ---@return string
 function Character:_createLocation(location)
-	if location == nil then
+	if not location then
 		return ''
 	end
 
