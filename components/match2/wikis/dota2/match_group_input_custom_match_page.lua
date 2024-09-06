@@ -53,9 +53,18 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			image = item.image,
 		}
 	end
+	local function fetchLpdbPlayer(playerId)
+		if not playerId then return end
+		return mw.ext.LiquipediaDB.lpdb('player', {
+			conditions = '[[extradata_playerid::' .. playerId .. ']]',
+			query = 'pagename, id',
+		})[1]
+	end
 	local players = Array.map(team.players, function(player)
+		local playerData = fetchLpdbPlayer(player.id) or {}
 		return {
-			player = player.name,
+			player = playerData.pagename or player.name,
+			name = playerData.id,
 			role = player.position,
 			facet = player.facet,
 			character = player.heroName,
