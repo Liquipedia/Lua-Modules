@@ -30,9 +30,14 @@ end
 ---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
-	local f = function() return self:make(injector) end
-	local e = function (error) return {ErrorDisplay.InlineError(error)} end
-	return Logic.tryOrElseLog(f, e)
+	Logic.tryOrElseLog(
+		function() return self:make(injector) end,
+		function(error) return {ErrorDisplay.InlineError(error)} end,
+		function(error)
+			error.header = 'Error occured in widget: (caught by Widget:tryMake)'
+			return error
+		end
+	)
 end
 
 return Widget
