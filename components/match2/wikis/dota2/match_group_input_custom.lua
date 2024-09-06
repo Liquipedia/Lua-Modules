@@ -215,6 +215,7 @@ function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
 		headtohead = match.headtohead,
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
