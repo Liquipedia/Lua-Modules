@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local ErrorDisplay = require('Module:Error/Display')
+local ErrorDisplay = require('Module:Error/Display/dev/rath')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
@@ -31,7 +31,8 @@ end
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
 	local f = function() return self:make(injector) end
-	return Logic.tryOrElseLog(f,  ErrorDisplay.InlineError)
+	local e = function (error) return {ErrorDisplay.InlineError(error)} end
+	return Logic.tryOrElseLog(f, e)
 end
 
 return Widget
