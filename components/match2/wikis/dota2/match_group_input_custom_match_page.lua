@@ -51,14 +51,15 @@ end
 ---@param opponentIndex integer
 ---@return string|nil
 function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
-	return (map['team' .. opponentIndex] or {}).side
+	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
+	return (team or {}).side
 end
 
 ---@param map dota2MatchDataExtended
 ---@param opponentIndex integer
 ---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
-	local team = map['team' .. opponentIndex]
+	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
 	if not team then return end
 	if not team.players then return end
 
@@ -109,7 +110,7 @@ end
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
-	local team = map['team' .. opponentIndex]
+	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
 	if not team then return end
 	return Array.map(team.players or {}, Operator.property('heroName'))
 end
@@ -118,8 +119,8 @@ end
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
-	---@type dota2TeamVeto
-	local teamVeto = map.heroVeto['team' .. opponentIndex]
+	if not map.heroVeto then return end
+	local teamVeto = map.heroVeto['team' .. opponentIndex] ---@type dota2TeamVeto?
 	if not teamVeto then return end
 	return Array.map(teamVeto.bans or {}, Operator.property('hero'))
 end
@@ -128,9 +129,12 @@ end
 ---@return {character: string?, team: integer, type: 'pick'|'ban', vetoNumber: integer}[]|nil
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.heroVeto then return end
+
 	local buildVetoData = function(teamIdx, vetoType)
-		if not map.heroVeto['team' .. teamIdx] then return {} end
-		return Array.map(map.heroVeto['team' .. teamIdx][vetoType .. 's'] or {}, function(vetoData)
+		local teamVeto = map.heroVeto['team' .. teamIdx] ---@type dota2TeamVeto?
+		if not teamVeto then return {} end
+		local vetoesOfType = teamVeto[vetoType .. 's'] ---@type dota2VetoEntry[]
+		return Array.map(vetoesOfType or {}, function(vetoData)
 			return {
 				character = vetoData.hero,
 				team = teamIdx,
@@ -154,7 +158,7 @@ end
 ---@param opponentIndex integer
 ---@return {towers: integer?, barracks: integer?, roshans: integer?}?
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
-	local team = map['team' .. opponentIndex]
+	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
 	if not team then return end
 	return {
 		towers = team.towersDestroyed,
