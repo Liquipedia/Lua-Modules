@@ -12,21 +12,30 @@ local Operator = require('Module:Operator')
 
 local CustomMatchGroupInputMatchPage = {}
 
+---@class dota2MatchDataExtended: dota2MatchData
+---@field matchid integer
+
+---@param mapInput {matchid: string?, reversed: string?}
+---@return dota2MatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
 		return mapInput
 	end
+	local matchId = tonumber(mapInput.matchid)
+	assert(matchId, 'Numeric matchid expected, got ' .. mapInput.matchid)
 
-	local map = mw.ext.Dota2DB.getBigMatch(tonumber(mapInput.matchid), Logic.readBool(mapInput.reversed))
+	local map = mw.ext.Dota2DB.getBigMatch(matchId, Logic.readBool(mapInput.reversed))
 
-	-- Match not found on the API
 	assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
-	map.matchid = mapInput.matchid
+	---@cast map dota2MatchDataExtended
+	map.matchid = matchId
 
 	return map
 end
 
+---@param map dota2MatchDataExtended
+---@return string|nil
 function CustomMatchGroupInputMatchPage.getLength(map)
 	if Logic.isEmpty(map.length) and Logic.isEmpty(map.lengthInSeconds) then
 		return
@@ -38,10 +47,16 @@ function CustomMatchGroupInputMatchPage.getLength(map)
 	return map.length
 end
 
+---@param map dota2MatchDataExtended
+---@param opponentIndex integer
+---@return string|nil
 function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 	return (map['team' .. opponentIndex] or {}).side
 end
 
+---@param map dota2MatchDataExtended
+---@param opponentIndex integer
+---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
@@ -90,18 +105,27 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	end)
 end
 
+---@param map dota2MatchDataExtended
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end
 	return Array.map(team.players or {}, Operator.property('heroName'))
 end
 
+---@param map dota2MatchDataExtended
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
+	---@type dota2TeamVeto
 	local teamVeto = map.heroVeto['team' .. opponentIndex]
 	if not teamVeto then return end
 	return Array.map(teamVeto.bans or {}, Operator.property('hero'))
 end
 
+---@param map dota2MatchDataExtended
+---@return {character: string?, team: integer, type: 'pick'|'ban', vetoNumber: integer}[]|nil
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.heroVeto then return end
 	local buildVetoData = function(teamIdx, vetoType)
@@ -126,6 +150,9 @@ function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	end)
 end
 
+---@param map dota2MatchDataExtended
+---@param opponentIndex integer
+---@return {towers: integer?, barracks: integer?, roshans: integer?}?
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
 	if not team then return end

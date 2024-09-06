@@ -1079,4 +1079,29 @@ function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
 	return 'ok'
 end
 
+mw.ext.Dota2DB = {}
+
+
+---@alias dota2VetoEntry {hero: string, order: number}
+---@alias dota2TeamVeto {bans: dota2VetoEntry[], picks: dota2VetoEntry[]}
+---@alias Dota2PlayerItem {name: string?, image: string?, image_url: string?}
+---@alias dota2MatchTeamPlayers {aghanimsScepterBuff: 0|1|nil, aghanimsShardBuff: 0|1|nil, assists: integer?, backpackItems: Dota2PlayerItem[], buildingDamage: integer?, damage: integer?, deaths: integer?, denies: integer?, facet: string?, goldPerMinute: integer?, heroId: integer?, heroName: string?, id: integer?, items: Dota2PlayerItem[], kills: integer?, lastHits: integer?, level: integer?, moonShardBuff: 0|1|nil, name: string?, neutralItem: Dota2PlayerItem, position: 1|2|3|4|5|nil, towerDamage: integer?, totalGold: integer?, wards: {observerKills: integer?, observerPlaced: integer?, sentryKills: integer?, sentryPlaced: integer?}?, xpPerMinute: integer?}
+---@alias dota2MatchTeam {barracksDestroyed: integer?, players: dota2MatchTeamPlayers[], roshanKills: integer?, side: string?, towersDestroyed: integer?}
+---@class dota2MatchData
+---@field heroVeto {team1: dota2TeamVeto[], team2:dota2TeamVeto[]}
+---@field length string?
+---@field lengthInSeconds integer?
+---@field patch string?
+---@field startTime string?
+---@field team1 dota2MatchTeam
+---@field team2 dota2MatchTeam
+---@field team1score integer?
+---@field team2score integer?
+---@field winner 1|2|nil
+
+---@param matchId integer
+---@param reversed boolean?
+---@return dota2MatchData
+function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
+
 return mw
