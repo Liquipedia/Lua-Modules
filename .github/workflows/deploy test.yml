@@ -17,10 +17,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: nrwl/nx-set-shas@v3
+      - uses: nrwl/nx-set-shas@v4
         id: last_successful_commit_push
-        #with:
-          #workflow-id: 'deploy test.yml'
+        with:
+          workflow-id: 'deploy test.yml'
 
       - id: changed-files
         uses: tj-actions/changed-files@v45
