@@ -1081,12 +1081,44 @@ end
 
 mw.ext.Dota2DB = {}
 
+---@alias dota2VetoEntry {hero: string?, order: number?}
+---@alias dota2TeamVeto {bans: dota2VetoEntry[]?, picks: dota2VetoEntry[]?}
+---@alias dota2PlayerItem {name: string?, image: string?, image_url: string?}
 
----@alias dota2VetoEntry {hero: string, order: number}
----@alias dota2TeamVeto {bans: dota2VetoEntry[], picks: dota2VetoEntry[]}
----@alias Dota2PlayerItem {name: string?, image: string?, image_url: string?}
----@alias dota2MatchTeamPlayers {aghanimsScepterBuff: 0|1|nil, aghanimsShardBuff: 0|1|nil, assists: integer?, backpackItems: Dota2PlayerItem[], buildingDamage: integer?, damage: integer?, deaths: integer?, denies: integer?, facet: string?, goldPerMinute: integer?, heroId: integer?, heroName: string?, id: integer?, items: Dota2PlayerItem[], kills: integer?, lastHits: integer?, level: integer?, moonShardBuff: 0|1|nil, name: string?, neutralItem: Dota2PlayerItem, position: 1|2|3|4|5|nil, towerDamage: integer?, totalGold: integer?, wards: {observerKills: integer?, observerPlaced: integer?, sentryKills: integer?, sentryPlaced: integer?}?, xpPerMinute: integer?}
----@alias dota2MatchTeam {barracksDestroyed: integer?, players: dota2MatchTeamPlayers[], roshanKills: integer?, side: string?, towersDestroyed: integer?}
+---@class dota2MatchTeamPlayer
+---@field aghanimsScepterBuff 0|1|nil
+---@field aghanimsShardBuff 0|1|nil
+---@field assists integer?
+---@field backpackItems dota2PlayerItem[]?
+---@field buildingDamage integer?
+---@field damage integer?
+---@field deaths integer?
+---@field denies integer?
+---@field facet string?
+---@field goldPerMinute integer?
+---@field heroId integer?
+---@field heroName string?
+---@field id integer?
+---@field items dota2PlayerItem[]?
+---@field kills integer?
+---@field lastHits integer?
+---@field level integer?
+---@field moonShardBuff 0|1|nil
+---@field name string?
+---@field neutralItem dota2PlayerItem?
+---@field position 1|2|3|4|5|nil
+---@field towerDamage integer?
+---@field totalGold integer?
+---@field wards {observerKills: integer?, observerPlaced: integer?, sentryKills: integer?, sentryPlaced: integer?}?
+---@field xpPerMinute integer?
+
+---@class dota2MatchTeam
+---@field barracksDestroyed integer?
+---@field players dota2MatchTeamPlayer[]
+---@field roshanKills integer?
+---@field side 'radiant'|'dire'|nil
+---@field towersDestroyed integer?
+
 ---@class dota2MatchData
 ---@field heroVeto {team1: dota2TeamVeto[], team2:dota2TeamVeto[]}
 ---@field length string?
