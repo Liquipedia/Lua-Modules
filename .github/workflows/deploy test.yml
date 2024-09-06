@@ -20,7 +20,7 @@ jobs:
       - uses: nrwl/nx-set-shas@v4
         id: last_successful_commit_push
         with:
-          workflow-id: 'deploy test.yml'
+          workflow-id: '"deploy test.yml"'
 
       - id: changed-files
         uses: tj-actions/changed-files@v45
