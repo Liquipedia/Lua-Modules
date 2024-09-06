@@ -26,10 +26,11 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
-local WidgetTable = require('Module:Widget/Table')
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local Widgets = require('Module:Infobox/Widget/All')
+local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+local WidgetTable = Widgets.Table
+local TableRow = Widgets.TableRow
+local TableCell = Widgets.TableCell
 
 local pageVars = PageVariableNamespace('PrizePool')
 

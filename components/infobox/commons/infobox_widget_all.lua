@@ -13,7 +13,6 @@ local Lua = require('Module:Lua')
 --- Core Widgets
 Widgets.Builder = Lua.import('Module:Infobox/Widget/Builder')
 Widgets.Customizable = Lua.import('Module:Infobox/Widget/Customizable')
-Widgets.Error = Lua.import('Module:Infobox/Widget/Error')
 
 --- Infobox Widgets
 Widgets.Breakdown = Lua.import('Module:Infobox/Widget/Breakdown')
