@@ -61,7 +61,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		})[1]
 	end
 	local players = Array.map(team.players, function(player)
-		local playerData = fetchLpdbPlayer(player.playerId) or {}
+		local playerData = fetchLpdbPlayer(player.id) or {}
 		return {
 			player = playerData.pagename or player.name,
 			name = playerData.id,
