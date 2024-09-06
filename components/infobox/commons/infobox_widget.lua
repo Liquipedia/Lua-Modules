@@ -30,7 +30,7 @@ end
 ---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
-	Logic.tryOrElseLog(
+	return Logic.tryOrElseLog(
 		function() return self:make(injector) end,
 		function(error) return {ErrorDisplay.InlineError(error)} end,
 		function(error)
