@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local ErrorDisplay = require('Module:Error/Display/dev/rath')
+local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
