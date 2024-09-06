@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget
+-- page=Module:Widget
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
