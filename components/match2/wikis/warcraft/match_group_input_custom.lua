@@ -264,7 +264,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 		}
 	}
 
-	map.finished = MatchGroupInputUtil.mapIsFinished(map)
+	map.finished = MatchGroupInputUtil.mapIsFinished(mapInput)
 	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore({
 			walkover = mapInput.walkover,
@@ -277,7 +277,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 
 	map.scores = Array.map(opponentInfo, Operator.property('score'))
 
-	if map.finished or MatchGroupInputUtil.isNotPlayed(map.winner, mapInput.finished) then
+	if map.finished or MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, mapInput.winner, opponentInfo)
