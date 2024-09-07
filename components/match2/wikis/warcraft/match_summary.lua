@@ -374,7 +374,7 @@ function CustomMatchSummary._submatchHeader(submatch)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner
+		local isWinner = opponentIndex == submatch.winner or submatch.resultType ~= 'draw'
 		if submatch.resultType == 'default' then
 			return OpponentDisplay.BlockScore{
 				isWinner = isWinner,
