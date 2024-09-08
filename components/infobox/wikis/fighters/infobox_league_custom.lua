@@ -182,9 +182,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.assumedprizepool = tostring(args.prizepoolassumed)
 	lpdbData.extradata.circuit = args.circuit
-	lpdbData.extradata.circuittier = args.circuittier
+	lpdbData.extradata.circuit_tier = args.circuittier
 	lpdbData.extradata.circuit2 = args.circuit2
-	lpdbData.extradata.circuit2tier = args.circuit2tier
+	lpdbData.extradata.circuit2_tier = args.circuit2tier
 
 	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
