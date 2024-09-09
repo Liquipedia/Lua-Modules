@@ -13,7 +13,7 @@ local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local User = Lua.import('Module:Infobox/Person/User')
 
 local Widgets = require('Module:Infobox/Widget/All')

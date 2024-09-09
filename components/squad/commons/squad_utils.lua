@@ -22,7 +22,7 @@ local Variables = require('Module:Variables')
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Widget = Lua.import('Module:Infobox/Widget/All')
 
 local SquadUtils = {}
