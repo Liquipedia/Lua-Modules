@@ -204,7 +204,7 @@ function MapFunctions.getSideData(map)
 	---@return {t1Side: string, t2Side: string, t1Half: integer, t2Half: integer}?
 	local getDataFor = function(prefix, t1Side, t2Side)
 		local half1 = tonumber(map[prefix .. 't1' .. t1Side])
-		local half2 = tonumber(map[prefix .. 't1' .. t2Side])
+		local half2 = tonumber(map[prefix .. 't2' .. t2Side])
 		if not half1 or not half2 then return end
 		return {
 			t1Side = t1Side,
@@ -244,10 +244,10 @@ end
 ---@param map table
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
+	local sideData = MapFunctions.getSideData(map)
 	return function(opponentIndex)
-		local partialScores = map.extradata['t' .. opponentIndex .. 'halfs']
-		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not map.winner and not map.finished and Logic.isEmpty(partialScores) then
+		local partialScores = sideData['t' .. opponentIndex .. 'halfs']
+		if Logic.isEmpty(partialScores) then
 			return
 		end
 
