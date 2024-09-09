@@ -93,17 +93,6 @@ end
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
 
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummary.Break():create())
-	end
-
 	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:wikitext(Page.makeInternalLink(game.map))
