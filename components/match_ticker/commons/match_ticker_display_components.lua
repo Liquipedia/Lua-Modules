@@ -18,6 +18,7 @@ local Icon = require('Module:Icon')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -297,8 +298,14 @@ function Details:countdown(matchPageIcon)
 		:addClass('match-countdown')
 		:node(Countdown._create(countdownArgs))
 
-	if String.isNotEmpty(match.vod) then
-		countdownDisplay:node(VodLink.display{vod = match.vod})
+	if Logic.readBool(match.finished) then
+		local vods = Array.map(match.match2games, Operator.property('vod'))
+		if String.isNotEmpty(match.vod) then
+			table.insert(vods, match.vod)
+		end
+		Array.forEach(vods, function(vod)
+			countdownDisplay:node(VodLink.display{vod = vod})
+		end)
 	end
 
 	return mw.html.create('div')
