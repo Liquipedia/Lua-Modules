@@ -50,7 +50,7 @@ local NUMBER_OF_RECENT_MATCHES = 10
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Infobox/Widget/All')
 
 local Cell = Widgets.Cell

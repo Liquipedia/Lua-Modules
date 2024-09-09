@@ -16,7 +16,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
 local Widgets = require('Module:Infobox/Widget/All')
