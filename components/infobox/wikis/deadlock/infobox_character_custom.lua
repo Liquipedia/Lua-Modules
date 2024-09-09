@@ -46,8 +46,8 @@ function CustomInjector:parse(id, widgets)
 			Title{name = 'Vitality'},
 			Cell{name = 'Health', content = {args.basehealth}},
 			Cell{name = 'Health Regeneration', content = {args.basehealthregen}},
-			Cell{name = 'Bullet Restistance', content = {args.resistancebullet .. '%'}},
-			Cell{name = 'Spirit Restistance', content = {args.resistancespirit .. '%'}},
+			Cell{name = 'Bullet Resistance', content = {args.resistancebullet .. '%'}},
+			Cell{name = 'Spirit Resistance', content = {args.resistancespirit .. '%'}},
 			Cell{name = 'Move Speed', content = {args.speedmove .. 'm/s'}},
 			Cell{name = 'Sprint Speed', content = {args.speedsprint .. 'm/s'}},
 			Cell{name = 'Stamina', content = {args.stamina}}
