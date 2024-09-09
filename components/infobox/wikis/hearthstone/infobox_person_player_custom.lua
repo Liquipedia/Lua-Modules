@@ -93,9 +93,8 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
 	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
