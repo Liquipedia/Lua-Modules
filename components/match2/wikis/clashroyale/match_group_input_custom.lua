@@ -222,8 +222,8 @@ function MapFunctions.calculateMapScore(mapInput, finished)
 	local winner = tonumber(mapInput.winner)
 	return function(opponentIndex)
 		local manualScore = tonumber(mapInput['score' .. opponentIndex])
-		if manualScore then return
-			manualScore
+		if manualScore then
+			return manualScore
 		end
 
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
