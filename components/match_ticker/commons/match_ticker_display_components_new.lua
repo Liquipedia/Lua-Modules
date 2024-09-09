@@ -122,7 +122,17 @@ function Details:create()
 			:node(self:tournament())
 			:node(self:streams())
 		)
-		:node(self:countdown())
+		:node(mw.html.create('div'):addClass('match-bottom-bar')
+			:node(self:countdown())
+			:node(mw.html.create('div')
+					:addClass('btn btn-secondary btn-new btn--match-details')
+					:attr('tabindex', '0')
+					:node(mw.html.create('i')
+						:addClass('fas fa-external-link')
+					)
+					:wikitext('  Details')
+	)
+		)
 end
 
 ---It will display both countdown and date of the match so the user can select which one to show
