@@ -72,7 +72,6 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate each map
 	Array.forEach(match.games, function(game)
-		if not game.map then return end
 		body:addRow(CustomMatchSummary._createMapRow(game))
 	end)
 
