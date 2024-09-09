@@ -23,7 +23,7 @@ local Variables = require('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local GAME_MOD = 'mod'

@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 

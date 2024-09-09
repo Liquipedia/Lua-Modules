@@ -16,7 +16,7 @@ local Table = require('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RainbowsixWeaponInfobox: WeaponInfobox

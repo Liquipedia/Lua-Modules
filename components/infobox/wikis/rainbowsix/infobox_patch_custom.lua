@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Injector = Lua.import('Module:Widget/Injector')
 local Patch = Lua.import('Module:Infobox/Patch')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class R6PatchInfobox: PatchInfobox

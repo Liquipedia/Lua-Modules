@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local Widget = Lua.import('Module:Infobox/Widget/All')
+local Widget = Lua.import('Module:Widget/All')
 local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class Squad

@@ -15,7 +15,7 @@ local Game = Lua.import('Module:Infobox/Game')
 
 local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class EsportsGameInfobox: GameInfobox
