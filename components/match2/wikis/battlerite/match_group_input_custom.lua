@@ -111,7 +111,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex] or map['t' .. opponentIndex .. 'score'],
-			}, MapFunctions.calculateMapScore(map.winner, map.finished))
+			})
 			return {score = score, status = status}
 		end)
 
@@ -170,20 +170,6 @@ function MapFunctions.getExtraData(map, opponentCount)
 	return {
 		comment = map.comment,
 	}
-end
-
----@param winnerInput string|integer|nil
----@param finished boolean
----@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
-	return function(opponentIndex)
-		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
-			return
-		end
-		return winner == opponentIndex and 1 or 0
-	end
 end
 
 return CustomMatchGroupInput
