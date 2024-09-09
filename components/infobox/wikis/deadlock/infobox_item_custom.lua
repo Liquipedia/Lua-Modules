@@ -128,6 +128,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
 		table.insert(widgets, Center{content = {args.recipe}})
+	elseif id == 'maps' then return {}
 	elseif id == 'info' then return {}
 	end
 
