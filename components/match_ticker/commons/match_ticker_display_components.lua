@@ -299,12 +299,21 @@ function Details:countdown(matchPageIcon)
 		:node(Countdown._create(countdownArgs))
 
 	if Logic.readBool(match.finished) then
-		local vods = Array.map(match.match2games, Operator.property('vod'))
-		if String.isNotEmpty(match.vod) then
-			table.insert(vods, 1, match.vod)
+		local function makeVod(vod, num)
+			if Logic.isEmpty(vod) then
+				return nil
+			end
+			return VodLink.display{
+				vod = vod,
+				gamenum = num,
+			}
 		end
+
+		local vods = Array.map(match.match2games, makeVod)
+		table.insert(vods, 1, makeVod(match.vod))
+
 		Array.forEach(vods, function(vod)
-			countdownDisplay:node(VodLink.display{vod = vod})
+			countdownDisplay:node(vod)
 		end)
 	end
 
