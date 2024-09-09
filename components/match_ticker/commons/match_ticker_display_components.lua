@@ -301,7 +301,7 @@ function Details:countdown(matchPageIcon)
 	if Logic.readBool(match.finished) then
 		local vods = Array.map(match.match2games, Operator.property('vod'))
 		if String.isNotEmpty(match.vod) then
-			table.insert(vods, match.vod)
+			table.insert(vods, 1, match.vod)
 		end
 		Array.forEach(vods, function(vod)
 			countdownDisplay:node(VodLink.display{vod = vod})
