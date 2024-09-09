@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local SquadPlayerData = require('Module:SquadPlayer/data')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Widget = require('Module:Infobox/Widget/All')
+local Widget = require('Module:Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
