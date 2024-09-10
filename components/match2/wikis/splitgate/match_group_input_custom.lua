@@ -101,7 +101,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex] or map['t' .. opponentIndex .. 'score'],
+				score = map['score' .. opponentIndex],
 			})
 			return {score = score, status = status}
 		end)
