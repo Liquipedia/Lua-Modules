@@ -403,7 +403,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 
 	Array.forEach(unattachedParticipants, function(participant)
 		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
-		local nameUpper = participant.name:upper()
+		local nameUpper = name:upper()
 		local isTBD = nameUpper == TBD or nameUpper == TBA
 
 		table.insert(opponent.match2players, {
