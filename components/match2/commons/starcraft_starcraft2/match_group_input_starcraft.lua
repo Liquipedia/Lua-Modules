@@ -400,16 +400,18 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
 			}
-		end
+		end,
+		OPPONENT_CONFIG
 	)
 
 	Array.forEach(unattachedParticipants, function(participant)
+		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
 		local nameUpper = participant.name:upper()
 		local isTBD = nameUpper == TBD or nameUpper == TBA
 
 		table.insert(opponent.match2players, {
-			name = isTBD and TBD or participant.link,
-			displayname = isTBD and TBD or nameUpper,
+			name = isTBD and TBD or participant.player,
+			displayname = isTBD and TBD or name,
 			flag = participant.flag,
 			extradata = {faction = participant.faction},
 		})
