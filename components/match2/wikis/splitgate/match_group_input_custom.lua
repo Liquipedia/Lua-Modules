@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local GodNames = mw.loadData('Module:GodNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
