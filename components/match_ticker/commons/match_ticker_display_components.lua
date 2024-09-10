@@ -19,6 +19,7 @@ local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
@@ -298,20 +299,20 @@ function Details:countdown(matchPageIcon)
 		:node(Countdown._create(countdownArgs))
 
 	if Logic.readBool(match.finished) then
-		local function makeVod(tbl, num)
-			if Logic.isEmpty(tbl.vod) then
+		local function makeVod(vod, num)
+			if Logic.isEmpty(vod) then
 				return nil
 			end
 			return VodLink.display{
-				vod = tbl,
+				vod = vod,
 				gamenum = num,
 			}
 		end
 
-		local vods = Array.map(match.match2games, makeVod)
-		table.insert(vods, 1, makeVod(match))
+		local gameVods = Array.map(Array.map(match.match2games, Operator.property('vod')), makeVod)
 
-		Array.forEach(vods, function(vod)
+		countdownDisplay:node(makeVod(match.vod))
+		Array.forEach(gameVods, function(vod)
 			countdownDisplay:node(vod)
 		end)
 	end
