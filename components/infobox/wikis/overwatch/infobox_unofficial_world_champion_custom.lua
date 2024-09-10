@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 
 local Widgets = require('Module:Infobox/Widget/All')

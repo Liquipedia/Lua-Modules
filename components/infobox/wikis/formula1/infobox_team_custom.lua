@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TeamTemplates = require('Module:Team')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Infobox/Widget/All')

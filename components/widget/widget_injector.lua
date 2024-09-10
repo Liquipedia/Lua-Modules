@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Injector
+-- page=Module:Widget/Injector
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

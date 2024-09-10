@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Center
+-- page=Module:Widget/Center
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class CentereWidget: Widget
 ---@operator call({content: (string|number)[], classes: string[]}): CentereWidget

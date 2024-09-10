@@ -59,11 +59,11 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
 	},
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
-	match2 = 2,
 }

@@ -80,7 +80,7 @@ end
 ---@return ParticipantTableEntry?
 function ParticipantTableImport._entryFromOpponentRecord(opponentRecord)
 	local opponent = Opponent.fromMatch2Record(opponentRecord) --[[@as standardOpponent]]
-	if  Opponent.isTbd(opponent) then
+	if Opponent.isTbd(opponent) then
 		return
 	end
 	return {

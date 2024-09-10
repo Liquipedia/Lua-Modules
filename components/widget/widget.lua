@@ -1,12 +1,13 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget
+-- page=Module:Widget
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
+local ErrorDisplay = require('Module:Error/Display')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 ---@class Widget: BaseClass
@@ -29,21 +30,14 @@ end
 ---@param injector WidgetInjector?
 ---@return Widget[]|Html[]|nil
 function Widget:tryMake(injector)
-	local _, output = xpcall(
-		function()
-			return self:make(injector)
-		end,
-		function(errorMessage)
-			mw.log('-----Error in Widget:tryMake()-----')
-			mw.logObject(errorMessage, 'error')
-			mw.logObject(self, 'widget')
-			mw.log(debug.traceback())
-			local ErrorWidget = Lua.import('Module:Infobox/Widget/Error')
-			return {ErrorWidget({errorMessage = errorMessage})}
+	return Logic.tryOrElseLog(
+		function() return self:make(injector) end,
+		function(error) return {ErrorDisplay.InlineError(error)} end,
+		function(error)
+			error.header = 'Error occured in widget: (caught by Widget:tryMake)'
+			return error
 		end
 	)
-
-	return output
 end
 
 return Widget

@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 
 local Widgets = require('Module:Infobox/Widget/All')

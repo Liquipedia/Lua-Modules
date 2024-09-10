@@ -51,11 +51,12 @@ function FeatureFlag.get(flag)
 end
 
 ---@param flag string
----@return boolean
+---@return boolean|string
 function FeatureFlag._get(flag)
 	local config = FeatureFlag.getConfig(flag)
 	return Logic.nilOr(
 		Logic.readBoolOrNil(mw.ext.VariablesLua.var('feature_' .. flag)),
+		Logic.nilIfEmpty(mw.ext.VariablesLua.var('feature_' .. flag)),
 		config.defaultValue,
 		false
 	)
@@ -63,11 +64,14 @@ end
 
 ---Sets the value of a feature flag. If value is nil, then this resets the value to the configured default.
 ---@param flag string
----@param value boolean?
+---@param value boolean|string|nil
 function FeatureFlag.set(flag, value)
 	FeatureFlag.getConfig(flag)
-	if value ~= nil then
+	if Logic.readBoolOrNil(value) ~= nil then
 		mw.ext.VariablesLua.vardefine('feature_' .. flag, value and '1' or '0')
+	elseif value ~= nil then
+		---@cast value string
+		mw.ext.VariablesLua.vardefine('feature_' .. flag, value)
 	else
 		mw.ext.VariablesLua.vardefine('feature_' .. flag, '')
 	end
@@ -76,7 +80,7 @@ end
 
 ---Runs a function inside a scope where the specified flags are set.
 ---@generic V
----@param flags? {[string]: boolean}
+---@param flags? {[string]: boolean|string}
 ---@param f fun(): V
 ---@return V|Error
 function FeatureFlag.with(flags, f)
@@ -107,13 +111,18 @@ function FeatureFlag.with(flags, f)
 end
 
 ---@param flag string
----@return {defaultValue: boolean}
+---@return {defaultValue: boolean|string}
 function FeatureFlag.getConfig(flag)
 	local config = FeatureFlagConfig[flag]
 	if not config then
 		error('Unrecognized feature flag \'' .. flag .. '\'', 2)
 	end
 	return config
+end
+
+---Clears the cache of feature flags. This is useful for testing.
+function FeatureFlag.clearCache()
+	cachedFlags = {}
 end
 
 return FeatureFlag

@@ -104,7 +104,7 @@ end
 ---@param baseConditions string
 ---@param placementData InfoboxPlacementStatsData
 function PlacementStats._fetchForTier(tier, baseConditions, placementData)
-	placementData.tiers[tier] =  {top3 = 0, all = 0, placement = {}}
+	placementData.tiers[tier] = {top3 = 0, all = 0, placement = {}}
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,

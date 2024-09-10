@@ -34,7 +34,7 @@ for luaFile in $luaFiles; do
     echo '...skipping - no magic comment found'
   else
     wiki="${BASH_REMATCH[1]}"
-    page="${BASH_REMATCH[2]}"
+    page="${BASH_REMATCH[2]}${LUA_DEV_ENV_NAME}"
 
     if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
         echo '...skipping - dev wiki not applicable...'

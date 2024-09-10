@@ -17,7 +17,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Infobox/Widget/All')
@@ -182,9 +182,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.assumedprizepool = tostring(args.prizepoolassumed)
 	lpdbData.extradata.circuit = args.circuit
-	lpdbData.extradata.circuittier = args.circuittier
+	lpdbData.extradata.circuit_tier = args.circuittier
 	lpdbData.extradata.circuit2 = args.circuit2
-	lpdbData.extradata.circuit2tier = args.circuit2tier
+	lpdbData.extradata.circuit2_tier = args.circuit2tier
 
 	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
