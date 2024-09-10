@@ -36,7 +36,7 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field score number?
 
 ---@class WarcraftMatchGroupUtilGame: MatchGroupUtilGame
----@field opponents  WarcraftMatchGroupUtilGameOpponent[]
+---@field opponents WarcraftMatchGroupUtilGameOpponent[]
 ---@field offfactions table<integer, string[]>?
 
 ---@class WarcraftMatchGroupUtilVeto

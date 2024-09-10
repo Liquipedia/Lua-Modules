@@ -150,9 +150,9 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 1,
 		},
 	},
 	opponentLibrary = 'Opponent',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
-	match2 = 1,
 }

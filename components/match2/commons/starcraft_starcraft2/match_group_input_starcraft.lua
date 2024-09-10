@@ -99,10 +99,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2)
-	elseif MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.winner = nil
+		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
 	MatchGroupInputUtil.getCommonTournamentVars(match)
@@ -110,10 +107,11 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
 	match.links = MatchFunctions.getLinks(match)
-	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	match.games = games
 	match.opponents = opponents
+
+	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	return match
 end
@@ -292,7 +290,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 
 	map.scores = Array.map(opponentInfo, Operator.property('score'))
 
-	if map.finished or MatchGroupInputUtil.isNotPlayed(map.winner, mapInput.finished) then
+	if map.finished then
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
 		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, mapInput.winner, opponentInfo)
@@ -433,7 +431,7 @@ end
 ---@param displayName string
 ---@return integer
 function MapFunctions.getPlayerIndex(players, name, displayName)
-	local playerIndex =  Array.indexOf(players, function(player) return player.name == name end)
+	local playerIndex = Array.indexOf(players, function(player) return player.name == name end)
 
 	if playerIndex ~= 0 then
 		return playerIndex

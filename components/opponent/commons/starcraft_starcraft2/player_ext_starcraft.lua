@@ -159,8 +159,9 @@ options.fetchPlayer: Whether to use the LPDB player record. Enabled by default.
 options.fetchMatch2Player: Whether to use the player's recent matches. Disabled by default.
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
+
 ---@param player StarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string|number|osdate?}?
+---@param options PlayerExtSyncOptions?
 ---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.syncPlayer(player, options)
 	options = options or {}
@@ -185,7 +186,7 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
-		StarcraftPlayerExt.saveToPageVars(player)
+		StarcraftPlayerExt.saveToPageVars(player, {overwritePageVars = options.overwritePageVars})
 	end
 
 	return player
@@ -193,7 +194,7 @@ end
 
 ---Same as StarcraftPlayerExt.syncPlayer, except it does not save the player's flag and faction to page variables.
 ---@param player StarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@param options PlayerExtPopulateOptions?
 ---@return StarcraftStandardPlayer
 function StarcraftPlayerExt.populatePlayer(player, options)
 	return StarcraftPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
@@ -202,12 +203,20 @@ end
 ---Saves the pageName, flag, and faction of a player to page variables,
 ---so that editors do not have to duplicate the same info later on.
 ---@param player StarcraftStandardPlayer
-function StarcraftPlayerExt.saveToPageVars(player)
-	if player.faction and player.faction ~= Faction.defaultFaction then
-		globalVars:set(player.displayName .. '_faction', player.faction)
+---@param options {overwritePageVars: boolean}?
+function StarcraftPlayerExt.saveToPageVars(player, options)
+	local displayName = player.displayName
+	if not displayName then return end
+
+	options = options or {}
+	local overwrite = options.overwritePageVars
+
+	if PlayerExt.shouldWritePageVar(displayName .. '_faction', player.faction, overwrite)
+		and player.faction ~= Faction.defaultFaction then
+			globalVars:set(displayName .. '_faction', player.faction)
 	end
 
-	PlayerExt.saveToPageVars(player)
+	PlayerExt.saveToPageVars(player, options)
 end
 
 ---@param frame Frame
@@ -218,12 +227,12 @@ function StarcraftPlayerExt.TemplateStorePlayerLink(frame)
 
 	local pageName, displayName = PlayerExt.extractFromLink(args[1])
 
-	StarcraftPlayerExt.saveToPageVars{
+	StarcraftPlayerExt.saveToPageVars({
 		displayName = displayName,
 		pageName = args.link or pageName or displayName,
 		flag = String.nilIfEmpty(Flags.CountryName(args.flag)),
 		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
-	}
+	}, {overwritePageVars = true})
 end
 
 return StarcraftPlayerExt

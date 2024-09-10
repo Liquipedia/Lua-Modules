@@ -102,20 +102,18 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2)
-	elseif MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.winner = nil
+		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
 	MatchFunctions.getTournamentVars(match)
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
-	match.extradata = MatchFunctions.getExtraData(match)
 
 	match.games = games
 	match.opponents = opponents
+
+	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
@@ -153,7 +151,7 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		end)
 
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished or MatchGroupInputUtil.isNotPlayed(map.winner, finishedInput) then
+		if map.finished then
 			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
 			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
@@ -214,6 +212,7 @@ function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
 		headtohead = match.headtohead,
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -223,7 +222,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(MatchParser, map, opponentCount)
 	local extraData = {
-		publisherid = map.publisherid or '',
+		publisherid = tonumber(map.publisherid),
 		comment = map.comment,
 	}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)

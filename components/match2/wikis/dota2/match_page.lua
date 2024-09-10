@@ -82,6 +82,8 @@ function MatchPage.getByMatchId(props)
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
 				local newPlayer = Table.mergeInto(player, {
+					displayName = player.name or player.player,
+					link = player.player,
 					items = Array.map(player.items or {}, makeItemDisplay),
 					backpackitems = Array.map(player.backpackitems or {}, makeItemDisplay),
 					neutralitem = makeItemDisplay(player.neutralitem or {}),

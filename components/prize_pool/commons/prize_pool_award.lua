@@ -18,8 +18,9 @@ local Placement = Lua.import('Module:PrizePool/Award/Placement')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local Widgets = require('Module:Infobox/Widget/All')
+local TableRow = Widgets.TableRow
+local TableCell = Widgets.TableCell
 
 --- @class AwardPrizePool
 --- @field options table

@@ -16,102 +16,102 @@ local AOM_SUFFIX = '/Age of Mythology'
 local AOEO_SUFFIX = '/Age of Empires Online'
 
 local factionPropsAoE1 = {
-    assyrians = {
-        index = 1,
-        name = 'Assyrians',
-        faction = 'assyrians',
-    },
-    babylonians = {
-        index = 2,
-        name = 'Babylonians',
-        pageName = 'Babylonians' .. AOE1_SUFFIX,
-        faction = 'babylonians',
-    },
-    carthaginians = {
-        index = 3,
-        name = 'Carthaginians',
-        faction = 'carthaginians',
-    },
-    choson = {
-        index = 4,
-        name = 'Choson',
-        faction = 'choson',
-    },
-    egyptians = {
-        index = 5,
-        name = 'Egyptians',
-        pageName = 'Egyptians' .. AOE1_SUFFIX,
-        faction = 'egyptians',
-    },
-    greeks = {
-        index = 6,
-        name = 'Greeks',
-        pageName = 'Greeks' .. AOE1_SUFFIX,
-        faction = 'greeks',
-    },
-    hittites = {
-        index = 7,
-        name = 'Hittites',
-        faction = 'hittites',
-    },
-    macedonians = {
-        index = 8,
-        name = 'Macedonians',
-        faction = 'macedonians',
-    },
-    minoans = {
-        index = 9,
-        name = 'Minoans',
-        faction = 'minoans',
-    },
-    palmyrans = {
-        index = 10,
-        name = 'Palmyrans',
-        faction = 'palmyrans',
-    },
-    persians = {
-        index = 11,
-        name = 'Persians',
-        pageName = 'Persians' .. AOE1_SUFFIX,
-        faction = 'persians',
-    },
-    phoenicians = {
-        index = 12,
-        name = 'Phoenicians',
-        faction = 'phoenicians',
-    },
-    romans = {
-        index = 13,
-        name = 'Romans',
-        pageName = 'Romans' .. AOE1_SUFFIX,
-        faction = 'romans',
-    },
-    shang = {
-        index = 14,
-        name = 'Shang',
-        faction = 'shang',
-    },
-    sumerians = {
-        index = 15,
-        name = 'Sumerians',
-        faction = 'sumerians',
-    },
-    yamato = {
-        index = 16,
-        name = 'Yamato',
-        faction = 'yamato',
-    },
-    lacviet = {
-        index = 17,
-        name = 'Lac Viet',
-        faction = 'lacviet',
-    },
+	assyrians = {
+		index = 1,
+		name = 'Assyrians',
+		faction = 'assyrians',
+	},
+	babylonians = {
+		index = 2,
+		name = 'Babylonians',
+		pageName = 'Babylonians' .. AOE1_SUFFIX,
+		faction = 'babylonians',
+	},
+	carthaginians = {
+		index = 3,
+		name = 'Carthaginians',
+		faction = 'carthaginians',
+	},
+	choson = {
+		index = 4,
+		name = 'Choson',
+		faction = 'choson',
+	},
+	egyptians = {
+		index = 5,
+		name = 'Egyptians',
+		pageName = 'Egyptians' .. AOE1_SUFFIX,
+		faction = 'egyptians',
+	},
+	greeks = {
+		index = 6,
+		name = 'Greeks',
+		pageName = 'Greeks' .. AOE1_SUFFIX,
+		faction = 'greeks',
+	},
+	hittites = {
+		index = 7,
+		name = 'Hittites',
+		faction = 'hittites',
+	},
+	macedonians = {
+		index = 8,
+		name = 'Macedonians',
+		faction = 'macedonians',
+	},
+	minoans = {
+		index = 9,
+		name = 'Minoans',
+		faction = 'minoans',
+	},
+	palmyrans = {
+		index = 10,
+		name = 'Palmyrans',
+		faction = 'palmyrans',
+	},
+	persians = {
+		index = 11,
+		name = 'Persians',
+		pageName = 'Persians' .. AOE1_SUFFIX,
+		faction = 'persians',
+	},
+	phoenicians = {
+		index = 12,
+		name = 'Phoenicians',
+		faction = 'phoenicians',
+	},
+	romans = {
+		index = 13,
+		name = 'Romans',
+		pageName = 'Romans' .. AOE1_SUFFIX,
+		faction = 'romans',
+	},
+	shang = {
+		index = 14,
+		name = 'Shang',
+		faction = 'shang',
+	},
+	sumerians = {
+		index = 15,
+		name = 'Sumerians',
+		faction = 'sumerians',
+	},
+	yamato = {
+		index = 16,
+		name = 'Yamato',
+		faction = 'yamato',
+	},
+	lacviet = {
+		index = 17,
+		name = 'Lac Viet',
+		faction = 'lacviet',
+	},
 
-    unknown = {
-        index = 18,
-        name = 'Unknown',
-        faction = 'unknown',
-    },
+	unknown = {
+		index = 18,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
 }
 
 local factionPropsAoE2 = {
@@ -367,138 +367,138 @@ local factionPropsAoE2 = {
 }
 
 local factionPropsAoE3 = {
-    aztecs = {
+	aztecs = {
 		index = 1,
 		name = 'Aztecs',
 		pageName = 'Aztecs' .. AOE3_SUFFIX,
 		faction = 'aztecs',
 	},
-    british = {
+	british = {
 		index = 2,
 		name = 'British',
 		faction = 'british',
 	},
-    chinese = {
+	chinese = {
 		index = 3,
 		name = 'Chinese',
 		pageName = 'Chinese' .. AOE3_SUFFIX,
 		faction = 'chinese',
 	},
-    dutch = {
+	dutch = {
 		index = 4,
 		name = 'Dutch',
 		faction = 'dutch',
 	},
-    ethiopians = {
+	ethiopians = {
 		index = 5,
 		name = 'Ethiopians',
 		pageName = 'Ethiopians' .. AOE3_SUFFIX,
 		faction = 'ethiopians',
 	},
-    french = {
+	french = {
 		index = 6,
 		name = 'French',
 		faction = 'french',
 	},
-    germans = {
+	germans = {
 		index = 7,
 		name = 'Germans',
 		faction = 'germans',
 	},
-    haudenosaunee = {
+	haudenosaunee = {
 		index = 8,
 		name = 'Haudenosaunee',
 		faction = 'haudenosaunee',
 	},
-    hausa = {
+	hausa = {
 		index = 9,
 		name = 'Hausa',
 		faction = 'hausa',
 	},
-    incas = {
+	incas = {
 		index = 10,
 		name = 'Incas',
 		pageName = 'Incas' .. AOE3_SUFFIX,
 		faction = 'incas',
 	},
-    indians = {
+	indians = {
 		index = 11,
 		name = 'Indians',
 		pageName = 'Indians' .. AOE3_SUFFIX,
 		faction = 'indians',
 	},
-    italians = {
+	italians = {
 		index = 12,
 		name = 'Italians',
 		pageName = 'Italians' .. AOE3_SUFFIX,
 		faction = 'italians',
 	},
-    japanese = {
+	japanese = {
 		index = 13,
 		name = 'Japanese',
 		pageName = 'Japanese' .. AOE3_SUFFIX,
 		faction = 'japanese',
 	},
-    lakota = {
+	lakota = {
 		index = 14,
 		name = 'Lakota',
 		faction = 'lakota',
 	},
-    maltese = {
+	maltese = {
 		index = 15,
 		name = 'Maltese',
 		pageName = 'Maltese' .. AOE3_SUFFIX,
 		faction = 'maltese',
 	},
-    mexicans = {
+	mexicans = {
 		index = 16,
 		name = 'Mexicans',
 		faction = 'mexicans',
 	},
-    ottomans = {
+	ottomans = {
 		index = 17,
 		name = 'Ottomans',
 		pageName = 'Ottomans' .. AOE3_SUFFIX,
 		faction = 'ottomans',
 	},
-    portuguese = {
+	portuguese = {
 		index = 18,
 		name = 'Portuguese',
 		pageName = 'Portuguese' .. AOE3_SUFFIX,
 		faction = 'portuguese',
 	},
-    russians = {
+	russians = {
 		index = 19,
 		name = 'Russians',
 		faction = 'russians',
 	},
-    spanish = {
+	spanish = {
 		index = 20,
 		name = 'Spanish',
 		pageName = 'Spanish' .. AOE3_SUFFIX,
 		faction = 'spanish',
 	},
-    swedes = {
+	swedes = {
 		index = 21,
 		name = 'Swedes',
 		faction = 'swedes',
 	},
-    unitedstates = {
+	unitedstates = {
 		index = 22,
 		name = 'United States',
 		faction = 'unitedstates',
 	},
-    random = {
+	random = {
 		index = 23,
 		name = 'Random',
 		faction = 'random',
 	},
 
-    unknown = {
-        index = 24,
-        name = 'Unknown',
-        faction = 'unknown',
-    },
+	unknown = {
+		index = 24,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
 }
 
 local factionPropsAoE4 = {
@@ -591,10 +591,10 @@ local factionPropsAoE4 = {
 	},
 
 	unknown = {
-        index = 17,
-        name = 'Unknown',
-        faction = 'unknown',
-    },
+		index = 17,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
 }
 
 local factionPropsAoM = {
@@ -722,10 +722,10 @@ local factionPropsAoM = {
 	},
 
 	unknown = {
-        index = 24,
-        name = 'Unknown',
-        faction = 'unknown',
-    },
+		index = 24,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
 }
 
 local factionPropsAoEO = {
@@ -779,104 +779,104 @@ local factionPropsAoEO = {
 	},
 
 	unknown = {
-        index = 9,
-        name = 'Unknown',
-        faction = 'unknown',
-    },
+		index = 9,
+		name = 'Unknown',
+		faction = 'unknown',
+	},
 }
 
 return {
-    factionProps = {
-        aoe1 = factionPropsAoE1,
-        aoe2 = factionPropsAoE2,
-        aoe3 = factionPropsAoE3,
-        aoe4 = factionPropsAoE4,
+	factionProps = {
+		aoe1 = factionPropsAoE1,
+		aoe2 = factionPropsAoE2,
+		aoe3 = factionPropsAoE3,
+		aoe4 = factionPropsAoE4,
 		aom = factionPropsAoM,
 		aoeo = factionPropsAoEO,
-    },
-    defaultFaction = 'unknown',
-    factions = {
-        aoe1 = Array.extractKeys(factionPropsAoE1),
-        aoe2 = Array.extractKeys(factionPropsAoE2),
-        aoe3 = Array.extractKeys(factionPropsAoE3),
-        aoe4 = Array.extractKeys(factionPropsAoE4),
-        aom = Array.extractKeys(factionPropsAoM),
-        aoeo = Array.extractKeys(factionPropsAoEO),
-    },
-    aliases = {
-        aoe1 = {
-            asr = 'assyrians',
-            asy = 'assyrians',
-            bab = 'babylonians',
-            car = 'carthaginians',
-            cho = 'choson',
-            egy = 'egyptians',
-            gre = 'greeks',
-            hit = 'hittites',
-            mac = 'macedonians',
-            min = 'minoans',
-            pal = 'palmyrans',
-            per = 'persians',
-            pho = 'phoenicians',
-            rom = 'romans',
-            sha = 'shang',
-            sum = 'sumerians',
-            yam = 'yamato',
-            lac = 'lacviet',
-            lv = 'lacviet',
-            ['lac viet'] = 'lacviet',
-         },
-        aoe2 = {
-            arm = 'armenians',
-            azt = 'aztecs',
-            ber = 'berbers',
-            ben = 'bengalis',
-            boh = 'bohemians',
-            bri = 'britons',
-            bul = 'bulgarians',
-            brg = 'burgundians',
-            bur = 'burmese',
-            byz = 'byzantines',
-            cel = 'celts',
-            chi = 'chinese',
-            cms = 'cumans',
-            cum = 'cumans',
-            dra = 'dravidians',
-            eth = 'ethiopians',
-            fra = 'franks',
-            geo = 'georgians',
-            got = 'goths',
-            gur = 'gurjaras',
-            hin = 'hindustanis',
-            hun = 'huns',
-            inc = 'incas',
-            ind = 'indians',
-            ita = 'italians',
-            jap = 'japanese',
-            jpn = 'japanese',
-            khm = 'khmer',
-            kor = 'koreans',
-            lit = 'lithuanians',
-            mag = 'magyars',
-            mly = 'malay',
-            mal = 'malians',
-            mli = 'malians',
-            may = 'mayans',
-            mon = 'mongols',
-            per = 'persians',
-            pol = 'poles',
-            por = 'portuguese',
-            rom = 'romans',
-            sar = 'saracens',
-            sic = 'sicilians',
-            sla = 'slavs',
-            spa = 'spanish',
-            tat = 'tatars',
-            teu = 'teutons',
-            tur = 'turks',
-            vie = 'vietnamese',
-            vik = 'vikings',
-        },
+	},
+	defaultFaction = 'unknown',
+	factions = {
+		aoe1 = Array.extractKeys(factionPropsAoE1),
+		aoe2 = Array.extractKeys(factionPropsAoE2),
+		aoe3 = Array.extractKeys(factionPropsAoE3),
+		aoe4 = Array.extractKeys(factionPropsAoE4),
+		aom = Array.extractKeys(factionPropsAoM),
+		aoeo = Array.extractKeys(factionPropsAoEO),
+	},
+	aliases = {
+		aoe1 = {
+			asr = 'assyrians',
+			asy = 'assyrians',
+			bab = 'babylonians',
+			car = 'carthaginians',
+			cho = 'choson',
+			egy = 'egyptians',
+			gre = 'greeks',
+			hit = 'hittites',
+			mac = 'macedonians',
+			min = 'minoans',
+			pal = 'palmyrans',
+			per = 'persians',
+			pho = 'phoenicians',
+			rom = 'romans',
+			sha = 'shang',
+			sum = 'sumerians',
+			yam = 'yamato',
+			lac = 'lacviet',
+			lv = 'lacviet',
+			['lac viet'] = 'lacviet',
+		 },
+		aoe2 = {
+			arm = 'armenians',
+			azt = 'aztecs',
+			ber = 'berbers',
+			ben = 'bengalis',
+			boh = 'bohemians',
+			bri = 'britons',
+			bul = 'bulgarians',
+			brg = 'burgundians',
+			bur = 'burmese',
+			byz = 'byzantines',
+			cel = 'celts',
+			chi = 'chinese',
+			cms = 'cumans',
+			cum = 'cumans',
+			dra = 'dravidians',
+			eth = 'ethiopians',
+			fra = 'franks',
+			geo = 'georgians',
+			got = 'goths',
+			gur = 'gurjaras',
+			hin = 'hindustanis',
+			hun = 'huns',
+			inc = 'incas',
+			ind = 'indians',
+			ita = 'italians',
+			jap = 'japanese',
+			jpn = 'japanese',
+			khm = 'khmer',
+			kor = 'koreans',
+			lit = 'lithuanians',
+			mag = 'magyars',
+			mly = 'malay',
+			mal = 'malians',
+			mli = 'malians',
+			may = 'mayans',
+			mon = 'mongols',
+			per = 'persians',
+			pol = 'poles',
+			por = 'portuguese',
+			rom = 'romans',
+			sar = 'saracens',
+			sic = 'sicilians',
+			sla = 'slavs',
+			spa = 'spanish',
+			tat = 'tatars',
+			teu = 'teutons',
+			tur = 'turks',
+			vie = 'vietnamese',
+			vik = 'vikings',
+		},
 		aoe3 = {
 			azt = 'aztecs',
 			brt = 'british',
@@ -952,5 +952,5 @@ return {
 			per = 'persians',
 			rom = 'romans',
 		}
-    },
+	},
 }

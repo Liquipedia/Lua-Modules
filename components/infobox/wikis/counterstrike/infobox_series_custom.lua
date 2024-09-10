@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 local Tier = require('Module:Tier/Custom')
 
 local Game = Lua.import('Module:Game')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
 local Widgets = require('Module:Infobox/Widget/All')
