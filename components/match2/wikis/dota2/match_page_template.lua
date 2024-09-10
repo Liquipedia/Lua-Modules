@@ -146,7 +146,7 @@ return {
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
 								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
-								<div class="match-bm-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
+								<div class="match-bm-players-player-name">[[{{link}}|{{displayName}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->
@@ -177,7 +177,7 @@ return {
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
 								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
-								<div class="match-bm-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
+								<div class="match-bm-players-player-name">[[{{link}}|{{displayName}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->

@@ -121,7 +121,7 @@ function MatchLegacy.storeGames(match, match2)
 		local game = Table.deepCopy(game2)
 
 		-- Extradata
-		local extradata = Json.parseIfString(game2.extradata)
+		local extradata = Json.parseIfString(game2.extradata) or {}
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		for key, item in pairs(extradata) do

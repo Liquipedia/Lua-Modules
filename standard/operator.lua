@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+
 local Operator = {}
 
 ---Uses the __add metamethod (a + b)
@@ -67,11 +69,24 @@ end
 ---@param item string|number
 ---@return fun(tbl: table): any
 function Operator.property(item)
-	if string.find(item, '%.') then
-		error('Pathing not yet supported in property')
-	end
+	-- catch nil and tables
+	assert(type(item) == 'string' or type(item) == 'number', 'Invalid or missing input to `Operator.property`')
+
+	local pathSegments = mw.text.split(item, '.', true)
+
 	return function(tbl)
-		return tbl[item]
+		local selected = tbl
+		for segmentIndex, pathSegment in ipairs(pathSegments) do
+			if type(selected) ~= 'table' and segmentIndex == 1 then
+				error('Nil supplied to `Operator.property(' .. item .. ')`')
+			elseif type(selected) ~= 'table' then
+				local pathUntilHere = Array.sub(pathSegments, 1, segmentIndex - 1)
+				error('Could not index "tbl.' .. table.concat(pathUntilHere, '.') .. '"')
+			end
+
+			selected = selected[pathSegment] or selected[tonumber(pathSegment)]
+		end
+		return selected
 	end
 end
 

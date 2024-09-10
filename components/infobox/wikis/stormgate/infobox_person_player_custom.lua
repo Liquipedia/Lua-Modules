@@ -41,7 +41,7 @@ local ROLES = {
 	player = {category = 'Player', variable = 'Player', personType = 'Player'},
 }
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Widgets = Lua.import('Module:Infobox/Widget/All')
 
 local Cell = Widgets.Cell

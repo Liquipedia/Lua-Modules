@@ -949,9 +949,10 @@ end
 ---@param winner integer?
 ---@param placementWinner integer
 ---@param placementLoser integer
+---@param resultType string?
 ---@return table[]
-function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser)
-	if not opponents or #opponents ~= 2 then
+function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, resultType)
+	if not opponents or #opponents ~= 2 or resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
 		return opponents
 	end
 
@@ -990,7 +991,7 @@ end
 ---@return boolean
 function MatchGroupInputUtil.matchIsFinished(match, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
-		return false
+		return true
 	end
 
 	local finished = Logic.readBoolOrNil(match.finished)
@@ -1032,7 +1033,7 @@ end
 ---@return boolean
 function MatchGroupInputUtil.mapIsFinished(map, opponents)
 	if MatchGroupInputUtil.isNotPlayed(map.winner, map.finished) then
-		return false
+		return true
 	end
 
 	local finished = Logic.readBoolOrNil(map.finished)
