@@ -18,6 +18,7 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
+local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
 local MAX_NUM_PLAYERS = 15
@@ -49,9 +50,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
-
-	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
-	games = MatchFunctions.removeUnsetMaps(games)
+	match.bestof = MatchFunctions.getBestOf(match.bestof)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -107,6 +106,19 @@ function MatchFunctions.extractMaps(match, opponentCount)
 	return maps
 end
 
+---@param bestofInput string|integer?
+---@return integer?
+function MatchFunctions.getBestOf(bestofInput)
+	local bestof = tonumber(bestofInput)
+
+	if bestof then
+		Variables.varDefine('bestof', bestof)
+		return bestof
+	end
+
+	return tonumber(Variables.varDefault('bestof')) or DEFAULT_BESTOF
+end
+
 ---@param match table
 ---@return table
 function MatchFunctions.getTournamentVars(match)
@@ -139,22 +151,13 @@ function MatchFunctions.getExtraData(match)
 	}
 end
 
--- Template:Map sets a default map name so we can count the number of maps.
--- These maps however shouldn't be stored
--- The keepMap function will check if a map should be kept
----@param games table[]
----@return table[]
-function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, Logic.isNotDeepEmpty)
-end
-
 --
 -- map related functions
 --
 
 ---@param map table
 ---@param opponentCount integer
----@return table
+---@return table?
 function MapFunctions.readMap(map, opponentCount)
 	local finishedInput = map.finished --[[@as string?]]
 	local winnerInput = map.winner --[[@as string?]]
@@ -164,7 +167,7 @@ function MapFunctions.readMap(map, opponentCount)
 	end
 
 	if Logic.isDeepEmpty(map) then
-		return map
+		return nil
 	end
 
 	map.extradata = MapFunctions.getExtraData(map, opponentCount)
