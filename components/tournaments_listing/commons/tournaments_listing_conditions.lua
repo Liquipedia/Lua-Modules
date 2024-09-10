@@ -6,7 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
@@ -93,30 +95,30 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('shortname'), Comparator.neq, '')}
 	end
 
-	if args.organizer then
-		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for _, organizer in ipairs(mw.text.split(args.organizer, ',', true)) do
-			organizer = mw.text.trim(organizer)
-			organizerConditions:add{
-				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
-				ConditionNode(ColumnName('organizers_organizer2'), Comparator.eq, organizer),
-				ConditionNode(ColumnName('organizers_organizer3'), Comparator.eq, organizer),
-			}
-		end
-		conditions:add{organizerConditions}
-	end
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.organizer,
+		lpdbKey = 'organizers_organizer',
+		maxNumber = 3,
+	})
 
-	if args.region then
-		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in ipairs(mw.text.split(args.region, ',', true)) do
-			region = mw.text.trim(region)
-			regionConditions:add{
-				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
-				ConditionNode(ColumnName('locations_region2'), Comparator.eq, region),
-			}
-		end
-		conditions:add{regionConditions}
-	end
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.region,
+		lpdbKey = 'locations_region',
+		maxNumber = 2,
+	})
+
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.country,
+		lpdbKey = 'locations_country',
+		maxNumber = tonumber(args.numberOfCountries) or 2,
+		normalize = Flags.CountryCode,
+	})
+
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.city,
+		lpdbKey = 'locations_city',
+		maxNumber = tonumber(args.numberOfCities) or 2,
+	})
 
 	args.tier1 = args.tier1 or args.tier or '!'
 	local tierConditions = ConditionTree(BooleanOperator.any)
@@ -173,5 +175,30 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 
 	return conditions:toString()
 end
+
+---@param conditions ConditionTree
+---@param props {input: string, lpdbKey: string, maxNumber: integer, normalize?: fun(val: string): string?}
+function TournamentsListingConditions._addConditionsFromCsv(conditions, props)
+	local values = Array.parseCommaSeparatedString(props.input)
+
+	if props.normalize then
+		values = Array.map(values, props.normalize)
+	end
+
+	if Logic.isEmpty(values) then
+		return
+	end
+
+	local csvConditions = ConditionTree(BooleanOperator.any)
+	Array.forEach(values, function(value)
+		Array.forEach(Array.range(1, props.maxNumber), function(index)
+			csvConditions:add{ConditionNode(ColumnName(props.lpdbKey .. index), Comparator.eq, value)}
+		end)
+	end)
+
+	conditions:add{csvConditions}
+end
+
+
 
 return TournamentsListingConditions

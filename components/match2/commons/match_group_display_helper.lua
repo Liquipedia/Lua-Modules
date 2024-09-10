@@ -32,7 +32,9 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 		return opponent.template and opponent.template ~= 'tbd' or false
 	else
 		return 0 < #opponent.players
-			and Array.all(opponent.players, function(player) return player.pageName ~= '' and player.displayName ~= 'TBD' end)
+			and Array.all(opponent.players, function(player)
+				return Logic.isNotEmpty(player.pageName) and Logic.isNotEmpty(player.displayName) and player.displayName ~= 'TBD'
+			end)
 	end
 end
 
@@ -138,11 +140,11 @@ function DisplayHelper.MapAndStatus(game, config)
 
 	local statusText = nil
 	if game.resultType == 'default' then
-		if game.walkover == 'L' then
+		if game.walkover == 'l' then
 			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
-		elseif game.walkover == 'FF' then
+		elseif game.walkover == 'ff' then
 			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
-		elseif game.walkover == 'DQ' then
+		elseif game.walkover == 'dq' then
 			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
 		else
 			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'
@@ -150,6 +152,19 @@ function DisplayHelper.MapAndStatus(game, config)
 	end
 
 	return mapText .. (statusText or '')
+end
+
+---@param score string|number|nil
+---@param opponentIndex integer
+---@param resultType string?
+---@param walkover string?
+---@param winner integer?
+---@return string
+function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
+	if resultType == 'default' then
+		return opponentIndex == winner and 'W' or string.upper(walkover or '')
+	end
+	return score and tostring(score) or ''
 end
 
 --[[

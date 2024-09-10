@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local p = {}
+local MatchLegacy = {}
 
 local Json = require('Module:Json')
 local String = require('Module:StringUtils')
@@ -14,20 +14,18 @@ local Table = require('Module:Table')
 
 local MAX_NUM_PLAYERS = 10
 
-function p.storeMatch(match2, options)
-	if options.storeMatch1 then
-		local match = p._convertParameters(match2)
+function MatchLegacy.storeMatch(match2)
+	local match = MatchLegacy._convertParameters(match2)
 
-		match.games = p.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
-function p.storeGames(match, match2)
+function MatchLegacy.storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game = Table.deepCopy(game)
@@ -51,7 +49,7 @@ function p.storeGames(match, match2)
 	return games
 end
 
-function p._convertParameters(match2)
+function MatchLegacy._convertParameters(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, 'match2') then
@@ -98,4 +96,4 @@ function p._convertParameters(match2)
 	return match
 end
 
-return p
+return MatchLegacy

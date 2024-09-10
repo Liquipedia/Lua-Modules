@@ -307,7 +307,7 @@ end
 
 ---@return Html?
 function Team:_createUpcomingMatches()
-	if self:shouldStore(self.args) and Info.match2 > 0 then
+	if self:shouldStore(self.args) and Info.config.match2.status > 0 then
 		local frame = {short = true} ---@type Frame
 		return MatchTicker.team(frame)
 	end

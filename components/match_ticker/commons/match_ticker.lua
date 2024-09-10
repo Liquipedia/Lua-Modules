@@ -258,6 +258,8 @@ function MatchTicker:buildQueryConditions()
 			tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tierType) }
 		end)
 
+		tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, '') }
+
 		conditions:add(tierTypeConditions)
 	end
 
@@ -293,7 +295,12 @@ function MatchTicker:dateConditions()
 
 		if config.upcoming then return dateConditions end
 
-		return dateConditions:add{ConditionNode(ColumnName('date'), Comparator.lt, NOW)}
+		return dateConditions:add{
+			ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('date'), Comparator.lt, NOW),
+				ConditionNode(ColumnName('date'), Comparator.eq, NOW),
+			}
+		}
 	end
 
 	--case upcoming

@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
@@ -131,6 +131,7 @@ function CustomMatchGroupInput._getExtraData(match)
 		headtohead = match.headtohead,
 		civdraft = match.civdraft,
 		mapdraft = match.mapdraft,
+		casters = MatchGroupInput.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -269,12 +270,15 @@ function CustomMatchGroupInput._getOpponents(match)
 		end
 		match['opponent' .. opponentIndex] = opponent
 
-		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.name) then
-			MatchGroupInput.readPlayersOfTeam(match, opponentIndex, opponent.name, {
-				resolveRedirect = true,
-				applyUnderScores = true,
-				maxNumPlayers = MAX_NUM_PLAYERS,
-			})
+		if opponent.type == Opponent.team and Logic.isNotEmpty(opponent.template) then
+			local template = mw.ext.TeamTemplate.raw(opponent.template)
+			if template then
+				MatchGroupInput.readPlayersOfTeam(match, opponentIndex, template.page, {
+					resolveRedirect = true,
+					applyUnderScores = true,
+					maxNumPlayers = MAX_NUM_PLAYERS,
+				})
+			end
 		end
 	end
 
@@ -291,7 +295,16 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 		opponent = {type = Opponent.literal, name = 'BYE'}
 	end
 
-	Opponent.resolve(opponent, timestamp, {syncPlayer = true})
+	---@type number|string
+	local teamTemplateDate = timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if teamTemplateDate == DateExt.defaultTimestamp then
+		teamTemplateDate = DateExt.getContextualDateOrNow()
+	end
+
+	Opponent.resolve(opponent, teamTemplateDate, {syncPlayer = true})
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 

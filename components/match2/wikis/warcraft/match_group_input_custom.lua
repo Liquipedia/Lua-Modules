@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Streams = Lua.import('Module:Links/Stream')
 
 local OpponentLibrary = require('Module:OpponentLibraries')

@@ -7,7 +7,6 @@
 --
 
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local MatchGroupBase = {}
@@ -110,18 +109,6 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 		mw.addWarning(warning)
 		return warning
 	end
-end
-
----@deprecated
-function MatchGroupBase.luaMatchlist(_, args)
-	local MatchGroup = Lua.import('Module:MatchGroup')
-	return MatchGroup.MatchList(args) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroupBase.luaBracket(_, args)
-	local MatchGroup = Lua.import('Module:MatchGroup')
-	return MatchGroup.Bracket(args) .. MatchGroup.deprecatedCategory
 end
 
 return MatchGroupBase

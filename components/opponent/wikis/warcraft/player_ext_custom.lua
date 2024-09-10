@@ -47,7 +47,7 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 end)
 
 ---@param resolvedPageName string
----@param date string|number?
+---@param date string|number|osdate?
 ---@return string?
 function CustomPlayerExt.fetchPlayerFaction(resolvedPageName, date)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
@@ -91,7 +91,7 @@ function CustomPlayerExt.fetchFactionHistory(resolvedPageName)
 end
 
 ---@param player WarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, savePageVar: boolean, date: string?}?
+---@param options PlayerExtSyncOptions?
 ---@return WarcraftStandardPlayer
 function CustomPlayerExt.syncPlayer(player, options)
 	options = options or {}
@@ -104,7 +104,7 @@ function CustomPlayerExt.syncPlayer(player, options)
 		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
-		CustomPlayerExt.saveToPageVars(player)
+		CustomPlayerExt.saveToPageVars(player, {overwritePageVars = options.overwritePageVars})
 	end
 
 	return player
@@ -112,19 +112,27 @@ end
 
 ---Same as PlayerExt.syncPlayer, except it does not save the player's flag to page variables.
 ---@param player WarcraftStandardPlayer
----@param options {fetchPlayer: boolean, fetchMatch2Player: boolean, date: string?}?
+---@param options PlayerExtPopulateOptions?
 ---@return WarcraftStandardPlayer
 function CustomPlayerExt.populatePlayer(player, options)
 	return CustomPlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
 end
 
 ---@param player WarcraftStandardPlayer
-function CustomPlayerExt.saveToPageVars(player)
-	if player.faction and player.faction ~= Faction.defaultFaction then
-		globalVars:set(player.displayName .. '_faction', player.faction)
+---@param options {overwritePageVars: boolean}?
+function CustomPlayerExt.saveToPageVars(player, options)
+	local displayName = player.displayName
+	if not displayName then return end
+
+	options = options or {}
+	local overwrite = options.overwritePageVars
+
+	if PlayerExt.shouldWritePageVar(displayName .. '_faction', player.faction, overwrite)
+		and player.faction ~= Faction.defaultFaction then
+			globalVars:set(displayName .. '_faction', player.faction)
 	end
 
-	PlayerExt.saveToPageVars(player)
+	PlayerExt.saveToPageVars(player, options)
 end
 
 return CustomPlayerExt

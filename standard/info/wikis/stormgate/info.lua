@@ -30,9 +30,10 @@ return {
 		squads = {
 			hasPosition = false,
 			hasSpecialTeam = false,
-			allowManual = true,
+			allowManual = false,
 		},
 		match2 = {
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
@@ -40,5 +41,4 @@ return {
 	defaultRoundPrecision = 0,
 	opponentLibrary = 'Opponent/Custom',
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
-	match2 = 2,
 }

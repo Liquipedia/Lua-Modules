@@ -12,15 +12,8 @@ local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-function MatchLegacy.storeMatch(match2, options)
-	local match, doStore = MatchLegacy.convertParameters(match2)
-
-	if options.storeMatch1 and doStore then
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+function MatchLegacy.storeMatch(match2)
+	return MatchLegacy.convertParameters(match2)
 end
 
 function MatchLegacy.convertParameters(match2)
@@ -61,7 +54,7 @@ function MatchLegacy.convertParameters(match2)
 			match.opponent2score = (tonumber(opponent2.score) or 0) > 0 and opponent2.score or 0
 			match.mode = 'team'
 		else
-			return nil, false
+			return nil
 		end
 
 		if match.resulttype == 'default' then
@@ -71,10 +64,13 @@ function MatchLegacy.convertParameters(match2)
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = Json.stringify(match.extradata)
 	else
-		return nil, false
+		return nil
 	end
 
-	return match, true
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 return MatchLegacy

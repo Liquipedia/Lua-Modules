@@ -46,9 +46,9 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidth = 150,
 		},
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
-	match2 = 2,
 }

@@ -38,6 +38,19 @@ return {
 				lightMode = 'Fighters default lightmode.png',
 			},
 		},
+		['2xko'] = {
+			abbreviation = '2XKO',
+			name = '2XKO',
+			link = '2XKO',
+			logo = {
+				darkMode = '2XKO Vertical darkmode.png',
+				lightMode = '2XKO Vertical lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = '2XKO default allmode.png',
+				lightMode = '2XKO default allmode.png',
+			},
+		},
 		abk = {
 			abbreviation = 'ABK',
 			name = 'Akatsuki Blitzkampf',
@@ -1671,8 +1684,8 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 1,
 		},
 	},
 	opponentLibrary = 'Opponent/Custom',
-	match2 = 1,
 }

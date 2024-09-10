@@ -22,11 +22,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 
-function MatchLegacy.storeMatch(match2, options)
-	if not options.storeMatch1 then
-		return
-	end
-
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 	match.games = MatchLegacy._storeGames(match, match2)
 
@@ -78,6 +74,7 @@ function MatchLegacy._convertParameters(match2)
 		return not String.startsWith(key, 'match2')
 	end)
 
+	match.walkover = match.walkover and string.upper(match.walkover) or nil
 	if match.walkover == 'FF' or match.walkover == 'DQ' then
 		match.resulttype = match.walkover:lower()
 		match.walkover = match.winner

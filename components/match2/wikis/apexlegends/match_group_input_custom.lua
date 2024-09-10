@@ -17,7 +17,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_SCORE = 'S'
@@ -70,7 +70,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
-CustomMatchGroupInput.processPlayer = FnUtil.identity
 
 ---@param record table
 ---@param timestamp number

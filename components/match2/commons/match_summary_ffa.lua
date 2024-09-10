@@ -267,7 +267,7 @@ function FfaMatchSummary.PlacementCells(props)
 
 	-- Use separate grid elements to draw pbg backgrounds
 	if #match.bracketData.advanceSpots > 0 then
-		for rowIx_ = 1, match.opponents do
+		for rowIx_ = 1, #match.opponents do
 			local spot = match.bracketData.advanceSpots[rowIx_]
 			local bgCell = mw.html.create('div')
 				:addClass(FfaMatchSummary.getAdvanceClass(spot and spot.bg or 'down'))

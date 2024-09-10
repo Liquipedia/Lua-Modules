@@ -72,9 +72,9 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidth = 190,
 		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 2,
 }

@@ -96,7 +96,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
-		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score  .. '|finished='
+		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score .. '|finished='
 		if not mapDetails then
 			Array.appendWith(lines, firstMapLine .. '}}')
 			return

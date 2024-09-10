@@ -793,18 +793,21 @@
 	font-size: 85%;
 }
 
+.brkts-popup-body-match-sidewins-overtime,
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
 
-	.skin-lakesideview & {
-		font-weight: 800;
+	& img {
+		[ data-darkreader-scheme="dark" ] &,
+		.theme--dark & {
+			filter: invert( 1 );
+		}
 	}
 }
 
-.brkts-popup-body-match-sidewins-overtime {
-	padding: 0 0 3px 3px;
-	line-height: 11px;
+.skin-lakesideview .brkts-popup-body-match-sidewins {
+	font-weight: 800;
 }
 
 .brkts-popup-body-operator-bans {
@@ -830,22 +833,22 @@
 
 .brkts-popup-body-gradient-left {
 	padding: 4px 0;
-	background: linear-gradient( to left, #fbdfdf 35%, #ffffff 35%, #ffffff 65%, #ddf4dd 65% ) !important;
+	background: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forestgreen-background-color, #ddf4dd ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-right {
 	padding: 4px 0;
-	background: linear-gradient( to right, #fbdfdf 35%, #ffffff 35%, #ffffff 65%, #ddf4dd 65% ) !important;
+	background: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forestgreen-background-color, #ddf4dd ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-draw {
 	padding: 4px 0;
-	background: linear-gradient( to left, #f9f9c7 35%, #ffffff 35%, #ffffff 65%, #f9f9c7 65% ) !important;
+	background: linear-gradient( to left, var( --clr-pear-background-color, #f9f9c7 ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-pear-background-color, #f9f9c7 ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-default {
 	padding: 4px 0;
-	background: #ffffff !important;
+	background: var( --table-background-color, #ffffff ) !important;
 }
 
 .brkts-popup-side-color-blue {
@@ -1153,13 +1156,6 @@ img.brkts-champion-icon,
 	font-size: smaller;
 	line-height: 1;
 	margin-left: 4px;
-}
-
-.block-player > .note,
-.block-team > .note,
-.block-literal > .note {
-	align-self: flex-start;
-	font-weight: bold;
 }
 
 .block-team {

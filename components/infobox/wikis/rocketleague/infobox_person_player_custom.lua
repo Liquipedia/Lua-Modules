@@ -18,7 +18,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 local YearsActive = Lua.import('Module:YearsActive')
 
@@ -221,9 +221,13 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	Array.forEach(self.locations, function(country)
 		local demonym = Flags.getLocalisation(country)
 		if demonym then
-			return
+			Array.appendWith(categories,
+				checkRole('coach', demonym .. ' Coaches'),
+				checkRole('caster', demonym .. ' Casters'),
+				checkRole('host', demonym .. ' Casters'),
+				checkRole('player', demonym .. ' Players')
+			)
 		end
-		table.insert(categories, demonym .. ' Players')
 	end)
 
 	return categories

@@ -16,7 +16,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 ---@class CrossfireInfoboxPlayer: Person

@@ -59,11 +59,11 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
-	match2 = 2,
 }

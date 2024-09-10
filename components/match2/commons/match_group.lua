@@ -98,7 +98,7 @@ function MatchGroup.MatchPage(args)
 	matchId = args.matchid or matchId
 	local fullMatchId = bracketId .. '_' .. matchId
 
-	local options = {storeMatch1 = false,  storeMatch2 = true, storePageVar = true, bracketId = bracketId}
+	local options = {storeMatch1 = false, storeMatch2 = true, storePageVar = true, bracketId = bracketId}
 	local matches = MatchGroupInput.readMatchpage(bracketId, matchId, args)
 	Match.storeMatchGroup(matches, options)
 
@@ -151,7 +151,7 @@ function MatchGroup.MatchGroupById(args)
 		config.matchHasDetails = function() return false end
 	end
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
+	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
 	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({
@@ -229,47 +229,8 @@ end
 
 if FeatureFlag.get('perf') then
 	MatchGroup.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
-	require('Module:Performance/Util').setupEntryPoints(MatchGroup)
 end
 
 Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
-
-MatchGroup.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
-
--- Entry point used by Template:Bracket
----@deprecated
-function MatchGroup.bracket(frame)
-	return MatchGroup.TemplateBracket(frame) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroup.luaBracket(_, args)
-	return MatchGroup.TemplateBracket(args) .. MatchGroup.deprecatedCategory
-end
-
--- Entry point used by Template:Matchlist
----@deprecated
-function MatchGroup.matchlist(frame)
-	return MatchGroup.TemplateMatchlist(frame) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroup.luaMatchlist(_, args)
-	return MatchGroup.TemplateMatchlist(args) .. MatchGroup.deprecatedCategory
-end
-
--- Entry point from Template:ShowBracket and direct #invoke
----@deprecated
-function MatchGroup.Display(frame)
-	return tostring(MatchGroup.TemplateShowBracket(frame)) .. MatchGroup.deprecatedCategory
-end
-
--- Entry point from direct #invoke
----@deprecated
-function MatchGroup.DisplayDev(frame)
-	local args = Arguments.getArgs(frame)
-	args.dev = true
-	return tostring(MatchGroup.TemplateShowBracket(args)) .. MatchGroup.deprecatedCategory
-end
 
 return MatchGroup

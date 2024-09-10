@@ -26,7 +26,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
-local GREEN_CHECK  = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
+local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
 local MAP_VETO_START = '<b>Start Map Veto</b>'
@@ -303,8 +303,8 @@ function CustomMatchSummary.createBody(match)
 		local vetoData = match.extradata.mapveto
 		if vetoData then
 			local mapVeto = MapVeto()
-			if vetoData.vetostart then
-				mapVeto:vetoStart(tonumber(vetoData.vetostart), vetoData.format)
+			if vetoData[1] and vetoData[1].vetostart then
+				mapVeto:vetoStart(tonumber(vetoData[1].vetostart), vetoData[1].format)
 			end
 
 			for _,vetoRound in ipairs(vetoData) do
