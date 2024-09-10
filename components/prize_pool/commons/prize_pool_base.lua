@@ -26,7 +26,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local WidgetFactory = Lua.import('Module:Widget/Factory')
 local WidgetTable = Widgets.Table
 local TableRow = Widgets.TableRow
