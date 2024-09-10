@@ -18,7 +18,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 local YearsActive = Lua.import('Module:YearsActive')
 

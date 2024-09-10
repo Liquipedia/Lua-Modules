@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Links
+-- page=Module:Widget/Links
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local UtilLinks = Lua.import('Module:Links')
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class LinksWidget: Widget
 ---@operator call({content: table<string, string>, variant: string?}): LinksWidget
