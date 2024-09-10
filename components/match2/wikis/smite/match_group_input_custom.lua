@@ -98,31 +98,9 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponentCount)
 	local maps = {}
+
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(map, opponentCount)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
+		table.insert(maps, MapFunctions.readMap(map, opponentCount))
 		match[key] = nil
 	end
 
@@ -167,12 +145,50 @@ end
 ---@param games table[]
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, MapFunctions.keepMap)
+	return Array.filter(games, Logic.isNotDeepEmpty)
 end
 
 --
 -- map related functions
 --
+
+---@param map table
+---@param opponentCount integer
+---@return table
+function MapFunctions.readMap(map, opponentCount)
+	local finishedInput = map.finished --[[@as string?]]
+	local winnerInput = map.winner --[[@as string?]]
+
+	if not MapFunctions.keepMap(map) then
+		map.map = nil
+	end
+
+	if Logic.isDeepEmpty(map) then
+		return map
+	end
+
+	map.extradata = MapFunctions.getExtraData(map, opponentCount)
+	map.finished = MatchGroupInputUtil.mapIsFinished(map)
+
+	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local score, status = MatchGroupInputUtil.computeOpponentScore({
+			walkover = map.walkover,
+			winner = map.winner,
+			opponentIndex = opponentIndex,
+			score = map['score' .. opponentIndex],
+		}, MapFunctions.calculateMapScore(map.winner, map.finished))
+		return {score = score, status = status}
+	end)
+
+	map.scores = Array.map(opponentInfo, Operator.property('score'))
+	if map.finished then
+		map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
+		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+	end
+
+	return map
+end
 
 -- Check if a map should be discarded due to being redundant
 -- DUMMY_MAP_NAME needs the match the default value in Template:Map
