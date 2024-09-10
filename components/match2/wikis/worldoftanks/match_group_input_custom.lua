@@ -152,9 +152,7 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-	}
+	return {}
 end
 
 ---@param match table
