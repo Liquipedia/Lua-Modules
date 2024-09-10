@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class WidgetTableRowInput
 ---@field cells Widget[]?

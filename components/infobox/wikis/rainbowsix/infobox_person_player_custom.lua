@@ -19,7 +19,7 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
@@ -31,7 +31,7 @@ local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[placement::1]]',
 }
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local BANNED = mw.loadData('Module:Banned')

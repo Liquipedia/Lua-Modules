@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Widget = require('Module:Infobox/Widget/All')
+local Widget = require('Module:Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')

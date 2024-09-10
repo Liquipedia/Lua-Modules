@@ -20,14 +20,14 @@ local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
+local WidgetInjector = Lua.import('Module:Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Widgets = require('Module:Infobox/Widget/All')
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+local Widgets = require('Module:Widget/All')
+local WidgetFactory = Lua.import('Module:Widget/Factory')
 local WidgetTable = Widgets.Table
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
