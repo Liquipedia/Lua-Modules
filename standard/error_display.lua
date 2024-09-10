@@ -21,6 +21,9 @@ local FILTERED_ERROR_STACK_ITEMS = {
 	'^Module:ResultOrError:%d+: in function \'try\'$',
 }
 
+local INLINE_ERROR_MESSAGE =
+	'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ${errorMessage}'
+
 ---@param props {limit: integer?, errors: Error[]}
 ---@return Html
 function ErrorDisplay.ErrorList(props)
@@ -96,6 +99,15 @@ function ErrorDisplay.ErrorDetails(error)
 	end
 
 	return errorDetailsNode
+end
+
+---Simple error message when a short error message is needed
+---Currently used for infobox errors
+---@param error Error
+---@return Html
+function ErrorDisplay.InlineError(error)
+	local errorText = String.interpolate(INLINE_ERROR_MESSAGE, {errorMessage = error.message})
+	return mw.html.create('span'):addClass('error'):addClass('show-when-logged-in'):wikitext(errorText)
 end
 
 ---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.

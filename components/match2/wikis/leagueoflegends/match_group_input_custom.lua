@@ -102,10 +102,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2)
-	elseif MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.winner = nil
+		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
 	MatchFunctions.getTournamentVars(match)
@@ -153,7 +150,7 @@ function MatchFunctions.extractMaps(MatchParser, match, opponents)
 		end)
 
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished or MatchGroupInputUtil.isNotPlayed(map.winner, finishedInput) then
+		if map.finished then
 			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
 			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)

@@ -14,10 +14,10 @@ local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -26,9 +26,12 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {
-	{key = 'resourcecamps', name = 'Resource Camp(s)'},
+	{key = 'luminitecamps', name = 'Luminite Camp(s)'},
+	{key = 'theriumcamps', name = 'Therium Camp(s)'},
 	{key = 'speedcamps', name = 'Speed Camp(s)'},
+	{key = 'visioncamps', name = 'Vision Camp(s)'},
 	{key = 'healthcamps', name = 'Health Camp(s)'},
+	{key = 'energycamps', name = 'Energy Camp(s)'},
 	{key = 'siegecamps', name = 'Siege Camp(s)'},
 }
 --currently the ingame icons are still temporary

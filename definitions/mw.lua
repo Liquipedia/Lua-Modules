@@ -588,7 +588,7 @@ function mw.text.nowiki(s)
 end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
----@param s string
+---@param s string|number
 ---@param pattern string?
 ---@param plain boolean?
 ---@return string[]
@@ -1078,5 +1078,62 @@ mw.ext.Brackets = {}
 function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
 	return 'ok'
 end
+
+mw.ext.Dota2DB = {}
+
+---@alias dota2VetoEntry {hero: string?, order: number?}
+---@alias dota2TeamVeto {bans: dota2VetoEntry[]?, picks: dota2VetoEntry[]?}
+---@alias dota2PlayerItem {name: string?, image: string?, image_url: string?}
+
+---@class dota2MatchTeamPlayer
+---@field aghanimsScepterBuff 0|1|nil
+---@field aghanimsShardBuff 0|1|nil
+---@field assists integer?
+---@field backpackItems dota2PlayerItem[]?
+---@field buildingDamage integer?
+---@field damage integer?
+---@field deaths integer?
+---@field denies integer?
+---@field facet string?
+---@field goldPerMinute integer?
+---@field heroId integer?
+---@field heroName string?
+---@field id integer?
+---@field items dota2PlayerItem[]?
+---@field kills integer?
+---@field lastHits integer?
+---@field level integer?
+---@field moonShardBuff 0|1|nil
+---@field name string?
+---@field neutralItem dota2PlayerItem?
+---@field position 1|2|3|4|5|nil
+---@field towerDamage integer?
+---@field totalGold integer?
+---@field wards {observerKills: integer?, observerPlaced: integer?, sentryKills: integer?, sentryPlaced: integer?}?
+---@field xpPerMinute integer?
+
+---@class dota2MatchTeam
+---@field barracksDestroyed integer?
+---@field players dota2MatchTeamPlayer[]
+---@field roshanKills integer?
+---@field side 'radiant'|'dire'|nil
+---@field towersDestroyed integer?
+
+---@class dota2MatchData
+---@field heroVeto {team1: dota2TeamVeto[], team2:dota2TeamVeto[]}
+---@field length string?
+---@field lengthInSeconds integer?
+---@field patch string?
+---@field startTime string?
+---@field team1 dota2MatchTeam
+---@field team2 dota2MatchTeam
+---@field team1score integer?
+---@field team2score integer?
+---@field winner 1|2|nil
+
+---@param matchId integer
+---@param reversed boolean?
+---@return dota2MatchData
+function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
 
 return mw

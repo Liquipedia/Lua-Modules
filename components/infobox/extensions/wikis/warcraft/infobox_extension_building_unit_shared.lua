@@ -18,7 +18,7 @@ local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
