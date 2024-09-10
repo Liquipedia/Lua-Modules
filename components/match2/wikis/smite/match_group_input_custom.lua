@@ -20,6 +20,13 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
+local MAX_NUM_PLAYERS = 15
+local OPPONENT_CONFIG = {
+	resolveRedirect = true,
+	pagifyTeamNames = true,
+	pagifyPlayerNames = true,
+	maxNumPlayers = MAX_NUM_PLAYERS,
+}
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -38,7 +45,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
@@ -201,6 +208,7 @@ function MapFunctions.getExtraData(map, opponentCount)
 end
 
 ---@param map table
+---@param opponentCount integer
 ---@return table
 function MapFunctions.getPicksAndBans(map, opponentCount)
 	local godData = {}
