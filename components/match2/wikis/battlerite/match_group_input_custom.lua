@@ -16,6 +16,12 @@ local Table = require('Module:Table')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DUMMY_MAP = 'default' -- Is set in Template:Map when |map= is empty.
+local OPPONENT_CONFIG = {
+	resolveRedirect = true,
+	pagifyTeamNames = true,
+	pagifyPlayerNames = true,
+	maxNumPlayers = 15,
+}
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -34,7 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)

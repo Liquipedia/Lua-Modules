@@ -19,6 +19,12 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
+local OPPONENT_CONFIG = {
+	resolveRedirect = true,
+	pagifyTeamNames = true,
+	pagifyPlayerNames = true,
+	maxNumPlayers = 5
+}
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -37,7 +43,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
