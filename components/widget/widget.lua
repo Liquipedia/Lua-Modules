@@ -51,8 +51,9 @@ end
 ---@param injector WidgetInjector?
 ---@return string[]
 function Widget:tryChildren(injector)
-	local WidgetFactory = Lua.import('Module:Widget/Factory') -- Here due to circular dependency
-	return Array.map(self.children, function(child)
+	-- Here due to circular dependency
+	local WidgetFactory = Lua.import('Module:Widget/Factory')
+	return Array.flatMap(self.children, function(child)
 		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
 			---@cast child Widget
 			return Logic.tryOrElseLog(
@@ -64,7 +65,7 @@ function Widget:tryChildren(injector)
 				end
 			)
 		end
-		return tostring(child)
+		return {tostring(child)}
 	end)
 end
 
