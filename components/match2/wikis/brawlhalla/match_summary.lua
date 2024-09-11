@@ -20,7 +20,7 @@ local Opponent = OpponentLibraries.Opponent
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local DRAW_LINE = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHECK = '[[File:NoCheck.png|link=|16px]]'
 
 local CustomMatchSummary = {}
 

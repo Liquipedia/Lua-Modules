@@ -29,15 +29,13 @@ describe('hidden data box', function()
 	end)
 
 	describe('missing parents', function()
-		local origLpdb = mw.ext.LiquipediaDB.lpdb
+		local LpdbQueryStub
 		before_each(function ()
-			mw.ext.LiquipediaDB.lpdb = function()
-				return {}
-			end
+			LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 		end)
 
 		after_each(function ()
-			mw.ext.LiquipediaDB.lpdb = origLpdb
+			LpdbQueryStub:revert()
 		end)
 
 		it('has correct warning', function()
@@ -49,9 +47,9 @@ describe('hidden data box', function()
 	end)
 
 	describe('test fetching and wiki var storing', function()
-		local origLpdb = mw.ext.LiquipediaDB.lpdb
+		local LpdbQueryStub
 		before_each(function ()
-			mw.ext.LiquipediaDB.lpdb = function(tbl)
+			LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', function(tbl)
 				if tbl == 'tournament' then
 					return {
 						require('test_assets.lpdb_tournament')[2]
@@ -61,11 +59,11 @@ describe('hidden data box', function()
 						require('test_assets.lpdb_placement')[18]
 					}
 				end
-			end
+			end)
 		end)
 
 		after_each(function ()
-			mw.ext.LiquipediaDB.lpdb = origLpdb
+			LpdbQueryStub:revert()
 		end)
 
 		it('no warnings', function()

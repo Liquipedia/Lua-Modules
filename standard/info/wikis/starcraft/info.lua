@@ -32,9 +32,13 @@ return {
 			hasSpecialTeam = true,
 			allowManual = true,
 		},
+		match2 = {
+			status = 1,
+			matchWidthMobile = 120,
+			matchWidth = 170,
+		},
 	},
 	maximumNumberOfPlayersInPlacements = 35,
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
-	match2 = 1,
 }

@@ -16,7 +16,7 @@ local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
 
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local STATUS_HAS_SCORE = 'S'
@@ -35,6 +35,9 @@ local matchFunctions = {}
 local mapFunctions = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
@@ -49,6 +52,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	map = mapFunctions.getExtraData(map)
 	map = mapFunctions.getScoresAndWinner(map)
@@ -56,6 +61,8 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
+---@param record table
+---@param timestamp integer
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -92,11 +99,11 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	end
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
-
+---@param op1 table
+---@param op2 table
+---@param op1norm boolean
+---@param op2norm boolean
+---@return boolean
 function CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm)
 	if op1norm then return true
 	elseif op2norm then return false
@@ -111,6 +118,10 @@ end
 --
 --
 -- function to sort out winner/placements
+---@param opponents table[]
+---@param opponentKey1 integer
+---@param opponentKey2 integer
+---@return boolean
 function CustomMatchGroupInput._placementSortFunction(opponents, opponentKey1, opponentKey2)
 	local op1 = opponents[opponentKey1]
 	local op2 = opponents[opponentKey2]
@@ -127,6 +138,8 @@ function CustomMatchGroupInput._placementSortFunction(opponents, opponentKey1, o
 	else return CustomMatchGroupInput._sortOpponents(op1, op2, op1norm, op2norm) end
 end
 
+---@param opp table
+---@return integer
 function CustomMatchGroupInput._getSetWins(opp)
 	local extradata = opp.extradata or {}
 	local set1win = extradata.set1win and 1 or 0
@@ -138,16 +151,23 @@ end
 --
 -- match related functions
 --
+
+---@param matchArgs table
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function matchFunctions.readDate(matchArgs)
 	return MatchGroupInput.readDate(matchArgs.date, {'tournament_enddate'})
 end
 
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', '2v2'))
 	match.showh2h = Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -155,11 +175,15 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+---@param match table
+---@return boolean
 function matchFunctions.isFeatured(match)
 	return tonumber(match.liquipediatier) == 1
 		or tonumber(match.liquipediatier) == 2
 end
 
+---@param match table
+---@return table
 function matchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
@@ -178,6 +202,10 @@ function matchFunctions.getExtraData(match)
 	return match
 end
 
+---@param match table
+---@return table[]
+---@return boolean
+---@return table
 function matchFunctions.readOpponents(match)
 	local opponents = {}
 	local isScoreSet = false
@@ -211,6 +239,9 @@ function matchFunctions.readOpponents(match)
 	return opponents, isScoreSet, match
 end
 
+---@param opponents table[]
+---@param match table
+---@return table
 function matchFunctions.applyMatchPlacement(opponents, match)
 	local placement = 1
 	local lastScore
@@ -239,6 +270,10 @@ function matchFunctions.applyMatchPlacement(opponents, match)
 	return match
 end
 
+---@param winner string|integer?
+---@param opponents table[]
+---@param match table
+---@return table
 function matchFunctions.setMatchWinner(winner, opponents, match)
 	if
 		winner == RESULT_TYPE_DRAW or
@@ -264,6 +299,8 @@ function matchFunctions.setMatchWinner(winner, opponents, match)
 	return match
 end
 
+---@param match table
+---@return table
 function matchFunctions.getOpponents(match)
 	-- read opponents and ignore empty ones
 	local opponents
@@ -303,8 +340,10 @@ end
 --
 -- map related functions
 --
-function mapFunctions.getExtraData(map)
 
+---@param map table
+---@return table
+function mapFunctions.getExtraData(map)
 	map.extradata = {
 		comment = map.comment,
 		header = map.header,
@@ -313,6 +352,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.scores = {}
 	local indexedScores = {}
@@ -344,11 +385,16 @@ function mapFunctions.getScoresAndWinner(map)
 	return map
 end
 
+---@param indexedScores table[]
+---@return integer?
 function mapFunctions.getWinner(indexedScores)
 	table.sort(indexedScores, mapFunctions.mapWinnerSortFunction)
 	return indexedScores[1].index
 end
 
+---@param op1 table
+---@param op2 table
+---@return boolean
 function mapFunctions.mapWinnerSortFunction(op1, op2)
 	local op1norm = op1.status == STATUS_HAS_SCORE
 	local op2norm = op2.status == STATUS_HAS_SCORE

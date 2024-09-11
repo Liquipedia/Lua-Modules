@@ -11,8 +11,8 @@ local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+local Widget = Lua.import('Module:Widget')
+local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class WidgetTableRowNewInput
 ---@field children Widget[]?

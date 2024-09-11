@@ -75,7 +75,7 @@ function CustomMatchSummary._createGame(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-	    :node(CustomMatchSummary._createCheckMark(game.winner == 1))
+		:node(CustomMatchSummary._createCheckMark(game.winner == 1))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local centerNode = mw.html.create('div')

@@ -21,8 +21,8 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Dota2 logo.png',
-				lightMode = 'Dota2 logo.png',
+				darkMode = 'Dota 2 default allmode.png',
+				lightMode = 'Dota 2 default allmode.png',
 			},
 		},
 		dota2 = {
@@ -30,12 +30,12 @@ return {
 			name = 'Dota 2',
 			link = 'Dota 2',
 			logo = {
-				darkMode = 'Dota2 logo.png',
-				lightMode = 'Dota2 logo.png',
+				darkMode = 'Dota 2 default allmode.png',
+				lightMode = 'Dota 2 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Dota2 logo.png',
-				lightMode = 'Dota2 logo.png',
+				darkMode = 'Dota 2 default allmode.png',
+				lightMode = 'Dota 2 default allmode.png',
 			},
 		},
 	},
@@ -45,7 +45,10 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 2,
 }

@@ -32,7 +32,9 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			status = 0,
+		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 0,
 }

@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetCellInput
 ---@field content (string|number|table|Html)[]?

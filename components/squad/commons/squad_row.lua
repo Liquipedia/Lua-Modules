@@ -15,7 +15,7 @@ local OpponentDisplay = OpponentLib.OpponentDisplay
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Widget = Lua.import('Module:Infobox/Widget/All')
+local Widget = Lua.import('Module:Widget/All')
 
 local RoleIcons = {
 	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},
@@ -172,7 +172,7 @@ function SquadRow:newteam()
 			return content
 		end
 
-		local date = self.model.newteamdate or self.model.leavedate
+		local date = self.model.extradata.newteamdate or self.model.leavedate
 		table.insert(content, mw.ext.TeamTemplate.team(newTeam, date))
 
 		if hasNewTeamRole then

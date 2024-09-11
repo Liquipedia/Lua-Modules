@@ -58,7 +58,11 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			status = 1,
+			matchWidthMobile = 110,
+			matchWidth = 190,
+		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 1,
 }

@@ -9,14 +9,19 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
 
---
--- Override functons
---
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
+
+---@class LeagueoflegendsBrktsWikiSpecific: BrktsWikiSpecific
+local WikiSpecific = Table.copy(BaseWikiSpecific)
+
+---@param match table
+---@return boolean
 function WikiSpecific.matchHasDetails(match)
-	return Lua.import('Module:MatchGroup/Display/Helper').defaultMatchHasDetails or
-		Lua.import('Module:BigMatch').isEnabledFor(match)
+	local MatchGroupDisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+	local MatchPage = Lua.import('Module:MatchPage')
+	return MatchGroupDisplayHelper.defaultMatchHasDetails(match) or
+		MatchPage.isEnabledFor(match)
 end
 
 return WikiSpecific

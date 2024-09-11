@@ -97,7 +97,9 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			status = 0,
+		},
 	},
 	opponentLibrary = 'Opponent/Custom',
-	match2 = 0,
 }

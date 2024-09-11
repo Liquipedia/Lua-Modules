@@ -24,6 +24,9 @@ WikiCopyPaste.Indent = INDENT
 local MODES = {
 	solo = Opponent.solo,
 	team = Opponent.team,
+	duo = Opponent.duo,
+	trio = Opponent.trio,
+	quad = Opponent.quad,
 	literal = Opponent.literal,
 }
 
@@ -81,6 +84,20 @@ function WikiCopyPaste.getOpponent(mode, showScore)
 		return '{{SoloOpponent||flag=' .. score .. '}}'
 	elseif mode == Opponent.team then
 		return '{{TeamOpponent|' .. score .. '}}'
+	elseif Opponent.typeIsParty(mode) then
+		local partySize = Opponent.partySize(mode)
+		--can not be nil due to the check typeIsParty check
+		---@cast partySize -nil
+
+		local parts = {'{{' .. mw.getContentLanguage():ucfirst(mode) .. 'Opponent'}
+		Array.forEach(Array.range(1, partySize), function(playerIndex)
+			local prefix = '|p' .. playerIndex
+			Array.appendWith(parts,
+				prefix .. '=',
+				prefix .. 'flag='
+			)
+		end)
+		return table.concat(Array.append(parts, score .. '}}'))
 	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end

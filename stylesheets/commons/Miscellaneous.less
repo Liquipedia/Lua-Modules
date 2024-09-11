@@ -400,7 +400,7 @@ Template(s): Timelines
 Author(s): FO-nTTaX
 *******************************************************************************/
 .timeline {
-	border: 1px solid #dddddd;
+	border: 1px solid var( --table-border-color, #dddddd );
 	vertical-align: middle;
 }
 
@@ -412,7 +412,7 @@ Author(s): FO-nTTaX
 	font-size: 200%;
 	text-align: center;
 	vertical-align: middle;
-	border-bottom: 1px solid #dddddd;
+	border-bottom: 1px solid var( --table-border-color, #dddddd );
 }
 
 .timeline-row {
@@ -456,7 +456,7 @@ Author(s): FO-nTTaX
 
 .timeline-line {
 	width: 0;
-	border-left: 1px solid #333333;
+	border-left: 1px solid var( --table-border-color, #333333 );
 	opacity: 0.5;
 	height: 5000px;
 	margin-top: -5000px;
@@ -468,7 +468,7 @@ Author(s): FO-nTTaX
 	justify-content: space-between;
 	height: 92px;
 	padding-left: 150px;
-	border-top: 1px solid #dddddd;
+	border-top: 1px solid var( --table-border-color, #dddddd );
 }
 
 .timeline-footer-date {
@@ -492,7 +492,7 @@ Author(s): FO-nTTaX
 .timeline-now-sc {
 	position: absolute;
 	height: 100%;
-	border-right: 1px dotted #9a9a9a;
+	border-right: 1px dotted var( --table-border-color, #9a9a9a );
 	width: 1px;
 }
 
@@ -500,7 +500,7 @@ Author(s): FO-nTTaX
 	border: 1px solid #9a9a9a;
 	padding-top: 5px;
 	height: 40px;
-	background-color: #eeeeee;
+	background-color: var( --table-variant-background-color, #eeeeee );
 	text-align: center;
 }
 

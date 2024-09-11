@@ -78,6 +78,36 @@ function MatchGroup.Bracket(args)
 	return table.concat(Array.map(parts, tostring))
 end
 
+--- Sets up a MatchPage, which is a single match displayed on a standalone page. Also known as Standalone and BigMatch.
+--- The match is saved to LPDB, but does not contain complete information. The tournament page is the primary source.
+---@param args table
+---@return Html
+function MatchGroup.MatchPage(args)
+	local function getBracketIdFromPage()
+		local title = mw.title.getCurrentTitle().text
+
+		-- Title format is `ID bracketID matchID`
+		local titleParts = mw.text.split(title, ' ')
+
+		-- Return bracketID and matchID
+		return titleParts[2], titleParts[3]
+	end
+
+	local bracketId, matchId = getBracketIdFromPage()
+	bracketId = args.bracketid or bracketId
+	matchId = args.matchid or matchId
+	local fullMatchId = bracketId .. '_' .. matchId
+
+	local options = {storeMatch1 = false, storeMatch2 = true, storePageVar = true, bracketId = bracketId}
+	local matches = MatchGroupInput.readMatchpage(bracketId, matchId, args)
+	Match.storeMatchGroup(matches, options)
+
+	local MatchPageContainer = WikiSpecific.getMatchContainer('matchpage')
+	return MatchPageContainer{
+		matchId = fullMatchId,
+	}
+end
+
 -- Displays a matchlist or bracket specified by ID.
 ---@param args table
 ---@return Html
@@ -121,7 +151,7 @@ function MatchGroup.MatchGroupById(args)
 		config.matchHasDetails = function() return false end
 	end
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
+	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
 	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({
@@ -173,6 +203,14 @@ function MatchGroup.TemplateBracket(frame)
 	return MatchGroup.Bracket(args)
 end
 
+-- Entry point of Template:MatchPage
+---@param frame Frame
+---@return Html
+function MatchGroup.TemplateMatchPage(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.MatchPage(args)
+end
+
 -- Entry point of Template:ShowSingleMatch
 ---@param frame Frame
 ---@return Html
@@ -191,47 +229,8 @@ end
 
 if FeatureFlag.get('perf') then
 	MatchGroup.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
-	require('Module:Performance/Util').setupEntryPoints(MatchGroup)
 end
 
 Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
-
-MatchGroup.deprecatedCategory = '[[Category:Pages using deprecated Match Group functions]]'
-
--- Entry point used by Template:Bracket
----@deprecated
-function MatchGroup.bracket(frame)
-	return MatchGroup.TemplateBracket(frame) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroup.luaBracket(_, args)
-	return MatchGroup.TemplateBracket(args) .. MatchGroup.deprecatedCategory
-end
-
--- Entry point used by Template:Matchlist
----@deprecated
-function MatchGroup.matchlist(frame)
-	return MatchGroup.TemplateMatchlist(frame) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroup.luaMatchlist(_, args)
-	return MatchGroup.TemplateMatchlist(args) .. MatchGroup.deprecatedCategory
-end
-
--- Entry point from Template:ShowBracket and direct #invoke
----@deprecated
-function MatchGroup.Display(frame)
-	return tostring(MatchGroup.TemplateShowBracket(frame)) .. MatchGroup.deprecatedCategory
-end
-
--- Entry point from direct #invoke
----@deprecated
-function MatchGroup.DisplayDev(frame)
-	local args = Arguments.getArgs(frame)
-	args.dev = true
-	return tostring(MatchGroup.TemplateShowBracket(args)) .. MatchGroup.deprecatedCategory
-end
 
 return MatchGroup

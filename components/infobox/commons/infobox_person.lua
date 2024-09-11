@@ -25,7 +25,7 @@ local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
@@ -176,7 +176,7 @@ function Person:createInfobox()
 				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
 			}
 		},
-		Cell{name = 'Nicknames', content = {args.nicknames}},
+		Cell{name = 'Nickname(s)', content = {args.nicknames}},
 		Builder{
 			builder = function()
 				if self.totalEarnings and self.totalEarnings ~= 0 then

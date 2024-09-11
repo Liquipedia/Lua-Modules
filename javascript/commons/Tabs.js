@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.tabs = {
 	init: function() {
-		document.querySelectorAll( '.tabs-dynamic' ).forEach( function( tabs ) {
+		document.querySelectorAll( '.tabs-dynamic' ).forEach( ( tabs ) => {
 			const tabItems = [];
 			const tabContents = [];
 			for ( let i = 0; i < tabs.children.length; i++ ) {
@@ -20,33 +20,33 @@ liquipedia.tabs = {
 					}
 				}
 			}
-			tabContents.forEach( function( tabContent, i ) {
+			tabContents.forEach( ( tabContent, i ) => {
 				const heading = document.createElement( 'h6' );
 				heading.style.display = 'none';
 				heading.innerHTML = tabItems[ i ].innerHTML;
 				tabContent.insertAdjacentElement( 'afterbegin', heading );
 			} );
-			tabItems.forEach( function( tabItem, i ) {
+			tabItems.forEach( ( tabItem, i ) => {
 				if ( tabItem.classList.contains( 'active' ) ) {
 					tabContents[ i ].classList.add( 'active' );
 				}
 				tabItem.innerHTML = '<a href="#">' + tabItem.innerHTML + '</a>';
 				tabItem.addEventListener( 'click', function( ev ) {
 					ev.preventDefault();
-					tabItems.forEach( function( element ) {
+					tabItems.forEach( ( element ) => {
 						element.classList.remove( 'active' );
 					} );
 					this.classList.add( 'active' );
-					tabContents.forEach( function( element ) {
+					tabContents.forEach( ( element ) => {
 						element.classList.remove( 'active' );
 					} );
 					if ( !this.classList.contains( 'show-all' ) ) {
 						tabContents[ parseInt( this.dataset.count ) - 1 ].classList.add( 'active' );
-						tabContents.forEach( function( tabContent ) {
+						tabContents.forEach( ( tabContent ) => {
 							tabContent.querySelector( 'h6:first-child' ).style.display = 'none';
 						} );
 					} else {
-						tabContents.forEach( function( tabContent ) {
+						tabContents.forEach( ( tabContent ) => {
 							tabContent.classList.add( 'active' );
 							tabContent.querySelector( 'h6:first-child' ).style.display = 'block';
 						} );
@@ -90,16 +90,16 @@ liquipedia.tabs = {
 		}
 		if ( scrolltoelement !== null ) {
 			const tabs = scrolltoelement.closest( '.tabs-dynamic' );
-			tabs.querySelectorAll( '.nav-tabs li' ).forEach( function( listelement ) {
+			tabs.querySelectorAll( '.nav-tabs li' ).forEach( ( listelement ) => {
 				listelement.classList.remove( 'active' );
 			} );
 			tabs.querySelector( '.nav-tabs .tab' + tabno ).classList.add( 'active' );
-			tabs.querySelectorAll( '.tabs-content > div' ).forEach( function( contentelement ) {
+			tabs.querySelectorAll( '.tabs-content > div' ).forEach( ( contentelement ) => {
 				contentelement.classList.remove( 'active' );
 			} );
 			tabs.querySelector( '.tabs-content > .content' + tabno ).classList.add( 'active' );
 			if ( scrollto !== null ) {
-				setTimeout( function() {
+				setTimeout( () => {
 					if ( typeof window.scrollY !== 'undefined' ) {
 						window.scrollTo( 0, scrolltoelement.getBoundingClientRect().top + window.scrollY );
 					} else {
@@ -108,12 +108,12 @@ liquipedia.tabs = {
 				}, 500 );
 			}
 		} else {
-			document.querySelectorAll( '.tabs-dynamic' ).forEach( function( tabs ) {
-				tabs.querySelectorAll( '.nav-tabs li' ).forEach( function( listelement ) {
+			document.querySelectorAll( '.tabs-dynamic' ).forEach( ( tabs ) => {
+				tabs.querySelectorAll( '.nav-tabs li' ).forEach( ( listelement ) => {
 					listelement.classList.remove( 'active' );
 				} );
 				tabs.querySelector( '.nav-tabs .tab' + tabno ).classList.add( 'active' );
-				tabs.querySelectorAll( '.tabs-content > div' ).forEach( function( contentelement ) {
+				tabs.querySelectorAll( '.tabs-content > div' ).forEach( ( contentelement ) => {
 					contentelement.classList.remove( 'active' );
 				} );
 				tabs.querySelector( '.tabs-content > .content' + tabno ).classList.add( 'active' );

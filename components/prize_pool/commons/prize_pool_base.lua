@@ -13,22 +13,26 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
+local WidgetInjector = Lua.import('Module:Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
-local WidgetTable = require('Module:Widget/Table')
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local Widgets = require('Module:Widget/All')
+local WidgetFactory = Lua.import('Module:Widget/Factory')
+local WidgetTable = Widgets.Table
+local TableRow = Widgets.TableRow
+local TableCell = Widgets.TableCell
+
+local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
@@ -404,9 +408,8 @@ function BasePrizePool:_parseArgs(args)
 	return parsedArgs
 end
 
----@param args table
 ---@return self
-function BasePrizePool:create(args)
+function BasePrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self:readPlacements(self.args)
@@ -874,17 +877,24 @@ function BasePrizePool:storeData()
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
 		prizepoolindex = prizePoolIndex,
-		lastvsdata = {},
-		opponentplayers = {},
-		players = {},
-		extradata = {},
 	}
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
 		local lpdbEntries = placement:_getLpdbData(prizePoolIndex, self.options.lpdbPrefix)
 
-		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry) return Table.merge(lpdbTournamentData, lpdbEntry) end)
+		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry)
+			return Table.merge(
+				lpdbTournamentData,
+				{
+					lastvsdata = {},
+					opponentplayers = {},
+					players = {},
+					extradata = {},
+				},
+				lpdbEntry
+			)
+		end)
 
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
@@ -898,6 +908,10 @@ function BasePrizePool:storeData()
 		end
 
 		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
+	end
+
+	if self.options.storeLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	return self

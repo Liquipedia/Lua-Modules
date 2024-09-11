@@ -48,7 +48,7 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 })
 
 ---@class StormgateMatchGroupUtilGame: MatchGroupUtilGame
----@field opponents  StormgateMatchGroupUtilGameOpponent[]
+---@field opponents StormgateMatchGroupUtilGameOpponent[]
 ---@field offFactions table<integer, string[]>?
 
 ---@class StormgateMatchGroupUtilVeto
@@ -89,7 +89,7 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 		game.opponents = CustomMatchGroupUtil.computeGameOpponents(game, match.opponents)
 	end
 
-	match.isUniformMode = Array.all(match.opponents, function(opponent) return opponent.type  ~= Opponent.team end)
+	match.isUniformMode = Array.all(match.opponents, function(opponent) return opponent.type ~= Opponent.team end)
 
 	local extradata = match.extradata
 	---@cast extradata table

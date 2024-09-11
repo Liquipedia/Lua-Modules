@@ -62,11 +62,12 @@ return {
 	insidesource = 'fad fa-user-secret',
 	transferdatabase = 'fad fa-scroll',
 
-	-- Usage: Section links
+	-- Usage: Section links, navigation
 	activestage = 'fas fa-bell-exclamation',
 	prizepool = 'fas fa-sack-dollar',
 	teams = 'fas fa-users',
 	results = 'fas fa-th-list',
+	standings = 'fad fa-list-ol',
 	headlines = 'fas fa-newspaper',
 	achievements = 'fas fa-medal',
 	activeroster = 'fas fa-users',
