@@ -25,9 +25,9 @@ local Center = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return {[1]: Html?}
+---@return Html?
 function Center:make(injector)
-	return {Center:_create(self.content, self.classes)}
+	return Center:_create(self.content, self.classes)
 end
 
 ---@param content (string|number)[]

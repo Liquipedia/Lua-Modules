@@ -23,7 +23,7 @@ local Highlights = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return {[1]: Html}?
+---@return Html?
 function Highlights:make(injector)
 	return Highlights:_highlights(self.list)
 end
@@ -44,7 +44,7 @@ function Highlights:_highlights(list)
 
 	div:node(highlights)
 
-	return {div}
+	return div
 end
 
 return Highlights

@@ -90,7 +90,7 @@ function Cell:_content(...)
 end
 
 ---@param injector WidgetInjector?
----@return {[1]: Html?}
+---@return Html?
 function Cell:make(injector)
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))
@@ -102,9 +102,7 @@ function Cell:make(injector)
 
 	self.root	:node(self.description)
 				:node(self.contentDiv)
-	return {
-		self.root
-	}
+	return self.root
 end
 
 return Cell

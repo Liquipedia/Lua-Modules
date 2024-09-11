@@ -57,7 +57,7 @@ function TableCell:addCss(key, value)
 end
 
 ---@param injector WidgetInjector?
----@return {[1]: Html}
+---@return Html?
 function TableCell:make(injector)
 	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
@@ -73,7 +73,7 @@ function TableCell:make(injector)
 
 	cell:node(self:_concatContent())
 
-	return {cell}
+	return cell
 end
 
 ---@return string

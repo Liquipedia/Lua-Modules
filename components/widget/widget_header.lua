@@ -59,7 +59,11 @@ function Header:make(injector)
 		table.insert(header, 2, subHeader)
 	end
 
-	return header
+	local wrapper = mw.html.create()
+	for _, element in ipairs(header) do
+		wrapper:node(element)
+	end
+	return wrapper
 end
 
 ---@param name string?
