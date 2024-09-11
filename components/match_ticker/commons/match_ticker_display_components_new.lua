@@ -107,6 +107,7 @@ local Details = Class.new(
 		self.hideTournament = args.hideTournament
 		self.onlyHighlightOnValue = args.onlyHighlightOnValue
 		self.match = args.match
+		self.matchDetailLink = args.matchDetailLink
 	end
 )
 
@@ -117,22 +118,26 @@ function Details:create()
 		self.root:addClass(HIGHLIGHT_CLASS)
 	end
 
+	local matchBottomBar = mw.html.create('div'):addClass('match-bottom-bar')
+	matchBottomBar:node(self:countdown())
+
+	if self.matchDetailLink then
+		matchBottomBar:node(mw.html.create('div')
+			:addClass('btn btn-secondary btn-new btn--match-details')
+			:attr('tabindex', '0')
+			:node(mw.html.create('i')
+				:addClass('fas fa-external-link')
+			)
+			:wikitext('  Details')
+		)
+	end
+
 	return self.root
 		:node(mw.html.create('div'):addClass('match-links')
 			:node(self:tournament())
 			:node(self:streams())
 		)
-		:node(mw.html.create('div'):addClass('match-bottom-bar')
-			:node(self:countdown())
-			:node(mw.html.create('div')
-					:addClass('btn btn-secondary btn-new btn--match-details')
-					:attr('tabindex', '0')
-					:node(mw.html.create('i')
-						:addClass('fas fa-external-link')
-					)
-					:wikitext('  Details')
-	)
-		)
+		:node(matchBottomBar)
 end
 
 ---It will display both countdown and date of the match so the user can select which one to show
