@@ -19,7 +19,7 @@ local MatchLinks = mw.loadData('Module:MatchLinks')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local BigMatch = Lua.import('Module:BigMatch')
+local MatchPage = Lua.import('Module:MatchPage')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local Opponent = Lua.import('Module:Opponent')
@@ -108,9 +108,10 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
-	if BigMatch.isEnabledFor(match) then
+	if MatchPage.isEnabledFor(match) then
+		local matchId = match.extradata.originalmatchid or match.matchId
 		local matchPageElement = mw.html.create('center')
-		matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
+		matchPageElement:wikitext('[[Match:ID_' .. matchId .. '|Match Page]]')
 						:css('display', 'block')
 						:css('margin', 'auto')
 		body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement):addClass('brkts-popup-mvp'))

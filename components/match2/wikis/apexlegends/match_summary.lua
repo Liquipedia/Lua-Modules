@@ -11,6 +11,7 @@ local CustomMatchSummary = {}
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
@@ -22,12 +23,20 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local NOW = os.time(os.date('!*t') --[[@as osdateparam]])
+---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
+---@field games ApexMatchGroupUtilGame[]
 
-local MATCH_STATUS_TO_ICON = {
-	finished = 'fas fa-check icon--green',
-	live = 'fas fa-circle icon--red',
-	upcoming = 'fas fa-clock',
+---@class ApexMatchGroupUtilGame: MatchGroupUtilGame
+---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
+---@field stream table
+
+local NO_PLACEMENT = -99
+
+local PHASE_ICONS = {
+	finished = {iconName = 'concluded', color = 'icon--green'},
+	ongoing = {iconName = 'live', color = 'icon--red'},
+	upcoming = {iconName = 'upcomingandongoing'},
 }
 
 local PLACEMENT_BG = {
@@ -120,6 +129,31 @@ local MATCH_STANDING_COLUMNS = {
 			end,
 		},
 	},
+	{
+		sortable = true,
+		sortType = 'match-points',
+		class = 'cell--match-points',
+		iconClass = 'fad fa-diamond',
+		show = {
+			value = function(match)
+				return match.scoringTable.matchPointThreadhold
+			end
+		},
+		header = {
+			value = 'MPe Game',
+			mobileValue = 'MPe',
+		},
+		sortVal = {
+			value = function (opponent, idx)
+				return opponent.matchPointReachedIn or 999 -- High number that should not be exceeded
+			end,
+		},
+		row = {
+			value = function (opponent, idx)
+				return opponent.matchPointReachedIn and "Game " .. opponent.matchPointReachedIn or nil
+			end,
+		},
+	},
 	game = {
 		{
 			class = 'panel-table__cell__game-placement',
@@ -170,7 +204,10 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.placement ~= -1 and opponent.placement or idx
+				if opponent.placement == -1 or opponent.placement == NO_PLACEMENT then
+					return idx
+				end
+				return opponent.placement
 			end,
 		},
 		row = {
@@ -265,6 +302,7 @@ local GAME_STANDINGS_COLUMNS = {
 ---@param args table
 ---@return string
 function CustomMatchSummary.getByMatchId(args)
+	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 
 	match.scoringTable = CustomMatchSummary._createScoringData(match)
@@ -305,6 +343,21 @@ function CustomMatchSummary._opponents(match)
 		end)
 	end)
 
+	if match.scoringTable.matchPointThreadhold then
+		Array.forEach(match.opponents, function (opponent, idx)
+			local matchPointReachedIn
+			local sum = opponent.extradata.startingpoints or 0
+			for gameIdx, game in ipairs(opponent.games) do
+				if sum >= match.scoringTable.matchPointThreadhold then
+					matchPointReachedIn = gameIdx
+					break
+				end
+				sum = sum + (game.score or 0)
+			end
+			opponent.matchPointReachedIn = matchPointReachedIn
+		end)
+	end
+
 	local placementSortFunction = function(opponent1, opponent2)
 		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
 			if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
@@ -312,6 +365,12 @@ function CustomMatchSummary._opponents(match)
 			else
 				return (opponent1.name or '') < (opponent2.name or '')
 			end
+		end
+		if opponent1.placement == NO_PLACEMENT then
+			return false
+		end
+		if opponent2.placement == NO_PLACEMENT then
+			return true
 		end
 		return opponent1.placement < opponent2.placement
 	end
@@ -333,6 +392,7 @@ function CustomMatchSummary._createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
 	local scoreKill = Table.extract(scoreSettings, 'kill')
+	local matchPointThreadhold = Table.extract(scoreSettings, 'matchPointThreadhold')
 	local scorePlacement = {}
 
 	local points = Table.groupBy(scoreSettings, function (_, value)
@@ -353,6 +413,7 @@ function CustomMatchSummary._createScoringData(match)
 	return {
 		kill = scoreKill,
 		placement = scorePlacement,
+		matchPointThreadhold = matchPointThreadhold,
 	}
 end
 
@@ -372,16 +433,16 @@ function CustomMatchSummary._createHeader(match)
 				:attr('data-js-battle-royale-content-target-id', 'panel' .. idx)
 				:attr('role', 'tab')
 				:attr('tabindex', 0)
-				:tag('i'):addClass('panel-tabs__list-icon'):addClass(icon):done()
+				:node(icon)
 				:tag('h4'):addClass('panel-tabs__title'):wikitext(title):done()
 	end
 	local header = mw.html.create('ul')
 			:addClass('panel-tabs__list')
 			:attr('role', 'tablist')
-			:node(createHeader('Overall standings', 'fad fa-list-ol', 0))
+			:node(createHeader('Overall standings', Icon.makeIcon{iconName = 'standings'}, 0))
 
 	Array.forEach(match.games, function (game, idx)
-		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game), idx))
+		header:node(createHeader('Game '.. idx, CustomMatchSummary._countdownIcon(game, 'panel-tabs__list-icon'), idx))
 	end)
 
 	return mw.html.create('div')
@@ -463,10 +524,7 @@ function CustomMatchSummary._createOverallPage(match)
 
 	Array.forEach(match.games, function (game, idx)
 		scheduleList:tag('li')
-				:tag('i')
-						:addClass(CustomMatchSummary._countdownIcon(game))
-						:addClass('panel-content__game-schedule__icon')
-						:done()
+				:node(CustomMatchSummary._countdownIcon(game, 'panel-content__game-schedule__icon'))
 				:tag('span')
 						:addClass('panel-content__game-schedule__title')
 						:wikitext('Game ', idx, ':')
@@ -500,10 +558,7 @@ function CustomMatchSummary._createGameTab(game, idx)
 	informationList:tag('li')
 			:tag('div')
 					:addClass('panel-content__game-schedule__container')
-					:tag('i')
-							:addClass(CustomMatchSummary._countdownIcon(game))
-							:addClass('panel-content__game-schedule__icon')
-							:done()
+					:node(CustomMatchSummary._countdownIcon(game, 'panel-content__game-schedule__icon'))
 					:node(CustomMatchSummary._gameCountdown(game))
 	if game.map then
 		informationList:tag('li')
@@ -538,6 +593,10 @@ function CustomMatchSummary._createMatchStandings(match)
 	end
 
 	Array.forEach(MATCH_STANDING_COLUMNS, function(column)
+		if column.show and not column.show.value(match) then
+			return
+		end
+
 		local cell = header:tag('div')
 				:addClass('panel-table__cell')
 				:addClass(column.class)
@@ -583,10 +642,7 @@ function CustomMatchSummary._createMatchStandings(match)
 				:addClass('panel-table__cell__game-head')
 				:tag('div')
 						:addClass('panel-table__cell__game-title')
-						:tag('i')
-								:addClass(CustomMatchSummary._countdownIcon(game))
-								:addClass('panel-table__cell-icon')
-								:done()
+						:node(CustomMatchSummary._countdownIcon(game, 'panel-table__cell-icon'))
 						:tag('span')
 								:addClass('panel-table__cell-text')
 								:wikitext('Game ', idx)
@@ -617,10 +673,14 @@ function CustomMatchSummary._createMatchStandings(match)
 					:addClass('panel-table__cell')
 					:addClass('cell--status')
 					:addClass('bg-' .. (opponentMatch.advanceBg or ''))
-					:node(CustomMatchSummary._getStatusIcon(opponentMatch.advanceBg))
+					:node(CustomMatchSummary._getStatusIcon(match.extradata.status[index]))
 		end
 
 		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
+			if column.show and not column.show.value(match) then
+				return
+			end
+
 			local cell = row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
@@ -700,40 +760,15 @@ end
 
 ---@param game table
 ---@return boolean
-function CustomMatchSummary._isUpcoming(game)
-	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
-		return false
-	end
-	return NOW < timestamp
-end
-
----@param game table
----@return boolean
-function CustomMatchSummary._isLive(game)
-	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
-		return false
-	end
-	return not CustomMatchSummary._isFinished(game) and NOW >= timestamp
-end
-
----@param game table
----@return boolean
 function CustomMatchSummary._isFinished(game)
 	return game.winner ~= nil
 end
 
 ---@param game table
 ---@return string?
-function CustomMatchSummary._countdownIcon(game)
-	if CustomMatchSummary._isFinished(game) then
-		return MATCH_STATUS_TO_ICON.finished
-	elseif CustomMatchSummary._isLive(game) then
-		return MATCH_STATUS_TO_ICON.live
-	elseif CustomMatchSummary._isUpcoming(game) then
-		return MATCH_STATUS_TO_ICON.upcoming
-	end
+function CustomMatchSummary._countdownIcon(game, additionalClass)
+	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)] or {}
+	return Icon.makeIcon{iconName = iconData.iconName, color = iconData.color, additionalClasses = {additionalClass}}
 end
 
 ---Creates a countdown block for a given game
@@ -762,6 +797,10 @@ end
 ---@param placementEnd string|number|nil
 ---@return string
 function CustomMatchSummary._displayRank(placementStart, placementEnd)
+	if NO_PLACEMENT == placementStart then
+		return '-'
+	end
+
 	local places = {}
 
 	if placementStart then
@@ -794,6 +833,7 @@ end
 
 ---Determines whether the status column should be shown or not
 ---@param match table
+---@return boolean
 function CustomMatchSummary._showStatusColumn(match)
 	return Table.isNotEmpty(match.extradata.status)
 end

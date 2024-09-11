@@ -23,10 +23,10 @@ local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -43,7 +43,6 @@ local CustomInjector = Class.new(Injector)
 
 local RATINGCONFIG = {
 	aoe2 = {
-		{text = 'RM [[Age of Empires II/Definitive Edition|DE]]', id = 'aoe2net_id', game = 'aoe2de'},
 		{
 			text = Page.makeExternalLink('Tournament', 'https://aoe-elo.com/players'),
 			id = 'aoe-elo.com_id',
@@ -52,11 +51,7 @@ local RATINGCONFIG = {
 		{text = 'RM [[Voobly]]', id = 'voobly_elo'},
 	},
 	aoe3 = {
-		{text = 'Supremacy [[Age of Empires III/Definitive Edition|DE]]', id = 'aoe3net_id', game = 'aoe3de'},
 		{text = 'Supremacy', id = 'aoe3_elo'},
-	},
-	aoe4 = {
-		{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
 	},
 	aom = {
 		{text = 'Elo [[Voobly]]', id = 'aom_voobly_elo'},
@@ -157,10 +152,10 @@ function CustomInjector:parse(id, widgets)
 			-- Games & Inactive Games
 			Cell{name = 'Games', content = Array.map(args.gameList, function(game)
 				return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')
-			end)},
-			--Elo ratings
-			Title{name = 'Ratings'}
+			end)}
 		)
+		--Elo ratings
+		local ratingCells = {}
 		for game, ratings in Table.iter.spairs(RATINGCONFIG) do
 			game = Game.raw{game = game}
 			Array.forEach(ratings, function(rating)
@@ -179,8 +174,14 @@ function CustomInjector:parse(id, widgets)
 					bestRating = bestRating .. '&nbsp;<small>(highest)</small>'
 					table.insert(content, bestRating)
 				end
-				table.insert(widgets, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', content = content})
+				if Logic.isNotEmpty(content) then
+					table.insert(ratingCells, Cell{name = rating.text .. ' (' .. game.abbreviation .. ')', content = content})
+				end
 			end)
+		end
+		if Logic.isNotEmpty(ratingCells) then
+			table.insert(widgets, Title{name = 'Ratings'})
+			Array.extendWith(widgets, ratingCells)
 		end
 	elseif id == 'status' then
 		table.insert(widgets, Cell{

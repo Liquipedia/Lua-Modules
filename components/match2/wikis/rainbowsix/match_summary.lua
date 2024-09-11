@@ -6,14 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local OperatorIcon = require('Module:OperatorIcon')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -93,7 +91,10 @@ function OperatorBans:add(operator)
 			:tag('td')
 				:css('padding', '0')
 				:tag('div')
-					:wikitext(OperatorIcon.getImage{operator,'50x50px'})
+					:wikitext(CharacterIcon.Icon{
+						character = operator,
+						size = '50x50px'
+					})
 	return self
 end
 
@@ -438,15 +439,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	if String.isNotEmpty(match.extradata.casters) then
-		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Add the Map Vetoes
 	if match.extradata.mapveto then
@@ -478,12 +471,17 @@ function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
+	local function scoreDisplay(oppIdx)
+		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+	end
+
+
 	-- Score
 	local team1Score = Score():setLeft()
 	local team2Score = Score():setRight()
 
 	-- Score Team 1
-	team1Score:setMapScore(game.scores[1])
+	team1Score:setMapScore(scoreDisplay(1))
 
 	-- Detailed scores
 	local team1Halfs = extradata.t1halfs or {}
@@ -519,7 +517,7 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	-- Score Team 2
-	team2Score:setMapScore(game.scores[2])
+	team2Score:setMapScore(scoreDisplay(2))
 
 	-- Operator bans
 	local operatorBans = {team1 = extradata.t1bans or {}, team2 = extradata.t2bans or {}}

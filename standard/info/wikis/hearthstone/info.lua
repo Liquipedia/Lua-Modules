@@ -7,7 +7,7 @@
 --
 
 return {
-	startYear = 2014,
+	startYear = 2013,
 	wikiName = 'hearthstone',
 	name = 'Hearthstone',
 	defaultGame = 'hs',
@@ -32,6 +32,8 @@ return {
 			hasSpecialTeam = false,
 			allowManual = true,
 		},
+		match2 = {
+			status = 0,
+		},
 	},
-	match2 = 0,
 }

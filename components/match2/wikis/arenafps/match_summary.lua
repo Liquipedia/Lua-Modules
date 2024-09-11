@@ -8,12 +8,10 @@
 
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -85,15 +83,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add casters
-	if String.isNotEmpty(match.extradata.casters) then
-		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	return body
 end
@@ -162,7 +152,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param showIcon boolean?
----@param iconType AFPSMatchIcons?
+---@param iconType string?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
 	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')

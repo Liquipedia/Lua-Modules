@@ -10,13 +10,14 @@ local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 local Locale = require('Module:Locale')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -141,13 +142,14 @@ end
 
 ---@return string?
 function Company:_getOrganizerPrizepools()
+	local queryName = Logic.readBool(self.args.queryByBasename) and mw.title.getCurrentTitle().baseText or self.pagename
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions =
-			'[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer3::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer4::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer5::' .. self.pagename .. ']]',
+			'[[organizers_organizer1::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer2::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer3::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer4::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer5::' .. queryName .. ']]',
 		query = 'sum::prizepool'
 	})
 

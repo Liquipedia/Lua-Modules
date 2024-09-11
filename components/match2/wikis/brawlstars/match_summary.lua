@@ -205,19 +205,23 @@ function CustomMatchSummary.createBody(match)
 	local showGamePicks = {}
 	for gameIndex, game in ipairs(match.games) do
 		local pickData = {{}, {}}
-		local numberOfPicks = game.extradata.maximumpickindex
 		local participants = game.participants
-		for index = 1, numberOfPicks do
-			if not Table.isEmpty(participants['1_' .. index]) then
+		local index = 1
+		while true do
+			if Table.isEmpty(participants['1_' .. index]) and Table.isEmpty(participants['2_' .. index]) then
+				break
+			end
+			if Table.isNotEmpty(participants['1_' .. index]) then
 				pickData[1][index] = participants['1_' .. index].brawler
 			end
-			if not Table.isEmpty(participants['2_' .. index]) then
+			if Table.isNotEmpty(participants['2_' .. index]) then
 				pickData[2][index] = participants['2_' .. index].brawler
 			end
+			index = index + 1
 		end
 
-		if numberOfPicks > 0 then
-			pickData.numberOfPicks = numberOfPicks
+		if index > 1 then
+			pickData.numberOfPicks = index - 1
 			showGamePicks[gameIndex] = pickData
 		end
 	end
@@ -266,8 +270,9 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] or ''
-	return mw.html.create('div'):wikitext(score)
+	local score = game.scores[opponentIndex]
+	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
+	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame

@@ -32,6 +32,9 @@ return {
 			hasSpecialTeam = true,
 			allowManual = true,
 		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+		},
 	},
-	match2 = 2,
 }

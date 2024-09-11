@@ -8,11 +8,12 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -47,31 +48,50 @@ function Attack.run(argsJson, attackIndex, faction)
 
 	return {
 		Title{name = 'Attack' .. attackIndex .. ': ' .. args.name},
-		Cell{name = 'Target', content = data.targets},
-		Cell{name = 'Damage', content = {data.damagePercentage and (data.damagePercentage .. '%') or data.damage}},
-		Cell{name = 'Effect', content = Array.map(data.effect, function(effect) return Page.makeInternalLink(effect) end)},
+		Cell{name = 'Target', content = {Attack._displayArray(data.targets)}},
+		Cell{name = 'Damage', content = {Attack._displayDamage(data)}},
+		Cell{name = 'Effect', content = {Attack._displayArray(data.effect)}},
 		Cell{name = 'Attack Speed', content = {data.speed}},
-		Cell{name = 'DPS', content = {data.dps}},
-		Cell{name = 'Bonus vs', content = {data.bonus}},
-		Cell{name = 'Bonus Damage', content = {data.bonusDamage}},
-		Cell{name = 'Bonus DPS', content = {data.bonusDps}},
+		Cell{name = 'DPS', content = {Attack._displayDPS(data)}},
 		Cell{name = 'Range', content = {data.range}},
 	}
+end
+
+---@param data table
+---@return string?
+function Attack._displayDamage(data)
+	if data.damagePercentage then
+		return (data.damagePercentage .. '%')
+	elseif not data.damage then
+		return
+	elseif Logic.isEmpty(data.bonus) or not data.bonusDamage then
+		return data.damage
+	end
+	return data.damage .. ' (+' .. data.bonusDamage .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
+end
+
+---@param data table
+---@return string?
+function Attack._displayDPS(data)
+	if not data.dps then
+		return
+	elseif Logic.isEmpty(data.bonus) or not data.bonusDps then
+		return data.dps
+	end
+	return data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
 end
 
 ---@param args table
 ---@return StormgateAttackData
 function Attack._parse(args)
 	return {
-		targets = Array.map(args.target and mw.text.split(args.target or '', ','), function(target)
-			return mw.getContentLanguage():ucfirst(String.trim(target):lower())
-		end),
+		targets = Array.map(Array.map(Array.parseCommaSeparatedString(args.target), string.lower), String.upperCaseFirst),
 		damage = tonumber(args.damage),
 		damagePercentage = tonumber(args.damage_percentage),
 		effect = Array.parseCommaSeparatedString(args.effect),
 		speed = tonumber(args.speed),
 		dps = tonumber(args.dps),
-		bonus = args.bonus,
+		bonus = Array.parseCommaSeparatedString(args.bonus),
 		bonusDamage = tonumber(args.bonus_damage),
 		bonusDps = tonumber(args.bonus_dps),
 		range = tonumber(args.range),
@@ -94,6 +114,14 @@ function Attack._store(data, args, faction, attackIndex)
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json(extradata),
 	})
+end
+
+---@param arr string[]
+---@return string
+function Attack._displayArray(arr)
+	return table.concat(Array.map(arr, function(value)
+		return Page.makeInternalLink(value)
+	end), ', ')
 end
 
 return Attack

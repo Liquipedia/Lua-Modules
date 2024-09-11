@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -19,7 +20,7 @@ local Streams = require('Module:Links/Stream')
 local StrikerNames = mw.loadData('Module:StrikerNames')
 
 local Opponent = Lua.import('Module:Opponent')
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInput = Lua.import('Module:MatchGroup/Input/Util')
 
 local ALLOWED_STATUSES = {'W', 'FF', 'DQ', 'L', 'D'}
 local STATUS_TO_WALKOVER = {FF = 'ff', DQ = 'dq', L = 'l'}
@@ -35,6 +36,9 @@ local mapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(
 		match,
@@ -49,6 +53,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
+---@param match table
 function CustomMatchGroupInput._underScoreAdjusts(match)
 	local fixUnderscore = function(page)
 		return page and page:gsub(' ', '_') or page
@@ -64,6 +69,8 @@ function CustomMatchGroupInput._underScoreAdjusts(match)
 end
 
 -- called from Module:Match/Subobjects
+---@param map table
+---@return table
 function CustomMatchGroupInput.processMap(map)
 	local bestof = tonumber(Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof'))) or 3
 	Variables.varDefine('map_bestof', bestof)
@@ -76,6 +83,8 @@ function CustomMatchGroupInput.processMap(map)
 	return map
 end
 
+---@param record table
+---@param timestamp integer
 function CustomMatchGroupInput.processOpponent(record, timestamp)
 	local opponent = Opponent.readOpponentArgs(record)
 		or Opponent.blank()
@@ -98,14 +107,11 @@ function CustomMatchGroupInput.processOpponent(record, timestamp)
 	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
-
---
---
 -- function to sort out winner/placements
+---@param tbl table[]
+---@param key1 integer
+---@param key2 integer
+---@return boolean
 function CustomMatchGroupInput._placementSortFunction(tbl, key1, key2)
 	local op1 = tbl[key1]
 	local op2 = tbl[key2]
@@ -125,16 +131,21 @@ end
 --
 -- match related functions
 --
-
+---@param matchArgs table
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function matchFunctions.readDate(matchArgs)
 	return MatchGroupInput.readDate(matchArgs.date, {'tournament_enddate'})
 end
 
+---@param match table
+---@return table
 function matchFunctions.getTournamentVars(match)
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	return MatchGroupInput.getCommonTournamentVars(match)
 end
 
+---@param match table
+---@return table
 function matchFunctions.getVodStuff(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
@@ -142,6 +153,8 @@ function matchFunctions.getVodStuff(match)
 	return match
 end
 
+---@param args table
+---@return table
 function matchFunctions.getOpponents(args)
 	-- read opponents and ignore empty ones
 	local opponents = {}
@@ -262,6 +275,10 @@ function matchFunctions.getOpponents(args)
 	return args
 end
 
+---@param match table
+---@param opponentIndex integer
+---@param teamName string
+---@return table
 function matchFunctions.getPlayers(match, opponentIndex, teamName)
 	for playerIndex = 1, MAX_NUM_PLAYERS do
 		-- parse player
@@ -278,13 +295,16 @@ end
 --
 -- map related functions
 --
+
+---@param map table
+---@return table
 function mapFunctions.getExtraData(map)
 	local bans = {}
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, StrikerNames)
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			ban = mapFunctions._cleanStrikerName(ban)
-			table.insert(bans['team' .. opponentIndex], ban)
+			table.insert(bans['team' .. opponentIndex], getCharacterName(ban))
 		end
 	end
 
@@ -296,6 +316,8 @@ function mapFunctions.getExtraData(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getScoresAndWinner(map)
 	map.score1 = tonumber(map.score1)
 	map.score2 = tonumber(map.score2)
@@ -318,9 +340,11 @@ function mapFunctions.getScoresAndWinner(map)
 	return map
 end
 
+---@param map table
+---@return table
 function mapFunctions.getParticipantsData(map)
 	local participants = {}
-
+	local getCharacterName = FnUtil.curry(MatchGroupInput.getCharacterName, StrikerNames)
 	local maximumPickIndex = 0
 	for opponentIndex = 1, MAX_NUM_OPPONENTS do
 		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
@@ -328,9 +352,8 @@ function mapFunctions.getParticipantsData(map)
 		end
 
 		for _, striker, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
-			striker = mapFunctions._cleanStrikerName(striker)
 			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
-			participants[opponentIndex .. '_' .. pickIndex].striker = striker
+			participants[opponentIndex .. '_' .. pickIndex].striker = getCharacterName(striker)
 			if maximumPickIndex < pickIndex then
 				maximumPickIndex = pickIndex
 			end
@@ -340,15 +363,6 @@ function mapFunctions.getParticipantsData(map)
 	map.extradata.maximumpickindex = maximumPickIndex
 	map.participants = participants
 	return map
-end
-
-function mapFunctions._cleanStrikerName(strikerRaw)
-	local striker = StrikerNames[string.lower(strikerRaw)]
-	if not striker then
-		error('Unsupported striker input: ' .. strikerRaw)
-	end
-
-	return striker
 end
 
 return CustomMatchGroupInput

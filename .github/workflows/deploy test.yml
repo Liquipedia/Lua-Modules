@@ -1,0 +1,39 @@
+name: Personal Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      luadevenv:
+        description: 'Lua Dev Enviroment name'
+        required: true
+
+jobs:
+  deploy:
+    name: Live Wikis Personal
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: nrwl/nx-set-shas@v4
+        id: last_successful_commit_push
+
+      - id: changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          base_sha: ${{ steps.last_successful_commit_push.outputs.base }}
+          files: |
+            components/**/*.lua
+            standard/**/*.lua
+
+      - name: Personal Lua Deploy
+        if: steps.changed-files.outputs.any_changed == 'true'
+        env:
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          LUA_DEV_ENV_NAME: "/dev/${{ github.event.inputs.luadevenv }}"
+        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"

@@ -13,27 +13,32 @@ local Page = require('Module:Page')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
+	igl = {category = 'In-game leaders', variable = 'In-game leader'},
+	player = {category = 'Players', variable = 'Player'},
 
-	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
+	-- Team Staff (haven't yet actually)
+	analyst = {category = 'Analysts', variable = 'Analyst', staff = true},
+	coach = {category = 'Coaches', variable = 'Coach', staff = true},
+	manager = {category = 'Managers', variable = 'Manager', staff = true},
+
+	-- Tournament Talents
 	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
-	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
-	['host'] = {category = 'Host', variable = 'Host', talent = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
-	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	['referee'] = {category = 'Referees', variable = 'Referee', staff = true},
-	['mapper'] = {category = 'Mappers', variable = 'Mapper', staff = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', talent = true},
+	observer = {category = 'Observers', variable = 'Observer', talent = true},
+	host = {category = 'Host', variable = 'Host', talent = true},
+	caster = {category = 'Casters', variable = 'Caster', talent = true},
+
+	-- Tournament Staff (osu! unique roles)
+	referee = {category = 'Referees', variable = 'Referee', staff = true},
+	mapper = {category = 'Mappers', variable = 'Mapper', staff = true},
+	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
 }
 
 ---@class OsuInfoboxPlayer: Person

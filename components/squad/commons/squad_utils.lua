@@ -20,10 +20,10 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Faction = Lua.import('Module:Faction')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Lpdb = Lua.import('Module:Lpdb')
 local TransferRefs = Lua.import('Module:Transfer/Refences')
-local Widget = Lua.import('Module:Infobox/Widget/All')
+local Widget = Lua.import('Module:Widget/All')
 
 local SquadUtils = {}
 
@@ -96,7 +96,7 @@ function SquadUtils.convertAutoParameters(player)
 	-- Map between formats
 	newPlayer.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
 	newPlayer.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-	newPlayer.inactivedate = player.leavedate
+	newPlayer.inactivedate = newPlayer.leavedate
 
 	newPlayer.link = player.page
 	newPlayer.role = player.thisTeam.role
@@ -121,7 +121,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	end
 
 	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
-	local person =  Lpdb.SquadPlayer:new{
+	local person = Lpdb.SquadPlayer:new{
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = String.nilIfEmpty(args.name),
@@ -146,7 +146,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		extradata = {
 			loanedto = args.team,
 			loanedtorole = args.teamrole,
-			newteamdate = args.newteamdate,
+			newteamdate = String.nilIfEmpty(ReferenceCleaner.clean(args.newteamdate)),
 			faction = Faction.read(args.faction or args.race),
 		},
 	}
@@ -207,11 +207,12 @@ end
 ---@param squadType integer
 ---@param squadClass Squad
 ---@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param customTitle string?
 ---@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
 ---@return Html?
-function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, injector, personMapper)
-	local args = {type = squadType}
+function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, customTitle, injector, personMapper)
+	local args = {type = squadType, title = customTitle}
 	local injectorInstance = (injector and injector()) or
 		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
 		nil

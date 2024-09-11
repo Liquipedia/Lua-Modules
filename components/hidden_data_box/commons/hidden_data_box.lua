@@ -26,6 +26,8 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
+local Language = mw.getContentLanguage()
+
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
@@ -177,6 +179,8 @@ end
 ---@param key string
 ---@param value string|number
 function HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+	Variables.varDefine(participant .. '_' .. key, value)
+	participant = Language:ucfirst(participant)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
 		Variables.varDefine(participantResolved .. '_' .. key, value)

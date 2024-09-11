@@ -12,10 +12,15 @@
 	It is invoked by Template:BracketMatchSummary.
 ]]
 
+local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-local Class = require('Module:Class')
+local Table = require('Module:Table')
+
+local DRAW = 'draw'
+local SKIP = 'skip'
 
 local LegacyBracketMatchSummary = {}
 
@@ -26,23 +31,20 @@ function LegacyBracketMatchSummary.convert(args)
 	local index = 1
 	while not String.isEmpty(args['map' .. index]) or not Logic.isEmpty(args['map' .. index .. 'win']) do
 		local prefix = 'map' .. index
-		local score1
-		local score2
-		if not Logic.isEmpty(args[prefix..'score']) then
-			score1 = mw.text.split(args[prefix..'score'], '-')[1]
-			score2 = mw.text.split(args[prefix..'score'], '-')[2]
-		end
-		if not score1 and not score2 and args[prefix ..'win'] ~= 'skip' then
-			score1 = tonumber(args[prefix ..'win']) == 1 and 'W' or 'L'
-			score2 = tonumber(args[prefix ..'win']) == 2 and 'W' or 'L'
+		local winner = Table.extract(args, prefix .. 'win')
+		local score = Table.extract(args, prefix .. 'score')
+		if Logic.isNotEmpty(score) then
+			local splitedScore = Array.parseCommaSeparatedString(score, '-')
+			args[prefix .. 'score1'] = splitedScore[1]
+			args[prefix .. 'score2'] = splitedScore[2]
 		end
 
-		args['map' .. index .. 'score1'] = mw.text.trim(score1 or '')
-		args['map' .. index .. 'score2'] = mw.text.trim(score2 or '')
-		args['map' .. index .. 'score'] = nil
-		args['map' .. index .. 'finished'] = (args[prefix ..'win'] == 'skip' and 'skip') or
-											(not Logic.isEmpty(args[prefix ..'win']) and 'true') or 'false'
-		args['map' .. index .. 'win'] = nil
+		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
+											(not Logic.isEmpty(winner) and 'true') or 'false'
+		if Logic.isNumeric(winner) or winner == DRAW then
+			args[prefix .. 'win'] = winner == DRAW and 0 or winner
+		end
+
 		index = index + 1
 	end
 

@@ -8,11 +8,9 @@
 
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -25,18 +23,14 @@ local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
-local pageVars = PageVariableNamespace('PrizePool')
-
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
 local IS_AWARD = true
 
-local _lpdb_stash = {}
 local _series
 local _tier
 local _tournament_name
-local _series_number
 
 -- Template entry point
 ---@param frame Frame
@@ -58,21 +52,11 @@ function CustomPrizePool.run(frame)
 	-- fixed setting
 	args.resolveRedirect = true
 
-	-- stash seriesNumber
-	_series_number = CustomPrizePool._seriesNumber()
-
 	local prizePool = AwardPrizePool(args):create()
 
 	prizePool:setLpdbInjector(CustomLpdbInjector())
 
 	local builtPrizePool = prizePool:build(IS_AWARD)
-
-	if Logic.readBool(args.storelpdb) then
-		local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
-
-		-- stash the lpdb_placement data so teamCards can use them
-		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
-	end
 
 	return builtPrizePool
 end
@@ -88,7 +72,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.type = Variables.varDefault('tournament_type') or lpdbData.type
 
 	Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = _series_number,
+		seriesnumber = CustomPrizePool._seriesNumber(),
 
 		-- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
@@ -100,8 +84,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
-
-	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
 
 	return lpdbData
 end

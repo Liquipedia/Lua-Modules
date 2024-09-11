@@ -11,12 +11,12 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
 ---@class ApexlegendsWeaponInfobox: WeaponInfobox

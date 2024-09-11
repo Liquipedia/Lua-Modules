@@ -14,7 +14,7 @@ local String = require('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -48,7 +48,7 @@ function Building:createInfobox()
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
-		Title{name = 'Building Information'},
+		Title{name = (args.informationType or 'Building') .. ' Information'},
 		Cell{name = 'Built by', content = {args.builtby}},
 		Customizable{
 			id = 'cost',

@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.collapse = {
 	init: function() {
-		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( function( table, index ) {
+		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( table, index ) => {
 			if ( table.classList.contains( 'autocollapse' ) && index >= 1 ) {
 				table.classList.add( 'collapsed' );
 			}
@@ -17,7 +17,7 @@ liquipedia.collapse = {
 		liquipedia.collapse.setupCollapsibleNavFrameButtons();
 	},
 	setupCollapsibleButtons: function() {
-		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( function( collapsible ) {
+		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
 			const row = collapsible.querySelector( 'tr' );
 			if ( row !== null ) {
 				const collapseShowButton = document.createElement( 'span' );
@@ -64,7 +64,7 @@ liquipedia.collapse = {
 		// For xss safety, only the child nodes and class name are copied over.
 		function replaceWithAnchor( button ) {
 			const anchor = document.createElement( 'a' );
-			button.childNodes.forEach( function ( node ) {
+			button.childNodes.forEach( ( node ) => {
 				anchor.append( node );
 			} );
 			anchor.className = button.className;
@@ -73,13 +73,13 @@ liquipedia.collapse = {
 			return anchor;
 		}
 
-		document.querySelectorAll( '#mw-content-text .general-collapsible' ).forEach( function( collapsible ) {
+		document.querySelectorAll( '#mw-content-text .general-collapsible' ).forEach( ( collapsible ) => {
 			const collapseButton = collapsible.querySelector( '.general-collapsible-collapse-button' );
 			const expandButton = collapsible.querySelector( '.general-collapsible-expand-button' );
 
 			if ( expandButton ) {
 				const anchor = replaceWithAnchor( expandButton );
-				anchor.addEventListener( 'click', function( event ) {
+				anchor.addEventListener( 'click', ( event ) => {
 					collapsible.classList.remove( 'collapsed' );
 					event.preventDefault();
 				} );
@@ -87,7 +87,7 @@ liquipedia.collapse = {
 
 			if ( collapseButton ) {
 				const anchor = replaceWithAnchor( collapseButton );
-				anchor.addEventListener( 'click', function( event ) {
+				anchor.addEventListener( 'click', ( event ) => {
 					collapsible.classList.add( 'collapsed' );
 					event.preventDefault();
 				} );
@@ -95,7 +95,7 @@ liquipedia.collapse = {
 		} );
 	},
 	setupCollapsibleMapsButtons: function() {
-		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( function( collapsible ) {
+		document.querySelectorAll( '#mw-content-text .collapsible' ).forEach( ( collapsible ) => {
 			const row = collapsible.querySelector( 'tr' );
 			if ( row !== null && collapsible.querySelector( '.maprow' ) !== null ) {
 				const collapseShowButton = document.createElement( 'span' );
@@ -130,7 +130,7 @@ liquipedia.collapse = {
 		} );
 	},
 	setupCollapsibleNavFrameButtons: function() {
-		document.querySelectorAll( '#mw-content-text .NavFrame' ).forEach( function( navFrame ) {
+		document.querySelectorAll( '#mw-content-text .NavFrame' ).forEach( ( navFrame ) => {
 			const head = navFrame.querySelector( '.NavHead' );
 			if ( head !== null ) {
 				const collapseShowButton = document.createElement( 'span' );
@@ -165,7 +165,7 @@ liquipedia.collapse = {
 		} );
 	},
 	setupToggleGroups: function() {
-		document.querySelectorAll( '#mw-content-text .toggle-group' ).forEach( function( toggleGroup ) {
+		document.querySelectorAll( '#mw-content-text .toggle-group' ).forEach( ( toggleGroup ) => {
 			let showAllText;
 			if ( toggleGroup.dataset.showAllText !== undefined ) {
 				showAllText = toggleGroup.dataset.showAllText;
@@ -189,20 +189,20 @@ liquipedia.collapse = {
 					toggleGroup.classList.remove( 'toggle-state-hide' );
 					toggleGroup.classList.add( 'toggle-state-show' );
 					this.innerHTML = showAllText;
-					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( function( collapsible ) {
+					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
 						collapsible.classList.add( 'collapsed' );
 					} );
-					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( function( collapsible ) {
+					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( ( collapsible ) => {
 						collapsible.classList.add( 'brkts-matchlist-collapsed' );
 					} );
 				} else {
 					toggleGroup.classList.remove( 'toggle-state-show' );
 					toggleGroup.classList.add( 'toggle-state-hide' );
 					this.innerHTML = hideAllText;
-					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( function( collapsible ) {
+					toggleGroup.querySelectorAll( '.collapsible, .general-collapsible' ).forEach( ( collapsible ) => {
 						collapsible.classList.remove( 'collapsed' );
 					} );
-					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( function( collapsible ) {
+					toggleGroup.querySelectorAll( '.brkts-matchlist-collapsible' ).forEach( ( collapsible ) => {
 						collapsible.classList.remove( 'brkts-matchlist-collapsed' );
 					} );
 				}
@@ -212,29 +212,29 @@ liquipedia.collapse = {
 	},
 	setupDropdownBox: function() {
 		let toggleActive = false;
-		document.querySelector( 'html' ).addEventListener( 'click', function( ev ) {
+		document.querySelector( 'html' ).addEventListener( 'click', ( ev ) => {
 			if ( ev.target.closest( '.dropdown-box' ) === null ) {
 				if ( toggleActive ) {
-					document.querySelectorAll( '.dropdown-box-visible' ).forEach( function( box ) {
+					document.querySelectorAll( '.dropdown-box-visible' ).forEach( ( box ) => {
 						box.classList.remove( 'dropdown-box-visible' );
 					} );
 					toggleActive = false;
 				}
 			}
 		} );
-		document.querySelectorAll( '#mw-content-text .dropdown-box-wrapper' ).forEach( function( dropdownBox ) {
+		document.querySelectorAll( '#mw-content-text .dropdown-box-wrapper' ).forEach( ( dropdownBox ) => {
 			const dropdownButton = dropdownBox.querySelector( '.dropdown-box-button' );
 			dropdownButton.onclick = function( ev ) {
 				ev.stopPropagation();
-				dropdownBox.querySelectorAll( '.dropdown-box' ).forEach( function ( box ) {
+				dropdownBox.querySelectorAll( '.dropdown-box' ).forEach( ( box ) => {
 					if ( box.classList.contains( 'dropdown-box-visible' ) ) {
 						box.classList.remove( 'dropdown-box-visible' );
 						toggleActive = false;
 					} else {
 						box.classList.add( 'dropdown-box-visible' );
 						toggleActive = true;
-						box.querySelectorAll( '.btn' ).forEach( function( btn ) {
-							btn.addEventListener( 'click', function() {
+						box.querySelectorAll( '.btn' ).forEach( ( btn ) => {
+							btn.addEventListener( 'click', () => {
 								dropdownButton.innerHTML = btn.textContent + ' <span class="caret"></span>';
 								box.classList.remove( 'dropdown-box-visible' );
 								toggleActive = false;

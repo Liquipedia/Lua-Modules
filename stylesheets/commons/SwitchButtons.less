@@ -1,0 +1,129 @@
+.timer--hidden {
+	display: none;
+}
+
+.switch-toggle-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+
+	.switch-toggle {
+		position: relative;
+		display: inline-block;
+		width: 2rem;
+		height: 1.125rem;
+
+		.switch-toggle-slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			transition: 0.4s;
+			border-radius: 1.125rem;
+
+			&::after {
+				display: block;
+				content: "";
+				opacity: 0.12;
+				position: absolute;
+				inset: 0;
+				z-index: 1;
+				border-radius: 0.5rem;
+				transition: 0.4s;
+				background-color: #191f2b;
+
+				.theme--light & {
+					background-color: #000000;
+				}
+
+				.theme--dark & {
+					background-color: #ffffff;
+				}
+			}
+
+			&::before {
+				position: absolute;
+				content: "";
+				height: 0.875rem;
+				width: 0.875rem;
+				left: 0.125rem;
+				z-index: 2;
+				bottom: 0.125rem;
+				background-color: #ffffff;
+				transition: 0.4s;
+				border-radius: 50%;
+			}
+		}
+
+		&.switch-toggle-active .switch-toggle-slider {
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+
+			&::after {
+				background-color: transparent;
+			}
+
+			&::before {
+				transform: translateX( 0.875rem );
+			}
+		}
+	}
+}
+
+.switch-pill-container {
+	position: relative;
+
+	.switch-pill {
+		display: flex;
+		border-radius: 0.5rem;
+		overflow: hidden;
+		padding: 0.25rem;
+
+		&::after {
+			content: "";
+			opacity: 0.12;
+			position: absolute;
+			inset: 0;
+			z-index: 1;
+			border-radius: 0.625rem;
+			background-color: #c1cee8;
+
+			.theme--light & {
+				background-color: var( --clr-wiki-theme-primary );
+			}
+
+			.theme--dark & {
+				background-color: #ffffff;
+			}
+		}
+
+		.switch-pill-option {
+			z-index: 2;
+			display: flex;
+			flex: 1;
+			justify-content: center;
+			align-items: center;
+			cursor: pointer;
+			padding: 0.5rem 0.75rem;
+			border-radius: 0.5rem;
+			font-size: 0.875rem;
+			font-weight: bold;
+			line-height: 1.25rem;
+
+			.theme--light & {
+				color: var( --clr-wiki-theme-primary );
+			}
+
+			.theme--dark & {
+				color: #ffffff;
+			}
+
+			&.switch-pill-active {
+				background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+				color: #ffffff;
+			}
+		}
+	}
+}

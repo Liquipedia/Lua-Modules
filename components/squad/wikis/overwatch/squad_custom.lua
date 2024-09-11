@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Widget = require('Module:Infobox/Widget/All')
+local Widget = require('Module:Widget/All')
 
 local Squad = Lua.import('Module:Squad')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -68,9 +68,10 @@ end
 
 ---@param playerList table[]
 ---@param squadType integer
+---@param customTitle string?
 ---@return Html?
-function CustomSquad.runAuto(playerList, squadType)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow))
+function CustomSquad.runAuto(playerList, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
 ---@param person table

@@ -385,6 +385,15 @@ return {
 			text = 'kr',
 		},
 	},
+	jod = {
+		code = 'JOD',
+		name = 'Jordanian Dinar',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = 'د.أ',
+		},
+	},
 	jpy = {
 		code = 'JPY',
 		name = 'Japanese Yen',

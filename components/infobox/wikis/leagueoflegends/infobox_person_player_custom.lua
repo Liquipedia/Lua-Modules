@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
@@ -16,10 +17,10 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
@@ -174,8 +175,8 @@ end
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
-		return Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		return tostring(MatchTicker.participant({team = teamPage}))
+			.. Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 
