@@ -17,20 +17,22 @@ local WidgetFactory = Class.new()
 ---@return Html
 function WidgetFactory.work(widget, injector)
 	local children = widget:tryMake(injector)
+
 	if not children then
 		return mw.html.create()
 	end
-	if not Array.isArray(children) then
-		---@cast children Html
-		return children
+
+	if Array.isArray(children) then
+		---@cast children Widget[]
+		local wrapper = mw.html.create()
+		Array.forEach(children, function(child)
+			wrapper:node(WidgetFactory.work(child, injector))
+		end)
+		return wrapper
 	end
 
-	---@cast children Widget[]
-	local wrapper = mw.html.create()
-	Array.forEach(children, function(child)
-		wrapper:node(WidgetFactory.work(child, injector))
-	end)
-	return wrapper
+	---@cast children Html
+	return children
 end
 
 return WidgetFactory
