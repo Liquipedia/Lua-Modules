@@ -107,7 +107,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map))
+			})
 			return {score = score, status = status}
 		end)
 
@@ -180,75 +180,7 @@ end
 ---@param opponentCount integer
 ---@return table
 function MapFunctions.getExtraData(map, opponentCount)
-	local extradata = MapFunctions.getSideData(map)
-
-	return Table.merge(extradata, {comment = map.comment})
-end
-
----@param map table
----@return table
-function MapFunctions.getSideData(map)
-	---@param sideInput string
-	---@return boolean
-	local isValidSide = function(sideInput)
-		return Logic.isNotEmpty(sideInput) and (sideInput == SIDE_DEF or sideInput == SIDE_ATK)
-	end
-
-	---@param prefix string
-	---@param t1Side string
-	---@param t2Side string
-	---@return {t1Side: string, t2Side: string, t1Half: integer, t2Half: integer}?
-	local getDataFor = function(prefix, t1Side, t2Side)
-		local half1 = tonumber(map[prefix .. 't1' .. t1Side])
-		local half2 = tonumber(map[prefix .. 't2' .. t2Side])
-		if not half1 or not half2 then return end
-		return {
-			t1Side = t1Side,
-			t2Side = t2Side,
-			t1Half = half1,
-			t2Half = half2,
-		}
-	end
-
-	---@param prefix string
-	---@return {t1Side: string, t2Side: string, t1Half: integer, t2Half: integer}[]?
-	local getSideData = function(prefix)
-		local t1Side = map[prefix .. 't1firstside']
-		if not isValidSide(t1Side) then return end
-		local t2Side = t1Side == SIDE_DEF and SIDE_ATK or SIDE_DEF
-
-		return Array.append({},
-			getDataFor(prefix, t1Side, t2Side),
-			getDataFor(prefix, t2Side, t1Side)
-		)
-	end
-
-	local sideData = getSideData('') or {}
-
-	Array.extendWith(sideData, Array.mapIndexes(function(overtimeIndex)
-		return getSideData('o' .. overtimeIndex)
-	end))
-
-	return {
-		t1sides = Array.map(sideData, Operator.t1Side),
-		t2sides = Array.map(sideData, Operator.t2Side),
-		t1halfs = Array.map(sideData, Operator.t1Half),
-		t2halfs = Array.map(sideData, Operator.t2Half),
-	}
-end
-
----@param map table
----@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(map)
-	local sideData = MapFunctions.getSideData(map)
-	return function(opponentIndex)
-		local partialScores = sideData['t' .. opponentIndex .. 'halfs']
-		if Logic.isEmpty(partialScores) then
-			return
-		end
-
-		return MathUtil.sum(partialScores)
-	end
+	return {comment = map.comment}
 end
 
 return CustomMatchGroupInput

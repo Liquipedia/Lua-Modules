@@ -17,7 +17,7 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
+local ALLOWED_VETOES = Array.append(MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES,  'protect')
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 
@@ -94,7 +94,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = MapFunctions.getExtraData(map, opponentCount)
+		map.extradata = MapFunctions.getExtraData(map)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
@@ -176,9 +176,8 @@ end
 --
 
 ---@param map table
----@param opponentCount integer
 ---@return table
-function MapFunctions.getExtraData(map, opponentCount)
+function MapFunctions.getExtraData(map)
 	return {
 		comment = map.comment,
 		header = map.header,

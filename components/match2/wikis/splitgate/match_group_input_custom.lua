@@ -161,27 +161,8 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match)
 	return {
-		mapveto = MatchFunctions.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match),
-		isconverted = 0
 	}
-end
-
--- Parse the mapVeto input
----@param match table
----@return table[]
-function MatchFunctions.getMapVeto(match)
-	if not match.vetoes then return {} end
-
-	local vetoes = Array.parseCommaSeparatedString(match.vetoes)
-	match.vetoes = nil
-	local vetoesBy = Array.parseCommaSeparatedString(match.vetoesBy)
-	match.vetoesBy = nil
-
-	return Array.map(vetoes, function(veto, vetoIndex)
-		if Logic.isEmpty(veto) then return end
-		return {map = veto, by = vetoesBy[vetoIndex]}
-	end)
 end
 
 --

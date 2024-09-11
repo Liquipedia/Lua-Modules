@@ -97,7 +97,6 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		mvpteam = match.mvpteam or match.winner,
 	}
 end
 
