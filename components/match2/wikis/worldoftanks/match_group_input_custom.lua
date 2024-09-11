@@ -17,7 +17,7 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local ALLOWED_VETOES = Array.append(MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES,  'protect')
+local ALLOWED_VETOES = Array.append(MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES, 'protect')
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 
