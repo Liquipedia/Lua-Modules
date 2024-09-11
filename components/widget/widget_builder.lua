@@ -10,7 +10,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class BuilderWidget: Widget
 ---@operator call({builder: function}): BuilderWidget
