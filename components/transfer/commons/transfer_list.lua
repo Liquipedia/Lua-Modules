@@ -91,9 +91,9 @@ function TransferList:parseArgs(args)
 	local roles = Array.parseCommaSeparatedString(args.role)
 
 	local sortOrder = args.order or DEFAULT_VALUES.order
-	local objectNameSortOrder = 'desc'
+	local objectNameSortOrder = 'asc'
 	if sortOrder:lower() == 'asc' then
-		objectNameSortOrder = 'asc'
+		objectNameSortOrder = 'desc'
 	end
 
 	return {
