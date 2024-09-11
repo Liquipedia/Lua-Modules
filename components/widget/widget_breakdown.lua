@@ -19,16 +19,17 @@ local Widget = Lua.import('Module:Widget')
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
-		self.contents = input.content
+		self.children = input.children or input.content
 		self.classes = input.classes
 		self.contentClasses = input.contentClasses or {}
 	end
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Breakdown:make(injector)
-	return Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)
+function Breakdown:make(injector, children)
+	return Breakdown:_breakdown(children, self.classes, self.contentClasses)
 end
 
 ---@param contents (string|number)[]

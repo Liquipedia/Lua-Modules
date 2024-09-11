@@ -20,7 +20,6 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetTableCell:Widget
 ---@operator call(WidgetCellInput): WidgetTableCell
----@field content (string|number|table|Html)[]
 ---@field classes string[]
 ---@field css {[string]: string|number}
 ---@field rowSpan integer?
@@ -28,7 +27,7 @@ local Widget = Lua.import('Module:Widget')
 local TableCell = Class.new(
 	Widget,
 	function(self, input)
-		self.content = input.content or {}
+		self.children = input.children or input.content or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 	end
@@ -37,7 +36,7 @@ local TableCell = Class.new(
 ---@param text string|number|table|nil
 ---@return self
 function TableCell:addContent(text)
-	table.insert(self.content, text)
+	table.insert(self.children, text)
 	return self
 end
 
@@ -57,8 +56,9 @@ function TableCell:addCss(key, value)
 end
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function TableCell:make(injector)
+function TableCell:make(injector, children)
 	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
 		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,
@@ -71,14 +71,15 @@ function TableCell:make(injector)
 
 	cell:css(self.css)
 
-	cell:node(self:_concatContent())
+	cell:node(self:_concatContent(children))
 
 	return tostring(cell)
 end
 
+---@param children string[]
 ---@return string
-function TableCell:_concatContent()
-	return table.concat(Array.map(self.content, function (content)
+function TableCell:_concatContent(children)
+	return table.concat(Array.map(children, function (content)
 		if type(content) ~= 'table' then
 			return content
 		end

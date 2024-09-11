@@ -28,8 +28,9 @@ local Links = Class.new(
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Links:make(injector)
+function Links:make(injector, children)
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
 					:addClass('infobox-icons')

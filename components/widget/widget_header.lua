@@ -36,8 +36,9 @@ local Header = Class.new(
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string
-function Header:make(injector)
+function Header:make(injector, children)
 	local header = {
 		Header:_name(self.name),
 		Header:_image(

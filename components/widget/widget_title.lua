@@ -17,14 +17,15 @@ local Widget = Lua.import('Module:Widget')
 local Title = Class.new(
 	Widget,
 	function(self, input)
-		self.content = self:assertExistsAndCopy(input.name)
+		self.children = {self:assertExistsAndCopy(input.children or input.name)}
 	end
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Title:make(injector)
-	return Title:_create(self.content)
+function Title:make(injector, children)
+	return Title:_create(children[1])
 end
 
 ---@param infoDescription string|number|nil
