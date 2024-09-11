@@ -122,9 +122,9 @@ function Details:create()
 	matchBottomBar:node(self:countdown())
 
 	if self.matchDetailLink then
-		matchBottomBar:node(mw.html.create('div')
+		matchBottomBar:node(mw.html.create('a')
 			:addClass('btn btn-secondary btn-new btn--match-details')
-			:attr('tabindex', '0')
+			:attr('href', self.matchDetailLink)
 			:node(mw.html.create('i')
 				:addClass('fas fa-external-link')
 			)
