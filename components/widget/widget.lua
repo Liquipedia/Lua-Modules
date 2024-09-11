@@ -69,6 +69,7 @@ function Widget:tryChildren(injector)
 				end
 			)
 		end
+		---@cast child -Widget
 		return {tostring(child)}
 	end)
 end

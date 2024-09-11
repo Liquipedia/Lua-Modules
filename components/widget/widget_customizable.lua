@@ -24,19 +24,16 @@ local Customizable = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Widget[]?
-function Customizable:make(injector)
-	if injector == nil then
-		return self.children
-	end
-	return injector:parse(self.id, self.children)
+---@param children string[]
+---@return string[]?
+function Customizable:make(injector, children)
+	return children
 end
 
 ---@param injector WidgetInjector?
 ---@return Widget[]?
 function Customizable:makeChildren(injector)
 	local children = self.children
-	self.children = {} -- Temporary until make() is no longer building children
 	if injector == nil then
 		return children
 	end
