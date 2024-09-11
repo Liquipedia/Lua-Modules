@@ -54,7 +54,7 @@ end
 ---@return WidgetTableCell
 function PrizePool:placeOrAwardCell(placement)
 	local placeCell = TableCell{
-		content = {{placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()}},
+		content = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
 		css = {['font-weight'] = 'bolder'},
 		classes = {'prizepooltable-place'},
 	}

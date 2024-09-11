@@ -149,7 +149,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{content = {{currencyText}}}
+			return TableCell{content = {currencyText}}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -188,7 +188,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{Currency.display(data.currency)}}}
+			return TableCell{content = {Currency.display(data.currency)}}
 		end,
 
 		row = 'localprize',
@@ -226,7 +226,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{content = {data.title}}
 		end,
 
 		row = 'percentage',
@@ -240,7 +240,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data .. '%'}}}
+				return TableCell{content = {data .. '%'}}
 			end
 		end,
 	},
@@ -294,7 +294,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(content, '[[' .. headerData.link .. ']]')
 			end
 
-			return TableCell{content = {content}}
+			return TableCell{content = {table.concat(content)}}
 		end,
 
 		mergeDisplayColumns = true,
@@ -339,7 +339,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{content = {headerDisplay}}
+			return TableCell{content = {table.concat(headerDisplay)}}
 		end,
 
 		row = 'points',
@@ -348,7 +348,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{LANG:formatNum(data)}}}
+				return TableCell{content = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -360,7 +360,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{content = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -369,7 +369,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data}}}
+				return TableCell{content = {data}}
 			end
 		end,
 	}
