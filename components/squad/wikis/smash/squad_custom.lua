@@ -54,7 +54,7 @@ function ExtendedSquadRow:mains()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local squad = Squad(args, CustomInjector()):title():header()

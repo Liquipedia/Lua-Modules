@@ -101,7 +101,7 @@ function Squad:row(row)
 	return self
 end
 
----@return Html
+---@return string
 function Squad:create()
 	local dataTable = Widget.TableNew{
 		css = {['margin-bottom'] = '10px'},

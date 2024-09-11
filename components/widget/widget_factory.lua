@@ -14,25 +14,21 @@ local WidgetFactory = Class.new()
 
 ---@param widget Widget
 ---@param injector WidgetInjector?
----@return Html
+---@return string
 function WidgetFactory.work(widget, injector)
 	local children = widget:tryMake(injector)
 
 	if not children then
-		return mw.html.create()
+		return ''
 	end
 
-	if Array.isArray(children) then
-		---@cast children Widget[]
-		local wrapper = mw.html.create()
-		Array.forEach(children, function(child)
-			wrapper:node(WidgetFactory.work(child, injector))
-		end)
-		return wrapper
+	if type(children) == 'string' then
+		return children
 	end
 
-	---@cast children Html
-	return children
+	return table.concat(Array.map(children, function(child)
+		return WidgetFactory.work(child, injector)
+	end))
 end
 
 return WidgetFactory

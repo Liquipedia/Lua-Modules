@@ -48,7 +48,7 @@ function ExtendedSquadRow:number()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local squad = Squad(args, CustomInjector()):title()
@@ -69,7 +69,7 @@ end
 ---@param playerList table[]
 ---@param squadType integer
 ---@param customTitle string?
----@return Html?
+---@return string?
 function CustomSquad.runAuto(playerList, squadType, customTitle)
 	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
