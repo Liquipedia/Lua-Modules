@@ -107,7 +107,6 @@ local Details = Class.new(
 		self.hideTournament = args.hideTournament
 		self.onlyHighlightOnValue = args.onlyHighlightOnValue
 		self.match = args.match
-		self.matchDetailLink = args.matchDetailLink
 	end
 )
 
@@ -121,15 +120,22 @@ function Details:create()
 	local matchBottomBar = mw.html.create('div'):addClass('match-bottom-bar')
 	matchBottomBar:node(self:countdown())
 
-	if self.matchDetailLink then
-		matchBottomBar:node(mw.html.create('a')
+	if self.match.match2bracketdata.matchpage then
+		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
 			:addClass('btn btn-secondary btn-new btn--match-details')
-			:attr('href', self.matchDetailLink)
+			:attr('title', 'View Match Page')
 			:node(mw.html.create('i')
 				:addClass('fas fa-external-link')
 			)
 			:wikitext('  Details')
-		)
+		), self.match.match2bracketdata.matchpage))
+	else
+		local link = 'Match:ID ' .. self.match.matchid
+		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
+			:addClass('btn btn-new btn--add-match-details')
+				:attr('title', 'Add Match Page')
+			:wikitext('+ Add details')
+		), link))
 	end
 
 	return self.root
