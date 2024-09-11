@@ -70,9 +70,7 @@ function TableRow:make(injector)
 	row:css(self.css)
 
 	for _, cell in ipairs(self.cells) do
-		for _, node in ipairs(WidgetFactory.work(cell, injector)) do
-			row:node(node)
-		end
+		row:node(WidgetFactory.work(cell, injector))
 	end
 
 	return row

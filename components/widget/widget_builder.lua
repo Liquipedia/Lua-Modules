@@ -24,14 +24,14 @@ local Builder = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Widget[]
+---@return Html
 function Builder:make(injector)
 	local children = self.builder()
-	local widgets = {}
+	local builtChildren = mw.html.create()
 	for _, child in ipairs(children or {}) do
-		Array.extendWith(widgets, WidgetFactory.work(child, injector))
+		builtChildren:node(WidgetFactory.work(child, injector))
 	end
-	return widgets
+	return builtChildren
 end
 
 return Builder

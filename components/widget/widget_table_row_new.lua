@@ -43,7 +43,7 @@ function TableRow:make(injector)
 	row:css(self.css)
 
 	Array.forEach(self.children, function(child)
-		Array.forEach(WidgetFactory.work(child, injector), FnUtil.curry(row.node, row))
+		row:node(WidgetFactory.work(child, injector))
 	end)
 
 	return row

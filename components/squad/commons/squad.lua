@@ -110,7 +110,7 @@ function Squad:create()
 		children = self.rows,
 	}
 	local wrapper = mw.html.create()
-	Array.forEach(WidgetFactory.work(dataTable, self.injector), FnUtil.curry(wrapper.node, wrapper))
+	wrapper:node(WidgetFactory.work(dataTable, self.injector))
 	return wrapper
 end
 

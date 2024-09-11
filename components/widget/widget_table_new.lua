@@ -44,7 +44,7 @@ function Table:make(injector)
 	output:css(self.css)
 
 	Array.forEach(self.children, function(child)
-		Array.forEach(WidgetFactory.work(child, injector), FnUtil.curry(output.node, output))
+		output:node(WidgetFactory.work(child, injector))
 	end)
 
 	wrapper:node(output)

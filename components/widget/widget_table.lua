@@ -64,9 +64,7 @@ function Table:make(injector)
 	displayTable:css(self.css)
 
 	for _, row in ipairs(self.rows) do
-		for _, node in ipairs(WidgetFactory.work(row, injector)) do
-			displayTable:node(node)
-		end
+		displayTable:node(WidgetFactory.work(row, injector))
 	end
 
 	return displayTable
