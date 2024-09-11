@@ -71,27 +71,9 @@ function TableCell:make(injector, children)
 
 	cell:css(self.css)
 
-	cell:node(self:_concatContent(children))
+	Array.forEach(children, FnUtil.curry(cell.node, cell))
 
 	return tostring(cell)
-end
-
----@param children string[]
----@return string
-function TableCell:_concatContent(children)
-	return table.concat(Array.map(children, function (content)
-		if type(content) ~= 'table' then
-			return content
-		end
-
-		if not Array.isArray(content) then
-			return tostring(content)
-		end
-
-		local wrapper = mw.html.create('div')
-		Array.forEach(content, FnUtil.curry(wrapper.node, wrapper))
-		return tostring(wrapper)
-	end))
 end
 
 return TableCell
