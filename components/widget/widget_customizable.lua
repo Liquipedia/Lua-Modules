@@ -32,4 +32,15 @@ function Customizable:make(injector)
 	return injector:parse(self.id, self.children)
 end
 
+---@param injector WidgetInjector?
+---@return Widget[]?
+function Customizable:makeChildren(injector)
+	local children = self.children
+	self.children = {} -- Temporary until make() is no longer building children
+	if injector == nil then
+		return children
+	end
+	return injector:parse(self.id, children)
+end
+
 return Customizable

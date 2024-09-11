@@ -33,4 +33,12 @@ function Builder:make(injector)
 	return tostring(builtChildren)
 end
 
+---@param injector WidgetInjector?
+---@return Widget[]?
+function Builder:makeChildren(injector)
+	local children = self.builder()
+	self.builder = function() return {} end -- Temporary until make() is no longer building children
+	return children
+end
+
 return Builder
