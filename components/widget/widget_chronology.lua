@@ -23,9 +23,9 @@ local Chronology = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function Chronology:make(injector)
-	return Chronology:_chronology(self.links)
+	return tostring(Chronology:_chronology(self.links))
 end
 
 ---@param links table<string, string|number|nil>

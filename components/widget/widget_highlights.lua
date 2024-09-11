@@ -23,9 +23,9 @@ local Highlights = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function Highlights:make(injector)
-	return Highlights:_highlights(self.list)
+	return tostring(Highlights:_highlights(self.list))
 end
 
 ---@param list (string|number)[]?

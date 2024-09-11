@@ -34,7 +34,7 @@ local Table = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function Table:make(injector)
 	local wrapper = mw.html.create('div'):addClass('table-responsive')
 	local output = mw.html.create('table'):addClass('wikitable')
@@ -48,7 +48,7 @@ function Table:make(injector)
 	end)
 
 	wrapper:node(output)
-	return wrapper
+	return tostring(wrapper)
 end
 
 return Table

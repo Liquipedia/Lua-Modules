@@ -50,7 +50,7 @@ function Table:addClass(class)
 end
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function Table:make(injector)
 	local displayTable = mw.html.create('div'):addClass('csstable-widget')
 	displayTable:css{
@@ -67,7 +67,7 @@ function Table:make(injector)
 		displayTable:node(WidgetFactory.work(row, injector))
 	end
 
-	return displayTable
+	return tostring(displayTable)
 end
 
 ---@return integer?

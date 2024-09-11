@@ -23,14 +23,14 @@ local Builder = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html
+---@return string
 function Builder:make(injector)
 	local children = self.builder()
 	local builtChildren = mw.html.create()
 	for _, child in ipairs(children or {}) do
 		builtChildren:node(WidgetFactory.work(child, injector))
 	end
-	return builtChildren
+	return tostring(builtChildren)
 end
 
 return Builder

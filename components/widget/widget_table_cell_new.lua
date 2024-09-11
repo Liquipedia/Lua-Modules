@@ -43,7 +43,7 @@ local TableCell = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function TableCell:make(injector)
 	local cell = mw.html.create(self.isHeader and 'th' or 'td')
 	cell:attr('colspan', self.colSpan)
@@ -55,7 +55,7 @@ function TableCell:make(injector)
 
 	cell:node(self:_content())
 
-	return cell
+	return tostring(cell)
 end
 
 ---@return string

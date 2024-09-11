@@ -36,7 +36,7 @@ local Header = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html[]
+---@return string
 function Header:make(injector)
 	local header = {
 		Header:_name(self.name),
@@ -63,7 +63,7 @@ function Header:make(injector)
 	for _, element in ipairs(header) do
 		wrapper:node(element)
 	end
-	return wrapper
+	return tostring(wrapper)
 end
 
 ---@param name string?

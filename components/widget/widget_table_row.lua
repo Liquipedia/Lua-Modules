@@ -59,7 +59,7 @@ function TableRow:getCellCount()
 end
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function TableRow:make(injector)
 	local row = mw.html.create('div'):addClass('csstable-widget-row')
 
@@ -73,7 +73,7 @@ function TableRow:make(injector)
 		row:node(WidgetFactory.work(cell, injector))
 	end
 
-	return row
+	return tostring(row)
 end
 
 return TableRow

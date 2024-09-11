@@ -26,9 +26,9 @@ local Breakdown = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function Breakdown:make(injector)
-	return Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)
+	return tostring(Breakdown:_breakdown(self.contents, self.classes, self.contentClasses))
 end
 
 ---@param contents (string|number)[]

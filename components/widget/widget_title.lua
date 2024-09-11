@@ -22,9 +22,9 @@ local Title = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return Html?
+---@return string?
 function Title:make(injector)
-	return Title:_create(self.content)
+	return tostring(Title:_create(self.content))
 end
 
 ---@param infoDescription string|number|nil
