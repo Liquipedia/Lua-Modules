@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
 local Operator = require('Module:Operator')
 local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
@@ -20,8 +19,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
-local SIDE_DEF = 'ct'
-local SIDE_ATK = 't'
 
 -- containers for process helper functions
 local MatchFunctions = {}
