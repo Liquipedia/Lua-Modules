@@ -1008,7 +1008,7 @@ mw.ext.TeamTemplate = {}
 
 ---@param teamteplate string
 ---@param date string|number?
----@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracket: string, page: string, icon: string, image: string, legacyimage: string, legacyimagedark: string}
+---@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracketname: string, page: string, icon: string, image: string, legacyimage: string, legacyimagedark: string}|nil
 function mw.ext.TeamTemplate.raw(teamteplate, date) end
 
 ---@param teamteplate string
