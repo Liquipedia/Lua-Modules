@@ -25,11 +25,11 @@ local Chronology = Class.new(
 ---@param injector WidgetInjector?
 ---@return string?
 function Chronology:make(injector)
-	return tostring(Chronology:_chronology(self.links))
+	return Chronology:_chronology(self.links)
 end
 
 ---@param links table<string, string|number|nil>
----@return Html?
+---@return string?
 function Chronology:_chronology(links)
 	if links == nil or Table.size(links) == 0 then
 		return
@@ -49,7 +49,7 @@ function Chronology:_chronology(links)
 		next = links['next' .. index]
 	end
 
-	return chronologyContent
+	return tostring(chronologyContent)
 end
 
 ---@param previous string|number|nil

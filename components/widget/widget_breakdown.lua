@@ -28,13 +28,13 @@ local Breakdown = Class.new(
 ---@param injector WidgetInjector?
 ---@return string?
 function Breakdown:make(injector)
-	return tostring(Breakdown:_breakdown(self.contents, self.classes, self.contentClasses))
+	return Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)
 end
 
 ---@param contents (string|number)[]
 ---@param classes string[]
 ---@param contentClasses table<integer, string[]> --can have gaps in the outer table
----@return Html?
+---@return string?
 function Breakdown:_breakdown(contents, classes, contentClasses)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
@@ -54,7 +54,7 @@ function Breakdown:_breakdown(contents, classes, contentClasses)
 		div:node(infoboxCustomCell)
 	end
 
-	return div
+	return tostring(div)
 end
 
 return Breakdown
