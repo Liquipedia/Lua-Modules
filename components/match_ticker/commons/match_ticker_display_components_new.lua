@@ -129,11 +129,11 @@ function Details:create()
 			)
 			:wikitext('  Details')
 		), self.match.match2bracketdata.matchpage))
-	else
-		local link = 'Match:ID ' .. self.match.matchid
+	elseif self.match.match2id then
+		local link = 'Match:ID ' .. self.match.match2id
 		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
-			:addClass('btn btn-new btn--add-match-details')
-				:attr('title', 'Add Match Page')
+			:addClass('btn btn-new btn--add-match-details show-when-logged-in')
+			:attr('title', 'Add Match Page')
 			:wikitext('+ Add details')
 		), link))
 	end
