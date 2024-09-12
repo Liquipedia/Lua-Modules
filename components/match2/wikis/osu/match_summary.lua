@@ -251,7 +251,12 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
+	---@type integer|string|nil
+	local scoreDisplay = game.scores[opponentIndex]
+	if Logic.isNumeric(scoreDisplay) then
+		scoreDisplay = mw.getContentLanguage():formatNum(scoreDisplay --[[@as integer]])
+	end
+	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame

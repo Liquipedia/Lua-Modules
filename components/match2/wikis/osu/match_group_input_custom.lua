@@ -98,11 +98,16 @@ function MatchFunctions.extractMaps(match, opponentCount)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+			local percentageScore = (map['score' .. opponentIndex] or ''):match('(%d+)%%')
+			if percentageScore then
+				return {score = map['score' .. opponentIndex], status = MatchGroupInputUtil.STATUS.SCORE}
+			end
+			local scoreInput = string.gsub(map['score' .. opponentIndex] or '', ',', '')
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
+				score = scoreInput,
 			})
 			return {score = score, status = status}
 		end)
