@@ -251,8 +251,8 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 		record.icondark = opponent.icondark or record.icondark
 	end
 
-	if not record.match2players and Logic.isNotEmpty(opponent.players) then
-		record.match2players = Array.map(opponent.players, function(player)
+	if not record.match2players then
+		record.match2players = Array.map(opponent.players or {}, function(player)
 			return {
 				displayname = player.displayName,
 				flag = player.flag,
@@ -1087,6 +1087,78 @@ function MatchGroupInputUtil.getCharacterName(alias, character)
 	if Logic.isEmpty(character) then return nil end
 	---@cast character -nil
 	return (assert(alias[character:lower()], 'Invalid character:' .. character))
+end
+
+---@param players {name: string?, displayname: string?}[]
+---@param playerInput string?
+---@param playerLink string?
+---@return integer?
+function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
+	if Logic.isEmpty(playerInput) and Logic.isEmpty(playerLink) then
+		return
+	end
+
+	local playerLinks = Array.map(players, Operator.property('name'))
+	local playerIndex = Array.indexOf(playerLinks, FnUtil.curry(Operator.eq, playerLink))
+	if playerIndex > 0 then
+		return playerIndex
+	end
+
+	local playerDisplayNames = Array.map(players, Operator.property('displayname'))
+	playerIndex = Array.indexOf(playerDisplayNames, FnUtil.curry(Operator.eq, playerInput))
+	if playerIndex > 0 then
+		return playerIndex
+	end
+	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
+end
+
+---@param name string
+---@param options {pagifyPlayerNames: boolean?}?
+---@return string
+function MatchGroupInputUtil.makeLinkFromName(name, options)
+	local link = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
+
+	if (options or {}).pagifyPlayerNames then
+		link = Page.pageifyLink(link) --[[@as string]]
+	end
+
+	return link
+end
+
+---@param playerIds table[]
+---@param inputPlayers table[]
+---@param indexToPlayer fun(playerIndex: integer): {name: string?, link: string?}?
+---@param transform fun(playerIndex: integer, playerIdData?: table, playerInputData?: table): table?
+---@param options {pagifyPlayerNames: boolean?}?
+---@return table, table
+function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToPlayer, transform, options)
+	local participants = {}
+	local unattachedParticipants = {}
+	local function parsePlayer(_, playerIndex)
+		local playerInputData = indexToPlayer(playerIndex) or {}
+		if playerInputData.name and not playerInputData.link then
+			playerInputData.link = MatchGroupInputUtil.makeLinkFromName(playerInputData.name, options)
+		end
+		local playerId = MatchGroupInputUtil.findPlayerId(playerIds, playerInputData.name, playerInputData.link)
+		local toStoreData = transform(playerIndex, playerIds[playerId] or {}, playerInputData)
+		if playerId then
+			participants[playerId] = toStoreData
+		else
+			table.insert(unattachedParticipants, toStoreData)
+		end
+	end
+	Array.forEach(inputPlayers, parsePlayer)
+
+	return participants, unattachedParticipants
+end
+
+---@generic T:table
+---@param opponentIndex integer
+---@return fun(playerIndex: integer, data: T): string, T
+function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
+	return function(playerIndex, data)
+		return opponentIndex .. '_' .. playerIndex, data
+	end
 end
 
 --- Warning, both match and standalone match may be mutated
