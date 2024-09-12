@@ -138,20 +138,11 @@ function MatchFunctions.removeUnsetMaps(games)
 	return Array.filter(games, MapFunctions.keepMap)
 end
 
--- Calculate the match scores based on the map results.
--- If it's a Best of 1, we'll take the exact score of that map
--- If it's not a Best of 1, we should count the map wins
 ---@param maps table[]
 ---@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps, bestOf)
 	return function(opponentIndex)
-		if bestOf == 1 then
-			if not maps[1] or not maps[1].scores then
-				return
-			end
-			return maps[1].scores[opponentIndex]
-		end
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
 end
