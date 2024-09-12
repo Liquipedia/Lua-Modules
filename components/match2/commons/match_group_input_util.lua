@@ -251,8 +251,8 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 		record.icondark = opponent.icondark or record.icondark
 	end
 
-	if not record.match2players and Logic.isNotEmpty(opponent.players) then
-		record.match2players = Array.map(opponent.players, function(player)
+	if not record.match2players then
+		record.match2players = Array.map(opponent.players or {}, function(player)
 			return {
 				displayname = player.displayName,
 				flag = player.flag,
