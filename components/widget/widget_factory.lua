@@ -26,7 +26,7 @@ function WidgetFactory.work(widget, injector)
 	end
 
 	for _, child in ipairs(widget:tryMake(injector) or {}) do
-		if Class.instanceOf(widget, Widget) then
+		if Class.instanceOf(child, Widget) then
 			---@cast child Widget
 			Array.extendWith(convertedWidgets, WidgetFactory.work(child, injector))
 		else
