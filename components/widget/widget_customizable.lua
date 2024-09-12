@@ -33,11 +33,10 @@ end
 ---@param injector WidgetInjector?
 ---@return Widget[]?
 function Customizable:makeChildren(injector)
-	local children = self.children
 	if injector == nil then
-		return children
+		return self.children
 	end
-	return injector:parse(self.id, children)
+	return injector:parse(self.id, self.children)
 end
 
 return Customizable
