@@ -226,11 +226,12 @@ end
 function CustomMatchGroupInput.processPlayerMapData(map, opponents)
 	local participants = {}
 	for opponentIndex, opponent in ipairs(opponents) do
-		-- TODO: Merge ret into participants
 		if Opponent.typeIsParty(opponent.type) then
-			Table.mergeInto(participants, CustomMatchGroupInput._processPartyMapData(opponent.match2players, map, opponentIndex))
+			local participantsOfOpponent = CustomMatchGroupInput._processPartyMapData(opponent.match2players, map, opponentIndex)
+			Table.mergeInto(participants, Table.map(participantsOfOpponent, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 		elseif opponent.type == Opponent.team then
-			Table.mergeInto(participants, CustomMatchGroupInput._processTeamMapData(opponent.match2players, map, opponentIndex))
+			local participantsOfOpponent = CustomMatchGroupInput._processTeamMapData(opponent.match2players, map, opponentIndex)
+			Table.mergeInto(participants, Table.map(participantsOfOpponent, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 		end
 	end
 	return participants
@@ -239,19 +240,19 @@ end
 ---@param players table[]
 ---@param map table
 ---@param opponentIndex integer
----@return table<string, table>
+---@return {civ: string?, player: string?}[]
 function CustomMatchGroupInput._processPartyMapData(players, map, opponentIndex)
 	local participants = {}
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
-	for playerIndex, player in pairs(players) do
+	for playerIndex, player in ipairs(players) do
 		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
 		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
 
-		participants[opponentIndex .. '_' .. playerIndex] = {
+		table.insert(participants, {
 			civ = civ,
 			player = player.name,
-		}
+		})
 	end
 
 	return participants
@@ -260,30 +261,33 @@ end
 ---@param opponentPlayers table[]
 ---@param map table
 ---@param opponentIndex integer
----@return table<string, table>
+---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
 function CustomMatchGroupInput._processTeamMapData(opponentPlayers, map, opponentIndex)
-	local participants = {}
 	local players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
-	local function findPlayer(name)
-		return Table.filter(opponentPlayers or {}, function(player)
-			return player.displayName == name or player.pageName == name
-		end)[1] or {pageName = name, displayName = name}
-	end
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponentPlayers,
+		players,
+		function(playerIndex)
+			local player = players[playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData, playerInputData)
+			local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
+			civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
+			return {
+				civ = civ,
+				displayName = playerIdData.displayName or playerInputData.name,
+				pageName = playerIdData.pageName or playerInputData.name,
+				flag = playerIdData.flag,
+			}
+		end
+	)
+	Array.forEach(unattachedParticipants, function(participant)
+		table.insert(participants, participant)
+	end)
 
-	for playerIndex, player in pairs(players) do
-		local civ = Logic.emptyOr(civs[playerIndex], Faction.defaultFaction)
-		civ = Faction.read(civ, {game = Game.abbreviation{game = map.game}:lower()})
-		local playerData = findPlayer(player)
-
-		participants[opponentIndex .. '_' .. playerIndex] = {
-			civ = civ,
-			displayName = playerData.displayName,
-			pageName = playerData.pageName,
-			flag = playerData.flag,
-		}
-	end
 	return participants
 end
 
