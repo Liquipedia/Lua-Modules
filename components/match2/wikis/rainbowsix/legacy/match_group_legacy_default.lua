@@ -50,16 +50,22 @@ end
 ---@param isReset boolean
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
-	if not match.map1 then
-		match.map1 = {
-			map = 'Unknown',
-			finished = true,
-			score1 = (match.opponent1 or {}).score,
-			score2 = (match.opponent2 or {}).score,
-		}
+	local opp1score, opp2score = (match.opponent1 or {}).score, (match.opponent2 or {}).score
+	-- Legacy maps are Bo10 or Bo12, while >Bo5 in legacy matches are non existent
+	-- Let's assume that if the sum of the scores is less than 6, it's a a match, otherwise it's a map
+	if (opp1score or 0) + (opp2score or 0) < 6 then
+		return
 	end
+
 	(match.opponent1 or {}).score = nil
 	(match.opponent2 or {}).score = nil
+	match.map1 = match.map1 or {
+		map = 'Unknown',
+		finished = true,
+		score1 = opp1score,
+		score2 = opp2score,
+	}
+
 end
 
 return MatchGroupLegacyDefault
