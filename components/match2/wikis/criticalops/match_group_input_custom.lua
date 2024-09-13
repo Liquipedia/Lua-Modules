@@ -231,10 +231,10 @@ function MapFunctions.getSideData(map)
 	end))
 
 	return {
-		t1sides = Array.map(sideData, Operator.t1Side),
-		t2sides = Array.map(sideData, Operator.t2Side),
-		t1halfs = Array.map(sideData, Operator.t1Half),
-		t2halfs = Array.map(sideData, Operator.t2Half),
+		t1sides = Array.map(sideData, Operator.property('t1Side')),
+		t2sides = Array.map(sideData, Operator.property('t2Side')),
+		t1halfs = Array.map(sideData, Operator.property('t1Half')),
+		t2halfs = Array.map(sideData, Operator.property('t2Half')),
 	}
 end
 
