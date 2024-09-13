@@ -30,18 +30,18 @@ local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInputUtil = {}
 
-local DEFAULT_ALLOWED_VETOES = {
-	'decider',
-	'pick',
-	'ban',
-	'defaultban',
-}
-
 local NOT_PLAYED_INPUTS = {
 	'skip',
 	'np',
 	'canceled',
 	'cancelled',
+}
+
+MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES = {
+	'decider',
+	'pick',
+	'ban',
+	'defaultban',
 }
 
 MatchGroupInputUtil.STATUS_INPUTS = {
@@ -686,7 +686,7 @@ end
 function MatchGroupInputUtil.getMapVeto(match, allowedVetoes)
 	if not match.mapveto then return nil end
 
-	allowedVetoes = allowedVetoes or DEFAULT_ALLOWED_VETOES
+	allowedVetoes = allowedVetoes or MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES
 
 	match.mapveto = Json.parseIfString(match.mapveto)
 
