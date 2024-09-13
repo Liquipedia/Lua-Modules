@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
 ---@class RainbowsixMatchGroupLegacyDefault: MatchGroupLegacy
+---@field _base MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@return table
@@ -45,6 +46,26 @@ end
 ---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
+end
+
+---@param match2key string
+---@param match1params match1Keys
+function MatchGroupLegacyDefault:getMatch(match2key, match1params)
+	local match = self._base.getMatch(self, match2key, match1params)
+	if not match then
+		return nil
+	end
+	if not match.map1 then
+		match.map1 = {
+			map = 'Unknown',
+			finished = true,
+			score1 = (match.opponent1 or {}).score,
+			score2 = (match.opponent2 or {}).score,
+		}
+	end
+	(match.opponent1 or {}).score = nil
+	(match.opponent2 or {}).score = nil
+	return match
 end
 
 return MatchGroupLegacyDefault
