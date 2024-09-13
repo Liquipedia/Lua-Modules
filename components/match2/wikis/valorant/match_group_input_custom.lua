@@ -80,7 +80,7 @@ end
 
 
 ---@param match table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
@@ -200,7 +200,7 @@ function MapFunctions.getExtraData(map, participants)
 end
 
 ---@param map table
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@return table
 function MapFunctions.getParticipants(map, opponents)
 	local allParticipants = {}
