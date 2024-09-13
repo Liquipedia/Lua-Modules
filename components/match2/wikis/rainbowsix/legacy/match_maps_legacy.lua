@@ -57,6 +57,7 @@ function MatchMaps._main(args)
 					storage_args['opponent' .. i] = {
 						['type'] = 'team',
 						template = args['team' .. i],
+						score = args['games' .. i],
 					}
 				end
 			end
@@ -92,13 +93,6 @@ function MatchMaps._main(args)
 						vod = Table.extract(details, 'vod'..i),
 						winner = Table.extract(details, prefix .. 'win'),
 					}
-				elseif i == 1 then
-					storage_args[prefix] = {
-						map = 'Unknown',
-						finished = true,
-						score1 = args.games1,
-						score2 = args.games2,
-					}
 				else
 					break
 				end
@@ -115,7 +109,23 @@ function MatchMaps._main(args)
 				storage_args[key] = value
 			end
 
-			-- Store the processed args for later usage
+			local opp1score, opp2score = storage_args.opponent1.score, storage_args.opponent2.score
+			-- Legacy maps are Bo10 or Bo12, while >Bo5 in legacy matches are non existent
+			-- Let's assume that if the sum of the scores is less than 6, it's a a match, otherwise it's a map
+			if (opp1score or 0) + (opp2score or 0) < 6 then
+				Template.stashReturnValue(storage_args, 'LegacyMatchlist')
+				return
+			end
+
+			storage_args.opponent1.score = nil
+			storage_args.opponent2.score = nil
+			storage_args.map1 = storage_args.map1 or {
+				map = 'Unknown',
+				finished = true,
+				score1 = opp1score,
+				score2 = opp2score,
+			}
+
 			Template.stashReturnValue(storage_args, 'LegacyMatchlist')
 		end
 	end

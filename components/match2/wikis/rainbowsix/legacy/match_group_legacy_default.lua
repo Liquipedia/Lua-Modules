@@ -65,7 +65,6 @@ function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
 		score1 = opp1score,
 		score2 = opp2score,
 	}
-
 end
 
 return MatchGroupLegacyDefault
