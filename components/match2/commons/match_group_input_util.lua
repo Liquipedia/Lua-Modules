@@ -30,6 +30,26 @@ local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInputUtil = {}
 
+---@class MGIParsedPlayer
+---@field displayName string?
+---@field name string?
+---@field flag string?
+---@field faction string?
+---@field index integer
+---@field extradata table
+
+---@class MGIParsedOpponent
+---@field type OpponentType
+---@field name string
+---@field template string?
+---@field icon string?
+---@field icondark string?
+---@field score integer?
+---@field status string?
+---@field placement integer?
+---@field match2players MGIParsedPlayer[]
+---@field extradata table
+
 local NOT_PLAYED_INPUTS = {
 	'skip',
 	'np',
@@ -178,12 +198,12 @@ end
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
----@return table?
+---@return MGIParsedOpponent?
 function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
-		return opponentIndex <= 2 and Opponent.blank() or nil
+		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
 	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
@@ -243,7 +263,7 @@ Using the team template extension, the opponent struct is standardised and not u
 ---@param record table
 ---@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
 ---@param substitutions MatchGroupInputSubstituteInformation[]?
----@return table
+---@return MGIParsedOpponent
 function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitutions)
 	if opponent.type == Opponent.team then
 		record.template = opponent.template or record.template
@@ -945,12 +965,12 @@ end
 -- Special cases:
 -- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
 -- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param winner integer?
 ---@param placementWinner integer
 ---@param placementLoser integer
 ---@param resultType string?
----@return table[]
+---@return MGIParsedOpponent[]
 function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, resultType)
 	if not opponents or #opponents ~= 2 or resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
 		return opponents
@@ -1125,10 +1145,11 @@ function MatchGroupInputUtil.makeLinkFromName(name, options)
 	return link
 end
 
----@param playerIds table[]
+---@alias PlayerInputData {name: string?, link: string?}
+---@param playerIds MGIParsedPlayer[]
 ---@param inputPlayers table[]
----@param indexToPlayer fun(playerIndex: integer): {name: string?, link: string?}?
----@param transform fun(playerIndex: integer, playerIdData?: table, playerInputData?: table): table?
+---@param indexToPlayer fun(playerIndex: integer): PlayerInputData?
+---@param transform fun(playerIndex: integer, playerIdData: MGIParsedPlayer?, playerInputData: PlayerInputData): table?
 ---@param options {pagifyPlayerNames: boolean?}?
 ---@return table, table
 function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToPlayer, transform, options)
