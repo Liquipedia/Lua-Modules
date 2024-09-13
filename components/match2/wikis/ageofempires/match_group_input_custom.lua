@@ -86,8 +86,11 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = CustomMatchGroupInput._mapExtradata(map)
-		map.map, map.extradata.mapDisplay = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
+		map.extradata = {}
+		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
+		map.extradata.mapmode = map.mode
+
+		MatchGroupInputUtil.getCommonTournamentVars(map, match)
 
 		map.participants = CustomMatchGroupInput.processPlayerMapData(map, opponents)
 
@@ -209,15 +212,6 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 		return m.name == map.map or m.link == map.map
 	end) or {}
 	return info.link, info.name
-end
-
----@param map table
----@return table
-function CustomMatchGroupInput._mapExtradata(map)
-	return {
-		comment = map.comment,
-		header = map.header,
-	}
 end
 
 ---@param map table
