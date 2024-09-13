@@ -66,7 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end
 
 	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
 	match.links = CustomMatchGroupInput._getLinks(match)
 
 	match.games = games
