@@ -62,6 +62,7 @@ return {
 			status = 1,
 			matchWidthMobile = 110,
 			matchWidth = 190,
+			gameScoresIfBo1 = true,
 		},
 	},
 	defaultRoundPrecision = 0,
