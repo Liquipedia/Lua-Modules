@@ -67,6 +67,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	-- todo:
 	-- determine scores and statuses
 	--- can we use parts of commons???
+	--- add tracking category for alias shit and resolve alias for now (scoreX <-> pointsX)
 
 	if match.finished then
 		match.resulttype = MatchGroupInputUtil.getResultType(match.winner, finishedInput, opponents)
