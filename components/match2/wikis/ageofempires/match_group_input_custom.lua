@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -21,6 +23,12 @@ local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
 local CustomMatchGroupInput = {}
+
+local OPPONENT_CONFIG = {
+	resolveRedirect = true,
+	pagifyTeamNames = true,
+	pagifyPlayerNames = false,
+}
 
 ---@param match table
 ---@param options table?
@@ -34,7 +42,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return CustomMatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
@@ -74,6 +82,65 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.extradata = CustomMatchGroupInput._getExtraData(match)
 
 	return match
+end
+
+---@param match table
+---@param opponentIndex integer
+---@param options readOpponentOptions
+---@return table?
+function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
+	options = options or {}
+	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
+	if not opponentInput then
+		return opponentIndex <= 2 and Opponent.blank() or nil
+	end
+
+	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
+	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
+	if Opponent.isBye(opponent) then
+		return {type = Opponent.literal, name = 'BYE'}
+	end
+
+	---@type number|string?
+	local resolveDate = match.timestamp
+	-- If date is default date, resolve using tournament dates instead
+	-- default date indicates that the match is missing a date
+	-- In order to get correct child team template, we will use an approximately date and not the default date
+	if resolveDate == DateExt.defaultTimestamp then
+		resolveDate = DateExt.getContextualDate()
+	end
+
+	Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
+
+	local substitutions
+	if opponent.type == Opponent.team then
+		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
+		substitutions = manualPlayersInput.substitutions
+		-- Change compared to commons MatchGroupInputUtil.readOpponent
+		local template = mw.ext.TeamTemplate.raw(opponent.template or '') or {}
+		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
+			template.page or '',
+			manualPlayersInput,
+			options,
+			{timestamp = match.timestamp, timezoneOffset = match.timezoneOffset}
+		)
+	end
+
+	if options.pagifyPlayerNames then
+		Array.forEach(opponent.players or {}, function(player)
+			player.pageName = Page.pageifyLink(player.pageName)
+		end)
+	end
+
+	local record = MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
+
+	-- no need to pagify non opponent names as for literals it is irrelevant
+	-- and for party opponents it comes down to pagifying player names
+	if options.pagifyTeamNames and opponent.type == Opponent.team then
+		record.name = Page.pageifyLink(record.name)
+	end
+
+	return record
 end
 
 ---@param match table
@@ -260,7 +327,8 @@ function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex
 				pageName = playerIdData.name or playerInputData.name,
 				flag = playerIdData.flag,
 			}
-		end
+		end,
+		OPPONENT_CONFIG
 	)
 	Array.forEach(unattachedParticipants, function(participant)
 		table.insert(participants, participant)
