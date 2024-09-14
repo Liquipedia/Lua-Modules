@@ -387,7 +387,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 	local date = args.date
 
 	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
-	
+
 	local sideWrapper = mw.html.create('div')
 		:css('display', 'flex')
 		:css('flex-direction', 'column')
@@ -401,7 +401,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 		local wrapperCards = mw.html.create('div')
 			:css('display', 'flex')
 			:css('flex-direction', 'column')
-		
+
 		local cardDisplays = {}
 		for _, card in ipairs(cardData) do
 			table.insert(cardDisplays, mw.html.create('div')
@@ -441,7 +441,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 						})
 			wrapper:node(towerCardDisplay)
 		end
-		
+
 		sideWrapper:node(wrapper)
 	end
 
