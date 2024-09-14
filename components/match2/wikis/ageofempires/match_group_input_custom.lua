@@ -31,7 +31,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
 	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
 
-	Table.mergeInto(match, CustomMatchGroupInput.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
