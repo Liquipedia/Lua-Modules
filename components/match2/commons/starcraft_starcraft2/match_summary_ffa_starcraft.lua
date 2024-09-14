@@ -8,13 +8,16 @@
 
 local Lua = require('Module:Lua')
 local Placement = require('Module:Placement')
-local StarcraftMatchExternalLinks = require('Module:MatchExternalLinks/Starcraft')
 local Table = require('Module:Table')
 
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local FfaMatchSummary = Lua.import('Module:MatchSummary/Ffa')
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local CustomFfaMatchSummary = {propTypes = {}}
 
@@ -69,14 +72,15 @@ function CustomFfaMatchSummary.GamePlacement(props)
 end
 
 function CustomFfaMatchSummary.Footer(props)
-	local links = StarcraftMatchExternalLinks.extractFromMatch(props.match)
-	if #links > 0 then
-		local linksNode = StarcraftMatchExternalLinks.MatchExternalLinks({links = links})
-			:addClass('brkts-popup-sc-footer-links vodlink')
-		return mw.html.create('div'):addClass('ffa-match-summary-footer')
-			:node(linksNode)
-	else
-		return nil
+	local match = props.match
+
+	local footer = MatchSummary.addVodsToFooter(match, MatchSummary.Footer())
+
+	footer:addLinks(StarcraftMatchSummary.LINKS_DATA, match.links)
+
+	local footerDisplay = footer:create()
+	if footerDisplay then
+		return footerDisplay:addClass('ffa-match-summary-footer')
 	end
 end
 
