@@ -34,7 +34,6 @@ local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 -- make these available for ffa
-StarcraftMatchGroupInput.OPPONENT_CONFIG = OPPONENT_CONFIG
 StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
 StarcraftMatchGroupInput.MapFunctions = MapFunctions
 
@@ -109,7 +108,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@return MGIParsedOpponent[]
+---@return table[]
 function MatchFunctions.readOpponents(match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
