@@ -236,9 +236,11 @@ end
 ---@param opponentType OpponentType
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
 function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex, opponentType)
-	local players = opponentPlayers
+	local players
 	if opponentType == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
+	else
+		players = Array.map(opponentPlayers, Operator.property('name'))
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
