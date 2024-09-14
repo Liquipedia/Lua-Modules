@@ -16,9 +16,6 @@ local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
 local StarcraftOpponentDisplay = Lua.import('Module:OpponentDisplay/Starcraft')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-
 local CustomFfaMatchSummary = {propTypes = {}}
 
 --[[
