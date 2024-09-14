@@ -1145,7 +1145,7 @@ function MatchGroupInputUtil.makeLinkFromName(name, options)
 	return link
 end
 
----@alias PlayerInputData {name: string?, link: string?}
+---@alias PlayerInputData {name: string?, link: string?, faction: string?}
 ---@param playerIds MGIParsedPlayer[]
 ---@param inputPlayers table[]
 ---@param indexToPlayer fun(playerIndex: integer): PlayerInputData?
