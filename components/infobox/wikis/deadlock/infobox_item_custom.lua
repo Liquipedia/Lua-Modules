@@ -96,6 +96,7 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Bullet Resist vs. NPCs', parameter = 'bulletresistnpc', funct = '_positivePercentDisplay'},
 			{name = 'Sprint Speed', parameter = 'sprintspeed'},
 			{name = 'Stamina', parameter = 'Stamina'},
+			{name = 'Stamina Recovery', parameter = 'staminarecov', funct = '_positivePercentDisplay'},
 			{name = 'Slide Distance', parameter = 'slidedistance', funct = '_positivePercentDisplay'},
 			{name = 'Spirit Power', parameter = 'spiritpower'},
 			{name = 'Spirit Resist', parameter = 'spiritresist'},
@@ -103,6 +104,10 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Spirit Lifesteal', parameter = 'spiritlifesteal', funct = '_positivePercentDisplay'},
 			{name = 'Cooldown Reduction', parameter = 'cdreduction', funct = '_positivePercentDisplay'},
 			{name = 'Movement Speed', parameter = 'movespeed'},
+			{name = 'Ability Range', parameter = 'abilityrange', funct = '_positivePercentDisplay'},
+			{name = 'Ability Duration', parameter = 'abilityduration', funct = '_positivePercentDisplay'},
+			{name = 'Melee Range', parameter = 'meleerange', funct = '_positivePercentDisplay'},
+			{name = 'Melee Damage', parameter = 'meleedmg', funct = '_positivePercentDisplay'}
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
 		if not Table.isEmpty(widgets) then
