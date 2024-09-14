@@ -16,7 +16,6 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local DeprecatedCustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/deprecated')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -34,37 +33,31 @@ local MODE_MIXED = 'mixed'
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
+-- make these available for ffa
+StarcraftMatchGroupInput.OPPONENT_CONFIG = OPPONENT_CONFIG
+StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
+StarcraftMatchGroupInput.MapFunctions = MapFunctions
 
 ---@param match table
 ---@param options table?
 ---@return table
 function StarcraftMatchGroupInput.processMatch(match, options)
 	if Logic.readBool(match.ffa) then
-		return DeprecatedCustomMatchGroupInput.processMatch(match, options)
+		-- have to import here to avoid import loops
+		local FfaStarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/deprecated')
+		return FfaStarcraftMatchGroupInput.processMatch(match, options)
 	end
 
 	Table.mergeInto(match, MatchFunctions.readDate(match.date))
 
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
+	local opponents = MatchFunctions.readOpponents(match)
 
 	-- TODO: check how we can get rid of this legacy stuff ...
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local opponentHasWon = Table.extract(opponent, 'win')
 		if not Logic.readBool(opponentHasWon) then return end
+		mw.ext.TeamLiquidIntegration.add_category('Pages with matches using `|win` in opponents')
 		match.winner = match.winner or opponentIndex
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
-		-- make sure match2players is not nil to avoid indexing nil
-		opponent.match2players = opponent.match2players or {}
-		Array.forEach(opponent.match2players, function(player)
-			player.extradata = player.extradata or {}
-			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
-		end)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
@@ -113,6 +106,27 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	return match
+end
+
+---@param match table
+---@return MGIParsedOpponent[]
+function MatchFunctions.readOpponents(match)
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
+	end)
+
+	Array.forEach(opponents, function(opponent)
+		opponent.extradata = opponent.extradata or {}
+		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+		-- make sure match2players is not nil to avoid indexing nil
+		opponent.match2players = opponent.match2players or {}
+		Array.forEach(opponent.match2players, function(player)
+			player.extradata = player.extradata or {}
+			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+		end)
+	end)
+
+	return opponents
 end
 
 ---@param dateInput string?
