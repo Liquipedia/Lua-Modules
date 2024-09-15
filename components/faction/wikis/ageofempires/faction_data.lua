@@ -624,7 +624,7 @@ local factionPropsAoM = {
 	freyr = {
 		index = 5,
 		name = 'Freyr',
-		pageName = 'Freyr' .. AOM_SUFFIX,
+		pageName = 'Freyr'
 		faction = 'freyr',
 	},
 	norse = {
@@ -945,7 +945,7 @@ return {
 			fux = 'fuxi',
 			gai = 'gaia',
 			gre = 'greeks',
-			hai = 'hades',
+			had = 'hades',
 			isi = 'isis',
 			kro = 'kronos',
 			lok = 'loki',
@@ -956,6 +956,8 @@ return {
 			ora = 'oranos',
 			pos = 'poseidon',
 			she = 'shennong',
+			tho = 'thor',
+			zeu = 'zeus',
 			que = 'quetzalcoatl',
 			hui = 'huitzilopochtli',
 			tez = 'tezcatlipoca',
