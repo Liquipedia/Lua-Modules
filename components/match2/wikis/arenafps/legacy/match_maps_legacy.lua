@@ -42,9 +42,9 @@ end
 
 ---@param matchArgs table
 function MatchMapsLegacy._readOpponents(matchArgs)
-	local type
+	local matchMapsType
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
-		type = type or (matchArgs['player' .. opponentIndex] and Opponent.solo or
+		matchMapsType = matchMapsType or (matchArgs['player' .. opponentIndex] and Opponent.solo or
 			matchArgs['team' .. opponentIndex] and Opponent.team) or nil
 			matchArgs['opponent' .. opponentIndex] = {
 			score = Table.extract(matchArgs, 'score' .. opponentIndex) or
@@ -55,8 +55,9 @@ function MatchMapsLegacy._readOpponents(matchArgs)
 			flag = Table.extract(matchArgs, 'player' .. opponentIndex .. 'flag'),
 		}
 	end)
-	matchArgs['opponent1'].type = type
-	matchArgs['opponent2'].type = type
+	matchMapsType = matchMapsType or Opponent.literal
+	matchArgs['opponent1'].type = matchMapsType
+	matchArgs['opponent2'].type = matchMapsType
 end
 
 ---@param matchArgs table
