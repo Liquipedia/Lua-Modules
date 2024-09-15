@@ -43,7 +43,7 @@ StarcraftMatchGroupInput.MapFunctions = MapFunctions
 function StarcraftMatchGroupInput.processMatch(match, options)
 	if Logic.readBool(match.ffa) then
 		-- have to import here to avoid import loops
-		local FfaStarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/deprecated')
+		local FfaStarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/Ffa')
 		return FfaStarcraftMatchGroupInput.processMatch(match, options)
 	end
 
