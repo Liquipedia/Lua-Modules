@@ -93,6 +93,7 @@ local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
 	ESTIMATE = 86400,
 }
+MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()

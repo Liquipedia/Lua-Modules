@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -32,6 +33,8 @@ local VALID_BACKGROUNDS = {
 }
 local MODE_FFA = 'FFA'
 local TBD = 'TBD'
+local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
+local NOW = os.time()
 
 local StarcraftFfaMatchGroupInput = {}
 local MatchFunctions = {}
@@ -54,12 +57,9 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, opponents)
 
 	local finishedInput = match.finished --[[@as string?]]
-	local bestof = tonumber(match.firstto) or tonumber(match.bestof)
+	match.bestof = tonumber(match.firstto) or tonumber(match.bestof)
 
-	-- need to set this to nil for MatchGroupInputUtil.matchIsFinished usage
-	match.bestof = nil
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-	match.bestof = bestof
+	match.finished = MatchFunctions.isFinished(match, opponents)
 	match.mode = MODE_FFA
 
 	if MatchGroupInputUtil.isNotPlayed(match.winner, finishedInput) then
@@ -86,6 +86,10 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 			opponentIndex = opponentIndex,
 			score = opponent.score,
 		}, autoScoreFunction)
+	end)
+
+	Array.forEach(opponents, function(opponent)
+		opponent.placement = tonumber(opponent.placement)
 	end)
 
 	if match.finished then
@@ -118,6 +122,38 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
+end
+---@param match table
+---@param opponents {score: integer?}[]
+---@return boolean
+function MatchFunctions.isFinished(match, opponents)
+	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
+		return true
+	end
+
+	local finished = Logic.readBoolOrNil(match.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	-- If a winner has been set
+	if Logic.isNotEmpty(match.winner) then
+		return true
+	end
+
+	-- If enough time has passed since match started, it should be marked as finished
+	local threshold = match.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
+	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
+		return true
+	end
+
+	return MatchFunctions.placementHasBeenSet(opponents)
+end
+
+---@param opponents table[]
+---@return boolean
+function MatchFunctions.placementHasBeenSet(opponents)
+	return Array.any(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
 end
 
 ---@param maps table[]
@@ -296,8 +332,8 @@ function StarcraftFfaMatchGroupInput._setPlacements(opponents)
 
 	---@param status string
 	---@return string
-	local toPrepareStatus = function(status)
-		if status == MatchGroupInputUtil.STATUS.DEFAULT_WIN or status == MatchGroupInputUtil.STATUS.SCORE then
+	local toSortStatus = function(status)
+		if status == MatchGroupInputUtil.STATUS.DEFAULT_WIN or status == MatchGroupInputUtil.STATUS.SCORE or not status then
 			return status
 		end
 		return MatchGroupInputUtil.STATUS.DEFAULT_LOSS
@@ -320,7 +356,7 @@ function StarcraftFfaMatchGroupInput._setPlacements(opponents)
 	local lastPlacement = 0
 	local skippedPlacements = 1
 	for _, opponent in Table.iter.spairs(opponents, StarcraftFfaMatchGroupInput._placementSortFunction) do
-		local currentStatus = toPrepareStatus(opponent.status)
+		local currentStatus = toSortStatus(opponent.status)
 		local currentScore = opponent.score or 0
 		if isNewPlacement(currentStatus, currentScore) then
 			lastPlacement = lastPlacement + skippedPlacements
