@@ -107,7 +107,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `|win=` in opponents')
 		end
 
-		opponent.extradata.advances = (opponent.score or 0) >= match.bestof
+		opponent.extradata.advances = (match.bestof and (opponent.score or 0) >= match.bestof)
 			or opponent.bg == ADVANCE_BACKGROUND
 			or Logic.readBool(opponent.advances)
 	end)
