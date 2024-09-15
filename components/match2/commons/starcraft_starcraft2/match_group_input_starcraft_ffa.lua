@@ -197,7 +197,7 @@ function MatchFunctions.getExtraData(match)
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
 		noscore = tostring(Logic.readBool(match.noscore)),
-		showplacement = tostring(Logic.readBool(match.showplacement)),
+		showplacement = Logic.readBoolOrNil(match.showplacement),
 	}
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
@@ -276,7 +276,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	if map.finished then
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentsInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentsInfo)
-		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo)
+		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo, not hasScores)
 		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner, map.resulttype)
 	end
 
@@ -325,7 +325,10 @@ end
 --- helper fucntions applicable for both map and match
 
 ---@param opponents {placement: integer?, score: integer?, status: string}
-function StarcraftFfaMatchGroupInput._setPlacements(opponents)
+---@param noScores boolean?
+function StarcraftFfaMatchGroupInput._setPlacements(opponents, noScores)
+	if noScores then return end
+
 	if Array.all(opponents, function(opponent)
 		return Logic.isNotEmpty(opponent.placement)
 	end) then return end
@@ -339,33 +342,39 @@ function StarcraftFfaMatchGroupInput._setPlacements(opponents)
 		return MatchGroupInputUtil.STATUS.DEFAULT_LOSS
 	end
 
-	local lastScore, lastStatus
+	local cache = {}
 
 	---@param status string
 	---@param score integer?
+	---@param manualPlacement integer?
 	---@return boolean
-	local isNewPlacement = function(status, score)
-		if status ~= lastStatus then
+	local isNewPlacement = function(status, score, manualPlacement)
+		if manualPlacement then
 			return true
-		elseif status == MatchGroupInputUtil.STATUS.SCORE and score ~= lastScore then
+		elseif cache.manualPlacement and not manualPlacement then
+			return true
+		elseif status ~= cache.status then
+			return true
+		elseif status == MatchGroupInputUtil.STATUS.SCORE and score ~= cache.score then
 			return true
 		end
 		return false
 	end
 
-	local lastPlacement = 0
-	local skippedPlacements = 1
+	cache.placement = 1
+	cache.skipped = 1
 	for _, opponent in Table.iter.spairs(opponents, StarcraftFfaMatchGroupInput._placementSortFunction) do
 		local currentStatus = toSortStatus(opponent.status)
 		local currentScore = opponent.score or 0
-		if isNewPlacement(currentStatus, currentScore) then
-			lastPlacement = lastPlacement + skippedPlacements
-			skippedPlacements = 0
-			lastScore = currentScore
-			lastStatus = currentStatus
+		if isNewPlacement(currentStatus, currentScore, opponent.placement) then
+			cache.manualPlacement = opponent.placement
+			cache.placement = opponent.placement or (cache.placement + cache.skipped)
+			cache.skipped = 0
+			cache.score = currentScore
+			cache.status = currentStatus
 		end
-		opponent.placement = opponent.placement or lastPlacement
-		skippedPlacements = skippedPlacements + 1
+		opponent.placement = cache.placement
+		cache.skipped = cache.skipped + 1
 	end
 end
 
@@ -402,7 +411,19 @@ function StarcraftFfaMatchGroupInput._placementSortFunction(opponents, index1, i
 		return false
 	end
 
-	return (opponent1.score or -1) > (opponent2.score or -1)
+	if (opponent1.score or -1) ~= (opponent2.score or -1) then
+		return (opponent1.score or -1) > (opponent2.score or -1)
+	end
+
+	if opponent1.placement and opponent2.placement then
+		return opponent1.placement < opponent2.placement
+	elseif opponent1.placement and not opponent2.placement then
+		return true
+	elseif opponent2.placement and not opponent1.placement then
+		return false
+	end
+
+	return index1 < index2
 end
 
 return StarcraftFfaMatchGroupInput
