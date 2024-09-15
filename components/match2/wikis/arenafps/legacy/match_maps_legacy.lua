@@ -25,50 +25,8 @@ local Opponent = OpponentLibraries.Opponent
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUM_MAPS = 9
-local DRAW = 'draw'
-local SKIP = 'skip'
 
 local MatchMapsLegacy = {}
-
----@param args table
----@return table
-function MatchMapsLegacy._handleMaps(args)
-	Array.mapIndexes(function(index)
-		local prefix = 'map' .. index
-		local map = args[prefix]
-		local winner = Table.extract(args, prefix .. 'win')
-		local score = Table.extract(args, prefix .. 'score')
-		if Logic.isEmpty(map) and Logic.isEmpty(winner) then
-			return false
-		end
-
-		if Logic.isNotEmpty(score) then
-			local splitedScore = Array.parseCommaSeparatedString(score, '-')
-			args[prefix .. 'score1'] = mw.text.decode(splitedScore[1])
-			args[prefix .. 'score2'] = mw.text.decode(splitedScore[2])
-		end
-
-		args[prefix .. 'finished'] = (winner == SKIP and SKIP) or
-			(not Logic.isEmpty(winner) and 'true') or 'false'
-
-		if Logic.isNumeric(winner) or winner == DRAW then
-			args[prefix .. 'winner'] = winner == DRAW and 0 or winner
-		end
-		return true
-	end)
-
-	return args
-end
-
--- invoked by BracketMatchSummary
----@param frame Frame
----@return string
-function MatchMapsLegacy.convertBracketMatchSummary(frame)
-	local args = Arguments.getArgs(frame)
-	args = MatchMapsLegacy._handleMaps(args)
-
-	return Json.stringify(args)
-end
 
 ---@param args table
 ---@return table
@@ -137,6 +95,7 @@ function MatchMapsLegacy._shouldStore(store)
 	)
 end
 
+-- invoked by Template:LegacySingleMatch
 ---@param frame Frame
 ---@return Html
 function MatchMapsLegacy.showmatch(frame)
@@ -161,7 +120,7 @@ function MatchMapsLegacy.showmatch(frame)
 	})
 end
 
--- invoked by Template:MatchList
+-- invoked by Template:LegacyMatchList
 ---@param frame Frame
 ---@return string
 function MatchMapsLegacy.matchList(frame)
@@ -180,7 +139,6 @@ function MatchMapsLegacy.matchList(frame)
 		title = Logic.nilOr(Table.extract(args, 'title'), args[1]),
 		width = Table.extract(args, 'width') or '300px',
 	})
-	args.width = (args.width or ''):gsub('px', '')
 	args[1] = nil
 
 	for matchKey, _, matchIndex in Table.iter.pairsByPrefix(args, 'match') do
