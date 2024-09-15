@@ -116,7 +116,7 @@ function MatchMapsLegacy._readMaps(matchArgs)
 	end)
 end
 
--- invoked by Template:MatchMaps/Showmatch
+-- invoked by Template:MatchMaps
 ---@param frame Frame
 ---@return string
 function MatchMapsLegacy.convertMatch(frame)
