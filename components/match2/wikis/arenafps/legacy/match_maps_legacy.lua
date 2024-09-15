@@ -40,6 +40,7 @@ function MatchMapsLegacy._mergeDetailsIntoArgs(args)
 	})
 end
 
+---@param matchArgs table
 function MatchMapsLegacy._readOpponents(matchArgs)
 	local type
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
