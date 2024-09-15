@@ -62,18 +62,37 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	match.bestof = bestof
 	match.mode = MODE_FFA
 
+	if MatchGroupInputUtil.isNotPlayed(match.winner, finishedInput) then
+		match.finished = true
+		match.status = 'notplayed' -- according to RFC ;)
+		match.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+		match.scores = {}
+		match.statuses = {}
+		match.extradata = {ffa = 'true'}
+		return match
+	end
+
 	match.pbg = MatchFunctions.getPBG(match)
 
-	-- todo:
-	-- determine scores and statuses
-	--- can we use parts of commons???
-	--- add tracking category for alias shit and resolve alias for now (scoreX <-> pointsX)
+	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
+		and not Logic.readBool(match.noscore)
+		and MatchFunctions.calculateMatchScore(games, opponents)
+		or nil
+
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
+			walkover = match.walkover,
+			winner = match.winner,
+			opponentIndex = opponentIndex,
+			score = opponent.score,
+		}, autoScoreFunction)
+	end)
 
 	if match.finished then
 		match.resulttype = MatchGroupInputUtil.getResultType(match.winner, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		StarcraftFfaMatchGroupInput._setPlacements(opponents)
-		match.winner = StarcraftFfaMatchGroupInput._getWinnerFromPlacements(opponents, match.winner, match.resulttype)
+		match.winner = StarcraftFfaMatchGroupInput._getWinner(opponents, match.winner, match.resulttype)
 	end
 
 	Array.forEach(opponents, function(opponent)
@@ -82,9 +101,15 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 			or match.pbg[opponent.placement]
 			or DEFUALT_BACKGROUND
 
+		-- todo: get rid of the damn alias ...
+		if Logic.isEmpty(opponent.advances) and Logic.isNotEmpty(opponent.win) then
+			opponent.advances = opponent.win
+			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `|win=` in opponents')
+		end
+
 		opponent.extradata.advances = (opponent.score or 0) >= match.bestof
 			or opponent.bg == ADVANCE_BACKGROUND
-			or Logic.readBool(Logic.nilIfEmpty(opponent.advances) or opponent.win)
+			or Logic.readBool(opponent.advances)
 	end)
 
 	match.opponents = opponents
@@ -93,6 +118,20 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
+end
+
+---@param maps table[]
+---@param opponents table[]
+---@return fun(opponentIndex: integer): integer?
+function MatchFunctions.calculateMatchScore(maps, opponents)
+	return function(opponentIndex)
+		local opponent = opponents[opponentIndex]
+		local sum = (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
+		Array.forEach(maps, function(map)
+			sum = sum + ((map.scores or {})[opponentIndex] or 0)
+		end)
+		return sum
+	end
 end
 
 ---@param match table
@@ -202,7 +241,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentsInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentsInfo)
 		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo)
-		map.winner = StarcraftFfaMatchGroupInput._getWinnerFromPlacements(opponentsInfo, mapInput.winner, map.resulttype)
+		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner, map.resulttype)
 	end
 
 	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
@@ -255,15 +294,42 @@ function StarcraftFfaMatchGroupInput._setPlacements(opponents)
 		return Logic.isNotEmpty(opponent.placement)
 	end) then return end
 
-	local lastScore, lastPlacement
-	local skippedPlacements = 0
+	---@param status string
+	---@return string
+	local toPrepareStatus = function(status)
+		if status == MatchGroupInputUtil.STATUS.DEFAULT_WIN or status == MatchGroupInputUtil.STATUS.SCORE then
+			return status
+		end
+		return MatchGroupInputUtil.STATUS.DEFAULT_LOSS
+	end
+
+	local lastScore, lastStatus
+
+	---@param status string
+	---@param score integer?
+	---@return boolean
+	local isNewPlacement = function(status, score)
+		if status ~= lastStatus then
+			return true
+		elseif status == MatchGroupInputUtil.STATUS.SCORE and score ~= lastScore then
+			return true
+		end
+		return false
+	end
+
+	local lastPlacement = 0
+	local skippedPlacements = 1
 	for _, opponent in Table.iter.spairs(opponents, StarcraftFfaMatchGroupInput._placementSortFunction) do
-		if lastScore ~= opponent.score then
-			lastPlacement = lastPlacement + skippedPlacements + 1
+		local currentStatus = toPrepareStatus(opponent.status)
+		local currentScore = opponent.score or 0
+		if isNewPlacement(currentStatus, currentScore) then
+			lastPlacement = lastPlacement + skippedPlacements
 			skippedPlacements = 0
-			lastScore = opponent.score
+			lastScore = currentScore
+			lastStatus = currentStatus
 		end
 		opponent.placement = opponent.placement or lastPlacement
+		skippedPlacements = skippedPlacements + 1
 	end
 end
 
@@ -271,15 +337,11 @@ end
 ---@param winnerInput integer|string|nil
 ---@param resultType string?
 ---@return integer?
-function StarcraftFfaMatchGroupInput._getWinnerFromPlacements(opponents, winnerInput, resultType)
-	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
-		return nil
-	elseif Logic.isNumeric(winnerInput) then
+function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput, resultType)
+	if Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
 	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DRAW then
 		return MatchGroupInputUtil.WINNER_DRAW
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
-		return MatchGroupInputUtil.getDefaultWinner(opponents)
 	end
 
 	local placements = Array.map(opponents, Operator.property('placement'))
