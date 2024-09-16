@@ -188,7 +188,7 @@ function DisplayHelper.getParticipantsOfOpponent(allParticipants, opponentIndex)
 end
 
 --[[
-Display component showing the detailed sumary of a match. The component will
+Display component showing the detailed summary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a
 container component, so it takes in the match ID and bracket ID as inputs,
 which it uses to fetch the match data from LPDB and page variables.
