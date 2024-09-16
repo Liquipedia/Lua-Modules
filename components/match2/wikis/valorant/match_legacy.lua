@@ -73,21 +73,21 @@ function MatchLegacy.storeGames(match, match2)
 			end
 		end
 		local participants = Json.parseIfString(game2.participants) or {}
-		local addPlayer = function (team, player)
-			local data = participants[team..'_'..player]
+		local addPlayer = function (teamId, playerId, data)
 			if data then
 				local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
-				game.extradata['t'..team..'p'..player] = playerPage
+				game.extradata['t'..teamId..'p'..playerId] = playerPage
 				if data.kills and data.deaths and data.assists then
-					game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
+					game.extradata['t'..teamId..'kda'..playerId] = data.kills..'/'..data.deaths..'/'..data.assists
 				end
-				game.extradata['t'..team..'acs'..player] = data.acs
-				game.extradata['t'..team..'a'..player] = data.agent
+				game.extradata['t'..teamId..'acs'..playerId] = data.acs
+				game.extradata['t'..teamId..'a'..playerId] = data.agent
 			end
 		end
 		for team = 1, 2 do
-			for playerIndex in ipairs(DisplayHelper.getParticipantsOfOpponent(game.participants, team)) do
-				addPlayer(team, playerIndex)
+			local participantsOfTeam = DisplayHelper.getParticipantsOfOpponent(participants, team)
+			for player = 1, 5 do
+				addPlayer(team, player, participantsOfTeam[player])
 			end
 		end
 		-- Other stuff
