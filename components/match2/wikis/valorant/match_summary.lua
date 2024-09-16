@@ -55,7 +55,7 @@ function Agents:setRight()
 	return self
 end
 
----@param agent string
+---@param agent string?
 ---@return self
 function Agents:add(agent)
 	if Logic.isEmpty(agent) then
@@ -365,20 +365,12 @@ function CustomMatchSummary._createMap(game)
 		team1Agents = Agents():setLeft()
 		team2Agents = Agents():setRight()
 
-		for player = 1, 5 do
-			local playerStats = game.participants['1_' .. player]
-			if playerStats ~= nil then
-				team1Agents:add(playerStats['agent'])
-			end
+		for _, playerStats in ipairs(DisplayHelper.getParticipantsOfOpponent(game.participants, 1)) do
+			team1Agents:add(playerStats.agent)
 		end
-
-		for player = 1, 5 do
-			local playerStats = game.participants['2_' .. player]
-			if playerStats ~= nil then
-				team2Agents:add(playerStats['agent'])
-			end
+		for _, playerStats in ipairs(DisplayHelper.getParticipantsOfOpponent(game.participants, 2)) do
+			team2Agents:add(playerStats.agent)
 		end
-
 	end
 
 	local score1, score2

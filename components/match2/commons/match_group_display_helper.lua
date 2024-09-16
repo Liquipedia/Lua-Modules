@@ -13,6 +13,7 @@ local I18n = require('Module:I18n')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
@@ -165,6 +166,17 @@ function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winn
 		return opponentIndex == winner and 'W' or string.upper(walkover or '')
 	end
 	return score and tostring(score) or ''
+end
+
+---@param allParticipants table<string, table>
+---@param opponentIndex integer
+---@return table[]
+function DisplayHelper.getParticipantsOfOpponent(allParticipants, opponentIndex)
+	local prefix = opponentIndex .. '_'
+	local participantsOfOpponent = Array.extractValues(Table.mapArgumentsByPrefix(allParticipants, {prefix}, function (key, index)
+		return Table.merge({playerId = index}, allParticipants[key])
+	end, true))
+	return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
 end
 
 --[[
