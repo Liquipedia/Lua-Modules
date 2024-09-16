@@ -611,9 +611,22 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
 	local score = tonumber(record.score)
+	local status = record.status
 	local bestof = tonumber(matchRecord.bestof)
-	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and (matchRecord.match2games or {})[1] then
-		score = matchRecord.match2games[1].scores[opponentIndex] or score
+	local game1 = (matchRecord.match2games or {})[1]
+	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
+		local winner = tonumber(game1.winner)
+		if game1.resulttype == 'default' then
+			score = -1
+			if winner == 0 then
+				status = 'D'
+			else
+				status = winner == opponentIndex and 'W' or string.upper(game1.walkover)
+			end
+		elseif game1.scores[opponentIndex] then
+			score = game1.scores[opponentIndex]
+			status = 'S'
+		end
 	end
 
 	return {
@@ -625,7 +638,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
 		score = score,
-		status = record.status,
+		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
 	}
