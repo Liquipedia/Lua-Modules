@@ -21,10 +21,9 @@ local Builder = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string
-function Builder:make(injector, children)
+function Builder:make(children)
 	return table.concat(children)
 end
 

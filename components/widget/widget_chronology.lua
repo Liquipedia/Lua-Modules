@@ -22,10 +22,9 @@ local Chronology = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Chronology:make(injector, children)
+function Chronology:make(children)
 	return Chronology:_chronology(self.links)
 end
 

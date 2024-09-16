@@ -30,10 +30,9 @@ local Table = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Table:make(injector, children)
+function Table:make(children)
 	local wrapper = mw.html.create('div'):addClass('table-responsive')
 	local output = mw.html.create('table'):addClass('wikitable')
 

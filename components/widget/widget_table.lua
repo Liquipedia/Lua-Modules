@@ -47,10 +47,9 @@ function Table:addClass(class)
 	return self
 end
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Table:make(injector, children)
+function Table:make(children)
 	local displayTable = mw.html.create('div'):addClass('csstable-widget')
 	displayTable:css{
 		['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)',

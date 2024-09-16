@@ -23,10 +23,9 @@ local Center = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Center:make(injector, children)
+function Center:make(children)
 	return Center:_create(children, self.classes)
 end
 

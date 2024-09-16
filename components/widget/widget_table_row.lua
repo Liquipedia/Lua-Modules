@@ -56,10 +56,9 @@ function TableRow:getCellCount()
 	return #self.children
 end
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function TableRow:make(injector, children)
+function TableRow:make(children)
 	local row = mw.html.create('div'):addClass('csstable-widget-row')
 
 	for _, class in ipairs(self.classes) do

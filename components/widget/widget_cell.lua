@@ -88,10 +88,9 @@ function Cell:_content(...)
 	return self
 end
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Cell:make(injector, children)
+function Cell:make(children)
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))
 	self:_content(unpack(children))
