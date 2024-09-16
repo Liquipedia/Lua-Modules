@@ -31,7 +31,7 @@ local globalVars = PageVariableNamespace{cached = true}
 local MatchGroupInputUtil = {}
 
 ---@class MGIParsedPlayer
----@field displayName string?
+---@field displayname string?
 ---@field name string?
 ---@field flag string?
 ---@field faction string?
@@ -1109,7 +1109,7 @@ function MatchGroupInputUtil.getCharacterName(alias, character)
 	return (assert(alias[character:lower()], 'Invalid character:' .. character))
 end
 
----@param players {name: string?, displayname: string?}[]
+---@param players MGIParsedPlayer[]
 ---@param playerInput string?
 ---@param playerLink string?
 ---@return integer?
