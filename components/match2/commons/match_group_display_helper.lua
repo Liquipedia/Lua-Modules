@@ -13,8 +13,6 @@ local I18n = require('Module:I18n')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
