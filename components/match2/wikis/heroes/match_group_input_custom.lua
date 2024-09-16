@@ -28,8 +28,6 @@ local OPPONENT_CONFIG = {
 	pagifyPlayerNames = true,
 }
 
-local OPPONENT_CONFIG = {}
-
 -- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
