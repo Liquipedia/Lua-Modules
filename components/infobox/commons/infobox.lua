@@ -86,7 +86,7 @@ function Infobox:build(widgets)
 			error('Infobox:build can only accept Widgets')
 		end
 
-		self.content:node(WidgetFactory.work(widget, self.injector))
+		self.content:node(widget:tryMake(self.injector))
 	end
 
 	self.root:node(self.content)

@@ -108,7 +108,7 @@ function Squad:create()
 		classes = {'wikitable-striped', 'roster-card'},
 		children = self.rows,
 	}
-	return WidgetFactory.work(dataTable, self.injector)
+	return dataTable:tryMake(self.injector) or ''
 end
 
 return Squad

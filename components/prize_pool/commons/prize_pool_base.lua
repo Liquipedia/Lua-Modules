@@ -609,7 +609,7 @@ function BasePrizePool:_buildTable(isAward)
 	end
 
 	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
-	tableNode:node(WidgetFactory.work(tbl, self._widgetInjector))
+	tableNode:node(tbl:tryMake(self._widgetInjector))
 
 	return tableNode
 end
