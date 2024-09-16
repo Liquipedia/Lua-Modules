@@ -59,7 +59,7 @@ function ExtendedSquadRow:elo()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local tlpd = Logic.readBool(args.tlpd)

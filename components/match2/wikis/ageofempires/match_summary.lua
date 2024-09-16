@@ -14,6 +14,7 @@ local Faction = require('Module:Faction')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -171,9 +172,13 @@ function CustomMatchSummary._createGame(row, game, props)
 		end
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
-			for participantId in Table.iter.pairsByPrefix(game.participants, opponentId .. '_') do
+			local oppKey = opponentId .. '_'
+			Table.iter.forEachPair(game.participants, function (participantId)
+				if not String.startsWith(participantId, oppKey) then
+					return
+				end
 				display:node(createParticipant(participantId, opponentId == 1))
-			end
+			end)
 			return display
 		end
 

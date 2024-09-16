@@ -181,7 +181,7 @@ end
 ---@param squadClass Squad
 ---@param personFunction fun(player: table, squadType: integer):WidgetTableRowNew
 ---@param injector WidgetInjector?
----@return Html
+---@return string
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
 	local injectorInstance = (injector and injector()) or
@@ -210,7 +210,7 @@ end
 ---@param customTitle string?
 ---@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
----@return Html?
+---@return string?
 function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, customTitle, injector, personMapper)
 	local args = {type = squadType, title = customTitle}
 	local injectorInstance = (injector and injector()) or

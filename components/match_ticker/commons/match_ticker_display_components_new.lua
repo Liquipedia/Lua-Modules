@@ -117,12 +117,33 @@ function Details:create()
 		self.root:addClass(HIGHLIGHT_CLASS)
 	end
 
+	local matchBottomBar = mw.html.create('div'):addClass('match-bottom-bar')
+	matchBottomBar:node(self:countdown())
+
+	if self.match.match2bracketdata.matchpage then
+		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
+			:addClass('btn btn-secondary btn-new btn--match-details')
+			:attr('title', 'View Match Page')
+			:node(mw.html.create('i')
+				:addClass('fas fa-external-link')
+			)
+			:wikitext('  Details')
+		), self.match.match2bracketdata.matchpage))
+	elseif self.match.match2id then
+		local link = 'Match:ID ' .. self.match.match2id
+		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
+			:addClass('btn btn-new btn--add-match-details show-when-logged-in')
+			:attr('title', 'Add Match Page')
+			:wikitext('+ Add details')
+		), link))
+	end
+
 	return self.root
 		:node(mw.html.create('div'):addClass('match-links')
 			:node(self:tournament())
 			:node(self:streams())
 		)
-		:node(self:countdown())
+		:node(matchBottomBar)
 end
 
 ---It will display both countdown and date of the match so the user can select which one to show

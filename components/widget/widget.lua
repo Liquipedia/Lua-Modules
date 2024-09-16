@@ -22,13 +22,13 @@ function Widget:assertExistsAndCopy(value)
 end
 
 ---@param injector WidgetInjector?
----@return Widget[]|Html[]|nil
+---@return Widget[]|string|nil
 function Widget:make(injector)
 	error('A Widget must override the make() function!')
 end
 
 ---@param injector WidgetInjector?
----@return Widget[]|Html[]|nil
+---@return Widget[]|string|nil
 function Widget:tryMake(injector)
 	return Logic.tryOrElseLog(
 		function() return self:make(injector) end,

@@ -22,20 +22,20 @@ local Title = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return {[1]: Html}
+---@return string?
 function Title:make(injector)
-	return {Title:_create(self.content)}
+	return Title:_create(self.content)
 end
 
 ---@param infoDescription string|number|nil
----@return Html
+---@return string
 function Title:_create(infoDescription)
 	local header = mw.html.create('div')
 	header	:addClass('infobox-header')
 			:addClass('wiki-backgroundcolor-light')
 			:addClass('infobox-header-2')
 			:wikitext(infoDescription)
-	return mw.html.create('div'):node(header)
+	return tostring(mw.html.create('div'):node(header))
 end
 
 return Title
