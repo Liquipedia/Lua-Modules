@@ -173,14 +173,22 @@ end
 ---@return table[]
 function DisplayHelper.getParticipantsOfOpponent(allParticipants, opponentIndex)
 	local prefix = opponentIndex .. '_'
-	local participantsOfOpponent = Array.extractValues(Table.mapArgumentsByPrefix(allParticipants, {prefix}, function (key, index)
-		return Table.merge({playerId = index}, allParticipants[key])
-	end, true))
+	local participantsOfOpponent = Array.extractValues(Table.mapArgumentsByPrefix(
+		allParticipants,
+		{prefix},
+		function (key, index)
+			if Logic.isEmpty(allParticipants[key]) then
+				return nil
+			end
+			return Table.merge({playerId = index}, allParticipants[key])
+		end,
+		true
+	))
 	return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
 end
 
 --[[
-Display component showing the detailed summary of a match. The component will
+Display component showing the detailed sumary of a match. The component will
 appear as a popup from the Matchlist and Bracket components. This is a
 container component, so it takes in the match ID and bracket ID as inputs,
 which it uses to fetch the match data from LPDB and page variables.
