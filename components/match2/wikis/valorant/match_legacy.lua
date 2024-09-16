@@ -72,7 +72,6 @@ function MatchLegacy.storeGames(match, match2)
 				game.extradata.opponent2scores = table.concat(team2, ', ')
 			end
 		end
-		local participants = Json.parseIfString(game2.participants) or {}
 		local addPlayer = function (teamId, playerId, data)
 			if data then
 				local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
@@ -84,6 +83,7 @@ function MatchLegacy.storeGames(match, match2)
 				game.extradata['t'..teamId..'a'..playerId] = data.agent
 			end
 		end
+		local participants = Json.parseIfString(game2.participants) or {}
 		for team = 1, 2 do
 			local participantsOfTeam = DisplayHelper.getParticipantsOfOpponent(participants, team)
 			for player = 1, 5 do
