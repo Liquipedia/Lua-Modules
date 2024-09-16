@@ -66,8 +66,6 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 		match.finished = true
 		match.status = 'notplayed' -- according to RFC ;)
 		match.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-		match.scores = {}
-		match.statuses = {}
 		match.extradata = {ffa = 'true'}
 		return match
 	end
@@ -101,6 +99,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	Array.forEach(opponents, function(opponent)
 		opponent.extradata = opponent.extradata or {}
+		opponent.extradata.noscore = Logic.readBool(match.noscore)
 		opponent.extradata.bg = MatchFunctions.readBg(opponent.bg)
 			or match.pbg[opponent.placement]
 			or DEFUALT_BACKGROUND
@@ -111,9 +110,10 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `|win=` in opponents')
 		end
 
-		opponent.extradata.advances = (match.bestof and (opponent.score or 0) >= match.bestof)
-			or opponent.bg == ADVANCE_BACKGROUND
-			or Logic.readBool(opponent.advances)
+		opponent.extradata.advances = Logic.readBool(opponent.advances)
+			or (match.bestof and (opponent.score or 0) >= match.bestof)
+			or opponent.extradata.bg == ADVANCE_BACKGROUND
+			or opponent.placement == 1
 	end)
 
 	match.opponents = opponents
@@ -212,8 +212,12 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getPBG(match)
+	local advanceCount = tonumber(match.advancecount) or 0
+
 	return Array.mapIndexes(function(pbgIndex)
 		return MatchFunctions.readBg(match['pbg' .. pbgIndex])
+			or (pbgIndex <= advanceCount and ADVANCE_BACKGROUND)
+			or nil
 	end)
 end
 
