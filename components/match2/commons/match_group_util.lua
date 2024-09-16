@@ -613,7 +613,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local score = tonumber(record.score)
 	local bestof = tonumber(matchRecord.bestof)
 	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and (matchRecord.match2games or {})[1] then
-		score = matchRecord.match2games[1].scores[opponentIndex] or ''
+		score = matchRecord.match2games[1].scores[opponentIndex] or score
 	end
 
 	return {
