@@ -469,10 +469,10 @@ end
 ---@return string
 function OpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
-		if (opponent.score or 0) == 0 and Opponent.isTbd(opponent) then
+		if opponent.score == 0 and Opponent.isTbd(opponent) then
 			return ''
 		else
-			return opponent.score and opponent.score ~= -1 and tostring(opponent.score) or ''
+			return opponent.score ~= -1 and tostring(opponent.score) or ''
 		end
 	else
 		return opponent.status or ''
