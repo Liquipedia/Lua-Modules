@@ -91,7 +91,7 @@ end
 function CustomMap:_createRingTableRow(ringData)
 	local row = TableRow{}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		row:addCell(TableCell{content = item})
+		row:addCell(TableCell{content = {item}})
 	end
 	return row
 end
