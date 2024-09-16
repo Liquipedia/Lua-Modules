@@ -26,17 +26,19 @@ function Widget:assertExistsAndCopy(value)
 	return assert(String.nilIfEmpty(value), 'Tried to set a nil value to a mandatory property')
 end
 
+---@param injector WidgetInjector?
 ---@param children string[]
 ---@return string|nil
-function Widget:make(children)
+function Widget:make(injector, children)
 	error('A Widget must override the make() function!')
 end
 
+---@param injector WidgetInjector?
 ---@return string|nil
 function Widget:tryMake(injector)
 	local processedChildren = self:tryChildren(injector)
 	return Logic.tryOrElseLog(
-		function() return self:make(processedChildren) end,
+		function() return self:make(injector, processedChildren) end,
 		function(error) return tostring(ErrorDisplay.InlineError(error)) end,
 		function(error)
 			error.header = 'Error occured in widget: (caught by Widget:tryMake)'
