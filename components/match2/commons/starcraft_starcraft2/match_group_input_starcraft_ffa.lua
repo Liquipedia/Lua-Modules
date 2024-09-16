@@ -276,6 +276,8 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
 	end)
 
+	map.scores = Array.map(opponentsInfo, Operator.property('score'))
+
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentsInfo)
