@@ -155,6 +155,7 @@ function MatchFunctions.getLinks(match)
 		dbstats = match.dbstats and ('https://quakelife.ru/diabotical/stats/matches/?matches=' .. match.dbstats) or nil,
 		qrindr = match.qrindr and ('https://qrindr.com/match/' .. match.qrindr) or nil,
 		esl = match.esl and ('https://play.eslgaming.com/match/' .. match.esl) or nil,
+		pf = match.pf and ('https://www.plusforward.net/quake/post/' .. match.pf) or nil,
 		stats = match.stats,
 	}
 end
