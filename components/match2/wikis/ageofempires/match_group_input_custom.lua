@@ -154,7 +154,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 
 		map.extradata = {}
 		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
-		map.extradata.mapmode = map.mode
+		map.extradata.mapmode = Table.extract(map, 'mode')
 
 		MatchGroupInputUtil.getCommonTournamentVars(map, match)
 
@@ -200,7 +200,7 @@ end
 ---@param match table
 ---@return string?, table?
 function CustomMatchGroupInput._getMapsAndGame(match)
-	local mapsInfo = Json.parse(Variables.varDefault('tournament_maps'))
+	local mapsInfo = Json.parseIfString(Variables.varDefault('tournament_maps'))
 
 	if Logic.isNotEmpty(mapsInfo) and match.game then
 		return match.game, mapsInfo
@@ -256,8 +256,6 @@ end
 function CustomMatchGroupInput._getExtraData(match)
 	return {
 		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead')),
-		civdraft = match.civdraft,
-		mapdraft = match.mapdraft,
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
