@@ -468,6 +468,7 @@ function MatchGroupInputUtil.readPlayersOfTeamNew(teamName, manualPlayersInput, 
 	if not name then
 		teamName = teamName:gsub(' ', '_')
 		varPrefix = teamName .. '_p' .. playerIndex
+		name = globalVars:get(varPrefix)
 	end
 
 	while name do
