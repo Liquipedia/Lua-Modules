@@ -13,7 +13,6 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class TitleWidget: Widget
 ---@operator call({name: string|number|nil}): TitleWidget
----@field content string|number|nil
 local Title = Class.new(
 	Widget,
 	function(self, input)

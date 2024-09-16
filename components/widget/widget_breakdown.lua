@@ -12,8 +12,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class BreakdownWidget: Widget
----@operator call({content:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
----@field contents (string|number)[]
+---@operator call({children:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
 ---@field classes string[]
 ---@field contentClasses table<integer, string[]> --can have gaps in the outer table
 local Breakdown = Class.new(

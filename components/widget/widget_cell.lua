@@ -19,7 +19,6 @@ local Widget = Lua.import('Module:Widget')
 ---@class CellWidget: Widget
 ---@operator call({name:string|number,content:(string|number)[],classes:string[]?,options:CellWidgetOptions}):CellWidget
 ---@field name string|number
----@field children (string|number)[]
 ---@field options CellWidgetOptions
 ---@field classes string[]?
 local Cell = Class.new(Widget,

@@ -17,7 +17,7 @@ local Widget = Lua.import('Module:Widget')
 local Highlights = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content
+		self.children = input.children or input.content or {}
 	end
 )
 
