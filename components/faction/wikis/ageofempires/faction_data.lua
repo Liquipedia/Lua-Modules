@@ -624,7 +624,6 @@ local factionPropsAoM = {
 	freyr = {
 		index = 5,
 		name = 'Freyr',
-		pageName = 'Freyr',
 		faction = 'freyr',
 	},
 	norse = {
