@@ -17,7 +17,7 @@ local WidgetFactory = Lua.import('Module:Widget/Factory')
 ---@class Widget: BaseClass
 ---@operator call({children: Widget[]?}?): Widget
 ---@field children (Widget|Html|string|number)[]
----@field makeChildren? fun(self:self, injector: WidgetInjector?): string[]
+---@field makeChildren? fun(self:Widget, injector: WidgetInjector?): Widget[]?
 local Widget = Class.new(function(self, input)
 	self.children = input and input.children or {}
 end)
@@ -53,7 +53,11 @@ end
 ---@param injector WidgetInjector?
 ---@return string[]
 function Widget:tryChildren(injector)
-	return Array.flatMap(self.children, function(child)
+	local children = self.children
+	if self.makeChildren then
+		children = self:makeChildren(injector) or {}
+	end
+	return Array.flatMap(children, function(child)
 		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
 			---@cast child Widget
 			return Logic.tryOrElseLog(
@@ -65,6 +69,7 @@ function Widget:tryChildren(injector)
 				end
 			)
 		end
+		---@cast child -Widget
 		return {tostring(child)}
 	end)
 end

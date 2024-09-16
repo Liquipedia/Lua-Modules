@@ -10,7 +10,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class BuilderWidget: Widget
 ---@operator call({builder: function}): BuilderWidget
@@ -23,14 +22,16 @@ local Builder = Class.new(
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string
-function Builder:make(injector)
-	local children = self.builder()
-	local builtChildren = mw.html.create()
-	for _, child in ipairs(children or {}) do
-		builtChildren:node(WidgetFactory.work(child, injector))
-	end
-	return tostring(builtChildren)
+function Builder:make(injector, children)
+	return table.concat(children)
+end
+
+---@param injector WidgetInjector?
+---@return Widget[]?
+function Builder:makeChildren(injector)
+	return self.builder()
 end
 
 return Builder
