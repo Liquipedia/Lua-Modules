@@ -13,7 +13,8 @@ local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local StringUtils = require('Module:StringUtils')
+local Operator = require('Module:Operator')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
@@ -24,7 +25,7 @@ local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 local NOW = os.time()
 
-local nilIfEmpty = StringUtils.nilIfEmpty
+local nilIfEmpty = String.nilIfEmpty
 
 --[[
 Non-display utility functions for brackets, matchlists, matches, opponents,
@@ -205,6 +206,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
+---@field opponents {players: table[]}[]
 ---@field participants table
 ---@field resultType ResultType?
 ---@field scores number[]
@@ -429,7 +431,7 @@ function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
 	local rootMatchIds = {}
 	for matchId, bracketData in pairs(bracketDatasById) do
 		if not bracketData.upperMatchId
-			and not StringUtils.endsWith(matchId, 'RxMBR') then
+			and not String.endsWith(matchId, 'RxMBR') then
 			table.insert(rootMatchIds, matchId)
 		end
 	end
@@ -500,6 +502,7 @@ end
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
+	local games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
 		bracketData.lowerEdges = bracketData.lowerEdges
@@ -517,7 +520,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
 		game = record.game,
-		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
+		games = games,
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
@@ -666,6 +669,34 @@ function MatchGroupUtil.gameFromRecord(record)
 
 	local walkover = nilIfEmpty(record.walkover)
 
+	local function getParticipantsOfOpponent(allParticipants, opponentIndex)
+		local prefix = opponentIndex .. '_'
+		local function indexFromKey(key)
+			if String.startsWith(key, prefix) then
+				return tonumber(string.sub(key, #prefix + 1))
+			else
+				return nil
+			end
+		end
+		local participantsOfOpponent = Array.extractValues(Table.mapArguments(
+			allParticipants,
+			indexFromKey,
+			function (key, index)
+				if Logic.isEmpty(allParticipants[key]) then
+					return nil
+				end
+				return Table.merge({playerId = index}, allParticipants[key])
+			end,
+			true
+		))
+		return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
+	end
+
+	-- TODO: Dynamic range based on number of opponents
+	local opponents = Array.map(Array.range(1, 2), function (_, index)
+		return {players = getParticipantsOfOpponent(Json.parseIfString(record.participants) or {}, index)}
+	end)
+
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -676,6 +707,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		map = nilIfEmpty(record.map),
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
+		opponents = opponents,
 		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
 		scores = Json.parseIfString(record.scores) or {},
