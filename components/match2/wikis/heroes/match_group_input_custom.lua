@@ -22,6 +22,12 @@ local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 local DUMMY_MAP = 'default'
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 local OPPONENT_CONFIG = {}
 
 -- containers for process helper functions

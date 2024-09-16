@@ -29,6 +29,12 @@ local FIRST_PICK_CONVERSION = {
 local DEFAULT_BESTOF_MATCH = 5
 local DEFAULT_BESTOF_MAP = 3
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 -- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -45,7 +51,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {'tournament_enddate'}))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
@@ -223,7 +229,8 @@ function MapFunctions.getParticipants(map, opponents)
 					player = playerIdData.name,
 					brawler = getCharacterName(brawler),
 				}
-			end
+			end,
+			OPPONENT_CONFIG
 		)
 		Array.forEach(unattachedParticipants, function()
 			table.insert(participants, table.remove(unattachedParticipants, 1))

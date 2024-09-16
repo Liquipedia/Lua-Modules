@@ -24,6 +24,12 @@ local Opponent = Lua.import('Module:Opponent')
 
 local DEFAULT_MODE = '3v3'
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 local EARNINGS_LIMIT_FOR_FEATURED = 10000
 local CURRENT_YEAR = os.date('%Y')
 
@@ -42,7 +48,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 
@@ -126,7 +132,7 @@ end
 CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param opponent table
----@return table?
+---@return table
 function CustomMatchGroupInput.getOpponentExtradata(opponent)
 	if not Logic.isNumeric(opponent.score2) then
 		return {}

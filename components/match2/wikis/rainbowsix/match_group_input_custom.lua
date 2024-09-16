@@ -22,6 +22,12 @@ local MAX_NUM_BANS = 2
 local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 -- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -39,7 +45,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 	local games = MatchFunctions.extractMaps(match, #opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)

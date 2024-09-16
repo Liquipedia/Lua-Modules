@@ -24,6 +24,12 @@ local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 local MatchFunctions = {}
 local MapFunctions = {}
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
@@ -39,7 +45,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)

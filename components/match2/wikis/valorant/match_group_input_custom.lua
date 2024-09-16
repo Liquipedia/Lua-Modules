@@ -22,6 +22,12 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 -- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -38,7 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
@@ -229,7 +235,8 @@ function MapFunctions.getParticipants(map, opponents)
 					player = playerIdData.name or playerInputData.name,
 					agent = getCharacterName(stats.agent),
 				}
-			end
+			end,
+			OPPONENT_CONFIG
 		)
 		Array.forEach(unattachedParticipants, function(participant)
 			table.insert(participants, participant)

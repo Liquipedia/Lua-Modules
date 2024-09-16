@@ -27,7 +27,7 @@ local CustomMatchGroupInput = {}
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = false,
+	pagifyPlayerNames = true,
 }
 
 ---@param match table

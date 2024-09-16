@@ -21,6 +21,12 @@ local ALLOWED_VETOES = Array.append(MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES, 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 
+local OPPONENT_CONFIG = {
+	resolveRedirect = false,
+	pagifyTeamNames = false,
+	pagifyPlayerNames = true,
+}
+
 -- containers for process helper functions
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -38,7 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
