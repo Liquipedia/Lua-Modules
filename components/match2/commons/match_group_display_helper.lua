@@ -14,6 +14,7 @@ local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
@@ -173,9 +174,16 @@ end
 ---@return table[]
 function DisplayHelper.getParticipantsOfOpponent(allParticipants, opponentIndex)
 	local prefix = opponentIndex .. '_'
-	local participantsOfOpponent = Array.extractValues(Table.mapArgumentsByPrefix(
+	local function indexFromKey(key)
+		if String.startsWith(key, prefix) then
+			return tonumber(string.sub(key, #prefix + 1))
+		else
+			return nil
+		end
+	end
+	local participantsOfOpponent = Array.extractValues(Table.mapArguments(
 		allParticipants,
-		{prefix},
+		indexFromKey,
 		function (key, index)
 			if Logic.isEmpty(allParticipants[key]) then
 				return nil
