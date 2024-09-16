@@ -8,34 +8,27 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
-
-local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetFactory
 local WidgetFactory = Class.new()
 
 ---@param widget Widget
 ---@param injector WidgetInjector?
----@return Html[]
+---@return string
 function WidgetFactory.work(widget, injector)
-	local convertedWidgets = {} ---@type Html[]
+	local children = widget:tryMake(injector)
 
-	if widget == nil then
-		return {}
+	if not children then
+		return ''
 	end
 
-	for _, child in ipairs(widget:tryMake(injector) or {}) do
-		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
-			---@cast child Widget
-			Array.extendWith(convertedWidgets, WidgetFactory.work(child, injector))
-		else
-			---@cast child Html
-			table.insert(convertedWidgets, child)
-		end
+	if type(children) == 'string' then
+		return children
 	end
 
-	return convertedWidgets
+	return table.concat(Array.map(children, function(child)
+		return WidgetFactory.work(child, injector)
+	end))
 end
 
 return WidgetFactory

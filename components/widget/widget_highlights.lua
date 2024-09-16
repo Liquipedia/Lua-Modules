@@ -23,13 +23,13 @@ local Highlights = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return {[1]: Html}?
+---@return string?
 function Highlights:make(injector)
 	return Highlights:_highlights(self.list)
 end
 
 ---@param list (string|number)[]?
----@return Html?
+---@return string?
 function Highlights:_highlights(list)
 	if list == nil or Table.size(list) == 0 then
 		return nil
@@ -44,7 +44,7 @@ function Highlights:_highlights(list)
 
 	div:node(highlights)
 
-	return {div}
+	return tostring(div)
 end
 
 return Highlights
