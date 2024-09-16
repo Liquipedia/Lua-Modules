@@ -12,6 +12,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
+local WidgetFactory = Lua.import('Module:Widget/Factory')
+
 ---@class Widget: BaseClass
 ---@operator call({children: Widget[]?}?): Widget
 ---@field children (Widget|Html|string|number)[]
@@ -51,8 +53,6 @@ end
 ---@param injector WidgetInjector?
 ---@return string[]
 function Widget:tryChildren(injector)
-	-- Here due to circular dependency
-	local WidgetFactory = Lua.import('Module:Widget/Factory')
 	return Array.flatMap(self.children, function(child)
 		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
 			---@cast child Widget
