@@ -361,10 +361,10 @@ function CustomMatchSummary._createMap(game)
 
 	local team1Agents = Agents():setLeft()
 	local team2Agents = Agents():setRight()
-	for _, playerStats in ipairs((game.opponents[1] or {}).players or {}) do
+	for _, playerStats in ipairs((game.opponents[1] or {}).players) do
 		team1Agents:add(playerStats.agent)
 	end
-	for _, playerStats in ipairs((game.opponents[2] or {}).players or {}) do
+	for _, playerStats in ipairs((game.opponents[2] or {}).players) do
 		team2Agents:add(playerStats.agent)
 	end
 
