@@ -368,7 +368,7 @@ function StarcraftFfaMatchGroupInput._setPlacements(opponents, noScores)
 	end
 
 	cache.placement = 1
-	cache.skipped = 1
+	cache.skipped = 0
 	for _, opponent in Table.iter.spairs(opponents, StarcraftFfaMatchGroupInput._placementSortFunction) do
 		local currentStatus = toSortStatus(opponent.status)
 		local currentScore = opponent.score or 0
