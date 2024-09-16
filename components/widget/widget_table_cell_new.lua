@@ -43,7 +43,7 @@ local TableCell = Class.new(
 
 ---@param injector WidgetInjector?
 ---@param children string[]
----@return {[1]: Html}
+---@return string?
 function TableCell:make(injector, children)
 	local cell = mw.html.create(self.isHeader and 'th' or 'td')
 	cell:attr('colspan', self.colSpan)
@@ -55,7 +55,7 @@ function TableCell:make(injector, children)
 
 	Array.forEach(children, FnUtil.curry(cell.node, cell))
 
-	return {cell}
+	return tostring(cell)
 end
 
 return TableCell

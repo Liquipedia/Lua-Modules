@@ -29,13 +29,13 @@ end
 
 ---@param injector WidgetInjector?
 ---@param children string[]
----@return Widget[]|Html[]|nil
+---@return Widget[]|string|nil
 function Widget:make(injector, children)
 	error('A Widget must override the make() function!')
 end
 
 ---@param injector WidgetInjector?
----@return Widget[]|Html[]|nil
+---@return Widget[]|string|nil
 function Widget:tryMake(injector)
 	local processedChildren = self:tryChildren(injector)
 	return Logic.tryOrElseLog(

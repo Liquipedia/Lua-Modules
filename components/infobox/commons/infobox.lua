@@ -86,11 +86,7 @@ function Infobox:build(widgets)
 			error('Infobox:build can only accept Widgets')
 		end
 
-		local contentItems = WidgetFactory.work(widget, self.injector)
-
-		for _, node in ipairs(contentItems or {}) do
-			self.content:node(node)
-		end
+		self.content:node(WidgetFactory.work(widget, self.injector))
 	end
 
 	self.root:node(self.content)

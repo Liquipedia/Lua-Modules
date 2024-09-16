@@ -32,7 +32,7 @@ local TableRow = Class.new(
 
 ---@param injector WidgetInjector?
 ---@param children string[]
----@return {[1]: Html}
+---@return string?
 function TableRow:make(injector, children)
 	local row = mw.html.create('tr')
 
@@ -42,7 +42,7 @@ function TableRow:make(injector, children)
 
 	Array.forEach(children, FnUtil.curry(row.node, row))
 
-	return {row}
+	return tostring(row)
 end
 
 return TableRow

@@ -9,7 +9,6 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -102,16 +101,14 @@ function Squad:row(row)
 	return self
 end
 
----@return Html
+---@return string
 function Squad:create()
 	local dataTable = Widget.TableNew{
 		css = {['margin-bottom'] = '10px'},
 		classes = {'wikitable-striped', 'roster-card'},
 		children = self.rows,
 	}
-	local wrapper = mw.html.create()
-	Array.forEach(WidgetFactory.work(dataTable, self.injector), FnUtil.curry(wrapper.node, wrapper))
-	return wrapper
+	return WidgetFactory.work(dataTable, self.injector)
 end
 
 return Squad

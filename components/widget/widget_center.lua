@@ -25,14 +25,14 @@ local Center = Class.new(
 )
 
 ---@param injector WidgetInjector?
----@return {[1]: Html?}
+---@return string?
 function Center:make(injector)
-	return {Center:_create(self.content, self.classes)}
+	return Center:_create(self.content, self.classes)
 end
 
 ---@param content (string|number)[]
 ---@param classes string[]
----@return Html?
+---@return string?
 function Center:_create(content, classes)
 	if Table.isEmpty(content) then
 		return nil
@@ -47,7 +47,7 @@ function Center:_create(content, classes)
 		centered:wikitext(item)
 	end
 
-	return mw.html.create('div'):node(centered)
+	return tostring(mw.html.create('div'):node(centered))
 end
 
 return Center

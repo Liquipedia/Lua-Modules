@@ -55,7 +55,7 @@ function ExtendedSquadRow:activeteam()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow, CustomInjector)
 end
