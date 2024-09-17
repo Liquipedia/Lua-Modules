@@ -15,7 +15,6 @@ local String = require('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widget = Lua.import('Module:Widget/All')
-local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class Squad
 ---@operator call:Squad
@@ -108,7 +107,7 @@ function Squad:create()
 		classes = {'wikitable-striped', 'roster-card'},
 		children = self.rows,
 	}
-	return WidgetFactory.work(dataTable, self.injector)
+	return dataTable:tryMake(self.injector) or ''
 end
 
 return Squad

@@ -9,11 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
-
-local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class Infobox
 ---@field frame Frame?
@@ -86,7 +83,7 @@ function Infobox:build(widgets)
 			error('Infobox:build can only accept Widgets')
 		end
 
-		self.content:node(WidgetFactory.work(widget, self.injector))
+		self.content:node(widget:tryMake(self.injector))
 	end
 
 	self.root:node(self.content)
