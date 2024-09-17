@@ -667,6 +667,7 @@ end
 function MatchGroupUtil.gameFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
+	local participants = Json.parseIfString(record.participants) or {}
 	local walkover = nilIfEmpty(record.walkover)
 
 	local function getParticipantsOfOpponent(allParticipants, opponentIndex)
@@ -694,7 +695,7 @@ function MatchGroupUtil.gameFromRecord(record)
 
 	-- TODO: Dynamic range based on number of opponents
 	local opponents = Array.map(Array.range(1, 2), function (_, index)
-		return {players = getParticipantsOfOpponent(Json.parseIfString(record.participants) or {}, index)}
+		return {players = getParticipantsOfOpponent(participants, index)}
 	end)
 
 	return {
@@ -708,7 +709,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = opponents,
-		participants = Json.parseIfString(record.participants) or {},
+		participants = participants,
 		resultType = nilIfEmpty(record.resulttype),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
