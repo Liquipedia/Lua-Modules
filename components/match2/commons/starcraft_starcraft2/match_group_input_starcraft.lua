@@ -55,7 +55,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local opponentHasWon = Table.extract(opponent, 'win')
 		if not Logic.readBool(opponentHasWon) then return end
-		mw.ext.TeamLiquidIntegration.add_category('Pages with matches using `|win` in opponents')
 		match.winner = match.winner or opponentIndex
 	end)
 
