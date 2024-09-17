@@ -16,7 +16,6 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local DeprecatedCustomMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/deprecated')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -25,7 +24,6 @@ local Streams = Lua.import('Module:Links/Stream')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
 local TBA = 'TBA'
@@ -34,31 +32,23 @@ local MODE_MIXED = 'mixed'
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
+-- make these available for ffa
+StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
+StarcraftMatchGroupInput.MapFunctions = MapFunctions
 
 ---@param match table
 ---@param options table?
 ---@return table
 function StarcraftMatchGroupInput.processMatch(match, options)
 	if Logic.readBool(match.ffa) then
-		return DeprecatedCustomMatchGroupInput.processMatch(match, options)
+		-- have to import here to avoid import loops
+		local FfaStarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/Ffa')
+		return FfaStarcraftMatchGroupInput.processMatch(match, options)
 	end
 
 	Table.mergeInto(match, MatchFunctions.readDate(match.date))
 
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
-		-- make sure match2players is not nil to avoid indexing nil
-		opponent.match2players = opponent.match2players or {}
-		Array.forEach(opponent.match2players, function(player)
-			player.extradata = player.extradata or {}
-			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
-		end)
-	end)
+	local opponents = MatchFunctions.readOpponents(match)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
 
@@ -106,6 +96,27 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	return match
+end
+
+---@param match table
+---@return table[]
+function MatchFunctions.readOpponents(match)
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
+	end)
+
+	Array.forEach(opponents, function(opponent)
+		opponent.extradata = opponent.extradata or {}
+		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+		-- make sure match2players is not nil to avoid indexing nil
+		opponent.match2players = opponent.match2players or {}
+		Array.forEach(opponent.match2players, function(player)
+			player.extradata = player.extradata or {}
+			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+		end)
+	end)
+
+	return opponents
 end
 
 ---@param dateInput string?
@@ -380,18 +391,18 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
-				faction = isArchon and archonFaction or Faction.read(mapInput[prefix .. 'race']),
 			}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
+			local factionKey = 't' .. opponentIndex .. 'p' .. playerIndex .. 'race'
+			local faction = isArchon and archonFaction or Faction.read(mapInput[factionKey])
 			return {
-				faction = playerInputData.faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
-				player = playerIdData.name or playerInputData.link,
+				faction = faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
+				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
 			}
-		end,
-		OPPONENT_CONFIG
+		end
 	)
 
 	Array.forEach(unattachedParticipants, function(participant)

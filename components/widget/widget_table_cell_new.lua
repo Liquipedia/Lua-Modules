@@ -41,10 +41,9 @@ local TableCell = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function TableCell:make(injector, children)
+function TableCell:make(children)
 	local cell = mw.html.create(self.isHeader and 'th' or 'td')
 	cell:attr('colspan', self.colSpan)
 	cell:attr('rowspan', self.rowSpan)

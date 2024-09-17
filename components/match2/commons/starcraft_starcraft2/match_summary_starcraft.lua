@@ -68,6 +68,9 @@ end
 
 local StarcraftMatchSummary = {}
 
+-- make these available in FFA Matchsummary too
+StarcraftMatchSummary.LINKS_DATA = LINKS_DATA
+
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.MatchSummaryContainer(args)

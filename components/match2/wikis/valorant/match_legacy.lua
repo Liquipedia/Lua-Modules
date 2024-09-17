@@ -83,11 +83,10 @@ function MatchLegacy.storeGames(match, match2)
 				game.extradata['t'..teamId..'a'..playerId] = data.agent
 			end
 		end
-		local participants = Json.parseIfString(game2.participants) or {}
-		for team = 1, 2 do
-			local participantsOfTeam = DisplayHelper.getParticipantsOfOpponent(participants, team)
-			for player = 1, 5 do
-				addPlayer(team, player, participantsOfTeam[player])
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		for teamId, opponent in ipairs(opponents) do
+			for playerId, player in ipairs(opponent.players)  do
+				addPlayer(teamId, playerId, player)
 			end
 		end
 		-- Other stuff
