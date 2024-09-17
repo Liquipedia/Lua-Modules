@@ -107,7 +107,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 		-- todo: get rid of the damn alias ...
 		if Logic.isEmpty(opponent.advances) and Logic.isNotEmpty(opponent.win) then
 			opponent.advances = opponent.win
-			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `|win=` in opponents')
+			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `win=` in opponents')
 		end
 
 		opponent.extradata.advances = Logic.readBool(opponent.advances)
@@ -267,7 +267,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	-- todo: get rid of the damn alias ...
 	Array.forEach(Array.range(1, opponentCount), function(opponentIndex)
 		if not map['score' .. opponentIndex] and map['points' .. opponentIndex] then
-			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `|pointsX=` in maps')
+			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `pointsX=` in maps')
 			map['score' .. opponentIndex] = map['points' .. opponentIndex]
 		end
 	end)
