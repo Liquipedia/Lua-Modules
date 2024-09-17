@@ -21,10 +21,9 @@ local Highlights = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Highlights:make(injector, children)
+function Highlights:make(children)
 	return Highlights:_highlights(children)
 end
 

@@ -55,10 +55,9 @@ function TableCell:addCss(key, value)
 	return self
 end
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function TableCell:make(injector, children)
+function TableCell:make(children)
 	local cell = mw.html.create('div'):addClass('csstable-widget-cell')
 	cell:css{
 		['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil,

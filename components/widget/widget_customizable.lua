@@ -21,10 +21,9 @@ local Customizable = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string
-function Customizable:make(injector, children)
+function Customizable:make(children)
 	return table.concat(children)
 end
 

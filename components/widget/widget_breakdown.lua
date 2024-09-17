@@ -24,10 +24,9 @@ local Breakdown = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Breakdown:make(injector, children)
+function Breakdown:make(children)
 	return Breakdown:_breakdown(children, self.classes, self.contentClasses)
 end
 

@@ -20,10 +20,9 @@ local Title = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Title:make(injector, children)
+function Title:make(children)
 	return Title:_create(children[1])
 end
 

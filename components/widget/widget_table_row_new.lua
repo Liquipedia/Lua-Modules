@@ -30,10 +30,9 @@ local TableRow = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function TableRow:make(injector, children)
+function TableRow:make(children)
 	local row = mw.html.create('tr')
 
 	Array.forEach(self.classes, FnUtil.curry(row.addClass, row))

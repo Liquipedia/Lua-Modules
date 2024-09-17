@@ -23,10 +23,9 @@ local Div = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
 ---@param children string[]
 ---@return string?
-function Div:make(injector, children)
+function Div:make(children)
 	local div = mw.html.create('div')
 	Array.forEach(self.classes, FnUtil.curry(div.addClass, div))
 	Array.forEach(children, FnUtil.curry(div.node, div))
