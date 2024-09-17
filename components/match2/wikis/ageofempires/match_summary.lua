@@ -173,7 +173,10 @@ function CustomMatchSummary._createGame(row, game, props)
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
 			local oppKey = opponentId .. '_'
-			for participantId, _ in Table.iter.spairs(game.participants, function(tbl, a, b) return tbl[a].index < tbl[b].index end) do
+			for participantId, _ in Table.iter.spairs(
+				game.participants,
+				function(tbl, a, b) return tbl[a].index < tbl[b].index end
+			) do
 				if String.startsWith(participantId, oppKey) then
 					display:node(createParticipant(participantId, opponentId == 1))
 				end
