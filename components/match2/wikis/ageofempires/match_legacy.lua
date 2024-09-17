@@ -40,13 +40,17 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.vodmatch = match.vod
 		if game.mode == 'team' then
 			local function processOpponent(opponentIndex)
-				for _, player, playerId in Table.iter.pairsByPrefix(participants, opponentIndex .. '_') do
-					local prefix = 'o' .. opponentIndex .. 'p' .. playerId
+				local oppKey = opponentIndex .. '_'
+				Table.iter.forEachPair(participants, function (participantId, player)
+					if not String.startsWith(participantId, oppKey) then
+						return
+					end
+					local prefix = 'o' .. opponentIndex .. 'p' .. player.index
 					game.extradata[prefix] = player.pageName
 					game.extradata[prefix .. 'faction'] = player.civ
 					game.extradata[prefix .. 'name'] = player.displayname
 					game.extradata[prefix .. 'flag'] = player.flag
-				end
+				end)
 			end
 			processOpponent(1)
 			processOpponent(2)
