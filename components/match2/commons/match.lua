@@ -460,6 +460,7 @@ Match.gameFields = Table.map({
 	'parent',
 	'participants',
 	'patch',
+	'opponents', -- Not a real field yet, but will be in the future. Also for use in Match/Legacy
 	'resulttype',
 	'rounds',
 	'scores',
