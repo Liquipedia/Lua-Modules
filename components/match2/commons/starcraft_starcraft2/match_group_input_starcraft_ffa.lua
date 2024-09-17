@@ -257,7 +257,6 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true
-		map.status = 'notplayed' -- according to RFC ;)
 		map.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
 		map.scores = {}
 		map.statuses = {}
