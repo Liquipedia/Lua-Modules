@@ -502,7 +502,7 @@ end
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
-	local games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord)
+	local games = Array.map(record.match2games, function(game) return MatchGroupUtil.gameFromRecord(game, #opponents) end)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
 		bracketData.lowerEdges = bracketData.lowerEdges
@@ -663,8 +663,9 @@ function MatchGroupUtil.playerFromRecord(record)
 end
 
 ---@param record table
+---@param opponentCount integer?
 ---@return MatchGroupUtilGame
-function MatchGroupUtil.gameFromRecord(record)
+function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
 	local participants = Json.parseIfString(record.participants) or {}
@@ -693,8 +694,7 @@ function MatchGroupUtil.gameFromRecord(record)
 		return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
 	end
 
-	-- TODO: Dynamic range based on number of opponents
-	local opponents = Array.map(Array.range(1, 2), function (_, index)
+	local opponents = Array.map(Array.range(1, opponentCount or 2), function (_, index)
 		return {players = getParticipantsOfOpponent(participants, index)}
 	end)
 
