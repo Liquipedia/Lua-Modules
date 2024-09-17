@@ -331,26 +331,24 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
-				faction = Faction.read(mapInput[prefix .. 'race']),
-				heroes = mapInput[prefix .. 'heroes'],
-				heroesCheckDisabled = Logic.readBool(mapInput[prefix .. 'heroesNoCheck']),
-				playedRandom = Logic.readBool(mapInput[prefix .. 'random']),
 			}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
-			local faction = playerInputData.faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction
-			local link = playerIdData.name or playerInputData.link
+			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
+			local faction = Faction.read(mapInput[prefix .. 'race'])
+				or (playerIdData.extradata or {}).faction or Faction.defaultFaction
+			local link = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_')
 			return {
 				faction = faction,
 				player = link,
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
-				random = playerInputData.playedRandom,
+				random = Logic.readBool(mapInput[prefix .. 'random']),
 				heroes = MapFunctions.readHeroes(
-					playerInputData.heroes,
+					mapInput[prefix .. 'heroes'],
 					faction,
 					link,
-					playerInputData.heroesCheckDisabled
+					Logic.readBool(mapInput[prefix .. 'heroesNoCheck'])
 				),
 			}
 		end,
