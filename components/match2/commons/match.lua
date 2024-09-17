@@ -388,7 +388,7 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	if not gameRecord.participants and gameRecord.opponents then
 		gameRecord.participants = {}
 		for opponentId, opponent in ipairs(gameRecord.opponents) do
-			for playerId, player in ipairs(opponent.players) do
+			for playerId, player in pairs(opponent.players) do
 				gameRecord.participants[opponentId .. '_' .. playerId] = player
 			end
 		end
