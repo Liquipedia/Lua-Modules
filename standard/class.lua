@@ -6,10 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
-
 local Arguments = require('Module:Arguments')
 
 local Class = {}
