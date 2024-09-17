@@ -324,6 +324,7 @@ function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex
 				displayName = playerIdData.displayname or playerInputData.name,
 				pageName = playerIdData.name or playerInputData.name,
 				flag = playerIdData.flag,
+				index = playerIndex,
 			}
 		end,
 		OPPONENT_CONFIG
