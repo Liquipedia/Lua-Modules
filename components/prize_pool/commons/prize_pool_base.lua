@@ -919,7 +919,7 @@ end
 ---@param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
 ---@return self
 function BasePrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
+	assert(Class.instanceOf(widgetInjector, WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
 	self._widgetInjector = widgetInjector
 	return self
 end
@@ -928,7 +928,7 @@ end
 ---@param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
 ---@return self
 function BasePrizePool:setLpdbInjector(lpdbInjector)
-	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
+	assert(Class.instanceOf(lpdbInjector, LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
 	return self
 end

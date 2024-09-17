@@ -54,7 +54,7 @@ function Widget:tryChildren(injector)
 		children = self:makeChildren(injector) or {}
 	end
 	return Array.map(children, function(child)
-		if type(child) == 'table' and type(child['is_a']) == 'function' and child:is_a(Widget) then
+		if Class.instanceOf(child, Widget) then
 			---@cast child Widget
 			return Logic.tryOrElseLog(
 				function() return child:tryMake(injector) end,
