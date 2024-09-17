@@ -66,12 +66,12 @@ end
 
 ---@return boolean
 function ResultOrError:isResult()
-	return self:is_a(ResultOrError.Result)
+	return Class.instanceOf(self, ResultOrError.Result)
 end
 
 ---@return boolean
 function ResultOrError:isError()
-	return self:is_a(ResultOrError.Error)
+	return Class.instanceOf(self, ResultOrError.Error)
 end
 
 --[[
@@ -136,9 +136,7 @@ function ResultOrError.try(f, originalError)
 	xpcall(
 		function()
 			local result = f()
-			local isResultOrError = type(result) == 'table'
-				and type(result.is_a) == 'function'
-				and result:is_a(ResultOrError)
+			local isResultOrError = Class.instanceOf(result, ResultOrError)
 			resultOrError = isResultOrError
 				and result
 				or ResultOrError.Result(result)

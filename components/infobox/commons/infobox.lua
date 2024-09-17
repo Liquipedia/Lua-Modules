@@ -9,8 +9,11 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
+
+local Widget = Lua.import('Module:Widget')
 
 ---@class Infobox
 ---@field frame Frame?
@@ -79,9 +82,7 @@ end
 ---@return Html
 function Infobox:build(widgets)
 	for _, widget in ipairs(widgets) do
-		if widget == nil or widget['is_a'] == nil then
-			error('Infobox:build can only accept Widgets')
-		end
+		assert(Class.instanceOf(widget, Widget), 'Infobox:build can only accept Widgets')
 
 		self.content:node(widget:tryMake(self.injector))
 	end

@@ -222,9 +222,7 @@ local StreamKey = Class.new(
 )
 StreamLinks.StreamKey = StreamKey
 
----@param tbl string
----@param languageCode string
----@param index integer
+---@overload fun(self, tbl: string, languageCode: string, index: integer): StreamKey
 ---@overload fun(self, tbl: StreamKey): StreamKey
 ---@overload fun(self, tbl: string): StreamKey
 function StreamKey:new(tbl, languageCode, index)
@@ -236,6 +234,7 @@ function StreamKey:new(tbl, languageCode, index)
 		index = tbl.index
 	-- All three parameters are supplied
 	elseif languageCode and index then
+		---@cast tbl -StreamKey
 		platform = tbl
 	elseif type(tbl) == 'string' then
 		local components = mw.text.split(tbl, '_', true)
@@ -251,8 +250,8 @@ function StreamKey:new(tbl, languageCode, index)
 		end
 	end
 
-	self.platform = platform --[[@as string]]
-	self.languageCode = languageCode --[[@as string]]
+	self.platform = platform
+	self.languageCode = languageCode
 	self.index = tonumber(index) --[[@as integer]]
 	self:_isValid()
 	self.languageCode = self.languageCode:lower()
@@ -298,14 +297,10 @@ function StreamKey:_isValid()
 	return true
 end
 
----@param value StreamKey
----@return true
+---@overload fun(value: StreamKey): true
 ---@overload fun(value: any): false
 function StreamKey._isStreamKey(value)
-	if type(value) == 'table' and type(value.is_a) == 'function' and value:is_a(StreamKey) then
-		return true
-	end
-	return false
+	return Class.instanceOf(value, StreamKey)
 end
 StreamKey.__tostring = StreamKey.toString
 
