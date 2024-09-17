@@ -89,6 +89,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.opponents = MapFunctions.getParticipants(map, opponents)
+		map.participants = nil
 		map.extradata = MapFunctions.getExtraData(map, map.opponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
