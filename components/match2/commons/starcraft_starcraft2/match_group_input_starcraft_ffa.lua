@@ -103,12 +103,6 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 			or match.pbg[opponent.placement]
 			or DEFUALT_BACKGROUND
 
-		-- todo: get rid of the damn alias ...
-		if Logic.isEmpty(opponent.advances) and Logic.isNotEmpty(opponent.win) then
-			opponent.advances = opponent.win
-			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `win=` in opponents')
-		end
-
 		opponent.extradata.advances = Logic.readBool(opponent.advances)
 			or (match.bestof and (opponent.score or 0) >= match.bestof)
 			or opponent.extradata.bg == ADVANCE_BACKGROUND
@@ -261,14 +255,6 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		map.statuses = {}
 		return map
 	end
-
-	-- todo: get rid of the damn alias ...
-	Array.forEach(Array.range(1, opponentCount), function(opponentIndex)
-		if not map['score' .. opponentIndex] and map['points' .. opponentIndex] then
-			mw.ext.TeamLiquidIntegration.add_category('Pages with ffa matches using `pointsX=` in maps')
-			map['score' .. opponentIndex] = map['points' .. opponentIndex]
-		end
-	end)
 
 	local opponentsInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
