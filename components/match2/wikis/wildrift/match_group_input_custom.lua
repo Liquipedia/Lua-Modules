@@ -26,7 +26,6 @@ local DUMMY_MAP = 'default'
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = false,
-	pagifyPlayerNames = true,
 }
 
 -- containers for process helper functions

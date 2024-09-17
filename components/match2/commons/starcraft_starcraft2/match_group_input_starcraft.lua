@@ -25,7 +25,6 @@ local Streams = Lua.import('Module:Links/Stream')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
 local TBA = 'TBA'
@@ -398,8 +397,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
 			}
-		end,
-		OPPONENT_CONFIG
+		end
 	)
 
 	Array.forEach(unattachedParticipants, function(participant)

@@ -25,7 +25,6 @@ local MAX_NUM_PLAYERS = 15
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 	maxNumPlayers = MAX_NUM_PLAYERS,
 }
 
