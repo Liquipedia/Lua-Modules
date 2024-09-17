@@ -23,7 +23,6 @@ local DEFAULT_MODE = 'team'
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 
 -- containers for process helper functions
