@@ -31,6 +31,7 @@ local WidgetFactory = Lua.import('Module:Widget/Factory')
 local WidgetTable = Widgets.Table
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
+local Div = Widgets.Div
 
 local pageVars = PageVariableNamespace('PrizePool')
 
@@ -149,7 +150,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{content = {{currencyText}}}
+			return TableCell{content = {currencyText}}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -188,7 +189,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{Currency.display(data.currency)}}}
+			return TableCell{content = {Currency.display(data.currency)}}
 		end,
 
 		row = 'localprize',
@@ -226,7 +227,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{content = {data.title}}
 		end,
 
 		row = 'percentage',
@@ -240,7 +241,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data .. '%'}}}
+				return TableCell{content = {data .. '%'}}
 			end
 		end,
 	},
@@ -294,7 +295,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(content, '[[' .. headerData.link .. ']]')
 			end
 
-			return TableCell{content = {content}}
+			return TableCell{children = {Div{children = content}}}
 		end,
 
 		mergeDisplayColumns = true,
@@ -339,7 +340,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{content = {headerDisplay}}
+			return TableCell{content = {table.concat(headerDisplay)}}
 		end,
 
 		row = 'points',
@@ -348,7 +349,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{LANG:formatNum(data)}}}
+				return TableCell{content = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -360,7 +361,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{content = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -369,7 +370,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data}}}
+				return TableCell{content = {data}}
 			end
 		end,
 	}
@@ -665,11 +666,11 @@ function BasePrizePool:_buildRows()
 				local lastCellOfType = previousOfPrizeType[prize.type]
 				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
-					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
+					if Table.isNotEmpty(lastCellOfType.children) and Table.isNotEmpty(cell.children) then
 						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('width', '100%')))
 					end
 
-					Array.extendWith(lastCellOfType.content, cell.content)
+					Array.extendWith(lastCellOfType.children, cell.children)
 					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
@@ -683,11 +684,11 @@ function BasePrizePool:_buildRows()
 				local lastInColumn = previousOpponent[columnIndex]
 
 				---@cast prizeCell -nil
-				if Table.isEmpty(prizeCell.content) then
+				if Table.isEmpty(prizeCell.children) then
 					prizeCell = BasePrizePool._emptyCell()
 				end
 
-				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
+				if lastInColumn and Table.deepEquals(lastInColumn.children, prizeCell.children) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
 					previousOpponent[columnIndex] = prizeCell

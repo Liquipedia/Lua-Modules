@@ -24,6 +24,9 @@ Widgets.Highlights = Lua.import('Module:Widget/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Links')
 Widgets.Title = Lua.import('Module:Widget/Title')
 
+--- Generic Widgets
+Widgets.Div = Lua.import('Module:Widget/Div')
+
 --- Table Widgets (div-table) (might be removed)
 Widgets.Table = Lua.import('Module:Widget/Table')
 Widgets.TableRow = Lua.import('Module:Widget/Table/Row')
