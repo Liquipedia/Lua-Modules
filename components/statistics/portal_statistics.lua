@@ -1022,6 +1022,7 @@ function StatisticsPortal._cacheOpponentPlacementData(args)
 			.. 'opponentplayers, opponentname, opponenttype',
 		conditions = conditions:toString(),
 		limit = 1000,
+		order = 'date asc',
 	}
 
 	local function makeOpponentTable(item)

@@ -23,7 +23,6 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = false,
-	pagifyPlayerNames = true,
 	maxNumPlayers = 15,
 }
 local DEFAULT_MODE = 'team'
@@ -261,8 +260,8 @@ function MapFunctions.getParticipants(MatchParser, map, opponents)
 				local participant = participantList[playerIndex]
 				participant.character = getCharacterName(participant.character)
 				return participant
-			end,
-			OPPONENT_CONFIG)
+			end
+		)
 		Array.forEach(unattachedParticipants, function(participant)
 			table.insert(participants, participant)
 		end)

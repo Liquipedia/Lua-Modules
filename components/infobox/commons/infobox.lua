@@ -14,7 +14,6 @@ local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
 
 local Widget = Lua.import('Module:Widget')
-local WidgetFactory = Lua.import('Module:Widget/Factory')
 
 ---@class Infobox
 ---@field frame Frame?
@@ -85,7 +84,7 @@ function Infobox:build(widgets)
 	for _, widget in ipairs(widgets) do
 		assert(Class.instanceOf(widget, Widget), 'Infobox:build can only accept Widgets')
 
-		self.content:node(WidgetFactory.work(widget, self.injector))
+		self.content:node(widget:tryMake(self.injector))
 	end
 
 	self.root:node(self.content)

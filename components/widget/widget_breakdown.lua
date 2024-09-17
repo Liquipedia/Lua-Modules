@@ -12,23 +12,23 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class BreakdownWidget: Widget
----@operator call({content:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
----@field contents (string|number)[]
+---@operator call({children:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
 ---@field classes string[]
 ---@field contentClasses table<integer, string[]> --can have gaps in the outer table
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
-		self.contents = input.content
+		self.children = input.children or input.content
 		self.classes = input.classes
 		self.contentClasses = input.contentClasses or {}
 	end
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Breakdown:make(injector)
-	return Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)
+function Breakdown:make(injector, children)
+	return Breakdown:_breakdown(children, self.classes, self.contentClasses)
 end
 
 ---@param contents (string|number)[]

@@ -14,18 +14,18 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class HighlightsWidget: Widget
 ---@operator call({content: (string|number)[]?}):HighlightsWidget
----@field list (string|number)[]?
 local Highlights = Class.new(
 	Widget,
 	function(self, input)
-		self.list = input.content
+		self.children = input.children or input.content or {}
 	end
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Highlights:make(injector)
-	return Highlights:_highlights(self.list)
+function Highlights:make(injector, children)
+	return Highlights:_highlights(children)
 end
 
 ---@param list (string|number)[]?

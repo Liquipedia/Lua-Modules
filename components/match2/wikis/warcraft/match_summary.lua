@@ -371,17 +371,21 @@ function CustomMatchSummary._submatchHeader(submatch)
 		}
 	end
 
+	---@param opponentIndex any
+	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner
+		local isWinner = opponentIndex == submatch.winner or submatch.resultType ~= 'draw'
 		if submatch.resultType == 'default' then
 			return OpponentDisplay.BlockScore{
 				isWinner = isWinner,
-				scoreText = isWinner and 'W' or submatch.walkover,
+				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
 			}
 		end
+
+		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or ''
 		return OpponentDisplay.BlockScore{
 			isWinner = isWinner,
-			scoreText = (submatch.scores or {})[opponentIndex] or '',
+			scoreText = score,
 		}
 	end
 

@@ -14,20 +14,20 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class CentereWidget: Widget
 ---@operator call({content: (string|number)[], classes: string[]}): CentereWidget
----@field content (string|number)[]
 ---@field classes string[]
 local Center = Class.new(
 	Widget,
 	function(self, input)
-		self.content = input.content
+		self.children = input.children or input.content or {}
 		self.classes = input.classes
 	end
 )
 
 ---@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Center:make(injector)
-	return Center:_create(self.content, self.classes)
+function Center:make(injector, children)
+	return Center:_create(children, self.classes)
 end
 
 ---@param content (string|number)[]

@@ -25,7 +25,6 @@ local Streams = Lua.import('Module:Links/Stream')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
 local TBA = 'TBA'
@@ -53,6 +52,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local opponentHasWon = Table.extract(opponent, 'win')
 		if not Logic.readBool(opponentHasWon) then return end
+		mw.ext.TeamLiquidIntegration.add_category('Pages with matches using `win` in opponents')
 		match.winner = match.winner or opponentIndex
 	end)
 
@@ -180,7 +180,7 @@ end
 ---@param player table
 ---@return string
 function MatchFunctions.getPlayerFaction(player)
-	return player.extradata.faction or Faction.defaultFaction
+	return Faction.read(player.extradata.faction) or Faction.defaultFaction
 end
 
 ---@param opponents {type: OpponentType}
@@ -387,18 +387,18 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
-				faction = isArchon and archonFaction or Faction.read(mapInput[prefix .. 'race']),
 			}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
+			local factionKey = 't' .. opponentIndex .. 'p' .. playerIndex .. 'race'
+			local faction = isArchon and archonFaction or Faction.read(mapInput[factionKey])
 			return {
-				faction = playerInputData.faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
-				player = playerIdData.name or playerInputData.link,
+				faction = faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
+				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
 			}
-		end,
-		OPPONENT_CONFIG
+		end
 	)
 
 	Array.forEach(unattachedParticipants, function(participant)
