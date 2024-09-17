@@ -191,7 +191,7 @@ function MapFunctions.getExtraData(map, participants)
 	}
 
 	for opponentIdx, opponent in ipairs(participants) do
-		for playerIdx, player in ipairs(opponent.players) do
+		for playerIdx, player in pairs(opponent.players) do
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent
 		end
