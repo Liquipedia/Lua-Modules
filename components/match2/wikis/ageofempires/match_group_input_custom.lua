@@ -27,7 +27,6 @@ local CustomMatchGroupInput = {}
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = false,
 }
 
 ---@param match table
@@ -126,11 +125,9 @@ function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
 		)
 	end
 
-	if options.pagifyPlayerNames then
-		Array.forEach(opponent.players or {}, function(player)
-			player.pageName = Page.pageifyLink(player.pageName)
-		end)
-	end
+	Array.forEach(opponent.players or {}, function(player)
+		player.pageName = Page.pageifyLink(player.pageName)
+	end)
 
 	local record = MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
 
@@ -326,8 +323,7 @@ function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex
 				flag = playerIdData.flag,
 				index = playerIndex,
 			}
-		end,
-		OPPONENT_CONFIG
+		end
 	)
 	Array.forEach(unattachedParticipants, function(participant)
 		table.insert(participants, participant)

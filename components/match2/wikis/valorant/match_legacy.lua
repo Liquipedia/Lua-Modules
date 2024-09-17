@@ -85,7 +85,7 @@ function MatchLegacy.storeGames(match, match2)
 		end
 		local opponents = Json.parseIfString(game2.opponents) or {}
 		for teamId, opponent in ipairs(opponents) do
-			for playerId, player in ipairs(opponent.players)  do
+			for playerId, player in pairs(opponent.players)  do
 				addPlayer(teamId, playerId, player)
 			end
 		end

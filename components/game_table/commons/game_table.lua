@@ -11,12 +11,11 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
-local NP_STATUSES = {'skip', 'np', 'canceled', 'cancelled'}
+local NOT_PLAYED = 'np'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class GameTableMatch: MatchTableMatch
@@ -32,7 +31,7 @@ end)
 ---@return match2game?
 function GameTable:gameFromRecord(game)
 	if self.countGames == self.config.limit then return nil end
-	if Table.includes(NP_STATUSES, game.resulttype) then
+	if game.resulttype == NOT_PLAYED then
 		return nil
 	end
 

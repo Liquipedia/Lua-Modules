@@ -88,8 +88,8 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.participants = MapFunctions.getParticipants(map, opponents)
-		map.extradata = MapFunctions.getExtraData(map, map.participants)
+		map.opponents = MapFunctions.getParticipants(map, opponents)
+		map.extradata = MapFunctions.getExtraData(map, map.opponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
@@ -179,8 +179,8 @@ function MapFunctions.keepMap(map)
 end
 
 ---@param map table
----@param participants table<string, {player: string?, agent: string?}>
----@return table
+---@param participants {players: {player: string?, agent: string?}[]}[]
+---@return table<string, any>
 function MapFunctions.getExtraData(map, participants)
 	---@type table<string, any>
 	local extraData = {
@@ -190,10 +190,11 @@ function MapFunctions.getExtraData(map, participants)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
-	for key, participant in pairs(participants) do
-		local opponentIdx, playerIdx = unpack(mw.text.split(key, '_', true))
-		extraData['t' .. opponentIdx .. 'p' .. playerIdx] = participant.player
-		extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = participant.agent
+	for opponentIdx, opponent in ipairs(participants) do
+		for playerIdx, player in pairs(opponent.players) do
+			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
+			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent
+		end
 	end
 
 	return extraData
@@ -201,12 +202,11 @@ end
 
 ---@param map table
 ---@param opponents MGIParsedOpponent[]
----@return table
+---@return {players: table[]}[]
 function MapFunctions.getParticipants(map, opponents)
-	local allParticipants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
-	Array.forEach(opponents, function(opponent, opponentIndex)
+	return Array.map(opponents, function(opponent, opponentIndex)
 		local players = Array.mapIndexes(function(playerIndex)
 			return opponent.match2players[playerIndex] or
 				(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
@@ -234,10 +234,8 @@ function MapFunctions.getParticipants(map, opponents)
 		Array.forEach(unattachedParticipants, function(participant)
 			table.insert(participants, participant)
 		end)
-		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+		return {players = participants}
 	end)
-
-	return allParticipants
 end
 
 ---@param map table

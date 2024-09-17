@@ -93,6 +93,7 @@ local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
 	ESTIMATE = 86400,
 }
+MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()
@@ -114,7 +115,6 @@ local contentLanguage = mw.getContentLanguage()
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
 ---@field pagifyTeamNames boolean?
----@field pagifyPlayerNames boolean?
 
 ---@class MatchGroupInputSubstituteInformation
 ---@field substitute standardPlayer
@@ -236,11 +236,9 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		)
 	end
 
-	if options.pagifyPlayerNames then
-		Array.forEach(opponent.players or {}, function(player)
-			player.pageName = Page.pageifyLink(player.pageName)
-		end)
-	end
+	Array.forEach(opponent.players or {}, function(player)
+		player.pageName = Page.pageifyLink(player.pageName)
+	end)
 
 	local record = MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
 
@@ -1134,16 +1132,9 @@ function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
 end
 
 ---@param name string
----@param options {pagifyPlayerNames: boolean?}?
 ---@return string
-function MatchGroupInputUtil.makeLinkFromName(name, options)
-	local link = mw.ext.TeamLiquidIntegration.resolve_redirect(name)
-
-	if (options or {}).pagifyPlayerNames then
-		link = Page.pageifyLink(link) --[[@as string]]
-	end
-
-	return link
+function MatchGroupInputUtil.makeLinkFromName(name)
+	return Page.pageifyLink(name) --[[@as string]]
 end
 
 ---@alias PlayerInputData {name: string?, link: string?}
@@ -1151,15 +1142,14 @@ end
 ---@param inputPlayers table[]
 ---@param indexToPlayer fun(playerIndex: integer): PlayerInputData?
 ---@param transform fun(playerIndex: integer, playerIdData: MGIParsedPlayer?, playerInputData: PlayerInputData): table?
----@param options {pagifyPlayerNames: boolean?}?
 ---@return table, table
-function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToPlayer, transform, options)
+function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToPlayer, transform)
 	local participants = {}
 	local unattachedParticipants = {}
 	local function parsePlayer(_, playerIndex)
 		local playerInputData = indexToPlayer(playerIndex) or {}
 		if playerInputData.name and not playerInputData.link then
-			playerInputData.link = MatchGroupInputUtil.makeLinkFromName(playerInputData.name, options)
+			playerInputData.link = MatchGroupInputUtil.makeLinkFromName(playerInputData.name)
 		end
 		local playerId = MatchGroupInputUtil.findPlayerId(playerIds, playerInputData.name, playerInputData.link)
 		local toStoreData = transform(playerIndex, playerIds[playerId] or {}, playerInputData)

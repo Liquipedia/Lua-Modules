@@ -27,7 +27,6 @@ local Streams = Lua.import('Module:Links/Stream')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
 local NEUTRAL_HERO_FACTION = 'neutral'

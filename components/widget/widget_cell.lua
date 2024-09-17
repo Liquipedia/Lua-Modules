@@ -19,13 +19,12 @@ local Widget = Lua.import('Module:Widget')
 ---@class CellWidget: Widget
 ---@operator call({name:string|number,content:(string|number)[],classes:string[]?,options:CellWidgetOptions}):CellWidget
 ---@field name string|number
----@field content (string|number)[]
 ---@field options CellWidgetOptions
 ---@field classes string[]?
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
-		self.content = input.content
+		self.children = input.children or input.content or {}
 		self.options = input.options or {}
 		self.classes = input.classes
 
@@ -60,7 +59,7 @@ function Cell:_class(...)
 	return self
 end
 
----@param ... string|number
+---@param ... string
 ---@return CellWidget
 function Cell:_content(...)
 	local firstItem = select(1, ...)
@@ -75,7 +74,7 @@ function Cell:_content(...)
 		if i > 1 then
 			self.contentDiv:wikitext('<br/>')
 		end
-		local item = select(i, ...)
+		local item = select(i, ...) ---@type string?
 		if item == nil then
 			break
 		end
@@ -89,12 +88,12 @@ function Cell:_content(...)
 	return self
 end
 
----@param injector WidgetInjector?
+---@param children string[]
 ---@return string?
-function Cell:make(injector)
+function Cell:make(children)
 	self:_new(self.name)
 	self:_class(unpack(self.classes or {}))
-	self:_content(unpack(self.content))
+	self:_content(unpack(children))
 
 	if self.contentDiv == nil then
 		return
