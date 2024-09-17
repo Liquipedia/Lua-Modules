@@ -389,7 +389,9 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 		gameRecord.participants = {}
 		for opponentId, opponent in ipairs(gameRecord.opponents) do
 			for playerId, player in pairs(opponent.players) do
-				gameRecord.participants[opponentId .. '_' .. playerId] = player
+				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
+				-- between participants and opponents
+				gameRecord.participants[opponentId .. '_' .. playerId] = Table.deepCopy(player)
 			end
 		end
 	end
