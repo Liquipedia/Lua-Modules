@@ -64,7 +64,6 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	if MatchGroupInputUtil.isNotPlayed(match.winner, finishedInput) then
 		match.finished = true
-		match.status = 'notplayed' -- according to RFC ;)
 		match.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
 		match.extradata = {ffa = 'true'}
 		return match
