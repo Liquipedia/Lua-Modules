@@ -31,6 +31,7 @@ local WidgetFactory = Lua.import('Module:Widget/Factory')
 local WidgetTable = Widgets.Table
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
+local Div = Widgets.Div
 
 local pageVars = PageVariableNamespace('PrizePool')
 
@@ -294,7 +295,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(content, '[[' .. headerData.link .. ']]')
 			end
 
-			return TableCell{content = {table.concat(content)}}
+			return TableCell{children = {Div{children = content}}}
 		end,
 
 		mergeDisplayColumns = true,
@@ -665,11 +666,11 @@ function BasePrizePool:_buildRows()
 				local lastCellOfType = previousOfPrizeType[prize.type]
 				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
-					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
+					if Table.isNotEmpty(lastCellOfType.children) and Table.isNotEmpty(cell.children) then
 						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('width', '100%')))
 					end
 
-					Array.extendWith(lastCellOfType.content, cell.content)
+					Array.extendWith(lastCellOfType.children, cell.children)
 					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
@@ -683,11 +684,11 @@ function BasePrizePool:_buildRows()
 				local lastInColumn = previousOpponent[columnIndex]
 
 				---@cast prizeCell -nil
-				if Table.isEmpty(prizeCell.content) then
+				if Table.isEmpty(prizeCell.children) then
 					prizeCell = BasePrizePool._emptyCell()
 				end
 
-				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
+				if lastInColumn and Table.deepEquals(lastInColumn.children, prizeCell.children) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
 					previousOpponent[columnIndex] = prizeCell
