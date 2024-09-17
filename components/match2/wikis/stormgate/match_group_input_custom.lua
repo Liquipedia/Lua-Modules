@@ -332,8 +332,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 					Logic.readBool(mapInput[prefix .. 'noheroescheck'])
 				),
 			}
-		end,
-		OPPONENT_CONFIG
+		end
 	)
 
 	Array.forEach(unattachedParticipants, function(participant)
