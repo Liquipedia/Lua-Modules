@@ -25,7 +25,6 @@ local Streams = Lua.import('Module:Links/Stream')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
 local DEFAULT_HERO_FACTION = HeroData.default.faction
