@@ -179,7 +179,7 @@ function MapFunctions.keepMap(map)
 end
 
 ---@param map table
----@param participants {player: string?, agent: string?}[][]
+---@param participants {players: {player: string?, agent: string?}[]}[]
 ---@return table<string, any>
 function MapFunctions.getExtraData(map, participants)
 	---@type table<string, any>
@@ -191,7 +191,7 @@ function MapFunctions.getExtraData(map, participants)
 	}
 
 	for opponentIdx, opponent in ipairs(participants) do
-		for playerIdx, player in ipairs(opponent) do
+		for playerIdx, player in ipairs(opponent.players) do
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent
 		end
@@ -202,7 +202,7 @@ end
 
 ---@param map table
 ---@param opponents MGIParsedOpponent[]
----@return table[][]
+---@return {players: table[]}[]
 function MapFunctions.getParticipants(map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
