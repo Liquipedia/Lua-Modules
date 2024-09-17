@@ -173,7 +173,7 @@ function CustomMatchSummary._createGame(row, game, props)
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
 			Array.forEach(
-				Array.sortBy(game.opponents[opponentId], Operator.property('index')),
+				Array.sortBy(game.opponents[opponentId].players, Operator.property('index')),
 				function(player)
 					display:node(createParticipant(player, opponentId == 1))
 				end
