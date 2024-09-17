@@ -8,12 +8,13 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local MapMode = require('Module:MapMode')
 local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MapMode = require('Module:MapMode')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -161,8 +162,7 @@ function CustomMatchSummary._createGame(row, game, props)
 		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1').civ, normGame)
 		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1').civ, normGame)
 	else
-		local function createParticipant(participantId, flipped)
-			local player = CustomMatchSummary._getPlayerData(game, participantId)
+		local function createParticipant(player, flipped)
 			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(player.civ, normGame)
 			return mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
@@ -172,15 +172,12 @@ function CustomMatchSummary._createGame(row, game, props)
 		end
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
-			local oppKey = opponentId .. '_'
-			for participantId, _ in Table.iter.spairs(
-				game.participants,
-				function(tbl, a, b) return tbl[a].index < tbl[b].index end
-			) do
-				if String.startsWith(participantId, oppKey) then
-					display:node(createParticipant(participantId, opponentId == 1))
+			Array.forEach(
+				Array.sortBy(game.opponents[opponentId], Operator.property('index')),
+				function(player)
+					display:node(createParticipant(player, opponentId == 1))
 				end
-			end
+			)
 			return display
 		end
 

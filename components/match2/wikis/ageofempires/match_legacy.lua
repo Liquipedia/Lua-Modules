@@ -8,6 +8,7 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -31,6 +32,7 @@ function MatchLegacy.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		local participants = Json.parseIfString(game2.participants) or {}
+		local opponents = Json.parseIfString(game2.opponents) or {}
 
 		-- Extradata
 		game.extradata = {}
@@ -39,21 +41,15 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.tournament = match.tournament
 		game.extradata.vodmatch = match.vod
 		if game.mode == 'team' then
-			local function processOpponent(opponentIndex)
-				local oppKey = opponentIndex .. '_'
-				Table.iter.forEachPair(participants, function (participantId, player)
-					if not String.startsWith(participantId, oppKey) then
-						return
-					end
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players, function(player)
 					local prefix = 'o' .. opponentIndex .. 'p' .. player.index
 					game.extradata[prefix] = player.pageName
 					game.extradata[prefix .. 'faction'] = player.civ
 					game.extradata[prefix .. 'name'] = player.displayname
 					game.extradata[prefix .. 'flag'] = player.flag
 				end)
-			end
-			processOpponent(1)
-			processOpponent(2)
+			end)
 		elseif game.mode == '1v1' then
 			local player1 = participants['1_1'] or {}
 			local player2 = participants['2_1'] or {}
