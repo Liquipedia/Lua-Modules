@@ -181,7 +181,7 @@ end
 ---@param player table
 ---@return string
 function MatchFunctions.getPlayerFaction(player)
-	return player.extradata.faction or Faction.defaultFaction
+	return Faction.read(player.extradata.faction) or Faction.defaultFaction
 end
 
 ---@param opponents {type: OpponentType}
