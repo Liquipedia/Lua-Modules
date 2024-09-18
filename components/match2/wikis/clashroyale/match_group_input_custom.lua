@@ -185,7 +185,6 @@ function MapFunctions.readMap(mapInput, mapIndex, subGroup, opponentCount)
 	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
 	local map = {
-		map = 'Set ' .. mapIndex, -- CR has no map names, use generic one instead
 		subgroup = subGroup,
 	}
 
