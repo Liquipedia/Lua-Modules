@@ -18,18 +18,21 @@ liquipedia.countdown = {
 			mw.loader.using( 'user.options', () => {
 				liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 					const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
-					const dateChild = document.createElement( 'span' );
-					if ( typeof dateObject === 'object' ) {
-						const disableTimeZoneAdjust = mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === '1' || mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === 1;
-						if ( disableTimeZoneAdjust ) {
+					let dateChild;
+					if ( timerObjectNode.firstChild instanceof HTMLSpanElement ) {
+						dateChild = timerObjectNode.firstChild;
+					} else {
+						dateChild = document.createElement( 'span' );
+						if (
+							mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
+							typeof dateObject !== 'object'
+						) {
 							dateChild.innerHTML = timerObjectNode.innerHTML;
 						} else {
 							dateChild.innerHTML = liquipedia.countdown.getCorrectTimeZoneString( dateObject );
 						}
-					} else {
-						dateChild.innerHTML = timerObjectNode.innerHTML;
+						dateChild.classList.add( 'timer-object-date' );
 					}
-					dateChild.classList.add( 'timer-object-date' );
 					timerObjectNode.innerHTML = '';
 					timerObjectNode.appendChild( dateChild );
 					let separatorChild;
