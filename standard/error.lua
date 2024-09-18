@@ -66,10 +66,7 @@ end)
 ---@param error Error
 ---@return boolean
 function Error.isError(error)
-	return type(error) == 'table'
-		and type(error.is_a) == 'function'
-		and error:is_a(Error)
-		and type(error.message) == 'string'
+	return Class.instanceOf(error, Error) and type(error.message) == 'string'
 end
 
 function Error:__tostring()

@@ -72,21 +72,21 @@ function MatchLegacy.storeGames(match, match2)
 				game.extradata.opponent2scores = table.concat(team2, ', ')
 			end
 		end
-		local participants = Json.parseIfString(game2.participants)
-		if participants then
-			for team = 1, 2 do
-				for player = 1, 5 do
-					local data = participants[team..'_'..player]
-					if data then
-						local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
-						game.extradata['t'..team..'p'..player] = playerPage
-						if data.kills and data.deaths and data.assists then
-							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
-						end
-						game.extradata['t'..team..'acs'..player] = data.acs
-						game.extradata['t'..team..'a'..player] = data.agent
-					end
+		local addPlayer = function (teamId, playerId, data)
+			if data then
+				local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
+				game.extradata['t'..teamId..'p'..playerId] = playerPage
+				if data.kills and data.deaths and data.assists then
+					game.extradata['t'..teamId..'kda'..playerId] = data.kills..'/'..data.deaths..'/'..data.assists
 				end
+				game.extradata['t'..teamId..'acs'..playerId] = data.acs
+				game.extradata['t'..teamId..'a'..playerId] = data.agent
+			end
+		end
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		for teamId, opponent in ipairs(opponents) do
+			for playerId, player in pairs(opponent.players)  do
+				addPlayer(teamId, playerId, player)
 			end
 		end
 		-- Other stuff
@@ -95,12 +95,11 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(scores)
-		end
+
+		local scores = Json.parseIfString(game2.scores) or {}
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
+
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
 			Json.stringifySubTables(game)
@@ -182,7 +181,14 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = opponent.name
-			match[prefix..'score'] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
+			if match2.bestof == 1 then
+				if ((match2.match2games or {})[1] or {}).scores then
+					match[prefix..'score'] = Json.parseIfString(match2.match2games[1].scores)[index]
+				end
+			end
+			if not match[prefix..'score'] then
+				match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			end
 			local opponentplayers = {}
 			for i = 1, 5 do
 				local player = opponentmatch2players[i] or {}

@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/All
+-- page=Module:Widget/All
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -23,6 +23,9 @@ Widgets.Header = Lua.import('Module:Widget/Header')
 Widgets.Highlights = Lua.import('Module:Widget/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Links')
 Widgets.Title = Lua.import('Module:Widget/Title')
+
+--- Generic Widgets
+Widgets.Div = Lua.import('Module:Widget/Div')
 
 --- Table Widgets (div-table) (might be removed)
 Widgets.Table = Lua.import('Module:Widget/Table')

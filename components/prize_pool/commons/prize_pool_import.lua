@@ -707,12 +707,12 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	end
 
 	local score, vsScore, lastVs
-	for _, opponent in pairs(match.match2opponents) do
+	for opponentIndex, opponent in pairs(match.match2opponents) do
 		if opponent.name == opponentName then
 			score = Import._getScore(opponent)
 		else
 			vsScore = Import._getScore(opponent)
-			lastVs = MatchGroupUtil.opponentFromRecord(opponent)
+			lastVs = MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 		end
 	end
 

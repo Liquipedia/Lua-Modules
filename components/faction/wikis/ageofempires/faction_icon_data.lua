@@ -345,61 +345,64 @@ local byFactionAoM = {
 		icon = 'File:Chinese AoM icon.png',
 	},
 	greeks = {
-		icon = 'File:Greek AoM icon.png',
+		icon = 'File:Greek AoM R icon.png',
 	},
 	atlanteans = {
-		icon = 'File:Atlantean AoM icon.png',
+		icon = 'File:Atlantean AoM R icon.png',
 	},
 	egyptians = {
-		icon = 'File:Egyptian AoM icon.png',
+		icon = 'File:Egyptian AoM R icon.png',
 	},
 	norse = {
-		icon = 'File:Norse AoM icon.png',
+		icon = 'File:Norse AoM R icon.png',
 	},
 	fuxi = {
 		icon = 'File:Fu Xi AoM icon.png',
 	},
+	freyr = {
+		icon = 'File:Freyr AoM R icon.png',
+	},
 	gaia = {
-		icon = 'File:Gaia AoM icon.png',
+		icon = 'File:Gaia AoM R icon.png',
 	},
 	hades = {
-		icon = 'File:Hades AoM icon.png',
+		icon = 'File:Hades AoM R icon.png',
 	},
 	isis = {
-		icon = 'File:Isis AoM icon.png',
+		icon = 'File:Isis AoM R icon.png',
 	},
 	kronos = {
-		icon = 'File:Kronos AoM icon.png',
+		icon = 'File:Kronos AoM R icon.png',
 	},
 	loki = {
-		icon = 'File:Loki AoM icon.png',
+		icon = 'File:Loki AoM R icon.png',
 	},
 	nuwa = {
 		icon = 'File:Nu Wa AoM icon.png',
 	},
 	odin = {
-		icon = 'File:Odin AoM icon.png',
+		icon = 'File:Odin AoM R icon.png',
 	},
 	oranos = {
-		icon = 'File:Oranos AoM icon.png',
+		icon = 'File:Oranos AoM R icon.png',
 	},
 	poseidon = {
-		icon = 'File:Poseidon AoM icon.png',
+		icon = 'File:Poseidon AoM R icon.png',
 	},
 	ra = {
-		icon = 'File:Ra AoM icon.png',
+		icon = 'File:Ra AoM R icon.png',
 	},
 	set = {
-		icon = 'File:Set AoM icon.png',
+		icon = 'File:Set AoM R icon.png',
 	},
 	shennong = {
 		icon = 'File:Shennong AoM icon.png',
 	},
 	thor = {
-		icon = 'File:Thor AoM icon.png',
+		icon = 'File:Thor AoM R icon.png',
 	},
 	zeus = {
-		icon = 'File:Zeus AoM icon.png',
+		icon = 'File:Zeus AoM R icon.png',
 	},
 	quetzalcoatl = {
 		icon = 'File:Quetzalcoatl AoM icon.png',

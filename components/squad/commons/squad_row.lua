@@ -15,14 +15,14 @@ local OpponentDisplay = OpponentLib.OpponentDisplay
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Widget = Lua.import('Module:Infobox/Widget/All')
+local Widget = Lua.import('Module:Widget/All')
 
 local RoleIcons = {
 	captain = Icon.makeIcon{iconName = 'captain', hover = 'Captain'},
 	sub = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'},
 }
 
----@class SquadRow
+---@class SquadRow: BaseClass
 ---@operator call(ModelRow): SquadRow
 ---@field children Widget[]
 ---@field model ModelRow

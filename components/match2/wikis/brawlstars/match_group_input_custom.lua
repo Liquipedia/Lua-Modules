@@ -47,7 +47,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
 	end)
-	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
@@ -84,9 +84,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponentCount)
+function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
@@ -94,10 +94,10 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.bestof = MapFunctions.getBestOf(map)
-		map.participants = MapFunctions.getParticipants(map, opponentCount)
-		map.extradata = MapFunctions.getExtraData(map, opponentCount)
+		map.participants = MapFunctions.getParticipants(map, opponents)
+		map.extradata = MapFunctions.getExtraData(map, #opponents)
 
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -201,23 +201,37 @@ function MapFunctions.getExtraData(map, opponentCount)
 end
 
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getParticipants(map, opponentCount)
-	local participants = {}
+function MapFunctions.getParticipants(map, opponents)
+	local allParticipants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
-	for opponentIndex = 1, opponentCount do
-		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
-			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
-		end
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local players = Array.mapIndexes(function(playerIndex)
+			return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'c' .. playerIndex])
+		end)
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			opponent.match2players,
+			players,
+			function(playerIndex)
+				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+				return player and {name = player} or nil
+			end,
+			function(playerIndex, playerIdData)
+				local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
+				return {
+					player = playerIdData.name,
+					brawler = getCharacterName(brawler),
+				}
+			end
+		)
+		Array.forEach(unattachedParticipants, function()
+			table.insert(participants, table.remove(unattachedParticipants, 1))
+		end)
+		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	end)
 
-		for _, brawler, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
-			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
-			participants[opponentIndex .. '_' .. pickIndex].brawler = getCharacterName(brawler)
-		end
-	end
-
-	return participants
+	return allParticipants
 end
 
 return CustomMatchGroupInput

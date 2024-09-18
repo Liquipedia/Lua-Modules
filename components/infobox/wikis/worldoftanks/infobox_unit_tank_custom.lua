@@ -18,7 +18,7 @@ local Unit = Lua.import('Module:Infobox/Unit')
 
 local Nation = Lua.import('Module:Infobox/Extension/Nation')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WorldofTanksUnitInfobox: UnitInfobox

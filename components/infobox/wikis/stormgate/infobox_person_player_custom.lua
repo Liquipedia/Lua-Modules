@@ -42,7 +42,7 @@ local ROLES = {
 }
 
 local Injector = Lua.import('Module:Widget/Injector')
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 
 local Cell = Widgets.Cell
 local Title = Widgets.Title

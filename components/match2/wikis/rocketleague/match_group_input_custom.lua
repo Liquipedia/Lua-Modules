@@ -126,7 +126,7 @@ end
 CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param opponent table
----@return table?
+---@return table
 function CustomMatchGroupInput.getOpponentExtradata(opponent)
 	if not Logic.isNumeric(opponent.score2) then
 		return {}

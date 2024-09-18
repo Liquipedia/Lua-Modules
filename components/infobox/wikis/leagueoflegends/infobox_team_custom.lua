@@ -19,7 +19,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local REGION_REMAPPINGS = {

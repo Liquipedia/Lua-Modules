@@ -30,18 +30,38 @@ local globalVars = PageVariableNamespace{cached = true}
 
 local MatchGroupInputUtil = {}
 
-local DEFAULT_ALLOWED_VETOES = {
-	'decider',
-	'pick',
-	'ban',
-	'defaultban',
-}
+---@class MGIParsedPlayer
+---@field displayname string?
+---@field name string?
+---@field flag string?
+---@field faction string?
+---@field index integer
+---@field extradata table
+
+---@class MGIParsedOpponent
+---@field type OpponentType
+---@field name string
+---@field template string?
+---@field icon string?
+---@field icondark string?
+---@field score integer?
+---@field status string?
+---@field placement integer?
+---@field match2players MGIParsedPlayer[]
+---@field extradata table
 
 local NOT_PLAYED_INPUTS = {
 	'skip',
 	'np',
 	'canceled',
 	'cancelled',
+}
+
+MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES = {
+	'decider',
+	'pick',
+	'ban',
+	'defaultban',
 }
 
 MatchGroupInputUtil.STATUS_INPUTS = {
@@ -73,6 +93,7 @@ local ASSUME_FINISHED_AFTER = {
 	EXACT = 30800,
 	ESTIMATE = 86400,
 }
+MatchGroupInputUtil.ASSUME_FINISHED_AFTER = ASSUME_FINISHED_AFTER
 
 local NOW = os.time()
 local contentLanguage = mw.getContentLanguage()
@@ -94,7 +115,6 @@ local contentLanguage = mw.getContentLanguage()
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
 ---@field pagifyTeamNames boolean?
----@field pagifyPlayerNames boolean?
 
 ---@class MatchGroupInputSubstituteInformation
 ---@field substitute standardPlayer
@@ -178,12 +198,12 @@ end
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
----@return table?
+---@return MGIParsedOpponent?
 function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
-		return opponentIndex <= 2 and Opponent.blank() or nil
+		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
 	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
@@ -216,11 +236,9 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 		)
 	end
 
-	if options.pagifyPlayerNames then
-		Array.forEach(opponent.players or {}, function(player)
-			player.pageName = Page.pageifyLink(player.pageName)
-		end)
-	end
+	Array.forEach(opponent.players or {}, function(player)
+		player.pageName = Page.pageifyLink(player.pageName)
+	end)
 
 	local record = MatchGroupInputUtil.mergeRecordWithOpponent(opponentInput, opponent, substitutions)
 
@@ -243,7 +261,7 @@ Using the team template extension, the opponent struct is standardised and not u
 ---@param record table
 ---@param opponent standardOpponent|StarcraftStandardOpponent|StormgateStandardOpponent|WarcraftStandardOpponent
 ---@param substitutions MatchGroupInputSubstituteInformation[]?
----@return table
+---@return MGIParsedOpponent
 function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitutions)
 	if opponent.type == Opponent.team then
 		record.template = opponent.template or record.template
@@ -251,8 +269,8 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 		record.icondark = opponent.icondark or record.icondark
 	end
 
-	if not record.match2players and Logic.isNotEmpty(opponent.players) then
-		record.match2players = Array.map(opponent.players, function(player)
+	if not record.match2players then
+		record.match2players = Array.map(opponent.players or {}, function(player)
 			return {
 				displayname = player.displayName,
 				flag = player.flag,
@@ -448,6 +466,7 @@ function MatchGroupInputUtil.readPlayersOfTeamNew(teamName, manualPlayersInput, 
 	if not name then
 		teamName = teamName:gsub(' ', '_')
 		varPrefix = teamName .. '_p' .. playerIndex
+		name = globalVars:get(varPrefix)
 	end
 
 	while name do
@@ -686,7 +705,7 @@ end
 function MatchGroupInputUtil.getMapVeto(match, allowedVetoes)
 	if not match.mapveto then return nil end
 
-	allowedVetoes = allowedVetoes or DEFAULT_ALLOWED_VETOES
+	allowedVetoes = allowedVetoes or MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES
 
 	match.mapveto = Json.parseIfString(match.mapveto)
 
@@ -945,12 +964,12 @@ end
 -- Special cases:
 -- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
 -- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
----@param opponents table[]
+---@param opponents MGIParsedOpponent[]
 ---@param winner integer?
 ---@param placementWinner integer
 ---@param placementLoser integer
 ---@param resultType string?
----@return table[]
+---@return MGIParsedOpponent[]
 function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, resultType)
 	if not opponents or #opponents ~= 2 or resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
 		return opponents
@@ -1087,6 +1106,71 @@ function MatchGroupInputUtil.getCharacterName(alias, character)
 	if Logic.isEmpty(character) then return nil end
 	---@cast character -nil
 	return (assert(alias[character:lower()], 'Invalid character:' .. character))
+end
+
+---@param players MGIParsedPlayer[]
+---@param playerInput string?
+---@param playerLink string?
+---@return integer?
+function MatchGroupInputUtil.findPlayerId(players, playerInput, playerLink)
+	if Logic.isEmpty(playerInput) and Logic.isEmpty(playerLink) then
+		return
+	end
+
+	local playerLinks = Array.map(players, Operator.property('name'))
+	local playerIndex = Array.indexOf(playerLinks, FnUtil.curry(Operator.eq, playerLink))
+	if playerIndex > 0 then
+		return playerIndex
+	end
+
+	local playerDisplayNames = Array.map(players, Operator.property('displayname'))
+	playerIndex = Array.indexOf(playerDisplayNames, FnUtil.curry(Operator.eq, playerInput))
+	if playerIndex > 0 then
+		return playerIndex
+	end
+	mw.log('Player with id ' .. playerInput .. ' not found in opponent data')
+end
+
+---@param name string
+---@return string
+function MatchGroupInputUtil.makeLinkFromName(name)
+	return Page.pageifyLink(name) --[[@as string]]
+end
+
+---@alias PlayerInputData {name: string?, link: string?}
+---@param playerIds MGIParsedPlayer[]
+---@param inputPlayers table[]
+---@param indexToPlayer fun(playerIndex: integer): PlayerInputData?
+---@param transform fun(playerIndex: integer, playerIdData: MGIParsedPlayer?, playerInputData: PlayerInputData): table?
+---@return table, table
+function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToPlayer, transform)
+	local participants = {}
+	local unattachedParticipants = {}
+	local function parsePlayer(_, playerIndex)
+		local playerInputData = indexToPlayer(playerIndex) or {}
+		if playerInputData.name and not playerInputData.link then
+			playerInputData.link = MatchGroupInputUtil.makeLinkFromName(playerInputData.name)
+		end
+		local playerId = MatchGroupInputUtil.findPlayerId(playerIds, playerInputData.name, playerInputData.link)
+		local toStoreData = transform(playerIndex, playerIds[playerId] or {}, playerInputData)
+		if playerId then
+			participants[playerId] = toStoreData
+		else
+			table.insert(unattachedParticipants, toStoreData)
+		end
+	end
+	Array.forEach(inputPlayers, parsePlayer)
+
+	return participants, unattachedParticipants
+end
+
+---@generic T:table
+---@param opponentIndex integer
+---@return fun(playerIndex: integer, data: T): string, T
+function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
+	return function(playerIndex, data)
+		return opponentIndex .. '_' .. playerIndex, data
+	end
 end
 
 --- Warning, both match and standalone match may be mutated
