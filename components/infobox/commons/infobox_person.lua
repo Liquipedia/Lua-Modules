@@ -46,6 +46,8 @@ local COUNTRIES_EASTERN_NAME_ORDER = {
 	'Vietnam',
 	'South Korea',
 	'Cambodia'
+	'Macau'
+	'Singapore'
 }
 
 ---@enum PlayerStatus
