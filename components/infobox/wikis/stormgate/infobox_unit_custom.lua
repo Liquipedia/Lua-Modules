@@ -18,10 +18,10 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local MessageBox = require('Module:Message box')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Stormgate2UnitInfobox: UnitInfobox
@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
 		local hotkeyName = table.concat(Array.append({},
-			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+			args.hotkey and 'Hotkeys', args.macro_key and 'Macrokeys'
 		), HOTKEY_SEPERATOR)
 		local hotkeys = table.concat(Array.append({},
 			args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2),

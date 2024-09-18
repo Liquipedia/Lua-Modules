@@ -98,7 +98,7 @@ function MatchGroup.MatchPage(args)
 	matchId = args.matchid or matchId
 	local fullMatchId = bracketId .. '_' .. matchId
 
-	local options = {storeMatch1 = false,  storeMatch2 = true, storePageVar = true, bracketId = bracketId}
+	local options = {storeMatch1 = false, storeMatch2 = true, storePageVar = true, bracketId = bracketId}
 	local matches = MatchGroupInput.readMatchpage(bracketId, matchId, args)
 	Match.storeMatchGroup(matches, options)
 
@@ -151,7 +151,7 @@ function MatchGroup.MatchGroupById(args)
 		config.matchHasDetails = function() return false end
 	end
 
-	MatchGroupInput.applyOverrideArgs(matches, args)
+	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
 	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 	return MatchGroupContainer({

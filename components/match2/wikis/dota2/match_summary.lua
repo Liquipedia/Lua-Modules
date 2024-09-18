@@ -190,6 +190,8 @@ function CustomMatchSummary.createBody(match)
 		body:addRow(heroBan)
 	end
 
+	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+
 	return body
 end
 

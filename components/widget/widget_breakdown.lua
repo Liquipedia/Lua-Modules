@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Breakdown
+-- page=Module:Widget/Breakdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,32 +9,31 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class BreakdownWidget: Widget
----@operator call({content:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
----@field contents (string|number)[]
+---@operator call({children:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
 ---@field classes string[]
 ---@field contentClasses table<integer, string[]> --can have gaps in the outer table
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
-		self.contents = input.content
+		self.children = input.children or input.content
 		self.classes = input.classes
 		self.contentClasses = input.contentClasses or {}
 	end
 )
 
----@param injector WidgetInjector?
----@return {[1]: Html?}
-function Breakdown:make(injector)
-	return {Breakdown:_breakdown(self.contents, self.classes, self.contentClasses)}
+---@param children string[]
+---@return string?
+function Breakdown:make(children)
+	return Breakdown:_breakdown(children, self.classes, self.contentClasses)
 end
 
 ---@param contents (string|number)[]
 ---@param classes string[]
 ---@param contentClasses table<integer, string[]> --can have gaps in the outer table
----@return Html?
+---@return string?
 function Breakdown:_breakdown(contents, classes, contentClasses)
 	if type(contents) ~= 'table' or contents == {} then
 		return nil
@@ -54,7 +53,7 @@ function Breakdown:_breakdown(contents, classes, contentClasses)
 		div:node(infoboxCustomCell)
 	end
 
-	return div
+	return tostring(div)
 end
 
 return Breakdown

@@ -14,7 +14,7 @@ return {
 	header =
 		[=[
 			<div class="match-bm-lol-match-header">
-				<div class="match-bm-match-header-powered-by">[[File:SAP logo.svg|link=]]</div>
+				<div class="match-bm-match-header-powered-by">[[File:DataProvidedSAP.svg|link=]]</div>
 				<div class="match-bm-lol-match-header-overview">
 					<div class="match-bm-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-match-header-team-group"><div class="match-bm-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div class="match-bm-lol-match-header-round-results">{{#seriesDots}}<div class="match-bm-lol-match-header-round-result result--{{.}}"></div>{{/seriesDots}}</div>{{/opponents.1}}</div></div>
 					<div class="match-bm-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}<div class="match-bm-match-header-result-text">{{statusText}}</div></div>
@@ -23,12 +23,7 @@ return {
 				<div class="match-bm-lol-match-header-tournament">[[{{parent}}|{{tournament}}]]</div>
 				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
 			</div>
-			{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.1.side}}[[File:Dota2 faction {{games.1.teams.1.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.1.side}}</div>
-			<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{games.1.length}}</div></div></div>
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.2.side}}[[File:Dota2 faction {{games.1.teams.2.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.2.side}}</div>
-			</div></div>{{/isBestOfOne}}
-			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
+			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b>{{#players}} [[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
 		]=],
 	footer =
 		[=[
@@ -65,7 +60,7 @@ return {
 							</div>
 							{{/teams.1.picks}}
 						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row  match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
+						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
 							{{#teams.1.bans}}
 							<div class="match-bm-game-veto-overview-team-veto-row-item">
 								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
@@ -86,7 +81,7 @@ return {
 							</div>
 							{{/teams.2.picks}}
 						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row  match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
+						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
 							{{#teams.2.bans}}
 							<div class="match-bm-game-veto-overview-team-veto-row-item">
 								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
@@ -102,6 +97,7 @@ return {
 				<div class="match-bm-team-stats-header">
 					{{#winnerName}}<h4 class="match-bm-team-stats-header-title">{{winnerName}} Victory</h4>{{/winnerName}}
 					{{^winnerName}}<h4 class="match-bm-team-stats-header-title">No winner determined yet</h4>{{/winnerName}}
+					{{#length}}<div>{{length}}</div>{{/length}}
 				</div>
 				<div class="match-bm-team-stats-container">
 					<div class="match-bm-team-stats-team">
@@ -149,22 +145,21 @@ return {
 					{{#teams.1.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
-								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 {{facet}} facet icon lightmode.png|link=|{{facet}}]]</div></div>
-								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
+								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.1.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
+								<div class="match-bm-players-player-name">[[{{link}}|{{displayName}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
 									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">[[File:{{items.1}} itemicon dota2 gameasset.png|64px]][[File:{{items.2}} itemicon dota2 gameasset.png|64px]][[File:{{items.3}} itemicon dota2 gameasset.png|64px]]</div>
-									<div class="match-bm-players-player-loadout-item">[[File:{{items.4}} itemicon dota2 gameasset.png|64px]][[File:{{items.5}} itemicon dota2 gameasset.png|64px]][[File:{{items.6}} itemicon dota2 gameasset.png|64px]]</div>
-									<div class="match-bm-players-player-loadout-item">[[File:{{backpackitems.1}} itemicon dota2 gameasset.png|64px]][[File:{{backpackitems.2}} itemicon dota2 gameasset.png|64px]][[File:{{backpackitems.3}} itemicon dota2 gameasset.png|64px]]</div>
+									{{#items}}<div class="match-bm-players-player-loadout-item">{{&.}}</div>{{/items}}
+									{{#backpackitems}}<div class="match-bm-players-player-loadout-item item--backpack">{{&.}}</div>{{/backpackitems}}
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
-									<!-- Runes/Spells -->
-									<div class="match-bm-players-player-loadout-rs">[[File:{{neutralitem}} itemicon dota2 gameasset.png|64px]]</div>
-									<div class="match-bm-players-player-loadout-rs">{{#shard}}[[File:Dota2_Aghanim's_Shard_symbol_allmode.png|64px]]{{/shard}}</div>
-									<div class="match-bm-players-player-loadout-rs">{{#scepter}}[[File:Dota2_Aghanim's_Scepter_symbol_allmode.png|64px]]{{/scepter}}</div>
+									<!-- Special Items -->
+									<div class="match-bm-players-player-loadout-rs">{{&neutralitem}}</div>
+									<div class="match-bm-players-player-loadout-rs">{{#shard}}[[File:Dota2_Aghanim's_Shard_symbol_allmode.png|64px|Aghanim's Shard|link=]]{{/shard}}</div>
+									<div class="match-bm-players-player-loadout-rs">{{#scepter}}[[File:Dota2_Aghanim's_Scepter_symbol_allmode.png|64px|Aghanim's Scepter|link=]]{{/scepter}}</div>
 								</div>
 							</div>
 							<div class="match-bm-players-player-stats">
@@ -181,22 +176,20 @@ return {
 					{{#teams.2.players}}
 						<div class="match-bm-players-player">
 							<div class="match-bm-players-player-character">
-								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 {{facet}} facet icon lightmode.png|link=|{{facet}}]]</div></div>
-								<div class="match-bm-lol-players-player-name">[[{{player}}]]<i>{{character}}</i></div>
+								<div class="match-bm-players-player-avatar"><div class="match-bm-players-player-icon">{{&heroIcon}}</div><div class="match-bm-players-player-role role--{{teams.2.side}}">[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]</div></div>
+								<div class="match-bm-players-player-name">[[{{link}}|{{displayName}}]]<i>{{character}}</i></div>
 							</div>
 							<div class="match-bm-players-player-loadout">
 								<!-- Loadout -->
 								<div class="match-bm-players-player-loadout-items">
-									<!-- Items -->
-									<div class="match-bm-players-player-loadout-item">[[File:{{items.1}} itemicon dota2 gameasset.png|64px]][[File:{{items.2}} itemicon dota2 gameasset.png|64px]][[File:{{items.3}} itemicon dota2 gameasset.png|64px]]</div>
-									<div class="match-bm-players-player-loadout-item">[[File:{{items.4}} itemicon dota2 gameasset.png|64px]][[File:{{items.5}} itemicon dota2 gameasset.png|64px]][[File:{{items.6}} itemicon dota2 gameasset.png|64px]]</div>
-									<div class="match-bm-players-player-loadout-item">[[File:{{backpackitems.1}} itemicon dota2 gameasset.png|64px]][[File:{{backpackitems.2}} itemicon dota2 gameasset.png|64px]][[File:{{backpackitems.3}} itemicon dota2 gameasset.png|64px]]</div>
+									{{#items}}<div class="match-bm-players-player-loadout-item">{{&.}}</div>{{/items}}
+									{{#backpackitems}}<div class="match-bm-players-player-loadout-item item--backpack">{{&.}}</div>{{/backpackitems}}
 								</div>
 								<div class="match-bm-players-player-loadout-rs-wrap">
-									<!-- Runes/Spells -->
-									<div class="match-bm-players-player-loadout-rs">[[File:{{neutralitem}} itemicon dota2 gameasset.png|64px]]</div>
-									<div class="match-bm-players-player-loadout-rs">{{#shard}}[[File:Dota2_Aghanim's_Shard_symbol_allmode.png|64px]]{{/shard}}</div>
-									<div class="match-bm-players-player-loadout-rs">{{#scepter}}[[File:Dota2_Aghanim's_Scepter_symbol_allmode.png|64px]]{{/scepter}}</div>
+									<!-- Special Items -->
+									<div class="match-bm-players-player-loadout-rs">{{&neutralitem}}</div>
+									<div class="match-bm-players-player-loadout-rs">{{#shard}}[[File:Dota2_Aghanim's_Shard_symbol_allmode.png|64px|Aghanim's Shard|link=]]{{/shard}}</div>
+									<div class="match-bm-players-player-loadout-rs">{{#scepter}}[[File:Dota2_Aghanim's_Scepter_symbol_allmode.png|64px|Aghanim's Scepter|link=]]{{/scepter}}</div>
 								</div>
 							</div>
 							<div class="match-bm-players-player-stats">

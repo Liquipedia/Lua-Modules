@@ -21,6 +21,9 @@ local FILTERED_ERROR_STACK_ITEMS = {
 	'^Module:ResultOrError:%d+: in function \'try\'$',
 }
 
+local INLINE_ERROR_MESSAGE =
+	'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ${errorMessage}'
+
 ---@param props {limit: integer?, errors: Error[]}
 ---@return Html
 function ErrorDisplay.ErrorList(props)
@@ -98,9 +101,18 @@ function ErrorDisplay.ErrorDetails(error)
 	return errorDetailsNode
 end
 
+---Simple error message when a short error message is needed
+---Currently used for infobox errors
+---@param error Error
+---@return Html
+function ErrorDisplay.InlineError(error)
+	local errorText = String.interpolate(INLINE_ERROR_MESSAGE, {errorMessage = error.message})
+	return mw.html.create('span'):addClass('error'):addClass('show-when-logged-in'):wikitext(errorText)
+end
+
 ---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
 ---@param error Error
----@return string
+---@return Html
 function ErrorDisplay.ClassicError(error)
 	local stackTrace = {}
 
@@ -116,7 +128,7 @@ function ErrorDisplay.ClassicError(error)
 			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
 		elseif frameSplit[1]:sub(1, 3) == 'mw.' then
 			stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
-			stackEntry.content =  table.concat(frameSplit, ':', 3)
+			stackEntry.content = table.concat(frameSplit, ':', 3)
 		elseif frameSplit[1] == 'Module' then
 			local wiki = not Page.exists(table.concat(frameSplit, ':', 1, 2)) and 'commons'
 				or mw.text.split(mw.title.getCurrentTitle():canonicalUrl(), '/', true)[4] or 'commons'
@@ -156,11 +168,11 @@ function ErrorDisplay.ClassicError(error)
 		errorShort = errorText,
 		stackTrace = stackTrace,
 	}, {asArray = true})
-	return tostring(mw.html.create('div')
+	return mw.html.create('div')
 				:tag('strong'):addClass('error')
 				:tag('span'):addClass('scribunto-error')
 				:wikitext(jsonData):wikitext('.')
-				:allDone())
+				:allDone()
 end
 
 return ErrorDisplay

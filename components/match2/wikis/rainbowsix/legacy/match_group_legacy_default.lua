@@ -37,6 +37,7 @@ function MatchGroupLegacyDefault:getMap()
 		t2otatk = 'map$1$o1t2atk',
 		t2otdef = 'map$1$o1t2def',
 		vod = 'vod$1$',
+		winner = 'map$1$win'
 	}
 end
 
@@ -44,6 +45,26 @@ end
 ---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
+end
+
+---@param isReset boolean
+---@param match table
+function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
+	local opp1score, opp2score = (match.opponent1 or {}).score, (match.opponent2 or {}).score
+	-- Legacy maps are Bo10 or Bo12, while >Bo5 in legacy matches are non existent
+	-- Let's assume that if the sum of the scores is less than 6, it's a a match, otherwise it's a map
+	if (opp1score or 0) + (opp2score or 0) < 6 then
+		return
+	end
+
+	(match.opponent1 or {}).score = nil
+	(match.opponent2 or {}).score = nil
+	match.map1 = match.map1 or {
+		map = 'Unknown',
+		finished = true,
+		score1 = opp1score,
+		score2 = opp2score,
+	}
 end
 
 return MatchGroupLegacyDefault

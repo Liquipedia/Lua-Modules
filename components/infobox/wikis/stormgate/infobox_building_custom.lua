@@ -19,10 +19,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local MessageBox = require('Module:Message box')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -108,7 +108,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'hotkey' then
 		if not args.hotkey and not args.macro_key then return {} end
 		local hotkeyName = table.concat(Array.append({},
-			args.hotkey and 'Hotkeys',  args.macro_key and 'Macrokeys'
+			args.hotkey and 'Hotkeys', args.macro_key and 'Macrokeys'
 		), HOTKEY_SEPERATOR)
 		local hotkeys = table.concat(Array.append({},
 			args.hotkey and CustomBuilding._hotkeys(args.hotkey, args.hotkey2),
@@ -226,7 +226,7 @@ function CustomBuilding:setLpdbData(args)
 			respawn = tonumber(args.respawn),
 			creeps = Array.parseCommaSeparatedString(args.creeps),
 			capturepoint = args.capture_point,
-			globalbuff =  args.global_buff,
+			globalbuff = args.global_buff,
 		},
 	})
 end
@@ -308,7 +308,7 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 		Array.appendWith(creeps, unit)
 	end)
 
-	if id ~= 'custom' then return end
+	if id ~= 'custom' then return {} end
 
 	return {
 		Cell{name = 'Start Level', content = {startLevel}},

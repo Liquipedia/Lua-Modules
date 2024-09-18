@@ -74,7 +74,7 @@ function SingleMatchDisplay.Match(props)
 		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = true},
-	})
+	}, require('Module:Error/Display').ErrorList)
 end
 
 return Class.export(SingleMatchDisplay)

@@ -51,7 +51,7 @@ describe('match2', function()
 		end)
 		allwikis('smoketest', function(args, wikiName)
 			local Info = require('Module:Info')
-			if Info.match2 == 0 then
+			if Info.config.match2.status == 0 then
 				return
 			end
 			local MatchGroup = require('Module:MatchGroup')

@@ -12,10 +12,10 @@ local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetCellInputNew
----@field content (string|number|table|Html)[]?
+---@field content (Widget|Html|string|number)[]
 ---@field classes string[]?
 ---@field css {[string]: string|number}?
 ---@field rowSpan integer?
@@ -24,7 +24,6 @@ local Widget = Lua.import('Module:Infobox/Widget')
 
 ---@class WidgetTableCellNew:Widget
 ---@operator call(WidgetCellInputNew): WidgetTableCellNew
----@field content (string|number|table|Html)[]
 ---@field classes string[]
 ---@field css {[string]: string|number}
 ---@field rowSpan integer?
@@ -33,7 +32,7 @@ local Widget = Lua.import('Module:Infobox/Widget')
 local TableCell = Class.new(
 	Widget,
 	function(self, input)
-		self.content = input.content or {}
+		self.children = input.children or input.content or {} -- TODO remove input.content
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 		self.rowSpan = input.rowSpan
@@ -42,9 +41,9 @@ local TableCell = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
----@return {[1]: Html}
-function TableCell:make(injector)
+---@param children string[]
+---@return string?
+function TableCell:make(children)
 	local cell = mw.html.create(self.isHeader and 'th' or 'td')
 	cell:attr('colspan', self.colSpan)
 	cell:attr('rowspan', self.rowSpan)
@@ -53,26 +52,9 @@ function TableCell:make(injector)
 
 	cell:css(self.css)
 
-	cell:node(self:_content())
+	Array.forEach(children, FnUtil.curry(cell.node, cell))
 
-	return {cell}
-end
-
----@return string
-function TableCell:_content()
-	return table.concat(Array.map(self.content, function (content)
-		if type(content) ~= 'table' then
-			return content
-		end
-
-		if not Array.isArray(content) then
-			return tostring(content)
-		end
-
-		local wrapper = mw.html.create('div')
-		Array.forEach(content, FnUtil.curry(wrapper.node, wrapper))
-		return tostring(wrapper)
-	end))
+	return tostring(cell)
 end
 
 return TableCell

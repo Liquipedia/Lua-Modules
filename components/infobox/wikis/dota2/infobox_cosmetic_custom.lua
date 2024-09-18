@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=dota2game
+-- wiki=dota2
 -- page=Module:Infobox/Cosmetic/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,10 +16,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center

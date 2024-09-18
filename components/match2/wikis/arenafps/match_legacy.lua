@@ -14,18 +14,15 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 ---@param match2 table
----@param options table
-function MatchLegacy.storeMatch(match2, options)
-	if options.storeMatch1 then
-		local match = MatchLegacy._convertParameters(match2)
+function MatchLegacy.storeMatch(match2)
+	local match = MatchLegacy._convertParameters(match2)
 
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 ---@param match table

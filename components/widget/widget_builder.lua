@@ -1,17 +1,15 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Builder
+-- page=Module:Widget/Builder
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+local Widget = Lua.import('Module:Widget')
 
 ---@class BuilderWidget: Widget
 ---@operator call({builder: function}): BuilderWidget
@@ -23,15 +21,16 @@ local Builder = Class.new(
 	end
 )
 
+---@param children string[]
+---@return string
+function Builder:make(children)
+	return table.concat(children)
+end
+
 ---@param injector WidgetInjector?
----@return Widget[]
-function Builder:make(injector)
-	local children = self.builder()
-	local widgets = {}
-	for _, child in ipairs(children or {}) do
-		Array.extendWith(widgets, WidgetFactory.work(child, injector))
-	end
-	return widgets
+---@return Widget[]?
+function Builder:makeChildren(injector)
+	return self.builder()
 end
 
 return Builder

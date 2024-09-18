@@ -813,7 +813,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 0,
 		},
 	},
-	match2 = 0,
 }

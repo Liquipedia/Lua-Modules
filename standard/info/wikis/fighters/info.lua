@@ -1684,8 +1684,8 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 1,
 		},
 	},
 	opponentLibrary = 'Opponent/Custom',
-	match2 = 1,
 }

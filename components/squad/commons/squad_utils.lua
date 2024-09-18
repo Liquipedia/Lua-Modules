@@ -22,8 +22,8 @@ local Variables = require('Module:Variables')
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local Widget = Lua.import('Module:Infobox/Widget/All')
+local Injector = Lua.import('Module:Widget/Injector')
+local Widget = Lua.import('Module:Widget/All')
 
 local SquadUtils = {}
 
@@ -121,7 +121,7 @@ function SquadUtils.readSquadPersonArgs(args)
 	end
 
 	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
-	local person =  Lpdb.SquadPlayer:new{
+	local person = Lpdb.SquadPlayer:new{
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = String.nilIfEmpty(args.name),
@@ -181,7 +181,7 @@ end
 ---@param squadClass Squad
 ---@param personFunction fun(player: table, squadType: integer):WidgetTableRowNew
 ---@param injector WidgetInjector?
----@return Html
+---@return string
 function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
 	local args = Arguments.getArgs(frame)
 	local injectorInstance = (injector and injector()) or
@@ -210,7 +210,7 @@ end
 ---@param customTitle string?
 ---@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
----@return Html?
+---@return string?
 function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, customTitle, injector, personMapper)
 	local args = {type = squadType, title = customTitle}
 	local injectorInstance = (injector and injector()) or

@@ -30,7 +30,7 @@ local Locale = Lua.import('Module:Locale')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -307,7 +307,7 @@ end
 
 ---@return Html?
 function Team:_createUpcomingMatches()
-	if self:shouldStore(self.args) and Info.match2 > 0 then
+	if self:shouldStore(self.args) and Info.config.match2.status > 0 then
 		local frame = {short = true} ---@type Frame
 		return MatchTicker.team(frame)
 	end

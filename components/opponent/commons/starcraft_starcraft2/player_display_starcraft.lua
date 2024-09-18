@@ -98,15 +98,18 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	local pageName
 	local displayName
 	if not args.noclean then
-		pageName, displayName = StarcraftPlayerExt.extractFromLink(args[1])
-		if args.link == 'true' then
+		pageName, displayName = StarcraftPlayerExt.extractFromLink(args[1] or '')
+		local showLink = Logic.readBoolOrNil(args.link)
+		if showLink == true then
 			pageName = displayName
-		elseif args.link then
-			pageName = args.link
+		elseif showLink == false then
+			pageName = nil
+		else
+			pageName = args.link or pageName or displayName
 		end
 	else
 		pageName = args.link
-		displayName = args[1]
+		displayName = args[1] or ''
 	end
 
 	local player = {
@@ -117,7 +120,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 	}
 
 	if not args.novar then
-		StarcraftPlayerExt.saveToPageVars(player)
+		StarcraftPlayerExt.saveToPageVars(player, {overwritePageVars = true})
 	end
 
 	local hiddenSortNode = args.hs
@@ -169,6 +172,7 @@ function StarcraftPlayerDisplay.InlinePlayerContainer(props)
 	StarcraftPlayerExt.syncPlayer(props.player, {
 		date = props.date,
 		savePageVar = props.savePageVar,
+		overwritePageVars = true,
 	})
 
 	return StarcraftPlayerDisplay.InlinePlayer(props)

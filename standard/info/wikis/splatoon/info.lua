@@ -59,9 +59,9 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 190,
 		},
 	},
-	match2 = 2,
 }

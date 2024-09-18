@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Infobox/Widget/Links
+-- page=Module:Widget/Links
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local UtilLinks = Lua.import('Module:Links')
-local Widget = Lua.import('Module:Infobox/Widget')
+local Widget = Lua.import('Module:Widget')
 
 ---@class LinksWidget: Widget
 ---@operator call({content: table<string, string>, variant: string?}): LinksWidget
@@ -27,9 +27,9 @@ local Links = Class.new(
 
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
----@param injector WidgetInjector?
----@return {[1]: Html}
-function Links:make(injector)
+---@param children string[]
+---@return string?
+function Links:make(children)
 	local infoboxLinks = mw.html.create('div')
 	infoboxLinks	:addClass('infobox-center')
 					:addClass('infobox-icons')
@@ -56,9 +56,7 @@ function Links:make(injector)
 		infoboxLinks:wikitext(' ' .. self:_makeLink(key, value))
 	end
 
-	return {
-		mw.html.create('div'):node(infoboxLinks)
-	}
+	return tostring(mw.html.create('div'):node(infoboxLinks))
 end
 
 ---@param key string

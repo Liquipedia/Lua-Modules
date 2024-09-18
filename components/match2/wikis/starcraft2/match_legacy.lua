@@ -15,24 +15,22 @@ local _UNKNOWNREASON_DEFAULT_LOSS = 'L'
 
 local MODES = {solo = '1v1', team = 'team'}
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match, doStore = MatchLegacy.convertParameters(match2)
 
 	if not doStore then
 		return
 	end
 
-	match.games = MatchLegacy.storeGames(match, match2, options)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-	if options.storeMatch1 then
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
-function MatchLegacy.storeGames(match, match2, options)
+function MatchLegacy.storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
@@ -68,13 +66,10 @@ function MatchLegacy.storeGames(match, match2, options)
 			game.extradata.gamenumber = gameIndex
 
 			game.extradata = json.stringify(game.extradata)
-			local res = ''
-			if options.storeMatch1 then
-				res = mw.ext.LiquipediaDB.lpdb_game(
-					'legacygame_' .. match2.match2id .. gameIndex,
-					game
-				)
-			end
+			local res = mw.ext.LiquipediaDB.lpdb_game(
+				'legacygame_' .. match2.match2id .. gameIndex,
+				game
+			)
 
 			games = games .. res
 		end

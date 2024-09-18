@@ -15,17 +15,15 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -144,8 +142,14 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			local opponentplayers = {}
+			if match2.bestof == 1 then
+				if ((match2.match2games or {})[1] or {}).scores then
+					match[prefix..'score'] = Json.parseIfString(match2.match2games[1].scores)[index]
+				end
+			end
+			if not match[prefix..'score'] then
+				match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			end			local opponentplayers = {}
 			for i = 1,10 do
 				local player = opponentmatch2players[i] or {}
 				opponentplayers['p' .. i] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or '')

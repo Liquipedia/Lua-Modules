@@ -68,6 +68,9 @@ end
 
 local StarcraftMatchSummary = {}
 
+-- make these available in FFA Matchsummary too
+StarcraftMatchSummary.LINKS_DATA = LINKS_DATA
+
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.MatchSummaryContainer(args)
@@ -87,7 +90,7 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 
 	local matchSummary = MatchSummary():init()
 		:addClass('brkts-popup-sc')
-		:addClass(match.opponentMode ~= UNIFORM_MATCH  and 'brkts-popup-sc-team-match' or nil)
+		:addClass(match.opponentMode ~= UNIFORM_MATCH and 'brkts-popup-sc-team-match' or nil)
 
 	--additional header for when martin adds the the css and buttons for switching between match and reset match
 	--if bracketResetMatch then
@@ -327,15 +330,17 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 		return node:addClass('brkts-popup-sc-submatch-opponent')
 	end
 
+	local hasNonZeroScore = Array.any(submatch.scores, function(score) return score ~= 0 end)
+	local hasPlayers = Array.any(submatch.opponents, function(opponent) return Logic.isNotEmpty(opponent.players) end)
+
 	local renderScore = function(opponentIndex)
-		if submatch.resultType == 'np' then
-			return
-		end
 		local isWinner = opponentIndex == submatch.winner
 		local text
 		if submatch.resultType == 'default' then
 			text = isWinner and 'W' or submatch.walkover:upper()
-		else
+		elseif submatch.resultType == 'np' then
+			text = ''
+		elseif hasNonZeroScore or hasPlayers then
 			local score = submatch.scores[opponentIndex]
 			text = score and tostring(score) or ''
 		end

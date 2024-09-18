@@ -26,11 +26,6 @@ local MatchPage = {}
 
 local NO_CHARACTER = 'default'
 local NOT_PLAYED = 'np'
-local DEFAULT_ITEM = 'EmptyIcon'
-local DEFAULT_BACKPACK_ITEM = 'EmptyIcon'
-local TEAMS = Array.range(1, 2)
-local ITEMS_TO_SHOW = 6
-local BACKPACK_ITEMS_TO_SHOW = 3
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
@@ -69,10 +64,17 @@ function MatchPage.getByMatchId(props)
 	local phase = MatchGroupUtil.computeMatchPhase(props.match)
 	viewModel.statusText = phase == 'ongoing' and 'live' or phase
 
+	local function makeItemDisplay(item)
+		if String.isEmpty(item.name) then
+			return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
+		end
+		return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
+	end
+
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(TEAMS, function(teamIdx)
+		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = {players = {}}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
@@ -80,16 +82,15 @@ function MatchPage.getByMatchId(props)
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
 				local newPlayer = Table.mergeInto(player, {
-					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
-						return player.items[idx] or DEFAULT_ITEM
-					end),
-					backpackitems = Array.map(Array.range(1, BACKPACK_ITEMS_TO_SHOW), function(idx)
-						return player.backpackitems[idx] or DEFAULT_BACKPACK_ITEM
-					end),
+					displayName = player.name or player.player,
+					link = player.player,
+					items = Array.map(player.items or {}, makeItemDisplay),
+					backpackitems = Array.map(player.backpackitems or {}, makeItemDisplay),
+					neutralitem = makeItemDisplay(player.neutralitem or {}),
 				})
 
-				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone --[[@as number?]])
-				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold --[[@as number?]])
+				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
+				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold)
 
 				table.insert(team.players, newPlayer)
 			end
@@ -173,13 +174,13 @@ function MatchPage.getByMatchId(props)
 	end
 
 	local displayTitle = MatchPage.makeDisplayTitle(viewModel)
-	if String.isNotEmpty(displayTitle) then
-		mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
-	end
+	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
 
 	return MatchPage.render(viewModel)
 end
 
+---@param viewModel table
+---@return string
 function MatchPage.makeDisplayTitle(viewModel)
 	if not viewModel.opponents[1].shortname and viewModel.opponents[2].shortname then
 		return table.concat({'Match in', viewModel.tickername}, ' ')

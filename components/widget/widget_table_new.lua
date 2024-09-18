@@ -11,8 +11,7 @@ local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
-local Widget = Lua.import('Module:Infobox/Widget')
-local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
+local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetTableNewInput
 ---@field children Widget[]?
@@ -21,21 +20,19 @@ local WidgetFactory = Lua.import('Module:Infobox/Widget/Factory')
 
 ---@class WidgetTableNew:Widget
 ---@operator call(WidgetTableNewInput):WidgetTableNew
----@field children Widget[]
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}
 local Table = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 	end
 )
 
----@param injector WidgetInjector?
----@return {[1]: Html}
-function Table:make(injector)
+---@param children string[]
+---@return string?
+function Table:make(children)
 	local wrapper = mw.html.create('div'):addClass('table-responsive')
 	local output = mw.html.create('table'):addClass('wikitable')
 
@@ -43,12 +40,10 @@ function Table:make(injector)
 
 	output:css(self.css)
 
-	Array.forEach(self.children, function(child)
-		Array.forEach(WidgetFactory.work(child, injector), FnUtil.curry(output.node, output))
-	end)
+	Array.forEach(children, FnUtil.curry(output.node, output))
 
 	wrapper:node(output)
-	return {wrapper}
+	return tostring(wrapper)
 end
 
 return Table
