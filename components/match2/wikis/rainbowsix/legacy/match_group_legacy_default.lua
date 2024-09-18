@@ -53,7 +53,7 @@ function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
 	local opp1score, opp2score = (match.opponent1 or {}).score, (match.opponent2 or {}).score
 	-- Legacy maps are Bo10 or Bo12, while >Bo5 in legacy matches are non existent
 	-- Let's assume that if the sum of the scores is less than 6, it's a a match, otherwise it's a map
-	if (opp1score or 0) + (opp2score or 0) < 6 then
+	if (tonumber(opp1score) or 0) + (tonumber(opp2score) or 0) < 6 then
 		return
 	end
 

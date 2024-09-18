@@ -259,6 +259,20 @@ function MatchMapsLegacy.convertMatch(frame)
 	args = MatchMapsLegacy._setHeaderIfEmpty(args, details)
 	args = MatchMapsLegacy._copyDetailsToArgs(args, details)
 
+	local opp1score, opp2score = args.opponent1.score, args.opponent2.score
+	-- Maps are >Bo9, while >Bo5 in legacy matches are non existent
+	-- Let's assume that if the sum of the scores is less than 10, it's a a match, otherwise it's a map
+	if (tonumber(opp1score) or 0) + (tonumber(opp2score) or 0) >= 10 then
+		args.opponent1.score = nil
+		args.opponent2.score = nil
+		args.map1 = args.map1 or {
+			map = 'Unknown',
+			finished = true,
+			score1 = opp1score,
+			score2 = opp2score,
+		}
+	end
+
 	Template.stashReturnValue(args, 'LegacyMatchlist')
 	return mw.html.create('div'):css('display', 'none')
 end
