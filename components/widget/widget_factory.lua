@@ -10,8 +10,7 @@ local Class = require('Module:Class')
 
 local WidgetFactory = {}
 
----@generic T
----@param args {widget: `T`, children: ((Widget|Html|string|number)[])|Widget|Html|string|number, [string]:any}
+---@param args {widget: string, children: ((Widget|Html|string|number)[])|Widget|Html|string|number, [any]:any}
 ---@return Widget
 function WidgetFactory.fromTemplate(args)
 	local widgetClass = args.widget
