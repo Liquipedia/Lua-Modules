@@ -113,15 +113,19 @@ function CustomMatchSummary.addToFooter(match, footer)
 		return footer
 	end
 
-	local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
+	if not Opponent.isEmpty(match.opponents[1]) and not Opponent.isEmpty(match.opponents[2]) then
+		local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
 			string.gsub(match.opponents[2].name, ' ', '_')
-	return footer:addElement(
-		'[[File:Match Info Stats.png|link=' ..
-		tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
-		player1 ..
-		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
-	)
+		footer:addElement(
+			'[[File:Match Info Stats.png|link=' ..
+			tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
+			player1 ..
+			'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
+		)
+	end
+
+	return footer
 end
 
 ---@param match MatchGroupUtilMatch
