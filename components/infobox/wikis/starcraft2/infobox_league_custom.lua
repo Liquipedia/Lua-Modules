@@ -10,6 +10,8 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
+local Countdown = require('Module:Countdown')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -67,8 +69,31 @@ function CustomLeague:customParseArguments(args)
 	self.data.publishertier = tostring(Logic.readBool(args.featured))
 	self.data.status = self:_getStatus(args)
 
+	self.data.startTime = self:_readStartTime()
+
 	self:_computeChronology(args)
 	self:_computePatch(args)
+end
+
+---@return {display: string?, storage: string?}
+function CustomLeague:_readStartTime()
+	---@type string?
+	local timePart = self.args.start_time
+	local startDate = self.data.startDate
+	if Logic.isEmpty(timePart) or Logic.isEmpty(startDate) then return {} end
+	---@cast timePart -nil
+	---@cast startDate -nil
+
+	local dateString = startDate .. ' - ' .. timePart
+	local timestamp = DateExt.readTimestamp(dateString)
+
+	assert(timestamp, 'Invalid date time combination: '
+		.. '"|start_time=' .. timePart .. '" with "|(s)date=' .. startDate .. '"')
+
+	return {
+		display = dateString,
+		storage = DateExt.formatTimestamp('c', timestamp),
+	}
 end
 
 ---@param args table
@@ -166,12 +191,24 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
+	local data = caller.data
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}},
-			Cell{name = 'Server', content = {self.caller:_getServer(args)}}
+			Cell{name = 'Game Version', content = {caller:_getGameVersion(args)}},
+			Cell{name = 'Server', content = {caller:_getServer(args)}}
+		}
+	elseif id == 'dates' and data.startTime.display then
+		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
+
+		if data.startDate == data.endDate then
+			return {Cell{name = 'Date', content = {startTime}}}
+		end
+		return {
+			Cell{name = 'Start Date', content = {startTime}},
+			Cell{name = 'End Date', content = {args.edate}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
@@ -323,6 +360,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
+	Variables.varDefine('matchDate', self.data.startTime.storage)
 end
 
 ---@param prefix string
@@ -348,6 +386,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = Json.stringify(args.maps)
 
 	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
+	lpdbData.extradata.starttime = self.data.startTime.storage
 
 	return lpdbData
 end
