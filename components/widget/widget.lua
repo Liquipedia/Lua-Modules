@@ -11,8 +11,11 @@ local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
+---@class WidgetParameters
+---@field children (Widget|Html|string|number)[]?
+
 ---@class Widget: BaseClass
----@operator call({children: Widget[]?}?): Widget
+---@operator call(WidgetParameters): Widget
 ---@field children (Widget|Html|string|number)[]
 ---@field makeChildren? fun(self:Widget, injector: WidgetInjector?): Widget[]?
 local Widget = Class.new(function(self, input)
