@@ -25,7 +25,6 @@ local DEFAULT_MODE = 'solo'
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 }
 local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 
@@ -169,7 +168,7 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 end
 
 ---@param bansInput string
----@return table
+---@return table?
 function MatchFunctions.readBans(bansInput)
 	local bans = CustomMatchGroupInput._readCards(bansInput)
 
@@ -267,14 +266,14 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),
-				cards = CustomMatchGroupInput._readCards(mapInput[prefix .. 'c']),
 			}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
+			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
 			return {
 				played = true,
 				player = playerIdData.name or playerInputData.link,
-				cards = playerInputData.cards,
+				cards = CustomMatchGroupInput._readCards(mapInput[prefix .. 'c']),
 			}
 		end
 	)
