@@ -70,4 +70,9 @@ function Widget:tryChildren(injector)
 	end)
 end
 
+---@return string
+function Widget:__tostring()
+	return self:tryMake() or ''
+end
+
 return Widget
