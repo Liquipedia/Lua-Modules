@@ -42,13 +42,14 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.vodmatch = match.vod
 		if game.mode == 'team' then
 			Array.forEach(opponents, function(opponent, opponentIndex)
-				Array.forEach(opponent.players, function(player)
+				-- opponent.players can have gaps
+				for _, player in pairs(opponent.players) do
 					local prefix = 'o' .. opponentIndex .. 'p' .. player.index
 					game.extradata[prefix] = player.pageName
 					game.extradata[prefix .. 'faction'] = player.civ
 					game.extradata[prefix .. 'name'] = player.displayname
 					game.extradata[prefix .. 'flag'] = player.flag
-				end)
+				end
 			end)
 		elseif game.mode == '1v1' then
 			local player1 = participants['1_1'] or {}
