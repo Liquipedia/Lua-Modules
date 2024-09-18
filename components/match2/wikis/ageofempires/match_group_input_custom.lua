@@ -155,7 +155,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 
 		MatchGroupInputUtil.getCommonTournamentVars(map, match)
 
-		map.participants = CustomMatchGroupInput.processPlayerMapData(map, opponents)
+		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
@@ -277,19 +277,16 @@ end
 
 ---@param map table
 ---@param opponents table[]
----@return table<string, table>
+---@return {players: table[]}[]
 function CustomMatchGroupInput.processPlayerMapData(map, opponents)
-	local participants = {}
-	for opponentIndex, opponent in ipairs(opponents) do
-		local oppoParticipant = CustomMatchGroupInput._participants(
+	return Array.map(opponents, function(opponent, opponentIndex)
+		return {players = CustomMatchGroupInput._participants(
 			opponent.match2players,
 			map,
 			opponentIndex,
 			opponent.type
-		)
-		Table.mergeInto(participants, Table.map(oppoParticipant, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
-	end
-	return participants
+		)}
+	end)
 end
 
 ---@param opponentPlayers table[]
@@ -321,6 +318,7 @@ function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex
 				displayName = playerIdData.displayname or playerInputData.name,
 				pageName = playerIdData.name or playerInputData.name,
 				flag = playerIdData.flag,
+				index = playerIndex,
 			}
 		end
 	)
