@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:InlineIcon
+-- page=Module:AutoInlineIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
