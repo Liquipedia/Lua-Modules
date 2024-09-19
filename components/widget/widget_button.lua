@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local Link = Lua.import('Module:Widget/Link')
+local Div = Lua.import('Module:Widget/Div')
 
 ---@class ButtonWidgetParameters: WidgetParameters
 ---@field title string?
@@ -66,11 +67,11 @@ function Button:make(children)
 		return tostring(button)
 	end
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
-	return tostring(mw.html.create('div'):node(tostring(Link{
+	return tostring(Div{children = {Link{
 		link = self.link,
 		linktype = self.linktype,
 		children = {button}
-	})))
+	}}})
 end
 
 return Button
