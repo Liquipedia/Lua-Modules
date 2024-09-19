@@ -15,7 +15,7 @@ local InlineIcon = {}
 ---@param type string
 ---@param lookup string
 ---@param extraInfo string?
----@return string?
+---@return string
 function InlineIcon.display(type, lookup, extraInfo)
 	assert(type, 'Type parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
