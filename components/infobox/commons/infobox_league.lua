@@ -39,7 +39,7 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
+local CustomizableFactory = require('Module:Widget/Customizable/Factory')
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
 
@@ -55,6 +55,7 @@ end
 
 ---@return Html
 function League:createInfobox()
+	local Customizable = CustomizableFactory.createCustomizable(self.infobox.injector)
 	local args = self.args
 	self:_parseArgs()
 

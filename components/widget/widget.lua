@@ -5,7 +5,7 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-local Array = require('Module:Array')
+
 local Class = require('Module:Class')
 local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
@@ -29,18 +29,16 @@ function Widget:assertExistsAndCopy(value)
 	return assert(String.nilIfEmpty(value), 'Tried to set a nil value to a mandatory property')
 end
 
----@param children string[]
+---@param children string[]? #Backwards compatibility
 ---@return string|nil
 function Widget:make(children)
 	error('A Widget must override the make() function!')
 end
 
----@param injector WidgetInjector?
 ---@return string|nil
-function Widget:tryMake(injector)
-	local processedChildren = self:tryChildren(injector)
+function Widget:tryMake()
 	return Logic.tryOrElseLog(
-		function() return self:make(processedChildren) end,
+		function() return self:make(self.children) end,
 		function(error) return tostring(ErrorDisplay.InlineError(error)) end,
 		function(error)
 			error.header = 'Error occured in widget: (caught by Widget:tryMake)'
@@ -49,28 +47,8 @@ function Widget:tryMake(injector)
 	)
 end
 
----@param injector WidgetInjector?
----@return string[]
-function Widget:tryChildren(injector)
-	local children = self.children
-	if self.makeChildren then
-		children = self:makeChildren(injector) or {}
-	end
-	return Array.map(children, function(child)
-		if Class.instanceOf(child, Widget) then
-			---@cast child Widget
-			return Logic.tryOrElseLog(
-				function() return child:tryMake(injector) end,
-				function(error) return tostring(ErrorDisplay.InlineError(error)) end,
-				function(error)
-					error.header = 'Error occured in widget: (caught by Widget:tryChildren)'
-					return error
-				end
-			)
-		end
-		---@cast child -Widget
-		return tostring(child)
-	end)
+function Widget:__tostring()
+	return self:tryMake()
 end
 
 ---@return string

@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -24,13 +25,7 @@ local Builder = Class.new(
 ---@param children string[]
 ---@return string
 function Builder:make(children)
-	return table.concat(children)
-end
-
----@param injector WidgetInjector?
----@return Widget[]?
-function Builder:makeChildren(injector)
-	return self.builder()
+	return table.concat(Array.map(self.builder(), tostring))
 end
 
 return Builder
