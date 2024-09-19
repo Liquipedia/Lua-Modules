@@ -65,11 +65,12 @@ function Button:make(children)
 	if not self.link then
 		return tostring(button)
 	end
-	return tostring(Link{
+	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
+	return tostring(mw.html.create('div'):node(tostring(Link{
 		link = self.link,
 		linktype = self.linktype,
 		children = {button}
-	})
+	})))
 end
 
 return Button
