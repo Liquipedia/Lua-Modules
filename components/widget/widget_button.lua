@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
+local Link = Lua.import('Module:Widget/Link')
 
 ---@class ButtonWidgetParameters: WidgetParameters
 ---@field title string?
@@ -64,11 +65,11 @@ function Button:make(children)
 	if not self.link then
 		return tostring(button)
 	end
-	if self.linktype == 'external' then
-		return '[' .. self.link .. ' '.. tostring(button) .. ']'
-
-	end
-	return '[[' .. self.link .. '|'.. tostring(button) .. ']]'
+	return tostring(Link{
+		link = self.link,
+		linktype = self.linktype,
+		children = {button}
+	})
 end
 
 return Button
