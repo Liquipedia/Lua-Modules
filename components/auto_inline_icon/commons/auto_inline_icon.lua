@@ -10,23 +10,23 @@ local Lua = require('Module:Lua')
 local InlineIconAndText = require('Module:Widget/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
 
-local InlineIcon = {}
+local AutoInlineIcon = {}
 
 ---@param type string
 ---@param lookup string
 ---@param extraInfo string?
 ---@return string
-function InlineIcon.display(type, lookup, extraInfo)
+function AutoInlineIcon.display(type, lookup, extraInfo)
 	assert(type, 'Type parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
 	local data
 	if type == 'H' then
-		data = InlineIcon.queryHeroData(lookup)
+		data = AutoInlineIcon._queryHeroData(lookup)
 	elseif type == 'A' then
 		error('Ability data not yet implemented.')
 	elseif type == 'I' then
-		data = InlineIcon.queryItemData(lookup)
+		data = AutoInlineIcon._queryItemData(lookup)
 	elseif type == 'M' then
 		data = ManualData[lookup]
 	else
@@ -63,7 +63,7 @@ end
 
 ---@param name string
 ---@return table
-function InlineIcon.queryItemData(name)
+function AutoInlineIcon._queryItemData(name)
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::item]] AND [[name::'.. name ..']]',
 	})[1]
@@ -80,7 +80,7 @@ end
 
 ---@param name string
 ---@return table
-function InlineIcon.queryHeroData(name)
+function AutoInlineIcon._queryHeroData(name)
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::character]] AND [[name::'.. name ..']]',
 	})[1]
@@ -95,4 +95,4 @@ function InlineIcon.queryHeroData(name)
 	}
 end
 
-return Class.export(InlineIcon)
+return Class.export(AutoInlineIcon, {frameOnly = true})
