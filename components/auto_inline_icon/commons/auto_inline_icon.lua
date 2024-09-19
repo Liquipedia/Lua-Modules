@@ -12,22 +12,22 @@ local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData
 
 local AutoInlineIcon = {}
 
----@param type string
+---@param category string
 ---@param lookup string
 ---@param extraInfo string?
 ---@return string
-function AutoInlineIcon.display(type, lookup, extraInfo)
-	assert(type, 'Type parameter is required.')
+function AutoInlineIcon.display(category, lookup, extraInfo)
+	assert(category, 'Type parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
 	local data
-	if type == 'H' then
+	if category == 'H' then
 		data = AutoInlineIcon._queryHeroData(lookup)
-	elseif type == 'A' then
+	elseif category == 'A' then
 		error('Ability data not yet implemented.')
-	elseif type == 'I' then
+	elseif category == 'I' then
 		data = AutoInlineIcon._queryItemData(lookup)
-	elseif type == 'M' then
+	elseif category == 'M' then
 		data = ManualData[lookup]
 	else
 		error('Invalid type parameter.')
