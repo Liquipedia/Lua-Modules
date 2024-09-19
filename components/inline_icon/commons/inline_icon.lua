@@ -90,8 +90,8 @@ function InlineIcon.queryHeroData(name)
 		iconType = 'image',
 		link = data.pagename,
 		text = data.name,
-		iconLight = data.image,
-		iconDark = data.imagedark,
+		iconLight = data.extradata.icon or data.image,
+		iconDark = data.extradata.icon or data.imagedark,
 	}
 end
 
