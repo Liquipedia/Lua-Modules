@@ -30,11 +30,7 @@ local InlineIconAndText = Class.new(
 		local span = Span{
 			classes = {'image-link'},
 			children = {
-				Link{
-					link = link,
-					linktype = 'internal',
-					children = {input.icon}
-				},
+				input.icon,
 				' ',
 				Link{
 					link = link,
