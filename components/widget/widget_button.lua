@@ -12,25 +12,28 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class ButtonWidgetParameters: WidgetParameters
----@field title string
+---@field title string?
 ---@field link string?
+---@field linktype 'internal'|'external'|nil
 ---@field variant 'primary'|'secondary'|'ghost'|nil
----@field size 'sn'|'md'|'lg'|nil
+---@field size 'sm'|'md'|'lg'|nil
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
----@field title string
+---@field title string?
 ---@field link string?
+---@field linktype 'internal'|'external'
 ---@field variant 'primary'|'secondary'|'ghost'
----@field size 'sn'|'md'|'lg'
+---@field size 'sm'|'md'|'lg'
 
 local Button = Class.new(
 	Widget,
 	function(self, input)
-		self.title = self:assertExistsAndCopy(input.title)
+		self.title = input.title
 		self.link = input.link
-		self.variant = input.variant or 'primary' -- TODO: Validate
-		self.size = input.size or 'md' -- TODO: Validate
+		self.linktype = input.linktype or 'internal'
+		self.variant = input.variant or 'primary'
+		self.size = input.size or 'md'
 	end
 )
 
@@ -52,16 +55,18 @@ function Button:make(children)
 		button:addClass('btn-secondary')
 	end
 
-	if self.size == 'sn' then
-		button:addClass('small')
-	elseif self.size == 'md' then
-		button:addClass('medium')
+	if self.size == 'sm' then
+		button:addClass('btn-small')
 	elseif self.size == 'lg' then
-		button:addClass('large')
+		button:addClass('btn-large')
 	end
 
 	if not self.link then
 		return tostring(button)
+	end
+	if self.linktype == 'external' then
+		return '[' .. self.link .. ' '.. tostring(button) .. ']'
+
 	end
 	return '[[' .. self.link .. '|'.. tostring(button) .. ']]'
 end
