@@ -54,4 +54,24 @@ function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
 end
 
+---@param isReset boolean
+---@param match table
+function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
+	local opp1score, opp2score = (match.opponent1 or {}).score, (match.opponent2 or {}).score
+	-- Maps are >Bo9, while >Bo5 in legacy matches are non existent
+	-- Let's assume that if the sum of the scores is less than 10, it's a match, otherwise it's a map
+	if (tonumber(opp1score) or 0) + (tonumber(opp2score) or 0) < 10 then
+		return
+	end
+
+	(match.opponent1 or {}).score = nil
+	(match.opponent2 or {}).score = nil
+	match.map1 = match.map1 or {
+		map = 'Unknown',
+		finished = true,
+		score1 = opp1score,
+		score2 = opp2score,
+	}
+end
+
 return MatchGroupLegacyDefault
