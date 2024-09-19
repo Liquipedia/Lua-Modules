@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
 local WidgetFactory = {}
 
@@ -16,7 +17,7 @@ function WidgetFactory.fromTemplate(args)
 	local widgetClass = args.widget
 	args.widget = nil
 	args.children = type(args.children) == 'table' and args.children or {args.children}
-	local WidgetClass = require('Module:Widget/' .. widgetClass)
+	local WidgetClass = Lua.import('Module:Widget/' .. widgetClass)
 	return WidgetClass(args)
 end
 
