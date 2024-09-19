@@ -17,38 +17,13 @@ local AutoInlineIcon = {}
 ---@param extraInfo string?
 ---@return string
 function AutoInlineIcon.display(category, lookup, extraInfo)
-	assert(category, 'Type parameter is required.')
+	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
-	local data
-	if category == 'H' then
-		data = AutoInlineIcon._queryHeroData(lookup)
-	elseif category == 'A' then
-		error('Ability data not yet implemented.')
-	elseif category == 'I' then
-		data = AutoInlineIcon._queryItemData(lookup)
-	elseif category == 'M' then
-		data = ManualData[lookup]
-	else
-		error('Invalid type parameter.')
-	end
+	local data = AutoInlineIcon._getDataRetrevalFunction(category)(lookup)
 	assert(data, 'Data not found.')
 
-	local icon
-	if data.iconType == 'image' then
-		local IconImage = require('Module:Widget/Icon/Image')
-		icon = IconImage{
-			imageLight = data.iconLight,
-			imageDark = data.iconDark,
-			link = data.link,
-		}
-	elseif data.iconType == 'fa' then
-		local IconFa = require('Module:Widget/Icon/Fontawesome')
-		icon = IconFa{
-			iconName = data.icon,
-			link = data.link,
-		}
-	end
+	local icon = AutoInlineIcon._iconCreator(data)
 
 	if not data.text then
 		return tostring(icon)
@@ -59,6 +34,43 @@ function AutoInlineIcon.display(category, lookup, extraInfo)
 		text = data.text,
 		link = data.link,
 	})
+end
+
+---@param category string
+---@return fun(name: string): table
+function AutoInlineIcon._getDataRetrevalFunction(category)
+	local categoryMapper = {
+		H = AutoInlineIcon._queryHeroData,
+		A = function(name)
+			error('Abilities not yet implemented.')
+		end,
+		I = AutoInlineIcon._queryItemData,
+		M = function(name)
+			return ManualData[name]
+		end,
+	}
+	assert(categoryMapper[category], 'Invalid category parameter.')
+	return categoryMapper[category]
+end
+
+---@param data table
+---@return IconWidget
+function AutoInlineIcon._iconCreator(data)
+	if data.iconType == 'image' then
+		local IconImage = require('Module:Widget/Icon/Image')
+		return IconImage{
+			imageLight = data.iconLight,
+			imageDark = data.iconDark,
+			link = data.link,
+		}
+	elseif data.iconType == 'fa' then
+		local IconFa = require('Module:Widget/Icon/Fontawesome')
+		return IconFa{
+			iconName = data.icon,
+			link = data.link,
+		}
+	end
+	error('Invalid iconType.')
 end
 
 ---@param name string
