@@ -24,7 +24,7 @@ function InlineIcon.display(type, lookup, extraInfo)
 	if type == 'H' then
 		data = InlineIcon.queryHeroData(lookup)
 	elseif type == 'A' then
-		-- TODO: Query Ability Data
+		error('Ability data not yet implemented.')
 	elseif type == 'I' then
 		data = InlineIcon.queryItemData(lookup)
 	elseif type == 'M' then
