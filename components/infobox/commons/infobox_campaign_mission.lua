@@ -30,9 +30,8 @@ function Mission.run(frame)
 	return mission:createInfobox()
 end
 
----@return Html
+---@return string
 function Mission:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -57,11 +56,11 @@ function Mission:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Missions', 'Campaign')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Missions', 'Campaign')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 return Mission

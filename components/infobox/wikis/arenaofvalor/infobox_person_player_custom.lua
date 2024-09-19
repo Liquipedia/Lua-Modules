@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 			local standardizedHero = HeroNames[hero:lower()]
 			if not standardizedHero then
 				-- we have an invalid hero entry add warning (including tracking category)
-				table.insert(caller.infobox.warnings,
+				table.insert(caller.warnings,
 					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]')
 			end
 			return CharacterIcon.Icon{character = standardizedHero or hero, size = SIZE_HERO}

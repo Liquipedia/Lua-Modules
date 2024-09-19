@@ -84,7 +84,7 @@ function CustomStrategy:setWikiCategories()
 		return self
 	end
 
-	self.infobox:categories(unpack(self:_getCategories()))
+	self:categories(unpack(self:_getCategories()))
 
 	return self
 end

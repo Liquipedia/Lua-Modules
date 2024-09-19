@@ -34,9 +34,8 @@ function Scene.run(frame)
 	return scene:createInfobox()
 end
 
----@return Html
+---@return string
 function Scene:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -77,9 +76,9 @@ function Scene:createInfobox()
 		}
 	}
 
-	infobox:categories('Scene')
+	self:categories('Scene')
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 --- Allows for overriding this functionality

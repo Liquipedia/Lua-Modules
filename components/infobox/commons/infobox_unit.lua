@@ -31,9 +31,8 @@ function Unit.run(frame)
 	return unit:createInfobox()
 end
 
----@return Html
+---@return string
 function Unit:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -106,14 +105,14 @@ function Unit:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	infobox:categories('Units')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Units')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table

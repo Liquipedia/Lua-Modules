@@ -33,9 +33,8 @@ function Building.run(frame)
 end
 
 ---creates the infobox
----@return Html
+---@return string
 function Building:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -96,14 +95,14 @@ function Building:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Buildings')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Buildings')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
