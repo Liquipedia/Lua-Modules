@@ -22,11 +22,11 @@ function InlineIcon.display(type, lookup, extraInfo)
 
 	local data
 	if type == 'H' then
-		-- TODO: Query Hero Data
+		data = InlineIcon.queryHeroData(lookup)
 	elseif type == 'A' then
 		-- TODO: Query Ability Data
 	elseif type == 'I' then
-		-- TOOD: Query Item Data
+		data = InlineIcon.queryItemData(lookup)
 	elseif type == 'M' then
 		data = ManualData[lookup]
 	else
@@ -59,6 +59,40 @@ function InlineIcon.display(type, lookup, extraInfo)
 		text = data.text,
 		link = data.link,
 	})
+end
+
+---@param name string
+---@return table
+function InlineIcon.queryItemData(name)
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::item]] AND [[name::'.. name ..']]',
+	})[1]
+	assert(data, 'Item not found.')
+
+	return {
+		iconType = 'image',
+		link = data.pagename,
+		text = data.name,
+		iconLight = data.image,
+		iconDark = data.imagedark,
+	}
+end
+
+---@param name string
+---@return table
+function InlineIcon.queryHeroData(name)
+	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::character]] AND [[name::'.. name ..']]',
+	})[1]
+	assert(data, 'Hero not found.')
+
+	return {
+		iconType = 'image',
+		link = data.pagename,
+		text = data.name,
+		iconLight = data.image,
+		iconDark = data.imagedark,
+	}
 end
 
 return Class.export(InlineIcon)
