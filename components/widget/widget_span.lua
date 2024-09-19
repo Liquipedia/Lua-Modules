@@ -29,10 +29,10 @@ local Span = Class.new(
 ---@param children string[]
 ---@return string?
 function Span:make(children)
-	local div = mw.html.create('span')
-	Array.forEach(self.classes, FnUtil.curry(div.addClass, div))
-	Array.forEach(children, FnUtil.curry(div.node, div))
-	return tostring(div)
+	local span = mw.html.create('span')
+	Array.forEach(self.classes, FnUtil.curry(span.addClass, span))
+	Array.forEach(children, FnUtil.curry(span.node, span))
+	return tostring(span)
 end
 
 return Span
