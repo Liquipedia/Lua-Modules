@@ -68,7 +68,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.links = MatchFunctions.getLinks(match, games)
 	match.games = games
 	match.opponents = opponents
-	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
@@ -151,14 +150,6 @@ function MatchFunctions.getLinks(match, games)
 	end)
 
 	return links
-end
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		comment = match.comment,
-	}
 end
 
 --
