@@ -47,10 +47,10 @@ function Mission:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Mission Information'},
 		Breakdown{
-			content = {'Mission Objective'},
+			children = {'Mission Objective'},
 			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}
 		},
-		Breakdown{content = { args.objective }},
+		Breakdown{children = { args.objective }},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}

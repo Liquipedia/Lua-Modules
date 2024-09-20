@@ -18,7 +18,6 @@ local Widget = Lua.import('Module:Widget')
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content
 		self.classes = input.classes
 		self.contentClasses = input.contentClasses or {}
 	end

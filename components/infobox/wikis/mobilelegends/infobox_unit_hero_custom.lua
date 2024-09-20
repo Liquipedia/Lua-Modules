@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 			toBreakDownCell('secondaryrole', 'Secondary Role')
 		)
 		return {
-			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
+			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},

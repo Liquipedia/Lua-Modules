@@ -74,7 +74,7 @@ function UnofficialWorldChampion:createInfobox()
 					builder = function()
 						return Array.map(
 							self:getAllArgsForBase(args, 'most defences against '),
-							function (value) return Breakdown{content = {value}} end
+							function (value) return Breakdown{children = {value}} end
 						)
 					end
 				},

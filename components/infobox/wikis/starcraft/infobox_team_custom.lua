@@ -89,7 +89,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
+				Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }}
 			)
 		end
 	elseif id == 'history' then

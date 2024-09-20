@@ -144,7 +144,7 @@ function CustomBuildingUnit.attackDisplay(args)
 		if Array.all(data, Logic.isEmpty) then
 			return nil
 		end
-		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, content = {desc, unpack(data)}}
+		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, children = {desc, unpack(data)}}
 	end
 
 	return Array.append({Title{name = 'Combat'}},
