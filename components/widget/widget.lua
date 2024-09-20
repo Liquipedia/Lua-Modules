@@ -47,10 +47,6 @@ function Widget:tryMake()
 	)
 end
 
-function Widget:__tostring()
-	return self:tryMake()
-end
-
 ---@return string
 function Widget:__tostring()
 	return self:tryMake() or ''
