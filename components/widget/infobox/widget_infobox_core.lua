@@ -28,8 +28,8 @@ function Infobox:make(children)
 	local firstInfobox = not Variables.varDefault('has_infobox')
 	Variables.varDefine('has_infobox', 'true')
 
-	local adbox = Div{classes = 'fo-nttax-infobox-adbox', children = {mw.getCurrentFrame():preprocess('<adbox />')}}
-	local content = Div{classes = 'fo-nttax-infobox', children = children}
+	local adbox = Div{classes = {'fo-nttax-infobox-adbox'}, children = {mw.getCurrentFrame():preprocess('<adbox />')}}
+	local content = Div{classes = {'fo-nttax-infobox'}, children = children}
 	local bottomContent = Div{children = self.props.bottomContent}
 
 	return tostring(Fragment{children = {
