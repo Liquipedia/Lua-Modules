@@ -18,9 +18,9 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Breakdown = Widgets.Breakdown
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class UnofficialWorldChampionInfobox: BasicInfobox
 local UnofficialWorldChampion = Class.new(BasicInfobox)
@@ -35,6 +35,7 @@ end
 ---@return string
 function UnofficialWorldChampion:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	local widgets = {
 		Header{

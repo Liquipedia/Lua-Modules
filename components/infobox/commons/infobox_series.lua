@@ -32,8 +32,8 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
@@ -48,6 +48,7 @@ end
 ---@return string
 function Series:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	-- define this here so we can use it in lpdb data and the display
 	local links = Links.transform(args)

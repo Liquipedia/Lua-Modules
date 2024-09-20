@@ -20,7 +20,7 @@ local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Builder = Widgets.Builder
-local Customizable = Widgets.Customizable
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class WeaponInfobox: BasicInfobox
 local Weapon = Class.new(BasicInfobox)
@@ -35,6 +35,7 @@ end
 ---@return string
 function Weapon:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	local widgets = {
 		Header{

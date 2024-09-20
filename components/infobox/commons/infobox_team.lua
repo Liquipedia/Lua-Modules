@@ -35,8 +35,8 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class InfoboxTeam : BasicInfobox
 local Team = Class.new(BasicInfobox)
@@ -63,6 +63,7 @@ end
 ---@return string
 function Team:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	--- Transform data
 	-- Links

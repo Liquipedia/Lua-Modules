@@ -39,9 +39,9 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local CustomizableFactory = require('Module:Widget/Customizable/Factory')
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
@@ -55,7 +55,7 @@ end
 
 ---@return Html
 function League:createInfobox()
-	local Customizable = CustomizableFactory.createCustomizable(self.infobox.injector)
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 	local args = self.args
 	self:_parseArgs()
 

@@ -23,8 +23,8 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 local Chronology = Widgets.Chronology
 local Builder = Widgets.Builder
-local Customizable = Widgets.Customizable
 local Highlights = Widgets.Highlights
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class PatchInfobox: BasicInfobox
 local Patch = Class.new(BasicInfobox)
@@ -39,6 +39,7 @@ end
 ---@return string
 function Patch:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	local widgets = {
 		Header{

@@ -16,8 +16,8 @@ local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
 local Breakdown = Widgets.Breakdown
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class CampaignMissionInfobox: BasicInfobox
 local Mission = Class.new(BasicInfobox)
@@ -33,6 +33,7 @@ end
 ---@return string
 function Mission:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	local widgets = {
 		Customizable{id = 'header', children = {

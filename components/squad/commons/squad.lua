@@ -15,6 +15,7 @@ local String = require('Module:StringUtils')
 
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widget = Lua.import('Module:Widget/All')
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class Squad
 ---@operator call:Squad
@@ -66,6 +67,8 @@ end
 
 ---@return self
 function Squad:header()
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
+
 	local isInactive = self.type == SquadUtils.SquadType.INACTIVE or self.type == SquadUtils.SquadType.FORMER_INACTIVE
 	local isFormer = self.type == SquadUtils.SquadType.FORMER or self.type == SquadUtils.SquadType.FORMER_INACTIVE
 	table.insert(self.rows, Widget.TableRowNew{
@@ -73,17 +76,17 @@ function Squad:header()
 		children = Array.append({},
 			Widget.TableCellNew{content = {'ID'}, header = true},
 			Widget.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
-			Widget.Customizable{id = 'header_name',
+			Customizable{id = 'header_name',
 				children = {Widget.TableCellNew{content = {'Name'}, header = true}}
 			},
-			Widget.Customizable{id = 'header_role',
+			Customizable{id = 'header_role',
 				children = {Widget.TableCellNew{header = true}}
 			},
 			Widget.TableCellNew{content = {'Join Date'}, header = true},
-			isInactive and Widget.Customizable{id = 'header_inactive', children = {
+			isInactive and Customizable{id = 'header_inactive', children = {
 				Widget.TableCellNew{content = {'Inactive Date'}, header = true},
 			}} or nil,
-			isFormer and Widget.Customizable{id = 'header_former', children = {
+			isFormer and Customizable{id = 'header_former', children = {
 				Widget.TableCellNew{content = {'Leave Date'}, header = true},
 				Widget.TableCellNew{content = {'New Team'}, header = true},
 			}} or nil

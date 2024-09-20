@@ -16,7 +16,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class CosmeticInfobox: BasicInfobox
 local Cosmetic = Class.new(BasicInfobox)
@@ -24,6 +24,7 @@ local Cosmetic = Class.new(BasicInfobox)
 ---@return string
 function Cosmetic:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 	self:customParseArguments(args)
 
 	local widgets = {

@@ -31,7 +31,7 @@ local Title = Widgets.Title
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Builder = Widgets.Builder
-local Customizable = Widgets.Customizable
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
@@ -79,6 +79,7 @@ end
 ---@return string
 function Person:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	self.locations = self:getLocations()
 

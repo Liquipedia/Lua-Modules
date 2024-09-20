@@ -22,7 +22,7 @@ local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Customizable = Widgets.Customizable
+local CustomizableFactory = Lua.import('Module:Widget/Customizable/Factory')
 
 ---@class SkillInfobox: BasicInfobox
 local Skill = Class.new(BasicInfobox)
@@ -37,6 +37,7 @@ end
 ---@return string
 function Skill:createInfobox()
 	local args = self.args
+	local Customizable = CustomizableFactory.createCustomizable(self.injector)
 
 	if String.isEmpty(args.informationType) then
 		error('You need to specify an informationType, e.g. "Spell", "Ability, ...')
