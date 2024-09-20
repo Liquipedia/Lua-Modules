@@ -14,33 +14,12 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Widget = require('Module:Widget/All')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
+local SquadTldb = Lua.import('Module:Widget/Squad/TldbVariant')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
-local TlpdSquad = Class.new(Squad)
-
----@return self
-function TlpdSquad:header()
-	table.insert(self.rows, Widget.TableRowNew{
-		classes = {'HeaderRow'},
-		cells = {
-			Widget.TableCellNew{content = {'ID'}, header = true},
-			Widget.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
-			Widget.TableCellNew{content = {'Name'}, header = true},
-			Widget.TableCellNew{content = {'ELO'}, header = true},
-			Widget.TableCellNew{content = {'ELO Peak'}, header = true},
-		}
-	})
-
-	return self
-end
-
----@return self
-function TlpdSquad:title()
-	return self
-end
 
 ---@class StarcraftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
@@ -63,7 +42,7 @@ end
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local tlpd = Logic.readBool(args.tlpd)
-	local SquadClass = tlpd and TlpdSquad or Squad
+	local SquadClass = tlpd and SquadTldb or Squad
 
 	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadType)
 		local inputId = person.id --[[@as number]]
