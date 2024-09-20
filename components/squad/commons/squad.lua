@@ -105,12 +105,11 @@ end
 
 ---@return string
 function Squad:create()
-	local dataTable = Widget.TableNew{
+	return tostring(Widget.TableNew{
 		css = {['margin-bottom'] = '10px'},
 		classes = {'wikitable-striped', 'roster-card'},
 		children = self.rows,
-	}
-	return dataTable:tryMake(self.injector) or ''
+	})
 end
 
 return Squad
