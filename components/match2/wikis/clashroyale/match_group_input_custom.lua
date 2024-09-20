@@ -256,7 +256,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		opponent.match2players,
 		players,
 		function(playerIndex)
-			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
+			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']) or Variables.varDefault(mapInput[prefix] .. '_page'),

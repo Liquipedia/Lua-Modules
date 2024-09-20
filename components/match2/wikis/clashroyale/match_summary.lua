@@ -14,9 +14,11 @@ local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -217,35 +219,60 @@ end
 ---@param matchId string
 ---@return MatchSummaryBody
 function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
-	local subMatches = match.extradata.submatches
-	for _, game in ipairs(match.games) do
-		local subMatch = subMatches[game.subgroup]
-		if not subMatch.games then
-			subMatch.games = {}
-		end
+	local _, subMatches = Array.groupBy(match.games, Operator.property('subgroup'))
+	subMatches = Array.map(subMatches, function(subMatch)
+		return {games = subMatch}
+	end)
 
-		table.insert(subMatch.games, game)
-	end
-
-	for subMatchIndex, subMatch in ipairs(subMatches) do
-		local players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
+	Array.forEach(subMatches, FnUtil.curry(CustomMatchSummary._getSubMatchOpponentsAndPlayers, match))
+	Array.forEach(subMatches, CustomMatchSummary._calculateSubMatchWinner)
+	Array.forEach(subMatches, function(subMatch, subMatchIndex)
 		body:addRow(CustomMatchSummary._createSubMatch(
-			players,
+			subMatch.players,
 			subMatchIndex,
 			subMatch,
 			match.extradata
 		))
-	end
+	end)
 
 	CustomMatchSummary._addMvp(match, body)
 
 	return body
 end
 
+---@param match MatchGroupUtilMatch
+---@param subMatch table
+---@param subMatchIndex integer
+function CustomMatchSummary._getSubMatchOpponentsAndPlayers(match, subMatch, subMatchIndex)
+	subMatch.players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
+	subMatch.opponents = Array.map(Array.range(1, #subMatch.players), function(opponentIndex)
+		local score, status = MatchGroupInputUtil.computeOpponentScore(
+			{opponentIndex = opponentIndex},
+			FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, subMatch.games)
+		)
+		return {score = score, status = status}
+	end)
+end
+
+---@param subMatch table
+function CustomMatchSummary._calculateSubMatchWinner(subMatch)
+	subMatch.scores = Array.map(subMatch.opponents, Operator.property('score'))
+
+	local subMatchIsFinished = Array.all(subMatch.games, function(game)
+		return Logic.isNotEmpty(game.winner)
+			or game.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+
+	end)
+	if not subMatchIsFinished then return end
+
+	subMatch.finished = true
+	subMatch.winner = MatchGroupInputUtil.getHighestScoringOpponent(subMatch.opponents)
+end
+
 ---@param subMatchIndex integer
 ---@param subMatch table
 ---@param match MatchGroupUtilMatch
----@return table
+---@return table[]
 function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
 	local players = {{}, {}, hash = {{}, {}}}
 
@@ -256,6 +283,8 @@ function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, ma
 			CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[gameIndex], match)
 		end
 	end
+
+	players.hash = nil
 
 	return players
 end
