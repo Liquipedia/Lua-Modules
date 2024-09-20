@@ -87,8 +87,10 @@ function MatchLegacy.storeGames(match, match2)
 		for teamId, opponent in ipairs(opponents) do
 			local counter = 0
 			for _, player in pairs(opponent.players)  do
-				counter = counter + 1
-				addPlayer(teamId, counter, player)
+				if Logic.isNotEmpty(player) then
+					counter = counter + 1
+					addPlayer(teamId, counter, player)
+				end
 			end
 		end
 		-- Other stuff
