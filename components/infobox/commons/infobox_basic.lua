@@ -102,13 +102,13 @@ end
 ---@param widgets Widget[]
 ---@return string
 function BasicInfobox:build(widgets)
-	return Infobox{
+	return tostring(Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
 		bottomContent = self.bottomContent,
 		warnings = self.warnings,
 		children = widgets,
-	}:tryMake(self.injector) or ''
+	})
 end
 
 return BasicInfobox
