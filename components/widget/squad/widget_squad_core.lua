@@ -27,6 +27,8 @@ local Squad = Class.new(Widget, function(self, props)
 	self.title = props.title
 end)
 
+---@param children string[]
+---@return string
 function Squad:make(children)
 	local title = self._title(self.type, self.title)
 	local header = self._header(self.type)
