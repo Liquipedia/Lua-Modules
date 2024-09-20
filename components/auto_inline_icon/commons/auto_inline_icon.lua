@@ -12,11 +12,12 @@ local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData
 
 local AutoInlineIcon = {}
 
+---@param _ table
 ---@param category string
 ---@param lookup string
 ---@param extraInfo string?
 ---@return string
-function AutoInlineIcon.display(category, lookup, extraInfo)
+function AutoInlineIcon.display(_, category, lookup, extraInfo)
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
@@ -107,4 +108,4 @@ function AutoInlineIcon._queryHeroData(name)
 	}
 end
 
-return Class.export(AutoInlineIcon, {frameOnly = true})
+return Class.export(AutoInlineIcon)
