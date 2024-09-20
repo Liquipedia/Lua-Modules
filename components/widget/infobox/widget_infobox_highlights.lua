@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Highlights
+-- page=Module:Widget/Infobox/Highlights
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
