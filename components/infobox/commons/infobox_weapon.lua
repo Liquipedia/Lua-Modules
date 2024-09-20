@@ -32,9 +32,8 @@ function Weapon.run(frame)
 	return weapon:createInfobox()
 end
 
----@return Html
+---@return string
 function Weapon:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -107,14 +106,14 @@ function Weapon:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Weapons')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Weapons')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param location string?

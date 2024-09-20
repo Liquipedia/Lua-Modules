@@ -32,9 +32,8 @@ function UnofficialWorldChampion.run(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
----@return Html
+---@return string
 function UnofficialWorldChampion:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -100,7 +99,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 return UnofficialWorldChampion

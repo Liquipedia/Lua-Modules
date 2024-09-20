@@ -30,9 +30,8 @@ function Strategy.run(frame)
 	return strategy:createInfobox()
 end
 
----@return Html
+---@return string
 function Strategy:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	if String.isEmpty(args.informationType) then
@@ -61,10 +60,10 @@ function Strategy:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Strategies')
+		self:categories('Strategies')
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 return Strategy

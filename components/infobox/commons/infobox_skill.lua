@@ -34,9 +34,8 @@ function Skill.run(frame)
 	return skill:createInfobox()
 end
 
----@return Html
+---@return string
 function Skill:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	if String.isEmpty(args.informationType) then
@@ -85,11 +84,11 @@ function Skill:createInfobox()
 
 	if Namespace.isMain() then
 		local categories = self:getCategories(args)
-		infobox:categories(unpack(categories))
+		self:categories(unpack(categories))
 		self:_setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
