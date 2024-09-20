@@ -13,7 +13,7 @@ local WarningBox = require('Module:WarningBox')
 
 local Widget = Lua.import('Module:Widget')
 local Div = Lua.import('Module:Widget/Div')
-local Fragement = Lua.import('Module:Widget/Fragement')
+local Fragment = Lua.import('Module:Widget/Fragment')
 
 ---@class Infobox: Widget
 ---@operator call(table): Infobox
@@ -32,7 +32,7 @@ function Infobox:make(children)
 	local content = Div{classes = 'fo-nttax-infobox', children = children}
 	local bottomContent = Div{children = self.props.bottomContent}
 
-	return tostring(Fragement{children = {
+	return tostring(Fragment{children = {
 		Div{
 			classes = {
 				'fo-nttax-infobox-wrapper',
