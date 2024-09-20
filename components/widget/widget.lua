@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
@@ -37,8 +38,9 @@ end
 
 ---@return string|nil
 function Widget:tryMake()
+	local children = Array.map(self.children, tostring) -- Backwards compatibility
 	return Logic.tryOrElseLog(
-		function() return self:make(self.children) end,
+		function() return self:make(children) end,
 		function(error) return tostring(ErrorDisplay.InlineError(error)) end,
 		function(error)
 			error.header = 'Error occured in widget: (caught by Widget:tryMake)'
