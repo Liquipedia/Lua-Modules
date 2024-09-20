@@ -204,10 +204,10 @@ function CustomInjector:parse(id, widgets)
 		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
 
 		if data.startDate == data.endDate then
-			return {Cell{name = 'Date', content = {startTime}}}
+			return {Cell{name = 'Start Time', content = {startTime}}}
 		end
 		return {
-			Cell{name = 'Start Date', content = {startTime}},
+			Cell{name = 'Start Time', content = {startTime}},
 			Cell{name = 'End Date', content = {args.edate}},
 		}
 	elseif id == 'customcontent' then
