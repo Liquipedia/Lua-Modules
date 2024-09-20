@@ -69,7 +69,7 @@ function CustomLeague:customParseArguments(args)
 	self.data.publishertier = tostring(Logic.readBool(args.featured))
 	self.data.status = self:_getStatus(args)
 
-	self.data.startTime = self:_readStartTime()
+	self.data.startTime = Logic.wrapTryOrLog(self:_readStartTime)()
 
 	self:_computeChronology(args)
 	self:_computePatch(args)
