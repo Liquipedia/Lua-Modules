@@ -360,7 +360,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
-	Variables.varDefine('matchDate', self.data.startTime.storage)
+	Variables.varDefine('match_date', self.data.startTime.storage)
 end
 
 ---@param prefix string
