@@ -124,6 +124,7 @@ end
 function MatchFunctions.readDate(dateInput)
 	local dateProps = MatchGroupInputUtil.readDate(dateInput, {
 		'matchDate',
+		'match_date',
 		'tournament_startdate',
 		'tournament_enddate',
 	})
