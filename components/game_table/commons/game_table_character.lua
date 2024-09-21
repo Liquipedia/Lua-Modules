@@ -194,8 +194,9 @@ end
 
 
 ---@param picks string[][]
+---@param winner number?
 ---@return number?
-function CharacterGameTable:_getCharacterPick(picks)
+function CharacterGameTable:_getCharacterPick(picks, winner)
 	---@param opponentIndex number
 	---@return number?
 	local findCharacter = function (opponentIndex)
@@ -205,7 +206,12 @@ function CharacterGameTable:_getCharacterPick(picks)
 
 		return found and opponentIndex or nil
 	end
-	return findCharacter(1) or findCharacter(2)
+
+	if winner ~= 0 then
+		return findCharacter(winner) or findCharacter(winner == 1 and 2 or 1)
+	else
+		return findCharacter(1) or findCharacter(2)
+	end
 end
 
 ---@param game match2game
@@ -220,7 +226,7 @@ function CharacterGameTable:gameFromRecord(game)
 	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
 	gameRecord.bans = self.config.showBans and
 		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
-	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks) or nil
+	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks, tonumber(gameRecord.winner)) or nil
 
 	if self.isCharacterTable then
 		return Logic.isNotEmpty(gameRecord.pickedBy) and gameRecord or nil
