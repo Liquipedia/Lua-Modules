@@ -130,11 +130,13 @@ function MatchFunctions.readDate(matchArgs)
 			matchArgs.date and dateProps.dateexact or false
 		)
 		Variables.varDefine('matchDate', dateProps.date)
+		Variables.varDefine('match_date', dateProps.date)
 		return dateProps
 	end
 
 	return MatchGroupInputUtil.readDate(nil, {
 		'matchDate',
+		'match_date',
 		'tournament_startdate',
 		'tournament_enddate',
 	})
