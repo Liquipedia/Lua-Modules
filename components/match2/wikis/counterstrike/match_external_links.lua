@@ -47,7 +47,7 @@ return {
 	{
 		name = 'faceit',
 		icon = 'FACEIT-icon.png',
-		prefixLink = 'https://www.faceit.com/en/cs2/room/',
+		prefixLink = 'https://www.faceit.com/en/match/room/',
 		label = 'Match Room and Stats on FACEIT',
 		isMapStats = true
 	},
