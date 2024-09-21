@@ -133,7 +133,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param showIcon boolean?
----@param icon strings?
+---@param icon string?
 ---@return Html
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, icon)
 	return mw.html.create('div')
