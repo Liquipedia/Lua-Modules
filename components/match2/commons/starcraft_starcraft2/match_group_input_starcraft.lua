@@ -130,6 +130,7 @@ function MatchFunctions.readDate(dateInput)
 	})
 	if dateProps.dateexact then
 		Variables.varDefine('matchDate', dateProps.date)
+		Variables.varDefine('match_date', dateProps.date)
 	end
 	return dateProps
 end
