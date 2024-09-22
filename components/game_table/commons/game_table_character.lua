@@ -339,7 +339,7 @@ end
 ---@param match GameTableMatch
 ---@param game CharacterGameTableGame
 ---@return Html?
-function CharacterGameTable:_displayGame(match, game)
+function CharacterGameTable:displayGame(match, game)
 	if not self.config.showResult then
 		return
 	end
@@ -424,7 +424,7 @@ function CharacterGameTable:gameRow(match, game)
 		:node(self:_displayGameIconForGame(game))
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
-		:node(self:_displayGame(match, game))
+		:node(self:displayGame(match, game))
 		:node(self:_displayLength(game))
 		:node(self:_displayGameVod(game.vod))
 end

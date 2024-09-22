@@ -117,7 +117,7 @@ end
 ---@param match GameTableMatch
 ---@param game CharacterGameTableGame
 ---@return Html?
-function CustomCharacterGameTable:_displayGame(match, game)
+function CustomCharacterGameTable:displayGame(match, game)
 	local makeCell = function (text)
 		return mw.html.create('td'):node(text)
 	end
