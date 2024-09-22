@@ -34,7 +34,7 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -121,13 +121,13 @@ function League:createInfobox()
 						local value = tostring(args.type):lower()
 						if self:shouldStore(args) then
 							if value == 'offline' then
-								self.infobox:categories('Offline Tournaments')
+								self:categories('Offline Tournaments')
 							elseif value == 'online' then
-								self.infobox:categories('Online Tournaments')
+								self:categories('Online Tournaments')
 							elseif value:match('online') and value:match('offline') then
-								self.infobox:categories('Online/Offline Tournaments')
+								self:categories('Online/Offline Tournaments')
 							else
-								self.infobox:categories('Unknown Type Tournaments')
+								self:categories('Unknown Type Tournaments')
 							end
 						end
 
@@ -225,16 +225,16 @@ function League:createInfobox()
 
 	self.name = TextSanitizer.stripHTML(self.name)
 
-	self.infobox:bottom(self:createBottomContent())
+	self:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
-		self.infobox:categories(unpack(self:_getCategories(args)))
+		self:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
 		self:_setSeoTags(args)
 	end
 
 	return mw.html.create()
-		:node(self.infobox:build(widgets))
+		:node(self:build(widgets))
 		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
 end
 
@@ -372,11 +372,11 @@ function League:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and Logic.isNotEmpty(tier) then
-		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.infobox.warnings,
+		table.insert(self.warnings,
 			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
@@ -581,7 +581,7 @@ function League:_createLocation(args)
 		local nationality = Flags.getLocalisation(country)
 
 		if String.isEmpty(nationality) then
-			self.infobox:categories('Unrecognised Country')
+			self:categories('Unrecognised Country')
 
 		else
 			local location = args['city' .. index] or args['location' .. index]
@@ -592,7 +592,7 @@ function League:_createLocation(args)
 			end
 
 			if self:shouldStore(args) then
-				self.infobox:categories(nationality .. ' Tournaments')
+				self:categories(nationality .. ' Tournaments')
 			end
 			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
 		end
@@ -639,7 +639,7 @@ function League:getIcons(iconArgs)
 	}
 
 	if String.isNotEmpty(trackingCategory) then
-		table.insert(self.infobox.warnings, 'Missing icon while icondark is set.')
+		table.insert(self.warnings, 'Missing icon while icondark is set.')
 	end
 
 	return icon, iconDark, display

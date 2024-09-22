@@ -22,34 +22,34 @@ local Chronology = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
----@return Html[]
-function Chronology:make(injector)
+---@param children string[]
+---@return string?
+function Chronology:make(children)
 	return Chronology:_chronology(self.links)
 end
 
 ---@param links table<string, string|number|nil>
----@return Html[]
+---@return string?
 function Chronology:_chronology(links)
 	if links == nil or Table.size(links) == 0 then
-		return self
+		return
 	end
 
-	local chronologyContent = {}
-	chronologyContent[1] = self:_createChronologyRow(links['previous'], links['next'])
+	local chronologyContent = mw.html.create()
+	chronologyContent:node(self:_createChronologyRow(links['previous'], links['next']))
 
 	local index = 2
 	local previous = links['previous' .. index]
 	local next = links['next' .. index]
 	while (previous ~= nil or next ~= nil) do
-		chronologyContent[index] = self:_createChronologyRow(previous, next)
+		chronologyContent:node(self:_createChronologyRow(previous, next))
 
 		index = index + 1
 		previous = links['previous' .. index]
 		next = links['next' .. index]
 	end
 
-	return chronologyContent
+	return tostring(chronologyContent)
 end
 
 ---@param previous string|number|nil

@@ -318,8 +318,8 @@ function CustomMatchSummary._createMap(game)
 	local team2Score = Score('rtl'):setRight()
 
 	-- Teams map score
-	team1Score:setMapScore(game.scores[1])
-	team2Score:setMapScore(game.scores[2])
+	team1Score:setMapScore(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
+	team2Score:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 
 	local t1sides = extradata['t1sides'] or {}
 	local t2sides = extradata['t2sides'] or {}

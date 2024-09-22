@@ -21,7 +21,7 @@ local League = Lua.import('Module:Infobox/League')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -107,7 +107,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(widgets,
 				Title{name = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
-				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
+				Breakdown{children = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
 

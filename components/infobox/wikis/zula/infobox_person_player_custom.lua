@@ -15,7 +15,7 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Title = Widgets.Title
 local Center = Widgets.Center
 

@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -47,7 +47,7 @@ function CustomInjector:parse(id, widgets)
 		for regionKey, region in Table.iter.pairsByPrefix(args, 'region') do
 			Array.appendWith(widgets,
 				Cell{name = (args[regionKey .. ' no'] or '') .. ' champions', content = {region}},
-				Breakdown{content = {args[regionKey .. ' champions']}}
+				Breakdown{children = {args[regionKey .. ' champions']}}
 			)
 		end
 	end

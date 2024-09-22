@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -31,9 +31,8 @@ function Tool.run(frame)
 	return tool:createInfobox()
 end
 
----@return Html
+---@return string
 function Tool:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -55,10 +54,10 @@ function Tool:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Tools', unpack(self:getWikiCategories(args)))
+		self:categories('Tools', unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 --- Allows for overriding this functionality

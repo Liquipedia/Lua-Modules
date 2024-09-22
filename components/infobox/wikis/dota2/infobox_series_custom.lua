@@ -14,7 +14,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class DotaSeriesInfobox: SeriesInfobox

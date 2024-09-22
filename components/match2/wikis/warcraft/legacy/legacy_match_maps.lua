@@ -144,6 +144,7 @@ function LegacyMatchMaps._readMaps(args)
 		end)
 		map.vod = args['vodgame' .. mapIndex]
 		args['vodgame' .. mapIndex] = nil
+		args[prefix .. 'finished'] = true
 
 		if Table.isNotEmpty(map) then
 			args[prefix] = map

@@ -13,7 +13,7 @@ local Namespace = require('Module:Namespace')
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RocketLeagueUnitInfobox: UnitInfobox

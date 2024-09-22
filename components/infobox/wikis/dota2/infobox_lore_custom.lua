@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Injector = Lua.import('Module:Widget/Injector')
 local Lore = Lua.import('Module:Infobox/Lore')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 

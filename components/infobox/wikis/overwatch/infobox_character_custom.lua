@@ -15,7 +15,7 @@ local String = require('Module:StringUtils')
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class OverwatchHeroInfobox: CharacterInfobox

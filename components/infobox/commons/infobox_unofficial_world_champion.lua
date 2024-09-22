@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -32,9 +32,8 @@ function UnofficialWorldChampion.run(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
----@return Html
+---@return string
 function UnofficialWorldChampion:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -75,7 +74,7 @@ function UnofficialWorldChampion:createInfobox()
 					builder = function()
 						return Array.map(
 							self:getAllArgsForBase(args, 'most defences against '),
-							function (value) return Breakdown{content = {value}} end
+							function (value) return Breakdown{children = {value}} end
 						)
 					end
 				},
@@ -100,7 +99,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 return UnofficialWorldChampion

@@ -13,7 +13,7 @@ local Table = require('Module:Table')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
@@ -31,9 +31,8 @@ function Website.run(frame)
 	return website:createInfobox()
 end
 
----@return Html
+---@return string
 function Website:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -65,7 +64,7 @@ function Website:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 return Website

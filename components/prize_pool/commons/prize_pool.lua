@@ -19,7 +19,7 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
@@ -54,7 +54,7 @@ end
 ---@return WidgetTableCell
 function PrizePool:placeOrAwardCell(placement)
 	local placeCell = TableCell{
-		content = {{placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()}},
+		content = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
 		css = {['font-weight'] = 'bolder'},
 		classes = {'prizepooltable-place'},
 	}

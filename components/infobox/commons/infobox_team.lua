@@ -30,7 +30,7 @@ local Locale = Lua.import('Module:Locale')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -60,9 +60,8 @@ function Team.run(frame)
 	return team:createInfobox()
 end
 
----@return Html
+---@return string
 function Team:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	--- Transform data
@@ -186,13 +185,13 @@ function Team:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 		Center{content = {args.footnotes}},
 	}
-	infobox:bottom(self:_createUpcomingMatches())
-	infobox:bottom(self:createBottomContent())
+	self:bottom(self:_createUpcomingMatches())
+	self:bottom(self:createBottomContent())
 
 	-- Categories
 	if self:shouldStore(args) then
-		infobox:categories('Teams')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Teams')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
 	-- Store LPDB data and Wiki-variables
@@ -201,7 +200,7 @@ function Team:createInfobox()
 		self:_definePageVariables(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@return string|number|nil # storage date
@@ -297,7 +296,7 @@ function Team:_createLocation(location)
 	end
 
 	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
-		self.infobox:categories(demonym .. ' Teams')
+		self:categories(demonym .. ' Teams')
 	end
 
 	return Flags.Icon({flag = location, shouldLink = true}) ..
@@ -324,7 +323,7 @@ function Team:getStandardLocationValue(location)
 
 	if String.isEmpty(locationToStore) then
 		table.insert(
-			self.infobox.warnings,
+			self.warnings,
 			'"' .. location .. '" is not supported as a value for locations'
 		)
 		return

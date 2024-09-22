@@ -35,9 +35,9 @@ local Header = Class.new(
 	end
 )
 
----@param injector WidgetInjector?
----@return Html[]
-function Header:make(injector)
+---@param children string[]
+---@return string
+function Header:make(children)
 	local header = {
 		Header:_name(self.name),
 		Header:_image(
@@ -59,7 +59,11 @@ function Header:make(injector)
 		table.insert(header, 2, subHeader)
 	end
 
-	return header
+	local wrapper = mw.html.create()
+	for _, element in ipairs(header) do
+		wrapper:node(element)
+	end
+	return tostring(wrapper)
 end
 
 ---@param name string?

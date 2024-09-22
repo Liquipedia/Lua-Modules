@@ -14,18 +14,22 @@ local Widget = Lua.import('Module:Widget')
 ---@class CustomizableWidget: Widget
 ---@operator call({id: string, children: Widget[]}): CustomizableWidget
 ---@field id string
----@field children Widget[]
 local Customizable = Class.new(
 	Widget,
 	function(self, input)
 		self.id = self:assertExistsAndCopy(input.id)
-		self.children = input.children
 	end
 )
 
+---@param children string[]
+---@return string
+function Customizable:make(children)
+	return table.concat(children)
+end
+
 ---@param injector WidgetInjector?
 ---@return Widget[]?
-function Customizable:make(injector)
+function Customizable:makeChildren(injector)
 	if injector == nil then
 		return self.children
 	end

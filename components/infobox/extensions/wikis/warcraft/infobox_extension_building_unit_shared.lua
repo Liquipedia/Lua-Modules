@@ -18,7 +18,7 @@ local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -144,7 +144,7 @@ function CustomBuildingUnit.attackDisplay(args)
 		if Array.all(data, Logic.isEmpty) then
 			return nil
 		end
-		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, content = {desc, unpack(data)}}
+		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, children = {desc, unpack(data)}}
 	end
 
 	return Array.append({Title{name = 'Combat'}},

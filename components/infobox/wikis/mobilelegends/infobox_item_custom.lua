@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		if String.isNotEmpty(args.itemcost) then
 			table.insert(widgets, Breakdown{
-				content = caller:_getCostDisplay(),
+				children = caller:_getCostDisplay(),
 				classes = {
 					'infobox-header',
 					'wiki-backgroundcolor-light',

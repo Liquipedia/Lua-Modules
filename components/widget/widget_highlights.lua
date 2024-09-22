@@ -14,22 +14,21 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class HighlightsWidget: Widget
 ---@operator call({content: (string|number)[]?}):HighlightsWidget
----@field list (string|number)[]?
 local Highlights = Class.new(
 	Widget,
 	function(self, input)
-		self.list = input.content
+		self.children = input.children or input.content or {}
 	end
 )
 
----@param injector WidgetInjector?
----@return {[1]: Html}?
-function Highlights:make(injector)
-	return Highlights:_highlights(self.list)
+---@param children string[]
+---@return string?
+function Highlights:make(children)
+	return Highlights:_highlights(children)
 end
 
 ---@param list (string|number)[]?
----@return Html?
+---@return string?
 function Highlights:_highlights(list)
 	if list == nil or Table.size(list) == 0 then
 		return nil
@@ -44,7 +43,7 @@ function Highlights:_highlights(list)
 
 	div:node(highlights)
 
-	return {div}
+	return tostring(div)
 end
 
 return Highlights

@@ -14,7 +14,7 @@ local Namespace = require('Module:Namespace')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -25,9 +25,8 @@ local Builder = Widgets.Builder
 ---@class ManufacturerInfobox: BasicInfobox
 local Manufacturer = Class.new(BasicInfobox)
 
----@return Html
+---@return string
 function Manufacturer:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -75,11 +74,11 @@ function Manufacturer:createInfobox()
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
-		infobox:categories('Manufacturers')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Manufacturers')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table

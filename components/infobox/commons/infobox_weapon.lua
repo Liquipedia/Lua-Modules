@@ -14,7 +14,7 @@ local Namespace = require('Module:Namespace')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -32,9 +32,8 @@ function Weapon.run(frame)
 	return weapon:createInfobox()
 end
 
----@return Html
+---@return string
 function Weapon:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -107,14 +106,14 @@ function Weapon:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Weapons')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Weapons')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param location string?

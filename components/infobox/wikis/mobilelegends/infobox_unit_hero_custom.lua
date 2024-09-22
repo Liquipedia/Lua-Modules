@@ -22,7 +22,7 @@ local Table = require('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 			toBreakDownCell('secondaryrole', 'Secondary Role')
 		)
 		return {
-			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
+			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
 		}
 	elseif id == 'cost' then
 		local cost = Array.append({},

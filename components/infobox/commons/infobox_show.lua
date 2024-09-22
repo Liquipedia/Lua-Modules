@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -34,9 +34,8 @@ function Show.run(frame)
 	return show:createInfobox()
 end
 
----@return Html
+---@return string
 function Show:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -78,10 +77,10 @@ function Show:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Shows')
+		self:categories('Shows')
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param country string?
