@@ -41,8 +41,7 @@ function CustomCharacterGameTable:getCharacterPick(game)
 	local found
 	Table.iter.forEachPair(game.participants, function (participantId, participant)
 		if found then return end
-		found = aliases[participant.player] and participantId or nil
-		if found then
+		if aliases[participant.player] then
 			local pKey = Array.parseCommaSeparatedString(participantId, '_')
 			game.pickedByplayer = tonumber(pKey[2])
 			found = tonumber(pKey[1])
