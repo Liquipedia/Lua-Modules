@@ -21,7 +21,7 @@ local Opponent = OpponentLibraries.Opponent
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
 
 ---@class ValorantCharacterGameTable: CharacterGameTable
-local CustomGameTableCharacter = Class.new(CharacterGameTable, function (self)
+local CustomCharacterGameTable = Class.new(CharacterGameTable, function (self)
 	self.args.showBans = false
 
 	if self.args.tableMode == Opponent.solo then
@@ -33,7 +33,7 @@ end)
 
 ---@param game CharacterGameTableGame
 ---@return number?
-function CustomGameTableCharacter:getCharacterPick(game)
+function CustomCharacterGameTable:getCharacterPick(game)
 	if self.config.mode ~= Opponent.solo then
 		return CharacterGameTable.getCharacterPick(self, game)
 	end
@@ -54,19 +54,19 @@ function CustomGameTableCharacter:getCharacterPick(game)
 end
 
 ---@return integer
-function CustomGameTableCharacter:getNumberOfPicks()
+function CustomCharacterGameTable:getNumberOfPicks()
 	return 10
 end
 
 ---@param opponentIndex number
 ---@param playerIndex number
 ---@return string
-function CustomGameTableCharacter:getCharacterKey(opponentIndex, playerIndex)
+function CustomCharacterGameTable:getCharacterKey(opponentIndex, playerIndex)
 	return 't' .. opponentIndex .. 'p' .. playerIndex .. 'agent'
 end
 
 ---@return Html
-function CustomGameTableCharacter:headerRow()
+function CustomCharacterGameTable:headerRow()
 	local makeHeaderCell = function(text, width)
 		return mw.html.create('th'):css('max-width', width):node(text)
 	end
@@ -104,7 +104,7 @@ end
 
 ---@param participant table
 ---@return number?
-function CustomGameTableCharacter:_getRatio(participant)
+function CustomCharacterGameTable:_getRatio(participant)
 	local kills = tonumber(participant.kills) or 0
 	local deaths = tonumber(participant.deaths) or 0
 	if deaths == 0 then
@@ -117,7 +117,7 @@ end
 ---@param match GameTableMatch
 ---@param game CharacterGameTableGame
 ---@return Html?
-function CustomGameTableCharacter:_displayGame(match, game)
+function CustomCharacterGameTable:_displayGame(match, game)
 	local makeCell = function (text)
 		return mw.html.create('td'):node(text)
 	end
@@ -165,10 +165,10 @@ end
 
 ---@param frame Frame
 ---@return Html
-function CustomGameTableCharacter.results(frame)
+function CustomCharacterGameTable.results(frame)
 	local args = Arguments.getArgs(frame)
 
-	return CustomGameTableCharacter(args):readConfig():query():build()
+	return CustomCharacterGameTable(args):readConfig():query():build()
 end
 
-return CustomGameTableCharacter
+return CustomCharacterGameTable
