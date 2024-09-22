@@ -13,16 +13,14 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
----@class ValorantCustomGameTableCharacter: CharacterGameTable
 local CharacterGameTable = Lua.import('Module:GameTable/Character')
 
----@class CustomGameTableCharacter: CharacterGameTable
+---@class ValorantCharacterGameTable: CharacterGameTable
 local CustomGameTableCharacter = Class.new(CharacterGameTable, function (self)
 	self.args.showBans = false
 
