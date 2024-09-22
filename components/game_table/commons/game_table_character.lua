@@ -46,9 +46,11 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@class CharacterGameTable: GameTable
 ---@field character string
 ---@field isCharacterTable boolean
+---@field isPickedByRequired boolean
 ---@field config CharacterGameTableConfig
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
+	self.isPickedByRequired = self.isCharacterTable
 
 	if not self.isCharacterTable then
 		self.resultFromRecord = GameTable.resultFromRecord
@@ -227,9 +229,9 @@ function CharacterGameTable:gameFromRecord(game)
 	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
 	gameRecord.bans = self.config.showBans and
 		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
-	gameRecord.pickedBy = self.isCharacterTable and self:getCharacterPick(gameRecord) or nil
+	gameRecord.pickedBy = self.isPickedByRequired and self:getCharacterPick(gameRecord) or nil
 
-	if self.isCharacterTable then
+	if self.isPickedByRequired then
 		return Logic.isNotEmpty(gameRecord.pickedBy) and gameRecord or nil
 	end
 
