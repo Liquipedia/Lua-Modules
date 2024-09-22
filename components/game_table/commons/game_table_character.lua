@@ -41,6 +41,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field picks string[][]
 ---@field bans string[][]?
 ---@field pickedBy number?
+---@field pickedByplayer number?
 
 ---@class CharacterGameTable: GameTable
 ---@field character string
@@ -193,25 +194,25 @@ function CharacterGameTable:getCharacters(game, maxNumber, keyMaker)
 end
 
 
----@param picks string[][]
----@param winner number?
+---@param game CharacterGameTableGame
 ---@return number?
-function CharacterGameTable:_getCharacterPick(picks, winner)
+function CharacterGameTable:getCharacterPick(game)
 	---@param opponentIndex number
 	---@return number?
 	local findCharacter = function (opponentIndex)
-		local found = Array.find(picks[opponentIndex], function (character)
+		local found = Array.indexOf(game.picks[opponentIndex], function (character)
 			return character == self.character
 		end)
+		game.pickedByplayer = found > 0 and found or nil
 
-		return found and opponentIndex or nil
+		return found > 0 and opponentIndex or nil
 	end
 
+	local winner = tonumber(game.winner)
 	if winner ~= 0 then
 		return findCharacter(winner) or findCharacter(winner == 1 and 2 or 1)
-	else
-		return findCharacter(1) or findCharacter(2)
 	end
+	return findCharacter(1) or findCharacter(2)
 end
 
 ---@param game match2game
@@ -226,7 +227,7 @@ function CharacterGameTable:gameFromRecord(game)
 	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
 	gameRecord.bans = self.config.showBans and
 		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
-	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks, tonumber(gameRecord.winner)) or nil
+	gameRecord.pickedBy = self.isCharacterTable and self:getCharacterPick(gameRecord) or nil
 
 	if self.isCharacterTable then
 		return Logic.isNotEmpty(gameRecord.pickedBy) and gameRecord or nil
