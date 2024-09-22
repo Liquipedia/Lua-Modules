@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 
 local GameTableCharacter = Lua.import('Module:GameTable/Character')
 
+---@class Dota2CustomGameTableCharacter: CharacterGameTable
 local CustomGameTableCharacter = Class.new(GameTableCharacter)
 
 ---@return integer
