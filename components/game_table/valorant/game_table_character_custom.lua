@@ -40,29 +40,19 @@ function CustomGameTableCharacter:getCharacterPick(game)
 		return CharacterGameTable.getCharacterPick(self, game)
 	end
 	local aliases = self.config.aliases
-	---@param opponentIndex number
-	---@return number?
-	local findPlayer = function (opponentIndex)
-		local oppKey = opponentIndex .. '_'
-		local found
-		local id
-		Table.iter.forEachPair(game.participants, function (participantId, participant)
-			if found or not String.startsWith(participantId, oppKey) then
-				return
-			end
-			found = aliases[participant.player] and opponentIndex or nil
-			id = found and participantId or nil
-		end)
-
+	local found
+	Table.iter.forEachPair(game.participants, function (participantId, participant)
+		if found then return end
+		found = aliases[participant.player] and participantId or nil
 		if found then
-			game.pickedByplayer = tonumber((id:gsub(oppKey, '')))
-			return found
+			local pKey = Array.parseCommaSeparatedString(participantId, '_')
+			game.pickedByplayer = tonumber(pKey[2])
+			found = tonumber(pKey[1])
+			return
 		end
+	end)
 
-		return found
-	end
-
-	return findPlayer(1) or findPlayer(2)
+	return found
 end
 
 ---@return integer
