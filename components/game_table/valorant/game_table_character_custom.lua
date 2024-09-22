@@ -132,8 +132,9 @@ function CustomCharacterGameTable:displayGame(match, game)
 	if self.isCharacterTable then
 		local pickedBy = game.pickedBy
 		---@cast pickedBy -nil
-		opponent = pickedBy == 1 and match.result.opponent or match.result.vs
-		opponentVs = pickedBy == 2 and match.result.opponent or match.result.vs
+		if pickedBy == 2 then
+			opponent, opponentVs = opponentVs, opponent
+		end
 	end
 
 	local node = mw.html.create()
