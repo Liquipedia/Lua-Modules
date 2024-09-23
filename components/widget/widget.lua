@@ -69,7 +69,7 @@ function Widget:tryMake(injector)
 			return Array.reduce(ret, function(acc, val)
 				if Class.instanceOf(val, Widget) then
 					---@cast val Widget
-					val.context = Widget._nextContext(self.context, self)
+					val.context = Widget:_nextContext()
 					return acc .. val:tryMake()
 				end
 				if val ~= nil then
@@ -123,8 +123,8 @@ function Widget:getDerivedStateFromError(error)
 	return ErrorDisplay.InlineError(error)
 end
 
-function Widget._nextContext(currentContext, add)
-	return Array.append(currentContext, add)
+function Widget:_nextContext()
+	return Array.append(self.context, self)
 end
 
 function Widget._updateErrorHeader(error)

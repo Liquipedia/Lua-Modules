@@ -11,8 +11,9 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local Div = Lua.import('Module:Widget/Div')
-local Table = Lua.import('Module:Widget/Table')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Table = HtmlWidgets.Table
 
 ---@class WidgetDataTable: Widget
 local DataTable = Class.new(Widget)

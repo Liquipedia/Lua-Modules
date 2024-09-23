@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Th
+-- page=Module:Widget/Span
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,25 +13,23 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 
----@class WidgetTh: Widget
-local Th = Class.new(Widget)
+---@class WidgetSpan: Widget
+---@operator call(table): WidgetSpan
+local Span = Class.new(Widget)
 
 ---@return Html
-function Th:render()
-	local th = mw.html.create('th')
-	th:attr('colspan', self.props.colSpan)
-	th:attr('rowspan', self.props.rowSpan)
-
-	Array.forEach(self.props.classes, FnUtil.curry(th.addClass, th))
+function Span:render(children)
+	local span = mw.html.create('span')
+	Array.forEach(self.props.classes, FnUtil.curry(span.addClass, span))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
-			child.context = Widget._nextContext(self.context, self)
-			th:node(child:tryMake())
+			child.context = self:_nextContext()
+			span:node(child:tryMake())
 		else
-			th:node(child)
+			span:node(child)
 		end
 	end)
-	return th
+	return span
 end
 
-return Th
+return Span

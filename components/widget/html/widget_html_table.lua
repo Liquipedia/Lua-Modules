@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 
----@class WidgetTableOld: Widget
+---@class WidgetTable: Widget
 local Table = Class.new(Widget)
 
 ---@return Html
@@ -22,7 +22,7 @@ function Table:render()
 	Array.forEach(self.props.classes, FnUtil.curry(table.addClass, table))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
-			child.context = Widget._nextContext(self.context, self)
+			child.context = self:_nextContext()
 			table:node(child:tryMake())
 		else
 			table:node(child)

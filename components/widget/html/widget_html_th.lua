@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Td
+-- page=Module:Widget/Th
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,25 +13,25 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 
----@class WidgetTd: Widget
-local Td = Class.new(Widget)
+---@class WidgetTh: Widget
+local Th = Class.new(Widget)
 
 ---@return Html
-function Td:render()
-	local td = mw.html.create('td')
-	td:attr('colspan', self.props.colSpan)
-	td:attr('rowspan', self.props.rowSpan)
+function Th:render()
+	local th = mw.html.create('th')
+	th:attr('colspan', self.props.colSpan)
+	th:attr('rowspan', self.props.rowSpan)
 
-	Array.forEach(self.props.classes, FnUtil.curry(td.addClass, td))
+	Array.forEach(self.props.classes, FnUtil.curry(th.addClass, th))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
-			child.context = Widget._nextContext(self.context, self)
-			td:node(child:tryMake())
+			child.context = self:_nextContext()
+			th:node(child:tryMake())
 		else
-			td:node(child)
+			th:node(child)
 		end
 	end)
-	return td
+	return th
 end
 
-return Td
+return Th
