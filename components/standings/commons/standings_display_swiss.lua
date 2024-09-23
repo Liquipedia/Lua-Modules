@@ -7,10 +7,11 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
-local SwissStandingsDisplay = Class.new(function(self, group)
-	self.group = group
-end)
+local StandingsDisplay = Lua.import('Module:Standings/Display')
+
+local SwissStandingsDisplay = Class.new(StandingsDisplay)
 
 function SwissStandingsDisplay:build()
 

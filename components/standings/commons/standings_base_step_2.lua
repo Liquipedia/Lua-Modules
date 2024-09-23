@@ -18,8 +18,12 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Table = require('Module:Table')
 
----@class storageStanding: standingstable
----@field entries standingsentry[]
+local Storage = Lua.import('Module:Standings/Storage')
+
+---@class standardStanding
+---@field type standingType
+---@field matches string[]
+---and many more :)
 
 local BaseStandings = {}
 
@@ -66,20 +70,26 @@ function BaseStandings.displayStageStandingsFromLpdb(args)
 end
 
 ---@param conditions string[]
----@return storageStanding[]
+---@return standardStanding[]
 function BaseStandings._query(conditions)
-	local groups = mw.ext.LiquipediaB.lpdb('standingstable', {
+	local groupRecords = mw.ext.LiquipediaB.lpdb('standingstable', {
 		conditions = table.concat(conditions, ' AND '),
 		limit = 5000,
 	})
 
-	assert(type(groups[1] == 'table'), 'No results found')
+	assert(type(groupRecords[1] == 'table'), 'No results found')
 
-	return Array.map(groups, BaseStandings._fetchEntries)
+	groupRecords = Array.map(groupRecords, BaseStandings._fetchEntries)
+
+	local groups = Array.map(groupRecords, Storage.fromStorageStruct)
+
+	Array.map(groups, BaseStandings._backFillVs)
+
+	return groups
 end
 
----@param group storageStanding
----@return storageStanding
+---@param group standingStorageStruct
+---@return standingStorageStruct
 function BaseStandings._fetchEntries(group)
 	local conditions = Array.extend(
 		'[[namespace::' .. group.namespace .. ']]',
@@ -95,7 +105,7 @@ function BaseStandings._fetchEntries(group)
 	return group
 end
 
----@param groups storageStanding
+---@param groups standingStorageStruct
 ---@return Html
 function BaseStandings._displayGroups(groups)
 
@@ -115,6 +125,28 @@ function BaseStandings._displayGroups(groups)
 	end)
 
 	return display:node(Box.finish())
+end
+
+--- fill in vs data per entry (per round) for swiss tables
+---@param group standardStanding
+---@return standardStanding
+function BaseStandings._backFillVs(group)
+	if group.type ~= Storage.STANDING_TYPES.SWISS then
+		return group
+	end
+
+	local matchConditions = Array.map(group.matches, function(matchId)
+		return '[[match2id::' .. matchId .. ']]'
+	end)
+
+	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = table.concat(matchConditions, ' OR '),
+		query = 'match2opponents, extradata, ',
+		limit = '5000',
+	})
+
+	-- todo: sort the matches towards the correct entries
+	-- todo: extract vs information from the matches for the according entries
 end
 
 return BaseStandings

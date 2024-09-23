@@ -23,6 +23,15 @@ local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
 
+---@enum standingType
+StandingsStorage.STANDING_TYPES = {
+	SWISS = 'swiss',
+	LEAGUE = 'league',
+}
+
+---@class standingStorageStruct: standingstable
+---@field entries standingsentry[]
+
 ---@param data table
 function StandingsStorage.run(data)
 	if Table.isEmpty(data) then
@@ -264,6 +273,12 @@ end
 ---@param frame table
 function StandingsStorage.fromTemplate(frame)
 	StandingsStorage.fromTemplateEntry(frame)
+end
+
+---@param record standingStorageStruct
+---@return standardStanding
+function StandingsStorage.fromStorageStruct(record)
+	--todo
 end
 
 return StandingsStorage
