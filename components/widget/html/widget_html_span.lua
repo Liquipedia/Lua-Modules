@@ -18,7 +18,7 @@ local Widget = Lua.import('Module:Widget')
 local Span = Class.new(Widget)
 
 ---@return Html
-function Span:render(children)
+function Span:render()
 	local span = mw.html.create('span')
 	Array.forEach(self.props.classes, FnUtil.curry(span.addClass, span))
 	Array.forEach(self.props.children, function(child)
