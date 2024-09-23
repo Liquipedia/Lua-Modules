@@ -7,10 +7,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-
---- this module together with /Custom adjusts, /Input and /Import is basically step 3 of the RFC
-
-
 local Array = require('Module:Array')
 local Box = require('Module:Box')
 local Class = require('Module:Class')
@@ -29,7 +25,7 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@field matchRecordsByRound match2[][]
 ---@field matchResultsByRound table<integer, standingMatchEntryResult>[][]
 ---@field resultsByRound standingResult[][]
----@field rounds {range: {[1]: integer, [2]: integer}, startIsExact: boolean, title: string}[]
+---@field rounds {range: {[1]: integer, [2]: integer}, startIsExact: boolean}[]
 ---@field structure standingStructure
 ---@field slots {pbg: string}[]
 ---@field status standingStatus
@@ -37,6 +33,7 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@field options {hasPoints: boolean, resolveDate: string?, hasDraw: boolean, hasOvertime: boolean} #formerly "tableProps"
 ---@field config standingConfig
 ---@field links table?
+---@field placeMapping integer[] # only for swiss
 
 ---@class standingConfig
 ---@field display {roundWidth: number, width: string?, date: string?, title: string?, streams: table?, roundTitle: string, columns: standingsColumnOptions}
@@ -54,7 +51,6 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@field currentRoundIndex number
 ---@field groupFinished boolean
 ---@field groupStarted boolean
----@field roundFinished boolean
 ---@field roundIsLive boolean
 ---@field roundStarted boolean
 
