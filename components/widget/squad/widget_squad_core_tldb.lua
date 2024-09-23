@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Squad/TldbVariant
+-- page=Module:Widget/Squad/Core/Tldb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -14,11 +14,11 @@ local SquadWidget = Lua.import('Module:Widget/Squad/Core')
 
 ---@class SquadTldbWidget: SquadWidget
 ---@operator call:SquadTldbWidget
-local Squad = Class.new(SquadWidget)
+local SquadTldb = Class.new(SquadWidget)
 
 ---@param type SquadType
 ---@return WidgetTableRowNew
-function Squad._header(type)
+function SquadTldb._header(type)
 	return Widgets.TableRowNew{
 		classes = {'HeaderRow'},
 		cells = {
@@ -34,8 +34,8 @@ end
 ---@param type SquadType
 ---@param title string?
 ---@return WidgetTableRowNew?
-function Squad._title(type, title)
+function SquadTldb._title(type, title)
 	return nil
 end
 
-return Squad
+return SquadTldb

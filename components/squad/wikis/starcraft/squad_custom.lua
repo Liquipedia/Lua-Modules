@@ -15,7 +15,7 @@ local Table = require('Module:Table')
 local Widget = require('Module:Widget/All')
 
 local Squad = Lua.import('Module:Widget/Squad/Core')
-local SquadTldb = Lua.import('Module:Widget/Squad/TldbVariant')
+local SquadTldb = Lua.import('Module:Widget/Squad/Core/Tldb')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
