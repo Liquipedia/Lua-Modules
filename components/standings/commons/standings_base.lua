@@ -31,13 +31,22 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@field resultsByRound standingResult[][]
 ---@field rounds {range: {[1]: integer, [2]: integer}, startIsExact: boolean, title: string}[]
 ---@field structure standingStructure
----@field slots {pbg: string}
+---@field slots {pbg: string}[]
 ---@field status standingStatus
 ---@field results standingResult[]
----@field options {hasPoints: boolean, resolveDate: string?, streams: table, title: string?} #formerly "tableProps"
+---@field options {hasPoints: boolean, resolveDate: string?, hasDraw: boolean, hasOvertime: boolean} #formerly "tableProps"
+---@field config standingConfig
+---@field links table?
+
+---@class standingConfig
+---@field display {roundWidth: number, width: string?, date: string?, title: string?, streams: table?, roundTitle: string, columns: standingsColumnOptions}
+---@field import standingImportOptions # to be defined in /Import
+---@field computeMode 'auto'|'none'|'swiss'|'gsl'|'finished'
+---@field results {exclusive: boolean, gamesPerWalkover: integer, pointsByGameScore: table<string, integer>, pointsPerMatch: {w: integer, d: integer, l: integer}}
+---@field tieBreakers string[]
 
 ---@class standingStructure
----@field type 'gsl'|'roundRobin'|'swiss'|'other'
+---@field type 'gsl'|'roundRobin'|'swiss'|nil
 ---@field cycleCount integer? # only for roundRobin
 ---@field roundCount integer? # only for swiss
 
@@ -248,7 +257,7 @@ end
 
 ---@return Html
 function BaseStandings:build()
-	return BaseStandings.Dispaly(self.group):build()
+	return BaseStandings.Dispaly(self.group):build(BaseStandings.LINKS_DATA)
 end
 
 return BaseStandings

@@ -284,7 +284,262 @@ end
 ---@param group standardStanding
 ---@return table
 function StandingsStorage.toStorageData(group)
+	local standingsIndex = tonumber(Variables.varDefault('standingsindex'))
+	Variables.varDefine('standingsindex', standingsIndex and standingsIndex + 1 or 0)
+
 	--todo
 end
+
+
+
+Storage.store = Logic.wrapTryOrLog(function(groupTable, options)
+	Storage.syncVariables(groupTable)
+
+	if config.storeStanding then
+		Storage.standardized(groupTable, config.toStandingRecords(groupTable))
+	end
+end)
+
+--storage the new standardized way
+function Storage.standardized(groupTable, records)
+	local tableProps = groupTable.tableProps or {}
+	local standingsIndex = globalVars:get('standingsindex')
+	local groupTableStatus = groupTable.status or {}
+	local roundCount = #groupTable.rounds
+
+	local endTime = ''
+	for _, record in pairs(records) do
+		if ((record.extradata or {}).endTime or '') > endTime then
+			endTime = record.extradata.endTime
+		end
+	end
+
+	local finished = groupTableStatus.groupFinished
+
+	local showMatchDraws = GroupTableLeague.Display.computeShowMatchDraws(groupTable) or nil
+	-- store to lpdb_standingstable
+	local standingsStorageData = {
+		noLegacy = true,
+		standingsindex = standingsIndex,
+		title = tableProps.title,
+		type = groupTable.structure.type or 'league',
+		matches = Storage.getMatches(groupTable.matchRecords),
+		roundCount = roundCount,
+		extradata = {
+			groupfinished = groupTableStatus.groupFinished,
+			bracketindex = tonumber(globalVars:get('match2bracketindex')) or 0,
+			endtime = endTime,
+			placemapping = groupTable.placeMapping,
+		},
+		enddate = endTime,
+		opponentLibrary = 'Opponent/Starcraft',
+		hasovertime = false,
+		hasdraw = showMatchDraws ~= nil,
+		finished = finished,
+	}
+
+	local entries = {}
+	for roundIndex = 1, roundCount do
+		local results = groupTable.resultsByRound[roundIndex]
+
+		local sortedOppIxs = Array.sortBy(Array.range(1, #groupTable.entries), function(oppIx)
+			return results[oppIx].slotIndex
+		end)
+
+		Array.appendWith(entries, unpack(Array.map(sortedOppIxs, function(oppIx, slotIx)
+			local entry = groupTable.entries[oppIx]
+			if (entry.opponent or {}).type == Opponent.team then
+				entry.opponent.template = entry.opponent.template or (entry.opponent.name or ''):lower()
+			end
+			return Table.deepMergeInto(
+				Storage.resultPropsNew(oppIx, slotIx, roundIndex, groupTable, showMatchDraws, finished),
+				{
+					opponent = entry.opponent,
+					roundindex = roundIndex,
+					slotindex = slotIx,
+				}
+			)
+		end)))
+	end
+
+	standingsStorageData.entries = entries
+
+	StandingsStorage.run(standingsStorageData)
+end
+
+function Storage.getMatches(matches)
+	local matchIds = {}
+	for _, match in pairs(matches) do
+		table.insert(matchIds, match.match2id)
+	end
+
+	return matchIds
+end
+
+function Storage.prepForNewScoreBoard(data, showMatchDraws)
+	return {
+		w = data[1],
+		d = showMatchDraws and data[2] or nil,
+		l = data[3],
+	}
+end
+
+function Storage.resultPropsNew(opponentIndex, slotIndex, roundIndex, groupTable, showMatchDraws, finished)
+	local slot = groupTable.slots[slotIndex]
+	local entry = groupTable.entries[opponentIndex]
+	local result = groupTable.resultsByRound[roundIndex][opponentIndex]
+	result.rank = result.manualFinalTiebreak and finished and result.placeRange[1] == result.placeRange[2]
+		and result.placeRangeIsExact and result.placeRange[1]
+		or result.rank
+
+	return {
+		currentstatus = result.pbg,
+		definitestatus = result.bg,
+		diff = result.gameScore[1] - result.gameScore[3],
+		extradata = {placerangeisexact = result.placeRangeIsExact},
+		game = Storage.prepForNewScoreBoard(result.gameScore, showMatchDraws),
+		match = Storage.prepForNewScoreBoard(result.matchScore, showMatchDraws),
+		placement = result.rank,
+		placementchange = result.rankChange and -result.rankChange,
+		placerange = result.placeRange,
+		points = groupTable.tableProps.hasPoints and result.points or nil,
+		scoreboard = scoreboard,
+		slotindex = slotIndex,
+	}
+end
+
+--[[
+Sets page variables expected by other templates.
+]]
+
+
+local StandingRecord = {}
+
+function StandingRecord.toLpdbId(roundIndex, slotIndex)
+	return table.concat({
+		'standing',
+		tonumber(globalVars:get('standingsindex')),
+		roundIndex,
+		slotIndex,
+	}, '_')
+end
+
+function StandingRecord.toRecords(groupTable)
+	-- Sort opponent results of the final round
+	local results = groupTable.resultsByRound[#groupTable.rounds]
+	local sortedOppIxs = Array.sortBy(Array.range(1, #groupTable.entries), function(oppIx)
+		return results[oppIx].slotIndex
+	end)
+
+	local commonProps = StandingRecord.commonProps(groupTable)
+
+	return Array.map(sortedOppIxs, function(oppIx, slotIx)
+		local entry = groupTable.entries[oppIx]
+		return Table.deepMergeInto(
+			StandingRecord.resultProps(oppIx, slotIx, groupTable),
+			StandingRecord.opponentProps(entry, groupTable),
+			commonProps
+		)
+	end)
+end
+
+function StandingRecord.commonProps(groupTable)
+	local matchGroupIds = Array.map(groupTable.matchRecords, function(matchRecord)
+		return matchRecord.match2bracketid
+	end)
+	local pageNames = Array.map(groupTable.matchRecords, function(matchRecord)
+		return matchRecord.pagename
+	end)
+	local endTime = GroupTableLeague.Status.getEndTime(groupTable.rounds, groupTable.matchRecords)
+
+	local uniqueMatchGroupIds = Array.unique(matchGroupIds)
+
+	local extradata = {
+		bracketIndex = tonumber(globalVars:get('match2bracketindex')) or 0,
+		endTime = DateExt.formatTimestamp('c', endTime),
+		groupFinished = groupTable.status.groupFinished,
+		finished = groupTable.status.groupFinished,
+		matchGroupId = #uniqueMatchGroupIds == 1 and uniqueMatchGroupIds[1] or nil,
+		roundFinished = groupTable.status.roundFinished,
+		showMatchDraws = GroupTableLeague.Display.computeShowMatchDraws(groupTable) or nil,
+		stageName = globalVars:get('bracket_header'),
+	}
+
+	local uniquePageNames = Array.unique(pageNames)
+
+	return {
+		extradata = extradata,
+		roundindex = groupTable.status.currentRoundIndex,
+		section = globalVars:get('last_heading') ~= nil and (globalVars:get('last_heading'):gsub('<.->', '')) or nil,
+		standingsindex = globalVars:get('standingsindex'),
+		title = groupTable.tableProps.title or 'Group',
+		tournament = #uniquePageNames == 1 and uniquePageNames[1] or nil,
+	}
+end
+
+
+function StandingRecord.resultProps(opponentIndex, slotIndex, groupTable)
+	local slot = groupTable.slots[slotIndex]
+	local entry = groupTable.entries[opponentIndex]
+	local result = groupTable.resultsByRound[#groupTable.rounds][opponentIndex]
+
+	local scoreboard = {
+		diff = result.gameScore[1] - result.gameScore[3],
+		game = result.gameScore,
+		match = result.matchScore,
+		points = groupTable.tableProps.hasPoints and result.points or nil,
+	}
+	local extradata = {
+		opponent = entry.opponent,
+		placeRange = result.placeRange,
+		placeRangeIsExact = result.placeRangeIsExact,
+		slotIndex = slotIndex,
+	}
+	return {
+		change = result.rankChange and -result.rankChange,
+		currentstatus = slot.pbg,
+		definitestatus = result.bg,
+		extradata = extradata,
+		id = StandingRecord.toLpdbId(groupTable.status.currentRoundIndex, slotIndex),
+		participant = Opponent.toName(entry.opponent):gsub(' ', '_'),
+		placement = result.rank,
+		scoreboard = scoreboard,
+	}
+end
+
+function StandingRecord.opponentProps(entry, groupTable)
+	local opponent = entry.opponent
+	if opponent.type == 'team' then
+		local raw = TeamTemplate.getRaw(opponent.template or opponent.name:gsub('_', ' '), groupTable.tableProps.resolveDate)
+		return {
+			icon = raw.image,
+			icondark = raw.imagedark,
+			participantdisplay = raw.name,
+		}
+
+	elseif Opponent.typeIsParty(opponent.type) then
+		return {
+			participantdisplay = opponent.players[1].displayName,
+			participantflag = opponent.players[1].flag,
+		}
+
+	elseif opponent.type == 'literal' then
+		return {
+			participantdisplay = opponent.name,
+		}
+	end
+end
+
+
+
+
+
+
+
+
+
+
+
+
 
 return StandingsStorage
