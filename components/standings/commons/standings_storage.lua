@@ -276,12 +276,6 @@ function StandingsStorage.fromTemplate(frame)
 	StandingsStorage.fromTemplateEntry(frame)
 end
 
----@param record standingStorageStruct
----@return standardStanding
-function StandingsStorage.fromStorageStruct(record)
-	--todo
-end
-
 ---@param groupTable standardStanding
 ---@return table
 function StandingsStorage.toStorageData(groupTable)
@@ -312,7 +306,7 @@ function StandingsStorage.toStorageData(groupTable)
 	}
 
 	local entries = {}
-	for roundIndex = 1, roundCount do
+	Array.forEach(Array.range(1, roundCount), function(roundIndex)
 		local results = groupTable.resultsByRound[roundIndex]
 
 		local sortedOppIxs = Array.sortBy(Array.range(1, #groupTable.entries), function(oppIx)
@@ -320,6 +314,7 @@ function StandingsStorage.toStorageData(groupTable)
 		end)
 
 		Array.extendWith(entries, Array.map(sortedOppIxs, function(oppIx, slotIx)
+			local result = groupTable.resultsByRound[roundIndex][oppIx]
 			local entry = groupTable.entries[oppIx]
 
 			-- not sure if needed
@@ -328,8 +323,8 @@ function StandingsStorage.toStorageData(groupTable)
 				entry.opponent.template = entry.opponent.template or (entry.opponent.name or ''):lower():gsub('_', ' ')
 			end
 			]]
-			return Table.deepMergeInto(
-				Storage.resultPropsNew(oppIx, slotIx, roundIndex, groupTable, groupTable.options.hasDraw, finished),
+			return Table.deepMerge(
+				StandingsStorage.entriesToStorageData(result, slotIx, groupTable, finished),
 				{
 					opponent = entry.opponent,
 					roundindex = roundIndex,
@@ -337,7 +332,7 @@ function StandingsStorage.toStorageData(groupTable)
 				}
 			)
 		end))
-	end
+	end)
 
 	standingsStorageData.entries = entries
 
@@ -361,19 +356,20 @@ function StandingsStorage.getEndDate(groupTable)
 	return DateExt.formatTimestamp('c', endTime) --[[@as string?]]
 end
 
+---@param result standingResult
+---@param slotIndex integer
+---@param groupTable standardStanding
+---@param finished boolean
+---@return table
+function StandingsStorage.entriesToStorageData(result, slotIndex, groupTable, finished)
+	local removeDrawIfApplicable = function(scores)
+		if groupTable.options.hasDraw then
+			return scores
+		end
 
-function Storage.prepForNewScoreBoard(data, showMatchDraws)
-	return {
-		w = data[1],
-		d = showMatchDraws and data[2] or nil,
-		l = data[3],
-	}
-end
+		return {w = scores.w, l = scores.l}
+	end
 
-function Storage.resultPropsNew(opponentIndex, slotIndex, roundIndex, groupTable, showMatchDraws, finished)
-	local slot = groupTable.slots[slotIndex]
-	local entry = groupTable.entries[opponentIndex]
-	local result = groupTable.resultsByRound[roundIndex][opponentIndex]
 	result.rank = result.manualFinalTiebreak and finished and result.placeRange[1] == result.placeRange[2]
 		and result.placeRangeIsExact and result.placeRange[1]
 		or result.rank
@@ -383,15 +379,20 @@ function Storage.resultPropsNew(opponentIndex, slotIndex, roundIndex, groupTable
 		definitestatus = result.bg,
 		diff = result.gameScore[1] - result.gameScore[3],
 		extradata = {placerangeisexact = result.placeRangeIsExact},
-		game = Storage.prepForNewScoreBoard(result.gameScore, showMatchDraws),
-		match = Storage.prepForNewScoreBoard(result.matchScore, showMatchDraws),
+		game = removeDrawIfApplicable(result.gameScore),
+		match = removeDrawIfApplicable(result.matchScore),
 		placement = result.rank,
 		placementchange = result.rankChange and -result.rankChange,
 		placerange = result.placeRange,
-		points = groupTable.tableProps.hasPoints and result.points or nil,
-		scoreboard = scoreboard,
+		points = groupTable.options.hasPoints and result.points or nil,
 		slotindex = slotIndex,
 	}
+end
+
+---@param record standingStorageStruct
+---@return standardStanding
+function StandingsStorage.fromStorageStruct(record)
+	--todo
 end
 
 return StandingsStorage

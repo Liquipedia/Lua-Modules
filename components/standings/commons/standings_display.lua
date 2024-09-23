@@ -103,7 +103,7 @@ function StandingsDisplay:_dropdown()
 	local status = groupTable.status
 
 	local buttonText = status.groupFinished
-		and groupTable.rounds[status.currentRoundIndex].title
+		and (config.roundTitle .. ' ' .. status.currentRoundIndex)
 		or 'Current'
 	local buttonNode = mw.html.create('div')
 		:addClass('dropdown-box-button btn btn-secondary')

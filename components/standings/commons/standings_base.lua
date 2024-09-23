@@ -67,6 +67,7 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@field gameScore scoreInfo
 ---@field matchScore scoreInfo
 ---@field points integer
+---@field manualFinalTiebreak boolean?
 ---later: add overtime stuff here!
 
 ---@class standingMatchEntryResult
@@ -213,6 +214,8 @@ function BaseStandings._backFillVs(group)
 
 	-- todo: sort the matches towards the correct entries
 	-- todo: extract vs information from the matches for the according entries
+
+	return group
 end
 
 ---@param defaultTieBreakers string[]
