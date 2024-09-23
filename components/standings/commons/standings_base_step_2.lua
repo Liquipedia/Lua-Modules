@@ -13,6 +13,7 @@
 
 local Array = require('Module:Array')
 local Box = require('Module:Box')
+local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -25,7 +26,13 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@field matches string[]
 ---and many more :)
 
-local BaseStandings = {}
+---@class BaseStandings
+---@field args table
+local BaseStandings = Class.new(function(self, args)
+	self.args = args
+end)
+
+BaseStandings.LINKS_DATA = {}
 
 BaseStandings.Dispaly = Lua.import('Module:Standings/Display') -- todo
 

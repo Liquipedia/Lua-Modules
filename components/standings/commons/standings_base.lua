@@ -24,7 +24,57 @@ local Storage = Lua.import('Module:Standings/Storage')
 ---@class standardStanding
 ---@field type standingType
 ---@field matches string[]
----and many more :)
+---@field entries standardStandingEntry
+---@field entryIndexesByName table<string, integer>
+---@field matchRecordsByRound match2[][]
+---@field matchResultsByRound table<integer, standingMatchEntryResult>[][]
+---@field resultsByRound standingResult[][]
+---@field rounds {range: {[1]: integer, [2]: integer}, startIsExact: boolean, title: string}[]
+---@field structure standingStructure
+---@field slots {pbg: string}
+---@field status standingStatus
+---@field results standingResult[]
+---@field options {hasPoints: boolean, resolveDate: string?, streams: table, title: string?} #formerly "tableProps"
+
+---@class standingStructure
+---@field type 'gsl'|'roundRobin'|'swiss'|'other'
+---@field cycleCount integer? # only for roundRobin
+---@field roundCount integer? # only for swiss
+
+---@class standingStatus
+---@field currentRoundIndex number
+---@field groupFinished boolean
+---@field groupStarted boolean
+---@field roundFinished boolean
+---@field roundIsLive boolean
+---@field roundStarted boolean
+
+---@class standingResult
+---@field bg string?
+---@field pbg string?
+---@field dq boolean?
+---@field finalTiebreak number
+---@field placeRange {[1]: integer, [2]: integer} #start, end
+---@field placeRangeIsExact boolean
+---@field rank integer
+---@field slotIndex integer
+---@field rankChange integer?
+---@field gameScore scoreInfo
+---@field matchScore scoreInfo
+---@field points integer
+---later: add overtime stuff here!
+
+---@class standingMatchEntryResult
+---@field gameScore scoreInfo
+---@field matchScore scoreInfo
+---@field points integer
+---later: add overtime stuff here!
+
+---@class standardStandingEntry
+---@field opponent standardOpponent
+---@field aliases string[]
+---@field identifierKey 'name'|'template' #template for team opponents, name for other opponents
+---@field note string?
 
 ---@class BaseStandings
 ---@field args table
@@ -33,6 +83,8 @@ local Storage = Lua.import('Module:Standings/Storage')
 local BaseStandings = Class.new(function(self, args)
 	self.args = args
 end)
+
+BaseStandings.LINKS_DATA = {}
 
 BaseStandings.Dispaly = Lua.import('Module:Standings/Display') -- todo
 BaseStandings.Input = Lua.import('Module:Standings/Input') -- todo
@@ -158,6 +210,15 @@ function BaseStandings._backFillVs(group)
 	-- todo: extract vs information from the matches for the according entries
 end
 
+---@param defaultTieBreakers string[]
+---@return self
+function BaseStandings:setDefaultTieBreakers(defaultTieBreakers)
+	if Logic.isNotEmpty(defaultTieBreakers) then
+		self.defaultTieBreakers = defaultTieBreakers
+	end
+	return self
+end
+
 ---@return self
 function BaseStandings:read()
 	self.config = BaseStandings.Input.readConfig(self.args)
@@ -168,15 +229,19 @@ end
 
 ---@return self
 function BaseStandings:process()
-	self.group = BaseStandings.Import(self.group):query():process()
+	self.group = BaseStandings.Import(self):query():process()
 
 	return self
 end
 
 ---@return self
 function BaseStandings:store()
+	if Logic.readBoolOrNil(self.args.storeStanding) == false then
+		return self
+	end
+
 	local storageData = Storage.toStorageData(self.group)
-	Storage.run(BaseStandings)
+	Storage.run(storageData)
 
 	return self
 end
