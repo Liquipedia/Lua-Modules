@@ -17,7 +17,7 @@ local String = require('Module:StringUtils')
 ---@class Widget: BaseClass
 ---@operator call(table): self
 ---@field children (Widget|Html|string|number)[] @deprecated
----@field context table<string, any>
+---@field context Widget[]
 ---@field props table<string, any>
 ---@field makeChildren? fun(self:Widget, injector: WidgetInjector?): Widget[]?
 local Widget = Class.new(function(self, props)
@@ -119,7 +119,9 @@ function Widget:useContext(otherContext, default)
 	local context = Array.find(self.context, function(node)
 		return Class.instanceOf(node, otherContext)
 	end)
+	print('context', type(context))
 	if context then
+		---@cast context WidgetContext
 		return context:getValue(default)
 	end
 	return default
@@ -130,7 +132,7 @@ function Widget:getDerivedStateFromError(error)
 end
 
 function Widget:_nextContext()
-	return {unpack(self.context), self}
+	return {self, unpack(self.context)}
 end
 
 function Widget._updateErrorHeader(error)
