@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 		Array.extendWith(widgets,
 			{
 				raceBreakdown and Title{name = 'Racial Distribution of Champions'} or nil,
-				raceBreakdown and Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }} or nil,
+				raceBreakdown and Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }} or nil,
 			},
 			self.caller:_buildCellsFromBase('countries with multiple champions', 'Countries with Multiple Champions'),
 			self.caller:_buildCellsFromBase('teams with multiple champions', 'Teams with Multiple Champions')

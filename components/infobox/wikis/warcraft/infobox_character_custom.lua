@@ -73,12 +73,12 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return Array.append(widgets,
 			Title{name = 'Attributes'},
-			BreakDown{content = {
+			BreakDown{children = {
 				self.caller:_basicAttribute('str'),
 				self.caller:_basicAttribute('agi'),
 				self.caller:_basicAttribute('int'),
 			}, classes = {'infobox-center'}},
-			BreakDown{content = {
+			BreakDown{children = {
 				self.caller:_getDamageAttribute(),
 				self.caller:_getArmorAttribute(),
 				self.caller:_getPrimaryAttribute(),
@@ -97,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 			args.icon and Title{name = 'Icon'} or nil,
 			Center{content = {self.caller:_displayIcon()}},
 			Title{name = 'Level Changes'},
-			BreakDown{content = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
+			BreakDown{children = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
 			BreakDown(CustomCharacter._toLevelChangesRow(
 				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, '[[Hit Points]]:')),
 			BreakDown(CustomCharacter._toLevelChangesRow(function(gainFactor)
@@ -345,7 +345,7 @@ end
 ---@param title string
 ---@return {content: table, contentClasses: table}}
 function CustomCharacter._toLevelChangesRow(funct, title)
-	return {content = {title, funct(0), funct(4), funct(9)}, contentClasses = LEVEL_CHANGE_CLASSES}
+	return {children = {title, funct(0), funct(4), funct(9)}, contentClasses = LEVEL_CHANGE_CLASSES}
 end
 
 return CustomCharacter

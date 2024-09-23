@@ -36,9 +36,8 @@ function Patch.run(frame)
 	return patch:createInfobox()
 end
 
----@return Html
+---@return string
 function Patch:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -85,11 +84,11 @@ function Patch:createInfobox()
 	}
 
 	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		infobox:categories(self:getInformationType(args))
+		self:categories(self:getInformationType(args))
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 --- Allows for overriding this functionality

@@ -35,7 +35,7 @@ function Icon:make(children)
 		self.props.imageDark,
 		{
 			link = self.props.link or '',
-			size = 'x24px',
+			size = 'x20px',
 		}
 	)
 end

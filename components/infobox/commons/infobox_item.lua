@@ -29,9 +29,8 @@ function Item.run(frame)
 	return item:createInfobox()
 end
 
----@return Html
+---@return string
 function Item:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -100,14 +99,14 @@ function Item:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Items')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Items')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table

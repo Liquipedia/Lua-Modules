@@ -29,7 +29,7 @@ function CustomShow.run(frame)
 	show:setWidgetInjector(CustomInjector(show))
 
 	if Namespace.isMain() and show.args.edate == nil then
-		show.infobox:categories('Active Shows')
+		show:categories('Active Shows')
 	end
 
 	return show:createInfobox()

@@ -115,13 +115,13 @@ end
 ---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
 function MatchFunctions.readDate(matchArgs)
 	local dateProps = MatchGroupInputUtil.readDate(matchArgs.date, {
-		'matchDate',
+		'match_date',
 		'tournament_startdate',
 		'tournament_enddate'
 	})
 
 	if dateProps.dateexact then
-		Variables.varDefine('matchDate', dateProps.date)
+		Variables.varDefine('match_date', dateProps.date)
 	end
 
 	return dateProps

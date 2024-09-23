@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Breakdown
+-- page=Module:Widget/Infobox/Breakdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,7 +18,6 @@ local Widget = Lua.import('Module:Widget')
 local Breakdown = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content
 		self.classes = input.classes
 		self.contentClasses = input.contentClasses or {}
 	end

@@ -47,7 +47,7 @@ function CustomInjector:parse(id, widgets)
 		for regionKey, region in Table.iter.pairsByPrefix(args, 'region') do
 			Array.appendWith(widgets,
 				Cell{name = (args[regionKey .. ' no'] or '') .. ' champions', content = {region}},
-				Breakdown{content = {args[regionKey .. ' champions']}}
+				Breakdown{children = {args[regionKey .. ' champions']}}
 			)
 		end
 	end
