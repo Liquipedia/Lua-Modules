@@ -33,7 +33,7 @@ function Squad:make(children)
 	local title = self._title(self.type, self.title)
 	local header = self._header(self.type)
 
-	local allChildren = Array.extend(title, header, children)
+	local allChildren = {title, header, unpack(children)}
 
 	return Widgets.TableNew{
 		css = {['margin-bottom'] = '10px'},
