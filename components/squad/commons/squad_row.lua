@@ -53,7 +53,7 @@ function SquadRow:id()
 		table.insert(content, '&nbsp;' .. roleIcon)
 	end
 
-	local cell = Widget.TableCellNew{
+	local cell = Widget.Td{
 		classes = {'ID'},
 		content = content,
 	}
@@ -61,7 +61,7 @@ function SquadRow:id()
 	local date = self.model.leavedate or self.model.inactivedate
 	local hasTeam = self.model.extradata.loanedto and mw.ext.TeamTemplate.teamexists(self.model.extradata.loanedto)
 	local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
-	local teamNode = Widget.TableCellNew{
+	local teamNode = Widget.Td{
 		css = hasTeamRole and {'text-align', 'center'} or nil,
 		content = {
 			hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
@@ -77,7 +77,7 @@ end
 
 ---@return self
 function SquadRow:name()
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		classes = {'Name'},
 		content = String.isNotEmpty(self.model.name) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('(', self.model.name, ')'),
@@ -92,7 +92,7 @@ end
 function SquadRow:role()
 	local display = String.isNotEmpty(self.model.role) and not RoleIcons[self.model.role:lower()]
 
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		classes = {'Position'},
 		content = display and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'),
@@ -123,7 +123,7 @@ function SquadRow:position()
 		end
 	end
 
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		classes = {'Position'},
 		content = content,
 	})
@@ -135,7 +135,7 @@ end
 ---@param cellTitle string?
 ---@return self
 function SquadRow:date(field, cellTitle)
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		classes = {'Date'},
 		content = self.model[field] and {
 			mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle),
@@ -182,7 +182,7 @@ function SquadRow:newteam()
 		return content
 	end
 
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		classes = {'NewTeam'},
 		content = createContent(),
 	})
@@ -190,7 +190,7 @@ function SquadRow:newteam()
 	return self
 end
 
----@return WidgetTableRowNew
+---@return WidgetTr
 function SquadRow:create()
 	-- Set row background for certain roles
 	local backgrounds = {'Player'}
@@ -203,7 +203,7 @@ function SquadRow:create()
 		table.insert(backgrounds, 'roster-coach')
 	end
 
-	return Widget.TableRowNew{
+	return Widget.Tr{
 		classes = backgrounds,
 		children = self.children,
 	}

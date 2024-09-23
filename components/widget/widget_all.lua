@@ -24,17 +24,20 @@ Widgets.Highlights = Lua.import('Module:Widget/Infobox/Highlights')
 Widgets.Links = Lua.import('Module:Widget/Infobox/Links')
 Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
 
---- Generic Widgets
-Widgets.Div = Lua.import('Module:Widget/Div')
-
---- Table Widgets (div-table) (might be removed)
-Widgets.Table = Lua.import('Module:Widget/Table')
+--- Table Widgets (div-table) (will be removed)
+Widgets.TableOld = Lua.import('Module:Widget/Table/Old')
 Widgets.TableRow = Lua.import('Module:Widget/Table/Row')
 Widgets.TableCell = Lua.import('Module:Widget/Table/Cell')
 
---- Table Widgets (html-table)
-Widgets.TableNew = Lua.import('Module:Widget/Table/New')
-Widgets.TableRowNew = Lua.import('Module:Widget/Table/Row/New')
-Widgets.TableCellNew = Lua.import('Module:Widget/Table/Cell/New')
+--- Data Table Widgets (html-table)
+Widgets.DataTable = Lua.import('Module:Widget/DataTable')
+
+--- Base Html Widgets
+Widgets.Div = Lua.import('Module:Widget/Div')
+Widgets.Span = Lua.import('Module:Widget/Span')
+Widgets.Table = Lua.import('Module:Widget/Table')
+Widgets.Td = Lua.import('Module:Widget/Td')
+Widgets.Th = Lua.import('Module:Widget/Th')
+Widgets.Tr = Lua.import('Module:Widget/Tr')
 
 return Widgets

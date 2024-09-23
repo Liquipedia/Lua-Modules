@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Div
+-- page=Module:Widget/Td
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,23 +13,25 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 
----@class DivWidget: Widget
----@operator call(table): DivWidget
-local Div = Class.new(Widget)
+---@class WidgetTd: Widget
+local Td = Class.new(Widget)
 
 ---@return Html
-function Div:render()
-	local div = mw.html.create('div')
-	Array.forEach(self.props.classes, FnUtil.curry(div.addClass, div))
+function Td:render()
+	local td = mw.html.create('td')
+	td:attr('colspan', self.props.colSpan)
+	td:attr('rowspan', self.props.rowSpan)
+
+	Array.forEach(self.props.classes, FnUtil.curry(td.addClass, td))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
 			child.context = Widget._nextContext(self.context, self)
-			div:node(child:tryMake())
+			td:node(child:tryMake())
 		else
-			div:node(child)
+			td:node(child)
 		end
 	end)
-	return div
+	return td
 end
 
-return Div
+return Td

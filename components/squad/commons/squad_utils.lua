@@ -22,7 +22,7 @@ local Variables = require('Module:Variables')
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
-local Injector = Lua.import('Module:Widget/Injector')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 local Widget = Lua.import('Module:Widget/All')
 
 local SquadUtils = {}
@@ -179,17 +179,13 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadType: integer):WidgetTableRowNew
----@param injector WidgetInjector?
----@return string
-function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator, injector)
+---@param rowCreator fun(player: table, squadType: integer):WidgetTr
+---@return Widget
+function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
 	local props = {
 		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
 		title = args.title,
-		injector = (injector and injector()) or
-			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-			nil,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
@@ -201,24 +197,23 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator, injector)
 		return rowCreator(player, props.type)
 	end)
 
-	return tostring(squadWidget(props))
+	if Info.config.squads.hasPosition then
+		return SquadContexts.Role{value = SquadUtils.positionHeader(), children = {squadWidget(props)}}
+	end
+	return squadWidget(props)
 end
 
 ---@param players table[]
 ---@param squadType SquadType
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param rowCreator fun(person: table, squadType: integer):WidgetTr
 ---@param customTitle string?
----@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
----@return string
-function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, injector, personMapper)
+---@return Widget
+function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, personMapper)
 	local props = {
 		type = squadType,
-		title = customTitle,
-		injector = (injector and injector()) or
-			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-			nil,
+		title = customTitle
 	}
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
@@ -226,11 +221,14 @@ function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, 
 		return rowCreator(player, props.type)
 	end)
 
-	return tostring(squadWidget(props))
+	if Info.config.squads.hasPosition then
+		return SquadContexts.Role{value = SquadUtils.positionHeader(), children = {squadWidget(props)}}
+	end
+	return squadWidget(props)
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadType: integer):WidgetTableRowNew
+---@return fun(person: table, squadType: integer):WidgetTr
 function SquadUtils.defaultRow(squadRowClass)
 	return function(person, squadType)
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
@@ -258,21 +256,9 @@ function SquadUtils.defaultRow(squadRowClass)
 	end
 end
 
----@return WidgetInjector
-function SquadUtils.positionHeaderInjector()
-	local CustomInjector = Class.new(Injector)
-
-	function CustomInjector:parse(id, widgets)
-		if id == 'header_role' then
-			return {
-				Widget.TableCellNew{content = {'Position'}, header = true}
-			}
-		end
-
-		return widgets
-	end
-
-	return CustomInjector
+---@return WidgetTh
+function SquadUtils.positionHeader()
+	return {Widget.Th{content = {'Position'}}}
 end
 
 return SquadUtils

@@ -7,19 +7,24 @@
 --
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
----@class WidgetParameters
----@field children (Widget|Html|string|number)[]?
+local WidgetContext = require('Module:Widget/Context')
 
 ---@class Widget: BaseClass
----@operator call(WidgetParameters): Widget
----@field children (Widget|Html|string|number)[]
+---@operator call(table): self
+---@field children (Widget|Html|string|number)[] @deprecated
+---@field context table<string, any>
+---@field props table<string, any>
 ---@field makeChildren? fun(self:Widget, injector: WidgetInjector?): Widget[]?
-local Widget = Class.new(function(self, input)
-	self.children = input and input.children or {}
+local Widget = Class.new(function(self, props)
+	self.props = props or {}
+	self.props.children = self.props.children or {}
+	self.children = self.props.children -- Legacy support @deprecated
+	self.context = {} -- Set by the parent
 end)
 
 ---Asserts the existence of a value and copies it
@@ -29,6 +34,11 @@ function Widget:assertExistsAndCopy(value)
 	return assert(String.nilIfEmpty(value), 'Tried to set a nil value to a mandatory property')
 end
 
+---@return (string|Widget|Html|nil)[]|(string|Widget|Html|nil)
+function Widget:render()
+	error('A Widget must override the render() function!')
+end
+
 ---@param children string[]
 ---@return string|nil
 function Widget:make(children)
@@ -36,16 +46,44 @@ function Widget:make(children)
 end
 
 ---@param injector WidgetInjector?
----@return string|nil
+---@return string
 function Widget:tryMake(injector)
-	local processedChildren = self:tryChildren(injector)
-	return Logic.tryOrElseLog(
-		function() return self:make(processedChildren) end,
-		function(error) return tostring(ErrorDisplay.InlineError(error)) end,
-		function(error)
-			error.header = 'Error occured in widget: (caught by Widget:tryMake)'
-			return error
+	local renderComponent
+	if self.render == Widget.render then
+		-- Legacy support
+		renderComponent = function()
+			local processedChildren = self:tryChildren(injector)
+			if self.render == Widget.render then
+				local ret = self:make(processedChildren)
+				return ret ~= nil and ret or ''
+			end
 		end
+	else
+		renderComponent = function()
+			local ret = self:render()
+			if not Array.isArray(ret) then
+				ret = {ret}
+			end
+
+			---@cast ret (string|Widget|Html|nil)[]
+			return Array.reduce(ret, function(acc, val)
+				if Class.instanceOf(val, Widget) then
+					---@cast val Widget
+					val.context = Widget._nextContext(self.context, self)
+					return acc .. val:tryMake()
+				end
+				if val ~= nil then
+					return acc .. tostring(val)
+				end
+				return acc
+			end, '')
+		end
+	end
+
+	return Logic.tryOrElseLog(
+		renderComponent,
+		FnUtil.curry(self.getDerivedStateFromError, self),
+		Widget._updateErrorHeader
 	)
 end
 
@@ -61,16 +99,37 @@ function Widget:tryChildren(injector)
 			---@cast child Widget
 			return Logic.tryOrElseLog(
 				function() return child:tryMake(injector) end,
-				function(error) return tostring(ErrorDisplay.InlineError(error)) end,
-				function(error)
-					error.header = 'Error occured in widget: (caught by Widget:tryChildren)'
-					return error
-				end
+				FnUtil.curry(self.getDerivedStateFromError, self),
+				Widget._updateErrorHeader
 			)
 		end
 		---@cast child -Widget
 		return tostring(child)
 	end)
+end
+
+function Widget:useContext(otherContext, default)
+	assert(Class.instanceOf(otherContext, WidgetContext), 'Context must be a Context Widget')
+	local context = Array.find(self.context, function(node)
+		return Class.instanceOf(node, otherContext)
+	end)
+	if context then
+		return context:getValue(default)
+	end
+	return default
+end
+
+function Widget:getDerivedStateFromError(error)
+	return ErrorDisplay.InlineError(error)
+end
+
+function Widget._nextContext(currentContext, add)
+	return Array.append(currentContext, add)
+end
+
+function Widget._updateErrorHeader(error)
+	error.header = 'Error occured in widget building:'
+	return error
 end
 
 ---@return string

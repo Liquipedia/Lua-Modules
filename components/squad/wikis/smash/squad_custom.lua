@@ -19,21 +19,9 @@ local Widget = require('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
-
-local Injector = Lua.import('Module:Widget/Injector')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local CustomSquad = {}
-local CustomInjector = Class.new(Injector)
-
-function CustomInjector:parse(id, widgets)
-	if id == 'header_role' then
-		return {
-			Widget.TableCellNew{content = {'Main'}, header = true}
-		}
-	end
-
-	return widgets
-end
 
 ---@class SmashSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
@@ -45,7 +33,7 @@ function ExtendedSquadRow:mains()
 		table.insert(characters, Characters.GetIconAndName{main, game = self.model.extradata.game, large = true})
 	end)
 
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		css = {['text-align'] = 'center'},
 		content = characters,
 	})
@@ -54,11 +42,10 @@ function ExtendedSquadRow:mains()
 end
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local props = {
-		injector = CustomInjector(),
 		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
 		title = args.title,
 	}
@@ -99,7 +86,10 @@ function CustomSquad.run(frame)
 
 	end)
 
-	return tostring(Squad(props))
+	return SquadContexts.Role{
+		value = {Widget.Th{content = {'Main'}}},
+		children = {Squad(props)}
+	}
 end
 
 return CustomSquad
