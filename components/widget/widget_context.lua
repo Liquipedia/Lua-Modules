@@ -7,9 +7,12 @@
 --
 
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetContext: Widget
-local WidgetContext = Class.new()
+local WidgetContext = Class.new(Widget)
 
 ---@param default any
 ---@return any

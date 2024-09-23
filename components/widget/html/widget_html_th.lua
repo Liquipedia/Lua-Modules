@@ -22,7 +22,7 @@ function Th:render()
 	th:attr('colspan', self.props.colSpan)
 	th:attr('rowspan', self.props.rowSpan)
 
-	Array.forEach(self.props.classes, FnUtil.curry(th.addClass, th))
+	Array.forEach(self.props.classes or {}, FnUtil.curry(th.addClass, th))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
 			child.context = self:_nextContext()

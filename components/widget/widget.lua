@@ -7,12 +7,12 @@
 --
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 local FnUtil = require('Module:FnUtil')
 local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
-local WidgetContext = require('Module:Widget/Context')
 
 ---@class Widget: BaseClass
 ---@operator call(table): self
@@ -69,8 +69,12 @@ function Widget:tryMake(injector)
 			return Array.reduce(ret, function(acc, val)
 				if Class.instanceOf(val, Widget) then
 					---@cast val Widget
-					val.context = Widget:_nextContext()
-					return acc .. val:tryMake()
+					val.context = self:_nextContext()
+					local ret2 = val:tryMake(injector)
+					if type(ret2) == 'table' then
+						error('returned table?!?!' .. tostring(ret2))
+					end
+					return acc .. val:tryMake(injector)
 				end
 				if val ~= nil then
 					return acc .. tostring(val)
@@ -109,7 +113,9 @@ function Widget:tryChildren(injector)
 end
 
 function Widget:useContext(otherContext, default)
-	assert(Class.instanceOf(otherContext, WidgetContext), 'Context must be a Context Widget')
+	-- For some reason this is not working, I don't understand why...
+	--local WidgetContext = Lua.import('Module:Widget/Context')
+	--assert(Class.instanceOf(otherContext, WidgetContext), 'Context must be a Context Widget')
 	local context = Array.find(self.context, function(node)
 		return Class.instanceOf(node, otherContext)
 	end)
@@ -120,11 +126,11 @@ function Widget:useContext(otherContext, default)
 end
 
 function Widget:getDerivedStateFromError(error)
-	return ErrorDisplay.InlineError(error)
+	return tostring(ErrorDisplay.InlineError(error))
 end
 
 function Widget:_nextContext()
-	return Array.append(self.context, self)
+	return {unpack(self.context), self}
 end
 
 function Widget._updateErrorHeader(error)
@@ -132,9 +138,30 @@ function Widget._updateErrorHeader(error)
 	return error
 end
 
+function Widget.collect(...)
+	local flattenedArray = {}
+	for _, x in ipairs({...}) do
+		if type(x) == 'table' and not Class.instanceOf(x, Widget) then
+			for _, y in ipairs(x) do
+				table.insert(flattenedArray, y)
+			end
+		else
+			table.insert(flattenedArray, x)
+		end
+	end
+	return flattenedArray
+end
+
 ---@return string
 function Widget:__tostring()
-	return self:tryMake() or ''
+	return self:tryMake()
+end
+
+
+--- Here to allow for Widget to be used as a node in the third part html library (mw.html).
+---@param ret string[]
+function Widget:_build(ret)
+	table.insert(ret, self:__tostring())
 end
 
 --- Here to allow for Widget to be used as a node in the third part html library (mw.html).

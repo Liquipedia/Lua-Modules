@@ -24,7 +24,7 @@ function DataTable:render()
 		children = {
 			Table{
 				children = self.props.children,
-				classes = Array.append(self.props.classes, 'wikitable'),
+				classes = {'wikitable', unpack(self.props.classes or {})}
 			},
 		},
 		classes = {'table-responsive'},

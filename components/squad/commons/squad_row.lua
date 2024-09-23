@@ -55,7 +55,7 @@ function SquadRow:id()
 
 	local cell = Widget.Td{
 		classes = {'ID'},
-		content = content,
+		children = content,
 	}
 
 	local date = self.model.leavedate or self.model.inactivedate
@@ -63,7 +63,7 @@ function SquadRow:id()
 	local hasTeamRole = hasTeam and self.model.extradata.loanedtorole
 	local teamNode = Widget.Td{
 		css = hasTeamRole and {'text-align', 'center'} or nil,
-		content = {
+		children = {
 			hasTeam and mw.ext.TeamTemplate.teamicon(self.model.extradata.loanedto, date) or nil,
 			hasTeamRole and mw.html.create('small'):tag('i'):wikitext(self.model.extradata.loanedtorole) or nil,
 		}
@@ -79,7 +79,7 @@ end
 function SquadRow:name()
 	table.insert(self.children, Widget.Td{
 		classes = {'Name'},
-		content = String.isNotEmpty(self.model.name) and {
+		children = String.isNotEmpty(self.model.name) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('(', self.model.name, ')'),
 			mw.html.create('div'):addClass('LargeStuff'):wikitext(self.model.name),
 		} or nil
@@ -94,7 +94,7 @@ function SquadRow:role()
 
 	table.insert(self.children, Widget.Td{
 		classes = {'Position'},
-		content = display and {
+		children = display and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Role:&nbsp;'),
 			mw.html.create('i'):wikitext('(' .. self.model.role .. ')'),
 		} or nil,
@@ -125,7 +125,7 @@ function SquadRow:position()
 
 	table.insert(self.children, Widget.Td{
 		classes = {'Position'},
-		content = content,
+		children = content,
 	})
 
 	return self
@@ -137,7 +137,7 @@ end
 function SquadRow:date(field, cellTitle)
 	table.insert(self.children, Widget.Td{
 		classes = {'Date'},
-		content = self.model[field] and {
+		children = self.model[field] and {
 			mw.html.create('div'):addClass('MobileStuffDate'):wikitext(cellTitle),
 			mw.html.create('div'):addClass('Date')
 				:tag('i'):wikitext(self.model.extradata[field .. 'display'] or self.model[field])
@@ -184,7 +184,7 @@ function SquadRow:newteam()
 
 	table.insert(self.children, Widget.Td{
 		classes = {'NewTeam'},
-		content = createContent(),
+		children = createContent(),
 	})
 
 	return self

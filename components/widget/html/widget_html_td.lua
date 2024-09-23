@@ -22,9 +22,10 @@ function Td:render()
 	td:attr('colspan', self.props.colSpan)
 	td:attr('rowspan', self.props.rowSpan)
 
-	Array.forEach(self.props.classes, FnUtil.curry(td.addClass, td))
+	Array.forEach(self.props.classes or {}, FnUtil.curry(td.addClass, td))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
+			---@cast child Widget
 			child.context = self:_nextContext()
 			td:node(child:tryMake())
 		else

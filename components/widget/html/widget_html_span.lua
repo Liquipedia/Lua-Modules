@@ -20,7 +20,7 @@ local Span = Class.new(Widget)
 ---@return Html
 function Span:render()
 	local span = mw.html.create('span')
-	Array.forEach(self.props.classes, FnUtil.curry(span.addClass, span))
+	Array.forEach(self.props.classes or {}, FnUtil.curry(span.addClass, span))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
 			child.context = self:_nextContext()

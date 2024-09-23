@@ -78,7 +78,7 @@ function Squad:_header(type)
 
 	return Tr{
 		classes = {'HeaderRow'},
-		children = Array.append({},
+		children = Widget.collect(
 			Th{children = {'ID'}},
 			Th{}, -- "Team Icon" (most commmonly used for loans)
 			name,

@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Table
+-- page=Module:Widget/Html/Table
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -19,7 +19,7 @@ local Table = Class.new(Widget)
 ---@return Html
 function Table:render()
 	local table = mw.html.create('table')
-	Array.forEach(self.props.classes, FnUtil.curry(table.addClass, table))
+	Array.forEach(self.props.classes or {}, FnUtil.curry(table.addClass, table))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
 			child.context = self:_nextContext()

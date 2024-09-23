@@ -20,7 +20,7 @@ local Div = Class.new(Widget)
 ---@return Html
 function Div:render()
 	local div = mw.html.create('div')
-	Array.forEach(self.props.classes, FnUtil.curry(div.addClass, div))
+	Array.forEach(self.props.classes or {}, FnUtil.curry(div.addClass, div))
 	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
 			child.context = self:_nextContext()
