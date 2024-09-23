@@ -54,12 +54,17 @@ function CustomSquad.run(frame)
 		return CustomSquad._playerRow(player, props.type, showNumber)
 	end)
 
+	local root = SquadContexts.Role{value = SquadUtils.positionHeader(), children = {Squad(props)}}
+	if not showNumber then
+		return root
+	end
+
 	return SquadContexts.HeaderName{
 		value = function(widgets)
-			table.insert(widgets, 1, Widget.Th{content = {'Name'}})
+			table.insert(widgets, 1, Widget.Th{content = {'Number'}})
 			return widgets
 		end,
-		children = {SquadContexts.Role{value = SquadUtils.positionHeader(), children = {Squad(props)}}},
+		children = {root},
 	}
 end
 

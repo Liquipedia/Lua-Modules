@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
