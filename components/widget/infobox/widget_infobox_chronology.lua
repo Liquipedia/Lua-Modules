@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Chronology
+-- page=Module:Widget/Infobox/Chronology
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
