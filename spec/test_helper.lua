@@ -80,6 +80,7 @@ return function(busted, helper, options)
 		table.insert(paths, 'standard/links/commons/?.lua')
 		table.insert(paths, 'standard/tier/commons/?.lua')
 		table.insert(paths, 'components/widget/?.lua')
+		table.insert(paths, 'components/widget/contexts/?.lua')
 		table.insert(paths, 'components/widget/squad/?.lua')
 		table.insert(paths, 'components/widget/infobox/?.lua')
 
