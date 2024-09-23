@@ -175,28 +175,15 @@ end
 
 ---@return self
 function BaseStandings:store()
-	Storage.run(BaseStandings:_toStorageData())
+	local storageData = Storage.toStorageData(self.group)
+	Storage.run(BaseStandings)
 
 	return self
 end
 
--- possibly not needed ...
----@return table
-function BaseStandings:_toStorageData()
-	--todo, possibly not needed ...
-end
-
 ---@return Html
 function BaseStandings:build()
-	local groupData = self:_toDisplayData(self.group)
-	return BaseStandings.Dispaly(groupData):build()
-end
-
----@param group standardStanding
----@return standardStanding
-function BaseStandings:_toDisplayData(group)
-	--- possibly adjust /Storage to return the tables it passes to lpdb so we do not need this function here???
-	--todo
+	return BaseStandings.Dispaly(self.group):build()
 end
 
 return BaseStandings

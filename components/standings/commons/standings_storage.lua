@@ -281,4 +281,10 @@ function StandingsStorage.fromStorageStruct(record)
 	--todo
 end
 
+---@param group standardStanding
+---@return table
+function StandingsStorage.toStorageData(group)
+	--todo
+end
+
 return StandingsStorage
