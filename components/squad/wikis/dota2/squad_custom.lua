@@ -52,7 +52,6 @@ end
 function CustomSquad.run(frame)
 	return SquadContexts.InactiveSection{
 		value = function(widgets)
-			mw.log('Hiii')
 			table.insert(widgets, Widget.Th{children = {'Active Team'}})
 			return widgets
 		end,
