@@ -22,11 +22,11 @@ function SquadTldb._header(type)
 	return Widgets.Tr{
 		classes = {'HeaderRow'},
 		cells = {
-			Widgets.Th{content = {'ID'}},
+			Widgets.Th{children = {'ID'}},
 			Widgets.Th{}, -- "Team Icon" (most commmonly used for loans)
-			Widgets.Th{content = {'Name'}},
-			Widgets.Th{content = {'ELO'}},
-			Widgets.Th{content = {'ELO Peak'}},
+			Widgets.Th{children = {'Name'}},
+			Widgets.Th{children = {'ELO'}},
+			Widgets.Th{children = {'ELO Peak'}},
 		}
 	}
 end

@@ -61,7 +61,7 @@ function CustomSquad.run(frame)
 
 	return SquadContexts.NameSection{
 		value = function(widgets)
-			table.insert(widgets, 1, Widget.Th{content = {'Number'}})
+			table.insert(widgets, 1, Widget.Th{children = {'Number'}})
 			return widgets
 		end,
 		children = {root},
