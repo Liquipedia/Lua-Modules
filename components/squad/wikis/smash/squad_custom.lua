@@ -86,8 +86,8 @@ function CustomSquad.run(frame)
 
 	end)
 
-	return SquadContexts.Role{
-		value = {Widget.Th{content = {'Main'}}},
+	return SquadContexts.RoleTitle{
+		value = 'Main',
 		children = {Squad(props)}
 	}
 end

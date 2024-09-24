@@ -197,7 +197,7 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	end)
 
 	if Info.config.squads.hasPosition then
-		return SquadContexts.Role{value = SquadUtils.positionHeader(), children = {squadWidget(props)}}
+		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
 	end
 	return squadWidget(props)
 end
@@ -221,7 +221,7 @@ function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, 
 	end)
 
 	if Info.config.squads.hasPosition then
-		return SquadContexts.Role{value = SquadUtils.positionHeader(), children = {squadWidget(props)}}
+		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
 	end
 	return squadWidget(props)
 end
@@ -255,9 +255,9 @@ function SquadUtils.defaultRow(squadRowClass)
 	end
 end
 
----@return WidgetTh
-function SquadUtils.positionHeader()
-	return {Widget.Th{content = {'Position'}}}
+---@return string
+function SquadUtils.positionTitle()
+	return 'Position'
 end
 
 return SquadUtils

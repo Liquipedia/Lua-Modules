@@ -107,13 +107,14 @@ function Widget:tryChildren(injector)
 	end)
 end
 
-function Widget:useContext(otherContext, default)
+function Widget:useContext(widget, default)
 	-- For some reason this is not working, I don't understand why...
 	--local Lua = require('Module:Lua')
 	--local WidgetContext = Lua.import('Module:Widget/Context')
-	--assert(Class.instanceOf(otherContext, WidgetContext), 'Context must be a Context Widget')
+	--assert(Class.instanceOf(widget, WidgetContext), 'Context must be a Context Widget')
+	--Might be because widget is not instantiated?
 	local context = Array.find(self.context, function(node)
-		return Class.instanceOf(node, otherContext)
+		return Class.instanceOf(node, widget) -- This is also not working?!?
 	end)
 	if context then
 		---@cast context WidgetContext

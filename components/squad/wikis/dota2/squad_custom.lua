@@ -50,7 +50,7 @@ end
 ---@param frame Frame
 ---@return Widget
 function CustomSquad.run(frame)
-	return SquadContexts.Inactive{
+	return SquadContexts.InactiveSection{
 		value = function(widgets)
 			table.insert(widgets, Widget.Th{content = {'Inactive Date'}})
 			return widgets

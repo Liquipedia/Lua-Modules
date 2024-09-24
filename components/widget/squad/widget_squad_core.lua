@@ -65,15 +65,15 @@ function Squad:_header(type)
 	local isInactive = type == SquadUtils.SquadType.INACTIVE or type == SquadUtils.SquadType.FORMER_INACTIVE
 	local isFormer = type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE
 
-	local name = self:useContext(SquadContexts.HeaderName, {Th{children = {'Name'}}})
-	local inactive = isInactive and self:useContext(SquadContexts.Inactive, {
+	local name = self:useContext(SquadContexts.NameSection, {Th{children = {'Name'}}})
+	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
 		Th{children = {'Inactive Date'}}
 	}) or nil
-	local former = isFormer and self:useContext(SquadContexts.Former, {
+	local former = isFormer and self:useContext(SquadContexts.FormerSection, {
 		Th{children = {'Leave Date'}},
 		Th{children = {'New Team'}},
 	}) or nil
-	local role = self:useContext(SquadContexts.Role, {Th{}})
+	local role = {Th{children = {self:useContext(SquadContexts.RoleTitle)}}}
 
 	return Tr{
 		classes = {'HeaderRow'},
