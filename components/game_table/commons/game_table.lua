@@ -31,7 +31,7 @@ end)
 ---@return match2game?
 function GameTable:gameFromRecord(game)
 	if self.countGames == self.config.limit then return nil end
-	if game.resulttype == NOT_PLAYED then
+	if game.resulttype == NOT_PLAYED or Logic.isEmpty(game.winner) then
 		return nil
 	end
 
