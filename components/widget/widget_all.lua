@@ -15,14 +15,14 @@ Widgets.Builder = Lua.import('Module:Widget/Builder')
 Widgets.Customizable = Lua.import('Module:Widget/Customizable')
 
 --- Infobox Widgets
-Widgets.Breakdown = Lua.import('Module:Widget/Breakdown')
-Widgets.Cell = Lua.import('Module:Widget/Cell')
-Widgets.Center = Lua.import('Module:Widget/Center')
-Widgets.Chronology = Lua.import('Module:Widget/Chronology')
-Widgets.Header = Lua.import('Module:Widget/Header')
-Widgets.Highlights = Lua.import('Module:Widget/Highlights')
-Widgets.Links = Lua.import('Module:Widget/Links')
-Widgets.Title = Lua.import('Module:Widget/Title')
+Widgets.Breakdown = Lua.import('Module:Widget/Infobox/Breakdown')
+Widgets.Cell = Lua.import('Module:Widget/Infobox/Cell')
+Widgets.Center = Lua.import('Module:Widget/Infobox/Center')
+Widgets.Chronology = Lua.import('Module:Widget/Infobox/Chronology')
+Widgets.Header = Lua.import('Module:Widget/Infobox/Header')
+Widgets.Highlights = Lua.import('Module:Widget/Infobox/Highlights')
+Widgets.Links = Lua.import('Module:Widget/Infobox/Links')
+Widgets.Title = Lua.import('Module:Widget/Infobox/Title')
 
 --- Generic Widgets
 Widgets.Div = Lua.import('Module:Widget/Div')

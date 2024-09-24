@@ -102,7 +102,7 @@ end
 ---@param match GameTableMatch
 ---@param game match2game
 ---@return Html?
-function GameTable:_displayGame(match, game)
+function GameTable:displayGame(match, game)
 	if not self.config.showResult then
 		return
 	elseif Logic.isEmpty(match.result.vs) then
@@ -129,7 +129,7 @@ function GameTable:gameRow(match, game)
 		:node(self:_displayGameIconForGame(game))
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
-		:node(self:_displayGame(match, game))
+		:node(self:displayGame(match, game))
 		:node(self:_displayGameVod(game.vod))
 end
 
