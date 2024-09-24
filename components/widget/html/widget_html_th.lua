@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Th
+-- page=Module:Widget/Html/Th
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

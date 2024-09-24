@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Span
+-- page=Module:Widget/Html/Span
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
