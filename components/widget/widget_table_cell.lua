@@ -6,9 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -69,7 +67,9 @@ function TableCell:make(children)
 
 	cell:css(self.css)
 
-	Array.forEach(children, FnUtil.curry(cell.node, cell))
+	for _, child in ipairs(children) do
+		cell:node(child)
+	end
 
 	return tostring(cell)
 end
