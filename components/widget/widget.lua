@@ -107,14 +107,12 @@ function Widget:tryChildren(injector)
 	end)
 end
 
+---@param widget WidgetContext
+---@param default any
+---@return any
 function Widget:useContext(widget, default)
-	-- For some reason this is not working, I don't understand why...
-	--local Lua = require('Module:Lua')
-	--local WidgetContext = Lua.import('Module:Widget/Context')
-	--assert(Class.instanceOf(widget, WidgetContext), 'Context must be a Context Widget')
-	--Might be because widget is not instantiated?
 	local context = Array.find(self.context, function(node)
-		return Class.instanceOf(node, widget) -- This is also not working?!?
+		return Class.instanceOf(node, widget)
 	end)
 	if context then
 		---@cast context WidgetContext
@@ -123,14 +121,19 @@ function Widget:useContext(widget, default)
 	return default
 end
 
+---@param error Error
+---@return string
 function Widget:getDerivedStateFromError(error)
 	return tostring(ErrorDisplay.InlineError(error))
 end
 
+---@return Widget[]
 function Widget:_nextContext()
 	return {self, unpack(self.context)}
 end
 
+---@param error Error
+---@return Error
 function Widget._updateErrorHeader(error)
 	error.header = 'Error occured in widget building:'
 	return error
@@ -140,7 +143,6 @@ end
 function Widget:__tostring()
 	return self:tryMake()
 end
-
 
 --- Here to allow for Widget to be used as a node in the third part html library (mw.html).
 ---@param ret string[]
