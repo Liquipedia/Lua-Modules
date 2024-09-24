@@ -22,7 +22,7 @@ local String = require('Module:StringUtils')
 local Widget = Class.new(function(self, props)
 	self.props = props or {}
 	self.props.children = self.props.children or {}
-	self.children = self.props.children -- Legacy support @deprecated
+	self.children = self.children or self.props.children -- Legacy support @deprecated
 	self.context = {} -- Set by the parent
 end)
 
@@ -69,10 +69,6 @@ function Widget:tryMake(injector)
 				if Class.instanceOf(val, Widget) then
 					---@cast val Widget
 					val.context = self:_nextContext()
-					local ret2 = val:tryMake(injector)
-					if type(ret2) == 'table' then
-						error('returned table?!?!' .. tostring(ret2))
-					end
 					return acc .. val:tryMake(injector)
 				end
 				if val ~= nil then
