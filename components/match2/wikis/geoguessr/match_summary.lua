@@ -16,9 +16,6 @@ local Page = require('Module:Page')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local htmlCreate = mw.html.create
-
----@enum GeoguessrMatchIcons
 local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
@@ -66,7 +63,7 @@ end
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex]
 	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
-	return htmlCreate('div'):wikitext(scoreDisplay)
+	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame
