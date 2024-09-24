@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Cell
+-- page=Module:Widget/Infobox/Cell
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

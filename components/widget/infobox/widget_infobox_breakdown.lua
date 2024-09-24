@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Breakdown
+-- page=Module:Widget/Infobox/Breakdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
