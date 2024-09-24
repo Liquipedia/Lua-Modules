@@ -9,8 +9,8 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Widget = require('Module:Widget/All')
 
+local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
