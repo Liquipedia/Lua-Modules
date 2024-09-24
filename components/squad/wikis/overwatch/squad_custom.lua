@@ -29,7 +29,7 @@ local ExtendedSquadRow = Class.new(SquadRow)
 function ExtendedSquadRow:number()
 	table.insert(self.children, Widget.Td{
 		classes = {'Number'},
-		content = String.isNotEmpty(self.model.extradata.number) and {
+		children = String.isNotEmpty(self.model.extradata.number) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'),
 			self.model.extradata.number,
 		} or nil,

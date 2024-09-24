@@ -28,10 +28,10 @@ local ExtendedSquadRow = Class.new(SquadRow)
 function ExtendedSquadRow:elo()
 	local eloCurrent, eloPeak = self.model.extradata.eloCurrent, self.model.extradata.eloPeak
 	table.insert(self.children,
-		Widget.Td{content = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
+		Widget.Td{children = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
 	)
 	table.insert(self.children,
-		Widget.Td{content = {eloPeak and (eloPeak .. ' pts') or '-'}}
+		Widget.Td{children = {eloPeak and (eloPeak .. ' pts') or '-'}}
 	)
 
 	return self

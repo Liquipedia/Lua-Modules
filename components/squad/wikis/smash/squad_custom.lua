@@ -35,7 +35,7 @@ function ExtendedSquadRow:mains()
 
 	table.insert(self.children, Widget.Td{
 		css = {['text-align'] = 'center'},
-		content = characters,
+		children = characters,
 	})
 
 	return self

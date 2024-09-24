@@ -27,7 +27,7 @@ function ExtendedSquadRow:activeteam()
 	local date = self.model.inactivedate
 
 	if not activeTeam then
-		table.insert(self.children,Widget.Td{classes = {'NewTeam'}, content = {}})
+		table.insert(self.children,Widget.Td{classes = {'NewTeam'}, children = {}})
 		return self
 	end
 
@@ -41,7 +41,7 @@ function ExtendedSquadRow:activeteam()
 	end
 
 	table.insert(self.children,
-		Widget.Td{classes = {'NewTeam'}, content = content}
+		Widget.Td{classes = {'NewTeam'}, children = content}
 	)
 
 	return self
