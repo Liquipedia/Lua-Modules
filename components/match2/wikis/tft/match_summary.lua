@@ -20,7 +20,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
 local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 
----@enum TftMatchIcons
 local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
