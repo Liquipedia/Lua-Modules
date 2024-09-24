@@ -18,7 +18,6 @@ local Streams = Lua.import('Module:Links/Stream')
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
-local ALLOWED_VETOES = {'decider', 'pick', 'ban', 'defaultban', 'protect'}
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
@@ -86,9 +85,7 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview
-	}
+	return {}
 end
 
 ---@param match table
@@ -96,7 +93,7 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		mapveto = MatchGroupInputUtil.getMapVeto(match, ALLOWED_VETOES),
+		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
@@ -164,7 +161,6 @@ end
 function MapFunctions.getExtradata(mapInput, opponents)
 	return {
 		comment = mapInput.comment,
-		header = mapInput.header,
 	}
 end
 
