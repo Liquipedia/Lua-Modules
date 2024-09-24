@@ -31,8 +31,8 @@ function Squad:render()
 	local allChildren = WidgetUtil.collect(title, header, unpack(self.props.children))
 
 	return DataTable{
-		css = {['margin-bottom'] = '10px'}, -- TODO Move to css-class
-		classes = {'wikitable-striped', 'roster-card'},
+		classes = {'wikitable-striped'},
+		wrapperClasses = {'roster-card'},
 		children = allChildren,
 	}
 end
