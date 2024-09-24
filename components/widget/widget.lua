@@ -11,7 +11,7 @@ local FnUtil = require('Module:FnUtil')
 local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-
+local Table = require('Module:Table')
 
 ---@class Widget: BaseClass
 ---@operator call(table): self
@@ -20,10 +20,11 @@ local String = require('Module:StringUtils')
 ---@field props table<string, any>
 ---@field makeChildren? fun(self:Widget, injector: WidgetInjector?): Widget[]?
 local Widget = Class.new(function(self, props)
-	self.props = props or {}
+	self.props = Table.copy(props) or {}
 	self.props.children = self.props.children or {}
-	self.children = self.children or self.props.children -- Legacy support @deprecated
-	self.context = {} -- Set by the parent
+	self.context = {} -- Populated by the parent
+	---@deprecated Legacy support
+	self.children = self.children or self.props.children
 end)
 
 ---Asserts the existence of a value and copies it
