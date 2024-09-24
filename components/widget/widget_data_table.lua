@@ -6,11 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Table = HtmlWidgets.Table
@@ -24,7 +24,7 @@ function DataTable:render()
 		children = {
 			Table{
 				children = self.props.children,
-				classes = {'wikitable', unpack(self.props.classes or {})}
+				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes or {})),
 			},
 		},
 		classes = {'table-responsive'},

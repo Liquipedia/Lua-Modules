@@ -7,7 +7,6 @@
 --
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
 local FnUtil = require('Module:FnUtil')
 local ErrorDisplay = require('Module:Error/Display')
 local Logic = require('Module:Logic')
@@ -114,12 +113,12 @@ end
 
 function Widget:useContext(otherContext, default)
 	-- For some reason this is not working, I don't understand why...
+	--local Lua = require('Module:Lua')
 	--local WidgetContext = Lua.import('Module:Widget/Context')
 	--assert(Class.instanceOf(otherContext, WidgetContext), 'Context must be a Context Widget')
 	local context = Array.find(self.context, function(node)
 		return Class.instanceOf(node, otherContext)
 	end)
-	print('context', type(context))
 	if context then
 		---@cast context WidgetContext
 		return context:getValue(default)
