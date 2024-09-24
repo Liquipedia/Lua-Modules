@@ -136,20 +136,6 @@ function Widget._updateErrorHeader(error)
 	return error
 end
 
-function Widget.collect(...)
-	local flattenedArray = {}
-	for _, x in ipairs({...}) do
-		if type(x) == 'table' and not Class.instanceOf(x, Widget) then
-			for _, y in ipairs(x) do
-				table.insert(flattenedArray, y)
-			end
-		else
-			table.insert(flattenedArray, x)
-		end
-	end
-	return flattenedArray
-end
-
 ---@return string
 function Widget:__tostring()
 	return self:tryMake()

@@ -77,14 +77,14 @@ function Squad:_header(type)
 
 	return Tr{
 		classes = {'HeaderRow'},
-		children = Widget.collect(
+		children = WidgetUtil.collect(
 			Th{children = {'ID'}},
 			Th{}, -- "Team Icon" (most commmonly used for loans)
 			name,
 			role,
 			Th{children = {'Join Date'}},
-			inactive,
-			former
+			unpack(inactive or {}),
+			unpack(former or {})
 		)
 	}
 end
