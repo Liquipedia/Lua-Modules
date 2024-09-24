@@ -15,6 +15,7 @@ local String = require('Module:StringUtils')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widgets = Lua.import('Module:Widget/All')
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class SquadWidget: Widget
 ---@operator call:SquadWidget
@@ -33,7 +34,7 @@ function Squad:make(children)
 	local title = self._title(self.type, self.title)
 	local header = self._header(self.type)
 
-	local allChildren = {title, header, unpack(children)}
+	local allChildren = WidgetUtil.collect(title, header, unpack(children))
 
 	return Widgets.TableNew{
 		css = {['margin-bottom'] = '10px'},
