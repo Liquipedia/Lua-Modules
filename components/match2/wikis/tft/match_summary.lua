@@ -67,47 +67,33 @@ function MapVeto:createHeader()
 end
 
 ---@param firstVeto number?
----@param format string?
 ---@return self
-function MapVeto:vetoStart(firstVeto, format)
-	format = format and ('Veto format: ' .. format) or nil
+function MapVeto:vetoStart(firstVeto)
 	local textLeft
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
-		textLeft = MAP_VETO_START
+		textLeft = '<b>Start Map Veto</b>'
 		textCenter = ARROW_LEFT
-		textRight = format
 	elseif firstVeto == 2 then
-		textLeft = format
 		textCenter = ARROW_RIGHT
-		textRight = MAP_VETO_START
+		textRight = '<b>Start Map Veto</b>'
 	else return self end
-
 	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
-		:tag('th'):wikitext(textLeft):done()
+		:tag('th'):wikitext(textLeft or ''):done()
 		:tag('th'):wikitext(textCenter):done()
-		:tag('th'):wikitext(textRight):done()
-
+		:tag('th'):wikitext(textRight or ''):done()
 	return self
-end
-
----@param map1 string?
----@param map2 string?
----@return string, string
-function MapVeto._displayMaps(map1, map2)
-	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
-		return TBD, TBD
-	end
-
-	return Page.makeInternalLink(map1) or NONE,
-		Page.makeInternalLink(map2) or NONE
 end
 
 ---@param map string?
 ---@return self
 function MapVeto:addDecider(map)
-	map = Page.makeInternalLink(map) or TBD
+	if Logic.isEmpty(map) then
+		map = 'TBD'
+	else
+		map = '[[' .. map .. '/siege|' .. map .. ']]'
+	end
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
 	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
@@ -118,18 +104,35 @@ function MapVeto:addDecider(map)
 	return self
 end
 
----@param vetoType string?
+---@param vetotype string?
 ---@param map1 string?
 ---@param map2 string?
 ---@return self
-function MapVeto:addRound(vetoType, map1, map2)
-	map1, map2 = MapVeto._displayMaps(map1, map2)
-
-	local vetoText = VETO_TYPE_TO_TEXT[vetoType]
-
-	if not vetoText then return self end
-
-	local class = 'brkts-popup-mapveto-' .. vetoType
+function MapVeto:addRound(vetotype, map1, map2)
+	if Logic.isEmpty(map1) then
+		map1 = 'TBD'
+	else
+		map1 = '[[' .. map1 .. '/siege|' .. map1 .. ']]'
+	end
+	if Logic.isEmpty(map2) then
+		map2 = 'TBD'
+	else
+		map2 = '[[' .. map2 .. '/siege|' .. map2 .. ']]'
+	end
+	local class
+	local vetoText
+	if vetotype == 'ban' then
+		vetoText = 'BAN'
+		class = 'brkts-popup-mapveto-ban'
+	elseif vetotype == 'pick' then
+		vetoText = 'PICK'
+		class = 'brkts-popup-mapveto-pick'
+	elseif vetotype == 'defaultban' then
+		vetoText = 'DEFAULT BAN'
+		class = 'brkts-popup-mapveto-defaultban'
+	else
+		return self
+	end
 
 	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
 
