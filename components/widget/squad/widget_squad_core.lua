@@ -83,8 +83,8 @@ function Squad:_header(type)
 			name,
 			role,
 			Th{children = {'Join Date'}},
-			unpack(inactive or {}),
-			unpack(former or {})
+			inactive,
+			former
 		)
 	}
 end
