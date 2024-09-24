@@ -65,7 +65,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	MatchFunctions.getTournamentVars(match)
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
 	match.games = games
 	match.opponents = opponents
 
@@ -120,12 +119,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {}
 end
 
 ---@param match table
