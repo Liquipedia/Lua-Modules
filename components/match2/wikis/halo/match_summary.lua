@@ -147,11 +147,17 @@ function CustomMatchSummary._createMapRow(game)
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._addCheckmark(game.winner == 1))
-		:node(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
+		:node(DisplayHelper.MapScore(
+			game.scores[1] .. (game.extradata.points1 and '(' .. game.extradata.points1 .. ')' or ''),
+			1, game.resultType, game.walkover, game.winner
+		))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
+		:node(DisplayHelper.MapScore(
+			game.scores[2] .. (game.extradata.points2 and '(' .. game.extradata.points2 .. ')' or ''),
+			2, game.resultType, game.walkover, game.winner
+		))
 		:node(CustomMatchSummary._addCheckmark(game.winner == 2))
 
 	row:addElement(leftNode)

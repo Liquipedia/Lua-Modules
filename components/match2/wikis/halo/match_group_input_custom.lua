@@ -177,6 +177,8 @@ end
 function MapFunctions.getExtraData(map, opponentCount)
 	return {
 		comment = map.comment,
+		points1 = map.points1,
+		points2 = map.points2,
 	}
 end
 
