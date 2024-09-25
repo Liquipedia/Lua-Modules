@@ -80,7 +80,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add the Map Vetoes
-	MatchSummary.defaultVetoDisplay(match, body)
+	body:addRow(MatchSummary.defaultVetoDisplay(match))
 
 	return body
 end

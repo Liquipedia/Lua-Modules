@@ -199,7 +199,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add the Map Vetoes
-	MatchSummary.defaultVetoDisplay(match, body, MapVeto(match.game))
+	body:addRow(MatchSummary.defaultVetoDisplay(match, MapVeto(match.game)))
 
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then

@@ -870,8 +870,8 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param mapVeto VetoDisplay?
----@param body MatchSummaryBody
-function MatchSummary.defaultVetoDisplay(match, body, mapVeto)
+---@return VetoDisplay?
+function MatchSummary.defaultVetoDisplay(match, mapVeto)
 	local vetoData = match.extradata.mapveto
 	if Logic.isEmpty(vetoData) then
 		return
@@ -889,7 +889,7 @@ function MatchSummary.defaultVetoDisplay(match, body, mapVeto)
 		end
 	end)
 
-	body:addRow(mapVeto)
+	return mapVeto
 end
 
 return MatchSummary
