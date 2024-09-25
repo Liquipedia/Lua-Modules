@@ -263,7 +263,7 @@ end)
 ---@param map string?
 ---@return string
 function MapVeto:displayMap(map)
-	return Page.makeInternalLink(map, map .. '/siege') or TBD
+	return Page.makeInternalLink(map, map and (map .. '/siege') or nil) or TBD
 end
 
 local CustomMatchSummary = {}
