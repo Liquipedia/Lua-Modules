@@ -25,6 +25,17 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
+local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local DEFAULT_VETO_TYPE_TO_TEXT = {
+	ban = 'BAN',
+	pick = 'PICK',
+	decider = 'DECIDER',
+	defaultban = 'DEFAULT BAN',
+}
+local TBD = 'TBD'
+local VETO_DECIDER = 'decider'
+
 ---just a base class to avoid anno warnings
 ---@class MatchSummaryRowInterface
 ---@field create fun(self): Html
@@ -715,6 +726,159 @@ function MatchSummary.makeCastersRow(castersInput)
 	local casterRow = Casters()
 	Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
 	return casterRow
+end
+
+-- Map Veto Class
+---@class VetoDisplay: MatchSummaryRowInterface
+---@operator call: self
+---@field root Html
+---@field table Html
+---@field vetoTypeToText table
+local MapVeto = Class.new(
+	function(self, vetoTypeToText)
+		self.root = mw.html.create('div')
+			:addClass('brkts-popup-mapveto')
+
+		self.table = self.root:tag('table')
+			:addClass('wikitable-striped')
+			:addClass('collapsible')
+			:addClass('collapsed')
+
+		self.vetoTypeToText = vetoTypeToText or DEFAULT_VETO_TYPE_TO_TEXT
+
+		self:createHeader()
+	end
+)
+
+---@return self
+function MapVeto:createHeader()
+	self.table:tag('tr')
+		:tag('th'):css('width','33%'):done()
+		:tag('th'):css('width','34%'):wikitext('Map Veto'):done()
+		:tag('th'):css('width','33%'):done()
+	return self
+end
+
+---@param firstVeto number?
+---@return self
+function MapVeto:vetoStart(firstVeto)
+	local textLeft
+	local textCenter
+	local textRight
+	if firstVeto == 1 then
+		textLeft = '<b>Start Map Veto</b>'
+		textCenter = ARROW_LEFT
+	elseif firstVeto == 2 then
+		textCenter = ARROW_RIGHT
+		textRight = '<b>Start Map Veto</b>'
+	else return self end
+
+	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
+		:tag('th'):wikitext(textLeft):done()
+		:tag('th'):wikitext(textCenter):done()
+		:tag('th'):wikitext(textRight):done()
+
+	return self
+end
+
+---@param map string?
+---@return self
+function MapVeto:addDecider(map)
+	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
+
+	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', self.vetoTypeToText.decider)
+	self:addColumnVetoMap(row, self:displayMap(map))
+	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', self.vetoTypeToText.decider)
+
+	self.table:node(row)
+	return self
+end
+
+---@param vetoType string?
+---@param map1 string?
+---@param map2 string?
+---@return self
+function MapVeto:addRound(vetoType, map1, map2)
+	map1, map2 = self:displayMaps(map1, map2)
+
+	local vetoText = self.vetoTypeToText[vetoType]
+
+	if not vetoText then return self end
+
+	local class = 'brkts-popup-mapveto-' .. vetoType
+
+	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
+
+	self:addColumnVetoMap(row, map1)
+	self:addColumnVetoType(row, class, vetoText)
+	self:addColumnVetoMap(row, map2)
+
+	self.table:node(row)
+	return self
+end
+
+---@param map1 string?
+---@param map2 string?
+---@return string
+---@return string
+function MapVeto:displayMaps(map1, map2)
+	return self:displayMap(map1), self:displayMap(map2)
+end
+
+---@param map string?
+---@return string
+function MapVeto:displayMap(map)
+	return Page.makeInternalLink(map) or TBD
+end
+
+---@param row Html
+---@param styleClass string
+---@param vetoText string
+---@return self
+function MapVeto:addColumnVetoType(row, styleClass, vetoText)
+	row:tag('td')
+		:tag('span')
+			:addClass(styleClass)
+			:addClass('brkts-popup-mapveto-vetotype')
+			:wikitext(vetoText)
+	return self
+end
+
+---@param row Html
+---@param map string
+---@return self
+function MapVeto:addColumnVetoMap(row, map)
+	row:tag('td'):wikitext(map)
+	return self
+end
+
+---@return Html
+function MapVeto:create()
+	return self.root
+end
+
+---@param match MatchGroupUtilMatch
+---@param body MatchSummaryBody
+---@param vetoTypeToText table?
+function MatchSummary.defaultVetoDisplay(match, body, vetoTypeToText)
+	local vetoData = match.extradata.mapveto
+	if Logic.isEmpty(vetoData) then
+		return
+	end
+
+	local mapVeto = MapVeto(vetoTypeToText)
+	Array.forEach(vetoData, function(vetoRound)
+		if vetoRound.vetostart then
+			mapVeto:vetoStart(tonumber(vetoRound.vetostart))
+		end
+		if vetoRound.type == VETO_DECIDER then
+			mapVeto:addDecider(vetoRound.decider)
+		else
+			mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
+		end
+	end)
+
+	body:addRow(mapVeto)
 end
 
 return MatchSummary
