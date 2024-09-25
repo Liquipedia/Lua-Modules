@@ -18,6 +18,7 @@ local ExternalLinks = require('Module:ExternalLinks')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -94,32 +95,11 @@ function ChampionBan:create()
 	return self.root
 end
 
--- Map Veto Class
----@class HeroesOfTheStormMapVeto: MatchSummaryRowInterface
----@operator call: HeroesOfTheStormMapVeto
----@field root Html
----@field table Html
-local MapVeto = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
-		self.table = self.root:tag('table')
-			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader()
-	end
-)
-
----@return HeroesOfTheStormMapVeto
-function MapVeto:createHeader()
-	self.table:tag('tr')
-		:tag('th'):css('width','33%'):done()
-		:tag('th'):css('width','34%'):wikitext('Map Veto'):done()
-		:tag('th'):css('width','33%'):done()
-	return self
-end
+local MapVeto = Class.new(MatchSummary.MapVeto)
 
 ---@param firstVeto number?
 ---@param format string?
----@return HeroesOfTheStormMapVeto
+---@return self
 function MapVeto:vetoStart(firstVeto, format)
 	format = format and ('Veto format: ' .. format) or nil
 	local textLeft
@@ -145,63 +125,20 @@ end
 
 ---@param map1 string?
 ---@param map2 string?
----@return string, string
-function MapVeto._displayMaps(map1, map2)
+---@return string
+---@return string
+function MapVeto:displayMaps(map1, map2)
 	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
 		return TBD, TBD
 	end
 
-	return Logic.isEmpty(map1) and FP or ('[[' .. map1 .. ']]'),
-		Logic.isEmpty(map2) and FP or ('[[' .. map2 .. ']]')
+	return self:displayMap(map1), self:displayMap(map2)
 end
 
----@param vetoType string?
----@param map1 string?
----@param map2 string?
----@return HeroesOfTheStormMapVeto
-function MapVeto:addRound(vetoType, map1, map2)
-	map1, map2 = MapVeto._displayMaps(map1, map2)
-
-	local vetoText = VETO_TYPE_TO_TEXT[vetoType]
-
-	if not vetoText then return self end
-
-	local class = 'brkts-popup-mapveto-' .. vetoType
-
-	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
-
-	self:addColumnVetoMap(row, map1)
-	self:addColumnVetoType(row, class, vetoText)
-	self:addColumnVetoMap(row, map2)
-
-	self.table:node(row)
-	return self
-end
-
----@param row Html
----@param styleClass string
----@param vetoText string
----@return HeroesOfTheStormMapVeto
-function MapVeto:addColumnVetoType(row, styleClass, vetoText)
-	row:tag('td')
-		:tag('span')
-			:addClass(styleClass)
-			:addClass('brkts-popup-mapveto-vetotype')
-			:wikitext(vetoText)
-	return self
-end
-
----@param row Html
----@param map string
----@return HeroesOfTheStormMapVeto
-function MapVeto:addColumnVetoMap(row, map)
-	row:tag('td'):wikitext(map):done()
-	return self
-end
-
----@return Html
-function MapVeto:create()
-	return self.root
+---@param map string?
+---@return string
+function MapVeto:displayMap(map)
+	return Logic.isEmpty(map) and FP or ('[[' .. Page.makeInternalLink(map) .. ']]')
 end
 
 ---@param args table
@@ -299,20 +236,18 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add the Map Vetoes
-	if match.extradata.mapveto then
-		local vetoData = match.extradata.mapveto
-		if vetoData then
-			local mapVeto = MapVeto()
-			if vetoData[1] and vetoData[1].vetostart then
-				mapVeto:vetoStart(tonumber(vetoData[1].vetostart), vetoData[1].format)
-			end
-
-			for _,vetoRound in ipairs(vetoData) do
-				mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
-			end
-
-			body:addRow(mapVeto)
+	local vetoData = match.extradata.mapveto
+	if vetoData then
+		local mapVeto = MapVeto()
+		if vetoData[1] and vetoData[1].vetostart then
+			mapVeto:vetoStart(tonumber(vetoData[1].vetostart), vetoData[1].format)
 		end
+
+		Array.forEach(vetoData, function(vetoRound)
+			mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
+		end)
+
+		body:addRow(mapVeto)
 	end
 
 	return body
