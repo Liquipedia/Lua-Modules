@@ -18,9 +18,6 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local MAP_VETO_START = '<b>Start Map Veto</b>'
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local NONE = '-'
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
@@ -34,13 +31,6 @@ local LINK_DATA = {
 	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
 }
 
-local VETO_TYPE_TO_TEXT = {
-	ban = 'BAN',
-	pick = 'PICK',
-	decider = 'DECIDER',
-	defaultban = 'DEFAULT BAN',
-
-}
 local CustomMatchSummary = {}
 
 ---@class WoTMapVeto: VetoDisplay
