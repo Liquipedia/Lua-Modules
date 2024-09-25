@@ -861,15 +861,15 @@ function MatchSummary.makeCastersRow(castersInput)
 end
 
 ---@param match MatchGroupUtilMatch
+---@param mapVeto VetoDisplay?
 ---@param body MatchSummaryBody
----@param vetoTypeToText table?
-function MatchSummary.defaultVetoDisplay(match, body, vetoTypeToText)
+function MatchSummary.defaultVetoDisplay(match, body, mapVeto)
 	local vetoData = match.extradata.mapveto
 	if Logic.isEmpty(vetoData) then
 		return
 	end
 
-	local mapVeto = MapVeto(vetoTypeToText)
+	mapVeto = mapVeto or MapVeto()
 	Array.forEach(vetoData, function(vetoRound)
 		if vetoRound.vetostart then
 			mapVeto:vetoStart(tonumber(vetoRound.vetostart))
