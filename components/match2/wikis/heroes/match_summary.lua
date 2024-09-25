@@ -103,7 +103,7 @@ end
 ---@param map string?
 ---@return string
 function MapVeto:displayMap(map)
-	return Logic.isEmpty(map) and FP or ('[[' .. Page.makeInternalLink(map) .. ']]')
+	return Logic.isEmpty(map) and FP or Page.makeInternalLink(map) --[[@as string]]
 end
 
 ---@param args table
