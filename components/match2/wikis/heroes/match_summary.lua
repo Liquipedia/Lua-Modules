@@ -30,18 +30,8 @@ local NUM_CHAMPIONS_PICK = 5
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
-local MAP_VETO_START = '<b>Start Map Veto</b>'
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
-
-local VETO_TYPE_TO_TEXT = {
-	ban = 'BAN',
-	pick = 'PICK',
-	decider = 'DECIDER',
-	defaultban = 'DEFAULT BAN',
-}
 
 -- Champion Ban Class
 ---@class HeroesOfTheStormHeroBan: MatchSummaryRowInterface
@@ -95,33 +85,8 @@ function ChampionBan:create()
 	return self.root
 end
 
+---@class HeroesOfTheStormMapVeto: VetoDisplay
 local MapVeto = Class.new(MatchSummary.MapVeto)
-
----@param firstVeto number?
----@param format string?
----@return self
-function MapVeto:vetoStart(firstVeto, format)
-	format = format and ('Veto format: ' .. format) or nil
-	local textLeft
-	local textCenter
-	local textRight
-	if firstVeto == 1 then
-		textLeft = MAP_VETO_START
-		textCenter = ARROW_LEFT
-		textRight = format
-	elseif firstVeto == 2 then
-		textLeft = format
-		textCenter = ARROW_RIGHT
-		textRight = MAP_VETO_START
-	else return self end
-
-	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
-		:tag('th'):wikitext(textLeft or ''):done()
-		:tag('th'):wikitext(textCenter):done()
-		:tag('th'):wikitext(textRight or ''):done()
-
-	return self
-end
 
 ---@param map1 string?
 ---@param map2 string?
@@ -236,19 +201,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add the Map Vetoes
-	local vetoData = match.extradata.mapveto
-	if vetoData then
-		local mapVeto = MapVeto()
-		if vetoData[1] and vetoData[1].vetostart then
-			mapVeto:vetoStart(tonumber(vetoData[1].vetostart), vetoData[1].format)
-		end
-
-		Array.forEach(vetoData, function(vetoRound)
-			mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
-		end)
-
-		body:addRow(mapVeto)
-	end
+	MatchSummary.defaultVetoDisplay(match, body, MapVeto())
 
 	return body
 end

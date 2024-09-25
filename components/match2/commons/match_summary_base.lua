@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
@@ -33,7 +34,7 @@ local DEFAULT_VETO_TYPE_TO_TEXT = {
 	decider = 'DECIDER',
 	defaultban = 'DEFAULT BAN',
 }
-local TBD = 'TBD'
+local TBD = Abbreviation.make('TBD', 'To Be Determined')
 local VETO_DECIDER = 'decider'
 
 ---just a base class to avoid anno warnings
@@ -516,15 +517,19 @@ function MapVeto:createHeader()
 end
 
 ---@param firstVeto number?
+---@param format string?
 ---@return self
-function MapVeto:vetoStart(firstVeto)
+function MapVeto:vetoStart(firstVeto, format)
+	format = format and ('Veto format: ' .. format)
 	local textLeft
 	local textCenter
 	local textRight
 	if firstVeto == 1 then
 		textLeft = '<b>Start Map Veto</b>'
 		textCenter = ARROW_LEFT
+		textRight = format
 	elseif firstVeto == 2 then
+		textLeft = format
 		textCenter = ARROW_RIGHT
 		textRight = '<b>Start Map Veto</b>'
 	else
@@ -626,6 +631,8 @@ end
 ---@field Mvp MatchSummaryMvp
 ---@field Casters MatchSummaryCasters
 ---@field Match MatchSummaryMatch
+---@field MapVeto VetoDisplay
+---@field DEFAULT_VETO_TYPE_TO_TEXT table
 ---@field matches Html[]?
 ---@field headerElement Html?
 ---@field root Html?
@@ -640,6 +647,7 @@ MatchSummary.Mvp = Mvp
 MatchSummary.Casters = Casters
 MatchSummary.Match = Match
 MatchSummary.MapVeto = MapVeto
+MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT = DEFAULT_VETO_TYPE_TO_TEXT
 
 ---@param width string?
 ---@return MatchSummary
@@ -872,7 +880,7 @@ function MatchSummary.defaultVetoDisplay(match, body, mapVeto)
 	mapVeto = mapVeto or MapVeto()
 	Array.forEach(vetoData, function(vetoRound)
 		if vetoRound.vetostart then
-			mapVeto:vetoStart(tonumber(vetoRound.vetostart))
+			mapVeto:vetoStart(tonumber(vetoRound.vetostart), vetoRound.format)
 		end
 		if vetoRound.type == VETO_DECIDER then
 			mapVeto:addDecider(vetoRound.decider)
