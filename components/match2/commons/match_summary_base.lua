@@ -871,7 +871,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@param mapVeto VetoDisplay?
 ---@return VetoDisplay?
-function MatchSummary.defaultVetoDisplay(match, mapVeto)
+function MatchSummary.defaultMapVetoDisplay(match, mapVeto)
 	local vetoData = match.extradata.mapveto
 	if Logic.isEmpty(vetoData) then
 		return

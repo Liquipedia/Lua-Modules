@@ -113,7 +113,7 @@ function CustomMatchSummary.createBody(match)
 	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultVetoDisplay(match, MapVeto()))
+	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))
 
 	return body
 end
