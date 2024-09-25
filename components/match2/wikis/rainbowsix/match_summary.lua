@@ -6,12 +6,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Abbreviation = require('Module:Abbreviation')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -28,8 +30,6 @@ local ROUND_ICONS = {
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
 local LINK_DATA = {
 	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
 	opl = {icon = 'File:OPL Icon 2023 allmode.png', text = 'OPL Match Page'},
@@ -49,6 +49,7 @@ local LINK_DATA = {
 	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
 	ebattle = {icon = 'File:Ebattle Series allmode.png', text = 'Match page on ebattle'},
 }
+local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 -- Operator Bans Class
 ---@class R6OperatorBan
@@ -253,131 +254,16 @@ function Score:create()
 	return self.root
 end
 
--- Map Veto Class
----@class R6MapVeto: MatchSummaryRowInterface
----@operator call: R6MapVeto
----@field root Html
----@field table Html
-local MapVeto = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
-		self.table = self.root:tag('table')
-			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader()
-	end
-)
-
----@return self
-function MapVeto:createHeader()
-	self.table:tag('tr')
-		:tag('th'):css('width','33%'):done()
-		:tag('th'):css('width','34%'):wikitext('Map Veto'):done()
-		:tag('th'):css('width','33%'):done()
-	return self
-end
-
----@param firstVeto number?
----@return self
-function MapVeto:vetoStart(firstVeto)
-	local textLeft
-	local textCenter
-	local textRight
-	if firstVeto == 1 then
-		textLeft = '<b>Start Map Veto</b>'
-		textCenter = ARROW_LEFT
-	elseif firstVeto == 2 then
-		textCenter = ARROW_RIGHT
-		textRight = '<b>Start Map Veto</b>'
-	else return self end
-	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
-		:tag('th'):wikitext(textLeft or ''):done()
-		:tag('th'):wikitext(textCenter):done()
-		:tag('th'):wikitext(textRight or ''):done()
-	return self
-end
+---@class R6MapVeto: VetoDisplay
+---@field game string?
+local MapVeto = Class.new(MatchSummary.MapVeto, function(self, game)
+	self.game = game
+end)
 
 ---@param map string?
----@return self
-function MapVeto:addDecider(map)
-	if Logic.isEmpty(map) then
-		map = 'TBD'
-	else
-		map = '[[' .. map .. '/siege|' .. map .. ']]'
-	end
-	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
-
-	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
-	self:addColumnVetoMap(row, map)
-	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
-
-	self.table:node(row)
-	return self
-end
-
----@param vetotype string?
----@param map1 string?
----@param map2 string?
----@return self
-function MapVeto:addRound(vetotype, map1, map2)
-	if Logic.isEmpty(map1) then
-		map1 = 'TBD'
-	else
-		map1 = '[[' .. map1 .. '/siege|' .. map1 .. ']]'
-	end
-	if Logic.isEmpty(map2) then
-		map2 = 'TBD'
-	else
-		map2 = '[[' .. map2 .. '/siege|' .. map2 .. ']]'
-	end
-	local class
-	local vetoText
-	if vetotype == 'ban' then
-		vetoText = 'BAN'
-		class = 'brkts-popup-mapveto-ban'
-	elseif vetotype == 'pick' then
-		vetoText = 'PICK'
-		class = 'brkts-popup-mapveto-pick'
-	elseif vetotype == 'defaultban' then
-		vetoText = 'DEFAULT BAN'
-		class = 'brkts-popup-mapveto-defaultban'
-	else
-		return self
-	end
-
-	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
-
-	self:addColumnVetoMap(row, map1)
-	self:addColumnVetoType(row, class, vetoText)
-	self:addColumnVetoMap(row, map2)
-
-	self.table:node(row)
-	return self
-end
-
----@param row Html
----@param styleClass string
----@param vetoText string
----@return self
-function MapVeto:addColumnVetoType(row, styleClass, vetoText)
-	row:tag('td')
-		:tag('span')
-			:addClass(styleClass)
-			:addClass('brkts-popup-mapveto-vetotype')
-			:wikitext(vetoText)
-	return self
-end
-
----@param row Html
----@param map string
----@return self
-function MapVeto:addColumnVetoMap(row,map)
-	row:tag('td'):wikitext(map):done()
-	return self
-end
-
----@return Html
-function MapVeto:create()
-	return self.root
+---@return string
+function MapVeto:displayMap(map)
+	return Page.makeInternalLink(map, map .. '/siege') or TBD
 end
 
 local CustomMatchSummary = {}
@@ -442,25 +328,7 @@ function CustomMatchSummary.createBody(match)
 	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Add the Map Vetoes
-	if match.extradata.mapveto then
-		local vetoData = match.extradata.mapveto
-		if vetoData then
-			local mapVeto = MapVeto()
-
-			for _,vetoRound in ipairs(vetoData) do
-				if vetoRound.vetostart then
-					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
-				end
-				if vetoRound.type == 'decider' then
-					mapVeto:addDecider(vetoRound.decider)
-				else
-					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
-				end
-			end
-
-			body:addRow(mapVeto)
-		end
-	end
+	MatchSummary.defaultVetoDisplay(match, body, MapVeto())
 
 	return body
 end
