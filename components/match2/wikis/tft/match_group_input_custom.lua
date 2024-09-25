@@ -93,7 +93,6 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
