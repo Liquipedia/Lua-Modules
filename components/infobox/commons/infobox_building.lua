@@ -38,13 +38,19 @@ function Building:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Header{
-			name = self:nameDisplay(args),
-			image = args.image,
-			imageDefault = args.default,
-			imageDark = args.imagedark or args.imagedarkmode,
-			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-			size = args.imagesize,
+		Customizable{
+			id = 'header',
+			children = {
+				Header{
+					name = self:nameDisplay(args),
+					image = args.image,
+					imageDefault = args.default,
+					imageDark = args.imagedark or args.imagedarkmode,
+					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+					subHeader = self:subHeaderDisplay(args),
+					size = args.imagesize,
+				},
+			}
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Building') .. ' Information'},
@@ -134,6 +140,13 @@ end
 
 ---@param args table
 function Building:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string?
+function Building:subHeaderDisplay(args)
+	return args.title
 end
 
 return Building
