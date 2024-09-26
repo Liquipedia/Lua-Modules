@@ -144,6 +144,16 @@ function CustomBuilding:nameDisplay(args)
 	return factionIcon .. (args.name or self.pagename)
 end
 
+---@param args table
+---@return string?
+function CustomBuilding:subHeaderDisplay(args)
+	if string.find(args.subfaction, '1v1') or string.find(args.subfaction, self.pagename) then return end
+	return tostring(mw.html.create('span')
+		:css('font-size', '90%')
+		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
+	)
+end
+
 ---@param hotkey1 string?
 ---@param hotkey2 string?
 ---@return string?
@@ -191,6 +201,7 @@ function CustomBuilding:setLpdbData(args)
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			deprecated = args.deprecated or '',
 			introduced = args.introduced or '',
+			subfaction = Array.parseCommaSeparatedString(args.subfaction),
 			size = tonumber(args.size),
 			sight = tonumber(args.sight),
 			luminite = tonumber(args.luminite),
