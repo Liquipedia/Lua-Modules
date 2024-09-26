@@ -39,7 +39,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {'tournament_enddate'}))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
