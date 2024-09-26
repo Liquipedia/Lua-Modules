@@ -38,19 +38,14 @@ function Building:createInfobox()
 	local args = self.args
 
 	local widgets = {
-		Customizable{
-			id = 'header',
-			children = {
-				Header{
-					name = self:nameDisplay(args),
-					image = args.image,
-					imageDefault = args.default,
-					imageDark = args.imagedark or args.imagedarkmode,
-					imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-					subHeader = self:subHeaderDisplay(args),
-					size = args.imagesize,
-				},
-			}
+		Header{
+			name = self:nameDisplay(args),
+			image = args.image,
+			imageDefault = args.default,
+			imageDark = args.imagedark or args.imagedarkmode,
+			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			subHeader = self:subHeaderDisplay(args),
+			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
 		Title{name = (args.informationType or 'Building') .. ' Information'},
