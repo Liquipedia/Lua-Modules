@@ -153,6 +153,9 @@ function CustomMatchSummary._createMapRow(game)
 		if not points then
 			return score
 		end
+		if opponentIndex == 2 then
+            return '(' .. points .. ') ' .. score
+        end
 		return score .. ' (' .. points .. ')'
 	end
 
