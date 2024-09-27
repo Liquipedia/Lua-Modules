@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -147,7 +148,9 @@ end
 ---@param args table
 ---@return string?
 function CustomBuilding:subHeaderDisplay(args)
-	if string.find(args.subfaction, '1v1') or string.find(args.subfaction, self.pagename) then return end
+	if Logic.isEmpty(args.subfaction) or
+		string.find(args.subfaction, '1v1') or
+		string.find(args.subfaction, self.pagename) then return end
 	return tostring(mw.html.create('span')
 		:css('font-size', '90%')
 		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
