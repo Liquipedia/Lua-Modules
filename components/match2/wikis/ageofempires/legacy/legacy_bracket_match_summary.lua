@@ -19,6 +19,7 @@ function LegacyBracketMatchSummary._handleMaps(args)
 	Array.mapIndexes(function(index)
 		local prefix = 'map' .. index
 
+		--Template:MatchTeam
 		if args['match' .. index] then
 			local match = Json.parse(Table.extract(args, 'match' .. index)) --[[@as table]]
 			Table.mergeInto(args,
