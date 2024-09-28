@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Match = Lua.import('Module:Match')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -301,7 +302,7 @@ function MatchGroupLegacy:getMatch(match2key, match1params)
 			return nil
 		end
 	end
-	return match
+	return Match.makeEncodedJson(match)
 end
 
 ---@param match2mapping match2mapping
