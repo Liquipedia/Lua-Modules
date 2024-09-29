@@ -29,6 +29,7 @@ function LegacyBracketMatchSummary._handleMaps(args)
 			)
 			args[prefix] = Table.extract(args, prefix .. 'map')
 			args[prefix .. 'mode'] = Table.extract(args, prefix .. 'mapmode')
+			args['date' .. index] = Table.extract(args, prefix .. 'date')
 		end
 
 		if args[prefix] then
