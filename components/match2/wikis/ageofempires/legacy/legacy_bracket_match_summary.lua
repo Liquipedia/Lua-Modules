@@ -16,12 +16,15 @@ local LegacyBracketMatchSummary = {}
 ---@param args table
 ---@return table
 function LegacyBracketMatchSummary._handleMaps(args)
-	Array.mapIndexes(function(index)
-		local prefix = 'map' .. index
+	local isValidMap = true
+	local mapIndex = 1
+
+	while isValidMap do
+		local prefix = 'map' .. mapIndex
 
 		--Template:MatchTeam
-		if args['match' .. index] then
-			local match = Json.parse(Table.extract(args, 'match' .. index)) --[[@as table]]
+		if args['match' .. mapIndex] then
+			local match = Json.parse(Table.extract(args, 'match' .. mapIndex)) --[[@as table]]
 			Table.mergeInto(args,
 					Table.map(match, function(subKey, value)
 						return prefix .. subKey, value
@@ -29,7 +32,7 @@ function LegacyBracketMatchSummary._handleMaps(args)
 			)
 			args[prefix] = Table.extract(args, prefix .. 'map')
 			args[prefix .. 'mode'] = Table.extract(args, prefix .. 'mapmode')
-			args['date' .. index] = args['date' .. index] or Table.extract(args, prefix .. 'date')
+			args['date' .. mapIndex] = args['date' .. mapIndex] or Table.extract(args, prefix .. 'date')
 		end
 
 		if args[prefix] then
@@ -37,8 +40,9 @@ function LegacyBracketMatchSummary._handleMaps(args)
 			args[prefix] = mapInfo[1]
 		end
 
-		return args[prefix] or args[prefix .. 'win']
-	end)
+		isValidMap = args[prefix] or args[prefix .. 'win']
+		mapIndex = mapIndex + 1
+	end
 
 	return args
 end
