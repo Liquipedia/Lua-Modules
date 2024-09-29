@@ -191,8 +191,7 @@ end
 ---@param player standardPlayer
 ---@return boolean
 function Opponent.playerIsTbd(player)
-	local displayName = player.displayName or player.displayname
-	return String.isEmpty(displayName) or displayName:upper() == 'TBD'
+	return String.isEmpty(player.displayName) or player.displayName:upper() == 'TBD'
 end
 
 ---Checks if a provided string is an opponent type
