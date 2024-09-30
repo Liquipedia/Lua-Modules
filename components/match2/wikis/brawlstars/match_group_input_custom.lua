@@ -225,8 +225,8 @@ function MapFunctions.getParticipants(map, opponents)
 				}
 			end
 		)
-		Array.forEach(unattachedParticipants, function()
-			table.insert(participants, table.remove(unattachedParticipants, 1))
+		Array.forEach(unattachedParticipants, function(participant)
+			table.insert(participants, participant)
 		end)
 		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
 	end)
