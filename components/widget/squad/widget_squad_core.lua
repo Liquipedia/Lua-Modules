@@ -55,7 +55,7 @@ function Squad:_title(type, title)
 	end
 
 	return Tr{
-		children = {Th{children = {titleText}, colSpan = 10}}
+		children = {Th{children = {titleText}, attributes={colspan = 10}}}
 	}
 end
 
