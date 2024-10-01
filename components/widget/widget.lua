@@ -39,6 +39,7 @@ function Widget:render()
 	error('A Widget must override the render() function!')
 end
 
+---@deprecated
 ---@param children string[]
 ---@return string|nil
 function Widget:make(children)
