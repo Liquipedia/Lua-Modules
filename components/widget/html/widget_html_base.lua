@@ -22,7 +22,7 @@ function HtmlBase:render()
 	error('HtmlBase:render() must be overridden')
 end
 
----@param tag string
+---@param tag string?
 ---@param children (Widget|Html|string|number)[]
 ---@param attributesInput {class: table?, style: table?, [string]: string}?
 ---@return Html

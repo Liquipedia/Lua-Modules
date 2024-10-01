@@ -21,7 +21,7 @@ function Tr:render()
 	local attributes = Table.copy(self.props.attributes or {})
 	attributes.class = self.props.classes
 	attributes.style = self.props.css
-	return self:renderAs('tr', self.children, attributes)
+	return self:renderAs('tr', self.props.children, attributes)
 end
 
 return Tr

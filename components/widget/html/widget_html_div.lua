@@ -21,7 +21,7 @@ function Div:render()
 	local attributes = Table.copy(self.props.attributes or {})
 	attributes.class = self.props.classes
 	attributes.style = self.props.css
-	return self:renderAs('div', self.children, attributes)
+	return self:renderAs('div', self.props.children, attributes)
 end
 
 return Div

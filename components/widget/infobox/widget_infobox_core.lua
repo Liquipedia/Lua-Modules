@@ -13,7 +13,7 @@ local WarningBox = require('Module:WarningBox')
 
 local Widget = Lua.import('Module:Widget')
 local Div = Lua.import('Module:Widget/Div')
-local Fragment = Lua.import('Module:Widget/Fragment')
+local Fragment = Lua.import('Module:Widget/Html/Fragment')
 
 ---@class Infobox: Widget
 ---@operator call(table): Infobox
