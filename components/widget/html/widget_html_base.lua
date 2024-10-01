@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -34,7 +35,7 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 	local styles = Table.extract(attributes, 'style') or {} --[[@as table]]
 	---@cast attributes {[string]: string}
 
-	htmlNode:addClass(table.concat(class, ' '))
+	htmlNode:addClass(String.nilIfEmpty(table.concat(class, ' ')))
 	htmlNode:css(styles)
 	htmlNode:attr(attributes)
 
