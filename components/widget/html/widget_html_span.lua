@@ -6,30 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local WidgetHtml = Lua.import('Module:Widget/Html/Base')
 
----@class WidgetSpan: Widget
+---@class WidgetSpan: WidgetHtmlBase
 ---@operator call(table): WidgetSpan
-local Span = Class.new(Widget)
+local Span = Class.new(WidgetHtml)
 
 ---@return Html
 function Span:render()
-	local span = mw.html.create('span')
-	Array.forEach(self.props.classes or {}, FnUtil.curry(span.addClass, span))
-	Array.forEach(self.props.children, function(child)
-		if Class.instanceOf(child, Widget) then
-			child.context = self:_nextContext()
-			span:node(child:tryMake())
-		else
-			span:node(child)
-		end
-	end)
-	return span
+	local attributes = Table.copy(self.props.attributes or {})
+	attributes.class = self.props.classes
+	attributes.style = self.props.css
+	return self:renderAs('span', self.children, attributes)
 end
 
 return Span

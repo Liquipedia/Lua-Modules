@@ -22,20 +22,29 @@ function HtmlBase:render()
 	error('HtmlBase:render() must be overridden')
 end
 
-function HtmlBase:renderAs(tag)
-	local attributes = Table.copy(self.props.attributes or {})
+---@param tag string
+---@param children (Widget|Html|string|number)[]
+---@param attributesInput {class: table?, style: table?, [string]: string}?
+---@return Html
+function HtmlBase:renderAs(tag, children, attributesInput)
 	local htmlNode = mw.html.create(tag)
-	htmlNode:addClass(table.concat(attributes.class or self.props.classes or {}, ' '))
-	htmlNode:css(attributes.style or {})
-	attributes.class = nil
-	attributes.style = nil
+
+	local attributes = Table.copy(attributesInput or {})
+	local class = Table.extract(attributes, 'class') or {} --[[@as table]]
+	local styles = Table.extract(attributes, 'style') or {} --[[@as table]]
+	---@cast attributes {[string]: string}
+
+	htmlNode:addClass(table.concat(class, ' '))
+	htmlNode:css(styles)
 	htmlNode:attr(attributes)
 
-	Array.forEach(self.props.children, function(child)
+	Array.forEach(children, function(child)
 		if Class.instanceOf(child, Widget) then
+			---@cast child Widget
 			child.context = self:_nextContext()
 			htmlNode:node(child:tryMake())
 		else
+			---@cast child -Widget
 			htmlNode:node(child)
 		end
 	end)

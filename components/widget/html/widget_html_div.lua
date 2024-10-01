@@ -6,30 +6,22 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
-local Widget = Lua.import('Module:Widget')
+local WidgetHtml = Lua.import('Module:Widget/Html/Base')
 
----@class WidgetDiv: Widget
+---@class WidgetDiv: WidgetHtmlBase
 ---@operator call(table): WidgetDiv
-local Div = Class.new(Widget)
+local Div = Class.new(WidgetHtml)
 
 ---@return Html
 function Div:render()
-	local div = mw.html.create('div')
-	Array.forEach(self.props.classes or {}, FnUtil.curry(div.addClass, div))
-	Array.forEach(self.props.children, function(child)
-		if Class.instanceOf(child, Widget) then
-			child.context = self:_nextContext()
-			div:node(child:tryMake())
-		else
-			div:node(child)
-		end
-	end)
-	return div
+	local attributes = Table.copy(self.props.attributes or {})
+	attributes.class = self.props.classes
+	attributes.style = self.props.css
+	return self:renderAs('div', self.children, attributes)
 end
 
 return Div
