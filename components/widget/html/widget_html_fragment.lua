@@ -11,12 +11,12 @@ local Lua = require('Module:Lua')
 
 local WidgetHtml = Lua.import('Module:Widget/Html/Base')
 
----@class WidgetHtmlBase: Widget
----@operator call(table): WidgetHtmlBase
+---@class WidgetHtmlFragment: WidgetHtmlBase
+---@operator call(table): WidgetHtmlFragment
 local Fragment = Class.new(WidgetHtml)
 
 ---@return Html
-function Fragment:make()
+function Fragment:render()
 	return self:renderAs(nil, self.props.children)
 end
 
