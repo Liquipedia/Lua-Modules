@@ -153,7 +153,8 @@ function CustomMatchSummary._createMapRow(game)
 		if not points then
 			return score
 		end
-		if opponentIndex == 2 then
+		local flipped = opponentIndex == 2
+		if flipped then
             return '(' .. points .. ') ' .. score
         end
 		return score .. ' (' .. points .. ')'
