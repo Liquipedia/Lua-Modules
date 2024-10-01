@@ -44,6 +44,7 @@ function Building:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
@@ -134,6 +135,13 @@ end
 
 ---@param args table
 function Building:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string?
+function Building:subHeaderDisplay(args)
+	return args.title
 end
 
 return Building
