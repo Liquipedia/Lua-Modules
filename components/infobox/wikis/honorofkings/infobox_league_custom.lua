@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=arenaofvalor
+-- wiki=honorofkings
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -20,7 +20,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class ArenaofvalorLeagueInfobox: InfoboxLeague
+---@class HonorofkingsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
