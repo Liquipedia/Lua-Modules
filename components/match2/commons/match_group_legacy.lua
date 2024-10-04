@@ -16,7 +16,6 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchSubobjects = Lua.import('Module:Match/Subobjects')
@@ -302,7 +301,7 @@ function MatchGroupLegacy:getMatch(match2key, match1params)
 			return nil
 		end
 	end
-	return Match.makeEncodedJson(match)
+	return match
 end
 
 ---@param match2mapping match2mapping
