@@ -220,7 +220,7 @@ function MediaList._row(item, args)
 	row:node(MediaList._displayTitle(item))
 
 	if String.isNotEmpty(item.translatedtitle) then
-		row:wikitext(mw.text.nowiki('[') .. item.translatedtitle .. mw.text.nowiki(']'))
+		row:wikitext(' ' .. mw.text.nowiki('[') .. item.translatedtitle .. mw.text.nowiki(']'))
 	end
 
 	local authors = {}
