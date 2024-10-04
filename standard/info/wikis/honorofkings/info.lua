@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=arenaofvalor
+-- wiki=honorofkings
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +8,7 @@
 
 return {
 	startYear = 2015,
-	wikiName = 'arenaofvalor',
+	wikiName = 'honorofkings',
 	name = 'Arena of Valor',
 	defaultGame = 'aov',
 

@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=arenaofvalor
+-- wiki=honorofkings
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,7 +15,7 @@ local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_NUMBER_OF_PLAYERS = 5
 
----@class ArenaofvalorMatchGroupLegacyDefault: MatchGroupLegacy
+---@class HonorofkingsMatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@return table

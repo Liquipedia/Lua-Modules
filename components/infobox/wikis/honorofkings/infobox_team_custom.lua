@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=arenaofvalor
+-- wiki=honorofkings
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -34,7 +34,7 @@ local REGION_REMAPPINGS = {
 	['japan'] = 'asia',
 }
 
----@class ArenaofvalorInfoboxTeam: InfoboxTeam
+---@class HonorofkingsInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 
 ---@param frame Frame

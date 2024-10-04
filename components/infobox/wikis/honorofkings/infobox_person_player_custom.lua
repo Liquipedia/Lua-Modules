@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=arenaofvalor
+-- wiki=honorofkings
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -22,7 +22,7 @@ local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
 
----@class ArenaofvalorInfoboxPlayer: Person
+---@class HonorofkingsInfoboxPlayer: Person
 ---@field role table
 ---@field role2 table
 local CustomPlayer = Class.new(Player)
