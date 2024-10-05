@@ -25,6 +25,8 @@ local ROLES = {
 	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
 	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
 	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
+	['host'] = {category = 'Host', variable = 'Host', talent = true},
+	['manager'] = {category = 'Manager', variable = 'Manager', staff = true},
 }
 
 ---@class GeoguessrInfoboxPlayer: Person
