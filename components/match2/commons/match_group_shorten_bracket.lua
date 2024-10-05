@@ -45,6 +45,8 @@ function ShortenBracket.adjustMatchesAndBracketId(props)
 		bracketDatasById
 	)
 
+	-- in case of a third place match we need to adjust that after the finals match was processed
+	-- as we need the data of the processed finals match, hence adjust it here
 	newMatches = ShortenBracket._adjustThirdPlaceMatch(newMatches)
 
 	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
