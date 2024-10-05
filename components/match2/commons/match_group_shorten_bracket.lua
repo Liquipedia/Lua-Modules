@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -44,12 +45,39 @@ function ShortenBracket.adjustMatchesAndBracketId(props)
 		bracketDatasById
 	)
 
+	newMatches = ShortenBracket._adjustThirdPlaceMatch(newMatches)
+
 	assert(newMatches[1], 'The provided id and shortTemplate values leave an empty bracket')
 
 	-- store as wiki var so it can be retrieved by the display function
 	Variables.varDefine('match2bracket_' .. newBracketId, Json.stringify(newMatches))
 
 	return newBracketId
+end
+
+---@param newMatches match2[]
+---@return match2[]
+function ShortenBracket._adjustThirdPlaceMatch(newMatches)
+	local thirdPlaceMatch = Array.filter(newMatches, function(match)
+		return string.match(match.match2id, '_RxMTP$') ~= nil
+	end)[1]
+
+	if not thirdPlaceMatch then return newMatches end
+
+	local finals = Array.filter(newMatches, function(match)
+		return Logic.isNotEmpty(match.match2bracketdata.thirdplace)
+	end)[1]
+
+	local finalsCoordinates = finals.match2bracketdata.coordinates
+
+	thirdPlaceMatch.match2bracketdata.coordinates = Table.merge(finalsCoordinates, {
+		depthCount = finalsCoordinates.depthCount - 1,
+		matchIndexInRound = finalsCoordinates.matchIndexInRound + 1,
+		rootIndex = finalsCoordinates.rootIndex + 1,
+	})
+	thirdPlaceMatch.match2bracketdata.coordinates.semanticDepth = nil
+
+	return newMatches
 end
 
 ---@param shortTemplate string
