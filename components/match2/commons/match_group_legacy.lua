@@ -62,6 +62,7 @@ function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, l
 	local isReset = false
 	if id == THIRD_PLACE_MATCH then
 		round = lastRound
+		match2mapping[THIRD_PLACE_MATCH .. 'header'] = 'L' .. round.R
 	elseif id == RESET_MATCH then
 		round = lastRound
 		round.G = round.G - 2
