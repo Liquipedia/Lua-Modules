@@ -46,7 +46,7 @@ end
 ---@return table?
 function MatchGroupLegacyDefault:handleMap(details, mapIndex)
 	local blueprint = self:_getMap(mapIndex)
-	if Logic.isEmpty(details[blueprint['$notEmpty$']]) then
+	if Logic.isEmpty(details[blueprint['$notEmpty$']]) and Logic.isEmpty(details[blueprint['winner']]) then
 		return nil
 	end
 
