@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
+-- wiki=mobilelegends
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,7 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Streams = require('Module:Links/Stream')
-local BrawlerNames = mw.loadData('Module:BrawlerNames')
+local ChampionNames = mw.loadData('Module:HeroNames')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -167,7 +167,7 @@ function MapFunctions.getExtraData(map, opponentCount)
 		team2side = string.lower(map.team2side or ''),
 	}
 
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 	for opponentIndex = 1, opponentCount do
 		for idx, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
 			extradata['team' .. opponentIndex .. 'bans' .. idx] = getCharacterName(ban)
@@ -185,7 +185,7 @@ end
 ---@return table
 function MapFunctions.getParticipants(map, opponents)
 	local allParticipants = {}
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local players = Array.mapIndexes(function(playerIndex)
 			return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'h' .. playerIndex])
