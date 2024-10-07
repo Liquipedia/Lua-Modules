@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+-- luacheck: ignore 112
+
 local Lua = require('Module:Lua')
 
 _G.Array = Lua.import('Module:Array')
