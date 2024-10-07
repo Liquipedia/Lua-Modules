@@ -64,7 +64,7 @@ function Show:createInfobox()
 					table.insert(returnWidgets, Title{children = 'Links'})
 				end
 				if not Table.isEmpty(links) then
-					table.insert(returnWidgets, Widgets.Links{content = links})
+					table.insert(returnWidgets, Widgets.Links{links = links})
 				end
 				if secondaryLinks ~= '' then
 					table.insert(returnWidgets, Center{children = {secondaryLinks}})

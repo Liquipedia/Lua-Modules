@@ -13,12 +13,12 @@ local Table = require('Module:Table')
 local Widget = Lua.import('Module:Widget')
 
 ---@class ChronologyWidget: Widget
----@operator call({content: table<string, string|number|nil>}): ChronologyWidget
+---@operator call({links: table<string, string|number|nil>}): ChronologyWidget
 ---@field links table<string, string|number|nil>
 local Chronology = Class.new(
 	Widget,
 	function(self, input)
-		self.links = input.content
+		self.links = input.links
 	end
 )
 

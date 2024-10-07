@@ -73,7 +73,7 @@ function Patch:createInfobox()
 					return {
 						Title{children = 'Chronology'},
 						Chronology{
-							content = chronologyData
+							links = chronologyData
 						}
 					}
 				end

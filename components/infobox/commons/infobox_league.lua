@@ -197,7 +197,7 @@ function League:createInfobox()
 				if Table.isNotEmpty(self.links) then
 					return {
 						Title{children = 'Links'},
-						Widgets.Links{content = self.links}
+						Widgets.Links{links = self.links}
 					}
 				end
 			end
@@ -211,7 +211,7 @@ function League:createInfobox()
 							return {
 								Title{children = 'Chronology'},
 								Chronology{
-									content = Table.filterByKey(args, function(key)
+									links = Table.filterByKey(args, function(key)
 										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
 									end)
 								}

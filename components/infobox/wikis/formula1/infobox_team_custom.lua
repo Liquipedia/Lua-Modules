@@ -70,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 			Array.appendWith(
 				widgets,
 				Title{children = 'Chronology'},
-				Chronology{content = {
+				Chronology{links = {
 					previous = args.previous,
 					previous2 = args.previous2,
 					next = args.next,

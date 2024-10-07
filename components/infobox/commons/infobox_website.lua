@@ -56,7 +56,7 @@ function Website:createInfobox()
 				if not Table.isEmpty(links) then
 					return {
 						Title{children = 'Links'},
-						Widgets.Links{content = links}
+						Widgets.Links{links = links}
 					}
 				end
 			end
