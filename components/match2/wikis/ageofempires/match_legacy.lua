@@ -64,8 +64,8 @@ function MatchLegacy.storeGames(match, match2)
 					(tonumber(game.winner) == 2 and game.extradata.opponent1civ) or
 					(tonumber(game.winner) == 1 and game.extradata.opponent2civ) or
 					''
-			game.extradata.opponent1name = player1.player
-			game.extradata.opponent2name = player2.player
+			game.extradata.opponent1name = player1.displayName
+			game.extradata.opponent2name = player2.displayName
 		end
 		-- Other stuff
 		game.opponent1 = match.opponent1
