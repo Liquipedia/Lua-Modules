@@ -189,7 +189,10 @@ end
 ---@return boolean
 function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	if Opponent.typeIsParty(opponent.type) then
-		return not Array.all(opponent.match2players, Opponent.playerIsTbd)
+		local playerIsTbd = function (player)
+			return String.isEmpty(player.displayname) or player.displayname:upper() == 'TBD'
+		end
+		return not Array.all(opponent.match2players, playerIsTbd)
 	end
 	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
 	return not Opponent.isTbd(opponent)
