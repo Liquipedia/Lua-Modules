@@ -77,10 +77,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		--maps
 		if String.isNotEmpty(args.map1) then
-			table.insert(widgets, Title{name = args.maptitle or 'Maps'})
+			table.insert(widgets, Title{children = args.maptitle or 'Maps'})
 			table.insert(widgets, Center{children = self.caller:_makeBasedListFromArgs('map')})
 		elseif String.isNotEmpty(args['2map1']) then
-			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
+			table.insert(widgets, Title{children = args['2maptitle'] or '2v2 Maps'})
 			table.insert(widgets, Center{children = self.caller:_makeBasedListFromArgs('2map')})
 		end
 	end

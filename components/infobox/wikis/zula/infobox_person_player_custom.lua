@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
-				Title{name = 'History'},
+				Title{children = 'History'},
 				Center{children = {manualHistory}},
 				Center{children = {automatedHistory}},
 			}

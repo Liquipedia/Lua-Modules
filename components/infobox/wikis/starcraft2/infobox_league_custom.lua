@@ -213,7 +213,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
-				Title{name = 'Participants'},
+				Title{children = 'Participants'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
 				Breakdown{children = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
@@ -227,7 +227,7 @@ function CustomInjector:parse(id, widgets)
 		local displayMaps = function(prefix, defaultTitle, maps)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
-				Title{name = args[prefix .. 'title'] or defaultTitle},
+				Title{children = args[prefix .. 'title'] or defaultTitle},
 				Center{children = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
 			)
 		end

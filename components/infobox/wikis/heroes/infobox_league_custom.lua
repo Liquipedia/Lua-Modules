@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 		end)
 
 		if #maps > 0 then
-			table.insert(widgets, Title{name = 'Battlegrounds'})
+			table.insert(widgets, Title{children = 'Battlegrounds'})
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end

@@ -48,7 +48,7 @@ function Building:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = (args.informationType or 'Building') .. ' Information'},
+		Title{children = (args.informationType or 'Building') .. ' Information'},
 		Cell{name = 'Built by', content = {args.builtby}},
 		Customizable{
 			id = 'cost',

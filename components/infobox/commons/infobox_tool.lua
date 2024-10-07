@@ -42,7 +42,7 @@ function Tool:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 		},
 		Center{children = {args.caption}},
-		Title{name = 'Tool Information'},
+		Title{children = 'Tool Information'},
 		Cell{name = 'Game', content = {
 				(args.game or args.defaultGame) .. (args.gameversion and (' ' .. args.gameversion) or '')
 		}},

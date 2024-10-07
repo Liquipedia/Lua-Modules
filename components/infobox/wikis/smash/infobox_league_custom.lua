@@ -161,7 +161,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
-			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Title{children = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
 		if args.circuit2 or args.points2 or args.circuit2_next or args.circuit2_previous then
@@ -170,13 +170,13 @@ function CustomInjector:parse(id, widgets)
 
 		local singles = Array.map(league:getAllArgsForBase(args, 's_stage'), CustomLeague._createNoWrappingSpan)
 		if #singles > 0 then
-			table.insert(widgets, Title{name = 'Singles Stages'})
+			table.insert(widgets, Title{children = 'Singles Stages'})
 			table.insert(widgets, Center{children = {table.concat(singles, '&nbsp;• ')}})
 		end
 
 		local doubles = Array.map(league:getAllArgsForBase(args, 'd_stage'), CustomLeague._createNoWrappingSpan)
 		if #doubles > 0 then
-			table.insert(widgets, Title{name = 'Doubles Stages'})
+			table.insert(widgets, Title{children = 'Doubles Stages'})
 			table.insert(widgets, Center{children = {table.concat(doubles, '&nbsp;• ')}})
 		end
 	elseif id == 'dates' then

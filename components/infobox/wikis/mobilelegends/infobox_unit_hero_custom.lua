@@ -119,7 +119,7 @@ function CustomHero:addCustomCells(widgets)
 	}
 
 	if Array.any(baseStats, function(item) return Logic.isNotEmpty(item.value) end) then
-		table.insert(widgets, Title{name = 'Base Statistics'})
+		table.insert(widgets, Title{children = 'Base Statistics'})
 	end
 
 	Array.extendWith(widgets, Array.map(baseStats, function(item)
@@ -131,7 +131,7 @@ function CustomHero:addCustomCells(widgets)
 	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
 
 	return Array.append(widgets,
-		Title{name = 'Esports Statistics'},
+		Title{children = 'Esports Statistics'},
 		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end

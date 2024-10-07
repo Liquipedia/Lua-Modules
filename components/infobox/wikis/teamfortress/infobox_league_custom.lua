@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 					PageLink.makeInternalLink(map)
 				)))
 			end
-			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Title{children = 'Maps'})
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end

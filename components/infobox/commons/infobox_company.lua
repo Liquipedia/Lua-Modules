@@ -51,7 +51,7 @@ function Company:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = 'Company Information'},
+		Title{children = 'Company Information'},
 		Customizable{id = 'parent', children = {
 			Cell{
 				name = 'Parent Company',
@@ -91,7 +91,7 @@ function Company:createInfobox()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
+						Title{children = 'Links'},
 						Widgets.Links{content = links}
 					}
 				end

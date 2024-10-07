@@ -47,7 +47,7 @@ function Weapon:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = (args.informationType or 'Weapon') .. ' Information'},
+		Title{children = (args.informationType or 'Weapon') .. ' Information'},
 		Cell{
 			name = 'Class',
 			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),

@@ -328,7 +328,7 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 		Cell{name = 'Start Level', content = {startLevel}},
 		Cell{name = 'Defenders', content = {self._displayCreepDefenders(creeps)}},
 		Cell{name = 'Respawn', content = {args.respawn and args.respawn .. 's'}},
-		Title{name = 'Tower Rewards'},
+		Title{children = 'Tower Rewards'},
 		Cell{name = 'Capture Point', content = {args.capture_point}},
 		Cell{name = 'Global Buff', content = {args.global_buff}},
 	}

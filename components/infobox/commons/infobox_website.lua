@@ -43,7 +43,7 @@ function Website:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = 'Website Information'},
+		Title{children = 'Website Information'},
 		Cell{name = 'Type', content = {args.type}},
 		Cell{name = 'Available Language(s)', content = self:getAllArgsForBase(args, 'language')},
 		Cell{name = 'Content License', content = {args.content_license}},
@@ -55,7 +55,7 @@ function Website:createInfobox()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
+						Title{children = 'Links'},
 						Widgets.Links{content = links}
 					}
 				end

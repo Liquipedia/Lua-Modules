@@ -44,12 +44,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Manufacturer', content = {args.manufacturer}},
 			Cell{name = 'Production', content = {args.production}},
 			Cell{name = 'Weight', content = {args.weight}},
-			Title{name = 'Engine Output'},
+			Title{children = 'Engine Output'},
 			Cell{name = 'Power', content = {args.power}},
 			Cell{name = 'Torque', content = {args.torque}},
 			Cell{name = 'Idle RPM', content = {args.idlerpm}},
 			Cell{name = 'Peak RPM', content = {args.peakrpm}},
-			Title{name = 'Engine Layout'},
+			Title{children = 'Engine Layout'},
 			Cell{name = 'Configuration', content = {args.configuration}},
 			Cell{name = 'Displacement', content = {args.displacement}},
 			Cell{name = 'Compression', content = {args.compression}},
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if String.isEmpty(args.previous) and String.isEmpty(args.next) then return widgets end
 		return {
-			Title{name = 'Chronology'},
+			Title{children = 'Chronology'},
 			Chronology{content = {previous = args.previous, next = args.next}}
 		}
 	end

@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if Table.any(args, function(key) return MODE_AVAILABILITY[key] end) then
-			table.insert(widgets, Title{name = 'Mode Availability'})
+			table.insert(widgets, Title{children = 'Mode Availability'})
 			local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
 			for key, item in Table.iter.spairs(MODE_AVAILABILITY, modeAvailabilityOrder) do
 				table.insert(widgets, Cell{name = item.name, content = {args[key]}})

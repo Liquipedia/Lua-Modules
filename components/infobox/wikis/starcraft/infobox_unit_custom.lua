@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 		if not aoeArgs or String.isEmpty(aoeArgs.name) then return {} end
 
 		return {
-			Title{name = aoeArgs.name},
+			Title{children = aoeArgs.name},
 			Cell{name = 'Inner', content = {aoeArgs.size1}},
 			Cell{name = 'Medium', content = {aoeArgs.size2}},
 			Cell{name = 'Outer', content = {aoeArgs.size3}},
@@ -105,7 +105,7 @@ function CustomUnit:getCustomCells(widgets)
 	end
 
 	return {
-		Title{name = 'Unit stats'},
+		Title{children = 'Unit stats'},
 		Cell{name = 'Attributes', content = {args.att}},
 		Cell{name = 'Defense', content = {CustomUnit:_defenseDisplay(args)}},
 		Cell{name = 'Damage', content = {args.damage}},

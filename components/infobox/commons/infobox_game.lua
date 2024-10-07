@@ -46,7 +46,7 @@ function Game:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = 'Game Information'},
+		Title{children = 'Game Information'},
 		Customizable{
 			id = 'developer',
 			children = {
@@ -101,7 +101,7 @@ function Game:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
+						Title{children = 'Links'},
 						Widgets.Links{content = links}
 					}
 				end

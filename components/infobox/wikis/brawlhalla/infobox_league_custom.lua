@@ -41,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'customcontent' then
 		if not String.isEmpty(args.player_number) or not String.isEmpty(args.doubles_number) then
-			table.insert(widgets, Title{name = 'Player Breakdown'})
+			table.insert(widgets, Title{children = 'Player Breakdown'})
 			table.insert(widgets, Cell{
 				name = 'Number of Players',
 				content = {args.player_number}

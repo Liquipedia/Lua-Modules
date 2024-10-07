@@ -270,7 +270,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		local playerNumber = caller.data.playerNumberDisplay
 		if playerNumber or args.team_number then
-			table.insert(widgets, Title{name = 'Participants breakdown'})
+			table.insert(widgets, Title{children = 'Participants breakdown'})
 		end
 
 		if playerNumber then
@@ -295,7 +295,7 @@ function CustomInjector:parse(id, widgets)
 		local displayMaps = function(prefix, defaultTitle, maps)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
-				Title{name = args[prefix .. 'title'] or defaultTitle},
+				Title{children = args[prefix .. 'title'] or defaultTitle},
 				Center{children = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
 			)
 		end

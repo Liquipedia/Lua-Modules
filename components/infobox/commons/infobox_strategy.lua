@@ -49,7 +49,7 @@ function Strategy:createInfobox()
 			}
 		},
 		Center{children = {args.caption}},
-		Title{name = args.informationType .. ' Information'},
+		Title{children = args.informationType .. ' Information'},
 		Cell{
 			name = 'Creator(s)',
 			content = {args.creator or args['created-by']},

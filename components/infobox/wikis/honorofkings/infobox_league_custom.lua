@@ -47,13 +47,13 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'customcontent' then
 		if args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
+			table.insert(widgets, Title{children = 'Players'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
 		end
 
 		--teams section
 		if args.team_number then
-			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
 		end
 	end

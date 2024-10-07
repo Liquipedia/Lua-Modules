@@ -46,7 +46,7 @@ function Scene:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = 'Scene Information'},
+		Title{children = 'Scene Information'},
 		Cell{name = 'Region', content = {args.region}},
 		Cell{name = 'National Team', content = {args.nationalteam}, options = {makeLink = true}},
 		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
@@ -58,7 +58,7 @@ function Scene:createInfobox()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
+						Title{children = 'Links'},
 						Widgets.Links{content = links}
 					}
 				end
@@ -68,7 +68,7 @@ function Scene:createInfobox()
 			builder = function()
 				if not String.isEmpty(args.achievements) then
 					return {
-						Title{name ='Achievements'},
+						Title{children ='Achievements'},
 						Center{children = {args.achievements}}
 					}
 				end
