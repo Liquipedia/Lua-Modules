@@ -412,9 +412,10 @@ function Match._backwardsCompatabilityForV3API(record)
 	record.resulttype = record.resulttype or (record.status == 'notplayed' and 'np') or ''
 
 	if record.finished then
+		local opponents = record.opponents or {}
 		local function calculateWalkover()
-			local status = (record.opponents[record.winner] or {}).status
-			return (status == 'FF' and 'ff') or (status == 'DQ' and 'dq') or (status == 'L' and 'l')
+			local status = (opponents[record.winner] or {}).status
+			return (status == 'FF' and 'ff') or (status == 'DQ' and 'dq') or (status == 'L' and 'l') or nil
 		end
 		record.walkover = record.walkover or calculateWalkover() or ''
 	end
