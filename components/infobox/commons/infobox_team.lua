@@ -137,7 +137,7 @@ function Team:createInfobox()
 				if not Table.isEmpty(links) then
 					return {
 						Title{children = 'Links'},
-						Widgets.Links{content = links, variant = LINK_VARIANT}
+						Widgets.Links{links = links, variant = LINK_VARIANT}
 					}
 				end
 			end

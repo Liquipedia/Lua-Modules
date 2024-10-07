@@ -197,7 +197,7 @@ function League:createInfobox()
 				if Table.isNotEmpty(self.links) then
 					return {
 						Title{children = 'Links'},
-						Widgets.Links{content = self.links}
+						Widgets.Links{links = self.links}
 					}
 				end
 			end

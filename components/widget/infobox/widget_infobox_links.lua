@@ -20,7 +20,7 @@ local Widget = Lua.import('Module:Widget')
 local Links = Class.new(
 	Widget,
 	function(self, input)
-		self.links = Table.copy(input.content)
+		self.links = Table.copy(input.links)
 		self.variant = input.variant
 	end
 )
