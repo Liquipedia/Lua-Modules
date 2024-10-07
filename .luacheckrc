@@ -1,42 +1,3 @@
-local function newConfig()
-    local cfg = require("luacheck.config").load_default_config()
-
-    -- Function to check if a file imports 'standard.lua'
-    local function imports_standard(file_content)
-        return file_content:match("require%s*%(?%s*['\"]Module:Standard['\"]%)?")
-    end
-
-    -- Add globals to files that import 'standard.lua'
-    for _, file in ipairs(cfg.files) do
-        local file_content = require("luacheck.utils").read_file(file)
-        if file_content and imports_standard(file_content) then
-            cfg.overrides[file] = {
-				read_globals = {
-                    "Array",
-                    "Class",
-                    "Condition",
-                    "DateExt",
-                    "I18n",
-                    "Info",
-                    "Json",
-                    "Logic",
-                    "Lpdb",
-                    "Lua",
-                    "Operator",
-                    "Page",
-                    "String",
-                    "Table",
-                    "Variables",
-                }
-            }
-        end
-    end
-
-    return cfg
-end
-
-config = newConfig()
-
 std = {
 	globals = {
 		"mw",
@@ -66,6 +27,22 @@ std = {
 		"type",
 		"unpack",
 		"xpcall",
+		-- From standard.lua
+		"Array",
+		"Class",
+		"Condition",
+		"DateExt",
+		"I18n",
+		"Info",
+		"Json",
+		"Logic",
+		"Lpdb",
+		"Lua",
+		"Operator",
+		"Page",
+		"String",
+		"Table",
+		"Variables",
 	}
 }
 
