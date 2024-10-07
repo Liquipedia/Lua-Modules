@@ -13,7 +13,7 @@ local Table = require('Module:Table')
 local Widget = Lua.import('Module:Widget')
 
 ---@class HighlightsWidget: Widget
----@operator call({content: (string|number)[]?}):HighlightsWidget
+---@operator call(table):HighlightsWidget
 local Highlights = Class.new(Widget)
 
 ---@param children string[]
