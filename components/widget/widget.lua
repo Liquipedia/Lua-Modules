@@ -23,7 +23,7 @@ local Widget = Class.new(function(self, props)
 	self.props = Table.copy(props) or {}
 	self.props.children = self.props.children or {}
 	self.context = {} -- Populated by the parent
-	---@deprecated Legacy support
+	---@deprecated Widget v1 backwards compability
 	self.children = self.children or self.props.children
 end)
 
@@ -51,7 +51,7 @@ end
 function Widget:tryMake(injector)
 	local renderComponent
 	if self.render == Widget.render then
-		-- Legacy support
+		-- Widget v1 backwards compability
 		renderComponent = function()
 			local processedChildren = self:tryChildren(injector)
 			if self.render == Widget.render then
