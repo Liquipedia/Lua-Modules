@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -21,8 +20,6 @@ local OpponentDisplay = OpponentLibrary.OpponentDisplay
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
-
-local HEADTOHEAD = '[[File:Match Info Stats.png|14x14px|link=%s|Head to Head history]]'
 
 -- Custom Header Class
 ---@class TrackmaniaMatchSummaryHeader: MatchSummaryHeader
