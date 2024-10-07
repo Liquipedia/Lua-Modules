@@ -209,7 +209,9 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
 	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
 	if Opponent.isBye(opponent) then
-		return {type = Opponent.literal, name = 'BYE'}
+		local byeOpponent = Opponent.blank()
+		byeOpponent.name = 'BYE'
+		return MatchGroupInputUtil.mergeRecordWithOpponent({}, byeOpponent)
 	end
 
 	---@type number|string?
