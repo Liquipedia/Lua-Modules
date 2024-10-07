@@ -88,6 +88,7 @@ function Widget:tryMake(injector)
 	)
 end
 
+---@deprecated
 ---@param injector WidgetInjector?
 ---@return string[]
 function Widget:tryChildren(injector)
