@@ -1,3 +1,5 @@
+
+---@diagnostic disable: undefined-global
 std = {
 	globals = {
 		"mw",
