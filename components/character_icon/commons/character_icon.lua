@@ -79,7 +79,7 @@ function CharacterIcon.Icon(args)
 
 	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
 		.. (Logic.readBool(args.addTextLink)
-			and ('&nbsp;' .. Page.makeInternalLink(args.character, iconInfo.link or args.character))
+			and ('&nbsp;' .. Page.makeInternalLink(iconInfo.display or args.character, iconInfo.link or args.character))
 			or '')
 end
 

@@ -57,7 +57,6 @@ end)
 local NO_CHARACTER = 'default'
 local NOT_PLAYED = 'np'
 local DEFAULT_ITEM = 'EmptyIcon'
-local TEAMS = Array.range(1, 2)
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
@@ -87,13 +86,13 @@ function MatchPage.getByMatchId(props)
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
-		game.teams = Array.map(TEAMS, function(teamIdx)
+		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
 			local team = {players = {}}
 
 			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
-			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
+			for _, player in ipairs(opponent.players) do
 				table.insert(team.players, Table.mergeInto(player, {
 					roleIcon = player.role .. ' ' .. team.side,
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)

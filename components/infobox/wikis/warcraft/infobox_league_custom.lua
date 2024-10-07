@@ -44,8 +44,10 @@ local OFFLINE = 'offline'
 local ONLINE = 'online'
 
 local GAME_REFORGED = 'wc3r'
-local GAME_FROZEN_THRONE = 'tft'
-local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
+local GAME_REIGN_OF_CHAOS = 'reignofchaos'
+local GAME_FROZEN_THRONE = 'frozenthrone'
+local START_DATE_FROZEN_THRONE = '2003-07-01'
+local START_DATE_REFORGED = '2020-01-01'
 
 local MODES = {
 	team = {tier = 'Team', store = 'team', category = 'Team'},
@@ -177,16 +179,18 @@ end
 ---@param game string?
 ---@return string?
 function CustomLeague:_determineGame(game)
-	game = Game.toIdentifier{game = game}
+	game = Game.toIdentifier{game = game, useDefault = false}
 	if game then return game end
 
 	local startDate = self.data.startDate or self.data.endDate
 
-	if startDate and startDate > GAME_DEFAULT_SWITCH_DATE then
+	if startDate and startDate > START_DATE_REFORGED then
 		return Game.toIdentifier{game = GAME_REFORGED}
+	elseif startDate and startDate > START_DATE_FROZEN_THRONE then
+		return Game.toIdentifier{game = GAME_FROZEN_THRONE}
 	end
 
-	return Game.toIdentifier{game = GAME_FROZEN_THRONE}
+	return Game.toIdentifier{game = GAME_REIGN_OF_CHAOS}
 end
 
 ---@param args table
@@ -272,7 +276,7 @@ function CustomInjector:parse(id, widgets)
 		if playerNumber then
 			Array.appendWith(widgets,
 				Cell{name = 'Number of Players', content = {playerNumber}},
-				Breakdown{content = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{children = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 

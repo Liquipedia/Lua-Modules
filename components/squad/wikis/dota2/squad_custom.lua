@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Widget = require('Module:Widget/All')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
@@ -35,6 +35,7 @@ function ExtendedSquadRow:activeteam()
 	local date = self.model.inactivedate
 
 	if not activeTeam then
+		table.insert(self.children,Widget.TableCellNew{classes = {'NewTeam'}, content = {}})
 		return self
 	end
 
@@ -55,7 +56,7 @@ function ExtendedSquadRow:activeteam()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow, CustomInjector)
 end

@@ -45,9 +45,8 @@ function Series.run(frame)
 	return series:createInfobox()
 end
 
----@return Html
+---@return string
 function Series:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	-- define this here so we can use it in lpdb data and the display
@@ -177,10 +176,10 @@ function Series:createInfobox()
 
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		infobox:categories(unpack(self:_getCategories(args)))
+		self:categories(unpack(self:_getCategories(args)))
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -294,7 +293,7 @@ function Series:_getIconFromLeagueIconSmall(lpdbData)
 
 	if String.isNotEmpty(trackingCategory) then
 		table.insert(
-			self.infobox.warnings,
+			self.warnings,
 			'Missing icon while icondark is set.' .. trackingCategory
 		)
 	end
@@ -396,11 +395,11 @@ function Series:addTierCategories(args)
 	table.insert(categories, tierTypeCategory)
 
 	if not isValidTierTuple and not tierCategory and String.isNotEmpty(tier) then
-		table.insert(self.infobox.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
+		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.infobox.warnings,
+		table.insert(self.warnings,
 			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end

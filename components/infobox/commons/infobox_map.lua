@@ -33,9 +33,8 @@ function Map.run(frame)
 	return map:createInfobox()
 end
 
----@return Html
+---@return string
 function Map:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	self:_readCreators()
@@ -59,11 +58,11 @@ function Map:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Maps', unpack(self:getWikiCategories(args)))
+		self:categories('Maps', unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 --- Allows for overriding this functionality

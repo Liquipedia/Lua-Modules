@@ -8,12 +8,13 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local MapMode = require('Module:MapMode')
 local Faction = require('Module:Faction')
+local Game = require('Module:Game')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MapMode = require('Module:MapMode')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -112,15 +113,19 @@ function CustomMatchSummary.addToFooter(match, footer)
 		return footer
 	end
 
-	local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
+	if not Opponent.isEmpty(match.opponents[1]) and not Opponent.isEmpty(match.opponents[2]) then
+		local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
 			string.gsub(match.opponents[2].name, ' ', '_')
-	return footer:addElement(
-		'[[File:Match Info Stats.png|link=' ..
-		tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
-		player1 ..
-		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
-	)
+		footer:addElement(
+			'[[File:Match Info Stats.png|link=' ..
+			tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
+			player1 ..
+			'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
+		)
+	end
+
+	return footer
 end
 
 ---@param match MatchGroupUtilMatch
@@ -160,8 +165,7 @@ function CustomMatchSummary._createGame(row, game, props)
 		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1').civ, normGame)
 		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1').civ, normGame)
 	else
-		local function createParticipant(participantId, flipped)
-			local player = CustomMatchSummary._getPlayerData(game, participantId)
+		local function createParticipant(player, flipped)
 			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
 			local factionNode = CustomMatchSummary._createFactionIcon(player.civ, normGame)
 			return mw.html.create('div'):css('display', 'flex'):css('align-self', flipped and 'end' or 'start')
@@ -171,9 +175,12 @@ function CustomMatchSummary._createGame(row, game, props)
 		end
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
-			for participantId in Table.iter.pairsByPrefix(game.participants, opponentId .. '_') do
-				display:node(createParticipant(participantId, opponentId == 1))
-			end
+			Array.forEach(
+				Array.sortBy(game.opponents[opponentId].players, Operator.property('index')),
+				function(player)
+					display:node(createParticipant(player, opponentId == 1))
+				end
+			)
 			return display
 		end
 

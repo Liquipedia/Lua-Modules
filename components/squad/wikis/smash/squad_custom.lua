@@ -16,7 +16,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Widget = require('Module:Widget/All')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
@@ -54,22 +54,26 @@ function ExtendedSquadRow:mains()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
-	local squad = Squad(args, CustomInjector()):title():header()
+	local props = {
+		injector = CustomInjector(),
+		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		title = args.title,
+	}
 
-	local tableGame = squad.args.game
+	local tableGame = args.game
 
-	local players = SquadUtils.parsePlayers(squad.args)
+	local players = SquadUtils.parsePlayers(args)
 
-	Array.forEach(players, function(person)
+	props.children = Array.map(players, function(person)
 		local game = person.game and mw.text.split(person.game:lower(), ',')[1] or tableGame
 		local mains = SquadPlayerData.get{link = person.link, player = person.id, game = game} or person.mains
 		person.flag = Variables.varDefault('nationality') or person.flag
 		person.name = Variables.varDefault('name') or person.name
 
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squad.type}))
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = props.type}))
 		squadPerson.extradata.game = game
 		squadPerson.extradata.mains = mains
 		SquadUtils.storeSquadPerson(squadPerson)
@@ -79,11 +83,11 @@ function CustomSquad.run(frame)
 		row:id():name()
 		row:mains():date('joindate', 'Join Date:&nbsp;')
 
-		if squad.type == SquadUtils.SquadType.INACTIVE or squad.type == SquadUtils.SquadType.FORMER_INACTIVE then
+		if props.type == SquadUtils.SquadType.INACTIVE or props.type == SquadUtils.SquadType.FORMER_INACTIVE then
 			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
 
-		if squad.type == SquadUtils.SquadType.FORMER or squad.type == SquadUtils.SquadType.FORMER_INACTIVE then
+		if props.type == SquadUtils.SquadType.FORMER or props.type == SquadUtils.SquadType.FORMER_INACTIVE then
 			row:date('leavedate', 'Leave Date:&nbsp;')
 			row:newteam()
 		end
@@ -91,11 +95,11 @@ function CustomSquad.run(frame)
 		Variables.varDefine('nationality', '')
 		Variables.varDefine('name', '')
 
-		squad:row(row:create())
+		return row:create()
 
 	end)
 
-	return squad:create()
+	return tostring(Squad(props))
 end
 
 return CustomSquad

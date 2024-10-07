@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 				-- we have an invalid weapon entry
 				-- add warning (including tracking category)
 				table.insert(
-					caller.infobox.warnings,
+					caller.warnings,
 					'Invalid weapon input "' .. weapon .. '"[[Category:Pages with invalid weapon input]]'
 				)
 			end

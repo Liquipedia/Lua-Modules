@@ -10,14 +10,14 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
 end
@@ -25,7 +25,7 @@ end
 ---@param playerList table[]
 ---@param squadType integer
 ---@param customTitle string?
----@return Html?
+---@return string?
 function CustomSquad.runAuto(playerList, squadType, customTitle)
 	return SquadUtils.defaultRunAuto(
 		playerList,

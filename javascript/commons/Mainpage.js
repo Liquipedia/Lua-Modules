@@ -37,7 +37,12 @@ liquipedia.mainpage = {
 		if ( typeof data.parse !== 'undefined' ) {
 			document.getElementById( 'this-day-date' ).innerHTML = '(' + liquipedia.mainpage.getMonthName( month ) + ' ' + liquipedia.mainpage.getOrdinal( day ) + ')';
 			document.getElementById( 'this-day-trivialink' ).innerHTML = 'Add trivia about this day <a href="' + mw.util.getUrl( 'Liquipedia:This_day/' + month + '/' + day ) + '" title="Liquipedia:This day/' + month + '/' + day + '">here</a>.';
-			document.getElementById( 'this-day-facts' ).innerHTML = data.parse.text[ '*' ].replace( '<p><br />\n</p>', '' );
+			const thisDayFacts = document.getElementById( 'this-day-facts' );
+			thisDayFacts.innerHTML = data.parse.text[ '*' ].replace( '<p><br />\n</p>', '' );
+			// Remove ads from the API data to avoid duplicates
+			thisDayFacts.querySelectorAll( '.content-ad' ).forEach( ( n ) => {
+				n.parentNode.removeChild( n );
+			} );
 			document.querySelectorAll( '.age' ).forEach( ( age ) => {
 				age.innerHTML = ( new Date() ).getFullYear() - age.dataset.year;
 			} );

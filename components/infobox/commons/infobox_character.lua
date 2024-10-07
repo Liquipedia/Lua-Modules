@@ -31,9 +31,8 @@ function Character.run(frame)
 	return character:createInfobox()
 end
 
----@return Html
+---@return string
 function Character:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -92,12 +91,12 @@ function Character:createInfobox()
 	}
 
 	if Namespace.isMain() then
-		infobox:categories(args.informationType or 'Character')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories(args.informationType or 'Character')
+		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param location string?

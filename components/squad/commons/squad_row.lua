@@ -22,7 +22,7 @@ local RoleIcons = {
 	sub = Icon.makeIcon{iconName = 'substitute', hover = 'Substitute'},
 }
 
----@class SquadRow
+---@class SquadRow: BaseClass
 ---@operator call(ModelRow): SquadRow
 ---@field children Widget[]
 ---@field model ModelRow

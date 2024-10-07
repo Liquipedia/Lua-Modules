@@ -39,7 +39,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {'tournament_enddate'}))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
@@ -126,7 +126,7 @@ end
 CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param opponent table
----@return table?
+---@return table
 function CustomMatchGroupInput.getOpponentExtradata(opponent)
 	if not Logic.isNumeric(opponent.score2) then
 		return {}
@@ -189,7 +189,10 @@ end
 ---@return boolean
 function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	if Opponent.typeIsParty(opponent.type) then
-		return not Array.all(opponent.match2players, Opponent.playerIsTbd)
+		local playerIsTbd = function (player)
+			return String.isEmpty(player.displayname) or player.displayname:upper() == 'TBD'
+		end
+		return not Array.all(opponent.match2players, playerIsTbd)
 	end
 	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
 	return not Opponent.isTbd(opponent)

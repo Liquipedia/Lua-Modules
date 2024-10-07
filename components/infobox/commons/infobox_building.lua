@@ -33,9 +33,8 @@ function Building.run(frame)
 end
 
 ---creates the infobox
----@return Html
+---@return string
 function Building:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -45,6 +44,7 @@ function Building:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
 		Center{content = {args.caption}},
@@ -96,14 +96,14 @@ function Building:createInfobox()
 		Center{content = {args.footnotes}},
 	}
 
-	infobox:categories('Buildings')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Buildings')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -135,6 +135,13 @@ end
 
 ---@param args table
 function Building:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string?
+function Building:subHeaderDisplay(args)
+	return args.title
 end
 
 return Building

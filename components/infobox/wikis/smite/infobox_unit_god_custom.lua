@@ -72,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 				toBreakDownCell('powertype', 'Power Type', 'PowerTypeIcon')
 			)
 		return {
-			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
+			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
 			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then

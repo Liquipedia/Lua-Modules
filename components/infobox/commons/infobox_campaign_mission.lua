@@ -30,9 +30,8 @@ function Mission.run(frame)
 	return mission:createInfobox()
 end
 
----@return Html
+---@return string
 function Mission:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -48,20 +47,20 @@ function Mission:createInfobox()
 		Center{content = {args.caption}},
 		Title{name = 'Mission Information'},
 		Breakdown{
-			content = {'Mission Objective'},
+			children = {'Mission Objective'},
 			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}
 		},
-		Breakdown{content = { args.objective }},
+		Breakdown{children = { args.objective }},
 		Customizable{id = 'custom', children = {}},
 		Center{content = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Missions', 'Campaign')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Missions', 'Campaign')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 return Mission

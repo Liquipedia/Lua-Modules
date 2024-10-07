@@ -251,6 +251,7 @@ function ExternalMediaLink.wrapper(args)
 		language = args.language,
 		translation = args.translation,
 		translator = args.translator,
+		trans_title = args.trans_title,
 	}
 
 	if args.authors then

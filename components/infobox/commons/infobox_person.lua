@@ -45,7 +45,9 @@ local COUNTRIES_EASTERN_NAME_ORDER = {
 	'Hong Kong',
 	'Vietnam',
 	'South Korea',
-	'Cambodia'
+	'Cambodia',
+	'Macau',
+	'Singapore',
 }
 
 ---@enum PlayerStatus
@@ -74,9 +76,8 @@ function Person.run(frame)
 	return person:createInfobox()
 end
 
----@return Html
+---@return string
 function Person:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	self.locations = self:getLocations()
@@ -225,10 +226,10 @@ function Person:createInfobox()
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	infobox:bottom(self:createBottomContent())
+	self:bottom(self:createBottomContent())
 
 	local statusToStore = self:getStatusToStore(args)
-	infobox:categories(unpack(self:getCategories(
+	self:categories(unpack(self:getCategories(
 				args,
 				age.birth,
 				personType.category,
@@ -245,7 +246,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -328,7 +329,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			self.infobox.warnings,
+			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		return nil

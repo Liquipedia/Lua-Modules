@@ -110,9 +110,10 @@ end
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
-	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
-	if not team then return end
-	return Array.map(team.players or {}, Operator.property('heroName'))
+	if not map.heroVeto then return end
+	local teamVeto = map.heroVeto['team' .. opponentIndex] ---@type dota2TeamVeto?
+	if not teamVeto then return end
+	return Array.map(teamVeto.picks or {}, Operator.property('hero'))
 end
 
 ---@param map dota2MatchDataExtended
