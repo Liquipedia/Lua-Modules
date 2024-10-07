@@ -51,7 +51,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.bestof = MatchFunctions.getBestOf(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, match.bestof)
+		and MatchFunctions.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
@@ -130,9 +130,8 @@ CustomMatchGroupInput.processMap = FnUtil.identity
 --
 
 ---@param maps table[]
----@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, bestOf)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
