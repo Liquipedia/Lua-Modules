@@ -91,13 +91,15 @@ function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
-		return opponentIndex <= 2 and Opponent.blank() or nil
+		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
 	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
 	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
 	if Opponent.isBye(opponent) then
-		return {type = Opponent.literal, name = 'BYE'}
+		local byeOpponent = Opponent.blank()
+		byeOpponent.name = 'BYE'
+		return MatchGroupInputUtil.mergeRecordWithOpponent({}, byeOpponent)
 	end
 
 	---@type number|string?
