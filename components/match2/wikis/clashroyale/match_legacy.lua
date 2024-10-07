@@ -12,21 +12,11 @@ local Json = require('Module:Json')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local UNKNOWNREASON_DEFAULT_LOSS = 'L'
-
-function MatchLegacy.storeMatch(match2, options)
-	local match, doStore = MatchLegacy.convertParameters(match2)
-
-	if options.storeMatch1 and doStore then
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+function MatchLegacy.storeMatch(match2)
+	return MatchLegacy.store(match2)
 end
 
-function MatchLegacy.convertParameters(match2)
-	local doStore = true
+function MatchLegacy.store(match2)
 	local match = Table.deepCopy(match2)
 	for key, _ in pairs(match) do
 		if String.startsWith(key, 'match2') then
@@ -50,13 +40,13 @@ function MatchLegacy.convertParameters(match2)
 			match.opponent1score = (tonumber(opponent1.score) or 0) >= 0 and opponent1.score or 0
 			match.opponent1flag = player.flag
 			match.extradata.opponent1name = player.displayname
-			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
+			player.extradata = Json.parseIfString(player.extradata) or {}
 			player = opponent2match2players[1] or {}
 			match.opponent2 = player.name and player.name:gsub('_', ' ') or nil
 			match.opponent2score = (tonumber(opponent2.score) or 0) >= 0 and opponent2.score or 0
 			match.opponent2flag = player.flag
 			match.extradata.opponent2name = player.displayname
-			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
+			player.extradata = Json.parseIfString(player.extradata) or {}
 		elseif opponent1.type == 'team' then
 			match.opponent1 = String.isNotEmpty(opponent1.name) and opponent1.name:gsub('_', ' ') or 'TBD'
 			match.opponent1score = (tonumber(opponent1.score) or 0) >= 0 and opponent1.score or 0
@@ -64,25 +54,19 @@ function MatchLegacy.convertParameters(match2)
 			match.opponent2score = (tonumber(opponent2.score) or 0) >= 0 and opponent2.score or 0
 			match.mode = 'team'
 		else
-			return nil, false
+			return
 		end
 
-		if match.resulttype == 'default' then
-			match.resulttype = string.upper(match.walkover or '')
-			if match.resulttype == UNKNOWNREASON_DEFAULT_LOSS then
-				--needs to be converted because in match1 storage it was marked this way
-				match.resulttype = 'unk'
-			end
-			match.walkover = match.winner
-		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
 		match.extradata = Json.stringify(match.extradata)
 	else
-		doStore = false
-		match = nil
+		return
 	end
 
-	return match, doStore
+	return return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 return MatchLegacy
