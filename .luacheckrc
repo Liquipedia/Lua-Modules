@@ -1,4 +1,4 @@
-config = function()
+local function newConfig()
     local cfg = require("luacheck.config").load_default_config()
 
     -- Function to check if a file imports 'standard.lua'
@@ -34,6 +34,8 @@ config = function()
 
     return cfg
 end
+
+config = newConfig()
 
 std = {
 	globals = {
