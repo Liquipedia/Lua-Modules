@@ -61,7 +61,7 @@ function Patch:createInfobox()
 				if not Table.isEmpty(highlights) then
 					return {
 						Title{name = 'Highlights'},
-						Highlights{content = highlights}
+						Highlights{children = highlights}
 					}
 				end
 			end
