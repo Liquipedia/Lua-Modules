@@ -72,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		return Array.append(widgets,
-			Title{name = 'Attributes'},
+			Title{children = 'Attributes'},
 			BreakDown{children = {
 				self.caller:_basicAttribute('str'),
 				self.caller:_basicAttribute('agi'),
@@ -83,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 				self.caller:_getArmorAttribute(),
 				self.caller:_getPrimaryAttribute(),
 			}, classes = {'infobox-center'}},
-			Title{name = 'Base Stats'},
+			Title{children = 'Base Stats'},
 			Cell{name = '[[Movement Speed]]', content = {args.basespeed}},
 			Cell{name = '[[Sight Range]]', content = {args.sightrange or (
 				Abbreviation.make(args.daysight or 1800, 'Day') .. ' / ' .. Abbreviation.make(args.nightsight or 800, 'Night')
@@ -94,9 +94,9 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Base Attack Time', content = {args.attacktime}},
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
 			Cell{name = 'Hotkey', content = {Hotkeys.hotkey(args.hotkey)}},
-			args.icon and Title{name = 'Icon'} or nil,
+			args.icon and Title{children = 'Icon'} or nil,
 			Center{children = {self.caller:_displayIcon()}},
-			Title{name = 'Level Changes'},
+			Title{children = 'Level Changes'},
 			BreakDown{children = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
 			BreakDown(CustomCharacter._toLevelChangesRow(
 				function(gainFactor) return self.caller:_calculateHitPoints(gainFactor) end, '[[Hit Points]]:')),

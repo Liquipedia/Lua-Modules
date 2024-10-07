@@ -48,7 +48,7 @@ function Patch:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = (self:getInformationType(args)) .. ' Information'},
+		Title{children = (self:getInformationType(args)) .. ' Information'},
 		Cell{name = 'Version', content = {args.version}},
 		Customizable{id = 'release', children = {
 				Cell{name = 'Release', content = {args.release}},
@@ -60,7 +60,7 @@ function Patch:createInfobox()
 				local highlights = self:getAllArgsForBase(args, 'highlight')
 				if not Table.isEmpty(highlights) then
 					return {
-						Title{name = 'Highlights'},
+						Title{children = 'Highlights'},
 						Highlights{children = highlights}
 					}
 				end
@@ -71,7 +71,7 @@ function Patch:createInfobox()
 				local chronologyData = self:getChronologyData(args)
 				if not Table.isEmpty(chronologyData) then
 					return {
-						Title{name = 'Chronology'},
+						Title{children = 'Chronology'},
 						Chronology{
 							content = chronologyData
 						}

@@ -67,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 		end)
 
 		Array.appendWith(widgets,
-			Title{name = 'Ring Information'},
+			Title{children = 'Ring Information'},
 			ringTable
 		)
 	end

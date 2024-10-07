@@ -45,7 +45,7 @@ function Mission:createInfobox()
 			}
 		},
 		Center{children = {args.caption}},
-		Title{name = 'Mission Information'},
+		Title{children = 'Mission Information'},
 		Breakdown{
 			children = {'Mission Objective'},
 			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}

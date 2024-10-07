@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'achievements' then
 		if String.isNotEmpty(args.maps_ladder) or String.isNotEmpty(args.maps_special) then
 			return {
-				Title{name = 'Achievements'},
+				Title{children = 'Achievements'},
 				Cell{name = 'Ladder maps created', content = {args.maps_ladder}},
 				Cell{name = 'Non-ladder competitive maps created', content = {args.maps_special}}
 			}

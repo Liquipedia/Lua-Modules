@@ -130,7 +130,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
 			},
 			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
-			{hasCampData and Title{name = 'Camp Information'} or nil},
+			{hasCampData and Title{children = 'Camp Information'} or nil},
 			self.caller:_addCellsFromDataTable(args, CAMPS)
 		)
 	end

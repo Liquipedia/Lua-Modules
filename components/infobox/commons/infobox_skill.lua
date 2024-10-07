@@ -50,7 +50,7 @@ function Skill:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = args.informationType .. ' Information'},
+		Title{children = args.informationType .. ' Information'},
 		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
 		Customizable{
 			id = 'cost',

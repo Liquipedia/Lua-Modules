@@ -56,7 +56,7 @@ function Unit:createInfobox()
 				Center{children = {args.caption}},
 			}
 		},
-		Title{name = (args.informationType or 'Unit') .. ' Information'},
+		Title{children = (args.informationType or 'Unit') .. ' Information'},
 		Customizable{
 			id = 'type',
 			children = {

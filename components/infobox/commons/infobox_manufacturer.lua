@@ -48,7 +48,7 @@ function Manufacturer:createInfobox()
 				Center{children = {args.caption}},
 			}
 		},
-		Title{name = (args.informationType or 'Manufacturer') .. ' Information'},
+		Title{children = (args.informationType or 'Manufacturer') .. ' Information'},
 		Cell{name = 'Former Name(s)', content = {args.formernames}},
 		Cell{name = 'Description', content = {args.description}},
 		Cell{name = 'Season(s)', content = {args.seasons}},
@@ -61,7 +61,7 @@ function Manufacturer:createInfobox()
 					builder = function()
 						if args.founded or args.dissolved then
 							return {
-								Title{name = 'History'},
+								Title{children = 'History'},
 								Cell{name = 'Founded', content = {args.founded}},
 								Cell{name = 'Dissolved', content = {args.dissolved}}
 							}

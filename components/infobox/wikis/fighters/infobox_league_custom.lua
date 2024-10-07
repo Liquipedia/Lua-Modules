@@ -151,7 +151,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
-			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Title{children = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
 		if args.circuit2 or args.points2 or args.circuit2_next or args.circuit2_previous then

@@ -70,12 +70,12 @@ function CustomInjector:parse(id, widgets)
 				)
 				index = index + 1
 			end
-			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Title{children = 'Maps'})
 			table.insert(widgets, Center{children = maps})
 		end
 
 		if not String.isEmpty(args.team_number) then
-			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{
 				name = 'Number of teams',
 				content = {args.team_number}

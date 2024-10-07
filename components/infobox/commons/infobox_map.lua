@@ -47,7 +47,7 @@ function Map:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = (args.informationType or 'Map') .. ' Information'},
+		Title{children = (args.informationType or 'Map') .. ' Information'},
 		Cell{name = 'Creator', content = self.creators, options = {makeLink = true}},
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}

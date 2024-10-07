@@ -56,7 +56,7 @@ function Item:createInfobox()
 		Customizable{
 			id = 'info',
 			children = {
-				Title{name = 'Item Information'},
+				Title{children = 'Item Information'},
 				Cell{name = 'Type', content = {args.type}},
 				Cell{name = 'Rarity', content = {args.rarity}},
 				Cell{name = 'Level', content = {args.level}},
@@ -68,31 +68,31 @@ function Item:createInfobox()
 		Customizable{
 			id = 'attributes',
 			children = {
-				Title{name = 'Attributes'},
+				Title{children = 'Attributes'},
 			}
 		},
 		Customizable{
 			id = 'ability',
 			children = {
-				Title{name = 'Ability'},
+				Title{children = 'Ability'},
 			}
 		},
 		Customizable{
 			id = 'availability',
 			children = {
-				Title{name = 'Availability'},
+				Title{children = 'Availability'},
 			}
 		},
 		Customizable{
 			id = 'maps',
 			children = {
-				Title{name = 'Maps'},
+				Title{children = 'Maps'},
 			}
 		},
 		Customizable{
 			id = 'recipe',
 			children = {
-				Title{name = 'Recipe'},
+				Title{children = 'Recipe'},
 			}
 		},
 		Customizable{id = 'custom', children = {}},

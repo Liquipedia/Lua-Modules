@@ -66,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 				return PageLink.makeInternalLink(map)
 			end)
 			Array.appendWith(widgets,
-				Logic.isNotEmpty(maps) and table.insert(widgets, Title{name = 'Maps'}) or nil,
+				Logic.isNotEmpty(maps) and table.insert(widgets, Title{children = 'Maps'}) or nil,
 				Center{children = table.concat(maps, '&nbsp;• ')}
 			)
 		end

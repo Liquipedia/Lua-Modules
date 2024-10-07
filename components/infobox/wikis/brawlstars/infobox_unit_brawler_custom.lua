@@ -58,10 +58,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Release Date', content = {args.releasedate}},
 			Cell{name = 'Health', content = {args.hp}},
 			Cell{name = 'Movespeed', content = {args.movespeed}},
-			Title{name = 'Weapon & Super'},
+			Title{children = 'Weapon & Super'},
 			Cell{name = 'Primary Weapon', content = {args.attack}},
 			Cell{name = 'Super Ability', content = {args.super}},
-			Title{name = 'Gadgets & Star Powers'},
+			Title{children = 'Gadgets & Star Powers'},
 			Cell{name = 'Gadgets', content = {args.gadget}},
 			Cell{name = 'Star Powers', content = {args.star}}
 		)

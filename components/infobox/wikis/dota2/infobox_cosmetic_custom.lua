@@ -72,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 			Center{children = {
 				CustomCosmetic._buyNow(Logic.readBool(args.marketable or true), args.defindex)
 			}},
-			Title{name = 'Extra Information'},
+			Title{children = 'Extra Information'},
 			Cell{name = 'Created By', content =
 				(args.creator == 'Valve' and {Template.safeExpand(mw.getCurrentFrame(), 'Valve icon')})
 				or self.caller:getAllArgsForBase(args, 'creator')
@@ -126,7 +126,7 @@ function CustomCosmetic._displaySet(setName, manualItems)
 	end
 
 	return {
-		Title{name = setName},
+		Title{children = setName},
 		Widgets.Highlights{children = Array.map(setItems, function(element)
 			return '[['.. element ..']]'
 		end)}

@@ -105,7 +105,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 then
 			Array.appendWith(widgets,
-				Title{name = 'Player Breakdown'},
+				Title{children = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
 				Breakdown{children = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
@@ -114,7 +114,7 @@ function CustomInjector:parse(id, widgets)
 		--teams section
 		if Logic.isNumeric(args.team_number) and tonumber(args.team_number) > 0 then
 			Array.appendWith(widgets,
-				Title{name = 'Teams'},
+				Title{children = 'Teams'},
 				Cell{name = 'Number of Teams', content = {args.team_number}}
 			)
 		end
@@ -122,7 +122,7 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
-				Title{name = 'Maps'},
+				Title{children = 'Maps'},
 				Center{children = {self.caller:_mapsDisplay(args.maps)}}
 			)
 		end

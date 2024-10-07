@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 				)))
 			end
 			table.sort(maps)
-			table.insert(widgets, Title{name = 'Maps'})
+			table.insert(widgets, Title{children = 'Maps'})
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'gamesettings' then

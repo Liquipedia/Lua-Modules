@@ -15,15 +15,19 @@ local Widget = Lua.import('Module:Widget')
 ---@operator call({name: string|number|nil}): TitleWidget
 local Title = Class.new(
 	Widget,
-	function(self, input)
-		self.children = {self:assertExistsAndCopy(input.children or input.name)}
+	function(self)
+		-- Legacy support for single string children, convert to array
+		-- Widget v2.1 will have this support added to the base class
+		if type(self.children) == 'string' then
+			self.children = {self.children}
+		end
 	end
 )
 
 ---@param children string[]
 ---@return string?
 function Title:make(children)
-	return Title:_create(children[1])
+	return Title:_create(table.concat(children))
 end
 
 ---@param infoDescription string|number|nil
@@ -38,4 +42,3 @@ function Title:_create(infoDescription)
 end
 
 return Title
-

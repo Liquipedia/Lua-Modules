@@ -139,7 +139,7 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		return {
-			Title{name = 'Item Tier'},
+			Title{children = 'Item Tier'},
 			Cell{name = 'Category', content = {caller:_categoryDisplay()}},
 			Cell{name = 'Bought From', content = caller:_shopDisplay()},
 			Cell{name = 'Dropped From', content = {args.drop}},

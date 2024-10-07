@@ -103,7 +103,7 @@ function CustomChampion:getCustomCells(widgets)
 	)
 
 	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
-		table.insert(widgets, Title{name = 'Base Statistics'})
+		table.insert(widgets, Title{children = 'Base Statistics'})
 	end
 
 	local function bonusPerLevel(start, bonuslvl)
@@ -138,7 +138,7 @@ function CustomChampion:getCustomCells(widgets)
 	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
 
 	return Array.append(widgets,
-		Title{name = 'Esports Statistics'},
+		Title{children = 'Esports Statistics'},
 		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end

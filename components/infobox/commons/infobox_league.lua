@@ -68,7 +68,7 @@ function League:createInfobox()
 			size = args.imagesize,
 		},
 		Center{children = {args.caption}},
-		Title{name = 'League Information'},
+		Title{children = 'League Information'},
 		Cell{
 			name = 'Series',
 			content = {
@@ -196,7 +196,7 @@ function League:createInfobox()
 			builder = function()
 				if Table.isNotEmpty(self.links) then
 					return {
-						Title{name = 'Links'},
+						Title{children = 'Links'},
 						Widgets.Links{content = self.links}
 					}
 				end
@@ -209,7 +209,7 @@ function League:createInfobox()
 					builder = function()
 						if self:_isChronologySet(args.previous, args.next) then
 							return {
-								Title{name = 'Chronology'},
+								Title{children = 'Chronology'},
 								Chronology{
 									content = Table.filterByKey(args, function(key)
 										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
