@@ -67,7 +67,7 @@ function TableRow:make(children)
 	row:css(self.css)
 
 	for _, cell in ipairs(children) do
-		row:wikitext(cell)
+		row:node(cell)
 	end
 
 	return tostring(row)
