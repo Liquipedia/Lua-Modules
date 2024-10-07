@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 			return {
 				Title{children = 'Chronology'},
 				Chronology{
-					content = {
+					links = {
 						previous = args.previous,
 						next = args.next,
 					}
