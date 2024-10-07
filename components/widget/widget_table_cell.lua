@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetCellInput
----@field content (string|number|table|Html)[]?
+---@field children (string|number|table|Html)[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number}?
 
@@ -27,7 +27,6 @@ local Widget = Lua.import('Module:Widget')
 local TableCell = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 	end
