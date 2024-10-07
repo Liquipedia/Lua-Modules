@@ -75,6 +75,10 @@ MatchGroupInputUtil.STATUS_INPUTS = {
 MatchGroupInputUtil.STATUS = Table.copy(MatchGroupInputUtil.STATUS_INPUTS)
 MatchGroupInputUtil.STATUS.SCORE = 'S'
 
+MatchGroupInputUtil.MATCH_STATUS = {
+	NOT_PLAYED = 'notplayed',
+}
+
 MatchGroupInputUtil.RESULT_TYPE = {
 	DEFAULT = 'default',
 	NOT_PLAYED = 'np',
@@ -744,6 +748,7 @@ function MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
 end
 
 ---Should only be called on finished matches or maps
+---@deprecated
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@param opponents {score: number?, status: string}[]
@@ -759,6 +764,12 @@ function MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents
 
 	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return MatchGroupInputUtil.RESULT_TYPE.DEFAULT
+	end
+end
+
+function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
 	end
 end
 
@@ -805,6 +816,7 @@ function MatchGroupInputUtil.getHighestScoringOpponent(opponents)
 	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
 end
 
+---@deprecated
 ---@param resultType string?
 ---@param opponents {status: string}[]
 ---@return string? # Walkover Type
@@ -814,6 +826,7 @@ function MatchGroupInputUtil.getWalkover(resultType, opponents)
 	end
 end
 
+---@deprecated
 ---@param opponents {status: string}[]
 ---@return string?
 function MatchGroupInputUtil.getWalkoverType(opponents)
@@ -940,6 +953,7 @@ function MatchGroupInputUtil._opponentWithStatus(opponents, status)
 	return Array.indexOf(opponents, function (opponent) return opponent.status == status end)
 end
 
+---@deprecated
 -- function to check for forfeits
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -947,6 +961,7 @@ function MatchGroupInputUtil.hasForfeit(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFIET) ~= 0
 end
 
+---@deprecated
 -- function to check for DQ's
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -954,6 +969,7 @@ function MatchGroupInputUtil.hasDisqualified(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DISQUALIFIED) ~= 0
 end
 
+---@deprecated
 -- function to check for W/L
 ---@param opponents {status: string?}[]
 ---@return boolean
