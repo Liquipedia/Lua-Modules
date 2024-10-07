@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class TitleWidget: Widget
----@operator call({name: string|number|nil}): TitleWidget
+---@operator call(table): TitleWidget
 local Title = Class.new(
 	Widget,
 	function(self)
