@@ -14,7 +14,7 @@ local UtilLinks = Lua.import('Module:Links')
 local Widget = Lua.import('Module:Widget')
 
 ---@class LinksWidget: Widget
----@operator call({content: table<string, string>, variant: string?}): LinksWidget
+---@operator call({links: table<string, string>, variant: string?}): LinksWidget
 ---@field links table<string, string>
 ---@field variant string?
 local Links = Class.new(
