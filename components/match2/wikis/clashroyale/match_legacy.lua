@@ -63,7 +63,7 @@ function MatchLegacy.store(match2)
 		return
 	end
 
-	return return mw.ext.LiquipediaDB.lpdb_match(
+	return mw.ext.LiquipediaDB.lpdb_match(
 		'legacymatch_' .. match2.match2id,
 		match
 	)
