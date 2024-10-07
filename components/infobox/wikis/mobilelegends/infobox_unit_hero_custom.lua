@@ -56,7 +56,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'caption' then
-		table.insert(widgets, Center{content = {args.quote}})
+		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title)
 			if String.isEmpty(args[key]) then return end

@@ -171,13 +171,13 @@ function CustomInjector:parse(id, widgets)
 		local singles = Array.map(league:getAllArgsForBase(args, 's_stage'), CustomLeague._createNoWrappingSpan)
 		if #singles > 0 then
 			table.insert(widgets, Title{name = 'Singles Stages'})
-			table.insert(widgets, Center{content = {table.concat(singles, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = {table.concat(singles, '&nbsp;• ')}})
 		end
 
 		local doubles = Array.map(league:getAllArgsForBase(args, 'd_stage'), CustomLeague._createNoWrappingSpan)
 		if #doubles > 0 then
 			table.insert(widgets, Title{name = 'Doubles Stages'})
-			table.insert(widgets, Center{content = {table.concat(doubles, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = {table.concat(doubles, '&nbsp;• ')}})
 		end
 	elseif id == 'dates' then
 		return {

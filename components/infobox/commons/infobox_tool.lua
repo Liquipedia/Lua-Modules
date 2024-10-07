@@ -41,7 +41,7 @@ function Tool:createInfobox()
 			image = args.image,
 			imageDark = args.imagedark or args.imagedarkmode,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Tool Information'},
 		Cell{name = 'Game', content = {
 				(args.game or args.defaultGame) .. (args.gameversion and (' ' .. args.gameversion) or '')
@@ -50,7 +50,7 @@ function Tool:createInfobox()
 		Cell{name = 'Current Version', content = {args.version or UNKNOWN}},
 		Cell{name = 'Thread', content = {args.thread and ('[' .. args.thread .. ' Thread]') or nil}},
 		Cell{name = 'Download', content = {args.download}},
-		Center{content = {args.footnotes and ('<small>' .. args.footnotes .. '</small>') or nil}},
+		Center{children = {args.footnotes and ('<small>' .. args.footnotes .. '</small>') or nil}},
 	}
 
 	if Namespace.isMain() then

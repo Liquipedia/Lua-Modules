@@ -95,13 +95,13 @@ function CustomInjector:parse(id, widgets)
 				index = index + 1
 			end
 
-			table.insert(widgets, Center{content = teams})
+			table.insert(widgets, Center{children = teams})
 		end
 
 		if not String.isEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = caller:_displayMaps(caller.data.maps)}
+				Center{children = caller:_displayMaps(caller.data.maps)}
 			)
 		end
 	elseif id == 'sponsors' then

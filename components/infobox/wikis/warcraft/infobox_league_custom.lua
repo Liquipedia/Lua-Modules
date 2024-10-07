@@ -296,7 +296,7 @@ function CustomInjector:parse(id, widgets)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
 				Title{name = args[prefix .. 'title'] or defaultTitle},
-				Center{content = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
+				Center{children = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
 			)
 		end
 

@@ -79,12 +79,12 @@ function CustomInjector:parse(id, widgets)
 		widgets = {}
 		if achievements then
 			table.insert(widgets, Title{name = 'Achievements'})
-			table.insert(widgets, Center{content = {achievements}})
+			table.insert(widgets, Center{children = {achievements}})
 		end
 
 		if soloAchievements then
 			table.insert(widgets, Title{name = 'Solo Achievements'})
-			table.insert(widgets, Center{content = {soloAchievements}})
+			table.insert(widgets, Center{children = {soloAchievements}})
 		end
 
 		--need this ABOVE the history display and below the

@@ -95,7 +95,7 @@ function Team:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Team Information'},
 		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
@@ -150,7 +150,7 @@ function Team:createInfobox()
 						if String.isNotEmpty(args.achievements) then
 							return {
 								Title{name = 'Achievements'},
-								Center{content = {args.achievements}}
+								Center{children = {args.achievements}}
 							}
 						end
 					end
@@ -177,13 +177,13 @@ function Team:createInfobox()
 			builder = function()
 				if args.trades then
 					return {
-						Center{content = {args.trades}}
+						Center{children = {args.trades}}
 					}
 				end
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 	self:bottom(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())

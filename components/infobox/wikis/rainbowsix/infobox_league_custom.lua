@@ -82,7 +82,7 @@ function CustomInjector:parse(id, widgets)
 				)))
 			end
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
 		if self.caller:_validPublisherTier(args.ubisofttier) then

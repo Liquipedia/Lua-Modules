@@ -136,7 +136,7 @@ function Person:createInfobox()
 			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = (args.informationType or 'Player') .. ' Information'},
 		Customizable{id = 'names', children = {
 				Cell{name = 'Name', content = {args.name}},
@@ -204,7 +204,7 @@ function Person:createInfobox()
 					if String.isNotEmpty(args.achievements) then
 						return {
 							Title{name = 'Achievements'},
-							Center{content = {args.achievements}}
+							Center{children = {args.achievements}}
 						}
 					end
 				end
@@ -216,13 +216,13 @@ function Person:createInfobox()
 					if String.isNotEmpty(args.history) then
 						return {
 							Title{name = 'History'},
-							Center{content = {args.history}}
+							Center{children = {args.history}}
 						}
 					end
 				end
 			},
 		}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 

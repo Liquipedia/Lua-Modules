@@ -45,7 +45,7 @@ function Character:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = (args.informationType or 'Character') .. ' Information'},
 		Cell{name = 'Real Name', content = {args.realname}},
 		Customizable{
@@ -87,7 +87,7 @@ function Character:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

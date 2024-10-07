@@ -39,7 +39,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'caption' and not String.isEmpty(args.min) then
-		table.insert(widgets, Center{content = {args.quote}})
+		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		return {
 			Cell{name = 'Real Name', content = {args.realname}},

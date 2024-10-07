@@ -87,7 +87,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Inner', content = {aoeArgs.size1}},
 			Cell{name = 'Medium', content = {aoeArgs.size2}},
 			Cell{name = 'Outer', content = {aoeArgs.size3}},
-			Center{content = {aoeArgs.footnotes and ('<small>' .. aoeArgs.footnotes .. '</small>') or nil}}
+			Center{children = {aoeArgs.footnotes and ('<small>' .. aoeArgs.footnotes .. '</small>') or nil}}
 		}
 	elseif id == 'custom' then
 		return self.caller:getCustomCells(widgets)

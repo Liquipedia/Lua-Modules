@@ -141,7 +141,7 @@ function CustomInjector:parse(id, widgets)
 
 		return {
 			Title{name = 'Achievements'},
-			Center{content = {Achievements.display(caller.infoboxAchievements)}},
+			Center{children = {Achievements.display(caller.infoboxAchievements)}},
 			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}

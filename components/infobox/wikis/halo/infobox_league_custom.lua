@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' and String.isNotEmpty(args.map1) then
 		Array.appendWith(widgets,
 			Title{name = 'Maps'},
-			Center{content = self.caller:_makeMapList()}
+			Center{children = self.caller:_makeMapList()}
 		)
 	end
 	return widgets

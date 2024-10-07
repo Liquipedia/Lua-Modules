@@ -50,7 +50,7 @@ function Item:createInfobox()
 		Customizable{
 			id = 'caption',
 			children = {
-				Center{content = {args.caption}},
+				Center{children = {args.caption}},
 			}
 		},
 		Customizable{
@@ -96,7 +96,7 @@ function Item:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	self:categories('Items')

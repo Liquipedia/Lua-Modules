@@ -73,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.itemtext) then
 			iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
 		end
-		table.insert(widgets, Center{content = {iconImage}})
+		table.insert(widgets, Center{children = {iconImage}})
 	elseif id == 'attributes' then
 		if not CustomItem._hasAttributes(args) then return {} end
 
@@ -152,7 +152,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{content = {args.recipe}})
+		table.insert(widgets, Center{children = {args.recipe}})
 	elseif id == 'info' then return {}
 	end
 

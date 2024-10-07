@@ -45,14 +45,14 @@ function Scene:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Scene Information'},
 		Cell{name = 'Region', content = {args.region}},
 		Cell{name = 'National Team', content = {args.nationalteam}, options = {makeLink = true}},
 		Cell{name = 'Events', content = self:getAllArgsForBase(args, 'event', {makeLink = true})},
 		Cell{name = 'Size', content = {args.size}},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Builder{
 			builder = function()
 				local links = Links.transform(args)
@@ -69,7 +69,7 @@ function Scene:createInfobox()
 				if not String.isEmpty(args.achievements) then
 					return {
 						Title{name ='Achievements'},
-						Center{content = {args.achievements}}
+						Center{children = {args.achievements}}
 					}
 				end
 			end

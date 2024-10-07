@@ -108,7 +108,7 @@ function CustomInjector:parse(id, widgets)
 
 		return {
 			Title{name = 'Achievements'},
-			Center{content = {achievements}},
+			Center{children = {achievements}},
 		}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})

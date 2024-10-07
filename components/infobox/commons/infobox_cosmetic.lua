@@ -45,11 +45,11 @@ function Cosmetic:createInfobox()
 		Customizable{
 			id = 'caption',
 			children = {
-				Center{content = {args.caption}},
+				Center{children = {args.caption}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	self:categories('Cosmetics')

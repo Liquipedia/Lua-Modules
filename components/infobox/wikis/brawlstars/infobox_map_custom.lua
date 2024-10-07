@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Environment', content = {args.environment}},
 			Title{name = modes and 'Mode' or nil},
-			Center{content = modes and {table.concat(modes, '<br>')} or nil}
+			Center{children = modes and {table.concat(modes, '<br>')} or nil}
 		)
 	end
 	return widgets

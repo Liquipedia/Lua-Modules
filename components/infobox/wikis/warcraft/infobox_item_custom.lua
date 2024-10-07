@@ -95,9 +95,9 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		return {
 			args.desc and Title{name = 'Description'} or nil,
-			Center{content = {args.desc}},
+			Center{children = {args.desc}},
 			args.history and Title{name = 'Item History'} or nil,
-			Center{content = {args.history}}
+			Center{children = {args.history}}
 		}
 	elseif id == 'info' then
 		return {

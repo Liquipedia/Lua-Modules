@@ -45,7 +45,7 @@ function Game:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Game Information'},
 		Customizable{
 			id = 'developer',
@@ -107,7 +107,7 @@ function Game:createInfobox()
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

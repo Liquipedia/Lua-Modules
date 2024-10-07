@@ -36,7 +36,7 @@ function Campaign:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 	}
 
 	self:categories('Campaign')
