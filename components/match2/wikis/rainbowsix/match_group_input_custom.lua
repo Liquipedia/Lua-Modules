@@ -61,7 +61,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
@@ -109,7 +109,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, map.opponents)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)

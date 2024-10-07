@@ -773,18 +773,18 @@ function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	end
 end
 
----@param resultType string?
+---@param status string?
 ---@param winnerInput integer|string|nil
 ---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
-function MatchGroupInputUtil.getWinner(resultType, winnerInput, opponents)
-	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
+function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
+	if status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DRAW then
+	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
 		return MatchGroupInputUtil.WINNER_DRAW
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
+	elseif MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return MatchGroupInputUtil.getDefaultWinner(opponents)
 	elseif MatchGroupInputUtil.findOpponentWithFirstPlace(opponents) then
 		return MatchGroupInputUtil.findOpponentWithFirstPlace(opponents)
