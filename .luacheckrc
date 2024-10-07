@@ -1,4 +1,5 @@
 
+---@diagnostic disable: lowercase-global
 ---@diagnostic disable: undefined-global
 std = {
 	globals = {
