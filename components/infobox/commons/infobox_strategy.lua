@@ -48,7 +48,7 @@ function Strategy:createInfobox()
 				},
 			}
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = args.informationType .. ' Information'},
 		Cell{
 			name = 'Creator(s)',
@@ -56,7 +56,7 @@ function Strategy:createInfobox()
 			options = {makeLink = true}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

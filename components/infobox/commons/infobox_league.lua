@@ -67,7 +67,7 @@ function League:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'League Information'},
 		Cell{
 			name = 'Series',
@@ -203,7 +203,7 @@ function League:createInfobox()
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
 				Builder{
 					builder = function()

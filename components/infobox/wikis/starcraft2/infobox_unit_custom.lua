@@ -117,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if args.game ~= GAME_LOTV and args.buildtime then
-			table.insert(widgets, Center{content = {
+			table.insert(widgets, Center{children = {
 				'<small><b>Note:</b> ' ..
 				'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
 				' <i>See [[Game Speed]].</i></small>'

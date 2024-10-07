@@ -53,8 +53,8 @@ function CustomInjector:parse(id, widgets)
 	then
 		return {
 			Title{ name = 'History' },
-			Center{content = {args.team_history}},
-			Center{content = {args.clan_history}},
+			Center{children = {args.team_history}},
+			Center{children = {args.clan_history}},
 		}
 	end
 	return widgets
@@ -77,7 +77,7 @@ function CustomUser:addCustomCells(widgets)
 
 	if not String.isEmpty(args['fav-team-1']) then
 		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {self:_getFavouriteTeams()}})
+		table.insert(widgets, Center{children = {self:_getFavouriteTeams()}})
 	end
 
 	if not String.isEmpty(args.s1high) then

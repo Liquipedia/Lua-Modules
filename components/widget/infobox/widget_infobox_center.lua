@@ -18,7 +18,6 @@ local Widget = Lua.import('Module:Widget')
 local Center = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content or {}
 		self.classes = input.classes
 	end
 )

@@ -43,9 +43,9 @@ function UnofficialWorldChampion:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Current Champion'},
-		Center{content = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
+		Center{children = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
 		Builder{
 			builder = function()
 				if not String.isEmpty(args['gained date']) then
@@ -96,7 +96,7 @@ function UnofficialWorldChampion:createInfobox()
 			content = { args['most times held'] },
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	return self:build(widgets)

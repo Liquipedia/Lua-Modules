@@ -45,7 +45,7 @@ function Show:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Show Information'},
 		Cell{name = 'Host(s)', content = self:getAllArgsForBase(args, 'host', {makeLink = true})},
 		Cell{name = 'Format', content = {args.format}},
@@ -67,13 +67,13 @@ function Show:createInfobox()
 					table.insert(returnWidgets, Widgets.Links{content = links})
 				end
 				if secondaryLinks ~= '' then
-					table.insert(returnWidgets, Center{content = {secondaryLinks}})
+					table.insert(returnWidgets, Center{children = {secondaryLinks}})
 				end
 				return returnWidgets
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

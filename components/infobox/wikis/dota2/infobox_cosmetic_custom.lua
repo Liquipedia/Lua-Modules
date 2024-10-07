@@ -69,7 +69,7 @@ function CustomInjector:parse(id, widgets)
 					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
 				}
 			},
-			Center{content = {
+			Center{children = {
 				CustomCosmetic._buyNow(Logic.readBool(args.marketable or true), args.defindex)
 			}},
 			Title{name = 'Extra Information'},
@@ -99,7 +99,7 @@ function CustomInjector:parse(id, widgets)
 					Cell{name = #orgins == 1 and 'Origin' or 'Origins', content = orgins}
 				}
 			end},
-			Center{content = {args.description}},
+			Center{children = {args.description}},
 			Center{name = '[[Trading|Tradable]]', classes = {'infobox-cosmetic-tradeable'}, content = {
 				CustomCosmetic._ableText('TRADEABLE', args.tradeable, args.marketlock)
 			}},

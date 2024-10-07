@@ -62,7 +62,7 @@ function CustomInjector:parse(id, widgets)
 			end)
 			Array.extendWith(widgets,
 				{Title{name = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
-				Array.map(academyTeams, function(academyTeam) return Center{content = {academyTeam}} end)
+				Array.map(academyTeams, function(academyTeam) return Center{children = {academyTeam}} end)
 			)
 		end
 

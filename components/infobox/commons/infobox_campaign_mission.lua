@@ -44,7 +44,7 @@ function Mission:createInfobox()
 				},
 			}
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Mission Information'},
 		Breakdown{
 			children = {'Mission Objective'},
@@ -52,7 +52,7 @@ function Mission:createInfobox()
 		},
 		Breakdown{children = { args.objective }},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

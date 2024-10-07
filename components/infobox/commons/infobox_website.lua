@@ -42,7 +42,7 @@ function Website:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Website Information'},
 		Cell{name = 'Type', content = {args.type}},
 		Cell{name = 'Available Language(s)', content = self:getAllArgsForBase(args, 'language')},
@@ -61,7 +61,7 @@ function Website:createInfobox()
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	return self:build(widgets)

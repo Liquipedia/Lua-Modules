@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'caption' then
-		table.insert(widgets, Center{content = {args.quote}})
+		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title, dataModule)
 			if String.isEmpty(args[key]) then return end

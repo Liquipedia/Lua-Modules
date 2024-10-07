@@ -118,7 +118,7 @@ function CustomInjector:parse(id, widgets)
 		local getHistoryCells = function(key, title)
 			return {
 				String.isNotEmpty(args[key]) and Title{name = title} or nil,
-				Center{content = {args[key]}},
+				Center{children = {args[key]}},
 			}
 		end
 

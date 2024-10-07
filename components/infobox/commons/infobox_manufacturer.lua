@@ -45,7 +45,7 @@ function Manufacturer:createInfobox()
 		Customizable{
 			id = 'caption',
 			children = {
-				Center{content = {args.caption}},
+				Center{children = {args.caption}},
 			}
 		},
 		Title{name = (args.informationType or 'Manufacturer') .. ' Information'},

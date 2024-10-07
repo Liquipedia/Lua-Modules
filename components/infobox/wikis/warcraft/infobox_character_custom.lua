@@ -95,7 +95,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
 			Cell{name = 'Hotkey', content = {Hotkeys.hotkey(args.hotkey)}},
 			args.icon and Title{name = 'Icon'} or nil,
-			Center{content = {self.caller:_displayIcon()}},
+			Center{children = {self.caller:_displayIcon()}},
 			Title{name = 'Level Changes'},
 			BreakDown{children = {'[[Experience|Level]]:', 1, 5, 10}, contentClasses = LEVEL_CHANGE_CLASSES},
 			BreakDown(CustomCharacter._toLevelChangesRow(

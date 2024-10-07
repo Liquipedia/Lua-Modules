@@ -46,7 +46,7 @@ function Map:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = (args.informationType or 'Map') .. ' Information'},
 		Cell{name = 'Creator', content = self.creators, options = {makeLink = true}},
 		Customizable{id = 'location', children = {
@@ -54,7 +54,7 @@ function Map:createInfobox()
 		}},
 		Cell{name = 'Release Date', content = {args.releasedate}},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

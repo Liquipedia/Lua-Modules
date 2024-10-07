@@ -50,7 +50,7 @@ function Company:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Company Information'},
 		Customizable{id = 'parent', children = {
 			Cell{
@@ -85,7 +85,7 @@ function Company:createInfobox()
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Builder{
 			builder = function()
 				local links = Links.transform(args)

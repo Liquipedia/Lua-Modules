@@ -73,7 +73,7 @@ function Series:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 		Title{name = 'Series Information'},
 		Builder{
 			builder = function()

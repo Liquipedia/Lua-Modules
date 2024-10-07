@@ -53,7 +53,7 @@ function Unit:createInfobox()
 		Customizable{
 			id = 'caption',
 			children = {
-				Center{content = {args.caption}},
+				Center{children = {args.caption}},
 			}
 		},
 		Title{name = (args.informationType or 'Unit') .. ' Information'},
@@ -101,7 +101,7 @@ function Unit:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 

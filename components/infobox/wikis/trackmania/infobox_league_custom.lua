@@ -80,7 +80,7 @@ function CustomInjector:parse(id, widgets)
 		local maps = self.caller:getAllArgsForBase(args, 'map')
 		if #maps > 0 then
 			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 
 		if args.circuit or args.circuit_next or args.circuit_previous then

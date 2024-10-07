@@ -123,7 +123,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
 				Title{name = 'Maps'},
-				Center{content = {self.caller:_mapsDisplay(args.maps)}}
+				Center{children = {self.caller:_mapsDisplay(args.maps)}}
 			)
 		end
 	end

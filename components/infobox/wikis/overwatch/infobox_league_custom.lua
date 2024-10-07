@@ -67,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 			end)
 			Array.appendWith(widgets,
 				Logic.isNotEmpty(maps) and table.insert(widgets, Title{name = 'Maps'}) or nil,
-				Center{content = table.concat(maps, '&nbsp;• ')}
+				Center{children = table.concat(maps, '&nbsp;• ')}
 			)
 		end
 	elseif id == 'liquipediatier' then
