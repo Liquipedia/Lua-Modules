@@ -341,7 +341,7 @@ end
 
 ---@param match table
 function Match._prepareMatchRecordForStore(match)
-	Match._backwardsCompatabilityForV3API(match)
+	Match._commonBackwardsCompatabilityForV3API(match)
 
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
@@ -385,8 +385,9 @@ end
 ---@param matchRecord table
 ---@param gameRecord table
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
+	-- Backwards compatibility for API v3
 	gameRecord.opponents = gameRecord.opponents or {}
-	Match._backwardsCompatabilityForV3API(gameRecord)
+	Match._commonBackwardsCompatabilityForV3API(gameRecord)
 
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
@@ -408,7 +409,7 @@ end
 ---Adds fields needed for backwards compatibility with API v3.
 ---walkover and resulttype are added to record.
 ---@param record table #game or match record
-function Match._backwardsCompatabilityForV3API(record)
+function Match._commonBackwardsCompatabilityForV3API(record)
 	record.resulttype = record.resulttype or (record.status == 'notplayed' and 'np') or ''
 
 	if record.finished then
@@ -488,7 +489,7 @@ Match.gameFields = Table.map({
 	'resulttype', -- LPDB API v3: backwards compatibility
 	'rounds',
 	'scores',
-	'status',  -- LPDB API v3: backwards compatibility
+	'status',
 	'subgroup',
 	'tournament',
 	'type',

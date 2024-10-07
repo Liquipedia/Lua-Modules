@@ -11,6 +11,7 @@ local CharacterNames = require('Module:CharacterNames')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -105,6 +106,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 			return {score = score, status = status}
 		end)
 
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, map.opponents)
