@@ -79,11 +79,11 @@ end
 function CustomMap:_createRingTableHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
 	return headerRow
-		:addCell(TableCell{content = {'Ring'}})
-		:addCell(TableCell{content = {'Wait (s)'}})
-		:addCell(TableCell{content = {'Close<br>Time (s)'}})
-		:addCell(TableCell{content = {'Damage<br>per tick'}})
-		:addCell(TableCell{content = {'End Diameter (m)'}})
+		:addCell(TableCell{children = {'Ring'}})
+		:addCell(TableCell{children = {'Wait (s)'}})
+		:addCell(TableCell{children = {'Close<br>Time (s)'}})
+		:addCell(TableCell{children = {'Damage<br>per tick'}})
+		:addCell(TableCell{children = {'End Diameter (m)'}})
 end
 
 ---@param ringData string
@@ -91,7 +91,7 @@ end
 function CustomMap:_createRingTableRow(ringData)
 	local row = TableRow{}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		row:addCell(TableCell{content = {item}})
+		row:addCell(TableCell{children = {item}})
 	end
 	return row
 end
