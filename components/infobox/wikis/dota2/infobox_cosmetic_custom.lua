@@ -127,7 +127,7 @@ function CustomCosmetic._displaySet(setName, manualItems)
 
 	return {
 		Title{name = setName},
-		Widgets.Highlights{content = Array.map(setItems, function(element)
+		Widgets.Highlights{children = Array.map(setItems, function(element)
 			return '[['.. element ..']]'
 		end)}
 	}

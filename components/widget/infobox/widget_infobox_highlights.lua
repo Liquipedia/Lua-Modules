@@ -14,12 +14,7 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class HighlightsWidget: Widget
 ---@operator call({content: (string|number)[]?}):HighlightsWidget
-local Highlights = Class.new(
-	Widget,
-	function(self, input)
-		self.children = input.children or input.content or {}
-	end
-)
+local Highlights = Class.new(Widget)
 
 ---@param children string[]
 ---@return string?
