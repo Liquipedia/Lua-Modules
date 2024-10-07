@@ -159,12 +159,7 @@ function MatchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
 
-	local showh2h = Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))
-		and opponent1.type == Opponent.team
-		and opponent2.type == Opponent.team
-
 	match.extradata = {
-		showh2h = showh2h,
 		isfeatured = MatchFunctions.isFeatured(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
