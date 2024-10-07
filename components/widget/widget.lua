@@ -152,10 +152,4 @@ function Widget:_build(ret)
 	table.insert(ret, self:__tostring())
 end
 
---- Here to allow for Widget to be used as a node in the third part html library (mw.html).
----@param ret string[]
-function Widget:_build(ret)
-	table.insert(ret, self:__tostring())
-end
-
 return Widget
