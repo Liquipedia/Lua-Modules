@@ -35,7 +35,6 @@ local OPPONENT_CONFIG = {
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
 	MatchGroupInputUtil.getCommonTournamentVars(match)
-	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
 	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
@@ -58,7 +57,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 			score = opponent.score,
 		}, autoScoreFunction)
 	end)
-
 	match.bestof = CustomMatchGroupInput.getBestOf(match.bestof)
 
 	local winnerInput = match.winner --[[@as string?]]
@@ -72,6 +70,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
+	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
 	match.stream = Streams.processStreams(match)
 	match.links = CustomMatchGroupInput._getLinks(match)
 
