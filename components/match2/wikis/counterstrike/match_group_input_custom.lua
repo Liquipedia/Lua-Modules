@@ -170,37 +170,40 @@ function MatchFunctions.getLinks(match, maps)
 	local platforms = mw.loadData('Module:MatchExternalLinks')
 	table.insert(platforms, {name = 'vod2', isMapStats = true})
 
-	for _, platform in ipairs(platforms) do
+	Array.forEach(platforms, function (platform)
 		-- Stat external links inserted in {{Map}}
-		if Logic.isNotEmpty(platform) then
-			local platformLinks = {}
-			local name = platform.name
-			local prefixLink = platform.prefixLink or ''
-			local suffixLink = platform.suffixLink or ''
+		if Logic.isEmpty(platform) then
+			return
+		end
 
-			if match[name] then
-				platformLinks[0] = prefixLink .. match[name] .. suffixLink
-			end
+		local platformLinks = {}
+		local name = platform.name
+		local prefixLink = platform.prefixLink or ''
+		local suffixLink = platform.suffixLink or ''
 
-			if platform.isMapStats then
-				for i = 1, match.bestof do
-					if maps[i] and maps[i][name] then
-						platformLinks[i] = prefixLink .. maps[i][name] .. suffixLink
-					end
+		if match[name] then
+			platformLinks[0] = prefixLink .. match[name] .. suffixLink
+		end
+
+		if platform.isMapStats then
+			Array.forEach(maps, function(map, mapIndex)
+				if not map[name] then
+					return
 				end
-			elseif platform.max then
-				for i = 2, platform.max, 1 do
-					if match[name .. i] then
-						platformLinks[i] = prefixLink .. match[name .. i] .. suffixLink
-					end
+				platformLinks[mapIndex] = prefixLink .. map[name] .. suffixLink
+			end)
+		elseif platform.max then
+			for i = 2, platform.max, 1 do
+				if match[name .. i] then
+					platformLinks[i] = prefixLink .. match[name .. i] .. suffixLink
 				end
-			end
-
-			if #platformLinks > 0 then
-				links[name] = platformLinks
 			end
 		end
-	end
+
+		if #platformLinks > 0 then
+			links[name] = platformLinks
+		end
+	end)
 
 	return links
 end
