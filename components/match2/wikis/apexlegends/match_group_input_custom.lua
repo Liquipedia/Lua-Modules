@@ -18,7 +18,6 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
-local NO_SCORE = -99
 
 local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local OPPONENT_CONFIG = {
@@ -165,13 +164,13 @@ function CustomMatchGroupInput.setPlacements(opponents)
 		return findNextSlot(placement + 1)
 	end
 
-	local lastScore = NO_SCORE
+	local lastScore
 	local lastPlacement = 0
 	for _, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.scoreSorter) do
 		if not opp.placement then
 			local thisPlacement = findNextSlot(lastPlacement)
 			usedPlacements[thisPlacement] = 1
-			if opp.score == lastScore then
+			if lastScore and opp.score == lastScore then
 				opp.placement = lastPlacement
 			else
 				opp.placement = thisPlacement
@@ -189,8 +188,8 @@ end
 ---@param key2 string|number
 ---@return boolean
 function CustomMatchGroupInput.scoreSorter(tbl, key1, key2)
-	local value1 = tonumber(tbl[key1].score) or NO_SCORE
-	local value2 = tonumber(tbl[key2].score) or NO_SCORE
+	local value1 = tonumber(tbl[key1].score) or -math.huge
+	local value2 = tonumber(tbl[key2].score) or -math.huge
 	return value1 > value2
 end
 
