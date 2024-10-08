@@ -160,29 +160,29 @@ function MatchFunctions.getTournamentVars(match)
 	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
---- Warning, mutates the input arrays
 ---@param match table
 ---@param maps table[]
 ---@return table
 function MatchFunctions.getLinks(match, maps)
-	local links = {}
-
 	local platforms = mw.loadData('Module:MatchExternalLinks')
 	table.insert(platforms, {name = 'vod2', isMapStats = true})
 
-	Array.forEach(platforms, function (platform)
-		-- Stat external links inserted in {{Map}}
+	return Table.map(platforms, function (key, platform)
 		if Logic.isEmpty(platform) then
-			return
+			return key, nil
 		end
 
-		local platformLinks = {}
+		local makeLink = function(name)
+			local linkPrefix = platform.prefixLink or ''
+			local linkSuffix = platform.suffixLink or ''
+			return linkPrefix .. name .. linkSuffix
+		end
+
+		local linksOfPlatform = {}
 		local name = platform.name
-		local prefixLink = platform.prefixLink or ''
-		local suffixLink = platform.suffixLink or ''
 
 		if match[name] then
-			platformLinks[0] = prefixLink .. match[name] .. suffixLink
+			linksOfPlatform[0] = makeLink(match[name])
 		end
 
 		if platform.isMapStats then
@@ -190,22 +190,21 @@ function MatchFunctions.getLinks(match, maps)
 				if not map[name] then
 					return
 				end
-				platformLinks[mapIndex] = prefixLink .. map[name] .. suffixLink
+				linksOfPlatform[mapIndex] = makeLink(map[name])
 			end)
 		elseif platform.max then
 			for i = 2, platform.max, 1 do
 				if match[name .. i] then
-					platformLinks[i] = prefixLink .. match[name .. i] .. suffixLink
+					linksOfPlatform[i] = makeLink(match[name .. i])
 				end
 			end
 		end
 
-		if #platformLinks > 0 then
-			links[name] = platformLinks
+		if Logic.isEmpty(linksOfPlatform) then
+			return name, nil
 		end
+		return name, linksOfPlatform
 	end)
-
-	return links
 end
 
 ---@param match table
