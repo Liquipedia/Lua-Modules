@@ -21,7 +21,6 @@ local WeaponIcon = require('Module:WeaponIcon')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local NUM_OPPONENTS = 2
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
