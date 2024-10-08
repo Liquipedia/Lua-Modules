@@ -278,7 +278,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
 	if placement and kills then
-		scoreBreakdown.placePoints = scoreSettings[placement] or 0
+		scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
 		scoreBreakdown.killPoints = kills * scoreSettings.kill
 		scoreBreakdown.kills = kills
 		scoreBreakdown.totalPoints = scoreBreakdown.placePoints + scoreBreakdown.killPoints
