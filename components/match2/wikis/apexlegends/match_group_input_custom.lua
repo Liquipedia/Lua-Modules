@@ -67,7 +67,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or nil
+		match.resulttype =
+			MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
+			and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+			or nil
 		match.walkover = nil
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
 		CustomMatchGroupInput.setPlacements(opponents)
@@ -112,7 +115,9 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or nil
+			map.resulttype = MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
+				and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+				or nil
 			map.walkover = nil
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
@@ -153,7 +158,7 @@ function CustomMatchGroupInput.setPlacements(opponents)
 	Array.forEach(usedPlacements, function(count, placement)
 		if count > 1 then
 			usedPlacements[placement+1] = usedPlacements[placement + 1] + (count - 1)
-			count = 1
+			usedPlacements[placement] = 1
 		end
 	end)
 
