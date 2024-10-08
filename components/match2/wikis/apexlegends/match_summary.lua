@@ -369,20 +369,20 @@ function CustomMatchSummary._opponents(match)
 	end
 
 	local placementSortFunction = function(opponent1, opponent2)
-		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
-			if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
-				return opponent1.score > opponent2.score
-			else
-				return (opponent1.name or '') < (opponent2.name or '')
-			end
+		if opponent1.placement ~= opponent2.placement and opponent1.placement and opponent2.placement then
+			return opponent1.placement < opponent2.placement
 		end
-		if opponent1.status ~= 'S' then
+		if opponent1.status ~= 'S' and opponent2.status == 'S' then
 			return false
 		end
-		if opponent2.status ~= 'S' then
+		if opponent2.status ~= 'S' and opponent1.status == 'S' then
 			return true
 		end
-		return opponent1.placement < opponent2.placement
+		if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
+			return opponent1.score > opponent2.score
+		else
+			return (opponent1.name or '') < (opponent2.name or '')
+		end
 	end
 
 	-- Sort match level based on final placement & score
