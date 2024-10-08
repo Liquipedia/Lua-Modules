@@ -93,8 +93,6 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 			map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
 		end
 
-		map.game = match.game
-		map.mode = match.mode
 		map.extradata = {
 			comment = map.comment,
 		}
