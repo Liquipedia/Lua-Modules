@@ -380,9 +380,8 @@ function CustomMatchSummary._opponents(match)
 		end
 		if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
 			return opponent1.score > opponent2.score
-		else
-			return (opponent1.name or '') < (opponent2.name or '')
 		end
+		return (opponent1.name or '') < (opponent2.name or '')
 	end
 
 	-- Sort match level based on final placement & score
