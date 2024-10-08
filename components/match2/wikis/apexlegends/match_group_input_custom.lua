@@ -208,7 +208,7 @@ function MatchFunctions.parseSetting(match)
 	local scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
 		matchPointThreadhold = tonumber(match.matchpoint),
-		placements = Array.mapIndexes(function(idx)
+		placement = Array.mapIndexes(function(idx)
 			return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 		end)
 	}
