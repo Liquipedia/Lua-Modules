@@ -76,7 +76,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	MatchFunctions.getTournamentVars(match)
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
