@@ -169,11 +169,10 @@ end
 ---@param map table
 ---@return table
 function MapFunctions.getExtraData(map)
-	map.extradata = {
+	return {
 		comment = map.comment,
 		overtime = Logic.readBool(map.overtime)
 	}
-	return map
 end
 
 return CustomMatchGroupInput
