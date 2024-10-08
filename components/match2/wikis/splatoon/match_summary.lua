@@ -14,6 +14,7 @@ local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local WeaponIcon = require('Module:WeaponIcon')
@@ -100,9 +101,7 @@ function CustomMatchSummary._createGame(game)
 	end
 
 	local weaponsData = Array.map(game.opponents, function(opponent)
-		return Array.map(opponent.players, function(player)
-			return player.weapon or ''
-		end)
+		return Array.map(opponent.players, Operator.propety('weapon'))
 	end)
 
 	row:addClass('brkts-popup-body-game')
