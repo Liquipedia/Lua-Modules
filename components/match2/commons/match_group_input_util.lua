@@ -764,7 +764,7 @@ end
 
 ---@param resultType string?
 ---@param winnerInput integer|string|nil
----@param opponents {score: number, status: string, placment: integer?}[]
+---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(resultType, winnerInput, opponents)
 	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
