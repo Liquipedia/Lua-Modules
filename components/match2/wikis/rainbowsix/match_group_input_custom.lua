@@ -62,7 +62,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.status)
 	end
 
 	MatchFunctions.getTournamentVars(match)

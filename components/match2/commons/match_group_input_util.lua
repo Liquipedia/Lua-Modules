@@ -1001,10 +1001,13 @@ end
 ---@param winner integer?
 ---@param placementWinner integer
 ---@param placementLoser integer
----@param resultType string?
+---@param status string?
 ---@return MGIParsedOpponent[]
-function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, resultType)
-	if not opponents or #opponents ~= 2 or resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
+function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, status)
+	if not opponents or #opponents ~= 2
+		or status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+		or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+
 		return opponents
 	end
 
