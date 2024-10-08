@@ -132,11 +132,10 @@ end
 ---@param opponent table
 ---@return integer
 function CustomMatchGroupInput._getSetWins(opponent)
-	local extradata = opponent.extradata
-	local set1win = extradata.set1win and 1 or 0
-	local set2win = extradata.set2win and 1 or 0
-	local set3win = extradata.set3win and 1 or 0
-	return set1win + set2win + set3win
+	local setWin = function(setIndex)
+		return opponent.extradata['set' .. setIndex .. 'win'] and 1 or 0
+	end
+	return setWin(1) + setWin(2) + setWin(3)
 end
 
 ---@param match table
@@ -159,13 +158,12 @@ function MatchFunctions.getExtraData(match)
 	local opponent1 = match.opponent1 or {}
 	local opponent2 = match.opponent2 or {}
 
-	match.extradata = {
+	return {
 		isfeatured = MatchFunctions.isFeatured(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
 		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}
-	return match
 end
 
 ---@param map table
