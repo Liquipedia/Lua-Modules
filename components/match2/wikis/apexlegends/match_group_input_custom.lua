@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -109,7 +110,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(matchOpponent)
-			local opponentMapInput = matchOpponent['m' .. mapIndex]
+			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
 			return MapFunctions.makeMapOpponentDetails(opponentMapInput, scoreSettings)
 		end)
 
@@ -270,7 +271,7 @@ function MapFunctions.getExtraData(map, opponents)
 end
 
 ---Calculate Score and Winner of the map
----@param scoreDataInput table
+---@param scoreDataInput table?
 ---@param scoreSettings table
 ---@return table
 function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
@@ -296,6 +297,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 
 	if scoreDataInput[1] == '-' then
 		opponent.status = MatchGroupInputUtil.STATUS.FORFIET
+		opponent.score = 0
 	end
 
 	return opponent
