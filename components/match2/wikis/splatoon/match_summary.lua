@@ -100,19 +100,11 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 
-	local extradata = game.extradata or {}
-	local participants = game.participants or {}
-
-	local numberOfWeapons = extradata.maximumpickindex
-
-	local weaponsData = {}
-	for opponentIndex = 1, NUM_OPPONENTS do
-		weaponsData[opponentIndex] = {}
-		for weaponIndex = 1, numberOfWeapons do
-			local participantsKey = opponentIndex .. '_' .. weaponIndex
-			weaponsData[opponentIndex][weaponIndex] = (participants[participantsKey] or {}).weapon or ''
-		end
-	end
+	local weaponsData = Array.map(game.opponents, function(opponent)
+		return Array.map(opponent.players, function(player)
+			return player.weapon or ''
+		end)
+	end)
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '90%')
