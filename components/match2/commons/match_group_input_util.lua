@@ -767,6 +767,9 @@ function MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents
 	end
 end
 
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
+---@return string? #Match Status
 function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
