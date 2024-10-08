@@ -55,19 +55,13 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'status' then
-		return {
-			Cell{name = 'Status', content = caller:_getStatusContents()},
-		}
-	elseif id == 'role' then
+	if id == 'role' then
 		return {
 			Cell{name = 'Role', content = {
 				caller:_displayRole(caller.role),
 				caller:_displayRole(caller.role2)
 			}},
 		}
-	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
 
 	return widgets
