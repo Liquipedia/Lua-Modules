@@ -369,7 +369,7 @@ function CustomMatchSummary._opponents(match)
 	end
 
 	local placementSortFunction = function(opponent1, opponent2)
-		if opponent1.placement ~= opponent2.placement and opponent1.placement and opponent2.placement then
+		if opponent1.placement and opponent2.placement and opponent1.placement ~= opponent2.placement then
 			return opponent1.placement < opponent2.placement
 		end
 		if opponent1.status ~= 'S' and opponent2.status == 'S' then
