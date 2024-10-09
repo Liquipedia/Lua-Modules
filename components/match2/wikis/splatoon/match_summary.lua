@@ -172,7 +172,7 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 		:css('min-width', '24px')
 		:node(mw.html.create('div')
 			:css('margin', 'auto')
-			:wikitext(game.scores[opponentIndex] or '')
+			:wikitext(scoreDisplay)
 		)
 end
 
