@@ -83,7 +83,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.games = games
 	match.opponents = opponents
 
-	match.extradata = MatchFunctions.getExtraData(match)
+	match.extradata = MatchFunctions.getExtraData(match, opponents)
 
 	return match
 end
@@ -227,8 +227,9 @@ function MatchFunctions.getEarnings(name, year)
 end
 
 ---@param match table
+---@param opponents table[]
 ---@return boolean
-function MatchFunctions.isFeatured(match)
+function MatchFunctions.isFeatured(match, opponents)
 	if Table.includes(FEATURED_TIERS, tonumber(match.liquipediatier)) then
 		return true
 	end
@@ -240,15 +241,14 @@ function MatchFunctions.isFeatured(match)
 		return false
 	end
 
-	local opponent1, opponent2 = match.opponent1, match.opponent2
 	local year = os.date('%Y')
 
 	if
-		opponent1.type == Opponent.team and
-		MatchFunctions.getEarnings(opponent1.name, year) >= MIN_EARNINGS_FOR_FEATURED
+		opponents[1].type == Opponent.team and
+		MatchFunctions.getEarnings(opponents[1].name, year) >= MIN_EARNINGS_FOR_FEATURED
 	or
-		opponent2.type == Opponent.team and
-		MatchFunctions.getEarnings(opponent2.name, year) >= MIN_EARNINGS_FOR_FEATURED
+		opponents[2].type == Opponent.team and
+		MatchFunctions.getEarnings(opponents[2].name, year) >= MIN_EARNINGS_FOR_FEATURED
 	then
 		return true
 	end
@@ -257,13 +257,14 @@ function MatchFunctions.isFeatured(match)
 end
 
 ---@param match table
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		status = MatchFunctions.getMatchStatus(match),
 		overturned = Logic.isNotEmpty(match.overturned),
-		featured = MatchFunctions.isFeatured(match),
+		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
 	}
 end
