@@ -32,27 +32,27 @@ function OpponentDisplayCustom.BracketOpponentEntry:addScores(opponent)
 	local extradata = opponent.extradata or {}
 	if not extradata.additionalScores then
 		OpponentDisplay.BracketOpponentEntry.addScores(self, opponent)
-	else
+		return
+	end
+	self.root:node(OpponentDisplay.BracketScore{
+		isWinner = extradata.set1win,
+		scoreText = OpponentDisplayCustom.InlineScore(opponent, 1),
+	})
+	if opponent.extradata.score2 or opponent.score2 then
 		self.root:node(OpponentDisplay.BracketScore{
-			isWinner = extradata.set1win,
-			scoreText = OpponentDisplayCustom.InlineScore(opponent, ''),
+			isWinner = extradata.set2win,
+			scoreText = OpponentDisplayCustom.InlineScore(opponent, 2),
 		})
-		if opponent.extradata.score2 or opponent.score2 then
-			self.root:node(OpponentDisplay.BracketScore{
-				isWinner = extradata.set2win,
-				scoreText = OpponentDisplayCustom.InlineScore(opponent, 2),
-			})
-		end
-		if opponent.extradata.score3 then
-			self.root:node(OpponentDisplay.BracketScore{
-				isWinner = extradata.set3win,
-				scoreText = OpponentDisplayCustom.InlineScore(opponent, 3)
-			})
-		end
-		if (opponent.placement2 or opponent.placement or 0) == 1
-			or opponent.advances then
-			self.content:addClass('brkts-opponent-win')
-		end
+	end
+	if opponent.extradata.score3 then
+		self.root:node(OpponentDisplay.BracketScore{
+			isWinner = extradata.set3win,
+			scoreText = OpponentDisplayCustom.InlineScore(opponent, 3)
+		})
+	end
+	if (opponent.placement2 or opponent.placement or 0) == 1
+		or opponent.advances then
+		self.content:addClass('brkts-opponent-win')
 	end
 end
 
