@@ -169,10 +169,10 @@ function MapFunctions.getExtraData(map, opponentCount)
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 	for opponentIndex = 1, opponentCount do
-		for idx, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			extradata['team' .. opponentIndex .. 'bans' .. idx] = getCharacterName(ban)
+		for _, ban, idx in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			extradata['team' .. opponentIndex .. 'ban' .. idx] = getCharacterName(ban)
 		end
-		for idx, pick in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h') do
+		for _, pick, idx in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h') do
 			extradata['team' .. opponentIndex .. 'champion' .. idx] = getCharacterName(pick)
 		end
 	end
