@@ -14,6 +14,7 @@ local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local WeaponIcon = require('Module:WeaponIcon')
@@ -21,7 +22,6 @@ local WeaponIcon = require('Module:WeaponIcon')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
-local NUM_OPPONENTS = 2
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 -- Normal links, from input/lpdb
@@ -100,19 +100,9 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(MatchSummary.Break():create())
 	end
 
-	local extradata = game.extradata or {}
-	local participants = game.participants or {}
-
-	local numberOfWeapons = extradata.maximumpickindex
-
-	local weaponsData = {}
-	for opponentIndex = 1, NUM_OPPONENTS do
-		weaponsData[opponentIndex] = {}
-		for weaponIndex = 1, numberOfWeapons do
-			local participantsKey = opponentIndex .. '_' .. weaponIndex
-			weaponsData[opponentIndex][weaponIndex] = (participants[participantsKey] or {}).weapon or ''
-		end
-	end
+	local weaponsData = Array.map(game.opponents, function(opponent)
+		return Array.map(opponent.players, Operator.property('weapon'))
+	end)
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '90%')
@@ -136,7 +126,7 @@ function CustomMatchSummary._createGame(game)
 			:wikitext(CustomMatchSummary._getMapDisplay(game))
 		)
 	)
-	row:addElement(CustomMatchSummary._gameScore(game, 2, true))
+	row:addElement(CustomMatchSummary._gameScore(game, 2))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentWeaponsDisplay{
 		data = weaponsData[2],
@@ -170,15 +160,19 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
----@param flip boolean?
 ---@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex, flip)
+function CustomMatchSummary._gameScore(game, opponentIndex)
+	local score = game.scores[opponentIndex] --[[@as number|string?]]
+	if score and game.mode == 'Turf War' then
+		score = score .. '%'
+	end
+	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
 	return mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:css('min-width', '24px')
 		:node(mw.html.create('div')
 			:css('margin', 'auto')
-			:wikitext(game.scores[opponentIndex] or '')
+			:wikitext(scoreDisplay)
 		)
 end
 
