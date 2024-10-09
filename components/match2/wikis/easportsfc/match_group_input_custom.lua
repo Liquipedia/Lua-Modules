@@ -98,6 +98,11 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
 		map.extradata = CustomMatchGroupInput.getMapExtraData(map, opponents, Logic.readBool(match.hasSubmatches))
 
+		map.opponents = CustomMatchGroupInput.getParticipants(map, opponents)
+		-- Match/Subobjects:luaGetMap sets a empty table as default value for participants.
+		-- Once subobjects have been refactored away this can be removed.
+		map.participants = nil
+
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
@@ -191,6 +196,31 @@ function CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatc
 	end)
 
 	return hasPenalties and scores or nil
+end
+
+---@param map table
+---@param opponents MGIParsedOpponent[]
+---@return {players: table[]}[]
+function CustomMatchGroupInput.getParticipants(map, opponents)
+	return Array.map(opponents, function(opponent, opponentIndex)
+		local players = Array.mapIndexes(function(playerIndex)
+			return map['t' .. opponentIndex .. 'p' .. playerIndex]
+		end)
+		local participants, _ = MatchGroupInputUtil.parseParticipants(
+			opponent.match2players,
+			players,
+			function(playerIndex)
+				local data = map['t' .. opponentIndex .. 'p' .. playerIndex]
+				return data and {name = data} or nil
+			end,
+			function(playerIndex, playerIdData, playerInputData)
+				return {
+					played = true
+				}
+			end
+		)
+		return {players = participants}
+	end)
 end
 
 return CustomMatchGroupInput
