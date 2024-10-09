@@ -182,7 +182,7 @@ function MatchFunctions.getLinks(match, maps)
 		local name = platform.name
 
 		if match[name] then
-			linksOfPlatform[0] = makeLink(match[name])
+			table.insert(linksOfPlatform, {makeLink(match[name]), 0})
 		end
 
 		if platform.isMapStats then
@@ -190,12 +190,12 @@ function MatchFunctions.getLinks(match, maps)
 				if not map[name] then
 					return
 				end
-				linksOfPlatform[mapIndex] = makeLink(map[name])
+				table.insert(linksOfPlatform, {makeLink(map[name]), mapIndex})
 			end)
 		elseif platform.max then
 			for i = 2, platform.max, 1 do
 				if match[name .. i] then
-					linksOfPlatform[i] = makeLink(match[name .. i])
+					table.insert(linksOfPlatform, {makeLink(match[name .. i]), i})
 				end
 			end
 		end
