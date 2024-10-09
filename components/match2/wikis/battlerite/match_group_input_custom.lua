@@ -67,7 +67,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchGroupInputUtil.getCommonTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)

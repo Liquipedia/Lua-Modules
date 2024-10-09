@@ -292,36 +292,38 @@ end
 ---@param obj table
 ---@param parent table?
 ---@return table
-function MatchGroupInputUtil.getCommonTournamentVars(obj, parent)
+---@nodiscard
+function MatchGroupInputUtil.getTournamentContext(obj, parent)
 	parent = parent or {}
-	obj.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
-	obj.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
-	obj.liquipediatier = Logic.emptyOr(
+	local vars = {}
+	vars.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
+	vars.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
+	vars.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
+	vars.liquipediatier = Logic.emptyOr(
 		obj.liquipediatier,
 		parent.liquipediatier,
 		globalVars:get('tournament_liquipediatier')
 	)
-	obj.liquipediatiertype = Logic.emptyOr(
+	vars.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
 		parent.liquipediatiertype,
 		globalVars:get('tournament_liquipediatiertype')
 	)
-	obj.publishertier = Logic.emptyOr(
+	vars.publishertier = Logic.emptyOr(
 		obj.publishertier,
 		parent.publishertier,
 		globalVars:get('tournament_publishertier')
 	)
-	obj.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
-	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
-	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
-	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
-	obj.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
-	obj.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
-	obj.date = Logic.emptyOr(obj.date, parent.date)
-	obj.mode = Logic.emptyOr(obj.mode, parent.mode)
+	vars.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
+	vars.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
+	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
+	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
+	vars.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
+	vars.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
+	vars.date = Logic.emptyOr(obj.date, parent.date)
+	vars.mode = Logic.emptyOr(obj.mode, parent.mode)
 
-	return obj
+	return vars
 end
 
 ---@param match table

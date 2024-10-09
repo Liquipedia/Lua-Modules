@@ -75,7 +75,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
+	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
+	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
@@ -149,15 +152,6 @@ end
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
 	return Array.filter(games, MapFunctions.keepMap)
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
-
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table

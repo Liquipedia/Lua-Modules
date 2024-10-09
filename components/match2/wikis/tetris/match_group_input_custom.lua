@@ -72,7 +72,8 @@ function CustomMatchGroupInput.processMatch(match)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	CustomMatchGroupInput.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -140,12 +141,6 @@ function CustomMatchGroupInput.getBestOf(match)
 	local bestOf = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('match_bestof')))
 	Variables.varDefine('match_bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
-end
-
----@param match table
-function CustomMatchGroupInput.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
-	MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table

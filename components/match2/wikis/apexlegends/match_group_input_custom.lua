@@ -78,7 +78,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchFunctions.setBgForOpponents(opponents, settings.status)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -229,12 +230,6 @@ function MatchFunctions.parseSetting(match)
 		score = scoreSettings,
 		status = statusSettings,
 	}
-end
-
----@param match table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param settings table

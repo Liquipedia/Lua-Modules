@@ -70,7 +70,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -134,13 +135,6 @@ function MatchFunctions.extractMaps(match, opponentCount)
 	end
 
 	return maps
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param maps table[]
