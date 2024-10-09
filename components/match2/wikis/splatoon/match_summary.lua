@@ -101,7 +101,7 @@ function CustomMatchSummary._createGame(game)
 	end
 
 	local weaponsData = Array.map(game.opponents, function(opponent)
-		return Array.map(opponent.players, Operator.propety('weapon'))
+		return Array.map(opponent.players, Operator.property('weapon'))
 	end)
 
 	row:addClass('brkts-popup-body-game')
@@ -126,7 +126,7 @@ function CustomMatchSummary._createGame(game)
 			:wikitext(CustomMatchSummary._getMapDisplay(game))
 		)
 	)
-	row:addElement(CustomMatchSummary._gameScore(game, 2, true))
+	row:addElement(CustomMatchSummary._gameScore(game, 2))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(CustomMatchSummary._opponentWeaponsDisplay{
 		data = weaponsData[2],
@@ -160,9 +160,13 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param opponentIndex integer
----@param flip boolean?
 ---@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex, flip)
+function CustomMatchSummary._gameScore(game, opponentIndex)
+	local score = game.scores[opponentIndex] --[[@as number|string?]]
+	if score and game.mode == 'Turf War' then
+		score = score .. '%'
+	end
+	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
 	return mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:css('min-width', '24px')

@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -93,11 +94,15 @@ function MatchFunctions.extractMaps(match, opponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+			local scoreInput = map['score' .. opponentIndex]
+			if map.maptype == 'Turf War' and scoreInput then
+				scoreInput = scoreInput:gsub('%%', '')
+			end
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
+				score = scoreInput,
 			}, MapFunctions.calculateMapScore(map.winner, map.finished))
 			return {score = score, status = status}
 		end)
@@ -115,6 +120,8 @@ function MatchFunctions.extractMaps(match, opponents)
 
 	return maps
 end
+
+CustomMatchGroupInput.processMap = FnUtil.identity
 
 --
 -- match related functions
@@ -194,8 +201,11 @@ function MapFunctions.getParticipants(map, opponents)
 end
 
 ---@param weaponRaw string
----@return string
+---@return string?
 function MapFunctions._cleanWeaponName(weaponRaw)
+	if not weaponRaw then
+		return nil
+	end
 	return assert(WeaponNames[string.lower(weaponRaw)], 'Unsupported weapon input: ' .. weaponRaw)
 end
 
