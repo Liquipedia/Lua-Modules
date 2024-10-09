@@ -385,9 +385,9 @@ end
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
-	if not gameRecord.participants and gameRecord.opponents then
+	if not gameRecord.participants then
 		gameRecord.participants = {}
-		for opponentId, opponent in ipairs(gameRecord.opponents) do
+		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
 			for playerId, player in pairs(opponent.players) do
 				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
 				-- between participants and opponents
