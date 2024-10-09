@@ -29,55 +29,52 @@ local MapFunctions = {}
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
----@param match table
+---@param input table
 ---@param options table?
 ---@return table
-function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
+function CustomMatchGroupInput.processMatch(input, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
+		return MatchGroupInputUtil.readOpponent(input, opponentIndex, {})
 	end)
-	local games = MatchFunctions.extractMaps(match, #opponents)
-	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
+	local games = MatchFunctions.extractMaps(input, #opponents)
+	local bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
+	local dateDetails = MatchGroupInputUtil.readDate(input.date)
+	local tournamentContext = MatchGroupInputUtil.getTournamentContext(input)
+
+	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(TODO, games)
 		and MatchFunctions.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
+			walkover = input.walkover,
+			winner = input.winner,
 			opponentIndex = opponentIndex,
 			score = opponent.score,
 		}, autoScoreFunction)
 	end)
 
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+	local match = Table.merge({
+		opponents = opponents,
+		games = games,
+		finished = MatchGroupInputUtil.matchIsFinished(input, opponents),
+		vod = input.vod,
+		bestof = bestof,
+		extradata = MatchFunctions.getExtraData(input),
+		links = MatchFunctions.getLinks(input),
+		stream = Streams.processStreams(input),
+		mode = Logic.emptyOr(input.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE),
+	}, dateDetails, tournamentContext)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.resulttype = MatchGroupInputUtil.getResultType(input.winner, input.finished, match.opponents)
+		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, match.opponents)
+		match.winner = MatchGroupInputUtil.getWinner(input.resulttype, input.winner, match.opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
 		end)
 	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
@@ -86,37 +83,37 @@ end
 -- match related functions
 --
 
----@param match table
+---@param matchInput table
 ---@param opponentCount integer
 ---@return table[]
-function MatchFunctions.extractMaps(match, opponentCount)
+function MatchFunctions.extractMaps(matchInput, opponentCount)
 	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = MapFunctions.getExtraData(map, opponentCount)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
+	for _, input in Table.iter.pairsByPrefix(matchInput, 'map', {requireIndex = true}) do
 		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
+				walkover = input.walkover,
+				winner = input.winner,
 				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map))
+				score = input['score' .. opponentIndex],
+			}, MapFunctions.calculateMapScore(input))
 			return {score = score, status = status}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		local map = {
+			vod = input.vod,
+			extradata = MapFunctions.getExtraData(input, opponentCount),
+			finished = MatchGroupInputUtil.mapIsFinished(input),
+			scores = Array.map(opponentInfo, Operator.property('score'))
+		}
+
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
+			map.resulttype = MatchGroupInputUtil.getResultType(input.winner, input.finished, opponentInfo)
 			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, input.winner, opponentInfo)
 		end
 
-		table.insert(maps, map)
-		match[key] = nil
+		table.insert(maps, input)
 	end
 
 	return maps
