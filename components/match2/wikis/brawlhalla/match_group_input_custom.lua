@@ -142,7 +142,7 @@ end
 ---@return table<string, table>?
 function CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.solo then
-		CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex)
+		return CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex)
 	end
 	return nil
 end
@@ -155,10 +155,12 @@ function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex)
 	local char = map['char' .. opponentIndex] or ''
 
 	return {
-		players = {{
-			char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
-			player = player.name,
-		}}
+		players = {
+			{
+				char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
+				player = player.name,
+			}
+		}
 	}
 end
 
