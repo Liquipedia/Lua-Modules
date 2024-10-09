@@ -118,7 +118,7 @@ function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
 		substitutions = manualPlayersInput.substitutions
 		-- Change compared to commons MatchGroupInputUtil.readOpponent
 		local template = mw.ext.TeamTemplate.raw(opponent.template or '') or {}
-		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
+		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
 			template.page or '',
 			manualPlayersInput,
 			options,
