@@ -73,8 +73,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param match table
 ---@param matchOpponents table[]
 ---@return table[]

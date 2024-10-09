@@ -86,8 +86,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 --
 -- match related functions
 --

@@ -113,8 +113,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)

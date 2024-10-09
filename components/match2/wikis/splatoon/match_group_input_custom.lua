@@ -122,8 +122,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 --
 -- match related functions
 --
