@@ -83,6 +83,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
 	for mapKey, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Table.isEmpty(map) then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
