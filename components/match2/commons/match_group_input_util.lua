@@ -764,7 +764,7 @@ end
 
 ---@param resultType string?
 ---@param winnerInput integer|string|nil
----@param opponents {score: number, status: string}[]
+---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(resultType, winnerInput, opponents)
 	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
@@ -775,8 +775,23 @@ function MatchGroupInputUtil.getWinner(resultType, winnerInput, opponents)
 		return MatchGroupInputUtil.WINNER_DRAW
 	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
 		return MatchGroupInputUtil.getDefaultWinner(opponents)
+	elseif MatchGroupInputUtil.findOpponentWithFirstPlace(opponents) then
+		return MatchGroupInputUtil.findOpponentWithFirstPlace(opponents)
 	else
 		return MatchGroupInputUtil.getHighestScoringOpponent(opponents)
+	end
+end
+
+---Find the opponent with placement 1
+---If multiple opponents share this placement, the first one is returned
+---@param opponents {placement: integer?}[]
+---@return integer?
+function MatchGroupInputUtil.findOpponentWithFirstPlace(opponents)
+	local firstPlace = Array.indexOf(opponents, function(opponent)
+		return opponent.placement == 1
+	end)
+	if firstPlace > 0 then
+		return firstPlace
 	end
 end
 
