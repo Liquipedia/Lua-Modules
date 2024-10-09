@@ -136,7 +136,7 @@ function CustomMatchGroupInput.calculateMatchScore(maps)
 end
 
 ---@param match table
-function CustomMatchGroupInput._getTournamentVars(match)
+function CustomMatchGroupInput.getTournamentVars(match)
 	MatchGroupInputUtil.getCommonTournamentVars(match)
 	match.mode = Variables.varDefault('tournament_mode', 'singles')
 end
@@ -150,7 +150,7 @@ function CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponent
 		return {}
 	end
 
-	return CustomMatchGroupInput._processPlayerMapData(opponent, map, opponentIndex)
+	return CustomMatchGroupInput._processPlayerMapData(map, opponent, opponentIndex)
 end
 
 ---@param map table
