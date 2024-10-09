@@ -13,7 +13,6 @@ local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -28,6 +27,13 @@ local Center = Widgets.Center
 local GAME_MODE = mw.loadData('Module:GameMode')
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
+
+local EA_TIERS = {
+	major = '[[Major]]',
+	premier = '[[Premier]]',
+	challenger = '[[Challenger]]',
+	online = '[[Online]]',
+}
 
 ---@class ApexlegendsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -71,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 		end
 		table.insert(widgets, Cell{
 			name = 'EA tier',
-			content = {Tier['ea'][string.lower(args.eatier or '')]},
+			content = {EA_TIERS[string.lower(args.eatier or '')]},
 			classes = {'tournament-highlighted-bg'}
 		})
 	elseif id == 'customcontent' then
