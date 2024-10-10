@@ -27,6 +27,7 @@ function MatchLegacy.storeMatch(match2)
 end
 
 function MatchLegacy._convertParameters(match2)
+	---@type table
 	local match = Table.filterByKey(Table.deepCopy(match2), function(key) return not String.startsWith(key, 'match2') end)
 	match.links = nil
 
