@@ -8,6 +8,7 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
