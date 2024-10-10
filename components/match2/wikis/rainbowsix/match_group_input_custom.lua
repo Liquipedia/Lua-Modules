@@ -46,7 +46,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	games = MatchFunctions.removeUnsetMaps(games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, match.bestof)
+		and MatchFunctions.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
@@ -65,7 +65,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.status)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -77,8 +78,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	return match
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 --
 -- match related functions
@@ -119,14 +118,6 @@ function MatchFunctions.extractMaps(match, opponentCount)
 	return maps
 end
 
---- Fetch information about the tournament
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
-end
-
 -- Template:Map sets a default map name so we can count the number of maps.
 -- These maps however shouldn't be stored
 -- The keepMap function will check if a map should be kept
@@ -137,9 +128,8 @@ function MatchFunctions.removeUnsetMaps(games)
 end
 
 ---@param maps table[]
----@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, bestOf)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end

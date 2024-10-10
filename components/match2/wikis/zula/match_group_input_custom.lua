@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -67,7 +66,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -79,8 +79,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	return match
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 --
 -- match related functions
@@ -120,13 +118,6 @@ function MatchFunctions.extractMaps(match, opponentCount)
 	end
 
 	return maps
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 -- Template:Map sets a default map name so we can count the number of maps.

@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -47,7 +46,7 @@ function CustomMatchGroupInput.processMatch(match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.bestof = CustomMatchGroupInput.getBestOf(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
@@ -72,7 +71,8 @@ function CustomMatchGroupInput.processMatch(match)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	CustomMatchGroupInput.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -85,9 +85,9 @@ function CustomMatchGroupInput.processMatch(match)
 end
 
 ---@param match table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponentCount)
+function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
@@ -97,10 +97,10 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 			comment = map.comment,
 		}
 		map.map = 'Game ' .. mapIndex
-		map.mode = Opponent.toMode(match.opponent1.type, match.opponent2.type)
+		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -124,8 +124,6 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps)
@@ -140,12 +138,6 @@ function CustomMatchGroupInput.getBestOf(match)
 	local bestOf = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('match_bestof')))
 	Variables.varDefine('match_bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
-end
-
----@param match table
-function CustomMatchGroupInput.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
-	MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table

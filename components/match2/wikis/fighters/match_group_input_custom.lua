@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -68,7 +67,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	CustomMatchGroupInput.getTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
 
 	match.stream = Streams.processStreams(match)
 
@@ -97,9 +97,6 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
 			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
 		end)
-		-- Match/Subobjects:luaGetMap sets a empty table as default value for participants.
-		-- Once subobjects have been refactored away this can be removed.
-		map.participants = nil
 
 		local opponentInfo = Array.map(matchOpponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
@@ -125,20 +122,12 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
-function CustomMatchGroupInput.getTournamentVars(match)
-	MatchGroupInputUtil.getCommonTournamentVars(match)
-	match.mode = Variables.varDefault('tournament_mode', 'singles')
 end
 
 ---@param map table

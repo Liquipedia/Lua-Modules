@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -78,7 +77,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchFunctions.setBgForOpponents(opponents, settings.status)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -89,8 +89,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	return match
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 ---@param opponents table[]
@@ -229,12 +227,6 @@ function MatchFunctions.parseSetting(match)
 		score = scoreSettings,
 		status = statusSettings,
 	}
-end
-
----@param match table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param settings table

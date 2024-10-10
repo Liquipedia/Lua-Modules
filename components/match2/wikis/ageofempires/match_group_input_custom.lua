@@ -34,7 +34,7 @@ local OPPONENT_CONFIG = {
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
-	MatchGroupInputUtil.getCommonTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
@@ -118,7 +118,7 @@ function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
 		substitutions = manualPlayersInput.substitutions
 		-- Change compared to commons MatchGroupInputUtil.readOpponent
 		local template = mw.ext.TeamTemplate.raw(opponent.template or '') or {}
-		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
+		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
 			template.page or '',
 			manualPlayersInput,
 			options,
@@ -154,7 +154,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
 		map.extradata.mapmode = Table.extract(map, 'mode')
 
-		MatchGroupInputUtil.getCommonTournamentVars(map, match)
+		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 
 		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
 

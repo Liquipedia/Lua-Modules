@@ -1,45 +1,41 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
+-- wiki=tft
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local Streams = Lua.import('Module:Links/Stream')
 
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-	maxNumPlayers = 10,
-}
+local DEFAULT_BESTOF = 3
+local DEFAULT_MODE = 'team'
 
+local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
-local CustomMatchGroupInput = {}
-
 ---@param match table
----@param options? {isMatchPage: boolean?}
+---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
+
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex)
 	end)
+
 	local games = MatchFunctions.extractMaps(match, opponents)
-	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -64,6 +60,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end
 
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+	match.mode = Variables.varDefault('tournament_mode', DEFAULT_MODE)
 
 	match.stream = Streams.processStreams(match)
 
@@ -76,20 +73,42 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
+---@return table
+function MatchFunctions.getExtraData(match)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match),
+		casters = MatchGroupInputUtil.readCasters(match),
+	}
+end
+
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function MatchFunctions.calculateMatchScore(maps)
+	return function(opponentIndex)
+		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
+	end
+end
+
+---@param bestofInput string|integer?
+---@return integer
+function MatchFunctions.getBestOf(bestofInput)
+	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('match_bestof')) or DEFAULT_BESTOF
+	Variables.varDefine('match_bestof', bestof)
+	return bestof
+end
+
+---@param match table
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.map = nil
-		map.participants = MapFunctions.getParticipants(map, opponents)
-		map.extradata = MapFunctions.getExtraData(map)
-
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+
+		local opponentInfo = Array.map(Array.range(1, #opponents), function(opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -106,57 +125,22 @@ function MatchFunctions.extractMaps(match, opponents)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
 
+		map.extradata = MapFunctions.getExtradata(map, opponents)
+
 		table.insert(maps, map)
-		match[key] = nil
+		match[mapKey] = nil
 	end
 
 	return maps
 end
 
----@param maps table[]
----@return fun(opponentIndex: integer): integer
-function MatchFunctions.calculateMatchScore(maps)
-	return function(opponentIndex)
-		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		comment = match.comment,
-	}
-end
-
----@param map table
----@return table
-function MapFunctions.getExtraData(map)
-	local extraData = {
-		comment = map.comment,
-		team1side = map.team1side,
-		team2side = map.team2side,
-	}
-
-	return extraData
-end
-
----@param map table
+---@param mapInput table
 ---@param opponents table[]
 ---@return table
-function MapFunctions.getParticipants(map, opponents)
-	local participants = {}
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
-
-	for opponentIndex in ipairs(opponents) do
-		for _, hero, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h', {requireIndex = true}) do
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				character = getCharacterName(hero),
-			}
-		end
-	end
-
-	return participants
+function MapFunctions.getExtradata(mapInput, opponents)
+	return {
+		comment = mapInput.comment,
+	}
 end
 
 ---@param winnerInput string|integer|nil

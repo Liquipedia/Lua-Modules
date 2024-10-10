@@ -201,7 +201,7 @@ end
 ---Warning, mutates first argument by removing the key `opponentX` where X is the second argument
 ---@param match table
 ---@param opponentIndex integer
----@param options readOpponentOptions
+---@param options readOpponentOptions?
 ---@return MGIParsedOpponent?
 function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	options = options or {}
@@ -233,8 +233,7 @@ function MatchGroupInputUtil.readOpponent(match, opponentIndex, options)
 	if opponent.type == Opponent.team then
 		local manualPlayersInput = MatchGroupInputUtil.extractManualPlayersInput(match, opponentIndex, opponentInput)
 		substitutions = manualPlayersInput.substitutions
-		--a variation of `MatchGroupInput.readPlayersOfTeam` that returns a player array
-		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
+		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
 			Opponent.toName(opponent) or '',
 			manualPlayersInput,
 			options,
@@ -297,36 +296,38 @@ end
 ---@param obj table
 ---@param parent table?
 ---@return table
-function MatchGroupInputUtil.getCommonTournamentVars(obj, parent)
+---@nodiscard
+function MatchGroupInputUtil.getTournamentContext(obj, parent)
 	parent = parent or {}
-	obj.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
-	obj.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
-	obj.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
-	obj.liquipediatier = Logic.emptyOr(
+	local vars = {}
+	vars.game = Logic.emptyOr(obj.game, parent.game, globalVars:get('tournament_game'))
+	vars.icon = Logic.emptyOr(obj.icon, parent.icon, globalVars:get('tournament_icon'))
+	vars.icondark = Logic.emptyOr(obj.iconDark, parent.icondark, globalVars:get('tournament_icondark'))
+	vars.liquipediatier = Logic.emptyOr(
 		obj.liquipediatier,
 		parent.liquipediatier,
 		globalVars:get('tournament_liquipediatier')
 	)
-	obj.liquipediatiertype = Logic.emptyOr(
+	vars.liquipediatiertype = Logic.emptyOr(
 		obj.liquipediatiertype,
 		parent.liquipediatiertype,
 		globalVars:get('tournament_liquipediatiertype')
 	)
-	obj.publishertier = Logic.emptyOr(
+	vars.publishertier = Logic.emptyOr(
 		obj.publishertier,
 		parent.publishertier,
 		globalVars:get('tournament_publishertier')
 	)
-	obj.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
-	obj.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
-	obj.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
-	obj.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
-	obj.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
-	obj.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
-	obj.date = Logic.emptyOr(obj.date, parent.date)
-	obj.mode = Logic.emptyOr(obj.mode, parent.mode)
+	vars.series = Logic.emptyOr(obj.series, parent.series, globalVars:get('tournament_series'))
+	vars.shortname = Logic.emptyOr(obj.shortname, parent.shortname, globalVars:get('tournament_shortname'))
+	vars.tickername = Logic.emptyOr(obj.tickername, parent.tickername, globalVars:get('tournament_tickername'))
+	vars.tournament = Logic.emptyOr(obj.tournament, parent.tournament, globalVars:get('tournament_name'))
+	vars.type = Logic.emptyOr(obj.type, parent.type, globalVars:get('tournament_type'))
+	vars.patch = Logic.emptyOr(obj.patch, parent.patch, globalVars:get('tournament_patch'))
+	vars.date = Logic.emptyOr(obj.date, parent.date)
+	vars.mode = Logic.emptyOr(obj.mode, parent.mode)
 
-	return obj
+	return vars
 end
 
 ---@param match table
@@ -424,7 +425,7 @@ end
 ---@param options readOpponentOptions
 ---@param dateTimeInfo {timestamp: integer?, timezoneOffset: string?}
 ---@return table
-function MatchGroupInputUtil.readPlayersOfTeamNew(teamName, manualPlayersInput, options, dateTimeInfo)
+function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, options, dateTimeInfo)
 	local players = {}
 	local playersIndex = 0
 
@@ -509,138 +510,6 @@ function MatchGroupInputUtil.readPlayersOfTeamNew(teamName, manualPlayersInput, 
 	end)
 
 	return playersArray
-end
-
----reads the players of a team from input and wiki variables
----@deprecated
----@param match table
----@param opponentIndex integer
----@param teamName string
----@param options MatchGroupInputReadPlayersOfTeamOptions?
----@return table
-function MatchGroupInputUtil.readPlayersOfTeam(match, opponentIndex, teamName, options)
-	options = options or {}
-
-	local opponent = match['opponent' .. opponentIndex]
-	local players = {}
-	local playersIndex = 0
-
-	local insertIntoPlayers = function(player)
-		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.name or player.pageName) then
-			return
-		end
-
-		player.name = Logic.emptyOr(player.name, player.pageName) --[[@as string]]
-		player.name = options.resolveRedirect and mw.ext.TeamLiquidIntegration.resolve_redirect(player.name) or player.name
-		player.name = options.applyUnderScores and player.name:gsub(' ', '_') or player.name
-		player.flag = Flags.CountryName(player.flag)
-		player.displayname = Logic.emptyOr(player.displayname, player.displayName)
-		playersIndex = playersIndex + 1
-		player.index = playersIndex
-
-		players[player.name] = players[player.name] or {}
-		Table.mergeInto(players[player.name], player)
-	end
-
-	local playerIndex = 1
-	local varPrefix = teamName .. '_p' .. playerIndex
-	local name = globalVars:get(varPrefix)
-	while name do
-		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
-
-		local wasPresentInMatch = function()
-			if not match.timestamp then return true end
-
-			local joinDate = DateExt.readTimestamp(globalVars:get(varPrefix .. 'joindate') or '')
-			local leaveDate = DateExt.readTimestamp(globalVars:get(varPrefix .. 'leavedate') or '')
-
-			if (not joinDate) and (not leaveDate) then return true end
-
-			-- need to offset match time to correct timezone as transfers do not have a time associated with them
-			local timestampLocal = match.timestamp + DateExt.getOffsetSeconds(match.timezoneOffset or '')
-
-			return (not joinDate or (joinDate <= timestampLocal)) and
-				(not leaveDate or (leaveDate > timestampLocal))
-		end
-
-		if wasPresentInMatch() then
-			insertIntoPlayers{
-				pageName = name,
-				displayName = globalVars:get(varPrefix .. 'dn'),
-				flag = globalVars:get(varPrefix .. 'flag'),
-			}
-		end
-		playerIndex = playerIndex + 1
-		varPrefix = teamName .. '_p' .. playerIndex
-		name = globalVars:get(varPrefix)
-	end
-
-	--players from manual input as `opponnetX_pY`
-	for _, player in Table.iter.pairsByPrefix(match, 'opponent' .. opponentIndex .. '_p') do
-		local playerTable = Json.parseIfString(player) or {}
-		insertIntoPlayers(playerTable)
-	end
-
-	--players from manual input in `opponent.players`
-	local playersData = Json.parseIfString(opponent.players) or {}
-	for playerPrefix, playerName in Table.iter.pairsByPrefix(playersData, 'p') do
-		insertIntoPlayers{
-			pageName = playerName,
-			displayName = playersData[playerPrefix .. 'dn'],
-			flag = playersData[playerPrefix .. 'flag'],
-		}
-	end
-
-	---@param playerData table|string|nil
-	---@return standardPlayer?
-	local getStandardPlayer = function(playerData)
-		if not playerData then return end
-		playerData = type(playerData) == 'string' and {playerData} or playerData
-		local player = {
-			displayName = Logic.emptyOr(playerData.displayName, playerData.displayname, playerData[1] or playerData.name),
-			pageName = Logic.emptyOr(playerData.pageName, playerData.pagename, playerData.link),
-			flag = playerData.flag,
-		}
-		if Logic.isEmpty(player.displayName) then return end
-		player = PlayerExt.populatePlayer(player)
-		player.pageName = options.applyUnderScores and player.pageName:gsub(' ', '_') or player.pageName
-		return player
-	end
-
-	local substitutions, parseFailure = Json.parseStringified(opponent.substitutes)
-	if parseFailure then
-		substitutions = {}
-	end
-
-	--handle `substitutes` input for opponenets
-	Array.forEach(substitutions, function(substitution)
-		if type(substitution) ~= 'table' or not substitution['in'] then return end
-		local substitute = getStandardPlayer(substitution['in'])
-
-		local subbedGames = substitution['games']
-
-		local player = getStandardPlayer(substitution['out'])
-		if player then
-			players[player.pageName] = subbedGames and players[player.pageName] or nil
-		end
-
-		opponent.extradata = Table.merge({substitutions = {}}, opponent.extradata or {})
-		table.insert(opponent.extradata.substitutions, {
-			substitute = substitute,
-			player = player,
-			games = subbedGames and Array.map(mw.text.split(subbedGames, ';'), String.trim) or nil,
-			reason = substitution['reason'],
-		})
-
-		insertIntoPlayers(substitute)
-	end)
-
-	opponent.match2players = Array.extractValues(players)
-	Array.sortInPlaceBy(opponent.match2players, function (player)
-		return player.index
-	end)
-
-	return match
 end
 
 ---reads the caster input of a match

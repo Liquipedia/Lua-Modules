@@ -392,10 +392,9 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
 
-	-- Allow opponents input to be used as an alternative input method for participants
 	if not gameRecord.participants then
 		gameRecord.participants = {}
-		for opponentId, opponent in ipairs(gameRecord.opponents) do
+		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
 			for playerId, player in pairs(opponent.players or {}) do
 				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
 				-- between participants and opponents
