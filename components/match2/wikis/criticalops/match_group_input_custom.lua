@@ -153,7 +153,6 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and match.status or nil,
 	}
 end
 

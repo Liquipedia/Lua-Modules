@@ -147,7 +147,6 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match)
 	return {
-		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and match.status or nil,
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 	}
 end

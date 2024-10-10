@@ -67,12 +67,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype =
-			MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
-			and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-			or nil
-		match.walkover = nil
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		CustomMatchGroupInput.setPlacements(opponents)
 		MatchFunctions.setBgForOpponents(opponents, settings.status)
 	end
@@ -114,10 +110,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
-				and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-				or nil
-			map.walkover = nil
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
 

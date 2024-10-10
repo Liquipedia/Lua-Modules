@@ -341,6 +341,8 @@ end
 
 ---@param match table
 function Match._prepareMatchRecordForStore(match)
+	Match._commonBackwardsCompatabilityForV3API(match)
+
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
@@ -383,12 +385,17 @@ end
 ---@param matchRecord table
 ---@param gameRecord table
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
+	-- Backwards compatibility for API v3
+	gameRecord.opponents = gameRecord.opponents or {}
+	Match._commonBackwardsCompatabilityForV3API(gameRecord)
+
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
+
 	if not gameRecord.participants then
 		gameRecord.participants = {}
 		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
-			for playerId, player in pairs(opponent.players) do
+			for playerId, player in pairs(opponent.players or {}) do
 				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
 				-- between participants and opponents
 				gameRecord.participants[opponentId .. '_' .. playerId] = Table.deepCopy(player)
@@ -398,6 +405,21 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	Match.clampFields(gameRecord, Match.gameFields)
 end
 
+---Adds fields needed for backwards compatibility with API v3.
+---walkover and resulttype are added to record.
+---@param record table #game or match record
+function Match._commonBackwardsCompatabilityForV3API(record)
+	record.resulttype = record.resulttype or (record.status == 'notplayed' and 'np') or ''
+
+	if record.finished then
+		local opponents = record.opponents or {}
+		local function calculateWalkover()
+			local status = (opponents[record.winner] or {}).status
+			return (status == 'FF' and 'ff') or (status == 'DQ' and 'dq') or (status == 'L' and 'l') or nil
+		end
+		record.walkover = record.walkover or calculateWalkover() or ''
+	end
+end
 
 Match.matchFields = Table.map({
 	'bestof',
@@ -419,7 +441,7 @@ Match.matchFields = Table.map({
 	'parentname',
 	'patch',
 	'publishertier',
-	'resulttype',
+	'resulttype', -- LPDB API v3: backwards compatibility
 	'series',
 	'shortname',
 	'status',
@@ -428,7 +450,7 @@ Match.matchFields = Table.map({
 	'tournament',
 	'type',
 	'vod',
-	'walkover',
+	'walkover', -- LPDB API v3: backwards compatibility
 	'winner',
 	'section',
 }, function(_, field) return field, true end)
@@ -462,15 +484,16 @@ Match.gameFields = Table.map({
 	'parent',
 	'participants',
 	'patch',
-	'opponents', -- Not a real field yet, but will be in the future. Also for use in Match/Legacy
-	'resulttype',
+	'opponents',
+	'resulttype', -- LPDB API v3: backwards compatibility
 	'rounds',
 	'scores',
+	'status',
 	'subgroup',
 	'tournament',
 	'type',
 	'vod',
-	'walkover',
+	'walkover', -- LPDB API v3: backwards compatibility
 	'winner',
 }, function(_, field) return field, true end)
 
