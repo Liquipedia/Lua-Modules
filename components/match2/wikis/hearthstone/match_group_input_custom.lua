@@ -71,7 +71,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -79,13 +80,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.opponents = opponents
 
 	return match
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Variables.varDefault('tournament_mode', 'singles')
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param maps table[]
@@ -213,13 +207,13 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']),
-				character = Logic.nilIfEmpty(mapInput[prefix .. 'char']),
 			}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
+			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
 			return {
 				player = playerIdData.name or playerInputData.link,
-				character = MapFunctions.readCharacter(playerInputData.character),
+				character = MapFunctions.readCharacter(Logic.nilIfEmpty(mapInput[prefix .. 'char']).character),
 			}
 		end
 	)
