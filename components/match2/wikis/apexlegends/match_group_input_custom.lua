@@ -164,8 +164,9 @@ function CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
 		end
 	end)
 
+	local placementCount = #usedPlacements
 	local function findNextSlot(placement)
-		if usedPlacements[placement] == 0 then
+		if usedPlacements[placement] == 0 or placement > placementCount then
 			return placement
 		end
 		return findNextSlot(placement + 1)
