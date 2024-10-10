@@ -26,12 +26,7 @@ function MatchLegacy.storeMatch(match2)
 end
 
 function MatchLegacy._convertParameters(match2)
-	local match = Table.deepCopy(match2)
-	for key, _ in pairs(match) do
-		if String.startsWith(key, 'match2') then
-			match[key] = nil
-		end
-	end
+	local match = Table.filterByKey(Table.deepCopy(match2), fucntion(key) return not String.startsWith(key, 'match2') end)
 	match.links = nil
 
 	if Logic.isNotEmpty(match.walkover) then
@@ -46,22 +41,19 @@ function MatchLegacy._convertParameters(match2)
 	local handleOpponent = function (index)
 		local prefix = 'opponent'..index
 		local opponent = match2.match2opponents[index] or {}
-		local opponentmatch2players = opponent.match2players or {}
+		match[prefix .. 'score'] = tonumber(opponent.score) or 0
 		if opponent.type == Opponent.team then
 			match[prefix] = opponent.name
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			local opponentplayers = {}
-			for i = 1, 10 do
-				local player = opponentmatch2players[i] or {}
-				opponentplayers['p' .. i] = player.name or ''
-				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
-				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
-			end
-			match[prefix..'players'] = opponentplayers
+			local players = {}
+			Array.forEach(opponent.match2players or {}, function(player, playerIndex)
+				players['p' .. playerIndex] = player.name or ''
+				players['p' .. playerIndex .. 'flag'] = player.flag or ''
+				players['p' .. playerIndex .. 'dn'] = player.displayname or ''
+			end)
+			match[prefix .. 'players'] = players
 		elseif opponent.type == Opponent.solo then
-			local player = opponentmatch2players[1] or {}
+			local player = (opponent.match2players or {})[1] or {}
 			match[prefix] = player.name
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix..'flag'] = player.flag
 		elseif opponent.type == Opponent.literal then
 			match[prefix] = 'TBD'
@@ -75,8 +67,7 @@ function MatchLegacy._convertParameters(match2)
 end
 
 function MatchLegacy.storeGames(match, match2)
-	local games = {}
-	for gameIndex, game2 in ipairs(match2.match2games or {}) do
+	local games = Array.map(match2.match2games or {}, fucntion(game2, gameIndex)
 		local game = Table.deepCopy(game2)
 
 		-- Other stuff
@@ -85,15 +76,14 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local winner = tonumber(game.winner) or 0
+		local winner = tonumber(game.winner)
 		game.opponent1score = winner == 1 and 1 or 0
 		game.opponent2score = winner == 2 and 1 or 0
-		local res = mw.ext.LiquipediaDB.lpdb_game(
+		return mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. '_' .. gameIndex,
 			Json.stringifySubTables(game)
 		)
-		table.insert(games, res)
-	end
+	end)
 	return table.concat(games)
 end
 
