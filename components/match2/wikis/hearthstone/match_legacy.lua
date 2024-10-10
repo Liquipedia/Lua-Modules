@@ -67,7 +67,7 @@ function MatchLegacy._convertParameters(match2)
 end
 
 function MatchLegacy.storeGames(match, match2)
-	local games = Array.map(match2.match2games or {}, fucntion(game2, gameIndex)
+	local games = Array.map(match2.match2games or {}, function(game2, gameIndex)
 		local game = Table.deepCopy(game2)
 
 		-- Other stuff
