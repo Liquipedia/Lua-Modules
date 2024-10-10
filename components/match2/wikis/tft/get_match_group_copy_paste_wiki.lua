@@ -35,6 +35,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.needsWinner) and (INDENT .. '|winner=') or nil,
 		INDENT .. '|date=',
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		Logic.readBool(args.casters) and (INDENT .. '|caster1=|caqster2=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
