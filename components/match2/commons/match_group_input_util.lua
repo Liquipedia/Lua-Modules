@@ -695,11 +695,16 @@ function MatchGroupInputUtil.getWalkoverType(opponents)
 	end
 end
 
----@param match table
+---@param dateProps {date: string, dateexact: boolean, timestamp: integer}
 ---@param maps {scores: integer[]?, winner: integer?}[]
 ---@return boolean
-function MatchGroupInputUtil.canUseAutoScore(match, maps)
-	local matchHasStarted = MatchGroupUtil.computeMatchPhase(match) ~= 'upcoming'
+function MatchGroupInputUtil.canUseAutoScore(dateProps, maps)
+	local matchPhase = MatchGroupUtil.computeMatchPhaseNew{
+		date = dateProps.date,
+		dateexact = dateProps.dateexact,
+		timestamp = dateProps.timestamp,
+	}
+	local matchHasStarted = matchPhase ~= 'upcoming'
 	local anyMapHasWinner = Table.any(maps, function(_, map)
 		return Logic.isNotEmpty(map.winner)
 	end)

@@ -36,14 +36,16 @@ function CustomMatchGroupInput.processMatch(input, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(input, opponentIndex, {})
 	end)
-	local games = MatchFunctions.extractMaps(input, #opponents)
+	local games = Array.mapIndexes(function (gameIndex)
+		return MatchGroupInputUtil.readGame(input, gameIndex, opponents)
+	end)
 	local bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 
 	local dateDetails = MatchGroupInputUtil.readDate(input.date)
 	local tournamentContext = MatchGroupInputUtil.getTournamentContext(input)
 
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(TODO, games)
+	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(dateDetails, games)
 		and MatchFunctions.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -84,39 +86,39 @@ end
 --
 
 ---@param matchInput table
----@param opponentCount integer
----@return table[]
-function MatchFunctions.extractMaps(matchInput, opponentCount)
-	local maps = {}
-
-	for _, input in Table.iter.pairsByPrefix(matchInput, 'map', {requireIndex = true}) do
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = input.walkover,
-				winner = input.winner,
-				opponentIndex = opponentIndex,
-				score = input['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(input))
-			return {score = score, status = status}
-		end)
-
-		local map = {
-			vod = input.vod,
-			extradata = MapFunctions.getExtraData(input, opponentCount),
-			finished = MatchGroupInputUtil.mapIsFinished(input),
-			scores = Array.map(opponentInfo, Operator.property('score'))
-		}
-
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(input.winner, input.finished, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, input.winner, opponentInfo)
-		end
-
-		table.insert(maps, input)
+---@param mapIndex integer
+---@param opponents table[]
+---@return table[]?
+function MatchFunctions.readMap(matchInput, mapIndex, opponents)
+	local input = matchInput['map' .. mapIndex]
+	if not input then
+		return nil
 	end
 
-	return maps
+	local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+		local score, status = MatchGroupInputUtil.computeOpponentScore({
+			walkover = input.walkover,
+			winner = input.winner,
+			opponentIndex = opponentIndex,
+			score = input['score' .. opponentIndex],
+		}, MapFunctions.calculateMapScore(input))
+		return {score = score, status = status}
+	end)
+
+	local map = {
+		vod = input.vod,
+		extradata = MapFunctions.getExtraData(input, #opponents),
+		finished = MatchGroupInputUtil.mapIsFinished(input),
+		scores = Array.map(opponentInfo, Operator.property('score'))
+	}
+
+	if map.finished then
+		map.resulttype = MatchGroupInputUtil.getResultType(input.winner, input.finished, opponentInfo)
+		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
+		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, input.winner, opponentInfo)
+	end
+
+	return map
 end
 
 -- Template:Map sets a default map name so we can count the number of maps.
