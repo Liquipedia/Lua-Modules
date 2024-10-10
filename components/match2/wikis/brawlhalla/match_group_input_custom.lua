@@ -62,7 +62,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	CustomMatchGroupInput.getTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
 
 	match.stream = Streams.processStreams(match)
 
@@ -73,12 +74,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 CustomMatchGroupInput.processMap = FnUtil.identity
-
----@param match table
-function CustomMatchGroupInput.getTournamentVars(match)
-	match = MatchGroupInputUtil.getCommonTournamentVars(match)
-	match.mode = Variables.varDefault('tournament_mode', 'singles')
-end
 
 ---@param match table
 ---@param matchOpponents table[]

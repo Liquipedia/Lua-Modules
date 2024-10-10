@@ -66,7 +66,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	CustomMatchGroupInput.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.extradata = CustomMatchGroupInput.getExtraData(match, scoreType == 'mapWins')
@@ -153,12 +154,6 @@ function CustomMatchGroupInput.calculateMatchScore(maps, calculateBy)
 			error('Unknown calculateBy: ' .. tostring(calculateBy))
 		end
 	end
-end
-
----@param match table
-function CustomMatchGroupInput.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
-	MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table

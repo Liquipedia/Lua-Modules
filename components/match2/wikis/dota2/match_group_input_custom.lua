@@ -104,7 +104,8 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
@@ -174,14 +175,6 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
-end
-
----@param match table
 ---@param games table[]
 ---@return table
 function MatchFunctions.getLinks(match, games)
@@ -210,7 +203,7 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		headtohead = match.headtohead,
+		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end

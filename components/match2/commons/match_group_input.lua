@@ -45,7 +45,7 @@ local VALID_GSL_GROUP_STYLES = {
 ---@param match table
 function MatchGroupInput._applyTournamentVarsToMaps(match)
 	for _, map in ipairs(MatchGroupUtil.normalizeSubtype(match, 'map')) do
-		MatchGroupInputUtil.getCommonTournamentVars(map, match)
+		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 	end
 end
 

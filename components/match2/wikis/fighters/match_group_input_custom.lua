@@ -68,7 +68,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	CustomMatchGroupInput.getTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
 
 	match.stream = Streams.processStreams(match)
 
@@ -133,12 +134,6 @@ function CustomMatchGroupInput.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
-function CustomMatchGroupInput.getTournamentVars(match)
-	MatchGroupInputUtil.getCommonTournamentVars(match)
-	match.mode = Variables.varDefault('tournament_mode', 'singles')
 end
 
 ---@param map table
