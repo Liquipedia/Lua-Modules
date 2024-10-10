@@ -47,7 +47,7 @@ function CustomMatchGroupInput.processMatch(match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.bestof = CustomMatchGroupInput.getBestOf(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
@@ -86,9 +86,9 @@ function CustomMatchGroupInput.processMatch(match)
 end
 
 ---@param match table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponentCount)
+function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
@@ -98,10 +98,10 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 			comment = map.comment,
 		}
 		map.map = 'Game ' .. mapIndex
-		map.mode = Opponent.toMode(match.opponent1.type, match.opponent2.type)
+		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
