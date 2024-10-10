@@ -871,21 +871,24 @@ function MatchGroupInputUtil.placementFromWinner(resultType, winner, opponentInd
 	return 2
 end
 
----@param match table
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
 ---@param opponents {score: integer?}[]
+---@param date {dateexact: boolean?, timestamp: integer}
+---@param bestof integer?
 ---@return boolean
-function MatchGroupInputUtil.matchIsFinished(match, opponents)
-	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
+function MatchGroupInputUtil.matchIsFinished(winnerInput, finishedInput, opponents, date, bestof)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return true
 	end
 
-	local finished = Logic.readBoolOrNil(match.finished)
+	local finished = Logic.readBoolOrNil(finishedInput)
 	if finished ~= nil then
 		return finished
 	end
 
 	-- If a winner has been set
-	if Logic.isNotEmpty(match.winner) then
+	if Logic.isNotEmpty(winnerInput) then
 		return true
 	end
 
@@ -899,12 +902,11 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	local threshold = match.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
-	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
+	local threshold = date.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
+	if date.timestamp and date.timestamp ~= DateExt.defaultTimestamp and (date.timestamp + threshold) < NOW then
 		return true
 	end
 
-	local bestof = match.bestof
 	if not bestof then
 		return false
 	end
@@ -913,28 +915,29 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 end
 
----@param map {winner: string|nil, finished: string?, bestof: integer?}
----@param opponents? {score: integer?}[]
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
+---@param opponents {score: integer?}[]?
+---@param bestof integer?
 ---@return boolean
-function MatchGroupInputUtil.mapIsFinished(map, opponents)
-	if MatchGroupInputUtil.isNotPlayed(map.winner, map.finished) then
+function MatchGroupInputUtil.mapIsFinished(winnerInput, finishedInput, opponents, bestof)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return true
 	end
 
-	local finished = Logic.readBoolOrNil(map.finished)
+	local finished = Logic.readBoolOrNil(finishedInput)
 	if finished ~= nil then
 		return finished
 	end
 
-	if Logic.isNotEmpty(map.winner) then
+	if Logic.isNotEmpty(winnerInput) then
 		return true
 	end
 
-	if Logic.isNotEmpty(map.finished) then
+	if Logic.isNotEmpty(finishedInput) then
 		return true
 	end
 
-	local bestof = map.bestof
 	if not bestof or bestof == 0 or not opponents then
 		return false
 	end

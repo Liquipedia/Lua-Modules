@@ -57,10 +57,12 @@ function CustomMatchGroupInput.processMatch(input, options)
 		}, autoScoreFunction)
 	end)
 
+	local finished = MatchGroupInputUtil.matchIsFinished(input.winner, input.finished, opponents, dateDetails, bestof)
+
 	local match = Table.merge({
 		opponents = opponents,
 		games = games,
-		finished = MatchGroupInputUtil.matchIsFinished(input, opponents),
+		finished = finished,
 		vod = input.vod,
 		bestof = bestof,
 		extradata = MatchFunctions.getExtraData(input),
@@ -69,10 +71,10 @@ function CustomMatchGroupInput.processMatch(input, options)
 		mode = Logic.emptyOr(input.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE),
 	}, dateDetails, tournamentContext)
 
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(input.winner, input.finished, match.opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, match.opponents)
-		match.winner = MatchGroupInputUtil.getWinner(input.resulttype, input.winner, match.opponents)
+	if finished then
+		match.resulttype = MatchGroupInputUtil.getResultType(input.winner, input.finished, opponents)
+		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
+		match.winner = MatchGroupInputUtil.getWinner(input.resulttype, input.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
 		end)
@@ -104,11 +106,12 @@ function MatchFunctions.readMap(matchInput, mapIndex, opponents)
 		}, MapFunctions.calculateMapScore(input))
 		return {score = score, status = status}
 	end)
+	local finished = MatchGroupInputUtil.mapIsFinished(input.winner, input.finished)
 
 	local map = {
 		vod = input.vod,
 		extradata = MapFunctions.getExtraData(input, #opponents),
-		finished = MatchGroupInputUtil.mapIsFinished(input),
+		finished = finished,
 		scores = Array.map(opponentInfo, Operator.property('score'))
 	}
 
