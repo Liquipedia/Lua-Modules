@@ -577,7 +577,7 @@ function BasePrizePool:build(isAward)
 	local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables'):node(prizePoolTable)
 
 	if self.adjacentContent then
-		tablesWrapper:wikitext(self.adjacentContent)
+		tablesWrapper:tag('span'):wikitext(self.adjacentContent)
 	end
 
 	wrapper:node(tablesWrapper)
