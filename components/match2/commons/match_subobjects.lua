@@ -29,9 +29,8 @@ function MatchSubobjects.luaGetMap(args)
 	-- dont save map if 'map' is not filled in
 	if Logic.isEmpty(args.map) then
 		return nil
-	else
-		return args
 	end
+	return args
 end
 
 if FeatureFlag.get('perf') then
