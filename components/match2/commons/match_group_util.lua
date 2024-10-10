@@ -1000,6 +1000,21 @@ function MatchGroupUtil.computeMatchPhase(match)
 	end
 end
 
+---Determines the phase of a match based on its properties.
+---@param props {date: string?, dateexact: boolean?, timestamp: number?, finished?: boolean, winner: integer?}
+---@return 'finished'|'ongoing'|'upcoming'
+function MatchGroupUtil.computeMatchPhaseNew(props)
+	local isExact = Logic.readBoolOrNil(props.dateexact)
+	local matchStartTimestamp = props.timestamp or Date.readTimestampOrNil(props.date) or Date.defaultTimestamp
+	if props.winner or Logic.readBool(props.finished) then
+		return 'finished'
+	elseif isExact ~= false and matchStartTimestamp ~= Date.defaultTimestamp and matchStartTimestamp <= NOW then
+		return 'ongoing'
+	else
+		return 'upcoming'
+	end
+end
+
 ---Normalizes subtypes (opponent, map) into a list
 ---@param match table
 ---@param type 'opponent'|'map'
