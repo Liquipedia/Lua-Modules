@@ -26,7 +26,7 @@ function MatchLegacy.storeMatch(match2)
 end
 
 function MatchLegacy._convertParameters(match2)
-	local match = Table.filterByKey(Table.deepCopy(match2), fucntion(key) return not String.startsWith(key, 'match2') end)
+	local match = Table.filterByKey(Table.deepCopy(match2), function(key) return not String.startsWith(key, 'match2') end)
 	match.links = nil
 
 	if Logic.isNotEmpty(match.walkover) then
