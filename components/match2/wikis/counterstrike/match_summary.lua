@@ -335,13 +335,17 @@ function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
+	local function scoreDisplay(oppIdx)
+		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+	end
+
 	-- Score
 	local team1Score = Score():setLeft()
 	local team2Score = Score('rtl'):setRight()
 
 	-- Teams map score
-	team1Score:setMapScore(game.scores[1])
-	team2Score:setMapScore(game.scores[2])
+	team1Score:setMapScore(scoreDisplay(1))
+	team2Score:setMapScore(scoreDisplay(2))
 
 	local t1sides = extradata['t1sides'] or {}
 	local t2sides = extradata['t2sides'] or {}
