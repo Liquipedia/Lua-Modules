@@ -79,11 +79,6 @@ MatchGroupInputUtil.MATCH_STATUS = {
 	NOT_PLAYED = 'notplayed',
 }
 
-MatchGroupInputUtil.RESULT_TYPE = {
-	DEFAULT = 'default',
-	NOT_PLAYED = 'np',
-	DRAW = 'draw',
-}
 MatchGroupInputUtil.WALKOVER = {
 	FORFIET = 'ff',
 	DISQUALIFIED = 'dq',
@@ -616,26 +611,6 @@ function MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
 		or (type(finishedInput) == 'string' and MatchGroupInputUtil.isNotPlayedInput(finishedInput))
 end
 
----Should only be called on finished matches or maps
----@deprecated
----@param winnerInput integer|string|nil
----@param finishedInput string?
----@param opponents {score: number?, status: string}[]
----@return string? #Result Type
-function MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
-		return MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-	end
-
-	if MatchGroupInputUtil.isDraw(opponents, winnerInput) then
-		return MatchGroupInputUtil.RESULT_TYPE.DRAW
-	end
-
-	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
-		return MatchGroupInputUtil.RESULT_TYPE.DEFAULT
-	end
-end
-
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@return string? #Match Status
@@ -650,7 +625,7 @@ end
 ---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
-	if status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
@@ -686,29 +661,6 @@ function MatchGroupInputUtil.getHighestScoringOpponent(opponents)
 	local scores = Array.map(opponents, Operator.property('score'))
 	local maxScore = Array.max(scores)
 	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
-end
-
----@deprecated
----@param resultType string?
----@param opponents {status: string}[]
----@return string? # Walkover Type
-function MatchGroupInputUtil.getWalkover(resultType, opponents)
-	if resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
-		return MatchGroupInputUtil.getWalkoverType(opponents)
-	end
-end
-
----@deprecated
----@param opponents {status: string}[]
----@return string?
-function MatchGroupInputUtil.getWalkoverType(opponents)
-	if MatchGroupInputUtil.hasForfeit(opponents) then
-		return MatchGroupInputUtil.WALKOVER.FORFIET
-	elseif MatchGroupInputUtil.hasDisqualified(opponents) then
-		return MatchGroupInputUtil.WALKOVER.DISQUALIFIED
-	elseif MatchGroupInputUtil.hasDefaultWinLoss(opponents) then
-		return MatchGroupInputUtil.WALKOVER.NO_SCORE
-	end
 end
 
 ---@param match table
@@ -825,30 +777,6 @@ function MatchGroupInputUtil._opponentWithStatus(opponents, status)
 	return Array.indexOf(opponents, function (opponent) return opponent.status == status end)
 end
 
----@deprecated
--- function to check for forfeits
----@param opponents {status: string?}[]
----@return boolean
-function MatchGroupInputUtil.hasForfeit(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFIET) ~= 0
-end
-
----@deprecated
--- function to check for DQ's
----@param opponents {status: string?}[]
----@return boolean
-function MatchGroupInputUtil.hasDisqualified(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DISQUALIFIED) ~= 0
-end
-
----@deprecated
--- function to check for W/L
----@param opponents {status: string?}[]
----@return boolean
-function MatchGroupInputUtil.hasDefaultWinLoss(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DEFAULT_LOSS) ~= 0
-end
-
 -- function to check for Normal Scores
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -876,10 +804,7 @@ end
 ---@param status string?
 ---@return MGIParsedOpponent[]
 function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, status)
-	if not opponents or #opponents ~= 2
-		or status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-		or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
-
+	if not opponents or #opponents ~= 2 or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return opponents
 	end
 
