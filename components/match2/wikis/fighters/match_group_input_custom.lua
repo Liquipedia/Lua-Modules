@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')

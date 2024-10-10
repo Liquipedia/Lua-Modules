@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
@@ -22,8 +21,6 @@ local DEFAULT_MODE = 'team'
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 ---@param options table?

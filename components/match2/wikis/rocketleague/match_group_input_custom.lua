@@ -9,7 +9,6 @@
 local CustomMatchGroupInput = {}
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
