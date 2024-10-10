@@ -66,7 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.mode = Variables.varDefault('tournament_mode', DEFAULT_MODE)
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -74,12 +73,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {}
 end
 
 ---@param match table
@@ -100,14 +93,10 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param bestofInput string|integer?
----@return integer?
+---@return integer
 function MatchFunctions.getBestOf(bestofInput)
-	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('match_bestof', DEFAULT_BESTOF))
-
-	if bestof then
-		Variables.varDefine('match_bestof', bestof)
-	end
-
+	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('match_bestof')) or DEFAULT_BESTOF
+	Variables.varDefine('match_bestof', bestof)
 	return bestof
 end
 
