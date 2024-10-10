@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
@@ -73,8 +72,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return match
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param match table
 ---@param matchOpponents table[]
 ---@return table[]
@@ -95,9 +92,6 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
 			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
 		end)
-		-- Match/Subobjects:luaGetMap sets a empty table as default value for participants.
-		-- Once subobjects have been refactored away this can be removed.
-		map.participants = nil
 
 		local opponentInfo = Array.map(matchOpponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({

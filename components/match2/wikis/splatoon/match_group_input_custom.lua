@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -121,8 +120,6 @@ function MatchFunctions.extractMaps(match, opponents)
 
 	return maps
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 --
 -- match related functions

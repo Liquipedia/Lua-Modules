@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -78,8 +77,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	return match
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 --
 -- match related functions

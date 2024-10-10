@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -90,8 +89,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	return match
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param match table
 ---@param opponents table[]

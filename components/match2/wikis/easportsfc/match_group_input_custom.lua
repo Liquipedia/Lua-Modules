@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
@@ -131,7 +130,6 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 
 	return maps
 end
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 --- TODO: Investigate if some parts of this should be a display rather than storage.
 --- If penalties is supplied, than one map MUST have the penalty flag set to true.
