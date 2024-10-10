@@ -42,7 +42,7 @@
  * Properties:
  * The switch button can be easily accessed and manipulated by other components using the getSwitchGroup method.
  *
- * SwithGroup object contains the following properties:
+ * SwitchGroup object contains the following properties:
  * - type: The type of the switch group (toggle or pill).
  * - name: The name of the switch group.
  * - activeClassName: The class name that is added to the active switch button.
@@ -120,10 +120,13 @@ liquipedia.switchButtons = {
 				targetValue
 			) );
 		} else {
-			switchGroup.nodes.forEach( ( node ) => node.classList.toggle(
-				switchGroup.activeClassName,
-				targetValue === node.dataset.switchValue
-			) );
+			switchGroup.nodes.forEach( ( node ) => {
+				const isActive = targetValue === node.dataset.switchValue;
+				node.classList.toggle( switchGroup.activeClassName, isActive );
+				if ( isActive ) {
+					node.dispatchEvent( new Event( 'click' ) );
+				}
+			} );
 		}
 	},
 

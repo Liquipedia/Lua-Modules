@@ -19,7 +19,7 @@ local Template = require('Module:Template')
 local Injector = Lua.import('Module:Widget/Injector')
 local Cosmetic = Lua.import('Module:Infobox/Cosmetic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -69,10 +69,10 @@ function CustomInjector:parse(id, widgets)
 					args.slot and ('<b>Slot:</b> ' .. slotText) or nil,
 				}
 			},
-			Center{content = {
+			Center{children = {
 				CustomCosmetic._buyNow(Logic.readBool(args.marketable or true), args.defindex)
 			}},
-			Title{name = 'Extra Information'},
+			Title{children = 'Extra Information'},
 			Cell{name = 'Created By', content =
 				(args.creator == 'Valve' and {Template.safeExpand(mw.getCurrentFrame(), 'Valve icon')})
 				or self.caller:getAllArgsForBase(args, 'creator')
@@ -99,7 +99,7 @@ function CustomInjector:parse(id, widgets)
 					Cell{name = #orgins == 1 and 'Origin' or 'Origins', content = orgins}
 				}
 			end},
-			Center{content = {args.description}},
+			Center{children = {args.description}},
 			Center{name = '[[Trading|Tradable]]', classes = {'infobox-cosmetic-tradeable'}, content = {
 				CustomCosmetic._ableText('TRADEABLE', args.tradeable, args.marketlock)
 			}},
@@ -126,8 +126,8 @@ function CustomCosmetic._displaySet(setName, manualItems)
 	end
 
 	return {
-		Title{name = setName},
-		Widgets.Highlights{content = Array.map(setItems, function(element)
+		Title{children = setName},
+		Widgets.Highlights{children = Array.map(setItems, function(element)
 			return '[['.. element ..']]'
 		end)}
 	}

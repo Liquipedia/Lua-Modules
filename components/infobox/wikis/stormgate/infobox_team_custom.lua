@@ -16,7 +16,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -46,21 +46,21 @@ function CustomInjector:parse(id, widgets)
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
 		widgets = {}
 		if achievements then
-			table.insert(widgets, Title{name = 'Achievements'})
-			table.insert(widgets, Center{content = {achievements}})
+			table.insert(widgets, Title{children = 'Achievements'})
+			table.insert(widgets, Center{children = {achievements}})
 		end
 
 		if soloAchievements then
-			table.insert(widgets, Title{name = 'Solo Achievements'})
-			table.insert(widgets, Center{content = {soloAchievements}})
+			table.insert(widgets, Title{children = 'Solo Achievements'})
+			table.insert(widgets, Center{children = {soloAchievements}})
 		end
 
 		local raceBreakdown = RaceBreakdown.run(args)
 		if raceBreakdown then
 			Array.appendWith(widgets,
-				Title{name = 'Player Breakdown'},
+				Title{children = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }}
+				Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }}
 			)
 		end
 

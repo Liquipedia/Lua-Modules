@@ -22,7 +22,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 local YearsActive = Lua.import('Module:YearsActive')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -117,8 +117,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'history' then
 		local getHistoryCells = function(key, title)
 			return {
-				String.isNotEmpty(args[key]) and Title{name = title} or nil,
-				Center{content = {args[key]}},
+				String.isNotEmpty(args[key]) and Title{children = title} or nil,
+				Center{children = {args[key]}},
 			}
 		end
 

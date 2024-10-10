@@ -40,12 +40,12 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
 	end)
-	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, match.bestof)
+		and MatchFunctions.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
@@ -65,7 +65,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -80,19 +81,19 @@ end
 
 
 ---@param match table
----@param opponentCount integer
+---@param opponents MGIParsedOpponent[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponentCount)
+function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.participants = MapFunctions.getParticipants(map, opponentCount)
-		map.extradata = MapFunctions.getExtraData(map, map.participants)
+		map.opponents = MapFunctions.getParticipants(map, opponents)
+		map.extradata = MapFunctions.getExtraData(map, map.opponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -116,8 +117,6 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 --
 -- match related functions
 --
@@ -131,31 +130,12 @@ function MatchFunctions.removeUnsetMaps(games)
 	return Array.filter(games, MapFunctions.keepMap)
 end
 
--- Calculate the match scores based on the map results.
--- If it's a Best of 1, we'll take the exact score of that map
--- If it's not a Best of 1, we should count the map wins
 ---@param maps table[]
----@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, bestOf)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
-		if bestOf == 1 then
-			if not maps[1] or not maps[1].scores then
-				return
-			end
-			return maps[1].scores[opponentIndex]
-		end
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	match.patch = Logic.emptyOr(match.patch, Variables.varDefault('patch'))
-
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table
@@ -188,8 +168,8 @@ function MapFunctions.keepMap(map)
 end
 
 ---@param map table
----@param participants table<string, {player: string?, agent: string?}>
----@return table
+---@param participants {players: {player: string?, agent: string?}[]}[]
+---@return table<string, any>
 function MapFunctions.getExtraData(map, participants)
 	---@type table<string, any>
 	local extraData = {
@@ -199,40 +179,52 @@ function MapFunctions.getExtraData(map, participants)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
-	for key, participant in pairs(participants) do
-		local opponentIdx, playerIdx = unpack(mw.text.split(key, '_', true))
-		extraData['t' .. opponentIdx .. 'p' .. playerIdx] = participant.player
-		extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = participant.agent
+	for opponentIdx, opponent in ipairs(participants) do
+		for playerIdx, player in pairs(opponent.players) do
+			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
+			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent
+		end
 	end
 
 	return extraData
 end
 
 ---@param map table
----@param opponentCount integer
----@return table
-function MapFunctions.getParticipants(map, opponentCount)
-	local participants = {}
+---@param opponents MGIParsedOpponent[]
+---@return {players: table[]}[]
+function MapFunctions.getParticipants(map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
-	for opponentIdx = 1, opponentCount do
-		for _, stats, playerIdx in Table.iter.pairsByPrefix(map, 't' .. opponentIdx .. 'p', {requireIndex = true}) do
-			stats = Json.parseIfString(stats)
-
-			local participant = {
-				kills = stats.kills,
-				deaths = stats.deaths,
-				assists = stats.assists,
-				acs = stats.acs,
-				player = stats.player,
-				agent = getCharacterName(stats.agent),
-			}
-
-			participants[opponentIdx .. '_' .. playerIdx] = participant
-		end
-	end
-
-	return participants
+	return Array.map(opponents, function(opponent, opponentIndex)
+		local players = Array.mapIndexes(function(playerIndex)
+			return opponent.match2players[playerIndex] or
+				(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
+				nil
+		end)
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			opponent.match2players,
+			players,
+			function(playerIndex)
+				local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+				return data and {name = data.player} or nil
+			end,
+			function(playerIndex, playerIdData, playerInputData)
+				local stats = Json.parseIfString(map['t'.. opponentIndex .. 'p' .. playerIndex]) or {}
+				return {
+					kills = stats.kills,
+					deaths = stats.deaths,
+					assists = stats.assists,
+					acs = stats.acs,
+					player = playerIdData.name or playerInputData.name,
+					agent = getCharacterName(stats.agent),
+				}
+			end
+		)
+		Array.forEach(unattachedParticipants, function(participant)
+			table.insert(participants, participant)
+		end)
+		return {players = participants}
+	end)
 end
 
 ---@param map table

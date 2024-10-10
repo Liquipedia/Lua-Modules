@@ -18,11 +18,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
-
-local TBD = 'TBD'
-
 -- Score Class
 ---@class ZulaScore
 ---@operator call(string|number|nil): ZulaScore
@@ -103,123 +98,6 @@ function Score:create()
 	return self.root
 end
 
--- Map Veto Class
----@class ZulaMapVeto: MatchSummaryRowInterface
----@operator call: ZulaMapVeto
----@field root Html
----@field table Html
-local MapVeto = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
-		self.table = self.root:tag('table')
-			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader()
-	end
-)
-
----@return ZulaMapVeto
-function MapVeto:createHeader()
-	self.table:tag('tr')
-		:tag('th'):css('width','33%'):done()
-		:tag('th'):css('width','34%'):wikitext('Map Veto'):done()
-		:tag('th'):css('width','33%'):done()
-	return self
-end
-
----@param firstVeto number?
----@return ZulaMapVeto
-function MapVeto:vetoStart(firstVeto)
-	local textLeft
-	local textCenter
-	local textRight
-	if firstVeto == 1 then
-		textLeft = '<b>Start Map Veto</b>'
-		textCenter = ARROW_LEFT
-	elseif firstVeto == 2 then
-		textCenter = ARROW_RIGHT
-		textRight = '<b>Start Map Veto</b>'
-	else return self end
-	self.table:tag('tr'):addClass('brkts-popup-mapveto-vetostart')
-		:tag('th'):wikitext(textLeft or ''):done()
-		:tag('th'):wikitext(textCenter):done()
-		:tag('th'):wikitext(textRight or ''):done()
-	return self
-end
-
----@param map string?
----@return ZulaMapVeto
-function MapVeto:addDecider(map)
-	map = Logic.emptyOr(map, TBD)
-
-	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
-
-	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
-	self:addColumnVetoMap(row, map)
-	self:addColumnVetoType(row, 'brkts-popup-mapveto-decider', 'DECIDER')
-
-	self.table:node(row)
-	return self
-end
-
----@param vetotype string?
----@param map1 string?
----@param map2 string?
----@return ZulaMapVeto
-function MapVeto:addRound(vetotype, map1, map2)
-	map1 = Logic.emptyOr(map1, TBD)
-	map2 = Logic.emptyOr(map2, TBD)
-
-	local class
-	local vetoText
-	if vetotype == 'ban' then
-		vetoText = 'BAN'
-		class = 'brkts-popup-mapveto-ban'
-	elseif vetotype == 'pick' then
-		vetoText = 'PICK'
-		class = 'brkts-popup-mapveto-pick'
-	elseif vetotype == 'defaultban' then
-		vetoText = 'DEFAULT BAN'
-		class = 'brkts-popup-mapveto-defaultban'
-	else
-		return self
-	end
-
-	local row = mw.html.create('tr'):addClass('brkts-popup-mapveto-vetoround')
-
-	self:addColumnVetoMap(row, map1)
-	self:addColumnVetoType(row, class, vetoText)
-	self:addColumnVetoMap(row, map2)
-
-	self.table:node(row)
-	return self
-end
-
----@param row Html
----@param styleClass string
----@param vetoText string
----@return ZulaMapVeto
-function MapVeto:addColumnVetoType(row, styleClass, vetoText)
-	row:tag('td')
-		:tag('span')
-			:addClass(styleClass)
-			:addClass('brkts-popup-mapveto-vetotype')
-			:wikitext(vetoText)
-	return self
-end
-
----@param row Html
----@param map string?
----@return ZulaMapVeto
-function MapVeto:addColumnVetoMap(row, map)
-	row:tag('td'):wikitext(map):done()
-	return self
-end
-
----@return Html
-function MapVeto:create()
-	return self.root
-end
-
 ---@class ZulaMatchStatus: MatchSummaryRowInterface
 ---@operator call: ZulaMatchStatus
 ---@field root Html
@@ -277,25 +155,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add the Map Vetoes
-	if match.extradata.mapveto then
-		local vetoData = match.extradata.mapveto
-		if vetoData then
-			local mapVeto = MapVeto()
-
-			for _,vetoRound in ipairs(vetoData) do
-				if vetoRound.vetostart then
-					mapVeto:vetoStart(tonumber(vetoRound.vetostart))
-				end
-				if vetoRound.type == 'decider' then
-					mapVeto:addDecider(vetoRound.decider)
-				else
-					mapVeto:addRound(vetoRound.type, vetoRound.team1, vetoRound.team2)
-				end
-			end
-
-			body:addRow(mapVeto)
-		end
-	end
+	body:addRow(MatchSummary.defaultMapVetoDisplay(match))
 
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then
@@ -318,8 +178,8 @@ function CustomMatchSummary._createMap(game)
 	local team2Score = Score('rtl'):setRight()
 
 	-- Teams map score
-	team1Score:setMapScore(game.scores[1])
-	team2Score:setMapScore(game.scores[2])
+	team1Score:setMapScore(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
+	team2Score:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 
 	local t1sides = extradata['t1sides'] or {}
 	local t2sides = extradata['t2sides'] or {}

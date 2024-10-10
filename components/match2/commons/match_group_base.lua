@@ -47,6 +47,11 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		end
 	end
 
+	if not Variables.varDefault('tournament_parent') then
+		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing tournament context')
+	end
+
 	if Logic.readBool(args.isLegacy) then
 		if matchGroupType == 'matchlist' then
 			table.insert(warnings, 'This is a legacy matchlist! Please use the new matchlist instead.')

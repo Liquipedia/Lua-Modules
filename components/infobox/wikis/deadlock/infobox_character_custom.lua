@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Title{name = 'Vitality'},
+			Title{children = 'Vitality'},
 			Cell{name = 'Health', content = {args.basehealth}},
 			Cell{name = 'Health Regeneration', content = {args.basehealthregen}},
 			Cell{name = 'Bullet Resistance', content = {args.resistancebullet .. '%'}},
@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Title{name = 'Weapon'},
+			Title{children = 'Weapon'},
 			Cell{name = 'DPS', content = {args.dps}},
 			Cell{name = 'Bullet Damage', content = {args.damagebullet}},
 			Cell{name = 'Bullets per Seconds', content = {args.bps}},

@@ -123,6 +123,7 @@ local infoData = {
 			opponentHeight = 26,
 			scoreWidth = 26,
 			matchWidth = 200,
+			gameScoresIfBo1 = true,
 		},
 	},
 }

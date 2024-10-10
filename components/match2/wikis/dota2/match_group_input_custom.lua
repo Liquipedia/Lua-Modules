@@ -23,7 +23,6 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = false,
-	pagifyPlayerNames = true,
 	maxNumPlayers = 15,
 }
 local DEFAULT_MODE = 'team'
@@ -80,7 +79,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-	local games = MatchFunctions.extractMaps(MatchParser, match, #opponents)
+	local games = MatchFunctions.extractMaps(MatchParser, match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
@@ -105,7 +104,8 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match, games)
@@ -120,9 +120,9 @@ end
 
 ---@param MatchParser Dota2MatchParserInterface
 ---@param match table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table[]
-function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
+function MatchFunctions.extractMaps(MatchParser, match, opponents)
 	local maps = {}
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MatchParser.getMap(mapInput)
@@ -136,11 +136,11 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 		map.length = MatchParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.publisherid = map.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
-		map.participants = MapFunctions.getParticipants(MatchParser, map, opponentCount)
-		map.extradata = MapFunctions.getExtraData(MatchParser, map, opponentCount)
+		map.participants = MapFunctions.getParticipants(MatchParser, map, opponents)
+		map.extradata = MapFunctions.getExtraData(MatchParser, map, #opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -164,22 +164,12 @@ function MatchFunctions.extractMaps(MatchParser, match, opponentCount)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table
@@ -211,7 +201,7 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		headtohead = match.headtohead,
+		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
@@ -261,20 +251,34 @@ end
 -- Parse participant information
 ---@param MatchParser Dota2MatchParserInterface
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getParticipants(MatchParser, map, opponentCount)
-	local participants = {}
+function MapFunctions.getParticipants(MatchParser, map, opponents)
+	local allParticipants = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	for opponentIndex = 1, opponentCount do
-		for playerIndex, participant in ipairs(MatchParser.getParticipants(map, opponentIndex) or {}) do
-			participant.character = getCharacterName(participant.character)
-			participants[opponentIndex .. '_' .. playerIndex] = participant
-		end
-	end
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local participantList = MatchParser.getParticipants(map, opponentIndex) or {}
+		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+			opponent.match2players,
+			participantList,
+			function (playerIndex)
+				local participant = participantList[playerIndex]
+				return participant and {name = participant.player} or nil
+			end,
+			function(playerIndex)
+				local participant = participantList[playerIndex]
+				participant.character = getCharacterName(participant.character)
+				return participant
+			end
+		)
+		Array.forEach(unattachedParticipants, function(participant)
+			table.insert(participants, participant)
+		end)
+		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	end)
 
-	return participants
+	return allParticipants
 end
 
 ---@param winnerInput string|integer|nil

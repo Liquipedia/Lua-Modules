@@ -20,7 +20,7 @@ local Variables = require('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -57,8 +57,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'customcontent' and String.isNotEmpty(args.map1) then
 		Array.appendWith(widgets,
-			Title{name = 'Maps'},
-			Center{content = self.caller:_makeMapList()}
+			Title{children = 'Maps'},
+			Center{children = self.caller:_makeMapList()}
 		)
 	end
 	return widgets

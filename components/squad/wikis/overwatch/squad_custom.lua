@@ -13,9 +13,9 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Widget = require('Module:Infobox/Widget/All')
+local Widget = require('Module:Widget/All')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
 
@@ -48,28 +48,29 @@ function ExtendedSquadRow:number()
 end
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
-	local squad = Squad(args, CustomInjector()):title()
-
-	local players = SquadUtils.parsePlayers(squad.args)
+	local props = {
+		injector = CustomInjector(),
+		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		title = args.title,
+	}
+	local players = SquadUtils.parsePlayers(args)
 
 	HAS_NUMBER = Array.any(players, Operator.property('number'))
 
-	squad:header()
-
-	Array.forEach(players, function(player)
-		squad:row(CustomSquad._playerRow(player, squad.type))
+	props.children = Array.map(players, function(player)
+		return CustomSquad._playerRow(player, props.type)
 	end)
 
-	return squad:create()
+	return tostring(Squad(props))
 end
 
 ---@param playerList table[]
 ---@param squadType integer
 ---@param customTitle string?
----@return Html?
+---@return string?
 function CustomSquad.runAuto(playerList, squadType, customTitle)
 	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end

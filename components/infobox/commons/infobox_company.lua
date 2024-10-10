@@ -17,7 +17,7 @@ local Table = require('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -39,9 +39,8 @@ function Company.run(frame)
 	return company:createInfobox()
 end
 
----@return Html
+---@return string
 function Company:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -51,8 +50,8 @@ function Company:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Company Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Company Information'},
 		Customizable{id = 'parent', children = {
 			Cell{
 				name = 'Parent Company',
@@ -76,7 +75,7 @@ function Company:createInfobox()
 		Builder{
 			builder = function()
 				if args.companytype == COMPANY_TYPE_ORGANIZER then
-					infobox:categories('Tournament organizers')
+					self:categories('Tournament organizers')
 					return {
 						Cell{
 							name = 'Awarded Prize Pools',
@@ -86,14 +85,14 @@ function Company:createInfobox()
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Builder{
 			builder = function()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end
@@ -124,9 +123,9 @@ function Company:createInfobox()
 		})
 	})
 
-	infobox:categories('Companies')
+	self:categories('Companies')
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param location string?

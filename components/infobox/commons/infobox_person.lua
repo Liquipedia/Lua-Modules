@@ -25,7 +25,7 @@ local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
@@ -45,7 +45,9 @@ local COUNTRIES_EASTERN_NAME_ORDER = {
 	'Hong Kong',
 	'Vietnam',
 	'South Korea',
-	'Cambodia'
+	'Cambodia',
+	'Macau',
+	'Singapore',
 }
 
 ---@enum PlayerStatus
@@ -74,9 +76,8 @@ function Person.run(frame)
 	return person:createInfobox()
 end
 
----@return Html
+---@return string
 function Person:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	self.locations = self:getLocations()
@@ -135,8 +136,8 @@ function Person:createInfobox()
 			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Player') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Player') .. ' Information'},
 		Customizable{id = 'names', children = {
 				Cell{name = 'Name', content = {args.name}},
 				Cell{name = 'Romanized Name', content = {args.romanized_name}},
@@ -191,8 +192,8 @@ function Person:createInfobox()
 			builder = function()
 				if Table.isNotEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = LINK_VARIANT}
+						Title{children = 'Links'},
+						Widgets.Links{links = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -202,8 +203,8 @@ function Person:createInfobox()
 				builder = function()
 					if String.isNotEmpty(args.achievements) then
 						return {
-							Title{name = 'Achievements'},
-							Center{content = {args.achievements}}
+							Title{children = 'Achievements'},
+							Center{children = {args.achievements}}
 						}
 					end
 				end
@@ -214,21 +215,21 @@ function Person:createInfobox()
 				builder = function()
 					if String.isNotEmpty(args.history) then
 						return {
-							Title{name = 'History'},
-							Center{content = {args.history}}
+							Title{children = 'History'},
+							Center{children = {args.history}}
 						}
 					end
 				end
 			},
 		}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	infobox:bottom(self:createBottomContent())
+	self:bottom(self:createBottomContent())
 
 	local statusToStore = self:getStatusToStore(args)
-	infobox:categories(unpack(self:getCategories(
+	self:categories(unpack(self:getCategories(
 				args,
 				age.birth,
 				personType.category,
@@ -245,7 +246,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -328,7 +329,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			self.infobox.warnings,
+			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		return nil

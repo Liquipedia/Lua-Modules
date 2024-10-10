@@ -164,7 +164,7 @@ end
 ---and removes direct references between a match record and its subobject records.
 ---@param match table
 ---@return {matchRecord: table, gameRecords: table[], opponentRecords: table[], playerRecords: table[]}
----@overload fun(match: table): {}
+---@overload fun(match: any): {}
 function Match.splitRecordsByType(match)
 	if match == nil or type(match) ~= 'table' then
 		return {}
@@ -385,6 +385,16 @@ end
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
+	if not gameRecord.participants then
+		gameRecord.participants = {}
+		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
+			for playerId, player in pairs(opponent.players) do
+				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
+				-- between participants and opponents
+				gameRecord.participants[opponentId .. '_' .. playerId] = Table.deepCopy(player)
+			end
+		end
+	end
 	Match.clampFields(gameRecord, Match.gameFields)
 end
 
@@ -452,6 +462,7 @@ Match.gameFields = Table.map({
 	'parent',
 	'participants',
 	'patch',
+	'opponents', -- Not a real field yet, but will be in the future. Also for use in Match/Legacy
 	'resulttype',
 	'rounds',
 	'scores',

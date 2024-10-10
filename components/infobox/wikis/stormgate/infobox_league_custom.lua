@@ -21,7 +21,7 @@ local League = Lua.import('Module:Infobox/League')
 local PatchAuto = Lua.import('Module:Infobox/Extension/PatchAuto')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -105,16 +105,16 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 then
 			Array.appendWith(widgets,
-				Title{name = 'Player Breakdown'},
+				Title{children = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
-				Breakdown{content = args.raceBreakDown.display, classes = { 'infobox-center' }}
+				Breakdown{children = args.raceBreakDown.display, classes = { 'infobox-center' }}
 			)
 		end
 
 		--teams section
 		if Logic.isNumeric(args.team_number) and tonumber(args.team_number) > 0 then
 			Array.appendWith(widgets,
-				Title{name = 'Teams'},
+				Title{children = 'Teams'},
 				Cell{name = 'Number of Teams', content = {args.team_number}}
 			)
 		end
@@ -122,8 +122,8 @@ function CustomInjector:parse(id, widgets)
 		--maps
 		if String.isNotEmpty(args.map1) then
 			Array.appendWith(widgets,
-				Title{name = 'Maps'},
-				Center{content = {self.caller:_mapsDisplay(args.maps)}}
+				Title{children = 'Maps'},
+				Center{children = {self.caller:_mapsDisplay(args.maps)}}
 			)
 		end
 	end

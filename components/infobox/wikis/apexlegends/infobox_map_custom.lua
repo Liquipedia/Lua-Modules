@@ -15,7 +15,7 @@ local String = require('Module:StringUtils')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local TableCell = Widgets.TableCell
@@ -67,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 		end)
 
 		Array.appendWith(widgets,
-			Title{name = 'Ring Information'},
+			Title{children = 'Ring Information'},
 			ringTable
 		)
 	end
@@ -79,11 +79,11 @@ end
 function CustomMap:_createRingTableHeader()
 	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
 	return headerRow
-		:addCell(TableCell{content = {'Ring'}})
-		:addCell(TableCell{content = {'Wait (s)'}})
-		:addCell(TableCell{content = {'Close<br>Time (s)'}})
-		:addCell(TableCell{content = {'Damage<br>per tick'}})
-		:addCell(TableCell{content = {'End Diameter (m)'}})
+		:addCell(TableCell{children = {'Ring'}})
+		:addCell(TableCell{children = {'Wait (s)'}})
+		:addCell(TableCell{children = {'Close<br>Time (s)'}})
+		:addCell(TableCell{children = {'Damage<br>per tick'}})
+		:addCell(TableCell{children = {'End Diameter (m)'}})
 end
 
 ---@param ringData string
@@ -91,7 +91,7 @@ end
 function CustomMap:_createRingTableRow(ringData)
 	local row = TableRow{}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		row:addCell(TableCell{content = {item}})
+		row:addCell(TableCell{children = {item}})
 	end
 	return row
 end

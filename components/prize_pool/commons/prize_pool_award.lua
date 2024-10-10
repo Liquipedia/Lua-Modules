@@ -18,7 +18,7 @@ local Placement = Lua.import('Module:PrizePool/Award/Placement')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
@@ -53,7 +53,7 @@ end
 ---@return WidgetTableCell
 function AwardPrizePool:placeOrAwardCell(placement)
 	local awardCell = TableCell{
-		content = {placement.award},
+		children = {placement.award},
 		css = {['font-weight'] = 'bolder'},
 		classes = {'prizepooltable-place'},
 	}
@@ -85,9 +85,9 @@ end
 
 ---@return WidgetTableRow
 function AwardPrizePool:_toggleExpand()
-	local expandButton = TableCell{content = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
+	local expandButton = TableCell{children = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
 		:addClass('general-collapsible-expand-button')
-	local collapseButton = TableCell{content = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
+	local collapseButton = TableCell{children = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
 		:addClass('general-collapsible-collapse-button')
 
 	return TableRow{classes = {'ppt-toggle-expand'}}:addCell(expandButton):addCell(collapseButton)

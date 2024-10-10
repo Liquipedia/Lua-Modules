@@ -12,7 +12,7 @@ local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Title = Widgets.Title
 local Center = Widgets.Center
 
@@ -47,9 +47,9 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isEmpty(manualHistory) and not automatedHistory then return {} end
 		return {
-			Title{name = 'History'},
-			Center{content = {manualHistory}},
-			Center{content = {automatedHistory}},
+			Title{children = 'History'},
+			Center{children = {manualHistory}},
+			Center{children = {automatedHistory}},
 		}
 	elseif id == 'region' then return {}
 	end

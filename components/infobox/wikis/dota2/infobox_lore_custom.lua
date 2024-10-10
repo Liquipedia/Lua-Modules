@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 local Injector = Lua.import('Module:Widget/Injector')
 local Lore = Lua.import('Module:Infobox/Lore')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -39,7 +39,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
-			Title{name = 'About'},
+			Title{children = 'About'},
 			Cell{name = 'Names', content = {args.names}},
 			Cell{name = 'Examples', content = {args.examples}},
 			Cell{name = 'Members', content = {args.members}},
@@ -50,7 +50,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Age', content = {args.age}},
 			Cell{name = 'Race/Species', content = {args['race/species']}},
 			Cell{name = 'Faction/s', content = {args['faction/s']}},
-			Title{name = 'Associated With'},
+			Title{children = 'Associated With'},
 			Cell{name = 'Heroes', content = {args.heroes}},
 			Cell{name = 'Races', content = {args.race}},
 			Cell{name = 'Factions', content = {args.factions}},

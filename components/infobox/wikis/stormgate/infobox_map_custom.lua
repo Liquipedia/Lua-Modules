@@ -17,7 +17,7 @@ local Table = require('Module:Table')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -130,7 +130,7 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
 			},
 			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
-			{hasCampData and Title{name = 'Camp Information'} or nil},
+			{hasCampData and Title{children = 'Camp Information'} or nil},
 			self.caller:_addCellsFromDataTable(args, CAMPS)
 		)
 	end

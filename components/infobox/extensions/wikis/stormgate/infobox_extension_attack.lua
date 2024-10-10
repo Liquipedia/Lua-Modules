@@ -13,7 +13,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -47,7 +47,7 @@ function Attack.run(argsJson, attackIndex, faction)
 	Attack._store(data, args, faction, attackIndex)
 
 	return {
-		Title{name = 'Attack' .. attackIndex .. ': ' .. args.name},
+		Title{children = 'Attack' .. attackIndex .. ': ' .. args.name},
 		Cell{name = 'Target', content = {Attack._displayArray(data.targets)}},
 		Cell{name = 'Damage', content = {Attack._displayDamage(data)}},
 		Cell{name = 'Effect', content = {Attack._displayArray(data.effect)}},

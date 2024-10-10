@@ -41,13 +41,16 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field picks string[][]
 ---@field bans string[][]?
 ---@field pickedBy number?
+---@field pickedByplayer number?
 
 ---@class CharacterGameTable: GameTable
 ---@field character string
 ---@field isCharacterTable boolean
+---@field isPickedByRequired boolean
 ---@field config CharacterGameTableConfig
 local CharacterGameTable = Class.new(GameTable, function (self)
 	self.isCharacterTable = self.args.tableMode == CHARACTER_MODE
+	self.isPickedByRequired = self.isCharacterTable
 
 	if not self.isCharacterTable then
 		self.resultFromRecord = GameTable.resultFromRecord
@@ -193,17 +196,23 @@ function CharacterGameTable:getCharacters(game, maxNumber, keyMaker)
 end
 
 
----@param picks string[][]
+---@param game CharacterGameTableGame
 ---@return number?
-function CharacterGameTable:_getCharacterPick(picks)
+function CharacterGameTable:getCharacterPick(game)
 	---@param opponentIndex number
 	---@return number?
 	local findCharacter = function (opponentIndex)
-		local found = Array.find(picks[opponentIndex], function (character)
+		local found = Array.indexOf(game.picks[opponentIndex], function (character)
 			return character == self.character
 		end)
+		game.pickedByplayer = found > 0 and found or nil
 
-		return found and opponentIndex or nil
+		return found > 0 and opponentIndex or nil
+	end
+
+	local winner = tonumber(game.winner)
+	if winner ~= 0 then
+		return findCharacter(winner) or findCharacter(winner == 1 and 2 or 1)
 	end
 	return findCharacter(1) or findCharacter(2)
 end
@@ -220,9 +229,9 @@ function CharacterGameTable:gameFromRecord(game)
 	gameRecord.picks = self:getCharacters(gameRecord, self.config.numPicks, self.getCharacterKey)
 	gameRecord.bans = self.config.showBans and
 		self:getCharacters(gameRecord, self.config.numBans,self.getCharacterBanKey) or nil
-	gameRecord.pickedBy = self.isCharacterTable and self:_getCharacterPick(gameRecord.picks) or nil
+	gameRecord.pickedBy = self.isPickedByRequired and self:getCharacterPick(gameRecord) or nil
 
-	if self.isCharacterTable then
+	if self.isPickedByRequired then
 		return Logic.isNotEmpty(gameRecord.pickedBy) and gameRecord or nil
 	end
 
@@ -330,7 +339,7 @@ end
 ---@param match GameTableMatch
 ---@param game CharacterGameTableGame
 ---@return Html?
-function CharacterGameTable:_displayGame(match, game)
+function CharacterGameTable:displayGame(match, game)
 	if not self.config.showResult then
 		return
 	end
@@ -415,7 +424,7 @@ function CharacterGameTable:gameRow(match, game)
 		:node(self:_displayGameIconForGame(game))
 		:node(self:_displayIcon(match))
 		:node(self:_displayTournament(match))
-		:node(self:_displayGame(match, game))
+		:node(self:displayGame(match, game))
 		:node(self:_displayLength(game))
 		:node(self:_displayGameVod(game.vod))
 end

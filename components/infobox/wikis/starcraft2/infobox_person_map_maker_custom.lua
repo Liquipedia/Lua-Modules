@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 local Injector = Lua.import('Module:Widget/Injector')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -53,7 +53,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'achievements' then
 		if String.isNotEmpty(args.maps_ladder) or String.isNotEmpty(args.maps_special) then
 			return {
-				Title{name = 'Achievements'},
+				Title{children = 'Achievements'},
 				Cell{name = 'Ladder maps created', content = {args.maps_ladder}},
 				Cell{name = 'Non-ladder competitive maps created', content = {args.maps_special}}
 			}

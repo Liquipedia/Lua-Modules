@@ -76,7 +76,9 @@ function mw.frame:callParserFunction(name, args) end
 ---This is transclusion. As in transclusion, if the passed title does not contain a namespace prefix it will be assumed to be in the Template: namespace.
 ---@param params {title: string, args: table?}
 ---@return string
-function mw.frame:expandTemplate(params) end
+function mw.frame:expandTemplate(params)
+	error('Cannot expand template in fake')
+end
 
 ---This is equivalent to a call to frame:callParserFunction() with function name '#tag:' .. name and with content prepended to args.
 ---@param name string
@@ -1008,7 +1010,7 @@ mw.ext.TeamTemplate = {}
 
 ---@param teamteplate string
 ---@param date string|number?
----@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracket: string, page: string, icon: string, image: string, legacyimage: string, legacyimagedark: string}
+---@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracketname: string, page: string, icon: string, image: string, legacyimage: string, legacyimagedark: string}|nil
 function mw.ext.TeamTemplate.raw(teamteplate, date) end
 
 ---@param teamteplate string

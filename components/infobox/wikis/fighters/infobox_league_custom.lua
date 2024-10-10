@@ -20,7 +20,7 @@ local Variables = require('Module:Variables')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
@@ -151,7 +151,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
-			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Title{children = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
 		if args.circuit2 or args.points2 or args.circuit2_next or args.circuit2_previous then
@@ -326,7 +326,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
 		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
 		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{content = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
 	)
 end
 

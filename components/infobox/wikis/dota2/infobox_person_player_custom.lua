@@ -23,7 +23,7 @@ local Flags = Lua.import('Module:Flags')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -130,16 +130,16 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(args.history_iwo) then
-			table.insert(widgets, Title{name = '[[Intel World Open|Intel World Open]] History'})
-			table.insert(widgets, Center{content = {args.history_iwo}})
+			table.insert(widgets, Title{children = '[[Intel World Open|Intel World Open]] History'})
+			table.insert(widgets, Center{children = {args.history_iwo}})
 		end
 		if not String.isEmpty(args.history_gfinity) then
-			table.insert(widgets, Title{name = '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'})
-			table.insert(widgets, Center{content = {args.history_gfinity}})
+			table.insert(widgets, Title{children = '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'})
+			table.insert(widgets, Center{children = {args.history_gfinity}})
 		end
 		if not String.isEmpty(args.history_odl) then
-			table.insert(widgets, Title{name = '[[Oceania Draft League|Oceania Draft League]] History'})
-			table.insert(widgets, Center{content = {args.history_odl}})
+			table.insert(widgets, Title{children = '[[Oceania Draft League|Oceania Draft League]] History'})
+			table.insert(widgets, Center{children = {args.history_odl}})
 		end
 	elseif id == 'role' then
 		return {

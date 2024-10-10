@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local Injector = Lua.import('Module:Widget/Injector')
 local Strategy = Lua.import('Module:Infobox/Strategy')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
@@ -84,7 +84,7 @@ function CustomStrategy:setWikiCategories()
 		return self
 	end
 
-	self.infobox:categories(unpack(self:_getCategories()))
+	self:categories(unpack(self:_getCategories()))
 
 	return self
 end

@@ -13,7 +13,7 @@ local Namespace = require('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
@@ -21,7 +21,7 @@ local Customizable = Widgets.Customizable
 ---@class CosmeticInfobox: BasicInfobox
 local Cosmetic = Class.new(BasicInfobox)
 
----@return Html
+---@return string
 function Cosmetic:createInfobox()
 	local args = self.args
 	self:customParseArguments(args)
@@ -45,21 +45,21 @@ function Cosmetic:createInfobox()
 		Customizable{
 			id = 'caption',
 			children = {
-				Center{content = {args.caption}},
+				Center{children = {args.caption}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
-	self.infobox:categories('Cosmetics')
-	self.infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Cosmetics')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return self.infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table

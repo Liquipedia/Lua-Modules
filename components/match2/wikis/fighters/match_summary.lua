@@ -89,7 +89,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param teamIdx integer
----@return {name: string, active: boolean}[]
+---@return {name: string}[]
 function CustomMatchSummary.fetchCharacters(game, teamIdx)
 	local characters = {}
 	for _, playerCharacters in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_', {requireIndex = true}) do
@@ -135,7 +135,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 	return elements
 end
 
----@param characters {name: string, active: boolean}[]?
+---@param characters {name: string}[]?
 ---@param game string?
 ---@param reverse boolean?
 ---@return Html
@@ -151,22 +151,17 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	if #characters == 1 then
 		local characterDisplay = mw.html.create('span'):addClass('draft faction')
 		local character = characters[1]
-		if not character.active then
-			characterDisplay:css('opacity', '0.3')
-		end
 		if reverse then
 			characterDisplay:wikitext(character.name):wikitext('&nbsp;'):wikitext(CharacterIcons[character.name])
 		else
 			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
 		end
+
 		return characterDisplay
 	end
 
 	local characterDisplays = Array.map(characters, function (character, index)
 		local characterDisplay = mw.html.create('span'):addClass('draft faction')
-		if not character.active then
-			characterDisplay:css('opacity', '0.3')
-		end
 		characterDisplay:wikitext(CharacterIcons[character.name])
 		return characterDisplay
 	end)

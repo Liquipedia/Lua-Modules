@@ -19,7 +19,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	pagifyPlayerNames = true,
 	maxNumPlayers = 10,
 }
 
@@ -64,7 +63,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
 	end
 
-	MatchGroupInputUtil.getCommonTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -113,8 +112,6 @@ function MatchFunctions.extractMaps(match, opponents)
 
 	return maps
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer

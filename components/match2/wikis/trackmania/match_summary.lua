@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -21,8 +20,6 @@ local OpponentDisplay = OpponentLibrary.OpponentDisplay
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
-
-local HEADTOHEAD = '[[File:Match Info Stats.png|14x14px|link=%s|Head to Head history]]'
 
 -- Custom Header Class
 ---@class TrackmaniaMatchSummaryHeader: MatchSummaryHeader
@@ -150,35 +147,7 @@ end
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addElement(match.extradata.showh2h and CustomMatchSummary._getHeadToHead(match) or nil)
-end
-
----@param match MatchGroupUtilMatch
----@return string
-function CustomMatchSummary._getHeadToHead(match)
-	local opponents = match.opponents
-	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	local buildQueryFormLink = function(form, template, arguments)
-		return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
-			mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
-			.. '&_run'
-		))
-	end
-
-	local headtoheadArgs = {
-		['[team1]'] = team1,
-		['[team2]'] = team2,
-		['[games][is_list]'] = 1,
-		['[tiers][is_list]'] = 1,
-		['[fromdate][day]'] = '01',
-		['[fromdate][month]'] = '01',
-		['[fromdate][year]'] = string.sub(match.date,1,4)
-	}
-
-	local link = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
-	return HEADTOHEAD:format(link)
+	return MatchSummary.addVodsToFooter(match, footer)
 end
 
 ---@param match MatchGroupUtilMatch

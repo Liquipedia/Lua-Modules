@@ -23,7 +23,7 @@ local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 local Injector = Lua.import('Module:Widget/Injector')
-local Widget = Lua.import('Module:Infobox/Widget/All')
+local Widget = Lua.import('Module:Widget/All')
 
 local SquadUtils = {}
 
@@ -178,52 +178,55 @@ function SquadUtils.storeSquadPerson(squadPerson)
 end
 
 ---@param frame table
----@param squadClass Squad
----@param personFunction fun(player: table, squadType: integer):WidgetTableRowNew
+---@param squadWidget SquadWidget
+---@param rowCreator fun(player: table, squadType: integer):WidgetTableRowNew
 ---@param injector WidgetInjector?
----@return Html
-function SquadUtils.defaultRunManual(frame, squadClass, personFunction, injector)
+---@return string
+function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator, injector)
 	local args = Arguments.getArgs(frame)
-	local injectorInstance = (injector and injector()) or
-		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-		nil
-	local squad = squadClass(args, injectorInstance):title()
-	local players = SquadUtils.parsePlayers(squad.args)
+	local props = {
+		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		title = args.title,
+		injector = (injector and injector()) or
+			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
+			nil,
+	}
+	local players = SquadUtils.parsePlayers(args)
 
-	if squad.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
-		squad.type = SquadUtils.SquadType.FORMER_INACTIVE
+	if props.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
+		props.type = SquadUtils.SquadType.FORMER_INACTIVE
 	end
 
-	squad:header()
-
-	Array.forEach(players, function(player)
-		squad:row(personFunction(player, squad.type))
+	props.children = Array.map(players, function(player)
+		return rowCreator(player, props.type)
 	end)
 
-	return squad:create()
+	return tostring(squadWidget(props))
 end
 
 ---@param players table[]
----@param squadType integer
----@param squadClass Squad
+---@param squadType SquadType
+---@param squadWidget SquadWidget
 ---@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
 ---@param customTitle string?
 ---@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
----@return Html?
-function SquadUtils.defaultRunAuto(players, squadType, squadClass, rowCreator, customTitle, injector, personMapper)
-	local args = {type = squadType, title = customTitle}
-	local injectorInstance = (injector and injector()) or
-		(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-		nil
-	local squad = squadClass(args, injectorInstance):title():header()
+---@return string
+function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, injector, personMapper)
+	local props = {
+		type = squadType,
+		title = customTitle,
+		injector = (injector and injector()) or
+			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
+			nil,
+	}
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
-	Array.forEach(mappedPlayers, function(player)
-		squad:row(rowCreator(player, squad.type))
+	props.children = Array.map(mappedPlayers, function(player)
+		return rowCreator(player, props.type)
 	end)
 
-	return squad:create()
+	return tostring(squadWidget(props))
 end
 
 ---@param squadRowClass SquadRow

@@ -11,16 +11,16 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Tier = require('Module:Tier/Custom')
-local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -28,6 +28,7 @@ local Center = Widgets.Center
 ---@class RocketleagueLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
+local NotabilityCalculator = {}
 
 local SERIES_RLCS = 'Rocket League Championship Series'
 local MODE_2v2 = '2v2'
@@ -70,12 +71,12 @@ function CustomInjector:parse(id, widgets)
 				)
 				index = index + 1
 			end
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = maps})
 		end
 
 		if not String.isEmpty(args.team_number) then
-			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{
 				name = 'Number of teams',
 				content = {args.team_number}
@@ -166,7 +167,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.mode = args.mode
 	lpdbData.extradata.notabilitymod = args.notabilitymod
 	lpdbData.extradata.liquipediatiertype2 = args.liquipediatiertype2
-	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
+	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and NotabilityCalculator.run() or ''
 
 	return lpdbData
 end
@@ -205,5 +206,87 @@ end
 function CustomLeague:_makeInternalLink(content)
 	return '[[' .. content .. ']]'
 end
+
+---@return number
+function NotabilityCalculator.run()
+	local pagename = mw.title.getCurrentTitle().text:gsub(' ', '_')
+	local placements = NotabilityCalculator._getPlacements(pagename)
+	local allTeams = NotabilityCalculator._getAllTeams()
+
+	local teamsWithAPage = 0
+
+	-- We need this because sometimes we get a placement like "tbd"
+	local numberOfPlacements = 0
+
+	for _, placement in ipairs(placements) do
+		if placement.participant:lower() ~= '' and placement.participant:lower() ~= 'tbd' then
+			local doesTeamExist = NotabilityCalculator._findTeam(allTeams, placement.participant)
+			numberOfPlacements = numberOfPlacements + 1
+
+			if doesTeamExist == true then
+				teamsWithAPage = teamsWithAPage + 1
+			end
+		end
+	end
+
+	if numberOfPlacements == 0 then
+		return 0
+	end
+
+	return Math.round((teamsWithAPage / numberOfPlacements) * 100, 2)
+end
+
+---@param allTeams table
+---@param teamToFind string
+---@return boolean
+function NotabilityCalculator._findTeam(allTeams, teamToFind)
+	local firstLetter = string.sub(teamToFind, 1, 1):lower()
+
+	if not allTeams[firstLetter] then
+		return false
+	end
+
+	for _, team in ipairs(allTeams[firstLetter]) do
+		if team:lower() == teamToFind:lower() then
+			return true
+		end
+	end
+
+	return false
+end
+
+---@return table
+function NotabilityCalculator._getAllTeams()
+	local teams = mw.ext.LiquipediaDB.lpdb('team', {
+		query = 'name',
+		limit = 5000,
+	})
+
+	-- Make a table of letters, with each letter mapping to an
+	-- array of names, to aid in faster lookup
+	local indexedTeams = {}
+
+	for _, team in pairs(teams) do
+		local firstLetter = string.sub(team.name, 1, 1):lower()
+
+		if indexedTeams[firstLetter] == nil then
+			indexedTeams[firstLetter] = {}
+		end
+
+		table.insert(indexedTeams[firstLetter], team.name)
+	end
+
+	return indexedTeams
+end
+
+---@param pagename string
+---@return {participant: string, participantflag: string, mode: string}[]
+function NotabilityCalculator._getPlacements(pagename)
+	return mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. pagename .. ']] AND [[mode::3v3]]',
+		query = 'participant, participantflag, mode'
+	})
+end
+
 
 return CustomLeague

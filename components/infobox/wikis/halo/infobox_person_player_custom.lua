@@ -17,7 +17,7 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -61,9 +61,9 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isNotEmpty(args.history) or automatedHistory then
 			return {
-				Title{name = 'History'},
-				Center{content = {args.history}},
-				Center{content = {automatedHistory}},
+				Title{children = 'History'},
+				Center{children = {args.history}},
+				Center{children = {automatedHistory}},
 			}
 		end
 	elseif id == 'region' then return {}

@@ -21,7 +21,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -93,8 +93,8 @@ function CustomUnit:addCustomCells(widgets)
 
 	if args.icon then
 		Array.appendWith(widgets,
-			Title{name = 'Icon'},
-			Center{content = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
+			Title{children = 'Icon'},
+			Center{children = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
 		)
 	end
 

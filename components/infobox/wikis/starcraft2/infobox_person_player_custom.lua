@@ -51,7 +51,7 @@ local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local Injector = Lua.import('Module:Widget/Injector')
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -140,8 +140,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Title{name = 'Achievements'},
-			Center{content = {Achievements.display(caller.infoboxAchievements)}},
+			Title{children = 'Achievements'},
+			Center{children = {Achievements.display(caller.infoboxAchievements)}},
 			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}

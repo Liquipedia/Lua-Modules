@@ -42,7 +42,7 @@ local ROLES = {
 }
 
 local Injector = Lua.import('Module:Widget/Injector')
-local Widgets = Lua.import('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -107,8 +107,8 @@ function CustomInjector:parse(id, widgets)
 		if not achievements then return {} end
 
 		return {
-			Title{name = 'Achievements'},
-			Center{content = {achievements}},
+			Title{children = 'Achievements'},
+			Center{children = {achievements}},
 		}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})

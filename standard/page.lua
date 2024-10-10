@@ -64,8 +64,8 @@ function Page.makeExternalLink(display, link)
 end
 
 --- Converts a link to a proper pagename format
----@param link string?
----@return string?
+---@overload fun(link: string): string
+---@overload fun(link?: nil): nil
 function Page.pageifyLink(link)
 	if String.isEmpty(link) then
 		return nil
