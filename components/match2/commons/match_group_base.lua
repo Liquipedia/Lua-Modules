@@ -48,7 +48,8 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 	end
 
 	if not Variables.varDefault('tournament_parent') then
-		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
+		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.'
+			.. 'If you only see this in a section preview, please ignore this warning.')
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing tournament context')
 	end
 
