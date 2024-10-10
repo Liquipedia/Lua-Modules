@@ -66,7 +66,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
