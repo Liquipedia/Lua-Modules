@@ -80,6 +80,8 @@ return function(busted, helper, options)
 		table.insert(paths, 'standard/links/commons/?.lua')
 		table.insert(paths, 'standard/tier/commons/?.lua')
 		table.insert(paths, 'components/widget/?.lua')
+		table.insert(paths, 'components/widget/contexts/?.lua')
+		table.insert(paths, 'components/widget/html/?.lua')
 		table.insert(paths, 'components/widget/squad/?.lua')
 		table.insert(paths, 'components/widget/infobox/?.lua')
 
@@ -127,6 +129,7 @@ return function(busted, helper, options)
 	local function GoldenTest(testname, actual)
 		local filename = 'spec/golden_masters/' .. testname .. '.txt'
 		local file = io.open(filename, 'r')
+		actual = tostring(actual)
 
 		---@diagnostic disable-next-line: undefined-field
 		if not file or _G.updategolden == true then

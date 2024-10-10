@@ -10,8 +10,9 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Link')
-local Div = Lua.import('Module:Widget/Div')
+local Div = HtmlWidgets.Div
 
 ---@class ButtonWidgetParameters: WidgetParameters
 ---@field title string?

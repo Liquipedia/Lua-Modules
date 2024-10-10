@@ -17,7 +17,7 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 local CustomSquad = {}
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
 	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
 end
@@ -25,7 +25,7 @@ end
 ---@param playerList table[]
 ---@param squadType integer
 ---@param customTitle string?
----@return string?
+---@return Widget
 function CustomSquad.runAuto(playerList, squadType, customTitle)
 	return SquadUtils.defaultRunAuto(
 		playerList,
@@ -33,7 +33,6 @@ function CustomSquad.runAuto(playerList, squadType, customTitle)
 		Squad,
 		CustomSquad._playerRow,
 		customTitle,
-		nil,
 		CustomSquad.personMapper
 	)
 end
@@ -48,7 +47,7 @@ end
 
 ---@param person table
 ---@param squadType integer
----@return WidgetTableRowNew
+---@return WidgetTr
 function CustomSquad._playerRow(person, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
 	if Logic.isEmpty(squadPerson.newteam) then
