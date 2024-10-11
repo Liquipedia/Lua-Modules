@@ -11,7 +11,6 @@ local MatchMapsLegacy = {}
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
