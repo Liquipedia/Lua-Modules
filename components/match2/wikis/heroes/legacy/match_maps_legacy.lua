@@ -93,7 +93,7 @@ function MatchMapsLegacy._readMaps(matchArgs)
 		if map and Logic.isEmpty(map.winner) then
 			map.winner = mapWinner
 		end
-		matchArgs['map' .. index] = map and map or nil
+		matchArgs['map' .. index] = map
 		return map
 	end)
 end
