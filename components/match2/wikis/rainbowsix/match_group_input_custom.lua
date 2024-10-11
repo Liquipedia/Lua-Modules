@@ -62,7 +62,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.status)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)

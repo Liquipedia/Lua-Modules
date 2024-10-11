@@ -1,22 +1,32 @@
 ---
 -- @Liquipedia
--- wiki=tft
+-- wiki=hearthstone
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
+local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
+local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 local Streams = Lua.import('Module:Links/Stream')
 
-local DEFAULT_BESTOF = 3
-local DEFAULT_MODE = 'team'
+local OPPONENT_CONFIG = {
+	resolveRedirect = true,
+	pagifyTeamNames = true,
+	pagifyPlayerNames = true,
+}
+local TBD = 'TBD'
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
@@ -32,7 +42,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
@@ -61,26 +71,15 @@ function CustomMatchGroupInput.processMatch(match, options)
 		end)
 	end
 
+	match.mode = Variables.varDefault('tournament_mode', 'singles')
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-	match.mode = Variables.varDefault('tournament_mode', DEFAULT_MODE)
 
 	match.stream = Streams.processStreams(match)
 
 	match.games = games
 	match.opponents = opponents
 
-	match.extradata = MatchFunctions.getExtraData(match)
-
 	return match
-end
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		mvp = MatchGroupInputUtil.readMvp(match),
-		casters = MatchGroupInputUtil.readCasters(match),
-	}
 end
 
 ---@param maps table[]
@@ -92,11 +91,9 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param bestofInput string|integer?
----@return integer
+---@return integer?
 function MatchFunctions.getBestOf(bestofInput)
-	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('match_bestof')) or DEFAULT_BESTOF
-	Variables.varDefine('match_bestof', bestof)
-	return bestof
+	return tonumber(bestofInput)
 end
 
 ---@param match table
@@ -107,6 +104,10 @@ function MatchFunctions.extractMaps(match, opponents)
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
+
+		if String.isNotEmpty(map.map) and string.upper(map.map) ~= TBD then
+			map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
+		end
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
@@ -129,6 +130,8 @@ function MatchFunctions.extractMaps(match, opponents)
 
 		map.extradata = MapFunctions.getExtradata(map, opponents)
 
+		map.participants = MapFunctions.getParticipants(map, opponents)
+
 		table.insert(maps, map)
 		match[mapKey] = nil
 	end
@@ -140,9 +143,19 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtradata(mapInput, opponents)
-	return {
-		comment = mapInput.comment,
-	}
+	local extradata = {comment = mapInput.comment}
+
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local prefix = 'o' .. opponentIndex .. 'p'
+		local chars = Array.mapIndexes(function(charIndex)
+			return Logic.nilIfEmpty(mapInput[prefix .. charIndex .. 'char']) or Logic.nilIfEmpty(mapInput[prefix .. charIndex])
+		end)
+		Array.forEach(chars, function(char, charIndex)
+			extradata[prefix .. charIndex] = MapFunctions.readCharacter(char)
+		end)
+	end)
+
+	return extradata
 end
 
 ---@param winnerInput string|integer|nil
@@ -157,6 +170,92 @@ function MapFunctions.calculateMapScore(winnerInput, finished)
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param mapInput table
+---@param opponents table[]
+---@return table<string, {character: string?, player: string}>
+function MapFunctions.getParticipants(mapInput, opponents)
+	local participants = {}
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		if opponent.type == Opponent.literal then
+			return
+		elseif opponent.type == Opponent.team then
+			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
+			return
+		end
+		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
+	end)
+
+	return participants
+end
+
+---@param mapInput table
+---@param opponent table
+---@param opponentIndex integer
+---@return table<string, {character: string?, player: string}>
+function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+	local players = Array.mapIndexes(function(playerIndex)
+		return Logic.nilIfEmpty(mapInput['o' .. opponentIndex .. 'p' .. playerIndex])
+	end)
+
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
+			return {
+				name = mapInput[prefix],
+				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']),
+			}
+		end,
+		function(playerIndex, playerIdData, playerInputData)
+			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
+			return {
+				player = playerIdData.name or playerInputData.link,
+				character = MapFunctions.readCharacter(Logic.nilIfEmpty(mapInput[prefix .. 'char']).character),
+			}
+		end
+	)
+
+	Array.forEach(unattachedParticipants, function(participant)
+		table.insert(opponent.match2players, {
+			name = participant.player,
+			displayname = participant.player,
+		})
+		participants[#opponent.match2players] = participant
+	end)
+
+	return Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
+end
+
+---@param mapInput table
+---@param opponent table
+---@param opponentIndex integer
+---@return table<string, {character: string?, player: string}>
+function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
+	local players = opponent.match2players
+
+	local prefix = 'o' .. opponentIndex .. 'p'
+
+	local participants = {}
+
+	Array.forEach(players, function(player, playerIndex)
+		participants[opponentIndex .. '_' .. playerIndex] = {
+			character = MapFunctions.readCharacter(mapInput[prefix .. playerIndex]),
+			player = player.name,
+		}
+	end)
+
+	return participants
+end
+
+---@param input string?
+---@return string?
+function MapFunctions.readCharacter(input)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterStandardization)
+
+	return getCharacterName(input)
 end
 
 return CustomMatchGroupInput

@@ -69,8 +69,11 @@ function CustomMatchGroupInput.processMatch(match, options)
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-		CustomMatchGroupInput.setPlacements(opponents)
-		MatchFunctions.setBgForOpponents(opponents, settings.status)
+		local placementOfTeams = CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = placementOfTeams[opponentIndex]
+			opponent.extradata.bg = settings.status[opponent.placement]
+		end)
 	end
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
@@ -133,10 +136,9 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
----Warning mutates the placement field in each opponent
 ---@param opponents table[]
----@return table[]
-function CustomMatchGroupInput.setPlacements(opponents)
+---@return integer[]
+function CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
 	local usedPlacements = Array.map(opponents, function()
 		return 0
 	end)
@@ -154,30 +156,35 @@ function CustomMatchGroupInput.setPlacements(opponents)
 		end
 	end)
 
+	local placementCount = #usedPlacements
 	local function findNextSlot(placement)
-		if usedPlacements[placement] == 0 then
+		if usedPlacements[placement] == 0 or placement > placementCount then
 			return placement
 		end
 		return findNextSlot(placement + 1)
 	end
 
+	local placementOfTeams = {}
 	local lastScore
 	local lastPlacement = 0
-	for _, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.scoreSorter) do
-		if not opp.placement then
+	for opponentIdx, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.scoreSorter) do
+		local placement = opp.placement
+		if not placement then
 			local thisPlacement = findNextSlot(lastPlacement)
 			usedPlacements[thisPlacement] = 1
 			if lastScore and opp.score == lastScore then
-				opp.placement = lastPlacement
+				placement = lastPlacement
 			else
-				opp.placement = thisPlacement
-				lastPlacement = opp.placement
-				lastScore = opp.score
+				placement = thisPlacement
 			end
 		end
+		placementOfTeams[opponentIdx] = placement
+
+		lastPlacement = placement
+		lastScore = opp.score
 	end
 
-	return opponents
+	return placementOfTeams
 end
 
 ---@param tbl table
@@ -229,14 +236,6 @@ function MatchFunctions.getExtraData(settings)
 		scoring = settings.score,
 		status = settings.status,
 	}
-end
-
----@param opponents table
----@param statusSettings table
-function MatchFunctions.setBgForOpponents(opponents, statusSettings)
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata.bg = statusSettings[opponent.placement]
-	end)
 end
 
 --

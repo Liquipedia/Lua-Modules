@@ -792,50 +792,24 @@ function MatchGroupInputUtil.getDefaultWinner(opponents)
 	return idx > 0 and idx or -1
 end
 
--- Set the field 'placement' for the two participants in the opponenets list.
--- Set the placementWinner field to the winner, and placementLoser to the other team
--- Special cases:
--- If Winner = 0, that means draw, and placementLoser isn't used. Both teams will get placementWinner
--- If Winner = -1, that mean no team won, and placementWinner isn't used. Both teams will get placementLoser
----@param opponents MGIParsedOpponent[]
----@param winner integer?
----@param placementWinner integer
----@param placementLoser integer
+--- Calculate the correct value of the 'placement' for the two-opponent matches/games.
+--- Cases:
+--- If Winner = OpponentIndex, return 1
+--- If Winner = 0, means it was a draw, return 1
+--- If Winner = -1, means that mean no team won, returns 2
+--- Otherwise return 2
 ---@param status string?
----@return MGIParsedOpponent[]
-function MatchGroupInputUtil.setPlacement(opponents, winner, placementWinner, placementLoser, status)
-	if not opponents or #opponents ~= 2 or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
-		return opponents
+---@param winner integer?
+---@param opponentIndex integer
+---@return integer?
+function MatchGroupInputUtil.placementFromWinner(status, winner, opponentIndex)
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+		return nil
 	end
-
-	local loserIdx
-	local winnerIdx
-	if winner == 1 then
-		winnerIdx = 1
-		loserIdx = 2
-	elseif winner == 2 then
-		winnerIdx = 2
-		loserIdx = 1
-	elseif winner == 0 then
-		-- Draw; idx of winner/loser doesn't matter
-		-- since loser and winner gets the same placement
-		placementLoser = placementWinner
-		winnerIdx = 1
-		loserIdx = 2
-	elseif winner == -1 then
-		-- No Winner (both loses). For example if both teams DQ.
-		-- idx's doesn't matter
-		placementWinner = placementLoser
-		winnerIdx = 1
-		loserIdx = 2
-	else
-		error('setPlacement: Unexpected winner: ' .. tostring(winner))
-		return opponents
+	if winner == 0 or winner == opponentIndex then
+		return 1
 	end
-	opponents[winnerIdx].placement = placementWinner
-	opponents[loserIdx].placement = placementLoser
-
-	return opponents
+	return 2
 end
 
 ---@param match table
