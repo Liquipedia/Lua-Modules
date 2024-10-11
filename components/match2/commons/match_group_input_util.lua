@@ -784,7 +784,7 @@ function MatchGroupInputUtil.hasScore(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.SCORE) ~= 0
 end
 
--- Get the winner when resulttype=default
+-- Get the winner with letter results
 ---@param opponents {status: string?}[]
 ---@return integer
 function MatchGroupInputUtil.getDefaultWinner(opponents)

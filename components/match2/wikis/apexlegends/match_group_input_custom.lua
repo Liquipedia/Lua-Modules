@@ -114,7 +114,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 		map.scores = Array.map(opponentInfo, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, opponentInfo)
 		end
 
 		map.extradata = MapFunctions.getExtraData(map, opponentInfo)
