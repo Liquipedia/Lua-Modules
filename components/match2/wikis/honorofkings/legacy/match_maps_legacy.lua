@@ -15,8 +15,6 @@ local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
-
 local globalVars = PageVariableNamespace()
 
 local MAX_NUMBER_OF_OPPONENTS = 2
@@ -116,16 +114,15 @@ function MatchMapsLegacy._handleDetails(args, details)
 				map[ban] = Table.extract(details, prefix .. ban)
 			end)
 		end)
-		return MatchSubobjects.luaGetMap(map)
+		return map
 	end
 
 	local getMapOnlyWithWinner = function (index)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		return MatchSubobjects.luaGetMap{
+		return {
 			winner = args['map' .. index .. 'win'],
-			map = DEFAULT
 		}
 	end
 

@@ -18,14 +18,11 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
-
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_MUMBER_OF_PLAYERS = 5
-local DUMMY_MAP_NAME = 'default'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
@@ -145,16 +142,15 @@ function MatchMapsLegacy.handleDetails(args, details)
 		details[prefix] = nil
 		details[prefix .. 'winner'] = nil
 		details[prefix .. 'length'] = nil
-		return MatchSubobjects.luaGetMap(map)
+		return map
 	end
 
 	local getMapOnlyWithWinner = function (index)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		return MatchSubobjects.luaGetMap{
+		return {
 			winner = args['map' .. index .. 'win'],
-			map = DUMMY_MAP_NAME
 		}
 	end
 

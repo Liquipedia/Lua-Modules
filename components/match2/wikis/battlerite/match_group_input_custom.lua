@@ -14,7 +14,6 @@ local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DUMMY_MAP = 'default' -- Is set in Template:Map when |map= is empty.
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
@@ -157,11 +156,10 @@ end
 --
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
 ---@param map table

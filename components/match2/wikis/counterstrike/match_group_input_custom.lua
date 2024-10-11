@@ -19,8 +19,6 @@ local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
-
 local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
@@ -267,11 +265,10 @@ end
 --
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP_NAME
+	return map.map ~= nil
 end
 
 -- Parse extradata information
