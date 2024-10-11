@@ -63,7 +63,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
 	end
 
