@@ -182,30 +182,28 @@ function MatchLegacy._convertParameters(match2)
 	local handleOpponent = function (index)
 		local prefix = 'opponent'..index
 		local opponent = match2.match2opponents[index] or {}
-		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = opponent.name
 			if match2.bestof == 1 then
 				if ((match2.match2games or {})[1] or {}).scores then
-					match[prefix..'score'] = Json.parseIfString(match2.match2games[1].scores)[index]
+					match[prefix .. 'score'] = Json.parseIfString(match2.match2games[1].scores)[index]
 				end
 			end
 			if not match[prefix..'score'] then
 				match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			end
-			local opponentplayers = {}
-			for i = 1, 5 do
-				local player = opponentmatch2players[i] or {}
-				opponentplayers['p' .. i] = player.name or ''
-				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
-				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
-			end
-			match[prefix..'players'] = opponentplayers
+			local players = {}
+			Array.forEach(opponent.match2players or {}, function(player, playerIndex)
+				players['p' .. playerIndex] = player.name or ''
+				players['p' .. playerIndex .. 'flag'] = player.flag or ''
+				players['p' .. playerIndex .. 'dn'] = player.displayname or ''
+			end)
+			match[prefix .. 'players'] = players
 		elseif opponent.type == 'solo' then
-			local player = opponentmatch2players[1] or {}
+			local player = (opponent.match2players or {})[1] or {}
 			match[prefix] = player.name
-			match[prefix..'score'] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
-			match[prefix..'flag'] = player.flag
+			match[prefix .. 'score'] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
+			match[prefix .. 'flag'] = player.flag
 		elseif opponent.type == 'literal' then
 			match[prefix] = 'TBD'
 		end
