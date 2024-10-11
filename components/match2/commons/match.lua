@@ -409,15 +409,29 @@ end
 ---walkover and resulttype are added to record.
 ---@param record table #game or match record
 function Match._commonBackwardsCompatabilityForV3API(record)
-	record.resulttype = record.resulttype or (record.status == 'notplayed' and 'np') or ''
-
 	if record.finished then
-		local opponents = record.opponents or {}
-		local function calculateWalkover()
-			local status = (opponents[record.winner] or {}).status
-			return (status == 'FF' and 'ff') or (status == 'DQ' and 'dq') or (status == 'L' and 'l') or nil
+		if not record.walkover then
+			local opponents = record.opponents or {}
+			local function calculateWalkover()
+				local walkoverOpponent = Array.find(opponents, function(opponent)
+					return opponent.status == 'FF' or opponent.status == 'DQ' or opponent.status == 'L'
+				end)
+				return walkoverOpponent and walkoverOpponent.status:lower() or ''
+			end
+			record.walkover = calculateWalkover()
 		end
-		record.walkover = record.walkover or calculateWalkover() or ''
+
+		if not record.resulttype then
+			if record.status == 'notplayed' then
+				record.resulttype = 'np'
+			elseif record.winner == 0 then
+				record.resulttype = 'draw'
+			elseif record.walkover ~= '' then
+				record.resulttype = record.walkover:upper()
+			else
+				record.resulttype = ''
+			end
+		end
 	end
 end
 
