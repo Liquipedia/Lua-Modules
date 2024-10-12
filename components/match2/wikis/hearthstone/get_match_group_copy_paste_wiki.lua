@@ -58,13 +58,13 @@ function WikiCopyPaste._getMap(mode, opponents)
 		return '={{Map|winner=}}'
 	end
 
-	local parts = Array.extend({},
+	local parts = Array.extend({'={{Map'},
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return table.concat(Array.map(Array.range(1, Opponent.partySize(mode) --[[@as integer]]), function(playerIndex)
 				return '|o' .. opponentIndex .. 'p' .. playerIndex .. '='
 			end))
 		end),
-		'}}'
+		'|winner=}}'
 	)
 
 	return table.concat(parts)
