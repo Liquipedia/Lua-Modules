@@ -416,7 +416,7 @@ end
 ---@param args table
 ---@return boolean
 function League:liquipediaTierHighlighted(args)
-	return false
+	return Logic.readBool(args.publisherpremier)
 end
 
 --- Allows for overriding this functionality
