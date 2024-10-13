@@ -140,6 +140,7 @@ function StarcraftParticipantTable:readEntry(sectionArgs, key, index, config)
 		opponent = opponent,
 		name = Opponent.toName(opponent),
 		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
+		inputIndex = index,
 	}
 end
 
