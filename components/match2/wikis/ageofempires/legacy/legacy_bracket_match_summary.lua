@@ -28,7 +28,7 @@ function LegacyBracketMatchSummary._handleMaps(args)
 		local mapArgs = {
 			map = Table.extract(args, prefix) or Table.extract(matchTeam, 'map'),
 			mode = Table.extract(args, prefix .. 'mode') or Table.extract(matchTeam, 'mapmode'),
-			winner = Table.extract(args, prefix .. 'winner'),
+			winner = Table.extract(args, prefix .. 'win') or Table.extract(matchTeam, 'win'),
 			civs1 = Table.extract(args, prefix .. 'p1civ') or Table.extract(matchTeam, 't1civs'),
 			civs2 = Table.extract(args, prefix .. 'p2civ') or Table.extract(matchTeam, 't2civs'),
 			players1 = Table.extract(matchTeam, 't1players'),
