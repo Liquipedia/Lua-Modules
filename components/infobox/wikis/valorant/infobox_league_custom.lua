@@ -92,7 +92,7 @@ function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
 	if self.data.gameChanger then
-		table.insert(categories, 'Game Changers Tournaments')
+		table.insert(categories, 'Game Changer Tournaments')
 	end
 
 	return categories
@@ -107,7 +107,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
-	lpdbData.extradata.gamechangers = tostring(self.data.gameChanger)
+	lpdbData.extradata.gamechanger = tostring(self.data.gameChanger)
 
 	return lpdbData
 end
