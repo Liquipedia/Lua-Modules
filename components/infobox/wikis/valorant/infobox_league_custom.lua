@@ -44,6 +44,8 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
+	-- female as a temp alias to bot the old input over
+	self.data.gameChanger = Logic.readBool(args.gc or args.female)
 	self.data.publishertier = Logic.readBool(args['riot-highlighted']) and 'highlighted'
 		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
 		or nil
@@ -89,8 +91,8 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if Logic.readBool(args.female) then
-		table.insert(categories, 'Female Tournaments')
+	if self.data.gameChanger then
+		table.insert(categories, 'Game Changers Tournaments')
 	end
 
 	return categories
@@ -105,7 +107,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.region = Template.safeExpand(mw.getCurrentFrame(), 'Template:Player region', {args.country})
 	lpdbData.extradata.startdate_raw = args.sdate or args.date
 	lpdbData.extradata.enddate_raw = args.edate or args.date
-	lpdbData.extradata.female = args.female or 'false'
+	lpdbData.extradata.gamechangers = tostring(self.data.gameChanger)
 
 	return lpdbData
 end
@@ -146,7 +148,7 @@ end
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	-- Wiki Custom
-	Variables.varDefine('female', args.female or 'false')
+	Variables.varDefine('gamechanger', tostring(self.data.gameChanger))
 	Variables.varDefine('tournament_riot_premier', args.riotpremier and 'true' or '')
 	Variables.varDefine('patch', args.patch or '')
 
