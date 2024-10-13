@@ -282,6 +282,8 @@ function League:_parseArgs()
 
 	self.data = data
 
+	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
+
 	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = self:_parsePrizePool(args, data.endDate)
 
 	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
