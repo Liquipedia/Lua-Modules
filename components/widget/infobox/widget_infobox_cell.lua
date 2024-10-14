@@ -53,7 +53,7 @@ function Cell:render()
 		return
 	end
 
-	return HtmlWidgets.TableDiv{
+	return HtmlWidgets.Div{
 		classes = self.props.classes,
 		children = {
 			HtmlWidgets.Div{

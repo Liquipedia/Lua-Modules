@@ -99,9 +99,8 @@ end
 ---@param mode string
 ---@return Html
 function Header:_makeSizedImage(imageName, size, mode)
-	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
-
 	local fixedSize = false
+
 	-- Number (interpret as pixels)
 	size = size or ''
 	if tonumber(size) then
