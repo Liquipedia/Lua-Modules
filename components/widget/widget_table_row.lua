@@ -32,7 +32,7 @@ local TableRow = Class.new(
 
 ---@return integer
 function TableRow:getCellCount()
-	return #self.children
+	return #self.props.children
 end
 
 ---@return Widget

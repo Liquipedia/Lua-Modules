@@ -51,7 +51,7 @@ function TableOld:_getMaxCells()
 	local getNumberCells = function(row)
 		return row:getCellCount()
 	end
-	return Array.reduce(Array.map(self.children, getNumberCells), math.max)
+	return Array.reduce(Array.map(self.props.children, getNumberCells), math.max)
 end
 
 return TableOld
