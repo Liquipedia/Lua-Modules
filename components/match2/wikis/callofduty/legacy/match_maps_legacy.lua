@@ -80,7 +80,7 @@ function MatchMapsLegacy._readMaps(matchArgs)
 			score1 = Table.extract(matchArgs, prefix .. 'score1'),
 			score2 = Table.extract(matchArgs, prefix .. 'score2'),
 		}
-		matchArgs[prefix] = Logic.isNotEmpty(mapArgs) and mapArgs or nil
+		matchArgs[prefix] = Logic.nilIfEmpty(mapArgs)
 	end)
 end
 
