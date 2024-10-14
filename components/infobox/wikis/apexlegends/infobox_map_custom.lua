@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local TableCell = Widgets.TableCell
 local TableRow = Widgets.TableRow
-local WidgetTable = Widgets.Table
+local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)

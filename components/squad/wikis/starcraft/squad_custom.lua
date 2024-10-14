@@ -12,8 +12,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Widget = require('Module:Widget/All')
 
+local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadTldb = Lua.import('Module:Widget/Squad/Core/Tldb')
 local SquadRow = Lua.import('Module:Squad/Row')
@@ -28,17 +28,17 @@ local ExtendedSquadRow = Class.new(SquadRow)
 function ExtendedSquadRow:elo()
 	local eloCurrent, eloPeak = self.model.extradata.eloCurrent, self.model.extradata.eloPeak
 	table.insert(self.children,
-		Widget.TableCellNew{content = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
+		Widget.Td{children = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
 	)
 	table.insert(self.children,
-		Widget.TableCellNew{content = {eloPeak and (eloPeak .. ' pts') or '-'}}
+		Widget.Td{children = {eloPeak and (eloPeak .. ' pts') or '-'}}
 	)
 
 	return self
 end
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local tlpd = Logic.readBool(args.tlpd)
