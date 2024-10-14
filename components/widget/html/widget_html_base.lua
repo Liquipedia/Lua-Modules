@@ -56,22 +56,11 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 	return htmlNode
 end
 
-local function dumpObject(obj)
-	local str = ''
-	for k, v in pairs(obj) do
-		if type(v) == 'table' then
-			str = str .. k .. ': ' .. dumpObject(v) .. '\n'
-		else
-			str = str .. k .. ': ' .. tostring(v) .. '\n'
-		end
-	end
-	return str
-end
-
 ---@param error Error
 ---@return string
 function HtmlBase:getDerivedStateFromError(error)
-	return tostring('ERROR! Bad child input:' .. dumpObject(self.props.children))
+	mw.log('ERROR! Bad child input:' .. mw.dumpObject(self.props.children))
+	return Widget.getDerivedStateFromError(self, error)
 end
 
 return HtmlBase

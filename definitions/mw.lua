@@ -43,7 +43,17 @@ function mw.loadJsonData(page) end
 ---Serializes object to a human-readable representation, then returns the resulting string.
 ---@param object any
 ---@return string
-function mw.dumpObject(object) end
+function mw.dumpObject(object)
+	local str = ''
+	for k, v in pairs(object) do
+		if type(v) == 'table' then
+			str = str .. k .. ': ' .. mw.dumpObject(v) .. '\n'
+		else
+			str = str .. k .. ': ' .. tostring(v) .. '\n'
+		end
+	end
+	return str
+end
 
 ---Passes the arguments to mw.allToString(), then appends the resulting string to the log buffer.
 ---@param ... any
