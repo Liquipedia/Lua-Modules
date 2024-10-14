@@ -21,19 +21,12 @@ local Customizable = Class.new(
 	end
 )
 
----@param children string[]
----@return string
-function Customizable:make(children)
-	return table.concat(children)
-end
-
----@param injector WidgetInjector?
 ---@return Widget[]?
-function Customizable:makeChildren(injector)
-	if injector == nil then
+function Customizable:render()
+	if self.injector == nil then
 		return self.props.children
 	end
-	return injector:parse(self.id, self.props.children)
+	return self.injector:parse(self.id, self.props.children)
 end
 
 return Customizable
