@@ -103,6 +103,9 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	return row
 end
 
+---@param winner integer|string
+---@param opponentIndex integer
+---@return Html
 function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 	return CustomMatchSummary._createIcon(
 			winner == opponentIndex and ICONS.winner
@@ -112,8 +115,7 @@ function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 		)
 end
 
----@param winner integer|string
----@param opponentIndex integer
+---@param icon string
 ---@return Html
 function CustomMatchSummary._createIcon(icon)
 	return mw.html.create('div')
