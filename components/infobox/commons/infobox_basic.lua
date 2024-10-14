@@ -102,7 +102,7 @@ end
 ---@param widgets Widget[]
 ---@return string
 function BasicInfobox:build(widgets)
-	local infobox = {
+	local infobox = Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
 		bottomContent = self.bottomContent,
