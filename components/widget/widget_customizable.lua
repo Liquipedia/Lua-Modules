@@ -31,9 +31,9 @@ end
 ---@return Widget[]?
 function Customizable:makeChildren(injector)
 	if injector == nil then
-		return self.children
+		return self.props.children
 	end
-	return injector:parse(self.id, self.children)
+	return injector:parse(self.id, self.props.children)
 end
 
 return Customizable

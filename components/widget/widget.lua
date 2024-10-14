@@ -23,8 +23,6 @@ local Widget = Class.new(function(self, props)
 	self.props = Table.copy(props) or {}
 	self.props.children = self.props.children or {}
 	self.context = {} -- Populated by the parent
-	---@deprecated Widget v1 backwards compability
-	self.children = self.children or self.props.children
 end)
 
 ---Asserts the existence of a value and copies it
@@ -54,10 +52,8 @@ function Widget:tryMake(injector)
 		-- Widget v1 backwards compability
 		renderComponent = function()
 			local processedChildren = self:tryChildren(injector)
-			if self.render == Widget.render then
-				local ret = self:make(processedChildren)
-				return ret ~= nil and ret or ''
-			end
+			local ret = self:make(processedChildren)
+			return ret ~= nil and ret or ''
 		end
 	else
 		renderComponent = function()
@@ -92,7 +88,7 @@ end
 ---@param injector WidgetInjector?
 ---@return string[]
 function Widget:tryChildren(injector)
-	local children = self.children
+	local children = self.props.children
 	if self.makeChildren then
 		children = self:makeChildren(injector) or {}
 	end
