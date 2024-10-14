@@ -57,7 +57,6 @@ function MatchMapsLegacy._handleMaps(args)
 			args[mapKey .. key] = value
 		end
 		args[mapKey .. 'winner'] = Table.extract(args, mapKey .. 'win')
-		args[mapKey] = ''
 		args[matchKey] = nil
 	end
 	return args

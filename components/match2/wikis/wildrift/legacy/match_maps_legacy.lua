@@ -193,7 +193,6 @@ function MatchMapsLegacy.convertMaps(args)
 			args[mapKey .. key] = value
 		end
 		args['vodgame' .. matchIndex] = nil
-		args[mapKey] = ''
 		args[matchKey] = nil
 	end
 	return args

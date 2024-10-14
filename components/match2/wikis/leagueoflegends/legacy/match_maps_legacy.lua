@@ -189,7 +189,6 @@ function MatchMapsLegacy.convertMaps(args)
 		for key, value in pairs(map) do
 			args[mapKey .. key] = value
 		end
-		args[mapKey] = ''
 		args[matchKey] = nil
 	end
 	return args
