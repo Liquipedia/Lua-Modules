@@ -46,6 +46,13 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 			htmlNode:node(child:tryMake())
 		else
 			---@cast child -Widget
+			if type(child) == 'number' then
+				child = tostring(child)
+			end
+
+			if type(child) ~= 'string' and type(child._build) ~= 'function' then
+				error('Invalid child' .. tostring(child))
+			end
 			htmlNode:node(child)
 		end
 	end)
