@@ -80,10 +80,13 @@ return function(busted, helper, options)
 		table.insert(paths, 'standard/links/commons/?.lua')
 		table.insert(paths, 'standard/tier/commons/?.lua')
 		table.insert(paths, 'components/widget/?.lua')
+		table.insert(paths, 'components/widget/basic/?.lua')
 		table.insert(paths, 'components/widget/contexts/?.lua')
 		table.insert(paths, 'components/widget/html/?.lua')
-		table.insert(paths, 'components/widget/squad/?.lua')
 		table.insert(paths, 'components/widget/infobox/?.lua')
+		table.insert(paths, 'components/widget/image/?.lua')
+		table.insert(paths, 'components/widget/misc/?.lua')
+		table.insert(paths, 'components/widget/squad/?.lua')
 
 		package.path = table.concat(paths, ';')
 	end
@@ -104,7 +107,7 @@ return function(busted, helper, options)
 
 	-- Top 10 wikis based on traffic
 	local wikis = {'dota2', 'valorant', 'counterstrike', 'rocketleague', 'mobilelegends', 'leagueoflegends', 'apexlegends', 'rainbowsix', 'overwatch', 'starcraft2'}
-	-- Warnings! Extremely time consuming!
+	-- Warnings! Extremely time consuming if different filesystems (eg. windows files with wsl)
 	local function allwikis(name, funcToRun, wikiArgs)
 		busted.executors.insulate('', function ()
 			for _, wiki in ipairs(wikis) do
