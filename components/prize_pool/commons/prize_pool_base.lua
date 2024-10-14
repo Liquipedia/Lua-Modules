@@ -593,7 +593,7 @@ function BasePrizePool:_buildTable(isAward)
 			classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
 			css = {width = 'max-content'},
 			columns = headerRow:getCellCount(),
-			children = WidgetUtil.collect(headerRow, self:_buildRows())
+			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
 		}},
 	}
 end
