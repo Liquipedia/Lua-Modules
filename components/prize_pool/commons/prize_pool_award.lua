@@ -64,7 +64,7 @@ end
 
 ---@param placement AwardPlacement
 ---@return boolean
-function AwardPrizePool:applyCutAfter(placement, row)
+function AwardPrizePool:applyCutAfter(placement)
 	if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
 		return true
 	end

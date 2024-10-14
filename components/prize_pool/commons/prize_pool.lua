@@ -65,7 +65,7 @@ end
 
 ---@param placement PrizePoolPlacement
 ---@return boolean
-function PrizePool:applyCutAfter(placement, row)
+function PrizePool:applyCutAfter(placement)
 	if placement.placeStart > self.options.cutafter then
 		return true
 	end
