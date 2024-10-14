@@ -42,7 +42,7 @@ function LegacyBracketMatchSummary._handleMaps(args)
 		end
 
 		isValidMap = mapArgs.map ~= nil or mapArgs.winner
-		args['map' .. mapIndex] = isValidMap and mapArgs or nil
+		args['map' .. mapIndex] = isValidMap and Json.stringify(mapArgs) or nil
 		mapIndex = mapIndex + 1
 	end
 
