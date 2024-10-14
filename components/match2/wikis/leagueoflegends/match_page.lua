@@ -140,12 +140,10 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.opponents, function(opponent, index)
 		opponent.opponentIndex = index
 
-		if not opponent.template or not mw.ext.TeamTemplate.teamexists(opponent.template) then
+		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
+		if not teamTemplate then
 			return
 		end
-		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
-		-- can not be nil due to above check in the if
-		---@cast teamTemplate - nil
 
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = teamTemplate.shortname
