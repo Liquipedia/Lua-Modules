@@ -101,10 +101,10 @@ function TransferRow:_readBaseData()
 	---@param teamInput string
 	---@return {name: string?, template: string?}
 	local checkTeam = function(dateInput, teamInput)
-		if Logic.isEmpty(teamInput) or not mw.ext.TeamTemplate.teamexists(teamInput) then
+		local teamData = Logic.isNotEmpty(teamInput) and mw.ext.TeamTemplate.raw(teamInput, dateInput)
+		if not teamData then
 			return {}
 		end
-		local teamData = mw.ext.TeamTemplate.raw(teamInput, dateInput)
 		return {name = teamData.page, template = teamData.templatename}
 	end
 
@@ -198,8 +198,7 @@ function TransferRow:readPlayers()
 	local args = self.args
 	local players = {}
 	for _, _, playerIndex in Table.iter.pairsByPrefix(args, 'name', {requireIndex = false}) do
-		playerIndex = playerIndex == 1 and '' or playerIndex
-		table.insert(players, PlayerExt.syncPlayer(self:readPlayer(playerIndex)))
+		table.insert(players, PlayerExt.syncPlayer(self:readPlayer(playerIndex == 1 and '' or playerIndex)))
 	end
 
 	return players
