@@ -570,16 +570,14 @@ function BasePrizePool:build(isAward)
 		return prizePoolTable
 	end
 
-	return Div{classes = {'prizepool-section-wrapper'}, children = {
-		WidgetUtil.collect(
-			self:_shouldDisplayPrizeSummary() and Span{children = {self:_getPrizeSummaryText()}} or nil,
-			Div{
-				classes = {'prizepool-section-tables'},
-				children = WidgetUtil.collect(prizePoolTable, self.adjacentContent)
-			},
-			self.options.exchangeInfo and self:_currencyExchangeInfo() or nil
-		)
-	}}
+	return Div{classes = {'prizepool-section-wrapper'}, children = WidgetUtil.collect(
+		self:_shouldDisplayPrizeSummary() and Span{children = {self:_getPrizeSummaryText()}} or nil,
+		Div{
+			classes = {'prizepool-section-tables'},
+			children = WidgetUtil.collect(prizePoolTable, self.adjacentContent)
+		},
+		self.options.exchangeInfo and self:_currencyExchangeInfo() or nil
+	)}
 end
 
 ---@param isAward boolean?

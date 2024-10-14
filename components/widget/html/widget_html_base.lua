@@ -46,6 +46,7 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 			htmlNode:node(child:tryMake())
 		else
 			---@cast child -Widget
+			---@diagnostic disable-next-line: undefined-field
 			if type(child) == 'table' and not child._build then
 				error('Table passed to HtmlBase:renderAs() without _build method')
 			end
