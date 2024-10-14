@@ -144,11 +144,8 @@ function CustomMatchSummary._createMapRow(game)
 		centerNode:addClass('brkts-popup-spaced-map-skip')
 	end
 
-	local getScoreValue = function(opponentIndex)
-		local score = game.scores[opponentIndex]
-		if not score then
-			return
-		end
+	local displayScore = function(opponentIndex)
+		local score = DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
 		local points = game.extradata['points' .. opponentIndex]
 		if not points then
 			return score
@@ -163,17 +160,11 @@ function CustomMatchSummary._createMapRow(game)
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._addCheckmark(game.winner == 1))
-		:node(DisplayHelper.MapScore(
-			getScoreValue(1),
-			1, game.resultType, game.walkover, game.winner
-		))
+		:node(displayScore(1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(DisplayHelper.MapScore(
-			getScoreValue(2),
-			2, game.resultType, game.walkover, game.winner
-		))
+		:node(displayScore(2))
 		:node(CustomMatchSummary._addCheckmark(game.winner == 2))
 
 	row:addElement(leftNode)
