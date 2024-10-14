@@ -55,8 +55,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		Array.appendWith(widgets,
-			Title{name = 'Maps'},
-			Center{content = {table.concat(maps, '&nbsp;• ')}}
+			Title{children = 'Maps'},
+			Center{children = {table.concat(maps, '&nbsp;• ')}}
 		)
 	end
 	return widgets

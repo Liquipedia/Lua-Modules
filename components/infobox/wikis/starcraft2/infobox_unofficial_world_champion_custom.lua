@@ -57,7 +57,7 @@ function CustomInjector:parse(id, widgets)
 
 		Array.extendWith(widgets,
 			{
-				raceBreakdown and Title{name = 'Racial Distribution of Champions'} or nil,
+				raceBreakdown and Title{children = 'Racial Distribution of Champions'} or nil,
 				raceBreakdown and Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }} or nil,
 			},
 			self.caller:_buildCellsFromBase('countries with multiple champions', 'Countries with Multiple Champions'),
@@ -76,7 +76,7 @@ function CustomUnofficialWorldChampion:_buildCellsFromBase(base, title)
 		return {}
 	end
 
-	local widgets = {Title{name = title}}
+	local widgets = {Title{children = title}}
 	for key, value in Table.iter.pairsByPrefix(args, base .. ' ') do
 		table.insert(widgets, Cell{name = (args[key .. ' no'] or '?') .. ' champions', content = {value}})
 	end

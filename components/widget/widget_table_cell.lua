@@ -6,15 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetCellInput
----@field content (string|number|table|Html)[]?
+---@field children (string|number|table|Html)[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number}?
 
@@ -27,7 +25,6 @@ local Widget = Lua.import('Module:Widget')
 local TableCell = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 	end
@@ -70,7 +67,9 @@ function TableCell:make(children)
 
 	cell:css(self.css)
 
-	Array.forEach(children, FnUtil.curry(cell.node, cell))
+	for _, child in ipairs(children) do
+		cell:node(child)
+	end
 
 	return tostring(cell)
 end

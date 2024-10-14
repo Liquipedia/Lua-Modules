@@ -147,7 +147,7 @@ function CustomBuildingUnit.attackDisplay(args)
 		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, children = {desc, unpack(data)}}
 	end
 
-	return Array.append({Title{name = 'Combat'}},
+	return Array.append({Title{children = 'Combat'}},
 		toWidget('Requirement:', 'requirement'),
 		toWidget('[[Attack Damage|Damage]]:', 'attackTypeAndDamage'),
 		toWidget(CustomBuildingUnit.getAreaHeader(args) or '', 'area'),
@@ -340,7 +340,7 @@ function CustomBuildingUnit.mercenaryStats(args)
 	end
 
 	return {
-		Title{name = 'Mercenary Stats'},
+		Title{children = 'Mercenary Stats'},
 		Cell{name = 'Stock Maximum', content = {args.stock}},
 		Cell{name = 'Stock Start Delay', content = {
 			Abbreviation.make(args.stockstart .. 's', 'First available at ' .. GameClock.run(args.stockstart))}},
@@ -360,7 +360,7 @@ function CustomBuildingUnit.movement(args, title)
 	end
 
 	return {
-		Title{name = title},
+		Title{children = title},
 		Cell{name = '[[Movement Speed|Speed]]', content = {speed}},
 		Cell{name = 'Turn Rate', content = {args.turnrate}},
 		Cell{name = 'Move Type', content = {args.movetype}},

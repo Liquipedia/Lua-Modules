@@ -48,15 +48,15 @@ function Strategy:createInfobox()
 				},
 			}
 		},
-		Center{content = {args.caption}},
-		Title{name = args.informationType .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = args.informationType .. ' Information'},
 		Cell{
 			name = 'Creator(s)',
 			content = {args.creator or args['created-by']},
 			options = {makeLink = true}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -19,11 +18,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Faction = Lua.import('Module:Faction')
-local Injector = Lua.import('Module:Widget/Injector')
 local Lpdb = Lua.import('Module:Lpdb')
+local Faction = Lua.import('Module:Faction')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 local TransferRefs = Lua.import('Module:Transfer/Refences')
-local Widget = Lua.import('Module:Widget/All')
 
 local SquadUtils = {}
 
@@ -179,17 +177,13 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadType: integer):WidgetTableRowNew
----@param injector WidgetInjector?
----@return string
-function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator, injector)
+---@param rowCreator fun(player: table, squadType: integer):WidgetTr
+---@return Widget
+function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
 	local props = {
 		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
 		title = args.title,
-		injector = (injector and injector()) or
-			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-			nil,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
@@ -201,24 +195,23 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator, injector)
 		return rowCreator(player, props.type)
 	end)
 
-	return tostring(squadWidget(props))
+	if Info.config.squads.hasPosition then
+		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
+	end
+	return squadWidget(props)
 end
 
 ---@param players table[]
 ---@param squadType SquadType
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param rowCreator fun(person: table, squadType: integer):WidgetTr
 ---@param customTitle string?
----@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
----@return string
-function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, injector, personMapper)
+---@return Widget
+function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, personMapper)
 	local props = {
 		type = squadType,
-		title = customTitle,
-		injector = (injector and injector()) or
-			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-			nil,
+		title = customTitle
 	}
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
@@ -226,11 +219,14 @@ function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, 
 		return rowCreator(player, props.type)
 	end)
 
-	return tostring(squadWidget(props))
+	if Info.config.squads.hasPosition then
+		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
+	end
+	return squadWidget(props)
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadType: integer):WidgetTableRowNew
+---@return fun(person: table, squadType: integer):WidgetTr
 function SquadUtils.defaultRow(squadRowClass)
 	return function(person, squadType)
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
@@ -258,21 +254,9 @@ function SquadUtils.defaultRow(squadRowClass)
 	end
 end
 
----@return WidgetInjector
-function SquadUtils.positionHeaderInjector()
-	local CustomInjector = Class.new(Injector)
-
-	function CustomInjector:parse(id, widgets)
-		if id == 'header_role' then
-			return {
-				Widget.TableCellNew{content = {'Position'}, header = true}
-			}
-		end
-
-		return widgets
-	end
-
-	return CustomInjector
+---@return string
+function SquadUtils.positionTitle()
+	return 'Position'
 end
 
 return SquadUtils

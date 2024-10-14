@@ -95,8 +95,8 @@ function Team:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Team Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Team Information'},
 		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
@@ -136,8 +136,8 @@ function Team:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = LINK_VARIANT}
+						Title{children = 'Links'},
+						Widgets.Links{links = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -149,8 +149,8 @@ function Team:createInfobox()
 					builder = function()
 						if String.isNotEmpty(args.achievements) then
 							return {
-								Title{name = 'Achievements'},
-								Center{content = {args.achievements}}
+								Title{children = 'Achievements'},
+								Center{children = {args.achievements}}
 							}
 						end
 					end
@@ -164,7 +164,7 @@ function Team:createInfobox()
 					builder = function()
 						if Table.isNotEmpty(created) or args.disbanded then
 							return {
-								Title{name = 'History'},
+								Title{children = 'History'},
 								Cell{name = 'Created', content = created},
 								Cell{name = 'Disbanded', content = {args.disbanded}}
 							}
@@ -177,13 +177,13 @@ function Team:createInfobox()
 			builder = function()
 				if args.trades then
 					return {
-						Center{content = {args.trades}}
+						Center{children = {args.trades}}
 					}
 				end
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 	self:bottom(self:_createUpcomingMatches())
 	self:bottom(self:createBottomContent())

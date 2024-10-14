@@ -47,7 +47,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Affiliation', content = {'[[File:' .. args.affiliation .. ' allmode.png|20px]] ' .. args.affiliation}
 			},
 			Cell{name = 'Voice Actor(s)', content = {args.voiceactors}},
-			Title{name = 'Abilities'},
+			Title{children = 'Abilities'},
 			Cell{name = 'Primary', content = {'[[File:' .. args.name .. ' - Primary.png|20px]] ' .. args.primary}},
 			Cell{name = 'Secondary', content = {'[[File:' .. args.name .. ' - Secondary.png|20px]] ' .. args.secondary}},
 			Cell{name = 'Special', content = {'[[File:' .. args.name .. ' - Special.png|20px]] ' .. args.special}}

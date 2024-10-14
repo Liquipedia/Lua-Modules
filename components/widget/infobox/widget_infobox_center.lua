@@ -13,12 +13,11 @@ local Table = require('Module:Table')
 local Widget = Lua.import('Module:Widget')
 
 ---@class CentereWidget: Widget
----@operator call({content: (string|number)[], classes: string[]}): CentereWidget
+---@operator call(table): CentereWidget
 ---@field classes string[]
 local Center = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.content or {}
 		self.classes = input.classes
 	end
 )

@@ -47,8 +47,8 @@ function Patch:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (self:getInformationType(args)) .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (self:getInformationType(args)) .. ' Information'},
 		Cell{name = 'Version', content = {args.version}},
 		Customizable{id = 'release', children = {
 				Cell{name = 'Release', content = {args.release}},
@@ -60,8 +60,8 @@ function Patch:createInfobox()
 				local highlights = self:getAllArgsForBase(args, 'highlight')
 				if not Table.isEmpty(highlights) then
 					return {
-						Title{name = 'Highlights'},
-						Highlights{content = highlights}
+						Title{children = 'Highlights'},
+						Highlights{children = highlights}
 					}
 				end
 			end
@@ -71,16 +71,16 @@ function Patch:createInfobox()
 				local chronologyData = self:getChronologyData(args)
 				if not Table.isEmpty(chronologyData) then
 					return {
-						Title{name = 'Chronology'},
+						Title{children = 'Chronology'},
 						Chronology{
-							content = chronologyData
+							links = chronologyData
 						}
 					}
 				end
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then

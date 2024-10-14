@@ -44,8 +44,6 @@ function CustomMatchSummary.createBody(match)
 
 	if Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
 		error('Team matches not yet supported')
-		-- todo (in sep PR): team match submatch support
-		--return CustomMatchSummary._createTeamMatchBody(body, match)
 	end
 
 	-- Iterate each map

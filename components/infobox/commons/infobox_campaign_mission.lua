@@ -44,15 +44,15 @@ function Mission:createInfobox()
 				},
 			}
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Mission Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Mission Information'},
 		Breakdown{
 			children = {'Mission Objective'},
 			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}
 		},
 		Breakdown{children = { args.objective }},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

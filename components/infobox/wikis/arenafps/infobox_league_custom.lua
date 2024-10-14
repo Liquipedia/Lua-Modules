@@ -81,8 +81,8 @@ function CustomInjector:parse(id, widgets)
 				))
 			end)
 
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
 	return widgets

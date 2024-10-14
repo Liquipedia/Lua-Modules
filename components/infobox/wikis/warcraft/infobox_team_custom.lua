@@ -76,8 +76,8 @@ function CustomInjector:parse(id, widgets)
 			return param, self.caller:_createProfile(profileData, args[param])
 		end))
 		if not Table.isEmpty(profiles) then
-			table.insert(widgets, Title{name = 'Profiles'})
-			table.insert(widgets, Center{content = profiles})
+			table.insert(widgets, Title{children = 'Profiles'})
+			table.insert(widgets, Center{children = profiles})
 		end
 	end
 	return widgets

@@ -136,8 +136,8 @@ function Person:createInfobox()
 			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Player') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Player') .. ' Information'},
 		Customizable{id = 'names', children = {
 				Cell{name = 'Name', content = {args.name}},
 				Cell{name = 'Romanized Name', content = {args.romanized_name}},
@@ -192,8 +192,8 @@ function Person:createInfobox()
 			builder = function()
 				if Table.isNotEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = LINK_VARIANT}
+						Title{children = 'Links'},
+						Widgets.Links{links = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -203,8 +203,8 @@ function Person:createInfobox()
 				builder = function()
 					if String.isNotEmpty(args.achievements) then
 						return {
-							Title{name = 'Achievements'},
-							Center{content = {args.achievements}}
+							Title{children = 'Achievements'},
+							Center{children = {args.achievements}}
 						}
 					end
 				end
@@ -215,14 +215,14 @@ function Person:createInfobox()
 				builder = function()
 					if String.isNotEmpty(args.history) then
 						return {
-							Title{name = 'History'},
-							Center{content = {args.history}}
+							Title{children = 'History'},
+							Center{children = {args.history}}
 						}
 					end
 				end
 			},
 		}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 

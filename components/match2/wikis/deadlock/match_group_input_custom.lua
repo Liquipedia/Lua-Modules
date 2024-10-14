@@ -60,10 +60,12 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
-	MatchGroupInputUtil.getCommonTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 
@@ -112,8 +114,6 @@ function MatchFunctions.extractMaps(match, opponents)
 
 	return maps
 end
-
-CustomMatchGroupInput.processMap = FnUtil.identity
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer

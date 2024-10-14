@@ -93,8 +93,8 @@ function CustomUnit:addCustomCells(widgets)
 
 	if args.icon then
 		Array.appendWith(widgets,
-			Title{name = 'Icon'},
-			Center{content = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
+			Title{children = 'Icon'},
+			Center{children = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
 		)
 	end
 

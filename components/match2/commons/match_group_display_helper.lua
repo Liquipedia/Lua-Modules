@@ -161,7 +161,9 @@ end
 ---@param winner integer?
 ---@return string
 function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
-	if resultType == 'default' then
+	if resultType == 'np' then
+		return ''
+	elseif resultType == 'default' then
 		return opponentIndex == winner and 'W' or string.upper(walkover or '')
 	end
 	return score and tostring(score) or ''

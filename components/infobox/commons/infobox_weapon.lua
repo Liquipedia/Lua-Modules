@@ -46,8 +46,8 @@ function Weapon:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Weapon') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Weapon') .. ' Information'},
 		Cell{
 			name = 'Class',
 			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
@@ -103,7 +103,7 @@ function Weapon:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	self:categories('Weapons')

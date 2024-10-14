@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetTableRowInput
----@field cells Widget[]?
+---@field children Widget[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 
@@ -23,7 +23,6 @@ local Widget = Lua.import('Module:Widget')
 local TableRow = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.cells or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 	end

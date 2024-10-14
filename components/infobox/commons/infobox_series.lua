@@ -73,8 +73,8 @@ function Series:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Series Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Series Information'},
 		Builder{
 			builder = function()
 				local organizers = self:_createOrganizers(args)
@@ -165,8 +165,8 @@ function Series:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end

@@ -77,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 		local playertitle = (not String.isEmpty(args.team_number)) and 'Teams' or 'Players'
 
 		Array.appendWith(widgets,
-			Title{name = playertitle},
+			Title{children = playertitle},
 			Cell{name = 'Number of Teams', content = {args.team_number}},
 			Cell{name = 'Number of Players', content = {args.player_number}}
 		)
@@ -95,13 +95,13 @@ function CustomInjector:parse(id, widgets)
 				index = index + 1
 			end
 
-			table.insert(widgets, Center{content = teams})
+			table.insert(widgets, Center{children = teams})
 		end
 
 		if not String.isEmpty(args.map1) then
 			Array.appendWith(widgets,
-				Title{name = 'Maps'},
-				Center{content = caller:_displayMaps(caller.data.maps)}
+				Title{children = 'Maps'},
+				Center{children = caller:_displayMaps(caller.data.maps)}
 			)
 		end
 	elseif id == 'sponsors' then

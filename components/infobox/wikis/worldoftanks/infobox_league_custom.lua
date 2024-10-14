@@ -62,8 +62,8 @@ function CustomInjector:parse(id, widgets)
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
 				return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 			end)
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
 	return widgets

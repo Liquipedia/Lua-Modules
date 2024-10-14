@@ -45,7 +45,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	games = MatchFunctions.removeUnsetMaps(games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, match.bestof)
+		and MatchFunctions.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
@@ -62,10 +62,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -89,9 +92,6 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.opponents = MapFunctions.getParticipants(map, opponents)
-		-- Match/Subobjects:luaGetMap sets a empty table as default value for participants.
-		-- Once subobjects have been refactored away this can be removed.
-		map.participants = nil
 		map.extradata = MapFunctions.getExtraData(map, map.opponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
@@ -119,8 +119,6 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 --
 -- match related functions
 --
@@ -135,21 +133,11 @@ function MatchFunctions.removeUnsetMaps(games)
 end
 
 ---@param maps table[]
----@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, bestOf)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	match.patch = Logic.emptyOr(match.patch, Variables.varDefault('patch'))
-
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table

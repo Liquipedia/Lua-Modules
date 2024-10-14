@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Table
+-- page=Module:Widget/Table/Old
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,20 +13,19 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetTableInput
----@field rows WidgetTableRow[]?
+---@field children WidgetTableRow[]?
 ---@field classes string[]?
 ---@field css {[string]: string|number|nil}?
 ---@field columns integer?
 
----@class WidgetTable:Widget
----@operator call(WidgetTableInput):WidgetTable
+---@class WidgetTableOld:Widget
+---@operator call(WidgetTableInput):WidgetTableOld
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}
 ---@field columns integer?
 local Table = Class.new(
 	Widget,
 	function(self, input)
-		self.children = input.children or input.rows or {}
 		self.classes = input.classes or {}
 		self.css = input.css or {}
 		self.columns = input.columns

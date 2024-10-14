@@ -73,7 +73,7 @@ function CustomInjector:parse(id, widgets)
 			if String.isNotEmpty(args.itemtext) then
 				iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
 			end
-			table.insert(widgets, Center{content = {iconImage}})
+			table.insert(widgets, Center{children = {iconImage}})
 		end
 		return widgets
 	elseif id == 'attributes' then
@@ -102,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
 		if not Table.isEmpty(widgets) then
-			table.insert(widgets, 1, Title{name = 'Attributes'})
+			table.insert(widgets, 1, Title{children = 'Attributes'})
 		end
 		return widgets
 	elseif id == 'ability' then
@@ -117,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'availability' then
 		if String.isEmpty(args.category) and String.isEmpty(args.drop) then return {} end
 		return {
-			Title{name = 'Item Tier'},
+			Title{children = 'Item Tier'},
 			Cell{name = 'Category', content = {caller:_categoryDisplay()}},
 			Cell{name = 'Dropped From', content = {args.drop}},
 		}
@@ -131,7 +131,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{content = {args.recipe}})
+		table.insert(widgets, Center{children = {args.recipe}})
 	elseif id == 'info' then return {}
 	end
 

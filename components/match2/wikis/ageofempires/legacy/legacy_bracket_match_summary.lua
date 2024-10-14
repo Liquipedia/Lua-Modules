@@ -23,24 +23,26 @@ function LegacyBracketMatchSummary._handleMaps(args)
 		local prefix = 'map' .. mapIndex
 
 		--Template:MatchTeam
-		if args['match' .. mapIndex] then
-			local match = Json.parse(Table.extract(args, 'match' .. mapIndex)) --[[@as table]]
-			Table.mergeInto(args,
-					Table.map(match, function(subKey, value)
-						return prefix .. subKey, value
-					end)
-			)
-			args[prefix] = Table.extract(args, prefix .. 'map')
-			args[prefix .. 'mode'] = Table.extract(args, prefix .. 'mapmode')
-			args['date' .. mapIndex] = args['date' .. mapIndex] or Table.extract(args, prefix .. 'date')
+		local matchTeam = Json.parseIfTable(Table.extract(args, 'match' .. mapIndex)) or {}
+
+		local mapArgs = {
+			map = Table.extract(args, prefix) or Table.extract(matchTeam, 'map'),
+			mode = Table.extract(args, prefix .. 'mode') or Table.extract(matchTeam, 'mapmode'),
+			winner = Table.extract(args, prefix .. 'win') or Table.extract(matchTeam, 'win'),
+			civs1 = Table.extract(args, prefix .. 'p1civ') or Table.extract(matchTeam, 't1civs'),
+			civs2 = Table.extract(args, prefix .. 'p2civ') or Table.extract(matchTeam, 't2civs'),
+			players1 = Table.extract(matchTeam, 't1players'),
+			players2 = Table.extract(matchTeam, 't2players'),
+			vod = Table.extract(args, 'vodgame' .. mapIndex),
+			date = Table.extract(args, 'date' .. mapIndex) or Table.extract(matchTeam, 'date'),
+		}
+		if mapArgs.map then
+			local mapInfo = Array.parseCommaSeparatedString(mapArgs.map, '|')
+			mapArgs.map = mapInfo[1]
 		end
 
-		if args[prefix] then
-			local mapInfo = Array.parseCommaSeparatedString(args[prefix], '|')
-			args[prefix] = mapInfo[1]
-		end
-
-		isValidMap = args[prefix] or args[prefix .. 'win']
+		isValidMap = mapArgs.map ~= nil or mapArgs.winner
+		args['map' .. mapIndex] = isValidMap and Json.stringify(mapArgs) or nil
 		mapIndex = mapIndex + 1
 	end
 

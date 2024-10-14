@@ -38,7 +38,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Age', content = {args.age}},
 			Cell{name = 'Home World', content = {args.homeworld}},
-			Title{name = 'Abilities'},
+			Title{children = 'Abilities'},
 			Cell{name = 'Legend Type', content = {args.legendtype}},
 			Cell{name = 'Passive', content = {'[[File:' .. args.name .. ' - Passive.png|20px]] ' .. args.passive}},
 			Cell{name = 'Tactical', content = {'[[File:' .. args.name .. ' - Active.png|20px]] ' .. args.active}},
