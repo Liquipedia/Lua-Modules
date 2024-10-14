@@ -55,8 +55,8 @@ function Button:render(children)
 	end
 
 	local button = Div{
+		classes = cssClasses,
 		attributes = {
-			class = table.concat(cssClasses, ' '),
 			title = self.title,
 			['aria-label'] = self.title,
 			role = 'button',
