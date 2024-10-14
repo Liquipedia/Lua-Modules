@@ -24,10 +24,10 @@ function Center:render()
 	if Table.isEmpty(self.props.children) then
 		return nil
 	end
-	return HtmlWidgets.Div{children = HtmlWidgets.Div{
+	return HtmlWidgets.Div{children = {HtmlWidgets.Div{
 		classes = WidgetUtil.collect('infobox-center', self.props.classes),
 		children = self.props.children
-	}}
+	}}}
 end
 
 return Center
