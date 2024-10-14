@@ -28,7 +28,7 @@ function Customizable:render()
 	if injector == nil then
 		return self.props.children
 	end
-	return injector(self, self.id, self.props.children)
+	return injector:parse(self.id, self.props.children)
 end
 
 return Customizable
