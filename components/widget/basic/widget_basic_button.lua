@@ -24,19 +24,10 @@ local Div = HtmlWidgets.Div
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
 
-local Button = Class.new(
-	Widget,
-	function(self, input)
-		self.title = input.title
-		self.link = input.link
-		self.linktype = input.linktype or 'internal'
-		self.variant = input.variant or 'primary'
-		self.size = input.size or 'md'
-	end
-)
+local Button = Class.new(Widget)
 
 ---@return Widget
-function Button:render(children)
+function Button:render()
 	--- MW Parser does not allowed the <button> tag, so we use a DIV for now instead
 	local cssClasses = {
 		'btn',
@@ -48,32 +39,32 @@ function Button:render(children)
 		table.insert(cssClasses, 'btn-secondary')
 	end
 
-	if self.size == 'sm' then
+	if self.props.size == 'sm' then
 		table.insert(cssClasses, 'btn-small')
-	elseif self.size == 'lg' then
+	elseif self.props.size == 'lg' then
 		table.insert(cssClasses, 'btn-large')
 	end
 
 	local button = Div{
 		classes = cssClasses,
 		attributes = {
-			title = self.title,
-			['aria-label'] = self.title,
+			title = self.props.title,
+			['aria-label'] = self.props.title,
 			role = 'button',
 			tabindex = '0',
 		},
-		children = children,
+		children = self.props.children,
 	}
 
-	if not self.link then
+	if not self.props.link then
 		return button
 	end
 
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
 	return Div{children = {
 		Link{
-			link = self.link,
-			linktype = self.linktype,
+			link = self.props.link,
+			linktype = self.props.linktype,
 			children = {button},
 		}
 	}}
