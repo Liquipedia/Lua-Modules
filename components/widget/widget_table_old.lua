@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Table
+-- page=Module:Widget/Table/Old
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,8 +18,8 @@ local Widget = Lua.import('Module:Widget')
 ---@field css {[string]: string|number|nil}?
 ---@field columns integer?
 
----@class WidgetTable:Widget
----@operator call(WidgetTableInput):WidgetTable
+---@class WidgetTableOld:Widget
+---@operator call(WidgetTableInput):WidgetTableOld
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}
 ---@field columns integer?
