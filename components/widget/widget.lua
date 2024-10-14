@@ -15,7 +15,6 @@ local Table = require('Module:Table')
 
 ---@class Widget: BaseClass
 ---@operator call(table): self
----@field children (Widget|Html|string|number)[] @deprecated
 ---@field context Widget[]
 ---@field props table<string, any>
 ---@field injector WidgetInjector?
@@ -42,25 +41,25 @@ end
 ---@param injector WidgetInjector?
 ---@return string
 function Widget:tryMake(injector)
-	local renderComponent = function()
+	local function renderComponent()
 		self.injector = injector
 		local ret = self:render()
 		if not Array.isArray(ret) then
 			ret = {ret}
 		end
-
 		---@cast ret (string|Widget|Html|nil)[]
-		return Array.reduce(ret, function(acc, val)
+
+		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, Widget) then
 				---@cast val Widget
 				val.context = self:_nextContext()
-				return acc .. val:tryMake(injector)
+				return val:tryMake(injector)
 			end
 			if val ~= nil then
-				return acc .. tostring(val)
+				return tostring(val)
 			end
-			return acc
-		end, '')
+			return nil
+		end))
 	end
 
 	return Logic.tryOrElseLog(
