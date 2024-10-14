@@ -27,10 +27,10 @@ local Title = Class.new(
 
 ---@return string?
 function Title:render()
-	return HtmlWidgets.Div{
+	return HtmlWidgets.Div{children = HtmlWidgets.Div{
 		children = self.props.children,
 		classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-2'}
-	}
+	}}
 end
 
 return Title
