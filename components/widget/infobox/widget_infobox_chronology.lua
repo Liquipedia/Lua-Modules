@@ -65,7 +65,6 @@ function Chronology:_createChronologyRow(previous, next)
 						iconName = 'next',
 						link = next,
 					},
-					options = {flipped = true},
 				}
 			}
 		}
@@ -85,6 +84,7 @@ function Chronology:_createChronologyRow(previous, next)
 						iconName = 'previous',
 						link = previous,
 					},
+					options = {flipped = true},
 				}
 			}
 		}
