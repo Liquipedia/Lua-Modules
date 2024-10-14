@@ -145,7 +145,13 @@ function CustomMatchSummary._createMapRow(game)
 	end
 
 	local displayScore = function(opponentIndex)
-		local score = DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+		local score = DisplayHelper.MapScore(
+			game.scores[opponentIndex],
+			opponentIndex,
+			game.resultType,
+			game.walkover,
+			game.winner
+		)
 		local points = game.extradata['points' .. opponentIndex]
 		if not points then
 			return score
