@@ -26,8 +26,8 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Widgets = require('Module:Widget/All')
-local WidgetTable = Widgets.Table
+local Widgets = Lua.import('Module:Widget/All')
+local WidgetTable = Widgets.TableOld
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 local Div = Widgets.Div
@@ -149,7 +149,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{content = {currencyText}}
+			return TableCell{children = {currencyText}}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -158,7 +158,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {
+				return TableCell{children = {
 					Currency.display(BASE_CURRENCY, data,
 						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
@@ -188,7 +188,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {Currency.display(data.currency)}}
+			return TableCell{children = {Currency.display(data.currency)}}
 		end,
 
 		row = 'localprize',
@@ -197,7 +197,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {
+				return TableCell{children = {
 					Currency.display(headerData.currency, data,
 					{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
@@ -226,7 +226,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {data.title}}
+			return TableCell{children = {data.title}}
 		end,
 
 		row = 'percentage',
@@ -240,7 +240,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {data .. '%'}}
+				return TableCell{children = {data .. '%'}}
 			end
 		end,
 	},
@@ -266,7 +266,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {'Qualifies To'}}
+			return TableCell{children = {'Qualifies To'}}
 		end,
 
 		row = 'qualified',
@@ -339,7 +339,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{content = {table.concat(headerDisplay)}}
+			return TableCell{children = {table.concat(headerDisplay)}}
 		end,
 
 		row = 'points',
@@ -348,7 +348,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {LANG:formatNum(data)}}
+				return TableCell{children = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -360,7 +360,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {data.title}}
+			return TableCell{children = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -369,7 +369,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {data}}
+				return TableCell{children = {data}}
 			end
 		end,
 	}
@@ -618,7 +618,7 @@ end
 function BasePrizePool:_buildHeader(isAward)
 	local headerRow = TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}}
 
-	headerRow:addCell(TableCell{content = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
+	headerRow:addCell(TableCell{children = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
@@ -631,7 +631,7 @@ function BasePrizePool:_buildHeader(isAward)
 		end
 	end
 
-	headerRow:addCell(TableCell{content = {'Participant'}, classes = {'prizepooltable-col-team'}})
+	headerRow:addCell(TableCell{children = {'Participant'}, classes = {'prizepooltable-col-team'}})
 
 	return headerRow
 end
@@ -702,7 +702,7 @@ function BasePrizePool:_buildRows()
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
-			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+			row:addCell(TableCell{children = {opponentDisplay}, css = opponentCss})
 		end
 
 		table.insert(rows, row)
@@ -813,7 +813,7 @@ end
 --- Creates an empty table cell
 ---@return WidgetTableCell
 function BasePrizePool._emptyCell()
-	return TableCell{content = {DASH}}
+	return TableCell{children = {DASH}}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.

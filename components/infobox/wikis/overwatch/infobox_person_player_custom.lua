@@ -102,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		if args.nationalteams then
-			table.insert(widgets, 1, Center{content = {args.nationalteams}})
+			table.insert(widgets, 1, Center{children = {args.nationalteams}})
 		end
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end

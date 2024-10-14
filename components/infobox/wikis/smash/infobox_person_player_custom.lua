@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 			local alt = CustomPlayer.inputToCharacterIconList(args['alt-' .. game], game, 'InfoboxCharacter')
 
 			Array.appendWith(widgets,
-				(main or former or alt) and Title{name = gameData.name} or nil,
+				(main or former or alt) and Title{children = gameData.name} or nil,
 				Cell{name = 'Current Mains', content = main or {}},
 				Cell{name = 'Former Mains', content = former or {}},
 				Cell{name = 'Secondaries', content = alt or {}}
@@ -94,7 +94,7 @@ function CustomInjector:parse(id, widgets)
 			table.insert(achievements, {gameName = gameData.abbreviation, icons = icons})
 		end)
 		if #achievements == 0 then return {} end
-		return Array.extend({Title{name = 'Achievements'}}, Array.map(achievements, function(achievement)
+		return Array.extend({Title{children = 'Achievements'}}, Array.map(achievements, function(achievement)
 			return Cell{name = achievement.gameName, content = {achievement.icons}, options = {columns = 3}}
 		end))
 	end

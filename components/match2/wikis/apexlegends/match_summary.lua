@@ -31,8 +31,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
 ---@field stream table
 
-local NO_PLACEMENT = -99
-
 local PHASE_ICONS = {
 	finished = {iconName = 'concluded', color = 'icon--green'},
 	ongoing = {iconName = 'live', color = 'icon--red'},
@@ -166,6 +164,12 @@ local MATCH_STANDING_COLUMNS = {
 					return PLACEMENT_BG[opponent.placement]
 				end,
 				value = function (opponent)
+					local placementDisplay
+					if opponent.status and opponent.status ~= 'S' then
+						placementDisplay = '-'
+					else
+						placementDisplay = CustomMatchSummary._displayRank(opponent.placement)
+					end
 					local icon, color = CustomMatchSummary._getTrophy(opponent.placement)
 					return mw.html.create()
 							:tag('i')
@@ -174,7 +178,7 @@ local MATCH_STANDING_COLUMNS = {
 								:addClass(color)
 								:done()
 							:tag('span'):addClass('panel-table__cell-game__text')
-									:wikitext(CustomMatchSummary._displayRank(opponent.placement)):done()
+									:wikitext(placementDisplay):done()
 				end,
 			},
 		},
@@ -204,7 +208,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				if opponent.placement == -1 or opponent.placement == NO_PLACEMENT then
+				if opponent.placement == -1 or opponent.status ~= 'S' then
 					return idx
 				end
 				return opponent.placement
@@ -213,10 +217,16 @@ local GAME_STANDINGS_COLUMNS = {
 		row = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
+				local placementDisplay
+					if opponent.status and opponent.status ~= 'S' then
+						placementDisplay = '-'
+					else
+						placementDisplay = CustomMatchSummary._displayRank(place)
+					end
 				local icon, color = CustomMatchSummary._getTrophy(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(CustomMatchSummary._displayRank(place)):done()
+						:tag('span'):wikitext(CustomMatchSummary._displayRank(placementDisplay)):done()
 			end,
 		},
 	},
@@ -359,20 +369,19 @@ function CustomMatchSummary._opponents(match)
 	end
 
 	local placementSortFunction = function(opponent1, opponent2)
-		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
-			if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
-				return opponent1.score > opponent2.score
-			else
-				return (opponent1.name or '') < (opponent2.name or '')
-			end
+		if opponent1.placement and opponent2.placement and opponent1.placement ~= opponent2.placement then
+			return opponent1.placement < opponent2.placement
 		end
-		if opponent1.placement == NO_PLACEMENT then
+		if opponent1.status ~= 'S' and opponent2.status == 'S' then
 			return false
 		end
-		if opponent2.placement == NO_PLACEMENT then
+		if opponent2.status ~= 'S' and opponent1.status == 'S' then
 			return true
 		end
-		return opponent1.placement < opponent2.placement
+		if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
+			return opponent1.score > opponent2.score
+		end
+		return (opponent1.name or '') < (opponent2.name or '')
 	end
 
 	-- Sort match level based on final placement & score
@@ -391,11 +400,9 @@ end
 function CustomMatchSummary._createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
-	local scoreKill = Table.extract(scoreSettings, 'kill')
-	local matchPointThreadhold = Table.extract(scoreSettings, 'matchPointThreadhold')
 	local scorePlacement = {}
 
-	local points = Table.groupBy(scoreSettings, function (_, value)
+	local points = Table.groupBy(scoreSettings.placement, function (_, value)
 		return value
 	end)
 
@@ -411,9 +418,9 @@ function CustomMatchSummary._createScoringData(match)
 	end
 
 	return {
-		kill = scoreKill,
+		kill = scoreSettings.kill,
 		placement = scorePlacement,
-		matchPointThreadhold = matchPointThreadhold,
+		matchPointThreadhold = scoreSettings.matchPointThreadhold,
 	}
 end
 
@@ -797,10 +804,6 @@ end
 ---@param placementEnd string|number|nil
 ---@return string
 function CustomMatchSummary._displayRank(placementStart, placementEnd)
-	if NO_PLACEMENT == placementStart then
-		return '-'
-	end
-
 	local places = {}
 
 	if placementStart then

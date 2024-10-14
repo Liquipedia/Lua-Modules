@@ -48,8 +48,8 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Abbreviations', content = {args.abbreviations}})
 	elseif id == 'history' then
 		return {
-			Title{name = 'History'},
-			Center{content = {TeamHistoryAuto.results{
+			Title{children = 'History'},
+			Center{children = {TeamHistoryAuto.results{
 				convertrole = true,
 				addlpdbdata = true
 			}}},
@@ -90,7 +90,7 @@ function CustomPlayer:addCustomCells(widgets)
 	end
 
 	return Array.extendWith(widgets,
-		{Title{name = 'F1 Driver Statistics'}},
+		{Title{children = 'F1 Driver Statistics'}},
 		Array.map(statisticsCells, function(cellData)
 			return Cell{name = cellData.name, content = {args[cellData.key]}}
 		end)

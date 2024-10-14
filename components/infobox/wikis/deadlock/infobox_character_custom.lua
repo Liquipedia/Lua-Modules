@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Title{name = 'Vitality'},
+			Title{children = 'Vitality'},
 			Cell{name = 'Health', content = {args.basehealth}},
 			Cell{name = 'Health Regeneration', content = {args.basehealthregen}},
 			Cell{name = 'Bullet Resistance', content = {args.resistancebullet .. '%'}},
@@ -55,7 +55,7 @@ function CustomInjector:parse(id, widgets)
 
 		Array.appendWith(
 			widgets,
-			Title{name = 'Weapon'},
+			Title{children = 'Weapon'},
 			Cell{name = 'DPS', content = {args.dps}},
 			Cell{name = 'Bullet Damage', content = {args.damagebullet}},
 			Cell{name = 'Bullets per Seconds', content = {args.bps}},

@@ -97,15 +97,15 @@ function CustomBuilding:addCustomCells(widgets)
 	local pathingMap = CustomBuilding._pathingMap(args)
 	if pathingMap then
 		Array.appendWith(widgets,
-			Title{name = 'Pathing Map'},
-			Center{content = {pathingMap}}
+			Title{children = 'Pathing Map'},
+			Center{children = {pathingMap}}
 		)
 	end
 
 	if args.icon then
 		Array.appendWith(widgets,
-			Title{name = 'Icon'},
-			Center{content = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
+			Title{children = 'Icon'},
+			Center{children = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
 		)
 	end
 

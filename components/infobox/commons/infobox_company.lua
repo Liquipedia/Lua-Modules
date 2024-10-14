@@ -50,8 +50,8 @@ function Company:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Company Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Company Information'},
 		Customizable{id = 'parent', children = {
 			Cell{
 				name = 'Parent Company',
@@ -85,14 +85,14 @@ function Company:createInfobox()
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Builder{
 			builder = function()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end

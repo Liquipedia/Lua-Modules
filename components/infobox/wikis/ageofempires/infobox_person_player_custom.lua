@@ -180,7 +180,7 @@ function CustomInjector:parse(id, widgets)
 			end)
 		end
 		if Logic.isNotEmpty(ratingCells) then
-			table.insert(widgets, Title{name = 'Ratings'})
+			table.insert(widgets, Title{children = 'Ratings'})
 			Array.extendWith(widgets, ratingCells)
 		end
 	elseif id == 'status' then

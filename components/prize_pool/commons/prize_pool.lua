@@ -19,7 +19,7 @@ local Placement = Lua.import('Module:PrizePool/Placement')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local TableRow = Widgets.TableRow
 local TableCell = Widgets.TableCell
 
@@ -54,7 +54,7 @@ end
 ---@return WidgetTableCell
 function PrizePool:placeOrAwardCell(placement)
 	local placeCell = TableCell{
-		content = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
+		children = {placement:getMedal() or '', NON_BREAKING_SPACE, placement:_displayPlace()},
 		css = {['font-weight'] = 'bolder'},
 		classes = {'prizepooltable-place'},
 	}
@@ -91,9 +91,9 @@ end
 ---@return WidgetTableRow
 function PrizePool:_toggleExpand(placeStart, placeEnd)
 	local text = 'place ' .. placeStart .. ' to ' .. placeEnd
-	local expandButton = TableCell{content = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
+	local expandButton = TableCell{children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
 		:addClass('general-collapsible-expand-button')
-	local collapseButton = TableCell{content = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
+	local collapseButton = TableCell{children = {'<div>' .. text .. '&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
 		:addClass('general-collapsible-collapse-button')
 
 	return TableRow{classes = {'ppt-toggle-expand'}}:addCell(expandButton):addCell(collapseButton)

@@ -45,8 +45,8 @@ function Game:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Game Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Game Information'},
 		Customizable{
 			id = 'developer',
 			children = {
@@ -101,13 +101,13 @@ function Game:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

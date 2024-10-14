@@ -45,8 +45,8 @@ function Show:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Show Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Show Information'},
 		Cell{name = 'Host(s)', content = self:getAllArgsForBase(args, 'host', {makeLink = true})},
 		Cell{name = 'Format', content = {args.format}},
 		Cell{name = 'Airs', content = {args.airs}},
@@ -61,19 +61,19 @@ function Show:createInfobox()
 				local secondaryLinks = Show:_addSecondaryLinkDisplay(args)
 				local returnWidgets = {}
 				if (not Table.isEmpty(links)) or (secondaryLinks ~= '') then
-					table.insert(returnWidgets, Title{name = 'Links'})
+					table.insert(returnWidgets, Title{children = 'Links'})
 				end
 				if not Table.isEmpty(links) then
-					table.insert(returnWidgets, Widgets.Links{content = links})
+					table.insert(returnWidgets, Widgets.Links{links = links})
 				end
 				if secondaryLinks ~= '' then
-					table.insert(returnWidgets, Center{content = {secondaryLinks}})
+					table.insert(returnWidgets, Center{children = {secondaryLinks}})
 				end
 				return returnWidgets
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

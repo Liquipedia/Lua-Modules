@@ -43,9 +43,9 @@ function UnofficialWorldChampion:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Current Champion'},
-		Center{content = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
+		Center{children = {args.caption}},
+		Title{children = 'Current Champion'},
+		Center{children = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
 		Builder{
 			builder = function()
 				if not String.isEmpty(args['gained date']) then
@@ -58,13 +58,13 @@ function UnofficialWorldChampion:createInfobox()
 						contentCell = ' vs ' .. args['gained against']
 					end
 					return {
-						Title{name = 'Title Gained'},
+						Title{children = 'Title Gained'},
 						Cell{name = args['gained date'], content = { contentCell }},
 					}
 				end
 			end
 		},
-		Title{name = 'Most Defences'},
+		Title{children = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = { args['most defences'] },
@@ -80,23 +80,23 @@ function UnofficialWorldChampion:createInfobox()
 				},
 			}
 		},
-		Title{name = 'Longest Consecutive Time as Champion'},
+		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
 			content = { args['longest consecutive'] },
 		},
-		Title{name = 'Longest Total Time as Champion'},
+		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
 			content = { args['longest total'] },
 		},
-		Title{name = 'Most Times Held'},
+		Title{children = 'Most Times Held'},
 		Cell{
 			name = (args['most times held no'] or '?') .. ' times',
 			content = { args['most times held'] },
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	return self:build(widgets)

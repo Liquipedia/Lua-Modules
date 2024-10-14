@@ -50,7 +50,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	match.vod = Logic.nilIfEmpty(match.vod)
 	match.links = BaseMatchFunctions.getLinks(match)
 
-	MatchGroupInputUtil.getCommonTournamentVars(match)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	local opponents = BaseMatchFunctions.readOpponents(match)
 

@@ -101,10 +101,13 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -162,21 +165,12 @@ function MatchFunctions.extractMaps(MatchParser, match, opponents)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode'), DEFAULT_MODE)
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
 end
 
 ---@param match table

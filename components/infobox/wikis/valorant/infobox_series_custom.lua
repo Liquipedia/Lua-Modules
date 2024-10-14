@@ -56,9 +56,9 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
 			return {
-				Title{name = 'Chronology'},
+				Title{children = 'Chronology'},
 				Chronology{
-					content = {
+					links = {
 						previous = args.previous,
 						next = args.next,
 					}

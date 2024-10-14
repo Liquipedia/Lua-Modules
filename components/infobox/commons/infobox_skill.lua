@@ -49,8 +49,8 @@ function Skill:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = args.informationType .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = args.informationType .. ' Information'},
 		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
 		Customizable{
 			id = 'cost',
@@ -79,7 +79,7 @@ function Skill:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then

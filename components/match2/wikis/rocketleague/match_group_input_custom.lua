@@ -9,7 +9,6 @@
 local CustomMatchGroupInput = {}
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -39,7 +38,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {'tournament_enddate'}))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
@@ -65,10 +64,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
-	MatchFunctions.getTournamentVars(match)
+	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchFunctions.getLinks(match)
@@ -123,8 +125,6 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	return maps
 end
 
-CustomMatchGroupInput.processMap = FnUtil.identity
-
 ---@param opponent table
 ---@return table
 function CustomMatchGroupInput.getOpponentExtradata(opponent)
@@ -158,13 +158,6 @@ end
 --
 
 ---@param match table
----@return table
-function MatchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	return MatchGroupInputUtil.getCommonTournamentVars(match)
-end
-
----@param match table
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, opponents)
@@ -189,7 +182,10 @@ end
 ---@return boolean
 function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	if Opponent.typeIsParty(opponent.type) then
-		return not Array.all(opponent.match2players, Opponent.playerIsTbd)
+		local playerIsTbd = function (player)
+			return String.isEmpty(player.displayname) or player.displayname:upper() == 'TBD'
+		end
+		return not Array.all(opponent.match2players, playerIsTbd)
 	end
 	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
 	return not Opponent.isTbd(opponent)

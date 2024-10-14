@@ -99,7 +99,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(
 			widgets,
-			Title{name = 'Unit stats'},
+			Title{children = 'Unit stats'},
 			Cell{name = 'Defense', content = {self.caller:_defenseDisplay()}},
 			Cell{name = 'Attributes', content = {args.attributes}},
 			Cell{name = 'Energy', content = {args.energy}},
@@ -117,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if args.game ~= GAME_LOTV and args.buildtime then
-			table.insert(widgets, Center{content = {
+			table.insert(widgets, Center{children = {
 				'<small><b>Note:</b> ' ..
 				'All time-related values are expressed assuming Normal speed, as they were before LotV.' ..
 				' <i>See [[Game Speed]].</i></small>'
@@ -217,7 +217,7 @@ function CustomUnit:_getAttack(index)
 	self:_storeAttack(index)
 
 	return {
-		Title{name = attackHeader},
+		Title{children = attackHeader},
 		Cell{name = 'Targets', content = {args['attack' .. index .. '_target']}},
 		Cell{name = 'Damage', content = {args['attack' .. index .. '_damage']}},
 		Cell{name = '[[Damage Per Second|DPS]]', content = {args['attack' .. index .. '_dps']}},

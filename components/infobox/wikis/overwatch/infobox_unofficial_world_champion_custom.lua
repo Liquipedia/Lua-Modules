@@ -42,7 +42,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		--Regional distribution
-		table.insert(widgets, String.isNotEmpty(args.region1) and Title{name = 'Regional distribution'} or nil)
+		table.insert(widgets, String.isNotEmpty(args.region1) and Title{children = 'Regional distribution'} or nil)
 
 		for regionKey, region in Table.iter.pairsByPrefix(args, 'region') do
 			Array.appendWith(widgets,

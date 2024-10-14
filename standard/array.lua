@@ -35,6 +35,7 @@ end
 ---Return true if the input is a table in array format
 ---@param tbl any
 ---@return boolean
+---@nodiscard
 function Array.isArray(tbl)
 	return type(tbl) == 'table' and Table.size(tbl) == #tbl
 end
@@ -43,6 +44,7 @@ end
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
+---@nodiscard
 function Array.copy(tbl)
 	local copy = {}
 	for _, element in ipairs(tbl) do
@@ -64,6 +66,7 @@ Array.sub({3, 5, 7, 11}, -2, -1) = {7, 11}
 ---@param startIndex integer
 ---@param endIndex integer?
 ---@return T[]
+---@nodiscard
 function Array.sub(tbl, startIndex, endIndex)
 	if startIndex < 0 then startIndex = #tbl + 1 + startIndex end
 	if not endIndex then endIndex = #tbl end
@@ -81,6 +84,7 @@ end
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T|nil
 ---@return T[]
+---@nodiscard
 function Array.map(elements, funct)
 	local mappedArray = {}
 	for index, element in ipairs(elements) do
@@ -100,6 +104,7 @@ Array.filter({1, 2, 3}, function(x) return x % 2 == 1 end)
 ---@param tbl T[]
 ---@param predicate fun(element?: T, index?: integer): boolean
 ---@return T[]
+---@nodiscard
 function Array.filter(tbl, predicate)
 	local filteredArray = {}
 	for index, element in ipairs(tbl) do
@@ -114,6 +119,7 @@ end
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
+---@nodiscard
 function Array.flatten(tbl)
 	local flattenedArray = {}
 	for _, x in ipairs(tbl) do
@@ -132,6 +138,7 @@ end
 ---@param tbl T[]
 ---@param funct any
 ---@return T[]
+---@nodiscard
 function Array.flatMap(tbl, funct)
 	return Array.flatten(Array.map(tbl, funct))
 end
@@ -141,6 +148,7 @@ end
 ---@param tbl T[]
 ---@param predicate fun(element: T): boolean
 ---@return boolean
+---@nodiscard
 function Array.all(tbl, predicate)
 	for _, element in ipairs(tbl) do
 		if not predicate(element) then
@@ -155,6 +163,7 @@ end
 ---@param tbl T[]
 ---@param predicate fun(element: T): boolean
 ---@return boolean
+---@nodiscard
 function Array.any(tbl, predicate)
 	for _, element in ipairs(tbl) do
 		if predicate(element) then
@@ -169,6 +178,7 @@ end
 ---@param tbl T[]
 ---@param predicate fun(element?: T, index?: integer): boolean
 ---@return T?
+---@nodiscard
 function Array.find(tbl, predicate)
 	for index, element in ipairs(tbl) do
 		if predicate(element, index) then
@@ -195,6 +205,7 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 ---@param funct fun(xValue: T): K?
 ---@return T[][]
 ---@return table<K, T[]>
+---@nodiscard
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
 	local groups = {}
@@ -230,6 +241,7 @@ Array.groupAdjacentBy({2, 3, 5, 7, 14, 16}, function(x) return x % 2 end)
 ---@param f fun(elem: V): T
 ---@param equals? fun(key: T, currentKey: T): boolean
 ---@return V[][]
+---@nodiscard
 function Array.groupAdjacentBy(array, f, equals)
 	equals = equals or Logic.deepEquals
 
@@ -252,6 +264,7 @@ end
 ---@param tblX T[]
 ---@param tblY T[]
 ---@return boolean
+---@nodiscard
 function Array.lexicalCompare(tblX, tblY)
 	for index = 1, math.min(#tblX, #tblY) do
 		if tblX[index] < tblY[index] then
@@ -270,6 +283,7 @@ end
 ---@param y1 T[]|T
 ---@param y2 T[]|T
 ---@return boolean
+---@nodiscard
 function Array.lexicalCompareIfTable(y1, y2)
 	if type(y1) == 'table' and type(y2) == 'table' then
 		return Array.lexicalCompare(y1, y2)
@@ -309,6 +323,7 @@ Array.sortBy({
 ---@param funct fun(element: T): V
 ---@param compare? fun(a: V, b: V): boolean
 ---@return T[]
+---@nodiscard
 function Array.sortBy(tbl, funct, compare)
 	local copy = Table.copy(tbl)
 	Array.sortInPlaceBy(copy, funct, compare)
@@ -330,6 +345,7 @@ end
 ---@generic T
 ---@param tbl T[]
 ---@return T[]
+---@nodiscard
 function Array.reverse(tbl)
 	local reversedArray = {}
 	for index = #tbl, 1, -1 do
@@ -349,6 +365,7 @@ Array.append({2, 3}, 5, 7, 11)
 ---@param tbl T[]
 ---@param ... any
 ---@return any[]
+---@nodiscard
 function Array.append(tbl, ...)
 	return Array.appendWith(Array.copy(tbl), ...)
 end
@@ -383,6 +400,7 @@ Array.extend({2, 3}, 5, 7, nil, {11, 13})
 ---@param tbl T[]|T
 ---@param ... T[]|T
 ---@return T[]
+---@nodiscard
 function Array.extend(tbl, ...)
 	return Array.extendWith({}, tbl, ...)
 end
@@ -436,6 +454,7 @@ end
 ---@param from integer
 ---@param to integer
 ---@return integer[]
+---@nodiscard
 function Array.range(from, to)
 	local elements = {}
 	for element = from, to do
@@ -450,6 +469,7 @@ end
 ---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...
 ---@param ... any
 ---@return K[]
+---@nodiscard
 function Array.extractKeys(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
@@ -465,6 +485,7 @@ end
 ---@param iterator? fun(tbl: table, ...):fun(table: table<K, V>, index?: K):K, V, ...
 ---@param ... any
 ---@return V[]
+---@nodiscard
 function Array.extractValues(tbl, iterator, ...)
 	iterator = iterator or pairs
 	local array = {}
@@ -509,6 +530,7 @@ Array.reduce({2, 3, 5}, pow)
 ---@param operator fun(aggregate: V, arrayValue: T): V
 ---@param initialValue V?
 ---@return V?
+---@nodiscard
 function Array.reduce(array, operator, initialValue)
 	local aggregate
 	if initialValue ~= nil then
@@ -529,6 +551,7 @@ end
 ---@param funct fun(item: T): V
 ---@param compare? fun(maxScore: V, score: V): boolean
 ---@return V
+---@nodiscard
 function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
@@ -548,6 +571,7 @@ end
 ---@param array T[]
 ---@param compare? fun(maxScore: T, score: T): boolean
 ---@return T
+---@nodiscard
 function Array.max(array, compare)
 	return Array.maxBy(array, function(x) return x end, compare)
 end
@@ -558,6 +582,7 @@ end
 ---@param funct fun(item: T): V
 ---@param compare? fun(score: V, minScore: V): boolean
 ---@return V?
+---@nodiscard
 function Array.minBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
 
@@ -577,6 +602,7 @@ end
 ---@param array T[]
 ---@param compare? fun(score: T, minScore: T): boolean
 ---@return T
+---@nodiscard
 function Array.min(array, compare)
 	return Array.minBy(array, function(x) return x end, compare)
 end
@@ -594,6 +620,7 @@ Array.indexOf({3, 5, 4, 6, 7}, function(x) return x % 2 == 0 end)
 ---@param array V[]
 ---@param pred fun(elem: V, ix: integer?): boolean
 ---@return integer
+---@nodiscard
 function Array.indexOf(array, pred)
 	for ix, elem in ipairs(array) do
 		if pred(elem, ix) then
@@ -614,6 +641,7 @@ Array.unique({4, 5, 4, 3})
 ---@generic V
 ---@param elements V[]
 ---@return V[]
+---@nodiscard
 function Array.unique(elements)
 	local elementCache = {}
 	local uniqueElements = {}
@@ -629,6 +657,7 @@ end
 ---@param inputString string?
 ---@param sep string?
 ---@return string[]
+---@nodiscard
 function Array.parseCommaSeparatedString(inputString, sep)
 	if Logic.isEmpty(inputString) then return {} end
 	---@cast inputString -nil

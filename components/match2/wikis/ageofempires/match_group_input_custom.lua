@@ -34,8 +34,7 @@ local OPPONENT_CONFIG = {
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
-	MatchGroupInputUtil.getCommonTournamentVars(match)
-	match.mode = Opponent.toLegacyMode(match.opponent1.type, match.opponent2.type)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
@@ -58,7 +57,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 			score = opponent.score,
 		}, autoScoreFunction)
 	end)
-
 	match.bestof = CustomMatchGroupInput.getBestOf(match.bestof)
 
 	local winnerInput = match.winner --[[@as string?]]
@@ -69,9 +67,12 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
 		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		MatchGroupInputUtil.setPlacement(opponents, match.winner, 1, 2, match.resulttype)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
 	end
 
+	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
 	match.stream = Streams.processStreams(match)
 	match.links = CustomMatchGroupInput._getLinks(match)
 
@@ -91,13 +92,15 @@ function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
-		return opponentIndex <= 2 and Opponent.blank() or nil
+		return opponentIndex <= 2 and MatchGroupInputUtil.mergeRecordWithOpponent({}, Opponent.blank()) or nil
 	end
 
 	--- or Opponent.blank() is only needed because readOpponentArg can return nil for team opponents
 	local opponent = Opponent.readOpponentArgs(opponentInput) or Opponent.blank()
 	if Opponent.isBye(opponent) then
-		return {type = Opponent.literal, name = 'BYE'}
+		local byeOpponent = Opponent.blank()
+		byeOpponent.name = 'BYE'
+		return MatchGroupInputUtil.mergeRecordWithOpponent({}, byeOpponent)
 	end
 
 	---@type number|string?
@@ -117,7 +120,7 @@ function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
 		substitutions = manualPlayersInput.substitutions
 		-- Change compared to commons MatchGroupInputUtil.readOpponent
 		local template = mw.ext.TeamTemplate.raw(opponent.template or '') or {}
-		opponent.players = MatchGroupInputUtil.readPlayersOfTeamNew(
+		opponent.players = MatchGroupInputUtil.readPlayersOfTeam(
 			template.page or '',
 			manualPlayersInput,
 			options,
@@ -153,7 +156,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
 		map.extradata.mapmode = Table.extract(map, 'mode')
 
-		MatchGroupInputUtil.getCommonTournamentVars(map, match)
+		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 
 		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
 

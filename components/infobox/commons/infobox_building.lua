@@ -44,10 +44,11 @@ function Building:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Building') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Building') .. ' Information'},
 		Cell{name = 'Built by', content = {args.builtby}},
 		Customizable{
 			id = 'cost',
@@ -92,7 +93,7 @@ function Building:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	self:categories('Buildings')
@@ -134,6 +135,13 @@ end
 
 ---@param args table
 function Building:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string?
+function Building:subHeaderDisplay(args)
+	return args.title
 end
 
 return Building

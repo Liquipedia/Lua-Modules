@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -144,6 +145,18 @@ function CustomBuilding:nameDisplay(args)
 	return factionIcon .. (args.name or self.pagename)
 end
 
+---@param args table
+---@return string?
+function CustomBuilding:subHeaderDisplay(args)
+	if Logic.isEmpty(args.subfaction) or
+		string.find(args.subfaction, '1v1') or
+		string.find(args.subfaction, self.pagename) then return end
+	return tostring(mw.html.create('span')
+		:css('font-size', '90%')
+		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
+	)
+end
+
 ---@param hotkey1 string?
 ---@param hotkey2 string?
 ---@return string?
@@ -191,6 +204,7 @@ function CustomBuilding:setLpdbData(args)
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
 			deprecated = args.deprecated or '',
 			introduced = args.introduced or '',
+			subfaction = Array.parseCommaSeparatedString(args.subfaction),
 			size = tonumber(args.size),
 			sight = tonumber(args.sight),
 			luminite = tonumber(args.luminite),
@@ -314,7 +328,7 @@ function CustomBuilding:_parseForCreeps(id, widgets)
 		Cell{name = 'Start Level', content = {startLevel}},
 		Cell{name = 'Defenders', content = {self._displayCreepDefenders(creeps)}},
 		Cell{name = 'Respawn', content = {args.respawn and args.respawn .. 's'}},
-		Title{name = 'Tower Rewards'},
+		Title{children = 'Tower Rewards'},
 		Cell{name = 'Capture Point', content = {args.capture_point}},
 		Cell{name = 'Global Buff', content = {args.global_buff}},
 	}

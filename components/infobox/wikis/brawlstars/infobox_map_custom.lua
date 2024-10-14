@@ -42,8 +42,8 @@ function CustomInjector:parse(id, widgets)
 		local modes = self.caller:_getModes(args)
 		Array.appendWith(widgets,
 			Cell{name = 'Environment', content = {args.environment}},
-			Title{name = modes and 'Mode' or nil},
-			Center{content = modes and {table.concat(modes, '<br>')} or nil}
+			Title{children = modes and 'Mode' or nil},
+			Center{children = modes and {table.concat(modes, '<br>')} or nil}
 		)
 	end
 	return widgets
