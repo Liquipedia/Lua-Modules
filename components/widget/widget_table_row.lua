@@ -38,10 +38,8 @@ end
 ---@return Widget
 function TableRow:render()
 	return HtmlWidgets.Div{
-		attributes = {
-			class = WidgetUtil.collect('csstable-widget-row', unpack(self.classes)),
-			style = self.css,
-		},
+		classes = WidgetUtil.collect('csstable-widget-row', unpack(self.classes)),
+		css = self.css,
 		children = self.props.children
 	}
 end

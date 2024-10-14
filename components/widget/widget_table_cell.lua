@@ -39,10 +39,8 @@ function TableCell:render()
 	styles['grid-row'] = self.rowSpan and 'span ' .. self.rowSpan or nil
 	styles['grid-column'] = self.colSpan and 'span ' .. self.colSpan or nil
 	return HtmlWidgets.Div{
-		attributes = {
-			class = WidgetUtil.collect('csstable-widget-cell', unpack(self.classes)),
-			style = styles,
-		},
+		classes = WidgetUtil.collect('csstable-widget-cell', unpack(self.classes)),
+		css = styles,
 		children = self.props.children
 	}
 end

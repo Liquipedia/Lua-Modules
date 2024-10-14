@@ -586,7 +586,7 @@ function BasePrizePool:_buildTable(isAward)
 	local headerRow = self:_buildHeader(isAward)
 
 	return Div{
-		attributes = {style = 'overflow-x: auto;'},
+		css = {['overflow-x'] = 'auto;'},
 		children = {WidgetTable{
 			classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
 			css = {width = 'max-content'},

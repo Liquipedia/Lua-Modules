@@ -40,10 +40,8 @@ function TableOld:render()
 	local styles = Table.copy(self.css)
 	styles['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)'
 	return HtmlWidgets.Div{
-		attributes = {
-			class = WidgetUtil.collect('csstable-widget', unpack(self.classes)),
-			style = styles,
-		},
+		classes = WidgetUtil.collect('csstable-widget', unpack(self.classes)),
+		css = styles,
 		children = self.props.children
 	}
 end
