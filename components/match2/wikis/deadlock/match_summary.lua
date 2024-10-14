@@ -23,6 +23,8 @@ local SIZE_HERO = '48x48px'
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
+	amber = Icon.makeIcon{iconName = 'amberhand', color = 'deadlock-amberhand-text', size = 'initial'},
+	sapphire = Icon.makeIcon{iconName = 'sapphireflame', color = 'deadlock-sapphireflame-text', size = 'initial'},
 	empty = '[[File:NoCheck.png|link=|16px]]',
 }
 
@@ -31,7 +33,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '440px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
@@ -75,11 +77,11 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	local function makeCharacterDisplay(opponentIndex)
 		return CustomMatchSummary._createCharacterDisplay(
 			CustomMatchSummary._getHeroesForOpponent(game.participants, opponentIndex),
-			extradata['team' .. opponentIndex .. 'side'],
 			opponentIndex == 2
 		)
 	end
 
+	row:addElement(CustomMatchSummary._createIcon(ICONS[extradata.team1side]))
 	row:addElement(makeCharacterDisplay(1))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 	row:addElement(mw.html.create('div')
@@ -91,6 +93,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(makeCharacterDisplay(2))
+	row:addElement(CustomMatchSummary._createIcon(ICONS[extradata.team2side]))
 
 	if Logic.isNotEmpty(game.comment) then
 		row:addElement(MatchSummary.Break():create())
@@ -100,16 +103,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	return row
 end
 
----@param winner integer|string
----@param opponentIndex integer
----@return Html
 function CustomMatchSummary._createCheckMark(winner, opponentIndex)
-	return mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-		:wikitext(
+	return CustomMatchSummary._createIcon(
 			winner == opponentIndex and ICONS.winner
 			or winner == 0 and ICONS.draw
 			or Logic.isNotEmpty(winner) and ICONS.loss
@@ -117,11 +112,22 @@ function CustomMatchSummary._createCheckMark(winner, opponentIndex)
 		)
 end
 
+---@param winner integer|string
+---@param opponentIndex integer
+---@return Html
+function CustomMatchSummary._createIcon(icon)
+	return mw.html.create('div')
+		:addClass('brkts-popup-spaced')
+		:css('line-height', '17px')
+		:css('margin-left', '1%')
+		:css('margin-right', '1%')
+		:wikitext(icon)
+end
+
 ---@param characters {name: string, active: boolean}[]?
----@param side string?
 ---@param reverse boolean?
 ---@return Html
-function CustomMatchSummary._createCharacterDisplay(characters, side, reverse)
+function CustomMatchSummary._createCharacterDisplay(characters, reverse)
 	local wrapper = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
 		:addClass('brkts-popup-body-element-thumbs-' .. (reverse and 'right' or 'left'))
