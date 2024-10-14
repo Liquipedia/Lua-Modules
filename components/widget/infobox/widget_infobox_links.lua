@@ -23,7 +23,7 @@ local Links = Class.new(Widget)
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
 function Links:render()
-	local linkInputs = Table.copy(self.props.links)
+	local linkInputs = Table.copy(self.props.links or {})
 
 	local links = {}
 
