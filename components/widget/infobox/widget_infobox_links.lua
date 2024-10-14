@@ -22,8 +22,12 @@ local Links = Class.new(Widget)
 
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
+---@return Widget?
 function Links:render()
-	local linkInputs = Table.copy(self.props.links or {})
+	if Table.isEmpty(self.props.links) then
+		return nil
+	end
+	local linkInputs = Table.copy(self.props.links)
 
 	local links = {}
 
@@ -53,7 +57,7 @@ function Links:render()
 
 	return HtmlWidgets.Div{children = HtmlWidgets.Div{
 		classes = {'infobox-center', 'infobox-icons'},
-		children = table.concat(links, ' ' )
+		children = Array.interleave(links, ' ')
 	}}
 end
 
