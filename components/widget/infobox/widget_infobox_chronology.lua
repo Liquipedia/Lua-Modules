@@ -58,14 +58,14 @@ function Chronology:_createChronologyRow(previous, next)
 		return Div{
 			classes = {'infobox-cell-2', 'infobox-text-right'},
 			children = {
-				-- TODO FLIPPED
 				InlineIconAndText{
 					link = next,
 					text = next,
 					icon = IconFa{
 						iconName = 'next',
 						link = next,
-					}
+					},
+					options = {flipped = true},
 				}
 			}
 		}
@@ -84,7 +84,7 @@ function Chronology:_createChronologyRow(previous, next)
 					icon = IconFa{
 						iconName = 'previous',
 						link = previous,
-					}
+					},
 				}
 			}
 		}

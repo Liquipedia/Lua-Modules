@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -27,17 +28,21 @@ local InlineIconAndText = Class.new(Widget)
 
 ---@return Widget
 function InlineIconAndText:render()
+	local children = {
+		Link{
+			link = self.props.link,
+			linktype = 'internal',
+			children = {self.props.text}
+		},
+		' ',
+		self.props.icon,
+	}
+	if self.props.options and self.props.options.flipped then
+		children = Array.reverse(children)
+	end
 	return Span{
 		classes = {'image-link'},
-		children = {
-			self.props.icon,
-			' ',
-			Link{
-				link = self.props.link,
-				linktype = 'internal',
-				children = {self.props.text}
-			}
-		},
+		children = children,
 	}
 end
 
