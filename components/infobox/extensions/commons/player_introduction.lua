@@ -596,10 +596,8 @@ end
 function PlayerIntroduction._displayTeam(team, date)
 	team = team:gsub('_', ' ')
 
-	if mw.ext.TeamTemplate.teamexists(team) then
-		local rawTeam = mw.ext.TeamTemplate.raw(team, date)
-		-- can not be nil due to above check in the if
-		---@cast rawTeam - nil
+	local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+	if rawTeam then
 		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'
 	end
 

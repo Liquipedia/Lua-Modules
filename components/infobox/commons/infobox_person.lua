@@ -263,10 +263,8 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		local teamRaw = mw.ext.TeamTemplate.raw(team)
-		-- can not be nil due to above check in the if
-		---@cast teamRaw - nil
+	local teamRaw = team and mw.ext.TeamTemplate.raw(team)
+	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
 	end
@@ -470,10 +468,8 @@ function Person:_createTeam(team, link)
 	end
 	---@cast link -nil
 
-	if mw.ext.TeamTemplate.teamexists(link) then
-		local teamRaw = mw.ext.TeamTemplate.raw(link)
-		-- can not be nil due to above check in the if
-		---@cast teamRaw - nil
+	local teamRaw = mw.ext.TeamTemplate.raw(link)
+	if teamRaw then
 		link, team = teamRaw.page, teamRaw.name
 	end
 
