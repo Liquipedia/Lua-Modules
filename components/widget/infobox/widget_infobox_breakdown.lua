@@ -29,12 +29,12 @@ function Breakdown:render()
 
 	local number = #self.props.children
 	local mappedChildren = Array.map(self.props.children, function(child, childIndex)
-		HtmlWidgets.Div{
+		return HtmlWidgets.Div{
 			children = {child},
 			classes = WidgetUtil.collect(
 				'infobox-cell-' .. number,
 				self.props.classes,
-				self.props.contentClasses['content' .. childIndex]
+				(self.props.contentClasses or {})['content' .. childIndex]
 			),
 		}
 	end)
