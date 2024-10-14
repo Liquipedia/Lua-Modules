@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Icon
+-- page=Module:Widget/Image/Icon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -17,7 +17,7 @@ local Icon = Class.new(Widget)
 
 ---@return string?
 function Icon:render()
-	error('Widget/Icon is an interface and should not be instantiated directly')
+	error('Widget/Image/Icon is an interface and should not be instantiated directly')
 end
 
 return Icon

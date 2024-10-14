@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/DataTable
+-- page=Module:Widget/Basic/DataTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

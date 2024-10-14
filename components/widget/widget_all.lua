@@ -30,7 +30,7 @@ Widgets.TableRow = Lua.import('Module:Widget/Table/Row')
 Widgets.TableCell = Lua.import('Module:Widget/Table/Cell')
 
 --- Data Table Widgets (html-table)
-Widgets.DataTable = Lua.import('Module:Widget/DataTable')
+Widgets.DataTable = Lua.import('Module:Widget/Basic/DataTable')
 
 --- Base Html Widgets
 Widgets.Div = Lua.import('Module:Widget/Html/Div')

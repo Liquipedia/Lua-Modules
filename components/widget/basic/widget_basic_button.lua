@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Button
+-- page=Module:Widget/Basic/Button
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Link = Lua.import('Module:Widget/Link')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Div = HtmlWidgets.Div
 
 ---@class ButtonWidgetParameters
