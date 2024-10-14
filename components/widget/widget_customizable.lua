@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
+local CustomizableContext = Lua.import('Module:Widget/Context/Customizable')
 
 ---@class CustomizableWidget: Widget
 ---@operator call({id: string, children: Widget[]}): CustomizableWidget
@@ -23,10 +24,11 @@ local Customizable = Class.new(
 
 ---@return Widget[]?
 function Customizable:render()
-	if self.injector == nil then
+	local injector = self:useContext(CustomizableContext.LegacyCustomizable)
+	if injector == nil then
 		return self.props.children
 	end
-	return self.injector:parse(self.id, self.props.children)
+	return injector(self.id, self.props.children)
 end
 
 return Customizable

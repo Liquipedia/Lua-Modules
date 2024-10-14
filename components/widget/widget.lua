@@ -22,8 +22,6 @@ local Widget = Class.new(function(self, props)
 	self.props = Table.copy(props) or {}
 	self.props.children = self.props.children or {}
 	self.context = {} -- Populated by the parent
-	---@deprecated To be removed when CustomizableWidget is removed
-	self.injector = nil -- Populated by the parent
 end)
 
 ---Asserts the existence of a value and copies it
@@ -38,11 +36,9 @@ function Widget:render()
 	error('A Widget must override the render() function!')
 end
 
----@param injector WidgetInjector?
 ---@return string
-function Widget:tryMake(injector)
+function Widget:tryMake()
 	local function renderComponent()
-		self.injector = injector
 		local ret = self:render()
 		if not Array.isArray(ret) then
 			ret = {ret}
@@ -52,9 +48,8 @@ function Widget:tryMake(injector)
 		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, Widget) then
 				---@cast val Widget
-				val.injector = self.injector
 				val.context = self:_nextContext()
-				return val:tryMake(injector)
+				return val:tryMake()
 			end
 			if val ~= nil then
 				return tostring(val)
@@ -104,13 +99,13 @@ end
 
 ---@return string
 function Widget:__tostring()
-	return self:tryMake(self.injector)
+	return self:tryMake()
 end
 
 --- Here to allow for Widget to be used as a node in the third part html library (mw.html).
 ---@param ret string[]
 function Widget:_build(ret)
-	table.insert(ret, self:tryMake(self.injector))
+	table.insert(ret, self:__tostring())
 end
 
 return Widget
