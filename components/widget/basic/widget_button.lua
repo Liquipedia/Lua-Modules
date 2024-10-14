@@ -14,7 +14,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Link')
 local Div = HtmlWidgets.Div
 
----@class ButtonWidgetParameters: WidgetParameters
+---@class ButtonWidgetParameters
 ---@field title string?
 ---@field link string?
 ---@field linktype 'internal'|'external'|nil
@@ -23,11 +23,6 @@ local Div = HtmlWidgets.Div
 
 ---@class ButtonWidget: Widget
 ---@operator call(ButtonWidgetParameters): ButtonWidget
----@field title string?
----@field link string?
----@field linktype 'internal'|'external'
----@field variant 'primary'|'secondary'|'ghost'
----@field size 'sm'|'md'|'lg'
 
 local Button = Class.new(
 	Widget,
@@ -40,39 +35,48 @@ local Button = Class.new(
 	end
 )
 
----@param children string[]
----@return string
-function Button:make(children)
-	--- MW Parser does not allowed the <button> tag, so we use a div for now instead
-	local button = mw.html.create('div'):addClass('btn'):addClass('btn-new')
-	button:attr('title', self.title)
-	button:attr('aria-label', self.title)
-	button:attr('role', 'button')
-	button:attr('tabindex', '0')
-
-	button:wikitext(table.concat(children))
-
-	if self.variant == 'primary' then
-		button:addClass('btn-primary')
-	elseif self.variant == 'secondary' then
-		button:addClass('btn-secondary')
+---@return Widget
+function Button:render(children)
+	--- MW Parser does not allowed the <button> tag, so we use a DIV for now instead
+	local cssClasses = {
+		'btn',
+		'btn-new',
+	}
+	if self.props.variant == 'primary' or self.props.variant == nil then
+		table.insert(cssClasses, 'btn-primary')
+	elseif self.props.variant == 'secondary' then
+		table.insert(cssClasses, 'btn-secondary')
 	end
 
 	if self.size == 'sm' then
-		button:addClass('btn-small')
+		table.insert(cssClasses, 'btn-small')
 	elseif self.size == 'lg' then
-		button:addClass('btn-large')
+		table.insert(cssClasses, 'btn-large')
 	end
 
+	local button = Div{
+		attributes = {
+			class = table.concat(cssClasses, ' '),
+			title = self.title,
+			['aria-label'] = self.title,
+			role = 'button',
+			tabindex = '0',
+		},
+		children = children,
+	}
+
 	if not self.link then
-		return tostring(button)
+		return button
 	end
+
 	-- Have to wrap it in an extra div to prevent the mediawiki parser from messing it up
-	return tostring(Div{children = {Link{
-		link = self.link,
-		linktype = self.linktype,
-		children = {button}
-	}}})
+	return Div{children = {
+		Link{
+			link = self.link,
+			linktype = self.linktype,
+			children = {button},
+		}
+	}}
 end
 
 return Button

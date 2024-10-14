@@ -15,7 +15,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Link')
 local Span = HtmlWidgets.Span
 
----@class InlineIconAndTextWidgetParameters: WidgetParameters
+---@class InlineIconAndTextWidgetParameters
 ---@field icon IconWidget
 ---@field text string?
 ---@field link string?
@@ -23,32 +23,22 @@ local Span = HtmlWidgets.Span
 ---@class InlineIconAndTextWidget: Widget
 ---@operator call(InlineIconAndTextWidgetParameters): InlineIconAndTextWidget
 
-local InlineIconAndText = Class.new(
-	Widget,
-	function(self, input)
-		local text = self:assertExistsAndCopy(input.text)
-		local link = self:assertExistsAndCopy(input.link)
+local InlineIconAndText = Class.new(Widget)
 
-		local span = Span{
-			classes = {'image-link'},
-			children = {
-				input.icon,
-				' ',
-				Link{
-					link = link,
-					linktype = 'internal',
-					children = {text}
-				}
-			},
-		}
-		self.children = {span}
-	end
-)
-
----@param children string[]
----@return string
-function InlineIconAndText:make(children)
-	return table.concat(children)
+---@return Widget
+function InlineIconAndText:render()
+	return Span{
+		classes = {'image-link'},
+		children = {
+			self.props.icon,
+			' ',
+			Link{
+				link = self.props.link,
+				linktype = 'internal',
+				children = {self.props.text}
+			}
+		},
+	}
 end
 
 return InlineIconAndText

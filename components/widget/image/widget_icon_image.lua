@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 
 local WidgetIcon = Lua.import('Module:Widget/Icon')
 
----@class IconImageWidgetParameters: WidgetParameters
+---@class IconImageWidgetParameters
 ---@field imageLight string?
 ---@field imageDark string?
 ---@field link string?
@@ -20,16 +20,10 @@ local WidgetIcon = Lua.import('Module:Widget/Icon')
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
 ---@field props IconImageWidgetParameters
-local Icon = Class.new(
-	WidgetIcon,
-	function(self, input)
-		self.props = input
-	end
-)
+local Icon = Class.new(WidgetIcon)
 
----@param children string[]
 ---@return string?
-function Icon:make(children)
+function Icon:render()
 	return Image.display(
 		self.props.imageLight,
 		self.props.imageDark,
