@@ -46,10 +46,31 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 			htmlNode:node(child:tryMake())
 		else
 			---@cast child -Widget
+			if type(child) == 'table' and not child._build then
+				error('Table passed to HtmlBase:renderAs() without _build method')
+			end
 			htmlNode:node(child)
 		end
 	end)
 	return htmlNode
+end
+
+local function dumpObject(obj)
+	local str = ''
+	for k, v in pairs(obj) do
+		if type(v) == 'table' then
+			str = str .. k .. ': ' .. dumpObject(v) .. '\n'
+		else
+			str = str .. k .. ': ' .. tostring(v) .. '\n'
+		end
+	end
+	return str
+end
+
+---@param error Error
+---@return string
+function Widget:getDerivedStateFromError(error)
+	return tostring('ERROR! Bad child input:' .. dumpObject(self.props))
 end
 
 return HtmlBase
