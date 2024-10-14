@@ -69,7 +69,7 @@ end
 
 ---@param error Error
 ---@return string
-function Widget:getDerivedStateFromError(error)
+function HtmlBase:getDerivedStateFromError(error)
 	return tostring('ERROR! Bad child input:' .. dumpObject(self.props))
 end
 
