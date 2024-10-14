@@ -70,7 +70,7 @@ end
 ---@param error Error
 ---@return string
 function HtmlBase:getDerivedStateFromError(error)
-	return tostring('ERROR! Bad child input:' .. dumpObject(self.props))
+	return tostring('ERROR! Bad child input:' .. dumpObject(self.props.children))
 end
 
 return HtmlBase
