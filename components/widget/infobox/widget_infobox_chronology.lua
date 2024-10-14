@@ -51,19 +51,24 @@ function Chronology:_createChronologyRow(previous, next)
 		return nil
 	end
 
+	local function splitInputIntoLinkAndText(input)
+		return unpack(mw.text.split(input, '|'))
+	end
+
 	local function nextSlot()
 		if not doesNextExist then
 			return
 		end
+		local link, text = splitInputIntoLinkAndText(next)
 		return Div{
 			classes = {'infobox-cell-2', 'infobox-text-right'},
 			children = {
 				InlineIconAndText{
-					link = next,
-					text = next,
+					link = link,
+					text = text,
 					icon = IconFa{
 						iconName = 'next',
-						link = next,
+						link = link,
 					},
 				}
 			}
@@ -74,15 +79,16 @@ function Chronology:_createChronologyRow(previous, next)
 		if not doesPreviousExist then
 			return
 		end
+		local link, text = splitInputIntoLinkAndText(previous)
 		return Div{
 			classes = {'infobox-cell-2', 'infobox-text-left'},
 			children = {
 				InlineIconAndText{
-					link = previous,
-					text = previous,
+					link = link,
+					text = text,
 					icon = IconFa{
 						iconName = 'previous',
-						link = previous,
+						link = link,
 					},
 					options = {flipped = true},
 				}
