@@ -72,17 +72,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.publisherpremier) and 'true' or nil
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or args.name)

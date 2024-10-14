@@ -93,17 +93,6 @@ function CustomLeague:defineCustomPageVariables(args)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.publisherpremier
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
-end
-
----@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
 	return {CustomLeague._getGameMode(args).category}

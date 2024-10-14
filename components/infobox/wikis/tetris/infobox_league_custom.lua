@@ -86,13 +86,6 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = args.team_number and 'team' or 'individual'
-	self.data.publishertier = args.publisherpremier
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
 end
 
 return CustomLeague
