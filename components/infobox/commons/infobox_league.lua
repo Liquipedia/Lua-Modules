@@ -275,7 +275,7 @@ function League:_parseArgs()
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
-		publishertier = tostring(Logic.readBool(args.publisherpremier))
+		publishertier = tostring(Logic.readBool(args.publisherpremier)),
 	}
 
 	data.liquipediatier, data.liquipediatiertype =
