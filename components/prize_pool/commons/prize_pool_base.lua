@@ -644,11 +644,11 @@ function BasePrizePool:_buildRows()
 				local lastCellOfType = previousOfPrizeType[prize.type]
 				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
-					if Table.isNotEmpty(lastCellOfType.children) and Table.isNotEmpty(cell.children) then
-						table.insert(lastCellOfType.children, tostring(mw.html.create('hr'):css('width', '100%')))
+					if Table.isNotEmpty(lastCellOfType.props.children) and Table.isNotEmpty(cell.props.children) then
+						table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
 					end
 
-					Array.extendWith(lastCellOfType.children, cell.children)
+					Array.extendWith(lastCellOfType.props.children, cell.props.children)
 					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
@@ -662,11 +662,11 @@ function BasePrizePool:_buildRows()
 				local lastInColumn = previousOpponent[columnIndex]
 
 				---@cast prizeCell -nil
-				if Table.isEmpty(prizeCell.children) then
+				if Table.isEmpty(prizeCell.props.children) then
 					prizeCell = BasePrizePool._emptyCell()
 				end
 
-				if lastInColumn and Table.deepEquals(lastInColumn.children, prizeCell.children) then
+				if lastInColumn and Table.deepEquals(lastInColumn.props.children, prizeCell.props.children) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
 					previousOpponent[columnIndex] = prizeCell
