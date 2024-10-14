@@ -1,8 +1,7 @@
-local Json = require('Module:TransferRow/Custom')
-
 --- Triple Comment to Enable our LLS Plugin
+local Json = require('Module:Json')
 insulate('Transfer', function()
-	allwikis('storage', function (args, wikiName)
+	allwikis('smoke', function (args, wikiName)
 		local LpdbTransferStub = stub(mw.ext.LiquipediaDB, 'lpdb_transfer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 		local TransferCustom = require('Module:TransferRow/Custom')
