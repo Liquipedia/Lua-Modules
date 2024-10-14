@@ -28,18 +28,38 @@ insulate('Transfer', function()
 				url = 'https://x.com/streamerzone_gg/status/1844766204742832441',
 				type = 'web source',
 			},
-			status = 'former',
-			{
-				id = 'Baz',
-				flag = 'se',
-				name = 'Foo Bar',
-				joindate = '2022-01-01',
-				inactivedate = '2022-03-03',
-				leavedate = '2022-05-01',
-			}
 		},
 		lpdbExpected = {
 			{
+				player = 'Supr',
+				nationality = 'United States',
+				fromteam = 'Team Liquid',
+				toteam = 'mousesports',
+				fromteamtemplate = 'team liquid 2024',
+				toteamtemplate = 'mousesports',
+				reference = {
+					reference1 = 'https://x.com/streamerzone_gg/status/1844766204742832441',
+					reference1type = 'web source',
+				},
+				date = '2024-10-11 00:00:00',
+				wholeteam = 0,
+				extradata = {
+					platform = '',
+					icontype = '',
+					sortindex = 0,
+					displaydate = '2024-10-11',
+					fromteamsectemplate = '',
+					displayname = 'supr',
+					chars = {},
+					role1sec = '',
+					role2sec = '',
+					toteamsectemplate = '',
+					position = '',
+					icon2 = '',
+					toteamsec = '',
+					icon = '',
+					fromteamsec = '',
+				},
 			}
 		}
 	}})
