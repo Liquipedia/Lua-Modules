@@ -63,11 +63,12 @@ function AwardPrizePool:placeOrAwardCell(placement)
 end
 
 ---@param placement AwardPlacement
----@param row WidgetTableRow
+---@return boolean
 function AwardPrizePool:applyCutAfter(placement, row)
 	if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
-		row:addClass('ppt-hide-on-collapse')
+		return true
 	end
+	return false
 end
 
 ---@param placement AwardPlacement?
@@ -85,12 +86,16 @@ end
 
 ---@return WidgetTableRow
 function AwardPrizePool:_toggleExpand()
-	local expandButton = TableCell{children = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
-		:addClass('general-collapsible-expand-button')
-	local collapseButton = TableCell{children = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
-		:addClass('general-collapsible-collapse-button')
+	local expandButton = TableCell{
+		children = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'},
+		classes = {'general-collapsible-expand-button'},
+	}
+	local collapseButton = TableCell{
+		children = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'},
+		classes = {'general-collapsible-collapse-button'},
+	}
 
-	return TableRow{classes = {'ppt-toggle-expand'}}:addCell(expandButton):addCell(collapseButton)
+	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
 end
 
 -- Get the lpdbObjectName depending on opponenttype
