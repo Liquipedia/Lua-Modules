@@ -18,7 +18,6 @@ local globalVars = PageVariableNamespace()
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_MUMBER_OF_PLAYERS = 5
-local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
 local FORFEIT = 'FF'
@@ -58,7 +57,7 @@ function MatchMapsLegacy._handleMaps(args)
 			args[mapKey .. key] = value
 		end
 		args[mapKey .. 'winner'] = Table.extract(args, mapKey .. 'win')
-		args[mapKey] = DEFAULT
+		args[mapKey] = ''
 		args[matchKey] = nil
 	end
 	return args
