@@ -10,7 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local CustomizableContext = Lua.import('Module:Widget/Context/Customizable')
+local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
 
 ---@class CustomizableWidget: Widget
 ---@operator call({id: string, children: Widget[]}): CustomizableWidget
