@@ -275,14 +275,13 @@ function League:_parseArgs()
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
+		publishertier = tostring(Logic.readBool(args.publisherpremier))
 	}
 
 	data.liquipediatier, data.liquipediatiertype =
 		Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 
 	self.data = data
-
-	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
 
 	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = self:_parsePrizePool(args, data.endDate)
 
