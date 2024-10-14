@@ -25,7 +25,7 @@ describe('Team Card Storage', function()
 			imagedark = args.imagedark1,
 			mode = 'team',
 			participant = 'Team Liquid',
-			publishertier = nil,
+			publishertier = 'false',
 			icon = tournamentData.icon,
 			icondark = tournamentData.icondark,
 			game = string.lower(tournamentData.game),
