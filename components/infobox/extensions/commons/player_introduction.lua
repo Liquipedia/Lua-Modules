@@ -598,6 +598,8 @@ function PlayerIntroduction._displayTeam(team, date)
 
 	if mw.ext.TeamTemplate.teamexists(team) then
 		local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+		-- can not be nil due to above check in the if
+		---@cast rawTeam - nil
 		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'
 	end
 
