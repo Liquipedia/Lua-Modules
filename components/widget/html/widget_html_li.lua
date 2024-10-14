@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Html/Div
+-- page=Module:Widget/Html/Li
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
