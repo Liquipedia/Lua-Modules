@@ -52,6 +52,7 @@ function Widget:tryMake(injector)
 		return table.concat(Array.map(ret, function(val)
 			if Class.instanceOf(val, Widget) then
 				---@cast val Widget
+				val.injector = self.injector
 				val.context = self:_nextContext()
 				return val:tryMake(injector)
 			end
@@ -103,13 +104,13 @@ end
 
 ---@return string
 function Widget:__tostring()
-	return self:tryMake()
+	return self:tryMake(self.injector)
 end
 
 --- Here to allow for Widget to be used as a node in the third part html library (mw.html).
 ---@param ret string[]
 function Widget:_build(ret)
-	table.insert(ret, self:__tostring())
+	table.insert(ret, self:tryMake(self.injector))
 end
 
 return Widget
