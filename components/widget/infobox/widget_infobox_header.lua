@@ -7,89 +7,63 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
 
 ---@class HeaderWidget: Widget
 ---@operator call(table): HeaderWidget
----@field name string?
----@field subHeader string?
----@field image string?
----@field imageDefault string?
----@field imageDark string?
----@field imageDefaultDark string?
----@field size number|string|nil
----@field imageText string?
-local Header = Class.new(
-	Widget,
-	function(self, input)
-		self.name = input.name
-		self.subHeader = input.subHeader
-		self.image = input.image
-		self.imageDefault = input.imageDefault
-		self.imageDark = input.imageDark
-		self.imageDefaultDark = input.imageDefaultDark
-		self.size = input.size
-		self.imageText = input.imageText
-	end
-)
+local Header = Class.new(Widget)
 
----@param children string[]
----@return string
-function Header:make(children)
-	local header = {
-		Header:_name(self.name),
-		Header:_image(
-			self.image,
-			self.imageDark,
-			self.imageDefault,
-			self.imageDefaultDark,
-			self.size,
-			self.imageText
+function Header:render()
+	if self.props.image then
+		mw.ext.SearchEngineOptimization.metaimage(self.props.image)
+	end
+
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_name(),
+			self:_subHeader(),
+			self:_image(
+				self.props.image,
+				self.props.imageDark,
+				self.props.imageDefault,
+				self.props.imageDefaultDark,
+				self.props.size,
+				self.props.imageText
+			)
 		)
 	}
-
-	if self.image then
-		mw.ext.SearchEngineOptimization.metaimage(self.image)
-	end
-
-	local subHeader = Header:_subHeader(self.subHeader)
-	if subHeader then
-		table.insert(header, 2, subHeader)
-	end
-
-	local wrapper = mw.html.create()
-	for _, element in ipairs(header) do
-		wrapper:node(element)
-	end
-	return tostring(wrapper)
 end
 
----@param name string?
----@return Html
-function Header:_name(name)
-	local pagename = name or mw.title.getCurrentTitle().text
-	local infoboxHeader = mw.html.create('div')
-	infoboxHeader	:addClass('infobox-header')
-					:addClass('wiki-backgroundcolor-light')
-					:node(self:_createInfoboxButtons())
-					:wikitext(pagename)
-	return mw.html.create('div'):node(infoboxHeader)
+---@return Widget
+function Header:_name()
+	return Div{children = {Div{
+		classes = {'infobox-header', 'wiki-backgroundcolor-light'},
+		children = {
+			self:_createInfoboxButtons(),
+			self.props.name or mw.title.getCurrentTitle().text,
+		}
+	}}}
 end
 
----@param subHeader string?
----@return Html?
-function Header:_subHeader(subHeader)
-	if not subHeader then
+---@return Widget?
+function Header:_subHeader()
+	if not self.props.subHeader then
 		return nil
 	end
-	local infoboxSubHeader = mw.html.create('div')
-	infoboxSubHeader:addClass('infobox-header')
-					:addClass('wiki-backgroundcolor-light')
-					:addClass('infobox-header-2')
-					:wikitext(subHeader)
-	return mw.html.create('div'):node(infoboxSubHeader)
+	return Div{
+		children = {
+			Div{
+				classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-2'},
+				children = {self.props.subHeader}
+			}
+		}
+	}
 end
 
 ---@param fileName string?
@@ -100,59 +74,59 @@ end
 ---@param imageText string?
 ---@return Html?
 function Header:_image(fileName, fileNameDark, default, defaultDark, size, imageText)
-	if (fileName == nil or fileName == '') and (default == nil or default == '') then
+	if Logic.isEmpty(fileName) and Logic.isEmpty(default) then
 		return nil
 	end
 
 	local imageName = fileName or default
 	---@cast imageName -nil
-	local infoboxImage = Header:_makeSizedImage(imageName, fileName, size, 'lightmode')
+	local infoboxImage = Header:_makeSizedImage(imageName, size, 'lightmode')
 
 	imageName = fileNameDark or fileName or defaultDark or default
 	---@cast imageName -nil
-	local infoboxImageDark = Header:_makeSizedImage(imageName, fileNameDark or fileName, size, 'darkmode')
+	local infoboxImageDark = Header:_makeSizedImage(imageName, size, 'darkmode')
 
 	local imageTextNode = Header:_makeImageText(imageText)
 
-	return mw.html.create('div'):addClass('infobox-image-wrapper')
-		:node(infoboxImage)
-		:node(infoboxImageDark)
-		:node(imageTextNode)
+	return Div{
+		classes = {'infobox-image-wrapper'},
+		children = {infoboxImage, infoboxImageDark, imageTextNode},
+	}
 end
 
 ---@param imageName string
----@param fileName string?
 ---@param size number|string|nil
 ---@param mode string
 ---@return Html
-function Header:_makeSizedImage(imageName, fileName, size, mode)
+function Header:_makeSizedImage(imageName, size, mode)
 	local infoboxImage = mw.html.create('div'):addClass('infobox-image ' .. mode)
 
+	local fixedSize = false
 	-- Number (interpret as pixels)
 	size = size or ''
 	if tonumber(size) then
 		size = tonumber(size) .. 'px'
-		infoboxImage:addClass('infobox-fixed-size-image')
+		fixedSize = true
 	-- Percentage (interpret as scaling)
 	elseif size:find('%%') then
 		local scale = size:gsub('%%', '')
 		local scaleNumber = tonumber(scale)
 		if scaleNumber then
 			size = 'frameless|upright=' .. (scaleNumber / 100)
-			infoboxImage:addClass('infobox-fixed-size-image')
+			fixedSize = true
 		end
 	-- Default
 	else
 		size = '600px'
 	end
 
-	local fullFileName = '[[File:' .. imageName .. '|center|' .. size .. ']]'
-	infoboxImage:wikitext(fullFileName)
-
-	return infoboxImage
+	return Div{
+		classes = {'infobox-image ' .. mode, fixedSize and 'infobox-fixed-size-image' or nil},
+		children = {'[[File:' .. imageName .. '|center|' .. size .. ']]'},
+	}
 end
 
----@return Html
+---@return Widget
 function Header:_createInfoboxButtons()
 	local rootFrame
 	local currentFrame = mw.getCurrentFrame()
@@ -163,34 +137,32 @@ function Header:_createInfoboxButtons()
 
 	local moduleTitle = rootFrame:getTitle()
 
-	local buttons = mw.html.create('span')
-	buttons:addClass('infobox-buttons')
-	buttons:addClass('navigation-not-searchable')
-
 	-- Quick edit link
-	buttons:node(
+	local editLink =
 		mw.text.nowiki('[') .. '[' .. mw.site.server ..
 		tostring(mw.uri.localUrl( mw.title.getCurrentTitle().prefixedText, 'action=edit&section=0' )) ..
 		' e]' .. mw.text.nowiki(']')
-	)
 
 	-- Quick help link (links to template)
 	if not mw.title.new(moduleTitle).exists then
 		moduleTitle = 'lpcommons:'.. moduleTitle
 	end
-	buttons:node(mw.text.nowiki('[') .. '[[' .. moduleTitle ..'|h]]' .. mw.text.nowiki(']'))
+	local helpLink = mw.text.nowiki('[') .. '[[' .. moduleTitle .. '|h]]' .. mw.text.nowiki(']')
 
-	return buttons
+	return HtmlWidgets.Span{
+		classes = {'infobox-buttons', 'navigation-not-searchable'},
+		children = {editLink, helpLink}
+	}
 end
 
 ---@param text string?
----@return Html?
+---@return Widget?
 function Header:_makeImageText(text)
 	if not text then
 		return
 	end
 
-	return mw.html.create('div'):addClass('infobox-image-text'):wikitext(text)
+	return Div{classes = 'infobox-image-text', children = {text}}
 end
 
 return Header
