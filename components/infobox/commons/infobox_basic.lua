@@ -112,7 +112,7 @@ function BasicInfobox:build(widgets)
 	if self.injector then
 		-- Customizable backwards compatibility
 		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
-		return CustomizableContext{value = self.injector.parse, children = infobox}
+		return CustomizableContext.LegacyCustomizable{value = self.injector.parse, children = infobox}
 	end
 	return infobox:tryMake()
 end
