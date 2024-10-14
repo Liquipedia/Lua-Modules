@@ -16,7 +16,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
-local IconFa = Lua.import('Module:Widget/Icon/Fontawesome') -- TODO
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ChronologyWidget: Widget
 ---@operator call(table): ChronologyWidget
