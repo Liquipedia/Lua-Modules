@@ -43,8 +43,6 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 
 	htmlNode:addClass(String.nilIfEmpty(table.concat(class, ' ')))
 	htmlNode:css(styles)
-
-	htmlNode:css(styles)
 	htmlNode:attr(attributes)
 
 	Array.forEach(children, function(child)
