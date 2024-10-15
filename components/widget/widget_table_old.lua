@@ -9,8 +9,11 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class WidgetTableInput
 ---@field children WidgetTableRow[]?
@@ -23,7 +26,7 @@ local Widget = Lua.import('Module:Widget')
 ---@field classes string[]
 ---@field css {[string]: string|number|nil}
 ---@field columns integer?
-local Table = Class.new(
+local TableOld = Class.new(
 	Widget,
 	function(self, input)
 		self.classes = input.classes or {}
@@ -32,47 +35,23 @@ local Table = Class.new(
 	end
 )
 
----@param row WidgetTableRow?
----@return self
-function Table:addRow(row)
-	table.insert(self.children, row)
-	return self
-end
-
----@param class string
----@return self
-function Table:addClass(class)
-	table.insert(self.classes, class)
-	return self
-end
-
----@param children string[]
----@return string?
-function Table:make(children)
-	local displayTable = mw.html.create('div'):addClass('csstable-widget')
-	displayTable:css{
-		['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)',
+---@return Widget
+function TableOld:render()
+	local styles = Table.copy(self.css)
+	styles['grid-template-columns'] = 'repeat(' .. (self.columns or self:_getMaxCells()) .. ', auto)'
+	return HtmlWidgets.Div{
+		classes = WidgetUtil.collect('csstable-widget', unpack(self.classes)),
+		css = styles,
+		children = self.props.children
 	}
-
-	for _, class in ipairs(self.classes) do
-		displayTable:addClass(class)
-	end
-
-	displayTable:css(self.css)
-
-	for _, row in ipairs(children) do
-		displayTable:node(row)
-	end
-
-	return tostring(displayTable)
 end
 
 ---@return integer?
-function Table:_getMaxCells()
+function TableOld:_getMaxCells()
 	local getNumberCells = function(row)
 		return row:getCellCount()
 	end
 	return Array.reduce(Array.map(self.children, getNumberCells), math.max)
 end
 
-return Table
+return TableOld
