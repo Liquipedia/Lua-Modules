@@ -170,12 +170,12 @@ function Match.splitRecordsByType(match)
 		return {}
 	end
 
-	local gameRecordList = match.match2games or match.games or {}
+	local gameRecordList = MatchGroupUtil.normalizeSubtype(match, 'map')
 	Match._removeLegacySubobjectRecords(match, 'map')
 	match.match2games = nil
 	match.games = nil
 
-	local opponentRecordList = match.match2opponents or match.opponents or {}
+	local opponentRecordList = MatchGroupUtil.normalizeSubtype(match, 'opponent')
 	Match._removeLegacySubobjectRecords(match, 'opponent')
 	match.match2opponents = nil
 	match.opponents = nil
