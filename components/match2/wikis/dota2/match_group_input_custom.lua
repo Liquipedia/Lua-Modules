@@ -81,6 +81,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	end)
 	local games = MatchFunctions.extractMaps(MatchParser, match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
+	match.links = MatchFunctions.getLinks(match, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -110,7 +111,6 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
 
 	match.games = games
 	match.opponents = opponents
