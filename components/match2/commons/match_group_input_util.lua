@@ -1039,9 +1039,7 @@ end
 ---@return { [string]: string }
 function MatchGroupInputUtil.getLinks(match)
 	local links = Links.transform(match)
-	return Table.map(links, function(value, key)
-		return key, Links.makeFullLink(key, value, 'match')
-	end)
+	return Links.makeFullLinksForTableItems(links, 'match')
 end
 
 --- Warning, both match and standalone match may be mutated
