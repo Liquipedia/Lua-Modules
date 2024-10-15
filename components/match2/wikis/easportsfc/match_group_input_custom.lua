@@ -104,9 +104,6 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.extradata = CustomMatchGroupInput.getMapExtraData(map, opponents, Logic.readBool(match.hasSubmatches))
 
 		map.opponents = CustomMatchGroupInput.getParticipants(map, opponents)
-		-- Match/Subobjects:luaGetMap sets a empty table as default value for participants.
-		-- Once subobjects have been refactored away this can be removed.
-		map.participants = nil
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)

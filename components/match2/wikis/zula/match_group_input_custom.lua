@@ -17,7 +17,6 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -159,11 +158,10 @@ end
 --
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
 ---@param map table

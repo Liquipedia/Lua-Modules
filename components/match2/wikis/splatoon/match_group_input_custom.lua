@@ -18,7 +18,6 @@ local WeaponNames = mw.loadData('Module:WeaponNames')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'default'
 
 -- containers for process helper functions
 local MatchFunctions = {}
@@ -86,10 +85,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
-
-		if map.map == DUMMY_MAP then
-			map.map = nil
-		end
 
 		map.participants = MapFunctions.getParticipants(map, opponents)
 		map.extradata = MapFunctions.getExtraData(map)

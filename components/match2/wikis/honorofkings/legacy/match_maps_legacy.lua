@@ -9,19 +9,15 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
-
 local globalVars = PageVariableNamespace()
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_MUMBER_OF_PLAYERS = 5
-local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
 local FORFEIT = 'FF'
@@ -61,7 +57,6 @@ function MatchMapsLegacy._handleMaps(args)
 			args[mapKey .. key] = value
 		end
 		args[mapKey .. 'winner'] = Table.extract(args, mapKey .. 'win')
-		args[mapKey] = DEFAULT
 		args[matchKey] = nil
 	end
 	return args
@@ -116,16 +111,15 @@ function MatchMapsLegacy._handleDetails(args, details)
 				map[ban] = Table.extract(details, prefix .. ban)
 			end)
 		end)
-		return MatchSubobjects.luaGetMap(map)
+		return map
 	end
 
 	local getMapOnlyWithWinner = function (index)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		return MatchSubobjects.luaGetMap{
+		return {
 			winner = args['map' .. index .. 'win'],
-			map = DEFAULT
 		}
 	end
 

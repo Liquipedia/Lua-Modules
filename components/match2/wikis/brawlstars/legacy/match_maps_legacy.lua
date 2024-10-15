@@ -20,7 +20,6 @@ local Template = require('Module:Template')
 local CharacterNames = mw.loadData('Module:BrawlerNames')
 
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -114,7 +113,7 @@ function MatchMapsLegacy._handleDetails(args, details)
 			score1 = Table.extract(details, prefix .. 'score1'),
 			score2 = Table.extract(details, prefix .. 'score2')
 		}
-		args[prefix] = MatchSubobjects.luaGetMap(map)
+		args[prefix] = map
 
 		if map and map.winner then
 			args.mapWinnersSet = true
