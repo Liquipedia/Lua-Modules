@@ -109,7 +109,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchFunctions.getLinks(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	match.games = games
@@ -215,16 +215,6 @@ function MatchFunctions.getBestOf(bestofInput)
 	end
 
 	return bestof
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-		review = match.review,
-		recap = match.recap,
-	}
 end
 
 ---@param match table
