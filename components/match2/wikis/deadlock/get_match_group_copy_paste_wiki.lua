@@ -53,7 +53,6 @@ function WikiCopyPaste._getMapCode(mapIndex, bans)
 		INDENT .. INDENT .. '|t2h1=|t2h2=|t2h3=|t2h4=|t2h5=|t2h6=',
 		bans and (INDENT .. INDENT .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5=|t2b6=') or nil,
 		INDENT .. INDENT .. '|length=|winner=|matchid=|vod=',
-		INDENT .. '|matchid'.. mapIndex ..'=',
 		INDENT .. '}}'
 	), '\n')
 end
