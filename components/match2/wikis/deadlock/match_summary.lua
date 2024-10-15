@@ -136,9 +136,6 @@ function CustomMatchSummary.createBody(match)
 		end
 
 		if numberOfBans > 0 then
-			banData[1].color = extradata.team1side
-			banData[2].color = extradata.team2side
-			banData.numberOfBans = numberOfBans
 			HeroBanData[gameIndex] = banData
 		end
 	end
