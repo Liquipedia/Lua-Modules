@@ -21,7 +21,7 @@ local INDENT = WikiCopyPaste.Indent
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil, bestof == 0)
 	local bans = Logic.readBool(args.bans)
-	
+
 	local lines = Array.extend(
 		'{{Match|bestof=' .. (bestof ~= 0 and bestof or ''),
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
