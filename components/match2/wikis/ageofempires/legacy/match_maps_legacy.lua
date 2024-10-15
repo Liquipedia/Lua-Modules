@@ -46,7 +46,7 @@ end
 function MatchMapsLegacy._readOpponents(matchArgs)
 	local matchMapsType
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
-			local opponent = {
+		local opponent = {
 			score = Table.extract(matchArgs, 'score' .. opponentIndex) or
 				Table.extract(matchArgs, 'p' .. opponentIndex .. 'score'),
 			template = Table.extract(matchArgs, 'team' .. opponentIndex),
