@@ -17,6 +17,11 @@ local Widget = Lua.import('Module:Widget')
 ---@class WidgetHtmlBase: Widget
 ---@operator call(table): WidgetHtmlBase
 local HtmlBase = Class.new(Widget)
+HtmlBase.defaultProps = {
+	classes = {},
+	css = {},
+	attributes = {},
+}
 
 ---@return Html
 function HtmlBase:render()
@@ -25,17 +30,20 @@ end
 
 ---@param tag string?
 ---@param children (Widget|Html|string|number)[]
----@param attributesInput {class: table?, style: table?, [string]: string}?
+---@param attributesInput {style: table, class: table, [string]: string}
 ---@return Html
 function HtmlBase:renderAs(tag, children, attributesInput)
 	local htmlNode = mw.html.create(tag)
 
-	local attributes = Table.copy(attributesInput or {})
-	local class = Table.extract(attributes, 'class') or {} --[[@as table]]
-	local styles = Table.extract(attributes, 'style') or {} --[[@as table]]
-	---@cast attributes {[string]: string}
+	---@type table<string, string|table>
+	local attributes = Table.copy(attributesInput)
+	local class = Table.extract(attributes, 'class') --[[@as table]]
+	local styles = Table.extract(attributes, 'style') --[[@as table]]
+	---@cast attributes table<string, string>
 
 	htmlNode:addClass(String.nilIfEmpty(table.concat(class, ' ')))
+	htmlNode:css(styles)
+
 	htmlNode:css(styles)
 	htmlNode:attr(attributes)
 

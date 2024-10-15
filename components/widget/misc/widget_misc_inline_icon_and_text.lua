@@ -25,6 +25,11 @@ local Span = HtmlWidgets.Span
 ---@operator call(InlineIconAndTextWidgetParameters): InlineIconAndTextWidget
 
 local InlineIconAndText = Class.new(Widget)
+InlineIconAndText.defaultProps = {
+	options = {
+		flipped = false,
+	},
+}
 
 ---@return Widget
 function InlineIconAndText:render()
@@ -37,7 +42,7 @@ function InlineIconAndText:render()
 		' ',
 		self.props.icon,
 	}
-	if self.props.options and self.props.options.flipped then
+	if self.props.options.flipped then
 		children = Array.reverse(children)
 	end
 	return Span{

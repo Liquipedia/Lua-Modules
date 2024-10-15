@@ -18,6 +18,9 @@ local Div = HtmlWidgets.Div
 ---@class HeaderWidget: Widget
 ---@operator call(table): HeaderWidget
 local Header = Class.new(Widget)
+Header.defaultProps = {
+	name = mw.title.getCurrentTitle().text,
+}
 
 function Header:render()
 	if self.props.image then
@@ -46,7 +49,7 @@ function Header:_name()
 		classes = {'infobox-header', 'wiki-backgroundcolor-light'},
 		children = {
 			self:_createInfoboxButtons(),
-			self.props.name or mw.title.getCurrentTitle().text,
+			self.props.name,
 		}
 	}}}
 end

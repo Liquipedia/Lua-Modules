@@ -18,7 +18,7 @@ local Span = Class.new(WidgetHtml)
 
 ---@return Html
 function Span:render()
-	local attributes = Table.copy(self.props.attributes or {})
+	local attributes = Table.copy(self.props.attributes)
 	attributes.class = self.props.classes
 	attributes.style = self.props.css
 	return self:renderAs('span', self.props.children, attributes)

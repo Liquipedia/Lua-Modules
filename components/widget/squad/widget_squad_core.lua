@@ -22,6 +22,9 @@ local DataTable, Tr, Th = Widgets.DataTable, Widgets.Tr, Widgets.Th
 ---@class SquadWidget: Widget
 ---@operator call(table): SquadWidget
 local Squad = Class.new(Widget)
+Squad.defaultProps = {
+	type = SquadUtils.SquadType.ACTIVE,
+}
 
 ---@return WidgetDataTable
 function Squad:render()

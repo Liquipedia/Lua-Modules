@@ -20,6 +20,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field classes string[]
 ---@field contentClasses table<integer, string[]> --can have gaps in the outer table
 local Breakdown = Class.new(Widget)
+Breakdown.defaultProps = {
+	classes = {},
+	contentClasses = {},
+}
 
 ---@return Widget?
 function Breakdown:render()
@@ -34,7 +38,7 @@ function Breakdown:render()
 			classes = WidgetUtil.collect(
 				'infobox-cell-' .. number,
 				self.props.classes,
-				(self.props.contentClasses or {})['content' .. childIndex]
+				self.props.contentClasses['content' .. childIndex]
 			),
 		}
 	end)

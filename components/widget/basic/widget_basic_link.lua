@@ -22,6 +22,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class LinkWidget: Widget
 ---@operator call(LinkWidgetParameters): LinkWidget
 local Link = Class.new(Widget)
+Link.defaultProps = {
+	linktype = 'internal',
+}
 
 ---@return Widget
 function Link:render()
