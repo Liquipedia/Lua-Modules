@@ -32,7 +32,7 @@ function MatchSummaryMVP:render()
 				children = {player.displayname},
 			}
 			if player.comment then
-				return Fragment{children = {link, ' ('.. player.comment ..')'}}
+				return Fragment{children = {link, ' (' .. player.comment .. ')'}}
 			end
 			return link
 		end
@@ -47,7 +47,7 @@ function MatchSummaryMVP:render()
 			children = WidgetUtil.collect(
 				#players > 1 and 'MVPs: ' or 'MVP: ',
 				Array.interleave(players, ', '),
-				self.props.points and ' ('.. self.props.points ..' pts)' or nil
+				self.props.points and ' (' .. self.props.points .. ' pts)' or nil
 			),
 		}},
 	}
