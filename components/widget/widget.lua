@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 ---@field props table<string, any>
 ---@field injector WidgetInjector?
 local Widget = Class.new(function(self, props)
-	self.props = Table.deepMerge(self.defaultProps, Table.deepCopy(props))
+	self.props = Table.deepMerge(Table.deepCopy(self.defaultProps), props)
 	self.props.children = self.props.children or {}
 	self.context = {} -- Populated by the parent
 end)
