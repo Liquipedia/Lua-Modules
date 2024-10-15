@@ -51,6 +51,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = MatchFunctions.readOpponents(match)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -90,7 +91,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents

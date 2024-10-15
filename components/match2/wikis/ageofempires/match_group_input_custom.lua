@@ -44,6 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games)
@@ -74,7 +75,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
 	match.stream = Streams.processStreams(match)
-	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents

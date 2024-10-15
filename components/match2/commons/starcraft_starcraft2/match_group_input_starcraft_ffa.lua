@@ -46,9 +46,9 @@ local MapFunctions = {}
 function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, BaseMatchFunctions.readDate(match.date))
 
+	match.links = MatchGroupInputUtil.getLinks(match)
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchGroupInputUtil.getLinks(match)
 
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 

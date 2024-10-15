@@ -70,6 +70,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -109,7 +110,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	match.games = games

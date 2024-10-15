@@ -47,6 +47,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, #opponents)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -75,7 +76,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 

@@ -44,6 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
@@ -73,7 +74,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
