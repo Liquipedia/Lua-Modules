@@ -13,12 +13,14 @@ local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
+local MAX_NUM_BANS = 6
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
@@ -28,6 +30,55 @@ local ICONS = {
 }
 
 local CustomMatchSummary = {}
+
+-- Hero Ban Class
+---@class DeadlockHeroBan: MatchSummaryRowInterface
+---@operator call: DeadlockHeroBan
+---@field root Html
+---@field table Html
+local HeroBan = Class.new(
+	function(self)
+		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
+		self.table = self.root:tag('table')
+			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
+		self:createHeader()
+	end
+)
+
+---@return self
+function HeroBan:createHeader()
+	self.table:tag('tr')
+		:tag('th'):css('width', '40%'):wikitext(''):done()
+		:tag('th'):css('width', '20%'):wikitext('Bans'):done()
+		:tag('th'):css('width', '40%'):wikitext(''):done()
+	return self
+end
+
+---@param banData {numberOfBans: integer, [1]: table, [2]: table}
+---@param gameNumber integer
+---@param numberOfBans integer
+---@param date string
+---@return self
+function HeroBan:banRow(banData, gameNumber, numberOfBans, date)
+	self.table:tag('tr')
+		:tag('td'):css('float', 'left')
+			:node(CustomMatchSummary._createCharacterDisplay(banData[1], false))
+		:tag('td'):css('font-size', '80%'):node(mw.html.create('div')
+			:wikitext(Abbreviation.make(
+				'Game ' .. gameNumber,
+				'Bans in game ' .. gameNumber
+			))
+		)
+		:tag('td'):css('float', 'right')
+			:node(CustomMatchSummary._createCharacterDisplay(banData[2], true))
+	return self
+end
+
+
+---@return Html
+function HeroBan:create()
+	return self.root
+end
 
 ---@param args table
 ---@return Html
@@ -46,7 +97,64 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
-	Array.forEach(Array.map(match.games, CustomMatchSummary._createGame), FnUtil.curry(body.addRow, body))
+	-- Iterate each map
+	for gameIndex, game in ipairs(match.games) do
+		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
+		if rowDisplay then
+			body:addRow(rowDisplay)
+		end
+	end
+
+	-- Add Match MVP(s)
+	if match.extradata.mvp then
+		local mvpData = match.extradata.mvp
+		if not Table.isEmpty(mvpData) and mvpData.players then
+			local mvp = MatchSummary.Mvp()
+			for _, player in ipairs(mvpData.players) do
+				mvp:addPlayer(player)
+			end
+			mvp:setPoints(mvpData.points)
+
+			body:addRow(mvp)
+		end
+
+	end
+
+	-- Pre-Process Hero Ban Data
+	local HeroBanData = {}
+	for gameIndex, game in ipairs(match.games) do
+		local extradata = game.extradata or {}
+		local banData = {{}, {}}
+		local numberOfBans = 0
+		for index = 1, MAX_NUM_BANS do
+			if String.isNotEmpty(extradata['team1ban' .. index]) then
+				numberOfBans = index
+				banData[1][index] = extradata['team1ban' .. index]
+			end
+			if String.isNotEmpty(extradata['team2ban' .. index]) then
+				numberOfBans = index
+				banData[2][index] = extradata['team2ban' .. index]
+			end
+		end
+
+		if numberOfBans > 0 then
+			banData[1].color = extradata.team1side
+			banData[2].color = extradata.team2side
+			banData.numberOfBans = numberOfBans
+			HeroBanData[gameIndex] = banData
+		end
+	end
+
+	-- Add the Hero Bans
+	if not Table.isEmpty(HeroBanData) then
+		local HeroBan = HeroBan()
+
+		for gameIndex, banData in ipairs(HeroBanData) do
+			HeroBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+		end
+
+		body:addRow(HeroBan)
+	end
 
 	return body
 end
@@ -124,5 +232,6 @@ function CustomMatchSummary._createIcon(icon)
 		:css('margin-right', '1%')
 		:wikitext(icon)
 end
+
 
 return CustomMatchSummary
