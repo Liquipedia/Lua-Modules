@@ -8,6 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Faction = require('Module:Faction')
+local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -232,7 +234,7 @@ function TransferRow:_convertToTransferStructure(data)
 
 	return Table.merge(self.baseData, {
 		player = player.pageIsResolved and player.pageName or mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName),
-		nationality = player.flag,
+		nationality = Flags.CountryCode(player.flag),
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
 		reference = self.references[data.index] or self.references.all or {reference1 = ''},
@@ -243,7 +245,7 @@ function TransferRow:_convertToTransferStructure(data)
 			icontype = subs[1] and 'Substitute' or '',
 			displayname = player.displayName or '',
 			sortindex = data.sortIndex,
-			faction = player.faction,
+			faction = player.faction and Faction.read(player.faction),
 			chars = player.chars,
 		}),
 	})
