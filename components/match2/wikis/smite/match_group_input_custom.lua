@@ -77,7 +77,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -124,15 +124,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		stats = match.stats,
-		smiteesports = match.smiteesports and ('https://www.smiteesports.com/matches/' .. match.smiteesports) or nil,
-	}
 end
 
 ---@param match table

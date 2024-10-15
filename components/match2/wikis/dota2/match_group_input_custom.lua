@@ -178,15 +178,12 @@ end
 ---@param games table[]
 ---@return table
 function MatchFunctions.getLinks(match, games)
-	local links = {
-		preview = match.preview,
-		lrthread = match.lrthread,
-		recap = match.recap,
-		faceit = match.faceit and 'https://www.faceit.com/en/dota2/room/' .. match.faceit or nil,
-		stratz = {},
-		dotabuff = {},
-		datdota = {},
-	}
+	---@type table<string, string|table>
+	local links = MatchGroupInputUtil.getLinks(match)
+	links.stratz = {}
+	links.dotabuff = {}
+	links.datdota = {}
+
 	Array.forEach(
 		Array.filter(games, function(map) return map.publisherid ~= nil end),
 		function(map, mapIndex)

@@ -73,7 +73,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -192,24 +192,6 @@ function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	end
 	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
 	return not Opponent.isTbd(opponent)
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	local links = {}
-
-	-- Shift (formerly Octane)
-	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
-		links[key] = 'https://www.shiftrle.gg/matches/' .. shift
-	end
-
-	-- Ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
-		links[key] = 'https://ballchasing.com/group/' .. ballchasing
-	end
-
-	return links
 end
 
 ---@param opponents table[]
