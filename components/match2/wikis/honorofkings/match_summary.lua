@@ -26,6 +26,7 @@ local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 
 ---@param args table
 ---@return Html
@@ -75,34 +76,11 @@ function CustomMatchSummary.createBody(match)
 		})
 	end
 
-	-- Pre-Process Champion Ban Data
-	local championBanData = {}
-	for _, game in ipairs(match.games) do
-		local extradata = game.extradata or {}
-		local banData = {{}, {}}
-		local numberOfBans = 0
-		for index = 1, MAX_NUM_BANS do
-			if String.isNotEmpty(extradata['team1ban' .. index]) then
-				numberOfBans = index
-				banData[1][index] = extradata['team1ban' .. index]
-			end
-			if String.isNotEmpty(extradata['team2ban' .. index]) then
-				numberOfBans = index
-				banData[2][index] = extradata['team2ban' .. index]
-			end
-		end
-
-		if numberOfBans > 0 then
-			table.insert(championBanData, banData)
-		else
-			table.insert(championBanData, {})
-		end
-	end
-
-	-- Add the Champion Bans
-	if Array.any(championBanData, Table.isNotEmpty) then
+	-- Add the Character Bans
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS, NO_CHARACTER)
+	if characterBansData then
 		body.root:node(MatchSummaryWidgets.CharacterBanTable{
-			bans = championBanData,
+			bans = characterBansData,
 			date = match.date,
 		})
 	end

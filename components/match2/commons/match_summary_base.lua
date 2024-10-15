@@ -838,4 +838,33 @@ function MatchSummary.defaultMapVetoDisplay(match, mapVeto)
 	return mapVeto
 end
 
+---@param games table[]
+---@param maxNumberOfBans integer
+---@param defaultIcon string?
+---@return nil
+function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
+	local matchHasBans = false
+	local gamesBans = Array.map(games, function(game)
+		local extradata = game.extradata or {}
+		local banData = {{}, {}}
+		local gameHasBans = false
+		for index = 1, maxNumberOfBans do
+			if String.isNotEmpty(extradata['team1ban' .. index]) or String.isNotEmpty(extradata['team2ban' .. index]) then
+				gameHasBans = true
+			end
+			table.insert(banData[1], String.nilIfEmpty(extradata['team1ban' .. index]) or defaultIcon)
+			table.insert(banData[2], String.nilIfEmpty(extradata['team1ban' .. index]) or defaultIcon)
+		end
+
+		if gameHasBans then
+			matchHasBans = true
+			return banData
+		else
+			return {}
+		end
+	end)
+
+	return matchHasBans and gamesBans or nil
+end
+
 return MatchSummary

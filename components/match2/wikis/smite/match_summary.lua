@@ -26,6 +26,7 @@ local NUM_GODS_PICK_TEAM = 5
 local NUM_GODS_PICK_SOLO = 1
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
+local NO_CHARACTER = 'default'
 
 local LINK_DATA = {
 	smiteesports = {
@@ -62,32 +63,11 @@ function CustomMatchSummary.createBody(match)
 	-- casters
 	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
-	-- Pre-Process God Ban Data
-	local godBans = {}
-	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata or {}
-		local banData = {{}, {}}
-		local numberOfBans = 0
-		for index = 1, MAX_NUM_BANS do
-			if String.isNotEmpty(extradata['team1ban' .. index]) then
-				numberOfBans = index
-				banData[1][index] = extradata['team1ban' .. index]
-			end
-			if String.isNotEmpty(extradata['team2ban' .. index]) then
-				numberOfBans = index
-				banData[2][index] = extradata['team2ban' .. index]
-			end
-		end
-
-		if numberOfBans > 0 then
-			godBans[gameIndex] = banData
-		end
-	end
-
-	-- Add the God Bans
-	if not Table.isEmpty(godBans) then
+	-- Add the Character Bans
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS, NO_CHARACTER)
+	if characterBansData then
 		body.root:node(MatchSummaryWidgets.CharacterBanTable{
-			bans = godBans,
+			bans = characterBansData,
 			date = match.date,
 		})
 	end
