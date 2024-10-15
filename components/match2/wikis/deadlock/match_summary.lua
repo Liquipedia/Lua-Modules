@@ -119,7 +119,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Pre-Process Hero Ban Data
-	local HeroBanData = {}
+	local heroBanData = {}
 	for gameIndex, game in ipairs(match.games) do
 		local extradata = game.extradata or {}
 		local banData = {{}, {}}
