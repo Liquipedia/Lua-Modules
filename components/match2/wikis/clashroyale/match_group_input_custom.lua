@@ -26,7 +26,6 @@ local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
 }
-local ROYALE_API_PREFIX = 'https://royaleapi.com/'
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
@@ -76,7 +75,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
 	match.extradata = MatchFunctions.getExtraData(match, #games)
 
@@ -84,14 +83,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.opponents = opponents
 
 	return match
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		royaleapi = match.royaleapi and (ROYALE_API_PREFIX .. match.royaleapi) or nil,
-	}
 end
 
 ---@param match table

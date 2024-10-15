@@ -66,7 +66,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -133,16 +133,6 @@ function MatchFunctions.getBestOf(match)
 	local bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		reddit = match.reddit and 'https://redd.it/' .. match.reddit or nil,
-		cdl = match.cdl and 'https://callofdutyleague.com/en-us/match/' .. match.cdl or nil,
-		breakingpoint = match.breakingpoint and 'https://www.breakingpoint.gg/match/' .. match.breakingpoint or nil,
-	}
 end
 
 ---@param match table

@@ -46,7 +46,9 @@ local PREFIXES = {
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
+	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	cc = {'https://cc.163.com/'},
+	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
@@ -58,6 +60,7 @@ local PREFIXES = {
 		player = 'https://challonge.com/users/',
 	},
 	chzzk = {'https://chzzk.naver.com/live/'},
+	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	corestrike = {'https://corestrike.gg/lookup/'},
 	cfs = {'https://www.crossfirestars.com/'},
@@ -67,6 +70,7 @@ local PREFIXES = {
 		team = 'https://www.datdota.com/teams/'
 	},
 	daumcafe = {'http://cafe.daum.net/'},
+	dbstats = {match = 'https://quakelife.ru/diabotical/stats/matches/?matches='},
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
 	dotabuff = {
@@ -124,6 +128,7 @@ local PREFIXES = {
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
+	interview = {''},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	['letsplaylive-old'] = {
@@ -140,6 +145,8 @@ local PREFIXES = {
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
+	lrthread = {''},
+	mapdraft = {match = 'https://aoe2cm.net/draft/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
@@ -159,19 +166,31 @@ local PREFIXES = {
 		player = 'https://osu.ppy.sh/users/',
 	},
 	patreon = {'https://www.patreon.com/'},
+	pf = {match = 'https://www.plusforward.net/quake/post/'},
 	playlist = {''},
+	preview = {''},
+	qrindr = {match = 'https://qrindr.com/match/'},
+	quakehistory = {match = 'http://www.quakehistory.com/en/matches/'},
 	r6esports = {
 		match = 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/',
 	},
-	reddit = {'https://www.reddit.com/user/'},
+	reddit = {
+		'https://www.reddit.com/user/',
+		match = 'https://redd.it/',
+	},
 	replay = {''},
+	recap = {''},
+	review = {''},
 	rgl = {
 		'https://rgl.gg/Public/LeagueTable?s=',
 		team = 'https://rgl.gg/Public/Team?t=',
 		player = 'https://rgl.gg/Public/PlayerProfile?p=',
 	},
 	rooter = {'https://rooter.gg/'},
-	royaleapi = {'https://royaleapi.com/player/'},
+	royaleapi = {
+		'https://royaleapi.com/player/',
+		match = 'https://royaleapi.com/'
+	},
 	rules = {''},
 	shift = {'https://www.shiftrle.gg/events/'},
 	siegegg = {
