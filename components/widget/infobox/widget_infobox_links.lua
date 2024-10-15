@@ -43,7 +43,7 @@ function Links:render()
 
 			local index = 2
 			while linkInputs[key .. index] ~= nil do
-				table.insert(self:_makeLink(key, linkInputs[key .. index]))
+				table.insert(links, self:_makeLink(key, linkInputs[key .. index]))
 				-- Remove link from the collection
 				linkInputs[key .. index] = nil
 				index = index + 1
@@ -52,13 +52,13 @@ function Links:render()
 	end
 
 	for key, value in Table.iter.spairs(linkInputs) do
-		table.insert(self:_makeLink(key, value))
+		table.insert(links, self:_makeLink(key, value))
 	end
 
-	return HtmlWidgets.Div{children = HtmlWidgets.Div{
+	return HtmlWidgets.Div{children = {HtmlWidgets.Div{
 		classes = {'infobox-center', 'infobox-icons'},
 		children = Array.interleave(links, ' ')
-	}}
+	}}}
 end
 
 ---@param key string
