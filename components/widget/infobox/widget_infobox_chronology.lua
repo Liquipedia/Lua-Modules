@@ -98,7 +98,7 @@ function Chronology:_createChronologyRow(previous, next)
 
 	return Div{
 		children = {
-			prevSlot() or Div{classes = 'infobox-cell-2'},
+			prevSlot() or Div{classes = {'infobox-cell-2'}},
 			nextSlot(),
 		}
 	}
