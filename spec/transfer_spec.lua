@@ -31,7 +31,8 @@ insulate('Transfer', function()
 					type = 'web source',
 				},
 			},
-			-- due to team template extension not having a fake yet some values are left as empty string instead of what would be on the wikis
+			-- due to team template extension not having a fake yet
+			-- some values are left as empty string instead of what would be on the wikis
 			lpdbExpected = {
 				{
 					objectname = 'transfer_2024-10-11_000000',
