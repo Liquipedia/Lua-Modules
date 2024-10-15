@@ -20,6 +20,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Links = Lua.import('Module:Links')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -1032,6 +1033,15 @@ function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
 	return function(playerIndex, data)
 		return opponentIndex .. '_' .. playerIndex, data
 	end
+end
+
+---@param match table
+---@return { [string]: string }
+function MatchGroupInputUtil.getLinks(match)
+	local links = Links.transform(match)
+	return Table.map(links, function(value, key)
+		return key, Links.makeFullLink(key, value, 'match')
+	end)
 end
 
 --- Warning, both match and standalone match may be mutated

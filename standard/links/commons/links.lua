@@ -50,7 +50,8 @@ local PREFIXES = {
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
-		team = 'https://www.challengermode.com/teams/'
+		team = 'https://www.challengermode.com/teams/',
+		match = 'https://www.challengermode.com/games/',
 	},
 	challonge = {
 		'',
@@ -76,6 +77,7 @@ local PREFIXES = {
 	douyin = {'https://live.douyin.com/'},
 	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
+	ebattle = {match = 'https://www.ebattle.gg/turnier/match/'},
 	esea = {
 		'https://play.esea.net/events/',
 		player = 'https://play.esea.net/users/',
@@ -86,6 +88,7 @@ local PREFIXES = {
 		'',
 		team = 'https://play.eslgaming.com/team/',
 		player = 'https://play.eslgaming.com/player/',
+		match = 'https://play.eslgaming.com/match/',
 	},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
@@ -132,6 +135,7 @@ local PREFIXES = {
 		'https://gg.letsplay.live/tournament/',
 		team = 'https://gg.letsplay.live/view-team/',
 		player = 'https://gg.letsplay.live/profile/view-stats/',
+		match = 'https://old.letsplay.live/match/',
 	},
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
@@ -147,12 +151,18 @@ local PREFIXES = {
 		player = 'https://nwc3l.com/profile/',
 	},
 	openrec = {'https://www.openrec.tv/live/'},
+	opl = {
+		match = 'https://www.opleague.eu/match/'
+	},
 	osu = {
 		'https://osu.ppy.sh/',
 		player = 'https://osu.ppy.sh/users/',
 	},
 	patreon = {'https://www.patreon.com/'},
 	playlist = {''},
+	r6esports = {
+		match = 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/',
+	},
 	reddit = {'https://www.reddit.com/user/'},
 	replay = {''},
 	rgl = {
@@ -168,6 +178,7 @@ local PREFIXES = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
+		match = 'https://siege.gg/matches/',
 	},
 	sk = {'https://sk-gaming.com/member/'},
 	smashboards = {'https://smashboards.com/'},
@@ -185,6 +196,7 @@ local PREFIXES = {
 	pubsteam = {'https://steamcommunity.com/groups/'},
 	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
+	stats = {''},
 	stratz = {
 		'https://stratz.com/leagues/',
 		player = 'https://stratz.com/players/',
