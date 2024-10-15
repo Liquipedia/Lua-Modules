@@ -56,10 +56,8 @@ end
 
 ---@param banData {numberOfBans: integer, [1]: table, [2]: table}
 ---@param gameNumber integer
----@param numberOfBans integer
----@param date string
 ---@return self
-function HeroBan:banRow(banData, gameNumber, numberOfBans, date)
+function HeroBan:banRow(banData, gameNumber)
 	self.table:tag('tr')
 		:tag('td'):css('float', 'left')
 			:node(CustomMatchSummary._createCharacterDisplay(banData[1], false))
