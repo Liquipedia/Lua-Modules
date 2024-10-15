@@ -21,7 +21,7 @@ local Variables = require('Module:Variables')
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
-local TransferRefs = Lua.import('Module:Transfer/Refences')
+local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = {}
 

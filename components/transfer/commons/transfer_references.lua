@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Transfer/Refences
+-- page=Module:Transfer/References
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

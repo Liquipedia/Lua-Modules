@@ -19,7 +19,7 @@ local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = t
 local Info = Lua.import('Module:Info', {loadData = true})
 local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
-local TransferRef = Lua.import('Module:Transfer/Refences')
+local TransferRef = Lua.import('Module:Transfer/References')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local EMPTY_POSITION_ICON = '[[File:Logo filler event.png|16px|link=]]'
