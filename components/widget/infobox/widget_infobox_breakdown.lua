@@ -6,53 +6,41 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class BreakdownWidget: Widget
----@operator call({children:(string|number)[],classes:string[],contentClasses:table<integer,string[]>}):BreakdownWidget
+---@operator call(table):BreakdownWidget
 ---@field classes string[]
 ---@field contentClasses table<integer, string[]> --can have gaps in the outer table
-local Breakdown = Class.new(
-	Widget,
-	function(self, input)
-		self.classes = input.classes
-		self.contentClasses = input.contentClasses or {}
-	end
-)
+local Breakdown = Class.new(Widget)
 
----@param children string[]
----@return string?
-function Breakdown:make(children)
-	return Breakdown:_breakdown(children, self.classes, self.contentClasses)
-end
-
----@param contents (string|number)[]
----@param classes string[]
----@param contentClasses table<integer, string[]> --can have gaps in the outer table
----@return string?
-function Breakdown:_breakdown(contents, classes, contentClasses)
-	if type(contents) ~= 'table' or contents == {} then
+---@return Widget?
+function Breakdown:render()
+	if Table.isEmpty(self.props.children) then
 		return nil
 	end
 
-	local div = mw.html.create('div')
-	local number = #contents
-	for contentIndex, content in ipairs(contents) do
-		local infoboxCustomCell = mw.html.create('div'):addClass('infobox-cell-' .. number)
-		for _, class in pairs(classes or {}) do
-			infoboxCustomCell:addClass(class)
-		end
-		for _, class in pairs(contentClasses['content' .. contentIndex] or {}) do
-			infoboxCustomCell:addClass(class)
-		end
-		infoboxCustomCell:wikitext(content)
-		div:node(infoboxCustomCell)
-	end
-
-	return tostring(div)
+	local number = #self.props.children
+	local mappedChildren = Array.map(self.props.children, function(child, childIndex)
+		return HtmlWidgets.Div{
+			children = {child},
+			classes = WidgetUtil.collect(
+				'infobox-cell-' .. number,
+				self.props.classes,
+				(self.props.contentClasses or {})['content' .. childIndex]
+			),
+		}
+	end)
+	return HtmlWidgets.Div{
+		children = mappedChildren,
+	}
 end
 
 return Breakdown

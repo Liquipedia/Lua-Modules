@@ -6,57 +6,59 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local UtilLinks = Lua.import('Module:Links')
 local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class LinksWidget: Widget
----@operator call({links: table<string, string>, variant: string?}): LinksWidget
----@field links table<string, string>
----@field variant string?
-local Links = Class.new(
-	Widget,
-	function(self, input)
-		self.links = Table.copy(input.links)
-		self.variant = input.variant
-	end
-)
+---@operator call(table): LinksWidget
+local Links = Class.new(Widget)
 
 local PRIORITY_GROUPS = Lua.import('Module:Links/PriorityGroups', {loadData = true})
 
----@param children string[]
----@return string?
-function Links:make(children)
-	local infoboxLinks = mw.html.create('div')
-	infoboxLinks	:addClass('infobox-center')
-					:addClass('infobox-icons')
+---@return Widget?
+function Links:render()
+	if Table.isEmpty(self.props.links) then
+		return nil
+	end
+	local linkInputs = Table.copy(self.props.links)
+
+	local links = {}
 
 	for _, group in Table.iter.spairs(PRIORITY_GROUPS) do
-		for _, key in ipairs(group) do
-			if self.links[key] ~= nil then
-				infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key]))
-				-- Remove link from the collection
-				self.links[key] = nil
-
-				local index = 2
-				while self.links[key .. index] ~= nil do
-					infoboxLinks:wikitext(' ' .. self:_makeLink(key, self.links[key .. index]))
-					-- Remove link from the collection
-					self.links[key .. index] = nil
-					index = index + 1
-				end
+		Array.forEach(group, function(key)
+			if not linkInputs[key] then
+				return
 			end
-		end
+
+			table.insert(links, self:_makeLink(key, linkInputs[key]))
+			-- Remove link from the collection
+			linkInputs[key] = nil
+
+			local index = 2
+			while linkInputs[key .. index] ~= nil do
+				table.insert(self:_makeLink(key, linkInputs[key .. index]))
+				-- Remove link from the collection
+				linkInputs[key .. index] = nil
+				index = index + 1
+			end
+		end)
 	end
 
-	for key, value in Table.iter.spairs(self.links) do
-		infoboxLinks:wikitext(' ' .. self:_makeLink(key, value))
+	for key, value in Table.iter.spairs(linkInputs) do
+		table.insert(self:_makeLink(key, value))
 	end
 
-	return tostring(mw.html.create('div'):node(infoboxLinks))
+	return HtmlWidgets.Div{children = HtmlWidgets.Div{
+		classes = {'infobox-center', 'infobox-icons'},
+		children = Array.interleave(links, ' ')
+	}}
 end
 
 ---@param key string
@@ -64,8 +66,11 @@ end
 ---@return string
 function Links:_makeLink(key, value)
 	key = UtilLinks.removeAppendedNumber(key)
-	return '[' .. UtilLinks.makeFullLink(key, value, self.variant) ..
-		' ' .. UtilLinks.makeIcon(key) .. ']'
+	return Link{
+		linktype = 'external',
+		link = UtilLinks.makeFullLink(key, value, self.props.variant),
+		children = {UtilLinks.makeIcon(key)},
+	}
 end
 
 return Links

@@ -664,4 +664,20 @@ function Array.parseCommaSeparatedString(inputString, sep)
 	return Array.map(mw.text.split(inputString, sep or ','), String.trim)
 end
 
+---Interleaves an array with elements
+---Array.interleave({4, 5, 4, 3}, 1) -- {4, 1, 5, 1, 4, 1, 3}
+---@generic V, T
+---@param elements V[]
+---@param x T
+---@return (V|T)[]
+function Array.interleave(elements, x)
+	local size = #elements
+	return Array.flatMap(elements, function(element, index)
+		if index == size then
+			return {element}
+		end
+		return {element, x}
+	end)
+end
+
 return Array

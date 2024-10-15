@@ -8,8 +8,11 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CellWidgetOptions
 ---@field columns number?
@@ -17,91 +20,52 @@ local Widget = Lua.import('Module:Widget')
 ---@field surpressColon boolean?
 
 ---@class CellWidget: Widget
----@operator call({name:string|number,content:(string|number)[],classes:string[]?,options:CellWidgetOptions}):CellWidget
----@field name string|number
----@field options CellWidgetOptions
----@field classes string[]?
+---@operator call(table):CellWidget
 local Cell = Class.new(Widget,
 	function(self, input)
 		self.name = self:assertExistsAndCopy(input.name)
-		self.children = input.children or input.content or {}
-		self.options = input.options or {}
-		self.classes = input.classes
-
-		self.options.columns = self.options.columns or 2
+		self.props.children = input.children or input.content or {}
 	end
 )
 
----@param description string|number
----@return CellWidget
-function Cell:_new(description)
-	self.root = mw.html.create('div')
-	self.description = mw.html.create('div')
-	self.description:addClass('infobox-cell-'.. self.options.columns)
-					:addClass('infobox-description')
-					:wikitext(description)
-					:wikitext(not self.options.surpressColon and ':' or nil)
-	self.contentDiv = nil
-	return self
-end
-
----@param ... string
----@return CellWidget
-function Cell:_class(...)
-	for i = 1, select('#', ...) do
-		local item = select(i, ...)
-		if item == nil then
-			break
-		end
-
-		self.root:addClass(item)
-	end
-	return self
-end
-
----@param ... string
----@return CellWidget
-function Cell:_content(...)
-	local firstItem = select(1, ...)
-	if firstItem == nil or firstItem == '' then
-		self.contentDiv = nil
-		return self
-	end
-
-	self.contentDiv = mw.html.create('div')
-	self.contentDiv:css('width', (100 * (self.options.columns - 1) / self.options.columns) .. '%') -- 66.66% for col = 3
-	for i = 1, select('#', ...) do
-		if i > 1 then
-			self.contentDiv:wikitext('<br/>')
-		end
-		local item = select(i, ...) ---@type string?
-		if item == nil then
-			break
-		end
-
-		if self.options.makeLink == true then
-			self.contentDiv:wikitext('[[' .. item .. ']]')
-		else
-			self.contentDiv:wikitext(item)
-		end
-	end
-	return self
-end
-
----@param children string[]
----@return string?
-function Cell:make(children)
-	self:_new(self.name)
-	self:_class(unpack(self.classes or {}))
-	self:_content(unpack(children))
-
-	if self.contentDiv == nil then
+---@return Widget?
+function Cell:render()
+	if Logic.isEmpty(self.props.children) then
 		return
 	end
 
-	self.root	:node(self.description)
-				:node(self.contentDiv)
-	return tostring(self.root)
+	local options = self.props.options or {}
+	options.columns = options.columns or 2
+
+	local mappedChildren = {}
+	for i, child in ipairs(self.props.children) do
+		if i > 1 then
+			table.insert(mappedChildren, '<br/>')
+		end
+		if options.makeLink then
+			table.insert(mappedChildren, Link{children = {child}, link = child})
+		else
+			table.insert(mappedChildren, child)
+		end
+	end
+
+	if Logic.isEmpty(mappedChildren[1]) then
+		return
+	end
+
+	return HtmlWidgets.Div{
+		classes = self.props.classes,
+		children = {
+			HtmlWidgets.Div{
+				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
+				children = {self.props.name, not options.surpressColon and ':' or nil}
+			},
+			HtmlWidgets.Div{
+				css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
+				children = mappedChildren,
+			}
+		}
+	}
 end
 
 return Cell
