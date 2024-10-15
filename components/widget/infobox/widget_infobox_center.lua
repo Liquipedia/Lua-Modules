@@ -11,41 +11,23 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class CentereWidget: Widget
 ---@operator call(table): CentereWidget
 ---@field classes string[]
-local Center = Class.new(
-	Widget,
-	function(self, input)
-		self.classes = input.classes
-	end
-)
+local Center = Class.new(Widget)
 
----@param children string[]
----@return string?
-function Center:make(children)
-	return Center:_create(children, self.classes)
-end
-
----@param content (string|number)[]
----@param classes string[]
----@return string?
-function Center:_create(content, classes)
-	if Table.isEmpty(content) then
+---@return Widget?
+function Center:render()
+	if Table.isEmpty(self.props.children) then
 		return nil
 	end
-
-	local centered = mw.html.create('div'):addClass('infobox-center')
-	for _, class in ipairs(classes or {}) do
-		centered:addClass(class)
-	end
-
-	for _, item in pairs(content) do
-		centered:wikitext(item)
-	end
-
-	return tostring(mw.html.create('div'):node(centered))
+	return HtmlWidgets.Div{children = {HtmlWidgets.Div{
+		classes = WidgetUtil.collect('infobox-center', self.props.classes),
+		children = self.props.children
+	}}}
 end
 
 return Center

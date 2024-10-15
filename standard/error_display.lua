@@ -22,7 +22,7 @@ local FILTERED_ERROR_STACK_ITEMS = {
 }
 
 local INLINE_ERROR_MESSAGE =
-	'Unexpected Error, report this in #bugs on our [https://discord.gg/liquipedia Discord]. ${errorMessage}'
+	'Unexpected Error, report this in #report-bugs on our [https://discord.gg/liquipedia Discord]. ${errorMessage}'
 
 ---@param props {limit: integer?, errors: Error[]}
 ---@return Html

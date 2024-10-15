@@ -19,21 +19,18 @@ local Fragment = HtmlWidgets.Fragment
 ---@class Infobox: Widget
 ---@operator call(table): Infobox
 ---@field props table
-local Infobox = Class.new(Widget, function(self, props)
-	self.props = props
-end)
+local Infobox = Class.new(Widget)
 
----@param children string[]
 ---@return string
-function Infobox:make(children)
+function Infobox:render()
 	local firstInfobox = not Variables.varDefault('has_infobox')
 	Variables.varDefine('has_infobox', 'true')
 
 	local adbox = Div{classes = {'fo-nttax-infobox-adbox'}, children = {mw.getCurrentFrame():preprocess('<adbox />')}}
-	local content = Div{classes = {'fo-nttax-infobox'}, children = children}
+	local content = Div{classes = {'fo-nttax-infobox'}, children = self.props.children}
 	local bottomContent = Div{children = self.props.bottomContent}
 
-	return tostring(Fragment{children = {
+	return Fragment{children = {
 		Div{
 			classes = {
 				'fo-nttax-infobox-wrapper',
@@ -47,7 +44,7 @@ function Infobox:make(children)
 			}
 		},
 		WarningBox.displayAll(self.props.warnings),
-	}})
+	}}
 end
 
 return Infobox

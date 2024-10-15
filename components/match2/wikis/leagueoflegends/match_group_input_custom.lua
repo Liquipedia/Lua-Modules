@@ -26,7 +26,6 @@ local OPPONENT_CONFIG = {
 	maxNumPlayers = 15,
 }
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'default'
 
 local MatchFunctions = {}
 local MapFunctions = {}
@@ -130,10 +129,6 @@ function MatchFunctions.extractMaps(MatchParser, match, opponents)
 		local map = MatchParser.getMap(mapInput)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
-
-		if map.map == DUMMY_MAP then
-			map.map = nil
-		end
 
 		map.length = MatchParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])

@@ -90,6 +90,9 @@ end
 function MatchFunctions.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -170,6 +173,8 @@ end
 function MapFunctions.getExtraData(map, opponentCount)
 	return {
 		comment = map.comment,
+		points1 = map.points1,
+		points2 = map.points2,
 	}
 end
 

@@ -20,7 +20,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'default'
 local MAX_NUM_PLAYERS = 15
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
@@ -187,11 +186,10 @@ function MapFunctions.readMap(map, opponentCount)
 end
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
 ---@param winnerInput string|integer|nil

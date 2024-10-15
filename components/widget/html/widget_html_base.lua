@@ -46,6 +46,13 @@ function HtmlBase:renderAs(tag, children, attributesInput)
 			htmlNode:node(child:tryMake())
 		else
 			---@cast child -Widget
+			---@diagnostic disable-next-line: undefined-field
+			if type(child) == 'table' and not child._build then
+				mw.log('ERROR! Bad child input:' .. mw.dumpObject(self.props.children))
+				-- Erroring here to make it easier to debug
+				-- Otherwise it will fail when the html is built
+				error('Table passed to HtmlBase:renderAs() without _build method')
+			end
 			htmlNode:node(child)
 		end
 	end)

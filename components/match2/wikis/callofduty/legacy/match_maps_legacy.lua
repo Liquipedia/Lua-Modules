@@ -17,7 +17,6 @@ local Template = require('Module:Template')
 
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -81,7 +80,7 @@ function MatchMapsLegacy._readMaps(matchArgs)
 			score1 = Table.extract(matchArgs, prefix .. 'score1'),
 			score2 = Table.extract(matchArgs, prefix .. 'score2'),
 		}
-		matchArgs[prefix] = Logic.isNotEmpty(mapArgs) and MatchSubobjects.luaGetMap(mapArgs) or nil
+		matchArgs[prefix] = Logic.nilIfEmpty(mapArgs)
 	end)
 end
 

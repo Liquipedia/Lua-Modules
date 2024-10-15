@@ -6,96 +6,102 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ChronologyWidget: Widget
----@operator call({links: table<string, string|number|nil>}): ChronologyWidget
+---@operator call(table): ChronologyWidget
 ---@field links table<string, string|number|nil>
-local Chronology = Class.new(
-	Widget,
-	function(self, input)
-		self.links = input.links
-	end
-)
+local Chronology = Class.new(Widget)
 
----@param children string[]
 ---@return string?
-function Chronology:make(children)
-	return Chronology:_chronology(self.links)
-end
-
----@param links table<string, string|number|nil>
----@return string?
-function Chronology:_chronology(links)
-	if links == nil or Table.size(links) == 0 then
+function Chronology:render()
+	if Table.isEmpty(self.props.links) then
 		return
 	end
 
-	local chronologyContent = mw.html.create()
-	chronologyContent:node(self:_createChronologyRow(links['previous'], links['next']))
-
-	local index = 2
-	local previous = links['previous' .. index]
-	local next = links['next' .. index]
-	while (previous ~= nil or next ~= nil) do
-		chronologyContent:node(self:_createChronologyRow(previous, next))
-
-		index = index + 1
-		previous = links['previous' .. index]
-		next = links['next' .. index]
-	end
-
-	return tostring(chronologyContent)
+	return HtmlWidgets.Fragment{
+		children = Array.mapIndexes(function(index)
+			local prevKey, nextKey = 'previous' .. index, 'next' .. index
+			if index == 1 then
+				prevKey, nextKey = 'previous', 'next'
+			end
+			return self:_createChronologyRow(self.props.links[prevKey], self.props.links[nextKey])
+		end)
+	}
 end
 
 ---@param previous string|number|nil
 ---@param next string|number|nil
 ---@return Html?
 function Chronology:_createChronologyRow(previous, next)
-	local doesPreviousExist = previous ~= nil and previous ~= ''
-	local doesNextExist = next ~= nil and next ~= ''
+	local doesPreviousExist = Logic.isNotEmpty(previous)
+	local doesNextExist = Logic.isNotEmpty(next)
 
 	if not doesPreviousExist and not doesNextExist then
 		return nil
 	end
 
-	local node = mw.html.create('div')
-
-	local previousWrapper = mw.html.create('div'):addClass('infobox-cell-2')
-	if doesPreviousExist then
-		previousWrapper :addClass('infobox-text-left')
-
-		local previousArrow = mw.html.create('div')
-		previousArrow	:addClass('infobox-arrow-icon')
-						:css('float', 'left')
-						:wikitext('[[File:Arrow sans left.svg|link=' .. previous .. ']]')
-
-		previousWrapper	:node(previousArrow)
-						:wikitext('&nbsp;[[' .. previous .. ']]')
-	end
-	node:node(previousWrapper)
-
-	if doesNextExist then
-		local nextWrapper = mw.html.create('div')
-		nextWrapper	:addClass('infobox-cell-2')
-					:addClass('infobox-text-right')
-
-		local nextArrow = mw.html.create('div')
-		nextArrow	:addClass('infobox-arrow-icon')
-					:css('float', 'right')
-					:wikitext('[[File:Arrow sans right.svg|link=' .. next .. ']]')
-
-		nextWrapper	:wikitext('[[' .. next .. ']]&nbsp;')
-					:node(nextArrow)
-
-		node:node(nextWrapper)
+	local function splitInputIntoLinkAndText(input)
+		return unpack(mw.text.split(input, '|'))
 	end
 
-	return node
+	local function nextSlot()
+		if not doesNextExist then
+			return
+		end
+		local link, text = splitInputIntoLinkAndText(next)
+		return Div{
+			classes = {'infobox-cell-2', 'infobox-text-right'},
+			children = {
+				InlineIconAndText{
+					link = link,
+					text = text,
+					icon = IconFa{
+						iconName = 'next',
+						link = link,
+					},
+				}
+			}
+		}
+	end
+
+	local function prevSlot()
+		if not doesPreviousExist then
+			return
+		end
+		local link, text = splitInputIntoLinkAndText(previous)
+		return Div{
+			classes = {'infobox-cell-2', 'infobox-text-left'},
+			children = {
+				InlineIconAndText{
+					link = link,
+					text = text,
+					icon = IconFa{
+						iconName = 'previous',
+						link = link,
+					},
+					options = {flipped = true},
+				}
+			}
+		}
+	end
+
+	return Div{
+		children = {
+			prevSlot() or Div{classes = {'infobox-cell-2'}},
+			nextSlot(),
+		}
+	}
 end
 
 return Chronology
