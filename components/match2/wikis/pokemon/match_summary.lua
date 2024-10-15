@@ -8,8 +8,6 @@
 
 local CustomMatchSummary = {}
 
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Icon = require('Module:Icon')
@@ -29,56 +27,6 @@ local NUM_CHAMPIONS_PICK = 5
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-local NO_CHARACTER = 'default'
-
--- Champion Ban Class
----@class PokemonChampionBan: MatchSummaryRowInterface
----@operator call: PokemonChampionBan
----@field root Html
----@field table Html
-local ChampionBan = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
-		self.table = self.root:tag('table')
-			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader()
-	end
-)
-
----@return self
-function ChampionBan:createHeader()
-	self.table:tag('tr')
-		:tag('th'):css('width','40%'):wikitext(''):done()
-		:tag('th'):css('width','20%'):wikitext('Bans'):done()
-		:tag('th'):css('width','40%'):wikitext(''):done()
-	return self
-end
-
----@param banData {numberOfBans: integer, [1]: table, [2]: table}
----@param gameNumber integer
----@param numberOfBans integer
----@param date string
----@return self
-function ChampionBan:banRow(banData, gameNumber, numberOfBans, date)
-	self.table:tag('tr')
-		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[1], numberOfBans, date, false, true))
-		:tag('td')
-			:node(mw.html.create('div')
-				:wikitext(Abbreviation.make(
-					'Game ' .. gameNumber,
-					'Bans in game ' .. gameNumber
-				))
-			)
-		:tag('td')
-			:node(CustomMatchSummary._opponentChampionsDisplay(banData[2], numberOfBans, date, true, true))
-	return self
-end
-
----@return Html
-function ChampionBan:create()
-	return self.root
-end
 
 ---@param args table
 ---@return Html
@@ -146,22 +94,16 @@ function CustomMatchSummary.createBody(match)
 		end
 
 		if numberOfBans > 0 then
-			banData[1].color = extradata.team1side
-			banData[2].color = extradata.team2side
-			banData.numberOfBans = numberOfBans
 			championBanData[gameIndex] = banData
 		end
 	end
 
 	-- Add the Champion Bans
-	if not Table.isEmpty(championBanData) then
-		local championBan = ChampionBan()
-
-		for gameIndex, banData in ipairs(championBanData) do
-			championBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
-		end
-
-		body:addRow(championBan)
+	if Table.isNotEmpty(championBanData) then
+		body.root:node(MatchSummaryWidgets.CharacterBanTable{
+			bans = championBanData,
+			date = match.date,
+		})
 	end
 
 	return body
@@ -199,7 +141,12 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		score = table.concat(game.scores, '-')
 	end
 
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[1], NUM_CHAMPIONS_PICK, date, false))
+	row:addElement(MatchSummaryWidgets.Characters{
+		flipped = false,
+		date = date,
+		characters = championsData[1],
+		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
+	})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -209,7 +156,12 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		))
 	)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentChampionsDisplay(championsData[2], NUM_CHAMPIONS_PICK, date, true))
+	row:addElement(MatchSummaryWidgets.Characters{
+		flipped = true,
+		date = date,
+		characters = championsData[2],
+		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
+	})
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -239,48 +191,6 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	end
 
 	return container
-end
-
----@param opponentChampionsData table
----@param numberOfChampions integer
----@param date string
----@param flip boolean?
----@param isBan boolean?
----@return Html
-function CustomMatchSummary._opponentChampionsDisplay(opponentChampionsData, numberOfChampions, date, flip, isBan)
-	local opponentChampionsDisplay = {}
-	local color = Table.extract(opponentChampionsData, 'color') or ''
-	for index = 1, numberOfChampions do
-		local champDisplay = mw.html.create('div')
-		:addClass('brkts-popup-side-color-' .. color)
-		:css('float', flip and 'right' or 'left')
-		:node(CharacterIcon.Icon{
-			character = opponentChampionsData[index] or NO_CHARACTER,
-			class = 'brkts-champion-icon',
-			date = date,
-		})
-		if index == 1 then
-			champDisplay:css('padding-left', '2px')
-		elseif index == numberOfChampions then
-			champDisplay:css('padding-right', '2px')
-		end
-		table.insert(opponentChampionsDisplay, champDisplay)
-	end
-
-	if flip then
-		opponentChampionsDisplay = Array.reverse(opponentChampionsDisplay)
-	end
-
-	local display = mw.html.create('div')
-	if isBan then
-		display:addClass('brkts-popup-side-shade-out' .. (flip and '-flipped' or ''))
-	end
-
-	for _, item in ipairs(opponentChampionsDisplay) do
-		display:node(item)
-	end
-
-	return display
 end
 
 return CustomMatchSummary

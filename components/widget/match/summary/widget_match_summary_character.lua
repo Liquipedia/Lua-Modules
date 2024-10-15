@@ -1,0 +1,39 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Widget/Match/Summary/Character
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Widget = Lua.import('Module:Widget')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+
+---@class MatchSummaryCharacter: Widget
+---@operator call(table): MatchSummaryCharacter
+local MatchSummaryCharacter = Class.new(Widget)
+
+---@return Widget[]?
+function MatchSummaryCharacter:render()
+	local characterIcon = CharacterIcon.Icon{
+		character = self.props.character,
+		date = self.props.date,
+	}
+	local children = { characterIcon }
+	if self.props.showName then
+		children = {self.props.character, ' ', characterIcon}
+	end
+
+	return Div{
+		classes = {self.props.bg},
+		children = self.props.flipped and Array.reverse(children) or children
+	}
+end
+
+return MatchSummaryCharacter

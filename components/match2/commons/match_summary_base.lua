@@ -177,7 +177,7 @@ function Row:css(name, value)
 	return self
 end
 
----@param element Html|string|nil
+---@param element Html|string|nil|Widget
 ---@return MatchSummaryRow
 function Row:addElement(element)
 	table.insert(self.elements, element)
