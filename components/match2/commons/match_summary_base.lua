@@ -202,58 +202,6 @@ function Row:create()
 	return self.root
 end
 
----@class MatchSummaryMvp: MatchSummaryRowInterface
----@operator call: MatchSummaryMvp
----@field root Html
----@field players Html[]
-local Mvp = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
-		self.players = {}
-	end
-)
-
----@param player table|string
----@return MatchSummaryMvp
-function Mvp:addPlayer(player)
-	local playerDisplay
-	if Logic.isEmpty(player) then
-		return self
-	elseif type(player) == 'table' then
-		playerDisplay = '[[' .. player.name .. '|' .. player.displayname .. ']]'
-		if player.comment then
-			playerDisplay = playerDisplay .. ' (' .. player.comment .. ')'
-		end
-	else
-		playerDisplay = '[[' .. player .. ']]'
-	end
-
-	table.insert(self.players, playerDisplay)
-
-	return self
-end
-
----@param points number
----@return MatchSummaryMvp
-function Mvp:setPoints(points)
-	if Logic.isNumeric(points) then
-		self.points = points
-	end
-	return self
-end
-
----@return Html
-function Mvp:create()
-	local span = mw.html.create('span')
-	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-		:wikitext(table.concat(self.players, ', '))
-	if self.points and self.points ~= 1 then
-		span:wikitext(' ('.. self.points ..'pts)')
-	end
-	self.root:node(span)
-	return self.root
-end
-
 ---@class MatchSummaryBody
 ---@operator call: MatchSummaryBody
 ---@field root Html
@@ -628,7 +576,6 @@ end
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
 ---@field Break MatchSummaryBreak
----@field Mvp MatchSummaryMvp
 ---@field Casters MatchSummaryCasters
 ---@field Match MatchSummaryMatch
 ---@field MapVeto VetoDisplay
@@ -643,7 +590,6 @@ MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
-MatchSummary.Mvp = Mvp
 MatchSummary.Casters = Casters
 MatchSummary.Match = Match
 MatchSummary.MapVeto = MapVeto
