@@ -237,7 +237,7 @@ end
 function TransferRowDisplay:date()
 	self.display:tag('div')
 		:addClass('divCell Date')
-		:wikitext(self.transfer.date)
+		:wikitext(self.transfer.displayDate)
 	return self
 end
 
