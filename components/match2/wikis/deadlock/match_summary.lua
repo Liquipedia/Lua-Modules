@@ -147,13 +147,13 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Hero Bans
 	if not Table.isEmpty(HeroBanData) then
-		local HeroBan = HeroBan()
+		local heroBan = HeroBan()
 
 		for gameIndex, banData in ipairs(HeroBanData) do
-			HeroBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
+			heroBan:banRow(banData, gameIndex, banData.numberOfBans, match.date)
 		end
 
-		body:addRow(HeroBan)
+		body:addRow(heroBan)
 	end
 
 	return body
