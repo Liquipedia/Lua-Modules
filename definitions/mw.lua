@@ -1018,63 +1018,63 @@ function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
 
 mw.ext.TeamTemplate = {}
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracketname: string, page: string, icon: string, image: string, legacyimage: string, legacyimagedark: string}|nil
-function mw.ext.TeamTemplate.raw(teamteplate, date) end
+function mw.ext.TeamTemplate.raw(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@return {[string]: string} ## key is formated as `YYYY-MM-DD`and values are team template names
-function mw.ext.TeamTemplate.raw_historical(teamteplate) end
+function mw.ext.TeamTemplate.raw_historical(teamtemplate) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@return boolean
-function mw.ext.TeamTemplate.teamexists(teamteplate) end
+function mw.ext.TeamTemplate.teamexists(teamtemplate) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team(teamteplate, date) end
+function mw.ext.TeamTemplate.team(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team2(teamteplate, date) end
+function mw.ext.TeamTemplate.team2(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamshort(teamteplate, date) end
+function mw.ext.TeamTemplate.teamshort(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team2short(teamteplate, date) end
+function mw.ext.TeamTemplate.team2short(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teambracket(teamteplate, date) end
+function mw.ext.TeamTemplate.teambracket(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamicon(teamteplate, date) end
+function mw.ext.TeamTemplate.teamicon(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamimage(teamteplate, date) end
+function mw.ext.TeamTemplate.teamimage(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teampage(teamteplate, date) end
+function mw.ext.TeamTemplate.teampage(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teampart(teamteplate, date) end
+function mw.ext.TeamTemplate.teampart(teamtemplate, date) end
 
 mw.ext.SearchEngineOptimization = {}
 
