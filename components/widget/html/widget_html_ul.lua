@@ -18,10 +18,7 @@ local Ul = Class.new(WidgetHtml)
 
 ---@return Html
 function Ul:render()
-	local attributes = Table.copy(self.props.attributes)
-	attributes.class = self.props.classes
-	attributes.style = self.props.css
-	return self:renderAs('ul', self.props.children, attributes)
+	return self:renderAs('ul')
 end
 
 return Ul

@@ -18,10 +18,7 @@ local Td = Class.new(WidgetHtml)
 
 ---@return Html
 function Td:render()
-	local attributes = Table.copy(self.props.attributes)
-	attributes.class = self.props.classes
-	attributes.style = self.props.css
-	return self:renderAs('td', self.props.children, attributes)
+	return self:renderAs('td')
 end
 
 return Td

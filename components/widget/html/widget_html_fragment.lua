@@ -17,7 +17,7 @@ local Fragment = Class.new(WidgetHtml)
 
 ---@return Html
 function Fragment:render()
-	return self:renderAs(nil, self.props.children, {})
+	return self:renderAs(nil)
 end
 
 return Fragment

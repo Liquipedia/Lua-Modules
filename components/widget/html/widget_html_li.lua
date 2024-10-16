@@ -18,10 +18,7 @@ local Li = Class.new(WidgetHtml)
 
 ---@return Html
 function Li:render()
-	local attributes = Table.copy(self.props.attributes)
-	attributes.class = self.props.classes
-	attributes.style = self.props.css
-	return self:renderAs('li', self.props.children, attributes)
+	return self:renderAs('li')
 end
 
 return Li
