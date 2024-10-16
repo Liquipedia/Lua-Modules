@@ -10,6 +10,7 @@ local Widgets = {}
 
 local Lua = require('Module:Lua')
 
+Widgets.MatchPageLink = Lua.import('Module:Widget/Match/Summary/MatchPageLink')
 Widgets.Mvp = Lua.import('Module:Widget/Match/Summary/Mvp')
 
 return Widgets
