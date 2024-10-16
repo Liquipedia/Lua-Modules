@@ -213,5 +213,4 @@ function CustomMatchSummary._createIcon(icon)
 		:wikitext(icon)
 end
 
-
 return CustomMatchSummary
