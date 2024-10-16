@@ -853,7 +853,7 @@ function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
 				gameHasBans = true
 			end
 			table.insert(banData[1], String.nilIfEmpty(extradata['team1ban' .. index]) or defaultIcon)
-			table.insert(banData[2], String.nilIfEmpty(extradata['team1ban' .. index]) or defaultIcon)
+			table.insert(banData[2], String.nilIfEmpty(extradata['team2ban' .. index]) or defaultIcon)
 		end
 
 		if gameHasBans then
