@@ -43,6 +43,7 @@ function MatchSummaryCharacterBanTable:render()
 			},
 		}
 	end)
+
 	return Div{
 		classes = {'brkts-popup-mapveto'},
 		children = {

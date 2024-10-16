@@ -23,22 +23,21 @@ local MatchSummaryCharacters = Class.new(Widget)
 function MatchSummaryCharacters:render()
 	local flipped = self.props.flipped
 
-	local characters = Array.map(self.props.characters, function(character)
-		return Character{
-			character = character,
-			date = self.props.date,
-			bg = self.props.bg,
-			showName = #self.props.characters == 1,
-			flipped = flipped,
-		}
-	end)
 	return Div{
 		classes = {
 			'brkts-popup-body-element-thumbs',
 			'brkts-popup-body-element-thumbs-' .. (flipped and 'right' or 'left'),
 			'brkts-champion-icon'
 		},
-		children = flipped and Array.reverse(characters) or characters
+		children = Array.map(self.props.characters, function(character)
+			return Character{
+				character = character,
+				date = self.props.date,
+				bg = self.props.bg,
+				showName = #self.props.characters == 1,
+				flipped = flipped,
+			}
+		end)
 	}
 end
 
