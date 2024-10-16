@@ -120,12 +120,6 @@ function TransferRef.fromStorageData(referencesData)
 	end
 	---@cast referencesData -nil
 
-	--fallback processing for pre standardized TRef data, so we do not break stuff
-	--to be removed after switching to standardized and having everything purged
-	if Logic.isEmpty(referencesData.reference1type) then
-		return TransferRef.fromLegacyStorageData(referencesData)
-	end
-
 	return Array.mapIndexes(function(referenceIndex)
 		local prefix = 'reference' .. referenceIndex
 		local link = referencesData[prefix]
@@ -142,34 +136,6 @@ function TransferRef.fromStorageData(referencesData)
 			publisher = referencesData[prefix .. 'publisher'],
 			archiveUrl = referencesData[prefix .. 'archiveurl'],
 			archiveDate = referencesData[prefix .. 'archivedate'],
-		}
-	end)
-end
-
----@deprecated
----to be removed after switching to standardized and having everything purged
----@param referencesData table
----@return TransferReference[]
-function TransferRef.fromLegacyStorageData(referencesData)
-	return Array.mapIndexes(function(referenceIndex)
-		local tempArray = mw.text.split(referencesData['reference' .. referenceIndex] or '', ',,,', true)
-		local refType = tempArray[1]
-
-		if not TransferRef.isValidRefType(refType) then return end
-
-		local link = Logic.nilIfEmpty(tempArray[2])
-		if Logic.isEmpty(refType) or refType == WEB_TYPE and not link then return end
-		return {
-			link = link,
-			refType = refType,
-			text = Logic.nilIfEmpty(tempArray[3]),
-			title = Logic.nilIfEmpty(tempArray[4]),
-			transTitle = Logic.nilIfEmpty(tempArray[5]),
-			language = Logic.nilIfEmpty(tempArray[6]),
-			author = Logic.nilIfEmpty(tempArray[7]),
-			publisher = Logic.nilIfEmpty(tempArray[8]),
-			archiveUrl = Logic.nilIfEmpty(tempArray[9]),
-			archiveDate = Logic.nilIfEmpty(tempArray[10]),
 		}
 	end)
 end

@@ -64,6 +64,9 @@ return {
 			matchWidth = 190,
 			gameScoresIfBo1 = true,
 		},
+		transfers = {
+			showTeamName = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
