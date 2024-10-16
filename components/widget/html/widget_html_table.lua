@@ -8,17 +8,16 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local WidgetHtml = Lua.import('Module:Widget/Html/Base')
 
 ---@class WidgetTable: WidgetHtmlBase
 ---@operator call(table): WidgetTable
-local HtmlTable = Class.new(WidgetHtml)
+local Table = Class.new(WidgetHtml)
 
 ---@return Html
-function HtmlTable:render()
+function Table:render()
 	return self:renderAs('table')
 end
 
-return HtmlTable
+return Table
