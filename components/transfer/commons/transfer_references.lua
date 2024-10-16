@@ -146,7 +146,7 @@ function TransferRef.makeUnique(references)
 	local refs = {}
 	Array.forEach(references, function(reference)
 		if Array.all(refs, function(ref)
-			return Logic.deepEquals(ref, reference)
+			return not Logic.deepEquals(ref, reference)
 		end) then
 			table.insert(refs, reference)
 		end

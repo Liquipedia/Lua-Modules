@@ -14,16 +14,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class TitleWidget: Widget
 ---@operator call(table): TitleWidget
-local Title = Class.new(
-	Widget,
-	function(self)
-		-- Legacy support for single string children, convert to array
-		-- Widget v2.1 will have this support added to the base class
-		if type(self.props.children) == 'string' then
-			self.props.children = {self.props.children}
-		end
-	end
-)
+local Title = Class.new(Widget)
 
 ---@return string?
 function Title:render()

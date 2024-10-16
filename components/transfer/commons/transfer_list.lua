@@ -101,7 +101,7 @@ function TransferList:parseArgs(args)
 		sortOrder = (args.sort or DEFAULT_VALUES.sort) .. ' ' .. (args.order or DEFAULT_VALUES.order) ..
 			', objectname ' .. objectNameSortOrder,
 		title = Logic.nilIfEmpty(args.title),
-		shown = Logic.readBool(args.shown),
+		shown = Logic.nilOr(Logic.readBoolOrNil(args.shown), true),
 		class = Logic.nilIfEmpty(args.class),
 		showMissingResultsMessage = Logic.readBool(args.form),
 		conditions = {

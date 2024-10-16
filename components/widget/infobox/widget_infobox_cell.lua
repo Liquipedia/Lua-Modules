@@ -27,6 +27,13 @@ local Cell = Class.new(Widget,
 		self.props.children = input.children or input.content or {}
 	end
 )
+Cell.defaultProps = {
+	options = {
+		columns = 2,
+		makeLink = false,
+		surpressColon = false,
+	}
+}
 
 ---@return Widget?
 function Cell:render()
@@ -34,8 +41,7 @@ function Cell:render()
 		return
 	end
 
-	local options = self.props.options or {}
-	options.columns = options.columns or 2
+	local options = self.props.options
 
 	local mappedChildren = {}
 	for i, child in ipairs(self.props.children) do

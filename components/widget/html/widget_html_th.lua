@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local WidgetHtml = Lua.import('Module:Widget/Html/Base')
 
@@ -18,10 +17,7 @@ local Th = Class.new(WidgetHtml)
 
 ---@return Html
 function Th:render()
-	local attributes = Table.copy(self.props.attributes or {})
-	attributes.class = self.props.classes
-	attributes.style = self.props.css
-	return self:renderAs('th', self.props.children, attributes)
+	return self:renderAs('th')
 end
 
 return Th
