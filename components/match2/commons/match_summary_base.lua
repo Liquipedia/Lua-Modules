@@ -849,11 +849,13 @@ function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
 		local banData = {{}, {}}
 		local gameHasBans = false
 		for index = 1, maxNumberOfBans do
-			if String.isNotEmpty(extradata['team1ban' .. index]) or String.isNotEmpty(extradata['team2ban' .. index]) then
+			local team1ban = String.nilIfEmpty(extradata['team1ban' .. index])
+			local team2ban = String.nilIfEmpty(extradata['team2ban' .. index])
+			if team1ban or team2ban then
 				gameHasBans = true
 			end
-			table.insert(banData[1], String.nilIfEmpty(extradata['team1ban' .. index]) or defaultIcon)
-			table.insert(banData[2], String.nilIfEmpty(extradata['team2ban' .. index]) or defaultIcon)
+			table.insert(banData[1], team1ban or defaultIcon)
+			table.insert(banData[2], team2ban or defaultIcon)
 		end
 
 		if gameHasBans then
