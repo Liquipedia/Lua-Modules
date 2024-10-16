@@ -56,6 +56,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		}, autoScoreFunction)
 	end)
 
+	match.bestof = tonumber(match.bestof)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
