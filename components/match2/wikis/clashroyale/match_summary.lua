@@ -20,6 +20,7 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -95,16 +96,14 @@ end
 ---@param match MatchGroupUtilMatch
 ---@param body MatchSummaryBody
 function CustomMatchSummary._addMvp(match, body)
-	local mvpData = match.extradata.mvp
-	if Table.isEmpty(mvpData) or not mvpData.players then
+	if Table.isEmpty(match.extradata.mvp) then
 		return
 	end
 
-	local mvp = MatchSummary.Mvp()
-	Array.forEach(mvpData.players, FnUtil.curry(mvp.addPlayer, mvp))
-	mvp:setPoints(mvpData.points)
-
-	body:addRow(mvp)
+	body.root:node(MatchSummaryWidgets.Mvp{
+		players = match.extradata.mvp.players,
+		points = match.extradata.mvp.points,
+	})
 end
 
 ---@param game MatchGroupUtilGame
