@@ -7,5 +7,5 @@
 --
 
 local Lua = require('Module:Lua')
-
-return Lua.import('Module:Player/Display')
+local PlayerDisplay = Lua.import('Module:Player/Display')
+return PlayerDisplay
