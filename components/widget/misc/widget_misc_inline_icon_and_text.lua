@@ -25,6 +25,9 @@ local Span = HtmlWidgets.Span
 ---@operator call(InlineIconAndTextWidgetParameters): InlineIconAndTextWidget
 
 local InlineIconAndText = Class.new(Widget)
+InlineIconAndText.defaultProps = {
+	flipped = false,
+}
 
 ---@return Widget
 function InlineIconAndText:render()
