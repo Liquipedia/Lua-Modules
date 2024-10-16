@@ -274,6 +274,8 @@ function TransferRow:readIconsAndPosition(playerIndex)
 		return iconInput .. '_Substitute'
 	end)
 
+	icons[2] = icons[2] or icons[1]
+
 	return icons, positions
 end
 
