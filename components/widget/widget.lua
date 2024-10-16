@@ -5,10 +5,11 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local ErrorDisplay = require('Module:Error/Display')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -19,7 +20,11 @@ local Table = require('Module:Table')
 ---@field props table<string, any>
 local Widget = Class.new(function(self, props)
 	self.props = Table.deepMerge(Table.deepCopy(self.defaultProps), props)
-	self.props.children = self.props.children or {}
+
+	if not Array.isArray(self.props.children) then
+		self.props.children = {self.props.children}
+	end
+
 	self.context = {} -- Populated by the parent
 end)
 
