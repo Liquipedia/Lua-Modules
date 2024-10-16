@@ -40,7 +40,7 @@ function InlineIconAndText:render()
 
 	return Span{
 		classes = {'image-link'},
-		children = self.props.flipped and Array.reverse(children) or nil,
+		children = self.props.flipped and Array.reverse(children) or children,
 	}
 end
 
