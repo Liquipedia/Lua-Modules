@@ -841,7 +841,7 @@ end
 ---@param games table[]
 ---@param maxNumberOfBans integer
 ---@param defaultIcon string?
----@return nil
+---@return {[1]: string[]?, [2]: string[]?}[]?
 function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
 	local matchHasBans = false
 	local gamesBans = Array.map(games, function(game)
