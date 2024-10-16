@@ -87,6 +87,7 @@ return function(busted, helper, options)
 		table.insert(paths, 'components/widget/html/?.lua')
 		table.insert(paths, 'components/widget/infobox/?.lua')
 		table.insert(paths, 'components/widget/image/?.lua')
+		table.insert(paths, 'components/widget/match/summary/?.lua')
 		table.insert(paths, 'components/widget/misc/?.lua')
 		table.insert(paths, 'components/widget/squad/?.lua')
 
