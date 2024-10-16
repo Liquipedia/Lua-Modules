@@ -29,20 +29,18 @@ local InlineIconAndText = Class.new(Widget)
 ---@return Widget
 function InlineIconAndText:render()
 	local children = {
+		self.props.icon,
+		' ',
 		Link{
 			link = self.props.link,
 			linktype = 'internal',
 			children = {self.props.text}
 		},
-		' ',
-		self.props.icon,
 	}
-	if self.props.options and self.props.options.flipped then
-		children = Array.reverse(children)
-	end
+
 	return Span{
 		classes = {'image-link'},
-		children = children,
+		children = self.props.flipped and Array.reverse(children) or nil,
 	}
 end
 
