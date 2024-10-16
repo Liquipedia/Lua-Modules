@@ -18,6 +18,11 @@ local Div = HtmlWidgets.Div
 ---@class MatchSummaryCharacter: Widget
 ---@operator call(table): MatchSummaryCharacter
 local MatchSummaryCharacter = Class.new(Widget)
+MatchSummaryCharacter.defaultProps = {
+	showName = false,
+	flipped = false,
+}
+
 
 ---@return Widget[]?
 function MatchSummaryCharacter:render()

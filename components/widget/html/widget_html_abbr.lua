@@ -21,7 +21,8 @@ function Abbr:render()
 	if Logic.isEmpty(self.props.title) or Logic.isEmpty(self.props.children) then
 		return nil
 	end
-	return self:renderAs('abbr', self.props.children, {title = self.props.title})
+	self.props.attributes.title = self.props.attributes.title or self.props.title
+	return self:renderAs('abbr')
 end
 
 return Abbr

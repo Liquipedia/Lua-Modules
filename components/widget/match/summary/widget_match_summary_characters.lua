@@ -18,6 +18,9 @@ local Character = Lua.import('Module:Widget/Match/Summary/Character')
 ---@class MatchSummaryCharacters: Widget
 ---@operator call(table): MatchSummaryCharacters
 local MatchSummaryCharacters = Class.new(Widget)
+MatchSummaryCharacters.defaultProps = {
+	flipped = false,
+}
 
 ---@return Widget[]?
 function MatchSummaryCharacters:render()
