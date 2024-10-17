@@ -136,7 +136,7 @@ local PREFIXES = {
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
-	interview = {''},
+	interview = {'', match = ''},
 	jcg = {match = 'https://web.archive.org/web/ow.j-cg.com/compe/view/match/'},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
@@ -154,7 +154,7 @@ local PREFIXES = {
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
-	lrthread = {''},
+	lrthread = {'', match = ''},
 	mapdraft = {match = 'https://aoe2cm.net/draft/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
@@ -183,7 +183,7 @@ local PREFIXES = {
 	patreon = {'https://www.patreon.com/'},
 	pf = {match = 'https://www.plusforward.net/quake/post/'},
 	playlist = {''},
-	preview = {''},
+	preview = {'', match = ''},
 	qrindr = {match = 'https://qrindr.com/match/'},
 	quakehistory = {match = 'http://www.quakehistory.com/en/matches/'},
 	r6esports = {
@@ -194,8 +194,8 @@ local PREFIXES = {
 		match = 'https://redd.it/',
 	},
 	replay = {''},
-	recap = {''},
-	review = {''},
+	recap = {'', match = ''},
+	review = {'', match = ''},
 	rgl = {
 		'https://rgl.gg/Public/LeagueTable?s=',
 		team = 'https://rgl.gg/Public/Team?t=',
@@ -235,7 +235,7 @@ local PREFIXES = {
 	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
-	stats = {''},
+	stats = {'', match = ''},
 	stratz = {
 		'https://stratz.com/leagues/',
 		player = 'https://stratz.com/players/',
@@ -397,8 +397,9 @@ end
 ---@param platform string
 ---@param id string?
 ---@param variant string?
+---@param fallbaseToBase boolean? #defaults to true
 ---@return string
-function Links.makeFullLink(platform, id, variant)
+function Links.makeFullLink(platform, id, variant, fallbaseToBase)
 	if id == nil or id == '' then
 		return ''
 	end
@@ -409,20 +410,29 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
-	local prefix = prefixData[variant] or prefixData[1]
-
 	local suffixData = SUFFIXES[platform] or {}
-	local suffix = suffixData[variant] or suffixData[1] or ''
 
-	return prefix .. id .. suffix
+	local prefix = prefixData[variant]
+	local suffix = suffixData[variant]
+	if fallbaseToBase ~= false then
+		prefix = prefix or prefixData[1]
+		suffix = suffix or suffixData[1]
+	end
+
+	if not prefix then
+		return ''
+	end
+
+	return prefix .. id .. (suffix or '')
 end
 
 ---@param links {[string]: string}
 ---@param variant string?
+---@param fallbaseToBase boolean? #defaults to true
 ---@return {[string]: string}
-function Links.makeFullLinksForTableItems(links, variant)
+function Links.makeFullLinksForTableItems(links, variant, fallbaseToBase)
 	return Table.map(links, function(key, item)
-		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
+		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant, fallbaseToBase)
 	end)
 end
 
@@ -442,5 +452,6 @@ function Links.makeIcon(key, size)
 	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key)
 		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
+
 
 return Class.export(Links, {frameOnly = true})
