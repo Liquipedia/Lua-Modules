@@ -24,6 +24,9 @@ MatchSummaryCharacters.defaultProps = {
 
 ---@return Widget[]?
 function MatchSummaryCharacters:render()
+	if not self.props.characters then
+		return nil
+	end
 	local flipped = self.props.flipped
 
 	return Div{

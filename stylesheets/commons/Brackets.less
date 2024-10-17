@@ -882,21 +882,24 @@
 }
 
 .brkts-champion-icon img {
-	height: auto;
+	height: 24px;
 	width: 24px;
+	object-fit: cover;
 }
 
 @media only screen and ( max-width: 768px ) {
 	img.brkts-champion-icon {
-		height: auto;
+		height: 20px;
 		width: 20px;
+		object-fit: cover;
 	}
 }
 
 @media ( max-width: 768px ) {
 	.brkts-champion-icon img {
-		height: auto;
+		height: 20px;
 		width: 20px;
+		object-fit: cover;
 	}
 }
 
@@ -905,6 +908,7 @@
 		-ms-transform: scale( 2.5, 2.5 );
 		-webkit-transform: scale( 2.5, 2.5 );
 		transform: scale( 2.5, 2.5 );
+		object-fit: contain;
 	}
 }
 

@@ -107,12 +107,10 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Character Bans
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS, NO_CHARACTER)
-	if characterBansData then
-		body.root:node(MatchSummaryWidgets.CharacterBanTable{
-			bans = characterBansData,
-			date = match.date,
-		})
-	end
+	body.root:node(MatchSummaryWidgets.CharacterBanTable{
+		bans = characterBansData,
+		date = match.date,
+	})
 
 	-- Add the Map Vetoes
 	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))

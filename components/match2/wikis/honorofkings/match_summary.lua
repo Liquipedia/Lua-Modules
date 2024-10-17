@@ -77,12 +77,10 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Character Bans
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS, NO_CHARACTER)
-	if characterBansData then
-		body.root:node(MatchSummaryWidgets.CharacterBanTable{
-			bans = characterBansData,
-			date = match.date,
-		})
-	end
+	body.root:node(MatchSummaryWidgets.CharacterBanTable{
+		bans = characterBansData,
+		date = match.date,
+	})
 
 	return body
 end
@@ -106,8 +104,6 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			championsData[2][champIndex] = extradata['team2champion' .. champIndex]
 			championsDataIsEmpty = false
 		end
-		championsData[1].color = extradata.team1side
-		championsData[2].color = extradata.team2side
 	end
 
 	if

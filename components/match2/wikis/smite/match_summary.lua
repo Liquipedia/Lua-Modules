@@ -64,12 +64,10 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Character Bans
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS, NO_CHARACTER)
-	if characterBansData then
-		body.root:node(MatchSummaryWidgets.CharacterBanTable{
-			bans = characterBansData,
-			date = match.date,
-		})
-	end
+	body.root:node(MatchSummaryWidgets.CharacterBanTable{
+		bans = characterBansData,
+		date = match.date,
+	})
 
 	return body
 end
@@ -95,8 +93,6 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		if String.isNotEmpty(extradata['team2god' .. godIndex]) then
 			godsData[2][godIndex] = extradata['team2god' .. godIndex]
 		end
-		godsData[1].side = extradata.team1side
-		godsData[2].side = extradata.team2side
 	end
 
 	row:addClass('brkts-popup-body-game')
