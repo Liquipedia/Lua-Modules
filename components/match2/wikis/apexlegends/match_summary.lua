@@ -118,12 +118,12 @@ local MATCH_STANDING_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.score
+				return OpponentDisplay.InlineScore(opponent)
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.score
+				return OpponentDisplay.InlineScore(opponent)
 			end,
 		},
 	},
