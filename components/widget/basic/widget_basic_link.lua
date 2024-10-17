@@ -45,7 +45,7 @@ function Link:render()
 			'[[',
 			self.props.link,
 			'|',
-			unpack(self.props.children),
+			unpack(self.props.children) or self.props.link,
 			']]'
 		)
 	}
