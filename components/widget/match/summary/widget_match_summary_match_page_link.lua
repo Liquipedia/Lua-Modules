@@ -35,3 +35,5 @@ function MatchSummaryMatchPageLink:render()
 		}
 	}}
 end
+
+return MatchSummaryMatchPageLink
