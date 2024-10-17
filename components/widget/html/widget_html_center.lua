@@ -18,10 +18,7 @@ local Center = Class.new(WidgetHtml)
 
 ---@return Html
 function Center:render()
-	local attributes = Table.copy(self.props.attributes or {})
-	attributes.class = self.props.classes
-	attributes.style = self.props.css
-	return self:renderAs('center', self.props.children, attributes)
+	return self:renderAs('center')
 end
 
 return Center
