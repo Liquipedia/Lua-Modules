@@ -52,6 +52,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -81,7 +82,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -149,14 +149,6 @@ function MatchFunctions.getBestOf(match)
 	local bestOf = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		reddit = match.reddit,
-	}
 end
 
 ---@param match table

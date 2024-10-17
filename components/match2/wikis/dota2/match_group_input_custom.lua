@@ -81,6 +81,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	end)
 	local games = MatchFunctions.extractMaps(MatchParser, match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
+	match.links = MatchFunctions.getLinks(match, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -110,7 +111,6 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
 
 	match.games = games
 	match.opponents = opponents
@@ -178,15 +178,12 @@ end
 ---@param games table[]
 ---@return table
 function MatchFunctions.getLinks(match, games)
-	local links = {
-		preview = match.preview,
-		lrthread = match.lrthread,
-		recap = match.recap,
-		faceit = match.faceit and 'https://www.faceit.com/en/dota2/room/' .. match.faceit or nil,
-		stratz = {},
-		dotabuff = {},
-		datdota = {},
-	}
+	---@type table<string, string|table>
+	local links = MatchGroupInputUtil.getLinks(match)
+	links.stratz = {}
+	links.dotabuff = {}
+	links.datdota = {}
+
 	Array.forEach(
 		Array.filter(games, function(map) return map.publisherid ~= nil end),
 		function(map, mapIndex)
