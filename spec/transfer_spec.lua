@@ -71,7 +71,7 @@ insulate('Transfer', function()
 		starcraft2 = {
 			input = {
 				name = 'Clem',
-				flag = 'fra',
+				flag = 'fr',
 				faction = 't',
 				team1 = 'team liquid',
 				team2 = 'mouz',
@@ -85,7 +85,7 @@ insulate('Transfer', function()
 				{
 					objectname = 'transfer_2024-10-11_000000',
 					player = 'Clem',
-					nationality = 'fr',
+					nationality = 'fra',
 					fromteam = '', --'Team Liquid',
 					toteam = '', --'mousesports',
 					fromteamtemplate = '', --'team liquid 2024',
