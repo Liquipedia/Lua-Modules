@@ -1039,9 +1039,9 @@ end
 ---@return table<string, string>
 function MatchGroupInputUtil.getLinks(match)
 	local links = Links.transform(match)
-	return Table.filter(
+	return Table.mapValues(
 		Links.makeFullLinksForTableItems(links, 'match', false),
-		String.isNotEmpty
+		String.nilIfEmpty
 	) --[[@as table<string, string>]]
 end
 
