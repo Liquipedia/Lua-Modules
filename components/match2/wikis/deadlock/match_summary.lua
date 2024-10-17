@@ -8,7 +8,6 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
 local FnUtil = require('Module:FnUtil')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
@@ -18,8 +17,8 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
-local SIZE_HERO = '48x48px'
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
@@ -75,10 +74,10 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		:css('padding', '4px')
 
 	local function makeCharacterDisplay(opponentIndex)
-		return CustomMatchSummary._createCharacterDisplay(
-			CustomMatchSummary._getHeroesForOpponent(game.participants, opponentIndex),
-			opponentIndex == 2
-		)
+		return MatchSummaryWidgets.Characters{
+			characters = CustomMatchSummary._getHeroesForOpponent(game.participants, opponentIndex),
+			flipped = opponentIndex == 2,
+		}
 	end
 
 	row:addElement(CustomMatchSummary._createIcon(ICONS[extradata.team1side]))
@@ -124,49 +123,6 @@ function CustomMatchSummary._createIcon(icon)
 		:css('margin-left', '1%')
 		:css('margin-right', '1%')
 		:wikitext(icon)
-end
-
----@param characters {name: string, active: boolean}[]?
----@param reverse boolean?
----@return Html
-function CustomMatchSummary._createCharacterDisplay(characters, reverse)
-	local wrapper = mw.html.create('div')
-		:addClass('brkts-popup-body-element-thumbs')
-		:addClass('brkts-popup-body-element-thumbs-' .. (reverse and 'right' or 'left'))
-		:addClass('brkts-champion-icon')
-
-	local function makeCharacterIcon(character)
-		return CharacterIcon.Icon{
-			character = character,
-			size = SIZE_HERO,
-		}
-	end
-
-	local function characterDisplay(character, showName)
-		local display = mw.html.create('div')
-		if not showName then
-			display:node(makeCharacterIcon(character))
-			return display
-		end
-		if reverse then
-			display:wikitext(character):wikitext('&nbsp;'):wikitext(makeCharacterIcon(character))
-		else
-			display:node(makeCharacterIcon(character)):wikitext('&nbsp;'):wikitext(character)
-		end
-		return display
-	end
-
-	local characterDisplays = Array.map(characters or {}, function (character)
-		return characterDisplay(character, #characters == 1)
-	end)
-
-	if reverse then
-		characterDisplays = Array.reverse(characterDisplays)
-	end
-
-	Array.forEach(characterDisplays, FnUtil.curry(wrapper.node, wrapper))
-
-	return wrapper
 end
 
 return CustomMatchSummary
