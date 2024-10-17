@@ -397,9 +397,9 @@ end
 ---@param platform string
 ---@param id string?
 ---@param variant string?
----@param fallbaseToBase boolean? #defaults to true
+---@param fallbackToBase boolean? #defaults to true
 ---@return string
-function Links.makeFullLink(platform, id, variant, fallbaseToBase)
+function Links.makeFullLink(platform, id, variant, fallbackToBase)
 	if id == nil or id == '' then
 		return ''
 	end
@@ -414,7 +414,7 @@ function Links.makeFullLink(platform, id, variant, fallbaseToBase)
 
 	local prefix = prefixData[variant]
 	local suffix = suffixData[variant]
-	if fallbaseToBase ~= false then
+	if fallbackToBase ~= false then
 		prefix = prefix or prefixData[1]
 		suffix = suffix or suffixData[1]
 	end
@@ -428,11 +428,11 @@ end
 
 ---@param links {[string]: string}
 ---@param variant string?
----@param fallbaseToBase boolean? #defaults to true
+---@param fallbackToBase boolean? #defaults to true
 ---@return {[string]: string}
-function Links.makeFullLinksForTableItems(links, variant, fallbaseToBase)
+function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 	return Table.map(links, function(key, item)
-		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant, fallbaseToBase)
+		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant, fallbackToBase)
 	end)
 end
 
