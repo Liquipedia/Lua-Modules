@@ -379,7 +379,7 @@ end
 ---@param value string|number
 ---@return string
 function MatchesTable._bestof(value)
-	return Abbreviation.make('Bo' .. value, 'Best of ' .. value)
+	return Abbreviation.make('Bo' .. value, 'Best of ' .. value) --[[@as string]]
 end
 
 return MatchesTable
