@@ -22,6 +22,10 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Display = Lua.import('Module:MatchPage/Template')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local MatchPageWidgets = Lua.import('Module:Widget/Match/Page/All')
+
 local MatchPage = {}
 
 local NO_CHARACTER = 'default'
@@ -50,19 +54,12 @@ end
 ---@field seriesDots string[]
 
 ---@param props {match: MatchGroupUtilMatch}
----@return Html
+---@return Widget
 function MatchPage.getByMatchId(props)
 	---@class Dota2MatchPageViewModel: MatchGroupUtilMatch
 	---@field games Dota2MatchPageViewModelGame[]
 	---@field opponents Dota2MatchPageViewModelOpponent[]
 	local viewModel = props.match
-
-	viewModel.isBestOfOne = #viewModel.games == 1
-	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
-		DisplayHelper.MatchCountdownBlock(viewModel) or nil
-
-	local phase = MatchGroupUtil.computeMatchPhase(props.match)
-	viewModel.statusText = phase == 'ongoing' and 'live' or phase
 
 	local function makeItemDisplay(item)
 		if String.isEmpty(item.name) then
@@ -121,45 +118,7 @@ function MatchPage.getByMatchId(props)
 	end)
 
 	-- Add more opponent data field
-	Array.forEach(viewModel.opponents, function(opponent, index)
-		opponent.opponentIndex = index
 
-		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
-		if not teamTemplate then
-			return
-		end
-
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
-		opponent.shortname = teamTemplate.shortname
-		opponent.page = teamTemplate.page
-		opponent.name = teamTemplate.name
-
-		opponent.seriesDots = Array.map(viewModel.games, function(game)
-			return game.teams[index].scoreDisplay
-		end)
-	end)
-
-	viewModel.vods = Array.map(viewModel.games, function(game, gameIdx)
-		return game.vod and VodLink.display{
-			gamenum = gameIdx,
-			vod = game.vod,
-		} or ''
-	end)
-
-	-- Create an object array for links
-	local function processLink(site, link)
-		return Table.mergeInto({link = link}, MatchLinks[site])
-	end
-
-	viewModel.links = Array.flatMap(Table.entries(viewModel.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return processLink(site, sublink)
-			end)
-		end
-		return {processLink(site, link)}
-	end)
 
 	viewModel.heroIcon = function(c)
 		local character = c
@@ -176,7 +135,13 @@ function MatchPage.getByMatchId(props)
 	local displayTitle = MatchPage.makeDisplayTitle(viewModel)
 	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
 
-	return MatchPage.render(viewModel)
+	return Div{
+		children = {
+			MatchPage.header(viewModel),
+			MatchPage.games(viewModel),
+			MatchPage.footer(viewModel)
+		}
+	}
 end
 
 ---@param viewModel table
@@ -214,18 +179,36 @@ function MatchPage._abbreviateNumber(number)
 end
 
 ---@param model table
----@return Html
-function MatchPage.render(model)
-	return mw.html.create('div')
-		:wikitext(MatchPage.header(model))
-		:node(MatchPage.games(model))
-		:wikitext(MatchPage.footer(model))
-end
-
----@param model table
----@return string
+---@return Widget
 function MatchPage.header(model)
-	return TemplateEngine():render(Display.header, model)
+	local phase = MatchGroupUtil.computeMatchPhase(model)
+	local phaseDisplay = phase == 'ongoing' and 'live' or phase
+
+	local opponents = Array.map(model.opponents, function(opponent, index)
+		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
+		if not teamTemplate then
+			return {}
+		end
+
+		return {
+			icon = mw.ext.TeamTemplate.teamicon(opponent.template),
+			name = teamTemplate.name,
+			shortname = teamTemplate.shortname,
+			page = teamTemplate.page,
+			seriesDots = Array.map(model.games, function(game)
+				return game.teams[index].scoreDisplay
+			end),
+		}
+	end)
+
+	return MatchPageWidgets.header{
+		opponents = opponents,
+		matchPhase = phaseDisplay,
+		parent = model.parent,
+		tournament = model.tournament,
+		dateCountdown = model.timestamp ~= DateExt.defaultTimestamp and DisplayHelper.MatchCountdownBlock(model) or nil,
+		mvp = model.extradata.mvp,
+	}
 end
 
 ---@param model table
@@ -234,7 +217,7 @@ function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
 		return game.resultType ~= NOT_PLAYED
 	end), function(game)
-		return TemplateEngine():render(Display.game, Table.merge(model, game))
+		return tostring(MatchPageWidgets.game(game)) .. TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)
 
 	if #games < 2 then
@@ -256,9 +239,35 @@ function MatchPage.games(model)
 end
 
 ---@param model table
----@return string
+---@return Widget
 function MatchPage.footer(model)
-	return TemplateEngine():render(Display.footer, model)
+	local vods = Array.map(model.games, function(game, gameIdx)
+		return game.vod and VodLink.display{
+			gamenum = gameIdx,
+			vod = game.vod,
+		} or ''
+	end)
+
+	-- Create an object array for links
+	local function processLink(site, link)
+		return Table.mergeInto({link = link}, MatchLinks[site])
+	end
+
+	local links = Array.flatMap(Table.entries(model.links), function(linkData)
+		local site, link = unpack(linkData)
+		if type(link) == 'table' then
+			return Array.map(link, function(sublink)
+				return processLink(site, sublink)
+			end)
+		end
+		return {processLink(site, link)}
+	end)
+
+	return MatchPageWidgets.footer{
+		vods = vods,
+		links = links,
+		patch = model.patch,
+	}
 end
 
 return MatchPage

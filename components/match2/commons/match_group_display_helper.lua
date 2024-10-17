@@ -190,7 +190,7 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Widget
 function DisplayHelper.DefaultMatchPageContainer(props)
 	local MatchPageModule = Lua.import('Module:MatchPage')
 
