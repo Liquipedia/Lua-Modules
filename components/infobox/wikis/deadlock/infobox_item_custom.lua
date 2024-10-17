@@ -87,7 +87,7 @@ function CustomInjector:parse(id, widgets)
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
 		table.insert(widgets, Cell{name = 'Standard Bonus', children = {args.standardbonus}})
-		if not Table.isEmpty(widgets) then
+		if Table.isNotEmpty(widgets) then
 			table.insert(widgets, 1, Title{children = 'Attributes'})
 		end
 		return widgets
