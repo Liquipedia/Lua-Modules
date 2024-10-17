@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -42,17 +41,6 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 	return widgets
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
 end
 
 return CustomLeague

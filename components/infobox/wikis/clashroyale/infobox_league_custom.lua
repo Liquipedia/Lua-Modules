@@ -58,7 +58,6 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = args.player_number and 'solo' or 'team'
-	self.data.publishertier = args.publisherpremier
 end
 
 return CustomLeague
