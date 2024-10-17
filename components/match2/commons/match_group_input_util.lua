@@ -55,7 +55,6 @@ local NOT_PLAYED_INPUTS = {
 	'np',
 	'canceled',
 	'cancelled',
-	'postponed',
 }
 
 MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES = {
