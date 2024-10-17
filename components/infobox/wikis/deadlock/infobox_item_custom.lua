@@ -153,13 +153,8 @@ end
 
 ---@return string
 function CustomItem:_getCostDisplay()
-	local costs = self:getAllArgsForBase(self.args, 'itemcost')
-
-	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
-	local outerDiv = mw.html.create('div')
-		:node(AutoInlineIcon.display({onlyicon = true}, 'M', 'Souls')):wikitext(' '):wikitext(tostring(innerDiv))
-
-	return tostring(outerDiv)
+	return tostring(mw.html.create('div')
+		:node(AutoInlineIcon.display({onlyicon = true}, 'M', 'Souls')):wikitext(' '):wikitext(self.args.itemcost))
 end
 
 ---@param text string|number|nil
