@@ -25,6 +25,9 @@ MatchSummaryCharacterBanTable.defaultProps = {
 
 ---@return Widget[]?
 function MatchSummaryCharacterBanTable:render()
+	if not self.props.bans then
+		return nil
+	end
 	local rows = Array.map(self.props.bans, function(banData, gameNumber)
 		return Tr{
 			children = {
