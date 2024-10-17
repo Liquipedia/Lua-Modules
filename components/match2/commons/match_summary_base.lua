@@ -177,7 +177,7 @@ function Row:css(name, value)
 	return self
 end
 
----@param element Html|string|nil
+---@param element Html|string|nil|Widget
 ---@return MatchSummaryRow
 function Row:addElement(element)
 	table.insert(self.elements, element)
@@ -836,6 +836,37 @@ function MatchSummary.defaultMapVetoDisplay(match, mapVeto)
 	end)
 
 	return mapVeto
+end
+
+---@param games table[]
+---@param maxNumberOfBans integer
+---@param defaultIcon string?
+---@return {[1]: string[]?, [2]: string[]?}[]?
+function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
+	local matchHasBans = false
+	local gamesBans = Array.map(games, function(game)
+		local extradata = game.extradata or {}
+		local banData = {{}, {}}
+		local gameHasBans = false
+		for index = 1, maxNumberOfBans do
+			local team1ban = String.nilIfEmpty(extradata['team1ban' .. index])
+			local team2ban = String.nilIfEmpty(extradata['team2ban' .. index])
+			if team1ban or team2ban then
+				gameHasBans = true
+			end
+			table.insert(banData[1], team1ban or defaultIcon)
+			table.insert(banData[2], team2ban or defaultIcon)
+		end
+
+		if gameHasBans then
+			matchHasBans = true
+			return banData
+		else
+			return {}
+		end
+	end)
+
+	return matchHasBans and gamesBans or nil
 end
 
 return MatchSummary
