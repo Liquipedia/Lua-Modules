@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div, Center = HtmlWidgets.Div, HtmlWidgets.Center
+local Center = HtmlWidgets.Center
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchSummaryRow = Lua.import('Module:Widget/Match/Summary/Row')
 
