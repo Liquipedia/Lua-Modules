@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -25,10 +26,14 @@ MatchSummaryCharacterBanTable.defaultProps = {
 
 ---@return Widget[]?
 function MatchSummaryCharacterBanTable:render()
-	if not self.props.bans then
+	if Logic.isEmpty(self.props.bans) then
 		return nil
 	end
+
 	local rows = Array.map(self.props.bans, function(banData, gameNumber)
+		if Logic.isEmpty(banData) then
+			return nil
+		end
 		return Tr{
 			children = {
 				Td{
