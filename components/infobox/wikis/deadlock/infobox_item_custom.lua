@@ -125,10 +125,6 @@ function CustomItem:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 
 	local categories = {}
-	if String.isNotEmpty(args.str) or String.isNotEmpty(args.agi) or String.isNotEmpty(args.int) then
-		table.insert(categories, 'Attribute Items')
-	end
-
 	if String.isNotEmpty(args.movespeed) then
 		table.insert(categories, 'Movement Speed Items')
 	end
