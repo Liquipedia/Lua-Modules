@@ -6,18 +6,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local InlineIconAndText = require('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
 
 local AutoInlineIcon = {}
 
----@param _ table
+---@param options table
 ---@param category string
 ---@param lookup string
 ---@param extraInfo string?
----@return string
-function AutoInlineIcon.display(_, category, lookup, extraInfo)
+---@return Widget
+function AutoInlineIcon.display(options, category, lookup, extraInfo)
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
@@ -26,15 +27,15 @@ function AutoInlineIcon.display(_, category, lookup, extraInfo)
 
 	local icon = AutoInlineIcon._iconCreator(data)
 
-	if not data.text then
-		return tostring(icon)
+	if not data.text or Logic.readBool(options.onlyicon) then
+		return icon
 	end
 
-	return tostring(InlineIconAndText{
+	return InlineIconAndText{
 		icon = icon,
 		text = data.text,
 		link = data.link,
-	})
+	}
 end
 
 ---@param category string
