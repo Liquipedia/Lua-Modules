@@ -92,7 +92,7 @@ function CustomInjector:parse(id, widgets)
 		end
 		return widgets
 	elseif id == 'ability' then
-		if String.isEmpty(args.use) and String.isEmpty(args.active) and String.isEmpty(args.passive) then
+		if String.isEmpty(args.active) and String.isEmpty(args.passive) then
 			return {}
 		end
 		Array.appendWith(widgets,
