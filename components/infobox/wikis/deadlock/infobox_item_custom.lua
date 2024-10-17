@@ -23,7 +23,6 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Breakdown = Widgets.Breakdown
 
 ---@class DeadlockItemInfobox: ItemInfobox
 local CustomItem = Class.new(Item)
@@ -108,7 +107,6 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Type'},
 			Cell{name = 'Category', children = {caller:_categoryDisplay()}},
 			Cell{name = 'Tier', children = {args.tier}},
-			
 		}
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
