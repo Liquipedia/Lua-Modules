@@ -131,7 +131,7 @@ function CustomItem:getWikiCategories(args)
 		table.insert(categories, 'Attribute Items')
 	end
 
-	if String.isNotEmpty(args.movespeed) or String.isNotEmpty(args.movespeedmult) then
+	if String.isNotEmpty(args.movespeed) then
 		table.insert(categories, 'Movement Speed Items')
 	end
 
