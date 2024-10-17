@@ -37,7 +37,7 @@ function InlineIconAndText:render()
 		Link{
 			link = self.props.link,
 			linktype = 'internal',
-			children = {self.props.text}
+			children = {self.props.text or self.props.link}
 		},
 	}
 
