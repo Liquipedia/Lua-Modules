@@ -21,7 +21,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MAX_NUM_PLAYERS = 5
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'default'
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
@@ -98,10 +97,6 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
-
-		if map.map == DUMMY_MAP then
-			map.map = nil
-		end
 
 		map.extradata = MapFunctions.getExtraData(map, opponentCount)
 

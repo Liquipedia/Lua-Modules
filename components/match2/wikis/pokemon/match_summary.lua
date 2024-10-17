@@ -22,6 +22,7 @@ local Array = require('Module:Array')
 local Abbreviation = require('Module:Abbreviation')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local MAX_NUM_BANS = 5
 local NUM_CHAMPIONS_PICK = 5
@@ -120,18 +121,11 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- Pre-Process Champion Ban Data

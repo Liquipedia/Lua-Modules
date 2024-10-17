@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/DataTable
+-- page=Module:Widget/Basic/DataTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -17,6 +17,10 @@ local Table = HtmlWidgets.Table
 
 ---@class WidgetDataTable: Widget
 local DataTable = Class.new(Widget)
+DataTable.defaultProps = {
+	classes = {},
+	wrapperClasses = {},
+}
 
 ---@return Widget
 function DataTable:render()
@@ -24,10 +28,10 @@ function DataTable:render()
 		children = {
 			Table{
 				children = self.props.children,
-				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes or {})),
+				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes)),
 			},
 		},
-		classes = WidgetUtil.collect('table-responsive', unpack(self.props.wrapperClasses or {})),
+		classes = WidgetUtil.collect('table-responsive', unpack(self.props.wrapperClasses)),
 	}
 end
 

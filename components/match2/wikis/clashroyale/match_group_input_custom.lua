@@ -101,6 +101,9 @@ function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	local subGroup = 0
 	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Table.isEmpty(mapInput) then
+			break
+		end
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, mapIndex, subGroup, #opponents)
 

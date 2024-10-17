@@ -43,7 +43,17 @@ function mw.loadJsonData(page) end
 ---Serializes object to a human-readable representation, then returns the resulting string.
 ---@param object any
 ---@return string
-function mw.dumpObject(object) end
+function mw.dumpObject(object)
+	local str = ''
+	for k, v in pairs(object) do
+		if type(v) == 'table' then
+			str = str .. k .. ': ' .. mw.dumpObject(v) .. '\n'
+		else
+			str = str .. k .. ': ' .. tostring(v) .. '\n'
+		end
+	end
+	return str
+end
 
 ---Passes the arguments to mw.allToString(), then appends the resulting string to the log buffer.
 ---@param ... any
@@ -149,7 +159,7 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string|number
+---@param builder? Html|string|number|Widget
 ---@return self
 function mw.html:node(builder) end
 
@@ -1008,63 +1018,63 @@ function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
 
 mw.ext.TeamTemplate = {}
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracketname: string, page: string, icon: string, image: string, imagedark: string, legacyimage: string, legacyimagedark: string}|nil
-function mw.ext.TeamTemplate.raw(teamteplate, date) end
+function mw.ext.TeamTemplate.raw(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@return {[string]: string} ## key is formated as `YYYY-MM-DD`and values are team template names
-function mw.ext.TeamTemplate.raw_historical(teamteplate) end
+function mw.ext.TeamTemplate.raw_historical(teamtemplate) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@return boolean
-function mw.ext.TeamTemplate.teamexists(teamteplate) end
+function mw.ext.TeamTemplate.teamexists(teamtemplate) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team(teamteplate, date) end
+function mw.ext.TeamTemplate.team(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team2(teamteplate, date) end
+function mw.ext.TeamTemplate.team2(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamshort(teamteplate, date) end
+function mw.ext.TeamTemplate.teamshort(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team2short(teamteplate, date) end
+function mw.ext.TeamTemplate.team2short(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teambracket(teamteplate, date) end
+function mw.ext.TeamTemplate.teambracket(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamicon(teamteplate, date) end
+function mw.ext.TeamTemplate.teamicon(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamimage(teamteplate, date) end
+function mw.ext.TeamTemplate.teamimage(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teampage(teamteplate, date) end
+function mw.ext.TeamTemplate.teampage(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teampart(teamteplate, date) end
+function mw.ext.TeamTemplate.teampart(teamtemplate, date) end
 
 mw.ext.SearchEngineOptimization = {}
 

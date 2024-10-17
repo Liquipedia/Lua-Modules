@@ -7,7 +7,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local InlineIconAndText = require('Module:Widget/InlineIconAndText')
+local InlineIconAndText = require('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
 
 local AutoInlineIcon = {}
@@ -58,14 +58,14 @@ end
 ---@return IconWidget
 function AutoInlineIcon._iconCreator(data)
 	if data.iconType == 'image' then
-		local IconImage = require('Module:Widget/Icon/Image')
+		local IconImage = require('Module:Widget/Image/Icon/Image')
 		return IconImage{
 			imageLight = data.iconLight,
 			imageDark = data.iconDark,
 			link = data.link,
 		}
 	elseif data.iconType == 'fa' then
-		local IconFa = require('Module:Widget/Icon/Fontawesome')
+		local IconFa = require('Module:Widget/Image/Icon/Fontawesome')
 		return IconFa{
 			iconName = data.icon,
 			link = data.link,

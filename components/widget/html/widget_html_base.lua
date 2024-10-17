@@ -10,13 +10,17 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 
 ---@class WidgetHtmlBase: Widget
 ---@operator call(table): WidgetHtmlBase
 local HtmlBase = Class.new(Widget)
+HtmlBase.defaultProps = {
+	classes = {},
+	css = {},
+	attributes = {},
+}
 
 ---@return Html
 function HtmlBase:render()
@@ -24,28 +28,28 @@ function HtmlBase:render()
 end
 
 ---@param tag string?
----@param children (Widget|Html|string|number)[]
----@param attributesInput {class: table?, style: table?, [string]: string}?
 ---@return Html
-function HtmlBase:renderAs(tag, children, attributesInput)
+function HtmlBase:renderAs(tag)
 	local htmlNode = mw.html.create(tag)
 
-	local attributes = Table.copy(attributesInput or {})
-	local class = Table.extract(attributes, 'class') or {} --[[@as table]]
-	local styles = Table.extract(attributes, 'style') or {} --[[@as table]]
-	---@cast attributes {[string]: string}
+	htmlNode:addClass(String.nilIfEmpty(table.concat(self.props.classes, ' ')))
+	htmlNode:css(self.props.css)
+	htmlNode:attr(self.props.attributes)
 
-	htmlNode:addClass(String.nilIfEmpty(table.concat(class, ' ')))
-	htmlNode:css(styles)
-	htmlNode:attr(attributes)
-
-	Array.forEach(children, function(child)
+	Array.forEach(self.props.children, function(child)
 		if Class.instanceOf(child, Widget) then
 			---@cast child Widget
 			child.context = self:_nextContext()
 			htmlNode:node(child:tryMake())
 		else
 			---@cast child -Widget
+			---@diagnostic disable-next-line: undefined-field
+			if type(child) == 'table' and not child._build then
+				mw.log('ERROR! Bad child input:' .. mw.dumpObject(self.props.children))
+				-- Erroring here to make it easier to debug
+				-- Otherwise it will fail when the html is built
+				error('Table passed to HtmlBase:renderAs() without _build method')
+			end
 			htmlNode:node(child)
 		end
 	end)

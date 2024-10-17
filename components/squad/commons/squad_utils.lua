@@ -20,8 +20,8 @@ local Variables = require('Module:Variables')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
 local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = {}
 
@@ -88,8 +88,8 @@ end
 ---@return table
 function SquadUtils.convertAutoParameters(player)
 	local newPlayer = Table.copy(player)
-	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-	local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
+	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
+	local leaveReference = TransferRefs.useReferences(player.leavedateRef, player.leavedate)
 
 	-- Map between formats
 	newPlayer.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference

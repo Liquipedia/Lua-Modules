@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Icon/Fontawesome
+-- page=Module:Widget/Image/Icon/Fontawesome
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,21 +10,15 @@ local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 
-local WidgetIcon = Lua.import('Module:Widget/Icon')
+local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
 ---@class IconFontawesomeWidget: IconWidget
 ---@operator call(IconProps): IconFontawesomeWidget
 ---@field props IconProps
-local FontawesomeIcon = Class.new(
-	WidgetIcon,
-	function(self, input)
-		self.props = input
-	end
-)
+local FontawesomeIcon = Class.new(WidgetIcon)
 
----@param children string[]
 ---@return string?
-function FontawesomeIcon:make(children)
+function FontawesomeIcon:render()
 	return Icon.makeIcon(self.props)
 end
 
