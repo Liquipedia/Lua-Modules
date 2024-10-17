@@ -118,9 +118,8 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	if MatchPage.isEnabledFor(match) then
-		body:addRow(MatchSummary.Row():addElement(
-			MatchSummaryWidgets.MatchPageLink{matchId = match.extradata.originalmatchid or match.matchId}
-		))
+		body.root:node(MatchSummaryWidgets.MatchPageLink{matchId = match.extradata.originalmatchid or match.matchId})
+
 	end
 
 	-- Iterate each map
