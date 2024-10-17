@@ -23,7 +23,6 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
-local Breakdown = Widgets.Breakdown
 
 ---@class DeadlockItemInfobox: ItemInfobox
 local CustomItem = Class.new(Item)
