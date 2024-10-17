@@ -15,12 +15,10 @@ local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local Display = Lua.import('Module:MatchPage/Template')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -61,13 +59,6 @@ function MatchPage.getByMatchId(props)
 	---@field opponents Dota2MatchPageViewModelOpponent[]
 	local viewModel = props.match
 
-	local function makeItemDisplay(item)
-		if String.isEmpty(item.name) then
-			return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
-		end
-		return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
-	end
-
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
@@ -81,9 +72,9 @@ function MatchPage.getByMatchId(props)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
-					items = Array.map(player.items or {}, makeItemDisplay),
-					backpackitems = Array.map(player.backpackitems or {}, makeItemDisplay),
-					neutralitem = makeItemDisplay(player.neutralitem or {}),
+					items = player.items or {},
+					backpackitems = player.backpackitems or {},
+					neutralitem = player.neutralitem or {},
 				})
 
 				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
@@ -217,7 +208,7 @@ function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
 		return game.resultType ~= NOT_PLAYED
 	end), function(game)
-		return tostring(MatchPageWidgets.game(game)) .. TemplateEngine():render(Display.game, Table.merge(model, game))
+		return tostring(MatchPageWidgets.game(game))
 	end)
 
 	if #games < 2 then
