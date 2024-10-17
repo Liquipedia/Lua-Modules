@@ -8,8 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DeadlockIcon = require('Module:DeadlockIcon')
-local ItemIcon = require('Module:ItemIcon')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -18,6 +16,8 @@ local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
+
+local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 
 local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
@@ -41,6 +41,9 @@ local DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 ---@return Html
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
+	item.args.image = item.args.image or 'Deadlock_gameasset_Item ' .. item.args.itemname .. '.png'
+	item.args.subheader = item:_getCostDisplay()
+	item.args.imagesize = '100'
 	item:setWidgetInjector(CustomInjector(item))
 
 	return item:createInfobox()
@@ -53,27 +56,8 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'header' then
-		if String.isNotEmpty(args.itemcost) then
-			table.insert(widgets, Breakdown{
-				children = caller:_getCostDisplay(),
-				classes = {
-					'infobox-header',
-					'wiki-backgroundcolor-light',
-					'infobox-header-2',
-					'infobox-gold'
-				}
-			})
-		end
-		if String.isNotEmpty(args.itemname) then
-			local iconImage = ItemIcon.display({}, args.itemname)
-			if String.isNotEmpty(args.itemtext) then
-				iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
-			end
-			table.insert(widgets, Center{content = {iconImage}})
-		end
-		return widgets
-	elseif id == 'attributes' then
+
+	if id == 'attributes' then
 		local attributeCells = {
 			{name = 'Health', parameter = 'hp'},
 			{name = 'Bonus Health', parameter = 'bonushp'},
@@ -106,7 +90,7 @@ function CustomInjector:parse(id, widgets)
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
 		if not Table.isEmpty(widgets) then
-			table.insert(widgets, 1, Title{name = 'Attributes'})
+			table.insert(widgets, 1, Title{children = 'Attributes'})
 		end
 		return widgets
 	elseif id == 'ability' then
@@ -114,20 +98,20 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		Array.appendWith(widgets,
-			Cell{name = 'Use', content = {args.use}},
-			Cell{name = 'Active', content = {args.active}},
-			Cell{name = 'Passive', content = {args.passive, args.passive2}}
+			Cell{name = 'Active', children = {args.active, args.active2, args.active3}},
+			Cell{name = 'Passive', children = {args.passive, args.passive2, args.passive3}}
 		)
 	elseif id == 'availability' then
 		if String.isEmpty(args.category) and String.isEmpty(args.drop) then return {} end
 		return {
-			Title{name = 'Item Tier'},
-			Cell{name = 'Category', content = {caller:_categoryDisplay()}},
-			Cell{name = 'Dropped From', content = {args.drop}},
+			Title{children = 'Innate Stats'},
+			Cell{name = 'Category', children = {caller:_categoryDisplay()}},
+			Cell{name = 'Tier', children = {args.tier}},
+			Cell{name = 'Standard Bonus', children = {args.standardbonus}},
 		}
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{content = {args.recipe}})
+		table.insert(widgets, Center{children = {args.recipe}})
 	elseif id == 'maps' then return {}
 	elseif id == 'info' then return {}
 	end
@@ -167,24 +151,24 @@ function CustomItem.nameDisplay(args)
 	return args.itemname
 end
 
----@return string[]
+---@return string
 function CustomItem:_getCostDisplay()
 	local costs = self:getAllArgsForBase(self.args, 'itemcost')
 
 	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
-		:wikitext(DeadlockIcon.display({}, 'souls', '14') .. ' ' .. tostring(innerDiv))
+		:node(AutoInlineIcon.display({onlyicon = true}, 'M', 'Souls')):wikitext(' '):wikitext(tostring(innerDiv))
 	local display = tostring(outerDiv)
 
 	if String.isNotEmpty(self.args.recipecost) then
 		innerDiv = CustomItem._costInnerDiv('(' .. self.args.recipecost .. ')')
 		outerDiv = mw.html.create('div')
 			:css('padding-top', '3px')
-			:wikitext(DeadlockIcon.display({}, 'recipe', '21') .. ' ' .. tostring(innerDiv))
+			:wikitext()
 		display = display .. tostring(outerDiv)
 	end
 
-	return {display}
+	return display
 end
 
 ---@param text string|number|nil
@@ -194,7 +178,6 @@ function CustomItem._costInnerDiv(text)
 		:css('display', 'inline-block')
 		:css('padding', '0px 3px')
 		:css('border-radius', '4px')
-		:addClass('placement-darkgrey')
 		:wikitext(text)
 end
 
@@ -233,21 +216,23 @@ function CustomItem:_getAttributeCells(attributeCells)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
 		if String.isEmpty(content) then return nil end
-		return Cell{name = attribute.name, content = {content}}
+		return Cell{name = attribute.name, children = {content}}
 	end)
 end
 
----@param lpdbData table
 ---@param args table
-function CustomItem:addToLpdb(lpdbData, args)
-	lpdbData.information = args.name
-	lpdbData.image = args.image
-	lpdbData.date = args.released
-	lpdbData.extradata = {
-		name = args.name,
-		category = args.category,
+function CustomItem:setLpdbData(args)
+	local lpdbData = {
+		type = 'item',
+		name = args.itemname or self.pagename,
+		image = args.image,
+		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			cost = args.itemcost,
+			category = args.category,
+			removed = tostring(Logic.readBool(args.removed)),
+		})
 	}
-
-	return lpdbData
+	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. (args.itemname or self.pagename), lpdbData)
 end
+
 return CustomItem
