@@ -19,6 +19,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
+local MAX_NUM_BANS = 6
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
 	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
@@ -46,7 +47,17 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
+	-- Iterate each map
 	Array.forEach(Array.map(match.games, CustomMatchSummary._createGame), FnUtil.curry(body.addRow, body))
+
+	-- Add the Hero Bans
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+	if characterBansData then
+		body.root:node(MatchSummaryWidgets.CharacterBanTable{
+			bans = characterBansData,
+			date = match.date,
+		})
+	end
 
 	return body
 end
