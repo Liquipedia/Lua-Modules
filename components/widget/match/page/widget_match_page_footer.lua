@@ -16,6 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div, Fragment, Header = HtmlWidgets.Div, HtmlWidgets.Fragment, HtmlWidgets.Header
 local Link = Lua.import('Module:Widget/Basic/Link')
 local MatchPageFooterSection = Lua.import('Module:Widget/Match/Page/Footer/Section')
+local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class MatchPageFooter: Widget
 ---@operator call(table): MatchPageFooter
@@ -24,7 +25,7 @@ MatchPageFooter.defaultProps = {
 	flipped = false,
 }
 
----@return Widget[]?
+---@return Widget
 function MatchPageFooter:render()
 	return Fragment{children = {
 		Header{level = 3, children = 'Additional Information'},
@@ -33,10 +34,10 @@ function MatchPageFooter:render()
 			children = WidgetUtil.collect(
 				self.props.vods and MatchPageFooterSection{header = 'VODs', children = self.props.vods} or nil,
 				self.props.links and MatchPageFooterSection{header = 'Socials', children = Array.map(self.props.links, function(link)
-					return '[['.. link.icon .. '|link='.. link.link .. '|15px|'.. link.text .. ']]'
+					return ImageIcon{imageLight = link.icon, size = '16px', link = link.link, caption = link.text}
 				end)} or nil,
 				self.props.patch and MatchPageFooterSection{header = 'Patch', children =
-					Link{link = 'Version ' .. self.props.patch, children = 'Version ' .. self.props.patch}
+					Link{link = 'Version ' .. self.props.patch}
 				} or nil
 			)
 		}

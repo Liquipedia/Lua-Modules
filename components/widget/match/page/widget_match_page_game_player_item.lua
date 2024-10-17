@@ -11,6 +11,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
+local ImageIcon = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class MatchPageHeaderGameItem: Widget
 ---@operator call(table): MatchPageHeaderGameItem
@@ -19,9 +20,9 @@ local MatchPageHeaderGameItem = Class.new(Widget)
 ---@return string
 function MatchPageHeaderGameItem:render()
 	if Logic.isEmpty(self.props.name) then
-		return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
+		return ImageIcon{imageLight = 'EmptyIcon itemicon dota2 gameasset.png', size = '64px', caption = 'Empty'}
 	end
-	return '[[File:'.. self.props.image ..'|64px|'.. self.props.name ..'|link=]]'
+	return ImageIcon{imageLight = self.props.image, size = '64px', caption = self.props.name}
 end
 
 return MatchPageHeaderGameItem
