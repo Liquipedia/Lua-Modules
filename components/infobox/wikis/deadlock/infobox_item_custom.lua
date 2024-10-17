@@ -54,8 +54,6 @@ end
 function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
-
-
 	if id == 'attributes' then
 		local attributeCells = {
 			{name = 'Health', parameter = 'hp'},
