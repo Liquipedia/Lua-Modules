@@ -11,6 +11,7 @@ local Widgets = {}
 local Lua = require('Module:Lua')
 
 Widgets.Abbr = Lua.import('Module:Widget/Html/Abbr')
+Widgets.Center = Lua.import('Module:Widget/Html/Center')
 Widgets.Div = Lua.import('Module:Widget/Html/Div')
 Widgets.Fragment = Lua.import('Module:Widget/Html/Fragment')
 Widgets.Li = Lua.import('Module:Widget/Html/Li')
