@@ -23,6 +23,7 @@ local Widgets = require('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local Breakdown = Widgets.Breakdown
 
 ---@class DeadlockItemInfobox: ItemInfobox
 local CustomItem = Class.new(Item)
@@ -88,6 +89,7 @@ function CustomInjector:parse(id, widgets)
 			{name = 'Movement Speed', parameter = 'movespeed'},
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
+		table.insert(widgets, Cell{name = 'Standard Bonus', children = {args.standardbonus}})
 		if not Table.isEmpty(widgets) then
 			table.insert(widgets, 1, Title{children = 'Attributes'})
 		end
@@ -103,14 +105,17 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'availability' then
 		if String.isEmpty(args.category) and String.isEmpty(args.drop) then return {} end
 		return {
-			Title{children = 'Innate Stats'},
+			Title{children = 'Type'},
 			Cell{name = 'Category', children = {caller:_categoryDisplay()}},
 			Cell{name = 'Tier', children = {args.tier}},
-			Cell{name = 'Standard Bonus', children = {args.standardbonus}},
+			
 		}
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{children = {args.recipe}})
+		return {
+			Title{children = 'Components'},
+			Center{children = {args.recipe}}
+		}
 	elseif id == 'maps' then return {}
 	elseif id == 'info' then return {}
 	end
@@ -157,17 +162,8 @@ function CustomItem:_getCostDisplay()
 	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
 		:node(AutoInlineIcon.display({onlyicon = true}, 'M', 'Souls')):wikitext(' '):wikitext(tostring(innerDiv))
-	local display = tostring(outerDiv)
 
-	if String.isNotEmpty(self.args.recipecost) then
-		innerDiv = CustomItem._costInnerDiv('(' .. self.args.recipecost .. ')')
-		outerDiv = mw.html.create('div')
-			:css('padding-top', '3px')
-			:wikitext()
-		display = display .. tostring(outerDiv)
-	end
-
-	return display
+	return tostring(outerDiv)
 end
 
 ---@param text string|number|nil
