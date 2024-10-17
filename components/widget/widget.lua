@@ -18,9 +18,8 @@ local Table = require('Module:Table')
 ---@operator call(table): self
 ---@field context Widget[]
 ---@field props table<string, any>
----@field injector WidgetInjector?
 local Widget = Class.new(function(self, props)
-	self.props = Table.copy(props) or {}
+	self.props = Table.deepMerge(Table.deepCopy(self.defaultProps), props)
 
 	if not Array.isArray(self.props.children) then
 		self.props.children = {self.props.children}
@@ -28,6 +27,8 @@ local Widget = Class.new(function(self, props)
 
 	self.context = {} -- Populated by the parent
 end)
+
+Widget.defaultProps = {}
 
 ---Asserts the existence of a value and copies it
 ---@param value string

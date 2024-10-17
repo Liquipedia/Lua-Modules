@@ -25,6 +25,11 @@ local Div = HtmlWidgets.Div
 ---@operator call(ButtonWidgetParameters): ButtonWidget
 
 local Button = Class.new(Widget)
+Button.defaultProps = {
+	linktype = 'internal',
+	variant = 'primary',
+	size = 'md',
+}
 
 ---@return Widget
 function Button:render()
@@ -33,7 +38,7 @@ function Button:render()
 		'btn',
 		'btn-new',
 	}
-	if self.props.variant == 'primary' or self.props.variant == nil then
+	if self.props.variant == 'primary' then
 		table.insert(cssClasses, 'btn-primary')
 	elseif self.props.variant == 'secondary' then
 		table.insert(cssClasses, 'btn-secondary')

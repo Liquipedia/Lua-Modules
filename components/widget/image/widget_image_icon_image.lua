@@ -21,6 +21,9 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@operator call(IconImageWidgetParameters): IconImageWidget
 ---@field props IconImageWidgetParameters
 local Icon = Class.new(WidgetIcon)
+Icon.defaultProps = {
+	link = '',
+}
 
 ---@return string?
 function Icon:render()
@@ -28,7 +31,7 @@ function Icon:render()
 		self.props.imageLight,
 		self.props.imageDark,
 		{
-			link = self.props.link or '',
+			link = self.props.link,
 			size = 'x20px',
 		}
 	)
