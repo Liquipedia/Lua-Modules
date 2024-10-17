@@ -102,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Passive', children = {args.passive, args.passive2, args.passive3}}
 		)
 	elseif id == 'availability' then
-		if String.isEmpty(args.category) and String.isEmpty(args.drop) then return {} end
+		if String.isEmpty(args.category) and String.isEmpty(args.tier) then return {} end
 		return {
 			Title{children = 'Type'},
 			Cell{name = 'Category', children = {caller:_categoryDisplay()}},
