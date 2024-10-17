@@ -20,7 +20,7 @@ local MatchPageHeaderGameStats = Class.new(Widget)
 
 ---@return Widget
 function MatchPageHeaderGameStats:render()
-	local team1, team2 = self.props.teams[1], self.props.teams[2]
+	local team1, team2 = self.props.opponents[1], self.props.opponents[2]
 	return Fragment{children = {
 		Header{level = 3, children = 'Team Stats'},
 		Div{
@@ -45,7 +45,7 @@ function MatchPageHeaderGameStats:render()
 							children = {
 								Div{classes = {'match-bm-team-stats-team-logo'}, children = team1.icon},
 								Div{classes = {'match-bm-team-stats-team-side'}, children = team1.side},
-								Div{classes = {'match-bm-team-stats-team-state', 'state--'.. team1.scoreDisplay}, children = team1.scoreDisplay},
+								Div{classes = {'match-bm-team-stats-team-state', 'state--'.. team1.score}, children = team1.score},
 							},
 						},
 						Div{
@@ -53,33 +53,33 @@ function MatchPageHeaderGameStats:render()
 							children = {
 								MatchPageHeaderGameStatsRow{
 									leftValue = team1.kills .. '<span class="slash">/</span>' .. team1.deaths .. '<span class="slash">/</span>' .. team1.assists,
-									icon = '<i class="fas fa-skull-crossbones cell--icon"></i>',
+									icon = '<i class="fas fa-skull-crossbones"></i>',
 									text = 'KDA',
 									rightValue = team2.kills .. '<span class="slash">/</span>' .. team2.deaths .. '<span class="slash">/</span>' .. team2.assists
 								},
 								MatchPageHeaderGameStatsRow{
 									leftValue = team1.gold,
-									icon = '<i class="fas fa-coins cell--icon"></i>',
+									icon = '<i class="fas fa-coins"></i>',
 									text = 'Gold',
 									rightValue = team2.gold
 								},
 								MatchPageHeaderGameStatsRow{
-									leftValue = team1.objectives.towers,
-									icon = '<i class="fas fa-chess-rook cell--icon"></i>',
+									leftValue = team1.towers,
+									icon = '<i class="fas fa-chess-rook"></i>',
 									text = 'Towers',
-									rightValue = team2.objectives.towers
+									rightValue = team2.towers
 								},
 								MatchPageHeaderGameStatsRow{
-									leftValue = team1.objectives.barracks,
-									icon = '<i class="fas fa-warehouse cell--icon"></i>',
+									leftValue = team1.barracks,
+									icon = '<i class="fas fa-warehouse"></i>',
 									text = 'Barracks',
-									rightValue = team2.objectives.barracks
+									rightValue = team2.barracks
 								},
 								MatchPageHeaderGameStatsRow{
-									leftValue = team1.objectives.roshans,
-									icon = '<span class="liquipedia-custom-icon liquipedia-custom-icon-roshan"></span>',
+									leftValue = team1.roshans,
+									icon = '<i class="liquipedia-custom-icon liquipedia-custom-icon-roshan"></i>',
 									text = 'Roshan',
-									rightValue = team2.objectives.roshans
+									rightValue = team2.roshans
 								},
 							}
 						},

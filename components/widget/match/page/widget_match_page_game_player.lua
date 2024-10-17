@@ -33,7 +33,7 @@ function MatchPageHeaderGamePlayer:render()
 						classes = {'match-bm-players-player-avatar'},
 						children = {
 							Div{classes = {'match-bm-players-player-icon'}, children = self.props.heroIcon},
-							Div{classes = {'match-bm-players-player-role', 'role--' .. self.props.teams[1].side}, children = {'[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]'}},
+							Div{classes = {'match-bm-players-player-role', 'role--' .. self.props.side}, children = {'[[File:Dota2 {{facet}} facet icon darkmode.png|link=|{{facet}}]]'}},
 						},
 					},
 					Div{classes = {'match-bm-players-player-name'}, children = {
@@ -73,7 +73,7 @@ function MatchPageHeaderGamePlayer:render()
 					MatchPageHeaderGamePlayerStat{
 						icon = '<i class="fas fa-sword"></i>',
 						title = 'DMG',
-						children = self.props.displayDamageDone
+						children = self.props.damagedone and string.format('%.1fK', self.props.damagedone / 1000) or nil
 					},
 					MatchPageHeaderGamePlayerStat{
 						icon = '<i class="fas fa-swords"></i>',
@@ -83,7 +83,7 @@ function MatchPageHeaderGamePlayer:render()
 					MatchPageHeaderGamePlayerStat{
 						icon = '<i class="fas fa-coin"></i>',
 						title = 'NET',
-						children = self.props.displayGold
+						children = self.props.gold and string.format('%.1fK', self.props.gold / 1000) or nil
 					},
 					MatchPageHeaderGamePlayerStat{
 						icon = '<i class="fas fa-coins"></i>',

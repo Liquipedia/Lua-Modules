@@ -77,9 +77,6 @@ function MatchPage.getByMatchId(props)
 					neutralitem = player.neutralitem or {},
 				})
 
-				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
-				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold)
-
 				table.insert(team.players, newPlayer)
 			end
 
