@@ -31,53 +31,6 @@ local ICONS = {
 
 local CustomMatchSummary = {}
 
--- Hero Ban Class
----@class DeadlockHeroBan: MatchSummaryRowInterface
----@operator call: DeadlockHeroBan
----@field root Html
----@field table Html
-local HeroBan = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
-		self.table = self.root:tag('table')
-			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader()
-	end
-)
-
----@return self
-function HeroBan:createHeader()
-	self.table:tag('tr')
-		:tag('th'):css('width', '40%'):wikitext(''):done()
-		:tag('th'):css('width', '20%'):wikitext('Bans'):done()
-		:tag('th'):css('width', '40%'):wikitext(''):done()
-	return self
-end
-
----@param banData {numberOfBans: integer, [1]: table, [2]: table}
----@param gameNumber integer
----@return self
-function HeroBan:banRow(banData, gameNumber)
-	self.table:tag('tr')
-		:tag('td'):css('float', 'left')
-			:node(CustomMatchSummary._createCharacterDisplay(banData[1], false))
-		:tag('td'):css('font-size', '80%'):node(mw.html.create('div')
-			:wikitext(Abbreviation.make(
-				'Game ' .. gameNumber,
-				'Bans in game ' .. gameNumber
-			))
-		)
-		:tag('td'):css('float', 'right')
-			:node(CustomMatchSummary._createCharacterDisplay(banData[2], true))
-	return self
-end
-
-
----@return Html
-function HeroBan:create()
-	return self.root
-end
-
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
@@ -96,44 +49,15 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
-		if rowDisplay then
-			body:addRow(rowDisplay)
-		end
-	end
-
-	-- Pre-Process Hero Ban Data
-	local heroBanData = {}
-	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata or {}
-		local banData = {{}, {}}
-		local numberOfBans = 0
-		for index = 1, MAX_NUM_BANS do
-			if String.isNotEmpty(extradata['team1ban' .. index]) then
-				numberOfBans = index
-				banData[1][index] = extradata['team1ban' .. index]
-			end
-			if String.isNotEmpty(extradata['team2ban' .. index]) then
-				numberOfBans = index
-				banData[2][index] = extradata['team2ban' .. index]
-			end
-		end
-
-		if numberOfBans > 0 then
-			heroBanData[gameIndex] = banData
-		end
-	end
+	Array.forEach(Array.map(match.games, CustomMatchSummary._createGame), FnUtil.curry(body.addRow, body))
 
 	-- Add the Hero Bans
-	if not Table.isEmpty(heroBanData) then
-		local heroBan = HeroBan()
-
-		for gameIndex, banData in ipairs(heroBanData) do
-			heroBan:banRow(banData, gameIndex)
-		end
-
-		body:addRow(heroBan)
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+	if characterBansData then
+		body.root:node(MatchSummaryWidgets.CharacterBanTable{
+			bans = characterBansData,
+			date = match.date,
+		})
 	end
 
 	return body

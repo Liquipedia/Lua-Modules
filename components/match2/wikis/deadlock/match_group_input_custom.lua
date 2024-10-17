@@ -79,7 +79,6 @@ end
 
 ---@param match table
 ---@param opponents table[]
----@param opponentCount integer
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
