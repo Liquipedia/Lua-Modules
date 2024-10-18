@@ -208,7 +208,7 @@ function CustomMatchSummary._opponentWeaponsDisplay(props)
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
-		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
+		:addClass(flip and 'brkts-popup-body-element-thumbs-right' or nil)
 
 	for _, item in ipairs(displayElements) do
 		display:node(item)
