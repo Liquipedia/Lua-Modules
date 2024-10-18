@@ -77,7 +77,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.cfpremier
+	self.data.publishertier = Logic.readBool(args['cfpremier']) and 'true' or false
 end
 
 ---@param args table
