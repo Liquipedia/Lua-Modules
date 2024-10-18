@@ -39,6 +39,11 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
+	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'), match.finished)
+	if (not Logic.readBool(match.finished)) and Logic.isNotEmpty(match.status) then
+		match.finished = match.status
+	end
+
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
@@ -76,7 +81,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
-	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
@@ -198,14 +202,6 @@ function MatchFunctions.getLinks(match, maps)
 	end)
 end
 
----@param match table
----@return string?
-function MatchFunctions.getMatchStatus(match)
-	if match.resulttype == 'np' then
-		return Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
-	end
-end
-
 ---@param name string?
 ---@param year string|osdate
 ---@return number
@@ -253,7 +249,7 @@ end
 function MatchFunctions.getExtraData(match, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = MatchFunctions.getMatchStatus(match),
+		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and match.status or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
