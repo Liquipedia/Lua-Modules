@@ -32,8 +32,8 @@ function MatchSummaryCharacters:render()
 	return Div{
 		classes = {
 			'brkts-popup-body-element-thumbs',
-			'brkts-popup-body-element-thumbs-' .. (flipped and 'right' or 'left'),
-			'brkts-champion-icon'
+			'brkts-champion-icon',
+			flipped and 'brkts-popup-body-element-thumbs-right' or nil,
 		},
 		children = Array.map(self.props.characters, function(character)
 			return Character{

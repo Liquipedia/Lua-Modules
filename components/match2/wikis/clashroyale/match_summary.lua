@@ -449,7 +449,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 				wrapperCards:node(display)
 				display = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
-					:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'left' or 'right'))
+					:addClass(flip and 'brkts-popup-body-element-thumbs-right' or nil)
 			end
 
 			display:node(card)
