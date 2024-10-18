@@ -60,7 +60,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.riotpremier) and 'true' or nil
+	self.data.publishertier = Logic.readBool(args.riotpremier)
 end
 
 ---@param args table
