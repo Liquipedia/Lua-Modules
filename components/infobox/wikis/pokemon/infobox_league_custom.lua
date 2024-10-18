@@ -73,7 +73,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.pokemonpremier
+	self.data.publishertier = Logic.readBool(args.pokemonpremier)
 	self.data.mode = self:_getGameMode()
 end
 
