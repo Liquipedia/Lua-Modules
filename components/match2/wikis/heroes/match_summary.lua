@@ -26,7 +26,6 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
-local NO_CHARACTER = 'default'
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -106,7 +105,7 @@ function CustomMatchSummary.createBody(match)
 	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
 
 	-- Add the Character Bans
-	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS, NO_CHARACTER)
+	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 	body.root:node(MatchSummaryWidgets.CharacterBanTable{
 		bans = characterBansData,
 		date = match.date,
