@@ -98,6 +98,9 @@ end
 function MatchMapsLegacy._handleDetails(args, details)
 	Array.mapIndexes(function (index)
 		local prefix = 'map' .. index
+		if not details[prefix] then
+			return nil
+		end
 		local map = {
 			map = Table.extract(details, prefix),
 			score1 = Table.extract(details, prefix .. 'score1'),
