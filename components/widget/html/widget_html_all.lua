@@ -59,6 +59,7 @@ local function createHtmlTag(tag)
 end
 
 Widgets.Abbr = createHtmlTag('abbr')
+Widgets.Center = Lua.import('center')
 Widgets.Div = createHtmlTag('div')
 Widgets.Fragment = createHtmlTag()
 Widgets.Li = createHtmlTag('li')
