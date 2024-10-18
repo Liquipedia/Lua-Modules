@@ -113,7 +113,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.pubgpremier
+	self.data.publishertier = Logic.readBool(args.pubgpremier)
 end
 
 ---@param args table
