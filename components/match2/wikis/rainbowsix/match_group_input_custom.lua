@@ -43,6 +43,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, #opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -71,7 +72,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -136,23 +136,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		stats = match.stats,
-		siegegg = match.siegegg and 'https://siege.gg/matches/' .. match.siegegg or nil,
-		opl = match.opl and 'https://www.opleague.eu/match/' .. match.opl or nil,
-		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
-		faceit = match.faceit and 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit or nil,
-		lpl = match.lpl and 'https://old.letsplay.live/match/' .. match.lpl or nil,
-		r6esports = match.r6esports
-			and 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/' .. match.r6esports or nil,
-		challengermode = match.challengermode and 'https://www.challengermode.com/games/' .. match.challengermode or nil,
-		ebattle = match.ebattle and 'https://www.ebattle.gg/turnier/match/' .. match.ebattle or nil,
-	}
 end
 
 ---@param match table
