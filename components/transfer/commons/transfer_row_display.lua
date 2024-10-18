@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 local Info = Lua.import('Module:Info', {loadData = true})
 local Platform = Lua.import('Module:Platform')
-local PlayerDisplay = Lua.requireIfExists('Module:Player/Display/Custom')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 local TransferRef = Lua.import('Module:Transfer/References')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
