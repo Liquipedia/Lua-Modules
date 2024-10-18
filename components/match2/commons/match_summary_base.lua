@@ -840,9 +840,8 @@ end
 
 ---@param games table[]
 ---@param maxNumberOfBans integer
----@param defaultIcon string?
 ---@return {[1]: string[]?, [2]: string[]?}[]?
-function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
+function MatchSummary.buildCharacterBanData(games, maxNumberOfBans)
 	local matchHasBans = false
 	local gamesBans = Array.map(games, function(game)
 		local extradata = game.extradata or {}
@@ -854,8 +853,8 @@ function MatchSummary.buildCharacterBanData(games, maxNumberOfBans, defaultIcon)
 			if team1ban or team2ban then
 				gameHasBans = true
 			end
-			table.insert(banData[1], team1ban or defaultIcon)
-			table.insert(banData[2], team2ban or defaultIcon)
+			table.insert(banData[1], team1ban)
+			table.insert(banData[2], team2ban)
 		end
 
 		if gameHasBans then
