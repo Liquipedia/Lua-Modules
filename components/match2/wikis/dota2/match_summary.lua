@@ -65,11 +65,11 @@ function HeroBan:banRow(banData, gameNumber)
 		)
 		:tag('td')
 			:attr('colspan', '2')
-			:node(CustomMatchSummary._opponentHeroesDisplay(banData[1], true))
+			:node(CustomMatchSummary._opponentHeroesDisplay(banData[1], false))
 	self.table:tag('tr')
 		:tag('td')
 			:attr('colspan', '2')
-			:node(CustomMatchSummary._opponentHeroesDisplay(banData[2], true))
+			:node(CustomMatchSummary._opponentHeroesDisplay(banData[2], false))
 	return self
 end
 
