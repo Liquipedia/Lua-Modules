@@ -20,27 +20,19 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@operator call(table): MatchSummaryMVP
 local MatchSummaryMVP = Class.new(Widget)
 
----@return Widget[]?
+---@return Widget?
 function MatchSummaryMVP:render()
 	if self.props.players == nil or #self.props.players == 0 then
 		return nil
 	end
 	local points = tonumber(self.props.points)
-	local players = Array.map(self.props.players, function(player)
-		if type(player) == 'table' then
-			local link = Link{
-				link = player.name,
-				children = {player.displayname},
-			}
-			if player.comment then
-				return Fragment{children = {link, ' (' .. player.comment .. ')'}}
-			end
-			return link
-		end
-		return Link{
-			link = player,
-			children = {player},
-		}
+	local players = Array.map(self.props.players, function(inputPlayer)
+		local player = type(inputPlayer) ~= 'table' and {name = inputPlayer, displayname = inputPlayer} or inputPlayer
+
+		return Fragment{children = {
+			Link{link = player.name, children = player.displayname},
+			player.comment and ' (' .. player.comment .. ')' or nil
+		}}
 	end)
 	return Div{
 		classes = {'brkts-popup-footer', 'brkts-popup-mvp'},
