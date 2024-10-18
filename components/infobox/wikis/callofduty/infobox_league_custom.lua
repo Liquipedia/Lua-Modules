@@ -74,7 +74,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args['atvi-sponsored']
+	self.data.publishertier = Logic.readBool(args['atvi-sponsored'])
 	self.data.mode = args.player_number and 'solo' or self.data.mode
 end
 
