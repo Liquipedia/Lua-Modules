@@ -33,11 +33,12 @@ Widgets.TableCell = Lua.import('Module:Widget/Table/Cell')
 Widgets.DataTable = Lua.import('Module:Widget/Basic/DataTable')
 
 --- Base Html Widgets
-Widgets.Div = Lua.import('Module:Widget/Html/Div')
-Widgets.Span = Lua.import('Module:Widget/Html/Span')
-Widgets.Table = Lua.import('Module:Widget/Html/Table')
-Widgets.Td = Lua.import('Module:Widget/Html/Td')
-Widgets.Th = Lua.import('Module:Widget/Html/Th')
-Widgets.Tr = Lua.import('Module:Widget/Html/Tr')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+Widgets.Div = HtmlWidgets.Div
+Widgets.Span = HtmlWidgets.Span
+Widgets.Table = HtmlWidgets.Table
+Widgets.Td = HtmlWidgets.Td
+Widgets.Th = HtmlWidgets.Th
+Widgets.Tr = HtmlWidgets.Tr
 
 return Widgets
