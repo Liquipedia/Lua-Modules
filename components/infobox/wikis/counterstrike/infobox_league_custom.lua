@@ -126,7 +126,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = (self.valveTier or {}).name
+	self.data.publishertier = (self.valveTier or {}).name or ''
 	if String.isNotEmpty(args.localcurrency) and String.isNotEmpty(args.prizepool) then
 		local currency = string.upper(args.localcurrency)
 		local prize = InfoboxPrizePool._cleanValue(args.prizepool)

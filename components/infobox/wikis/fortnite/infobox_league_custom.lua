@@ -49,7 +49,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.epicpremier
+	self.data.publishertier = Logic.readBool(args.epicpremier)
 end
 
 ---@param args table

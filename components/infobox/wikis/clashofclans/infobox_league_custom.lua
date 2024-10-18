@@ -60,7 +60,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args['supercell-sponsored']) and 'true' or nil
+	self.data.publishertier = Logic.readBool(args['supercell-sponsored'])
 end
 
 return CustomLeague
