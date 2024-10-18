@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
