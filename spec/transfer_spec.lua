@@ -37,7 +37,7 @@ insulate('Transfer', function()
 				{
 					objectname = 'transfer_2024-10-11_000000',
 					player = 'Supr',
-					nationality = 'usa',
+					nationality = 'United States',
 					fromteam = '', --'Team Liquid',
 					toteam = '', --'mousesports',
 					fromteamtemplate = '', --'team liquid 2024',
@@ -85,7 +85,7 @@ insulate('Transfer', function()
 				{
 					objectname = 'transfer_2024-10-11_000000',
 					player = 'Clem',
-					nationality = 'fra',
+					nationality = 'France',
 					fromteam = '', --'Team Liquid',
 					toteam = '', --'mousesports',
 					fromteamtemplate = '', --'team liquid 2024',
