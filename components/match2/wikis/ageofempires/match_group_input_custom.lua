@@ -277,7 +277,12 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 	---@cast mapsInfo -nil
 	local info = Array.find(mapsInfo, function(m)
 		return m.name == map.map or m.link == map.map
-	end) or {}
+	end)
+	if not info then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with maps missing in infobox')
+		mw.logObject('Missing map: ' .. map.map)
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or ''), map.map
+	end
 	return info.link, info.name
 end
 
