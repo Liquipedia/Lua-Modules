@@ -65,7 +65,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.narakapremier
+	self.data.publishertier = Logic.readBool(args.narakapremier)
 end
 
 ---@param lpdbData table
