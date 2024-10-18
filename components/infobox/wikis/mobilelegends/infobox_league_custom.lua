@@ -60,7 +60,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args['moonton-sponsored']) and 'true' or false
+	self.data.publishertier = Logic.readBool(args['moonton-sponsored'])
 end
 
 ---@param args table
