@@ -1,3 +1,6 @@
+
+---@diagnostic disable: lowercase-global
+---@diagnostic disable: undefined-global
 std = {
 	globals = {
 		"mw",
@@ -27,8 +30,25 @@ std = {
 		"type",
 		"unpack",
 		"xpcall",
+		-- From standard.lua
+		"Array",
+		"Class",
+		"Condition",
+		"DateExt",
+		"I18n",
+		"Info",
+		"Json",
+		"Logic",
+		"Lpdb",
+		"Lua",
+		"Operator",
+		"Page",
+		"String",
+		"Table",
+		"Variables",
 	}
 }
+
 exclude_files = {
 	".install", -- package files
 	".luarocks", -- package manager files
