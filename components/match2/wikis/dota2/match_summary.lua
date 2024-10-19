@@ -97,7 +97,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	if Logic.isNotEmpty(game.comment) then
 		comment = {
 			MatchSummary.Break():create(),
-			mw.html.create('div'):wikitext(game.comment):css('margin', 'auto')
+			HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
 		}
 	end
 
