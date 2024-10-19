@@ -394,7 +394,7 @@ end
 ---@param body MatchSummaryBody|Widget
 ---@return MatchSummaryMatch
 function Match:body(body)
-	if body.create == 'function' then
+	if type(body.create) == 'function' then
 		---@cast body MatchSummaryBody
 		self.bodyElement = body:create()
 	else
