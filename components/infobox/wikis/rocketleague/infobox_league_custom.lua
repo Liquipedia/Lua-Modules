@@ -103,15 +103,9 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(self.data.publishertier)
-end
-
----@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.rlcsPremier = args.series == SERIES_RLCS and 1 or 0
-	self.data.publishertier = tostring(args.series == SERIES_RLCS and tonumber(self.data.liquipediatier) == TIER_1)
+	self.data.publishertier = args.series == SERIES_RLCS and tonumber(self.data.liquipediatier) == TIER_1
 end
 
 ---@param args table
