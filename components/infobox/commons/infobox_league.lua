@@ -451,7 +451,7 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_liquipediatier', self.data.liquipediatier)
 	Variables.varDefine('tournament_liquipediatiertype', self.data.liquipediatiertype)
-	Variables.varDefine('tournament_publishertier', tostring(self.data.publishertier))
+	Variables.varDefine('tournament_publishertier', tostring(self.data.publishertier or ''))
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_mode', self.data.mode)
@@ -522,7 +522,7 @@ function League:_setLpdbData(args, links)
 		prizepool = self.data.prizepoolUsd,
 		liquipediatier = self.data.liquipediatier,
 		liquipediatiertype = self.data.liquipediatiertype,
-		publishertier = tostring(self.data.publishertier),
+		publishertier = tostring(self.data.publishertier or ''),
 		participantsnumber = tonumber(args.participants_number)
 			or tonumber(args.team_number)
 			or tonumber(args.player_number)

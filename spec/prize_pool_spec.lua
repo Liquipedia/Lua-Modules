@@ -121,7 +121,6 @@ describe('prize pool', function()
 				players = '{"p1":"Rathoz","p1dn":"Rathoz","p1flag":"Sweden"}', -- Legacy
 				prizemoney = 970.97276906869001323,
 				prizepoolindex = 1,
-				publishertier = 'false',
 				series = 'Test Series',
 				shortname = 'Test Tourney',
 				startdate = '2022-10-13',
