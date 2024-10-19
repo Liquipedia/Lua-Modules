@@ -9,13 +9,13 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local MatchGroupInputUtil = require('Module:MatchGroup/Input/Util')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local LegacyBracketMatchSummary = {}
 
 local DEFAULT = 'default'
-local DEFAULT_WIN = 'W'
 
 ---@param args table
 ---@return table
@@ -47,7 +47,7 @@ function LegacyBracketMatchSummary._handleMaps(args)
 			map = mapInfo[1]
 			if String.startsWith(map:lower(), DEFAULT) then
 				map = nil
-				mapArgs.walkover = DEFAULT_WIN
+				mapArgs.walkover = MatchGroupInputUtil.STATUS_INPUTS.DEFAULT_WIN
 			end
 			mapArgs.map = map
 		end
