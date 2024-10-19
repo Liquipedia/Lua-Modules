@@ -9,9 +9,13 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local LegacyBracketMatchSummary = {}
+
+local DEFAULT = 'default'
+local DEFAULT_WIN = 'W'
 
 ---@param args table
 ---@return table
@@ -36,9 +40,16 @@ function LegacyBracketMatchSummary._handleMaps(args)
 			vod = Table.extract(args, 'vodgame' .. mapIndex),
 			date = Table.extract(args, 'date' .. mapIndex) or Table.extract(matchTeam, 'date'),
 		}
-		if mapArgs.map then
-			local mapInfo = Array.parseCommaSeparatedString(mapArgs.map, '|')
-			mapArgs.map = mapInfo[1]
+
+		local map = mapArgs.map
+		if map then
+			local mapInfo = Array.parseCommaSeparatedString(map, '|')
+			map = mapInfo[1]
+			if String.startsWith(map:lower(), DEFAULT) then
+				map = nil
+				mapArgs.walkover = DEFAULT_WIN
+			end
+			mapArgs.map = map
 		end
 
 		isValidMap = mapArgs.map ~= nil or mapArgs.winner
