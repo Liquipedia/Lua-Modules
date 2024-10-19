@@ -144,10 +144,4 @@ function CustomMatchSummary._createCheckMark(isWinner)
 	return container
 end
 
----@param args table
----@return string
-function CustomMatchSummary._createAbbreviation(args)
-	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
-end
-
 return CustomMatchSummary
