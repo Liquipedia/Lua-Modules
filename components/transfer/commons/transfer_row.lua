@@ -21,7 +21,7 @@ local Variables = require('Module:Variables')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
-local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
+local TransferRowDisplay = Lua.import('Module:TransferRow/Display/Custom')
 local References = Lua.import('Module:Transfer/References')
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
