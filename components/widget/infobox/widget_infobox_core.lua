@@ -12,6 +12,7 @@ local Variables = require('Module:Variables')
 local WarningBox = require('Module:WarningBox')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
@@ -37,11 +38,11 @@ function Infobox:render()
 				'infobox-' .. self.props.gameName:lower(),
 				self.props.forceDarkMode and 'infobox-darkmodeforced' or nil,
 			},
-			children = {
+			children = WidgetUtil.collect(
 				content,
 				firstInfobox and adbox or nil,
-				bottomContent,
-			}
+				bottomContent
+			)
 		},
 		WarningBox.displayAll(self.props.warnings),
 	}}
