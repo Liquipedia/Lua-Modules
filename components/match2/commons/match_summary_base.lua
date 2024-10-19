@@ -375,7 +375,7 @@ end
 ---@operator call: MatchSummaryMatch
 ---@field root Html
 ---@field headerElement Html?
----@field bodyElement Html?
+---@field bodyElement Widget|Html?
 ---@field commentElement Html?
 ---@field footerElement Html?
 local Match = Class.new(
@@ -391,10 +391,16 @@ function Match:header(header)
 	return self
 end
 
----@param body MatchSummaryBody
+---@param body MatchSummaryBody|Widget
 ---@return MatchSummaryMatch
 function Match:body(body)
-	self.bodyElement = body:create()
+	if body.create == 'function' then
+		---@cast body MatchSummaryBody
+		self.bodyElement = body:create()
+	else
+		---@cast body Widget
+		self.bodyElement = body
+	end
 	return self
 end
 
