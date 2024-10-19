@@ -15,8 +15,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
-local String = require('Module:StringUtils')
-local Array = require('Module:Array')
 local Abbreviation = require('Module:Abbreviation')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -94,16 +92,13 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local getChampsForTeam = function(team)
-		local getChampFromIndex = function(champIndex)
-			return champIndex, String.nilIfEmpty(extradata['team' .. team .. 'champion' .. champIndex])
-		end
-		return Table.map(Array.range(1, NUM_CHAMPIONS_PICK), getChampFromIndex)
-	end
-	local championsData = Array.map(Array.range(1, 2), getChampsForTeam)--[[@as table]]
-	local championsDataIsEmpty = Array.all(championsData, Table.isEmpty)
+	-- TODO: Change to use participant data
+	local characterData = {
+		MatchSummary.buildCharacterList(extradata, 'team1champion', NUM_CHAMPIONS_PICK),
+		MatchSummary.buildCharacterList(extradata, 'team2champion', NUM_CHAMPIONS_PICK),
+	}
 
-	if Table.isEmpty(game.scores) and Logic.isEmpty(game.winner) and championsDataIsEmpty then
+	if Logic.isEmpty(game.scores) and Logic.isEmpty(game.winner) and Logic.isDeepEmpty(characterData) then
 		return nil
 	end
 
@@ -119,7 +114,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = false,
 		date = date,
-		characters = championsData[1],
+		characters = characterData[1],
 		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 	})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
@@ -134,7 +129,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = true,
 		date = date,
-		characters = championsData[2],
+		characters = characterData[2],
 		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 	})
 
