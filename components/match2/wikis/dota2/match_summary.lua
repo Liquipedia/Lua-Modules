@@ -10,7 +10,6 @@ local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
@@ -20,14 +19,11 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchPage = Lua.import('Module:MatchPage')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local Opponent = Lua.import('Module:Opponent')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 ---@param args table
 ---@return Html
@@ -40,17 +36,6 @@ end
 ---@return MatchSummaryFooter
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if
-		Logic.readBool(match.extradata.headtohead) and
-		match.opponents[1].type == Opponent.team and
-		match.opponents[2].type == Opponent.team
-	then
-		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
-		'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
-	end
 
 	return footer:addLinks(MatchLinks, match.links)
 end
@@ -94,7 +79,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 
 	-- Map Comment
 	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummary.Break():create(),
+		MatchSummaryWidgets.Break{},
 		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
 	} or {}
 
@@ -107,12 +92,12 @@ function CustomMatchSummary._createGame(game, gameIndex)
 				characters = heroesData[1],
 				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 			},
-			CustomMatchSummary._createCheckMark(game.winner == 1),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-vertical-centered'},
 				children = {Logic.isNotEmpty(game.length) and game.length or ('Game ' .. gameIndex)},
 			},
-			CustomMatchSummary._createCheckMark(game.winner == 2),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.Characters{
 				flipped = true,
 				characters = heroesData[2],
@@ -121,24 +106,6 @@ function CustomMatchSummary._createGame(game, gameIndex)
 			unpack(comment)
 		}
 	}
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if Logic.readBool(isWinner) then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 return CustomMatchSummary

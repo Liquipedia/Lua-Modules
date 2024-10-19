@@ -20,6 +20,9 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = false,
@@ -110,12 +113,12 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
+	match.links = MatchFunctions.getLinks(match, games, opponents)
 
 	match.games = games
 	match.opponents = opponents
 
-	match.extradata = MatchFunctions.getExtraData(match)
+	match.extradata = MatchFunctions.getExtraData(match, opponents)
 
 	return match
 end
@@ -176,8 +179,9 @@ end
 
 ---@param match table
 ---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getLinks(match, games)
+function MatchFunctions.getLinks(match, games, opponents)
 	local links = {
 		preview = match.preview,
 		lrthread = match.lrthread,
@@ -195,15 +199,26 @@ function MatchFunctions.getLinks(match, games)
 			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
 		end
 	)
+
+	local isTeamGame = Array.all(opponents, function(opponent)
+		return opponent.type == Opponent.team
+	end)
+	if Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))) and isTeamGame then
+		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
+		links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
+			'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
+	end
+
 	return links
 end
 
 ---@param match table
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
