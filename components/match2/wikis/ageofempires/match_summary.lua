@@ -15,6 +15,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -68,7 +69,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	Array.forEach(match.games, function(game)
-		if not game.map and not game.winner then return end
+		if not game.map and not game.winner and String.isNotEmpty(game.resulttype) then return end
 		local row = MatchSummary.Row()
 				:addClass('brkts-popup-body-game')
 				:css('font-size', '0.75rem')
