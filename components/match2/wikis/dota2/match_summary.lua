@@ -22,6 +22,7 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local Opponent = Lua.import('Module:Opponent')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
@@ -106,7 +107,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 			},
 			CustomMatchSummary._createCheckMark(game.winner == 1),
-			Div{
+			HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-vertical-centered'},
 				children = {Logic.isNotEmpty(game.length) and game.length or ('Game ' .. gameIndex)},
 			},
