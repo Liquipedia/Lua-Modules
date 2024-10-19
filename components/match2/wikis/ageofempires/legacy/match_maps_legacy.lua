@@ -142,6 +142,7 @@ function MatchMapsLegacy.matchlistStart(frame)
 	matchlistVars:set('bracketid', args.id)
 	matchlistVars:set('matchListTitle', args.title or args[1] or 'Match List')
 	matchlistVars:set('width', args.width or '320px')
+	matchlistVars:set('matchsection', args.matchsection)
 	matchlistVars:set('hide', args.hide or 'true')
 	matchlistVars:set('store', store and 'true' or nil)
 	matchlistVars:set('gsl', args.gsl or matchlistVars:get('gsl'))
@@ -157,6 +158,7 @@ function MatchMapsLegacy.matchlistEnd()
 		id = bracketid,
 		title = matchlistVars:get('matchListTitle'),
 		width = matchlistVars:get('width'),
+		matchsection = matchlistVars:get('matchsection'),
 	}
 
 	local gsl = matchlistVars:get('gsl')
@@ -192,6 +194,7 @@ function MatchMapsLegacy.matchlistEnd()
 	matchlistVars:delete('bracketid')
 	matchlistVars:delete('matchListTitle')
 	matchlistVars:delete('width')
+	matchlistVars:delete('matchsection')
 	matchlistVars:delete('hide')
 	matchlistVars:delete('store')
 	matchlistVars:delete('gsl')
