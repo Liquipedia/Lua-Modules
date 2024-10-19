@@ -16,8 +16,9 @@ local String = require('Module:StringUtils')
 local Widget = Lua.import('Module:Widget')
 
 ---@param tag? string
+---@param specialMapping? fun(self: WidgetHtml)
 ---@return WidgetHtml
-local function createHtmlTag(tag)
+local function createHtmlTag(tag, specialMapping)
 	---@class WidgetHtml: Widget
 	---@operator call(table): WidgetHtml
 	local Html = Class.new(Widget)
@@ -25,11 +26,15 @@ local function createHtmlTag(tag)
 		classes = {},
 		css = {},
 		attributes = {},
+		tag = tag,
 	}
 
 	---@return Html
 	function Html:render()
-		local htmlNode = mw.html.create(tag)
+		if specialMapping then
+			specialMapping(self)
+		end
+		local htmlNode = mw.html.create(self.props.tag)
 
 		htmlNode:addClass(String.nilIfEmpty(table.concat(self.props.classes, ' ')))
 		htmlNode:css(self.props.css)
@@ -58,10 +63,12 @@ local function createHtmlTag(tag)
 	return Html
 end
 
-Widgets.Abbr = createHtmlTag('abbr')
+Widgets.Abbr = createHtmlTag('abbr', function (self)
+	self.props.attributes.title = self.props.attributes.title or self.props.title
+end)
 Widgets.Center = createHtmlTag('center')
 Widgets.Div = createHtmlTag('div')
-Widgets.Fragment = createHtmlTag()
+Widgets.Fragment = createHtmlTag(nil)
 Widgets.Li = createHtmlTag('li')
 Widgets.Span = createHtmlTag('span')
 Widgets.Table = createHtmlTag('table')
