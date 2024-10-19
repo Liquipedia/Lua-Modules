@@ -92,14 +92,11 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		end
 	end
 
-	-- Add Comment
-	local comment = {}
-	if Logic.isNotEmpty(game.comment) then
-		comment = {
-			MatchSummary.Break():create(),
-			HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-		}
-	end
+	-- Map Comment
+	local comment = Logic.isNotEmpty(game.comment) and {
+		MatchSummary.Break():create(),
+		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
+	} or {}
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
