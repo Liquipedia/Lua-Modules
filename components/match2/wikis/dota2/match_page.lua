@@ -21,7 +21,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
 local MatchPageWidgets = Lua.import('Module:Widget/Match/Page/All')
 
 local MatchPage = {}
@@ -63,10 +62,18 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local team = {players = {}}
-
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
+			local team = {
+				players = {},
+				scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-',
+				side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side']),
+				objectives = game.extradata['team' .. teamIdx .. 'objectives'],
+				picks = Array.filter(game.extradata.vetophase or {}, function(veto)
+					return veto.type == 'pick' and veto.team == teamIdx
+				end),
+				bans = Array.filter(game.extradata.vetophase or {}, function(veto)
+					return veto.type == 'ban' and veto.team == teamIdx
+				end),
+			}
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
 				local newPlayer = Table.mergeInto(player, {
@@ -80,33 +87,12 @@ function MatchPage.getByMatchId(props)
 				table.insert(team.players, newPlayer)
 			end
 
-			if game.finished then
-				-- Aggregate stats
-				team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
-				team.kills = MatchPage._sumItem(team.players, 'kills')
-				team.deaths = MatchPage._sumItem(team.players, 'deaths')
-				team.assists = MatchPage._sumItem(team.players, 'assists')
-
-				-- Set fields
-				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
-			end
-
-			team.picks = Array.filter(game.extradata.vetophase or {}, function(veto)
-				return veto.type == 'pick' and veto.team == teamIdx
-			end)
-			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
-				return veto.type == 'ban' and veto.team == teamIdx
-			end)
-
 			return team
 		end)
 		if game.finished and viewModel.opponents[game.winner] then
 			game.winnerName = viewModel.opponents[game.winner].name
 		end
 	end)
-
-	-- Add more opponent data field
-
 
 	viewModel.heroIcon = function(c)
 		local character = c
@@ -123,7 +109,7 @@ function MatchPage.getByMatchId(props)
 	local displayTitle = MatchPage.makeDisplayTitle(viewModel)
 	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
 
-	return Div{
+	return HtmlWidgets.Div{
 		children = {
 			MatchPage.header(viewModel),
 			MatchPage.games(viewModel),
@@ -204,9 +190,7 @@ end
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
 		return game.resultType ~= NOT_PLAYED
-	end), function(game)
-		return tostring(MatchPageWidgets.game(game))
-	end)
+	end), MatchPage.game)
 
 	if #games < 2 then
 		return tostring(games[1])
@@ -224,6 +208,83 @@ function MatchPage.games(model)
 	end)
 
 	return tostring(Tabs.dynamic(tabs))
+end
+
+---@param game table
+---@return Widget
+function MatchPage.game(game)
+	return HtmlWidgets.Fragment{
+		children = {
+			MatchPageWidgets.MatchPageGameDraft{
+				opponents = Array.map(game.teams, function(opponent)
+					return {
+						icon = opponent.icon,
+						picks = opponent.picks,
+						bans = opponent.bans,
+						side = opponent.side,
+					}
+				end),
+			},
+			MatchPageWidgets.MatchPageGameStats{
+				opponents = Array.map(game.teams, function(opponent)
+					return {
+						icon = opponent.icon,
+						side = opponent.side,
+						score = opponent.scoreDisplay,
+						kills = MatchPage._sumItem(opponent.players, 'kills'),
+						deaths = MatchPage._sumItem(opponent.players, 'deaths'),
+						assists = MatchPage._sumItem(opponent.players, 'assists'),
+						gold = MatchPage._sumItem(opponent.players, 'gold'),
+						towers = opponent.objectives.towers,
+						barracks = opponent.objectives.barracks,
+						roshans = opponent.objectives.roshans,
+					}
+				end),
+				length = game.length,
+				winner = game.winnerName,
+				children = {
+					{
+						render = function(team)
+							if not team.kills or not team.deaths or not team.assists then
+								return ''
+							end
+							return team.kills .. '/' .. team.deaths .. '/' .. team.assists
+						end,
+						icon = '<i class="fas fa-skull-crossbones"></i>',
+						text = 'KDA',
+					},
+					{
+						render = function(team) return MatchPage._abbreviateNumber(team.gold) end,
+						icon = '<i class="fas fa-coins"></i>',
+						text = 'Gold',
+					},
+					{
+						render = function(team) return team.towers end,
+						icon = '<i class="fas fa-chess-rook"></i>',
+						text = 'Towers',
+					},
+					{
+						render = function(team) return team.barracks end,
+						icon = '<i class="fas fa-warehouse"></i>',
+						text = 'Barracks',
+					},
+					{
+						render = function(team) return team.roshans end,
+						icon = '<i class="liquipedia-custom-icon liquipedia-custom-icon-roshan"></i>',
+						text = 'Roshan',
+					},
+				}
+			},
+			MatchPageWidgets.MatchPageGamePlayers{
+				opponents = Array.map(game.teams, function (opponent)
+					return {
+						icon = opponent.icon,
+						players = opponent.players,
+					}
+				end)
+			},
+		}
+	}
 end
 
 ---@param model table
