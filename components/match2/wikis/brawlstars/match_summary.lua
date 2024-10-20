@@ -115,10 +115,10 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 	for index = 1, numberOfBrawlers do
 		local brawlerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
+			:addClass('brkts-champion-icon')
 			:css('float', flip and 'right' or 'left')
 			:node(CharacterIcon.Icon{
 				character = brawlerData[index] or NO_CHARACTER,
-				class = 'brkts-champion-icon',
 				date = date,
 			})
 		if index == 1 then
