@@ -21,16 +21,26 @@ local MatchPageHeaderGameDraft = Class.new(Widget)
 
 ---@return Widget
 function MatchPageHeaderGameDraft:render()
+	if not self.props.draft then
+		return Fragment{}
+	end
+
+	local function getDraftsOfTeam(team, type)
+		return Array.filter(self.props.draft, function(veto)
+			return veto.type == type and veto.team == team
+		end)
+	end
+
 	return Fragment{children = {
 		Header{level = 3, children = 'Draft'},
 		Div{
 			classes = {'match-bm-game-veto-wrapper'},
-			children = Array.map(self.props.opponents, function(opponent)
+			children = Array.map(self.props.opponents, function(opponent, opponentIdx)
 				return MatchPageHeaderGameDraftTeam{
 					icon = opponent.icon,
-					picks = opponent.picks,
-					bans = opponent.bans,
-					side =opponent.side,
+					picks = getDraftsOfTeam(opponentIdx, 'pick'),
+					bans = getDraftsOfTeam(opponentIdx, 'ban'),
+					side = opponent.side,
 				}
 			end)
 		}

@@ -67,12 +67,6 @@ function MatchPage.getByMatchId(props)
 				scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-',
 				side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side']),
 				objectives = game.extradata['team' .. teamIdx .. 'objectives'],
-				picks = Array.filter(game.extradata.vetophase or {}, function(veto)
-					return veto.type == 'pick' and veto.team == teamIdx
-				end),
-				bans = Array.filter(game.extradata.vetophase or {}, function(veto)
-					return veto.type == 'ban' and veto.team == teamIdx
-				end),
 			}
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
@@ -216,11 +210,10 @@ function MatchPage.game(game)
 	return HtmlWidgets.Fragment{
 		children = {
 			MatchPageWidgets.MatchPageGameDraft{
+				draft = game.extradata.vetophase,
 				opponents = Array.map(game.teams, function(opponent)
 					return {
 						icon = opponent.icon,
-						picks = opponent.picks,
-						bans = opponent.bans,
 						side = opponent.side,
 					}
 				end),
