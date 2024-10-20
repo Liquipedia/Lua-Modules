@@ -21,6 +21,10 @@ local MatchPageHeaderGameStats = Class.new(Widget)
 
 ---@return Widget
 function MatchPageHeaderGameStats:render()
+	local function getIconFromTeamTemplate(template)
+		return template and mw.ext.TeamTemplate.teamicon(template) or nil
+	end
+
 	local team1, team2 = self.props.opponents[1], self.props.opponents[2]
 	return Fragment{children = {
 		Header{level = 3, children = 'Team Stats'},
@@ -44,7 +48,7 @@ function MatchPageHeaderGameStats:render()
 						Div{
 							classes = {'match-bm-team-stats-team'},
 							children = {
-								Div{classes = {'match-bm-team-stats-team-logo'}, children = team1.icon},
+								Div{classes = {'match-bm-team-stats-team-logo'}, children = getIconFromTeamTemplate(team1)},
 								Div{classes = {'match-bm-team-stats-team-side'}, children = team1.side},
 								Div{classes = {'match-bm-team-stats-team-state', 'state--'.. team1.score}, children = team1.score},
 							},
@@ -63,7 +67,7 @@ function MatchPageHeaderGameStats:render()
 						Div{
 							classes = {'match-bm-team-stats-team'},
 							children = {
-								Div{classes = {'match-bm-team-stats-team-logo'}, children = team2.icon},
+								Div{classes = {'match-bm-team-stats-team-logo'}, children = getIconFromTeamTemplate(team1)},
 								Div{classes = {'match-bm-team-stats-team-side'}, children = team2.side},
 								Div{classes = {'match-bm-team-stats-team-state', 'state--'.. team2.score}, children = team2.score},
 							},

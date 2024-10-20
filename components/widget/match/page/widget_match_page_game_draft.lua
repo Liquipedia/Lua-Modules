@@ -37,7 +37,7 @@ function MatchPageHeaderGameDraft:render()
 			classes = {'match-bm-game-veto-wrapper'},
 			children = Array.map(self.props.opponents, function(opponent, opponentIdx)
 				return MatchPageHeaderGameDraftTeam{
-					icon = opponent.icon,
+					template = opponent.template,
 					picks = getDraftsOfTeam(opponentIdx, 'pick'),
 					bans = getDraftsOfTeam(opponentIdx, 'ban'),
 					side = opponent.side,

@@ -21,6 +21,10 @@ local MatchPageHeaderGamePlayers = Class.new(Widget)
 
 ---@return Widget
 function MatchPageHeaderGamePlayers:render()
+	local function getIconFromTeamTemplate(template)
+		return template and mw.ext.TeamTemplate.teamicon(template) or nil
+	end
+
 	local team1, team2 = self.props.opponents[1], self.props.opponents[2]
 	return Fragment{children = {
 		Header{level = 3, children = 'Player Performance'},
@@ -32,7 +36,7 @@ function MatchPageHeaderGamePlayers:render()
 					children = {
 						Div{
 							classes = {'match-bm-lol-players-team-header'},
-							children = {team1.icon, unpack(Array.map(team1.players, MatchPageHeaderGamePlayer))}
+							children = {getIconFromTeamTemplate(team1.template), unpack(Array.map(team1.players, MatchPageHeaderGamePlayer))}
 						},
 					},
 				},
@@ -41,7 +45,7 @@ function MatchPageHeaderGamePlayers:render()
 					children = {
 						Div{
 							classes = {'match-bm-lol-players-team-header'},
-							children = {team1.icon, unpack(Array.map(team2.players, MatchPageHeaderGamePlayer))}
+							children = {getIconFromTeamTemplate(team2.template), unpack(Array.map(team2.players, MatchPageHeaderGamePlayer))}
 						},
 					},
 				},

@@ -67,6 +67,7 @@ function MatchPage.getByMatchId(props)
 				scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-',
 				side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side']),
 				objectives = game.extradata['team' .. teamIdx .. 'objectives'],
+				template = viewModel.opponents[teamIdx].template,
 			}
 
 			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
@@ -83,9 +84,6 @@ function MatchPage.getByMatchId(props)
 
 			return team
 		end)
-		if game.finished and viewModel.opponents[game.winner] then
-			game.winnerName = viewModel.opponents[game.winner].name
-		end
 	end)
 
 	viewModel.heroIcon = function(c)
@@ -213,7 +211,7 @@ function MatchPage.game(game)
 				draft = game.extradata.vetophase,
 				opponents = Array.map(game.teams, function(opponent)
 					return {
-						icon = opponent.icon,
+						template = opponent.template,
 						side = opponent.side,
 					}
 				end),
@@ -221,7 +219,7 @@ function MatchPage.game(game)
 			MatchPageWidgets.MatchPageGameStats{
 				opponents = Array.map(game.teams, function(opponent)
 					return {
-						icon = opponent.icon,
+						template = opponent.template,
 						side = opponent.side,
 						score = opponent.scoreDisplay,
 						kills = MatchPage._sumItem(opponent.players, 'kills'),
@@ -234,7 +232,7 @@ function MatchPage.game(game)
 					}
 				end),
 				length = game.length,
-				winner = game.winnerName,
+				winner = (game.teams[game.winner] or {}).name,
 				children = {
 					{
 						render = function(team)
@@ -271,7 +269,7 @@ function MatchPage.game(game)
 			MatchPageWidgets.MatchPageGamePlayers{
 				opponents = Array.map(game.teams, function (opponent)
 					return {
-						icon = opponent.icon,
+						template = opponent.template,
 						players = opponent.players,
 					}
 				end)

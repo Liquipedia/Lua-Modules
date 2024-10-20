@@ -20,12 +20,16 @@ local MatchPageHeaderGameDraftTeam = Class.new(Widget)
 
 ---@return Widget
 function MatchPageHeaderGameDraftTeam:render()
+	local function getIconFromTeamTemplate(template)
+		return template and mw.ext.TeamTemplate.teamicon(template) or nil
+	end
+
 	return Div{
 		classes = {'match-bm-lol-game-veto-overview-team'},
 		children = {
 			Div{
 				classes = {'match-bm-game-veto-overview-team-header'},
-				children = {self.props.icon},
+				children = getIconFromTeamTemplate{self.props.template},
 			},
 			Div{
 				classes = {'match-bm-game-veto-overview-team-veto'},
