@@ -17,7 +17,7 @@ local SquadWidget = Lua.import('Module:Widget/Squad/Core')
 local SquadTldb = Class.new(SquadWidget)
 
 ---@param type SquadType
----@return WidgetTr
+---@return Widget
 function SquadTldb:header(type)
 	return Widgets.Tr{
 		classes = {'HeaderRow'},
@@ -33,7 +33,7 @@ end
 
 ---@param type SquadType
 ---@param title string?
----@return WidgetTr?
+---@return Widget?
 function SquadTldb:_title(type, title)
 	return nil
 end
