@@ -177,7 +177,7 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadType: integer):WidgetTr
+---@param rowCreator fun(player: table, squadType: integer):Widget
 ---@return Widget
 function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
@@ -204,7 +204,7 @@ end
 ---@param players table[]
 ---@param squadType SquadType
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadType: integer):WidgetTr
+---@param rowCreator fun(person: table, squadType: integer):Widget
 ---@param customTitle string?
 ---@param personMapper? fun(person: table): table
 ---@return Widget
@@ -226,7 +226,7 @@ function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, 
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadType: integer):WidgetTr
+---@return fun(person: table, squadType: integer):Widget
 function SquadUtils.defaultRow(squadRowClass)
 	return function(person, squadType)
 		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
