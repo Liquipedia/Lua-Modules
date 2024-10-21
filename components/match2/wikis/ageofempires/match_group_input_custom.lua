@@ -44,6 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games)
@@ -74,7 +75,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
 	match.stream = Streams.processStreams(match)
-	match.links = CustomMatchGroupInput._getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -227,23 +227,6 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 	Variables.varDefine('tournament_maps', data.maps)
 
 	return match.game or data.game, Logic.emptyOr(mapsInfo, (Json.parse(data.maps)))
-end
-
----@param match table
-function CustomMatchGroupInput._getLinks(match)
-	local links = {}
-
-	match.civdraft1 = match.civdraft1 or match.civdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'civdraft') do
-		links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-
-	match.mapdraft1 = match.mapdraft1 or match.mapdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'mapdraft') do
-		links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-
-	return links
 end
 
 ---@param maps table[]

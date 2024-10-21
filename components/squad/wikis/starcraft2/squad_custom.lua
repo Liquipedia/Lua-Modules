@@ -48,7 +48,7 @@ end
 
 ---@param person table
 ---@param squadType integer
----@return WidgetTr
+---@return Widget
 function CustomSquad._playerRow(person, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
 	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())

@@ -40,6 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 
@@ -70,7 +71,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -142,16 +142,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		faceit = match.faceit and ('https://www.faceit.com/en/halo_infinite/room/' .. match.faceit) or nil,
-		halodatahive = match.halodatahive and ('https://halodatahive.com/Series/Summary/' .. match.halodatahive) or nil,
-		stats = match.stats,
-	}
 end
 
 ---@param match table

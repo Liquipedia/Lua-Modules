@@ -190,7 +190,7 @@ function SquadRow:newteam()
 	return self
 end
 
----@return WidgetTr
+---@return Widget
 function SquadRow:create()
 	-- Set row background for certain roles
 	local backgrounds = {'Player'}

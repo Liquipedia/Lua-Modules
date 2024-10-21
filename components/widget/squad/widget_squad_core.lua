@@ -42,7 +42,7 @@ end
 
 ---@param type SquadType
 ---@param title string?
----@return WidgetTr?
+---@return Widget?
 function Squad:_title(type, title)
 	local defaultTitle
 	if type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE then
@@ -63,7 +63,7 @@ function Squad:_title(type, title)
 end
 
 ---@param type SquadType
----@return WidgetTr
+---@return Widget
 function Squad:_header(type)
 	local isInactive = type == SquadUtils.SquadType.INACTIVE or type == SquadUtils.SquadType.FORMER_INACTIVE
 	local isFormer = type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE

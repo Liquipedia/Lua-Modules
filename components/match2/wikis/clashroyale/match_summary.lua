@@ -437,7 +437,8 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 				:addClass('brkts-champion-icon')
 				:node(CharacterIcon.Icon{
 					character = card,
-					date = date
+					date = date,
+					size = '48px'
 				})
 			)
 		end

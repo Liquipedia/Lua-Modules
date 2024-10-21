@@ -79,7 +79,7 @@ end
 ---@param person table
 ---@param squadType integer
 ---@param showNumber boolean
----@return WidgetTr
+---@return Widget
 function CustomSquad._playerRow(person, squadType, showNumber)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
 	squadPerson.extradata.number = person.number

@@ -47,6 +47,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, #opponents)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -75,7 +76,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -147,12 +147,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {}
 end
 
 ---@param match table
