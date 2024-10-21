@@ -52,12 +52,10 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Hero Bans
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-	if characterBansData then
-		body.root:node(MatchSummaryWidgets.CharacterBanTable{
-			bans = characterBansData,
-			date = match.date,
-		})
-	end
+	body.root:node(MatchSummaryWidgets.CharacterBanTable{
+		bans = characterBansData,
+		date = match.date,
+	})
 
 	return body
 end
