@@ -40,7 +40,7 @@ local DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 ---@return Html
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
-	item.args.image = item.args.image or 'Deadlock_gameasset_Item ' .. item.args.itemname .. '.png'
+	item.args.image = item.args.image or 'Deadlock_gameasset_Item ' .. item.args.name .. '.png'
 	item.args.subheader = item:_getCostDisplay()
 	item.args.imagesize = 100
 	item:setWidgetInjector(CustomInjector(item))
@@ -144,7 +144,7 @@ end
 ---@param args table
 ---@return string?
 function CustomItem.nameDisplay(args)
-	return args.itemname
+	return args.name
 end
 
 ---@return string
@@ -206,7 +206,7 @@ end
 function CustomItem:setLpdbData(args)
 	local lpdbData = {
 		type = 'item',
-		name = args.itemname or self.pagename,
+		name = args.name or self.pagename,
 		image = args.image,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
 			cost = args.itemcost,
@@ -214,7 +214,7 @@ function CustomItem:setLpdbData(args)
 			removed = tostring(Logic.readBool(args.removed)),
 		})
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. (args.itemname or self.pagename), lpdbData)
+	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. (args.name or self.pagename), lpdbData)
 end
 
 return CustomItem
