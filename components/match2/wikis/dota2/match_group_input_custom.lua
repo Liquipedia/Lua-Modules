@@ -118,7 +118,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	match.games = games
 	match.opponents = opponents
 
-	match.extradata = MatchFunctions.getExtraData(match, opponents)
+	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
@@ -211,9 +211,8 @@ function MatchFunctions.getLinks(match, games, opponents)
 end
 
 ---@param match table
----@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match, opponents)
+function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
