@@ -51,12 +51,13 @@ end
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+	local casterRow = MatchSummary.makeCastersRow(match.extradata.casters)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		unpack(Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date))),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummary.makeCastersRow(match.extradata.casters):create()
+		casterRow and casterRow:create() or nil
 	)}
 end
 
