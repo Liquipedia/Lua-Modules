@@ -50,6 +50,7 @@ function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local showMatchPage = MatchPage.isEnabledFor(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
+	local casterRow = MatchSummary.makeCastersRow(match.extradata.casters)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
@@ -57,7 +58,7 @@ function CustomMatchSummary.createBody(match)
 		unpack(Array.map(match.games, CustomMatchSummary._createGame)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummary.makeCastersRow(match.extradata.casters):create()
+		casterRow and casterRow:create() or nil
 	)}
 end
 
