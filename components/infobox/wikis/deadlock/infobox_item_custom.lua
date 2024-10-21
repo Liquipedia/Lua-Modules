@@ -125,14 +125,13 @@ function CustomItem:getWikiCategories(args)
 
 	if String.isNotEmpty(args.category) then
 		table.insert(categories, args.category .. ' Items')
-	end		
+	end
 
 	local possibleCategories = {
 		['Items with Active Abilities'] = 'active',
 		['Items with Passive Abilities'] = 'passive',
 	}
-	
-	
+
 	for category, requiredArg in pairs(possibleCategories) do
 		if String.isNotEmpty(args[requiredArg]) then
 			table.insert(categories, category)
