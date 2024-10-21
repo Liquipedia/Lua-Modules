@@ -28,12 +28,6 @@ local Center = Widgets.Center
 local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
-local CATEGORY_DISPLAY = {
-	['weapon'] = 'Weapon [[Category:Weapon Items]]',
-	['vitality'] = 'Vitality [[Category:Vitality Items]]',
-	['spirit'] = 'Spirit [[Category:Spirit Items]]',
-}
-
 local DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 
 ---@param frame Frame
@@ -103,7 +97,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isEmpty(args.category) and String.isEmpty(args.tier) then return {} end
 		return {
 			Title{children = 'Type'},
-			Cell{name = 'Category', children = {caller:_categoryDisplay()}},
+			Cell{name = 'Category', children = {args.category}},
 			Cell{name = 'Tier', children = {args.tier}},
 		}
 	elseif id == 'recipe' then
@@ -129,10 +123,16 @@ function CustomItem:getWikiCategories(args)
 		table.insert(categories, 'Movement Speed Items')
 	end
 
+	if String.isNotEmpty(args.category) then
+		table.insert(categories, args.category .. ' Items')
+	end		
+
 	local possibleCategories = {
 		['Items with Active Abilities'] = 'active',
 		['Items with Passive Abilities'] = 'passive',
 	}
+	
+	
 	for category, requiredArg in pairs(possibleCategories) do
 		if String.isNotEmpty(args[requiredArg]) then
 			table.insert(categories, category)
@@ -184,11 +184,6 @@ function CustomItem._positivePercentDisplay(caller, base)
 	end
 	---@cast base -nil
 	return '+ ' .. caller.args[base] .. '%'
-end
-
----@return string?
-function CustomItem:_categoryDisplay()
-	return CATEGORY_DISPLAY[string.lower(self.args.category or '')]
 end
 
 ---@param attributeCells {name: string, parameter: string?, funct: string?}[]
