@@ -55,10 +55,12 @@ end
 ---@param props {bracketId: string, config: table?}
 ---@return Html
 function BracketTemplate.BracketContainer(props)
-	local bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId) --[[@as MatchGroupUtilBracket]]
-	Array.forEach(bracket.matches or {}, function(match)
-		match.opponents = {Opponent.blank()}
+	local matchRecords = MatchGroupUtil.fetchMatchRecords(props.bracketId)
+	Array.forEach(matchRecords, function(match)
+		match.match2opponents = {{type = Opponent.literal, name = '', match2players = {}}}
 	end)
+	local bracket = MatchGroupUtil.makeMatchGroup(matchRecords) --[[@as MatchGroupUtilBracket]]
+
 	return BracketDisplay.Bracket({
 		bracket = bracket,
 		config = Table.merge(props.config, {
