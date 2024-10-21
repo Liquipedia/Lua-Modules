@@ -38,6 +38,9 @@ local PREFIXES = {
 		player = 'https://www.b5csgo.com/personalCenter/',
 		team = 'https://www.b5csgo.com/clan/'
 	},
+	ballchasing = {
+		match = 'https://ballchasing.com/group/',
+	},
 	battlefy = {'https://www.battlefy.com/'},
 	bilibili = {
 		'https://space.bilibili.com/',
@@ -46,17 +49,21 @@ local PREFIXES = {
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
+	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	cc = {'https://cc.163.com/'},
+	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
 	challengermode = {
 		'https://www.challengermode.com/tournaments/',
 		player = 'https://www.challengermode.com/users/',
-		team = 'https://www.challengermode.com/teams/'
+		team = 'https://www.challengermode.com/teams/',
+		match = 'https://www.challengermode.com/games/',
 	},
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',
 	},
 	chzzk = {'https://chzzk.naver.com/live/'},
+	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
 	corestrike = {'https://corestrike.gg/lookup/'},
 	cfs = {'https://www.crossfirestars.com/'},
@@ -66,6 +73,7 @@ local PREFIXES = {
 		team = 'https://www.datdota.com/teams/'
 	},
 	daumcafe = {'http://cafe.daum.net/'},
+	dbstats = {match = 'https://quakelife.ru/diabotical/stats/matches/?matches='},
 	discord = {'https://discord.gg/'},
 	dlive = {'https://www.dlive.tv/'},
 	dotabuff = {
@@ -76,22 +84,26 @@ local PREFIXES = {
 	douyin = {'https://live.douyin.com/'},
 	douyin_page = {'https://v.douyin.com/'},
 	douyu = {'https://www.douyu.com/'},
+	ebattle = {match = 'https://www.ebattle.gg/turnier/match/'},
 	esea = {
 		'https://play.esea.net/events/',
 		player = 'https://play.esea.net/users/',
-		team = 'https://play.esea.net/teams/'
+		team = 'https://play.esea.net/teams/',
+		match = 'https://play.esea.net/match/',
 	},
 	['esea-d'] = {'https://play.esea.net/league/standings?divisionId='},
 	esl = {
 		'',
 		team = 'https://play.eslgaming.com/team/',
 		player = 'https://play.eslgaming.com/player/',
+		match = 'https://play.eslgaming.com/match/',
 	},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
 		'',
 		team = 'https://etf2l.org/teams/',
 		player = 'https://etf2l.org/forum/user/',
+		match = 'https://etf2l.org/matches/',
 	},
 	facebook = {'https://facebook.com/'},
 	['facebook-gaming'] = {'https://fb.gg/'},
@@ -103,14 +115,17 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
+	factor = {match = 'https://www.factor.gg/match/'},
 	fanclub = {''},
 	geoguessr = {'https://www.geoguessr.com/'},
+	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
 	gplus = {'http://plus.google.com/-plus'},
 	halodatahive = {
 		'https://halodatahive.com/Tournament/Detail/',
 		team = 'https://halodatahive.com/Team/Detail/',
 		player = 'https://halodatahive.com/Player/Detail/',
+		match = 'https://halodatahive.com/Series/Summary/',
 	},
 	home = {''},
 	haojiao = {
@@ -121,6 +136,8 @@ local PREFIXES = {
 	huyatv = {'https://www.huya.com/'},
 	iccup = {'http://www.iccup.com/starcraft/gamingprofile/'},
 	instagram = {'https://www.instagram.com/'},
+	interview = {'', match = ''},
+	jcg = {match = 'https://web.archive.org/web/ow.j-cg.com/compe/view/match/'},
 	kick = {'https://www.kick.com/'},
 	kuaishou = {'https://live.kuaishou.com/u/'},
 	['letsplaylive-old'] = {
@@ -132,13 +149,17 @@ local PREFIXES = {
 		'https://gg.letsplay.live/tournament/',
 		team = 'https://gg.letsplay.live/view-team/',
 		player = 'https://gg.letsplay.live/profile/view-stats/',
+		match = 'https://old.letsplay.live/match/',
 	},
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
+	lrthread = {'', match = ''},
+	mapdraft = {match = 'https://aoe2cm.net/draft/'},
 	matcherino = {'https://matcherino.com/tournaments/'},
 	matcherinolink = {'https://matcherino.com/t/'},
 	mildom = {'https://www.mildom.com/'},
+	mplink = {match = 'https://osu.ppy.sh/community/matches/'}, -- Should this key be renamed?
 	niconico = {'https://www.nicovideo.jp/'},
 	nimotv = {'https://www.nimo.tv/'},
 	['nwc3l'] = {
@@ -147,27 +168,55 @@ local PREFIXES = {
 		player = 'https://nwc3l.com/profile/',
 	},
 	openrec = {'https://www.openrec.tv/live/'},
+	opl = {
+		match = 'https://www.opleague.eu/match/'
+	},
 	osu = {
 		'https://osu.ppy.sh/',
 		player = 'https://osu.ppy.sh/users/',
 	},
+	overgg = {match = 'https://www.over.gg/'},
+	owl = {
+		match = 'https://web.archive.org/web/overwatchleague.com/en-us/match/',
+	},
+	ozf = {match = 'https://warzone.ozfortress.com/matches/'},
 	patreon = {'https://www.patreon.com/'},
+	pf = {match = 'https://www.plusforward.net/quake/post/'},
 	playlist = {''},
-	reddit = {'https://www.reddit.com/user/'},
+	preview = {'', match = ''},
+	qrindr = {match = 'https://qrindr.com/match/'},
+	quakehistory = {match = 'http://www.quakehistory.com/en/matches/'},
+	r6esports = {
+		match = 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/',
+	},
+	reddit = {
+		'https://www.reddit.com/user/',
+		match = 'https://redd.it/',
+	},
 	replay = {''},
+	recap = {'', match = ''},
+	review = {'', match = ''},
 	rgl = {
 		'https://rgl.gg/Public/LeagueTable?s=',
 		team = 'https://rgl.gg/Public/Team?t=',
 		player = 'https://rgl.gg/Public/PlayerProfile?p=',
+		match = 'https://rgl.gg/Public/Match.aspx?m=',
 	},
 	rooter = {'https://rooter.gg/'},
-	royaleapi = {'https://royaleapi.com/player/'},
+	royaleapi = {
+		'https://royaleapi.com/player/',
+		match = 'https://royaleapi.com/'
+	},
 	rules = {''},
-	shift = {'https://www.shiftrle.gg/events/'},
+	shift = {
+		'https://www.shiftrle.gg/events/',
+		match = 'https://www.shiftrle.gg/matches/',
+	},
 	siegegg = {
 		'https://siege.gg/competitions/',
 		team = 'https://siege.gg/teams/',
 		player = 'https://siege.gg/players/',
+		match = 'https://siege.gg/matches/',
 	},
 	sk = {'https://sk-gaming.com/member/'},
 	smashboards = {'https://smashboards.com/'},
@@ -183,8 +232,10 @@ local PREFIXES = {
 	strikr = {'https://strikr.pro/pilot/'},
 	privsteam = {'https://steamcommunity.com/groups/'},
 	pubsteam = {'https://steamcommunity.com/groups/'},
+	smiteesports = {match = 'https://www.smiteesports.com/matches/'},
 	spotify = {'https://open.spotify.com/'},
 	steamalternative = {'https://steamcommunity.com/profiles/'},
+	stats = {'', match = ''},
 	stratz = {
 		'https://stratz.com/leagues/',
 		player = 'https://stratz.com/players/',
@@ -192,9 +243,11 @@ local PREFIXES = {
 	},
 	stream = {''},
 	telegram = {'https://t.me/'},
+	tespa = {match = 'https://web.archive.org/web/compete.tespa.org/tournament/'},
 	tftv = {
 		'https://www.teamfortress.tv/',
 		player = 'https://www.teamfortress.tv/user/',
+		match = 'http://tf.gg/',
 	},
 	tiktok = {'https://tiktok.com/@'},
 	tlpd = {''},
@@ -229,10 +282,12 @@ local PREFIXES = {
 	vlr = {
 		'https://www.vlr.gg/event/',
 		team = 'https://www.vlr.gg/team/',
-		player = 'https://www.vlr.gg/player/'
+		player = 'https://www.vlr.gg/player/',
+		match = 'https://vlr.gg/',
 	},
 	vod = {''},
 	weibo = {'https://weibo.com/'},
+	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
 	youtube = {'https://www.youtube.com/'},
 	zhangyutv = {'http://www.zhangyu.tv/'},
@@ -248,6 +303,7 @@ local SUFFIXES = {
 		'',
 		stream = '/live',
 	},
+	gol = {match = '/page-game/'},
 	iccup = {'.html'},
 	['faceit-c'] = {'/'},
 	['faceit-hub'] = {'/'},
@@ -341,8 +397,9 @@ end
 ---@param platform string
 ---@param id string?
 ---@param variant string?
+---@param fallbackToBase boolean? #defaults to true
 ---@return string
-function Links.makeFullLink(platform, id, variant)
+function Links.makeFullLink(platform, id, variant, fallbackToBase)
 	if id == nil or id == '' then
 		return ''
 	end
@@ -353,20 +410,29 @@ function Links.makeFullLink(platform, id, variant)
 		return ''
 	end
 
-	local prefix = prefixData[variant] or prefixData[1]
-
 	local suffixData = SUFFIXES[platform] or {}
-	local suffix = suffixData[variant] or suffixData[1] or ''
 
-	return prefix .. id .. suffix
+	local prefix = prefixData[variant]
+	local suffix = suffixData[variant]
+	if fallbackToBase ~= false then
+		prefix = prefix or prefixData[1]
+		suffix = suffix or suffixData[1]
+	end
+
+	if not prefix then
+		return ''
+	end
+
+	return prefix .. id .. (suffix or '')
 end
 
 ---@param links {[string]: string}
 ---@param variant string?
+---@param fallbackToBase boolean? #defaults to true
 ---@return {[string]: string}
-function Links.makeFullLinksForTableItems(links, variant)
+function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 	return Table.map(links, function(key, item)
-		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant)
+		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant, fallbackToBase)
 	end)
 end
 
@@ -386,5 +452,6 @@ function Links.makeIcon(key, size)
 	return '<i class="lp-icon lp-' .. (ICON_KEYS_TO_RENAME[key] or key)
 		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
+
 
 return Class.export(Links, {frameOnly = true})
