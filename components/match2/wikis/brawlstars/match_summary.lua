@@ -120,6 +120,7 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 			:node(CharacterIcon.Icon{
 				character = brawlerData[index] or NO_CHARACTER,
 				date = date,
+				size = '48px'
 			})
 		if index == 1 then
 			brawlerDisplay:css('padding-left', '2px')
