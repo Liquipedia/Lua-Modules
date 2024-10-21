@@ -13,16 +13,13 @@ local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local Opponent = Lua.import('Module:Opponent')
 
 local MAX_NUM_BANS = 5
-local NUM_GODS_PICK_TEAM = 5
-local NUM_GODS_PICK_SOLO = 1
+local NUM_GODS_PICK = 5
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
@@ -79,20 +76,11 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local numberOfGods = NUM_GODS_PICK_TEAM
-	if game.mode == Opponent.solo then
-		numberOfGods = NUM_GODS_PICK_SOLO
-	end
-
-	local godsData = {{}, {}}
-	for godIndex = 1, numberOfGods do
-		if String.isNotEmpty(extradata['team1god' .. godIndex]) then
-			godsData[1][godIndex] = extradata['team1god' .. godIndex]
-		end
-		if String.isNotEmpty(extradata['team2god' .. godIndex]) then
-			godsData[2][godIndex] = extradata['team2god' .. godIndex]
-		end
-	end
+	-- TODO: Change to use participant data
+	local characterData = {
+		MatchSummary.buildCharacterList(extradata, 'team1god', NUM_GODS_PICK),
+		MatchSummary.buildCharacterList(extradata, 'team2god', NUM_GODS_PICK),
+	}
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '80%')
@@ -101,7 +89,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = false,
-		characters = godsData[1],
+		characters = characterData[1],
 		date = date,
 		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 	})
@@ -116,7 +104,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = true,
-		characters = godsData[2],
+		characters = characterData[2],
 		date = date,
 		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 	})

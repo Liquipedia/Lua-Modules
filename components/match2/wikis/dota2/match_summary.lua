@@ -13,7 +13,6 @@ local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchPage = Lua.import('Module:MatchPage')
@@ -68,21 +67,11 @@ end
 function CustomMatchSummary._createGame(game, gameIndex)
 	local extradata = game.extradata or {}
 
-	local heroesData = {{}, {}}
-	for heroIndex = 1, NUM_HEROES_PICK do
-		if String.isNotEmpty(extradata['team1hero' .. heroIndex]) then
-			heroesData[1][heroIndex] = extradata['team1hero' .. heroIndex]
-		end
-		if String.isNotEmpty(extradata['team2hero' .. heroIndex]) then
-			heroesData[2][heroIndex] = extradata['team2hero' .. heroIndex]
-		end
-	end
-
-	-- Map Comment
-	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummaryWidgets.Break{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-	} or {}
+	-- TODO: Change to use participant data
+	local characterData = {
+		MatchSummary.buildCharacterList(extradata, 'team1hero', NUM_HEROES_PICK),
+		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
+	}
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
@@ -90,7 +79,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		children = {
 			MatchSummaryWidgets.Characters{
 				flipped = false,
-				characters = heroesData[1],
+				characters = characterData[1],
 				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
@@ -101,7 +90,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.Characters{
 				flipped = true,
-				characters = heroesData[2],
+				characters = characterData[2],
 				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 			},
 			unpack(comment)

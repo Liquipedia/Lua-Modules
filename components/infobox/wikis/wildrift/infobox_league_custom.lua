@@ -60,7 +60,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.riotpremier) and 'true' or nil
+	self.data.publishertier = Logic.readBool(args.riotpremier)
 end
 
 ---@param args table
@@ -72,12 +72,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
 	Variables.varDefine('tournament_riot_premier', args.riotpremier)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.riotpremier)
 end
 
 ---@return string?

@@ -15,7 +15,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local ExternalLinks = require('Module:ExternalLinks')
-local String = require('Module:StringUtils')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -95,24 +94,13 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local championsData = {{}, {}}
-	local championsDataIsEmpty = true
-	for champIndex = 1, NUM_CHAMPIONS_PICK do
-		if String.isNotEmpty(extradata['team1champion' .. champIndex]) then
-			championsData[1][champIndex] = extradata['team1champion' .. champIndex]
-			championsDataIsEmpty = false
-		end
-		if String.isNotEmpty(extradata['team2champion' .. champIndex]) then
-			championsData[2][champIndex] = extradata['team2champion' .. champIndex]
-			championsDataIsEmpty = false
-		end
-	end
+	-- TODO: Change to use participant data
+	local characterData = {
+		MatchSummary.buildCharacterList(extradata, 'team1champion', NUM_CHAMPIONS_PICK),
+		MatchSummary.buildCharacterList(extradata, 'team2champion', NUM_CHAMPIONS_PICK),
+	}
 
-	if
-		Logic.isEmpty(game.length) and
-		Logic.isEmpty(game.winner) and
-		championsDataIsEmpty
-	then
+	if Logic.isEmpty(game.length) and Logic.isEmpty(game.winner) and Logic.isDeepEmpty(characterData) then
 		return nil
 	end
 
@@ -123,7 +111,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = false,
 		date = date,
-		characters = championsData[1],
+		characters = characterData[1],
 		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 	})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
@@ -138,7 +126,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = true,
 		date = date,
-		characters = championsData[2],
+		characters = characterData[2],
 		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 	})
 

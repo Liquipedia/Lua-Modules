@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div, Abbr, Tr, Th, Td = HtmlWidgets.Div, HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
-local Table = HtmlWidgets.Table
 local Characters = Lua.import('Module:Widget/Match/Summary/Characters')
 
 ---@class MatchSummaryCharacterBanTable: Widget
@@ -26,12 +25,12 @@ MatchSummaryCharacterBanTable.defaultProps = {
 
 ---@return Widget[]?
 function MatchSummaryCharacterBanTable:render()
-	if Logic.isEmpty(self.props.bans) then
+	if Logic.isDeepEmpty(self.props.bans) then
 		return nil
 	end
 
 	local rows = Array.map(self.props.bans, function(banData, gameNumber)
-		if Logic.isEmpty(banData) then
+		if Logic.isDeepEmpty(banData) then
 			return nil
 		end
 		return Tr{
@@ -58,7 +57,7 @@ function MatchSummaryCharacterBanTable:render()
 	return Div{
 		classes = {'brkts-popup-mapveto'},
 		children = {
-			Table{
+			HtmlWidgets.Table{
 				classes = {'wikitable-striped', 'collapsible', 'collapsed'},
 				children = {
 					Tr{children = {

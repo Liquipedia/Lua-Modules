@@ -846,32 +846,25 @@ end
 
 ---@param games table[]
 ---@param maxNumberOfBans integer
----@return {[1]: string[]?, [2]: string[]?}[]?
+---@return {[1]: string[], [2]: string[]}[]
 function MatchSummary.buildCharacterBanData(games, maxNumberOfBans)
-	local matchHasBans = false
-	local gamesBans = Array.map(games, function(game)
+	return Array.map(games, function(game)
 		local extradata = game.extradata or {}
-		local banData = {{}, {}}
-		local gameHasBans = false
-		for index = 1, maxNumberOfBans do
-			local team1ban = String.nilIfEmpty(extradata['team1ban' .. index])
-			local team2ban = String.nilIfEmpty(extradata['team2ban' .. index])
-			if team1ban or team2ban then
-				gameHasBans = true
-			end
-			table.insert(banData[1], team1ban)
-			table.insert(banData[2], team2ban)
-		end
-
-		if gameHasBans then
-			matchHasBans = true
-			return banData
-		else
-			return {}
-		end
+		return {
+			MatchSummary.buildCharacterList(extradata, 'team1ban', maxNumberOfBans),
+			MatchSummary.buildCharacterList(extradata, 'team2ban', maxNumberOfBans),
+		}
 	end)
+end
 
-	return matchHasBans and gamesBans or nil
+---@param data table
+---@param prefix string
+---@param maxNumberOfCharacters integer
+---@return string[]
+function MatchSummary.buildCharacterList(data, prefix, maxNumberOfCharacters)
+	return Array.map(Array.range(1, maxNumberOfCharacters), function(index)
+		return data[prefix .. index]
+	end)
 end
 
 return MatchSummary

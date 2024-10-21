@@ -13,18 +13,15 @@ local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchPage = Lua.import('Module:MatchPage')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local Opponent = Lua.import('Module:Opponent')
 
 local MAX_NUM_BANS = 5
-local NUM_HEROES_PICK_TEAM = 5
-local NUM_HEROES_PICK_SOLO = 1
+local NUM_HEROES_PICK = 5
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
@@ -92,20 +89,11 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local numberOfHeroes = NUM_HEROES_PICK_TEAM
-	if game.mode == Opponent.solo then
-		numberOfHeroes = NUM_HEROES_PICK_SOLO
-	end
-
-	local heroesData = {{}, {}}
-	for heroIndex = 1, numberOfHeroes do
-		if String.isNotEmpty(extradata['team1champion' .. heroIndex]) then
-			heroesData[1][heroIndex] = extradata['team1champion' .. heroIndex]
-		end
-		if String.isNotEmpty(extradata['team2champion' .. heroIndex]) then
-			heroesData[2][heroIndex] = extradata['team2champion' .. heroIndex]
-		end
-	end
+	-- TODO: Change to use participant data
+	local characterData = {
+		MatchSummary.buildCharacterList(extradata, 'team1champion', NUM_HEROES_PICK),
+		MatchSummary.buildCharacterList(extradata, 'team2champion', NUM_HEROES_PICK),
+	}
 
 	row:addClass('brkts-popup-body-game')
 		:css('font-size', '80%')
@@ -115,7 +103,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = false,
 		date = date,
-		characters = heroesData[1],
+		characters = characterData[1],
 		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 	})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
@@ -130,7 +118,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = true,
 		date = date,
-		characters = heroesData[2],
+		characters = characterData[2],
 		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 	})
 
