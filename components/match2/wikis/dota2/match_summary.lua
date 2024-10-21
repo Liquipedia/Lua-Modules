@@ -57,7 +57,7 @@ function CustomMatchSummary.createBody(match)
 		unpack(Array.map(match.games, CustomMatchSummary._createGame)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummary.makeCastersRow(match.extradata.casters)
+		MatchSummary.makeCastersRow(match.extradata.casters):create()
 	)}
 end
 
