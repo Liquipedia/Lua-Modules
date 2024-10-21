@@ -118,26 +118,12 @@ end
 function CustomItem:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 
-	local categories = {}
-	if String.isNotEmpty(args.movespeed) then
-		table.insert(categories, 'Movement Speed Items')
-	end
-
-	if String.isNotEmpty(args.category) then
-		table.insert(categories, args.category .. ' Items')
-	end
-
-	local possibleCategories = {
-		['Items with Active Abilities'] = 'active',
-		['Items with Passive Abilities'] = 'passive',
-	}
-
-	for category, requiredArg in pairs(possibleCategories) do
-		if String.isNotEmpty(args[requiredArg]) then
-			table.insert(categories, category)
-		end
-	end
-	return categories
+	return Array.append({},
+		String.isNotEmpty(args.movespeed) and 'Movement Speed Items' or nil,
+		String.isNotEmpty(args.category) and (args.category .. ' Items') or nil,
+		String.isNotEmpty(args.active) and 'Items with Active Abilities' or nil,
+		String.isNotEmpty(args.passive) and 'Items with Passive Abilities' or nil
+	)
 end
 
 ---@return string
