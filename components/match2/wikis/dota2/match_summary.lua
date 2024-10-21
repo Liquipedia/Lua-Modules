@@ -73,6 +73,12 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
 	}
 
+	-- Map Comment
+	local comment = Logic.isNotEmpty(game.comment) and {
+		MatchSummaryWidgets.Break{},
+		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
+	} or {}
+
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
