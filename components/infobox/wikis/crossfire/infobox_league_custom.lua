@@ -60,12 +60,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.cfpremier)
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@return table
@@ -77,7 +71,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.cfpremier
+	self.data.publishertier = Logic.readBool(args.cfpremier)
 end
 
 ---@param args table

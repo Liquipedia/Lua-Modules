@@ -64,20 +64,14 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['supercell-sponsored'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
+	return self.data.publishertier and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args['supercell-sponsored']
+	self.data.publishertier = Logic.readBool(args['supercell-sponsored'])
 end
 
 ---@param args table

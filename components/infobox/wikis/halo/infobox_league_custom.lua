@@ -102,7 +102,7 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = args.player_number and 'solo' or self.data.mode
-	self.data.publishertier = args['hcs-sponsored']
+	self.data.publishertier = Logic.readBool(args['hcs-sponsored'])
 end
 
 ---@param args table
@@ -111,12 +111,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_edate', self.data.endDate)
 	Variables.varDefine('tournament_tier', args.liquipediatier)
 	Variables.varDefine('tournament_tiertype', args.liquipediatiertype)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['hcs-sponsored'])
 end
 
 ---@return string[]
