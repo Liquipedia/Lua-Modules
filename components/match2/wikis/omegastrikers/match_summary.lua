@@ -75,11 +75,12 @@ function Striker:_opponentStrikerDisplay(strikerData, numberOfStrikers, flip, da
 	for index = 1, numberOfStrikers do
 		local strikerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
+			:addClass('brkts-champion-icon')
 			:css('float', flip and 'right' or 'left')
 			:node(CharacterIcon.Icon{
 				character = strikerData[index] or NO_CHARACTER,
-				class = 'brkts-champion-icon',
 				date = date,
+				size = '48px',
 			})
 		if index == 1 then
 			strikerDisplay:css('padding-left', '2px')
