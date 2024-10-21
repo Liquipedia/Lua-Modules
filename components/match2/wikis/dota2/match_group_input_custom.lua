@@ -182,7 +182,6 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getLinks(match, games, opponents)
-function MatchFunctions.getLinks(match, games)
 	---@type table<string, string|table>
 	local links = MatchGroupInputUtil.getLinks(match)
 	links.stratz = {}
