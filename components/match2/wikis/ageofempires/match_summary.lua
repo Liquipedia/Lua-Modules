@@ -102,7 +102,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 			mw.log('Unknown link: ' .. linkType)
 			return
 		end
-		for _, link in Table.iter.pairsByPrefix(match.links, linkType) do
+		for _, link in Table.iter.pairsByPrefix(match.links, linkType, {requireIndex = false}) do
 			footer:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end
 	end
