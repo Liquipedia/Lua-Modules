@@ -56,7 +56,7 @@ function CustomMatchSummary.createBody(match)
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		unpack(Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date))),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummary.makeCastersRow(match.extradata.casters)
+		MatchSummary.makeCastersRow(match.extradata.casters):create()
 	)}
 end
 
