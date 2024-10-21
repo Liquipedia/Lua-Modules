@@ -8,23 +8,21 @@
 
 local CustomMatchSummary = {}
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchLinks = mw.loadData('Module:MatchLinks')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchPage = Lua.import('Module:MatchPage')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local Opponent = Lua.import('Module:Opponent')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 ---@param args table
 ---@return Html
@@ -38,69 +36,35 @@ end
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	if
-		Logic.readBool(match.extradata.headtohead) and
-		match.opponents[1].type == Opponent.team and
-		match.opponents[2].type == Opponent.team
-	then
-		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
-		'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
-	end
-
 	return footer:addLinks(MatchLinks, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	-- Original Match Id must be used to match page links if it exists.
+	-- It can be different from the matchId when shortened brackets are used.
+	local matchId = match.extradata.originalmatchid or match.matchId
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	if MatchPage.isEnabledFor(match) then
-		body.root:node(MatchSummaryWidgets.MatchPageLink{matchId = match.extradata.originalmatchid or match.matchId})
-	end
-
-	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex)
-		body:addRow(rowDisplay)
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- Add the Character Bans
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local showMatchPage = MatchPage.isEnabledFor(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-	body.root:node(MatchSummaryWidgets.CharacterBanTable{
-		bans = characterBansData,
-		date = match.date,
-	})
+	local casterRow = MatchSummary.makeCastersRow(match.extradata.casters)
 
-	-- Casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
+		unpack(Array.map(match.games, CustomMatchSummary._createGame)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
+		casterRow and casterRow:create() or nil
+	)}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game, gameIndex)
-	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data
@@ -109,64 +73,35 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
 	}
 
-	row:addClass('brkts-popup-body-game')
-		:css('font-size', '80%')
-		:css('padding', '4px')
+	-- Map Comment
+	local comment = Logic.isNotEmpty(game.comment) and {
+		MatchSummaryWidgets.Break{},
+		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
+	} or {}
 
-	row:addElement(MatchSummaryWidgets.Characters{
-		flipped = false,
-		characters = characterData[1],
-		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
-	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext(CustomMatchSummary._createAbbreviation{
-			title = Logic.isEmpty(game.length) and ('Game ' .. gameIndex .. ' picks') or 'Match Length',
-			text = Logic.isEmpty(game.length) and ('Game ' .. gameIndex) or game.length,
-		})
-	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(MatchSummaryWidgets.Characters{
-		flipped = true,
-		characters = characterData[2],
-		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
-	})
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
-		local comment = mw.html.create('div')
-		comment:wikitext(game.comment)
-				:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	return row
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if Logic.readBool(isWinner) then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
-end
-
----@param args table
----@return string
-function CustomMatchSummary._createAbbreviation(args)
-	return '<i><abbr title="' .. args.title .. '">' .. args.text .. '</abbr></i>'
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '80%', padding = '4px'},
+		children = {
+			MatchSummaryWidgets.Characters{
+				flipped = false,
+				characters = characterData[1],
+				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-body-element-vertical-centered'},
+				children = {Logic.isNotEmpty(game.length) and game.length or ('Game ' .. gameIndex)},
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.Characters{
+				flipped = true,
+				characters = characterData[2],
+				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
+			},
+			unpack(comment)
+		}
+	}
 end
 
 return CustomMatchSummary
