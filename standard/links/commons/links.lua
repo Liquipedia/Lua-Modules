@@ -115,7 +115,6 @@ local PREFIXES = {
 	['faceit-c'] = {'https://www.faceit.com/en/championship/'},
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
-	factor = {match = 'https://www.factor.gg/match/'},
 	fanclub = {''},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
