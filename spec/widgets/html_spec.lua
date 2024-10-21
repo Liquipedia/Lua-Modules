@@ -37,7 +37,7 @@ describe('HTML Widget', function()
 
 	describe('Ul & Li', function()
 		it('should create a list', function()
-			local ul = Widgets.Ul{ children = { Widgets.Li{ children = { "Item", "Item2" } } } }
+			local ul = Widgets.Ul{ children = { Widgets.Li{ children = { "Item" }}, Widgets.Li{ children = { "Item2" }}}}
 			local rendered = ul:render():allDone()
 			assert.are.same('<ul><li>Item</li><li>Item 2</li></ul>', tostring(rendered))
 		end)
