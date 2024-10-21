@@ -42,7 +42,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	---@type string
 	local finishedInput = tostring(Logic.nilOr(
 		Logic.readBoolOrNil(match.finished),
-		Logic.nilIfEmpty(match.status),
 		Variables.varDefault('tournament_status'),
 		match.finished,
 		''
