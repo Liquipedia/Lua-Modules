@@ -141,12 +141,6 @@ function CustomItem:getWikiCategories(args)
 	return categories
 end
 
----@param args table
----@return string?
-function CustomItem.nameDisplay(args)
-	return args.name
-end
-
 ---@return string
 function CustomItem:_getCostDisplay()
 	return tostring(mw.html.create('div')
