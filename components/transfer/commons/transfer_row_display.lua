@@ -320,7 +320,7 @@ end
 function TransferRowDisplay:_createRole(roles, team)
 	if Logic.isEmpty(roles) then return end
 
-	local rolesText = table.concat(roles, '/')
+	local rolesText = table.concat(Array.filter(roles, Logic.isNotEmpty), '/')
 
 	local roleCell = mw.html.create('span')
 		:css('font-style', 'italic')
