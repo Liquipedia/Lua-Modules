@@ -25,25 +25,13 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
--- Normal links, from input/lpdb
-local LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-}
+
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch

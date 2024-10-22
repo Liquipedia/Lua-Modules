@@ -32,7 +32,6 @@ local ICONS = {
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
-local LINK_DATA = {}
 
 local CustomMatchSummary = {}
 
@@ -156,16 +155,6 @@ end
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch

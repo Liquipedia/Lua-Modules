@@ -32,15 +32,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(MatchLinks, match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	-- Original Match Id must be used to match page links if it exists.

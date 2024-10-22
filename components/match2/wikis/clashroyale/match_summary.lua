@@ -32,17 +32,6 @@ local CARD_COLOR_2 = 'red'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local DEFAULT_CARD = 'default'
--- Normal links, from input/lpdb
-local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	interview = {icon = 'File:Interview32.png', text = 'Interview'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	royaleapi = {icon = 'File:RoyaleAPI_allmode.png', text = 'RoyaleAPI Match Page'},
-}
-LINK_DATA.review = LINK_DATA.recap
-LINK_DATA.preview2 = LINK_DATA.preview
-LINK_DATA.interview2 = LINK_DATA.interview
 
 local CustomMatchSummary = {}
 
@@ -50,15 +39,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '360px'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
