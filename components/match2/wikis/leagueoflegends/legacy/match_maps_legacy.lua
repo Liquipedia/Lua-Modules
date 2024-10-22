@@ -109,7 +109,11 @@ end
 function MatchMapsLegacy.handleDetails(args, details)
 	local getMapFromDetails = function (index)
 		local prefix = 'map' .. index
-		if not details[prefix] then
+		local mapDetails = Table.filterByKey(details, function(key)
+			return key == prefix or
+				string.find(key, '^' .. prefix .. '[^%d]') ~= nil
+		end)
+		if Logic.isEmpty(mapDetails) then
 			return nil
 		end
 		local map = {}
