@@ -19,6 +19,7 @@ local String = require('Module:StringUtils')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -46,28 +47,22 @@ function CustomMatchSummary._determineWidth(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@return MatchSummaryBody
+---@return Widget
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	Array.forEach(match.games, function(game)
-		body:addRow(CustomMatchSummary._createGame(game, {
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local games = Array.map(match.games, function(game)
+		return CustomMatchSummary._createGame(game, {
 			opponents = match.opponents,
 			game = match.game,
 			soloMode = CustomMatchSummary._isSolo(match)
-		}))
+		})
 	end)
 
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games,
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+	)}
 end
 
 ---@param match MatchGroupUtilMatch

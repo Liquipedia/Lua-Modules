@@ -15,6 +15,8 @@ local Page = require('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
@@ -32,22 +34,12 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if not DateExt.isDefaultTimestamp(match.timestamp) then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default timestamp, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	Array.forEach(match.games, function(game)
-		body:addRow(CustomMatchSummary._createMapRow(game))
-	end)
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMapRow)
+	)}
 end
 
 ---@param game MatchGroupUtilGame
