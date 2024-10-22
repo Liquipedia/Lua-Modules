@@ -69,7 +69,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	Array.forEach(match.games, function(game)
-		if not game.map and not game.winner and String.isNotEmpty(game.resulttype) then return end
+		if not game.map and not game.winner and String.isNotEmpty(game.resultType) then return end
 		local row = MatchSummary.Row()
 				:addClass('brkts-popup-body-game')
 				:css('font-size', '0.75rem')
