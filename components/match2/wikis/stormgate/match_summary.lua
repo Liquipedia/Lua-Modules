@@ -18,6 +18,7 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -128,7 +129,7 @@ function CustomMatchSummary.createBody(match)
 		Array.forEach(Array.map(match.vetoes, CustomMatchSummary.Veto), FnUtil.curry(body.addRow, body))
 	end
 
-	body:addRow(MatchSummary.makeCastersRow(match.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.casters})
 
 	return body
 end

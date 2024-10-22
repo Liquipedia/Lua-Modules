@@ -81,7 +81,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Map Vetoes
 	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))

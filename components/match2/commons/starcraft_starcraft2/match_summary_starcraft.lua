@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
 
@@ -167,9 +168,8 @@ function StarcraftMatchSummary.createBody(match)
 		body:addRow(StarcraftMatchSummary.Veto(veto))
 	end)
 
-	if match.casters then
-		body:addRow(MatchSummary.makeCastersRow(match.casters))
-	end
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.casters})
+
 
 	return body
 end

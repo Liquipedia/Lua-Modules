@@ -10,7 +10,6 @@ local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -46,7 +45,7 @@ function CustomMatchSummary.createBody(match)
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummaryWidgets.Casters{casters = Json.parseIfString(match.extradata.casters)}
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
 	)}
 end
 
