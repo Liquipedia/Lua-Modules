@@ -18,9 +18,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
-
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
@@ -30,42 +27,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if
-		match.opponents[1].type == Opponent.team and
-		match.opponents[2].type == Opponent.team and
-		match.opponents[1].name and
-		match.opponents[2].name
-	then
-		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		local buildQueryFormLink = function(form, template, arguments)
-			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
-				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
-					.. '&_run'
-			))
-		end
-
-		local headtoheadArgs = {
-			['[team1]'] = team1,
-			['[team2]'] = team2,
-			['[games][is_list]'] = 1,
-			['[tiers][is_list]'] = 1,
-			['[fromdate][day]'] = '01',
-			['[fromdate][month]'] = '01',
-			['[fromdate][year]'] = string.sub(match.date,1,4)
-		}
-
-		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
-	end
-
-	return footer:addLinks(match.links)
 end
 
 ---@param match MatchGroupUtilMatch

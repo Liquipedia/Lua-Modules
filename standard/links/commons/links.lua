@@ -350,6 +350,10 @@ local ICON_KEYS_TO_RENAME = {
 }
 
 local MATCH_ICONS = {
+	ballchasing = {
+		icon = 'File:Ballchasing icon.png',
+		text = 'Ballchasing replays'
+	},
 	breakingpoint = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
 		iconDark = 'File:Breaking Point GG icon darkmode.png',
@@ -490,6 +494,10 @@ local MATCH_ICONS = {
 	royaleapi = {
 		icon = 'File:RoyaleAPI_allmode.png',
 		text = 'RoyaleAPI Match Page'
+	},
+	shift = {
+		icon = 'File:ShiftRLE icon.png',
+		text = 'ShiftRLE matchpage'
 	},
 	siegegg = {
 		icon = 'File:SiegeGG icon.png',

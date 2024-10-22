@@ -1036,13 +1036,13 @@ function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
 end
 
 ---@param match table
----@return table<string, string>
+---@return table<string, string?>
 function MatchGroupInputUtil.getLinks(match)
 	local links = Links.transform(match)
 	return Table.mapValues(
 		Links.makeFullLinksForTableItems(links, 'match', false),
 		String.nilIfEmpty
-	) --[[@as table<string, string>]]
+	)
 end
 
 --- Warning, both match and standalone match may be mutated

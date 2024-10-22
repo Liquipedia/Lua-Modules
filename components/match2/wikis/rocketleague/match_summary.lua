@@ -25,12 +25,6 @@ local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
 local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
-local LINK_DATA = {
-	shift = {icon = 'File:ShiftRLE icon.png', text = 'ShiftRLE matchpage'},
-	ballchasing = {icon = 'File:Ballchasing icon.png', text = 'Ballchasing replays'},
-	headtohead = {icon = 'File:Match Info Stats.png', text = 'Head to Head history'},
-}
-
 -- Custom Header Class
 ---@class RocketleagueMatchSummaryHeader: MatchSummaryHeader
 ---@field leftElementAdditional Html
@@ -197,36 +191,6 @@ function CustomMatchSummary.createHeader(match, options)
 		))
 		:rightOpponent(header:createOpponent(match.opponents[2], 2))
 		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	for linkType, linkData in pairs(LINK_DATA) do
-		for _, link in Table.iter.pairsByPrefix(match.links, linkType, {requireIndex = false}) do
-			footer:addLink(link, linkData.icon, linkData.iconDark, linkData.text)
-		end
-	end
-
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if not match.extradata.showh2h then
-		return footer
-	end
-
-	local h2hLinkData = LINK_DATA.headtohead
-	return footer:addLink(CustomMatchSummary._getHeadToHead(match.opponents),
-		h2hLinkData.icon, h2hLinkData.iconDark, h2hLinkData.text)
-end
-
----@param opponents standardOpponent[]
----@return string
-function CustomMatchSummary._getHeadToHead(opponents)
-	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	return tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
-		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
-		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
 end
 
 ---@param match MatchGroupUtilMatch
