@@ -11,12 +11,10 @@ local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -28,17 +26,6 @@ local PlayerDisplay = require('Module:Player/Display')
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local DRAW_LINE = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local LINKDATA = {
-	mapdraft = {
-		text = 'Map Draft',
-		icon = 'File:Map Draft Icon.png'
-	},
-	civdraft = {
-		text = 'Civ Draft',
-		icon = 'File:Civ Draft Icon.png'
-	}
-}
 
 local CustomMatchSummary = {}
 

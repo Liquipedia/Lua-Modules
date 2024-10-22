@@ -368,6 +368,10 @@ local MATCH_ICONS = {
 		icon = 'File:Challengermode icon.png',
 		text = 'Match page on Challengermode'
 	},
+	civdraft = {
+		text = 'Civ Draft',
+		icon = 'File:Civ Draft Icon.png'
+	},
 	datdota = {
 		icon = 'File:DatDota-icon.png',
 		text = 'datDota'
@@ -437,6 +441,10 @@ local MATCH_ICONS = {
 	lrthread = {
 		icon = 'File:LiveReport32.png',
 		text = 'Live Report Thread'
+	},
+	mapdraft = {
+		text = 'Map Draft',
+		icon = 'File:Map Draft Icon.png'
 	},
 	mplink = {
 		icon = 'File:Osu single color allmode.png',
