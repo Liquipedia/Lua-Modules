@@ -261,8 +261,8 @@ function CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
 	end
 
 	local player1, player2 =
-		string.gsub(match.opponents[1].name, ' ', '_'),
-		string.gsub(match.opponents[2].name, ' ', '_')
+		string.gsub(opponents[1].name, ' ', '_'),
+		string.gsub(opponents[2].name, ' ', '_')
 
 	return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
 		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..player1 ..
