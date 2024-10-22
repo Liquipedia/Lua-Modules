@@ -303,9 +303,6 @@ function CustomMatchSummary.DispalyHeroes(opponent, hasHeroes, flip)
 				:css('float', flip and 'right' or 'left')
 				:wikitext('[[File:' .. data.icon .. '|link=' .. name .. '|' .. name .. ']]')
 		end)
-		if flip then
-			return Array.reverse(displays)
-		end
 		return displays
 	end)
 
