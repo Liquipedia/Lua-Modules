@@ -14,6 +14,7 @@ local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
@@ -165,7 +166,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
 end

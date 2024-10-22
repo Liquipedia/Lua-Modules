@@ -331,46 +331,6 @@ function Footer:create()
 	return self.root
 end
 
----MatchSummary Casters Class
----@class MatchSummaryCasters: MatchSummaryRowInterface
----@operator call: MatchSummaryCasters
----@field root Html
----@field casters string[]
-local Casters = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-		self.casters = {}
-	end
-)
-
----adds a casters display to thge casters list
----@param caster {name: string, displayName: string, flag: string?}?
----@return MatchSummaryCasters
-function Casters:addCaster(caster)
-	if Logic.isNotEmpty(caster) then
-		---@cast caster -nil
-		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
-		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster.flag) .. '&nbsp;' .. nameDisplay)
-		else
-			table.insert(self.casters, nameDisplay)
-		end
-	end
-
-	return self
-end
-
----creates the casters display
----@return Html
-function Casters:create()
-	return self.root
-		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
-end
-
 ---@class MatchSummaryMatch
 ---@operator call: MatchSummaryMatch
 ---@field root Html
@@ -582,7 +542,6 @@ end
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
 ---@field Break MatchSummaryBreak
----@field Casters MatchSummaryCasters
 ---@field Match MatchSummaryMatch
 ---@field MapVeto VetoDisplay
 ---@field DEFAULT_VETO_TYPE_TO_TEXT table
@@ -596,7 +555,6 @@ MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
-MatchSummary.Casters = Casters
 MatchSummary.Match = Match
 MatchSummary.MapVeto = MapVeto
 MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT = DEFAULT_VETO_TYPE_TO_TEXT
@@ -814,18 +772,6 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	matchSummary:addMatch(createMatch(bracketResetMatch))
 
 	return matchSummary:create()
-end
-
----Default getByMatchId function for usage in Custom MatchSummary
----@param castersInput string?
----@return MatchSummaryCasters?
-function MatchSummary.makeCastersRow(castersInput)
-	if String.isEmpty(castersInput) then return end
-	local casters = Json.parseIfString(castersInput)
-	if Logic.isEmpty(casters) then return end
-	local casterRow = Casters()
-	Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
-	return casterRow
 end
 
 ---@param match MatchGroupUtilMatch

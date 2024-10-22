@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
@@ -245,7 +246,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
 end

@@ -61,7 +61,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
 end

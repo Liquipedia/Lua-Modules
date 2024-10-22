@@ -101,7 +101,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Character Bans
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
