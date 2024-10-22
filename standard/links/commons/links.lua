@@ -392,11 +392,6 @@ local MATCH_ICONS = {
 	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
 	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
 	headtohead = {
-		icon = 'File:Match_Info_Halo_H2H.png',
-		iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
-		text = 'Head-to-head statistics'
-	},
-	headtohead = {
 		icon = 'File:Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
@@ -457,6 +452,8 @@ local MATCH_ICONS = {
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
 	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
 }
+
+MATCH_ICONS = Table.merge(MATCH_ICONS, CustomData.matchIcons or {})
 
 ---@param links {[string]: string}
 ---@return {[string]: string}
@@ -561,5 +558,11 @@ function Links.makeIcon(key, size)
 		.. (size and (' lp-icon-' .. size) or '') .. '></i>'
 end
 
+---Fetches Icon Data for a given key
+---@param key string
+---@return string
+function Links.getMatchIconData(key)
+	return MATCH_ICONS[key]
+end
 
 return Class.export(Links, {frameOnly = true})
