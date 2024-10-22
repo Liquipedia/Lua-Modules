@@ -62,7 +62,6 @@ end
 ---@param date string
 ---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game, gameIndex, date)
-	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data
