@@ -24,17 +24,6 @@ local Opponent = OpponentLibrary.Opponent
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local LINK_DATA = {
-	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
-	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
-	headtohead = {
-		icon = 'File:Match_Info_Halo_H2H.png',
-		iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
-		text = 'Head-to-head statistics'
-	},
-	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
-}
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -76,7 +65,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	end
 
-	return footer:addLinks(LINK_DATA, match.links)
+	return footer:addLinks(match.links)
 end
 
 ---@param match MatchGroupUtilMatch

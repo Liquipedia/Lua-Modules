@@ -23,27 +23,10 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MAX_NUM_BANS = 5
 local NUM_GODS_PICK = 5
 
-local LINK_DATA = {
-	smiteesports = {
-		icon = 'File:SMITE default lightmode.png',
-		iconDark = 'File:SMITE default darkmode.png',
-		text = 'Smite Esports Match Page'
-	},
-	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
-}
-
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch

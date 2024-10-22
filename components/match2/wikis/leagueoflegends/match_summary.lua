@@ -13,7 +13,6 @@ local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchLinks = mw.loadData('Module:MatchLinks')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchPage = Lua.import('Module:MatchPage')
@@ -29,15 +28,6 @@ local NUM_HEROES_PICK = 5
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(MatchLinks, match.links)
 end
 
 ---@param match MatchGroupUtilMatch

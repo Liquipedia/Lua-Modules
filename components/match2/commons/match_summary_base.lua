@@ -21,6 +21,7 @@ local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Links =  Lua.import('Module:Links')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -298,12 +299,11 @@ function Footer:addLink(link, icon, iconDark, text)
 	return self
 end
 
----@param linkData table<string, {icon: string, text: string, iconDark: string?}>
 ---@param links table<string, string|table>
 ---@return MatchSummaryFooter
-function Footer:addLinks(linkData, links)
+function Footer:addLinks(links)
 	for linkType, link in pairs(links) do
-		local currentLinkData = linkData[linkType]
+		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		elseif type(link) == 'table' then
@@ -668,6 +668,14 @@ function MatchSummary.createDefaultHeader(match, options)
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
 end
 
+---Default footer function
+---@param match table
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function MatchSummary.createDefaultFooter(match, footer)
+	return MatchSummary.addVodsToFooter(match, footer):addLinks(match.links)
+end
+
 ---Creates a match footer with vods if vods are set
 ---@param match table
 ---@param footer MatchSummaryFooter
@@ -766,7 +774,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		local comment = MatchSummary.Comment():content(matchData.comment):content(substituteComment)
 		match:comment(comment)
 	end
-	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.addVodsToFooter
+	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
 	return match

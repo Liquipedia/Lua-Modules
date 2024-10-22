@@ -20,8 +20,6 @@ local ICONS = {
 	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-local LINK_DATA = {
-}
 
 local CustomMatchSummary = {}
 
@@ -29,15 +27,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 function CustomMatchSummary.createBody(match)

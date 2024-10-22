@@ -73,7 +73,7 @@ function CustomFfaMatchSummary.Footer(props)
 
 	local footer = MatchSummary.addVodsToFooter(match, MatchSummary.Footer())
 
-	footer:addLinks(StarcraftMatchSummary.LINKS_DATA, match.links)
+	footer:addLinks(match.links)
 
 	local footerDisplay = footer:create()
 	if footerDisplay then

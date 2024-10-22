@@ -30,15 +30,6 @@ local ICONS = {
 	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
 	noCheck = '[[File:NoCheck.png|link=]]',
 }
-local LINKS_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	interview = {icon = 'File:Interview32.png', text = 'Interview'},
-	review = {icon = 'File:Reviews32.png', text = 'Review'},
-	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
-}
-LINKS_DATA.preview2 = LINKS_DATA.preview
-LINKS_DATA.interview2 = LINKS_DATA.interview
-LINKS_DATA.recap = LINKS_DATA.review
 
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
@@ -109,23 +100,21 @@ end
 function CustomMatchSummary.addToFooter(match, footer)
 	footer = MatchSummary.addVodsToFooter(match, footer)
 
-	match.links.lrthread = match.links.lrthread or match.lrthread
-
 	if #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
 		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
 	then
-		return footer:addLinks(LINKS_DATA, match.links)
+		return footer:addLinks(match.links)
 	end
 
-	match.links.h2h = tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
+	match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
 		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
 		.. match.opponents[1].players[1].pageName
 		.. '&Head_to_head_query%5Bopponent%5D='
 		.. match.opponents[2].players[1].pageName
 		.. '&wpRunQuery=Run+query'
-	match.links.h2h = string.gsub(match.links.h2h, ' ', '_')
+	match.links.headtohead = string.gsub(match.links.headtohead, ' ', '_')
 
-	return footer:addLinks(LINKS_DATA, match.links)
+	return footer:addLinks(match.links)
 end
 
 ---@param match table

@@ -26,31 +26,12 @@ local ICONS = {
 	check = GREEN_CHECK,
 }
 
-local LINK_DATA = {
-	owl = {icon = 'File:Overwatch League 2023 allmode.png', text = 'Overwatch League matchpage'},
-	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
-	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
-	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
-	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
-	faceit = {icon = 'File:FACEIT icon allmode.png', text = 'FACEIT matchpage'},
-}
-
 local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
