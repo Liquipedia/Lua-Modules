@@ -44,6 +44,7 @@ function MatchSummaryGameWinLossIndicator:render()
 	return Div{
 		classes = {'brkts-popup-spaced'},
 		css = {
+			['width'] = '16px',
 			['line-height'] = '17px',
 			['margin-left'] = '1%',
 			['margin-right'] = '1%',
