@@ -36,7 +36,7 @@ return {
 					</div>{{/vods.1}}{{#links.1}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Socials</div>
-						<div class="match-bm-match-additional-section-body">{{#links}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
+						<div class="match-bm-match-additional-section-body">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
 					</div>{{/links.1}}{{#patch}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Patch</div>
