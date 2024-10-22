@@ -75,12 +75,6 @@ function CustomMatchSummary._createGame(date, game, gameIndex)
 		return nil
 	end
 
-	-- Map Comment
-	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummaryWidgets.Break{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-	} or {}
-
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
@@ -103,7 +97,7 @@ function CustomMatchSummary._createGame(date, game, gameIndex)
 				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 				date = date,
 			},
-			unpack(comment)
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		}
 	}
 end

@@ -47,11 +47,6 @@ end
 ---@param gameIndex integer
 ---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game, gameIndex)
-	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummaryWidgets.Break{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-	} or {}
-
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
@@ -62,7 +57,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 				children = {Logic.isNotEmpty(game.length) and game.length or ('Game ' .. gameIndex)},
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			unpack(comment)
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		}
 	}
 end
