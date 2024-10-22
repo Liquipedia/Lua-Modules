@@ -166,8 +166,8 @@ end
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if not Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))) or
-		not opponents[1].type ~= Opponent.team or
-		not opponents[2].type ~= Opponent.team then
+		opponents[1].type ~= Opponent.team or
+		opponents[2].type ~= Opponent.team then
 
 		return nil
 	end
