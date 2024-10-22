@@ -236,8 +236,8 @@ end
 ---@param opponents table[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
-	local showH2H = tostring(Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))))
-	Variables.varDefine('headtohead', showH2H)
+	local showH2H = Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')))
+	Variables.varDefine('headtohead', tostring(showH2H))
 
 	if not showH2H or #opponents ~= 2 or Array.any(opponents, function(opponent)
 		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
