@@ -8,13 +8,11 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CustomMatchSummary = {}
@@ -35,23 +33,15 @@ function CustomMatchSummary.createBody(match)
 end
 
 function CustomMatchSummary._createGame(game)
-	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummaryWidgets.Break{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-	} or {}
-
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
-		children = {
+		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			HtmlWidgets.Div{
-				classes = {'brkts-popup-body-element-vertical-centered'},
-				children = {game.map},
-			},
+			MatchSummaryWidgets.GameCenter{children = game.map},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			unpack(comment)
-		}
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
 	}
 end
 
