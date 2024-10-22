@@ -311,7 +311,7 @@ function Details:countdown(matchPageIcon)
 
 		local gameVods = Array.map(Array.map(match.match2games, Operator.property('vod')), makeVod)
 
-		countdownDisplay:node(makeVod(match.vod))
+		countdownDisplay:node(makeVod(match.links.vod))
 		Array.forEach(gameVods, function(vod)
 			countdownDisplay:node(vod)
 		end)

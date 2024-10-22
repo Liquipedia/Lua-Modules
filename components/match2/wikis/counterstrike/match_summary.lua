@@ -168,7 +168,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 		end
 	end
 
-	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) or not Logic.isEmpty(match.vod) then
+	if not Table.isEmpty(vods) or not Table.isEmpty(match.links) then
 		return CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
@@ -257,12 +257,12 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 
 	-- Match vod
 	if Table.isNotEmpty(secondVods[0]) then
-		addVodLink(nil, match.vod, 1)
+		addVodLink(nil, match.links.vod, 1)
 		Array.forEach(secondVods[0], function(vodlink, vodindex)
 				addVodLink(nil, vodlink, vodindex + 1)
 			end)
 	else
-		addVodLink(nil, match.vod, nil)
+		addVodLink(nil, match.links.vod, nil)
 	end
 
 	-- Game Vods
@@ -278,7 +278,7 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 	end
 
 	if Table.isNotEmpty(match.links) then
-		if Logic.isNotEmpty(vods) or match.vod then
+		if Logic.isNotEmpty(vods) or match.links.vod then
 			footer:addElement(separator)
 		end
 	else

@@ -331,8 +331,7 @@ end
 ---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
 	return match.dateIsExact
-		or String.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or Table.isNotEmpty(match.links)
 		or String.isNotEmpty(match.comment)
 		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes

@@ -284,7 +284,7 @@ local PREFIXES = {
 		player = 'https://www.vlr.gg/player/',
 		match = 'https://vlr.gg/',
 	},
-	vod = {''},
+	vod = {'', match = ''},
 	weibo = {'https://weibo.com/'},
 	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},

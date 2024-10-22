@@ -673,12 +673,6 @@ end
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
 function MatchSummary.addVodsToFooter(match, footer)
-	if match.vod then
-		footer:addElement(VodLink.display{
-			vod = match.vod,
-		})
-	end
-
 	for gameIndex, game in ipairs(match.games) do
 		if game.vod then
 			footer:addElement(VodLink.display{

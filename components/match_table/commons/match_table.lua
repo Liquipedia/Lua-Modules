@@ -417,8 +417,8 @@ end
 ---@return {index: number, link: string}[]
 function MatchTable:vodsFromRecord(record)
 	local vods = {}
-	if String.nilIfEmpty(record.vod) then
-		vods = {{index = 0, link = record.vod}}
+	if String.nilIfEmpty(record.links.vod) then
+		vods = {{index = 0, link = record.links.vod}}
 	end
 
 	Array.forEach(record.match2games, function(game, gameIndex)

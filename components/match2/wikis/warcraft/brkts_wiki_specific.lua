@@ -24,8 +24,7 @@ end)
 ---@return boolean
 function WikiSpecific.matchHasDetails(match)
 	return match.dateIsExact
-		or match.vod
-		or not Table.isEmpty(match.links)
+		or Table.isNotEmpty(match.links)
 		or match.comment
 		or match.casters
 		or 0 < #match.vetoes

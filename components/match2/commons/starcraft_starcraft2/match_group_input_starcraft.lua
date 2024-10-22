@@ -90,7 +90,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
 
 	match.games = games
 	match.opponents = opponents

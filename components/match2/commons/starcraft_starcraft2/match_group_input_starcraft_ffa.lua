@@ -48,7 +48,6 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
 
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
