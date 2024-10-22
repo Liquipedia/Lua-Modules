@@ -135,7 +135,7 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.scores[opponentIndex] or 0
-		end), Operator.add, 0) + (opponents[opponentIndex].startingpoints or 0)
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
 end
 
