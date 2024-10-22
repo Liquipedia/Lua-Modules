@@ -400,7 +400,7 @@ local MATCH_ICONS = {
 		icon = 'File:Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
-	interview = {icon = 'File:Int_Icon.png', text = 'Interview'}, -- OR Interview32.png?
+	interview = {icon = 'File:Interview32.png', text = 'Interview'},
 	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
 	logstf = {icon = 'File:Logstf_icon.png', text = 'logs.tf Match Page '},
 	logstfgold = {icon = 'File:Logstf_gold_icon.png', text = 'logs.tf Match Page (Golden Cap) '},
