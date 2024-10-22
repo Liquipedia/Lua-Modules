@@ -49,7 +49,6 @@ function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local showMatchPage = MatchPage.isEnabledFor(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-	local casterRow = MatchSummary.makeCastersRow(match.extradata.casters)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
@@ -57,7 +56,7 @@ function CustomMatchSummary.createBody(match)
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		casterRow and casterRow:create() or nil
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
 	)}
 end
 
@@ -73,16 +72,10 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		MatchSummary.buildCharacterList(extradata, 'team2hero', NUM_HEROES_PICK),
 	}
 
-	-- Map Comment
-	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummaryWidgets.Break{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-	} or {}
-
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
-		children = {
+		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
 				characters = characterData[1],
@@ -99,8 +92,8 @@ function CustomMatchSummary._createGame(game, gameIndex)
 				characters = characterData[2],
 				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 			},
-			unpack(comment)
-		}
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
 	}
 end
 
