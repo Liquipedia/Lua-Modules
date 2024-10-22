@@ -40,6 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 
@@ -70,7 +71,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -90,6 +90,9 @@ end
 function MatchFunctions.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -143,16 +146,6 @@ end
 
 ---@param match table
 ---@return table
-function MatchFunctions.getLinks(match)
-	return {
-		faceit = match.faceit and ('https://www.faceit.com/en/halo_infinite/room/' .. match.faceit) or nil,
-		halodatahive = match.halodatahive and ('https://halodatahive.com/Series/Summary/' .. match.halodatahive) or nil,
-		stats = match.stats,
-	}
-end
-
----@param match table
----@return table
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
@@ -170,6 +163,8 @@ end
 function MapFunctions.getExtraData(map, opponentCount)
 	return {
 		comment = map.comment,
+		points1 = map.points1,
+		points2 = map.points2,
 	}
 end
 

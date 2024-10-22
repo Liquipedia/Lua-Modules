@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Icon/Image
+-- page=Module:Widget/Image/Icon/Image
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -10,9 +10,9 @@ local Class = require('Module:Class')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 
-local WidgetIcon = Lua.import('Module:Widget/Icon')
+local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
----@class IconImageWidgetParameters: WidgetParameters
+---@class IconImageWidgetParameters
 ---@field imageLight string?
 ---@field imageDark string?
 ---@field link string?
@@ -20,21 +20,18 @@ local WidgetIcon = Lua.import('Module:Widget/Icon')
 ---@class IconImageWidget: IconWidget
 ---@operator call(IconImageWidgetParameters): IconImageWidget
 ---@field props IconImageWidgetParameters
-local Icon = Class.new(
-	WidgetIcon,
-	function(self, input)
-		self.props = input
-	end
-)
+local Icon = Class.new(WidgetIcon)
+Icon.defaultProps = {
+	link = '',
+}
 
----@param children string[]
 ---@return string?
-function Icon:make(children)
+function Icon:render()
 	return Image.display(
 		self.props.imageLight,
 		self.props.imageDark,
 		{
-			link = self.props.link or '',
+			link = self.props.link,
 			size = 'x20px',
 		}
 	)

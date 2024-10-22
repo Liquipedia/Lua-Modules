@@ -1015,7 +1015,7 @@ function MatchGroupUtil.computeMatchPhaseNew(props)
 	end
 end
 
----Normalizes subtypes (opponent, map) into a list
+---Get subtypes (opponent, map) as a list
 ---@param match table
 ---@param type 'opponent'|'map'
 ---@return any[]
@@ -1034,7 +1034,7 @@ function MatchGroupUtil.normalizeSubtype(match, type)
 		end
 	end
 
-	return Array.mapIndexes(function(index) return match[type .. index] end)
+	return {}
 end
 
 return MatchGroupUtil

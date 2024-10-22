@@ -16,6 +16,7 @@ local MapModes = require('Module:MapModes')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local htmlCreate = mw.html.create
 
@@ -25,31 +26,12 @@ local ICONS = {
 	check = GREEN_CHECK,
 }
 
-local LINK_DATA = {
-	owl = {icon = 'File:Overwatch League 2023 allmode.png', text = 'Overwatch League matchpage'},
-	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
-	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
-	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
-	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
-	faceit = {icon = 'File:FACEIT icon allmode.png', text = 'FACEIT matchpage'},
-}
-
 local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -73,22 +55,15 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
 end

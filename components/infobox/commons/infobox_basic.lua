@@ -102,13 +102,19 @@ end
 ---@param widgets Widget[]
 ---@return string
 function BasicInfobox:build(widgets)
-	return Infobox{
+	local infobox = Infobox{
 		gameName = self.wiki,
 		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
 		bottomContent = self.bottomContent,
 		warnings = self.warnings,
 		children = widgets,
-	}:tryMake(self.injector) or ''
+	}
+	if self.injector then
+		-- Customizable backwards compatibility
+		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
+		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}:tryMake()
+	end
+	return infobox:tryMake()
 end
 
 return BasicInfobox

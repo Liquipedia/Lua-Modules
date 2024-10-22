@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
@@ -69,17 +68,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.publisherpremier) and 'true' or nil
 end
 
 ---@param args table

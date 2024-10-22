@@ -19,7 +19,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
 
-local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	applyUnderScores = true,
@@ -73,8 +72,12 @@ function CustomMatchGroupInput.processMatch(match, options)
 			or nil
 		match.walkover = nil
 		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		CustomMatchGroupInput.setPlacements(opponents)
-		MatchFunctions.setBgForOpponents(opponents, settings.status)
+
+		local placementOfTeams = CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = placementOfTeams[opponentIndex]
+			opponent.extradata.bg = settings.status[opponent.placement]
+		end)
 	end
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
@@ -99,10 +102,6 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
-
-		if map.map == DUMMY_MAP_NAME then
-			map.map = ''
-		end
 
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
@@ -136,14 +135,13 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.scores[opponentIndex] or 0
-		end), Operator.add, 0) + (opponents[opponentIndex].startingpoints or 0)
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
 end
 
----Warning mutates the placement field in each opponent
 ---@param opponents table[]
----@return table[]
-function CustomMatchGroupInput.setPlacements(opponents)
+---@return integer[]
+function CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
 	local usedPlacements = Array.map(opponents, function()
 		return 0
 	end)
@@ -161,30 +159,35 @@ function CustomMatchGroupInput.setPlacements(opponents)
 		end
 	end)
 
+	local placementCount = #usedPlacements
 	local function findNextSlot(placement)
-		if usedPlacements[placement] == 0 then
+		if usedPlacements[placement] == 0 or placement > placementCount then
 			return placement
 		end
 		return findNextSlot(placement + 1)
 	end
 
+	local placementOfTeams = {}
 	local lastScore
 	local lastPlacement = 0
-	for _, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.scoreSorter) do
-		if not opp.placement then
+	for opponentIdx, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.scoreSorter) do
+		local placement = opp.placement
+		if not placement then
 			local thisPlacement = findNextSlot(lastPlacement)
 			usedPlacements[thisPlacement] = 1
 			if lastScore and opp.score == lastScore then
-				opp.placement = lastPlacement
+				placement = lastPlacement
 			else
-				opp.placement = thisPlacement
-				lastPlacement = opp.placement
-				lastScore = opp.score
+				placement = thisPlacement
 			end
 		end
+		placementOfTeams[opponentIdx] = placement
+
+		lastPlacement = placement
+		lastScore = opp.score
 	end
 
-	return opponents
+	return placementOfTeams
 end
 
 ---@param tbl table
@@ -236,14 +239,6 @@ function MatchFunctions.getExtraData(settings)
 		scoring = settings.score,
 		status = settings.status,
 	}
-end
-
----@param opponents table
----@param statusSettings table
-function MatchFunctions.setBgForOpponents(opponents, statusSettings)
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata.bg = statusSettings[opponent.placement]
-	end)
 end
 
 --

@@ -24,37 +24,12 @@ local Icons = {
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
-local LINK_DATA = {
-	logstf = {icon = 'File:Logstf_icon.png', text = 'logs.tf Match Page '},
-	logstfgold = {icon = 'File:Logstf_gold_icon.png', text = 'logs.tf Match Page (Golden Cap) '},
-	esl = {
-		icon = 'File:ESL 2019 icon lightmode.png',
-		iconDark = 'File:ESL 2019 icon darkmode.png',
-		text = 'ESL matchpage'
-	},
-	esea = {icon = 'File:ESEA icon allmode.png', text = 'ESEA Match Page'},
-	etf2l = {icon = 'File:ETF2L.png', text = 'ETF2L Match Page'},
-	rgl = {icon = 'File:RGL_Logo.png', text = 'RGL Match Page'},
-	ozf = {icon = 'File:ozfortress-icon.png‎', text = 'ozfortress Match Page'},
-	tftv = {icon = 'File:Teamfortress.tv.png', text = 'TFTV Match Page'},
-}
-
 local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-		:addLinks(LINK_DATA, match.links)
-
-	return footer
 end
 
 ---@param match MatchGroupUtilMatch

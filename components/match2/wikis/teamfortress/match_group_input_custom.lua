@@ -38,6 +38,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
+	match.links = MatchFunctions.getLinks(match, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -67,7 +68,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
 	match.games = games
 	match.opponents = opponents
 
@@ -80,6 +80,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -126,16 +129,10 @@ end
 ---@param games table[]
 ---@return table
 function MatchFunctions.getLinks(match, games)
-	local links = {
-		rgl = match.rgl and 'https://rgl.gg/Public/Match.aspx?m=' .. match.rgl or nil,
-		ozf = match.ozf and 'https://warzone.ozfortress.com/matches/' .. match.ozf or nil,
-		etf2l = match.etf2l and 'http://etf2l.org/matches/' .. match.etf2l or nil,
-		tftv = match.tftv and'http://tf.gg/' .. match.tftv or nil,
-		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
-		esea = match.esea and 'https://play.esea.net/match/' .. match.esea or nil,
-		logstf = {},
-		logstfgold = {},
-	}
+	---@type table<string, string|table>
+	local links = MatchGroupInputUtil.getLinks(match)
+	links.logstf = {}
+	links.logstfgold = {}
 
 	Array.forEach(games or {}, function(game, gameIndex)
 		links.logstf[gameIndex] = game.logstf and ('https://logs.tf/' .. game.logstf) or nil

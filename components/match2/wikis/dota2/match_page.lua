@@ -10,7 +10,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local MatchLinks = mw.loadData('Module:MatchLinks')
+local Links = require('Module:Links')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -124,10 +124,10 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.opponents, function(opponent, index)
 		opponent.opponentIndex = index
 
-		if not opponent.template or not mw.ext.TeamTemplate.teamexists(opponent.template) then
+		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
+		if not teamTemplate then
 			return
 		end
-		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
 
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = teamTemplate.shortname
@@ -148,10 +148,10 @@ function MatchPage.getByMatchId(props)
 
 	-- Create an object array for links
 	local function processLink(site, link)
-		return Table.mergeInto({link = link}, MatchLinks[site])
+		return Table.mergeInto({link = link}, Links.getMatchIconData(site))
 	end
 
-	viewModel.links = Array.flatMap(Table.entries(viewModel.links), function(linkData)
+	viewModel.parsedLinks = Array.flatMap(Table.entries(viewModel.links), function(linkData)
 		local site, link = unpack(linkData)
 		if type(link) == 'table' then
 			return Array.map(link, function(sublink)

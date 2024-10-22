@@ -19,7 +19,6 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local MAX_NUM_BANS = 2
-local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 local DEFAULT_MODE = 'team'
 
 -- containers for process helper functions
@@ -143,23 +142,6 @@ end
 
 ---@param match table
 ---@return table
-function MatchFunctions.getLinks(match)
-	return {
-		stats = match.stats,
-		siegegg = match.siegegg and 'https://siege.gg/matches/' .. match.siegegg or nil,
-		opl = match.opl and 'https://www.opleague.eu/match/' .. match.opl or nil,
-		esl = match.esl and 'https://play.eslgaming.com/match/' .. match.esl or nil,
-		faceit = match.faceit and 'https://www.faceit.com/en/rainbow_6/room/' .. match.faceit or nil,
-		lpl = match.lpl and 'https://old.letsplay.live/match/' .. match.lpl or nil,
-		r6esports = match.r6esports
-			and 'https://www.ubisoft.com/en-us/esports/rainbow-six/siege/match/' .. match.r6esports or nil,
-		challengermode = match.challengermode and 'https://www.challengermode.com/games/' .. match.challengermode or nil,
-		ebattle = match.ebattle and 'https://www.ebattle.gg/turnier/match/' .. match.ebattle or nil,
-	}
-end
-
----@param match table
----@return table
 function MatchFunctions.getExtraData(match)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
@@ -173,11 +155,10 @@ end
 --
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
 -- Parse extradata information, particularally info about halfs and operator bans

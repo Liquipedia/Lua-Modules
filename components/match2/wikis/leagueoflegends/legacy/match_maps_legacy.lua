@@ -11,21 +11,17 @@ local MatchMapsLegacy = {}
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
-
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
 local MAX_NUMBER_OF_OPPONENTS = 2
 local MAX_MUMBER_OF_PLAYERS = 5
-local DUMMY_MAP_NAME = 'default'
 local DEFAULT = 'default'
 local DEFAULT_WIN = 'W'
 local DEFAULT_LOSS = 'L'
@@ -113,7 +109,11 @@ end
 function MatchMapsLegacy.handleDetails(args, details)
 	local getMapFromDetails = function (index)
 		local prefix = 'map' .. index
-		if not details[prefix] then
+		local mapDetails = Table.filterByKey(details, function(key)
+			return key == prefix or
+				string.find(key, '^' .. prefix .. '[^%d]') ~= nil
+		end)
+		if Logic.isEmpty(mapDetails) then
 			return nil
 		end
 		local map = {}
@@ -145,16 +145,15 @@ function MatchMapsLegacy.handleDetails(args, details)
 		details[prefix] = nil
 		details[prefix .. 'winner'] = nil
 		details[prefix .. 'length'] = nil
-		return MatchSubobjects.luaGetMap(map)
+		return map
 	end
 
 	local getMapOnlyWithWinner = function (index)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		return MatchSubobjects.luaGetMap{
+		return {
 			winner = args['map' .. index .. 'win'],
-			map = DUMMY_MAP_NAME
 		}
 	end
 
@@ -194,7 +193,6 @@ function MatchMapsLegacy.convertMaps(args)
 		for key, value in pairs(map) do
 			args[mapKey .. key] = value
 		end
-		args[mapKey] = DEFAULT
 		args[matchKey] = nil
 	end
 	return args

@@ -36,5 +36,8 @@ return {
 			status = 0,
 			matchWidth = 180,
 		},
+		transfers = {
+			showTeamName = true,
+		},
 	},
 }

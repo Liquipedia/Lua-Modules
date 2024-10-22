@@ -18,7 +18,6 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
 local SIDE_DEF = 'ct'
 local SIDE_ATK = 't'
 
@@ -47,6 +46,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, #opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -75,7 +75,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
 
@@ -146,12 +145,6 @@ end
 
 ---@param match table
 ---@return table
-function MatchFunctions.getLinks(match)
-	return {}
-end
-
----@param match table
----@return table
 function MatchFunctions.getExtraData(match)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
@@ -164,11 +157,10 @@ end
 --
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
 ---@param map table

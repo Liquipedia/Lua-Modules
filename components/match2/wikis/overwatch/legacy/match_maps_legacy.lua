@@ -17,7 +17,6 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local MapToMode = mw.loadData('Module:MapToMode')
 
@@ -99,7 +98,10 @@ end
 function MatchMapsLegacy._handleDetails(args, details)
 	Array.mapIndexes(function (index)
 		local prefix = 'map' .. index
-		local map = MatchSubobjects.luaGetMap{
+		if not details[prefix] then
+			return nil
+		end
+		local map = {
 			map = Table.extract(details, prefix),
 			score1 = Table.extract(details, prefix .. 'score1'),
 			score2 = Table.extract(details, prefix .. 'score2'),

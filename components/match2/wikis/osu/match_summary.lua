@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local NONE = '-'
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
@@ -26,13 +27,6 @@ local Icons = {
 	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
-
-local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	mplink = {icon = 'File:Osu single color allmode.png', text = 'Match Data'},
-}
-LINK_DATA.mplink2 = LINK_DATA.mplink
-LINK_DATA.mplink3 = LINK_DATA.mplink
 
 local VETO_TYPE_TO_TEXT = Table.copy(MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT)
 VETO_TYPE_TO_TEXT.protect = 'PROTECT'
@@ -62,15 +56,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
@@ -91,22 +76,15 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- Add casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Map Vetoes
 	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto(VETO_TYPE_TO_TEXT)))

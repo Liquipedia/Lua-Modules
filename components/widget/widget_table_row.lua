@@ -10,6 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class WidgetTableRowInput
 ---@field children Widget[]?
@@ -28,49 +30,18 @@ local TableRow = Class.new(
 	end
 )
 
----@param cell Widget?
----@return self
-function TableRow:addCell(cell)
-	table.insert(self.children, cell)
-	return self
-end
-
----@param class string|nil
----@return self
-function TableRow:addClass(class)
-	table.insert(self.classes, class)
-	return self
-end
-
----@param key string
----@param value string|number|nil
----@return self
-function TableRow:addCss(key, value)
-	self.css[key] = value
-	return self
-end
-
 ---@return integer
 function TableRow:getCellCount()
-	return #self.children
+	return #self.props.children
 end
 
----@param children string[]
----@return string?
-function TableRow:make(children)
-	local row = mw.html.create('div'):addClass('csstable-widget-row')
-
-	for _, class in ipairs(self.classes) do
-		row:addClass(class)
-	end
-
-	row:css(self.css)
-
-	for _, cell in ipairs(children) do
-		row:node(cell)
-	end
-
-	return tostring(row)
+---@return Widget
+function TableRow:render()
+	return HtmlWidgets.Div{
+		classes = WidgetUtil.collect('csstable-widget-row', unpack(self.classes)),
+		css = self.css,
+		children = self.props.children
+	}
 end
 
 return TableRow

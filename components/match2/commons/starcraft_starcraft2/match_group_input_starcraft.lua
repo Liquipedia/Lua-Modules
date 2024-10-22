@@ -51,6 +51,7 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = MatchFunctions.readOpponents(match)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -90,7 +91,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -142,6 +142,9 @@ function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	local subGroup = 0
 	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Logic.isEmpty(mapInput) then
+			break
+		end
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
@@ -206,20 +209,6 @@ function MatchFunctions.getBestOf(bestofInput)
 	end
 
 	return bestof
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-		preview2 = match.preview2,
-		interview = match.interview,
-		interview2 = match.interview2,
-		review = match.review,
-		recap = match.recap,
-		lrthread = match.lrthread,
-	}
 end
 
 ---@param match table

@@ -20,6 +20,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Links = Lua.import('Module:Links')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -511,7 +512,7 @@ end
 ---reads the caster input of a match
 ---@param match table
 ---@param options {noSort: boolean?}?
----@return string?
+---@return table[]?
 function MatchGroupInputUtil.readCasters(match, options)
 	options = options or {}
 	local casters = {}
@@ -527,7 +528,7 @@ function MatchGroupInputUtil.readCasters(match, options)
 		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 	end
 
-	return Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+	return Logic.nilIfEmpty(casters)
 end
 
 ---fills in missing information for a given caster
@@ -1040,6 +1041,16 @@ function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
 	return function(playerIndex, data)
 		return opponentIndex .. '_' .. playerIndex, data
 	end
+end
+
+---@param match table
+---@return table<string, string>
+function MatchGroupInputUtil.getLinks(match)
+	local links = Links.transform(match)
+	return Table.mapValues(
+		Links.makeFullLinksForTableItems(links, 'match', false),
+		String.nilIfEmpty
+	) --[[@as table<string, string>]]
 end
 
 --- Warning, both match and standalone match may be mutated

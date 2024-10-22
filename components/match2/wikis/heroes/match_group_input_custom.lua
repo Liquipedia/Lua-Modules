@@ -20,7 +20,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'default'
 
 local OPPONENT_CONFIG = {}
 
@@ -46,6 +45,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -75,7 +75,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -93,10 +92,6 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
-
-		if map.map == DUMMY_MAP then
-			map.map = nil
-		end
 
 		map.extradata = MapFunctions.getExtraData(map, opponentCount)
 
@@ -144,14 +139,6 @@ function MatchFunctions.getBestOf(match)
 	local bestOf = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		reddit = match.reddit
-	}
 end
 
 ---@param match table

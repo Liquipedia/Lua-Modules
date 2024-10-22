@@ -77,15 +77,6 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer
-end
-
----@param match MatchGroupUtilMatch
 ---@return boolean
 function CustomMatchSummary._isSolo(match)
 	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then

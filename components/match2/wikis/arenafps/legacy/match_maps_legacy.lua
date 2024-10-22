@@ -16,7 +16,6 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 
@@ -72,7 +71,7 @@ function MatchMapsLegacy._readMaps(matchArgs)
 			score2 = Table.extract(matchArgs, prefix .. 'score2'),
 			vod = Table.extract(matchArgs, 'vodgame' .. mapIndex)
 		}
-		matchArgs[prefix] = Logic.isNotEmpty(mapArgs) and MatchSubobjects.luaGetMap(mapArgs) or nil
+		matchArgs[prefix] = Logic.isNotEmpty(mapArgs) and mapArgs or nil
 	end)
 end
 

@@ -16,23 +16,13 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local LINK_DATA = {
-	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
-	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
-	headtohead = {
-		icon = 'File:Match_Info_Halo_H2H.png',
-		iconDark = 'File:Match_Info_Halo_H2H_darkmode.png',
-		text = 'Head-to-head statistics'
-	},
-	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
-}
 
 local CustomMatchSummary = {}
 
@@ -75,7 +65,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 	end
 
-	return footer:addLinks(LINK_DATA, match.links)
+	return footer:addLinks(match.links)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -99,21 +89,14 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	return body
@@ -144,14 +127,33 @@ function CustomMatchSummary._createMapRow(game)
 		centerNode:addClass('brkts-popup-spaced-map-skip')
 	end
 
+	local displayScore = function(opponentIndex)
+		local score = DisplayHelper.MapScore(
+			game.scores[opponentIndex],
+			opponentIndex,
+			game.resultType,
+			game.walkover,
+			game.winner
+		)
+		local points = game.extradata['points' .. opponentIndex]
+		if not points then
+			return score
+		end
+		local flipped = opponentIndex == 2
+		if flipped then
+            return '(' .. points .. ') ' .. score
+        end
+		return score .. ' (' .. points .. ')'
+	end
+
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._addCheckmark(game.winner == 1))
-		:node(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
+		:node(displayScore(1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
+		:node(displayScore(2))
 		:node(CustomMatchSummary._addCheckmark(game.winner == 2))
 
 	row:addElement(leftNode)

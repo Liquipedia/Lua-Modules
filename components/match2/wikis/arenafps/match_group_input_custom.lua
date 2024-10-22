@@ -40,6 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 
@@ -70,7 +71,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -88,6 +88,9 @@ end
 function MatchFunctions.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -137,20 +140,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-		quakehistory = match.quakehistory and ('http://www.quakehistory.com/en/matches/' .. match.quakehistory) or nil,
-		dbstats = match.dbstats and ('https://quakelife.ru/diabotical/stats/matches/?matches=' .. match.dbstats) or nil,
-		qrindr = match.qrindr and ('https://qrindr.com/match/' .. match.qrindr) or nil,
-		esl = match.esl and ('https://play.eslgaming.com/match/' .. match.esl) or nil,
-		pf = match.pf and ('https://www.plusforward.net/quake/post/' .. match.pf) or nil,
-		stats = match.stats,
-	}
 end
 
 --

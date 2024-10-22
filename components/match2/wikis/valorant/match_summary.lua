@@ -16,13 +16,10 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local LINK_DATA = {
-	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
-}
 
 ---@class ValorantAgents
 ---@operator call: ValorantAgents
@@ -157,15 +154,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
@@ -185,24 +173,17 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- Add Map Veto
 	body:addRow(MatchSummary.defaultMapVetoDisplay(match))
 
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
 end

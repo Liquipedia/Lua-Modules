@@ -19,6 +19,7 @@ local MapTypeIcon = require('Module:MapType')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local LEFT_SIDE = 1
@@ -31,7 +32,6 @@ local ICONS = {
 }
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local NO_CHARACTER = 'default'
-local LINK_DATA = {}
 
 local CustomMatchSummary = {}
 
@@ -114,11 +114,12 @@ function Brawler:_opponentBrawlerDisplay(brawlerData, numberOfBrawlers, flip, da
 	for index = 1, numberOfBrawlers do
 		local brawlerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
+			:addClass('brkts-champion-icon')
 			:css('float', flip and 'right' or 'left')
 			:node(CharacterIcon.Icon{
 				character = brawlerData[index] or NO_CHARACTER,
-				class = 'brkts-champion-icon',
 				date = date,
+				size = '48px'
 			})
 		if index == 1 then
 			brawlerDisplay:css('padding-left', '2px')
@@ -157,16 +158,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-
-	return footer:addLinks(LINK_DATA, match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
@@ -187,18 +178,11 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- Pre-Process Brawler picks

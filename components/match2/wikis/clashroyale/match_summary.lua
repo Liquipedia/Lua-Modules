@@ -20,6 +20,7 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -31,17 +32,6 @@ local CARD_COLOR_2 = 'red'
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local DEFAULT_CARD = 'default'
--- Normal links, from input/lpdb
-local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	interview = {icon = 'File:Interview32.png', text = 'Interview'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	royaleapi = {icon = 'File:RoyaleAPI_allmode.png', text = 'RoyaleAPI Match Page'},
-}
-LINK_DATA.review = LINK_DATA.recap
-LINK_DATA.preview2 = LINK_DATA.preview
-LINK_DATA.interview2 = LINK_DATA.interview
 
 local CustomMatchSummary = {}
 
@@ -49,15 +39,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '360px'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -95,16 +76,14 @@ end
 ---@param match MatchGroupUtilMatch
 ---@param body MatchSummaryBody
 function CustomMatchSummary._addMvp(match, body)
-	local mvpData = match.extradata.mvp
-	if Table.isEmpty(mvpData) or not mvpData.players then
+	if Table.isEmpty(match.extradata.mvp) then
 		return
 	end
 
-	local mvp = MatchSummary.Mvp()
-	Array.forEach(mvpData.players, FnUtil.curry(mvp.addPlayer, mvp))
-	mvp:setPoints(mvpData.points)
-
-	body:addRow(mvp)
+	body.root:node(MatchSummaryWidgets.Mvp{
+		players = match.extradata.mvp.players,
+		points = match.extradata.mvp.points,
+	})
 end
 
 ---@param game MatchGroupUtilGame
@@ -438,7 +417,8 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 				:addClass('brkts-champion-icon')
 				:node(CharacterIcon.Icon{
 					character = card,
-					date = date
+					date = date,
+					size = '48px'
 				})
 			)
 		end
@@ -450,7 +430,7 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 				wrapperCards:node(display)
 				display = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
-					:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'left' or 'right'))
+					:addClass(flip and 'brkts-popup-body-element-thumbs-right' or nil)
 			end
 
 			display:node(card)

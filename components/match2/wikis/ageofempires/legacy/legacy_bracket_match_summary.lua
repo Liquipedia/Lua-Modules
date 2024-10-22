@@ -9,9 +9,13 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local MatchGroupInputUtil = require('Module:MatchGroup/Input/Util')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local LegacyBracketMatchSummary = {}
+
+local DEFAULT = 'default'
 
 ---@param args table
 ---@return table
@@ -23,24 +27,33 @@ function LegacyBracketMatchSummary._handleMaps(args)
 		local prefix = 'map' .. mapIndex
 
 		--Template:MatchTeam
-		if args['match' .. mapIndex] then
-			local match = Json.parse(Table.extract(args, 'match' .. mapIndex)) --[[@as table]]
-			Table.mergeInto(args,
-					Table.map(match, function(subKey, value)
-						return prefix .. subKey, value
-					end)
-			)
-			args[prefix] = Table.extract(args, prefix .. 'map')
-			args[prefix .. 'mode'] = Table.extract(args, prefix .. 'mapmode')
-			args['date' .. mapIndex] = args['date' .. mapIndex] or Table.extract(args, prefix .. 'date')
+		local matchTeam = Json.parseIfTable(Table.extract(args, 'match' .. mapIndex)) or {}
+
+		local mapArgs = {
+			map = Table.extract(args, prefix) or Table.extract(matchTeam, 'map'),
+			mode = Table.extract(args, prefix .. 'mode') or Table.extract(matchTeam, 'mapmode'),
+			winner = Table.extract(args, prefix .. 'win') or Table.extract(matchTeam, 'win'),
+			civs1 = Table.extract(args, prefix .. 'p1civ') or Table.extract(matchTeam, 't1civs'),
+			civs2 = Table.extract(args, prefix .. 'p2civ') or Table.extract(matchTeam, 't2civs'),
+			players1 = Table.extract(matchTeam, 't1players'),
+			players2 = Table.extract(matchTeam, 't2players'),
+			vod = Table.extract(args, 'vodgame' .. mapIndex),
+			date = Table.extract(args, 'date' .. mapIndex) or Table.extract(matchTeam, 'date'),
+		}
+
+		local map = mapArgs.map
+		if map then
+			local mapInfo = Array.parseCommaSeparatedString(map, '|')
+			map = mapInfo[1]
+			if String.startsWith(map:lower(), DEFAULT) then
+				map = nil
+				mapArgs.walkover = MatchGroupInputUtil.STATUS_INPUTS.DEFAULT_WIN
+			end
+			mapArgs.map = map
 		end
 
-		if args[prefix] then
-			local mapInfo = Array.parseCommaSeparatedString(args[prefix], '|')
-			args[prefix] = mapInfo[1]
-		end
-
-		isValidMap = args[prefix] or args[prefix .. 'win']
+		isValidMap = mapArgs.map ~= nil or mapArgs.winner
+		args['map' .. mapIndex] = isValidMap and Json.stringify(mapArgs) or nil
 		mapIndex = mapIndex + 1
 	end
 

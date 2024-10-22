@@ -15,10 +15,12 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -68,7 +70,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	Array.forEach(match.games, function(game)
-		if not game.map and not game.winner then return end
+		if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
 		local row = MatchSummary.Row()
 				:addClass('brkts-popup-body-game')
 				:css('font-size', '0.75rem')
@@ -84,7 +86,7 @@ function CustomMatchSummary.createBody(match)
 	end)
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
 end
@@ -101,7 +103,7 @@ function CustomMatchSummary.addToFooter(match, footer)
 			mw.log('Unknown link: ' .. linkType)
 			return
 		end
-		for _, link in Table.iter.pairsByPrefix(match.links, linkType) do
+		for _, link in Table.iter.pairsByPrefix(match.links, linkType, {requireIndex = false}) do
 			footer:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end
 	end

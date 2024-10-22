@@ -44,6 +44,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
@@ -73,7 +74,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -89,6 +89,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if map.map == nil then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -189,24 +192,6 @@ function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	end
 	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
 	return not Opponent.isTbd(opponent)
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	local links = {}
-
-	-- Shift (formerly Octane)
-	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
-		links[key] = 'https://www.shiftrle.gg/matches/' .. shift
-	end
-
-	-- Ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
-		links[key] = 'https://ballchasing.com/group/' .. ballchasing
-	end
-
-	return links
 end
 
 ---@param opponents table[]

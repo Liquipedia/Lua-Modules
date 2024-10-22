@@ -18,7 +18,6 @@ local Table = require('Module:Table')
 
 local MatchGroup = Lua.import('Module:MatchGroup')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 
@@ -248,7 +247,7 @@ function MatchGroupLegacy:handleMap(details, mapIndex)
 		map = self:_copyAndReplace(blueprint, details, true)
 	end
 
-	return MatchSubobjects.luaGetMap(map)
+	return map
 end
 
 ---@param isReset boolean
