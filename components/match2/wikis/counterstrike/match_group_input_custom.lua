@@ -39,13 +39,7 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	---@type string
-	local finishedInput = tostring(Logic.nilOr(
-		Logic.readBoolOrNil(match.finished),
-		Variables.varDefault('tournament_status'),
-		match.finished,
-		''
-	))
+	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status') --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
@@ -246,12 +240,12 @@ end
 
 ---@param match table
 ---@param opponents table[]
----@param finishedInput string
+---@param finishedInput string?
 ---@return table
 function MatchFunctions.getExtraData(match, opponents, finishedInput)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and Logic.nilIfEmpty(finishedInput) or nil,
+		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and finishedInput or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
