@@ -97,7 +97,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-vertical-centered'},
-				children = {score and score or ('Game ' .. gameIndex)},
+				children = {score or ('Game ' .. gameIndex)},
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.Characters{
