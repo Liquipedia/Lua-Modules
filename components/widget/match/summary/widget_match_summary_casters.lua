@@ -13,8 +13,8 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchSummaryCasters: Widget
 ---@operator call(table): MatchSummaryCasters
@@ -47,13 +47,13 @@ function MatchSummaryCasters:render()
 		return nil
 	end
 
-	return Div{
+	return HtmlWidgets.Div{
 		classes = {'brkts-popup-comment'},
 		css = {['white-space'] = 'normal', ['font-size'] = '85%'},
-		children = {
+		children = WidgetUtil.collect(
 			#casters > 1 and 'Casters: ' or 'Caster: ',
-			Array.interleave(casters, ', '),
-		},
+			Array.interleave(casters, ', ')
+		),
 	}
 end
 
