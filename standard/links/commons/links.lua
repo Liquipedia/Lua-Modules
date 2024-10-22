@@ -405,10 +405,6 @@ local MATCH_ICONS = {
 		icon = 'File:Halo Data Hive allmode.png',
 		text = 'Match page on Halo Data Hive'
 	},
-	h2h = {
-		icon = 'File:Match Info Stats.png',
-		text = 'Head-to-head statistics'
-	},
 	headtohead = {
 		icon = 'File:Match Info Stats.png',
 		text = 'Head-to-head statistics'
