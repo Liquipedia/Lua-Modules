@@ -668,7 +668,7 @@ function MatchSummary.createDefaultHeader(match, options)
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
 end
 
----Default header function
+---Default footer function
 ---@param match table
 ---@param footer MatchSummaryFooter
 ---@return MatchSummaryFooter
