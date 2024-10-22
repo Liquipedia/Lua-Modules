@@ -560,9 +560,9 @@ end
 
 ---Fetches Icon Data for a given key
 ---@param key string
----@return string
+---@return {icon: string, text: string, iconDark: string?}?
 function Links.getMatchIconData(key)
-	return MATCH_ICONS[key]
+	return MATCH_ICONS[Links.removeAppendedNumber(key)]
 end
 
 return Class.export(Links, {frameOnly = true})

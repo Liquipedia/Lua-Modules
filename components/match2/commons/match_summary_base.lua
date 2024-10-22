@@ -21,6 +21,7 @@ local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Links =  Lua.import('Module:Links')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -302,7 +303,7 @@ end
 ---@return MatchSummaryFooter
 function Footer:addLinks(links)
 	for linkType, link in pairs(links) do
-		local currentLinkData = linkData[linkType]
+		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		elseif type(link) == 'table' then
