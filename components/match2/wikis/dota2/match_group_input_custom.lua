@@ -201,7 +201,7 @@ function MatchFunctions.getLinks(match, games, opponents)
 		return opponent.type == Opponent.team
 	end)
 	if Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))) and isTeamGame then
-		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
+		local team1, team2 = string.gsub(opponents[1].name, ' ', '_'), string.gsub(opponents[2].name, ' ', '_')
 		links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
 			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
 			'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
