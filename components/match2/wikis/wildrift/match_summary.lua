@@ -12,8 +12,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local ExternalLinks = require('Module:ExternalLinks')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -27,19 +25,6 @@ local NUM_CHAMPIONS_PICK = 5
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if Table.isNotEmpty(match.links) then
-		footer:addElement(ExternalLinks.print(match.links))
-	end
-
-	return footer
 end
 
 ---@param match MatchGroupUtilMatch
