@@ -70,9 +70,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMapRow(game))
-		end
+		body:addRow(CustomMatchSummary._createMapRow(game))
 	end
 
 	-- Add Match MVP(s)
@@ -93,8 +91,11 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return MatchSummaryRow?
 function CustomMatchSummary._createMapRow(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 
 	-- Add Header

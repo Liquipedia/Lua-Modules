@@ -270,17 +270,9 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
-	--local matchPageElement = mw.html.create('center')
-	--matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
-	--				:css('display', 'block')
-	--				:css('margin', 'auto')
-	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
-
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMap(game))
-		end
+		body:addRow(CustomMatchSummary._createMap(game))
 	end
 
 	-- Add Match MVP(s)
@@ -301,8 +293,11 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return MatchSummaryRow?
 function CustomMatchSummary._createMap(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 

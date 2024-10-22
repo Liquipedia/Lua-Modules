@@ -153,9 +153,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createGame(game))
-		end
+		body:addRow(CustomMatchSummary._createGame(game))
 	end
 
 	-- casters
@@ -165,8 +163,11 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
 	local extradata = game.extradata or {}

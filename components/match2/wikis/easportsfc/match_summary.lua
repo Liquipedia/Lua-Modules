@@ -44,38 +44,24 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
+	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
+	local gameFunc = hasSubMatches and CustomMatchSummary._createSubMatch or CustomMatchSummary._createGame
+
 	for _, game in ipairs(match.games) do
-		local row = MatchSummary.Row()
-			:addClass('brkts-popup-body-game')
-			:css('font-size', '84%')
-			:css('padding', '4px')
-			:css('min-height', '32px')
-
-		if Logic.readBool((match.extradata or {}).hassubmatches) then
-			CustomMatchSummary._createSubMatch(row, game, match)
-		else
-			CustomMatchSummary._createGame(row, game)
-		end
-
-		-- Add Comment
-		if not Logic.isEmpty(game.comment) then
-			row
-				:addElement(MatchSummary.Break():create())
-				:addElement(mw.html.create('div')
-					:wikitext(game.comment)
-					:css('margin', 'auto')
-				)
-		end
-
-		body:addRow(row)
+		body:addRow(gameFunc(game, match))
 	end
 
 	return body
 end
 
----@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
-function CustomMatchSummary._createGame(row, game)
+---@return MatchSummaryRow
+function CustomMatchSummary._createGame(game)
+	local row = MatchSummary.Row()
+			:addClass('brkts-popup-body-game')
+			:css('font-size', '84%')
+			:css('padding', '4px')
+			:css('min-height', '32px')
 	row
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
@@ -85,12 +71,28 @@ function CustomMatchSummary._createGame(row, game)
 		)
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+
+	-- Add Comment
+	if not Logic.isEmpty(game.comment) then
+		row
+			:addElement(MatchSummary.Break():create())
+			:addElement(mw.html.create('div')
+				:wikitext(game.comment)
+				:css('margin', 'auto')
+			)
+	end
+	return row
 end
 
----@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
 ---@param match MatchGroupUtilMatch
-function CustomMatchSummary._createSubMatch(row, game, match)
+---@return MatchSummaryRow
+function CustomMatchSummary._createSubMatch(game, match)
+	local row = MatchSummary.Row()
+			:addClass('brkts-popup-body-game')
+			:css('font-size', '84%')
+			:css('padding', '4px')
+			:css('min-height', '32px')
 	local players = CustomMatchSummary._extractPlayersFromGame(game, match)
 
 	row
@@ -110,6 +112,17 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		-- player right side
 		:addElement(CustomMatchSummary._players(players[2], 2, game.winner))
+
+	-- Add Comment
+	if not Logic.isEmpty(game.comment) then
+		row
+			:addElement(MatchSummary.Break():create())
+			:addElement(mw.html.create('div')
+				:wikitext(game.comment)
+				:css('margin', 'auto')
+			)
+	end
+	return row
 end
 
 ---@param game MatchGroupUtilGame
