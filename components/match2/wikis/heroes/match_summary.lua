@@ -13,7 +13,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local ExternalLinks = require('Module:ExternalLinks')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -56,19 +55,6 @@ end
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if Table.isNotEmpty(match.links) then
-		footer:addElement(ExternalLinks.print(match.links))
-	end
-
-	return footer
 end
 
 ---@param match MatchGroupUtilMatch

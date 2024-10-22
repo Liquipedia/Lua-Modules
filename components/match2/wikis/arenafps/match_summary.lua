@@ -67,27 +67,9 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
-	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
-end
-
----@param game MatchGroupUtilGame
 ---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
-
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummary.Break():create())
-	end
 
 	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')

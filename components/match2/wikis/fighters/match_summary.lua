@@ -78,15 +78,6 @@ function CustomMatchSummary._displayGames(match)
 	end)
 end
 
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer
-end
-
 ---@param game MatchGroupUtilGame
 ---@param teamIdx integer
 ---@return {name: string}[]
