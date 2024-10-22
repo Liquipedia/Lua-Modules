@@ -12,13 +12,10 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
-local ExternalLinks = require('Module:ExternalLinks')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 5
@@ -28,19 +25,6 @@ local NUM_CHAMPIONS_PICK = 5
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '420px'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if Table.isNotEmpty(match.links) then
-		footer:addElement(ExternalLinks.print(match.links))
-	end
-
-	return footer
 end
 
 ---@param match MatchGroupUtilMatch
@@ -73,34 +57,25 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		return nil
 	end
 
-	-- Map Comment
-	local comment = Logic.isNotEmpty(game.comment) and {
-		MatchSummaryWidgets.Break{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, children = game.comment},
-	} or {}
-
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
-		children = {
+		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
 				characters = characterData[1],
 				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			HtmlWidgets.Div{
-				classes = {'brkts-popup-body-element-vertical-centered'},
-				children = {Logic.isNotEmpty(game.length) and game.length or ('Game ' .. gameIndex)},
-			},
+			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.Characters{
 				flipped = true,
 				characters = characterData[2],
 				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
 			},
-			unpack(comment)
-		}
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
 	}
 end
 

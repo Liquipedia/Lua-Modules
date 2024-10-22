@@ -13,7 +13,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local ExternalLinks = require('Module:ExternalLinks')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -59,19 +58,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if Table.isNotEmpty(match.links) then
-		footer:addElement(ExternalLinks.print(match.links))
-	end
-
-	return footer
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
@@ -101,7 +87,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Character Bans
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)

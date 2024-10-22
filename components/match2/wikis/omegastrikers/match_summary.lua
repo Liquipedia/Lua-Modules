@@ -117,13 +117,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	return MatchSummary.addVodsToFooter(match, footer)
-end
-
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 

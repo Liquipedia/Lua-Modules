@@ -17,23 +17,8 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
-
 local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local LINK_DATA = {
-	cdl = {
-		icon = 'File:Call of Duty League lightmode.png',
-		iconDark = 'File:Call of Duty League darkmode.png',
-		text = 'Call of Duty League matchpage'
-	},
-	breakingpoint = {
-		icon = 'File:Breaking Point GG icon lightmode.png',
-		iconDark = 'File:Breaking Point GG icon darkmode.png',
-		text = 'Breaking Point matchpage'
-	},
-	reddit = {icon = 'File:Reddit-icon.png', text = 'Reddit stats'},
-}
 
 local CustomMatchSummary = {}
 
@@ -41,15 +26,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch

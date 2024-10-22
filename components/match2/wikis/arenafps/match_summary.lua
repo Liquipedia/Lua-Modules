@@ -24,29 +24,12 @@ local Icons = {
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
-local LINK_DATA = {
-	dbstats = {icon = 'File:Diabotical icon.png', text = 'QuakeLife matchpage'},
-	qrindr = {icon = 'File:Quake Champions icon.png', text = 'Qrindr matchpage'},
-	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
-	esl = {icon = 'File:ESL icon.png', text = 'Match page and stats on ESL'},
-	interview = {icon = 'File:Int_Icon.png', text = 'Interview'},
-}
-
 local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -78,33 +61,15 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
-end
-
----@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
-	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
 end
 
 ---@param game MatchGroupUtilGame
 ---@return MatchSummaryRow
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
-
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummary.Break():create())
-	end
 
 	local centerNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')

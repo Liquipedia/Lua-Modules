@@ -512,7 +512,7 @@ end
 ---reads the caster input of a match
 ---@param match table
 ---@param options {noSort: boolean?}?
----@return string?
+---@return table[]?
 function MatchGroupInputUtil.readCasters(match, options)
 	options = options or {}
 	local casters = {}
@@ -528,7 +528,7 @@ function MatchGroupInputUtil.readCasters(match, options)
 		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 	end
 
-	return Table.isNotEmpty(casters) and Json.stringify(casters) or nil
+	return Logic.nilIfEmpty(casters)
 end
 
 ---fills in missing information for a given caster

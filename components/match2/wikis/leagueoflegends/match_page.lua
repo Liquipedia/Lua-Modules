@@ -10,7 +10,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local MatchLinks = mw.loadData('Module:MatchLinks')
+local Links = require('Module:Links')
 local Operator = require('Module:Operator')
 local String = require('Module:String')
 local Table = require('Module:Table')
@@ -79,8 +79,8 @@ function MatchPage.getByMatchId(props)
 		DisplayHelper.MatchCountdownBlock(viewModel) or nil
 
 	-- Create an object array for links
-	viewModel.links = Array.extractValues(Table.map(viewModel.links, function(site, link)
-		return site, Table.mergeInto({link = link}, MatchLinks[site])
+	viewModel.parsedLinks = Array.extractValues(Table.map(viewModel.links, function(site, link)
+		return site, Table.mergeInto({link = link}, Links.getMatchIconData(site))
 	end))
 
 	-- Update the view model with game and team data
