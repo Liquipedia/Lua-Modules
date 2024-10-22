@@ -11,7 +11,6 @@ local CustomMatchSummary = {}
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local ExternalLinks = require('Module:ExternalLinks')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
