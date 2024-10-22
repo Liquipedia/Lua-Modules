@@ -360,17 +360,26 @@ local MATCH_ICONS = {
 		iconDark = 'File:Call of Duty League darkmode.png',
 		text = 'Call of Duty League matchpage'
 	},
-	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
+	challengermode = {
+		icon = 'File:Challengermode icon.png',
+		text = 'Match page on Challengermode'
+	},
 	datdota = {
 		icon = 'File:DatDota-icon.png',
 		text = 'datDota'
 	},
-	dbstats = {icon = 'File:Diabotical icon.png', text = 'QuakeLife matchpage'},
+	dbstats = {
+		icon = 'File:Diabotical icon.png',
+		text = 'QuakeLife matchpage'
+	},
 	dotabuff = {
 		icon = 'File:DOTABUFF-icon.png',
 		text = 'DOTABUFF'
 	},
-	ebattle = {icon = 'File:Ebattle Series allmode.png', text = 'Match page on ebattle'},
+	ebattle = {
+		icon = 'File:Ebattle Series allmode.png',
+		text = 'Match page on ebattle'
+	},
 	esl = {
 		icon = 'File:ESL_2019_icon_lightmode.png',
 		iconDark = 'File:ESL_2019_icon_darkmode.png',
@@ -380,7 +389,10 @@ local MATCH_ICONS = {
 		icon = 'File:ESEA icon allmode.png',
 		text = 'ESEA Match Page'
 	},
-	etf2l = {icon = 'File:ETF2L.png', text = 'ETF2L Match Page'},
+	etf2l = {
+		icon = 'File:ETF2L.png',
+		text = 'ETF2L Match Page'
+	},
 	faceit = {
 		icon = 'File:FACEIT icon allmode.png',
 		text = 'FACEIT match room'
@@ -389,32 +401,75 @@ local MATCH_ICONS = {
 		icon = 'File:Gol.gg allmode.png',
 		text = 'GolGG Match Report',
 	},
-	halodatahive = {icon = 'File:Halo Data Hive allmode.png',text = 'Match page on Halo Data Hive'},
-	h2h = {icon = 'File:Match Info Stats.png', text = 'Head-to-head statistics'},
+	halodatahive = {
+		icon = 'File:Halo Data Hive allmode.png',
+		text = 'Match page on Halo Data Hive'
+	},
+	h2h = {
+		icon = 'File:Match Info Stats.png',
+		text = 'Head-to-head statistics'
+	},
 	headtohead = {
 		icon = 'File:Match Info Stats.png',
 		text = 'Head-to-head statistics'
 	},
-	interview = {icon = 'File:Interview32.png', text = 'Interview'},
-	jcg = {icon = 'File:JCG-BMS icon.png', text = 'JCG matchpage'},
-	logstf = {icon = 'File:Logstf_icon.png', text = 'logs.tf Match Page '},
-	logstfgold = {icon = 'File:Logstf_gold_icon.png', text = 'logs.tf Match Page (Golden Cap) '},
-	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
+	interview = {
+		icon = 'File:Interview32.png',
+		text = 'Interview'
+	},
+	jcg = {
+		icon = 'File:JCG-BMS icon.png',
+		text = 'JCG matchpage'
+	},
+	logstf = {
+		icon = 'File:Logstf_icon.png',
+		text = 'logs.tf Match Page '
+	},
+	logstfgold = {
+		icon = 'File:Logstf_gold_icon.png',
+		text = 'logs.tf Match Page (Golden Cap) '
+	},
+	lpl = {
+		icon = 'File:LPL_Logo_lightmode.png',
+		iconDark = 'File:LPL_Logo_darkmode.png',
+		text = 'Match page on LPL Play'
+	},
 	lrthread = {
 		icon = 'File:LiveReport32.png',
 		text = 'Live Report Thread'
 	},
-	mplink = {icon = 'File:Osu single color allmode.png', text = 'Match Data'},
-	opl = {icon = 'File:OPL Icon 2023 allmode.png', text = 'OPL Match Page'},
-	overgg = {icon = 'File:overgg icon.png', text = 'over.gg matchpage'},
-	owl = {icon = 'File:Overwatch League 2023 allmode.png', text = 'Overwatch League matchpage'},
-	ozf = {icon = 'File:ozfortress-icon.png', text = 'ozfortress Match Page'},
-	pf = {icon = 'File:Plus Forward icon.png', text = 'Plus Forward matchpage'},
+	mplink = {
+		icon = 'File:Osu single color allmode.png',
+		text = 'Match Data'
+	},
+	opl = {
+		icon = 'File:OPL Icon 2023 allmode.png',
+		text = 'OPL Match Page'
+	},
+	overgg = {
+		icon = 'File:overgg icon.png',
+		text = 'over.gg matchpage'
+	},
+	owl = {
+		icon = 'File:Overwatch League 2023 allmode.png',
+		text = 'Overwatch League matchpage'
+	},
+	ozf = {
+		icon = 'File:ozfortress-icon.png',
+		text = 'ozfortress Match Page'
+	},
+	pf = {
+		icon = 'File:Plus Forward icon.png',
+		text = 'Plus Forward matchpage'
+	},
 	preview = {
 		icon = 'File:Preview Icon32.png',
 		text = 'Preview'
 	},
-	qrindr = {icon = 'File:Quake Champions icon.png', text = 'Qrindr matchpage'},
+	qrindr = {
+		icon = 'File:Quake Champions icon.png',
+		text = 'Qrindr matchpage'
+	},
 	r6esports = {
 		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
 		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
@@ -428,25 +483,52 @@ local MATCH_ICONS = {
 		icon = 'File:Reddit-icon.png',
 		text = 'Reddit Thread',
 	},
-	review = {icon = 'File:Reviews32.png', text = 'Review'},
-	rgl = {icon = 'File:RGL_Logo.png', text = 'RGL Match Page'},
-	royaleapi = {icon = 'File:RoyaleAPI_allmode.png', text = 'RoyaleAPI Match Page'},
-	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
+	review = {
+		icon = 'File:Reviews32.png',
+		text = 'Review'
+	},
+	rgl = {
+		icon = 'File:RGL_Logo.png',
+		text = 'RGL Match Page'
+	},
+	royaleapi = {
+		icon = 'File:RoyaleAPI_allmode.png',
+		text = 'RoyaleAPI Match Page'
+	},
+	siegegg = {
+		icon = 'File:SiegeGG icon.png',
+		text = 'SiegeGG Match Page'
+	},
 	smiteesports = {
 		icon = 'File:SMITE default lightmode.png',
 		iconDark = 'File:SMITE default darkmode.png',
 		text = 'Smite Esports Match Page'
 	},
-	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
+	stats = {
+		icon = 'File:Match_Info_Stats.png',
+		text = 'Match Statistics'
+	},
 	stratz = {
 		icon = 'File:STRATZ_icon_lightmode.svg',
 		iconDark = 'File:STRATZ_icon_darkmode.svg',
 		text = 'STRATZ'
 	},
-	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
-	tftv = {icon = 'File:Teamfortress.tv.png', text = 'TFTV Match Page'},
-	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
-	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
+	tespa = {
+		icon = 'File:Tespa icon.png',
+		text = 'Tespa matchpage'
+	},
+	tftv = {
+		icon = 'File:Teamfortress.tv.png',
+		text = 'TFTV Match Page'
+	},
+	vlr = {
+		icon = 'File:VLR icon.png',
+		text = 'Matchpage and Stats on VLR'
+	},
+	wl = {
+		icon = 'File:Winstons Lab-icon.png',
+		text = 'Winstons Lab matchpage'
+	},
 }
 
 MATCH_ICONS = Table.merge(MATCH_ICONS, CustomData.matchIcons or {})
