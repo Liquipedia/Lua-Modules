@@ -7,12 +7,10 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local MatchSummaryBreak = Lua.import('Module:Widget/Match/Summary/Break')
 
 ---@class MatchSummaryGameCenter: Widget
 ---@operator call(table): MatchSummaryGameCenter
