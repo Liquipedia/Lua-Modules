@@ -25,13 +25,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	return MatchSummary.addVodsToFooter(match, footer)
-end
-
----@param match MatchGroupUtilMatch
 ---@return Widget
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
