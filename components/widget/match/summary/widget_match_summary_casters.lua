@@ -28,7 +28,7 @@ function MatchSummaryCasters:render()
 	end
 
 	local casters = Array.map(self.props.casters, function(caster)
-		if Logic.isEmpty(caster) then
+		if not caster.name then
 			return nil
 		end
 
