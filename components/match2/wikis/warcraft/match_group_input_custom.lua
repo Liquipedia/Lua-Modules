@@ -240,16 +240,16 @@ end
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(opponents)
 	if #opponents ~= 2 or Array.any(opponents, function(opponent)
-		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
+		return opponent.type ~= Opponent.solo or not ((opponent.match2players or {})[1] or {}).name end)
 	then
 		return
 	end
 
 	return (tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
 		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
-		.. opponents[1].players[1].pageName
+		.. opponents[1].players[1].name
 		.. '&Head_to_head_query%5Bopponent%5D='
-		.. opponents[2].players[1].pageName
+		.. opponents[2].players[1].name
 		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
 end
 
