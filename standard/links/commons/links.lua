@@ -445,10 +445,6 @@ local MATCH_ICONS = {
 	},
 	tespa = {icon = 'File:Tespa icon.png', text = 'Tespa matchpage'},
 	tftv = {icon = 'File:Teamfortress.tv.png', text = 'TFTV Match Page'},
-	vod = {
-		icon = 'File:VOD Icon.png',
-		text = 'Watch VOD'
-	},
 	vlr = {icon = 'File:VLR icon.png', text = 'Matchpage and Stats on VLR'},
 	wl = {icon = 'File:Winstons Lab-icon.png', text = 'Winstons Lab matchpage'},
 }
