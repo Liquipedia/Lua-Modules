@@ -54,7 +54,7 @@ function CustomMatchSummary.createBody(match)
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
-		unpack(Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date))),
+		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)}
@@ -81,7 +81,7 @@ function CustomMatchSummary._createGame(date, game, gameIndex)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '80%', padding = '4px'},
+		css = {['font-size'] = '80%', padding = '4px', ['min-height'] = '32px'},
 		children = {
 			MatchSummaryWidgets.Characters{
 				flipped = false,
