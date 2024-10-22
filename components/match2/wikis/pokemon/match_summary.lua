@@ -81,7 +81,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
-		children = {
+		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{
 				flipped = false,
 				characters = characterData[1],
@@ -98,7 +98,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 				date = date,
 			},
 			MatchSummaryWidgets.GameComment{children = game.comment}
-		}
+		)
 	}
 end
 

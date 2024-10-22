@@ -65,7 +65,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
-		children = {
+		children = WidgetUtil.collect(
 			CustomMatchSummary._createIcon(ICONS[extradata.team1side]),
 			MatchSummaryWidgets.Characters{
 				characters = CustomMatchSummary._getHeroesForOpponent(game.participants, 1),
@@ -80,7 +80,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 			},
 			CustomMatchSummary._createIcon(ICONS[extradata.team2side]),
 			MatchSummaryWidgets.GameComment{children = game.comment}
-		}
+		)
 	}
 end
 
