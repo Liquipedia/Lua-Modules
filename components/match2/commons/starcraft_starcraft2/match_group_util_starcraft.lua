@@ -328,9 +328,12 @@ end
 ---@param match StarcraftMatchGroupUtilMatch
 ---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
+	local linksWithoutH2H = Table.filterByKey(match.links, function(key)
+		return key ~= 'headtohead'
+	end)
 	return match.dateIsExact
 		or String.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or not Table.isEmpty(linksWithoutH2H)
 		or String.isNotEmpty(match.comment)
 		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes
