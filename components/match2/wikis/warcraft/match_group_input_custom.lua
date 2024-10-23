@@ -71,6 +71,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
 	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = MatchFunctions.getHeadToHeadLink(opponents)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -233,6 +234,23 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end))
 
 	return extradata
+end
+
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(opponents)
+	if #opponents ~= 2 or Array.any(opponents, function(opponent)
+		return opponent.type ~= Opponent.solo or not ((opponent.match2players or {})[1] or {}).name end)
+	then
+		return
+	end
+
+	return (tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
+		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
+		.. opponents[1].players[1].name
+		.. '&Head_to_head_query%5Bopponent%5D='
+		.. opponents[2].players[1].name
+		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
 end
 
 ---@param mapInput table

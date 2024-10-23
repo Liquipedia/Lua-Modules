@@ -350,6 +350,10 @@ local ICON_KEYS_TO_RENAME = {
 }
 
 local MATCH_ICONS = {
+	ballchasing = {
+		icon = 'File:Ballchasing icon.png',
+		text = 'Ballchasing replays'
+	},
 	breakingpoint = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
 		iconDark = 'File:Breaking Point GG icon darkmode.png',
@@ -363,6 +367,10 @@ local MATCH_ICONS = {
 	challengermode = {
 		icon = 'File:Challengermode icon.png',
 		text = 'Match page on Challengermode'
+	},
+	civdraft = {
+		text = 'Civ Draft',
+		icon = 'File:Civ Draft Icon.png'
 	},
 	datdota = {
 		icon = 'File:DatDota-icon.png',
@@ -434,6 +442,10 @@ local MATCH_ICONS = {
 		icon = 'File:LiveReport32.png',
 		text = 'Live Report Thread'
 	},
+	mapdraft = {
+		text = 'Map Draft',
+		icon = 'File:Map Draft Icon.png'
+	},
 	mplink = {
 		icon = 'File:Osu single color allmode.png',
 		text = 'Match Data'
@@ -490,6 +502,10 @@ local MATCH_ICONS = {
 	royaleapi = {
 		icon = 'File:RoyaleAPI_allmode.png',
 		text = 'RoyaleAPI Match Page'
+	},
+	shift = {
+		icon = 'File:ShiftRLE icon.png',
+		text = 'ShiftRLE matchpage'
 	},
 	siegegg = {
 		icon = 'File:SiegeGG icon.png',

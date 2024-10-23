@@ -11,12 +11,10 @@ local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -29,17 +27,6 @@ local PlayerDisplay = require('Module:Player/Display')
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
 local DRAW_LINE = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local LINKDATA = {
-	mapdraft = {
-		text = 'Map Draft',
-		icon = 'File:Map Draft Icon.png'
-	},
-	civdraft = {
-		text = 'Civ Draft',
-		icon = 'File:Civ Draft Icon.png'
-	}
-}
 
 local CustomMatchSummary = {}
 
@@ -89,45 +76,6 @@ function CustomMatchSummary.createBody(match)
 	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	return body
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	local addLinks = function(linkType)
-		local currentLinkData = LINKDATA[linkType]
-		if not currentLinkData then
-			mw.log('Unknown link: ' .. linkType)
-			return
-		end
-		for _, link in Table.iter.pairsByPrefix(match.links, linkType, {requireIndex = false}) do
-			footer:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
-		end
-	end
-
-	addLinks('mapdraft')
-	addLinks('civdraft')
-
-	if not Logic.readBool(match.extradata.headtohead) or not CustomMatchSummary._isSolo(match) then
-		return footer
-	end
-
-	if not Opponent.isEmpty(match.opponents[1]) and not Opponent.isEmpty(match.opponents[2]) then
-		local player1, player2 = string.gsub(match.opponents[1].name, ' ', '_'),
-			string.gsub(match.opponents[2].name, ' ', '_')
-		footer:addElement(
-			'[[File:Match Info Stats.png|link=' ..
-			tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..
-			player1 ..
-			'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query|Head-to-head statistics]]'
-		)
-	end
-
-	return footer
 end
 
 ---@param match MatchGroupUtilMatch
