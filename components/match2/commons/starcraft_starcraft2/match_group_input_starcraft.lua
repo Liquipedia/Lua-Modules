@@ -51,6 +51,8 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	local opponents = MatchFunctions.readOpponents(match)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = MatchFunctions.getHeadToHeadLink(match, opponents)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -89,7 +91,6 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -141,6 +142,9 @@ function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	local subGroup = 0
 	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Logic.isEmpty(mapInput) then
+			break
+		end
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
@@ -208,29 +212,13 @@ function MatchFunctions.getBestOf(bestofInput)
 end
 
 ---@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-		preview2 = match.preview2,
-		interview = match.interview,
-		interview2 = match.interview2,
-		review = match.review,
-		recap = match.recap,
-		lrthread = match.lrthread,
-	}
-end
-
----@param match table
 ---@param numberOfGames integer
 ---@return table
 function MatchFunctions.getExtraData(match, numberOfGames)
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		headtohead = tostring(Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')))),
 		ffa = 'false',
 	}
-	Variables.varDefine('headtohead', extradata.headtohead)
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
 		MatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
@@ -241,6 +229,27 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 	end)
 
 	return extradata
+end
+
+---@param match table
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(match, opponents)
+	local showH2H = Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')))
+	Variables.varDefine('headtohead', tostring(showH2H))
+
+	if not showH2H or #opponents ~= 2 or Array.any(opponents, function(opponent)
+		return opponent.type ~= Opponent.solo or not ((opponent.match2players or {})[1] or {}).name end)
+	then
+		return
+	end
+
+	return (tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
+		.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
+		.. opponents[1].match2players[1].name
+		.. '&Head_to_head_query%5Bopponent%5D='
+		.. opponents[2].match2players[1].name
+		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
 end
 
 ---@param extradata table

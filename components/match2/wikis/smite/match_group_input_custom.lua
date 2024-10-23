@@ -20,7 +20,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
-local DUMMY_MAP = 'default'
 local MAX_NUM_PLAYERS = 15
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
@@ -50,6 +49,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -77,7 +77,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -124,15 +123,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		stats = match.stats,
-		smiteesports = match.smiteesports and ('https://www.smiteesports.com/matches/' .. match.smiteesports) or nil,
-	}
 end
 
 ---@param match table
@@ -185,11 +175,10 @@ function MapFunctions.readMap(map, opponentCount)
 end
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
 ---@param winnerInput string|integer|nil

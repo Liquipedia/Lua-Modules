@@ -38,6 +38,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -65,7 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -81,6 +81,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if map.map == nil then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -132,21 +135,6 @@ function MatchFunctions.getBestOf(match)
 	local bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		owl = match.owl and 'https://web.archive.org/web/overwatchleague.com/en-us/match/' .. match.owl or nil,
-		jcg = match.jcg and 'https://web.archive.org/web/ow.j-cg.com/compe/view/match/' .. match.jcg or nil,
-		tespa = match.tespa and 'https://web.archive.org/web/compete.tespa.org/tournament/' .. match.tespa or nil,
-		overgg = match.overgg and 'http://www.over.gg/' .. match.overgg or nil,
-		pf = match.pf and 'http://www.plusforward.net/overwatch/post/' .. match.pf or nil,
-		wl = match.wl and 'https://www.winstonslab.com/matches/match.php?id=' .. match.wl or nil,
-		faceit = match.faceit and 'https://www.faceit.com/en/ow2/room/' .. match.faceit or nil,
-		stats = match.stats,
-	}
 end
 
 ---@param match table

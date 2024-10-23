@@ -75,11 +75,12 @@ function Striker:_opponentStrikerDisplay(strikerData, numberOfStrikers, flip, da
 	for index = 1, numberOfStrikers do
 		local strikerDisplay = mw.html.create('div')
 			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
+			:addClass('brkts-champion-icon')
 			:css('float', flip and 'right' or 'left')
 			:node(CharacterIcon.Icon{
 				character = strikerData[index] or NO_CHARACTER,
-				class = 'brkts-champion-icon',
 				date = date,
+				size = '48px',
 			})
 		if index == 1 then
 			strikerDisplay:css('padding-left', '2px')
@@ -116,13 +117,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	return MatchSummary.addVodsToFooter(match, footer)
-end
-
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
 
@@ -136,9 +130,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMapRow(game))
-		end
+		body:addRow(CustomMatchSummary._createMapRow(game))
 	end
 
 	-- Pre-Process Striker picks
@@ -211,6 +203,9 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 end
 
 function CustomMatchSummary._createMapRow(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 
 	-- Add Header

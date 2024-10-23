@@ -52,39 +52,14 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
-	Array.forEach(CustomMatchSummary._displayGames(match), FnUtil.curry(body.addRow, body))
-
-	return body
-end
-
----@param match MatchGroupUtilMatch
----@return MatchSummaryRow[]
-function CustomMatchSummary._displayGames(match)
-	return Array.map(match.games, function(game)
-		local row = MatchSummary.Row()
-				:addClass('brkts-popup-body-game')
-				:css('font-size', '0.75rem')
-				:css('padding', '4px')
-				:css('min-height', '24px')
-
-		local elements = CustomMatchSummary._createStandardGame(game, {
+	Array.forEach(match.games, function(game)
+		body:addRow(CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
 			game = match.game,
-		})
-
-		Array.forEach(elements, FnUtil.curry(row.addElement, row))
-
-		return row
+		}))
 	end)
-end
 
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer
+	return body
 end
 
 ---@param game MatchGroupUtilGame
@@ -104,6 +79,12 @@ end
 ---@param props {game: string?, opponents: standardOpponent[]}
 ---@return Html[]
 function CustomMatchSummary._createStandardGame(game, props)
+	local row = MatchSummary.Row()
+		:addClass('brkts-popup-body-game')
+		:css('font-size', '0.75rem')
+		:css('padding', '4px')
+		:css('min-height', '24px')
+
 	game.extradata = game.extradata or {}
 
 	local elements = {}
@@ -123,14 +104,14 @@ function CustomMatchSummary._createStandardGame(game, props)
 		true
 	)
 
-	table.insert(elements, chars1:css('flex-basis', '30%'))
-	table.insert(elements, CustomMatchSummary._createCheckMark(game.winner, 1))
-	table.insert(elements, mw.html.create('div')
+	row:addElement(chars1:css('flex-basis', '30%'))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
+	row:addElement(mw.html.create('div')
 			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
 			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
 	)
-	table.insert(elements, CustomMatchSummary._createCheckMark(game.winner, 2))
-	table.insert(elements, chars2:css('flex-basis', '30%'):css('text-align', 'right'))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
 
 	return elements
 end

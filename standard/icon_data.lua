@@ -58,6 +58,9 @@ return {
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
+	link = 'fad fa-link',
+	insidesource = 'fad fa-user-secret',
+	transferdatabase = 'fad fa-scroll',
 
 	-- Usage: Section links, navigation
 	activestage = 'fas fa-bell-exclamation',
@@ -74,7 +77,11 @@ return {
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
 
-	-- Usage: Sqaud Table
+	-- Usage: Squad Table
 	captain = 'fas fa-crown',
 	substitute = 'fas fa-people-arrows',
+
+	-- Usage: Deadlock
+	amberhand = 'fas fa-hand-paper',
+	sapphireflame = 'fas fa-fire',
 }

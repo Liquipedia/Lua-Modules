@@ -18,6 +18,7 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local POSITION_LEFT = 1
 local POSITION_RIGHT = 2
@@ -30,25 +31,7 @@ local ROUND_ICONS = {
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
-local LINK_DATA = {
-	siegegg = {icon = 'File:SiegeGG icon.png', text = 'SiegeGG Match Page'},
-	opl = {icon = 'File:OPL Icon 2023 allmode.png', text = 'OPL Match Page'},
-	esl = {
-		icon = 'File:ESL_2019_icon_lightmode.png',
-		iconDark = 'File:ESL_2019_icon_darkmode.png',
-		text = 'Match page on ESL'
-	},
-	faceit = {icon = 'File:FACEIT-icon.png', text = 'Match page on FACEIT'},
-	lpl = {icon = 'File:LPL_Logo_lightmode.png', iconDark = 'File:LPL_Logo_darkmode.png', text = 'Match page on LPL Play'},
-	r6esports = {
-		icon = 'File:Rainbow 6 Esports 2023 lightmode.png',
-		iconDark = 'File:Rainbow 6 Esports 2023 darkmode.png',
-		text = 'R6 Esports Match Page'
-	},
-	challengermode = {icon = 'File:Challengermode icon.png', text = 'Match page on Challengermode'},
-	stats = {icon = 'File:Match_Info_Stats.png', text = 'Match Statistics'},
-	ebattle = {icon = 'File:Ebattle Series allmode.png', text = 'Match page on ebattle'},
-}
+
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 -- Operator Bans Class
@@ -275,15 +258,6 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local body = MatchSummary.Body()
@@ -296,36 +270,21 @@ function CustomMatchSummary.createBody(match)
 		))
 	end
 
-	--local matchPageElement = mw.html.create('center')
-	--matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
-	--				:css('display', 'block')
-	--				:css('margin', 'auto')
-	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
-
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMap(game))
-		end
+		body:addRow(CustomMatchSummary._createMap(game))
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- casters
-	body:addRow(MatchSummary.makeCastersRow(match.extradata.casters))
+	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Map Vetoes
 	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))
@@ -334,8 +293,11 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return MatchSummaryRow?
 function CustomMatchSummary._createMap(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 

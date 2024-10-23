@@ -104,6 +104,9 @@ end
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	for mapKey, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 

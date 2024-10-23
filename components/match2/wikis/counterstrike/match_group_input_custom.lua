@@ -19,8 +19,6 @@ local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
-
 local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
@@ -41,7 +39,7 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
+	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status') --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
@@ -52,6 +50,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = MatchFunctions.extractMaps(match, #opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
+	match.links = MatchFunctions.getLinks(match, games)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -77,16 +76,14 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
-	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
 
 	match.games = games
 	match.opponents = opponents
 
-	match.extradata = MatchFunctions.getExtraData(match, opponents)
+	match.extradata = MatchFunctions.getExtraData(match, opponents, finishedInput)
 
 	return match
 end
@@ -198,14 +195,6 @@ function MatchFunctions.getLinks(match, maps)
 	end)
 end
 
----@param match table
----@return string?
-function MatchFunctions.getMatchStatus(match)
-	if match.status == 'np' then
-		return Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
-	end
-end
-
 ---@param name string?
 ---@param year string|osdate
 ---@return number
@@ -249,11 +238,12 @@ end
 
 ---@param match table
 ---@param opponents table[]
+---@param finishedInput string?
 ---@return table
-function MatchFunctions.getExtraData(match, opponents)
+function MatchFunctions.getExtraData(match, opponents, finishedInput)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = MatchFunctions.getMatchStatus(match),
+		status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
@@ -265,11 +255,10 @@ end
 --
 
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP_NAME
+	return map.map ~= nil
 end
 
 -- Parse extradata information

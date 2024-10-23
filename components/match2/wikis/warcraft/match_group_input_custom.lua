@@ -70,6 +70,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = MatchFunctions.getHeadToHeadLink(opponents)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -108,7 +110,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchFunctions.getLinks(match)
 	match.extradata = MatchFunctions.getExtraData(match, #games)
 
 	match.games = games
@@ -148,6 +149,9 @@ function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	local subGroup = 0
 	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Logic.isEmpty(mapInput) then
+			break
+		end
 		local map
 		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
 
@@ -214,16 +218,6 @@ function MatchFunctions.getBestOf(bestofInput)
 end
 
 ---@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-		review = match.review,
-		recap = match.recap,
-	}
-end
-
----@param match table
 ---@param numberOfGames integer
 ---@return table
 function MatchFunctions.getExtraData(match, numberOfGames)
@@ -239,6 +233,23 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end))
 
 	return extradata
+end
+
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(opponents)
+	if #opponents ~= 2 or Array.any(opponents, function(opponent)
+		return opponent.type ~= Opponent.solo or not ((opponent.match2players or {})[1] or {}).name end)
+	then
+		return
+	end
+
+	return (tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
+		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
+		.. opponents[1].match2players[1].name
+		.. '&Head_to_head_query%5Bopponent%5D='
+		.. opponents[2].match2players[1].name
+		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
 end
 
 ---@param mapInput table

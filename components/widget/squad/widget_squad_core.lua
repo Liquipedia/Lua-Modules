@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -16,37 +15,35 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 local Widgets = Lua.import('Module:Widget/All')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+
+local DataTable, Tr, Th = Widgets.DataTable, Widgets.Tr, Widgets.Th
 
 ---@class SquadWidget: Widget
----@operator call:SquadWidget
----@field private injector WidgetInjector?
----@field type SquadType
----@field title string?
-local Squad = Class.new(Widget, function(self, props)
-	self.injector = props.injector
-	self.type = props.type
-	self.title = props.title
-end)
+---@operator call(table): SquadWidget
+local Squad = Class.new(Widget)
+Squad.defaultProps = {
+	type = SquadUtils.SquadType.ACTIVE,
+}
 
----@param children string[]
----@return string
-function Squad:make(children)
-	local title = self._title(self.type, self.title)
-	local header = self._header(self.type)
+---@return WidgetDataTable
+function Squad:render()
+	local title = self:_title(self.props.type, self.props.title)
+	local header = self:_header(self.props.type)
 
-	local allChildren = WidgetUtil.collect(title, header, unpack(children))
+	local allChildren = WidgetUtil.collect(title, header, unpack(self.props.children))
 
-	return Widgets.TableNew{
-		css = {['margin-bottom'] = '10px'},
+	return DataTable{
 		classes = {'wikitable-striped', 'roster-card'},
+		wrapperClasses = {'roster-card-wrapper'},
 		children = allChildren,
-	}:tryMake(self.injector) or ''
+	}
 end
 
 ---@param type SquadType
 ---@param title string?
----@return WidgetTableRowNew?
-function Squad._title(type, title)
+---@return Widget?
+function Squad:_title(type, title)
 	local defaultTitle
 	if type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE then
 		defaultTitle = 'Former Squad'
@@ -60,35 +57,37 @@ function Squad._title(type, title)
 		return
 	end
 
-	return Widgets.TableRowNew{
-		children = {Widgets.TableCellNew{content = {titleText}, colSpan = 10, header = true}}
+	return Tr{
+		children = {Th{children = {titleText}, attributes={colspan = 10}}}
 	}
 end
 
 ---@param type SquadType
----@return WidgetTableRowNew
-function Squad._header(type)
+---@return Widget
+function Squad:_header(type)
 	local isInactive = type == SquadUtils.SquadType.INACTIVE or type == SquadUtils.SquadType.FORMER_INACTIVE
 	local isFormer = type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE
-	return Widgets.TableRowNew{
+
+	local name = self:useContext(SquadContexts.NameSection, {Th{children = {'Name'}}})
+	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
+		Th{children = {'Inactive Date'}}
+	}) or nil
+	local former = isFormer and self:useContext(SquadContexts.FormerSection, {
+		Th{children = {'Leave Date'}},
+		Th{children = {'New Team'}},
+	}) or nil
+	local role = {Th{children = {self:useContext(SquadContexts.RoleTitle)}}}
+
+	return Tr{
 		classes = {'HeaderRow'},
-		children = Array.append({},
-			Widgets.TableCellNew{content = {'ID'}, header = true},
-			Widgets.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
-			Widgets.Customizable{id = 'header_name',
-				children = {Widgets.TableCellNew{content = {'Name'}, header = true}}
-			},
-			Widgets.Customizable{id = 'header_role',
-				children = {Widgets.TableCellNew{header = true}}
-			},
-			Widgets.TableCellNew{content = {'Join Date'}, header = true},
-			isInactive and Widgets.Customizable{id = 'header_inactive', children = {
-				Widgets.TableCellNew{content = {'Inactive Date'}, header = true},
-			}} or nil,
-			isFormer and Widgets.Customizable{id = 'header_former', children = {
-				Widgets.TableCellNew{content = {'Leave Date'}, header = true},
-				Widgets.TableCellNew{content = {'New Team'}, header = true},
-			}} or nil
+		children = WidgetUtil.collect(
+			Th{children = {'ID'}},
+			Th{}, -- "Team Icon" (most commmonly used for loans)
+			name,
+			role,
+			Th{children = {'Join Date'}},
+			inactive,
+			former
 		)
 	}
 end

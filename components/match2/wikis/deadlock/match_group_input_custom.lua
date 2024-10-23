@@ -87,7 +87,7 @@ function MatchFunctions.extractMaps(match, opponents)
 
 		map.map = nil
 		map.participants = MapFunctions.getParticipants(map, opponents)
-		map.extradata = MapFunctions.getExtraData(map)
+		map.extradata = MapFunctions.getExtraData(map, #opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
@@ -130,15 +130,26 @@ function MatchFunctions.getExtraData(match)
 end
 
 ---@param map table
+---@param opponentCount integer
 ---@return table
-function MapFunctions.getExtraData(map)
-	local extraData = {
+function MapFunctions.getExtraData(map, opponentCount)
+	local extradata = {
 		comment = map.comment,
 		team1side = map.team1side,
 		team2side = map.team2side,
 	}
 
-	return extraData
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
+	for opponentIndex = 1, opponentCount do
+		for _, ban, banIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
+			extradata['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(ban)
+		end
+		for _, pick, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h') do
+			extradata['team' .. opponentIndex .. 'hero' .. pickIndex] = getCharacterName(pick)
+		end
+	end
+
+	return extradata
 end
 
 ---@param map table

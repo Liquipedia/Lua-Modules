@@ -170,19 +170,13 @@ function Match.splitRecordsByType(match)
 		return {}
 	end
 
-	local gameRecordList = Match._moveRecordsFromMatchToList(
-		match,
-		match.match2games or match.games or {},
-		'map'
-	)
+	local gameRecordList = MatchGroupUtil.normalizeSubtype(match, 'map')
+	Match._removeLegacySubobjectRecords(match, 'map')
 	match.match2games = nil
 	match.games = nil
 
-	local opponentRecordList = Match._moveRecordsFromMatchToList(
-		match,
-		match.match2opponents or match.opponents or {},
-		'opponent'
-	)
+	local opponentRecordList = MatchGroupUtil.normalizeSubtype(match, 'opponent')
+	Match._removeLegacySubobjectRecords(match, 'opponent')
 	match.match2opponents = nil
 	match.opponents = nil
 
@@ -192,15 +186,8 @@ function Match.splitRecordsByType(match)
 			break
 		end
 
-		table.insert(
-			playerRecordList,
-			Match._moveRecordsFromMatchToList(
-				match,
-				opponentRecord.match2players or opponentRecord.players or {},
-				'opponent' .. opponentIndex .. '_p'
-			)
-		)
-
+		table.insert(playerRecordList, opponentRecord.match2players or opponentRecord.players or {})
+		Match._removeLegacySubobjectRecords(match, 'opponent' .. opponentIndex .. '_p')
 		opponentRecord.match2players = nil
 		opponentRecord.players = nil
 	end
@@ -213,19 +200,13 @@ function Match.splitRecordsByType(match)
 	}
 end
 
----Moves the records found by iterating through `match` by `typePrefix`
----to `list`. Sets the original location (so in `match`) to `nil`.
+---Sets the original location (so in `match`) to `nil` of suboject of a certain type.
 ---@param match table
----@param list table[]
 ---@param typePrefix string
----@return table[]
-function Match._moveRecordsFromMatchToList(match, list, typePrefix)
-	for key, item, index in Table.iter.pairsByPrefix(match, typePrefix) do
-		list[index] = list[index] or Json.parseIfTable(item) or item
+function Match._removeLegacySubobjectRecords(match, typePrefix)
+	for key in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
 	end
-
-	return list
 end
 
 --[[

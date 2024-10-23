@@ -57,6 +57,7 @@ return function(busted, helper, options)
 			table.insert(paths, 'components/hidden_data_box/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'components/squad/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'components/standings/wikis/'.. wiki ..'/?.lua')
+			table.insert(paths, 'components/transfer/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'standard/info/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'standard/region/wikis/'.. wiki ..'/?.lua')
 			table.insert(paths, 'standard/tier/wikis/'.. wiki ..'/?.lua')
@@ -75,13 +76,20 @@ return function(busted, helper, options)
 		table.insert(paths, 'components/squad/commons/?.lua')
 		table.insert(paths, 'components/standings/commons/?.lua')
 		table.insert(paths, 'components/team_card/?.lua')
+		table.insert(paths, 'components/transfer/commons/?.lua')
 		table.insert(paths, 'standard/info/commons/?.lua')
 		table.insert(paths, 'standard/region/commons/?.lua')
 		table.insert(paths, 'standard/links/commons/?.lua')
 		table.insert(paths, 'standard/tier/commons/?.lua')
 		table.insert(paths, 'components/widget/?.lua')
-		table.insert(paths, 'components/widget/squad/?.lua')
+		table.insert(paths, 'components/widget/basic/?.lua')
+		table.insert(paths, 'components/widget/contexts/?.lua')
+		table.insert(paths, 'components/widget/html/?.lua')
 		table.insert(paths, 'components/widget/infobox/?.lua')
+		table.insert(paths, 'components/widget/image/?.lua')
+		table.insert(paths, 'components/widget/match/summary/?.lua')
+		table.insert(paths, 'components/widget/misc/?.lua')
+		table.insert(paths, 'components/widget/squad/?.lua')
 
 		package.path = table.concat(paths, ';')
 	end
@@ -102,7 +110,7 @@ return function(busted, helper, options)
 
 	-- Top 10 wikis based on traffic
 	local wikis = {'dota2', 'valorant', 'counterstrike', 'rocketleague', 'mobilelegends', 'leagueoflegends', 'apexlegends', 'rainbowsix', 'overwatch', 'starcraft2'}
-	-- Warnings! Extremely time consuming!
+	-- Warnings! Extremely time consuming if different filesystems (eg. windows files with wsl)
 	local function allwikis(name, funcToRun, wikiArgs)
 		busted.executors.insulate('', function ()
 			for _, wiki in ipairs(wikis) do
@@ -127,6 +135,7 @@ return function(busted, helper, options)
 	local function GoldenTest(testname, actual)
 		local filename = 'spec/golden_masters/' .. testname .. '.txt'
 		local file = io.open(filename, 'r')
+		actual = tostring(actual)
 
 		---@diagnostic disable-next-line: undefined-field
 		if not file or _G.updategolden == true then

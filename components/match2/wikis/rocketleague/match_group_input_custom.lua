@@ -44,6 +44,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = MatchFunctions.getHeadToHeadLink(match, opponents)
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
@@ -72,7 +74,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -88,6 +89,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if map.map == nil then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -157,21 +161,30 @@ end
 
 ---@param match table
 ---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(match, opponents)
+	if not Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h'))) or
+		opponents[1].type ~= Opponent.team or
+		opponents[2].type ~= Opponent.team then
+
+		return nil
+	end
+
+	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
+	return tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
+		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
+		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
+end
+
+---@param match table
+---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, opponents)
-	local opponent1 = opponents[1]
-	local opponent2 = opponents[2]
-
-	local showh2h = Logic.readBool(Logic.emptyOr(match.showh2h, Variables.varDefault('showh2h')))
-		and opponent1.type == Opponent.team
-		and opponent2.type == Opponent.team
-
 	return {
-		showh2h = showh2h,
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
 		casters = MatchGroupInputUtil.readCasters(match),
-		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponent1),
-		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponent2),
+		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponents[1]),
+		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponents[2]),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
 	}
 end
@@ -187,24 +200,6 @@ function MatchFunctions._checkForNonEmptyOpponent(opponent)
 	end
 	-- Literal and Teams can use the default function, player's can not because of match2player vs player list names
 	return not Opponent.isTbd(opponent)
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	local links = {}
-
-	-- Shift (formerly Octane)
-	for key, shift in Table.iter.pairsByPrefix(match, 'shift', {requireIndex = false}) do
-		links[key] = 'https://www.shiftrle.gg/matches/' .. shift
-	end
-
-	-- Ballchasing
-	for key, ballchasing in Table.iter.pairsByPrefix(match, 'ballchasing', {requireIndex = false}) do
-		links[key] = 'https://ballchasing.com/group/' .. ballchasing
-	end
-
-	return links
 end
 
 ---@param opponents table[]

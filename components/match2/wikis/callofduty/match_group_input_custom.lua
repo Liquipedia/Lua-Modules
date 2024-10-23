@@ -38,6 +38,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
 	match.bestof = MatchFunctions.getBestOf(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -65,7 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -81,6 +81,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -128,16 +131,6 @@ function MatchFunctions.getBestOf(match)
 	local bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function MatchFunctions.getLinks(match)
-	return {
-		reddit = match.reddit and 'https://redd.it/' .. match.reddit or nil,
-		cdl = match.cdl and 'https://callofdutyleague.com/en-us/match/' .. match.cdl or nil,
-		breakingpoint = match.breakingpoint and 'https://www.breakingpoint.gg/match/' .. match.breakingpoint or nil,
-	}
 end
 
 ---@param match table

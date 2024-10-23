@@ -263,8 +263,8 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		local teamRaw = mw.ext.TeamTemplate.raw(team)
+	local teamRaw = team and mw.ext.TeamTemplate.raw(team)
+	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
 	end
@@ -468,9 +468,9 @@ function Person:_createTeam(team, link)
 	end
 	---@cast link -nil
 
-	if mw.ext.TeamTemplate.teamexists(link) then
-		local data = mw.ext.TeamTemplate.raw(link)
-		link, team = data.page, data.name
+	local teamRaw = mw.ext.TeamTemplate.raw(link)
+	if teamRaw then
+		link, team = teamRaw.page, teamRaw.name
 	end
 
 	return Page.makeInternalLink({onlyIfExists = true}, team, link) or team

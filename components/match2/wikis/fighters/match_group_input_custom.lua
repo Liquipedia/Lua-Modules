@@ -18,7 +18,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
-local DUMMY_MAP_NAME = 'Null' -- Is set in Template:Map when |map= is empty.
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	applyUnderScores = true,
@@ -88,9 +87,6 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		if map.map == DUMMY_MAP_NAME then
-			map.map = ''
-		end
 		map.extradata = {
 			comment = map.comment,
 		}

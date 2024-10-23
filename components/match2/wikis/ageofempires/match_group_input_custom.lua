@@ -44,6 +44,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games)
@@ -73,7 +75,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
 	match.stream = Streams.processStreams(match)
-	match.links = CustomMatchGroupInput._getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -148,6 +149,9 @@ end
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if map.map == nil and map.winner == nil then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -224,23 +228,6 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 	return match.game or data.game, Logic.emptyOr(mapsInfo, (Json.parse(data.maps)))
 end
 
----@param match table
-function CustomMatchGroupInput._getLinks(match)
-	local links = {}
-
-	match.civdraft1 = match.civdraft1 or match.civdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'civdraft') do
-		links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-
-	match.mapdraft1 = match.mapdraft1 or match.mapdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'mapdraft') do
-		links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-
-	return links
-end
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps)
@@ -253,9 +240,31 @@ end
 ---@return table
 function CustomMatchGroupInput._getExtraData(match)
 	return {
-		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
+end
+
+---@param match table
+---@param opponents table[]
+---@return string?
+function CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
+	if opponents[1].type ~= Opponent.solo or opponents[2].type ~= Opponent.solo then
+		return
+	end
+	if not Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead'))) then
+		return nil
+	end
+	if  Opponent.isEmpty(opponents[1]) or Opponent.isEmpty(opponents[2]) then
+		return nil
+	end
+
+	local player1, player2 =
+		string.gsub(opponents[1].name, ' ', '_'),
+		string.gsub(opponents[2].name, ' ', '_')
+
+	return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..player1 ..
+		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query'
 end
 
 ---@param map table
@@ -272,7 +281,12 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 	---@cast mapsInfo -nil
 	local info = Array.find(mapsInfo, function(m)
 		return m.name == map.map or m.link == map.map
-	end) or {}
+	end)
+	if not info then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with maps missing in infobox')
+		mw.logObject('Missing map: ' .. map.map)
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or ''), map.map
+	end
 	return info.link, info.name
 end
 

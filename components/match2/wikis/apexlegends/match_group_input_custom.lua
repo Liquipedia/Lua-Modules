@@ -19,7 +19,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local DEFAULT_MODE = 'team'
 
-local DUMMY_MAP_NAME = 'null' -- Is set in Template:Map when |map= is empty.
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	applyUnderScores = true,
@@ -99,10 +98,6 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		if map.map == DUMMY_MAP_NAME then
-			map.map = ''
-		end
-
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
@@ -132,7 +127,7 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.scores[opponentIndex] or 0
-		end), Operator.add, 0) + (opponents[opponentIndex].startingpoints or 0)
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
 end
 

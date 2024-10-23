@@ -9,9 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -21,6 +18,7 @@ local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Links =  Lua.import('Module:Links')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -177,7 +175,7 @@ function Row:css(name, value)
 	return self
 end
 
----@param element Html|string|nil
+---@param element Html|string|nil|Widget
 ---@return MatchSummaryRow
 function Row:addElement(element)
 	table.insert(self.elements, element)
@@ -199,58 +197,6 @@ function Row:create()
 		self.root:node(element)
 	end
 
-	return self.root
-end
-
----@class MatchSummaryMvp: MatchSummaryRowInterface
----@operator call: MatchSummaryMvp
----@field root Html
----@field players Html[]
-local Mvp = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-footer'):addClass('brkts-popup-mvp')
-		self.players = {}
-	end
-)
-
----@param player table|string
----@return MatchSummaryMvp
-function Mvp:addPlayer(player)
-	local playerDisplay
-	if Logic.isEmpty(player) then
-		return self
-	elseif type(player) == 'table' then
-		playerDisplay = '[[' .. player.name .. '|' .. player.displayname .. ']]'
-		if player.comment then
-			playerDisplay = playerDisplay .. ' (' .. player.comment .. ')'
-		end
-	else
-		playerDisplay = '[[' .. player .. ']]'
-	end
-
-	table.insert(self.players, playerDisplay)
-
-	return self
-end
-
----@param points number
----@return MatchSummaryMvp
-function Mvp:setPoints(points)
-	if Logic.isNumeric(points) then
-		self.points = points
-	end
-	return self
-end
-
----@return Html
-function Mvp:create()
-	local span = mw.html.create('span')
-	span:wikitext(#self.players > 1 and 'MVPs: ' or 'MVP: ')
-		:wikitext(table.concat(self.players, ', '))
-	if self.points and self.points ~= 1 then
-		span:wikitext(' ('.. self.points ..'pts)')
-	end
-	self.root:node(span)
 	return self.root
 end
 
@@ -350,12 +296,11 @@ function Footer:addLink(link, icon, iconDark, text)
 	return self
 end
 
----@param linkData table<string, {icon: string, text: string, iconDark: string?}>
 ---@param links table<string, string|table>
 ---@return MatchSummaryFooter
-function Footer:addLinks(linkData, links)
+function Footer:addLinks(links)
 	for linkType, link in pairs(links) do
-		local currentLinkData = linkData[linkType]
+		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		elseif type(link) == 'table' then
@@ -383,51 +328,11 @@ function Footer:create()
 	return self.root
 end
 
----MatchSummary Casters Class
----@class MatchSummaryCasters: MatchSummaryRowInterface
----@operator call: MatchSummaryCasters
----@field root Html
----@field casters string[]
-local Casters = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space','normal')
-			:css('font-size','85%')
-		self.casters = {}
-	end
-)
-
----adds a casters display to thge casters list
----@param caster {name: string, displayName: string, flag: string?}?
----@return MatchSummaryCasters
-function Casters:addCaster(caster)
-	if Logic.isNotEmpty(caster) then
-		---@cast caster -nil
-		local nameDisplay = '[[' .. caster.name .. '|' .. caster.displayName .. ']]'
-		if caster.flag then
-			table.insert(self.casters, Flags.Icon(caster.flag) .. '&nbsp;' .. nameDisplay)
-		else
-			table.insert(self.casters, nameDisplay)
-		end
-	end
-
-	return self
-end
-
----creates the casters display
----@return Html
-function Casters:create()
-	return self.root
-		:wikitext('Caster' .. (#self.casters > 1 and 's' or '') .. ': ')
-		:wikitext(mw.text.listToText(self.casters, ', ', ' & '))
-end
-
 ---@class MatchSummaryMatch
 ---@operator call: MatchSummaryMatch
 ---@field root Html
 ---@field headerElement Html?
----@field bodyElement Html?
+---@field bodyElement Widget|Html?
 ---@field commentElement Html?
 ---@field footerElement Html?
 local Match = Class.new(
@@ -443,10 +348,16 @@ function Match:header(header)
 	return self
 end
 
----@param body MatchSummaryBody
+---@param body MatchSummaryBody|Widget
 ---@return MatchSummaryMatch
 function Match:body(body)
-	self.bodyElement = body:create()
+	if type(body.create) == 'function' then
+		---@cast body MatchSummaryBody
+		self.bodyElement = body:create()
+	else
+		---@cast body Widget
+		self.bodyElement = body
+	end
 	return self
 end
 
@@ -628,8 +539,6 @@ end
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
 ---@field Break MatchSummaryBreak
----@field Mvp MatchSummaryMvp
----@field Casters MatchSummaryCasters
 ---@field Match MatchSummaryMatch
 ---@field MapVeto VetoDisplay
 ---@field DEFAULT_VETO_TYPE_TO_TEXT table
@@ -643,8 +552,6 @@ MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
-MatchSummary.Mvp = Mvp
-MatchSummary.Casters = Casters
 MatchSummary.Match = Match
 MatchSummary.MapVeto = MapVeto
 MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT = DEFAULT_VETO_TYPE_TO_TEXT
@@ -714,6 +621,14 @@ function MatchSummary.createDefaultHeader(match, options)
 		:leftScore(header:createScore(match.opponents[1]))
 		:rightScore(header:createScore(match.opponents[2]))
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
+end
+
+---Default footer function
+---@param match table
+---@param footer MatchSummaryFooter
+---@return MatchSummaryFooter
+function MatchSummary.createDefaultFooter(match, footer)
+	return MatchSummary.addVodsToFooter(match, footer):addLinks(match.links)
 end
 
 ---Creates a match footer with vods if vods are set
@@ -814,7 +729,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 		local comment = MatchSummary.Comment():content(matchData.comment):content(substituteComment)
 		match:comment(comment)
 	end
-	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.addVodsToFooter
+	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
 	return match
@@ -856,18 +771,6 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	return matchSummary:create()
 end
 
----Default getByMatchId function for usage in Custom MatchSummary
----@param castersInput string?
----@return MatchSummaryCasters?
-function MatchSummary.makeCastersRow(castersInput)
-	if String.isEmpty(castersInput) then return end
-	local casters = Json.parseIfString(castersInput)
-	if Logic.isEmpty(casters) then return end
-	local casterRow = Casters()
-	Array.forEach(casters, FnUtil.curry(casterRow.addCaster, casterRow))
-	return casterRow
-end
-
 ---@param match MatchGroupUtilMatch
 ---@param mapVeto VetoDisplay?
 ---@return VetoDisplay?
@@ -890,6 +793,29 @@ function MatchSummary.defaultMapVetoDisplay(match, mapVeto)
 	end)
 
 	return mapVeto
+end
+
+---@param games table[]
+---@param maxNumberOfBans integer
+---@return {[1]: string[], [2]: string[]}[]
+function MatchSummary.buildCharacterBanData(games, maxNumberOfBans)
+	return Array.map(games, function(game)
+		local extradata = game.extradata or {}
+		return {
+			MatchSummary.buildCharacterList(extradata, 'team1ban', maxNumberOfBans),
+			MatchSummary.buildCharacterList(extradata, 'team2ban', maxNumberOfBans),
+		}
+	end)
+end
+
+---@param data table
+---@param prefix string
+---@param maxNumberOfCharacters integer
+---@return string[]
+function MatchSummary.buildCharacterList(data, prefix, maxNumberOfCharacters)
+	return Array.map(Array.range(1, maxNumberOfCharacters), function(index)
+		return data[prefix .. index]
+	end)
 end
 
 return MatchSummary

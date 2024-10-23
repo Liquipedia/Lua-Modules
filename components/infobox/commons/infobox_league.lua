@@ -275,6 +275,7 @@ function League:_parseArgs()
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
+		publishertier = Logic.readBool(args.publisherpremier),
 	}
 
 	data.liquipediatier, data.liquipediatiertype =
@@ -416,7 +417,7 @@ end
 ---@param args table
 ---@return boolean
 function League:liquipediaTierHighlighted(args)
-	return false
+	return self.data.publishertier
 end
 
 --- Allows for overriding this functionality
@@ -450,7 +451,7 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_liquipediatier', self.data.liquipediatier)
 	Variables.varDefine('tournament_liquipediatiertype', self.data.liquipediatiertype)
-	Variables.varDefine('tournament_publishertier', self.data.publishertier)
+	Variables.varDefine('tournament_publishertier', tostring(self.data.publishertier or ''))
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_mode', self.data.mode)
@@ -521,7 +522,7 @@ function League:_setLpdbData(args, links)
 		prizepool = self.data.prizepoolUsd,
 		liquipediatier = self.data.liquipediatier,
 		liquipediatiertype = self.data.liquipediatiertype,
-		publishertier = self.data.publishertier,
+		publishertier = tostring(self.data.publishertier or ''),
 		participantsnumber = tonumber(args.participants_number)
 			or tonumber(args.team_number)
 			or tonumber(args.player_number)

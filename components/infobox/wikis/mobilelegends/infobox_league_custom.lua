@@ -60,7 +60,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args['moonton-sponsored']) and 'true' or nil
+	self.data.publishertier = Logic.readBool(args['moonton-sponsored'])
 end
 
 ---@param args table
@@ -71,12 +71,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['moonton-sponsored'])
 end
 
 ---@param args table

@@ -15,6 +15,8 @@ local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -46,43 +48,12 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	if not CustomMatchSummary._isSolo(match) then
-		return body
-	end
-
-	Array.forEach(match.games, function(game)
-		if not game.map and not game.winner then return end
-		local row = MatchSummary.Row()
-				:addClass('brkts-popup-body-game')
-				:css('font-size', '0.75rem')
-				:css('padding', '4px')
-				:css('min-height', '24px')
-
-		CustomMatchSummary._createGame(row, game, {
-			opponents = match.opponents,
-			game = match.game,
-		})
-		body:addRow(row)
-	end)
-
-	return body
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		CustomMatchSummary._isSolo(match) and Array.map(match.games, CustomMatchSummary._createGame) or nil
+	)}
 end
 
 ---@param match MatchGroupUtilMatch
@@ -104,10 +75,15 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 	return game.participants[paricipantId] or {}
 end
 
----@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
----@param props {game: string?, opponents: standardOpponent[]}
-function CustomMatchSummary._createGame(row, game, props)
+---@return Html?
+function CustomMatchSummary._createGame(game)
+	if not game.map and not game.winner then return end
+	local row = MatchSummary.Row()
+			:addClass('brkts-popup-body-game')
+			:css('font-size', '0.75rem')
+			:css('padding', '4px')
+			:css('min-height', '24px')
 	game.extradata = game.extradata or {}
 
 	local char1 =
@@ -119,6 +95,8 @@ function CustomMatchSummary._createGame(row, game, props)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(char2:css('flex', '1 1 35%'))
+
+	return row:create()
 end
 
 ---@param character string?

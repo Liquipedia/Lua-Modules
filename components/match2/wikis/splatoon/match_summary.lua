@@ -21,28 +21,17 @@ local WeaponIcon = require('Module:WeaponIcon')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
--- Normal links, from input/lpdb
-local LINK_DATA = {
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-}
+
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
-end
-
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
 end
 
 ---@param match MatchGroupUtilMatch
@@ -60,23 +49,15 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate each map
 	for _, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game)
-		body:addRow(rowDisplay)
+		body:addRow(CustomMatchSummary._createGame(game))
 	end
 
 	-- Add Match MVP(s)
-	if match.extradata.mvp then
-		local mvpData = match.extradata.mvp
-		if not Table.isEmpty(mvpData) and mvpData.players then
-			local mvp = MatchSummary.Mvp()
-			for _, player in ipairs(mvpData.players) do
-				mvp:addPlayer(player)
-			end
-			mvp:setPoints(mvpData.points)
-
-			body:addRow(mvp)
-		end
-
+	if Table.isNotEmpty(match.extradata.mvp) then
+		body.root:node(MatchSummaryWidgets.Mvp{
+			players = match.extradata.mvp.players,
+			points = match.extradata.mvp.points,
+		})
 	end
 
 	-- Add the Map Vetoes
@@ -214,7 +195,7 @@ function CustomMatchSummary._opponentWeaponsDisplay(props)
 
 	local display = mw.html.create('div')
 		:addClass('brkts-popup-body-element-thumbs')
-		:addClass('brkts-popup-body-element-thumbs-' .. (flip and 'right' or 'left'))
+		:addClass(flip and 'brkts-popup-body-element-thumbs-right' or nil)
 
 	for _, item in ipairs(displayElements) do
 		display:node(item)

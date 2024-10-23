@@ -15,6 +15,8 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
@@ -40,6 +42,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
+	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = MatchFunctions.getHeadToHeadLink(match, opponents)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 
@@ -69,7 +73,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
 
 	match.games = games
 	match.opponents = opponents
@@ -89,6 +92,9 @@ end
 function MatchFunctions.extractMaps(match, opponentCount)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if not map.map then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
@@ -141,21 +147,45 @@ end
 
 ---@param match table
 ---@return table
-function MatchFunctions.getLinks(match)
-	return {
-		faceit = match.faceit and ('https://www.faceit.com/en/halo_infinite/room/' .. match.faceit) or nil,
-		halodatahive = match.halodatahive and ('https://halodatahive.com/Series/Summary/' .. match.halodatahive) or nil,
-		stats = match.stats,
-	}
-end
-
----@param match table
----@return table
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 	}
+end
+
+---@param match table
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(match, opponents)
+	if
+		opponents[1].type ~= Opponent.team or
+		opponents[2].type ~= Opponent.team or
+		not opponents[1].name or
+		not opponents[2].name then
+
+		return nil
+	end
+
+	local team1, team2 = string.gsub(opponents[1].name, ' ', '_'), string.gsub(opponents[2].name, ' ', '_')
+	local buildQueryFormLink = function(form, template, arguments)
+		return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
+			mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
+				.. '&_run'
+		))
+	end
+
+	local headtoheadArgs = {
+		['[team1]'] = team1,
+		['[team2]'] = team2,
+		['[games][is_list]'] = 1,
+		['[tiers][is_list]'] = 1,
+		['[fromdate][day]'] = '01',
+		['[fromdate][month]'] = '01',
+		['[fromdate][year]'] = string.sub(match.date,1,4)
+	}
+
+	return buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 end
 
 --
@@ -168,6 +198,8 @@ end
 function MapFunctions.getExtraData(map, opponentCount)
 	return {
 		comment = map.comment,
+		points1 = map.points1,
+		points2 = map.points2,
 	}
 end
 

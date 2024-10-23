@@ -554,20 +554,14 @@
 	flex-basis: 100%;
 }
 
-.brkts-popup-body-element-thumbs {
+div.brkts-popup-body-element-thumbs {
+	display: inline-flex;
 	flex: 1;
 	min-width: 0.01%;
 }
 
-.brkts-popup-body-element-thumbs.brkts-popup-body-element-thumbs-left {
-	display: inline-flex;
-	flex-direction: row;
-	justify-content: left;
-}
-
+/* TODO: Remove when able, but is currently needed for hero picks no to lack of wrapper */
 .brkts-popup-body-element-thumbs.brkts-popup-body-element-thumbs-right {
-	display: inline-flex;
-	flex-direction: row-reverse;
 	justify-content: right;
 }
 
@@ -873,41 +867,25 @@
 
 .brkts-popup-side-color-radiant {
 	background-color: #bcd985 !important;
+	padding: 2px 1px 2px 1px;
 }
 
 .brkts-popup-side-color-dire {
 	background-color: #e79e7e !important;
+	padding: 2px 1px 2px 1px;
 }
 
-.brkts-popup-side-hero {
-	padding: 2px;
-	margin: -2px;
-}
-
-.brkts-popup-side-hero-hover img {
-	width: 29px;
-	height: 16px;
-}
-
-@media ( hover: hover ) {
-	.brkts-popup-side-hero-hover img:hover {
-		-ms-transform: scale( 2, 2 );
-		-webkit-transform: scale( 2, 2 );
-		transform: scale( 2, 2 );
-	}
-}
-
-/* First case is backwards comptability (Wild Rift, Others?), Second case is the proper usage (League) */
-img.brkts-champion-icon,
 .brkts-champion-icon img {
 	height: 24px;
 	width: 24px;
+	object-fit: cover;
 }
 
 @media only screen and ( max-width: 768px ) {
 	img.brkts-champion-icon {
 		height: 20px;
 		width: 20px;
+		object-fit: cover;
 	}
 }
 
@@ -915,14 +893,16 @@ img.brkts-champion-icon,
 	.brkts-champion-icon img {
 		height: 20px;
 		width: 20px;
+		object-fit: cover;
 	}
 }
 
 @media ( hover: hover ) {
 	.brkts-champion-icon img:hover {
-		-ms-transform: scale( 2, 2 );
-		-webkit-transform: scale( 2, 2 );
-		transform: scale( 2, 2 );
+		-ms-transform: scale( 2.5, 2.5 );
+		-webkit-transform: scale( 2.5, 2.5 );
+		transform: scale( 2.5, 2.5 );
+		object-fit: contain;
 	}
 }
 

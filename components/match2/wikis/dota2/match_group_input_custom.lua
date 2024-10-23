@@ -20,6 +20,9 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = false,
@@ -81,6 +84,7 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	end)
 	local games = MatchFunctions.extractMaps(MatchParser, match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
+	match.links = MatchFunctions.getLinks(match, games, opponents)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and MatchFunctions.calculateMatchScore(games)
@@ -109,7 +113,6 @@ function CustomMatchGroupInput.processMatchWithoutStandalone(MatchParser, match)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match, games)
 
 	match.games = games
 	match.opponents = opponents
@@ -174,17 +177,15 @@ end
 
 ---@param match table
 ---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getLinks(match, games)
-	local links = {
-		preview = match.preview,
-		lrthread = match.lrthread,
-		recap = match.recap,
-		faceit = match.faceit and 'https://www.faceit.com/en/dota2/room/' .. match.faceit or nil,
-		stratz = {},
-		dotabuff = {},
-		datdota = {},
-	}
+function MatchFunctions.getLinks(match, games, opponents)
+	---@type table<string, string|table|nil>
+	local links = MatchGroupInputUtil.getLinks(match)
+	links.stratz = {}
+	links.dotabuff = {}
+	links.datdota = {}
+
 	Array.forEach(
 		Array.filter(games, function(map) return map.publisherid ~= nil end),
 		function(map, mapIndex)
@@ -193,6 +194,17 @@ function MatchFunctions.getLinks(match, games)
 			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
 		end
 	)
+
+	local isTeamGame = Array.all(opponents, function(opponent)
+		return opponent.type == Opponent.team
+	end)
+	if Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))) and isTeamGame then
+		local team1, team2 = string.gsub(opponents[1].name, ' ', '_'), string.gsub(opponents[2].name, ' ', '_')
+		links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
+			'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
+	end
+
 	return links
 end
 
@@ -201,7 +213,6 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
