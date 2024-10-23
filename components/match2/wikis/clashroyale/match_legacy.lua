@@ -42,7 +42,7 @@ function MatchLegacy.store(match2)
 	if opponent1.type == Opponent.solo then
 		local function handlePlayer(index)
 			local opponent = match2.match2opponents[index] or {}
-			local player = opponent.match2players or {}
+			local player = opponent.match2players[1] or {}
 			local prefix = 'opponent' .. index
 
 			match[prefix] = player.name and player.name:gsub('_', ' ') or nil
