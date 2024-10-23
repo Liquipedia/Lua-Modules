@@ -15,11 +15,15 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Character = Lua.import('Module:Widget/Match/Summary/Character')
 
+local BASE_SIZE = 24 -- From brkts-champion-icon in Brackets.leess
+local HOOVER_MODIFIER = 2.5 -- From brkts-champion-icon in Brackets.leess
+
 ---@class MatchSummaryCharacters: Widget
 ---@operator call(table): MatchSummaryCharacters
 local MatchSummaryCharacters = Class.new(Widget)
 MatchSummaryCharacters.defaultProps = {
 	flipped = false,
+	size = BASE_SIZE*HOOVER_MODIFIER,
 }
 
 ---@return Widget[]?
@@ -42,6 +46,7 @@ function MatchSummaryCharacters:render()
 				bg = self.props.bg,
 				showName = #self.props.characters == 1,
 				flipped = flipped,
+				size = self.props.size .. 'px',
 			}
 		end)
 	}
