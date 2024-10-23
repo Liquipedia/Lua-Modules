@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Break = Lua.import('Module:Widget/Match/Sumamry/Break')
+local Break = Lua.import('Module:Widget/Match/Summary/Break')
 
 ---@class MatchSummaryMatchMatchComment: Widget
 ---@operator call(table): MatchSummaryMatchMatchComment
