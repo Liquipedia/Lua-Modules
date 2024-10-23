@@ -23,7 +23,7 @@ local HOOVER_MODIFIER = 2.5 -- From brkts-champion-icon in Brackets.leess
 local MatchSummaryCharacters = Class.new(Widget)
 MatchSummaryCharacters.defaultProps = {
 	flipped = false,
-	size = BASE_SIZE*HOOVER_MODIFIER,
+	size = BASE_SIZE * HOOVER_MODIFIER,
 }
 
 ---@return Widget[]?
