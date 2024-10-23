@@ -42,9 +42,9 @@ function CustomMatchSummary.createBody(match)
 
 	local games = Array.map(match.games, function(game)
 		if hasSubMatches then
-			return CustomMatchSummary._createSubMatch(game, match)
+			return CustomMatchSummary._createSubMatch(game, match):create()
 		end
-		return CustomMatchSummary._createGame(game)
+		return CustomMatchSummary._createGame(game):create()
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(

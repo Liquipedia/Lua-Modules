@@ -55,7 +55,7 @@ function CustomMatchSummary.createBody(match)
 			opponents = match.opponents,
 			game = match.game,
 			soloMode = CustomMatchSummary._isSolo(match)
-		})
+		}):create()
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(

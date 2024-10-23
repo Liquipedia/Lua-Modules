@@ -76,7 +76,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param props {game: string?, opponents: standardOpponent[]}
----@return Html[]
+---@return Html?
 function CustomMatchSummary._createStandardGame(game, props)
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
@@ -86,10 +86,8 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	game.extradata = game.extradata or {}
 
-	local elements = {}
-
 	if not game or not game.participants then
-		return elements
+		return
 	end
 
 	local chars1 = CustomMatchSummary._createCharacterDisplay(
@@ -112,7 +110,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
 
-	return elements
+	return row:create()
 end
 
 ---@param characters {name: string}[]?
