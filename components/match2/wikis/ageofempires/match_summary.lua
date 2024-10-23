@@ -57,19 +57,11 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	Array.forEach(match.games, function(game)
-		if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
-		local row = MatchSummary.Row()
-				:addClass('brkts-popup-body-game')
-				:css('font-size', '0.75rem')
-				:css('padding', '4px')
-				:css('min-height', '24px')
-
-		CustomMatchSummary._createGame(row, game, {
+		body:addRow(CustomMatchSummary._createGame(game, {
 			opponents = match.opponents,
 			game = match.game,
 			soloMode = CustomMatchSummary._isSolo(match)
-		})
-		body:addRow(row)
+		}))
 	end)
 
 	-- casters
@@ -97,10 +89,17 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 	return game.participants[paricipantId] or {}
 end
 
----@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
 ---@param props {game: string?, soloMode: boolean, opponents: standardOpponent[]}
-function CustomMatchSummary._createGame(row, game, props)
+---@return MatchSummaryRow?
+function CustomMatchSummary._createGame(game, props)
+	if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
+	local row = MatchSummary.Row()
+		:addClass('brkts-popup-body-game')
+		:css('font-size', '0.75rem')
+		:css('padding', '4px')
+		:css('min-height', '24px')
+
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.extradata = game.extradata or {}
 	game.mapDisplayName = game.mapDisplayName or game.map
@@ -148,6 +147,7 @@ function CustomMatchSummary._createGame(row, game, props)
 			)
 			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2, props.soloMode))
 			:addElement(faction2)
+	return row
 end
 
 ---@param civ string?

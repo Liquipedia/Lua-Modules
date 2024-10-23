@@ -59,18 +59,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	Array.forEach(match.games, function(game)
-		if not game.map and not game.winner then return end
-		local row = MatchSummary.Row()
-				:addClass('brkts-popup-body-game')
-				:css('font-size', '0.75rem')
-				:css('padding', '4px')
-				:css('min-height', '24px')
-
-		CustomMatchSummary._createGame(row, game, {
-			opponents = match.opponents,
-			game = match.game,
-		})
-		body:addRow(row)
+		body:addRow(CustomMatchSummary._createGame(game))
 	end)
 
 	return body
@@ -95,10 +84,15 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 	return game.participants[paricipantId] or {}
 end
 
----@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
----@param props {game: string?, opponents: standardOpponent[]}
-function CustomMatchSummary._createGame(row, game, props)
+---@return MatchSummaryRow?
+function CustomMatchSummary._createGame(game)
+	if not game.map and not game.winner then return end
+	local row = MatchSummary.Row()
+			:addClass('brkts-popup-body-game')
+			:css('font-size', '0.75rem')
+			:css('padding', '4px')
+			:css('min-height', '24px')
 	game.extradata = game.extradata or {}
 
 	local char1 =
@@ -110,6 +104,8 @@ function CustomMatchSummary._createGame(row, game, props)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(char2:css('flex', '1 1 35%'))
+
+	return row
 end
 
 ---@param character string?

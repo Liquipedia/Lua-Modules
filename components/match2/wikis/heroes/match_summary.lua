@@ -72,10 +72,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate each map
 	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
-		if rowDisplay then
-			body:addRow(rowDisplay)
-		end
+		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
 	end
 
 	-- Add Match MVP(s)
