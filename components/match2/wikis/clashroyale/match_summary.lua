@@ -52,8 +52,8 @@ function CustomMatchSummary.createBody(match)
 	if isTeamGame then
 		games = CustomMatchSummary._createTeamMatchBody(match)
 	else
-		return games = Array.map(match.games, function (game, gameIndex)
-			CustomMatchSummary._createGame(game, gameIndex, match.date)
+		games = Array.map(match.games, function (game, gameIndex)
+			return CustomMatchSummary._createGame(game, gameIndex, match.date)
 		end)
 	end
 
