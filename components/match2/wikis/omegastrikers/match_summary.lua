@@ -6,196 +6,46 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Icon = require('Module:Icon')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
-local Table = require('Module:Table')
 
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ICONS = {
 	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
 	empty = '[[File:NoCheck.png|link=]]'
 }
-local NO_CHARACTER = 'default'
 
 local CustomMatchSummary = {}
-
--- Striker Pick/Ban Class
-local Striker = Class.new(
-	function(self, options)
-		options = options or {}
-		self.isBan = options.isBan
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto')
-		self.table = self.root:tag('table')
-			:addClass('wikitable-striped'):addClass('collapsible'):addClass('collapsed')
-		self:createHeader()
-	end
-)
-
-function Striker:createHeader(text)
-	self.table:tag('tr')
-		:tag('th'):css('width','40%'):wikitext(''):done()
-		:tag('th'):css('width','20%'):wikitext(self.isBan and 'Bans' or 'Picks'):done()
-		:tag('th'):css('width','40%'):wikitext(''):done()
-	return self
-end
-
-function Striker:row(strikerData, gameNumber, numberStrikers, date)
-	if numberStrikers > 0 then
-		self.table:tag('tr')
-			:tag('td')
-				:node(self:_opponentStrikerDisplay(strikerData[1], numberStrikers, false, date))
-			:tag('td')
-				:node(mw.html.create('div')
-					:wikitext(Abbreviation.make(
-							'Map ' .. gameNumber,
-							(self.isBan and 'Bans' or 'Picks') .. ' in game ' .. gameNumber
-						)
-					)
-				)
-			:tag('td')
-				:node(self:_opponentStrikerDisplay(strikerData[2], numberStrikers, true, date))
-	end
-
-	return self
-end
-
-function Striker:_opponentStrikerDisplay(strikerData, numberOfStrikers, flip, date)
-	local opponentStrikerDisplay = {}
-
-	for index = 1, numberOfStrikers do
-		local strikerDisplay = mw.html.create('div')
-			:addClass('brkts-popup-side-color-' .. (flip and 'red' or 'blue'))
-			:addClass('brkts-champion-icon')
-			:css('float', flip and 'right' or 'left')
-			:node(CharacterIcon.Icon{
-				character = strikerData[index] or NO_CHARACTER,
-				date = date,
-				size = '48px',
-			})
-		if index == 1 then
-			strikerDisplay:css('padding-left', '2px')
-		elseif index == numberOfStrikers then
-			strikerDisplay:css('padding-right', '2px')
-		end
-		table.insert(opponentStrikerDisplay, strikerDisplay)
-	end
-
-	if flip then
-		opponentStrikerDisplay = Array.reverse(opponentStrikerDisplay)
-	end
-
-	local display = mw.html.create('div')
-	if self.isBan then
-		display:addClass('brkts-popup-side-shade-out')
-		display:css('padding-' .. (flip and 'right' or 'left'), '4px')
-	end
-
-	for _, item in ipairs(opponentStrikerDisplay) do
-		display:node(item)
-	end
-
-	return display
-end
-
-function Striker:create()
-	return self.root
-end
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
 
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local characterBansData = Array.map(match.games, function (game)
+		local extradata = game.extradata or {}
+		local bans = extradata.bans or {}
+		return {bans.team1 or {}, bans.team2 or {}}
+	end)
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createMapRow(game))
-	end
-
-	-- Pre-Process Striker picks
-	local showGamePicks = {}
-	for gameIndex, game in ipairs(match.games) do
-		local pickData = {{}, {}}
-		local participants = game.participants
-		local index = 1
-		while true do
-			if Table.isEmpty(participants['1_' .. index]) and Table.isEmpty(participants['2_' .. index]) then
-				break
-			end
-			if Table.isNotEmpty(participants['1_' .. index]) then
-				pickData[1][index] = participants['1_' .. index].striker
-			end
-			if Table.isNotEmpty(participants['2_' .. index]) then
-				pickData[2][index] = participants['2_' .. index].striker
-			end
-			index = index + 1
-		end
-
-		if index > 1 then
-			pickData.numberOfPicks = index - 1
-			showGamePicks[gameIndex] = pickData
-		end
-	end
-
-	-- Add the Striker picks
-	if not Table.isEmpty(showGamePicks) then
-		local striker = Striker{isBan = false}
-
-		for gameIndex, pickData in ipairs(showGamePicks) do
-			striker:row(pickData, gameIndex, pickData.numberOfPicks, match.date)
-		end
-
-		body:addRow(striker)
-	end
-
-	-- Pre-Process Striker bans
-	local showGameBans = {}
-	for gameIndex, game in ipairs(match.games) do
-		local extradata = game.extradata
-		local bans = Json.parseIfString(extradata.bans or '{}')
-		if not Table.isEmpty(bans) then
-			bans.numberOfBans = math.max(#bans.team1, #bans.team2)
-			if bans.numberOfBans > 0 then
-				bans[1] = bans.team1
-				bans[2] = bans.team2
-				showGameBans[gameIndex] = bans
-			end
-		end
-	end
-
-	-- Add the Striker bans
-	if not Table.isEmpty(showGameBans) then
-		local striker = Striker{isBan = true}
-
-		for gameIndex, banData in ipairs(showGameBans) do
-			striker:row(banData, gameIndex, banData.numberOfBans, match.date)
-		end
-
-		body:addRow(striker)
-	end
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMapRow),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
+	)}
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -206,6 +56,12 @@ function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
 	end
+
+	local characterData = {
+		Array.map((game.opponents[1] or {}).players or {}, Operator.property('striker')),
+		Array.map((game.opponents[2] or {}).players or {}, Operator.property('striker')),
+	}
+
 	local row = MatchSummary.Row()
 
 	-- Add Header
@@ -230,6 +86,11 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
+		:node(MatchSummaryWidgets.Characters{
+			flipped = false,
+			characters = characterData[1],
+			bg = 'brkts-popup-side-color-blue', -- Team 1 is always blue
+		})
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
 		:node(CustomMatchSummary._gameScore(game, 1))
 
@@ -237,6 +98,11 @@ function CustomMatchSummary._createMapRow(game)
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
 		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+		:node(MatchSummaryWidgets.Characters{
+			flipped = true,
+			characters = characterData[2],
+			bg = 'brkts-popup-side-color-red', -- Team 2 is always red
+		})
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -254,7 +120,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
