@@ -139,8 +139,6 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, numberOfGames)
 	local extradata = {
-		t1bans = MatchFunctions.readBans(match.t1bans),
-		t2bans = MatchFunctions.readBans(match.t2bans),
 		mvp = MatchGroupInputUtil.readMvp(match),
 	}
 
@@ -148,21 +146,7 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match(prefix .. 'header') end))
 	Table.mergeInto(extradata, Table.filterByKey(match, function(key) return key:match(prefix .. 'iskoth') end))
 
-	local t1Bans = Table.filterByKey(match, function(key) return key:match(prefix .. 't1bans') end)
-	Table.mergeInto(extradata, Table.mapValues(t1Bans, MatchFunctions.readBans))
-
-	local t2Bans = Table.filterByKey(match, function(key) return key:match(prefix .. 't2bans') end)
-	Table.mergeInto(extradata, Table.mapValues(t2Bans, MatchFunctions.readBans))
-
 	return extradata
-end
-
----@param bansInput string
----@return table?
-function MatchFunctions.readBans(bansInput)
-	local bans = CustomMatchGroupInput._readCards(bansInput)
-
-	return Logic.nilIfEmpty(bans)
 end
 
 ---@param mapInput table
