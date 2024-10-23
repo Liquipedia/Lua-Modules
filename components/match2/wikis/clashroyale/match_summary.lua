@@ -21,6 +21,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -44,52 +45,29 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
+	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
+	local games
+	if isTeamGame then
+		games = CustomMatchSummary._createTeamMatchBody(match)
+	else
+		games = Array.map(match.games, function (game, gameIndex)
+			return CustomMatchSummary._createGame(game, gameIndex, match.date)
+		end)
 	end
 
-	if Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
-		return CustomMatchSummary._createTeamMatchBody(body, match, match.matchId)
-	end
-
-	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
-	end
-
-	CustomMatchSummary._addMvp(match, body)
-
-	local extradata = match.extradata or {}
-	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
-		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))
-	end
-
-	return body
-end
-
----@param match MatchGroupUtilMatch
----@param body MatchSummaryBody
-function CustomMatchSummary._addMvp(match, body)
-	if Table.isEmpty(match.extradata.mvp) then
-		return
-	end
-
-	body.root:node(MatchSummaryWidgets.Mvp{
-		players = match.extradata.mvp.players,
-		points = match.extradata.mvp.points,
-	})
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games,
+		MatchSummaryWidgets.Mvp(match.extradata.mvp)
+	)}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@param date string
----@return MatchSummaryRow
+---@return Html
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local row = MatchSummary.Row()
 
@@ -145,59 +123,12 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		)
 	end
 
-	return row
+	return row:create()
 end
 
----@param t1bans string[]?
----@param t2bans string[]?
----@param date string
----@return MatchSummaryRow
-function CustomMatchSummary._banRow(t1bans, t2bans, date)
-	t1bans = t1bans or {}
-	t2bans = t2bans or {}
-	local maxAmountOfBans = math.max(#t1bans, #t2bans)
-	for banIndex = 1, maxAmountOfBans do
-		t1bans[banIndex] = t1bans[banIndex] or DEFAULT_CARD
-		t2bans[banIndex] = t2bans[banIndex] or DEFAULT_CARD
-	end
-
-	local banRow = MatchSummary.Row()
-
-	banRow:addClass('brkts-popup-body-game')
-		:css('font-size', '80%')
-		:css('padding', '4px')
-		:css('min-height', '32px')
-
-	banRow:addElement(mw.html.create('div')
-		:wikitext('Bans')
-		:css('margin', 'auto')
-		:css('font-weight', 'bold')
-	)
-	banRow:addElement(MatchSummary.Break():create())
-
-	banRow:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = {t1bans},
-		flip = true,
-		date = date,
-	})
-	banRow:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext('Bans')
-	)
-	banRow:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = {t2bans},
-		flip = false,
-		date = date,
-	})
-
-	return banRow
-end
-
----@param body MatchSummaryBody
 ---@param match MatchGroupUtilMatch
----@param matchId string
----@return MatchSummaryBody
-function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
+---@return Html[]
+function CustomMatchSummary._createTeamMatchBody(match)
 	local _, subMatches = Array.groupBy(match.games, Operator.property('subgroup'))
 	subMatches = Array.map(subMatches, function(subMatch)
 		return {games = subMatch}
@@ -205,18 +136,14 @@ function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
 
 	Array.forEach(subMatches, FnUtil.curry(CustomMatchSummary._getSubMatchOpponentsAndPlayers, match))
 	Array.forEach(subMatches, CustomMatchSummary._calculateSubMatchWinner)
-	Array.forEach(subMatches, function(subMatch, subMatchIndex)
-		body:addRow(CustomMatchSummary._createSubMatch(
+	return Array.map(subMatches, function(subMatch, subMatchIndex)
+		CustomMatchSummary._createSubMatch(
 			subMatch.players,
 			subMatchIndex,
 			subMatch,
 			match.extradata
-		))
+		):create()
 	end)
-
-	CustomMatchSummary._addMvp(match, body)
-
-	return body
 end
 
 ---@param match MatchGroupUtilMatch
