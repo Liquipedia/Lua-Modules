@@ -19,6 +19,8 @@ local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Links =  Lua.import('Module:Links')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -230,31 +232,6 @@ function Body:create()
 	return self.root
 end
 
----@class MatchSummaryComment
----@operator call: MatchSummaryComment
----@field root Html
-local Comment = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content Html|string|number|nil
----@return MatchSummaryComment
-function Comment:content(content)
-	if Logic.isEmpty(content) then return self end
-	self.root:node(content):node(Break():create())
-	return self
-end
-
----@return Html
-function Comment:create()
-	return self.root
-end
-
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
 ---@field root Html
@@ -333,7 +310,7 @@ end
 ---@field root Html
 ---@field headerElement Html?
 ---@field bodyElement Widget|Html?
----@field commentElement Html?
+---@field commentElement Widget?
 ---@field footerElement Html?
 local Match = Class.new(
 	function(self)
@@ -361,10 +338,10 @@ function Match:body(body)
 	return self
 end
 
----@param comment MatchSummaryComment
+---@param comment Widget
 ---@return MatchSummaryMatch
 function Match:comment(comment)
-	self.commentElement = comment:create()
+	self.commentElement = comment
 	return self
 end
 
@@ -382,16 +359,9 @@ function Match:create()
 		:node(Break():create())
 		:node(self.bodyElement)
 		:node(Break():create())
-
-	if self.commentElement ~= nil then
-		self.root
-			:node(self.commentElement)
-			:node(Break():create())
-	end
-
-	if self.footerElement ~= nil then
-		self.root:node(self.footerElement)
-	end
+		:node(self.commentElement)
+		:node(Break():create())
+		:node(self.footerElement)
 
 	return self.root
 end
@@ -535,7 +505,6 @@ end
 ---@operator call(string?):MatchSummary
 ---@field Header MatchSummaryHeader
 ---@field Body MatchSummaryBody
----@field Comment MatchSummaryComment
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
 ---@field Break MatchSummaryBreak
@@ -548,7 +517,6 @@ end
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
 MatchSummary.Body = Body
-MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Break = Break
@@ -725,10 +693,10 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local substituteComment = MatchSummary.createSubstitutesComment(matchData)
 
-	if matchData.comment or substituteComment then
-		local comment = MatchSummary.Comment():content(matchData.comment):content(substituteComment)
-		match:comment(comment)
-	end
+	match:comment(MatchSummaryWidgets.MatchComment{
+		children = WidgetUtil.collect(matchData.comment, substituteComment)
+	})
+
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 

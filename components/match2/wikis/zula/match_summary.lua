@@ -98,31 +98,6 @@ function Score:create()
 	return self.root
 end
 
----@class ZulaMatchStatus: MatchSummaryRowInterface
----@operator call: ZulaMatchStatus
----@field root Html
-local MatchStatus = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content Html|string|number|nil
----@return ZulaMatchStatus
-function MatchStatus:content(content)
-	self.root:node(content):node(MatchSummary.Break():create())
-	return self
-end
-
----@return Html
-function MatchStatus:create()
-	return self.root
-end
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -154,13 +129,6 @@ function CustomMatchSummary.createBody(match)
 
 	-- Add the Map Vetoes
 	body:addRow(MatchSummary.defaultMapVetoDisplay(match))
-
-	-- Match Status (postponed/ cancel(l)ed)
-	if match.extradata.status then
-		local matchStatus = MatchStatus()
-		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
-		body:addRow(matchStatus)
-	end
 
 	return body
 end

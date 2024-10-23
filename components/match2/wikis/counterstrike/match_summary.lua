@@ -18,6 +18,7 @@ local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -118,31 +119,6 @@ function MapVeto:displayMap(map)
 	return Logic.nilIfEmpty(CustomMatchSummary._createMapLink(map, self.game)) or TBD
 end
 
----@class CounterstrikeMatchStatus: MatchSummaryRowInterface
----@operator call: CounterstrikeMatchStatus
----@field root Html
-local MatchStatus = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content string|number|Html|nil
----@return self
-function MatchStatus:content(content)
-	self.root:node(content):node(MatchSummary.Break():create())
-	return self
-end
-
----@return Html
-function MatchStatus:create()
-	return self.root
-end
-
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
@@ -201,9 +177,9 @@ function CustomMatchSummary.createBody(match)
 
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then
-		local matchStatus = MatchStatus()
-		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
-		body:addRow(matchStatus)
+		body.root:node(MatchSummaryWidgets.MatchComment{
+			children = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
+		})
 	end
 
 	return body
