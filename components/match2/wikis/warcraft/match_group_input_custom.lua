@@ -247,9 +247,9 @@ function MatchFunctions.getHeadToHeadLink(opponents)
 
 	return (tostring(mw.uri.fullUrl('Special:RunQuery/Head-to-Head'))
 		.. '?pfRunQueryFormName=Head-to-Head&Head+to+head+query%5Bplayer%5D='
-		.. opponents[1].players[1].name
+		.. opponents[1].match2players[1].name
 		.. '&Head_to_head_query%5Bopponent%5D='
-		.. opponents[2].players[1].name
+		.. opponents[2].match2players[1].name
 		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
 end
 
