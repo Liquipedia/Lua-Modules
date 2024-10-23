@@ -45,6 +45,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games)
@@ -241,9 +242,31 @@ end
 ---@return table
 function CustomMatchGroupInput._getExtraData(match)
 	return {
-		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
+end
+
+---@param match table
+---@param opponents table[]
+---@return string?
+function CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
+	if opponents[1].type ~= Opponent.solo or opponents[2].type ~= Opponent.solo then
+		return
+	end
+	if not Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead'))) then
+		return nil
+	end
+	if  Opponent.isEmpty(opponents[1]) or Opponent.isEmpty(opponents[2]) then
+		return nil
+	end
+
+	local player1, player2 =
+		string.gsub(opponents[1].name, ' ', '_'),
+		string.gsub(opponents[2].name, ' ', '_')
+
+	return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..player1 ..
+		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query'
 end
 
 ---@param map table

@@ -182,7 +182,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getLinks(match, games, opponents)
-	---@type table<string, string|table>
+	---@type table<string, string|table|nil>
 	local links = MatchGroupInputUtil.getLinks(match)
 	links.stratz = {}
 	links.dotabuff = {}

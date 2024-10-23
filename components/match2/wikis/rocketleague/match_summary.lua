@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -18,6 +20,7 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
@@ -25,12 +28,6 @@ local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
 local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
-local LINK_DATA = {
-	shift = {icon = 'File:ShiftRLE icon.png', text = 'ShiftRLE matchpage'},
-	ballchasing = {icon = 'File:Ballchasing icon.png', text = 'Ballchasing replays'},
-	headtohead = {icon = 'File:Match Info Stats.png', text = 'Head to Head history'},
-}
 
 -- Custom Header Class
 ---@class RocketleagueMatchSummaryHeader: MatchSummaryHeader
@@ -201,59 +198,23 @@ function CustomMatchSummary.createHeader(match, options)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	for linkType, linkData in pairs(LINK_DATA) do
-		for _, link in Table.iter.pairsByPrefix(match.links, linkType, {requireIndex = false}) do
-			footer:addLink(link, linkData.icon, linkData.iconDark, linkData.text)
-		end
-	end
-
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if not match.extradata.showh2h then
-		return footer
-	end
-
-	local h2hLinkData = LINK_DATA.headtohead
-	return footer:addLink(CustomMatchSummary._getHeadToHead(match.opponents),
-		h2hLinkData.icon, h2hLinkData.iconDark, h2hLinkData.text)
-end
-
----@param opponents standardOpponent[]
----@return string
-function CustomMatchSummary._getHeadToHead(opponents)
-	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	return tostring(mw.uri.fullUrl('Special:RunQuery/Head2head'))
-		.. '?RunQuery=Run&pfRunQueryFormName=Head2head&Headtohead%5Bteam1%5D='
-		.. team1 .. '&Headtohead%5Bteam2%5D=' .. team2
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	body:addRow(MatchSummary.Row():addElement(DisplayHelper.MatchCountdownBlock(match)))
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			local rowDisplay = CustomMatchSummary._createGame(game)
-			body:addRow(rowDisplay)
-		end
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createGame),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createGame(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
 	local extradata = game.extradata or {}
@@ -334,7 +295,7 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param goalesValue string|number

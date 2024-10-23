@@ -7,7 +7,9 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -15,6 +17,7 @@ local String = require('Module:StringUtils')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
@@ -147,26 +150,22 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	body:addRow(MatchSummary.Row():addElement(DisplayHelper.MatchCountdownBlock(match)))
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createGame(game))
-		end
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createGame),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createGame(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
 	local extradata = game.extradata or {}
@@ -228,7 +227,7 @@ function CustomMatchSummary._createGame(game)
 		)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param icon string?

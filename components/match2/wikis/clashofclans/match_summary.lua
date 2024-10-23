@@ -64,9 +64,7 @@ function CustomMatchSummary.createBody(match)
 
 	-- Iterate over games
 	for gameIndex, game in ipairs(match.games) do
-		if Table.isNotEmpty(game.scores) then
-			body:addRow(CustomMatchSummary._createMapRow(game, gameIndex))
-		end
+		body:addRow(CustomMatchSummary._createMapRow(game, gameIndex))
 	end
 
 	-- Add Match MVP(s)
@@ -115,6 +113,9 @@ function CustomMatchSummary._time(game, opponentIndex)
 end
 
 function CustomMatchSummary._createMapRow(game, gameIndex)
+	if Table.isEmpty(game.scores) then
+		return
+	end
 	local row = MatchSummary.Row()
 
 	-- Add Header

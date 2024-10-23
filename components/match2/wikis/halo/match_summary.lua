@@ -6,20 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-
-local OpponentLibrary = require('Module:OpponentLibraries')
-local Opponent = OpponentLibrary.Opponent
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -33,78 +31,24 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if
-		match.opponents[1].type == Opponent.team and
-		match.opponents[2].type == Opponent.team and
-		match.opponents[1].name and
-		match.opponents[2].name
-	then
-		local team1, team2 = string.gsub(match.opponents[1].name, ' ', '_'), string.gsub(match.opponents[2].name, ' ', '_')
-		local buildQueryFormLink = function(form, template, arguments)
-			return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
-				mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
-					.. '&_run'
-			))
-		end
-
-		local headtoheadArgs = {
-			['[team1]'] = team1,
-			['[team2]'] = team2,
-			['[games][is_list]'] = 1,
-			['[tiers][is_list]'] = 1,
-			['[fromdate][day]'] = '01',
-			['[fromdate][month]'] = '01',
-			['[fromdate][year]'] = string.sub(match.date,1,4)
-		}
-
-		match.links.headtohead = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
-	end
-
-	return footer:addLinks(match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default time, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMapRow(game))
-		end
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMapRow),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createMapRow(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 
 	-- Add Header
@@ -172,7 +116,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param game MatchGroupUtilGame
