@@ -120,7 +120,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
