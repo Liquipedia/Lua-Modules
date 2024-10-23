@@ -161,7 +161,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createGame(game)
 	if not game.map then
 		return
@@ -227,7 +227,7 @@ function CustomMatchSummary._createGame(game)
 		)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param icon string?

@@ -55,7 +55,7 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html
 function CustomMatchSummary._createMapRow(game)
 	local row = MatchSummary.Row()
 
@@ -96,7 +96,7 @@ function CustomMatchSummary._createMapRow(game)
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param showIcon boolean?

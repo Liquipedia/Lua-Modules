@@ -35,7 +35,7 @@ function CustomMatchSummary.createBody(match)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createMapRow)
+		Array.map(match.games, CustomMatchSummary._createGame)
 	)}
 end
 
@@ -47,7 +47,7 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html
 function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
 
@@ -83,7 +83,7 @@ function CustomMatchSummary._createGame(game)
 		)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?

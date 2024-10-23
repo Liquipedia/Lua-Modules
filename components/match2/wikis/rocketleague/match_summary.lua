@@ -210,7 +210,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createGame(game)
 	if not game.map then
 		return
@@ -295,7 +295,7 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param goalesValue string|number

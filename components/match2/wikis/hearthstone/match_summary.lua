@@ -76,7 +76,7 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createGame(game)
 	if not game.map and not game.winner then return end
 	local row = MatchSummary.Row()
@@ -96,7 +96,7 @@ function CustomMatchSummary._createGame(game)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(char2:css('flex', '1 1 35%'))
 
-	return row
+	return row:create()
 end
 
 ---@param character string?
