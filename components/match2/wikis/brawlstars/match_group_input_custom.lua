@@ -176,7 +176,6 @@ function MapFunctions.getExtraData(map, opponentCount)
 	local extradata = {
 		bestof = map.bestof,
 		comment = map.comment,
-		header = map.header,
 		maptype = map.maptype,
 		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')]
 	}
