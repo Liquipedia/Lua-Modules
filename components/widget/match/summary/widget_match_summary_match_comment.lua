@@ -27,7 +27,7 @@ function MatchSummaryMatchMatchComment:render()
 
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-comment'},
-		css = {['font-size'] = '85%', whitespace = 'normal'},
+		css = {['font-size'] = '85%', ['white-space'] = 'normal'},
 		children = Array.flatMap(self.props.children, function (child)
 			return {child, Break{}}
 		end)
