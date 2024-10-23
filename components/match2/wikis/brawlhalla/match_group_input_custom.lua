@@ -93,24 +93,22 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 			comment = map.comment,
 		}
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
-			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
-		end)
 
-		local opponentInfo = Array.map(matchOpponents, function(_, opponentIndex)
+		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
+			local players = CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)
@@ -131,10 +129,10 @@ end
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, table>?
+---@return {char: string?, player: string?}[]?
 function CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.solo then
-		return CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex)
+		return {CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex)}
 	end
 	return nil
 end
@@ -142,17 +140,13 @@ end
 ---@param player table
 ---@param map table
 ---@param opponentIndex integer
----@return table<string, table>
+---@return {char: string?, player: string?}
 function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex)
 	local char = map['char' .. opponentIndex] or ''
 
 	return {
-		players = {
-			{
-				char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
-				player = player.name,
-			}
-		}
+		char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
+		player = player.name,
 	}
 end
 

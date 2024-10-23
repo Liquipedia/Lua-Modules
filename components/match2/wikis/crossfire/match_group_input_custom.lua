@@ -103,7 +103,7 @@ function MatchFunctions.extractMaps(match, opponentCount)
 		map.extradata = MapFunctions.getExtraData(map, opponentCount)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -113,10 +113,10 @@ function MatchFunctions.extractMaps(match, opponentCount)
 			return {score = score, status = status}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)

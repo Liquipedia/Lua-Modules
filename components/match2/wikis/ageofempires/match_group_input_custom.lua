@@ -161,23 +161,22 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 
 		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 
-		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
-
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
+			local players = CustomMatchGroupInput.processPlayerMapData(map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)
@@ -291,17 +290,16 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 end
 
 ---@param map table
----@param opponents table[]
----@return {players: table[]}[]
-function CustomMatchGroupInput.processPlayerMapData(map, opponents)
-	return Array.map(opponents, function(opponent, opponentIndex)
-		return {players = CustomMatchGroupInput._participants(
-			opponent.match2players,
-			map,
-			opponentIndex,
-			opponent.type
-		)}
-	end)
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function CustomMatchGroupInput.processPlayerMapData(map, opponent, opponentIndex)
+	return CustomMatchGroupInput._participants(
+		opponent.match2players,
+		map,
+		opponentIndex,
+		opponent.type
+	)
 end
 
 ---@param opponentPlayers table[]

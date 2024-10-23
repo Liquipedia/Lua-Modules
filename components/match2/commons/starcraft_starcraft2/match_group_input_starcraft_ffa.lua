@@ -255,20 +255,20 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		return map
 	end
 
-	local opponentsInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
 	end)
 
-	map.scores = Array.map(opponentsInfo, Operator.property('score'))
+	map.scores = Array.map(map.opponents, Operator.property('score'))
 
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
 		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo, not hasScores)
-		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner)
+		StarcraftFfaMatchGroupInput._setPlacements(map.opponents, not hasScores)
+		map.winner = StarcraftFfaMatchGroupInput._getWinner(map.opponents, mapInput.winner)
 	end
 
-	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
+	Array.forEach(map.opponents, function(opponentInfo, opponentIndex)
 		map.extradata['placement' .. opponentIndex] = opponentInfo.placement
 	end)
 

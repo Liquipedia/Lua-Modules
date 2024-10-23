@@ -101,18 +101,18 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		local opponentInfo = Array.map(opponents, function(matchOpponent)
+		map.opponents = Array.map(opponents, function(matchOpponent)
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
 			return MapFunctions.makeMapOpponentDetails(opponentMapInput, scoreSettings)
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = MapFunctions.getExtraData(map, opponentInfo)
+		map.extradata = MapFunctions.getExtraData(map, map.opponents)
 
 		table.insert(maps, map)
 		match[key] = nil
