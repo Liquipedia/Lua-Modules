@@ -18,6 +18,7 @@ local DEFAULT_VETO_TYPE_TO_TEXT = {
 	pick = 'PICK',
 	decider = 'DECIDER',
 	defaultban = 'DEFAULT BAN',
+	protect = 'PROTECT',
 }
 local VETO_DECIDER = 'decider'
 
@@ -27,18 +28,19 @@ local MatchSummaryMapVetoRound = Class.new(Widget)
 
 ---@return Widget?
 function MatchSummaryMapVetoRound:render()
-	if not self.props.vetoType then
+	local vetoType = self.props.vetoType
+	if not vetoType then
 		return
 	end
-	-- TODO Support Osu's "protect" type
-	local vetoText = DEFAULT_VETO_TYPE_TO_TEXT[self.props.vetoType]
+
+	local vetoText = DEFAULT_VETO_TYPE_TO_TEXT[vetoType]
 	if not vetoText then
 		return
 	end
 
 	local function displayMap(map)
 		if not map.page then
-			return map
+			return map.name
 		end
 		return Link{
 			children = map.name,
@@ -46,13 +48,13 @@ function MatchSummaryMapVetoRound:render()
 		}
 	end
 
-	local typeClass = 'brkts-popup-mapveto-' .. self.props.vetoType
+	local typeClass = 'brkts-popup-mapveto-' .. vetoType
 	local function createVetoTypeElement()
 		return HtmlWidgets.Span{classes = {typeClass, 'brkts-popup-mapveto-vetotype'}, text = vetoText}
 	end
 
 	local children
-	if self.props.vetoType == VETO_DECIDER then
+	if vetoType == VETO_DECIDER then
 		children = {
 			HtmlWidgets.Td{children = createVetoTypeElement()},
 			HtmlWidgets.Td{children = displayMap(self.props.map1)},
