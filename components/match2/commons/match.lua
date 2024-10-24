@@ -322,6 +322,8 @@ end
 
 ---@param match table
 function Match._prepareMatchRecordForStore(match)
+	match.links = match.links or {}
+	match.vod = match.vod or match.links.vod
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata

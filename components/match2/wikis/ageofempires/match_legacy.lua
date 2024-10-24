@@ -39,7 +39,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.gamenumber = gameIndex
 		game.extradata.mapmode = game2.extradata.mapmode
 		game.extradata.tournament = match.tournament
-		game.extradata.vodmatch = match.vod
+		game.extradata.vodmatch = match.links.vod
 		if game.mode == 'team' then
 			Array.forEach(opponents, function(opponent, opponentIndex)
 				-- opponent.players can have gaps

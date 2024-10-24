@@ -332,8 +332,7 @@ function StarcraftMatchGroupUtil.matchHasDetails(match)
 		return key ~= 'headtohead'
 	end)
 	return match.dateIsExact
-		or String.isNotEmpty(match.vod)
-		or not Table.isEmpty(linksWithoutH2H)
+		or Table.isNotEmpty(linksWithoutH2H)
 		or String.isNotEmpty(match.comment)
 		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes

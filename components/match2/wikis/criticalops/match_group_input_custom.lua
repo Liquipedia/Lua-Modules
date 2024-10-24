@@ -76,8 +76,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.stream = Streams.processStreams(match)
 
-	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-
 	match.games = games
 	match.opponents = opponents
 

@@ -284,7 +284,7 @@ local PREFIXES = {
 		player = 'https://www.vlr.gg/player/',
 		match = 'https://vlr.gg/',
 	},
-	vod = {''},
+	vod = {'', match = ''},
 	weibo = {'https://weibo.com/'},
 	wl = {match = 'https://www.winstonslab.com/matches/match.php?id='},
 	yandexefir = {'https://yandex.ru/efir?stream_channel='},
@@ -532,6 +532,10 @@ local MATCH_ICONS = {
 	tftv = {
 		icon = 'File:Teamfortress.tv.png',
 		text = 'TFTV Match Page'
+	},
+	vod = {
+		icon = 'File:VOD Icon.png',
+		text = 'Watch VOD'
 	},
 	vlr = {
 		icon = 'File:VLR icon.png',

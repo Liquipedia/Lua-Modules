@@ -535,7 +535,6 @@ function MatchGroupUtil.matchFromRecord(record)
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
-		vod = nilIfEmpty(record.vod),
 		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
