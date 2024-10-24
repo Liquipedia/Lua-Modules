@@ -29,9 +29,9 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
 	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
-	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
-	noCheck = '[[File:NoCheck.png|link=]]',
+	yellowLine = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = '110%'},
+	redCross = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = '110%'},
+	noCheck = '[[File:NoCheck.png|link=|16px]]',
 }
 
 local UNIFORM_MATCH = 'uniform'
@@ -106,9 +106,13 @@ function StarcraftMatchSummary.createBody(match)
 		} or nil,
 		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, StarcraftMatchSummary.Game)
-			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore)),
-		StarcraftMatchSummary.Vetoes(match.vetoes),
+		subMatches and Array.map(subMatches, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore))
+			or Array.map(match.games, function(game) return StarcraftMatchSummary.Game end),
+		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
+			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
+			children = {'Vetoes'},
+		} or nil,
+		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil,
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
 	)}
 end
@@ -142,14 +146,13 @@ end
 function StarcraftMatchSummary.advantageOrPenalty(opponent)
 	local extradata = opponent.extradata or {}
 	if not Logic.isNumeric(extradata.advantage) and not Logic.isNumeric(extradata.penalty) then
-		return
+		return nil
 	end
 	local infoType = Logic.isNumeric(extradata.advantage) and 'advantage' or 'penalty'
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-sc-game-center'},
-		css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
 		children = {
 			OpponentDisplay.InlineOpponent{
 				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
@@ -308,20 +311,6 @@ function StarcraftMatchSummary.TeamSubmatch(showScore, submatch)
 	end
 
 	return StarcraftMatchSummarySubmatchRow():addElement(headerNode):addElement(bodyNode)
-end
-
----@param vetoes StarcraftMatchGroupUtilVeto[]?
----@return Widget[]?
-function StarcraftMatchSummary.Vetos(vetoes)
-	if Logic.isEmpty(vetoes) then return nil end
-	---@cast vetoes -nil
-	return Array.append(
-		MatchSummaryWidgets.Row{
-			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
-			children = {'Vetoes'},
-		},
-		Array.map(vetoes, StarcraftMatchSummary.Veto)
-	)
 end
 
 ---@param veto StarcraftMatchGroupUtilVeto
