@@ -9,17 +9,19 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Faction = require('Module:Faction')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -61,8 +63,7 @@ local StarcraftMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
-function StarcraftMatchSummary.MatchSummaryContainer(args)
-	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
+function StarcraftMatchSummary.getByMatchId(args)
 	local match, bracketResetMatch =
 		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 	---@cast match StarcraftMatchGroupUtilMatch
@@ -76,21 +77,9 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 		}
 	end
 
-	local matchSummary = MatchSummary():init()
-		:addClass('brkts-popup-sc')
-		:addClass(match.opponentMode ~= UNIFORM_MATCH and 'brkts-popup-sc-team-match' or nil)
-
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
-		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
-		--here martin can add the buttons for switching between match and reset match
-	--end
-
-	matchSummary:addMatch(MatchSummary.createMatch(match, StarcraftMatchSummary))
-	matchSummary:addMatch(MatchSummary.createMatch(bracketResetMatch, StarcraftMatchSummary))
-
-	return matchSummary:create()
+	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {
+		width = match.opponentMode ~= UNIFORM_MATCH and '500px' or nil,
+	}):addClass('brkts-popup-sc')
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
@@ -98,58 +87,29 @@ end
 function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffFactions(match)
 
-	local body = MatchSummary.Body()
-
-	--this if can be removed once the "switching between match and reset match" stuff has been implemented
-	if String.endsWith(match.matchId, '_RxMBR') then
-		body:addRow(MatchSummary.Row()
-			:addClass('brkts-popup-sc-veto-center')
-			:css('line-height', '80%')
-			:css('font-weight', 'bold')
-			:addElement('Reset match')
-		)
-	end
-
-	-- Stream, date, and countdown
-	if match.dateIsExact then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		):addClass('brkts-popup-countdown'))
-	end
-
-	-- add a comment if there is a pre match map advantage
-	for _, opponent in ipairs(match.opponents or {}) do
-		StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
-	end
-
-	if match.opponentMode == UNIFORM_MATCH then
-		Array.forEach(match.games, function(game)
-			body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game')
-				:addElements(StarcraftMatchSummary.Game(game))) end)
-	else -- team games
-		-- Show the submatch score if any submatch consists of more than one game
-		-- or if the Map name starts with 'Submatch' (and the submatch has a game)
-		local showScore = Array.any(match.submatches, function(submatch)
+	local isResetMatch = String.endsWith(match.matchId, '_RxMBR')
+	local subMatches
+	local showSubMatchScore
+	if match.opponentMode ~= UNIFORM_MATCH then
+		subMatches = match.submatches or {}
+		showSubMatchScore = Array.any(subMatches, function(submatch)
 			return #submatch.games > 1
 				or #submatch.games == 1 and String.startsWith(submatch.games[1].map or '', 'Submatch')
 		end)
-
-		Array.forEach(match.submatches, function(submatch)
-			body:addRow(StarcraftMatchSummary.TeamSubmatch{submatch = submatch, showScore = showScore}) end)
 	end
 
-	if Table.isNotEmpty(match.vetoes) then
-		-- add Veto Header
-		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-header brkts-popup-sc-veto-center'):addElement('Vetoes'))
-	end
-	Array.forEach(match.vetoes, function(veto)
-		body:addRow(StarcraftMatchSummary.Veto(veto))
-	end)
-
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.casters})
-
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		isResetMatch and MatchSummaryWidgets.Row{
+			classes = {'brkts-popup-sc-veto-center'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			children = {'Reset match'},
+		} or nil,
+		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
+		subMatches and Array.map(subMatches, StarcraftMatchSummary.Game) or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore)),
+		StarcraftMatchSummary.Vetoes(match.vetoes),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+	)}
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
@@ -176,9 +136,9 @@ function StarcraftMatchSummary.computeMatchOffFactions(match)
 	end
 end
 
----@param body MatchSummaryBody
 ---@param opponent StarcraftStandardOpponent
-function StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
+---@return Widget?
+function StarcraftMatchSummary.advantageOrPenalty(opponent)
 	local extradata = opponent.extradata or {}
 	if not Logic.isNumeric(extradata.advantage) and not Logic.isNumeric(extradata.penalty) then
 		return
@@ -186,14 +146,20 @@ function StarcraftMatchSummary.addAdvantagePenaltyInfo(body, opponent)
 	local infoType = Logic.isNumeric(extradata.advantage) and 'advantage' or 'penalty'
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
-	body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-center')
-		:addElement(mw.html.create():node(OpponentDisplay.InlineOpponent{
-			opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
-			showFlag = false,
-			showLink = true,
-			showFaction = false,
-			teamStyle = 'short',
-		}):wikitext(' starts with a ' .. value .. ' map ' .. infoType .. '.')))
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-sc-game-center'},
+		css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+		children = {
+			OpponentDisplay.InlineOpponent{
+				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
+				showFlag = false,
+				showLink = true,
+				showFaction = false,
+				teamStyle = 'short',
+			},
+			' starts with a ' .. value .. ' map ' .. infoType .. '.',
+		},
+	}
 end
 
 ---@param game StarcraftMatchGroupUtilGame
@@ -271,11 +237,10 @@ function StarcraftMatchSummary.GameHeader(header)
 		:wikitext(header)
 end
 
----@param props {submatch: StarcraftMatchGroupUtilSubmatch, showScore: boolean}
+---@param showScore boolean
+---@param submatch StarcraftMatchGroupUtilSubmatch
 ---@return StarcraftMatchSummarySubmatchRow
-function StarcraftMatchSummary.TeamSubmatch(props)
-	local submatch = props.submatch
-
+function StarcraftMatchSummary.TeamSubmatch(showScore, submatch)
 	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-submatch-center')
 	Array.forEach(submatch.games, function(game)
 		if not game.map and not game.winner then return end
@@ -321,7 +286,7 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 			:addClass(opponentIndex == submatch.winner and 'bg-win' or nil)
 			:addClass(submatch.resultType == 'draw' and 'bg-draw' or nil)
 			:node(opponentIndex == 1 and renderOpponent(1) or nil)
-			:node(props.showScore and renderScore(opponentIndex) or nil)
+			:node(showScore and renderScore(opponentIndex) or nil)
 			:node(opponentIndex == 2 and renderOpponent(2) or nil)
 
 		return sideNode
@@ -329,7 +294,7 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 
 	local bodyNode = mw.html.create('div')
 		:addClass('brkts-popup-sc-submatch-body')
-		:addClass(props.showScore and 'brkts-popup-sc-submatch-has-score' or nil)
+		:addClass(showScore and 'brkts-popup-sc-submatch-has-score' or nil)
 		:node(renderSide(1))
 		:node(centerNode)
 		:node(renderSide(2))
@@ -342,6 +307,20 @@ function StarcraftMatchSummary.TeamSubmatch(props)
 	end
 
 	return StarcraftMatchSummarySubmatchRow():addElement(headerNode):addElement(bodyNode)
+end
+
+---@param vetoes StarcraftMatchGroupUtilVeto[]?
+---@return Widget[]?
+function StarcraftMatchSummary.Vetos(vetoes)
+	if Logic.isEmpty(vetoes) then return nil end
+	---@cast vetoes -nil
+	return Array.append(
+		MatchSummaryWidgets.Row{
+			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
+			children = {'Vetoes'},
+		},
+		Array.map(vetoes, StarcraftMatchSummary.Veto)
+	)
 end
 
 ---@param veto StarcraftMatchGroupUtilVeto
@@ -358,11 +337,17 @@ function StarcraftMatchSummary.Veto(veto)
 		map = '[[' .. map .. ']]'
 	end
 
-	return MatchSummary.Row():addClass('brkts-popup-sc-veto-body')
-		:addElement(statusIcon(1))
-		:addElement(mw.html.create('div'):addClass('brkts-popup-sc-veto-center')
-			:wikitext(map))
-		:addElement(statusIcon(2))
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-sc-veto-body'},
+		children = {
+			statusIcon(1),
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-sc-veto-center'},
+				children = {map},
+			},
+			statusIcon(2)
+		},
+	}
 end
 
 ---@param key string|boolean|nil
