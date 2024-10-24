@@ -54,11 +54,6 @@ function StarcraftMatchSummary.getByMatchId(args)
 	end
 
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
-	--[[
-	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {
-		width = match.opponentMode ~= UNIFORM_MATCH and '500px' or nil,
-	}):addClass('brkts-popup-sc')
-	]]
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
