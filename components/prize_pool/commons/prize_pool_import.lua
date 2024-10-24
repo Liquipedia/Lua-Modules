@@ -319,7 +319,7 @@ function Import:_computeBracketPlacementEntries(matchRecords, options)
 			return not (
 				entry.opponent
 				and entry.opponent.type == Opponent.literal
-				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
+				and (not Opponent.toName(entry.opponent) or (Opponent.toName(entry.opponent) or ''):lower() == BYE_OPPONENT_NAME)
 			) and (not self.config.ignoreNonScoreEliminations or not entry.opponent or entry.opponent.status == SCORE_STATUS)
 		end)
 	end
