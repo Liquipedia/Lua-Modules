@@ -6,17 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@enum CrossFireMatchIcons
 local Icons = {
@@ -35,40 +36,21 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMapRow(game))
-		end
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMapRow),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createMapRow(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 
 	-- Add Header
@@ -79,7 +61,7 @@ function CustomMatchSummary._createMapRow(game)
 			:css('font-size','85%')
 			:css('margin','auto')
 		row:addElement(mapHeader)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local centerNode = mw.html.create('div')
@@ -110,14 +92,14 @@ function CustomMatchSummary._createMapRow(game)
 
 	-- Add Comment
 	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param game MatchGroupUtilGame

@@ -53,7 +53,6 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StarcraftMatchGroupUtilGame[]
----@field headToHead boolean
 ---@field isFfa boolean
 ---@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
@@ -109,7 +108,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.noScore = Logic.readBoolOrNil(Table.extract(extradata, 'noscore'))
 	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
@@ -330,9 +328,12 @@ end
 ---@param match StarcraftMatchGroupUtilMatch
 ---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
+	local linksWithoutH2H = Table.filterByKey(match.links, function(key)
+		return key ~= 'headtohead'
+	end)
 	return match.dateIsExact
 		or String.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or not Table.isEmpty(linksWithoutH2H)
 		or String.isNotEmpty(match.comment)
 		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes

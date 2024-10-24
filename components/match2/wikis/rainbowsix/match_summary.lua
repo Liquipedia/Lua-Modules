@@ -6,19 +6,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local POSITION_LEFT = 1
 local POSITION_RIGHT = 2
@@ -31,8 +30,6 @@ local ROUND_ICONS = {
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
-
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 -- Operator Bans Class
 ---@class R6OperatorBan
@@ -237,18 +234,6 @@ function Score:create()
 	return self.root
 end
 
----@class R6MapVeto: VetoDisplay
----@field game string?
-local MapVeto = Class.new(MatchSummary.MapVeto, function(self, game)
-	self.game = game
-end)
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Page.makeInternalLink(map, map and (map .. '/siege') or nil) or TBD
-end
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -260,49 +245,24 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = 'siege'})
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	--local matchPageElement = mw.html.create('center')
-	--matchPageElement:wikitext('[[Match:ID_' .. match.matchId .. '|Match Page]]')
-	--				:css('display', 'block')
-	--				:css('margin', 'auto')
-	--body:addRow(MatchSummary.Row():css('font-size', '85%'):addElement(matchPageElement))
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMap(game))
-		end
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMap),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		mapVeto and mapVeto:create() or nil
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createMap(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -393,7 +353,7 @@ function CustomMatchSummary._createMap(game)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')
@@ -413,7 +373,7 @@ function CustomMatchSummary._createMap(game)
 		row:addClass('brkts-popup-body-gradient-default')
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param side string

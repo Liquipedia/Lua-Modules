@@ -19,6 +19,8 @@ local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Links =  Lua.import('Module:Links')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -38,20 +40,6 @@ local VETO_DECIDER = 'decider'
 ---just a base class to avoid anno warnings
 ---@class MatchSummaryRowInterface
 ---@field create fun(self): Html
-
----@class MatchSummaryBreak
----@operator call: MatchSummaryBreak
----@field root Html
-local Break = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-break')
-	end
-)
-
----@return Html
-function Break:create()
-	return self.root
-end
 
 ---@class MatchSummaryHeader
 ---@operator call: MatchSummaryHeader
@@ -230,31 +218,6 @@ function Body:create()
 	return self.root
 end
 
----@class MatchSummaryComment
----@operator call: MatchSummaryComment
----@field root Html
-local Comment = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content Html|string|number|nil
----@return MatchSummaryComment
-function Comment:content(content)
-	if Logic.isEmpty(content) then return self end
-	self.root:node(content):node(Break():create())
-	return self
-end
-
----@return Html
-function Comment:create()
-	return self.root
-end
-
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
 ---@field root Html
@@ -333,7 +296,7 @@ end
 ---@field root Html
 ---@field headerElement Html?
 ---@field bodyElement Widget|Html?
----@field commentElement Html?
+---@field commentElement Widget?
 ---@field footerElement Html?
 local Match = Class.new(
 	function(self)
@@ -361,10 +324,10 @@ function Match:body(body)
 	return self
 end
 
----@param comment MatchSummaryComment
+---@param comment Widget
 ---@return MatchSummaryMatch
 function Match:comment(comment)
-	self.commentElement = comment:create()
+	self.commentElement = comment
 	return self
 end
 
@@ -379,19 +342,12 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(Break():create())
+		:node(MatchSummaryWidgets.Break{})
 		:node(self.bodyElement)
-		:node(Break():create())
-
-	if self.commentElement ~= nil then
-		self.root
-			:node(self.commentElement)
-			:node(Break():create())
-	end
-
-	if self.footerElement ~= nil then
-		self.root:node(self.footerElement)
-	end
+		:node(MatchSummaryWidgets.Break{})
+		:node(self.commentElement)
+		:node(MatchSummaryWidgets.Break{})
+		:node(self.footerElement)
 
 	return self.root
 end
@@ -402,8 +358,10 @@ end
 ---@field root Html
 ---@field table Html
 ---@field vetoTypeToText table
+---@field game string?
+---@field emptyMapDisplay string
 local MapVeto = Class.new(
-	function(self, vetoTypeToText)
+	function(self, options)
 		self.root = mw.html.create('div')
 			:addClass('brkts-popup-mapveto')
 
@@ -412,7 +370,9 @@ local MapVeto = Class.new(
 			:addClass('collapsible')
 			:addClass('collapsed')
 
-		self.vetoTypeToText = vetoTypeToText or DEFAULT_VETO_TYPE_TO_TEXT
+		self.vetoTypeToText = options.vetoTypeToText or DEFAULT_VETO_TYPE_TO_TEXT
+		self.game = options.game
+		self.emptyMapDisplay = options.emptyMapDisplay or TBD
 
 		self:createHeader()
 	end
@@ -496,13 +456,23 @@ end
 ---@return string
 ---@return string
 function MapVeto:displayMaps(map1, map2)
+	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
+		return TBD, TBD
+	end
+
 	return self:displayMap(map1), self:displayMap(map2)
 end
 
 ---@param map string?
 ---@return string
 function MapVeto:displayMap(map)
-	return Page.makeInternalLink(map) or TBD
+	if not map then
+		return self.emptyMapDisplay
+	end
+	if not self.game then
+		return Page.makeInternalLink(map) or self.emptyMapDisplay
+	end
+	return Page.makeInternalLink(map, map .. '/' .. self.game) or self.emptyMapDisplay
 end
 
 ---@param row Html
@@ -535,10 +505,8 @@ end
 ---@operator call(string?):MatchSummary
 ---@field Header MatchSummaryHeader
 ---@field Body MatchSummaryBody
----@field Comment MatchSummaryComment
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
----@field Break MatchSummaryBreak
 ---@field Match MatchSummaryMatch
 ---@field MapVeto VetoDisplay
 ---@field DEFAULT_VETO_TYPE_TO_TEXT table
@@ -548,10 +516,8 @@ end
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
 MatchSummary.Body = Body
-MatchSummary.Comment = Comment
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
-MatchSummary.Break = Break
 MatchSummary.Match = Match
 MatchSummary.MapVeto = MapVeto
 MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT = DEFAULT_VETO_TYPE_TO_TEXT
@@ -703,7 +669,7 @@ function MatchSummary.createSubstitutesComment(match)
 
 	if Logic.isEmpty(comment) then return end
 
-	return table.concat(comment, tostring(Break():create()))
+	return table.concat(comment, tostring(MatchSummaryWidgets.Break{}))
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
@@ -725,10 +691,10 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local substituteComment = MatchSummary.createSubstitutesComment(matchData)
 
-	if matchData.comment or substituteComment then
-		local comment = MatchSummary.Comment():content(matchData.comment):content(substituteComment)
-		match:comment(comment)
-	end
+	match:comment(MatchSummaryWidgets.MatchComment{
+		children = WidgetUtil.collect(matchData.comment, substituteComment)
+	})
+
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter
 	match:footer(createFooter(matchData, MatchSummary.Footer()))
 
@@ -771,16 +737,15 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	return matchSummary:create()
 end
 
----@param match MatchGroupUtilMatch
----@param mapVeto VetoDisplay?
+---@param vetoData table
+---@param options {game: string?, vetoTypeToText:table?, emptyMapDisplay: string?}?
 ---@return VetoDisplay?
-function MatchSummary.defaultMapVetoDisplay(match, mapVeto)
-	local vetoData = match.extradata.mapveto
+function MatchSummary.defaultMapVetoDisplay(vetoData, options)
 	if Logic.isEmpty(vetoData) then
 		return
 	end
 
-	mapVeto = mapVeto or MapVeto()
+	local mapVeto = MapVeto(options or {})
 	Array.forEach(vetoData, function(vetoRound)
 		if vetoRound.vetostart then
 			mapVeto:vetoStart(tonumber(vetoRound.vetostart), vetoRound.format)

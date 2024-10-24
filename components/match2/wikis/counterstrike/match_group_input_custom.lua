@@ -39,7 +39,7 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
+	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status') --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
@@ -77,7 +77,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
-	match.status = Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
@@ -85,7 +84,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.games = games
 	match.opponents = opponents
 
-	match.extradata = MatchFunctions.getExtraData(match, opponents)
+	match.extradata = MatchFunctions.getExtraData(match, opponents, finishedInput)
 
 	return match
 end
@@ -198,14 +197,6 @@ function MatchFunctions.getLinks(match, maps)
 	end)
 end
 
----@param match table
----@return string?
-function MatchFunctions.getMatchStatus(match)
-	if match.resulttype == 'np' then
-		return Logic.emptyOr(match.status, Variables.varDefault('tournament_status'))
-	end
-end
-
 ---@param name string?
 ---@param year string|osdate
 ---@return number
@@ -249,11 +240,12 @@ end
 
 ---@param match table
 ---@param opponents table[]
+---@param finishedInput string?
 ---@return table
-function MatchFunctions.getExtraData(match, opponents)
+function MatchFunctions.getExtraData(match, opponents, finishedInput)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = MatchFunctions.getMatchStatus(match),
+		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and finishedInput or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))

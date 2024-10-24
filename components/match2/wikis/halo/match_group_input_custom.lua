@@ -15,6 +15,8 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
@@ -41,6 +43,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local games = MatchFunctions.extractMaps(match, #opponents)
 	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links.headtohead = MatchFunctions.getHeadToHeadLink(match, opponents)
 
 	match.bestof = MatchFunctions.getBestOf(match.bestof)
 
@@ -151,6 +154,40 @@ function MatchFunctions.getExtraData(match)
 		mvp = MatchGroupInputUtil.readMvp(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 	}
+end
+
+---@param match table
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(match, opponents)
+	if
+		opponents[1].type ~= Opponent.team or
+		opponents[2].type ~= Opponent.team or
+		not opponents[1].name or
+		not opponents[2].name then
+
+		return nil
+	end
+
+	local team1, team2 = string.gsub(opponents[1].name, ' ', '_'), string.gsub(opponents[2].name, ' ', '_')
+	local buildQueryFormLink = function(form, template, arguments)
+		return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
+			mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
+				.. '&_run'
+		))
+	end
+
+	local headtoheadArgs = {
+		['[team1]'] = team1,
+		['[team2]'] = team2,
+		['[games][is_list]'] = 1,
+		['[tiers][is_list]'] = 1,
+		['[fromdate][day]'] = '01',
+		['[fromdate][month]'] = '01',
+		['[fromdate][year]'] = string.sub(match.date,1,4)
+	}
+
+	return buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
 end
 
 --

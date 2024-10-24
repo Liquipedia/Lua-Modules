@@ -18,11 +18,11 @@ local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local TBD = 'TBD'
 
 local CustomMatchSummary = {}
 
@@ -106,43 +106,6 @@ function Score:create()
 	return self.root
 end
 
----@class CounterstrikeMapVeto: VetoDisplay
----@field game string?
-local MapVeto = Class.new(MatchSummary.MapVeto, function(self, game)
-	self.game = game
-end)
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Logic.nilIfEmpty(CustomMatchSummary._createMapLink(map, self.game)) or TBD
-end
-
----@class CounterstrikeMatchStatus: MatchSummaryRowInterface
----@operator call: CounterstrikeMatchStatus
----@field root Html
-local MatchStatus = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content string|number|Html|nil
----@return self
-function MatchStatus:content(content)
-	self.root:node(content):node(MatchSummary.Break():create())
-	return self
-end
-
----@return Html
-function MatchStatus:create()
-	return self.root
-end
-
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
@@ -178,37 +141,23 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		if Logic.isNotEmpty(match.extradata.status) then
-			match.stream = {rawdatetime = true}
-		end
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
+	if Logic.isNotEmpty(match.extradata.status) then
+		match.stream = {rawdatetime = true}
 	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMap(game))
-		end
-	end
-
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto(match.game)))
-
-	-- Match Status (postponed/ cancel(l)ed)
+	local matchStatusText
 	if match.extradata.status then
-		local matchStatus = MatchStatus()
-		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
-		body:addRow(matchStatus)
+		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
 	end
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	return body
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = match.game})
+
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMap),
+		mapVeto and mapVeto:create() or nil,
+		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
+	)}
 end
 
 ---@param match MatchGroupUtilMatch
@@ -330,8 +279,11 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createMap(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -389,7 +341,7 @@ function CustomMatchSummary._createMap(game)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')
@@ -398,7 +350,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?

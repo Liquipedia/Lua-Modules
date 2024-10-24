@@ -10,17 +10,16 @@ local CustomMatchSummary = {}
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
@@ -28,28 +27,6 @@ local NUM_CHAMPIONS_PICK = 5
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
-
----@class HeroesOfTheStormMapVeto: VetoDisplay
-local MapVeto = Class.new(MatchSummary.MapVeto)
-
----@param map1 string?
----@param map2 string?
----@return string
----@return string
-function MapVeto:displayMaps(map1, map2)
-	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
-		return TBD, TBD
-	end
-
-	return self:displayMap(map1), self:displayMap(map2)
-end
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Logic.isEmpty(map) and FP or Page.makeInternalLink(map) --[[@as string]]
-end
 
 ---@param args table
 ---@return Html
@@ -60,53 +37,24 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		local rowDisplay = CustomMatchSummary._createGame(game, gameIndex, match.date)
-		if rowDisplay then
-			body:addRow(rowDisplay)
-		end
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	-- Add the Character Bans
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-	body.root:node(MatchSummaryWidgets.CharacterBanTable{
-		bans = characterBansData,
-		date = match.date,
-	})
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {emptyMapDisplay = FP})
 
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		mapVeto and mapVeto:create() or nil
+	)}
 end
 
----@param game MatchGroupUtilGame
----@param gameIndex integer
 ---@param date string
----@return MatchSummaryRow?
-function CustomMatchSummary._createGame(game, gameIndex, date)
+---@param game MatchGroupUtilGame
+---@return Html?
+function CustomMatchSummary._createGame(date, game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -157,14 +105,14 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			game.length and tostring(mw.html.create('span'):wikitext('Match Duration: ' .. game.length)) or nil
 		)
 		row
-			:addElement(MatchSummary.Break():create())
+			:addElement(MatchSummaryWidgets.Break{})
 			:addElement(mw.html.create('div')
 				:css('margin', 'auto')
 				:wikitext(table.concat(commentContents, '<br>'))
 			)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?

@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -17,6 +19,8 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
@@ -170,24 +174,20 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	body:addRow(MatchSummary.Row():addElement(DisplayHelper.MatchCountdownBlock(match)))
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			local rowDisplay = CustomMatchSummary._createGame(game)
-			body:addRow(rowDisplay)
-		end
-	end
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createGame)
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createGame(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
 	local extradata = game.extradata or {}
@@ -200,7 +200,7 @@ function CustomMatchSummary._createGame(game)
 			:node(game.header)
 
 		row:addElement(gameHeader)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local centerNode = mw.html.create('div')
@@ -229,7 +229,7 @@ function CustomMatchSummary._createGame(game)
 
 	if extradata.timeout then
 		local timeouts = Json.parseIfString(extradata.timeout)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		row:addElement(CustomMatchSummary._iconDisplay(
 			TIMEOUT,
 			Table.includes(timeouts, 1)
@@ -249,7 +249,7 @@ function CustomMatchSummary._createGame(game)
 		or Logic.isNotEmpty(extradata.t2goals)
 		or Logic.isNotEmpty(game.comment)
 	then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 	if Logic.isNotEmpty(extradata.t1goals) then
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t1goals, 1))
@@ -265,7 +265,7 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param goalesValue string|number

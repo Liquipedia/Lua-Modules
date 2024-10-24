@@ -94,28 +94,6 @@ function StarcraftMatchSummary.MatchSummaryContainer(args)
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function StarcraftMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	if not match.headToHead or #match.opponents ~= 2 or Array.any(match.opponents, function(opponent)
-		return opponent.type ~= Opponent.solo or not ((opponent.players or {})[1] or {}).pageName end)
-	then
-		return footer:addLinks(match.links)
-	end
-	match.links.headtohead = tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
-		.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
-		.. match.opponents[1].players[1].pageName
-		.. '&Head_to_head_query%5Bopponent%5D='
-		.. match.opponents[2].players[1].pageName
-		.. '&wpRunQuery=Run+query'
-	match.links.headtohead = string.gsub(match.links.headtohead, ' ', '_')
-
-	return footer:addLinks(match.links)
-end
-
----@param match StarcraftMatchGroupUtilMatch
 ---@return MatchSummaryBody
 function StarcraftMatchSummary.createBody(match)
 	StarcraftMatchSummary.computeOffFactions(match)

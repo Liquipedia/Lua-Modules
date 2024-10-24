@@ -7,6 +7,7 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -15,6 +16,8 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
@@ -34,48 +37,30 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
+	local games = Array.map(match.games, function(game)
+		if hasSubMatches then
+			return CustomMatchSummary._createSubMatch(game, match):create()
+		end
+		return CustomMatchSummary._createGame(game):create()
+	end)
 
-	for _, game in ipairs(match.games) do
-		local row = MatchSummary.Row()
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games
+	)}
+end
+
+---@param game MatchGroupUtilGame
+---@return MatchSummaryRow
+function CustomMatchSummary._createGame(game)
+	local row = MatchSummary.Row()
 			:addClass('brkts-popup-body-game')
 			:css('font-size', '84%')
 			:css('padding', '4px')
 			:css('min-height', '32px')
-
-		if Logic.readBool((match.extradata or {}).hassubmatches) then
-			CustomMatchSummary._createSubMatch(row, game, match)
-		else
-			CustomMatchSummary._createGame(row, game)
-		end
-
-		-- Add Comment
-		if not Logic.isEmpty(game.comment) then
-			row
-				:addElement(MatchSummary.Break():create())
-				:addElement(mw.html.create('div')
-					:wikitext(game.comment)
-					:css('margin', 'auto')
-				)
-		end
-
-		body:addRow(row)
-	end
-
-	return body
-end
-
----@param row MatchSummaryRow
----@param game MatchGroupUtilGame
-function CustomMatchSummary._createGame(row, game)
 	row
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
 		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
@@ -85,12 +70,28 @@ function CustomMatchSummary._createGame(row, game)
 		)
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+
+	-- Add Comment
+	if not Logic.isEmpty(game.comment) then
+		row
+			:addElement(MatchSummaryWidgets.Break{})
+			:addElement(mw.html.create('div')
+				:wikitext(game.comment)
+				:css('margin', 'auto')
+			)
+	end
+	return row
 end
 
----@param row MatchSummaryRow
 ---@param game MatchGroupUtilGame
 ---@param match MatchGroupUtilMatch
-function CustomMatchSummary._createSubMatch(row, game, match)
+---@return MatchSummaryRow
+function CustomMatchSummary._createSubMatch(game, match)
+	local row = MatchSummary.Row()
+			:addClass('brkts-popup-body-game')
+			:css('font-size', '84%')
+			:css('padding', '4px')
+			:css('min-height', '32px')
 	local players = CustomMatchSummary._extractPlayersFromGame(game, match)
 
 	row
@@ -110,6 +111,17 @@ function CustomMatchSummary._createSubMatch(row, game, match)
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		-- player right side
 		:addElement(CustomMatchSummary._players(players[2], 2, game.winner))
+
+	-- Add Comment
+	if not Logic.isEmpty(game.comment) then
+		row
+			:addElement(MatchSummaryWidgets.Break{})
+			:addElement(mw.html.create('div')
+				:wikitext(game.comment)
+				:css('margin', 'auto')
+			)
+	end
+	return row
 end
 
 ---@param game MatchGroupUtilGame

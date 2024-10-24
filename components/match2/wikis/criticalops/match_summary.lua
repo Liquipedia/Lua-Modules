@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
@@ -14,6 +15,8 @@ local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -98,31 +101,6 @@ function Score:create()
 	return self.root
 end
 
----@class CriticalopsMatchStatus: MatchSummaryRowInterface
----@operator call: CriticalopsMatchStatus
----@field root Html
-local MatchStatus = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content Html|string|number|nil
----@return CriticalopsMatchStatus
-function MatchStatus:content(content)
-	self.root:node(content):node(MatchSummary.Break():create())
-	return self
-end
-
----@return Html
-function MatchStatus:create()
-	return self.root
-end
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -134,42 +112,22 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = match.game})
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		if Logic.isNotEmpty(match.extradata.status) then
-			match.stream = {rawdatetime = true}
-		end
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMap(game))
-		end
-	end
-
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match))
-
-	-- Match Status (postponed/ cancel(l)ed)
-	if match.extradata.status then
-		local matchStatus = MatchStatus()
-		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
-		body:addRow(matchStatus)
-	end
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMap),
+		mapVeto and mapVeto:create() or nil
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html?
 function CustomMatchSummary._createMap(game)
+	if not game.map then
+		return
+	end
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -223,7 +181,7 @@ function CustomMatchSummary._createMap(game)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')
@@ -232,7 +190,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?

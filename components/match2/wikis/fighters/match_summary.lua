@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
@@ -44,38 +46,19 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	Array.forEach(CustomMatchSummary._displayGames(match), FnUtil.curry(body.addRow, body))
-
-	return body
-end
-
----@param match MatchGroupUtilMatch
----@return MatchSummaryRow[]
-function CustomMatchSummary._displayGames(match)
-	return Array.map(match.games, function(game)
-		local row = MatchSummary.Row()
-				:addClass('brkts-popup-body-game')
-				:css('font-size', '0.75rem')
-				:css('padding', '4px')
-				:css('min-height', '24px')
-
-		local elements = CustomMatchSummary._createStandardGame(game, {
+	local games = Array.map(match.games, function(game)
+		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
 			game = match.game,
 		})
-
-		Array.forEach(elements, FnUtil.curry(row.addElement, row))
-
-		return row
 	end)
+
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games
+	)}
 end
 
 ---@param game MatchGroupUtilGame
@@ -93,14 +76,18 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param props {game: string?, opponents: standardOpponent[]}
----@return Html[]
+---@return Html?
 function CustomMatchSummary._createStandardGame(game, props)
+	local row = MatchSummary.Row()
+		:addClass('brkts-popup-body-game')
+		:css('font-size', '0.75rem')
+		:css('padding', '4px')
+		:css('min-height', '24px')
+
 	game.extradata = game.extradata or {}
 
-	local elements = {}
-
 	if not game or not game.participants then
-		return elements
+		return
 	end
 
 	local chars1 = CustomMatchSummary._createCharacterDisplay(
@@ -114,16 +101,16 @@ function CustomMatchSummary._createStandardGame(game, props)
 		true
 	)
 
-	table.insert(elements, chars1:css('flex-basis', '30%'))
-	table.insert(elements, CustomMatchSummary._createCheckMark(game.winner, 1))
-	table.insert(elements, mw.html.create('div')
+	row:addElement(chars1:css('flex-basis', '30%'))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
+	row:addElement(mw.html.create('div')
 			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
 			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
 	)
-	table.insert(elements, CustomMatchSummary._createCheckMark(game.winner, 2))
-	table.insert(elements, chars2:css('flex-basis', '30%'):css('text-align', 'right'))
+	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
 
-	return elements
+	return row:create()
 end
 
 ---@param characters {name: string}[]?
