@@ -53,9 +53,12 @@ function StarcraftMatchSummary.getByMatchId(args)
 		}
 	end
 
+	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
+	--[[
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args, {
 		width = match.opponentMode ~= UNIFORM_MATCH and '500px' or nil,
 	}):addClass('brkts-popup-sc')
+	]]
 end
 
 ---@param match StarcraftMatchGroupUtilMatch
@@ -65,13 +68,8 @@ function StarcraftMatchSummary.createBody(match)
 
 	local isResetMatch = String.endsWith(match.matchId, '_RxMBR')
 	local subMatches
-	local showSubMatchScore
 	if match.opponentMode ~= UNIFORM_MATCH then
 		subMatches = match.submatches or {}
-		showSubMatchScore = Array.any(subMatches, function(submatch)
-			return #submatch.games > 1
-				or #submatch.games == 1 and String.startsWith(submatch.games[1].map or '', 'Submatch')
-		end)
 	end
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
@@ -82,7 +80,7 @@ function StarcraftMatchSummary.createBody(match)
 		} or nil,
 		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore))
+		subMatches and Array.map(subMatches, StarcraftMatchSummary.TeamSubmatch)
 			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
@@ -142,7 +140,7 @@ function StarcraftMatchSummary.advantageOrPenalty(opponent)
 	}
 end
 
----@param options {noLink: boolean?}
+---@param options {noLink: boolean?, isPartOfSubMatch: boolean?}
 ---@param game StarcraftMatchGroupUtilGame
 ---@return MatchSummaryRow
 function StarcraftMatchSummary.Game(options, game)
@@ -164,8 +162,11 @@ function StarcraftMatchSummary.Game(options, game)
 		end
 	end
 
-	return MatchSummaryWidgets.Row{
+	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
+
+	return rowWidget{
 		classes = {'brkts-popup-body-game'},
+		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			game.header and {
 				HtmlWidgets.Div{css = {margin = 'auto'},  children = {game.header}},
@@ -197,73 +198,76 @@ function StarcraftMatchSummary.OffFactionIcons(factions)
 	}
 end
 
----@param showScore boolean
 ---@param submatch StarcraftMatchGroupUtilSubmatch
 ---@return Widget
-function StarcraftMatchSummary.TeamSubmatch(showScore, submatch)
-	local center = HtmlWidgets.Div{
-		classes = {'brkts-popup-sc-submatch-center'},
-		children = Array.map(submatch.games, function(game)
-			return StarcraftMatchSummary.Game({noLink = String.startsWith(game.map or '', 'Submatch')}, game)
-		end),
+function StarcraftMatchSummary.TeamSubmatch(submatch)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			submatch.header and {
+				HtmlWidgets.Div{css = {margin = 'auto'},  children = {submatch.header}},
+				MatchSummaryWidgets.Break{},
+			} or nil,
+			StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch),
+			Array.map(submatch.games, function(game)
+				return StarcraftMatchSummary.Game({noLink = String.startsWith(game.map or '', 'Submatch'), isPartOfSubMatch = true}, game)
+			end)
+		)
 	}
+end
 
-	local renderOpponent = function(opponentIndex)
-		local opponent = submatch.opponents[opponentIndex]
-		return opponent
-			and OpponentDisplay.BlockOpponent{
-				opponent = opponent --[[@as standardOpponent]],
-				flip = opponentIndex == 1,
-			}:addClass('brkts-popup-sc-submatch-opponent')
-			or HtmlWidgets.Div{children = {'&nbsp;'}, classes = {'brkts-popup-sc-submatch-opponent'}}
-	end
+---@param submatch StarcraftMatchGroupUtilSubmatch
+---@return Widget
+function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
+	local opponents = submatch.opponents or {{}, {}}
 
-	local hasNonZeroScore = Array.any(submatch.scores, function(score) return score ~= 0 end)
-	local hasPlayers = Array.any(submatch.opponents, function(opponent) return Logic.isNotEmpty(opponent.players) end)
-
-	local renderScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner
-		local text
-		if submatch.resultType == 'default' then
-			text = isWinner and 'W' or submatch.walkover:upper()
-		elseif submatch.resultType == 'np' then
-			text = ''
-		elseif hasNonZeroScore or hasPlayers then
-			local score = submatch.scores[opponentIndex]
-			text = score and tostring(score) or ''
+	local createOpponent = function(opponentIndex)
+		local players = (opponents[opponentIndex] or {}).players or {}
+		if Logic.isEmpty(players) then
+			players = Opponent.tbd(Opponent.solo).players
 		end
-		return HtmlWidgets.Div{children = {text}, classes = {'brkts-popup-sc-submatch-score'}}
+		return OpponentDisplay.BlockOpponent{
+			flip = opponentIndex == 1,
+			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
+			showLink = true,
+			overflow = 'ellipsis',
+		}
 	end
 
-	local renderSide = function(opponentIndex)
-		return HtmlWidgets.Div{
-			classes = Array.append(
-				{'brkts-popup-sc-submatch-side'},
-				opponentIndex == 1 and 'brkts-popup-left' or 'brkts-popup-right',
-				opponentIndex == submatch.winner and 'bg-win' or nil,
-				submatch.resultType == 'draw' and 'bg-draw' or nil
-			),
-			children = Array.append({},
-				opponentIndex == 1 and renderOpponent(1) or nil,
-				showScore and renderScore(opponentIndex) or nil,
-				opponentIndex == 2 and renderOpponent(2) or nil
-			),
+	---@param opponentIndex any
+	---@return Html
+	local createScore = function(opponentIndex)
+		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
+		if submatch.resultType == 'default' then
+			return OpponentDisplay.BlockScore{
+				isWinner = isWinner,
+				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
+			}
+		end
+
+		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
+		return OpponentDisplay.BlockScore{
+			isWinner = isWinner,
+			scoreText = score,
 		}
 	end
 
 	return HtmlWidgets.Div{
-		classes = {'brkts-popup-sc-submatch'},
+		classes = {'brkts-popup-header-dev'},
+		css = {['justify-content'] = 'center', margin = 'auto'},
 		children = WidgetUtil.collect(
-			submatch.header and HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-submatch'},
-				children = submatch.header,
-			} or nil,
 			HtmlWidgets.Div{
-				classes = {'brkts-popup-sc-submath-body', showScore and 'brkts-popup-sc-submatch-has-score' or nil},
+				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
-					renderSide(1),
-					center,
-					renderSide(2),
+					createOpponent(1),
+					createScore(1):addClass('brkts-popup-header-opponent-score-left'),
+				},
+			},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
+				children = {
+					createScore(2):addClass('brkts-popup-header-opponent-score-right'),
+					createOpponent(2),
 				},
 			}
 		)
