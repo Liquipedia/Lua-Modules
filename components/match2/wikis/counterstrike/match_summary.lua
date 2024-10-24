@@ -23,8 +23,6 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local TBD = 'TBD'
-
 local CustomMatchSummary = {}
 
 -- Score Class

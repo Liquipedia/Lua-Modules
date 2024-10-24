@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
@@ -30,8 +29,6 @@ local ROUND_ICONS = {
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
-
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 -- Operator Bans Class
 ---@class R6OperatorBan
