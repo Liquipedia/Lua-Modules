@@ -366,7 +366,7 @@ function CustomMatchSummary._createMap(game)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')

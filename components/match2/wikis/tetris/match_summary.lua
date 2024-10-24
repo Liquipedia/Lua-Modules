@@ -76,7 +76,7 @@ function CustomMatchSummary._createGame(game)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		row:addElement(mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')

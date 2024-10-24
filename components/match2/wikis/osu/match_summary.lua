@@ -106,7 +106,7 @@ function CustomMatchSummary._createMapRow(game)
 			:css('font-size','85%')
 			:css('margin','auto')
 		row:addElement(mapHeader)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local centerNode = mw.html.create('div')
@@ -148,7 +148,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	-- Add Comment
 	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')

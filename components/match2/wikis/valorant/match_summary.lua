@@ -257,7 +257,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 		comment :wikitext(game.comment)
 				:css('margin', 'auto')

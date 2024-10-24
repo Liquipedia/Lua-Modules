@@ -74,7 +74,7 @@ function CustomMatchSummary._createGame(game)
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
 		row
-			:addElement(MatchSummary.Break():create())
+			:addElement(MatchSummaryWidgets.Break{})
 			:addElement(mw.html.create('div')
 				:wikitext(game.comment)
 				:css('margin', 'auto')
@@ -115,7 +115,7 @@ function CustomMatchSummary._createSubMatch(game, match)
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
 		row
-			:addElement(MatchSummary.Break():create())
+			:addElement(MatchSummaryWidgets.Break{})
 			:addElement(mw.html.create('div')
 				:wikitext(game.comment)
 				:css('margin', 'auto')

@@ -78,7 +78,7 @@ function CustomMatchSummary._createGame(game)
 			:css('font-size','85%')
 			:css('margin','auto')
 		row:addElement(mapHeader)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local weaponsData = Array.map(game.opponents, function(opponent)
@@ -117,7 +117,7 @@ function CustomMatchSummary._createGame(game)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		local comment = mw.html.create('div')
 		comment:wikitext(game.comment)
 				:css('margin', 'auto')

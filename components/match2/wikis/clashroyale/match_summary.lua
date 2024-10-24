@@ -78,7 +78,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			:css('margin', 'auto')
 			:css('font-weight', 'bold')
 		)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local cardData = {{}, {}}
@@ -116,7 +116,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		row:addElement(mw.html.create('div')
 			:wikitext(game.comment)
 			:css('margin', 'auto')
@@ -242,7 +242,7 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			:css('margin', 'auto')
 			:css('font-weight', 'bold')
 		)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	-- players left side

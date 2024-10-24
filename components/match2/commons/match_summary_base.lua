@@ -41,20 +41,6 @@ local VETO_DECIDER = 'decider'
 ---@class MatchSummaryRowInterface
 ---@field create fun(self): Html
 
----@class MatchSummaryBreak
----@operator call: MatchSummaryBreak
----@field root Html
-local Break = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-break')
-	end
-)
-
----@return Html
-function Break:create()
-	return self.root
-end
-
 ---@class MatchSummaryHeader
 ---@operator call: MatchSummaryHeader
 ---@field root Html
@@ -356,11 +342,11 @@ end
 function Match:create()
 	self.root
 		:node(self.headerElement)
-		:node(Break():create())
+		:node(MatchSummaryWidgets.Break{})
 		:node(self.bodyElement)
-		:node(Break():create())
+		:node(MatchSummaryWidgets.Break{})
 		:node(self.commentElement)
-		:node(Break():create())
+		:node(MatchSummaryWidgets.Break{})
 		:node(self.footerElement)
 
 	return self.root
@@ -507,7 +493,6 @@ end
 ---@field Body MatchSummaryBody
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
----@field Break MatchSummaryBreak
 ---@field Match MatchSummaryMatch
 ---@field MapVeto VetoDisplay
 ---@field DEFAULT_VETO_TYPE_TO_TEXT table
@@ -519,7 +504,6 @@ MatchSummary.Header = Header
 MatchSummary.Body = Body
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
-MatchSummary.Break = Break
 MatchSummary.Match = Match
 MatchSummary.MapVeto = MapVeto
 MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT = DEFAULT_VETO_TYPE_TO_TEXT
@@ -671,7 +655,7 @@ function MatchSummary.createSubstitutesComment(match)
 
 	if Logic.isEmpty(comment) then return end
 
-	return table.concat(comment, tostring(Break():create()))
+	return table.concat(comment, tostring(MatchSummaryWidgets.Break{}))
 end
 
 ---Default createMatch function for usage in Custom MatchSummary
