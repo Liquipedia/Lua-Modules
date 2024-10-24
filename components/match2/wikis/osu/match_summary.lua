@@ -12,7 +12,6 @@ local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -27,9 +26,6 @@ local Icons = {
 	EMPTY = '[[File:NoCheck.png|link=]]',
 }
 
-local VETO_TYPE_TO_TEXT = Table.copy(MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT)
-VETO_TYPE_TO_TEXT.protect = 'PROTECT'
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -42,17 +38,13 @@ end
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {
-		vetoTypeToText = VETO_TYPE_TO_TEXT,
-		emptyMapDisplay = NONE}
-	)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, CustomMatchSummary._createMapRow),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		mapVeto and mapVeto:create() or nil
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = NONE}))
 	)}
 end
 
