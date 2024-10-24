@@ -6,8 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Class = require('Module:Class')
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -18,9 +17,9 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NONE = '-'
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 ---@enum OsuMatchIcons
 local Icons = {
@@ -33,22 +32,6 @@ VETO_TYPE_TO_TEXT.protect = 'PROTECT'
 
 local CustomMatchSummary = {}
 
----@class OsuMapVeto: VetoDisplay
-local MapVeto = Class.new(MatchSummary.MapVeto)
-
----@param map1 string?
----@param map2 string?
----@return string
----@return string
-function MapVeto:displayMaps(map1, map2)
-	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
-		return TBD, TBD
-	end
-
-	return Page.makeInternalLink(map1) or NONE,
-		Page.makeInternalLink(map2) or NONE
-end
-
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
@@ -58,36 +41,18 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createMapRow(game))
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- Add casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {vetoTypeToText = VETO_TYPE_TO_TEXT}))
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMapRow),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {
+			vetoTypeToText = VETO_TYPE_TO_TEXT,
+			emptyMapDisplay = NONE}
+		):create()
+	)}
 end
 
 ---@param game MatchGroupUtilGame
