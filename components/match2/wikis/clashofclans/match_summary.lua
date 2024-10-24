@@ -7,7 +7,8 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
-local Date = require('Module:Date/Ext')
+local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -16,6 +17,7 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -52,30 +54,13 @@ function CustomMatchSummary.createHeader(match)
 end
 
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or match.timestamp ~= Date.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate over games
-	for gameIndex, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createMapRow(game, gameIndex))
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMapRow),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp)
+	)}
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -168,7 +153,7 @@ function CustomMatchSummary._createMapRow(game, gameIndex)
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 function CustomMatchSummary._createCheckMarkOrCross(showIcon)

@@ -14,6 +14,8 @@ local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -42,23 +44,12 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	if not CustomMatchSummary._isSolo(match) then
-		return body
-	end
-
-	Array.forEach(match.games, function(game)
-		body:addRow(CustomMatchSummary._createGame(game))
-	end)
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		CustomMatchSummary._isSolo(match) and Array.map(match.games, CustomMatchSummary._createGame) or nil
+	)}
 end
 
 ---@param match MatchGroupUtilMatch
@@ -81,7 +72,7 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createGame(game)
 	if not game.map and not game.winner then return end
 	local row = MatchSummary.Row()
@@ -104,7 +95,7 @@ function CustomMatchSummary._createGame(game)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(char2)
 
-	return row
+	return row:create()
 end
 
 ---@param char string?

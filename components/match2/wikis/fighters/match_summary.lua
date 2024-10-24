@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ICONS = {
 	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
@@ -44,22 +46,19 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	Array.forEach(match.games, function(game)
-		body:addRow(CustomMatchSummary._createStandardGame(game, {
+	local games = Array.map(match.games, function(game)
+		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
 			game = match.game,
-		}))
+		})
 	end)
 
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games
+	)}
 end
 
 ---@param game MatchGroupUtilGame
@@ -77,7 +76,7 @@ end
 
 ---@param game MatchGroupUtilGame
 ---@param props {game: string?, opponents: standardOpponent[]}
----@return Html[]
+---@return Html?
 function CustomMatchSummary._createStandardGame(game, props)
 	local row = MatchSummary.Row()
 		:addClass('brkts-popup-body-game')
@@ -87,10 +86,8 @@ function CustomMatchSummary._createStandardGame(game, props)
 
 	game.extradata = game.extradata or {}
 
-	local elements = {}
-
 	if not game or not game.participants then
-		return elements
+		return
 	end
 
 	local chars1 = CustomMatchSummary._createCharacterDisplay(
@@ -113,7 +110,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
 	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
 
-	return elements
+	return row:create()
 end
 
 ---@param characters {name: string}[]?
