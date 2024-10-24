@@ -246,13 +246,14 @@ end
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = 'siege'})
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, CustomMatchSummary._createMap),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = 'siege'}):create()
+		mapVeto and mapVeto:create() or nil
 	)}
 end
 
