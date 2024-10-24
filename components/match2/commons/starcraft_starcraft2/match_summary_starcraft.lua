@@ -322,8 +322,6 @@ function StarcraftMatchSummary.Veto(veto)
 			}
 		},
 	}
-
-
 end
 
 return StarcraftMatchSummary
