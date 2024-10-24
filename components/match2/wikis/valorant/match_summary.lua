@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
@@ -17,6 +18,7 @@ local Table = require('Module:Table')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
@@ -156,38 +158,20 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto)
 
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	for _, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createMap(game))
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- Add Map Veto
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto))
-
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMap),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		mapVeto and mapVeto:create() or nil
+	)}
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createMap(game)
 	if not game.map then
 		return
@@ -265,7 +249,7 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	row:addClass('brkts-popup-body-game')
-	return row
+	return row:create()
 end
 
 ---@param side string

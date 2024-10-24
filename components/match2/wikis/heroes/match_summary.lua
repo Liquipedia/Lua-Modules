@@ -12,13 +12,14 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
@@ -36,50 +37,24 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
-	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
-	end
-
-	-- Add Match MVP(s)
-	if Table.isNotEmpty(match.extradata.mvp) then
-		body.root:node(MatchSummaryWidgets.Mvp{
-			players = match.extradata.mvp.players,
-			points = match.extradata.mvp.points,
-		})
-	end
-
-	-- casters
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
-
-	-- Add the Character Bans
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-	body.root:node(MatchSummaryWidgets.CharacterBanTable{
-		bans = characterBansData,
-		date = match.date,
-	})
+	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {emptyMapDisplay = FP})
 
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {emptyMapDisplay = FP}))
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		mapVeto and mapVeto:create() or nil
+	)}
 end
 
----@param game MatchGroupUtilGame
----@param gameIndex integer
 ---@param date string
----@return MatchSummaryRow?
-function CustomMatchSummary._createGame(game, gameIndex, date)
+---@param game MatchGroupUtilGame
+---@return Html?
+function CustomMatchSummary._createGame(date, game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
@@ -137,7 +112,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?
