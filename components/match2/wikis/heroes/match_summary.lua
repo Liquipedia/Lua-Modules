@@ -10,13 +10,11 @@ local CustomMatchSummary = {}
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -28,28 +26,6 @@ local NUM_CHAMPIONS_PICK = 5
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
-
----@class HeroesOfTheStormMapVeto: VetoDisplay
-local MapVeto = Class.new(MatchSummary.MapVeto)
-
----@param map1 string?
----@param map2 string?
----@return string
----@return string
-function MapVeto:displayMaps(map1, map2)
-	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
-		return TBD, TBD
-	end
-
-	return self:displayMap(map1), self:displayMap(map2)
-end
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Logic.isEmpty(map) and FP or Page.makeInternalLink(map) --[[@as string]]
-end
 
 ---@param args table
 ---@return Html
@@ -94,7 +70,7 @@ function CustomMatchSummary.createBody(match)
 	})
 
 	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))
+	body:addRow(MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {emptyMapDisplay = FP}))
 
 	return body
 end

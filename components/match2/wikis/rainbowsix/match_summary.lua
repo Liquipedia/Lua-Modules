@@ -13,7 +13,6 @@ local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -237,18 +236,6 @@ function Score:create()
 	return self.root
 end
 
----@class R6MapVeto: VetoDisplay
----@field game string?
-local MapVeto = Class.new(MatchSummary.MapVeto, function(self, game)
-	self.game = game
-end)
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Page.makeInternalLink(map, map and (map .. '/siege') or nil) or TBD
-end
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -287,7 +274,7 @@ function CustomMatchSummary.createBody(match)
 	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto()))
+	body:addRow(MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = 'siege'}))
 
 	return body
 end

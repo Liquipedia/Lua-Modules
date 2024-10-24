@@ -372,8 +372,10 @@ end
 ---@field root Html
 ---@field table Html
 ---@field vetoTypeToText table
+---@field game string?
+---@field emptyMapDisplay string
 local MapVeto = Class.new(
-	function(self, vetoTypeToText)
+	function(self, options)
 		self.root = mw.html.create('div')
 			:addClass('brkts-popup-mapveto')
 
@@ -382,7 +384,9 @@ local MapVeto = Class.new(
 			:addClass('collapsible')
 			:addClass('collapsed')
 
-		self.vetoTypeToText = vetoTypeToText or DEFAULT_VETO_TYPE_TO_TEXT
+		self.vetoTypeToText = options.vetoTypeToText or DEFAULT_VETO_TYPE_TO_TEXT
+		self.game = options.game
+		self.emptyMapDisplay = options.emptyMapDisplay or TBD
 
 		self:createHeader()
 	end
@@ -466,13 +470,23 @@ end
 ---@return string
 ---@return string
 function MapVeto:displayMaps(map1, map2)
+	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
+		return TBD, TBD
+	end
+
 	return self:displayMap(map1), self:displayMap(map2)
 end
 
 ---@param map string?
 ---@return string
 function MapVeto:displayMap(map)
-	return Page.makeInternalLink(map) or TBD
+	if not map then
+		return self.emptyMapDisplay
+	end
+	if not self.game then
+		return Page.makeInternalLink(map) or self.emptyMapDisplay
+	end
+	return Page.makeInternalLink(map, map .. '/' .. self.game) or self.emptyMapDisplay
 end
 
 ---@param row Html
@@ -739,16 +753,15 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	return matchSummary:create()
 end
 
----@param match MatchGroupUtilMatch
----@param mapVeto VetoDisplay?
+---@param vetoData table
+---@param options {game: string?, vetoTypeToText:table?, emptyMapDisplay: string?}?
 ---@return VetoDisplay?
-function MatchSummary.defaultMapVetoDisplay(match, mapVeto)
-	local vetoData = match.extradata.mapveto
+function MatchSummary.defaultMapVetoDisplay(vetoData, options)
 	if Logic.isEmpty(vetoData) then
 		return
 	end
 
-	mapVeto = mapVeto or MapVeto()
+	local mapVeto = MapVeto(options or {})
 	Array.forEach(vetoData, function(vetoRound)
 		if vetoRound.vetostart then
 			mapVeto:vetoStart(tonumber(vetoRound.vetostart), vetoRound.format)
