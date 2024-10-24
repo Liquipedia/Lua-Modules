@@ -42,7 +42,7 @@ end
 function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
 	local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
 	return function(props, matches)
-		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer})
+		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.getByMatchId})
 		return displayContainer(Table.merge(props, {config = config}), matches)
 	end
 end

@@ -120,7 +120,7 @@ end
 
 ---Displays the map name and link, and the status of the match if it had an unusual status.
 ---@param game MatchGroupUtilGame
----@param config {noLink: boolean}?
+---@param config {noLink: boolean?}?
 ---@return string
 function DisplayHelper.MapAndStatus(game, config)
 	config = config or {}
