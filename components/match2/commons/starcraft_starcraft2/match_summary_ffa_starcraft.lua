@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Placement = require('Module:Placement')
 local Table = require('Module:Table')
 
-local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local BaseMatchSummary = Lua.import('Module:MatchSummary/Base')
 local FfaMatchSummary = Lua.import('Module:MatchSummary/Ffa')
 local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
@@ -71,7 +71,7 @@ end
 function CustomFfaMatchSummary.Footer(props)
 	local match = props.match
 
-	local footer = MatchSummary.addVodsToFooter(match, MatchSummary.Footer())
+	local footer = BaseMatchSummary.addVodsToFooter(match, BaseMatchSummary.Footer())
 
 	footer:addLinks(match.links)
 

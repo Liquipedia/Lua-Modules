@@ -106,7 +106,8 @@ function StarcraftMatchSummary.createBody(match)
 		} or nil,
 		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, StarcraftMatchSummary.Game) or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore)),
+		subMatches and Array.map(subMatches, StarcraftMatchSummary.Game)
+			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore)),
 		StarcraftMatchSummary.Vetoes(match.vetoes),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
 	)}
