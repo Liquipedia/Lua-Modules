@@ -178,7 +178,7 @@ function CustomMatchSummary._createGame(game)
 			:node(game.header)
 
 		row:addElement(gameHeader)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local centerNode = mw.html.create('div')
@@ -218,7 +218,7 @@ function CustomMatchSummary._createGame(game)
 	))
 
 	if String.isNotEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 
 		row:addElement(mw.html.create('div')
 			:css('margin','auto')

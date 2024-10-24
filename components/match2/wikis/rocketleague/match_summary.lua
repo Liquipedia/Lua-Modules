@@ -227,7 +227,7 @@ function CustomMatchSummary._createGame(game)
 			:node(game.header)
 
 		row:addElement(gameHeader)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 
 	local centerNode = mw.html.create('div')
@@ -259,7 +259,7 @@ function CustomMatchSummary._createGame(game)
 
 	if extradata.timeout then
 		local timeouts = Json.parseIfString(extradata.timeout)
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 		row:addElement(CustomMatchSummary._iconDisplay(
 			TIMEOUT,
 			Table.includes(timeouts, 1)
@@ -279,7 +279,7 @@ function CustomMatchSummary._createGame(game)
 		or Logic.isNotEmpty(extradata.t2goals)
 		or Logic.isNotEmpty(game.comment)
 	then
-		row:addElement(MatchSummary.Break():create())
+		row:addElement(MatchSummaryWidgets.Break{})
 	end
 	if Logic.isNotEmpty(extradata.t1goals) then
 		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t1goals, 1))

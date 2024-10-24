@@ -154,7 +154,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			game.length and tostring(mw.html.create('span'):wikitext('Match Duration: ' .. game.length)) or nil
 		)
 		row
-			:addElement(MatchSummary.Break():create())
+			:addElement(MatchSummaryWidgets.Break{})
 			:addElement(mw.html.create('div')
 				:css('margin', 'auto')
 				:wikitext(table.concat(commentContents, '<br>'))
