@@ -39,7 +39,6 @@ end
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
-	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {emptyMapDisplay = FP})
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
@@ -47,7 +46,7 @@ function CustomMatchSummary.createBody(match)
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		mapVeto and mapVeto:create() or nil
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
 	)}
 end
 
