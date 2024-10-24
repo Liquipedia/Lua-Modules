@@ -7,6 +7,7 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -15,6 +16,8 @@ local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
@@ -34,24 +37,20 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	if match.dateIsExact or (match.timestamp ~= DateExt.defaultTimestamp) then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
-	end
-
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
-	local gameFunc = hasSubMatches and CustomMatchSummary._createSubMatch or CustomMatchSummary._createGame
 
-	for _, game in ipairs(match.games) do
-		body:addRow(gameFunc(game, match))
-	end
+	local games = Array.map(match.games, function(game)
+		if hasSubMatches then
+			return CustomMatchSummary._createSubMatch(game, match):create()
+		end
+		return CustomMatchSummary._createGame(game):create()
+	end)
 
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games
+	)}
 end
 
 ---@param game MatchGroupUtilGame
