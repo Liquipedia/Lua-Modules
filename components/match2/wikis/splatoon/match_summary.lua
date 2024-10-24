@@ -49,7 +49,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Html
 function CustomMatchSummary._createGame(game)
 	local row = MatchSummary.Row()
 
@@ -106,7 +106,7 @@ function CustomMatchSummary._createGame(game)
 		row:addElement(comment)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param game MatchGroupUtilGame

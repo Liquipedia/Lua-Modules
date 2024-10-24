@@ -123,7 +123,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createMap(game)
 	if not game.map then
 		return
@@ -190,7 +190,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?

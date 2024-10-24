@@ -53,7 +53,7 @@ end
 
 ---@param date string
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow?
+---@return Html?
 function CustomMatchSummary._createGame(date, game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
@@ -112,7 +112,7 @@ function CustomMatchSummary._createGame(date, game)
 			)
 	end
 
-	return row
+	return row:create()
 end
 
 ---@param isWinner boolean?
