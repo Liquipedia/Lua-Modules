@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
@@ -205,7 +204,10 @@ function StarcraftMatchSummary.TeamSubmatch(submatch)
 			} or nil,
 			StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch),
 			Array.map(submatch.games, function(game)
-				return StarcraftMatchSummary.Game({noLink = String.startsWith(game.map or '', 'Submatch'), isPartOfSubMatch = true}, game)
+				return StarcraftMatchSummary.Game(
+					{noLink = String.startsWith(game.map or '', 'Submatch'), isPartOfSubMatch = true},
+					game
+				)
 			end)
 		)
 	}
