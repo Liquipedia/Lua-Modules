@@ -28,9 +28,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
-	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	yellowLine = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = '110%'},
-	redCross = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = '110%'},
+	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
 	noCheck = '[[File:NoCheck.png|link=|16px]]',
 }
 
@@ -107,13 +105,13 @@ function StarcraftMatchSummary.createBody(match)
 		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, StarcraftMatchSummary.advantageOrPenalty),
 		subMatches and Array.map(subMatches, FnUtil.curry(StarcraftMatchSummary.TeamSubmatch, showSubMatchScore))
-			or Array.map(match.games, function(game) return StarcraftMatchSummary.Game end),
+			or Array.map(match.games, FnUtil.curry(StarcraftMatchSummary.Game, {})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
 			children = {'Vetoes'},
 		} or nil,
 		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil,
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+		MatchSummaryWidgets.Casters{casters = match.casters}
 	)}
 end
 
@@ -166,16 +164,11 @@ function StarcraftMatchSummary.advantageOrPenalty(opponent)
 	}
 end
 
+---@param options {noLink: boolean?}
 ---@param game StarcraftMatchGroupUtilGame
----@param options {noLink: boolean}?
----@return (Html|string)[]
-function StarcraftMatchSummary.Game(game, options)
-	options = options or {}
+---@return MatchSummaryRow
+function StarcraftMatchSummary.Game(options, game)
 	options.noLink = options.noLink or (game.map or ''):upper() == TBD
-	local getWinnerIcon = function(opponentIndex)
-		return StarcraftMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
-			or game.winner == opponentIndex and 'greenCheck')
-	end
 
 	local showOffFactionIcons = game.offFactions ~= nil and (game.offFactions[1] ~= nil or game.offFactions[2] ~= nil)
 	local offFactionIcons = function(opponentIndex)
@@ -193,52 +186,37 @@ function StarcraftMatchSummary.Game(game, options)
 		end
 	end
 
-	local gameNodes = {StarcraftMatchSummary.GameHeader(game.header)}
-
-	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-game-center')
-		:wikitext(DisplayHelper.MapAndStatus(game, options))
-
-	table.insert(gameNodes, mw.html.create('div')
-		:addClass('brkts-popup-sc-game-body')
-		:node(getWinnerIcon(1))
-		:node(offFactionIcons(1))
-		:node(centerNode)
-		:node(offFactionIcons(2))
-		:node(getWinnerIcon(2))
-	)
-
-	if (game.extradata or {}).server then
-		table.insert(gameNodes, mw.html.create('div'):addClass('brkts-popup-sc-game-comment')
-			:wikitext('Played server: ' .. (game.extradata or {}).server))
-	end
-
-	if game.comment then
-		table.insert(gameNodes, mw.html.create('div'):addClass('brkts-popup-sc-game-comment'):wikitext(game.comment))
-	end
-
-	return gameNodes
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			game.header and {
+				HtmlWidgets.Div{css = {margin = 'auto'},  children = {game.header}},
+				MatchSummaryWidgets.Break{},
+			} or nil,
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			offFactionIcons(1),
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game, options)},
+			offFactionIcons(2),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameComment{
+				children = (game.extradata or {}).server and ('Played server: ' .. (game.extradata or {}).server) or nil,
+				classes = {'brkts-popup-sc-game-comment'},
+			},
+			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
+		)
+	}
 end
 
 ---Renders off-factions as Nx2 grid of tiny icons
 ---@param factions string[]
 ---@return Html
 function StarcraftMatchSummary.OffFactionIcons(factions)
-	local factionsNode = mw.html.create('div')
-		:addClass('brkts-popup-sc-game-offrace-icons')
-	for _, faction in ipairs(factions) do
-		factionsNode:node(Faction.Icon{size = '12px', faction = faction})
-	end
-
-	return factionsNode
-end
-
----@param header string|number|nil
----@return Html?
-function StarcraftMatchSummary.GameHeader(header)
-	if not header then return end
-	return mw.html.create('div')
-		:addClass('brkts-popup-sc-game-header')
-		:wikitext(header)
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-sc-game-offrace-icons brkts-popup-spaced'},
+		children = Array.map(factions, function(faction)
+			return Faction.Icon{size = '12px', faction = faction}
+		end),
+	}
 end
 
 ---@param showScore boolean
@@ -248,7 +226,7 @@ function StarcraftMatchSummary.TeamSubmatch(showScore, submatch)
 	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-submatch-center')
 	Array.forEach(submatch.games, function(game)
 		if not game.map and not game.winner then return end
-		for _, node in ipairs(StarcraftMatchSummary.Game(game, {noLink = String.startsWith(game.map or '', 'Submatch')})) do
+		for _, node in ipairs(StarcraftMatchSummary.Game({noLink = String.startsWith(game.map or '', 'Submatch')}, game)) do
 			centerNode:node(node)
 		end
 	end)
@@ -317,7 +295,7 @@ end
 ---@return MatchSummaryRow
 function StarcraftMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
-		return StarcraftMatchSummary.toIcon(opponentIndex == veto.by and 'redCross')
+		return opponentIndex == veto.by and ICONS.veto or ICONS.noCheck
 	end
 
 	local map = veto.map or TBD
@@ -328,22 +306,24 @@ function StarcraftMatchSummary.Veto(veto)
 	end
 
 	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-sc-veto-body'},
+		classes = {'brkts-popup-body-game'},
 		children = {
-			statusIcon(1),
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
+				children = {statusIcon(1)},
+			},
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-sc-veto-center'},
 				children = {map},
 			},
-			statusIcon(2)
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
+				children = {statusIcon(2)},
+			}
 		},
 	}
-end
 
----@param key string|boolean|nil
----@return string
-function StarcraftMatchSummary.toIcon(key)
-	return ICONS[key] or ICONS.noCheck
+
 end
 
 return StarcraftMatchSummary
