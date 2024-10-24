@@ -66,11 +66,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
 	end
 
@@ -162,24 +161,22 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 
 		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 
-		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
-
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
+			local players = CustomMatchGroupInput.processPlayerMapData(map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)
@@ -293,17 +290,16 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 end
 
 ---@param map table
----@param opponents table[]
----@return {players: table[]}[]
-function CustomMatchGroupInput.processPlayerMapData(map, opponents)
-	return Array.map(opponents, function(opponent, opponentIndex)
-		return {players = CustomMatchGroupInput._participants(
-			opponent.match2players,
-			map,
-			opponentIndex,
-			opponent.type
-		)}
-	end)
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function CustomMatchGroupInput.processPlayerMapData(map, opponent, opponentIndex)
+	return CustomMatchGroupInput._participants(
+		opponent.match2players,
+		map,
+		opponentIndex,
+		opponent.type
+	)
 end
 
 ---@param opponentPlayers table[]
