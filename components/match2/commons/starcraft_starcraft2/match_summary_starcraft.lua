@@ -35,28 +35,6 @@ local ICONS = {
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
 
----Custom Class for displaying game details in submatches
----@class StarcraftMatchSummarySubmatchRow: MatchSummaryRowInterface
----@operator call: StarcraftMatchSummarySubmatchRow
----@field root Html
-local StarcraftMatchSummarySubmatchRow = Class.new(
-	function(self)
-		self.root = mw.html.create('div'):addClass('brkts-popup-sc-submatch')
-	end
-)
-
----@param element Html|string|nil
----@return self
-function StarcraftMatchSummarySubmatchRow:addElement(element)
-	self.root:node(element)
-	return self
-end
-
----@return Html
-function StarcraftMatchSummarySubmatchRow:create()
-	return self.root
-end
-
 local StarcraftMatchSummary = {}
 
 ---@param args {bracketId: string, matchId: string, config: table?}
@@ -221,25 +199,23 @@ end
 
 ---@param showScore boolean
 ---@param submatch StarcraftMatchGroupUtilSubmatch
----@return StarcraftMatchSummarySubmatchRow
+---@return Widget
 function StarcraftMatchSummary.TeamSubmatch(showScore, submatch)
-	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-submatch-center')
-	Array.forEach(submatch.games, function(game)
-		if not game.map and not game.winner then return end
-		for _, node in ipairs(StarcraftMatchSummary.Game({noLink = String.startsWith(game.map or '', 'Submatch')}, game)) do
-			centerNode:node(node)
-		end
-	end)
+	local center = HtmlWidgets.Div{
+		classes = {'brkts-popup-sc-submatch-center'},
+		children = Array.map(submatch.games, function(game)
+			return StarcraftMatchSummary.Game({noLink = String.startsWith(game.map or '', 'Submatch')}, game)
+		end),
+	}
 
 	local renderOpponent = function(opponentIndex)
 		local opponent = submatch.opponents[opponentIndex]
-		local node = opponent
-			and OpponentDisplay.BlockOpponent({
+		return opponent
+			and OpponentDisplay.BlockOpponent{
 				opponent = opponent --[[@as standardOpponent]],
 				flip = opponentIndex == 1,
-			})
-			or mw.html.create('div'):wikitext('&nbsp;')
-		return node:addClass('brkts-popup-sc-submatch-opponent')
+			}:addClass('brkts-popup-sc-submatch-opponent')
+			or HtmlWidgets.Div{children = {'&nbsp;'}, classes = {'brkts-popup-sc-submatch-opponent'}}
 	end
 
 	local hasNonZeroScore = Array.any(submatch.scores, function(score) return score ~= 0 end)
@@ -256,39 +232,42 @@ function StarcraftMatchSummary.TeamSubmatch(showScore, submatch)
 			local score = submatch.scores[opponentIndex]
 			text = score and tostring(score) or ''
 		end
-		return mw.html.create('div')
-			:addClass('brkts-popup-sc-submatch-score')
-			:wikitext(text)
+		return HtmlWidgets.Div{children = {text}, classes = {'brkts-popup-sc-submatch-score'}}
 	end
 
 	local renderSide = function(opponentIndex)
-		local sideNode = mw.html.create('div')
-			:addClass('brkts-popup-sc-submatch-side')
-			:addClass(opponentIndex == 1 and 'brkts-popup-left' or 'brkts-popup-right')
-			:addClass(opponentIndex == submatch.winner and 'bg-win' or nil)
-			:addClass(submatch.resultType == 'draw' and 'bg-draw' or nil)
-			:node(opponentIndex == 1 and renderOpponent(1) or nil)
-			:node(showScore and renderScore(opponentIndex) or nil)
-			:node(opponentIndex == 2 and renderOpponent(2) or nil)
-
-		return sideNode
+		return HtmlWidgets.Div{
+			classes = Array.append(
+				{'brkts-popup-sc-submatch-side'},
+				opponentIndex == 1 and 'brkts-popup-left' or 'brkts-popup-right',
+				opponentIndex == submatch.winner and 'bg-win' or nil,
+				submatch.resultType == 'draw' and 'bg-draw' or nil
+			),
+			children = Array.append({},
+				opponentIndex == 1 and renderOpponent(1) or nil,
+				showScore and renderScore(opponentIndex) or nil,
+				opponentIndex == 2 and renderOpponent(2) or nil
+			),
+		}
 	end
 
-	local bodyNode = mw.html.create('div')
-		:addClass('brkts-popup-sc-submatch-body')
-		:addClass(showScore and 'brkts-popup-sc-submatch-has-score' or nil)
-		:node(renderSide(1))
-		:node(centerNode)
-		:node(renderSide(2))
-
-	local headerNode
-	if submatch.header then
-		headerNode = mw.html.create('div')
-			:addClass('brkts-popup-sc-submatch-header')
-			:wikitext(submatch.header)
-	end
-
-	return StarcraftMatchSummarySubmatchRow():addElement(headerNode):addElement(bodyNode)
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-sc-submatch'},
+		children = WidgetUtil.collect(
+			submatch.header and HtmlWidgets.Div{
+				classes = {'brkts-popup-sc-submatch'},
+				children = submatch.header,
+			} or nil,
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-sc-submath-body', showScore and 'brkts-popup-sc-submatch-has-score' or nil},
+				children = {
+					renderSide(1),
+					center,
+					renderSide(2),
+				},
+			}
+		)
+	}
 end
 
 ---@param veto StarcraftMatchGroupUtilVeto
