@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -20,7 +18,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 
 local NONE = '-'
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 ---@enum OsuMatchIcons
 local Icons = {
@@ -32,22 +29,6 @@ local VETO_TYPE_TO_TEXT = Table.copy(MatchSummary.DEFAULT_VETO_TYPE_TO_TEXT)
 VETO_TYPE_TO_TEXT.protect = 'PROTECT'
 
 local CustomMatchSummary = {}
-
----@class OsuMapVeto: VetoDisplay
-local MapVeto = Class.new(MatchSummary.MapVeto)
-
----@param map1 string?
----@param map2 string?
----@return string
----@return string
-function MapVeto:displayMaps(map1, map2)
-	if Logic.isEmpty(map1) and Logic.isEmpty(map2) then
-		return TBD, TBD
-	end
-
-	return Page.makeInternalLink(map1) or NONE,
-		Page.makeInternalLink(map2) or NONE
-end
 
 ---@param args table
 ---@return Html
@@ -85,7 +66,9 @@ function CustomMatchSummary.createBody(match)
 	body.root:node(MatchSummaryWidgets.Casters{casters = match.extradata.casters})
 
 	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto(VETO_TYPE_TO_TEXT)))
+	body:addRow(MatchSummary.defaultMapVetoDisplay(
+		match.extradata.mapveto, {vetoTypeToText = VETO_TYPE_TO_TEXT, emptyMapDisplay = NONE}
+	))
 
 	return body
 end

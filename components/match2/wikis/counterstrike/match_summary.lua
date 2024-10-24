@@ -23,8 +23,6 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
-local TBD = 'TBD'
-
 local CustomMatchSummary = {}
 
 -- Score Class
@@ -107,18 +105,6 @@ function Score:create()
 	return self.root
 end
 
----@class CounterstrikeMapVeto: VetoDisplay
----@field game string?
-local MapVeto = Class.new(MatchSummary.MapVeto, function(self, game)
-	self.game = game
-end)
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Logic.nilIfEmpty(CustomMatchSummary._createMapLink(map, self.game)) or TBD
-end
-
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
@@ -173,7 +159,7 @@ function CustomMatchSummary.createBody(match)
 	end
 
 	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto(match.game)))
+	body:addRow(MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = match.game}))
 
 	-- Match Status (postponed/ cancel(l)ed)
 	if match.extradata.status then

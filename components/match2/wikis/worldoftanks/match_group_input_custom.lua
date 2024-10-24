@@ -16,7 +16,6 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local ALLOWED_VETOES = Array.append(MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES, 'protect')
 local DEFAULT_BESTOF = 3
 local DEFAULT_MODE = 'team'
 
@@ -150,7 +149,7 @@ end
 function MatchFunctions.getExtraData(match)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match),
-		mapveto = MatchGroupInputUtil.getMapVeto(match, ALLOWED_VETOES),
+		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
