@@ -200,7 +200,7 @@ function StarcraftMatchSummary.TeamSubmatch(submatch)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			submatch.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'},  children = {submatch.header}},
+				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'},  children = {submatch.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch),
