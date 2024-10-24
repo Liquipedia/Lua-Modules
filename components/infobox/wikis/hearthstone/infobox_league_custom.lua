@@ -62,7 +62,7 @@ function CustomInjector:parse(id, widgets)
 					prizepool = args.bin,
 					prizepoolusd = args.binusd,
 					currency = args.localcurrency,
-					setVariables = false,
+					setvariables = false,
 				}
 			}})
 		end
