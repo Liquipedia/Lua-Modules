@@ -40,6 +40,10 @@ describe('array', function()
 			assert.are_same({2, 4, 6}, Array.map(a, function(x)
 				return 2 * x
 			end))
+			assert.are_same({false, false, false}, Array.map(a, function(x)
+				return false
+			end))
+			assert.are_same({}, Array.map(a, function() end))
 		end)
 	end)
 
