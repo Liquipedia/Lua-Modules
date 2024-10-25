@@ -78,7 +78,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@return Html?
 function CustomMatchSummary._createGame(game)
-	if not game.map and not game.winner then return end
+	if not game.map and not game.winner then return nil end
 	local row = MatchSummary.Row()
 			:addClass('brkts-popup-body-game')
 			:css('font-size', '0.75rem')
