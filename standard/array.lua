@@ -88,7 +88,7 @@ end
 function Array.map(elements, funct)
 	local mappedArray = {}
 	for index, element in ipairs(elements) do
-		table.insert(mappedArray, funct(element, index))
+		table.insert(mappedArray, funct(element, index) or nil)
 	end
 	return mappedArray
 end
