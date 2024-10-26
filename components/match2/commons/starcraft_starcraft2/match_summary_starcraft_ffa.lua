@@ -240,17 +240,16 @@ function StarcraftMatchSummaryFfa._opponents(match)
 		return match
 	end
 	local cache = {
-		current = #match.opponents,
+		index = #match.opponents,
 		currentWorst = #match.opponents
 	}
 	Array.forEach(Array.reverse(match.opponents), function(opponent)
 		local place = opponent.placement
-		if opponent.place == cache.current then
-			opponent.extradata.worstPlace = cache.currentWorst
-			return
+		opponent.extradata.worstPlace = cache.currentWorst
+		if place == cache.index then
+			cache.currentWorst = place - 1
 		end
-		cache.current = place
-		cache.currentWorst = place - 1
+		cache.index = cache.index - 1
 	end)
 
 	return match
