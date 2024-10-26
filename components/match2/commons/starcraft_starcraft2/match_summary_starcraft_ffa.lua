@@ -191,9 +191,7 @@ local MATCH_STANDING_COLUMNS = {
 ---@param props {match: StarcraftMatchGroupUtilMatch, bracketResetMatch: StarcraftMatchGroupUtilMatch?, config: table?}
 ---@return Html
 function StarcraftMatchSummaryFfa.getByMatchId(props)
-	--if not props.match then return '' end
-
-	match = StarcraftMatchSummaryFfa._opponents(props.match)
+	local match = StarcraftMatchSummaryFfa._opponents(props.match)
 
 	return StarcraftMatchSummaryFfa._createOverallPage(match)
 end
