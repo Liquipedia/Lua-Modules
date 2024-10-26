@@ -42,7 +42,8 @@ function StarcraftSingleMatchDisplay.SingleMatch(props)
 	local singleMatchNode = SingleMatchDisplay.SingleMatch(props)
 
 	return singleMatchNode
-		:addClass(props.match.isFfa and 'ffa-match-summary' or nil)
+		:css('width', props.match.isFfa and 'unset' or nil)
+		:css('background-color', props.match.isFfa and 'unset' or nil)
 end
 
 ---Display component for a match in a singleMatch. Consists of the match summary.
