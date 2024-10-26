@@ -53,7 +53,7 @@ function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
 		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft')
-		return SingleMatch.SingleMatchContainer
+		return WikiSpecific.adjustMatchGroupContainerConfig(SingleMatch.SingleMatchContainer)
 	end
 end
 
