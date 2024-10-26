@@ -22,15 +22,6 @@ local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft')
 local BaseMatchFunctions = StarcraftMatchGroupInput.MatchFunctions
 local BaseMapFunctions = StarcraftMatchGroupInput.MapFunctions
 
-local ADVANCE_BACKGROUND = 'up'
-local DEFUALT_BACKGROUND = 'down'
-local VALID_BACKGROUNDS = {
-	ADVANCE_BACKGROUND,
-	DEFUALT_BACKGROUND,
-	'stayup',
-	'staydown',
-	'stay',
-}
 local MODE_FFA = 'FFA'
 local TBD = 'TBD'
 local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
@@ -69,8 +60,6 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 		return match
 	end
 
-	match.pbg = MatchFunctions.getPBG(match)
-
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and not Logic.readBool(match.noscore)
 		and MatchFunctions.calculateMatchScore(games, opponents)
@@ -99,13 +88,9 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	Array.forEach(opponents, function(opponent)
 		opponent.extradata = opponent.extradata or {}
 		opponent.extradata.noscore = Logic.readBool(match.noscore)
-		opponent.extradata.bg = MatchFunctions.readBg(opponent.bg)
-			or match.pbg[opponent.placement]
-			or DEFUALT_BACKGROUND
 
 		opponent.extradata.advances = Logic.readBool(opponent.advances)
 			or (match.bestof and (opponent.score or 0) >= match.bestof)
-			or opponent.extradata.bg == ADVANCE_BACKGROUND
 			or opponent.placement == 1
 	end)
 
@@ -197,33 +182,7 @@ function MatchFunctions.getExtraData(match)
 		BaseMatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
 	end
 
-	Array.forEach(match.pbg, function(value, key) extradata['pbg' .. key] = value end)
-
 	return extradata
-end
-
----@param match table
----@return table
-function MatchFunctions.getPBG(match)
-	local advanceCount = tonumber(match.advancecount) or 0
-
-	return Array.mapIndexes(function(pbgIndex)
-		return MatchFunctions.readBg(match['pbg' .. pbgIndex])
-			or (pbgIndex <= advanceCount and ADVANCE_BACKGROUND)
-			or nil
-	end)
-end
-
----@param input string?
----@return string?
-function MatchFunctions.readBg(input)
-	if Logic.isEmpty(input) then return nil end
-	---@cast input -nil
-
-	input = string.lower(input)
-	assert(Table.includes(VALID_BACKGROUNDS, input), 'Bad bg/pbg entry "' .. input .. '"')
-
-	return input
 end
 
 ---@param mapInput table
@@ -248,11 +207,14 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		}
 	}
 
+	if mapInput.date then
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
+	end
+
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true
 		map.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
 		map.scores = {}
-		map.statuses = {}
 		return map
 	end
 
@@ -272,6 +234,10 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 
 	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
 		map.extradata['placement' .. opponentIndex] = opponentInfo.placement
+	end)
+
+	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
+		map.extradata['status' .. opponentIndex] = opponentInfo.status
 	end)
 
 	return map
