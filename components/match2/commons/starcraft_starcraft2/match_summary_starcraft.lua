@@ -138,7 +138,7 @@ end
 ---@param game StarcraftMatchGroupUtilGame
 ---@return MatchSummaryRow
 function StarcraftMatchSummary.Game(options, game)
-	options.noLink = options.noLink or (game.map or ''):upper() == TBD
+	local noLink = options.noLink or (game.map or ''):upper() == TBD
 
 	local showOffFactionIcons = game.offFactions ~= nil and (game.offFactions[1] ~= nil or game.offFactions[2] ~= nil)
 	local offFactionIcons = function(opponentIndex)
@@ -168,7 +168,7 @@ function StarcraftMatchSummary.Game(options, game)
 			} or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			offFactionIcons(1),
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game, options)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game, {noLink = noLink})},
 			offFactionIcons(2),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{
