@@ -63,7 +63,8 @@ local MATCH_STANDING_COLUMNS = {
 		},
 		row = {
 			value = function (opponent, idx)
-				local statusIcon = Logic.readBool(opponent.extradata.advances) and STATUS_ICONS.advances or STATUS_ICONS.eliminated
+				local statusIcon = (Logic.readBool(opponent.extradata.advances) or opponent.placement == 1)
+					and STATUS_ICONS.advances or STATUS_ICONS.eliminated
 				return mw.html.create('i')
 					:addClass(statusIcon)
 			end,
@@ -123,7 +124,7 @@ local MATCH_STANDING_COLUMNS = {
 		},
 		show = {
 			value = function(match)
-				return not Logic.readBool(match.extradata.noscore)
+				return not Logic.readBool(match.noScore)
 			end
 		},
 		sortVal = {
@@ -172,7 +173,7 @@ local MATCH_STANDING_COLUMNS = {
 			iconClass = 'fas fa-star',
 			show = {
 				value = function(match)
-					return not Logic.readBool(match.extradata.noscore)
+					return not Logic.readBool(match.noScore)
 				end
 			},
 			header = {
@@ -180,7 +181,7 @@ local MATCH_STANDING_COLUMNS = {
 			},
 			row = {
 				value = function (opponent)
-					return OpponentDisplay.InlineScore(Table.merge({extradata = {}}, opponent))
+					return OpponentDisplay.InlineScore(Table.merge({extradata = {}, score = ''}, opponent))
 				end,
 			},
 		},
@@ -199,10 +200,10 @@ end
 
 function StarcraftMatchSummaryFfa._opponents(match)
 	-- Add match opponent data to game opponent and the other way around
-	Array.forEach(match.games, function (game)
-		game.extradata.opponents = Array.map(match.opponents, function (opponent, opponentIdx)
+	Array.forEach(match.games, function (game, gameIndex)
+		game.extradata.opponents = Array.map(game.opponents, function (opponent, opponentIdx)
 			return {
-				placement = game.extradata['placement' .. opponentIdx],
+				placement = opponent.placement,
 				status = game.extradata['status' .. opponentIdx] or 'S',
 				score = (game.scores or {})[opponentIdx],
 			}
@@ -230,7 +231,7 @@ function StarcraftMatchSummaryFfa._opponents(match)
 		if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
 			return opponent1.score > opponent2.score
 		end
-		return (opponent1.name or '') < (opponent2.name or '')
+		return (opponent1.name or ''):lower() < (opponent2.name or ''):lower()
 	end
 
 	-- Sort match level based on placement
@@ -262,43 +263,23 @@ function StarcraftMatchSummaryFfa._createOverallPage(match)
 			:addClass('panel-content')
 			:attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel0')
 
-	-- if we do not have any exact dates for games skip schedule display
-	if Array.all(match.games, function(game) return Logic.isEmpty(game.extradata.timezoneid) end) then
-		return page:node(StarcraftMatchSummaryFfa._createMatchStandings(match))
-	end
-
 	local schedule = page:tag('div')
-			:addClass('panel-content__collapsible')
-			:addClass('is--collapsed')
-			:attr('data-js-battle-royale', 'collapsible')
-	local button = schedule:tag('h5')
-			:addClass('panel-content__button')
-			:attr('data-js-battle-royale', 'collapsible-button')
-			:attr('tabindex', 0)
-		button:tag('i')
-				:addClass('far fa-chevron-up')
-				:addClass('panel-content__button-icon')
-		button:tag('span'):wikitext('Schedule')
 
 	local scheduleList = schedule:tag('div')
 			:addClass('panel-content__container')
-			:attr('data-js-battle-royale', 'collapsible-container')
 			:attr('role', 'tabpanel')
 			:tag('ul')
 					:addClass('panel-content__game-schedule')
 
-	Array.forEach(match.games, function (game, idx)
-		scheduleList:tag('li')
-				:node(StarcraftMatchSummaryFfa._countdownIcon(game, 'panel-content__game-schedule__icon'))
-				:tag('span')
-						:addClass('panel-content__game-schedule__title')
-						:wikitext('Game ', idx, ':')
-						:done()
-				:tag('div')
-					:addClass('panel-content__game-schedule__container')
-					:node(StarcraftMatchSummaryFfa._gameCountdown(game))
+	scheduleList:tag('li')
+			:node(StarcraftMatchSummaryFfa._countdownIcon(match, 'panel-content__game-schedule__icon'))
+			:tag('span')
+					:addClass('panel-content__game-schedule__title')
+					:wikitext('Match:')
 					:done()
-	end)
+			:tag('div')
+				:addClass('panel-content__game-schedule__container')
+				:node(StarcraftMatchSummaryFfa._countdown(match))
 
 	return page:node(StarcraftMatchSummaryFfa._createMatchStandings(match))
 end
@@ -373,7 +354,7 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 								:wikitext('Game ', idx)
 								:done()
 						:done()
-						:node(StarcraftMatchSummaryFfa._gameCountdown(game))
+						:node(StarcraftMatchSummaryFfa._countdown(game))
 						:node(StarcraftMatchSummaryFfa._map(game))
 						:done()
 
@@ -463,7 +444,7 @@ end
 ---Attaches any VODs of the game as well
 ---@param game table
 ---@return Html?
-function StarcraftMatchSummaryFfa._gameCountdown(game)
+function StarcraftMatchSummaryFfa._countdown(game)
 	if not game.extradata.timezoneid then
 		return
 	end
