@@ -306,10 +306,12 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 			:addClass('panel-table__cell')
 			:addClass('cell--game-container-nav-holder')
 			:attr('data-js-battle-royale', 'game-nav-holder')
+			:css('overflow', 'visible')
 	local gameCollectionContainer = gameCollectionContainerNavHolder:tag('div')
 			:addClass('panel-table__cell')
 			:addClass('cell--game-container')
 			:attr('data-js-battle-royale', 'game-container')
+			:css('overflow-x', 'visible')
 
 	Array.forEach(match.games, function (game, idx)
 		local gameContainer = gameCollectionContainer:tag('div')
@@ -366,6 +368,7 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 		local gameRowContainer = row:tag('div')
 				:addClass('panel-table__cell')
 				:addClass('cell--game-container')
+				:css('overflow-x', 'unset')
 				:attr('data-js-battle-royale', 'game-container')
 
 		Array.forEach(opponentMatch.games, function(opponent)
@@ -383,7 +386,9 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 		end)
 	end)
 
-	return wrapper
+	return mw.html.create('div')
+		:css('overflow-x', 'auto')
+		:node(wrapper)
 end
 
 ---@param game table
