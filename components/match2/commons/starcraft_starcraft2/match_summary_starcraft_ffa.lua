@@ -356,7 +356,7 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 				return
 			end
 
-			local cell = row:tag('div')
+			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
 					:node(column.row.value(opponentMatch, index))
