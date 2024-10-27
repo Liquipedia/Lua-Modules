@@ -240,6 +240,7 @@ end
 ---@return Html
 function StarcraftMatchSummaryFfa._createOverallPage(match)
 	local page = mw.html.create('div')
+			:addClass('brkts-match-info-popup-sc-ffa')
 			:addClass('panel-content')
 			:attr('data-js-battle-royale', 'panel-content'):attr('id', 'panel0')
 
