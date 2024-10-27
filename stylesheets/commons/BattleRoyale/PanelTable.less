@@ -85,7 +85,7 @@ Author(s): Elysienna
 		&.row {
 			&--header {
 				font-weight: bold;
-				background-color: #f5f5f5;
+				background-color: var( --table-header-variant-background-color, #f5f5f5 );
 				font-size: 0.8125rem;
 
 				& .panel-table__cell__game-placement {
@@ -141,7 +141,7 @@ Author(s): Elysienna
 
 		.panel-table__row.row--header & {
 			align-items: flex-end;
-			background-color: #f5f5f5;
+			background-color: var( --table-header-variant-background-color, #f5f5f5 );
 		}
 
 		&-icon {
