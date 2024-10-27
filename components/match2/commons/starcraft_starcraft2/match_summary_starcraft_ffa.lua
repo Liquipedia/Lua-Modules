@@ -58,30 +58,24 @@ local MATCH_STANDING_COLUMNS = {
 		--iconClass = 'fas fa-hashtag',
 		show = {
 			value = function(match)
-				return match.finished
+				return match.finished and #Array.filter(match.opponents, function(opponent)
+					return Logic.readBool(opponent.advances)
+				end) > 1
 			end
 		},
 		row = {
 			value = function (opponent, idx)
-				local statusIcon = (Logic.readBool(opponent.extradata.advances) or opponent.placement == 1)
-					and STATUS_ICONS.advances or STATUS_ICONS.eliminated
+				local statusIcon = Logic.readBool(opponent.advances) and STATUS_ICONS.advances or STATUS_ICONS.eliminated
 				return mw.html.create('i')
 					:addClass(statusIcon)
 			end,
 		},
 	},
 	{
-		sortable = true,
-		sortType = 'rank',
 		class = 'cell--rank',
 		iconClass = 'fas fa-hashtag',
 		header = {
 			value = 'Rank',
-		},
-		sortVal = {
-			value = function (opponent, idx)
-				return opponent.placement ~= -1 and opponent.placement or idx
-			end,
 		},
 		row = {
 			value = function (opponent, idx)
@@ -95,17 +89,10 @@ local MATCH_STANDING_COLUMNS = {
 		},
 	},
 	{
-		sortable = true,
-		sortType = 'team',
 		class = 'cell--team',
 		iconClass = 'fas fa-users',
 		header = {
 			value = 'Participant',
-		},
-		sortVal = {
-			value = function (opponent, idx)
-				return opponent.name
-			end,
 		},
 		row = {
 			value = function (opponent, idx)
@@ -114,8 +101,6 @@ local MATCH_STANDING_COLUMNS = {
 		},
 	},
 	{
-		sortable = true,
-		sortType = 'total-points',
 		class = 'cell--total-points',
 		iconClass = 'fas fa-star',
 		header = {
@@ -126,11 +111,6 @@ local MATCH_STANDING_COLUMNS = {
 			value = function(match)
 				return not Logic.readBool(match.noScore)
 			end
-		},
-		sortVal = {
-			value = function (opponent, idx)
-				return opponent.score or math.huge
-			end,
 		},
 		row = {
 			value = function (opponent, idx)
@@ -143,7 +123,8 @@ local MATCH_STANDING_COLUMNS = {
 			class = 'panel-table__cell__game-placement',
 			iconClass = 'fas fa-trophy-alt',
 			header = {
-				value = 'P',
+				value = 'Place',
+				mobileValue = 'P.',
 			},
 			row = {
 				class = function (opponent)
@@ -177,7 +158,8 @@ local MATCH_STANDING_COLUMNS = {
 				end
 			},
 			header = {
-				value = 'Pts',
+				value = 'Points',
+				mobileValue = 'Pts.',
 			},
 			row = {
 				value = function (opponent)
@@ -317,15 +299,6 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 						:addClass('d-block d-md-none')
 		end
 		span:done()
-		if (column.sortable and column.sortType) then
-			cell:attr('data-sort-type', column.sortType)
-			groupedCell:tag('div')
-				:addClass('panel-table__sort')
-				:tag('i')
-					:addClass('far fa-arrows-alt-v')
-					:addClass('icon--red')
-					:attr('data-js-battle-royale', 'sort-icon')
-		end
 	end)
 
 	local gameCollectionContainerNavHolder = header:tag('div')
@@ -385,9 +358,6 @@ function StarcraftMatchSummaryFfa._createMatchStandings(match)
 					:addClass('panel-table__cell')
 					:addClass(column.class)
 					:node(column.row.value(opponentMatch, index))
-			if(column.sortVal and column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(opponentMatch, index)):attr('data-sort-type', column.sortType)
-			end
 		end)
 
 		local gameRowContainer = row:tag('div')
