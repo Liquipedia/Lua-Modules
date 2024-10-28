@@ -28,7 +28,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
-	veto = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
+	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
 	noCheck = '[[File:NoCheck.png|link=]]',
 }
 
