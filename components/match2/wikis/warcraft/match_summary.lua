@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
