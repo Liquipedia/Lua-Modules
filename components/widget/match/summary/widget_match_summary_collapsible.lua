@@ -21,7 +21,7 @@ local TableWidget = HtmlWidgets.Table
 local MatchSummaryCollapsible = Class.new(Widget)
 MatchSummaryCollapsible.defaultProps = {
 	classes = {},
-	tableClasses = {},
+	tableCss = {},
 	children = {},
 }
 
@@ -35,7 +35,7 @@ function MatchSummaryCollapsible:render()
 		children = {
 			TableWidget{
 				classes = {'collapsible', 'collapsed', unpack(self.props.tableClasses)},
-				css = self.props.css,
+				css = self.props.tableCss,
 				children = WidgetUtil.collect(
 					self.props.header,
 					unpack(self.props.children)

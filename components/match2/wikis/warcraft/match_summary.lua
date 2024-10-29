@@ -223,7 +223,6 @@ end
 ---@return MatchSummaryRow
 function CustomMatchSummary.TeamSubmatch(submatch)
 	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
 			CustomMatchSummary.TeamSubMatchGames(submatch)
@@ -296,7 +295,7 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 
 	return MatchSummaryWidgets.Collapsible{
 		classes = {'brkts-popup-header-dev'},
-		css = {['margin-bottom'] = '-8px'},
+		css = {width = '100%', padding = 0},
 		tableClasses = {'inherit-bg'},
 		header = HtmlWidgets.Tr{
 			children = {
