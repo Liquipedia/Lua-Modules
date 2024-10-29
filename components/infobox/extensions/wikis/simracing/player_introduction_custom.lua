@@ -19,7 +19,7 @@ local TRANSFER_STATUS_CURRENT = 'current'
 local TYPE_PLAYER = 'player'
 local INACTIVE_ROLE = 'inactive'
 
----@class Formula1PlayerIntroduction: PlayerIntroduction
+---@class SimracingPlayerIntroduction: PlayerIntroduction
 local CustomPlayerIntroduction = Class.new(PlayerIntroduction)
 
 -- module entry point for PlayerIntroduction
