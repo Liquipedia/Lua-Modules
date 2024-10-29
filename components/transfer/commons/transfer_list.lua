@@ -30,7 +30,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
-local SPECIAL_ROLES = {'retired', 'inactive', 'military', 'passed away'}
 local DEFAULT_VALUES = {
 	sort = 'date',
 	order = 'desc',
@@ -188,7 +187,7 @@ function TransferList:fetch()
 		local currentGroup
 		local currentRole2
 		Array.forEach(transfers, function(transf)
-			if currentRole2 ~= transf.role2 or Table.includes(SPECIAL_ROLES, (transf.role2 or ''):lower()) then
+			if currentRole2 ~= transf.role2 then
 				currentRole2 = transf.role2
 				Array.appendWith(groupedData, currentGroup)
 				currentGroup = {}
