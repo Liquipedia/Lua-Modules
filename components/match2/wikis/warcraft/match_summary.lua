@@ -197,21 +197,23 @@ function CustomMatchSummary.DispalyHeroes(opponent, options)
 			-- not sure this is usable ...
 			return HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
-				children = {
-					-- not sure this is usable ...
+				children = Array.map(heroes, function(hero)
+					local name = hero.name or ''
+					return HtmlWidgets.Div{
+						classes = {'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red')},
+						css = {float = options.flipped and 'right' or 'left'},
+						children = {'[[File:' .. hero.icon .. '|link=' .. name .. '|' .. name .. ']]'},
+					}
+				end)
+				--[[ not usable as of now, but would replace the entire Array.map(heroes, ...)
+				{
 					MatchSummaryWidgets.Characters{
 						flipped = options.flipped,
 						characters = heroes,
 						bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
 					}
-					--[==[ old stuff:
-					local name = data.name or ''
-					return mw.html.create('div')
-						:addClass('brkts-popup-side-color-' .. (flip and 'blue' or 'red'))
-						:css('float', flip and 'right' or 'left')
-						:wikitext('[[File:' .. data.icon .. '|link=' .. name .. '|' .. name .. ']]')
-					]==]
 				}
+				]]
 			}
 		end)
 	}
