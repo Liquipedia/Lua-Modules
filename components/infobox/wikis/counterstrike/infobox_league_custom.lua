@@ -99,6 +99,11 @@ local RESTRICTIONS = {
 		name = 'Academy Teams Only',
 		link = 'Academy Tournaments',
 		data = 'academy',
+	},
+	['national'] = {
+		name = 'National Teams Only',
+		link = 'National Tournaments',
+		data = 'national',
 	}
 }
 
