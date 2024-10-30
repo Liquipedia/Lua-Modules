@@ -42,7 +42,7 @@ end
 function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
 	local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
 	return function(props, matches)
-		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer})
+		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.getByMatchId})
 		return displayContainer(Table.merge(props, {config = config}), matches)
 	end
 end
@@ -53,7 +53,7 @@ function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
 		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft')
-		return SingleMatch.SingleMatchContainer
+		return WikiSpecific.adjustMatchGroupContainerConfig(SingleMatch.SingleMatchContainer)
 	end
 end
 

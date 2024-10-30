@@ -587,6 +587,10 @@ div.brkts-popup-body-element-thumbs {
 	display: inline-block;
 }
 
+.brkts-popup-body-element > .brkts-popup-body-game {
+	display: flex;
+}
+
 .brkts-popup-body-element:nth-of-type( odd ) {
 	background-color: var( --table-background-color, #f9f9f9 );
 }
@@ -607,6 +611,13 @@ div.brkts-popup-body-element-thumbs {
 	align-items: center;
 	justify-content: center;
 	gap: 4px;
+}
+
+.brkts-popup-winloss-icon {
+	width: 16px;
+	line-height: 17px;
+	margin-left: %;
+	margin-right: 1%;
 }
 
 .brkts-popup-footer .brkts-popup-spaced > a {
@@ -1078,12 +1089,6 @@ div.brkts-popup-body-element-thumbs {
 	text-align: center;
 }
 
-.ffa-match-summary-footer {
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	padding: 2px 10px;
-	text-align: center;
-}
-
 /**
  * Wiki specific FFA Match Summary
  */
@@ -1371,13 +1376,6 @@ div.brkts-opponent-hover-active::after {
 	margin-right: 0;
 }
 
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-submatch .block-player > .flag,
-	.brkts-popup-sc-submatch .block-player > .race {
-		margin: 0 1px;
-	}
-}
-
 .starcraft-block-archon {
 	display: flex;
 	align-items: center;
@@ -1409,23 +1407,7 @@ div.brkts-opponent-hover-active::after {
 	display: block;
 	overflow-wrap: break-word;
 	white-space: normal;
-}
-
-.brkts-popup-sc-team-match {
-	width: 500px;
-}
-
-.brkts-popup-sc-body {
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	display: block;
-}
-
-.brkts-popup-sc-footer.brkts-popup-sc-footer {
-	padding: 4px 10px;
-}
-
-.brkts-popup-sc-footer-links {
-	line-height: 1;
+	overflow: auto;
 }
 
 .brkts-popup-sc-game {
@@ -1447,10 +1429,7 @@ div.brkts-opponent-hover-active::after {
 	text-align: center;
 }
 
-.brkts-popup-sc-header-opponent-with-score {
-	width: 50%;
-}
-
+// can probably be kicked with MatchSummary refactor on WC/SG
 .brkts-popup-sc-game-body {
 	align-items: center;
 	display: flex;
@@ -1476,83 +1455,11 @@ div.brkts-opponent-hover-active::after {
 	text-align: center;
 }
 
-.brkts-popup-sc-submatch {
-	padding: 0;
-}
-
-.brkts-popup-sc-submatch-header {
-	border-bottom: 1px solid var( --table-border-color, #dddddd );
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	display: block;
-	font-weight: bold;
-	text-align: center;
-}
-
-.brkts-popup-sc-submatch-body {
-	align-items: center;
-	display: flex;
-	padding: 2px 0;
-}
-
-.brkts-popup-sc-submatch-side {
-	align-items: center;
-	border-radius: 12px 0 0 12px;
-	display: flex;
-	padding: 2px 6px;
-	width: 32%;
-}
-
-.brkts-popup-left.brkts-popup-sc-submatch-side {
-	border-radius: 0 12px 12px 0;
-}
-
-.brkts-popup-sc-submatch-has-score > .brkts-popup-sc-submatch-side {
-	align-self: stretch;
-	border-radius: 0;
-}
-
-.brkts-popup-sc-submatch-opponent {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.brkts-popup-sc-submatch-center {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.brkts-popup-sc-submatch-has-score > .brkts-popup-sc-submatch-center {
-	padding: 4px;
-}
-
-.brkts-popup-sc-submatch-center > .brkts-popup-sc-game {
-	padding: 2px 10px;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-submatch-center > .brkts-popup-sc-game {
-		padding: 2px 4px;
-	}
-}
-
-.brkts-popup-sc-submatch-score {
-	min-width: 24px;
-}
-
-.brkts-popup-left > .brkts-popup-sc-submatch-score {
-	text-align: right;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-submatch-score {
-		min-width: 16px;
-	}
-}
-
 .brkts-popup-sc-veto {
 	padding: 0;
 }
 
+// can probably be kicked with MatchSummary refactor on WC/SG
 .brkts-popup-sc-veto-body {
 	align-items: center;
 	display: flex;
@@ -1560,6 +1467,7 @@ div.brkts-opponent-hover-active::after {
 	padding: 4px 10px;
 }
 
+// can probably be kicked with MatchSummary refactor on WC/SG
 @media ( max-width: 768px ) {
 	.brkts-popup-sc-veto-body {
 		padding: 4px 4px;
