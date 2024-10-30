@@ -50,7 +50,7 @@ function MatchSummaryMapVetoRound:render()
 
 	local typeClass = 'brkts-popup-mapveto-' .. vetoType
 	local function createVetoTypeElement()
-		return HtmlWidgets.Span{classes = {typeClass, 'brkts-popup-mapveto-vetotype'}, text = vetoText}
+		return HtmlWidgets.Span{classes = {typeClass, 'brkts-popup-mapveto-vetotype'}, children = vetoText}
 	end
 
 	local children
