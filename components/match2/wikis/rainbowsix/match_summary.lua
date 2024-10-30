@@ -10,80 +10,24 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local POSITION_LEFT = 1
 local POSITION_RIGHT = 2
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local ROUND_ICONS = {
 	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',
 	def = '[[File:R6S Para Bellum def logo.png|14px|link=]]',
 	otatk = '[[File:R6S Para Bellum atk logo ot rounds.png|11px|link=]]',
 	otdef = '[[File:R6S Para Bellum def logo ot rounds.png|11px|link=]]',
 }
-
--- Operator Bans Class
----@class R6OperatorBan
----@operator call: R6OperatorBan
----@field root Html
----@field text string
-local OperatorBans = Class.new(
-	function(self)
-		self.root = mw.html.create('table')
-		self.text = ''
-	end
-)
-
----@return self
-function OperatorBans:setLeft()
-	self.root
-		:addClass('brkts-popup-body-operator-bans')
-		:css('float', 'left')
-
-	return self
-end
-
----@return self
-function OperatorBans:setRight()
-	self.root
-		:addClass('brkts-popup-body-operator-bans')
-		:css('float', 'right')
-
-	return self
-end
-
----@param operator string?
----@return self
-function OperatorBans:add(operator)
-	if Logic.isEmpty(operator) then
-		return self
-	end
-	self.root
-		:tag('tr')
-			:tag('td')
-				:css('padding', '0')
-				:tag('div')
-					:wikitext(CharacterIcon.Icon{
-						character = operator,
-						size = '50x50px'
-					})
-	return self
-end
-
----@return Html
-function OperatorBans:create()
-	self.root:wikitext(self.text)
-	return self.root
-end
 
 -- Score Class, both for the "big" score, and the halfs scores
 ---@class R6Score
@@ -253,7 +197,7 @@ function CustomMatchSummary.createBody(match)
 		Array.map(match.games, CustomMatchSummary._createMap),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		mapVeto and mapVeto:create() or nil
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = 'siege'}))
 	)}
 end
 
@@ -270,6 +214,17 @@ function CustomMatchSummary._createMap(game)
 		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
 	end
 
+	local function operatorDisplay(operators)
+		return HtmlWidgets.Div{
+			classes = {'brkts-popup-body-operator-bans'},
+			children = Array.map(operators, function(operator)
+				return MatchSummaryWidgets.Character{
+					character = operator,
+					size = '50x50px'
+				}
+			end)
+		}
+	end
 
 	-- Score
 	local team1Score = Score():setLeft()
@@ -315,22 +270,9 @@ function CustomMatchSummary._createMap(game)
 	team2Score:setMapScore(scoreDisplay(2))
 
 	-- Operator bans
-	local operatorBans = {team1 = extradata.t1bans or {}, team2 = extradata.t2bans or {}}
-	local team1OperatorBans = OperatorBans():setLeft()
-	local team2OperatorBans = OperatorBans():setRight()
 
-	for _, operator in ipairs(operatorBans.team1) do
-		team1OperatorBans:add(operator)
-	end
-	for _, operator in ipairs(operatorBans.team2) do
-		team2OperatorBans:add(operator)
-	end
-
-	-- Add everything to view
-	if team1OperatorBans ~= nil then
-		row:addElement(team1OperatorBans:create())
-	end
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1, POSITION_LEFT))
+	row:addElement(operatorDisplay(extradata.t1bans or {}))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(team1Score:create())
 
 	local centerNode = mw.html.create('div')
@@ -345,11 +287,10 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	row:addElement(centerNode)
+
 	row:addElement(team2Score:create())
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2, POSITION_RIGHT))
-	if team2OperatorBans ~= nil then
-		row:addElement(team2OperatorBans:create())
-	end
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
+	row:addElement(operatorDisplay(extradata.t2bans or {}))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -383,28 +324,6 @@ function CustomMatchSummary._getOppositeSide(side)
 		return 'def'
 	end
 	return 'atk'
-end
-
----@param isWinner boolean?
----@param position integer
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner, position)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if isWinner then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	if position == POSITION_LEFT then
-		container:css('margin-left', '3%')
-	elseif position == POSITION_RIGHT then
-		container:css('margin-right', '3%')
-	end
-
-	return container
 end
 
 return CustomMatchSummary
