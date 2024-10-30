@@ -90,15 +90,20 @@ local VALVE_TIERS = {
 }
 
 local RESTRICTIONS = {
-	['female'] = {
+	female = {
 		name = 'Female Players Only',
 		link = 'Female Tournaments',
 		data = 'female',
 	},
-	['academy'] = {
+	academy = {
 		name = 'Academy Teams Only',
 		link = 'Academy Tournaments',
 		data = 'academy',
+	},
+	national = {
+		name = 'National Teams Only',
+		link = 'National Tournaments',
+		data = 'national',
 	}
 }
 
