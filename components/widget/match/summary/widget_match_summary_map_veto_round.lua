@@ -68,7 +68,7 @@ function MatchSummaryMapVetoRound:render()
 		}
 	end
 
-	return HtmlWidgets.Tr{classes = 'brkts-popup-mapveto-vetoround', children = children}
+	return HtmlWidgets.Tr{classes = {'brkts-popup-mapveto-vetoround'}, children = children}
 end
 
 return MatchSummaryMapVetoRound
