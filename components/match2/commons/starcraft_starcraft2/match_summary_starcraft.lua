@@ -39,15 +39,12 @@ local StarcraftMatchSummary = {}
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
-	local match, bracketResetMatch =
-		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
+	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 	---@cast match StarcraftMatchGroupUtilMatch
-	---@cast bracketResetMatch StarcraftMatchGroupUtilMatch?
 
 	if match.isFfa then
-		return Lua.import('Module:MatchSummary/Ffa/Starcraft').FfaMatchSummary{
+		return Lua.import('Module:MatchSummary/Starcraft/Ffa').getByMatchId{
 			match = match,
-			bracketResetMatch = bracketResetMatch,
 			config = args.config
 		}
 	end
