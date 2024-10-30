@@ -35,6 +35,9 @@ return {
 		match2 = {
 			status = 0,
 		},
+		transfers = {
+			showTeamName = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
