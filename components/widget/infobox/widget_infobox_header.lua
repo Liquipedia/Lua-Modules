@@ -164,7 +164,7 @@ function Header:_makeImageText(text)
 		return
 	end
 
-	return Div{classes = 'infobox-image-text', children = {text}}
+	return Div{classes = {'infobox-image-text'}, children = {text}}
 end
 
 return Header
