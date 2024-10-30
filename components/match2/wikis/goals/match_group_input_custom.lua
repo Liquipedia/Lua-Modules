@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -17,7 +16,6 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Streams = Lua.import('Module:Links/Stream')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
 
@@ -78,7 +76,7 @@ end
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
-	for mapKey, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for mapKey, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if Table.isEmpty(map) then
 			break
 		end
