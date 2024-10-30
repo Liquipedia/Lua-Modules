@@ -36,13 +36,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-
 	local scoreType = 'mapScores'
-	if Logic.readBool(match.hasSubmatches) then
-		scoreType = 'mapWins'
-	elseif Array.any(Array.map(games, Operator.property('penalty')), Logic.readBool) then
-		scoreType = 'penalties'
-	end
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games, scoreType)
 		or nil
@@ -72,7 +66,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.extradata = CustomMatchGroupInput.getExtraData(match, scoreType == 'mapWins')
 
 	match.games = games
 	match.opponents = opponents
@@ -91,20 +84,6 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
-
-		if Logic.readBool(match.hasSubmatches) then
-			-- generic map name (not displayed)
-			map.map = 'Game ' .. mapIndex
-		elseif Logic.readBool(map.penalty) then
-			map.map = 'Penalties'
-		else
-			map.map = mapIndex .. Ordinal.suffix(mapIndex) .. ' Leg'
-		end
-
-		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
-		map.extradata = CustomMatchGroupInput.getMapExtraData(map, opponents, Logic.readBool(match.hasSubmatches))
-
-		map.opponents = CustomMatchGroupInput.getParticipants(map, opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
@@ -131,10 +110,6 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 	return maps
 end
 
---- TODO: Investigate if some parts of this should be a display rather than storage.
---- If penalties is supplied, than one map MUST have the penalty flag set to true.
----@param maps table[]
----@param calculateBy 'mapWins'|'mapScores'|'penalties'
 ---@return fun(opponentIndex: integer): integer
 function CustomMatchGroupInput.calculateMatchScore(maps, calculateBy)
 	return function(opponentIndex)
@@ -152,71 +127,6 @@ function CustomMatchGroupInput.calculateMatchScore(maps, calculateBy)
 			error('Unknown calculateBy: ' .. tostring(calculateBy))
 		end
 	end
-end
-
----@param match table
----@param hasSubmatches boolean
----@return table
-function CustomMatchGroupInput.getExtraData(match, hasSubmatches)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		hassubmatches = tostring(hasSubmatches),
-	}
-end
-
----@param map table
----@param opponents table[]
----@param hasSubmatches boolean
----@return table
-function CustomMatchGroupInput.getMapExtraData(map, opponents, hasSubmatches)
-	return {
-		comment = map.comment,
-		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatches),
-	}
-end
-
----@param map table
----@param opponents table[]
----@param hasSubmatches boolean
----@return integer[]?
-function CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatches)
-	if not hasSubmatches then
-		return
-	end
-
-	local hasPenalties = false
-	local scores = Array.map(opponents, function(_, opponentIndex)
-		local score = tonumber(map['penaltyScore' .. opponentIndex])
-		hasPenalties = hasPenalties or (score ~= nil)
-		return score or 0
-	end)
-
-	return hasPenalties and scores or nil
-end
-
----@param map table
----@param opponents MGIParsedOpponent[]
----@return {players: table[]}[]
-function CustomMatchGroupInput.getParticipants(map, opponents)
-	return Array.map(opponents, function(opponent, opponentIndex)
-		local players = Array.mapIndexes(function(playerIndex)
-			return map['t' .. opponentIndex .. 'p' .. playerIndex]
-		end)
-		local participants, _ = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			players,
-			function(playerIndex)
-				local data = map['t' .. opponentIndex .. 'p' .. playerIndex]
-				return data and {name = data} or nil
-			end,
-			function(playerIndex, playerIdData, playerInputData)
-				return {
-					played = true
-				}
-			end
-		)
-		return {players = participants}
-	end)
 end
 
 return CustomMatchGroupInput
