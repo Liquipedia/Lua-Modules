@@ -27,9 +27,6 @@ function MatchSummaryMapVeto:render()
 		return
 	end
 
-	local firstVeto = tonumber(self.props.vetoRounds[1].vetostart)
-	local vetoFormat = self.props.vetoRounds[1].format
-
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-mapveto'},
 		children = HtmlWidgets.Table{
@@ -40,7 +37,7 @@ function MatchSummaryMapVeto:render()
 					HtmlWidgets.Th{css = {width = '34%'}, children = 'Map Veto'},
 					HtmlWidgets.Th{css = {width = '33%'}},
 				}},
-				MapVetoStart{firstVeto = firstVeto, vetoFormat = vetoFormat},
+				MapVetoStart{firstVeto = self.props.firstVeto, vetoFormat = self.props.vetoFormat},
 				Array.map(self.props.vetoRounds, function(veto)
 					return MapVetoRound{vetoType = veto.type, map1 = veto.map1, map2 = veto.map2}
 				end)

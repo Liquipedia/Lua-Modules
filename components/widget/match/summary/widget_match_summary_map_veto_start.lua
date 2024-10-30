@@ -26,7 +26,7 @@ function MatchSummaryMapVetoStart:render()
 		return
 	end
 
-	local format = self.props.vetoFormat and  ('Veto Format: ' .. self.props.vetoFormat) or nil
+	local format = self.props.vetoFormat and  ('Veto Format: ' .. self.props.vetoFormat) or ''
 	local children = {}
 	if self.props.firstVeto == 1 then
 		children = {
