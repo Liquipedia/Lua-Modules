@@ -150,12 +150,10 @@ function CustomMatchSummary.createBody(match)
 	end
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	local mapVeto = MatchSummary.defaultMapVetoDisplay(match.extradata.mapveto, {game = match.game})
-
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, CustomMatchSummary._createMap),
-		mapVeto and mapVeto:create() or nil,
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
 		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
 	)}
 end
