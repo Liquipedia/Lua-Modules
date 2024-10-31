@@ -33,7 +33,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-	local scoreType = 'mapScores'
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games)
 		or nil
