@@ -231,12 +231,22 @@ function League:createInfobox()
 				end
 				local venues = League._parseVenues(args)
 				-- If more than one venue, don't show the accommodation section, as it is unclear which one the link is for
-				if #venues ~= 1 then
+				if #venues > 1 then
 					return
 				end
-				local venueName = venues[1].id
-				if not venueName then
-					return
+				local location = (venues[1] or {}).id
+
+				-- If the event has no known venue, show based on the city instead, if there's only one city
+				if not location then
+					local locations = Locale.formatLocations(args)
+					if not locations.city1 or locations.city2 then
+						return
+					end
+					if locations.country1 or locations.region1 then
+						location = locations.city1 .. ', ' .. Flags.CountryName(locations.country1 or locations.region1)
+					else
+						location = locations.city1
+					end
 				end
 				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
 				-- End date for the accommodation should be 1 day after the event
@@ -270,7 +280,7 @@ function League:createInfobox()
 							variant = 'primary',
 							size = 'md',
 							link = buildStay22Link(
-								venueName,
+								location,
 								DateExt.toYmdInUtc(osdateStart),
 								DateExt.toYmdInUtc(osdateEnd)
 							),
