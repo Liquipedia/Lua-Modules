@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
@@ -64,8 +65,8 @@ function CustomMatchSummary.createBody(match)
 		} or nil,
 		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
-		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
-			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
+		subMatches and Array.map(subMatches, FnUtil.curry(CustomMatchSummary.TeamSubmatch, match.date))
+			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes, date = match.date})),
 		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
 			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
 			children = {'Vetoes'},
@@ -130,7 +131,7 @@ function CustomMatchSummary.advantageOrPenalty(opponent)
 	}
 end
 
----@param options {hasHeroes: boolean?, isPartOfSubMatch: boolean?}
+---@param options {hasHeroes: boolean?, isPartOfSubMatch: boolean?, date: string?}
 ---@param game table
 ---@return (Html|string)[]
 function CustomMatchSummary.Game(options, game)
@@ -152,14 +153,15 @@ function CustomMatchSummary.Game(options, game)
 				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
-			CustomMatchSummary.DispalyHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
+			CustomMatchSummary.DispalyHeroes(game.opponents[1], {hasHeroes = options.hasHeroes, date = options.date}),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			showOffFactionIcons and offFactionIcons(1) or nil,
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game)},
 			showOffFactionIcons and offFactionIcons(2) or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}},
-			CustomMatchSummary.DispalyHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true})
+			CustomMatchSummary.DispalyHeroes(game.opponents[2],
+				{hasHeroes = options.hasHeroes, flipped = true, date = options.date})
 		)
 	}
 end
@@ -178,7 +180,7 @@ function CustomMatchSummary.OfffactionIcons(factions)
 end
 
 ---@param opponent table
----@param options {hasHeroes: boolean?, flipped: boolean?}
+---@param options {hasHeroes: boolean?, flipped: boolean?, date: string?}
 ---@return Html?
 function CustomMatchSummary.DispalyHeroes(opponent, options)
 	if not options.hasHeroes then return nil end
@@ -195,35 +197,26 @@ function CustomMatchSummary.DispalyHeroes(opponent, options)
 		children = Array.map(heroesPerPlayer, function(heroes)
 			return HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
-				children = Array.map(heroes, function(hero)
-					local name = hero.name or ''
-					return HtmlWidgets.Div{
-						classes = {'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red')},
-						css = {float = options.flipped and 'right' or 'left'},
-						children = {'[[File:' .. hero.icon .. '|link=' .. name .. '|' .. name .. ']]'},
-					}
-				end)
-				--[[ the entire Array.map(heroes, ...) can probably be replaced with below after setting up CharacterIcon data
-				{
-					MatchSummaryWidgets.Characters{
-						flipped = options.flipped,
-						characters = heroes,
-						bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
-					}
-				}
-				]]
+				children =
+				MatchSummaryWidgets.Characters{
+					flipped = options.flipped,
+					characters = heroes,
+					bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
+					date = DateExt.nilIfDefaultTimestamp(options.date) or DateExt.getContextualDateOrNow(),
+				},
 			}
 		end)
 	}
 end
 
+---@param date string?
 ---@param submatch table
 ---@return MatchSummaryRow
-function CustomMatchSummary.TeamSubmatch(submatch)
+function CustomMatchSummary.TeamSubmatch(date, submatch)
 	return MatchSummaryWidgets.Row{
 		children = WidgetUtil.collect(
 			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
-			CustomMatchSummary.TeamSubMatchGames(submatch)
+			CustomMatchSummary.TeamSubMatchGames(submatch, date)
 		)
 	}
 end
@@ -287,8 +280,9 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 end
 
 ---@param submatch StarcraftMatchGroupUtilSubmatch
+---@param date string?
 ---@return Widget?
-function CustomMatchSummary.TeamSubMatchGames(submatch)
+function CustomMatchSummary.TeamSubMatchGames(submatch, date)
 	if not CustomMatchSummary._submatchHasDetails(submatch) then return nil end
 
 	return MatchSummaryWidgets.Collapsible{
@@ -307,7 +301,7 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 				children = {
 					HtmlWidgets.Th{
 						children = {CustomMatchSummary.Game(
-							{hasHeroes = true, isPartOfSubMatch = true},
+							{hasHeroes = true, isPartOfSubMatch = true, date = date},
 							game
 						)},
 					},
