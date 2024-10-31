@@ -197,7 +197,7 @@ function CustomMatchSummary.createBody(match)
 		Array.map(match.games, CustomMatchSummary._createMap),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = 'siege'}))
+		mapVeto and mapVeto:create() or nil
 	)}
 end
 
