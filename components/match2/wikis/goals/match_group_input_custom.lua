@@ -35,7 +35,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
 	local scoreType = 'mapScores'
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and CustomMatchGroupInput.calculateMatchScore(games, scoreType)
+		and CustomMatchGroupInput.calculateMatchScore(games)
 		or nil
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -108,21 +108,9 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 end
 
 ---@return fun(opponentIndex: integer): integer
-function CustomMatchGroupInput.calculateMatchScore(maps, calculateBy)
+function CustomMatchGroupInput.calculateMatchScore(maps)
 	return function(opponentIndex)
-		if calculateBy == 'mapWins' then
-			return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-		elseif calculateBy == 'mapScores' then
-			return Array.reduce(Array.map(maps, function(map)
-				return map.scores[opponentIndex] or 0
-			end), Operator.add, 0)
-		elseif calculateBy == 'penalties' then
-			return Array.filter(maps, function(map)
-				return Logic.readBool(map.penalty)
-			end)[1].scores[opponentIndex]
-		else
-			error('Unknown calculateBy: ' .. tostring(calculateBy))
-		end
+		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
 end
 
