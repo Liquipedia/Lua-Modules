@@ -30,13 +30,13 @@ function MatchSummaryDetailedScore:render()
 	return HtmlWidgets.Div{
 		css = {width = '70px', textAlign = 'center', direction = flipped and 'rtl' or 'ltr'},
 		children = HtmlWidgets.Table{
-			css = {lineHeight = '29px', float = flipped and 'right' or 'left'},
+			css = {lineHeight = '28px', float = flipped and 'right' or 'left'},
 			children = {
 				HtmlWidgets.Tr{
 					children = {
 						HtmlWidgets.Td{
 							attributes = {rowspan = 2},
-							css = {['font-size'] = '16px', width = '25px'},
+							css = {['font-size'] = '16px', width = '24px'},
 							children = self.props.score
 						},
 						unpack(Array.filter(partialScores, function(_, i)
