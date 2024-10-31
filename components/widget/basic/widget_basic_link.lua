@@ -26,13 +26,16 @@ Link.defaultProps = {
 	linktype = 'internal',
 }
 
----@return Widget
+---@return Widget?
 function Link:render()
+	if not self.props.link then
+		return
+	end
 	if self.props.linktype == 'external' then
 		return Fragment{
 			children = WidgetUtil.collect(
 				'[',
-				self.props.link,
+				(self.props.link:gsub(' ', '%%20')),
 				' ',
 				unpack(self.props.children),
 				']'
