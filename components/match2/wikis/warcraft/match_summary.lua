@@ -150,7 +150,7 @@ function CustomMatchSummary.Game(options, game)
 		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			game.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'},  children = {game.header}},
+				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			CustomMatchSummary.DispalyHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),

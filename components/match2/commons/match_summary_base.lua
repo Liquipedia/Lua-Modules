@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local Links =  Lua.import('Module:Links')
+local Links = Lua.import('Module:Links')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 

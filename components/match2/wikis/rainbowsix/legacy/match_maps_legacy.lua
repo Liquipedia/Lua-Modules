@@ -74,7 +74,7 @@ function MatchMaps._main(args)
 					storage_args[prefix] = {
 						map = Table.extract(details, prefix) or 'Unknown',
 						finished = Table.extract(details, prefix..'finished'),
-						score1 = Table.extract(details,  prefix..'score1'),
+						score1 = Table.extract(details, prefix..'score1'),
 						score2 = Table.extract(details, prefix..'score2'),
 						t1ban1 = Table.extract(details, prefix..'t1ban1'),
 						t1ban2 = Table.extract(details, prefix..'t1ban2'),
