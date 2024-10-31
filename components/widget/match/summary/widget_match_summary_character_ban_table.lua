@@ -13,8 +13,9 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div, Abbr, Tr, Th, Td = HtmlWidgets.Div, HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
+local Abbr, Tr, Th, Td = HtmlWidgets.Abbr, HtmlWidgets.Tr, HtmlWidgets.Th, HtmlWidgets.Td
 local Characters = Lua.import('Module:Widget/Match/Summary/Characters')
+local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
 
 ---@class MatchSummaryCharacterBanTable: Widget
 ---@operator call(table): MatchSummaryCharacterBanTable
@@ -54,21 +55,14 @@ function MatchSummaryCharacterBanTable:render()
 		}
 	end)
 
-	return Div{
-		classes = {'brkts-popup-mapveto'},
-		children = {
-			HtmlWidgets.Table{
-				classes = {'wikitable-striped', 'collapsible', 'collapsed'},
-				children = {
-					Tr{children = {
-						Th{css = {width = '40%'}},
-						Th{css = {width = '20%'}, children = {'Bans'}},
-						Th{css = {width = '40%'}},
-					}},
-					unpack(rows),
-				}
-			}
-		}
+	return Collapsible{
+		tableClasses = {'wikitable-striped'},
+		header = Tr{children = {
+			Th{css = {width = '40%'}},
+			Th{css = {width = '20%'}, children = {'Bans'}},
+			Th{css = {width = '40%'}},
+		}},
+		children = rows,
 	}
 end
 

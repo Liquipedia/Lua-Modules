@@ -7,9 +7,9 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Icon = require('Module:Icon')
 local Faction = require('Module:Faction')
+local FnUtil = require('Module:FnUtil')
 local HeroData = mw.loadData('Module:HeroData')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -17,82 +17,33 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local ICONS = {
-	greenCheck = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	yellowLine = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>',
-	redCross = '<i class="fas fa-times cinnabar-text" style="width: 14px; text-align: center" ></i>',
+	veto = Icon.makeIcon{iconName = 'veto', color = 'cinnabar-text', size = '110%'},
 	noCheck = '[[File:NoCheck.png|link=]]',
 }
 
 local UNIFORM_MATCH = 'uniform'
 local TBD = 'TBD'
 
----Custom Class for displaying game details in submatches
----@class WarcraftMatchSummarySubmatchCollapsible
----@operator call: WarcraftMatchSummarySubmatchCollapsible
----@field root Html
----@field table Html
-local SubmatchCollapsible = Class.new(
-	function(self, header)
-		self.root = mw.html.create('div'):addClass('brkts-popup-mapveto'):css('width', '100%')
-			:css('margin-bottom', '-8px')
-		self.table = self.root:tag('table'):addClass('inherit-bg collapsible collapsed')
-
-		self.table
-			:tag('tr'):tag('th'):wikitext('Submatch Details')
-	end
-)
-
----@param gameNodes Html[]
----@return self
-function SubmatchCollapsible:game(gameNodes)
-	self.table:tag('tr'):tag('td'):node(MatchSummary.Row():addClass('brkts-popup-sc-game'):addClass('inherit-bg')
-		:addElements(gameNodes):create())
-
-	return self
-end
-
----@return Html
-function SubmatchCollapsible:create()
-	return self.root
-end
-
 local CustomMatchSummary = {}
+--local StarcraftMatchSummary = CustomMatchSummary
 
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	--can not use commons due to ffa stuff and sc/sc2/wc specific classes
-	local match, bracketResetMatch =
-		MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId, {returnBoth = true})
-
-	if match.isFfa then
-		error('FFA is not yet supported in warcraft match2')
-		--later call ffa matchsummary from here
-	end
-
-	local matchSummary = MatchSummary():init('400px')
+	-- later when ffa is enabled need to check for that here
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px'})
 		:addClass('brkts-popup-sc')
-
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
-		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
-		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
-		--here martin can add the buttons for switching between match and reset match
-	--end
-
-	matchSummary:addMatch(MatchSummary.createMatch(match, CustomMatchSummary))
-	matchSummary:addMatch(MatchSummary.createMatch(bracketResetMatch, CustomMatchSummary))
-
-	return matchSummary:create()
 end
 
 ---@param match table
@@ -100,40 +51,29 @@ end
 function CustomMatchSummary.createBody(match)
 	CustomMatchSummary.computeOfffactions(match)
 	local hasHeroes = CustomMatchSummary.hasHeroes(match)
-
-	local body = MatchSummary.Body()
-	-- Stream, date, and countdown
-	if match.dateIsExact then
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		):addClass('brkts-popup-countdown'))
+	local isResetMatch = String.endsWith(match.matchId, '_RxMBR')
+	local subMatches
+	if match.opponentMode ~= UNIFORM_MATCH then
+		subMatches = match.submatches or {}
 	end
 
-	-- add a comment if there is a pre match map advantage
-	for _, opponent in ipairs(match.opponents or {}) do
-		CustomMatchSummary.addAdvantagePenaltyInfo(body, opponent)
-	end
-
-	if match.opponentMode == UNIFORM_MATCH then
-		Array.forEach(match.games, function(game)
-			body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game')
-				:addElements(CustomMatchSummary.Game(game, hasHeroes))) end)
-	else -- team games
-		Array.forEach(match.submatches, function(submatch)
-			body:addRow(CustomMatchSummary.TeamSubmatch(submatch)) end)
-	end
-
-	if Table.isNotEmpty(match.vetoes) then
-		-- add Veto Header
-		body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-header brkts-popup-sc-veto-center'):addElement('Vetoes'))
-	end
-	Array.forEach(match.vetoes, function(veto)
-		body:addRow(CustomMatchSummary.Veto(veto))
-	end)
-
-	body.root:node(MatchSummaryWidgets.Casters{casters = match.casters})
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		isResetMatch and MatchSummaryWidgets.Row{
+			classes = {'brkts-popup-sc-veto-center'},
+			css = {['line-height'] = '80%', ['font-weight'] = 'bold'},
+			children = {'Reset match'},
+		} or nil,
+		match.dateIsExact and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.opponents, CustomMatchSummary.advantageOrPenalty),
+		subMatches and Array.map(subMatches, CustomMatchSummary.TeamSubmatch)
+			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {hasHeroes = hasHeroes})),
+		Logic.isNotEmpty(match.vetoes) and MatchSummaryWidgets.Row{
+			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
+			children = {'Vetoes'},
+		} or nil,
+		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil,
+		MatchSummaryWidgets.Casters{casters = match.casters}
+	)}
 end
 
 ---@param match table
@@ -141,23 +81,21 @@ function CustomMatchSummary.computeOfffactions(match)
 	if match.opponentMode == UNIFORM_MATCH then
 		CustomMatchSummary.computeMatchOfffactions(match)
 	else
-		for _, submatch in pairs(match.submatches) do
-			CustomMatchSummary.computeMatchOfffactions(submatch)
-		end
+		Array.forEach(match.submatches, CustomMatchSummary.computeMatchOfffactions)
 	end
 end
 
 ---@param match table
 function CustomMatchSummary.computeMatchOfffactions(match)
-	for _, game in ipairs(match.games) do
+	Array.forEach(match.games, function(game)
 		game.offfactions = {}
-		for opponentIndex, gameOpponent in pairs(game.opponents) do
+		Array.forEach(game.opponents, function(gameOpponent, opponentIndex)
 			game.offfactions[opponentIndex] = MatchGroupUtil.computeOfffactions(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
-		end
-	end
+		end)
+	end)
 end
 
 ---@param match table
@@ -168,68 +106,63 @@ function CustomMatchSummary.hasHeroes(match)
 	end) end)
 end
 
----@param body MatchSummaryBody
----@param opponent WarcraftStandardOpponent
-function CustomMatchSummary.addAdvantagePenaltyInfo(body, opponent)
+---@param opponent StarcraftStandardOpponent
+---@return Widget?
+function CustomMatchSummary.advantageOrPenalty(opponent)
 	local extradata = opponent.extradata or {}
 	if not Logic.isNumeric(extradata.advantage) and not Logic.isNumeric(extradata.penalty) then
-		return
+		return nil
 	end
 	local infoType = Logic.isNumeric(extradata.advantage) and 'advantage' or 'penalty'
 	local value = tonumber(extradata.advantage) or tonumber(extradata.penalty)
 
-	body:addRow(MatchSummary.Row():addClass('brkts-popup-sc-game-center')
-		:addElement(mw.html.create():node(OpponentDisplay.InlineOpponent{
-			opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
-			showFlag = false,
-			showLink = true,
-			showFaction = false,
-			teamStyle = 'short',
-		}):wikitext(' starts with a ' .. value .. ' map ' .. infoType .. '.')))
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-sc-game-center'},
+		children = {
+			OpponentDisplay.InlineOpponent{
+				opponent = Opponent.isTbd(opponent) and Opponent.tbd() or opponent,
+				showFlag = false,
+				showLink = true,
+				showFaction = false,
+				teamStyle = 'short',
+			},
+			' starts with a ' .. value .. ' map ' .. infoType .. '.',
+		},
+	}
 end
 
+---@param options {hasHeroes: boolean?, isPartOfSubMatch: boolean?}
 ---@param game table
----@param hasHeroes boolean
 ---@return (Html|string)[]
-function CustomMatchSummary.Game(game, hasHeroes)
-	local getWinnerIcon = function(opponentIndex)
-		return CustomMatchSummary.toIcon(game.resultType == 'draw' and 'yellowLine'
-			or game.winner == opponentIndex and 'greenCheck')
+function CustomMatchSummary.Game(options, game)
+	local showOffFactionIcons = game.offFactions ~= nil and (game.offFactions[1] ~= nil or game.offFactions[2] ~= nil)
+	local offFactionIcons = function(opponentIndex)
+		local offFactions = game.offFactions and game.offFactions[opponentIndex]
+		local opponent = game.opponents and game.opponents[opponentIndex]
+
+		return CustomMatchSummary.OffFactionIcons(opponent and offFactions or {})
 	end
 
-	local showOfffactionIcons = game.offfactions ~= nil and (game.offfactions[1] ~= nil or game.offfactions[2] ~= nil)
-	local offfactionIcons = function(opponentIndex)
-		local offfactions = game.offfactions ~= nil and game.offfactions[opponentIndex] or nil
-		local opponent = game.opponents ~= nil and game.opponents[opponentIndex] or nil
+	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
 
-		if offfactions and opponent then
-			return CustomMatchSummary.OfffactionIcons(offfactions)
-		elseif showOfffactionIcons then
-			return CustomMatchSummary.OfffactionIcons({})
-		end
-	end
-
-	local gameNodes = {CustomMatchSummary.GameHeader(game.header)}
-
-	local centerNode = mw.html.create('div'):addClass('brkts-popup-sc-game-center')
-		:wikitext(DisplayHelper.MapAndStatus(game))
-
-	table.insert(gameNodes, mw.html.create('div')
-		:addClass('brkts-popup-sc-game-body')
-		:node(CustomMatchSummary.DispalyHeroes(game.opponents[1], hasHeroes))
-		:node(getWinnerIcon(1))
-		:node(offfactionIcons(1))
-		:node(centerNode)
-		:node(offfactionIcons(2))
-		:node(getWinnerIcon(2))
-		:node(CustomMatchSummary.DispalyHeroes(game.opponents[2], hasHeroes, true))
-	)
-
-	if game.comment then
-		table.insert(gameNodes, mw.html.create('div'):addClass('brkts-popup-sc-game-comment'):wikitext(game.comment))
-	end
-
-	return gameNodes
+	return rowWidget{
+		classes = {'brkts-popup-body-game', options.isPartOfSubMatch and 'inherit-bg' or nil},
+		css = {width = options.isPartOfSubMatch and '100%' or nil},
+		children = WidgetUtil.collect(
+			game.header and {
+				HtmlWidgets.Div{css = {margin = 'auto'},  children = {game.header}},
+				MatchSummaryWidgets.Break{},
+			} or nil,
+			CustomMatchSummary.DispalyHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			showOffFactionIcons and offFactionIcons(1) or nil,
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game)},
+			showOffFactionIcons and offFactionIcons(2) or nil,
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}},
+			CustomMatchSummary.DispalyHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true})
+		)
+	}
 end
 
 ---Renders off-factions as Nx2 grid of tiny icons
@@ -245,86 +178,65 @@ function CustomMatchSummary.OfffactionIcons(factions)
 	return factionsNode
 end
 
----@param header string|number|nil
----@return Html?
-function CustomMatchSummary.GameHeader(header)
-	if not header then return end
-	return mw.html.create('div')
-		:addClass('brkts-popup-sc-game-header')
-		:wikitext(header)
-end
-
 ---@param opponent table
----@param hasHeroes boolean
----@param flip boolean?
+---@param options {hasHeroes: boolean?, flipped: boolean?}
 ---@return Html?
-function CustomMatchSummary.DispalyHeroes(opponent, hasHeroes, flip)
-	if not hasHeroes then return end
+function CustomMatchSummary.DispalyHeroes(opponent, options)
+	if not options.hasHeroes then return nil end
 
-	local heroes = Array.map(opponent.players or {{}}, function(player)
-		local displays = Array.map(Array.range(1, 3), function(heroIndex)
-			local data = HeroData[((player.heroes or {})[heroIndex] or ''):lower()] or HeroData.default
-			local name = data.name or ''
-			return mw.html.create('div')
-				:addClass('brkts-popup-side-color-' .. (flip and 'blue' or 'red'))
-				:css('float', flip and 'right' or 'left')
-				:wikitext('[[File:' .. data.icon .. '|link=' .. name .. '|' .. name .. ']]')
+	local heroesPerPlayer = Array.map(opponent.players or {}, function(player)
+		return Array.map(Array.range(1, 3), function(heroIndex)
+			return HeroData[((player.heroes or {})[heroIndex] or ''):lower()] or HeroData.default
 		end)
-		return displays
 	end)
 
-	local rowsDisplay = mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('flex-direction', 'column')
-		:css('padding-' .. (flip and 'left' or 'right'), '8px')
-
-	Array.forEach(heroes, function(displays)
-		local row = mw.html.create('div')
-			:addClass('brkts-popup-body-element-thumbs brkts-champion-icon')
-
-		Array.forEach(displays, function(display) row:node(display) end)
-		rowsDisplay:node(row)
-	end)
-
-	return rowsDisplay
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-body-element-vertical-centered'},
+		css = {['flex-direction'] = 'column', ['padding-' .. (options.flipped and 'left' or 'right')] = '8px'},
+		children = Array.map(heroesPerPlayer, function(heroes)
+			return HtmlWidgets.Div{
+				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
+				children = Array.map(heroes, function(hero)
+					local name = hero.name or ''
+					return HtmlWidgets.Div{
+						classes = {'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red')},
+						css = {float = options.flipped and 'right' or 'left'},
+						children = {'[[File:' .. hero.icon .. '|link=' .. name .. '|' .. name .. ']]'},
+					}
+				end)
+				--[[ the entire Array.map(heroes, ...) can probably be replaced with below after setting up CharacterIcon data
+				{
+					MatchSummaryWidgets.Characters{
+						flipped = options.flipped,
+						characters = heroes,
+						bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
+					}
+				}
+				]]
+			}
+		end)
+	}
 end
 
 ---@param submatch table
 ---@return MatchSummaryRow
 function CustomMatchSummary.TeamSubmatch(submatch)
-	local submatchDisplay = MatchSummary.Row():addElement(CustomMatchSummary._submatchHeader(submatch))
-	if not CustomMatchSummary._submatchHasDetails(submatch) then
-		return submatchDisplay
-	end
-
-	local details = SubmatchCollapsible()
-	for _, game in ipairs(submatch.games) do
-		if game.map ~= 'Submatch Score Fix' then
-			details:game(CustomMatchSummary.Game(game, true))
-		end
-	end
-
-	return submatchDisplay:addElement(details:create()):css('margin-bottom', '8px')
+	return MatchSummaryWidgets.Row{
+		children = WidgetUtil.collect(
+			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
+			CustomMatchSummary.TeamSubMatchGames(submatch)
+		)
+	}
 end
 
----@param submatch table
----@return boolean
-function CustomMatchSummary._submatchHasDetails(submatch)
-	return #submatch.games > 0 and Array.any(submatch.games, function(game)
-		return String.isNotEmpty(game.map) and game.map:upper() ~= TBD and not string.find(game.map, '^[sS]ubmatch %d+$')
-			or Array.any(game.opponents, function(opponent) return Array.any(opponent.players, function(player)
-				return Table.isNotEmpty(player.heroes) end) end)
-	end)
-end
-
----@param submatch table
----@return Html
-function CustomMatchSummary._submatchHeader(submatch)
+---@param submatch StarcraftMatchGroupUtilSubmatch
+---@return Widget
+function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}
 
 	local createOpponent = function(opponentIndex)
 		local players = (opponents[opponentIndex] or {}).players or {}
-		if Table.isEmpty(players) then
+		if Logic.isEmpty(players) then
 			players = Opponent.tbd(Opponent.solo).players
 		end
 		return OpponentDisplay.BlockOpponent{
@@ -338,7 +250,7 @@ function CustomMatchSummary._submatchHeader(submatch)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner or submatch.resultType ~= 'draw'
+		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
 		if submatch.resultType == 'default' then
 			return OpponentDisplay.BlockScore{
 				isWinner = isWinner,
@@ -346,45 +258,104 @@ function CustomMatchSummary._submatchHeader(submatch)
 			}
 		end
 
-		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or ''
+		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
 		return OpponentDisplay.BlockScore{
 			isWinner = isWinner,
 			scoreText = score,
 		}
 	end
 
-	return mw.html.create('div')
-		:css('justify-content', 'center'):addClass('brkts-popup-header-dev')
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-			:node(createOpponent(1))
-			:node(createScore(1):addClass('brkts-popup-header-opponent-score-left'))
-			:done()
-		:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-			:node(createScore(2):addClass('brkts-popup-header-opponent-score-right'))
-			:node(createOpponent(2))
-			:done()
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-header-dev'},
+		css = {['justify-content'] = 'center', margin = 'auto'},
+		children = WidgetUtil.collect(
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
+				children = {
+					createOpponent(1),
+					createScore(1):addClass('brkts-popup-header-opponent-score-left'),
+				},
+			},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
+				children = {
+					createScore(2):addClass('brkts-popup-header-opponent-score-right'),
+					createOpponent(2),
+				},
+			}
+		)
+	}
 end
 
----@param veto {map: string, by: number}
+---@param submatch StarcraftMatchGroupUtilSubmatch
+---@return Widget?
+function CustomMatchSummary.TeamSubMatchGames(submatch)
+	if not CustomMatchSummary._submatchHasDetails(submatch) then return nil end
+
+	return MatchSummaryWidgets.Collapsible{
+		classes = {'brkts-popup-header-dev'},
+		css = {width = '100%', padding = 0},
+		tableClasses = {'inherit-bg'},
+		header = HtmlWidgets.Tr{
+			children = {
+				HtmlWidgets.Th{
+					children = {'Submatch Details'},
+				},
+			},
+		},
+		children = Array.map(submatch.games, function(game)
+			if game.map == 'Submatch Score Fix' then return nil end
+
+			return HtmlWidgets.Tr{
+				children = {
+					HtmlWidgets.Th{
+						children = {CustomMatchSummary.Game(
+							{hasHeroes = true, isPartOfSubMatch = true},
+							game
+						)},
+					},
+				},
+			}
+		end)
+	}
+end
+
+---@param submatch table
+---@return boolean
+function CustomMatchSummary._submatchHasDetails(submatch)
+	return #submatch.games > 0 and Array.any(submatch.games, function(game)
+		return String.isNotEmpty(game.map) and game.map:upper() ~= TBD and not string.find(game.map, '^[sS]ubmatch %d+$')
+			or Array.any(game.opponents, function(opponent) return Array.any(opponent.players, function(player)
+				return Table.isNotEmpty(player.heroes) end) end)
+	end)
+end
+
+---@param veto StarcraftMatchGroupUtilVeto
 ---@return MatchSummaryRow
 function CustomMatchSummary.Veto(veto)
 	local statusIcon = function(opponentIndex)
-		return CustomMatchSummary.toIcon(opponentIndex == veto.by and 'redCross')
+		return opponentIndex == veto.by and ICONS.veto or ICONS.noCheck
 	end
 
-	veto.map = veto.map or TBD
+	local map = (veto.map or TBD):upper() == TBD and TBD or ('[[' .. veto.map .. ']]')
 
-	return MatchSummary.Row():addClass('brkts-popup-sc-veto-body')
-		:addElement(statusIcon(1))
-		:addElement(mw.html.create('div'):addClass('brkts-popup-sc-veto-center')
-			:wikitext(veto.map:upper() == TBD and TBD or ('[[' .. veto.map .. ']]')))
-		:addElement(statusIcon(2))
-end
-
----@param key string|boolean|nil
----@return string
-function CustomMatchSummary.toIcon(key)
-	return ICONS[key] or ICONS.noCheck
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = {
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
+				children = {statusIcon(1)},
+			},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-sc-veto-center'},
+				children = {map},
+			},
+			HtmlWidgets.Div{
+				classes = {'brkts-popup-spaced brkts-popup-winloss-icon'},
+				children = {statusIcon(2)},
+			}
+		},
+	}
 end
 
 return CustomMatchSummary
