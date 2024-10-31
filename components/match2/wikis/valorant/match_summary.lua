@@ -157,6 +157,7 @@ function CustomMatchSummary._createMap(game)
 
 	score2:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(MatchSummaryWidgets.Characters{characters = team1Agents, flipped = false})
 	row:addElement(score1:create())
 
