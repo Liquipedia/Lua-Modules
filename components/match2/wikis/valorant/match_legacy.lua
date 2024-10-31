@@ -87,7 +87,7 @@ function MatchLegacy.storeGames(match, match2)
 		local opponents = Json.parseIfString(game2.opponents) or {}
 		for teamId, opponent in ipairs(opponents) do
 			local counter = 0
-			for _, player in pairs(opponent.players)  do
+			for _, player in pairs(opponent.players) do
 				if Logic.isNotEmpty(player) then
 					counter = counter + 1
 					addPlayer(teamId, counter, player)

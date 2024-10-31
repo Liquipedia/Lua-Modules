@@ -256,7 +256,7 @@ function CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
 	if not Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead'))) then
 		return nil
 	end
-	if  Opponent.isEmpty(opponents[1]) or Opponent.isEmpty(opponents[2]) then
+	if Opponent.isEmpty(opponents[1]) or Opponent.isEmpty(opponents[2]) then
 		return nil
 	end
 
