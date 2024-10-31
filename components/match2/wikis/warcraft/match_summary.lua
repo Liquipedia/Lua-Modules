@@ -156,7 +156,10 @@ function CustomMatchSummary.Game(options, game)
 			CustomMatchSummary.DispalyHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			showOffFactionIcons and offFactionIcons(1) or nil,
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game)},
+			MatchSummaryWidgets.GameCenter{
+				children = DisplayHelper.MapAndStatus(game),
+				css = {['flex-grow'] = 1, ['justify-content'] = 'center'}
+			},
 			showOffFactionIcons and offFactionIcons(2) or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}},
