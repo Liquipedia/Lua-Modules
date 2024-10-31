@@ -197,8 +197,7 @@ function CustomMatchSummary.DispalyHeroes(opponent, options)
 		children = Array.map(heroesPerPlayer, function(heroes)
 			return HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
-				children =
-				MatchSummaryWidgets.Characters{
+				children = MatchSummaryWidgets.Characters{
 					flipped = options.flipped,
 					characters = heroes,
 					bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
