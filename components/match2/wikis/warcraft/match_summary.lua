@@ -194,7 +194,6 @@ function CustomMatchSummary.DispalyHeroes(opponent, options)
 		classes = {'brkts-popup-body-element-vertical-centered'},
 		css = {['flex-direction'] = 'column', ['padding-' .. (options.flipped and 'left' or 'right')] = '8px'},
 		children = Array.map(heroesPerPlayer, function(heroes)
-			-- not sure this is usable ...
 			return HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
 				children = Array.map(heroes, function(hero)
@@ -205,7 +204,7 @@ function CustomMatchSummary.DispalyHeroes(opponent, options)
 						children = {'[[File:' .. hero.icon .. '|link=' .. name .. '|' .. name .. ']]'},
 					}
 				end)
-				--[[ not usable as of now, but would replace the entire Array.map(heroes, ...)
+				--[[ the entire Array.map(heroes, ...) can probably be replaced with below after setting up CharacterIcon data
 				{
 					MatchSummaryWidgets.Characters{
 						flipped = options.flipped,
