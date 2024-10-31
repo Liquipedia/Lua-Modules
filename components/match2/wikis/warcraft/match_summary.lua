@@ -153,7 +153,7 @@ function CustomMatchSummary.Game(options, game)
 				HtmlWidgets.Div{css = {margin = 'auto'},  children = {game.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
-			CustomMatchSummary.DispalyHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
+			CustomMatchSummary.DisplayHeroes(game.opponents[1], {hasHeroes = options.hasHeroes}),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			showOffFactionIcons and offFactionIcons(1) or nil,
 			MatchSummaryWidgets.GameCenter{
@@ -163,7 +163,7 @@ function CustomMatchSummary.Game(options, game)
 			showOffFactionIcons and offFactionIcons(2) or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}},
-			CustomMatchSummary.DispalyHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true})
+			CustomMatchSummary.DisplayHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true})
 		)
 	}
 end
@@ -184,7 +184,7 @@ end
 ---@param opponent table
 ---@param options {hasHeroes: boolean?, flipped: boolean?}
 ---@return Html?
-function CustomMatchSummary.DispalyHeroes(opponent, options)
+function CustomMatchSummary.DisplayHeroes(opponent, options)
 	if not options.hasHeroes then return nil end
 
 	local heroesPerPlayer = Array.map(opponent.players or {}, function(player)
