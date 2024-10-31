@@ -21,16 +21,17 @@ local MatchSummaryDetailedScore = Class.new(Widget)
 function MatchSummaryDetailedScore:render()
 	local flipped = self.props.flipped
 	local partialScores = Array.map(self.props.partialScores or {}, function(partialScore)
+		local children = {partialScore.score, partialScore.icon}
 		return HtmlWidgets.Td{
 			classes = {'brkts-popup-body-match-sidewins', partialScore.style},
-			children = partialScore.score
+			children = flipped and Array.reverse(children) or children,
 		}
 	end)
 
 	return HtmlWidgets.Div{
-		css = {width = '70px', textAlign = 'center', direction = flipped and 'rtl' or 'ltr'},
+		css = {width = '70px', ['text-align'] = 'center', direction = flipped and 'rtl' or 'ltr'},
 		children = HtmlWidgets.Table{
-			css = {lineHeight = '28px', float = flipped and 'right' or 'left'},
+			css = {['line-height'] = '28px', float = flipped and 'right' or 'left'},
 			children = {
 				HtmlWidgets.Tr{
 					children = {

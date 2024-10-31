@@ -106,7 +106,6 @@ function CustomMatchSummary._createMap(game)
 
 	local function makePartialScores(halves, firstSide)
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
-
 		return {
 			{style = 'brkts-valorant-score-color-' .. firstSide, score = halves[firstSide]},
 			{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves[oppositeSide]},

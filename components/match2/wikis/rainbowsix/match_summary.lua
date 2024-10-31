@@ -269,49 +269,28 @@ function CustomMatchSummary._createMap(game)
 		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
 	end
 
-
-	-- Score
-	local team1Score = Score():setLeft()
-	local team2Score = Score():setRight()
-
-	-- Score Team 1
-	team1Score:setMapScore(scoreDisplay(1))
-
-	-- Detailed scores
-	local team1Halfs = extradata.t1halfs or {}
-	local team2Halfs = extradata.t2halfs or {}
-	local firstSides = extradata.t1firstside or {}
-
-	local firstSide = (firstSides.rt or ''):lower()
-	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
-
-	if not Logic.isEmpty(firstSide) then
-		-- Regular Time for Team 1
-		team1Score:setFirstRoundScore(firstSide, team1Halfs[firstSide], POSITION_LEFT)
-		team1Score:setSecondRoundScore(oppositeSide, team1Halfs[oppositeSide], POSITION_LEFT)
-
-		-- Overtime for both, if applicable
-		local firstSideOvertime = firstSides.ot
-		local oppositeSideOvertime = CustomMatchSummary._getOppositeSide(firstSideOvertime)
-
-		if not Logic.isEmpty(firstSideOvertime) then
-			team1Score:setFirstOvertimeRoundScore(firstSideOvertime, team1Halfs['ot' .. firstSideOvertime], POSITION_LEFT)
-			team1Score:setSecondOvertimeRoundScore(oppositeSideOvertime, team1Halfs['ot' .. oppositeSideOvertime], POSITION_LEFT)
-
-			team2Score:setFirstOvertimeRoundScore(oppositeSideOvertime, team2Halfs['ot' .. oppositeSideOvertime], POSITION_RIGHT)
-			team2Score:setSecondOvertimeRoundScore(firstSideOvertime, team2Halfs['ot' .. firstSideOvertime], POSITION_RIGHT)
-		else
-			team1Score:addEmptyOvertime()
-			team2Score:addEmptyOvertime()
-		end
-
-		-- Regular Time for Team 2
-		team2Score:setFirstRoundScore(oppositeSide, team2Halfs[oppositeSide], POSITION_RIGHT)
-		team2Score:setSecondRoundScore(firstSide, team2Halfs[firstSide], POSITION_RIGHT)
+	local function makePartialScores(halves, firstSide)
+		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+		return {
+			{style = 'brkts-popup-body-match-sidewins', score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
+			{style = 'brkts-popup-body-match-sidewins', score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
+			{
+				style = 'brkts-popup-body-match-sidewins-overtime',
+				score = halves['ot' .. firstSide],
+				icon = ROUND_ICONS['ot' .. firstSide]
+			},
+			{
+				style = 'brkts-popup-body-match-sidewins-overtime',
+				score = halves['ot' .. oppositeSide],
+				icon = ROUND_ICONS['ot' .. oppositeSide]
+			},
+		}
 	end
 
-	-- Score Team 2
-	team2Score:setMapScore(scoreDisplay(2))
+	-- Detailed scores
+	local firstSides = extradata.t1firstside or {}
+	local firstSide = (firstSides.rt or ''):lower()
+	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 
 	-- Operator bans
 	local operatorBans = {team1 = extradata.t1bans or {}, team2 = extradata.t2bans or {}}
@@ -330,7 +309,13 @@ function CustomMatchSummary._createMap(game)
 		row:addElement(team1OperatorBans:create())
 	end
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1, POSITION_LEFT))
-	row:addElement(team1Score:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{
+		score = scoreDisplay(1),
+		partialScores = makePartialScores(
+			extradata.t1halfs or {},
+			firstSide
+		)
+	})
 
 	local centerNode = mw.html.create('div')
 	centerNode	:addClass('brkts-popup-spaced')
@@ -344,7 +329,13 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	row:addElement(centerNode)
-	row:addElement(team2Score:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{
+		score = scoreDisplay(2),
+		partialScores = makePartialScores(
+			extradata.t2halfs or {},
+			oppositeSide
+		)
+	})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2, POSITION_RIGHT))
 	if team2OperatorBans ~= nil then
 		row:addElement(team2OperatorBans:create())
