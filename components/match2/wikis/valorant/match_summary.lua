@@ -71,82 +71,6 @@ function Agents:create()
 	return self.root
 end
 
----@class ValorantScore
----@operator call: ValorantScore
----@field root Html
----@field table Html
----@field top Html
----@field bottom Html
-local Score = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.table = self.root:tag('table'):css('line-height', '20px'):css('text-align', 'center')
-		self.top = mw.html.create('tr')
-		self.bottom = mw.html.create('tr')
-	end
-)
-
----@return self
-function Score:setLeft()
-	self.root	:css('float', 'left')
-				:css('margin-left', '4px')
-
-	return self
-end
-
----@return self
-function Score:setRight()
-	self.root	:css('float', 'right')
-				:css('margin-right', '4px')
-
-	return self
-end
-
----@param score string?
----@return self
-function Score:setMapScore(score)
-	local mapScore = mw.html.create('td')
-			:attr('rowspan', '2')
-			:css('font-size', '16px')
-			:css('width', '24px')
-			:wikitext(score)
-	self.top:node(mapScore)
-
-	return self
-end
-
----@param side string
----@param score number
----@return self
-function Score:addTopRoundScore(side, score)
-	local roundScore = mw.html.create('td')
-	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:addClass('brkts-valorant-score-color-' .. side)
-				:css('width', '12px')
-				:wikitext(score)
-	self.top:node(roundScore)
-	return self
-end
-
----@param side string
----@param score number
----@return self
-function Score:addBottomRoundScore(side, score)
-	local roundScore = mw.html.create('td')
-	roundScore	:addClass('bracket-popup-body-match-sidewins')
-				:addClass('brkts-valorant-score-color-' .. side)
-				:css('width', '12px')
-				:wikitext(score)
-	self.bottom:node(roundScore)
-	return self
-end
-
----@return Html
-function Score:create()
-	self.table:node(self.top):node(self.bottom)
-	return self.root
-end
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -177,6 +101,21 @@ function CustomMatchSummary._createMap(game)
 	end
 	local row = MatchSummary.Row()
 
+	local function scoreDisplay(oppIdx)
+		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+	end
+
+	local function makePartialScores(halves, firstSide)
+		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+
+		return {
+			{style = 'brkts-valorant-score-color-' .. firstSide, score = halves[firstSide]},
+			{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves[oppositeSide]},
+			{style = 'brkts-valorant-score-color-' .. firstSide, score = halves['ot' .. firstSide]},
+			{style = 'brkts-valorant-score-color-' .. oppositeSide, score = halves['ot' .. oppositeSide]},
+		}
+	end
+
 	local team1Agents = Agents():setLeft()
 	local team2Agents = Agents():setRight()
 	for _, playerStats in ipairs((game.opponents[1] or {}).players) do
@@ -187,39 +126,18 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	local extradata = game.extradata or {}
-	local score1 = Score():setLeft()
-	local score2 = Score():setRight()
-
-	score1:setMapScore(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
-
-	if not Table.isEmpty(extradata) then
-		-- Detailed scores
-		local team1Halfs = extradata.t1halfs or {}
-		local team2Halfs = extradata.t2halfs or {}
-		local firstSide = string.lower(extradata.t1firstside or '')
-		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
-
-		score1:addTopRoundScore(firstSide, team1Halfs[firstSide])
-		score1:addBottomRoundScore(oppositeSide, team1Halfs[oppositeSide])
-
-		score1:addTopRoundScore(firstSide, team1Halfs['ot' .. firstSide])
-		score1:addBottomRoundScore(oppositeSide, team1Halfs['ot' .. oppositeSide])
-
-		score2:addTopRoundScore(oppositeSide, team2Halfs['ot' .. oppositeSide])
-		score2:addBottomRoundScore(firstSide, team2Halfs['ot' .. firstSide])
-
-		score2:addTopRoundScore(oppositeSide, team2Halfs[oppositeSide])
-		score2:addBottomRoundScore(firstSide, team2Halfs[firstSide])
-	end
-
-
-	score2:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
 	if team1Agents ~= nil then
 		row:addElement(team1Agents:create())
 	end
-	row:addElement(score1:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{
+		score = scoreDisplay(1),
+		partialScores = makePartialScores(
+			extradata.t1halfs or {},
+			extradata.t1firstside or ''
+		)
+	})
 
 	local centerNode = mw.html.create('div')
 	centerNode	:addClass('brkts-popup-spaced')
@@ -228,11 +146,17 @@ function CustomMatchSummary._createMap(game)
 				:css('text-align', 'center')
 
 	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popup-spaced-map-skip')
+		centerNode:addClass('brkts-popupspaced-map-skip')
 	end
 
 	row:addElement(centerNode)
-	row:addElement(score2:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{
+		score = scoreDisplay(2),
+		partialScores = makePartialScores(
+			extradata.t2halfs or {},
+			CustomMatchSummary._getOppositeSide(extradata.t2firstside or '')
+		)
+	})
 
 	if team2Agents ~= nil then
 		row:addElement(team2Agents:create())

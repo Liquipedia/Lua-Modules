@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -20,86 +19,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
--- Score Class
----@class ZulaScore
----@operator call(string|number|nil): ZulaScore
----@field root Html
----@field table Html
----@field top Html
----@field bottom Html
-local Score = Class.new(
-	function(self, direction)
-		self.root = mw.html.create('div')
-			:css('width','70px')
-			:css('text-align', 'center')
-			:css('direction', direction)
-		self.table = self.root:tag('table'):css('line-height', '29px')
-		self.top = mw.html.create('tr')
-		self.bottom = mw.html.create('tr')
-	end
-)
-
----@return ZulaScore
-function Score:setLeft()
-	self.table:css('float', 'left')
-	return self
-end
-
----@return ZulaScore
-function Score:setRight()
-	self.table:css('float', 'right')
-	return self
-end
-
----@param score string|number|nil
----@return ZulaScore
-function Score:setMapScore(score)
-	local mapScore = mw.html.create('td')
-	mapScore
-		:attr('rowspan', 2)
-		:css('font-size', '16px')
-		:css('width', '25px')
-		:wikitext(score or '')
-
-	self.top:node(mapScore)
-
-	return self
-end
-
----@param side string
----@param score number
----@return ZulaScore
-function Score:setFirstHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.top:node(halfScore)
-	return self
-end
-
----@param side string
----@param score number
----@return ZulaScore
-function Score:setSecondHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.bottom:node(halfScore)
-	return self
-end
-
----@return Html
-function Score:create()
-	self.table:node(self.top):node(self.bottom)
-	return self.root
-end
 
 local CustomMatchSummary = {}
 
@@ -128,32 +47,6 @@ function CustomMatchSummary._createMap(game)
 		return
 	end
 	local row = MatchSummary.Row()
-	local extradata = game.extradata or {}
-
-	-- Score
-	local team1Score = Score():setLeft()
-	local team2Score = Score('rtl'):setRight()
-
-	-- Teams map score
-	team1Score:setMapScore(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
-	team2Score:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
-
-	local t1sides = extradata['t1sides'] or {}
-	local t2sides = extradata['t2sides'] or {}
-	local t1halfs = extradata['t1halfs'] or {}
-	local t2halfs = extradata['t2halfs'] or {}
-
-	-- Teams half scores
-	for sideIndex, side in ipairs(t1sides) do
-		local oppositeSide = t2sides[sideIndex]
-		if math.fmod(sideIndex, 2) == 1 then
-			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
-			team2Score:setFirstHalfScore(t2halfs[sideIndex], oppositeSide)
-		else
-			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
-			team2Score:setSecondHalfScore(t2halfs[sideIndex], oppositeSide)
-		end
-	end
 
 	-- Map Info
 	local mapInfo = mw.html.create('div')
@@ -171,11 +64,11 @@ function CustomMatchSummary._createMap(game)
 
 	-- Build the HTML
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(team1Score:create())
+	row:addElement(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
 
 	row:addElement(mapInfo)
 
-	row:addElement(team2Score:create())
+	row:addElement(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
 	-- Add Comment

@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
@@ -25,86 +24,6 @@ local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-tex
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
-
--- Score Class
----@class CounterstrikeScore
----@operator call: CounterstrikeScore
----@field root Html
----@field table Html
----@field top Html
----@field bottom Html
-local Score = Class.new(
-	function(self, direction)
-		self.root = mw.html.create('div')
-			:css('width','70px')
-			:css('text-align', 'center')
-			:css('direction', direction)
-		self.table = self.root:tag('table'):css('line-height', '29px')
-		self.top = mw.html.create('tr')
-		self.bottom = mw.html.create('tr')
-	end
-)
-
----@return self
-function Score:setLeft()
-	self.table:css('float', 'left')
-	return self
-end
-
----@return self
-function Score:setRight()
-	self.table:css('float', 'right')
-	return self
-end
-
----@param score string|number|nil
----@return self
-function Score:setMapScore(score)
-	local mapScore = mw.html.create('td')
-	mapScore
-		:attr('rowspan', 2)
-		:css('font-size', '16px')
-		:css('width', '25px')
-		:wikitext(score or '')
-
-	self.top:node(mapScore)
-
-	return self
-end
-
----@param side string
----@param score number
----@return self
-function Score:setFirstHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.top:node(halfScore)
-	return self
-end
-
----@param side string
----@param score number
----@return self
-function Score:setSecondHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.bottom:node(halfScore)
-	return self
-end
-
----@return Html
-function Score:create()
-	self.table:node(self.top):node(self.bottom)
-	return self.root
-end
 
 ---@param args table
 ---@return Html
@@ -289,29 +208,19 @@ function CustomMatchSummary._createMap(game)
 		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
 	end
 
-	-- Score
-	local team1Score = Score():setLeft()
-	local team2Score = Score('rtl'):setRight()
+	-- Teams scores
+	local t1sides = extradata.t1sides or {}
+	local t2sides = extradata.t2sides or {}
+	local t1halfs = extradata.t1halfs or {}
+	local t2halfs = extradata.t2halfs or {}
 
-	-- Teams map score
-	team1Score:setMapScore(scoreDisplay(1))
-	team2Score:setMapScore(scoreDisplay(2))
-
-	local t1sides = extradata['t1sides'] or {}
-	local t2sides = extradata['t2sides'] or {}
-	local t1halfs = extradata['t1halfs'] or {}
-	local t2halfs = extradata['t2halfs'] or {}
-
-	-- Teams half scores
-	for sideIndex, side in ipairs(t1sides) do
-		local oppositeSide = t2sides[sideIndex]
-		if math.fmod(sideIndex, 2) == 1 then
-			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
-			team2Score:setFirstHalfScore(t2halfs[sideIndex], oppositeSide)
-		else
-			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
-			team2Score:setSecondHalfScore(t2halfs[sideIndex], oppositeSide)
-		end
+	local team1Scores = {}
+	local team2Scores = {}
+	for sideIndex in ipairs(t1sides) do
+		local side1, side2 = t1sides[sideIndex], t2sides[sideIndex]
+		local score1, score2 = t1halfs[sideIndex], t2halfs[sideIndex]
+		table.insert(team1Scores, {style = side1 and ('brkts-cs-score-color-'.. side1) or nil, score = score1})
+		table.insert(team2Scores, {style = side2 and ('brkts-cs-score-color-'.. side2) or nil, score = score2})
 	end
 
 	-- Map Info
@@ -330,11 +239,11 @@ function CustomMatchSummary._createMap(game)
 
 	-- Build the HTML
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(team1Score:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{score = scoreDisplay(1), partialScores = team1Scores})
 
 	row:addElement(mapInfo)
 
-	row:addElement(team2Score:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{score = scoreDisplay(2), partialScores = team2Scores})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
 	-- Add Comment
