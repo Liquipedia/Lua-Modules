@@ -16,6 +16,8 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Streams = Lua.import('Module:Links/Stream')
 
+local DEFAULT_BESTOF = 1
+
 local CustomMatchGroupInput = {}
 
 -- called from Module:MatchGroup
@@ -33,6 +35,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	end)
 
 	local games = CustomMatchGroupInput.extractMaps(match, opponents)
+
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and CustomMatchGroupInput.calculateMatchScore(games)
 		or nil
@@ -46,7 +49,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		}, autoScoreFunction)
 	end)
 
-	match.bestof = tonumber(match.bestof)
+	match.bestof = CustomMatchGroupInput.getBestOf(match.bestof)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
@@ -104,6 +107,19 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 	end
 
 	return maps
+end
+
+---@param bestofInput string|integer?
+---@return integer?
+function CustomMatchGroupInput.getBestOf(bestofInput)
+	local bestof = tonumber(bestofInput)
+
+	if bestof then
+		Variables.varDefine('bestof', bestof)
+		return bestof
+	end
+
+	return tonumber(Variables.varDefault('bestof')) or DEFAULT_BESTOF
 end
 
 ---@return fun(opponentIndex: integer): integer
