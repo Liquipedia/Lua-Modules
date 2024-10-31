@@ -22,7 +22,6 @@ local MatchSummaryCollapsible = Class.new(Widget)
 MatchSummaryCollapsible.defaultProps = {
 	classes = {},
 	tableCss = {},
-	children = {},
 }
 
 ---@return Widget
