@@ -207,6 +207,7 @@ end
 ---@param numberOfGames integer
 ---@return table
 function MatchFunctions.getExtraData(match, numberOfGames)
+	---@type table<string, string|table|nil>
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
