@@ -51,7 +51,6 @@ end
 ---@return Html?
 function CustomMatchSummary._createGame(game)
 	if not game.winner then return end
-	game.extradata = game.extradata or {}
 
 	local team1Characters = Array.map((game.opponents[1] or {}).players or {}, Operator.property('character'))
 	local team2Characters = Array.map((game.opponents[2] or {}).players or {}, Operator.property('character'))
