@@ -11,7 +11,6 @@ local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
-local HeroData = mw.loadData('Module:HeroData')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -34,6 +33,7 @@ local ICONS = {
 }
 
 local TBD = 'TBD'
+local DEFAULT_HERO = 'default'
 
 local CustomMatchSummary = {}
 --local StarcraftMatchSummary = CustomMatchSummary
@@ -187,7 +187,7 @@ function CustomMatchSummary.DispalyHeroes(opponent, options)
 
 	local heroesPerPlayer = Array.map(opponent.players or {}, function(player)
 		return Array.map(Array.range(1, 3), function(heroIndex)
-			return HeroData[((player.heroes or {})[heroIndex] or ''):lower()] or HeroData.default
+			return (player.heroes or {})[heroIndex] or DEFAULT_HERO
 		end)
 	end)
 
