@@ -106,12 +106,6 @@ local contentLanguage = mw.getContentLanguage()
 ---@field team string?
 ---@field template string
 
----@deprecated
----@class MatchGroupInputReadPlayersOfTeamOptions
----@field maxNumPlayers integer?
----@field resolveRedirect boolean?
----@field applyUnderScores boolean?
-
 ---@class readOpponentOptions
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
