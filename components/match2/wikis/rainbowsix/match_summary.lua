@@ -70,20 +70,21 @@ function CustomMatchSummary._createMap(game)
 			end)
 		}
 	end
-	local function makePartialScores(halves, firstSide)
+	local function makePartialScores(halves, firstSide, firstSideOt)
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+		local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
 		return {
 			{style = 'brkts-popup-body-match-sidewins', score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
 			{style = 'brkts-popup-body-match-sidewins', score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
 			{
 				style = 'brkts-popup-body-match-sidewins-overtime',
-				score = halves['ot' .. firstSide],
-				icon = ROUND_ICONS['ot' .. firstSide]
+				score = halves['ot' .. firstSideOt],
+				icon = ROUND_ICONS['ot' .. firstSideOt]
 			},
 			{
 				style = 'brkts-popup-body-match-sidewins-overtime',
-				score = halves['ot' .. oppositeSide],
-				icon = ROUND_ICONS['ot' .. oppositeSide]
+				score = halves['ot' .. oppositeSideOt],
+				icon = ROUND_ICONS['ot' .. oppositeSideOt]
 			},
 		}
 	end
@@ -91,7 +92,7 @@ function CustomMatchSummary._createMap(game)
 	-- Detailed scores
 	local firstSides = extradata.t1firstside or {}
 	local firstSide = (firstSides.rt or ''):lower()
-	local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
+	local firstSideOt = (firstSides.ot or ''):lower()
 
 	-- Operator bans
 
@@ -101,7 +102,8 @@ function CustomMatchSummary._createMap(game)
 		score = scoreDisplay(1),
 		partialScores = makePartialScores(
 			extradata.t1halfs or {},
-			firstSide
+			firstSide,
+			firstSideOt
 		)
 	})
 
@@ -122,7 +124,8 @@ function CustomMatchSummary._createMap(game)
 		score = scoreDisplay(2),
 		partialScores = makePartialScores(
 			extradata.t2halfs or {},
-			oppositeSide
+			CustomMatchSummary._getOppositeSide(firstSide),
+			CustomMatchSummary._getOppositeSide(firstSideOt)
 		)
 	})
 	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
