@@ -226,7 +226,7 @@ function League:createInfobox()
 					return
 				end
 				local onlineOrOffline = tostring(args.type or ''):lower()
-				if not onlineOrOffline:match('offline') then
+				if Logic.readBool(args['event-without-crowd']) or not onlineOrOffline:match('offline') then
 					return
 				end
 				local locations = Locale.formatLocations(args)
@@ -236,6 +236,13 @@ function League:createInfobox()
 				end
 				-- Must have a venue or a city to show the accommodation section
 				if not locations.venue1 and not locations.city1 then
+					return
+				end
+
+				-- if the event is finished do not show the button
+				local osdateCuttoff = DateExt.parseIsoDate(endDate)
+				osdateCuttoff.day = osdateCuttoff.day + 2
+				if os.difftime(os.time(), os.time(osdateCuttoff)) > 0 then
 					return
 				end
 
