@@ -160,7 +160,7 @@ function StarcraftMatchSummary.Game(options, game)
 		css = {width = options.isPartOfSubMatch and '100%' or nil},
 		children = WidgetUtil.collect(
 			game.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'},  children = {game.header}},
+				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
@@ -196,7 +196,7 @@ function StarcraftMatchSummary.TeamSubmatch(submatch)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			submatch.header and {
-				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'},  children = {submatch.header}},
+				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
 				MatchSummaryWidgets.Break{},
 			} or nil,
 			StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch),
