@@ -8,37 +8,24 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local CharacterIcon = require('Module:CharacterIcon')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
-local DRAW_LINE = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'}
-local NO_CHECK = '[[File:NoCheck.png|link=|16px]]'
 
 local CustomMatchSummary = {}
 
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
-		width = CustomMatchSummary._determineWidth,
-		teamStyle = 'bracket',
-	})
-end
-
----@param match MatchGroupUtilMatch
----@return string
-function CustomMatchSummary._determineWidth(match)
-	return '350px'
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
@@ -62,66 +49,30 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param game MatchGroupUtilGame
----@param paricipantId string
----@return {displayName: string?, pageName: string?, flag: string?, char: string?}
-function CustomMatchSummary._getPlayerData(game, paricipantId)
-	if not game or not game.participants then
-		return {}
-	end
-	return game.participants[paricipantId] or {}
-end
-
----@param game MatchGroupUtilGame
 ---@return Html?
 function CustomMatchSummary._createGame(game)
 	if not game.map and not game.winner then return end
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
-		:css('font-size', '0.75rem')
-		:css('padding', '4px')
-		:css('min-height', '24px')
 
-	game.extradata = game.extradata or {}
+	local team1Characters = Array.map((game.opponents[1] or {}).players or {}, Operator.property('char'))
+	local team2Characters = Array.map((game.opponents[2] or {}).players or {}, Operator.property('char'))
 
-	local char1 = CustomMatchSummary._createCharacterIcon(CustomMatchSummary._getPlayerData(game, '1_1').char)
-	local char2 = CustomMatchSummary._createCharacterIcon(CustomMatchSummary._getPlayerData(game, '2_1').char)
+	local map = HtmlWidgets.Div{
+		children = DisplayHelper.MapAndStatus(game),
+		classes = {'brkts-popup-spaced'},
+		css = {['flex-grow'] = '1'}
+	}
 
-	row:addElement(char1)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
-	row:addElement(mw.html.create('div')
-			:addClass('brkts-popup-spaced'):css('flex-grow', '1')
-			:wikitext(DisplayHelper.MapAndStatus(game))
-	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-	row:addElement(char2)
-
-	return row:create()
-end
-
----@param char string?
----@return Html
-function CustomMatchSummary._createCharacterIcon(char)
-	return mw.html.create('span')
-		:addClass('draft faction')
-		:wikitext(CharacterIcon.Icon{
-			character = char,
-			size = '18px',
-		})
-end
-
----@param winner integer|string
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
-	return mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:css('line-height', '17px')
-			:css('margin-left', (opponentIndex == 1) and '10%' or '1%')
-			:css('margin-right', (opponentIndex == 2) and '10%' or '1%')
-			:wikitext(
-				winner == opponentIndex and GREEN_CHECK
-				or winner == 0 and DRAW_LINE or NO_CHECK
-			)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '80%', padding = '4px', ['min-height'] = '24px'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.Characters{characters = team1Characters, flipped = false},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			map,
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.Characters{characters = team2Characters, flipped = true}
+		)
+	}
 end
 
 return CustomMatchSummary
