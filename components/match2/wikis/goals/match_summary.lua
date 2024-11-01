@@ -44,7 +44,7 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
+			MatchSummaryWidgets.GameCenter{children = ('Game ' .. gameIndex)},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
