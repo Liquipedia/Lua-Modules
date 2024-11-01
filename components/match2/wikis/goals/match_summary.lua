@@ -38,12 +38,7 @@ end
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-	local hasSubMatches = Logic.readBool((match.extradata or {}).hassubmatches)
-
 	local games = Array.map(match.games, function(game)
-		if hasSubMatches then
-			return CustomMatchSummary._createSubMatch(game, match):create()
-		end
 		return CustomMatchSummary._createGame(game):create()
 	end)
 
@@ -70,47 +65,6 @@ function CustomMatchSummary._createGame(game)
 		)
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
 		:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row
-			:addElement(MatchSummaryWidgets.Break{})
-			:addElement(mw.html.create('div')
-				:wikitext(game.comment)
-				:css('margin', 'auto')
-			)
-	end
-	return row
-end
-
----@param game MatchGroupUtilGame
----@param match MatchGroupUtilMatch
----@return MatchSummaryRow
-function CustomMatchSummary._createSubMatch(game, match)
-	local row = MatchSummary.Row()
-			:addClass('brkts-popup-body-game')
-			:css('font-size', '84%')
-			:css('padding', '4px')
-			:css('min-height', '32px')
-	local players = CustomMatchSummary._extractPlayersFromGame(game, match)
-
-	row
-		-- player left side
-		:addElement(CustomMatchSummary._players(players[1], 1, game.winner))
-		-- score
-		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
-		-- penalty score
-		:addElement(CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 1)))
-		:addElement(mw.html.create('div')
-			:addClass('brkts-popup-body-element-vertical-centered')
-			:wikitext(' vs ')
-		)
-		-- penalty score
-		:addElement(CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 2)))
-		-- score
-		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
-		-- player right side
-		:addElement(CustomMatchSummary._players(players[2], 2, game.winner))
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -173,20 +127,6 @@ function CustomMatchSummary._score(score)
 	return mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext(score)
-end
-
----@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return string
-function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
-	local scores = (game.extradata or {}).penaltyscores
-
-	if not scores then return NO_CHECK end
-
-	return Abbreviation.make(
-		'(' .. (scores[opponentIndex] or 0) .. ')',
-		'Penalty shoot-out'
-	)--[[@as string]]
 end
 
 ---@param players table[]
