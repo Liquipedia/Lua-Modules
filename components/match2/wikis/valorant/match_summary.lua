@@ -99,7 +99,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '480px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
 
 ---@param match MatchGroupUtilMatch
@@ -164,7 +164,7 @@ function CustomMatchSummary._createMap(game)
 	local centerNode = mw.html.create('div')
 	centerNode	:addClass('brkts-popup-spaced')
 				:wikitext('[[' .. game.map .. ']]')
-				:css('width', '100px')
+				:css('width', '68px')
 				:css('text-align', 'center')
 
 	if game.resultType == 'np' then
