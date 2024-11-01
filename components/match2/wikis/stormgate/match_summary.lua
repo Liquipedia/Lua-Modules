@@ -90,7 +90,7 @@ function CustomMatchSummary.computeMatchOfffactions(match)
 	Array.forEach(match.games, function(game)
 		game.offfactions = {}
 		Array.forEach(game.opponents, function(gameOpponent, opponentIndex)
-			game.offfactions[opponentIndex] = MatchGroupUtil.computeOfffactions(
+			game.offfactions[opponentIndex] = MatchGroupUtil.computeOffFactions(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
