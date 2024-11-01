@@ -33,7 +33,7 @@ function MatchSummaryCharacter:render()
 	}
 	local children = { characterIcon }
 	if self.props.showName then
-		children = {self.props.character, ' ', characterIcon}
+		children = {characterIcon, ' ', self.props.character}
 	end
 
 	return Div{
