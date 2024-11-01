@@ -111,15 +111,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['riot-highlighted'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args['riot-highlighted']) or Logic.readBool(args['riot-sponsored']) then
+	if String.isNotEmpty(self.data.publishertier) then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
