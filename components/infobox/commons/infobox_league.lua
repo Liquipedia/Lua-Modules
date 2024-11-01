@@ -229,25 +229,21 @@ function League:createInfobox()
 				if not onlineOrOffline:match('offline') then
 					return
 				end
-				local venues = League._parseVenues(args)
+				local locations = Locale.formatLocations(args)
 				-- If more than one venue, don't show the accommodation section, as it is unclear which one the link is for
-				if #venues > 1 then
+				if locations.venue2 or locations.city2 then
 					return
 				end
-				local location = (venues[1] or {}).id
-
-				-- If the event has no known venue, show based on the city instead, if there's only one city
-				if not location then
-					local locations = Locale.formatLocations(args)
-					if not locations.city1 or locations.city2 then
-						return
-					end
-					if locations.country1 or locations.region1 then
-						location = locations.city1 .. ', ' .. Flags.CountryName(locations.country1 or locations.region1)
-					else
-						location = locations.city1
-					end
+				-- Must have a venue or a city to show the accommodation section
+				if not locations.venue1 and not locations.city1 then
+					return
 				end
+
+				local addressParts = {}
+				table.insert(addressParts, locations.venue1)
+				table.insert(addressParts, locations.city1)
+				table.insert(addressParts, Flags.CountryName(locations.country1 or locations.region1))
+
 				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
 				-- End date for the accommodation should be 1 day after the event
 				local osdateEnd = DateExt.parseIsoDate(endDate)
@@ -280,7 +276,7 @@ function League:createInfobox()
 							variant = 'primary',
 							size = 'md',
 							link = buildStay22Link(
-								location,
+								table.concat(addressParts, ', '),
 								DateExt.toYmdInUtc(osdateStart),
 								DateExt.toYmdInUtc(osdateEnd)
 							),
