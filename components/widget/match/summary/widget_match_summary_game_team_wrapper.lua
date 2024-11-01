@@ -8,12 +8,10 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Break = Lua.import('Module:Widget/Match/Summary/Break')
 
 ---@class MatchSummaryMatchGameTeamWrapper: Widget
 ---@operator call(table): MatchSummaryMatchGameTeamWrapper
