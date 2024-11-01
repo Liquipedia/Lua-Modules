@@ -13,7 +13,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -24,8 +23,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
 
 ---@param args table
@@ -78,7 +75,7 @@ function CustomMatchSummary._createGame(date, game)
 		characters = characterData[1],
 		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
 	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:css('min-width', '120px')
@@ -89,7 +86,7 @@ function CustomMatchSummary._createGame(date, game)
 			:wikitext('[[' .. game.map .. ']]')
 		)
 	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 	row:addElement(MatchSummaryWidgets.Characters{
 		flipped = true,
 		date = date,
@@ -112,24 +109,6 @@ function CustomMatchSummary._createGame(date, game)
 	end
 
 	return row:create()
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '27px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if isWinner then
-		container:node(GREEN_CHECK )
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 return CustomMatchSummary

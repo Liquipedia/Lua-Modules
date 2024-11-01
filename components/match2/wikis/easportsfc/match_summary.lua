@@ -9,7 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -22,8 +21,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local DRAW_LINE = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
@@ -62,14 +59,14 @@ function CustomMatchSummary._createGame(game)
 			:css('padding', '4px')
 			:css('min-height', '32px')
 	row
-		:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
+		:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
 		:addElement(mw.html.create('div')
 			:addClass('brkts-popup-body-element-vertical-centered')
 			:wikitext(game.map)
 		)
 		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
-		:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+		:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -148,21 +145,6 @@ function CustomMatchSummary._extractPlayersFromGame(game, match)
 	end
 
 	return players
-end
-
----@param winner integer
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
-	return mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-		:wikitext(
-			winner == opponentIndex and GREEN_CHECK
-			or winner == 0 and DRAW_LINE or NO_CHECK
-		)
 end
 
 ---@param score number|string|nil

@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
@@ -24,10 +23,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local PlayerDisplay = require('Module:Player/Display')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
-local DRAW_LINE = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
 
@@ -135,12 +130,12 @@ function CustomMatchSummary._createGame(game, props)
 	row
 			:css('flex-wrap', 'nowrap')
 			:addElement(faction1)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1, props.soloMode))
+			:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 			:addElement(mw.html.create('div')
 				:addClass('brkts-popup-spaced'):css('flex-grow', '1')
 				:wikitext(DisplayHelper.MapAndStatus(game))
 			)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2, props.soloMode))
+			:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 			:addElement(faction2)
 	return row
 end
@@ -158,22 +153,6 @@ function CustomMatchSummary._createFactionIcon(civ, game)
 			showTitle = true,
 			showLink = true,
 		})
-end
-
----@param winner integer|string
----@param opponentIndex integer
----@param soloMode boolean
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex, soloMode)
-	return mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:css('line-height', '17px')
-			:css('margin-left', (opponentIndex == 1 and soloMode) and '10%' or '1%')
-			:css('margin-right', (opponentIndex == 2 and soloMode) and '10%' or '1%')
-			:wikitext(
-				winner == opponentIndex and GREEN_CHECK
-				or winner == 0 and DRAW_LINE or NO_CHECK
-			)
 end
 
 return CustomMatchSummary
