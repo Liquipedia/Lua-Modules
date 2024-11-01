@@ -239,6 +239,11 @@ function League:createInfobox()
 					return
 				end
 
+				-- Can not contain tba/tbd venue/city
+				if (locations.venue1 or ''):lower():match('tb[ad]') or (locations.city1 or ''):lower():match('tb[ad]') then
+					return
+				end
+
 				local addressParts = {}
 				table.insert(addressParts, locations.venue1)
 				table.insert(addressParts, locations.city1)
