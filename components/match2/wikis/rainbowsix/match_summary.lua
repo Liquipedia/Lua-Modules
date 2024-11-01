@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -17,9 +16,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local POSITION_LEFT = 1
-local POSITION_RIGHT = 2
 
 local ROUND_ICONS = {
 	atk = '[[File:R6S Para Bellum atk logo.png|14px|link=]]',
