@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
