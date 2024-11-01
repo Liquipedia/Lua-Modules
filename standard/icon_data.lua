@@ -84,4 +84,7 @@ return {
 	-- Usage: Deadlock
 	amberhand = 'fas fa-hand-paper',
 	sapphireflame = 'fas fa-fire',
+
+	-- Usage: Accommodations
+	accommodation = 'far fa-home-alt',
 }
