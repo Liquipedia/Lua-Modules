@@ -110,8 +110,8 @@ function TransferRow:_readBaseData()
 		return {name = teamData.page, template = teamData.templatename}
 	end
 
-	local toTeam = Array.map({args.team2 or '', args.team2_2 or ''}, FnUtil.curry(checkTeam, date))
-	local fromTeam = Array.map({args.team1 or '', args.team1_2 or ''}, FnUtil.curry(checkTeam, fromDate))
+	local toTeam = Array.map({args.team2, args.team2_2}, FnUtil.curry(checkTeam, date))
+	local fromTeam = Array.map({args.team1, args.team1_2}, FnUtil.curry(checkTeam, fromDate))
 
 	---@param str string?
 	---@return string?
