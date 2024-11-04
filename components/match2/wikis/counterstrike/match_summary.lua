@@ -221,6 +221,7 @@ function CustomMatchSummary._createMap(game)
 	local mapInfo = {
 		mapDisplayName = game.map,
 		map = game.game and (game.map .. '/' .. game.game) or game.map,
+		resultType = game.resultType,
 	}
 
 	return MatchSummaryWidgets.Row{
