@@ -33,7 +33,7 @@ end
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Html?
+---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	if not game.map then
 		return
