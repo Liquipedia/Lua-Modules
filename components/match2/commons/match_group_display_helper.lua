@@ -141,6 +141,21 @@ function DisplayHelper.MapAndStatus(game, config)
 	return mapText .. (statusText or '')
 end
 
+---Displays the map name and map-mode.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.MapAndMode(game, config)
+	local MapModes = require('Module:MapModes')
+
+	local mapText = DisplayHelper.Map(game, config)
+
+	if Logic.isEmpty(game.mode) then
+		return mapText
+	end
+	return MapModes.get{mode = game.mode} .. mapText
+end
+
 ---Displays the map name and link.
 ---@param game MatchGroupUtilGame
 ---@param config {noLink: boolean?}?

@@ -7,8 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
-local MapModes = require('Module:MapModes')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -43,7 +41,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndMode(game)},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -60,16 +58,6 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 	end
 	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
 	return mw.html.create('div'):wikitext(scoreDisplay)
-end
-
----@param game MatchGroupUtilGame
----@return string
-function CustomMatchSummary._getMapDisplay(game)
-	local mapDisplay = DisplayHelper.Map(game)
-	if String.isNotEmpty(game.mode) then
-		mapDisplay = MapModes.get{mode = game.mode} .. mapDisplay
-	end
-	return mapDisplay
 end
 
 return CustomMatchSummary
