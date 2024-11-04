@@ -100,6 +100,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(MatchSummaryWidgets.DetailedScore{
 		score = scoreDisplay(1),
+		flipped = false,
 		partialScores = makePartialScores(
 			extradata.t1halfs or {},
 			firstSide,
@@ -122,6 +123,7 @@ function CustomMatchSummary._createMap(game)
 
 	row:addElement(MatchSummaryWidgets.DetailedScore{
 		score = scoreDisplay(2),
+		flipped = true,
 		partialScores = makePartialScores(
 			extradata.t2halfs or {},
 			CustomMatchSummary._getOppositeSide(firstSide),
