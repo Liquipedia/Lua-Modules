@@ -29,7 +29,7 @@ function MatchSummaryDetailedScore:render()
 	end)
 
 	return HtmlWidgets.Div{
-		css = {width = '70px', ['text-align'] = 'center', direction = flipped and 'rtl' or 'ltr'},
+		css = {['text-align'] = 'center', direction = flipped and 'rtl' or 'ltr'},
 		children = HtmlWidgets.Table{
 			css = {['line-height'] = '28px', float = flipped and 'right' or 'left'},
 			children = {

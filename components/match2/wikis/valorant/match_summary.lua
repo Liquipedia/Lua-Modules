@@ -71,6 +71,7 @@ function CustomMatchSummary._createMap(game)
 	row:addElement(MatchSummaryWidgets.Characters{characters = team1Agents, flipped = false})
 	row:addElement(MatchSummaryWidgets.DetailedScore{
 		score = scoreDisplay(1),
+		flipped = false,
 		partialScores = makePartialScores(
 			extradata.t1halfs or {},
 			extradata.t1firstside or ''
@@ -84,16 +85,17 @@ function CustomMatchSummary._createMap(game)
 				:css('text-align', 'center')
 
 	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popupspaced-map-skip')
+		centerNode:addClass('brkts-popup-spaced-map-skip')
 	end
 
 	row:addElement(centerNode)
 
 	row:addElement(MatchSummaryWidgets.DetailedScore{
 		score = scoreDisplay(2),
+		flipped = true,
 		partialScores = makePartialScores(
 			extradata.t2halfs or {},
-			CustomMatchSummary._getOppositeSide(extradata.t2firstside or '')
+			CustomMatchSummary._getOppositeSide(extradata.t1firstside or '')
 		)
 	})
 	row:addElement(MatchSummaryWidgets.Characters{characters = team2Agents, flipped = true})
@@ -107,6 +109,7 @@ function CustomMatchSummary._createMap(game)
 		row:addElement(comment)
 	end
 
+	row:css('font-size', '85%')
 	row:addClass('brkts-popup-body-game')
 	return row:create()
 end
