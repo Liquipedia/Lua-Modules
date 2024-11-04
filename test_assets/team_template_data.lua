@@ -131,6 +131,18 @@ local data = {
 		shortname = "Liquid",
 		templatename = "team liquid 2024",
 	},
+	-- a non-historical TT
+	streamerzone = {
+		bracketname = "Streamerzone",
+		image = "Streamerzone lightmode.png",
+		imagedark = "Streamerzone darkmode.png",
+		legacyimage = "",
+		legacyimagedark = "",
+		name = "Streamerzone",
+		page = "Streamerzone",
+		shortname = "SZ",
+		templatename = "streamerzone",
+	},
 }
 
 for alias, key in pairs(aliases) do
