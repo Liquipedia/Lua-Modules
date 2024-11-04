@@ -7,17 +7,13 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
@@ -147,22 +143,11 @@ function CustomMatchSummary.createHeader(match, options)
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createGame),
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
-	)}
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
+---@param gameIndex integer
 ---@return Html?
-function CustomMatchSummary._createGame(game)
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	if not game.map then
 		return
 	end
