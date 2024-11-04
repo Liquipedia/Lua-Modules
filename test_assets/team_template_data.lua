@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local aliases = {

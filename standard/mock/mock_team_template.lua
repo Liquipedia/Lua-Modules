@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+-- Warning: This mock ignores the posibility of image/imagedark being unset/empty
+-- and never uses legacyimage/legacyimagedark for that reason
+
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -43,7 +46,7 @@ end
 
 ---@param teamtemplate string
 ---@param date string|number?
----@return {templatename: string, historicaltemplate: string?, shortname: string, name: string, bracketname: string, page: string, icon: string, image: string, imagedark: string, legacyimage: string, legacyimagedark: string}|nil
+---@return teamTemplateData?
 function mockTeamTemplate.raw(teamtemplate, date)
 	assert(type(teamtemplate) == 'string', MISSING_INPUT_ERROR)
 	local cleanedInput = teamtemplate:lower():gsub('_', ' ')
