@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
-local HeroData = mw.loadData('Module:HeroData')
+local CharacterAliases = mw.loadData('Module:CharacterAliases')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapsData = mw.loadData('Module:Maps/data')
@@ -495,7 +495,7 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 
 	local heroes = Array.map(mw.text.split(heroesInput, ','), String.trim)
 	return Array.map(heroes, function(hero)
-		local heroData = HeroData[hero:lower()]
+		local heroData = CharacterAliases[hero:lower()]
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
 
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)

@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
-local HeroData = mw.loadData('Module:HeroData')
+local CharacterAliases = mw.loadData('Module:CharacterAliases')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -27,7 +27,7 @@ local OPPONENT_CONFIG = {
 	pagifyTeamNames = true,
 }
 local TBD = 'TBD'
-local DEFAULT_HERO_FACTION = HeroData.default.faction
+local DEFAULT_HERO_FACTION = CharacterAliases.default.faction
 local MODE_MIXED = 'mixed'
 
 ---@class StormgateParticipant
@@ -207,6 +207,7 @@ end
 ---@param numberOfGames integer
 ---@return table
 function MatchFunctions.getExtraData(match, numberOfGames)
+	---@type table<string, string|table|nil>
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
@@ -467,7 +468,7 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 
 	local heroes = Array.map(mw.text.split(heroesInput, ','), String.trim)
 	return Array.map(heroes, function(hero)
-		local heroData = HeroData[hero:lower()]
+		local heroData = CharacterAliases[hero:lower()]
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
 
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)
