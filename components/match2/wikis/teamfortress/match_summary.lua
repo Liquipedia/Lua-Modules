@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -17,14 +16,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local htmlCreate = mw.html.create
-
----@enum TFMatchIcons
-local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
-	EMPTY = '[[File:NoCheck.png|link=]]',
-}
 
 local CustomMatchSummary = {}
 
@@ -51,7 +42,7 @@ end
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	local score = game.scores[opponentIndex]
 	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
-	return htmlCreate('div'):wikitext(scoreDisplay)
+	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
 ---@param game MatchGroupUtilGame
@@ -70,14 +61,14 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icons.CHECK))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 		:node(CustomMatchSummary._gameScore(game, 1))
 		:css('width', '20%')
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icons.CHECK))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 		:css('width', '20%')
 
 	row:addElement(leftNode)
@@ -97,16 +88,6 @@ function CustomMatchSummary._createMapRow(game)
 	end
 
 	return row:create()
-end
-
----@param showIcon boolean?
----@param icon string?
----@return Html
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, icon)
-	return mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '27px')
-		:node(showIcon and icon or Icons.EMPTY)
 end
 
 return CustomMatchSummary

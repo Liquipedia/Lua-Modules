@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -18,11 +17,6 @@ local Page = require('Module:Page')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local ICONS = {
-	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	empty = '[[File:NoCheck.png|link=]]'
-}
 
 local CustomMatchSummary = {}
 
@@ -91,13 +85,13 @@ function CustomMatchSummary._createMapRow(game)
 			characters = characterData[1],
 			bg = 'brkts-popup-side-color-blue', -- Team 1 is always blue
 		})
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 		:node(MatchSummaryWidgets.Characters{
 			flipped = true,
 			characters = characterData[2],
@@ -121,16 +115,6 @@ function CustomMatchSummary._createMapRow(game)
 	end
 
 	return row:create()
-end
-
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
-	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		return container:node(ICONS[iconType])
-	end
-
-	return container:node(ICONS.empty)
 end
 
 return CustomMatchSummary

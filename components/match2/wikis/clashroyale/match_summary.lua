@@ -11,7 +11,6 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -30,8 +29,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
 local CARD_COLOR_2 = 'red'
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local DEFAULT_CARD = 'default'
 
 local CustomMatchSummary = {}
@@ -102,12 +99,12 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		flip = true,
 		date = date,
 	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:wikitext('Game ' .. gameIndex)
 	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 	row:addElement(CustomMatchSummary._opponentCardsDisplay{
 		data = cardData[2],
 		flip = false,
@@ -294,24 +291,6 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 	)
 
 	return row
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if Logic.readBool(isWinner) then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 ---@param args table

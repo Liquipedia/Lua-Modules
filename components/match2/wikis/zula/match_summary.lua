@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -17,9 +16,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 -- Score Class
 ---@class ZulaScore
@@ -170,13 +166,13 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	-- Build the HTML
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(team1Score:create())
 
 	row:addElement(mapInfo)
 
 	row:addElement(team2Score:create())
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 
 	-- Add Comment
 	if not Logic.isEmpty(game.comment) then
@@ -190,18 +186,6 @@ function CustomMatchSummary._createMap(game)
 	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
 
 	return row:create()
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if isWinner then
-		return container:node(GREEN_CHECK)
-	end
-	return container:node(NO_CHECK)
 end
 
 return CustomMatchSummary

@@ -9,7 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -18,9 +17,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
 
@@ -124,7 +120,7 @@ function CustomMatchSummary._createMapRow(game, gameIndex)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 		:node(CustomMatchSummary._gameScore(game, 1))
 		:node(CustomMatchSummary._percentage(game, 1))
 		:node(CustomMatchSummary._time(game, 1))
@@ -134,7 +130,7 @@ function CustomMatchSummary._createMapRow(game, gameIndex)
 		:node(CustomMatchSummary._time(game, 2))
 		:node(CustomMatchSummary._percentage(game, 2))
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -154,19 +150,6 @@ function CustomMatchSummary._createMapRow(game, gameIndex)
 	end
 
 	return row:create()
-end
-
-function CustomMatchSummary._createCheckMarkOrCross(showIcon)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 return CustomMatchSummary
