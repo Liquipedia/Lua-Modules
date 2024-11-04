@@ -239,7 +239,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 				Logic.isNotEmpty(extradata.otlength) and '(' .. extradata.otlength .. ')' or nil
 			}},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
-			MatchSummaryWidgets.GameComment{children = CustomMatchSummary._timeoutDisplay(extradata.timeout)},
+			CustomMatchSummary._timeoutDisplay(extradata.timeout),
 			MatchSummaryWidgets.GameComment{children = comments}
 		)
 	}
