@@ -53,7 +53,7 @@ function CustomMatchSummary._createMapRow(game)
 		if not Logic.isNumeric(score) then
 			return score
 		end
-		return mw.getContentLanguage():formatNum(score --[[@as integer]])
+		return mw.getContentLanguage():formatNum(tonumber(score) --[[@as integer]])
 	end
 
 	local function makeTeamSection(opponentIndex)
@@ -67,7 +67,7 @@ function CustomMatchSummary._createMapRow(game)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		children = WidgetUtil.colect(
+		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
