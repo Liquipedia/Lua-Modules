@@ -9,7 +9,6 @@
 local CustomMatchGroupInput = {}
 
 local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -263,7 +262,7 @@ function MapFunctions.getExtraData(map)
 		--the following is used to store 'mapXtYgoals' from LegacyMatchLists
 		t1goals = map.t1goals,
 		t2goals = map.t2goals,
-		timeout = Table.isNotEmpty(timeouts) and Json.stringify(timeouts) or nil,
+		timeout = Table.isNotEmpty(timeouts) and timeouts or nil,
 	}
 end
 
