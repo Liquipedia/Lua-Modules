@@ -9,12 +9,11 @@
 -- Warning: This mock ignores the posibility of image/imagedark being unset/empty
 -- and never uses legacyimage/legacyimagedark for that reason
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MockData = Lua.import('Module:TestAssets/TeamTemplate/Data')
+local MockData = Lua.import('test_assets.team_template_data')
 
 local NOT_FOUND_ERROR = '<div class="error">No team template exists for name "${name}".</div>'
 local MISSING_INPUT_ERROR = 'bad argument #1 to "name" (string or number expected, got nil)'
@@ -63,11 +62,17 @@ function mockTeamTemplate.raw(teamtemplate, date)
 	end
 	table.sort(historicals, function(a, b) return a.startDate < b.startDate end)
 
-	local standardizedDate = date and DateExt.toYmdInUtc(date) or os.date('%F') --[[@as string]]
+	-- can not use DateExt.toYmdInUtc as mw.getContentLanguage():formatDate is not mocked
+	local standardizedDate
+	if type(date) == 'number' then
+		standardizedDate = os.date('%F', date)
+	else
+		standardizedDate = String.nilIfEmpty(date) or os.date('%F') --[[@as string]]
+	end
 
 	for index, info in ipairs(historicals) do
-		local endDate = historicals[index + 1].startDate or DateExt.toYmdInUtc(DateExt.maxTimestamp)
-		if standardizedDate >= info.startDate and standardizedDate < endDate then
+		local endDate = (historicals[index + 1] or {}).startDate or os.date('%F')
+		if standardizedDate >= info.startDate and standardizedDate <= endDate then
 			return MockData[info.name]
 		end
 	end
