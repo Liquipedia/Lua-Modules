@@ -9,6 +9,8 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -18,6 +20,7 @@ local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -179,36 +182,6 @@ function Row:create()
 	return self.root
 end
 
----@class MatchSummaryBody
----@operator call: MatchSummaryBody
----@field root Html
-local Body = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-body')
-	end
-)
-
----@param cssClass string?
----@return MatchSummaryBody
-function Body:addClass(cssClass)
-	self.root:addClass(cssClass)
-	return self
-end
-
----@param row MatchSummaryRowInterface?
----@return MatchSummaryBody
-function Body:addRow(row)
-	if not row then return self end
-	self.root:node(row:create())
-	return self
-end
-
----@return Html
-function Body:create()
-	return self.root
-end
-
 ---@class MatchSummaryFooter
 ---@operator call: MatchSummaryFooter
 ---@field root Html
@@ -302,16 +275,10 @@ function Match:header(header)
 	return self
 end
 
----@param body MatchSummaryBody|Widget
+---@param body Widget
 ---@return MatchSummaryMatch
 function Match:body(body)
-	if type(body.create) == 'function' then
-		---@cast body MatchSummaryBody
-		self.bodyElement = body:create()
-	else
-		---@cast body Widget
-		self.bodyElement = body
-	end
+	self.bodyElement = body
 	return self
 end
 
@@ -346,7 +313,6 @@ end
 ---@class MatchSummary
 ---@operator call(string?):MatchSummary
 ---@field Header MatchSummaryHeader
----@field Body MatchSummaryBody
 ---@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
 ---@field Match MatchSummaryMatch
@@ -355,7 +321,6 @@ end
 ---@field root Html?
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
-MatchSummary.Body = Body
 MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Match = Match
@@ -425,6 +390,21 @@ function MatchSummary.createDefaultHeader(match, options)
 		:leftScore(header:createScore(match.opponents[1]))
 		:rightScore(header:createScore(match.opponents[2]))
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right', teamStyle))
+end
+
+-- Default body function
+---@param match table
+---@return Widget
+function MatchSummary.createDefaultBody(match, createGame)
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+	)}
 end
 
 ---Default footer function
@@ -525,7 +505,8 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
 	match:header(createHeader(matchData, options))
 
-	match:body(CustomMatchSummary.createBody(matchData))
+	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
+	match:body(createBody(matchData, CustomMatchSummary.createGame))
 
 	local substituteComment = MatchSummary.createSubstitutesComment(matchData)
 
@@ -545,7 +526,10 @@ end
 ---@param options {teamStyle: teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
-	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
+	assert(
+		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
+		'createBody(match) or createGame(date, game, gameIndex) must be implemented in Module:MatchSummary'
+	)
 
 	options = options or {}
 
