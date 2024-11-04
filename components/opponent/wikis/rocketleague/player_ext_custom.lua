@@ -32,7 +32,7 @@ function PlayerExtCustom._fetchTeamFromPlacement(resolvedPageName, date)
 	local conditions = {
 		'[[opponenttype::solo]]', -- can not use Opponent.solo due to circular requires
 		'[[pagename::' .. mw.title.getCurrentTitle().text:gsub(' ', '_') .. ']]',
-		'[[opponentname::' .. resolvedPageName:gsub('_', ' ') .. ']]',
+		'([[opponentname::' .. resolvedPageName .. ']] OR [[opponentname::' .. resolvedPageName:gsub('_', ' ') .. ']])',
 	}
 	local placement = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 1,
