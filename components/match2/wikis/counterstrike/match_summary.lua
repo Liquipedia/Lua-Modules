@@ -204,7 +204,7 @@ function CustomMatchSummary._createMap(game)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	local function scoreDisplay(oppIdx)
+	local function score(oppIdx)
 		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
 	end
 
@@ -239,11 +239,11 @@ function CustomMatchSummary._createMap(game)
 
 	-- Build the HTML
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(MatchSummaryWidgets.DetailedScore{score = scoreDisplay(1), partialScores = team1Scores})
+	row:addElement(MatchSummaryWidgets.DetailedScore{score = score(1), partialScores = team1Scores, flipped = false})
 
 	row:addElement(mapInfo)
 
-	row:addElement(MatchSummaryWidgets.DetailedScore{score = scoreDisplay(2), partialScores = team2Scores})
+	row:addElement(MatchSummaryWidgets.DetailedScore{score = score(2), partialScores = team2Scores, flipped = true})
 	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
 
 	-- Add Comment
