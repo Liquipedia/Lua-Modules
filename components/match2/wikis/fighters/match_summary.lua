@@ -66,42 +66,34 @@ function CustomMatchSummary.fetchCharacters(game, teamIdx)
 end
 
 ---@param game MatchGroupUtilGame
----@param props {game: string?, opponents: standardOpponent[]}
----@return Html?
+---@param props {game: string?}
+---@return Widget?
 function CustomMatchSummary._createStandardGame(game, props)
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
-		:css('font-size', '0.75rem')
-		:css('padding', '4px')
-		:css('min-height', '24px')
-
-	game.extradata = game.extradata or {}
-
 	if not game or not game.participants then
 		return
 	end
 
-	local chars1 = CustomMatchSummary._createCharacterDisplay(
-		CustomMatchSummary.fetchCharacters(game, 1),
-		props.game,
-		false
-	)
-	local chars2 = CustomMatchSummary._createCharacterDisplay(
-		CustomMatchSummary.fetchCharacters(game, 2),
-		props.game,
-		true
-	)
+	local scoreDisplay = (game.scores[1] or '') .. '&nbsp;-&nbsp;' .. (game.scores[2] or '')
 
-	row:addElement(chars1:css('flex-basis', '30%'))
-	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
-	row:addElement(mw.html.create('div')
-			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
-			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
-	)
-	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
-	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
-
-	return row:create()
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '0.75rem', padding = '4px'},
+		children = WidgetUtil.collect(
+			CustomMatchSummary._createCharacterDisplay(
+				CustomMatchSummary.fetchCharacters(game, 1),
+				props.game,
+				false
+			),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {['flex-grow'] = 1}},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			CustomMatchSummary._createCharacterDisplay(
+				CustomMatchSummary.fetchCharacters(game, 2),
+				props.game,
+				true
+			)
+		)
+	}
 end
 
 ---@param characters {name: string}[]?
@@ -111,6 +103,8 @@ end
 function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
 	local wrapper = mw.html.create('div')
+		:css('flex-basis', '30%')
+		:css('text-align', reverse and 'right' or 'left')
 
 	if Table.isEmpty(characters) then
 		return wrapper
@@ -125,8 +119,8 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 		else
 			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
 		end
-
-		return characterDisplay
+		wrapper:node(characterDisplay)
+		return wrapper
 	end
 
 	local characterDisplays = Array.map(characters, function (character, index)

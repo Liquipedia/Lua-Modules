@@ -47,10 +47,9 @@ function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createGame(game, {
-			opponents = match.opponents,
 			game = match.game,
 			soloMode = CustomMatchSummary._isSolo(match)
-		}):create()
+		})
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
@@ -80,21 +79,15 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 end
 
 ---@param game MatchGroupUtilGame
----@param props {game: string?, soloMode: boolean, opponents: standardOpponent[]}
----@return MatchSummaryRow?
+---@param props {game: string?, soloMode: boolean}
+---@return Widget?
 function CustomMatchSummary._createGame(game, props)
 	if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
-		:css('font-size', '0.75rem')
-		:css('padding', '4px')
-		:css('min-height', '24px')
 
 	local normGame = Game.abbreviation{game = props.game}:lower()
-	game.extradata = game.extradata or {}
 	game.mapDisplayName = game.mapDisplayName or game.map
 
-	if game.extradata.mapmode then
+	if game.extradata and game.extradata.mapmode then
 		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.mapmode}
 	end
 
@@ -127,17 +120,16 @@ function CustomMatchSummary._createGame(game, props)
 		faction2 = createOpponentDisplay(2)
 	end
 
-	row
-			:css('flex-wrap', 'nowrap')
-			:addElement(faction1)
-			:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
-			:addElement(mw.html.create('div')
-				:addClass('brkts-popup-spaced'):css('flex-grow', '1')
-				:wikitext(DisplayHelper.MapAndStatus(game))
-			)
-			:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
-			:addElement(faction2)
-	return row
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '0.75rem'},
+		children = WidgetUtil.collect(
+			faction1,
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = '1'}},
+			faction2,
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 ---@param civ string?

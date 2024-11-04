@@ -31,10 +31,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
----just a base class to avoid anno warnings
----@class MatchSummaryRowInterface
----@field create fun(self): Html
-
 ---@class MatchSummaryHeader
 ---@operator call: MatchSummaryHeader
 ---@field root Html
@@ -128,58 +124,6 @@ function Header:create()
 			:node(self.rightScoreElement or '')
 			:node(self.rightElement)
 			:done()
-end
-
----@class MatchSummaryRow: MatchSummaryRowInterface
----@operator call: MatchSummaryRow
----@field root Html
----@field elements Html[]
-local Row = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root:addClass('brkts-popup-body-element')
-		self.elements = {}
-	end
-)
-
----@param class string?
----@return MatchSummaryRow
-function Row:addClass(class)
-	self.root:addClass(class)
-	return self
-end
-
----@param name string
----@param value string|number|nil
----@return MatchSummaryRow
-function Row:css(name, value)
-	self.root:css(name, value)
-	return self
-end
-
----@param element Html|string|nil|Widget
----@return MatchSummaryRow
-function Row:addElement(element)
-	table.insert(self.elements, element)
-	return self
-end
-
----@param elements (Html|string)[]
----@return MatchSummaryRow
-function Row:addElements(elements)
-	for _, element in ipairs(elements) do
-		self:addElement(element)
-	end
-	return self
-end
-
----@return Html
-function Row:create()
-	for _, element in pairs(self.elements) do
-		self.root:node(element)
-	end
-
-	return self.root
 end
 
 ---@class MatchSummaryFooter
@@ -313,7 +257,6 @@ end
 ---@class MatchSummary
 ---@operator call(string?):MatchSummary
 ---@field Header MatchSummaryHeader
----@field Row MatchSummaryRow
 ---@field Footer MatchSummaryFooter
 ---@field Match MatchSummaryMatch
 ---@field matches Html[]?
@@ -321,7 +264,6 @@ end
 ---@field root Html?
 local MatchSummary = Class.new()
 MatchSummary.Header = Header
-MatchSummary.Row = Row
 MatchSummary.Footer = Footer
 MatchSummary.Match = Match
 
