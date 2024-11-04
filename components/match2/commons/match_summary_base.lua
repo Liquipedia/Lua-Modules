@@ -526,7 +526,10 @@ end
 ---@param options {teamStyle: teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
-	assert(type(CustomMatchSummary.createBody) == 'function', 'Function "createBody" missing in "Module:MatchSummary"')
+	assert(
+		(type(CustomMatchSummary.createBody) == 'function' or type(CustomMatchSummary.createGame) == 'function'),
+		'createBody(match) or createGame(date, game, gameIndex) must be implemented in Module:MatchSummary'
+	)
 
 	options = options or {}
 
@@ -540,8 +543,8 @@ function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 
 	local matchSummary = MatchSummary():init(width)
 
-	--additional header for when martin adds the the css and buttons for switching between match and reset match
-	--if bracketResetMatch then
+	--additional header for when martin adds the the css and buttons for switching betwen match and reset match
+	--if bracketResetMatch the
 		--local createHeader = CustomMatchSummary.createHeader or MatchSummary.createDefaultHeader
 		--matchSummary:header(createHeader(match, {noScore = true, teamStyle = options.teamStyle}))
 		--here martin can add the buttons for switching between match and reset match
