@@ -8,12 +8,9 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -24,21 +21,11 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
 end
 
----@param match MatchGroupUtilMatch
----@return Widget
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createGame)
-	)}
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow
-function CustomMatchSummary._createGame(game, gameIndex)
+---@return Widget?
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},

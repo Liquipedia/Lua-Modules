@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -15,7 +13,6 @@ local Page = require('Module:Page')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CustomMatchSummary = {}
 
@@ -23,17 +20,6 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
-end
-
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createMapRow)
-	)}
 end
 
 ---@param game MatchGroupUtilGame
@@ -45,9 +31,11 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
+---@param date string
 ---@param game MatchGroupUtilGame
----@return Html
-function CustomMatchSummary._createMapRow(game)
+---@param gameIndex integer
+---@return Html?
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	local row = MatchSummary.Row()
 
 	local centerNode = mw.html.create('div')
