@@ -80,12 +80,21 @@ function CustomPlayer.run(frame)
 		player.args.history = automatedHistory
 	else
 		args.history = tostring(mw.html.create('div')
-			:addClass("show-when-logged-in")
-			:addClass("navigation-not-searchable")
-			:tag('big'):wikitext("Automated History"):done()
-			:wikitext(automatedHistory)
-			:tag('big'):wikitext("Manual History"):done())
-			.. args.history
+			:tag('div')
+				:tag('big')
+					:addClass("show-when-logged-in")
+					:addClass("navigation-not-searchable")
+					:wikitext("Automated History")
+					:done()
+				:wikitext(automatedHistory)
+				:done()
+			:tag('div')
+				:addClass("show-when-logged-in")
+				:addClass("navigation-not-searchable")
+				:tag('big'):wikitext("Manual History"):done()
+				:wikitext(args.history)
+				:done()
+			)
 	end
 
 	-- Automatic achievements
