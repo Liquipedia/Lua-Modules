@@ -6,14 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MapModes = require('Module:MapModes')
-local String = require('Module:StringUtils')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CustomMatchSummary = {}
 
@@ -23,82 +21,31 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex]
-	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
-	return mw.html.create('div'):wikitext(scoreDisplay)
-end
-
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Html?
+---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	if not game.map then
 		return
 	end
-	local row = MatchSummary.Row()
 
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummaryWidgets.Break{})
+	local function makeTeamSection(opponentIndex)
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+		}
 	end
 
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:wikitext(CustomMatchSummary._getMapDisplay(game))
-		:css('text-align', 'center')
-
-	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popup-spaced-map-skip')
-	end
-
-	local leftNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
-		:node(CustomMatchSummary._gameScore(game, 1))
-
-	local rightNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
-
-	row:addElement(leftNode)
-		:addElement(centerNode)
-		:addElement(rightNode)
-
-	row:addClass('brkts-popup-body-game')
-		:css('overflow', 'hidden')
-
-	-- Add Comment
-	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		local comment = mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	return row:create()
-end
-
----@param game MatchGroupUtilGame
----@return string
-function CustomMatchSummary._getMapDisplay(game)
-	local mapDisplay = '[[' .. game.map .. ']]'
-	if String.isNotEmpty(game.mode) then
-		mapDisplay = MapModes.get{mode = game.mode} .. mapDisplay
-	end
-	return mapDisplay
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 return CustomMatchSummary
