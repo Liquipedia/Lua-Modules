@@ -163,8 +163,10 @@ end
 function CustomMatchSummary._getOppositeSide(side)
 	if side == 'atk' then
 		return 'def'
+	elseif side == 'def' then
+		return 'atk'
 	end
-	return 'atk'
+	return ''
 end
 
 return CustomMatchSummary

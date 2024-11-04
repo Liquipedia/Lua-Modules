@@ -21,7 +21,7 @@ local MatchSummaryDetailedScore = Class.new(Widget)
 function MatchSummaryDetailedScore:render()
 	local flipped = self.props.flipped
 	local partialScores = Array.map(self.props.partialScores or {}, function(partialScore)
-		local children = {partialScore.score, partialScore.icon}
+		local children = {partialScore.score or '', partialScore.icon}
 		return HtmlWidgets.Td{
 			classes = {'brkts-popup-body-match-sidewins', partialScore.style},
 			children = flipped and Array.reverse(children) or children,
