@@ -145,6 +145,11 @@ function MatchPage.getByMatchId(props)
 			vod = game.vod,
 		} or ''
 	end)
+	if String.isNotEmpty(viewModel.vod) then
+		table.insert(viewModel.vods, 1, VodLink.display{
+			vod = viewModel.vod,
+		})
+	end
 
 	-- Create an object array for links
 	local function processLink(site, link)
