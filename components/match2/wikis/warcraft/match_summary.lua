@@ -171,7 +171,7 @@ end
 ---Renders off-factions as Nx2 grid of tiny icons
 ---@param factions string[]
 ---@return Html
-function CustomMatchSummary.OfffactionIcons(factions)
+function CustomMatchSummary.OffFactionIcons(factions)
 	local factionsNode = mw.html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
 	for _, faction in ipairs(factions) do
