@@ -9,8 +9,6 @@
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -18,13 +16,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local ICONS = {
-	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
-	draw = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'},
-	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
-	empty = '[[File:NoCheck.png|link=|16px]]',
-}
 
 local CustomMatchSummary = {}
 
@@ -102,12 +93,12 @@ function CustomMatchSummary._createStandardGame(game, props)
 	)
 
 	row:addElement(chars1:css('flex-basis', '30%'))
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(mw.html.create('div')
 			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
 			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
 	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
 
 	return row:create()
@@ -151,24 +142,6 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	Array.forEach(characterDisplays, FnUtil.curry(wrapper.node, wrapper))
 
 	return wrapper
-end
-
----@param winner integer|string
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
-	return mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:css('width', '16px')
-			:css('line-height', '17px')
-			:css('margin-left', (opponentIndex == 1) and '10%' or '1%')
-			:css('margin-right', (opponentIndex == 2) and '10%' or '1%')
-			:wikitext(
-				winner == opponentIndex and ICONS.winner
-				or winner == 0 and ICONS.draw
-				or Logic.isNotEmpty(winner) and ICONS.loss
-				or ICONS.empty
-			)
 end
 
 return CustomMatchSummary

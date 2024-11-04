@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -17,11 +16,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	EMPTY = '[[File:NoCheck.png|link=]]',
-}
 
 local CustomMatchSummary = {}
 
@@ -63,14 +57,14 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icons.CHECK))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 		:node(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
 		:css('width', '20%')
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icons.CHECK))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 		:css('width', '20%')
 
 	row:addElement(leftNode)
@@ -90,18 +84,6 @@ function CustomMatchSummary._createMapRow(game)
 	end
 
 	return row:create()
-end
-
----@param showIcon boolean?
----@param iconType string?
----@return Html
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
-	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		return container:node(iconType)
-	end
-	return container:node(Icons.EMPTY)
 end
 
 return CustomMatchSummary

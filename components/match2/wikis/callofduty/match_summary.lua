@@ -18,9 +18,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local GREEN_CHECK = '<i class="fa fa-check forest-green-text" style="width: 14px; text-align: center" ></i>'
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
 local CustomMatchSummary = {}
 
 ---@param args table
@@ -80,13 +77,13 @@ function CustomMatchSummary._createMapRow(game)
 
 	local leftNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 		:node(CustomMatchSummary._gameScore(game, 1))
 
 	local rightNode = mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2))
+		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 
 	row:addElement(leftNode)
 		:addElement(centerNode)
@@ -115,21 +112,6 @@ function CustomMatchSummary._getMapDisplay(game)
 		mapDisplay = MapModes.get{mode = game.mode} .. mapDisplay
 	end
 	return mapDisplay
-end
-
----@param showIcon boolean?
----@return Html
-function CustomMatchSummary._createCheckMarkOrCross(showIcon)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 return CustomMatchSummary

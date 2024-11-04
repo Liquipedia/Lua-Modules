@@ -10,7 +10,6 @@ local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')
@@ -22,9 +21,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local NON_BREAKING_SPACE = '&nbsp;'
 
@@ -76,7 +72,7 @@ function CustomMatchSummary._createGame(game)
 		flip = false,
 		game = game.game
 	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
 	row:addElement(CustomMatchSummary._gameScore(game, 1))
 	row:addElement(mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
@@ -89,7 +85,7 @@ function CustomMatchSummary._createGame(game)
 		)
 	)
 	row:addElement(CustomMatchSummary._gameScore(game, 2))
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
+	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 	row:addElement(CustomMatchSummary._opponentWeaponsDisplay{
 		data = weaponsData[2],
 		flip = true,
@@ -136,23 +132,6 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 			:css('margin', 'auto')
 			:wikitext(scoreDisplay)
 		)
-end
-
----@param showIcon boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(showIcon)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if Logic.readBool(showIcon) then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 ---@param props {data: string[], flip: boolean, game: string}
