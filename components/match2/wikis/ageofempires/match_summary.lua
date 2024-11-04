@@ -125,7 +125,9 @@ function CustomMatchSummary._createGame(game, props)
 		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			faction1,
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = '1'}},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			faction2,
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
