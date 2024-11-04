@@ -6,93 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-
--- Score Class
----@class CriticalopsScore
----@operator call(string|number|nil): CriticalopsScore
----@field root Html
----@field table Html
----@field top Html
----@field bottom Html
-local Score = Class.new(
-	function(self, direction)
-		self.root = mw.html.create('div')
-			:css('width','70px')
-			:css('text-align', 'center')
-			:css('direction', direction)
-		self.table = self.root:tag('table'):css('line-height', '29px')
-		self.top = mw.html.create('tr')
-		self.bottom = mw.html.create('tr')
-	end
-)
-
----@return CriticalopsScore
-function Score:setLeft()
-	self.table:css('float', 'left')
-	return self
-end
-
----@return CriticalopsScore
-function Score:setRight()
-	self.table:css('float', 'right')
-	return self
-end
-
----@param score string|number|nil
----@return CriticalopsScore
-function Score:setMapScore(score)
-	local mapScore = mw.html.create('td')
-	mapScore
-		:attr('rowspan', 2)
-		:css('font-size', '16px')
-		:css('width', '25px')
-		:wikitext(score or '')
-
-	self.top:node(mapScore)
-
-	return self
-end
-
----@param side string
----@param score number
----@return CriticalopsScore
-function Score:setFirstHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.top:node(halfScore)
-	return self
-end
-
----@param side string
----@param score number
----@return CriticalopsScore
-function Score:setSecondHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.bottom:node(halfScore)
-	return self
-end
-
----@return Html
-function Score:create()
-	self.table:node(self.top):node(self.bottom)
-	return self.root
-end
 
 local CustomMatchSummary = {}
 
@@ -113,29 +32,23 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
-	-- Score
-	local team1Score = Score():setLeft()
-	local team2Score = Score('rtl'):setRight()
+	local function score(oppIdx)
+		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+	end
 
-	-- Teams map score
-	team1Score:setMapScore(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
-	team2Score:setMapScore(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
+	-- Teams scores
+	local t1sides = extradata.t1sides or {}
+	local t2sides = extradata.t2sides or {}
+	local t1halfs = extradata.t1halfs or {}
+	local t2halfs = extradata.t2halfs or {}
 
-	local t1sides = extradata['t1sides'] or {}
-	local t2sides = extradata['t2sides'] or {}
-	local t1halfs = extradata['t1halfs'] or {}
-	local t2halfs = extradata['t2halfs'] or {}
-
-	-- Teams half scores
-	for sideIndex, side in ipairs(t1sides) do
-		local oppositeSide = t2sides[sideIndex]
-		if math.fmod(sideIndex, 2) == 1 then
-			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
-			team2Score:setFirstHalfScore(t2halfs[sideIndex], oppositeSide)
-		else
-			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
-			team2Score:setSecondHalfScore(t2halfs[sideIndex], oppositeSide)
-		end
+	local team1Scores = {}
+	local team2Scores = {}
+	for sideIndex in ipairs(t1sides) do
+		local side1, side2 = t1sides[sideIndex], t2sides[sideIndex]
+		local score1, score2 = t1halfs[sideIndex], t2halfs[sideIndex]
+		table.insert(team1Scores, {style = side1 and ('brkts-cs-score-color-'.. side1) or nil, score = score1})
+		table.insert(team2Scores, {style = side2 and ('brkts-cs-score-color-'.. side2) or nil, score = score2})
 	end
 
 	-- Map Info
@@ -154,11 +67,11 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	-- Build the HTML
 	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
-	row:addElement(team1Score:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{score = score(1), partialScores = team1Scores, flipped = false})
 
 	row:addElement(mapInfo)
 
-	row:addElement(team2Score:create())
+	row:addElement(MatchSummaryWidgets.DetailedScore{score = score(2), partialScores = team2Scores, flipped = true})
 	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
 
 	-- Add Comment

@@ -17,6 +17,7 @@ Widgets.CharacterBanTable = Lua.import('Module:Widget/Match/Summary/CharacterBan
 Widgets.Characters = Lua.import('Module:Widget/Match/Summary/Characters')
 Widgets.Character = Lua.import('Module:Widget/Match/Summary/Character')
 Widgets.Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
+Widgets.DetailedScore = Lua.import('Module:Widget/Match/Summary/DetailedScore')
 Widgets.GameCenter = Lua.import('Module:Widget/Match/Summary/GameCenter')
 Widgets.GameComment = Lua.import('Module:Widget/Match/Summary/GameComment')
 Widgets.GameTeamWrapper = Lua.import('Module:Widget/Match/Summary/GameTeamWrapper')
