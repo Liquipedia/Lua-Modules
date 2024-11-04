@@ -213,15 +213,17 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 				Logic.isNotEmpty(extradata.otlength) and '(' .. extradata.otlength .. ')' or nil
 			}},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
-			extradata.timeout and MatchSummaryWidgets.GameComment{children = CustomMatchSummary._timeoutDisplay(extradata.timeout)} or {},
+			MatchSummaryWidgets.GameComment{children = CustomMatchSummary._timeoutDisplay(extradata.timeout)},
 			MatchSummaryWidgets.GameComment{children = comments}
 		)
 	}
 end
 
+---@param timeout table?
+---@return Widget[]?
 function CustomMatchSummary._timeoutDisplay(timeout)
 	if not timeout then
-		return
+		return nil
 	end
 	local timeouts = timeout
 	return {
