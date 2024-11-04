@@ -8,9 +8,7 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -40,51 +38,28 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget?
 function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
 	end
-	local row = MatchSummary.Row()
 
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:wikitext(Page.makeInternalLink(game.map))
-		:css('text-align', 'center')
-
-	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popup-spaced-map-skip')
+	local function makeTeamSection(opponentIndex)
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+		}
 	end
 
-	local leftNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
-		:node(DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner))
-		:css('width', '20%')
-
-	local rightNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner))
-		:node(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
-		:css('width', '20%')
-
-	row:addElement(leftNode)
-		:addElement(centerNode)
-		:addElement(rightNode)
-
-	row:addClass('brkts-popup-body-game')
-		:css('overflow', 'hidden')
-
-	-- Add Comment
-	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		local comment = mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	return row:create()
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 return CustomMatchSummary
