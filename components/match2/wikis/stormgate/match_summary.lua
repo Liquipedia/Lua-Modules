@@ -161,8 +161,8 @@ function CustomMatchSummary.Game(options, game)
 			},
 			showOffFactionIcons and offFactionIcons(2) or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}},
-			CustomMatchSummary.DisplayHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true})
+			CustomMatchSummary.DisplayHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true}),
+			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
 		)
 	}
 end
