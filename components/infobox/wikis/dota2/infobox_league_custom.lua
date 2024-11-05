@@ -25,6 +25,14 @@ local Cell = Widgets.Cell
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+local VALVE_TIERS = {
+	['international'] = {meta = '', name = 'The International', link = 'The International'},
+	['major'] = {meta = 'Dota Major Championship', name = 'Dota Major Championship', link = 'Dota Major Championships'},
+	['dpc major'] = {meta = 'DPC Major', name = 'DPC Major', link = 'Dota Major Championships'},
+	['dpc minor'] = {meta = 'DPC Minor', name = 'DPC Major', link = 'Dota Minor Championships'},
+	['dpc league'] = {meta = 'DPC Regional League', name = 'DPC Regional League', link = 'Regional League'}
+}
+
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
@@ -35,6 +43,10 @@ function CustomLeague.run(frame)
 	league.args.datdota = league.args.leagueid
 	league.args.dotabuff = league.args.leagueid
 	league.args.stratz = league.args.leagueid
+
+	-- Valve Tier stuff
+	league.args.publisherdescription = 'metadesc-valve'
+	league.valveTier = VALVE_TIERS[(league.args.valvetier or ''):lower()]
 
 	return league:createInfobox()
 end
@@ -56,15 +68,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Dota TV Ticket', content = {args.dotatv}},
 			Cell{name = 'Pro Circuit Points', content = {points and mw.getContentLanguage():formatNum(points)}}
 		)
-	elseif id == 'liquipediatier' and args.pctier and args.liquipediatiertype ~= 'Qualifier' then
-		local valveIcon = ''
-		if Logic.readBool(args.valvepremier) then
-			valveIcon = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
-		end
-		table.insert(widgets,
+	elseif id == 'liquipediatier' and args.valveTier then
+		table.insert(
+			widgets,
 			Cell{
-				name = 'Pro Circuit Tier',
-				content = {'[[Dota Pro Circuit|' .. args.pctier .. ']] ' .. valveIcon},
+				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
+				content = {self.caller:_createValveTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)
@@ -74,22 +83,12 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return string
-function CustomLeague:appendLiquipediatierDisplay(args)
-	if String.isEmpty(args.pctier) and Logic.readBool(args.valvepremier) then
-		return ' ' .. Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox')
-	end
-	return ''
-end
-
----@param args table
 ---@return boolean
 function CustomLeague:liquipediaTierHighlighted(args)
 	return Logic.readBool(args.valvepremier)
 end
 
 function CustomLeague:addToLpdb(lpdbData, args)
-	lpdbData.extradata.valvepremier = String.isNotEmpty(args.valvepremier) and '1' or '0'
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.dpcpoints = String.isNotEmpty(args.points) or ''
 
@@ -98,7 +97,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.pctier
+	self.data.publishertier = (self.valveTier or {}).name
 end
 
 ---@param args table
@@ -107,9 +106,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_pro_circuit_points', args.points or '')
 	local isIndividual = String.isNotEmpty(args.individual) or String.isNotEmpty(args.player_number)
 	Variables.varDefine('tournament_individual', isIndividual and 'true' or '')
-	Variables.varDefine('tournament_valve_premier', args.valvepremier)
-	Variables.varDefine('tournament_publisher_major', args.valvepremier)
-	Variables.varDefine('tournament_pro_circuit_tier', args.pctier)
+	if self.valveTier then
+		Variables.varDefine('metadesc-valve', self.valveTier.meta)
+	end
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
@@ -138,6 +137,13 @@ function CustomLeague:_createPatchCell(args)
 		displayText = displayText .. ' &ndash; [['.. args.epatch .. ']]'
 	end
 	return displayText
+end
+
+---@return string?
+function CustomLeague:_createValveTierCell()
+	if self.valveTier then
+		return '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
+	end
 end
 
 return CustomLeague
