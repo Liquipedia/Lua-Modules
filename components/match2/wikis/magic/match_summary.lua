@@ -23,7 +23,7 @@ end
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Html?
+---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},

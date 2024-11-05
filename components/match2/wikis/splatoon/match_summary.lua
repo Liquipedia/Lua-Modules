@@ -31,7 +31,7 @@ end
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Html?
+---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	local weaponsData = Array.map(game.opponents, function(opponent)
 		return Array.map(opponent.players, Operator.property('weapon'))

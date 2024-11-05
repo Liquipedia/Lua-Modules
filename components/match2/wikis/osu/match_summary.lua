@@ -41,7 +41,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget?
 function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
