@@ -17,6 +17,7 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
+local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -1072,6 +1073,85 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 			match[key] = value
 		end
 	end
+
+	return match
+end
+
+---@class MatchParserInterface
+---@field extractMaps fun(match: table, opponents: table[]): table[]
+---@field getBestOf fun(bestOfInput: string|integer, maps: table[]): integer
+---@field calculateMatchScore fun(maps: table[]): fun(opponentIndex: integer): integer
+---@field removeUnsetMaps? fun(maps: table[]): table[]
+---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
+---@field DEFAULT_MODE? string
+---@field DATE_FALLBACKS? string[]
+---@field OPPONENT_CONFIG? readOpponentOptions
+
+--- The standard way to process a match input.
+---
+--- The Parser injection must have the following functions:
+--- - extractMaps(match, opponents): table[]
+--- - getBestOf(bestOfInput, maps): integer
+--- - calculateMatchScore(maps): fun(opponentIndex): integer
+---
+--- It may optionally have the following functions:
+--- - removeUnsetMaps(maps): table[]
+--- - getExtraData(match, games, opponents): table
+---
+--- Additionally, the Parser may have the following properties:
+--- - DEFAULT_MODE: string
+--- - DATE_FALLBACKS: string[]
+--- - OPPONENT_CONFIG: table
+---@param match table
+---@param Parser MatchParserInterface
+---@return table
+function MatchGroupInputUtil.standardProcessMatch(match, Parser)
+	local finishedInput = match.finished --[[@as string?]]
+	local winnerInput = match.winner --[[@as string?]]
+
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS))
+
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+	end)
+
+	local games = Parser.extractMaps(match, opponents)
+	match.bestof = Parser.getBestOf(match.bestof, games)
+	games = Parser.removeUnsetMaps and Parser.removeUnsetMaps(games) or games
+
+	match.links = MatchGroupInputUtil.getLinks(match)
+
+	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
+		and Parser.calculateMatchScore(games)
+		or nil
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
+			walkover = match.walkover,
+			winner = match.winner,
+			opponentIndex = opponentIndex,
+			score = opponent.score,
+		}, autoScoreFunction)
+	end)
+
+	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+
+	if match.finished then
+		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
+		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
+		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+		end)
+	end
+
+	match.mode = Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+
+	match.stream = Streams.processStreams(match)
+	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+
+	match.games = games
+	match.opponents = opponents
 
 	return match
 end
