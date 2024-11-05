@@ -9,13 +9,10 @@
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:ChampionNames')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -24,7 +21,6 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
-local DUMMY_MAP = 'default'
 MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = false,
