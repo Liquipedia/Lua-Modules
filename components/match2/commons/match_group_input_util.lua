@@ -1077,6 +1077,15 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	return match
 end
 
+---@class MatchParserInterface
+---@field extractMaps fun(match: table, opponents: table[]): table[]
+---@field getBestOf fun(bestOfInput: string|integer, maps: table[]): integer
+---@field calculateMatchScore fun(maps: table[]): fun(opponentIndex: integer): integer
+---@field removeUnsetMaps? fun(maps: table[]): table[]
+---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
+---@field DEFAULT_MODE? string
+---@field DATE_FALLBACKS? string[]
+---@field OPPONENT_CONFIG? readOpponentOptions
 
 --- The standard way to process a match input.
 ---
@@ -1094,7 +1103,7 @@ end
 --- - DATE_FALLBACKS: string[]
 --- - OPPONENT_CONFIG: table
 ---@param match table
----@param Parser any
+---@param Parser MatchParserInterface
 ---@return table
 function MatchGroupInputUtil.standardProcessMatch(match, Parser)
 	local finishedInput = match.finished --[[@as string?]]
