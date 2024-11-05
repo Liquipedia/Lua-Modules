@@ -39,7 +39,7 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
