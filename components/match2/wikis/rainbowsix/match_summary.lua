@@ -59,18 +59,10 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		local oppositeSide = CustomMatchSummary._getOppositeSide(firstSide)
 		local oppositeSideOt = CustomMatchSummary._getOppositeSide(firstSideOt)
 		return {
-			{style = 'brkts-popup-body-match-sidewins', score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
-			{style = 'brkts-popup-body-match-sidewins', score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
-			{
-				style = 'brkts-popup-body-match-sidewins-overtime',
-				score = halves['ot' .. firstSideOt],
-				icon = ROUND_ICONS['ot' .. firstSideOt]
-			},
-			{
-				style = 'brkts-popup-body-match-sidewins-overtime',
-				score = halves['ot' .. oppositeSideOt],
-				icon = ROUND_ICONS['ot' .. oppositeSideOt]
-			},
+			{score = halves[firstSide], icon = ROUND_ICONS[firstSide]},
+			{score = halves[oppositeSide], icon = ROUND_ICONS[oppositeSide]},
+			{score = halves['ot' .. firstSideOt], icon = ROUND_ICONS['ot' .. firstSideOt]},
+			{score = halves['ot' .. oppositeSideOt], icon = ROUND_ICONS['ot' .. oppositeSideOt]},
 		}
 	end
 
