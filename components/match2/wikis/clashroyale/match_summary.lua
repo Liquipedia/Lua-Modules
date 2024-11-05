@@ -64,20 +64,8 @@ end
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@param date string
----@return Html
+---@return Widget
 function CustomMatchSummary._createGame(game, gameIndex, date)
-	local row = MatchSummary.Row()
-
-	-- Add game header
-	if not Logic.isEmpty(game.header) then
-		row:addElement(mw.html.create('div')
-			:wikitext(game.header)
-			:css('margin', 'auto')
-			:css('font-weight', 'bold')
-		)
-		row:addElement(MatchSummaryWidgets.Break{})
-	end
-
 	local cardData = {{}, {}}
 	for participantKey, participantData in Table.iter.spairs(game.participants or {}) do
 		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
@@ -89,42 +77,30 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 		table.insert(cardData[opponentIndex], cards)
 	end
 
-	row:addClass('brkts-popup-body-game')
-		:css('font-size', '80%')
-		:css('padding', '4px')
-		:css('min-height', '32px')
-
-	row:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = cardData[1],
-		flip = true,
-		date = date,
-	})
-	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1})
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext('Game ' .. gameIndex)
-	)
-	row:addElement(MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2})
-	row:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = cardData[2],
-		flip = false,
-		date = date,
-	})
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		row:addElement(mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '90%', padding = '4px'},
+		children = WidgetUtil.collect(
+			CustomMatchSummary._opponentCardsDisplay{
+				data = cardData[1],
+				flip = true,
+				date = date,
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.GameCenter{children = 'Game ' .. gameIndex},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			CustomMatchSummary._opponentCardsDisplay{
+				data = cardData[2],
+				flip = false,
+				date = date,
+			},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-	end
-
-	return row:create()
+	}
 end
 
 ---@param match MatchGroupUtilMatch
----@return Html[]
+---@return Widget[]
 function CustomMatchSummary._createTeamMatchBody(match)
 	local _, subMatches = Array.groupBy(match.games, Operator.property('subgroup'))
 	subMatches = Array.map(subMatches, function(subMatch)
@@ -139,7 +115,7 @@ function CustomMatchSummary._createTeamMatchBody(match)
 			subMatchIndex,
 			subMatch,
 			match.extradata
-		):create()
+		)
 	end)
 end
 
@@ -220,30 +196,28 @@ function CustomMatchSummary._extractPlayersFromGame(players, game, match)
 
 	return players
 end
----comment
+
 ---@param players table
 ---@param subMatchIndex integer
 ---@param subMatch table
 ---@param extradata table
----@return MatchSummaryRow
+---@return Widget
 function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, extradata)
-	local row = MatchSummary.Row()
-
-	row:addClass('brkts-popup-body-game')
-		:css('min-height', '32px')
-
 	-- Add submatch header
-	if not Logic.isEmpty(extradata['subgroup' .. subMatchIndex .. 'header']) then
-		row:addElement(mw.html.create('div')
-			:wikitext(extradata['subgroup' .. subMatchIndex .. 'header'])
-			:css('margin', 'auto')
-			:css('font-weight', 'bold')
-		)
-		row:addElement(MatchSummaryWidgets.Break{})
+	local header
+	if Logic.isNotEmpty(extradata['subgroup' .. subMatchIndex .. 'header']) then
+		header = {
+			mw.html.create('div')
+				:wikitext(extradata['subgroup' .. subMatchIndex .. 'header'])
+				:css('margin', 'auto')
+				:css('font-weight', 'bold')
+			,
+			MatchSummaryWidgets.Break{}
+		}
 	end
 
 	-- players left side
-	row:addElement(mw.html.create('div')
+	local playersLeft = mw.html.create('div')
 		:addClass(subMatch.winner == 1 and 'bg-win' or nil)
 		:css('align-items', 'center')
 		:css('border-radius', '0 12px 12px 0')
@@ -256,8 +230,8 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			showLink = true,
 			flip = true,
 		})
-	)
 
+	-- Center element
 	local scoreDisplay = table.concat(subMatch.scores, ' - ')
 	local scoreElement
 	if extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
@@ -269,13 +243,8 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			)
 	end
 
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:node(scoreElement or scoreDisplay)
-	)
-
 	-- players right side
-	row:addElement(mw.html.create('div')
+	local playersRight = mw.html.create('div')
 		:addClass(subMatch.winner == 2 and 'bg-win' or nil)
 		:css('align-items', 'center')
 		:css('border-radius', '12px 0 0 12px')
@@ -288,9 +257,16 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			showLink = true,
 			flip = false,
 		})
-	)
 
-	return row
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			header,
+			playersLeft,
+			MatchSummaryWidgets.GameCenter{children = scoreElement or scoreDisplay},
+			playersRight
+		)
+	}
 end
 
 ---@param args table

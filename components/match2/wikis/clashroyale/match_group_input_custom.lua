@@ -285,7 +285,6 @@ end
 function MapFunctions.getExtraData(mapInput, participants)
 	local extradata = {
 		comment = mapInput.comment,
-		header = mapInput.header,
 	}
 
 	return Table.merge(extradata, MapFunctions.getCardsExtradata(participants))

@@ -8,17 +8,15 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
 -- Custom Header Class
@@ -146,88 +144,33 @@ end
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return Html?
+---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
 	if not game.map then
 		return
 	end
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
 	local extradata = game.extradata or {}
 
-	if String.isNotEmpty(game.header) then
-		local gameHeader = mw.html.create('div')
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-			:node(game.header)
-
-		row:addElement(gameHeader)
-		row:addElement(MatchSummaryWidgets.Break{})
-	end
-
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(mw.html.create('div'):node(game.map))
-
-	row:addElement(CustomMatchSummary._iconDisplay(
-		GREEN_CHECK,
-		game.winner == 1,
-		game.scores[1],
-		1
-	))
-	if extradata.overtime then
-		row:addElement(CustomMatchSummary._iconDisplay(
-			OVERTIME,
-			true,
-			nil,
-			nil,
-			'Overtime'
-		))
-	end
-	row:addElement(centerNode)
-	if extradata.overtime then
-		row:addElement(CustomMatchSummary._iconDisplay(
-			OVERTIME,
-			true,
-			nil,
-			nil,
-			'Overtime'
-		))
-	end
-	row:addElement(CustomMatchSummary._iconDisplay(
-		GREEN_CHECK,
-		game.winner == 2,
-		game.scores[2],
-		2
-	))
-
-	if String.isNotEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-
-		row:addElement(mw.html.create('div')
-			:css('margin','auto')
-			:css('max-width', '60%')
-			:node(game.comment)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-	end
-
-	return row:create()
+	}
 end
 
 ---@param icon string?
----@param shouldDisplay boolean?
----@param additionalElement number|string|Html|nil
----@param side integer?
 ---@param hoverText string|number|nil
 ---@return Html
-function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement, side, hoverText)
-	local flip = side == 2
+function CustomMatchSummary._iconDisplay(icon, hoverText)
 	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
-		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
-		:node(shouldDisplay and icon or NO_CHECK)
-		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
+		:node(icon)
 		:attr('title', hoverText)
 end
 

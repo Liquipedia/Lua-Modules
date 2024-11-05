@@ -149,7 +149,6 @@ end
 function MapFunctions.getExtraData(map)
 	return {
 		comment = map.comment,
-		header = map.header,
 		maptype = map.maptype,
 	}
 end
