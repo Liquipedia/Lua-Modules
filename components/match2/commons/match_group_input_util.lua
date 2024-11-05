@@ -1083,6 +1083,7 @@ end
 ---@field calculateMatchScore fun(maps: table[]): fun(opponentIndex: integer): integer
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
+---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1097,6 +1098,7 @@ end
 --- It may optionally have the following functions:
 --- - removeUnsetMaps(maps): table[]
 --- - getExtraData(match, games, opponents): table
+--- - adjustOpponent(opponent, opponentIndex)
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1112,7 +1114,11 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser)
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		if opponent and Parser.adjustOpponent then
+			Parser.adjustOpponent(opponent, opponentIndex)
+		end
+		return opponent
 	end)
 
 	local games = Parser.extractMaps(match, opponents)

@@ -6,13 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local CustomMatchGroupInput = {}
-
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -20,73 +17,37 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
-local DEFAULT_MODE = '3v3'
-
-local EARNINGS_LIMIT_FOR_FEATURED = 10000
-local CURRENT_YEAR = os.date('%Y')
-
--- containers for process helper functions
+local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
--- called from Module:MatchGroup
+local EARNINGS_LIMIT_FOR_FEATURED = 10000
+local CURRENT_YEAR = os.date('%Y')
+MatchFunctions.DEFAULT_MODE = '3v3'
+MatchFunctions.DATE_FALLBACKS = {'tournament_enddate'}
+
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
+	local parsedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+	parsedMatch.links.headtohead = MatchFunctions.getHeadToHeadLink(match, parsedMatch.opponents)
+	return parsedMatch
+end
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {'tournament_enddate'}))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
-	end)
-	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
-	match.links = MatchGroupInputUtil.getLinks(match)
-	match.links.headtohead = MatchFunctions.getHeadToHeadLink(match, opponents)
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
-		if opponent.extradata.additionalScores then
-			opponent.score = CustomMatchGroupInput._getSetWins(opponent)
-		end
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		})
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
+	if opponent.extradata.additionalScores then
+		opponent.score = CustomMatchGroupInput._getSetWins(opponent)
 	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match, opponents)
-
-	return match
 end
 
 ---@param match table
----@param opponentCount integer
----@return table
-function CustomMatchGroupInput.extractMaps(match, opponentCount)
+---@param opponents table[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if map.map == nil then
@@ -99,7 +60,7 @@ function CustomMatchGroupInput.extractMaps(match, opponentCount)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
