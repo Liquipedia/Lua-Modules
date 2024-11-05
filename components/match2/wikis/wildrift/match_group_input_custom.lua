@@ -49,7 +49,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
 	local games = CustomMatchGroupInput.extractMaps(match, #opponents)
-	match.bestof = MatchFunctions.getBestOf(match)
+	match.bestof = MatchFunctions.getBestOf(match.bestof)
 	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
@@ -137,10 +137,10 @@ function MatchFunctions.calculateMatchScore(maps)
 	end
 end
 
----@param match table
----@return integer
-function MatchFunctions.getBestOf(match)
-	local bestOf = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
+---@param bestofInput string|integer?
+---@return integer?
+function MatchFunctions.getBestOf(bestofInput)
+	local bestOf = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
 end

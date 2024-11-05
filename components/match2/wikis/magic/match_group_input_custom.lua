@@ -94,10 +94,10 @@ function CustomMatchGroupInput.calculateMatchScore(maps)
 	end
 end
 
----@param match table
----@return integer
-function CustomMatchGroupInput.getBestOf(match)
-	local bestOf = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('match_bestof')))
+---@param bestofInput string|integer?
+---@return integer?
+function CustomMatchGroupInput.getBestOf(bestofInput)
+	local bestOf = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('match_bestof')))
 	Variables.varDefine('match_bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
 end
