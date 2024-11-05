@@ -21,22 +21,23 @@ local MISSING_INPUT_ERROR = 'bad argument #1 to "name" (string or number expecte
 local mockTeamTemplate = {}
 
 -- temp copy the orig functions so we can retrieve them later again when tearing down the mock
-local _teamTemplate = Table.copy(mw.ext.TeamTemplate)
+local _teamTemplate = mw.ext.TeamTemplate
 
 function mockTeamTemplate.setUp()
-	mw.ext.TeamTemplate.raw = mockTeamTemplate.raw
-	mw.ext.TeamTemplate.raw_historical = mockTeamTemplate.raw_historical
-	mw.ext.TeamTemplate.teamexists = mockTeamTemplate.teamexists
-	mw.ext.TeamTemplate.team = mockTeamTemplate.team
-	mw.ext.TeamTemplate.team2 = mockTeamTemplate.team2
-	mw.ext.TeamTemplate.teamshort = mockTeamTemplate.teamshort
-	mw.ext.TeamTemplate.team2short = mockTeamTemplate.team2short
-	mw.ext.TeamTemplate.teambracket = mockTeamTemplate.teambracket
-	mw.ext.TeamTemplate.teamicon = mockTeamTemplate.teamicon
-	mw.ext.TeamTemplate.teamimage = mockTeamTemplate.teamimage
-	mw.ext.TeamTemplate.teampage = mockTeamTemplate.teampage
-	mw.ext.TeamTemplate.teampart = mockTeamTemplate.teampart
-	mw.ext.TeamTemplate.raw = mockTeamTemplate.raw
+	mw.ext.TeamTemplate = {
+		raw = mockTeamTemplate.raw,
+		raw_historical = mockTeamTemplate.raw_historical,
+		teamexists = mockTeamTemplate.teamexists,
+		team = mockTeamTemplate.team,
+		team2 = mockTeamTemplate.team2,
+		teamshort = mockTeamTemplate.teamshort,
+		team2short = mockTeamTemplate.team2short,
+		teambracket = mockTeamTemplate.teambracket,
+		teamicon = mockTeamTemplate.teamicon,
+		teamimage = mockTeamTemplate.teamimage,
+		teampage = mockTeamTemplate.teampage,
+		teampart = mockTeamTemplate.teampart,
+	}
 end
 
 function mockTeamTemplate.tearDown()
