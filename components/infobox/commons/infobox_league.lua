@@ -240,9 +240,9 @@ function League:createInfobox()
 				end
 
 				-- if the event is finished do not show the button
-				local osdateCuttoff = DateExt.parseIsoDate(endDate)
-				osdateCuttoff.day = osdateCuttoff.day + 2
-				if os.difftime(os.time(), os.time(osdateCuttoff)) > 0 then
+				local osdateCutoff = DateExt.parseIsoDate(endDate)
+				osdateCutoff.day = osdateCutoff.day + 2
+				if os.difftime(os.time(), os.time(osdateCutoff)) > 0 then
 					return
 				end
 
