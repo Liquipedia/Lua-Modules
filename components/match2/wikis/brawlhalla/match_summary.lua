@@ -48,7 +48,7 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget?
 function CustomMatchSummary._createGame(game)
 	if not game.map and not game.winner then return end
 
