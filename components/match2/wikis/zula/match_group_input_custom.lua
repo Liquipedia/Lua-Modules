@@ -18,6 +18,7 @@ local MatchFunctions = {}
 local MapFunctions = {}
 
 MatchFunctions.DEFAULT_MODE = 'team'
+MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
 ---@param match table
 ---@param options table?
