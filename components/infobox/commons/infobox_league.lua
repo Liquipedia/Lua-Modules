@@ -239,13 +239,6 @@ function League:createInfobox()
 					return
 				end
 
-				-- if the event is finished do not show the button
-				local osdateCuttoff = DateExt.parseIsoDate(endDate)
-				osdateCuttoff.day = osdateCuttoff.day + 2
-				if os.difftime(os.time(), os.time(osdateCuttoff)) > 0 then
-					return
-				end
-
 				local addressParts = {}
 				table.insert(addressParts, locations.venue1)
 				table.insert(addressParts, locations.city1)
