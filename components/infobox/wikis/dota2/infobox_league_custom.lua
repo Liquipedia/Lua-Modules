@@ -68,7 +68,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Dota TV Ticket', content = {args.dotatv}},
 			Cell{name = 'Pro Circuit Points', content = {points and mw.getContentLanguage():formatNum(points)}}
 		)
-	elseif id == 'liquipediatier' and self.valveTier then
+	elseif id == 'liquipediatier' and self.caller.valveTier then
 		table.insert(
 			widgets,
 			Cell{
