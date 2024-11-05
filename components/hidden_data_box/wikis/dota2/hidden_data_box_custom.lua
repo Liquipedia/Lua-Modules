@@ -39,9 +39,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_parent_page', Variables.varDefault('tournament_parent'))
 
 	BasicHiddenDataBox.checkAndAssign('tournament_patch', args.patch, queryResult.patch)
-	BasicHiddenDataBox.checkAndAssign('tournament_valve_premier', args.valvepremier, queryResult.extradata.valvepremier)
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args.pctier, queryResult.publishertier)
-	BasicHiddenDataBox.checkAndAssign('tournament_pro_circuit_tier', args.pctier, queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)
