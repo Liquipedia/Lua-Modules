@@ -226,7 +226,7 @@ function League:createInfobox()
 					return
 				end
 				local onlineOrOffline = tostring(args.type or ''):lower()
-				if Logic.readBool(args['event-without-crowd']) or not onlineOrOffline:match('offline') then
+				if not onlineOrOffline:match('offline') then
 					return
 				end
 				local locations = Locale.formatLocations(args)
@@ -236,6 +236,13 @@ function League:createInfobox()
 				end
 				-- Must have a venue or a city to show the accommodation section
 				if not locations.venue1 and not locations.city1 then
+					return
+				end
+
+				local exclusionList = Page.exists('MediaWiki:AccomodationExclusionList.json')
+					and mw.loadJsonData('MediaWiki:AccomodationExclusionList.json') or {}
+				Array.forEach(exclusionList, Page.pageifyLink)
+				if Table.includes(exclusionList, Page.pageifyLink(self.pagename)) then
 					return
 				end
 
