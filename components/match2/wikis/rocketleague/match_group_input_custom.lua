@@ -25,6 +25,7 @@ local EARNINGS_LIMIT_FOR_FEATURED = 10000
 local CURRENT_YEAR = os.date('%Y')
 MatchFunctions.DEFAULT_MODE = '3v3'
 MatchFunctions.DATE_FALLBACKS = {'tournament_enddate'}
+MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
 ---@param match table
 ---@param options table?
