@@ -1018,18 +1018,19 @@ function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
 
 mw.ext.TeamTemplate = {}
 
----@class teamTemplateData
----@field templatename string
----@field historicaltemplate string?
----@field shortname string
----@field name string
----@field bracketname string
----@field page string
----@field icon string
----@field image string
----@field imagedark string
----@field legacyimage string
----@field legacyimagedark string
+---@alias teamTemplateData {
+---templatename: string,
+---historicaltemplate: string?,
+---shortname: string,
+---name: string,
+---bracketname: string,
+---page: string,
+---icon: string,
+---image: string,
+---imagedark: string,
+---legacyimage: string,
+---legacyimagedark: string,
+---}
 
 ---@param teamtemplate string
 ---@param date string|number?
