@@ -10,81 +10,33 @@ local Array = require('Module:Array')
 local AgentNames = require('Module:AgentNames')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DEFAULT_MODE = 'team'
-
--- containers for process helper functions
+local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
-local CustomMatchGroupInput = {}
+MatchFunctions.DEFAULT_MODE = 'team'
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
-	end)
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
-	games = MatchFunctions.removeUnsetMaps(games)
-	match.links = MatchGroupInputUtil.getLinks(match)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
+--
+-- match related functions
+--
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
@@ -118,11 +70,9 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 	return maps
 end
 
---
--- match related functions
---
+MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
+MatchFunctions.canUseAutoScore = MatchGroupInputUtil.canUseAutoScore
 
--- Template:Map sets a default map name so we can count the number of maps.
 -- These maps however shouldn't be stored
 -- The keepMap function will check if a map should be kept
 ---@param games table[]
