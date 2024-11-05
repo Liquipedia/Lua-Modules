@@ -226,7 +226,7 @@ function League:createInfobox()
 					return
 				end
 				local onlineOrOffline = tostring(args.type or ''):lower()
-				if Logic.readBool(args['event-without-crowd']) or not onlineOrOffline:match('offline') then
+				if not onlineOrOffline:match('offline') then
 					return
 				end
 				local locations = Locale.formatLocations(args)
