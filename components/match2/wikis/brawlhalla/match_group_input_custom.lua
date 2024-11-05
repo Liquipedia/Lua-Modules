@@ -18,7 +18,6 @@ local Opponent = Lua.import('Module:Opponent')
 
 local CustomMatchGroupInput = {}
 CustomMatchGroupInput.getBestOf = MatchGroupInputUtil.getBestOf
-CustomMatchGroupInput.canUseAutoScore = MatchGroupInputUtil.canUseAutoScore
 CustomMatchGroupInput.DEFAULT_NODE = 'singles'
 CustomMatchGroupInput.DATE_FALLBACKS = {
 	'tournament_enddate',

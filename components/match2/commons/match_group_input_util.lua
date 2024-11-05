@@ -1083,9 +1083,6 @@ end
 --- The Parser injection must have the following functions:
 --- - extractMaps(match, opponents): table[]
 --- - getBestOf(bestOfInput, maps): integer
---- - canUseAutoScore(match, maps): boolean
----
---- If canUseAutoScore can return true, it must additionally have
 --- - calculateMatchScore(maps): fun(opponentIndex): integer
 ---
 --- It may optionally have the following functions:
@@ -1115,7 +1112,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser)
 
 	match.links = MatchGroupInputUtil.getLinks(match)
 
-	local autoScoreFunction = Parser.canUseAutoScore(match, games)
+	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and Parser.calculateMatchScore(games)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)

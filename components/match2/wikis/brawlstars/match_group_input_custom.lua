@@ -36,7 +36,6 @@ MatchFunctions.DEFAULT_MODE = 'team'
 MatchFunctions.DATE_FALLBACKS = {
 	'tournament_enddate',
 }
-MatchFunctions.canUseAutoScore = MatchGroupInputUtil.canUseAutoScore
 
 local CustomMatchGroupInput = {}
 
@@ -50,7 +49,7 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if map.map == nil then

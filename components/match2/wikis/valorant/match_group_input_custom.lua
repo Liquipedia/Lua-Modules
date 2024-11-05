@@ -71,7 +71,6 @@ function MatchFunctions.extractMaps(match, opponents)
 end
 
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
-MatchFunctions.canUseAutoScore = MatchGroupInputUtil.canUseAutoScore
 
 -- These maps however shouldn't be stored
 -- The keepMap function will check if a map should be kept

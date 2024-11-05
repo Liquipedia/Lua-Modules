@@ -34,7 +34,6 @@ end
 -- match related functions
 --
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
-MatchFunctions.canUseAutoScore = MatchGroupInputUtil.canUseAutoScore
 
 -- These maps however shouldn't be stored
 -- The keepMap function will check if a map should be kept

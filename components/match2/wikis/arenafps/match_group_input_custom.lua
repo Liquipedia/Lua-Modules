@@ -72,8 +72,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
-MatchFunctions.canUseAutoScore = MatchGroupInputUtil.canUseAutoScore
-
 ---@param bestofInput string|integer?
 ---@return integer?
 function MatchFunctions.getBestOf(bestofInput)
