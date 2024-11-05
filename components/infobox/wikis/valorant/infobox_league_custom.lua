@@ -113,7 +113,7 @@ end
 ---@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if String.isNotEmpty(self.data.publishertier) then
+	if self.data.publishertier then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
