@@ -20,24 +20,14 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '400px', teamStyle = 'bracket'})
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param match MatchGroupUtilMatch
----@return Widget
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createGame)
-	)}
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return MatchSummaryRow
-function CustomMatchSummary._createGame(game, gameIndex)
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px'},
