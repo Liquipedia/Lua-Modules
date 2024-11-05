@@ -82,12 +82,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.valvepremier)
-end
-
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.dpcpoints = String.isNotEmpty(args.points) or ''
