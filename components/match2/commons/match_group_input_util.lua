@@ -1078,11 +1078,12 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 end
 
 ---@class MatchParserInterface
----@field extractMaps fun(match: table, opponents: table[]): table[]
+---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer, maps: table[]): integer
 ---@field calculateMatchScore fun(maps: table[]): fun(opponentIndex: integer): integer
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
+---@field getLinks? fun(match: table, games: table[]): table
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1090,13 +1091,14 @@ end
 --- The standard way to process a match input.
 ---
 --- The Parser injection must have the following functions:
---- - extractMaps(match, opponents): table[]
+--- - extractMaps(match, opponents, mapProps): table[]
 --- - getBestOf(bestOfInput, maps): integer
 --- - calculateMatchScore(maps): fun(opponentIndex): integer
 ---
 --- It may optionally have the following functions:
 --- - removeUnsetMaps(maps): table[]
 --- - getExtraData(match, games, opponents): table
+--- - getLinks
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1104,8 +1106,9 @@ end
 --- - OPPONENT_CONFIG: table
 ---@param match table
 ---@param Parser MatchParserInterface
+---@param mapProps any?
 ---@return table
-function MatchGroupInputUtil.standardProcessMatch(match, Parser)
+function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
@@ -1115,11 +1118,11 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
 	end)
 
-	local games = Parser.extractMaps(match, opponents)
+	local games = Parser.extractMaps(match, opponents, mapProps)
 	match.bestof = Parser.getBestOf(match.bestof, games)
 	games = Parser.removeUnsetMaps and Parser.removeUnsetMaps(games) or games
 
-	match.links = MatchGroupInputUtil.getLinks(match)
+	match.links = Parser.getLinks and Parser.getLinks(match, games) or MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
 		and Parser.calculateMatchScore(games)
