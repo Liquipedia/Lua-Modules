@@ -31,9 +31,7 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local parsedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
-	parsedMatch.links.headtohead = MatchFunctions.getHeadToHeadLink(match, parsedMatch.opponents)
-	return parsedMatch
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param opponent MGIParsedOpponent
