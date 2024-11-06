@@ -58,7 +58,6 @@ function MatchFunctions.extractMaps(match, opponents)
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.extradata = MapFunctions.getExtraData(map)
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
