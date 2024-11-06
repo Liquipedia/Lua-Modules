@@ -1105,6 +1105,15 @@ end
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
+---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
+---@field readDate? fun(match: table): {
+---date: string,
+---dateexact: boolean,
+---timestamp: integer,
+---timezoneId: string?,
+---timezoneOffset:string?,
+---}
+---@field getMode? fun(opponents: table[]): string
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1120,7 +1129,10 @@ end
 --- - removeUnsetMaps(maps): table[]
 --- - getExtraData(match, games, opponents): table
 --- - adjustOpponent(opponent, opponentIndex)
---- - getLinks
+--- - getLinks(match, games)
+--- - getHeadToHeadLink(match, opponents)
+--- - readDate(match)
+--- - getMode(opponents)
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1134,7 +1146,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS))
+	local dateProps = Parser.readDate and Parser.readDate(match)
+		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
+	Table.mergeInto(match, dateProps)
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
@@ -1149,6 +1163,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	games = Parser.removeUnsetMaps and Parser.removeUnsetMaps(games) or games
 
 	match.links = Parser.getLinks and Parser.getLinks(match, games) or MatchGroupInputUtil.getLinks(match)
+	if Parser.getHeadToHeadLink then
+		match.links.headtohead = Parser.getHeadToHeadLink(match, opponents)
+	end
 
 	local autoScoreFunction = (Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games))
 		and Parser.calculateMatchScore(games, opponents)
@@ -1172,7 +1189,8 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 		end)
 	end
 
-	match.mode = Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+	match.mode = Parser.getMode and Parser.getMode(opponents)
+		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)

@@ -20,12 +20,7 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local Streams = Lua.import('Module:Links/Stream')
 
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-}
 local TBD = 'TBD'
 local DEFAULT_HERO_FACTION = CharacterAliases.default.faction
 local MODE_MIXED = 'mixed'
@@ -39,7 +34,12 @@ local MODE_MIXED = 'mixed'
 ---@field random boolean?
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = true,
+	},
+}
 local MapFunctions = {}
 
 ---@param match table
@@ -48,68 +48,7 @@ local MapFunctions = {}
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in stormgate match2')
 
-	Table.mergeInto(match, MatchFunctions.readDate(match))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
-		-- make sure match2players is not nil to avoid indexing nil
-		opponent.match2players = opponent.match2players or {}
-		Array.forEach(opponent.match2players, function(player)
-			player.extradata = player.extradata or {}
-			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
-		end)
-	end)
-
-	local games = MatchFunctions.extractMaps(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, opponents)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.mode = MatchFunctions.getMode(opponents)
-
-	match.bestof = MatchFunctions.getBestOf(match.bestof)
-	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('tournament_cancelled')))
-	if cancelled then
-		match.finished = match.finished or 'skip'
-	end
-
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
-		end)
-	end
-
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
-	match.extradata = MatchFunctions.getExtraData(match, #games)
-
-	match.games = games
-	match.opponents = opponents
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param matchArgs table
@@ -126,6 +65,19 @@ function MatchFunctions.readDate(matchArgs)
 	end
 
 	return dateProps
+end
+
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = opponent.extradata or {}
+	Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+	-- make sure match2players is not nil to avoid indexing nil
+	opponent.match2players = opponent.match2players or {}
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata = player.extradata or {}
+		player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+	end)
 end
 
 ---@param match table
