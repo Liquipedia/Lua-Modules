@@ -74,7 +74,7 @@ end
 ---@param match table
 ---@return table
 function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, MapParser)
 end
 
 ---@param match table
