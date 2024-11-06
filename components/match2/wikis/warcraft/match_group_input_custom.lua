@@ -23,10 +23,6 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-}
 local TBD = 'TBD'
 local NEUTRAL_HERO_FACTION = 'neutral'
 local MODE_MIXED = 'mixed'
