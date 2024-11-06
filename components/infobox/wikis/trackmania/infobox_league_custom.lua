@@ -93,21 +93,16 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Array.any(self:getAllArgsForBase(args, 'organizer'),
-		function(organizer)
-			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
-		end)
-end
-
----@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = Logic.emptyOr(
 		args.mode,
 		(String.isNotEmpty(args.team_number) and 'team' or nil),
 		DEFAULT_MODE
 	)
+	self.data.publishertier = Array.any(self:getAllArgsForBase(args, 'organizer'),
+		function(organizer)
+			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
+		end)
 end
 
 ---@param args table
@@ -133,7 +128,7 @@ function CustomLeague:getWikiCategories(args)
 		return info and (info.link .. ' Competitions') or nil
 	end)
 
-	return Array.append(categories, self:liquipediaTierHighlighted(args) and 'Ubisoft Tournaments' or nil)
+	return Array.append(categories, self.data.publishertier and 'Ubisoft Tournaments' or nil)
 end
 
 ---@param lpdbData table
