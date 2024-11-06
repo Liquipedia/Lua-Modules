@@ -40,14 +40,6 @@ return {
 			link = 'C-Tier Tournaments',
 			category = 'C-Tier Tournaments',
 		},
-		{
-			value = '5',
-			sort = 'A5',
-			name = 'D-Tier',
-			short = 'D',
-			link = 'D-Tier Tournaments',
-			category = 'D-Tier Tournaments',
-		},
 		[''] = {
 			value = nil,
 			sort = 'B2',
@@ -58,7 +50,7 @@ return {
 		-- for legacy reasons until arenafps switches to standardized tier/tiertype
 		monthly = {
 			value = 'Monthly',
-			sort = 'A6',
+			sort = 'A5',
 			name = 'Monthly',
 			short = 'Mon.',
 			link = 'Monthly Tournaments',
@@ -66,7 +58,7 @@ return {
 		},
 		weekly = {
 			value = 'Weekly',
-			sort = 'A7',
+			sort = 'A6',
 			name = 'Weekly',
 			short = 'Week.',
 			link = 'Weekly Tournaments',
@@ -74,7 +66,7 @@ return {
 		},
 		qualifier = {
 			value = 'Qualifier',
-			sort = 'A8',
+			sort = 'A7',
 			name = 'Qualifier',
 			short = 'Qual.',
 			link = 'Qualifier Tournaments',
@@ -82,7 +74,7 @@ return {
 		},
 		misc = {
 			value = 'Misc',
-			sort = 'A9',
+			sort = 'A8',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Tournaments',
@@ -90,7 +82,7 @@ return {
 		},
 		showmatch = {
 			value = 'Showmatch',
-			sort = 'B1',
+			sort = 'A9',
 			name = 'Showmatch',
 			short = 'Showm.',
 			link = 'Showmatches',
