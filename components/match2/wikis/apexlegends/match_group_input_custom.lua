@@ -66,12 +66,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype =
-			MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
-			and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-			or nil
-		match.walkover = nil
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 
 		local placementOfTeams = CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
