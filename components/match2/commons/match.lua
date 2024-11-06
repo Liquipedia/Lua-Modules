@@ -308,7 +308,7 @@ end
 ---Final processing of records before being stored to LPDB.
 ---@param records table
 function Match._prepareRecordsForStore(records)
-	Match._prepareMatchRecordForStore(records.matchRecord)
+	Match._prepareMatchRecordForStore(records.matchRecord, records.opponentRecords)
 	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
 		Match.clampFields(opponentRecord, Match.opponentFields)
 		for _, playerRecord in ipairs(records.playerRecords[opponentIndex]) do
@@ -321,8 +321,9 @@ function Match._prepareRecordsForStore(records)
 end
 
 ---@param match table
-function Match._prepareMatchRecordForStore(match)
-	Match._commonBackwardsCompatabilityForV3API(match)
+---@param opponents table[]?
+function Match._prepareMatchRecordForStore(match, opponents)
+	Match._commonBackwardsCompatabilityForV3API(match, opponents)
 
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
@@ -384,12 +385,12 @@ end
 ---Adds fields needed for backwards compatibility with API v3.
 ---walkover and resulttype are added to record.
 ---@param record table #game or match record
-function Match._commonBackwardsCompatabilityForV3API(record)
+---@param opponents table[]? #opponents of the record
+function Match._commonBackwardsCompatabilityForV3API(record, opponents)
 	if record.finished then
 		if not record.walkover then
-			local opponents = record.opponents or {}
 			local function calculateWalkover()
-				local walkoverOpponent = Array.find(opponents, function(opponent)
+				local walkoverOpponent = Array.find(opponents or {}, function(opponent)
 					return opponent.status == 'FF' or opponent.status == 'DQ' or opponent.status == 'L'
 				end)
 				return walkoverOpponent and walkoverOpponent.status:lower() or ''
