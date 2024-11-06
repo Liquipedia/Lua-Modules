@@ -404,7 +404,7 @@ function Match._commonBackwardsCompatabilityForV3API(record, opponents)
 			elseif record.winner == 0 then
 				record.resulttype = 'draw'
 			elseif record.walkover ~= '' then
-				record.resulttype = record.walkover:upper()
+				record.resulttype = 'default'
 			else
 				record.resulttype = ''
 			end
