@@ -27,6 +27,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
+---@param opponents table[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
+
+---@param match table
 ---@return table
 function MatchFunctions.getExtraData(match)
 	return {
@@ -57,13 +64,6 @@ function MatchFunctions.removeUnsetMaps(games)
 	return Array.filter(games, function(map)
 		return map.map ~= nil
 	end)
-end
-
----@param match table
----@param opponents table[]
----@return table[]
-function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param match table
