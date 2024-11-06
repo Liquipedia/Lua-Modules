@@ -105,7 +105,7 @@ function CustomStrategy:_getCategories(race, matchups)
 
 	table.insert(categories, race .. ' ' .. informationType .. 's')
 
-	matchups = (matchups or ''):lower()
+	matchups = matchups or ''
 	if informationType == 'Build Order' then
 		for _, raceMatchupItem in pairs(CustomStrategy._raceMatchups()) do
 			if String.contains(matchups, raceMatchupItem) then
@@ -122,7 +122,7 @@ function CustomStrategy._raceMatchups()
 	local raceMatchups = {}
 	for _, faction1 in pairs(Faction.coreFactions) do
 		for _, faction2 in pairs(Faction.coreFactions) do
-			table.insert(raceMatchups, faction1 .. 'v' .. faction2)
+			table.insert(raceMatchups, faction1:upper() .. 'v' .. faction2:upper())
 		end
 	end
 

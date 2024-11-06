@@ -23,6 +23,7 @@ local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
@@ -504,7 +505,7 @@ end
 ---@param args table
 ---@return boolean
 function League:liquipediaTierHighlighted(args)
-	return self.data.publishertier
+	return HighlightConditions.tournament(self.data)
 end
 
 --- Allows for overriding this functionality
