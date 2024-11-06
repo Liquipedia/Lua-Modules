@@ -50,7 +50,7 @@ end
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if map.map == nil then
 			break
 		end
