@@ -54,10 +54,10 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
----@param dateInput string?
+---@param matchArgs table
 ---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
-function MatchFunctions.readDate(dateInput)
-	local dateProps = MatchGroupInputUtil.readDate(dateInput, {
+function MatchFunctions.readDate(matchArgs)
+	local dateProps = MatchGroupInputUtil.readDate(matchArgs.date, {
 		'match_date',
 		'tournament_startdate',
 		'tournament_enddate',
