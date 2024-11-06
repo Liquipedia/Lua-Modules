@@ -29,11 +29,6 @@ local MatchFunctions = {
 		resolveRedirect = true,
 		pagifyTeamNames = true,
 	},
-	DATE_FALLBACKS = {
-		'match_date',
-		'tournament_startdate',
-		'tournament_enddate',
-	},
 }
 local MapFunctions = {}
 
