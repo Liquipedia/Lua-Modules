@@ -13,7 +13,9 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MockData = Lua.import('test_assets.team_template_data')
+local MockDatas = Lua.import('test_assets.team_template_data')
+local MockData = MockDatas.data
+local Aliases = MockDatas.aliases
 
 local NOT_FOUND_ERROR = '<div class="error">No team template exists for name "${name}".</div>'
 local MISSING_INPUT_ERROR = 'bad argument #1 to "name" (string or number expected, got nil)'
@@ -50,6 +52,7 @@ end
 function mockTeamTemplate.raw(teamtemplate, date)
 	assert(type(teamtemplate) == 'string', MISSING_INPUT_ERROR)
 	local cleanedInput = teamtemplate:lower():gsub('_', ' ')
+	cleanedInput = Aliases[cleanedInput] or cleanedInput
 	local found = MockData[cleanedInput]
 	if not found then return end
 
@@ -74,7 +77,13 @@ function mockTeamTemplate.raw(teamtemplate, date)
 	for index, info in ipairs(historicals) do
 		local endDate = (historicals[index + 1] or {}).startDate or os.date('%F')
 		if standardizedDate >= info.startDate and standardizedDate <= endDate then
-			return MockData[info.name]
+			-- add the historicaltemplate field
+			local foundCopy = MockData[info.name] and Table.copy(MockData[info.name])
+			if not foundCopy then
+				return
+			end
+			foundCopy.historicaltemplate = cleanedInput
+			return foundCopy
 		end
 	end
 end

@@ -31,7 +31,6 @@ local data = {
 	-- mouz subtemplates
 	['mousesports orig'] = {
 		bracketname = "mousesports",
-		historicaltemplate = "mouz",
 		image = "Mousesports new.png",
 		imagedark = "Mousesports new.png",
 		legacyimage = "",
@@ -66,7 +65,6 @@ local data = {
 	-- tl subtemplates
 	['team liquid orig'] = {
 		bracketname = "Team Liquid",
-		historicaltemplate = "team liquid",
 		image = "Team Liquid lightmode.png",
 		imagedark = "Team Liquid lightmode.png",
 		legacyimage = "",
@@ -145,8 +143,7 @@ local data = {
 	},
 }
 
-for alias, key in pairs(aliases) do
-	data[alias] = Table.copy(data[key])
-end
-
-return data
+return {
+	data = data,
+	aliases = aliases,
+}
