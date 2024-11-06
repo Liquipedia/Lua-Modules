@@ -45,7 +45,6 @@ function MatchFunctions.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.participants = MapFunctions.getParticipants(map, opponents)
 		map.extradata = MapFunctions.getExtraData(map, #opponents)
 
