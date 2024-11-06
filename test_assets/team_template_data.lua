@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
-
 local aliases = {
 	mousesports = 'mouz',
 	tl = 'team liquid',
