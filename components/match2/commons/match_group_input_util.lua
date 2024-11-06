@@ -1080,7 +1080,7 @@ end
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[]): table[]
 ---@field getBestOf fun(bestOfInput: string|integer, maps: table[]): integer
----@field calculateMatchScore fun(maps: table[]): fun(opponentIndex: integer): integer
+---@field calculateMatchScore fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
 ---@field DEFAULT_MODE? string
@@ -1092,7 +1092,7 @@ end
 --- The Parser injection must have the following functions:
 --- - extractMaps(match, opponents): table[]
 --- - getBestOf(bestOfInput, maps): integer
---- - calculateMatchScore(maps): fun(opponentIndex): integer
+--- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer
 ---
 --- It may optionally have the following functions:
 --- - removeUnsetMaps(maps): table[]
@@ -1122,7 +1122,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser)
 	match.links = MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and Parser.calculateMatchScore(games)
+		and Parser.calculateMatchScore(games, opponents)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
