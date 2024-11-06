@@ -129,6 +129,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return maps
 end
 
+---@param opponents table[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(opponents, maps)
@@ -283,7 +284,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 	}
 
 	if scoreDataInput[1] == '-' then
-		opponent.status = MatchGroupInputUtil.STATUS.FORFIET
+		opponent.status = MatchGroupInputUtil.STATUS.FORFEIT
 		opponent.score = 0
 	end
 
