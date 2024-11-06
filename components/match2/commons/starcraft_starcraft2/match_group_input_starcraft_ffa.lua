@@ -43,7 +43,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
-	local opponents = BaseMatchFunctions.readOpponents(match)
+	local opponents = MatchFunctions.readOpponents(match)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
 
@@ -101,6 +101,18 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	return match
 end
+
+---@param match table
+---@return table[]
+function MatchFunctions.readOpponents(match)
+	return Array.mapIndexes(function(opponentIndex)
+		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, BaseMatchFunctions.OPPONENT_CONFIG)
+		if not opponent then return end
+		BaseMatchFunctions.adjustOpponent(opponent, opponentIndex)
+		return opponent
+	end)
+end
+
 ---@param match table
 ---@param opponents {score: integer?}[]
 ---@return boolean
