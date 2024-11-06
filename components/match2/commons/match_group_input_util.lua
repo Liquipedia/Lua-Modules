@@ -70,7 +70,7 @@ MatchGroupInputUtil.STATUS_INPUTS = {
 	DEFAULT_WIN = 'W',
 	DEFAULT_LOSS = 'L',
 	DRAW = 'D',
-	FORFIET = 'FF',
+	FORFEIT = 'FF',
 	DISQUALIFIED = 'DQ',
 }
 
@@ -83,7 +83,7 @@ MatchGroupInputUtil.RESULT_TYPE = {
 	DRAW = 'draw',
 }
 MatchGroupInputUtil.WALKOVER = {
-	FORFIET = 'ff',
+	FORFEIT = 'ff',
 	DISQUALIFIED = 'dq',
 	NO_SCORE = 'l',
 }
@@ -683,7 +683,7 @@ end
 ---@return string?
 function MatchGroupInputUtil.getWalkoverType(opponents)
 	if MatchGroupInputUtil.hasForfeit(opponents) then
-		return MatchGroupInputUtil.WALKOVER.FORFIET
+		return MatchGroupInputUtil.WALKOVER.FORFEIT
 	elseif MatchGroupInputUtil.hasDisqualified(opponents) then
 		return MatchGroupInputUtil.WALKOVER.DISQUALIFIED
 	elseif MatchGroupInputUtil.hasDefaultWinLoss(opponents) then
@@ -809,7 +809,7 @@ end
 ---@param opponents {status: string?}[]
 ---@return boolean
 function MatchGroupInputUtil.hasForfeit(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFIET) ~= 0
+	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFEIT) ~= 0
 end
 
 -- function to check for DQ's
