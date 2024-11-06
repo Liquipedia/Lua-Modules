@@ -23,9 +23,11 @@ function MatchSummaryDetailedScore:render()
 	local partialScores = Array.map(self.props.partialScores or {}, function(partialScore)
 		local children = {partialScore.score or '', partialScore.icon}
 
-		local styles = {'brkts-popup-body-match-sidewins'}
-		table.insert(styles, partialScore.style)
-		table.insert(styles, partialScore.icon and 'brkts-popup-body-match-sidewins-icon' or nil)
+		local styles = Array.append({},
+			'brkts-popup-body-match-sidewins',
+			partialScore.style,
+			partialScore.icon and 'brkts-popup-body-match-sidewins-icon' or nil
+		)
 
 		return HtmlWidgets.Td{
 			classes = styles,
