@@ -140,9 +140,10 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 end
 
 ---@param match table
+---@param games table[]
 ---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match, opponents)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
 		casters = MatchGroupInputUtil.readCasters(match),
