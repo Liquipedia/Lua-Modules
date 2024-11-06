@@ -55,7 +55,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	if MatchGroupInputUtil.isNotPlayed(match.winner, finishedInput) then
 		match.finished = true
-		match.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+		match.status = MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 		match.extradata = {ffa = 'true'}
 		return match
 	end
@@ -79,10 +79,9 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	end)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(match.winner, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(match.winner, finishedInput)
 		StarcraftFfaMatchGroupInput._setPlacements(opponents)
-		match.winner = StarcraftFfaMatchGroupInput._getWinner(opponents, match.winner, match.resulttype)
+		match.winner = StarcraftFfaMatchGroupInput._getWinner(opponents, match.winner)
 	end
 
 	Array.forEach(opponents, function(opponent)
@@ -241,7 +240,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentsInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentsInfo)
 		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo, not hasScores)
-		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner, map.resulttype)
+		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner)
 	end
 
 	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
@@ -348,12 +347,11 @@ end
 
 ---@param opponents {placement: integer?, score: integer?, status: string}
 ---@param winnerInput integer|string|nil
----@param resultType string?
 ---@return integer?
-function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput, resultType)
+function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput)
 	if Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DRAW then
+	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
 		return MatchGroupInputUtil.WINNER_DRAW
 	end
 

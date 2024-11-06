@@ -192,6 +192,8 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	type = 'string',
 })
 
+---@alias MatchStatus 'notplayed'|''|nil
+MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
 ---@alias ResultType 'default'|'draw'|'np'
 MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
 ---@alias WalkoverType 'l'|'ff'|'dq'
@@ -249,6 +251,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field mode string?
 ---@field opponents standardOpponent[]
 ---@field resultType ResultType?
+---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
 ---@field tournament string?
@@ -272,6 +275,7 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
 	resultType = 'string?',
+	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
 	tournament = 'string?',
@@ -530,6 +534,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		parent = record.parent,
 		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
+		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),

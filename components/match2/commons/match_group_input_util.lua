@@ -82,6 +82,11 @@ MatchGroupInputUtil.RESULT_TYPE = {
 	NOT_PLAYED = 'np',
 	DRAW = 'draw',
 }
+
+MatchGroupInputUtil.MATCH_STATUS = {
+	NOT_PLAYED = 'notplayed',
+}
+
 MatchGroupInputUtil.WALKOVER = {
 	FORFEIT = 'ff',
 	DISQUALIFIED = 'dq',
@@ -608,7 +613,17 @@ function MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
 		or (type(finishedInput) == 'string' and MatchGroupInputUtil.isNotPlayedInput(finishedInput))
 end
 
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
+---@return string? #Match Status
+function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	end
+end
+
 ---Should only be called on finished matches or maps
+---@deprecated
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
 ---@param opponents {score: number?, status: string}[]
@@ -627,18 +642,18 @@ function MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents
 	end
 end
 
----@param resultType string?
+---@param status string
 ---@param winnerInput integer|string|nil
 ---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
-function MatchGroupInputUtil.getWinner(resultType, winnerInput, opponents)
-	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
+function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
+	if status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DRAW then
+	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
 		return MatchGroupInputUtil.WINNER_DRAW
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
+	elseif MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return MatchGroupInputUtil.getDefaultWinner(opponents)
 	elseif MatchGroupInputUtil.findOpponentWithFirstPlace(opponents) then
 		return MatchGroupInputUtil.findOpponentWithFirstPlace(opponents)
@@ -670,6 +685,7 @@ function MatchGroupInputUtil.getHighestScoringOpponent(opponents)
 	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
 end
 
+---@deprecated
 ---@param resultType string?
 ---@param opponents {status: string}[]
 ---@return string? # Walkover Type
@@ -679,6 +695,7 @@ function MatchGroupInputUtil.getWalkover(resultType, opponents)
 	end
 end
 
+---@deprecated
 ---@param opponents {status: string}[]
 ---@return string?
 function MatchGroupInputUtil.getWalkoverType(opponents)
@@ -805,6 +822,7 @@ function MatchGroupInputUtil._opponentWithStatus(opponents, status)
 	return Array.indexOf(opponents, function (opponent) return opponent.status == status end)
 end
 
+---@deprecated
 -- function to check for forfeits
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -812,6 +830,7 @@ function MatchGroupInputUtil.hasForfeit(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFEIT) ~= 0
 end
 
+---@deprecated
 -- function to check for DQ's
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -819,6 +838,7 @@ function MatchGroupInputUtil.hasDisqualified(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DISQUALIFIED) ~= 0
 end
 
+---@deprecated
 -- function to check for W/L
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -833,7 +853,7 @@ function MatchGroupInputUtil.hasScore(opponents)
 	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.SCORE) ~= 0
 end
 
--- Get the winner when resulttype=default
+-- Get the winner when letter results (W/L etc)
 ---@param opponents {status: string?}[]
 ---@return integer
 function MatchGroupInputUtil.getDefaultWinner(opponents)
@@ -848,12 +868,12 @@ end
 --- If Winner = 0, means it was a draw, return 1
 --- If Winner = -1, means that mean no team won, returns 2
 --- Otherwise return 2
----@param resultType string?
+---@param status string?
 ---@param winner integer?
 ---@param opponentIndex integer
 ---@return integer?
-function MatchGroupInputUtil.placementFromWinner(resultType, winner, opponentIndex)
-	if resultType == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED then
+function MatchGroupInputUtil.placementFromWinner(status, winner, opponentIndex)
+	if status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	end
 	if winner == 0 or winner == opponentIndex then
@@ -1162,11 +1182,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
 	end
 
