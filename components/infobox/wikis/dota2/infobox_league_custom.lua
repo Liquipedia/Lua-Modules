@@ -45,7 +45,7 @@ function CustomLeague.run(frame)
 
 	-- Valve Tier stuff
 	league.args.publisherdescription = 'metadesc-valve'
-	league.valveTier = VALVE_TIERS[(league.args.valvetier or ''):lower()]
+	league.publisherTier = VALVE_TIERS[(league.args.publishertier or ''):lower()]
 
 	return league:createInfobox()
 end
@@ -67,12 +67,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Dota TV Ticket', content = {args.dotatv}},
 			Cell{name = 'Pro Circuit Points', content = {points and mw.getContentLanguage():formatNum(points)}}
 		)
-	elseif id == 'liquipediatier' and self.caller.valveTier then
+	elseif id == 'liquipediatier' and self.caller.publisherTier then
 		table.insert(
 			widgets,
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createValveTierCell()},
+				content = {self.caller:_createPublisherTierCell()},
 				classes = {'valvepremier-highlighted'}
 			}
 		)
@@ -90,7 +90,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = (self.valveTier or {}).name
+	self.data.publishertier = (self.publisherTier or {}).name
 end
 
 ---@param args table
@@ -99,8 +99,8 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_pro_circuit_points', args.points or '')
 	local isIndividual = String.isNotEmpty(args.individual) or String.isNotEmpty(args.player_number)
 	Variables.varDefine('tournament_individual', isIndividual and 'true' or '')
-	if self.valveTier then
-		Variables.varDefine('metadesc-valve', self.valveTier.meta)
+	if self.publisherTier then
+		Variables.varDefine('metadesc-valve', self.publisherTier.meta)
 	end
 
 	--Legacy vars
@@ -133,9 +133,9 @@ function CustomLeague:_createPatchCell(args)
 end
 
 ---@return string?
-function CustomLeague:_createValveTierCell()
-	if self.valveTier then
-		return '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
+function CustomLeague:_createPublisherTierCell()
+	if self.publisherTier then
+		return '[[' .. self.publisherTier.link .. '|' .. self.publisherTier.name .. ']]'
 	end
 end
 
