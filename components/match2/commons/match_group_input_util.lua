@@ -1080,7 +1080,7 @@ end
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer, maps: table[]): integer
----@field calculateMatchScore? fun(maps: table[]): fun(opponentIndex: integer): integer
+---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
 ---@field getLinks? fun(match: table, games: table[]): table
@@ -1095,7 +1095,7 @@ end
 --- - getBestOf(bestOfInput, maps): integer
 ---
 --- It may optionally have the following functions:
---- - calculateMatchScore(maps): fun(opponentIndex): integer
+--- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer
 --- - removeUnsetMaps(maps): table[]
 --- - getExtraData(match, games, opponents): table
 --- - getLinks
@@ -1125,7 +1125,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	match.links = Parser.getLinks and Parser.getLinks(match, games) or MatchGroupInputUtil.getLinks(match)
 
 	local autoScoreFunction = (Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games))
-		and Parser.calculateMatchScore(games)
+		and Parser.calculateMatchScore(games, opponents)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
