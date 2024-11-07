@@ -262,6 +262,7 @@ function Match.encodeJson(matchRecord)
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
 		gameRecord.extradata = Json.stringify(gameRecord.extradata)
+		gameRecord.opponents = Json.stringify(gameRecord.opponents, {asArray = true})
 		gameRecord.participants = Json.stringify(gameRecord.participants)
 		gameRecord.scores = Json.stringify(gameRecord.scores, {asArray = true})
 	end
