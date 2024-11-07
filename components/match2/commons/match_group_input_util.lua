@@ -1206,7 +1206,7 @@ end
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field getMapName? fun(game: table): string?
----@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): {players: table[]}[]?
+---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 
 --- The standard way to process a match input.
