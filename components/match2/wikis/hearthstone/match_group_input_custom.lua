@@ -60,10 +60,7 @@ function MatchFunctions.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		if String.isNotEmpty(map.map) and string.upper(map.map) ~= TBD then
-			map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
-		end
-
+		map.map = MapFunctions.getMapName(map)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
@@ -92,6 +89,15 @@ function MatchFunctions.extractMaps(match, opponents)
 	end
 
 	return maps
+end
+
+---@param map table
+---@return string?
+function MapFunctions.getMapName(map)
+	if String.isNotEmpty(map.map) and map.map ~= TBD then
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
+	end
+	return map.map
 end
 
 ---@param mapInput table

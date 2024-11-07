@@ -88,10 +88,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		if map.map == DUMMY_MAP then
-			map.map = nil
-		end
-
+		map.map = MapFunctions.getMapName(map)
 		map.length = MapParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.publisherid = map.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
@@ -175,6 +172,15 @@ function MatchFunctions.getExtraData(match)
 		mvp = MatchGroupInputUtil.readMvp(match),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
+end
+
+---@param map table
+---@return string?
+function MapFunctions.getMapName(map)
+	if map.map == DUMMY_MAP then
+		return nil
+	end
+	return map.map
 end
 
 ---@param MapParser Dota2MapParserInterface

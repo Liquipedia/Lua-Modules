@@ -96,10 +96,6 @@ function MapFunctions.readMap(map, opponentCount)
 	local finishedInput = map.finished --[[@as string?]]
 	local winnerInput = map.winner --[[@as string?]]
 
-	if not MapFunctions.keepMap(map) then
-		map.map = nil
-	end
-
 	if Logic.isDeepEmpty(map) then
 		return nil
 	end
@@ -121,17 +117,10 @@ function MapFunctions.readMap(map, opponentCount)
 	if map.finished then
 		map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
 		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
 	end
 
 	return map
-end
-
--- Check if a map should be discarded due to being redundant
----@param map table
----@return boolean
-function MapFunctions.keepMap(map)
-	return map.map ~= nil
 end
 
 ---@param winnerInput string|integer|nil

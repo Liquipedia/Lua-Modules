@@ -42,7 +42,7 @@ function MatchFunctions.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.map = nil
+		map.map = MapFunctions.getMapName(map)
 		map.participants = MapFunctions.getParticipants(map, opponents)
 		map.extradata = MapFunctions.getExtraData(map, #opponents)
 
@@ -85,6 +85,12 @@ function MatchFunctions.getExtraData(match)
 	return {
 		comment = match.comment,
 	}
+end
+
+---@param map table
+---@return string?
+function MapFunctions.getMapName(map)
+	return nil
 end
 
 ---@param map table
