@@ -1207,6 +1207,7 @@ end
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field getMapName? fun(game: table): string?
+---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 
@@ -1215,7 +1216,8 @@ end
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
---- - getMapName(mapValues): string?
+--- - getMapName(map): string?
+--- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getParticipants(map, opponents): table (DEPRECATED)
 ---@param match table
@@ -1230,6 +1232,9 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		if Parser.getMapName then
 			map.map = Parser.getMapName(map)
+		end
+		if Parser.getMapMode then
+			map.mode = Parser.getMapMode(match, map, opponents)
 		end
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
