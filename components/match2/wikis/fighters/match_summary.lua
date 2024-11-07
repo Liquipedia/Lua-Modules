@@ -74,7 +74,8 @@ end
 function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, teamIdx)
 	return Array.map(game.opponents[teamIdx].players, function (players, index)
 		if players.characters then
-			return {player = matchOpponents[teamIdx].players[index], characters = Array.map(players.characters, Operator.property('name'))}
+			local characters = Array.map(players.characters, Operator.property('name'))
+			return {player = matchOpponents[teamIdx].players[index], characters = characters}
 		end
 	end)
 end
