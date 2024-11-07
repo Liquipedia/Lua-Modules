@@ -123,20 +123,7 @@ end
 ---@param config {noLink: boolean?}?
 ---@return string
 function DisplayHelper.MapAndStatus(game, config)
-	config = config or {}
-	local mapText
-	if game.map and game.mapDisplayName then
-		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
-	elseif game.map and not config.noLink then
-		mapText = '[[' .. game.map .. ']]'
-	elseif game.map then
-		mapText = game.map
-	else
-		mapText = 'Unknown'
-	end
-	if game.resultType == 'np' or game.resultType == 'default' then
-		mapText = '<s>' .. mapText .. '</s>'
-	end
+	local mapText = DisplayHelper.Map(game, config)
 
 	local statusText = nil
 	if game.resultType == 'default' then
@@ -152,6 +139,41 @@ function DisplayHelper.MapAndStatus(game, config)
 	end
 
 	return mapText .. (statusText or '')
+end
+
+---Displays the map name and map-mode.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.MapAndMode(game, config)
+	local MapModes = require('Module:MapModes')
+
+	local mapText = DisplayHelper.Map(game, config)
+
+	if Logic.isEmpty(game.mode) then
+		return mapText
+	end
+	return MapModes.get{mode = game.mode} .. mapText
+end
+
+---Displays the map name and link.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.Map(game, config)
+	config = config or {}
+	local mapText
+	if game.map and game.mapDisplayName then
+		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
+	elseif game.map and not config.noLink then
+		mapText = '[[' .. game.map .. ']]'
+	else
+		mapText = game.map or 'Unknown'
+	end
+	if game.resultType == 'np' or game.resultType == 'default' then
+		mapText = '<s>' .. mapText .. '</s>'
+	end
+	return mapText
 end
 
 ---@param score string|number|nil

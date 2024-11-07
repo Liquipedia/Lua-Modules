@@ -66,12 +66,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype =
-			MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
-			and MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-			or nil
-		match.walkover = nil
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 
 		local placementOfTeams = CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
@@ -129,6 +125,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return maps
 end
 
+---@param opponents table[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(opponents, maps)
@@ -283,7 +280,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 	}
 
 	if scoreDataInput[1] == '-' then
-		opponent.status = MatchGroupInputUtil.STATUS.FORFIET
+		opponent.status = MatchGroupInputUtil.STATUS.FORFEIT
 		opponent.score = 0
 	end
 

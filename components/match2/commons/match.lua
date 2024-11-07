@@ -308,7 +308,7 @@ end
 ---Final processing of records before being stored to LPDB.
 ---@param records table
 function Match._prepareRecordsForStore(records)
-	Match._prepareMatchRecordForStore(records.matchRecord)
+	Match._prepareMatchRecordForStore(records.matchRecord, records.opponentRecords)
 	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
 		Match.clampFields(opponentRecord, Match.opponentFields)
 		for _, playerRecord in ipairs(records.playerRecords[opponentIndex]) do
@@ -321,7 +321,10 @@ function Match._prepareRecordsForStore(records)
 end
 
 ---@param match table
-function Match._prepareMatchRecordForStore(match)
+---@param opponents table[]?
+function Match._prepareMatchRecordForStore(match, opponents)
+	Match._commonBackwardsCompatabilityForV3API(match, opponents)
+
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
@@ -379,6 +382,35 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 	Match.clampFields(gameRecord, Match.gameFields)
 end
 
+---Adds fields needed for backwards compatibility with API v3.
+---walkover and resulttype are added to record.
+---@param record table #game or match record
+---@param opponents table[]? #opponents of the record
+function Match._commonBackwardsCompatabilityForV3API(record, opponents)
+	if record.finished then
+		if not record.walkover then
+			local function calculateWalkover()
+				local walkoverOpponent = Array.find(opponents or {}, function(opponent)
+					return opponent.status == 'FF' or opponent.status == 'DQ' or opponent.status == 'L'
+				end)
+				return walkoverOpponent and walkoverOpponent.status:lower() or ''
+			end
+			record.walkover = calculateWalkover()
+		end
+
+		if not record.resulttype then
+			if record.status == 'notplayed' then
+				record.resulttype = 'np'
+			elseif record.winner == 0 then
+				record.resulttype = 'draw'
+			elseif record.walkover ~= '' then
+				record.resulttype = 'default'
+			else
+				record.resulttype = ''
+			end
+		end
+	end
+end
 
 Match.matchFields = Table.map({
 	'bestof',
@@ -400,7 +432,7 @@ Match.matchFields = Table.map({
 	'parentname',
 	'patch',
 	'publishertier',
-	'resulttype',
+	'resulttype', -- LPDB API v3: backwards compatibility
 	'series',
 	'shortname',
 	'status',
@@ -409,7 +441,7 @@ Match.matchFields = Table.map({
 	'tournament',
 	'type',
 	'vod',
-	'walkover',
+	'walkover', -- LPDB API v3: backwards compatibility
 	'winner',
 	'section',
 }, function(_, field) return field, true end)

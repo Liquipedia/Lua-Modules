@@ -9,9 +9,6 @@
 local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')
 local Operator = require('Module:Operator')
@@ -23,9 +20,6 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
 local NON_BREAKING_SPACE = '&nbsp;'
 
 ---@param args table
@@ -34,78 +28,37 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '490px', teamStyle = 'bracket'})
 end
 
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createGame),
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto))
-	)}
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
----@return Html
-function CustomMatchSummary._createGame(game)
-	local row = MatchSummary.Row()
-
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummaryWidgets.Break{})
-	end
-
+---@param gameIndex integer
+---@return Widget?
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	local weaponsData = Array.map(game.opponents, function(opponent)
 		return Array.map(opponent.players, Operator.property('weapon'))
 	end)
 
-	row:addClass('brkts-popup-body-game')
-		:css('font-size', '90%')
-		:css('padding', '4px')
-		:css('min-height', '32px')
-
-	row:addElement(CustomMatchSummary._opponentWeaponsDisplay{
-		data = weaponsData[1],
-		flip = false,
-		game = game.game
-	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(CustomMatchSummary._gameScore(game, 1))
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('min-width', '156px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-		:node(mw.html.create('div')
-			:css('margin', 'auto')
-			:wikitext(CustomMatchSummary._getMapDisplay(game))
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '90%', padding = '4px'},
+		children = WidgetUtil.collect(
+			CustomMatchSummary._opponentWeaponsDisplay{
+				data = weaponsData[1],
+				flip = false,
+				game = game.game
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			CustomMatchSummary._gameScore(game, 1),
+			MatchSummaryWidgets.GameCenter{children = CustomMatchSummary._getMapDisplay(game), css = {['flex-grow'] = 1}},
+			CustomMatchSummary._gameScore(game, 2),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			CustomMatchSummary._opponentWeaponsDisplay{
+				data = weaponsData[2],
+				flip = true,
+				game = game.game
+			},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-	)
-	row:addElement(CustomMatchSummary._gameScore(game, 2))
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentWeaponsDisplay{
-		data = weaponsData[2],
-		flip = true,
-		game = game.game
-	})
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		local comment = mw.html.create('div')
-		comment:wikitext(game.comment)
-				:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	return row:create()
+	}
 end
 
 ---@param game MatchGroupUtilGame
@@ -136,23 +89,6 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 			:css('margin', 'auto')
 			:wikitext(scoreDisplay)
 		)
-end
-
----@param showIcon boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(showIcon)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if Logic.readBool(showIcon) then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
 end
 
 ---@param props {data: string[], flip: boolean, game: string}

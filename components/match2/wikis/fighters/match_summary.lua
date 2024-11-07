@@ -9,8 +9,6 @@
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -18,13 +16,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local ICONS = {
-	winner = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'},
-	draw = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'},
-	loss = Icon.makeIcon{iconName = 'loss', color = 'cinnabar-text', size = 'initial'},
-	empty = '[[File:NoCheck.png|link=|16px]]',
-}
 
 local CustomMatchSummary = {}
 
@@ -75,42 +66,34 @@ function CustomMatchSummary.fetchCharacters(game, teamIdx)
 end
 
 ---@param game MatchGroupUtilGame
----@param props {game: string?, opponents: standardOpponent[]}
----@return Html?
+---@param props {game: string?}
+---@return Widget?
 function CustomMatchSummary._createStandardGame(game, props)
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
-		:css('font-size', '0.75rem')
-		:css('padding', '4px')
-		:css('min-height', '24px')
-
-	game.extradata = game.extradata or {}
-
 	if not game or not game.participants then
 		return
 	end
 
-	local chars1 = CustomMatchSummary._createCharacterDisplay(
-		CustomMatchSummary.fetchCharacters(game, 1),
-		props.game,
-		false
-	)
-	local chars2 = CustomMatchSummary._createCharacterDisplay(
-		CustomMatchSummary.fetchCharacters(game, 2),
-		props.game,
-		true
-	)
+	local scoreDisplay = (game.scores[1] or '') .. '&nbsp;-&nbsp;' .. (game.scores[2] or '')
 
-	row:addElement(chars1:css('flex-basis', '30%'))
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
-	row:addElement(mw.html.create('div')
-			:addClass('brkts-popup-spaced'):css('flex', '1 0 auto')
-			:wikitext(game.scores[1]):wikitext('&nbsp;-&nbsp;'):wikitext(game.scores[2])
-	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-	row:addElement(chars2:css('flex-basis', '30%'):css('text-align', 'right'))
-
-	return row:create()
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '0.75rem', padding = '4px'},
+		children = WidgetUtil.collect(
+			CustomMatchSummary._createCharacterDisplay(
+				CustomMatchSummary.fetchCharacters(game, 1),
+				props.game,
+				false
+			),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.GameCenter{children = scoreDisplay, css = {['flex-grow'] = 1}},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			CustomMatchSummary._createCharacterDisplay(
+				CustomMatchSummary.fetchCharacters(game, 2),
+				props.game,
+				true
+			)
+		)
+	}
 end
 
 ---@param characters {name: string}[]?
@@ -120,6 +103,8 @@ end
 function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
 	local wrapper = mw.html.create('div')
+		:css('flex-basis', '30%')
+		:css('text-align', reverse and 'right' or 'left')
 
 	if Table.isEmpty(characters) then
 		return wrapper
@@ -134,8 +119,8 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 		else
 			characterDisplay:wikitext(CharacterIcons[character.name]):wikitext('&nbsp;'):wikitext(character.name)
 		end
-
-		return characterDisplay
+		wrapper:node(characterDisplay)
+		return wrapper
 	end
 
 	local characterDisplays = Array.map(characters, function (character, index)
@@ -151,24 +136,6 @@ function CustomMatchSummary._createCharacterDisplay(characters, game, reverse)
 	Array.forEach(characterDisplays, FnUtil.curry(wrapper.node, wrapper))
 
 	return wrapper
-end
-
----@param winner integer|string
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
-	return mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:css('width', '16px')
-			:css('line-height', '17px')
-			:css('margin-left', (opponentIndex == 1) and '10%' or '1%')
-			:css('margin-right', (opponentIndex == 2) and '10%' or '1%')
-			:wikitext(
-				winner == opponentIndex and ICONS.winner
-				or winner == 0 and ICONS.draw
-				or Logic.isNotEmpty(winner) and ICONS.loss
-				or ICONS.empty
-			)
 end
 
 return CustomMatchSummary
