@@ -1219,7 +1219,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
@@ -1238,6 +1237,8 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
 			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
 		end
+
+		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
 
 		table.insert(maps, map)
 		match[key] = nil
