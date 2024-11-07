@@ -116,11 +116,9 @@ function TransferRow:_readBaseData()
 	if Logic.isDeepEmpty(fromTeam) and String.isNotEmpty(args.team1) then
 		error('Missing team template for team ' .. args.team1)
 	end
-	
 	if Logic.isDeepEmpty(toTeam) and String.isNotEmpty(args.team2) then
 		error('Missing team template for team ' .. args.team2)
 	end
-	
 	---@param str string?
 	---@return string?
 	local ucFirst = function(str)
