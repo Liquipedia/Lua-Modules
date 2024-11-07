@@ -46,7 +46,7 @@ end
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if Table.isEmpty(map) then
 			break
 		end
