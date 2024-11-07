@@ -61,7 +61,7 @@ end
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
----@return {players: table[]}[]?
+---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.literal then
 		return {}
@@ -73,7 +73,7 @@ end
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
----@return {players: table[]}
+---@return table[]
 function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
 	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
@@ -108,7 +108,7 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	Array.forEach(unattachedParticipants, function(participant)
 		table.insert(participants, participant)
 	end)
-	return {players = participants}
+	return participants
 end
 
 ---@param map table

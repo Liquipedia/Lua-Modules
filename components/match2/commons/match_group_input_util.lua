@@ -1215,7 +1215,7 @@ end
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
 --- - getMapName(mapValues): string?
---- - getPlayersOfMapOpponent(map, opponent, opponentIndex): {players: table[]}[]?
+--- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getParticipants(map, opponents): table (DEPRECATED)
 ---@param match table
 ---@param opponents table[]

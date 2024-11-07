@@ -73,11 +73,9 @@ function MapFunctions._processSoloMapData(player, map, opponentIndex)
 	local char = map['char' .. opponentIndex] or ''
 
 	return {
-		players = {
-			{
-				char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
-				player = player.name,
-			}
+		{
+			char = MatchGroupInputUtil.getCharacterName(CharacterStandardization, char),
+			player = player.name,
 		}
 	}
 end
