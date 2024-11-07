@@ -74,24 +74,22 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
 		map.extradata = CustomMatchGroupInput.getMapExtraData(map, opponents, Logic.readBool(match.hasSubmatches))
 
-		map.opponents = CustomMatchGroupInput.getParticipants(map, opponents)
-
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			})
-			return {score = score, status = status}
+			local players = CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)
@@ -162,28 +160,27 @@ function CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatc
 end
 
 ---@param map table
----@param opponents MGIParsedOpponent[]
----@return {players: table[]}[]
-function CustomMatchGroupInput.getParticipants(map, opponents)
-	return Array.map(opponents, function(opponent, opponentIndex)
-		local players = Array.mapIndexes(function(playerIndex)
-			return map['t' .. opponentIndex .. 'p' .. playerIndex]
-		end)
-		local participants, _ = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			players,
-			function(playerIndex)
-				local data = map['t' .. opponentIndex .. 'p' .. playerIndex]
-				return data and {name = data} or nil
-			end,
-			function(playerIndex, playerIdData, playerInputData)
-				return {
-					played = true
-				}
-			end
-		)
-		return {players = participants}
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	local players = Array.mapIndexes(function(playerIndex)
+		return map['t' .. opponentIndex .. 'p' .. playerIndex]
 	end)
+	local participants, _ = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local data = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			return data and {name = data} or nil
+		end,
+		function(playerIndex, playerIdData, playerInputData)
+			return {
+				played = true
+			}
+		end
+	)
+	return {players = participants}
 end
 
 return CustomMatchGroupInput
