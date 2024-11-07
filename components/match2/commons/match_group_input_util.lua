@@ -1206,6 +1206,8 @@ end
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field getMapName? fun(game: table): string?
+---@field getMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): {players: table[]}[]?
+---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 
 --- The standard way to process a match input.
 ---
@@ -1213,6 +1215,8 @@ end
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
 --- - getMapName(mapValues): string?
+--- - getMapOpponent(map, opponent, opponentIndex): {players: table[]}[]?
+--- - getParticipants(map, opponents): table (DEPRECATED)
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
@@ -1225,6 +1229,14 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		if Parser.getMapName then
 			map.map = Parser.getMapName(map)
+		end
+		if Parser.getMapOpponent then
+			map.opponents = Array.map(opponents, function(opponent, opponentIndex)
+				return Parser.getMapOpponent(map, opponent, opponentIndex)
+			end)
+		elseif Parser.getParticipants then
+			-- Legacy way, to be replaced by getMapOpponent
+			map.participants = Parser.getParticipants(map, opponents)
 		end
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 

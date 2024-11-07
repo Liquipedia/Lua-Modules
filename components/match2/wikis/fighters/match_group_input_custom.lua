@@ -40,42 +40,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param matchOpponents table[]
+---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, matchOpponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(match, map, matchOpponents)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
-			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
-		end)
-
-		local opponentInfo = Array.map(matchOpponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+function CustomMatchGroupInput.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestofInput string
@@ -95,20 +63,20 @@ end
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, table>?
-function CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
+---@return {players: table[]}[]?
+function MapFunctions.getMapOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.literal then
 		return {}
 	end
 
-	return CustomMatchGroupInput._processPlayerMapData(map, opponent, opponentIndex)
+	return MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 end
 
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return {players: table[]}
-function CustomMatchGroupInput._processPlayerMapData(map, opponent, opponentIndex)
+function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
 	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 
@@ -148,7 +116,7 @@ end
 ---@param winnerInput string|integer|nil
 ---@param finished boolean
 ---@return fun(opponentIndex: integer): integer?
-function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
+function MapFunctions.calculateMapScore(winnerInput, finished)
 	local winner = tonumber(winnerInput)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling

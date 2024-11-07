@@ -9,9 +9,7 @@
 local Array = require('Module:Array')
 local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -33,47 +31,20 @@ function CustomMatchGroupInput.processMatch(match, options)
 end
 
 ---@param match table
----@param matchOpponents table[]
+---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, matchOpponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if not map.map then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.map = CustomMatchGroupInput.getMapName(map)
-		map.extradata = MapFunctions.getExtraData(match, map, matchOpponents)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
-			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
-		end)
-
-		local opponentInfo = Array.map(matchOpponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+function CustomMatchGroupInput.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
+
+---@param games table[]
+---@return table[]
+function CustomMatchGroupInput.removeUnsetMaps(games)
+	return Array.filter(games, function(map)
+		return map.map ~= nil
+	end)
+end
+
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
@@ -86,10 +57,10 @@ end
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, table>?
-function CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
+---@return {players: {char: string, player: string}[]}?
+function MapFunctions.getMapOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.solo then
-		return CustomMatchGroupInput._processSoloMapData(opponent.match2players[1], map, opponentIndex)
+		return MapFunctions._processSoloMapData(opponent.match2players[1], map, opponentIndex)
 	end
 	return nil
 end
@@ -97,8 +68,8 @@ end
 ---@param player table
 ---@param map table
 ---@param opponentIndex integer
----@return table<string, table>
-function CustomMatchGroupInput._processSoloMapData(player, map, opponentIndex)
+---@return {players: {char: string, player: string}[]}
+function MapFunctions._processSoloMapData(player, map, opponentIndex)
 	local char = map['char' .. opponentIndex] or ''
 
 	return {
@@ -114,7 +85,7 @@ end
 ---@param winnerInput string|integer|nil
 ---@param finished boolean
 ---@return fun(opponentIndex: integer): integer?
-function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
+function MapFunctions.calculateMapScore(winnerInput, finished)
 	local winner = tonumber(winnerInput)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
@@ -127,7 +98,7 @@ end
 
 ---@param map table
 ---@return string?
-function CustomMatchGroupInput.getMapName(map)
+function MapFunctions.getMapName(map)
 	if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
 		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
 	end
