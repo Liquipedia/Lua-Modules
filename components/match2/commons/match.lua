@@ -262,6 +262,7 @@ function Match.encodeJson(matchRecord)
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
 		gameRecord.extradata = Json.stringify(gameRecord.extradata)
+		gameRecord.opponents = Json.stringify(gameRecord.opponents, {asArray = true})
 		gameRecord.participants = Json.stringify(gameRecord.participants)
 		gameRecord.scores = Json.stringify(gameRecord.scores, {asArray = true})
 	end
@@ -323,6 +324,7 @@ end
 ---@param match table
 ---@param opponents table[]?
 function Match._prepareMatchRecordForStore(match, opponents)
+	-- Backwards compatibility for API v3
 	Match._commonBackwardsCompatabilityForV3API(match, opponents)
 
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
@@ -367,12 +369,15 @@ end
 ---@param matchRecord table
 ---@param gameRecord table
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
+	-- Backwards compatibility for API v3
+	Match._commonBackwardsCompatabilityForV3API(gameRecord, gameRecord.opponents)
+
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
 	if not gameRecord.participants then
 		gameRecord.participants = {}
 		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
-			for playerId, player in pairs(opponent.players) do
+			for playerId, player in pairs(opponent.players or {}) do
 				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
 				-- between participants and opponents
 				gameRecord.participants[opponentId .. '_' .. playerId] = Table.deepCopy(player)
@@ -475,15 +480,16 @@ Match.gameFields = Table.map({
 	'parent',
 	'participants',
 	'patch',
-	'opponents', -- Not a real field yet, but will be in the future. Also for use in Match/Legacy
-	'resulttype',
+	'opponents',
+	'resulttype',  -- LPDB API v3: backwards compatibility
 	'rounds',
 	'scores',
+	'status',
 	'subgroup',
 	'tournament',
 	'type',
 	'vod',
-	'walkover',
+	'walkover', -- LPDB API v3: backwards compatibility
 	'winner',
 }, function(_, field) return field, true end)
 
