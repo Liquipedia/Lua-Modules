@@ -483,6 +483,7 @@ Match.gameFields = Table.map({
 	'resulttype',  -- LPDB API v3: backwards compatibility
 	'rounds',
 	'scores',
+	'status',
 	'subgroup',
 	'tournament',
 	'type',
