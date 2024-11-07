@@ -21,14 +21,15 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Dota2LeagueInfobox: InfoboxLeague
+---@field publisherTier {meta: string, name: string, link: string}?
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 local VALVE_TIERS = {
 	['international'] = {meta = '', name = 'The International', link = 'The International'},
-	['major'] = {meta = 'Dota Major Championship', name = 'Dota Major Championship', link = 'Dota Major Championships'},
+	['major'] = {meta = 'Major Championship', name = 'Dota Major Championship', link = 'Dota Major Championships'},
 	['dpc major'] = {meta = 'DPC Major', name = 'DPC Major', link = 'Dota Major Championships'},
-	['dpc minor'] = {meta = 'DPC Minor', name = 'DPC Major', link = 'Dota Minor Championships'},
+	['dpc minor'] = {meta = 'DPC Minor', name = 'DPC Minor', link = 'Dota Minor Championships'},
 	['dpc league'] = {meta = 'DPC Regional League', name = 'DPC Regional League', link = 'Regional League'}
 }
 
