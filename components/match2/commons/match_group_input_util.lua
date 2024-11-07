@@ -1130,9 +1130,9 @@ end
 --- - getExtraData(match, games, opponents): table?
 --- - adjustOpponent(opponent, opponentIndex)
 --- - getLinks(match, games): table?
---- - getHeadToHeadLink(match, opponents)
---- - readDate(match)
---- - getMode(opponents)
+--- - getHeadToHeadLink(match, opponents): string?
+--- - readDate(match): table
+--- - getMode(opponents): string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
