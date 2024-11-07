@@ -1236,7 +1236,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			-- Legacy way, to be replaced by getPlayersOfMapOpponent
 			map.participants = Parser.getParticipants(map, opponents)
 		end
-		map.opponents = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -1244,7 +1244,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 				score = map['score' .. opponentIndex],
 			}, Parser.calculateMapScore and Parser.calculateMapScore(map) or nil)
 			local players = Parser.getPlayersOfMapOpponent
-				and Parser.getPlayersOfMapOpponent(map, opponents[opponentIndex], opponentIndex)
+				and Parser.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 				or nil
 			return {score = score, status = status, players = players}
 		end)
