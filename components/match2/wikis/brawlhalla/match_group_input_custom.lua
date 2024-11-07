@@ -58,7 +58,7 @@ end
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return {players: {char: string, player: string}[]}?
-function MapFunctions.getMapOpponent(map, opponent, opponentIndex)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.solo then
 		return MapFunctions._processSoloMapData(opponent.match2players[1], map, opponentIndex)
 	end

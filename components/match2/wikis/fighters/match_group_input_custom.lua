@@ -62,7 +62,7 @@ end
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return {players: table[]}[]?
-function MapFunctions.getMapOpponent(map, opponent, opponentIndex)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	if opponent.type == Opponent.literal then
 		return {}
 	end
