@@ -479,7 +479,6 @@ Match.gameFields = Table.map({
 	'resulttype',
 	'rounds',
 	'scores',
-	'status',
 	'subgroup',
 	'tournament',
 	'type',
