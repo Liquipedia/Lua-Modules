@@ -18,6 +18,7 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local CustomMatchGroupInput = {}
+local MapFunctions = {}
 CustomMatchGroupInput.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	applyUnderScores = true,
@@ -47,9 +48,7 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = {
-			comment = map.comment,
-		}
+		map.extradata = MapFunctions.getExtraData(match, map, matchOpponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
 			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
@@ -158,6 +157,16 @@ function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+	}
 end
 
 return CustomMatchGroupInput

@@ -19,6 +19,7 @@ local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local CustomMatchGroupInput = {}
+local MapFunctions = {}
 
 local DEFAULT_BESTOF = 99
 CustomMatchGroupInput.OPPONENT_CONFIG = {
@@ -53,9 +54,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = {
-			comment = map.comment,
-		}
+		map.extradata = MapFunctions.getExtraData(match, map, opponents)
 		map.map = CustomMatchGroupInput.getMapName(map)
 		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
 
@@ -132,6 +131,16 @@ end
 ---@return string?
 function CustomMatchGroupInput.getMapName(map)
 	return nil
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+	}
 end
 
 return CustomMatchGroupInput

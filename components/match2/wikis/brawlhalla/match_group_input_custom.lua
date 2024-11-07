@@ -17,6 +17,7 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local CustomMatchGroupInput = {}
+local MapFunctions = {}
 CustomMatchGroupInput.getBestOf = MatchGroupInputUtil.getBestOf
 CustomMatchGroupInput.DEFAULT_NODE = 'singles'
 CustomMatchGroupInput.DATE_FALLBACKS = {
@@ -44,9 +45,7 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.map = CustomMatchGroupInput.getMapName(map)
-		map.extradata = {
-			comment = map.comment,
-		}
+		map.extradata = MapFunctions.getExtraData(match, map, matchOpponents)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		map.opponents = Array.map(matchOpponents, function(opponent, opponentIndex)
 			return CustomMatchGroupInput.getParticipantsOfOpponent(map, opponent, opponentIndex)
@@ -133,6 +132,16 @@ function CustomMatchGroupInput.getMapName(map)
 		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
 	end
 	return map.map
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+	}
 end
 
 return CustomMatchGroupInput
