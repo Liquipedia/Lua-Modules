@@ -1212,9 +1212,8 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
----@param mapProps any?
 ---@return table
-function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser, mapProps)
+function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
