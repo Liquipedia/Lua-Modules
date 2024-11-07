@@ -46,7 +46,7 @@ end
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
 	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if Table.isEmpty(map) then
 			break
 		end
@@ -56,7 +56,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.extradata = {
 			comment = map.comment,
 		}
-		map.map = 'Game ' .. mapIndex
+		map.map = CustomMatchGroupInput.getMapName(map)
 		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
@@ -126,6 +126,12 @@ function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param map table
+---@return string?
+function CustomMatchGroupInput.getMapName(map)
+	return nil
 end
 
 return CustomMatchGroupInput

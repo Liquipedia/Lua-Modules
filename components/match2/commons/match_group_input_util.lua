@@ -1204,11 +1204,15 @@ end
 
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
----@field getExtraData? fun(match: table, games: table, opponents: table[]): table?
+---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
+---@field getMapName? fun(game: table): string?
 
---- It may optionally have the following functions:
---- - calculateMatchScore(map): fun(opponentIndex): integer?
+--- The standard way to process a match input.
+---
+--- The Parser injection may optionally have the following functions:
+--- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
+--- - getMapName(mapValues): string?
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
@@ -1219,6 +1223,9 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		if Parser.getMapName then
+			map.map = Parser.getMapName(map)
+		end
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)

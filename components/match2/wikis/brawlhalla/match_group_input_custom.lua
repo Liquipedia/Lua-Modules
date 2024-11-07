@@ -43,10 +43,7 @@ function CustomMatchGroupInput.extractMaps(match, matchOpponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
-			map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
-		end
-
+		map.map = CustomMatchGroupInput.getMapName(map)
 		map.extradata = {
 			comment = map.comment,
 		}
@@ -127,6 +124,15 @@ function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param map table
+---@return string?
+function CustomMatchGroupInput.getMapName(map)
+	if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
+	end
+	return map.map
 end
 
 return CustomMatchGroupInput
