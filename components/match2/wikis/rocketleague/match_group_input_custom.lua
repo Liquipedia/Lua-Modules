@@ -48,7 +48,7 @@ end
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if map.map == nil then
 			break
 		end
@@ -56,7 +56,6 @@ function MatchFunctions.extractMaps(match, opponents)
 		local winnerInput = map.winner --[[@as string?]]
 
 		map.extradata = MapFunctions.getExtraData(map)
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentInfo = Array.map(opponents, function(_, opponentIndex)

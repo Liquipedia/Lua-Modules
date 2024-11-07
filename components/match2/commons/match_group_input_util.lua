@@ -1099,10 +1099,10 @@ end
 
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
----@field getBestOf fun(bestOfInput: string|integer, maps: table[]): integer
----@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer
+---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
+---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
----@field getExtraData? fun(match: table, games: table[], opponents: table[]): table
+---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table?
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
 ---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
@@ -1122,17 +1122,17 @@ end
 ---
 --- The Parser injection must have the following functions:
 --- - extractMaps(match, opponents, mapProps): table[]
---- - getBestOf(bestOfInput, maps): integer
+--- - getBestOf(bestOfInput, maps): integer?
 ---
 --- It may optionally have the following functions:
---- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer
+--- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
 --- - removeUnsetMaps(maps): table[]
---- - getExtraData(match, games, opponents): table
+--- - getExtraData(match, games, opponents): table?
 --- - adjustOpponent(opponent, opponentIndex)
---- - getLinks(match, games)
---- - getHeadToHeadLink(match, opponents)
---- - readDate(match)
---- - getMode(opponents)
+--- - getLinks(match, games): table?
+--- - getHeadToHeadLink(match, opponents): string?
+--- - readDate(match): table
+--- - getMode(opponents): string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1200,6 +1200,51 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	match.opponents = opponents
 
 	return match
+end
+
+---@class MapParserInterface
+---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
+---@field getExtraData? fun(match: table, games: table, opponents: table[]): table?
+
+--- It may optionally have the following functions:
+--- - calculateMatchScore(map): fun(opponentIndex): integer?
+--- - getExtraData(match, map, opponents): table?
+---@param match table
+---@param opponents table[]
+---@param Parser MapParserInterface
+---@return table
+function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
+	local maps = {}
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local finishedInput = map.finished --[[@as string?]]
+		local winnerInput = map.winner --[[@as string?]]
+
+		map.finished = MatchGroupInputUtil.mapIsFinished(map)
+
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+			local score, status = MatchGroupInputUtil.computeOpponentScore({
+				walkover = map.walkover,
+				winner = map.winner,
+				opponentIndex = opponentIndex,
+				score = map['score' .. opponentIndex],
+			}, Parser.calculateMapScore and Parser.calculateMapScore(map) or nil)
+			return {score = score, status = status}
+		end)
+
+		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		if map.finished then
+			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
+			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
+			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+		end
+
+		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+
+		table.insert(maps, map)
+		match[key] = nil
+	end
+
+	return maps
 end
 
 return MatchGroupInputUtil

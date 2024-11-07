@@ -10,8 +10,6 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -35,39 +33,24 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if not map.map then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
 
-		map.extradata = MapFunctions.getExtraData(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
+---@param games table[]
+---@return table[]
+function MatchFunctions.removeUnsetMaps(games)
+	return Array.filter(games, function(map)
+		return map.map ~= nil
+	end)
+end
 
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = CustomMatchGroupInput.getOpponentExtradata(opponent)
+	if opponent.extradata.additionalScores then
+		opponent.score = CustomMatchGroupInput._getSetWins(opponent)
 	end
-
-	return maps
 end
 
 ---@param opponent table
@@ -105,10 +88,12 @@ function MatchFunctions.isFeatured(match)
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match)
-	local opponent1 = match.opponent1 or {}
-	local opponent2 = match.opponent2 or {}
+function MatchFunctions.getExtraData(match, games, opponents)
+	local opponent1 = opponents[1] or {}
+	local opponent2 = opponents[2] or {}
 
 	return {
 		isfeatured = MatchFunctions.isFeatured(match),
@@ -118,9 +103,11 @@ function MatchFunctions.getExtraData(match)
 	}
 end
 
+---@param match table
 ---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
 		overtime = Logic.readBool(map.overtime)

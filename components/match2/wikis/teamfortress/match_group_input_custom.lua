@@ -8,8 +8,6 @@
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -30,44 +28,20 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if not map.map then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 --
 -- match related functions
 --
+
+---@param games table[]
+---@return table[]
+function MatchFunctions.removeUnsetMaps(games)
+	return Array.filter(games, function(map)
+		return map.map ~= nil
+	end)
+end
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
@@ -98,10 +72,11 @@ end
 -- map related functions
 --
 
--- Parse extradata information
+---@param match table
 ---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
 	}

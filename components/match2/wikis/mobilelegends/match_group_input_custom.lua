@@ -11,7 +11,6 @@ local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local ChampionNames = mw.loadData('Module:HeroNames')
@@ -41,11 +40,10 @@ end
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.participants = MapFunctions.getParticipants(map, opponents)
 		map.extradata = MapFunctions.getExtraData(map, #opponents)
 
