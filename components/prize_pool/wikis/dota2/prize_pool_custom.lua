@@ -44,8 +44,6 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.publishertier = Variables.varDefault('tournament_pro_circuit_tier', '')
-	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_valve_premier', '')
 	lpdbData.extradata.lis = Variables.varDefault('tournament_lis', '')
 	lpdbData.extradata.series2 = Variables.varDefault('tournament_series2', '')
 

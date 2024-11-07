@@ -74,9 +74,7 @@ end
 ---@param match table
 ---@return table
 function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-	local parsedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, MapParser)
-	parsedMatch.links.headtohead = MatchFunctions.getHeadToHeadLink(match, parsedMatch.opponents)
-	return parsedMatch
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, MapParser)
 end
 
 ---@param match table

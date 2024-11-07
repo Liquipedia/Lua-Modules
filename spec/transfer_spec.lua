@@ -1,9 +1,13 @@
 --- Triple Comment to Enable our LLS Plugin
 local Json = require('Module:Json')
+local TeamTemplateMock = require('standard.mock.mock_team_template')
 insulate('Transfer', function()
 	allwikis('smoke', function (args, wikiName)
 		local LpdbTransferStub = stub(mw.ext.LiquipediaDB, 'lpdb_transfer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
+
+		TeamTemplateMock.setUp()
+
 		local TransferCustom = require('Module:TransferRow/Custom')
 
 		-- this can not check for the proper display until we have a team template fake for testing purposes
@@ -18,6 +22,7 @@ insulate('Transfer', function()
 
 		LpdbTransferStub:revert()
 		LpdbQueryStub:revert()
+		TeamTemplateMock.tearDown()
 	end, {
 		default = {
 			input = {
@@ -38,10 +43,10 @@ insulate('Transfer', function()
 					objectname = 'transfer_2024-10-11_000000',
 					player = 'Supr',
 					nationality = 'United States',
-					fromteam = '', --'Team Liquid',
-					toteam = '', --'mousesports',
-					fromteamtemplate = '', --'team liquid 2024',
-					toteamtemplate = '', --'mousesports',
+					fromteam = 'Team Liquid',
+					toteam = 'MOUZ',
+					fromteamtemplate = 'team liquid 2024',
+					toteamtemplate = 'mouz 2021',
 					reference = Json.stringify{
 						reference1 = 'https://x.com/streamerzone_gg/status/1844766204742832441',
 						reference1type = 'web source',
@@ -86,10 +91,10 @@ insulate('Transfer', function()
 					objectname = 'transfer_2024-10-11_000000',
 					player = 'Clem',
 					nationality = 'France',
-					fromteam = '', --'Team Liquid',
-					toteam = '', --'mousesports',
-					fromteamtemplate = '', --'team liquid 2024',
-					toteamtemplate = '', --'mousesports',
+					fromteam = 'Team Liquid',
+					toteam = 'MOUZ',
+					fromteamtemplate = 'team liquid 2024',
+					toteamtemplate = 'mouz 2021',
 					reference = Json.stringify{
 						reference1 = 'https://x.com/streamerzone_gg/status/1844766204742832441',
 						reference1type = 'web source',
