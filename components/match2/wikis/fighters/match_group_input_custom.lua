@@ -122,7 +122,7 @@ function CustomMatchGroupInput._processPlayerMapData(map, opponent, opponentInde
 		opponent.match2players,
 		players,
 		function(playerIndex)
-			return (opponent.match2players[playerIndex] or {}).name
+			return {name = map['t' .. opponentIndex .. 'p' .. playerIndex]}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p' .. playerIndex]) or {} ---@type string[]
