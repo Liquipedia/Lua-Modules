@@ -174,6 +174,10 @@ end
 function Footer:addLinks(links)
 	local processLink = function(linkType)
 		local link = links[linkType]
+		if not link then
+			return
+		end
+
 		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
