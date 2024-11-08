@@ -69,21 +69,22 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or ''
 
-	lpdbData.extradata['is riot premier'] = lpdbData.publishertier and 'true' or ''
+	lpdbData.extradata['is riot premier'] = lpdbData.publishertier
 
 	return lpdbData
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBoolOrNil(args.riotpremier) or nil
+	-- line below can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.riotpremier)
 end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	-- Custom Vars
-	Variables.varDefine('tournament_riot_premier', args.riotpremier)
-	Variables.varDefine('tournament_publisher_major', args.riotpremier)
+	Variables.varDefine('tournament_riot_premier', tostring(self.data.publishertier or ''))
+	Variables.varDefine('tournament_publisher_major', tostring(self.data.publishertier or ''))
 
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
