@@ -240,7 +240,7 @@ function League:createInfobox()
 					return
 				end
 
-        local function invalidLocation(location)
+				local function invalidLocation(location)
 					-- Not allowed to contain HTML Tags
 					return (location or ''):lower():match('<')
 				end
