@@ -13,6 +13,7 @@ local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
@@ -29,6 +30,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local LINK_PRIORITY_GROUPS = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 ---@class MatchSummaryHeader
@@ -170,7 +172,8 @@ end
 ---@param links table<string, string|table>
 ---@return MatchSummaryFooter
 function Footer:addLinks(links)
-	for linkType, link in pairs(links) do
+	local processLink = function(linkType)
+		local link = links[linkType]
 		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
@@ -183,6 +186,19 @@ function Footer:addLinks(links)
 			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end
 	end
+
+	Array.forEach(LINK_PRIORITY_GROUPS.common, processLink)
+	Array.forEach(LINK_PRIORITY_GROUPS.ordered, processLink)
+
+	Array.forEach(
+		Array.filter(Array.extractKeys(links), function (key)
+			return not Array.find(
+				Array.extend(LINK_PRIORITY_GROUPS.common, LINK_PRIORITY_GROUPS.ordered),
+				FnUtil.curry(Operator.eq, key)
+			)
+		end),
+		processLink
+	)
 
 	return self
 end
@@ -204,9 +220,9 @@ end
 ---@field root Html
 ---@field headerElement Html?
 ---@field bodyElement Widget|Html?
----@field commentElement Widget?
+--@field commentElement Widget?
 ---@field footerElement Html?
-local Match = Class.new(
+locl Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
 	end
