@@ -82,11 +82,15 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.checkAndAssign('tournament_liquipediatier', args.liquipediatier, queryResult.liquipediatier)
 	HiddenDataBox.checkAndAssign('tournament_liquipediatiertype', args.liquipediatiertype, queryResult.liquipediatiertype)
-	HiddenDataBox.checkAndAssign('tournament_publishertier', args.publishertier, queryResult.publishertier)
+	HiddenDataBox.checkAndAssign(
+		'tournament_publishertier',
+		Logic.readBool(args.highlighted or args.publisherpremier) and 'true' or args.publishertier, --publisherpremier only for conversion
+		queryResult.publishertier
+	)
 
 	HiddenDataBox.checkAndAssign('tournament_type', args.type, queryResult.type)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
-	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
+	HiddenDataBox.checkAndAssign('tournament_mode', args.moe, queryResult.mode)
 
 	HiddenDataBox.checkAndAssign(
 		'tournament_game',

@@ -20,19 +20,7 @@ function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.game = Game.name{game = args.game}
 
-	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
-
 	return BasicHiddenDataBox.run(args)
-end
-
----@param args table
----@param queryResult table
-function CustomHiddenDataBox.addCustomVariables(args, queryResult)
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		args.publisherpremier and tostring(Logic.readBool(args.publisherpremier)) or nil,
-		queryResult.publishertier
-	)
 end
 
 return Class.export(CustomHiddenDataBox)
