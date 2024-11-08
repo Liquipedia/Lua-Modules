@@ -202,7 +202,7 @@ end
 ---@param finishedInput string?
 ---@param winnerInput string?
 ---@return boolean
-function MapFunctions.isFinished(map, opponents, finishedInput, winnerInput)
+function MapFunctions.mapIsFinished(map, opponents, finishedInput, winnerInput)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return true
 	end

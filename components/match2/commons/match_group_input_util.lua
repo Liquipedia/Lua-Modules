@@ -1131,7 +1131,7 @@ end
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
----@field isFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
+---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
 ---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 ---@field ADD_SUB_GROUP? boolean
 
@@ -1144,7 +1144,7 @@ end
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
---- - isFinished(map, opponents): boolean
+--- - mapIsFinished(map, opponents): boolean
 --- - getParticipants(map, opponents, finishedInput, winnerInput): table (DEPRECATED)
 ---
 --- Additionally, the Parser may have the following properties:
@@ -1168,8 +1168,8 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.map = Parser.getMapName(map)
 		end
 
-		if Parser.isFinished then
-			map.finished = Parser.isFinished(map, opponents, finishedInput, winnerInput)
+		if Parser.mapIsFinished then
+			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
 		else
 			map.finished = MatchGroupInputUtil.mapIsFinished(map)
 		end
