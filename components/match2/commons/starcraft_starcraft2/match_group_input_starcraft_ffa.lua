@@ -168,9 +168,11 @@ function MatchFunctions.extractMaps(match, opponents)
 	for mapKey, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = MapFunctions.readMap(mapInput, #opponents, hasScores)
 
-		map.participants = BaseMapFunctions.getParticipants(mapInput, opponents)
+		Array.forEach(map.opponents, function(opponent, opponentIndex)
+			opponent.players = BaseMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+		end)
 
-		map.mode = BaseMapFunctions.getMode(mapInput, map.participants, opponents)
+		map.mode = BaseMapFunctions.getMode(map, opponents)
 
 		table.insert(maps, map)
 		match[mapKey] = nil
