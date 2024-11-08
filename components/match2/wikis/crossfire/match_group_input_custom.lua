@@ -72,10 +72,12 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
-		mvp = MatchGroupInputUtil.readMvp(match),
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
