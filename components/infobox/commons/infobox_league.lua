@@ -240,6 +240,14 @@ function League:createInfobox()
 					return
 				end
 
+				local function invalidLocation(location)
+					-- Not allowed to contain HTML Tags
+					return (location or ''):lower():match('<')
+				end
+				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
+					return
+				end
+
 				-- if the event is finished do not show the button
 				local osdateCutoff = DateExt.parseIsoDate(endDate)
 				osdateCutoff.day = osdateCutoff.day + 1
