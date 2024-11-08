@@ -71,7 +71,8 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.cfpremier)
+	-- this entire function can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.cfpremier)
 end
 
 ---@param args table

@@ -66,7 +66,8 @@ function CustomLeague:customParseArguments(args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
-	self.data.publishertier = Logic.readBool(args.featured)
+	-- line below can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.featured)
 	self.data.status = self:_getStatus(args)
 
 	self.data.startTime = Logic.wrapTryOrLog(CustomLeague._readStartTime)(self)

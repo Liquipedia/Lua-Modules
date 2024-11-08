@@ -73,7 +73,8 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.pokemonpremier)
+	-- line below can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.pokemonpremier)
 	self.data.mode = self:_getGameMode()
 end
 
