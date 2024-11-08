@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -24,8 +23,8 @@ MatchSummaryMatchGameTeamWrapper.defaultProps = {
 function MatchSummaryMatchGameTeamWrapper:render()
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-spaced'},
-		css = {flex = 1},
-		children = self.props.flipped and Array.reverse(self.props.children) or self.props.children
+		css = {flex = 1, ['justify-content'] = 'unset', ['flex-direction'] = self.props.flipped and 'row-reverse' or 'row'},
+		children = self.props.children
 	}
 end
 
