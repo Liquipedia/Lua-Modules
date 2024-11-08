@@ -22,6 +22,7 @@ local Cell = Widgets.Cell
 
 ---@class Dota2LeagueInfobox: InfoboxLeague
 ---@field publisherTier {meta: string, name: string, link: string}?
+
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 

@@ -336,6 +336,7 @@ end
 
 -- Default body function
 ---@param match table
+---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
 ---@return Widget
 function MatchSummary.createDefaultBody(match, createGame)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
