@@ -162,24 +162,22 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 
 		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
 
-		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
-
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
+			local players = CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
 		end)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)
@@ -293,35 +291,20 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 end
 
 ---@param map table
----@param opponents table[]
----@return {players: table[]}[]
-function CustomMatchGroupInput.processPlayerMapData(map, opponents)
-	return Array.map(opponents, function(opponent, opponentIndex)
-		return {players = CustomMatchGroupInput._participants(
-			opponent.match2players,
-			map,
-			opponentIndex,
-			opponent.type
-		)}
-	end)
-end
-
----@param opponentPlayers table[]
----@param map table
+---@param opponent table
 ---@param opponentIndex integer
----@param opponentType OpponentType
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
-function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex, opponentType)
+function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players
-	if opponentType == Opponent.team then
+	if opponent.type == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
 	else
-		players = Array.map(opponentPlayers, Operator.property('name'))
+		players = Array.map(opponent.match2players, Operator.property('name'))
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
 	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-		opponentPlayers,
+		opponent.match2players,
 		players,
 		function(playerIndex)
 			local player = players[playerIndex]
