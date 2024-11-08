@@ -52,17 +52,21 @@ end
 function CustomMatchSummary._createGame(game)
 	if not game.winner then return end
 
-	local team1Characters = Array.map((game.opponents[1] or {}).players or {}, Operator.property('character'))
-	local team2Characters = Array.map((game.opponents[2] or {}).players or {}, Operator.property('character'))
+	local function makeTeamSection(opponentIndex)
+		local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('character'))
+		return {
+			MatchSummaryWidgets.Characters{characters =  characters},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1}
+		}
+	end
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '80%', padding = '4px', ['min-height'] = '24px'},
 		children = WidgetUtil.collect(
-			MatchSummaryWidgets.Characters{characters = team1Characters, flipped = false},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.Characters{characters = team2Characters, flipped = true}
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
