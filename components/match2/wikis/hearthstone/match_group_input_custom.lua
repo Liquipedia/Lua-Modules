@@ -11,14 +11,12 @@ local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
@@ -37,6 +35,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
+---@param match table
+---@param opponents table[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
+
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
@@ -51,46 +56,6 @@ function MatchFunctions.getBestOf(bestofInput)
 	return tonumber(bestofInput)
 end
 
----@param match table
----@param opponents table[]
----@return table[]
-function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for mapKey, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.map = MapFunctions.getMapName(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		map.extradata = MapFunctions.getExtradata(map, opponents)
-
-		map.participants = MapFunctions.getParticipants(map, opponents)
-
-		table.insert(maps, map)
-		match[mapKey] = nil
-	end
-
-	return maps
-end
-
 ---@param map table
 ---@return string?
 function MapFunctions.getMapName(map)
@@ -100,16 +65,17 @@ function MapFunctions.getMapName(map)
 	return map.map
 end
 
----@param mapInput table
+---@param match table
+---@param map table
 ---@param opponents table[]
 ---@return table
-function MapFunctions.getExtradata(mapInput, opponents)
-	local extradata = {comment = mapInput.comment}
+function MapFunctions.getExtraData(match, map, opponents)
+	local extradata = {comment = map.comment}
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		local prefix = 'o' .. opponentIndex .. 'p'
 		local chars = Array.mapIndexes(function(charIndex)
-			return Logic.nilIfEmpty(mapInput[prefix .. charIndex .. 'char']) or Logic.nilIfEmpty(mapInput[prefix .. charIndex])
+			return Logic.nilIfEmpty(map[prefix .. charIndex .. 'char']) or Logic.nilIfEmpty(map[prefix .. charIndex])
 		end)
 		Array.forEach(chars, function(char, charIndex)
 			extradata[prefix .. charIndex] = MapFunctions.readCharacter(char)
@@ -119,14 +85,13 @@ function MapFunctions.getExtradata(mapInput, opponents)
 	return extradata
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner and not map.finished then
 			return
 		end
 		return winner == opponentIndex and 1 or 0

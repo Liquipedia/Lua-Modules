@@ -1207,6 +1207,8 @@ end
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field getMapName? fun(game: table): string?
+---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
+---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 
 --- The standard way to process a match input.
 ---
@@ -1214,6 +1216,8 @@ end
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
 --- - getMapName(mapValues): string?
+--- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
+--- - getParticipants(map, opponents): table (DEPRECATED)
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
@@ -1229,14 +1233,21 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		map.opponents = Array.map(opponents, function(_, opponentIndex)
+		if Parser.getParticipants then
+			-- Legacy way, to be replaced by getPlayersOfMapOpponent
+			map.participants = Parser.getParticipants(map, opponents)
+		end
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			}, Parser.calculateMapScore and Parser.calculateMapScore(map) or nil)
-			return {score = score, status = status}
+			local players = Parser.getPlayersOfMapOpponent
+				and Parser.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+				or nil
+			return {score = score, status = status, players = players}
 		end)
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
