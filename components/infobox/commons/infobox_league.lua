@@ -240,7 +240,11 @@ function League:createInfobox()
 				end
 
 				-- Can not contain tba/tbd venue/city
-				if (locations.venue1 or ''):lower():match('tb[ad]') or (locations.city1 or ''):lower():match('tb[ad]') then
+				local function invalidLocation(location)
+					-- Not allowed to contain HTML Tags
+					return (location or ''):lower():match('<')
+				end
+				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
 					return
 				end
 
