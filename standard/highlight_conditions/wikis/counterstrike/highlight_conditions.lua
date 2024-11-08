@@ -23,7 +23,6 @@ local DEFAULT_HIGHLIGHTABLE_VALUES = {
 ---@param options table
 ---@return boolean
 function HighlightConditions.tournament(data, options)
-	data.extradata = data.extradata or {}
 	options = options or {}
 
 	if options.onlyHighlightOnValue then
