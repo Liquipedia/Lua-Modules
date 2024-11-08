@@ -248,29 +248,24 @@ function MapFunctions.calculateMapScore(winnerInput, finished)
 	end
 end
 
----@param mapInput table
----@param opponents table[]
----@return table<string, {faction: string?, player: string, position: string, flag: string?}>
-function MapFunctions.getParticipants(mapInput, opponents)
-	local participants = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		if opponent.type == Opponent.team then
-			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
-			return
-		elseif opponent.type == Opponent.literal then
-			return
-		end
-		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
-	end)
-
-	return participants
+---@param map table
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]?
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	if opponent.type == Opponent.team then
+		return MapFunctions.getTeamMapPlayers(map, opponent, opponentIndex)
+	elseif opponent.type == Opponent.literal then
+		return
+	end
+	return MapFunctions.getPartyMapPlayers(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
-function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race'])
 		or Faction.read(mapInput['opponent' .. opponentIndex .. 'race'])
 		or ((opponent.match2players[1] or {}).extradata or {}).faction
@@ -316,14 +311,14 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		participants[#opponent.match2players] = participant
 	end)
 
-	return Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
+	return participants
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return table<string, {faction: string?, player: string, position: string, flag: string?}>
-function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
+function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
 	-- resolve the aliases in case they are used
@@ -337,19 +332,15 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 		or ((players[1] or {}).extradata or {}).faction
 	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 
-	local participants = {}
-
-	Array.forEach(players, function(player, playerIndex)
+	return Array.map(players, function(player, playerIndex)
 		local faction = isArchon and archonFaction or
 			Logic.emptyOr(Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']), player.Faction)
 
-		participants[opponentIndex .. '_' .. playerIndex] = {
+		return {
 			faction = Faction.read(faction or player.extradata.faction),
-			player = player.name
+			player = player.name,
 		}
 	end)
-
-	return participants
 end
 
 ---@param map table # has map.opponents as the games opponents
@@ -434,14 +425,6 @@ function MapFunctions.getMapName(game)
 	elseif mapName then
 		return TBD
 	end
-end
-
----@param map table
----@param opponent table
----@param opponentIndex integer
----@return table[]?
-function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-	todo
 end
 
 return StarcraftMatchGroupInput
