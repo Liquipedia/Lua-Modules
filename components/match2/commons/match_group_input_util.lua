@@ -1131,7 +1131,6 @@ end
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
----@field getMode? fun(game: table, opponenets: table[]): string?
 ---@field isFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
 ---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 ---@field ADD_SUB_GROUP? boolean
@@ -1145,7 +1144,6 @@ end
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
---- - getMode(game, opponenets): string?
 --- - isFinished(map, opponents): boolean
 --- - getParticipants(map, opponents, finishedInput, winnerInput): table (DEPRECATED)
 ---

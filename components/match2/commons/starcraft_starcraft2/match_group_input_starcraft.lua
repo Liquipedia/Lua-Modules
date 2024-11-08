@@ -343,10 +343,11 @@ function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	end)
 end
 
+---@param match table
 ---@param map table # has map.opponents as the games opponents
 ---@param opponents table[]
 ---@return string
-function MapFunctions.getMode(map, opponents)
+function MapFunctions.getMapMode(match, map, opponents)
 	local playerCounts = Array.map(map.opponents, function(opponent)
 		return Table.size(opponent.players)
 	end)
