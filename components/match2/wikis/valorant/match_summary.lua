@@ -53,7 +53,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('agent'))
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-			MatchSummaryWidgets.Characters{characters = characters, flipped = flipped},
+			MatchSummaryWidgets.Characters{characters = characters, flipped = flipped, hideOnMobile = true},
 			MatchSummaryWidgets.DetailedScore{
 				score = scoreDisplay(opponentIndex),
 				flipped = flipped,
