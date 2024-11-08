@@ -222,7 +222,7 @@ end
 ---@field bodyElement Widget|Html?
 --@field commentElement Widget?
 ---@field footerElement Html?
-locl Match = Class.new(
+local Match = Class.new(
 	function(self)
 		self.root = mw.html.create()
 	end
