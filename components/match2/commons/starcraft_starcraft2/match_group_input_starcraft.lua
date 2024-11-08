@@ -30,7 +30,9 @@ local MatchFunctions = {
 		pagifyTeamNames = true,
 	},
 }
-local MapFunctions = {}
+local MapFunctions = {
+	ADD_SUB_GROUP = true,
+}
 
 -- make these available for ffa
 StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
@@ -85,28 +87,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	local subGroup = 0
-	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Logic.isEmpty(mapInput) then
-			break
-		end
-		local map
-		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
-
-		map.participants = MapFunctions.getParticipants(mapInput, opponents)
-
-		map.mode = MapFunctions.getMode(mapInput, map.participants, opponents)
-
-		Table.mergeInto(map.extradata, MapFunctions.getAdditionalExtraData(map, map.participants))
-
-		map.vod = Logic.emptyOr(mapInput.vod, match['vodgame' .. mapIndex])
-
-		table.insert(maps, map)
-		match[mapKey] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param maps table[]
@@ -210,82 +191,42 @@ function MatchFunctions.getVeto(extradata, map, match, prefix, vetoIndex)
 	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
----@param mapInput table
----@param subGroup integer
----@param opponentCount integer
----@return table
----@return integer
-function MapFunctions.readMap(mapInput, subGroup, opponentCount)
-	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
-
-	local mapName = mapInput.map
-	if mapName and mapName:upper() ~= TBD then
-		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
-	elseif mapName then
-		mapName = TBD
-	end
-
-	local map = {
-		map = mapName,
-		patch = Variables.varDefault('tournament_patch', ''),
-		subgroup = subGroup,
-		extradata = {
-			comment = mapInput.comment,
-			displayname = mapInput.mapDisplayName,
-			header = mapInput.header,
-			server = mapInput.server,
-		}
-	}
-
-	map.finished = MapFunctions.isFinished(mapInput, opponentCount)
-	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-		local score, status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = mapInput.walkover,
-			winner = mapInput.winner,
-			opponentIndex = opponentIndex,
-			score = mapInput['score' .. opponentIndex],
-		}, MapFunctions.calculateMapScore(mapInput.winner, map.finished))
-		return {score = score, status = status}
-	end)
-
-	map.scores = Array.map(map.opponents, Operator.property('score'))
-
-	if map.finished then
-		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		map.winner = MatchGroupInputUtil.getWinner(map.status, mapInput.winner, map.opponents)
-	end
-
-	return map, subGroup
+---@param map table
+---@return string?
+function MapFunctions.getPatch(map)
+	return map.patch or Variables.varDefault('tournament_patch', '')
 end
 
----@param mapInput table
----@param opponentCount integer
+---@param map table
+---@param opponents table[]
+---@param finishedInput string?
+---@param winnerInput string?
 ---@return boolean
-function MapFunctions.isFinished(mapInput, opponentCount)
-	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
+function MapFunctions.isFinished(map, opponents, finishedInput, winnerInput)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return true
 	end
 
-	local finished = Logic.readBoolOrNil(mapInput.finished)
+	local finished = Logic.readBoolOrNil(winnerInput)
 	if finished ~= nil then
 		return finished
 	end
 
-	if Logic.isNotEmpty(mapInput.winner) then
+	if Logic.isNotEmpty(winnerInput) then
 		return true
 	end
 
-	if Logic.isNotEmpty(mapInput.walkover) then
+	if Logic.isNotEmpty(map.walkover) then
 		return true
 	end
 
-	if Logic.isNotEmpty(mapInput.finished) then
+	if Logic.isNotEmpty(finishedInput) then
 		return true
 	end
 
 	-- check for manual score inputs
-	for opponentIndex = 1, opponentCount do
-		if String.isNotEmpty(mapInput['score' .. opponentIndex]) then
+	for opponentIndex = 1, #opponents do
+		if String.isNotEmpty(map['score' .. opponentIndex]) then
 			return true
 		end
 	end
@@ -411,27 +352,22 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	return participants
 end
 
----@param mapInput table # the input data
----@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
+---@param map table # has map.opponents as the games opponents
 ---@param opponents table[]
 ---@return string
-function MapFunctions.getMode(mapInput, participants, opponents)
-	-- assume we have a min of 2 opponents in a game
-	local playerCounts = {0, 0}
-	for key in pairs(participants) do
-		local parsedOpponentIndex = key:match('(%d+)_%d+')
-		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]
-		playerCounts[opponetIndex] = (playerCounts[opponetIndex] or 0) + 1
-	end
+function MapFunctions.getMode(map, opponents)
+	local playerCounts = Array.map(map.opponents, function(opponent)
+		return Table.size(opponent.players)
+	end)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
 			return Opponent.literal
-		elseif count == 2 and MapFunctions.isArchon(mapInput, opponents[opponentIndex], opponentIndex) then
+		elseif count == 2 and MapFunctions.isArchon(map, opponents[opponentIndex], opponentIndex) then
 			return 'Archon'
-		elseif count == 2 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'duoSpecial']) then
+		elseif count == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
 			return '2S'
-		elseif count == 4 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'quadSpecial']) then
+		elseif count == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
 			return '4S'
 		end
 
@@ -441,24 +377,37 @@ function MapFunctions.getMode(mapInput, participants, opponents)
 	return table.concat(modeParts, 'v')
 end
 
+---@param match table
 ---@param map table
----@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
----@return {}?
-function MapFunctions.getAdditionalExtraData(map, participants)
-	if map.mode ~= '1v1' then return end
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	local extradata = {
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		header = map.header,
+		server = map.server,
+	}
 
-	local players = {}
-	for _, player in Table.iter.spairs(participants) do
-		table.insert(players, player)
+	if #opponents ~= 2 then
+		return extradata
+	elseif Array.any(map.opponents, function(mapOpponent) return Table.size(mapOpponent.players or {}) ~= 1 end) then
+		return extradata
 	end
 
-	local extradata = {}
+	---@type table[]
+	local players = {
+		Array.extractValues(map.opponents[1].players)[1],
+		Array.extractValues(map.opponents[2].players)[1],
+	}
+
 	extradata.opponent1 = players[1].player
 	extradata.opponent2 = players[2].player
 
 	if map.winner ~= 1 and map.winner ~= 2 then
 		return extradata
 	end
+
 	local loser = 3 - map.winner
 
 	extradata.winnerfaction = players[map.winner].faction
@@ -474,6 +423,25 @@ end
 function MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 	return Logic.readBool(mapInput['opponent' .. opponentIndex .. 'archon']) or
 		Logic.readBool(opponent.extradata.isarchon)
+end
+
+---@param game table
+---@return string?
+function MapFunctions.getMapName(game)
+	local mapName = game.map
+	if mapName and mapName:upper() ~= TBD then
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map)
+	elseif mapName then
+		return TBD
+	end
+end
+
+---@param map table
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]?
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	todo
 end
 
 return StarcraftMatchGroupInput
