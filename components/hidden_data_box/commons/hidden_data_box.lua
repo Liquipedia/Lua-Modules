@@ -91,7 +91,7 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.checkAndAssign('tournament_type', args.type, queryResult.type)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
-	HiddenDataBox.checkAndAssign('tournament_mode', args.moe, queryResult.mode)
+	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
 	HiddenDataBox.checkAndAssign(
 		'tournament_game',
