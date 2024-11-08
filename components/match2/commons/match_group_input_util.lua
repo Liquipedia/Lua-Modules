@@ -77,20 +77,8 @@ MatchGroupInputUtil.STATUS_INPUTS = {
 MatchGroupInputUtil.STATUS = Table.copy(MatchGroupInputUtil.STATUS_INPUTS)
 MatchGroupInputUtil.STATUS.SCORE = 'S'
 
-MatchGroupInputUtil.RESULT_TYPE = {
-	DEFAULT = 'default',
-	NOT_PLAYED = 'np',
-	DRAW = 'draw',
-}
-
 MatchGroupInputUtil.MATCH_STATUS = {
 	NOT_PLAYED = 'notplayed',
-}
-
-MatchGroupInputUtil.WALKOVER = {
-	FORFEIT = 'ff',
-	DISQUALIFIED = 'dq',
-	NO_SCORE = 'l',
 }
 
 MatchGroupInputUtil.SCORE_NOT_PLAYED = -1
@@ -623,32 +611,12 @@ function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	end
 end
 
----Should only be called on finished matches or maps
----@deprecated
----@param winnerInput integer|string|nil
----@param finishedInput string?
----@param opponents {score: number?, status: string}[]
----@return string? #Result Type
-function MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
-		return MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
-	end
-
-	if MatchGroupInputUtil.isDraw(opponents, winnerInput) then
-		return MatchGroupInputUtil.RESULT_TYPE.DRAW
-	end
-
-	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
-		return MatchGroupInputUtil.RESULT_TYPE.DEFAULT
-	end
-end
-
 ---@param status string
 ---@param winnerInput integer|string|nil
 ---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
-	if status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
@@ -684,29 +652,6 @@ function MatchGroupInputUtil.getHighestScoringOpponent(opponents)
 	local scores = Array.map(opponents, Operator.property('score'))
 	local maxScore = Array.max(scores)
 	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
-end
-
----@deprecated
----@param resultType string?
----@param opponents {status: string}[]
----@return string? # Walkover Type
-function MatchGroupInputUtil.getWalkover(resultType, opponents)
-	if resultType == MatchGroupInputUtil.RESULT_TYPE.DEFAULT then
-		return MatchGroupInputUtil.getWalkoverType(opponents)
-	end
-end
-
----@deprecated
----@param opponents {status: string}[]
----@return string?
-function MatchGroupInputUtil.getWalkoverType(opponents)
-	if MatchGroupInputUtil.hasForfeit(opponents) then
-		return MatchGroupInputUtil.WALKOVER.FORFEIT
-	elseif MatchGroupInputUtil.hasDisqualified(opponents) then
-		return MatchGroupInputUtil.WALKOVER.DISQUALIFIED
-	elseif MatchGroupInputUtil.hasDefaultWinLoss(opponents) then
-		return MatchGroupInputUtil.WALKOVER.NO_SCORE
-	end
 end
 
 ---@param match table
@@ -823,30 +768,6 @@ function MatchGroupInputUtil._opponentWithStatus(opponents, status)
 	return Array.indexOf(opponents, function (opponent) return opponent.status == status end)
 end
 
----@deprecated
--- function to check for forfeits
----@param opponents {status: string?}[]
----@return boolean
-function MatchGroupInputUtil.hasForfeit(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.FORFEIT) ~= 0
-end
-
----@deprecated
--- function to check for DQ's
----@param opponents {status: string?}[]
----@return boolean
-function MatchGroupInputUtil.hasDisqualified(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DISQUALIFIED) ~= 0
-end
-
----@deprecated
--- function to check for W/L
----@param opponents {status: string?}[]
----@return boolean
-function MatchGroupInputUtil.hasDefaultWinLoss(opponents)
-	return MatchGroupInputUtil._opponentWithStatus(opponents, MatchGroupInputUtil.STATUS.DEFAULT_LOSS) ~= 0
-end
-
 -- function to check for Normal Scores
 ---@param opponents {status: string?}[]
 ---@return boolean
@@ -874,7 +795,7 @@ end
 ---@param opponentIndex integer
 ---@return integer?
 function MatchGroupInputUtil.placementFromWinner(status, winner, opponentIndex)
-	if status == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	end
 	if winner == 0 or winner == opponentIndex then
@@ -1207,6 +1128,7 @@ end
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field getMapName? fun(game: table): string?
+---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
 ---@field getMode? fun(game: table, opponenets: table[]): string?
@@ -1219,7 +1141,8 @@ end
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
---- - getMapName(mapValues): string?
+--- - getMapName(map): string?
+--- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
 --- - getMode(game, opponenets): string?
@@ -1246,6 +1169,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		if Parser.getMapName then
 			map.map = Parser.getMapName(map)
 		end
+
 		if Parser.isFinished then
 			map.finished = Parser.isFinished(map, opponents, finishedInput, winnerInput)
 		else
@@ -1273,9 +1197,9 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			return {score = score, status = status, players = players}
 		end)
 
-		-- needs to be after game opponent processing!
-		if Parser.getMode then
-			map.mode = Parser.getMode(map, opponents)
+		-- needs map.opponents available!
+		if Parser.getMapMode then
+			map.mode = Parser.getMapMode(match, map, opponents)
 		end
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
