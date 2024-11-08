@@ -56,7 +56,7 @@ function CustomMatchSummary._createGame(game)
 		local characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('character'))
 		return {
 			MatchSummaryWidgets.Characters{characters =  characters},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1}
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex}
 		}
 	end
 
