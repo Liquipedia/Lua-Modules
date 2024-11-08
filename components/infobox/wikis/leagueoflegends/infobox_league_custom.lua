@@ -56,10 +56,7 @@ end
 ---@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if self.data.publishertier then
-		return ' ' .. RIOT_ICON
-	end
-	return ''
+	return String.isNotEmpty(self.data.publishertier) and (' ' .. RIOT_ICON) or ''
 end
 
 ---@param lpdbData table
@@ -68,7 +65,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or ''
-
 	return lpdbData
 end
 
