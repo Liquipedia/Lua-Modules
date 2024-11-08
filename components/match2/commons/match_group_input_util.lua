@@ -1208,7 +1208,11 @@ end
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field getMapName? fun(game: table): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
+---@field getPatch? fun(game: table): string?
+---@field getMode? fun(game: table, opponenets: table[]): string?
+---@field isFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
 ---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
+---@field ADD_SUB_GROUP? boolean
 
 --- The standard way to process a match input.
 ---
@@ -1217,21 +1221,40 @@ end
 --- - getExtraData(match, map, opponents): table?
 --- - getMapName(mapValues): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
---- - getParticipants(map, opponents): table (DEPRECATED)
+--- - getPatch(game): string?
+--- - getMode(game, opponenets): string?
+--- - isFinished(map, opponents): boolean
+--- - getParticipants(map, opponents, finishedInput, winnerInput): table (DEPRECATED)
+---
+--- Additionally, the Parser may have the following properties:
+--- - ADD_SUB_GROUP boolean?
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
 ---@return table
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
+	local subGroup = 0
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		if Parser.ADD_SUB_GROUP then
+			map.subgroup = tonumber(map.subgroup) or (subGroup + 1)
+		end
+
 		if Parser.getMapName then
 			map.map = Parser.getMapName(map)
 		end
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
+		if Parser.isFinished then
+			map.finished = Parser.isFinished(map, opponents, finishedInput, winnerInput)
+		else
+			map.finished = MatchGroupInputUtil.mapIsFinished(map)
+		end
+
+		if Parser.getPatch then
+			map.patch = Parser.getPatch(map)
+		end
 
 		if Parser.getParticipants then
 			-- Legacy way, to be replaced by getPlayersOfMapOpponent
@@ -1249,6 +1272,11 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 				or nil
 			return {score = score, status = status, players = players}
 		end)
+
+		-- needs to be after game opponent processing!
+		if Parser.getMode then
+			map.mode = Parser.getMode(map, opponents)
+		end
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
