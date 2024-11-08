@@ -135,7 +135,7 @@ end
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return table[]
-function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
 	local players = Array.mapIndexes(function(playerIndex)
