@@ -224,31 +224,30 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true
-		map.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+		map.status = MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 		map.scores = {}
 		return map
 	end
 
-	local opponentsInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
 	end)
 
-	map.scores = Array.map(opponentsInfo, Operator.property('score'))
+	map.scores = Array.map(map.opponents, Operator.property('score'))
 
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
-		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentsInfo)
-		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentsInfo)
-		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo, not hasScores)
-		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner)
+		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
+		StarcraftFfaMatchGroupInput._setPlacements(map.opponents, not hasScores)
+		map.winner = StarcraftFfaMatchGroupInput._getWinner(map.opponents, mapInput.winner)
 	end
 
-	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
-		map.extradata['placement' .. opponentIndex] = opponentInfo.placement
+	Array.forEach(map.opponents, function(opponent, opponentIndex)
+		map.extradata['placement' .. opponentIndex] = opponent.placement
 	end)
 
-	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
-		map.extradata['status' .. opponentIndex] = opponentInfo.status
+	Array.forEach(map.opponents, function(opponent, opponentIndex)
+		map.extradata['status' .. opponentIndex] = opponent.status
 	end)
 
 	return map
