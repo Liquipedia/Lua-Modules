@@ -24,6 +24,7 @@ MatchSummaryMatchGameTeamWrapper.defaultProps = {
 function MatchSummaryMatchGameTeamWrapper:render()
 	return HtmlWidgets.Div{
 		classes = {'brkts-popup-spaced'},
+		css = {flex = 1},
 		children = self.props.flipped and Array.reverse(self.props.children) or self.props.children
 	}
 end
