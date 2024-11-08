@@ -23,6 +23,7 @@ local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
@@ -239,12 +240,18 @@ function League:createInfobox()
 					return
 				end
 
-				-- Can not contain tba/tbd venue/city
-				local function invalidLocation(location)
+        local function invalidLocation(location)
 					-- Not allowed to contain HTML Tags
 					return (location or ''):lower():match('<')
 				end
 				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
+					return
+				end
+
+				-- if the event is finished do not show the button
+				local osdateCutoff = DateExt.parseIsoDate(endDate)
+				osdateCutoff.day = osdateCutoff.day + 1
+				if os.difftime(os.time(), os.time(osdateCutoff)) > 0 then
 					return
 				end
 
@@ -513,7 +520,7 @@ end
 ---@param args table
 ---@return boolean
 function League:liquipediaTierHighlighted(args)
-	return self.data.publishertier
+	return HighlightConditions.tournament(self.data)
 end
 
 --- Allows for overriding this functionality

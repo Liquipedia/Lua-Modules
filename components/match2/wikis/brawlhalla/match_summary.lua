@@ -14,7 +14,6 @@ local Operator = require('Module:Operator')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -49,18 +48,12 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget?
 function CustomMatchSummary._createGame(game)
 	if not game.map and not game.winner then return end
 
 	local team1Characters = Array.map((game.opponents[1] or {}).players or {}, Operator.property('char'))
 	local team2Characters = Array.map((game.opponents[2] or {}).players or {}, Operator.property('char'))
-
-	local map = HtmlWidgets.Div{
-		children = DisplayHelper.MapAndStatus(game),
-		classes = {'brkts-popup-spaced'},
-		css = {['flex-grow'] = '1'}
-	}
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
@@ -68,7 +61,7 @@ function CustomMatchSummary._createGame(game)
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.Characters{characters = team1Characters, flipped = false},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			map,
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = 1}},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.Characters{characters = team2Characters, flipped = true}
 		)

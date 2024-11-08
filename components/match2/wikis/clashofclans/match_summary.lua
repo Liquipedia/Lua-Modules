@@ -7,10 +7,6 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -18,9 +14,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
 
@@ -51,16 +44,6 @@ function CustomMatchSummary.createHeader(match)
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 
 	return header
-end
-
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createMapRow),
-		MatchSummaryWidgets.Mvp(match.extradata.mvp)
-	)}
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
@@ -97,76 +80,34 @@ function CustomMatchSummary._time(game, opponentIndex)
 		:wikitext(Abbreviation.make('(' .. os.date('%M:%S', time) .. ')', 'Total Time'))
 end
 
-function CustomMatchSummary._createMapRow(game, gameIndex)
+---@param date string
+---@param game MatchGroupUtilGame
+---@param gameIndex integer
+---@return Widget?
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	if Table.isEmpty(game.scores) then
 		return
 	end
-	local row = MatchSummary.Row()
 
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummaryWidgets.Break{})
+	local function makeTeamSection(opponentIndex)
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			CustomMatchSummary._gameScore(game, opponentIndex),
+			CustomMatchSummary._percentage(game, opponentIndex),
+			CustomMatchSummary._time(game, opponentIndex)
+		}
 	end
 
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:wikitext('Game ' .. gameIndex)
-
-	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popup-spaced-map-skip')
-	end
-
-	local leftNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1))
-		:node(CustomMatchSummary._gameScore(game, 1))
-		:node(CustomMatchSummary._percentage(game, 1))
-		:node(CustomMatchSummary._time(game, 1))
-
-	local rightNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._time(game, 2))
-		:node(CustomMatchSummary._percentage(game, 2))
-		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2))
-
-	row:addElement(leftNode)
-		:addElement(centerNode)
-		:addElement(rightNode)
-
-	row:addClass('brkts-popup-body-game')
-		:css('text-align', 'center')
-		:css('overflow', 'hidden')
-
-	-- Add Comment
-	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		local comment = mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	return row:create()
-end
-
-function CustomMatchSummary._createCheckMarkOrCross(showIcon)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
+	game.map = 'Game ' .. gameIndex
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 return CustomMatchSummary

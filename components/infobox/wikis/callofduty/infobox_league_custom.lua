@@ -85,12 +85,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_edate', self.data.endDate)
 end
 
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['atvi-sponsored'])
-end
-
 ---@param content Html|string|number|nil
 ---@return Html
 function CustomLeague:_createNoWrappingSpan(content)

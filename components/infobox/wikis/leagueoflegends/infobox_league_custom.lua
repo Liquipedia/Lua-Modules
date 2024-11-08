@@ -56,16 +56,7 @@ end
 ---@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args.riotpremier) then
-		return ' ' .. RIOT_ICON
-	end
-	return ''
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.riotpremier)
+	return String.isNotEmpty(self.data.publishertier) and (' ' .. RIOT_ICON) or ''
 end
 
 ---@param lpdbData table
@@ -75,14 +66,14 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or ''
 
-	lpdbData.extradata['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or ''
+	lpdbData.extradata['is riot premier'] = lpdbData.publishertier
 
 	return lpdbData
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.riotpremier) and '1' or nil
+	self.data.publishertier = Logic.readBool(args.riotpremier) or ''
 end
 
 ---@param args table

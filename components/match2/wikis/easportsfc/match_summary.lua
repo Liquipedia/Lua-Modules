@@ -9,7 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -22,8 +21,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local DRAW_LINE = '<i class="fas fa-minus bright-sun-text" style="width: 14px; text-align: center" ></i>'
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
@@ -42,9 +39,9 @@ function CustomMatchSummary.createBody(match)
 
 	local games = Array.map(match.games, function(game)
 		if hasSubMatches then
-			return CustomMatchSummary._createSubMatch(game, match):create()
+			return CustomMatchSummary._createSubMatch(game, match)
 		end
-		return CustomMatchSummary._createGame(game):create()
+		return CustomMatchSummary._createGame(game)
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
@@ -56,72 +53,40 @@ end
 ---@param game MatchGroupUtilGame
 ---@return MatchSummaryRow
 function CustomMatchSummary._createGame(game)
-	local row = MatchSummary.Row()
-			:addClass('brkts-popup-body-game')
-			:css('font-size', '84%')
-			:css('padding', '4px')
-			:css('min-height', '32px')
-	row
-		:addElement(CustomMatchSummary._createCheckMark(game.winner, 1))
-		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
-		:addElement(mw.html.create('div')
-			:addClass('brkts-popup-body-element-vertical-centered')
-			:wikitext(game.map)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '84%', padding = '4px'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
-		:addElement(CustomMatchSummary._createCheckMark(game.winner, 2))
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row
-			:addElement(MatchSummaryWidgets.Break{})
-			:addElement(mw.html.create('div')
-				:wikitext(game.comment)
-				:css('margin', 'auto')
-			)
-	end
-	return row
+	}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryRow
 function CustomMatchSummary._createSubMatch(game, match)
-	local row = MatchSummary.Row()
-			:addClass('brkts-popup-body-game')
-			:css('font-size', '84%')
-			:css('padding', '4px')
-			:css('min-height', '32px')
 	local players = CustomMatchSummary._extractPlayersFromGame(game, match)
 
-	row
-		-- player left side
-		:addElement(CustomMatchSummary._players(players[1], 1, game.winner))
-		-- score
-		:addElement(CustomMatchSummary._score(game.scores[1] or 0))
-		-- penalty score
-		:addElement(CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 1)))
-		:addElement(mw.html.create('div')
-			:addClass('brkts-popup-body-element-vertical-centered')
-			:wikitext(' vs ')
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '84%', padding = '4px'},
+		children = WidgetUtil.collect(
+			CustomMatchSummary._players(players[1], 1, game.winner),
+			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 1)),
+			MatchSummaryWidgets.GameCenter{children = ' vs '},
+			CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 2)),
+			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
+			CustomMatchSummary._players(players[2], 2, game.winner),
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-		-- penalty score
-		:addElement(CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 2)))
-		-- score
-		:addElement(CustomMatchSummary._score(game.scores[2] or 0))
-		-- player right side
-		:addElement(CustomMatchSummary._players(players[2], 2, game.winner))
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row
-			:addElement(MatchSummaryWidgets.Break{})
-			:addElement(mw.html.create('div')
-				:wikitext(game.comment)
-				:css('margin', 'auto')
-			)
-	end
-	return row
+	}
 end
 
 ---@param game MatchGroupUtilGame
@@ -148,21 +113,6 @@ function CustomMatchSummary._extractPlayersFromGame(game, match)
 	end
 
 	return players
-end
-
----@param winner integer
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex)
-	return mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-		:wikitext(
-			winner == opponentIndex and GREEN_CHECK
-			or winner == 0 and DRAW_LINE or NO_CHECK
-		)
 end
 
 ---@param score number|string|nil

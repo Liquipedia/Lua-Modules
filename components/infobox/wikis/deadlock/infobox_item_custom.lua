@@ -34,7 +34,7 @@ local DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION = '_positiveConcatedArgsForBase'
 ---@return Html
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
-	item.args.image = item.args.image or 'Deadlock_gameasset_Item ' .. item.args.name .. '.png'
+	item.args.image = item.args.image or ('Deadlock_gameasset_Item ' .. item.args.name .. '.png')
 	item.args.subheader = item:_getCostDisplay()
 	item.args.imagesize = 100
 	item:setWidgetInjector(CustomInjector(item))

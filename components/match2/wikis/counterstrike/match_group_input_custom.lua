@@ -47,7 +47,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
 	end)
-	local games = MatchFunctions.extractMaps(match, #opponents)
+	local games = MatchFunctions.extractMaps(match, opponents)
 	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
 	games = MatchFunctions.removeUnsetMaps(games)
 	match.links = MatchFunctions.getLinks(match, games)
@@ -67,11 +67,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
 	end
 
@@ -94,44 +93,11 @@ end
 --
 
 ---@param match table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table[]
-function MatchFunctions.extractMaps(match, opponentCount)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
-
---
--- match related functions
---
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
@@ -141,13 +107,12 @@ function MatchFunctions.calculateMatchScore(maps)
 	end
 end
 
--- Template:Map sets a default map name so we can count the number of maps.
--- These maps however shouldn't be stored
--- The keepMap function will check if a map should be kept
 ---@param games table[]
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, MapFunctions.keepMap)
+	return Array.filter(games, function(map)
+		return map.map ~= nil
+	end)
 end
 
 ---@param match table
@@ -245,7 +210,7 @@ end
 function MatchFunctions.getExtraData(match, opponents, finishedInput)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = match.resulttype == MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED and finishedInput or nil,
+		status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
@@ -256,17 +221,11 @@ end
 -- map related functions
 --
 
--- Check if a map should be discarded due to being redundant
+---@param match table
 ---@param map table
----@return boolean
-function MapFunctions.keepMap(map)
-	return map.map ~= nil
-end
-
--- Parse extradata information
----@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
 	}

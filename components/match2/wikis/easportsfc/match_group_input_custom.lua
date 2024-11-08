@@ -12,72 +12,42 @@ local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local Streams = Lua.import('Module:Links/Stream')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
+CustomMatchGroupInput.DEFAULT_MODE = 'solo'
 
--- called from Module:MatchGroup
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
-	end)
-
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-
-	local scoreType = 'mapScores'
-	if Logic.readBool(match.hasSubmatches) then
-		scoreType = 'mapWins'
-	elseif Array.any(Array.map(games, Operator.property('penalty')), Logic.readBool) then
-		scoreType = 'penalties'
-	end
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and CustomMatchGroupInput.calculateMatchScore(games, scoreType)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = winnerInput,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.bestof = tonumber(match.bestof)
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
+	--- TODO: Investigate if some parts of this should be a display rather than storage.
+	--- If penalties is supplied, than one map MUST have the penalty flag set to true.
+	---@param maps table[]
+	---@return fun(opponentIndex: integer): integer
+	CustomMatchGroupInput.calculateMatchScore = function(maps)
+		local calculateBy = CustomMatchGroupInput.getScoreType(match, maps)
+		return function(opponentIndex)
+			if calculateBy == 'mapWins' then
+				return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
+			elseif calculateBy == 'mapScores' then
+				return Array.reduce(Array.map(maps, function(map)
+					return map.scores[opponentIndex] or 0
+				end), Operator.add, 0)
+			elseif calculateBy == 'penalties' then
+				return Array.filter(maps, function(map)
+					return Logic.readBool(map.penalty)
+				end)[1].scores[opponentIndex]
+			else
+				error('Unknown calculateBy: ' .. tostring(calculateBy))
+			end
+		end
 	end
 
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'solo'))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.extradata = CustomMatchGroupInput.getExtraData(match, scoreType == 'mapWins')
-
-	match.games = games
-	match.opponents = opponents
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, CustomMatchGroupInput)
 end
 
 ---@param match table
@@ -131,33 +101,30 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 	return maps
 end
 
---- TODO: Investigate if some parts of this should be a display rather than storage.
---- If penalties is supplied, than one map MUST have the penalty flag set to true.
----@param maps table[]
----@param calculateBy 'mapWins'|'mapScores'|'penalties'
----@return fun(opponentIndex: integer): integer
-function CustomMatchGroupInput.calculateMatchScore(maps, calculateBy)
-	return function(opponentIndex)
-		if calculateBy == 'mapWins' then
-			return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
-		elseif calculateBy == 'mapScores' then
-			return Array.reduce(Array.map(maps, function(map)
-				return map.scores[opponentIndex] or 0
-			end), Operator.add, 0)
-		elseif calculateBy == 'penalties' then
-			return Array.filter(maps, function(map)
-				return Logic.readBool(map.penalty)
-			end)[1].scores[opponentIndex]
-		else
-			error('Unknown calculateBy: ' .. tostring(calculateBy))
-		end
+---@param bestOfInput string?
+---@return integer?
+function CustomMatchGroupInput.getBestOf(bestOfInput)
+	return tonumber(bestOfInput)
+end
+
+---@param match table
+---@param games table[]
+---@return 'mapWins'|'mapScores'|'penalties'
+function CustomMatchGroupInput.getScoreType(match, games)
+	if Logic.readBool(match.hasSubmatches) then
+		return 'mapWins'
+	elseif Array.any(Array.map(games, Operator.property('penalty')), Logic.readBool) then
+		return 'penalties'
+	else
+		return 'mapScores'
 	end
 end
 
 ---@param match table
----@param hasSubmatches boolean
+---@param maps table[]
 ---@return table
-function CustomMatchGroupInput.getExtraData(match, hasSubmatches)
+function CustomMatchGroupInput.getExtraData(match, maps)
+	local hasSubmatches = CustomMatchGroupInput.getScoreType(match, maps) == 'mapWins'
 	return {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		hassubmatches = tostring(hasSubmatches),

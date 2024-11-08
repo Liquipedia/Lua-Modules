@@ -14,72 +14,27 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local Streams = Lua.import('Module:Links/Stream')
 
-local OPPONENT_CONFIG = {
+
+local CustomMatchGroupInput = {}
+local MatchFunctions = {}
+local MapFunctions = {}
+MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
 }
 local TBD = 'TBD'
 
-local CustomMatchGroupInput = {}
-local MatchFunctions = {}
-local MapFunctions = {}
-
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	local games = MatchFunctions.extractMaps(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Variables.varDefault('tournament_mode', 'singles')
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param maps table[]
@@ -105,13 +60,10 @@ function MatchFunctions.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		if String.isNotEmpty(map.map) and string.upper(map.map) ~= TBD then
-			map.map = mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
-		end
-
+		map.map = MapFunctions.getMapName(map)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		local opponentInfo = Array.map(Array.range(1, #opponents), function(opponentIndex)
+		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -137,6 +89,15 @@ function MatchFunctions.extractMaps(match, opponents)
 	end
 
 	return maps
+end
+
+---@param map table
+---@return string?
+function MapFunctions.getMapName(map)
+	if String.isNotEmpty(map.map) and map.map ~= TBD then
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
+	end
+	return map.map
 end
 
 ---@param mapInput table

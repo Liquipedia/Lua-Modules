@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Icon = require('Module:Icon')
 local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
-local HeroData = mw.loadData('Module:HeroData')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -33,6 +32,7 @@ local ICONS = {
 }
 
 local TBD = 'TBD'
+local DEFAULT_HERO = 'default'
 
 local CustomMatchSummary = {}
 --local StarcraftMatchSummary = CustomMatchSummary
@@ -87,9 +87,9 @@ end
 ---@param match table
 function CustomMatchSummary.computeMatchOfffactions(match)
 	Array.forEach(match.games, function(game)
-		game.offfactions = {}
+		game.offFactions = {}
 		Array.forEach(game.opponents, function(gameOpponent, opponentIndex)
-			game.offfactions[opponentIndex] = MatchGroupUtil.computeOfffactions(
+			game.offFactions[opponentIndex] = MatchGroupUtil.computeOffFactions(
 				gameOpponent,
 				match.opponents[opponentIndex]
 			)
@@ -161,8 +161,8 @@ function CustomMatchSummary.Game(options, game)
 			},
 			showOffFactionIcons and offFactionIcons(2) or nil,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}},
-			CustomMatchSummary.DisplayHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true})
+			CustomMatchSummary.DisplayHeroes(game.opponents[2], {hasHeroes = options.hasHeroes, flipped = true}),
+			MatchSummaryWidgets.GameComment{children = game.comment, classes = {'brkts-popup-sc-game-comment'}}
 		)
 	}
 end
@@ -170,7 +170,7 @@ end
 ---Renders off-factions as Nx2 grid of tiny icons
 ---@param factions string[]
 ---@return Html
-function CustomMatchSummary.OfffactionIcons(factions)
+function CustomMatchSummary.OffFactionIcons(factions)
 	local factionsNode = mw.html.create('div')
 		:addClass('brkts-popup-sc-game-offrace-icons')
 	for _, faction in ipairs(factions) do
@@ -188,7 +188,7 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 
 	local heroesPerPlayer = Array.map(opponent.players or {}, function(player)
 		return Array.map(Array.range(1, 3), function(heroIndex)
-			return HeroData[((player.heroes or {})[heroIndex] or ''):lower()] or HeroData.default
+			return (player.heroes or {})[heroIndex] or DEFAULT_HERO
 		end)
 	end)
 
@@ -198,23 +198,11 @@ function CustomMatchSummary.DisplayHeroes(opponent, options)
 		children = Array.map(heroesPerPlayer, function(heroes)
 			return HtmlWidgets.Div{
 				classes = {'brkts-popup-body-element-thumbs', 'brkts-champion-icon'},
-				children = Array.map(heroes, function(hero)
-					local name = hero.name or ''
-					return HtmlWidgets.Div{
-						classes = {'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red')},
-						css = {float = options.flipped and 'right' or 'left'},
-						children = {'[[File:' .. hero.icon .. '|link=' .. name .. '|' .. name .. ']]'},
-					}
-				end)
-				--[[ the entire Array.map(heroes, ...) can probably be replaced with below after setting up CharacterIcon data
-				{
-					MatchSummaryWidgets.Characters{
-						flipped = options.flipped,
-						characters = heroes,
-						bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
-					}
-				}
-				]]
+				children = MatchSummaryWidgets.Characters{
+					flipped = options.flipped,
+					characters = heroes,
+					bg = 'brkts-popup-side-color-' .. (options.flipped and 'blue' or 'red'),
+				},
 			}
 		end)
 	}
@@ -309,10 +297,7 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 			return HtmlWidgets.Tr{
 				children = {
 					HtmlWidgets.Th{
-						children = {CustomMatchSummary.Game(
-							{hasHeroes = true, isPartOfSubMatch = true},
-							game
-						)},
+						children = {CustomMatchSummary.Game({hasHeroes = true, isPartOfSubMatch = true}, game)},
 					},
 				},
 			}

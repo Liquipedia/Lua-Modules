@@ -42,11 +42,11 @@ function CustomMatchSummary.createBody(match)
 	)}
 end
 
+---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@param date string
 ---@return MatchSummaryRow?
-function CustomMatchSummary._createGame(game, gameIndex, date)
+function CustomMatchSummary._createGame(date, game, gameIndex)
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data

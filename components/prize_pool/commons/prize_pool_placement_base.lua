@@ -35,7 +35,7 @@ local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 ---@field opponentData standardOpponent
 ---@field prizeRewards table
 ---@field additionalData table?
----@field date osdate|string?
+---@field date osdate|osdateparam|string?
 
 --- @param args table Input information
 --- @param parent BasePrizePool The PrizePool this BasePlacement is part of

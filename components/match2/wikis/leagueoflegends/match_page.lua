@@ -12,7 +12,7 @@ local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Operator = require('Module:Operator')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
@@ -163,6 +163,11 @@ function MatchPage.getByMatchId(props)
 			} or ''
 		end)
 	}
+	if String.isNotEmpty(viewModel.vod) then
+		table.insert(viewModel.vods, 1, VodLink.display{
+			vod = viewModel.vod,
+		})
+	end
 
 	viewModel.heroIcon = function(self)
 		local character = self

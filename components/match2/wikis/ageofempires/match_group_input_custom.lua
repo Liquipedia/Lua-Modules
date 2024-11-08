@@ -23,6 +23,7 @@ local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
 local CustomMatchGroupInput = {}
+local MapFunctions = {}
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
@@ -66,11 +67,10 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
+			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
 	end
 
@@ -156,7 +156,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		map.extradata = {}
+		map.extradata = MapFunctions.getExtraData(match, map, opponents)
 		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
 		map.extradata.mapmode = Table.extract(map, 'mode')
 
@@ -358,6 +358,16 @@ function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+	}
 end
 
 return CustomMatchGroupInput
