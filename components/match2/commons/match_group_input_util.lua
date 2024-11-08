@@ -1134,6 +1134,7 @@ end
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
 ---@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 ---@field ADD_SUB_GROUP? boolean
+---@field BREAK_ON_EMPTY? boolean
 
 --- The standard way to process a match input.
 ---
@@ -1149,6 +1150,7 @@ end
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
+--- - BREAK_ON_EMPTY boolean?
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
@@ -1157,6 +1159,9 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
 	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(map) then
+			break
+		end
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
