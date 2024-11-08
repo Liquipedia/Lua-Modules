@@ -26,7 +26,8 @@ end
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args.pubgpremier, queryResult.publishertier)
+	BasicHiddenDataBox.checkAndAssign('tournament_publishertier',
+		args.highlighted or args.pubgpremier, queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)

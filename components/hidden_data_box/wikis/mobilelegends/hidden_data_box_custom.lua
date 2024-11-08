@@ -33,7 +33,9 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 
 	BasicHiddenDataBox.checkAndAssign('tournament_patch', args.patch, queryResult.patch)
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args['moonton-sponsored'], queryResult.publishertier)
+	-- can be kicked after conversion
+	BasicHiddenDataBox.checkAndAssign('tournament_publishertier',
+		args.highlighted or args['moonton-sponsored'], queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)
