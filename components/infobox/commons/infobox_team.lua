@@ -125,7 +125,7 @@ function Team:createInfobox()
 			id = 'earnings',
 			children = {
 				Cell{
-					name = Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make(
+					name = not Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make(
 						'Approx. Total Winnings',
 						'Includes individual player earnings won&#10;while representing this team'
 					) or 'Approx. Total Winnings',
