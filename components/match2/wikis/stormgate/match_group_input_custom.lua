@@ -261,8 +261,6 @@ function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 
 	local prefix = 't' .. opponentIndex .. 'p'
 
-	local participants = {}
-
 	return Array.map(players, function(player, playerIndex)
 		local faction = Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'faction'])
 			or player.extradata.faction

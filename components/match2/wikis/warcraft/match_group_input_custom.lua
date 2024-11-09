@@ -293,8 +293,6 @@ function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	mapInput[prefix .. '1race'] = Logic.emptyOr(mapInput[prefix .. '1race'], mapInput['race' .. opponentIndex])
 	mapInput[prefix .. '1heroes'] = Logic.emptyOr(mapInput[prefix .. '1heroes'], mapInput['heroes' .. opponentIndex])
 
-	local participants = {}
-
 	return Array.map(players, function(player, playerIndex)
 		local faction = Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'race'])
 			or player.extradata.faction
