@@ -221,7 +221,7 @@ end
 ---@field root Html
 ---@field headerElement Html?
 ---@field bodyElement Widget|Html?
---@field commentElement Widget?
+---@field commentElement Widget?
 ---@field footerElement Html?
 local Match = Class.new(
 	function(self)
