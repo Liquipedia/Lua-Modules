@@ -137,9 +137,10 @@ function MatchFunctions.getBestOf(bestofInput)
 end
 
 ---@param match table
----@param numberOfGames integer
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match, numberOfGames)
+function MatchFunctions.getExtraData(match, games, opponents)
 	---@type table<string, string|table|nil>
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
@@ -258,7 +259,6 @@ end
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
-	-- resolve the aliases in case they are used
 	local prefix = 't' .. opponentIndex .. 'p'
 
 	local participants = {}
