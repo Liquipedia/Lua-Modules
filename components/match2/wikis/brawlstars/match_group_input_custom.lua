@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local BrawlerNames = mw.loadData('Module:BrawlerNames')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -14,8 +15,6 @@ local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
-local BrawlerNames = mw.loadData('Module:BrawlerNames')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -33,63 +32,24 @@ local DEFAULT_BESTOF_MAP = 3
 local MatchFunctions = {}
 local MapFunctions = {}
 
+MatchFunctions.DEFAULT_MODE = 'team'
+MatchFunctions.DATE_FALLBACKS = {
+	'tournament_enddate',
+}
+
 local CustomMatchGroupInput = {}
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date, {'tournament_enddate'}))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
-	end)
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-	match.bestof = MatchFunctions.getBestOf(match)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	local maps = {}
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if map.map == nil then
@@ -103,7 +63,7 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 		map.participants = MapFunctions.getParticipants(map, opponents)
 		map.extradata = MapFunctions.getExtraData(map, #opponents)
 
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(_, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
@@ -113,13 +73,12 @@ function CustomMatchGroupInput.extractMaps(match, opponents)
 			return {score = score, status = status}
 		end)
 
-		map.finished = MatchGroupInputUtil.mapIsFinished(map, opponentInfo)
+		map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
 
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		table.insert(maps, map)
@@ -141,19 +100,21 @@ function MatchFunctions.calculateMatchScore(maps)
 	end
 end
 
----@param match table
----@return integer
-function MatchFunctions.getBestOf(match)
-	local bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
+---@param bestofInput string|integer?
+---@return integer?
+function MatchFunctions.getBestOf(bestofInput)
+	local bestof = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF_MATCH
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
-		mvp = MatchGroupInputUtil.readMvp(match),
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
 end
 

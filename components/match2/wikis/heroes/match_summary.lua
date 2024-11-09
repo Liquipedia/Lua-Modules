@@ -13,7 +13,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -24,8 +23,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
 
 ---@param args table
@@ -52,9 +49,8 @@ end
 
 ---@param date string
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget?
 function CustomMatchSummary._createGame(date, game)
-	local row = MatchSummary.Row()
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data
@@ -67,69 +63,31 @@ function CustomMatchSummary._createGame(date, game)
 		return nil
 	end
 
-	row:addClass('brkts-popup-body-game')
-		:css('font-size', '90%')
-		:css('padding', '4px')
-		:css('min-height', '32px')
-
-	row:addElement(MatchSummaryWidgets.Characters{
-		flipped = false,
-		date = date,
-		characters = characterData[1],
-		bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
-	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('min-width', '120px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-		:node(mw.html.create('div')
-			:css('margin', 'auto')
-			:wikitext('[[' .. game.map .. ']]')
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '90%', padding = '4px'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.Characters{
+				flipped = false,
+				date = date,
+				characters = characterData[1],
+				bg = 'brkts-popup-side-color-' .. (extradata.team1side or ''),
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = 1}},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.Characters{
+				flipped = true,
+				date = date,
+				characters = characterData[2],
+				bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
+			},
+			MatchSummaryWidgets.GameComment{children = WidgetUtil.collect(
+				game.comment,
+				game.length and ('Match Duration: ' .. game.length) or nil
+			)}
 		)
-	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(MatchSummaryWidgets.Characters{
-		flipped = true,
-		date = date,
-		characters = characterData[2],
-		bg = 'brkts-popup-side-color-' .. (extradata.team2side or ''),
-	})
-
-	if Logic.isNotEmpty(game.comment) or Logic.isNotEmpty(game.length) then
-		game.length = Logic.nilIfEmpty(game.length)
-		local commentContents = Array.append({},
-			Logic.nilIfEmpty(game.comment),
-			game.length and tostring(mw.html.create('span'):wikitext('Match Duration: ' .. game.length)) or nil
-		)
-		row
-			:addElement(MatchSummaryWidgets.Break{})
-			:addElement(mw.html.create('div')
-				:css('margin', 'auto')
-				:wikitext(table.concat(commentContents, '<br>'))
-			)
-	end
-
-	return row:create()
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:css('line-height', '27px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if isWinner then
-		container:node(GREEN_CHECK )
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
+	}
 end
 
 return CustomMatchSummary

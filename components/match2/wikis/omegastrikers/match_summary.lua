@@ -9,20 +9,12 @@
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Page = require('Module:Page')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local ICONS = {
-	check = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	empty = '[[File:NoCheck.png|link=]]'
-}
 
 local CustomMatchSummary = {}
 
@@ -57,80 +49,27 @@ function CustomMatchSummary._createMapRow(game)
 		return
 	end
 
-	local characterData = {
-		Array.map((game.opponents[1] or {}).players or {}, Operator.property('striker')),
-		Array.map((game.opponents[2] or {}).players or {}, Operator.property('striker')),
+	local function makeTeamSection(opponentIndex)
+		return {
+			MatchSummaryWidgets.Characters{
+				flipped = opponentIndex == 2,
+				characters = Array.map((game.opponents[opponentIndex] or {}).players or {}, Operator.property('striker')),
+				bg = opponentIndex == 1 and 'brkts-popup-side-color-blue' or 'brkts-popup-side-color-red',
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+		}
+	end
+
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
 	}
-
-	local row = MatchSummary.Row()
-
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummaryWidgets.Break{})
-	end
-
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:wikitext(Page.makeInternalLink(game.map))
-		:css('text-align', 'center')
-
-	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popup-spaced-map-skip')
-	end
-
-	local leftNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(MatchSummaryWidgets.Characters{
-			flipped = false,
-			characters = characterData[1],
-			bg = 'brkts-popup-side-color-blue', -- Team 1 is always blue
-		})
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, 'check'))
-		:node(CustomMatchSummary._gameScore(game, 1))
-
-	local rightNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._gameScore(game, 2))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, 'check'))
-		:node(MatchSummaryWidgets.Characters{
-			flipped = true,
-			characters = characterData[2],
-			bg = 'brkts-popup-side-color-red', -- Team 2 is always red
-		})
-
-	row:addElement(leftNode)
-		:addElement(centerNode)
-		:addElement(rightNode)
-
-	row:addClass('brkts-popup-body-game')
-		:css('overflow', 'hidden')
-
-	-- Add Comment
-	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		local comment = mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	return row:create()
-end
-
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
-	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		return container:node(ICONS[iconType])
-	end
-
-	return container:node(ICONS.empty)
 end
 
 return CustomMatchSummary

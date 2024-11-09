@@ -8,10 +8,8 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -19,12 +17,6 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NONE = '-'
-
----@enum OsuMatchIcons
-local Icons = {
-	CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'},
-	EMPTY = '[[File:NoCheck.png|link=]]',
-}
 
 local CustomMatchSummary = {}
 
@@ -49,31 +41,10 @@ function CustomMatchSummary.createBody(match)
 end
 
 ---@param game MatchGroupUtilGame
----@return Html?
+---@return Widget?
 function CustomMatchSummary._createMapRow(game)
 	if not game.map then
 		return
-	end
-	local row = MatchSummary.Row()
-
-	-- Add Header
-	if Logic.isNotEmpty(game.header) then
-		local mapHeader = mw.html.create('div')
-			:wikitext(game.header)
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-		row:addElement(mapHeader)
-		row:addElement(MatchSummaryWidgets.Break{})
-	end
-
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:wikitext(CustomMatchSummary._getMapDisplay(game))
-		:css('text-align', 'center')
-
-	if game.resultType == 'np' then
-		centerNode:addClass('brkts-popup-spaced-map-skip')
 	end
 
 	---@param score integer|string|nil
@@ -82,56 +53,27 @@ function CustomMatchSummary._createMapRow(game)
 		if not Logic.isNumeric(score) then
 			return score
 		end
-		return mw.getContentLanguage():formatNum(score --[[@as integer]])
+		return mw.getContentLanguage():formatNum(tonumber(score) --[[@as integer]])
 	end
 
-	local leftNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 1, Icons.CHECK))
-		:node(DisplayHelper.MapScore(displayNumericScore(game.scores[1]), 1, game.resultType, game.walkover, game.winner))
-		:css('width', '20%')
-
-	local rightNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(DisplayHelper.MapScore(displayNumericScore(game.scores[2]), 2, game.resultType, game.walkover, game.winner))
-		:node(CustomMatchSummary._createCheckMarkOrCross(game.winner == 2, Icons.CHECK))
-		:css('width', '20%')
-
-	row:addElement(leftNode)
-		:addElement(centerNode)
-		:addElement(rightNode)
-
-	row:addClass('brkts-popup-body-game')
-		:css('overflow', 'hidden')
-
-	-- Add Comment
-	if Logic.isNotEmpty(game.comment) then
-		row:addElement(MatchSummaryWidgets.Break{})
-		local comment = mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
-		row:addElement(comment)
+	local function makeTeamSection(opponentIndex)
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+			displayNumericScore(
+				DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+			)
+		}
 	end
 
-	return row:create()
-end
-
----@param game MatchGroupUtilGame
----@return string?
-function CustomMatchSummary._getMapDisplay(game)
-	return Page.makeInternalLink(game.map)
-end
-
----@param showIcon boolean?
----@param iconType string?
----@return Html
-function CustomMatchSummary._createCheckMarkOrCross(showIcon, iconType)
-	local container = mw.html.create('div'):addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if showIcon then
-		return container:node(iconType)
-	end
-	return container:node(Icons.EMPTY)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 return CustomMatchSummary

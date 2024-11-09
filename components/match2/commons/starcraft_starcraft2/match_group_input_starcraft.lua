@@ -19,19 +19,19 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local Streams = Lua.import('Module:Links/Stream')
-
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-}
 local TBD = 'TBD'
 local TBA = 'TBA'
 local MODE_MIXED = 'mixed'
 
 local StarcraftMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = true,
+	},
+}
 local MapFunctions = {}
+
 -- make these available for ffa
 StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
 StarcraftMatchGroupInput.MapFunctions = MapFunctions
@@ -46,86 +46,18 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		return FfaStarcraftMatchGroupInput.processMatch(match, options)
 	end
 
-	Table.mergeInto(match, MatchFunctions.readDate(match.date))
-
-	local opponents = MatchFunctions.readOpponents(match)
-
-	local games = MatchFunctions.extractMaps(match, opponents)
-	match.links = MatchGroupInputUtil.getLinks(match)
-	match.links.headtohead = MatchFunctions.getHeadToHeadLink(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, opponents)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.mode = MatchFunctions.getMode(opponents)
-
-	match.bestof = MatchFunctions.getBestOf(match.bestof)
 	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament')))
 	if cancelled then
 		match.finished = match.finished or 'skip'
 	end
 
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match, #games)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
----@param match table
----@return table[]
-function MatchFunctions.readOpponents(match)
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
-		-- make sure match2players is not nil to avoid indexing nil
-		opponent.match2players = opponent.match2players or {}
-		Array.forEach(opponent.match2players, function(player)
-			player.extradata = player.extradata or {}
-			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
-		end)
-	end)
-
-	return opponents
-end
-
----@param dateInput string?
+---@param matchArgs table
 ---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
-function MatchFunctions.readDate(dateInput)
-	local dateProps = MatchGroupInputUtil.readDate(dateInput, {
+function MatchFunctions.readDate(matchArgs)
+	local dateProps = MatchGroupInputUtil.readDate(matchArgs.date, {
 		'match_date',
 		'tournament_startdate',
 		'tournament_enddate',
@@ -134,6 +66,19 @@ function MatchFunctions.readDate(dateInput)
 		Variables.varDefine('match_date', dateProps.date)
 	end
 	return dateProps
+end
+
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = opponent.extradata or {}
+	Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+	-- make sure match2players is not nil to avoid indexing nil
+	opponent.match2players = opponent.match2players or {}
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata = player.extradata or {}
+		player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+	end)
 end
 
 ---@param match table
@@ -213,9 +158,10 @@ function MatchFunctions.getBestOf(bestofInput)
 end
 
 ---@param match table
----@param numberOfGames integer
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getExtraData(match, numberOfGames)
+function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'false',
@@ -225,7 +171,7 @@ function MatchFunctions.getExtraData(match, numberOfGames)
 		MatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
 	end
 
-	Array.forEach(Array.range(1, numberOfGames), function(subGroupIndex)
+	Array.forEach(games, function(_, subGroupIndex)
 		extradata['subGroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
 	end)
 
@@ -292,7 +238,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 	}
 
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount)
-	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore({
 			walkover = mapInput.walkover,
 			winner = mapInput.winner,
@@ -302,12 +248,11 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 		return {score = score, status = status}
 	end)
 
-	map.scores = Array.map(opponentInfo, Operator.property('score'))
+	map.scores = Array.map(map.opponents, Operator.property('score'))
 
 	if map.finished then
-		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
-		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, mapInput.winner, opponentInfo)
+		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
+		map.winner = MatchGroupInputUtil.getWinner(map.status, mapInput.winner, map.opponents)
 	end
 
 	return map, subGroup

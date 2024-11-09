@@ -19,7 +19,7 @@ local MatchSummaryGameCenter = Class.new(Widget)
 ---@return Widget?
 function MatchSummaryGameCenter:render()
 	return HtmlWidgets.Div{
-		classes = {'brkts-popup-body-element-vertical-centered'},
+		classes = {'brkts-popup-spaced'},
 		css = self.props.css,
 		children = self.props.children,
 	}

@@ -23,6 +23,7 @@ local HOVER_MODIFIER = 2.5 -- From brkts-champion-icon in Brackets.less
 local MatchSummaryCharacters = Class.new(Widget)
 MatchSummaryCharacters.defaultProps = {
 	flipped = false,
+	hideOnMobile = false,
 	size = BASE_SIZE * HOVER_MODIFIER,
 }
 
@@ -34,11 +35,12 @@ function MatchSummaryCharacters:render()
 	local flipped = self.props.flipped
 
 	return Div{
-		classes = {
+		classes = Array.extend(
 			'brkts-popup-body-element-thumbs',
 			'brkts-champion-icon',
 			flipped and 'brkts-popup-body-element-thumbs-right' or nil,
-		},
+			self.props.hideOnMobile and 'hide-mobile' or nil
+		),
 		children = Array.map(self.props.characters, function(character)
 			return Character{
 				character = character,

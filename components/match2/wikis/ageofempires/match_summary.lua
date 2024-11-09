@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
@@ -24,10 +23,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local PlayerDisplay = require('Module:Player/Display')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = 'initial'}
-local DRAW_LINE = Icon.makeIcon{iconName = 'draw', color = 'bright-sun-text', size = 'initial'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 
 local CustomMatchSummary = {}
 
@@ -52,10 +47,9 @@ function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createGame(game, {
-			opponents = match.opponents,
 			game = match.game,
 			soloMode = CustomMatchSummary._isSolo(match)
-		}):create()
+		})
 	end)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
@@ -85,21 +79,15 @@ function CustomMatchSummary._getPlayerData(game, paricipantId)
 end
 
 ---@param game MatchGroupUtilGame
----@param props {game: string?, soloMode: boolean, opponents: standardOpponent[]}
----@return MatchSummaryRow?
+---@param props {game: string?, soloMode: boolean}
+---@return Widget?
 function CustomMatchSummary._createGame(game, props)
 	if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
-		:css('font-size', '0.75rem')
-		:css('padding', '4px')
-		:css('min-height', '24px')
 
 	local normGame = Game.abbreviation{game = props.game}:lower()
-	game.extradata = game.extradata or {}
 	game.mapDisplayName = game.mapDisplayName or game.map
 
-	if game.extradata.mapmode then
+	if game.extradata and game.extradata.mapmode then
 		game.mapDisplayName = game.mapDisplayName .. MapMode._get{game.extradata.mapmode}
 	end
 
@@ -132,17 +120,18 @@ function CustomMatchSummary._createGame(game, props)
 		faction2 = createOpponentDisplay(2)
 	end
 
-	row
-			:css('flex-wrap', 'nowrap')
-			:addElement(faction1)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 1, props.soloMode))
-			:addElement(mw.html.create('div')
-				:addClass('brkts-popup-spaced'):css('flex-grow', '1')
-				:wikitext(DisplayHelper.MapAndStatus(game))
-			)
-			:addElement(CustomMatchSummary._createCheckMark(game.winner, 2, props.soloMode))
-			:addElement(faction2)
-	return row
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '0.75rem'},
+		children = WidgetUtil.collect(
+			faction1,
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = '1'}},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			faction2,
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 ---@param civ string?
@@ -158,22 +147,6 @@ function CustomMatchSummary._createFactionIcon(civ, game)
 			showTitle = true,
 			showLink = true,
 		})
-end
-
----@param winner integer|string
----@param opponentIndex integer
----@param soloMode boolean
----@return Html
-function CustomMatchSummary._createCheckMark(winner, opponentIndex, soloMode)
-	return mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:css('line-height', '17px')
-			:css('margin-left', (opponentIndex == 1 and soloMode) and '10%' or '1%')
-			:css('margin-right', (opponentIndex == 2 and soloMode) and '10%' or '1%')
-			:wikitext(
-				winner == opponentIndex and GREEN_CHECK
-				or winner == 0 and DRAW_LINE or NO_CHECK
-			)
 end
 
 return CustomMatchSummary

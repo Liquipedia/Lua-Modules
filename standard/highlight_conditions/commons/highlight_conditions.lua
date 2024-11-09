@@ -13,7 +13,7 @@ local HighlightConditions = {}
 
 --- Check arguments or queryData if the tournament should be highlighted
 ---@param data table
----@param options table
+---@param options table?
 ---@return boolean
 function HighlightConditions.tournament(data, options)
 	data.extradata = data.extradata or {}

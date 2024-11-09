@@ -6,113 +6,36 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local OPPONENT_CONFIG = {
+local MatchFunctions = {}
+local MapFunctions = {}
+local CustomMatchGroupInput = {}
+
+MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
 	maxNumPlayers = 10,
 }
-
-local MatchFunctions = {}
-local MapFunctions = {}
-
-local CustomMatchGroupInput = {}
+MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-	local games = MatchFunctions.extractMaps(match, opponents)
-	match.bestof = MatchGroupInputUtil.getBestOf(match.bestof, games)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.map = nil
-		map.participants = MapFunctions.getParticipants(map, opponents)
-		map.extradata = MapFunctions.getExtraData(map, #opponents)
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param maps table[]
@@ -132,9 +55,16 @@ function MatchFunctions.getExtraData(match)
 end
 
 ---@param map table
----@param opponentCount integer
+---@return string?
+function MapFunctions.getMapName(map)
+	return nil
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map, opponentCount)
+function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
 		team1side = map.team1side,
@@ -142,7 +72,7 @@ function MapFunctions.getExtraData(map, opponentCount)
 	}
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
-	for opponentIndex = 1, opponentCount do
+	for opponentIndex = 1, #opponents do
 		for _, ban, banIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
 			extradata['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(ban)
 		end
@@ -172,14 +102,13 @@ function MapFunctions.getParticipants(map, opponents)
 	return participants
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner and not map.finished then
 			return
 		end
 		return winner == opponentIndex and 1 or 0

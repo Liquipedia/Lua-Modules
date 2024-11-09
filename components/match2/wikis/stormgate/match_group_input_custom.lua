@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
-local HeroData = mw.loadData('Module:HeroData')
+local CharacterAliases = mw.loadData('Module:CharacterAliases')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -20,14 +20,9 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local Streams = Lua.import('Module:Links/Stream')
 
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-}
 local TBD = 'TBD'
-local DEFAULT_HERO_FACTION = HeroData.default.faction
+local DEFAULT_HERO_FACTION = CharacterAliases.default.faction
 local MODE_MIXED = 'mixed'
 
 ---@class StormgateParticipant
@@ -39,7 +34,12 @@ local MODE_MIXED = 'mixed'
 ---@field random boolean?
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = true,
+	},
+}
 local MapFunctions = {}
 
 ---@param match table
@@ -48,69 +48,7 @@ local MapFunctions = {}
 function CustomMatchGroupInput.processMatch(match, options)
 	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in stormgate match2')
 
-	Table.mergeInto(match, MatchFunctions.readDate(match))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
-		-- make sure match2players is not nil to avoid indexing nil
-		opponent.match2players = opponent.match2players or {}
-		Array.forEach(opponent.match2players, function(player)
-			player.extradata = player.extradata or {}
-			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
-		end)
-	end)
-
-	local games = MatchFunctions.extractMaps(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, opponents)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.mode = MatchFunctions.getMode(opponents)
-
-	match.bestof = MatchFunctions.getBestOf(match.bestof)
-	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('tournament_cancelled')))
-	if cancelled then
-		match.finished = match.finished or 'skip'
-	end
-
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
-	match.extradata = MatchFunctions.getExtraData(match, #games)
-
-	match.games = games
-	match.opponents = opponents
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param matchArgs table
@@ -127,6 +65,19 @@ function MatchFunctions.readDate(matchArgs)
 	end
 
 	return dateProps
+end
+
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = opponent.extradata or {}
+	Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+	-- make sure match2players is not nil to avoid indexing nil
+	opponent.match2players = opponent.match2players or {}
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata = player.extradata or {}
+		player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+	end)
 end
 
 ---@param match table
@@ -207,6 +158,7 @@ end
 ---@param numberOfGames integer
 ---@return table
 function MatchFunctions.getExtraData(match, numberOfGames)
+	---@type table<string, string|table|nil>
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
@@ -247,7 +199,7 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 	}
 
 	map.finished = MatchGroupInputUtil.mapIsFinished(mapInput)
-	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore({
 			walkover = mapInput.walkover,
 			winner = mapInput.winner,
@@ -257,12 +209,11 @@ function MapFunctions.readMap(mapInput, subGroup, opponentCount)
 		return {score = score, status = status}
 	end)
 
-	map.scores = Array.map(opponentInfo, Operator.property('score'))
+	map.scores = Array.map(map.opponents, Operator.property('score'))
 
 	if map.finished then
-		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
-		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, mapInput.winner, opponentInfo)
+		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
+		map.winner = MatchGroupInputUtil.getWinner(map.status, mapInput.winner, map.opponents)
 	end
 
 	return map, subGroup
@@ -467,7 +418,7 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 
 	local heroes = Array.map(mw.text.split(heroesInput, ','), String.trim)
 	return Array.map(heroes, function(hero)
-		local heroData = HeroData[hero:lower()]
+		local heroData = CharacterAliases[hero:lower()]
 		assert(heroData, 'Invalid hero input "' .. hero .. '"')
 
 		local isCoreFaction = Table.includes(Faction.coreFactions, faction)

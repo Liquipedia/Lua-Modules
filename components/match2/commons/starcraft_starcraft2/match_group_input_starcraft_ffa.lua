@@ -43,7 +43,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
-	local opponents = BaseMatchFunctions.readOpponents(match)
+	local opponents = MatchFunctions.readOpponents(match)
 
 	local games = MatchFunctions.extractMaps(match, opponents)
 
@@ -55,7 +55,7 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	if MatchGroupInputUtil.isNotPlayed(match.winner, finishedInput) then
 		match.finished = true
-		match.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+		match.status = MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 		match.extradata = {ffa = 'true'}
 		return match
 	end
@@ -79,10 +79,9 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 	end)
 
 	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(match.winner, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(match.winner, finishedInput)
 		StarcraftFfaMatchGroupInput._setPlacements(opponents)
-		match.winner = StarcraftFfaMatchGroupInput._getWinner(opponents, match.winner, match.resulttype)
+		match.winner = StarcraftFfaMatchGroupInput._getWinner(opponents, match.winner)
 	end
 
 	Array.forEach(opponents, function(opponent)
@@ -101,6 +100,18 @@ function StarcraftFfaMatchGroupInput.processMatch(match, options)
 
 	return match
 end
+
+---@param match table
+---@return table[]
+function MatchFunctions.readOpponents(match)
+	return Array.mapIndexes(function(opponentIndex)
+		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, BaseMatchFunctions.OPPONENT_CONFIG)
+		if not opponent then return end
+		BaseMatchFunctions.adjustOpponent(opponent, opponentIndex)
+		return opponent
+	end)
+end
+
 ---@param match table
 ---@param opponents {score: integer?}[]
 ---@return boolean
@@ -213,31 +224,30 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true
-		map.resulttype = MatchGroupInputUtil.RESULT_TYPE.NOT_PLAYED
+		map.status = MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 		map.scores = {}
 		return map
 	end
 
-	local opponentsInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
 		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
 	end)
 
-	map.scores = Array.map(opponentsInfo, Operator.property('score'))
+	map.scores = Array.map(map.opponents, Operator.property('score'))
 
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
-		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentsInfo)
-		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentsInfo)
-		StarcraftFfaMatchGroupInput._setPlacements(opponentsInfo, not hasScores)
-		map.winner = StarcraftFfaMatchGroupInput._getWinner(opponentsInfo, mapInput.winner, map.resulttype)
+		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
+		StarcraftFfaMatchGroupInput._setPlacements(map.opponents, not hasScores)
+		map.winner = StarcraftFfaMatchGroupInput._getWinner(map.opponents, mapInput.winner)
 	end
 
-	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
-		map.extradata['placement' .. opponentIndex] = opponentInfo.placement
+	Array.forEach(map.opponents, function(opponent, opponentIndex)
+		map.extradata['placement' .. opponentIndex] = opponent.placement
 	end)
 
-	Array.forEach(opponentsInfo, function(opponentInfo, opponentIndex)
-		map.extradata['status' .. opponentIndex] = opponentInfo.status
+	Array.forEach(map.opponents, function(opponent, opponentIndex)
+		map.extradata['status' .. opponentIndex] = opponent.status
 	end)
 
 	return map
@@ -336,12 +346,11 @@ end
 
 ---@param opponents {placement: integer?, score: integer?, status: string}
 ---@param winnerInput integer|string|nil
----@param resultType string?
 ---@return integer?
-function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput, resultType)
+function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput)
 	if Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
-	elseif resultType == MatchGroupInputUtil.RESULT_TYPE.DRAW then
+	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
 		return MatchGroupInputUtil.WINNER_DRAW
 	end
 
