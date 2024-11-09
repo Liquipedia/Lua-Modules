@@ -254,10 +254,10 @@ end
 ---@param opponentIndex integer
 ---@return table[]?
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-	if opponent.type == Opponent.team then
-		return MapFunctions.getTeamMapPlayers(map, opponent, opponentIndex)
-	elseif opponent.type == Opponent.literal then
+	if opponent.type == Opponent.literal then
 		return
+	elseif opponent.type == Opponent.team then
+		return MapFunctions.getTeamMapPlayers(map, opponent, opponentIndex)
 	end
 	return MapFunctions.getPartyMapPlayers(map, opponent, opponentIndex)
 end
