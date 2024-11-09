@@ -197,7 +197,7 @@ end
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, StormgateParticipant>
+---@return StormgateParticipant[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
@@ -254,7 +254,7 @@ end
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, StormgateParticipant>
+---@return StormgateParticipant[]
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 

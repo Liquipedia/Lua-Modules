@@ -265,7 +265,7 @@ end
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {faction: string?, player: string, position: string, flag: string?}>
+---@return {faction: string?, player: string, position: string, flag: string?}[]
 function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race'])
 		or Faction.read(mapInput['opponent' .. opponentIndex .. 'race'])
@@ -318,7 +318,7 @@ end
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {faction: string?, player: string, position: string, flag: string?}>
+---@return {faction: string?, player: string, position: string, flag: string?}[]
 function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
