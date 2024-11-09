@@ -187,7 +187,7 @@ function Footer:addLinks(links)
 	end
 
 	Array.forEach(MATCH_LINK_PRIORITY, function(linkTypePrefix)
-		for link, linkType in Table.iter.pairsByPrefix(links, linkTypePrefix) do
+		for linkType, link in Table.iter.pairsByPrefix(links, linkTypePrefix, {requireIndex=false}) do
 			processLink(linkType, link)
 		end
 	end)
@@ -198,7 +198,7 @@ function Footer:addLinks(links)
 		end)
 	end)
 
-	for link, linkType in pairs(unorderedLinks) do
+	for linkType, link in pairs(unorderedLinks) do
 		processLink(linkType, link)
 	end
 
