@@ -13,6 +13,7 @@ local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
@@ -185,16 +186,16 @@ function Footer:addLinks(links)
 		end
 	end
 
+	local processedKeys = {}
 	Array.forEach(MATCH_LINK_PRIORITY, function(linkTypePrefix)
-		for linkType, link in Table.iter.pairsByPrefix(links, linkTypePrefix, {requireIndex=false}) do
+		for linkType, link in Table.iter.pairsByPrefix(links, linkTypePrefix, {requireIndex = false}) do
 			processLink(linkType, link)
+			table.insert(processedKeys, linkType)
 		end
 	end)
 
 	local unorderedLinks = Table.filterByKey(links, function(key)
-		return Array.all(MATCH_LINK_PRIORITY, function (element)
-			return not String.startsWith(key, element)
-		end)
+		return Array.find(processedKeys, FnUtil.curry(Operator.eq, key)) == nil
 	end)
 
 	for linkType, link in pairs(unorderedLinks) do
