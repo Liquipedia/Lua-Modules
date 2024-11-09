@@ -124,11 +124,13 @@ function Team:createInfobox()
 		Customizable{
 			id = 'earnings',
 			children = {
-				Cell{name = Abbreviation.make(
-					'Approx. Total Winnings',
-					'Includes individual player earnings won&#10;while representing this team'
-				),
-				content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}}
+				Cell{
+					name = Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make(
+						'Approx. Total Winnings',
+						'Includes individual player earnings won&#10;while representing this team'
+					) or 'Approx. Total Winnings',
+					content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
+				}
 			}
 		},
 		Customizable{id = 'custom', children = {}},
