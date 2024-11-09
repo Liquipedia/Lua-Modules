@@ -30,7 +30,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local LINK_PRIORITY_GROUPS = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
+local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 ---@class MatchSummaryHeader
@@ -172,12 +172,7 @@ end
 ---@param links table<string, string|table>
 ---@return MatchSummaryFooter
 function Footer:addLinks(links)
-	local processLink = function(linkType)
-		local link = links[linkType]
-		if not link then
-			return
-		end
-
+	local processLink = function(linkType, link)
 		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
@@ -191,18 +186,21 @@ function Footer:addLinks(links)
 		end
 	end
 
-	Array.forEach(LINK_PRIORITY_GROUPS.common, processLink)
-	Array.forEach(LINK_PRIORITY_GROUPS.ordered, processLink)
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkTypePrefix)
+		for link, linkType in Table.iter.pairsByPrefix(links, linkTypePrefix) do
+			processLink(linkType, link)
+		end
+	end)
 
-	Array.forEach(
-		Array.filter(Array.extractKeys(links), function (key)
-			return not Array.find(
-				Array.extend(LINK_PRIORITY_GROUPS.common, LINK_PRIORITY_GROUPS.ordered),
-				FnUtil.curry(Operator.eq, key)
-			)
-		end),
-		processLink
-	)
+	local unorderedLinks = Table.filterByKey(links, function(key)
+		return Array.all(MATCH_LINK_PRIORITY, function (element)
+			return not String.startsWith(key, element)
+		end)
+	end)
+
+	for link, linkType in pairs(unorderedLinks) do
+		processLink(linkType, link)
+	end
 
 	return self
 end

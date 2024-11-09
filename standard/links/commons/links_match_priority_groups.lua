@@ -7,17 +7,16 @@
 --
 
 return {
-	common = {
-		'vod',
-		'preview',
-        'interview',
-        'review',
-        'lrthread',
-        'recap',
-		'headtohead',
-	},
-    ordered = {
-        'mapdraft',
-        'civdraft'
-    }
+	-- common
+	'vod',
+	'preview',
+	'interview',
+	'review',
+	'lrthread',
+	'recap',
+	'headtohead',
+
+	-- ageofempires
+	'mapdraft',
+	'civdraft'
 }
