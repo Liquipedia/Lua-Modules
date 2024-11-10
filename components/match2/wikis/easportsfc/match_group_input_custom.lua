@@ -180,7 +180,7 @@ function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIn
 			}
 		end
 	)
-	return {players = participants}
+	return participants
 end
 
 return CustomMatchGroupInput
