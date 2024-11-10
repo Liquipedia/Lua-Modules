@@ -37,9 +37,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		end),
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date= |youtube=',
+			args.vod == 'series' and (INDENT .. '|vod=') or nil,
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return WikiCopyPaste._getMapCode(mapIndex, bans)
+			return WikiCopyPaste._getMapCode(mapIndex, numberOfBans, args.vod)
 		end),
 		'}}'
 	)
@@ -49,8 +50,9 @@ end
 
 ---@param mapIndex integer
 ---@param bans boolean
+---@param vod string
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, bans)
+function WikiCopyPaste._getMapCode(mapIndex, numberOfBans, vod)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (vod == 'maps' and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
