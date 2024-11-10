@@ -60,8 +60,8 @@ function WikiCopyPaste._getMapCode(mapIndex, bans)
 	if bans then
 		Array.appendWith(lines,
 			INDENT .. INDENT .. '<!-- God bans -->',
-			INDENT .. INDENT .. '|t1b1=|t1b2=|t1b3=|t1b4=|t1b5=',
-			INDENT .. INDENT .. '|t2b1=|t2b2=|t2b3=|t2b4=|t2b5='
+			INDENT .. INDENT .. '|t1b1=',
+			INDENT .. INDENT .. '|t2b1='
 		)
 	end
 	Array.appendWith(lines, INDENT .. '}}')
