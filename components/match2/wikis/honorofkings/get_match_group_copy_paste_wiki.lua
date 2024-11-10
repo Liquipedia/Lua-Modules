@@ -63,7 +63,7 @@ function WikiCopyPaste._getMapCode(mapIndex, numberOfBans, vod)
 				return '|t' .. opponentIndex .. 'b' .. banIndex .. '='
 			end), ' ')
 	end
-	
+
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (vod == 'maps' and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
