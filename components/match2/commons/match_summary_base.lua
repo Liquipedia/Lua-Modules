@@ -186,16 +186,12 @@ function Footer:addLinks(links)
 		end
 	end
 
-	local processedKeys = {}
+	local unorderedLinks = Table.copy(links)
 	Array.forEach(MATCH_LINK_PRIORITY, function(linkTypePrefix)
 		for linkType, link in Table.iter.pairsByPrefix(links, linkTypePrefix, {requireIndex = false}) do
 			processLink(linkType, link)
-			table.insert(processedKeys, linkType)
+			unorderedLinks[linkType] = nil
 		end
-	end)
-
-	local unorderedLinks = Table.filterByKey(links, function(key)
-		return Array.find(processedKeys, FnUtil.curry(Operator.eq, key)) == nil
 	end)
 
 	for linkType, link in Table.iter.spairs(unorderedLinks) do
