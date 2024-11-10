@@ -198,7 +198,7 @@ function Footer:addLinks(links)
 		return Array.find(processedKeys, FnUtil.curry(Operator.eq, key)) == nil
 	end)
 
-	for linkType, link in pairs(unorderedLinks) do
+	for linkType, link in Table.iter.spairs(unorderedLinks) do
 		processLink(linkType, link)
 	end
 
