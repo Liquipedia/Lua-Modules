@@ -49,17 +49,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		table.insert(lines, INDENT .. '|twitch=|youtube=')
 	end
 
-	---@param list string[]
-	---@param indents integer
-	---@return string?
-	local buildListLine = function(list, indents)
-		if #list == 0 then return nil end
-
-		return string.rep(INDENT, indents) .. table.concat(Array.map(list, function(elemenmt)
-			return '|' .. elemenmt:lower() .. '='
-		end))
-	end
-
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
 		Array.appendWith(lines,
 			INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. (mapDetails and '' or '|score1=|score2=') .. '|finished=',
