@@ -32,14 +32,6 @@ return {
 			link = 'Tier 3 Tournaments',
 			category = 'Tier 3 Tournaments',
 		},
-		{
-			value = '4',
-			sort = 'A4',
-			name = 'Tier 4',
-			short = '4',
-			link = 'Tier 4 Tournaments',
-			category = 'Tier 4 Tournaments',
-		},
 		[''] = {
 			value = nil,
 			sort = 'D1',
@@ -51,7 +43,7 @@ return {
 	tierTypes = {
 		monthly = {
 			value = 'Monthly',
-			sort = 'A6',
+			sort = 'A4',
 			name = 'Monthly',
 			short = 'Mon.',
 			link = 'Monthly Tournaments',
@@ -59,7 +51,7 @@ return {
 		},
 		weekly = {
 			value = 'Weekly',
-			sort = 'A7',
+			sort = 'A5',
 			name = 'Weekly',
 			short = 'Week.',
 			link = 'Weekly Tournaments',
@@ -67,7 +59,7 @@ return {
 		},
 		qualifier = {
 			value = 'Qualifier',
-			sort = 'A8',
+			sort = 'A6',
 			name = 'Qualifier',
 			short = 'Qual.',
 			link = 'Qualifier Tournaments',
@@ -75,7 +67,7 @@ return {
 		},
 		misc = {
 			value = 'Misc',
-			sort = 'A9',
+			sort = 'A7',
 			name = 'Misc',
 			short = 'Misc',
 			link = 'Miscellaneous Tournaments',
