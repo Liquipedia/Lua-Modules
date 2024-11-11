@@ -124,7 +124,8 @@ function CustomLeague.run(frame)
 	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
 	league.args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 	league.gameData = Game.raw{game = league.args.game, useDefault = false}
-	league.valveTier = VALVE_TIERS[(league.args.valvetier or ''):lower()]
+	--valvetier will get removed after bot conversion
+	league.valveTier = VALVE_TIERS[(league.args.publishertier or league.args.valvetier or ''):lower()]
 
 	return league:createInfobox()
 end

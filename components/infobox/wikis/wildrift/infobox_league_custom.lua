@@ -60,7 +60,8 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.riotpremier)
+	-- this entire function can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.riotpremier)
 end
 
 ---@param args table
@@ -71,7 +72,8 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-	Variables.varDefine('tournament_riot_premier', args.riotpremier)
+	-- riotpremier only for conversion reasons
+	Variables.varDefine('tournament_riot_premier', args.highlighted or args.riotpremier)
 end
 
 ---@return string?

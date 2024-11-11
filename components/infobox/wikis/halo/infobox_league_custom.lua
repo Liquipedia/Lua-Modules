@@ -102,7 +102,8 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = args.player_number and 'solo' or self.data.mode
-	self.data.publishertier = Logic.readBool(args['hcs-sponsored'])
+	-- line below can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args['hcs-sponsored'])
 end
 
 ---@param args table

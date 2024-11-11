@@ -62,13 +62,14 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
 		Cell{name = 'Teams', content = {(args.team_number or '') .. (args.team_slots and ('/' .. args.team_slots) or '')}},
 		Cell{name = 'Game', content = {Game.name{game = args.game}}},
-		Cell{name = 'Platform', content = {self.caller:_createPlatformCell(args)}},
+		Cell{name = 'Platform', content = {caller:_createPlatformCell(args)}},
 		Cell{name = 'Players', content = {args.player_number}}
 	)
 	elseif id == 'customcontent' then
@@ -76,8 +77,8 @@ function CustomInjector:parse(id, widgets)
 			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
 			local maps = {}
 
-			for _, map in ipairs(self.caller:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
+			for _, map in ipairs(caller:getAllArgsForBase(args, 'map')) do
+				table.insert(maps, tostring(caller:_createNoWrappingSpan(
 					PageLink.makeInternalLink({}, map, map .. game)
 				)))
 			end
@@ -85,11 +86,11 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		if self.caller:_validPublisherTier(args.ubisofttier) then
+		if caller.data.publishertier then
 			table.insert(widgets,
 				Cell{
 					name = 'Ubisoft Tier',
-					content = {'[['..UBISOFT_TIERS[args.ubisofttier:lower()]..']]'},
+					content = {'[[' .. UBISOFT_TIERS[caller.data.publishertier] .. ']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -136,8 +137,8 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.liquipediatiertype = self.data.liquipediatiertype or DEFAULT_TIERTYPE
-	self.data.publishertier = self:_validPublisherTier(args.ubisofttier) and args.ubisofttier:lower()
-		or self.data.publishertier
+	local publishertierInput = args.publishertier or args.ubisofttier
+	self.data.publishertier = self:_validPublisherTier(publishertierInput) and publishertierInput:lower()
 end
 
 ---@param args table

@@ -49,7 +49,6 @@ function CustomLeague:customParseArguments(args)
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps(args)
 	self.data.status = self:_getStatus(args)
-	self.data.publishertier = Logic.readBool(args.publishertier)
 	self.data = PatchAuto.run(self.data, args)
 end
 
