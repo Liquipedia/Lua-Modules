@@ -1152,67 +1152,67 @@ end
 --- - ADD_SUB_GROUP boolean?
 --- - BREAK_ON_EMPTY boolean?
 ---@param match table
----@param opponents table[]
+---@param matchOpponents table[]
 ---@param Parser MapParserInterface
 ---@return table
-function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
+function MatchGroupInputUtil.standardProcessMaps(match, matchOpponents, Parser)
+	local funcs = {
+		mapExtradata = Parser.getExtraData or function() return nil end,
+		mapName = Parser.getMapName or function (game) return game.map end,
+		mapMode = Parser.getMapMode or function() return nil end,
+		mapIsFinished = Parser.mapIsFinished or MatchGroupInputUtil.mapIsFinished,
+		-- Legacy way, to be replaced by getPlayersOfMapOpponent
+		getParticipants = Parser.getParticipants or function() return nil end,
+		getPlayersOfMapOpponent = Parser.getPlayersOfMapOpponent or function() return nil end,
+		getPatch = Parser.getPatch or function() return nil end,
+		calculateMapScore = Parser.calculateMapScore or function() return nil end,
+	}
+
 	local maps = {}
 	local subGroup = 0
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(map) then
+	for key, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(mapInput) then
 			break
 		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
 
-		if Parser.ADD_SUB_GROUP then
-			subGroup = tonumber(map.subgroup) or (subGroup + 1)
-			map.subgroup = subGroup
-		end
-
-		if Parser.getMapName then
-			map.map = Parser.getMapName(map)
-		end
-
-		if Parser.mapIsFinished then
-			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
-		else
-			map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		end
-
-		if Parser.getPatch then
-			map.patch = Parser.getPatch(map)
-		end
-
-		if Parser.getParticipants then
-			-- Legacy way, to be replaced by getPlayersOfMapOpponent
-			map.participants = Parser.getParticipants(map, opponents)
-		end
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
+		local mapOpponents = Array.map(matchOpponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
+				walkover = mapInput.walkover,
+				winner = mapInput.winner,
 				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, Parser.calculateMapScore and Parser.calculateMapScore(map) or nil)
-			local players = Parser.getPlayersOfMapOpponent
-				and Parser.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-				or nil
+				score = mapInput['score' .. opponentIndex],
+			}, funcs.calculateMapScore(mapInput))
+			local players = funcs.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
 			return {score = score, status = status, players = players}
 		end)
 
-		-- needs map.opponents available!
-		if Parser.getMapMode then
-			map.mode = Parser.getMapMode(match, map, opponents)
+		local isFinished = funcs.mapIsFinished(mapInput, matchOpponents, mapInput.finished, mapInput.winner)
+
+		local map = {
+			map = funcs.mapName(mapInput),
+			patch = funcs.getPatch(mapInput),
+			length = mapInput.length,
+			vod = mapInput.vod,
+			-- TODO: Update params of MGI function
+			finished = isFinished,
+			opponents = mapOpponents,
+			participants = funcs.getParticipants(mapInput, matchOpponents),
+			scores = Array.map(mapOpponents, Operator.property('score')),
+			-- TODO: Update local functions to handle this change
+			mode = funcs.mapMode(match, mapInput, matchOpponents, mapOpponents),
+			-- TODO: Update local functions to handle this change
+			extradata = funcs.mapExtradata(match, mapInput, matchOpponents, mapOpponents)
+		}
+
+		if Parser.ADD_SUB_GROUP then
+			subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
+			map.subgroup = subGroup
 		end
 
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
+		if isFinished then
+			map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, mapInput.winner, mapOpponents)
 		end
-
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
 
 		table.insert(maps, map)
 		match[key] = nil
