@@ -1200,8 +1200,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, matchOpponents, Parser)
 			scores = Array.map(mapOpponents, Operator.property('score')),
 			-- TODO: Update local functions to handle this change
 			mode = funcs.mapMode(match, mapInput, matchOpponents, mapOpponents),
-			-- TODO: Update local functions to handle this change
-			extradata = funcs.mapExtradata(match, mapInput, matchOpponents, mapOpponents)
 		}
 
 		if Parser.ADD_SUB_GROUP then
@@ -1213,6 +1211,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, matchOpponents, Parser)
 			map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, mapInput.winner, mapOpponents)
 		end
+
+		-- needs to be after the winner processing for sc(2), sg, wc
+		-- TODO: Update local functions to handle this change
+		map.extradata = funcs.mapExtradata(match, mapInput, matchOpponents, mapOpponents, map.winner)
 
 		table.insert(maps, map)
 		match[key] = nil
