@@ -170,7 +170,7 @@ function DisplayHelper.Map(game, config)
 	else
 		mapText = game.map or 'Unknown'
 	end
-	if game.resultType == 'np' or game.resultType == 'default' then
+	if game.resultType == 'np' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
 	return mapText
