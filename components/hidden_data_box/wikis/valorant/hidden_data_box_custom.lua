@@ -40,7 +40,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 	Variables.varDefine('mode', Variables.varDefault('tournament_mode', 'team'))
-	Variables.varDefine('gamechanger', queryResult.extradata.gamechanger
+	Variables.varDefine('gamechangers', queryResult.extradata.gamechangers
 		or tostring(Logic.readBool(args.gc or args.female)))
 	BasicHiddenDataBox.checkAndAssign('patch', args.patch, queryResult.patch)
 	BasicHiddenDataBox.checkAndAssign('tournament_riot_premier', queryResult.tournament_riot_premier, args.riotpremier)
