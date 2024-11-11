@@ -247,7 +247,7 @@ function MapFunctions.getExtraData(map, opponents)
 	return {
 		dateexact = map.dateexact,
 		comment = map.comment,
-		opponents = opponents,
+		opponents = Table.deepCopy(opponents),
 	}
 end
 
