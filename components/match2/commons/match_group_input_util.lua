@@ -1166,7 +1166,8 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local winnerInput = map.winner --[[@as string?]]
 
 		if Parser.ADD_SUB_GROUP then
-			map.subgroup = tonumber(map.subgroup) or (subGroup + 1)
+			subGroup = tonumber(map.subgroup) or (subGroup + 1)
+			map.subgroup = subGroup
 		end
 
 		if Parser.getMapName then
