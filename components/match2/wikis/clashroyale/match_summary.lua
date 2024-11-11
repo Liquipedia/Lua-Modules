@@ -110,7 +110,7 @@ function CustomMatchSummary._createTeamMatchBody(match)
 	Array.forEach(subMatches, FnUtil.curry(CustomMatchSummary._getSubMatchOpponentsAndPlayers, match))
 	Array.forEach(subMatches, CustomMatchSummary._calculateSubMatchWinner)
 	return Array.map(subMatches, function(subMatch, subMatchIndex)
-		CustomMatchSummary._createSubMatch(
+		return CustomMatchSummary._createSubMatch(
 			subMatch.players,
 			subMatchIndex,
 			subMatch,
