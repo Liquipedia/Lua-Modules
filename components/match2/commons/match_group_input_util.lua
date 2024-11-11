@@ -1165,7 +1165,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, matchOpponents, Parser)
 		getParticipants = Parser.getParticipants or function() return nil end,
 		getPlayersOfMapOpponent = Parser.getPlayersOfMapOpponent or function() return nil end,
 		getPatch = Parser.getPatch or function() return nil end,
-		calculateMapScore = Parser.calculateMapScore or function() return nil end,
+		calculateMapScore = Parser.calculateMapScore or function() return function() return nil end end,
 	}
 
 	local maps = {}
