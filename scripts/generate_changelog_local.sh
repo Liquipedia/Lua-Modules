@@ -96,10 +96,10 @@ print_tag() {
 			echo "Listing commits for category: $CATEGORY_NAME under tag $2"
 			echo "$CATEGORY_COMMITS" | while read -r COMMIT; do
 				HASH=$(echo $COMMIT | awk '{print $1}')
-				MESSAGE=$(echo $COMMIT | sed -E 's/^$HASH $KEY(\(.*\))?: //')
+				MESSAGE=$(echo $COMMIT | sed -E "s/^$HASH $KEY(\(.*\))?: //")
 				PR_NUMBER=$(echo $MESSAGE | grep -oE '#[0-9]+' | tr -d '#')
 				MESSAGE=$(echo $MESSAGE | sed -E '$s/ \(#$PR_NUMBER\)//')
-				SCOPE=$(echo $COMMIT | sed -E 's/^$HASH $KEY(\((.*?)\))?: .*/\2/')
+				SCOPE=$(echo $COMMIT | sed -E "s/^$HASH $KEY(\((.*?)\))?: .*/\2/")
 				if [ "$GITHUB_REPO_URL" != "0" ]; then
 					if [ -n "$SCOPE" ]; then
 						echo "- ($SCOPE) $MESSAGE ($GITHUB_REPO_URL/pull/$PR_NUMBER)" >> $CHANGELOG_FILE
