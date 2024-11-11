@@ -102,36 +102,32 @@ function MapFunctions.getExtraData(match, map, opponents)
 end
 
 ---@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getParticipants(map, opponents)
-	local allParticipants = {}
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		local players = Array.mapIndexes(function(playerIndex)
-			return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'h' .. playerIndex])
-		end)
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			players,
-			function(playerIndex)
-				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
-				return player and {name = player} or nil
-			end,
-			function(playerIndex, playerIdData)
-				local character = map['t' .. opponentIndex .. 'h' .. playerIndex]
-				return {
-					champion = getCharacterName(character),
-				}
-			end
-		)
-		Array.forEach(unattachedParticipants, function(participant)
-			table.insert(participants, participant)
-		end)
-		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	local players = Array.mapIndexes(function(playerIndex)
+		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'h' .. playerIndex])
 	end)
-
-	return allParticipants
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData)
+			local character = map['t' .. opponentIndex .. 'h' .. playerIndex]
+			return {
+				champion = getCharacterName(character),
+			}
+		end
+	)
+	Array.forEach(unattachedParticipants, function(participant)
+		table.insert(participants, participant)
+	end)
+	return participants
 end
 
 return CustomMatchGroupInput

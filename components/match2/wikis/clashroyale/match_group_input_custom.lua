@@ -49,10 +49,9 @@ function MatchFunctions.extractMaps(match, opponents)
 			break
 		end
 		local map
-		map, subGroup = MapFunctions.readMap(mapInput, mapIndex, subGroup, #opponents)
+		map, subGroup = MapFunctions.readMap(mapInput, mapIndex, subGroup, opponents)
 
-		map.participants = MapFunctions.getParticipants(mapInput, opponents)
-		map.extradata = MapFunctions.getExtraData(mapInput, map.participants)
+		map.extradata = MapFunctions.getExtraData(mapInput, map.opponents)
 
 		map.vod = Logic.emptyOr(mapInput.vod, match['vodgame' .. mapIndex])
 
@@ -106,10 +105,10 @@ end
 ---@param mapInput table
 ---@param mapIndex integer
 ---@param subGroup integer
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
 ---@return integer
-function MapFunctions.readMap(mapInput, mapIndex, subGroup, opponentCount)
+function MapFunctions.readMap(mapInput, mapIndex, subGroup, opponents)
 	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
 
 	local map = {
@@ -117,14 +116,15 @@ function MapFunctions.readMap(mapInput, mapIndex, subGroup, opponentCount)
 	}
 
 	map.finished = MatchGroupInputUtil.mapIsFinished(mapInput)
-	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
+	map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore({
 			walkover = mapInput.walkover,
 			winner = mapInput.winner,
 			opponentIndex = opponentIndex,
 			score = mapInput['score' .. opponentIndex],
 		}, MapFunctions.calculateMapScore(mapInput, map.finished))
-		return {score = score, status = status}
+		local players = MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+		return {score = score, status = status, players = players}
 	end)
 
 	map.scores = Array.map(map.opponents, Operator.property('score'))
@@ -153,27 +153,22 @@ function MapFunctions.calculateMapScore(mapInput, finished)
 end
 
 ---@param mapInput table
----@param opponents table[]
----@return table<string, {player: string, played: boolean, cards: table}>
-function MapFunctions.getParticipants(mapInput, opponents)
-	local participants = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		if opponent.type == Opponent.literal then
-			return
-		elseif opponent.type == Opponent.team then
-			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
-			return
-		end
-		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
-	end)
-
-	return participants
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]?
+function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
+	if opponent.type == Opponent.literal then
+		return
+	elseif opponent.type == Opponent.team then
+		return MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+	end
+	return MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {player: string, played: boolean, cards: table}>
+---@return {player: string, played: boolean, cards: table}[]
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
@@ -207,61 +202,53 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		participants[#opponent.match2players] = participant
 	end)
 
-	return Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
+	return participants
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {player: string, played: boolean, cards: table}>
+---@return {player: string, played: boolean, cards: table}[]
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
 	local prefix = 't' .. opponentIndex .. 'p'
 
-	local participants = {}
-
-	Array.forEach(players, function(player, playerIndex)
-		participants[opponentIndex .. '_' .. playerIndex] = {
+	return Array.map(players, function(player, playerIndex)
+		return {
 			played = true,
 			player = player.name,
 			cards = CustomMatchGroupInput._readCards(mapInput[prefix .. playerIndex .. 'c']),
 		}
 	end)
-
-	return participants
 end
 
 ---@param mapInput table
----@param participants table<string, {player: string, played: boolean, cards: table}>
+---@param mapOpponents {players: {player: string, played: boolean, cards: table}[]}[]
 ---@return table
-function MapFunctions.getExtraData(mapInput, participants)
+function MapFunctions.getExtraData(mapInput, mapOpponents)
 	local extradata = {
 		comment = mapInput.comment,
 	}
 
-	return Table.merge(extradata, MapFunctions.getCardsExtradata(participants))
+	return Table.merge(extradata, MapFunctions.getCardsExtradata(mapOpponents))
 end
 
 --- additionally store cards info in extradata so we can condition on them
----@param participants table<string, {player: string, played: boolean, cards: table}>
+---@param mapOpponents {players: {player: string, played: boolean, cards: table}[]}[]
 ---@return table
-function MapFunctions.getCardsExtradata(participants)
+function MapFunctions.getCardsExtradata(mapOpponents)
 	local extradata = {}
-	local playerCount = {}
-	for participantKey, participant in Table.iter.spairs(participants) do
-		local opponentIndex = string.match(participantKey, '^(%d+)_')
-
-		playerCount[opponentIndex] = (playerCount[opponentIndex] or 0) + 1
-
-		local prefix = 't' .. opponentIndex .. 'p' .. playerCount[opponentIndex]
-		extradata[prefix .. 'tower'] = participant.cards.tower
-		-- participant.cards is an array plus the tower value ....
-		for cardIndex, card in ipairs(participant.cards) do
-			extradata[prefix .. 'c' .. cardIndex] = card
+	for opponentIndex, opponent in ipairs(mapOpponents) do
+		for playerIndex, player in pairs(opponent.players) do
+			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
+			extradata[prefix .. 'tower'] = player.cards.tower
+			-- participant.cards is an array plus the tower value ....
+			for cardIndex, card in ipairs(player.cards) do
+				extradata[prefix .. 'c' .. cardIndex] = card
+			end
 		end
 	end
-
 	return extradata
 end
 
