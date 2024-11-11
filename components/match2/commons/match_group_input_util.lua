@@ -996,6 +996,7 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	match.games = standaloneMatch.match2games
 	for _, game in ipairs(match.games) do
 		game.scores = ensureTable(game.scores)
+		game.opponents = ensureTable(game.opponents)
 		game.participants = ensureTable(game.participants)
 		game.extradata = ensureTable(game.extradata)
 	end
