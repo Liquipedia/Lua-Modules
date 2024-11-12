@@ -137,8 +137,7 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.liquipediatiertype = self.data.liquipediatiertype or DEFAULT_TIERTYPE
-	local publishertierInput = args.publishertier or args.ubisofttier
-	self.data.publishertier = self:_validPublisherTier(publishertierInput) and publishertierInput:lower()
+	self.data.publishertier = self:_validPublisherTier(args.publishertier) and args.publishertier:lower()
 end
 
 ---@param args table

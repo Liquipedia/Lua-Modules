@@ -74,8 +74,6 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	-- line below can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args['atvi-sponsored'])
 	self.data.mode = args.player_number and 'solo' or self.data.mode
 end
 

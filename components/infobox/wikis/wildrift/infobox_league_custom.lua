@@ -59,12 +59,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	-- this entire function can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.riotpremier)
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	if args.team_number or (not String.isEmpty(args.team1)) then
 		Variables.varDefine('is_team_tournament', 1)

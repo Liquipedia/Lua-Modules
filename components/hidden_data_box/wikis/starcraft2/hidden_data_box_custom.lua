@@ -34,13 +34,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
-	args.featured = args.featured or args.publishertier
-	args.featured = Logic.readBool(args.featured) and tostring(Logic.readBool(args.featured)) or nil
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		args.highlighted or args.featured,
-		queryResult.publishertier
-	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)
 		Variables.varDefine('participants_number', args.team_number)

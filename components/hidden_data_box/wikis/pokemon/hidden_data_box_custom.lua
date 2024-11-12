@@ -20,14 +20,4 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
----@param args table
----@param queryResult table
-function CustomHiddenDataBox.addCustomVariables(args, queryResult)
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		args.highlighted or args.pokemonpremier,
-		queryResult.publishertier
-	)
-end
-
 return Class.export(CustomHiddenDataBox)

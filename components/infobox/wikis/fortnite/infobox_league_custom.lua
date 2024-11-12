@@ -48,12 +48,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	-- this entire function can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.epicpremier)
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)

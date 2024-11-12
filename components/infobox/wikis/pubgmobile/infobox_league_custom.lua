@@ -97,12 +97,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	-- this entire function can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.pubgpremier)
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)

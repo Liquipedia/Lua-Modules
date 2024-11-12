@@ -39,13 +39,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 
 	BasicHiddenDataBox.checkAndAssign('patch', args.patch, queryResult.patch)
-
-	-- can be kicked after conversion
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		Logic.readBool(args.highlighted or args.riotpremier) and '1' or nil,
-		queryResult.publishertier
-	)
 end
 
 return Class.export(CustomHiddenDataBox)

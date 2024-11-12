@@ -45,8 +45,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	local publishertierInput = args.publishertier or args.blizzardtier
-	self.data.publishertier = self:_validPublisherTier(publishertierInput) and publishertierInput:lower()
+	self.data.publishertier = self:_validPublisherTier(args.publishertier) and args.publishertier:lower()
 end
 
 ---@param id string
