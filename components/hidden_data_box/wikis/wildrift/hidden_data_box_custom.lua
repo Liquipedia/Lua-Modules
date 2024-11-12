@@ -20,10 +20,4 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
----@param args table
----@param queryResult table
-function CustomHiddenDataBox.addCustomVariables(args, queryResult)
-	Variables.varDefine('tournament_riot_premier', Variables.varDefault('tournament_publishertier', ''))
-end
-
 return Class.export(CustomHiddenDataBox)

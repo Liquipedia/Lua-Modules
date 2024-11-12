@@ -66,8 +66,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-	-- riotpremier only for conversion reasons
-	Variables.varDefine('tournament_riot_premier', args.highlighted or args.riotpremier)
 end
 
 ---@return string?
