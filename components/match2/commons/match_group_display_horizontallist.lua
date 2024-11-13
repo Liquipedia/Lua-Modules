@@ -12,6 +12,7 @@ local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
@@ -75,11 +76,12 @@ function HorizontallistDisplay.Bracket(props)
 	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
 		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
 		local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
+		---@cast matchId -nil
 		local nodeProps = {
 			header = header,
 			index = index,
 			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
-			matchId = matchId and  MatchGroupUtil.matchIdToKey(matchId) or nil,
+			matchId = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId),
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
