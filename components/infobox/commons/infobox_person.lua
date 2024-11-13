@@ -133,6 +133,7 @@ function Person:createInfobox()
 			name = self:nameDisplay(args),
 			image = args.image,
 			imageDefault = args.default,
+			imageDefaultDark = args.defaultDark,
 			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
