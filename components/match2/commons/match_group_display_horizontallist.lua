@@ -77,11 +77,13 @@ function HorizontallistDisplay.Bracket(props)
 		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
 		local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
 		---@cast matchId -nil
+		--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
+		local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
 		local nodeProps = {
 			header = header,
 			index = index,
 			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
-			matchId = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId),
+			matchId = matchKey,
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
