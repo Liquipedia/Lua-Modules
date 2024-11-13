@@ -111,7 +111,7 @@ return function(busted, helper, options)
 	end]]
 
 	-- Top 10 wikis based on traffic
-	local wikis = {'apexlegends'}
+	local wikis = {'dota2', 'valorant', 'counterstrike', 'rocketleague', 'mobilelegends', 'leagueoflegends', 'apexlegends', 'rainbowsix', 'overwatch', 'starcraft2'}
 	-- Warnings! Extremely time consuming if different filesystems (eg. windows files with wsl)
 	local function allwikis(name, funcToRun, wikiArgs)
 		busted.executors.insulate('', function ()
