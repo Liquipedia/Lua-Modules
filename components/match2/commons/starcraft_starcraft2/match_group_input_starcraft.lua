@@ -235,11 +235,11 @@ function MapFunctions.mapIsFinished(map, opponents, finishedInput, winnerInput)
 	return false
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
+	local finished = map.finished
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
 		if not winner and not finished then
