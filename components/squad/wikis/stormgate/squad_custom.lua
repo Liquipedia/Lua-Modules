@@ -23,13 +23,13 @@ function CustomSquad.run(frame)
 end
 
 ---@param playerList table[]
----@param squadType integer
+---@param squadStatus integer
 ---@param customTitle string?
 ---@return Widget
-function CustomSquad.runAuto(playerList, squadType, customTitle)
+function CustomSquad.runAuto(playerList, squadStatus, customTitle)
 	return SquadUtils.defaultRunAuto(
 		playerList,
-		squadType,
+		squadStatus,
 		Squad,
 		CustomSquad._playerRow,
 		customTitle,
@@ -46,10 +46,10 @@ function CustomSquad.personMapper(person)
 end
 
 ---@param person table
----@param squadType integer
+---@param squadStatus integer
 ---@return Widget
-function CustomSquad._playerRow(person, squadType)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+function CustomSquad._playerRow(person, squadStatus)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
 	if Logic.isEmpty(squadPerson.newteam) then
 		if Logic.readBool(person.retired) then
 			squadPerson.newteamspecial = 'retired'
@@ -65,10 +65,10 @@ function CustomSquad._playerRow(person, squadType)
 	row:role()
 	row:date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == SquadUtils.SquadType.FORMER then
+	if squadStatus == SquadUtils.SquadStatus.FORMER then
 		row:date('leavedate', 'Leave Date:&nbsp;')
 		row:newteam()
-	elseif squadType == SquadUtils.SquadType.INACTIVE then
+	elseif squadStatus == SquadUtils.SquadStatus.INACTIVE then
 		row:date('inactivedate', 'Inactive Date:&nbsp;')
 	end
 

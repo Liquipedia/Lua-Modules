@@ -26,11 +26,11 @@ function CustomSquad.run(frame)
 end
 
 ---@param playerList table[]
----@param squadType integer
+---@param squadStatus integer
 ---@param customTitle string?
 ---@return Widget
-function CustomSquad.runAuto(playerList, squadType, customTitle)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+function CustomSquad.runAuto(playerList, squadStatus, customTitle)
+	return SquadUtils.defaultRunAuto(playerList, squadStatus, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
 return CustomSquad

@@ -46,7 +46,7 @@ end
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local props = {
-		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
 	}
 
@@ -60,7 +60,7 @@ function CustomSquad.run(frame)
 		person.flag = Variables.varDefault('nationality') or person.flag
 		person.name = Variables.varDefault('name') or person.name
 
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = props.type}))
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = props.status}))
 		squadPerson.extradata.game = game
 		squadPerson.extradata.mains = mains
 		SquadUtils.storeSquadPerson(squadPerson)
@@ -70,11 +70,11 @@ function CustomSquad.run(frame)
 		row:id():name()
 		row:mains():date('joindate', 'Join Date:&nbsp;')
 
-		if props.type == SquadUtils.SquadType.INACTIVE or props.type == SquadUtils.SquadType.FORMER_INACTIVE then
+		if props.status == SquadUtils.SquadStatus.INACTIVE or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
 
-		if props.type == SquadUtils.SquadType.FORMER or props.type == SquadUtils.SquadType.FORMER_INACTIVE then
+		if props.status == SquadUtils.SquadStatus.FORMER or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('leavedate', 'Leave Date:&nbsp;')
 			row:newteam()
 		end

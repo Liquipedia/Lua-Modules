@@ -23,13 +23,13 @@ local DataTable, Tr, Th = Widgets.DataTable, Widgets.Tr, Widgets.Th
 ---@operator call(table): SquadWidget
 local Squad = Class.new(Widget)
 Squad.defaultProps = {
-	type = SquadUtils.SquadType.ACTIVE,
+	status = SquadUtils.SquadStatus.ACTIVE,
 }
 
 ---@return WidgetDataTable
 function Squad:render()
-	local title = self:_title(self.props.type, self.props.title)
-	local header = self:_header(self.props.type)
+	local title = self:_title(self.props.status, self.props.title)
+	local header = self:_header(self.props.status)
 
 	local allChildren = WidgetUtil.collect(title, header, unpack(self.props.children))
 
@@ -40,14 +40,14 @@ function Squad:render()
 	}
 end
 
----@param type SquadType
+---@param status SquadStatus
 ---@param title string?
 ---@return Widget?
-function Squad:_title(type, title)
+function Squad:_title(status, title)
 	local defaultTitle
-	if type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE then
+	if status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		defaultTitle = 'Former Squad'
-	elseif type == SquadUtils.SquadType.INACTIVE then
+	elseif status == SquadUtils.SquadStatus.INACTIVE then
 		defaultTitle = 'Inactive Players'
 	end
 
@@ -62,11 +62,11 @@ function Squad:_title(type, title)
 	}
 end
 
----@param type SquadType
+---@param status SquadStatus
 ---@return Widget
-function Squad:_header(type)
-	local isInactive = type == SquadUtils.SquadType.INACTIVE or type == SquadUtils.SquadType.FORMER_INACTIVE
-	local isFormer = type == SquadUtils.SquadType.FORMER or type == SquadUtils.SquadType.FORMER_INACTIVE
+function Squad:_header(status)
+	local isInactive = status == SquadUtils.SquadStatus.INACTIVE or status == SquadUtils.SquadStatus.FORMER_INACTIVE
+	local isFormer = status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE
 
 	local name = self:useContext(SquadContexts.NameSection, {Th{children = {'Name'}}})
 	local inactive = isInactive and self:useContext(SquadContexts.InactiveSection, {
