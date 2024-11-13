@@ -350,8 +350,8 @@ end
 ---@param mapOpponents table[]
 ---@return string
 function MapFunctions.getMapMode(match, map, matchOpponents, mapOpponents)
-	local playerCounts = Array.map(mapOpponents, function(opponent)
-		return Table.size(opponent.players)
+	local playerCounts = Array.map(mapOpponents or {}, function(opponent)
+		return Table.size(opponent.players or {})
 	end)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
