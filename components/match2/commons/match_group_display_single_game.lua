@@ -64,11 +64,12 @@ end
 ---@param props {GameSummaryContainer: function, match: MatchGroupUtilMatch, gameIdx: integer}
 ---@return Html
 function SingleGameDisplay.Game(props)
+	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 	return DisplayUtil.TryPureComponent(props.GameSummaryContainer, {
-		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+		bracketId = bracketId,
 		matchId = props.match.matchId,
 		gameIdx = props.gameIdx,
-	})
+	}, require('Module:Error/Display').ErrorList)
 end
 
 return Class.export(SingleGameDisplay)

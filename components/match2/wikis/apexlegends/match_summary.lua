@@ -16,13 +16,11 @@ local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local SummaryHelper = Lua.import('Module:Summary/Util')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 ---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games ApexMatchGroupUtilGame[]
-
----@class ApexMatchGroupUtilGame: MatchGroupUtilGame
----@field scoringTable {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score: number}[]}
----@field stream table
 
 local PHASE_ICONS = {
 	finished = {iconName = 'concluded', color = 'icon--green'},
@@ -214,23 +212,6 @@ function CustomMatchSummary._opponents(match)
 			end
 			opponent.matchPointReachedIn = matchPointReachedIn
 		end)
-	end
-
-	local placementSortFunction = function(opponent1, opponent2)
-		if opponent1.placement == opponent2.placement or not opponent1.placement or not opponent2.placement then
-			if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
-				return opponent1.score > opponent2.score
-			else
-				return (opponent1.name or '') < (opponent2.name or '')
-			end
-		end
-		if opponent1.placement == NO_PLACEMENT then
-			return false
-		end
-		if opponent2.placement == NO_PLACEMENT then
-			return true
-		end
-		return opponent1.placement < opponent2.placement
 	end
 
 	-- Sort match level based on final placement & score
@@ -447,54 +428,6 @@ function CustomMatchSummary._createMatchStandings(match)
 end
 
 ---@param game table
----@return Html
-function CustomMatchSummary._createGameStandings(game)
-	local wrapper = mw.html.create('div')
-			:addClass('panel-table')
-			:attr('data-js-battle-royale', 'table')
-	local header = wrapper:tag('div')
-			:addClass('panel-table__row')
-			:addClass('row--header')
-			:attr('data-js-battle-royale', 'header-row')
-
-	Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-		local cell = header:tag('div')
-			:addClass('panel-table__cell')
-			:addClass(column.class)
-			local groupedCell = cell:tag('div'):addClass('panel-table__cell-grouped')
-				:tag('i')
-						:addClass('panel-table__cell-icon')
-						:addClass(column.iconClass)
-						:done()
-				:tag('span')
-						:wikitext(column.header.value)
-						:done()
-			if (column.sortable and column.sortType) then
-				cell:attr('data-sort-type', column.sortType)
-				groupedCell:tag('div')
-					:addClass('panel-table__sort')
-					:tag('i')
-						:addClass('far fa-arrows-alt-v')
-						:attr('data-js-battle-royale', 'sort-icon')
-			end
-	end)
-
-	Array.forEach(game.extradata.opponents, function (opponent, index)
-		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
-		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-			local cell = row:tag('div')
-					:addClass('panel-table__cell')
-					:addClass(column.class)
-					:node(column.row.value(opponent, index))
-			if (column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(opponent, index)):attr('data-sort-type', column.sortType)
-			end
-		end)
-	end)
-	return wrapper
-end
-
----@param game table
 ---@return boolean
 function CustomMatchSummary._isFinished(game)
 	return game.winner ~= nil
@@ -505,54 +438,6 @@ end
 function CustomMatchSummary._countdownIcon(game, additionalClass)
 	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)] or {}
 	return Icon.makeIcon{iconName = iconData.iconName, color = iconData.color, additionalClasses = {additionalClass}}
-end
-
----Creates a countdown block for a given game
----Attaches any VODs of the game as well
----@param game table
----@return Html?
-function CustomMatchSummary._gameCountdown(game)
-	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
-		return
-	end
-	-- TODO Use local TZ
-	local dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. Timezone.getTimezoneString('UTC')
-
-	local stream = Table.merge(game.stream, {
-		date = dateString,
-		finished = CustomMatchSummary._isFinished(game) and 'true' or nil,
-	})
-
-	return mw.html.create('div'):addClass('match-countdown-block')
-			:node(require('Module:Countdown')._create(stream))
-			:node(game.vod and VodLink.display{vod = game.vod} or nil)
-end
-
----@param placementStart string|number|nil
----@param placementEnd string|number|nil
----@return string
-function CustomMatchSummary._displayRank(placementStart, placementEnd)
-	local places = {}
-
-	if placementStart then
-		table.insert(places, Ordinal.toOrdinal(placementStart))
-	end
-
-	if placementStart and placementEnd and placementEnd > placementStart then
-		table.insert(places, Ordinal.toOrdinal(placementEnd))
-	end
-
-	return table.concat(places, ' - ')
-end
-
----@param place integer
----@return string? icon
----@return string? iconColor
-function CustomMatchSummary._getTrophy(place)
-	if TROPHY_COLOR[place] then
-		return 'fas fa-trophy', TROPHY_COLOR[place]
-	end
 end
 
 ---@param status string?

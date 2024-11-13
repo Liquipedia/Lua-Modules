@@ -31,7 +31,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				if opponent.placement == -1 or opponent.placement == SummaryHelper.NO_PLACEMENT then
+				if opponent.placement == -1 or opponent.status ~= 'S' then
 					return idx
 				end
 				return opponent.placement
@@ -40,10 +40,16 @@ local GAME_STANDINGS_COLUMNS = {
 		row = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
+				local placementDisplay
+					if opponent.status and opponent.status ~= 'S' then
+						placementDisplay = '-'
+					else
+						placementDisplay = SummaryHelper.displayRank(place)
+					end
 				local icon, color = SummaryHelper.getTrophy(place)
 				return mw.html.create()
 						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(SummaryHelper.displayRank(place)):done()
+						:tag('span'):wikitext(SummaryHelper.displayRank(placementDisplay)):done()
 			end,
 		},
 	},
@@ -125,7 +131,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 }
-
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
 ---@return string
 function CustomGameSummary.getGameByMatchId(props)
