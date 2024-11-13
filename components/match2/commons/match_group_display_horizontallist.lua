@@ -75,12 +75,11 @@ function HorizontallistDisplay.Bracket(props)
 	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
 		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
 		local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
-		---@cast matchId -nil
 		local nodeProps = {
 			header = header,
 			index = index,
 			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
-			matchId = MatchGroupUtil.matchIdToKey(matchId),
+			matchId = matchId and  MatchGroupUtil.matchIdToKey(matchId) or nil,
 		}
 		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
