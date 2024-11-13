@@ -199,6 +199,12 @@ function CustomMatchSummary.getByMatchId(props)
 end
 
 function CustomMatchSummary._opponents(match)
+	Array.forEach(match.opponents, function (opponent, idx)
+		opponent.games = Array.map(match.games, function (game)
+			return game.extradata.opponents[idx]
+		end)
+	end)
+
 	if match.matchPointThreadhold then
 		Array.forEach(match.opponents, function(opponent)
 			local matchPointReachedIn
