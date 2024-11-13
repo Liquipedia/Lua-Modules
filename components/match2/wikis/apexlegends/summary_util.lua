@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
--- wiki=Summary/Util
--- page=Module:GameSummary
+-- wiki=apexlegends
+-- page=Module:Summary/Util
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
