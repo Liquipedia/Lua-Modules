@@ -181,11 +181,9 @@ end
 function CustomSummaryHelper.createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
-	local scoreKill = Table.extract(scoreSettings, 'kill')
-	local matchPointThreadhold = Table.extract(scoreSettings, 'matchPointThreadhold')
 	local scorePlacement = {}
 
-	local points = Table.groupBy(scoreSettings, function (_, value)
+	local points = Table.groupBy(scoreSettings.placement, function (_, value)
 		return value
 	end)
 
@@ -201,9 +199,9 @@ function CustomSummaryHelper.createScoringData(match)
 	end
 
 	return {
-		kill = scoreKill,
+		kill = scoreSettings.kill,
 		placement = scorePlacement,
-		matchPointThreadhold = matchPointThreadhold,
+		matchPointThreadhold = scoreSettings.matchPointThreadhold,
 	}
 end
 
