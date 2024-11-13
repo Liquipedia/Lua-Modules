@@ -185,10 +185,16 @@ function TransferList:fetch()
 			order = self.config.sortOrder,
 		})
 		local currentGroup
-		local currentRole2
+		local cache = {}
 		Array.forEach(transfers, function(transf)
-			if currentRole2 ~= transf.role2 then
-				currentRole2 = transf.role2
+			if
+				cache.role2 ~= transf.role2 or
+				cache.team1_2 ~= transf.extradata.fromteamsec or
+				cache.team2_2 ~= transf.extradata.toteamsec
+			then
+				cache.role2 = transf.role2
+				cache.team1_2 = transfer.extradata.fromteamsec
+				cache.team2_2 = transfer.extradata.toteamsec
 				Array.appendWith(groupedData, currentGroup)
 				currentGroup = {}
 			end
