@@ -48,9 +48,6 @@ SquadUtils.SquadStatusToStorageValue = {
 	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'former',
 }
 
----@enum SquadTyppe
-
-
 SquadUtils.specialTeamsTemplateMapping = {
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
