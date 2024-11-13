@@ -132,7 +132,7 @@ local GAME_STANDINGS_COLUMNS = {
 	},
 }
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
----@return string
+---@return Html
 function CustomGameSummary.getGameByMatchId(props)
 	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
@@ -148,7 +148,7 @@ function CustomGameSummary.getGameByMatchId(props)
 	local gameSummary = mw.html.create()
 	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameIdx, scoringData))
 
-	return tostring(gameSummary)
+	return gameSummary
 end
 
 ---@param game table
