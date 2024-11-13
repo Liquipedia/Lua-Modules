@@ -14,10 +14,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 
-function MatchLegacy.storeMatch(match2, options)
-	if options.storeMatch1 then
-		MatchLegacy._storeMatch1(match2)
-	end
+function MatchLegacy.storeMatch(match2)
+	MatchLegacy._storeMatch1(match2)
 end
 
 function MatchLegacy._storeMatch1(match2)

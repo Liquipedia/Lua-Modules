@@ -17,10 +17,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local MessageBox = require('Module:Message box')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class StormgateSkillInfobox: SkillInfobox
@@ -33,6 +33,7 @@ local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local VALID_SKILLS = {
 	'Spell',
 	'Ability',
+	'Trait',
 	'Upgrade',
 	'Effect',
 }

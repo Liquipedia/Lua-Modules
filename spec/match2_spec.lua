@@ -1,29 +1,31 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('match2', function()
+	local tournamentData = require('test_assets.tournaments').dummy
 	insulate('matchlist', function()
+		local InfoboxLeague = require('Module:Infobox/League/Custom')
 		local Json = require('Module:Json')
 
 		before_each(function ()
 			local dataSaved, dataSavedOpponent, dataSavedPlayer, dataSavedGame = {}, {}, {}, {}
 			-- Mock the lpdb functions
-			stub(mw.ext.LiquipediaDB, "lpdb_match2", function (objName, data)
+			stub(mw.ext.LiquipediaDB, 'lpdb_match2', function (objName, data)
 				dataSaved = data
 			end)
-			stub(mw.ext.LiquipediaDB, "lpdb_match2opponent", function(objName, data)
+			stub(mw.ext.LiquipediaDB, 'lpdb_match2opponent', function(objName, data)
 				data.match2players = dataSavedPlayer
 				dataSavedPlayer = {}
 				table.insert(dataSavedOpponent, data)
 				return objName
 			end)
-			stub(mw.ext.LiquipediaDB, "lpdb_match2player", function(objName, data)
+			stub(mw.ext.LiquipediaDB, 'lpdb_match2player', function(objName, data)
 				table.insert(dataSavedPlayer, data)
 				return objName
 			end)
-			stub(mw.ext.LiquipediaDB, "lpdb_match2game", function(objName, data)
+			stub(mw.ext.LiquipediaDB, 'lpdb_match2game', function(objName, data)
 				table.insert(dataSavedGame, data)
 				return objName
 			end)
-			stub(mw.ext.LiquipediaDB, "lpdb", function(tbl)
+			stub(mw.ext.LiquipediaDB, 'lpdb', function(tbl)
 				if tbl == 'match2' then
 					dataSaved.extradata = Json.parse(dataSaved.extradata)
 					dataSaved.match2bracketdata = Json.parse(dataSaved.match2bracketdata)
@@ -36,6 +38,9 @@ describe('match2', function()
 				end
 				return {}
 			end)
+
+			stub(mw.ext.LiquipediaDB, 'lpdb_tournament')
+			InfoboxLeague.run(tournamentData) -- Set variable for tournament context
 		end)
 
 		after_each(function ()
@@ -48,10 +53,11 @@ describe('match2', function()
 			mw.ext.LiquipediaDB.lpdb_match2opponent:revert()
 			mw.ext.LiquipediaDB.lpdb_match2player:revert()
 			mw.ext.LiquipediaDB.lpdb_match2game:revert()
+			mw.ext.LiquipediaDB.lpdb_tournament:revert()
 		end)
 		allwikis('smoketest', function(args, wikiName)
 			local Info = require('Module:Info')
-			if Info.match2 == 0 then
+			if Info.config.match2.status == 0 then
 				return
 			end
 			local MatchGroup = require('Module:MatchGroup')

@@ -9,22 +9,14 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Widget = require('Module:Infobox/Widget/All')
 
-local Squad = Lua.import('Module:Squad')
+local Widget = Lua.import('Module:Widget/All')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local CustomSquad = {}
-local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
-
-function CustomInjector:parse(id, widgets)
-	if id == 'header_inactive' then
-		table.insert(widgets, Widget.TableCellNew{content = {'Active Team'}, header = true})
-	end
-
-	return self._base:parse(id, widgets)
-end
 
 ---@class Dota2SquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
@@ -35,6 +27,7 @@ function ExtendedSquadRow:activeteam()
 	local date = self.model.inactivedate
 
 	if not activeTeam then
+		table.insert(self.children,Widget.Td{classes = {'NewTeam'}, children = {}})
 		return self
 	end
 
@@ -48,16 +41,22 @@ function ExtendedSquadRow:activeteam()
 	end
 
 	table.insert(self.children,
-		Widget.TableCellNew{classes = {'NewTeam'}, content = content}
+		Widget.Td{classes = {'NewTeam'}, children = content}
 	)
 
 	return self
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomSquad.run(frame)
-	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow, CustomInjector)
+	return SquadContexts.InactiveSection{
+		value = function(widgets)
+			table.insert(widgets, Widget.Th{children = {'Active Team'}})
+			return widgets
+		end,
+		children = {SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)}
+	}
 end
 
 function CustomSquad._playerRow(person, squadType)

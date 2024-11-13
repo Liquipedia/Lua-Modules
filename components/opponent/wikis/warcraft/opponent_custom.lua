@@ -37,7 +37,7 @@ function CustomOpponent.readOpponentArgs(args)
 	end
 
 	if partySize == 1 then
-		opponent.players[1].faction = Faction.read(args.faction or args.race)
+		opponent.players[1].faction = Faction.read(args.faction or args.race or args.p1race)
 	elseif partySize then
 		for playerIx, player in ipairs(opponent.players) do
 			player.faction = Faction.read(args['p' .. playerIx .. 'faction'] or args['p' .. playerIx .. 'race'])
@@ -100,7 +100,7 @@ end
 
 ---@param opponent WarcraftStandardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}?
 ---@return WarcraftStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
@@ -111,11 +111,18 @@ function CustomOpponent.resolve(opponent, date, options)
 			if options.syncPlayer then
 				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
+				PlayerExt.syncPlayer(player, {
+					savePageVar = savePageVar,
+					date = date,
+					overwritePageVars = options.overwritePageVars,
+				})
 				player.team = PlayerExt.syncTeam(
 					player.pageName:gsub(' ', '_'),
 					player.team,
-					{date = date, savePageVar = savePageVar}
+					{
+							date = date,
+							savePageVar = savePageVar,
+						}
 				)
 				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else

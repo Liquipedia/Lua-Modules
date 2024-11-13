@@ -8,6 +8,7 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,15 +19,12 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
+	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		local match = MatchLegacy._convertParameters(match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		match.games = MatchLegacy.storeGames(match, match2)
-
-		return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
-	end
+	return mw.ext.LiquipediaDB.lpdb_match('legacymatch_' .. match2.match2id, Json.stringifySubTables(match))
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -34,6 +32,7 @@ function MatchLegacy.storeGames(match, match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
 		local participants = Json.parseIfString(game2.participants) or {}
+		local opponents = Json.parseIfString(game2.opponents) or {}
 
 		-- Extradata
 		game.extradata = {}
@@ -42,17 +41,16 @@ function MatchLegacy.storeGames(match, match2)
 		game.extradata.tournament = match.tournament
 		game.extradata.vodmatch = match.vod
 		if game.mode == 'team' then
-			local function processOpponent(opponentIndex)
-				for _, player, playerId in Table.iter.pairsByPrefix(participants, opponentIndex .. '_') do
-					local prefix = 'o' .. opponentIndex .. 'p' .. playerId
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				-- opponent.players can have gaps
+				for _, player in pairs(opponent.players) do
+					local prefix = 'o' .. opponentIndex .. 'p' .. player.index
 					game.extradata[prefix] = player.pageName
 					game.extradata[prefix .. 'faction'] = player.civ
 					game.extradata[prefix .. 'name'] = player.displayname
 					game.extradata[prefix .. 'flag'] = player.flag
 				end
-			end
-			processOpponent(1)
-			processOpponent(2)
+			end)
 		elseif game.mode == '1v1' then
 			local player1 = participants['1_1'] or {}
 			local player2 = participants['2_1'] or {}
@@ -66,8 +64,8 @@ function MatchLegacy.storeGames(match, match2)
 					(tonumber(game.winner) == 2 and game.extradata.opponent1civ) or
 					(tonumber(game.winner) == 1 and game.extradata.opponent2civ) or
 					''
-			game.extradata.opponent1name = player1.player
-			game.extradata.opponent2name = player2.player
+			game.extradata.opponent1name = player1.displayName
+			game.extradata.opponent2name = player2.displayName
 		end
 		-- Other stuff
 		game.opponent1 = match.opponent1
@@ -95,6 +93,7 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
+	match.walkover = match.walkover and string.upper(match.walkover) or nil
 	if match.walkover == 'FF' or match.walkover == 'DQ' then
 		match.resulttype = match.walkover:lower()
 		match.walkover = match.winner
@@ -124,12 +123,12 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name:gsub(' ', '_')
+			match[prefix] = (player.name or 'TBD'):gsub(' ', '_')
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'name'] = player.displayname
 		elseif opponent.type == Opponent.team then
-			match[prefix] = opponent.name
+			match[prefix] = mw.ext.TeamTemplate.raw(opponent.template).page
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i, player in pairs(opponentmatch2players) do

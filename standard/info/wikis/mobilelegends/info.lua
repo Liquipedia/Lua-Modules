@@ -33,9 +33,12 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 190,
 		},
+		transfers = {
+			showTeamName = true,
+		},
 	},
-	match2 = 2,
 }

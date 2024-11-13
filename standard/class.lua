@@ -6,10 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----
--- @author Vogan for Liquipedia
---
-
 local Arguments = require('Module:Arguments')
 
 local Class = {}
@@ -18,7 +14,8 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 
 ---@class BaseClass
 ---@operator call:self
----@field is_a fun(self, BaseClass):boolean
+---@field is_a fun(self, class: BaseClass):boolean #deprecated
+---@field init fun(self, ...)
 
 function Class.new(base, init)
 	local instance = {}
@@ -59,16 +56,9 @@ function Class.new(base, init)
 		return Class.export(instance, options)
 	end
 
-	instance.is_a = function(self, class)
-		local m = getmetatable(self)
-		while m do
-			if m == class then
-				return true
-			end
-			m = m._base
-		end
-		return false
-	end
+	---@deprecated
+	instance.is_a = Class.instanceOf
+
 	setmetatable(instance, metatable)
 	return instance
 end
@@ -157,6 +147,20 @@ function Class._frameToArgs(frame, options)
 	end
 
 	return (Table.isNotEmpty(namedArgs) and namedArgs or nil), indexedArgs
+end
+
+---@param instance any
+---@param class BaseClass
+---@return boolean
+function Class.instanceOf(instance, class)
+	local metatable = getmetatable(instance)
+	while metatable do
+		if metatable == class then
+			return true
+		end
+		metatable = metatable._base
+	end
+	return false
 end
 
 return Class

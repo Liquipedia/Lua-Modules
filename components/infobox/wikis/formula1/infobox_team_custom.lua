@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local TeamTemplates = require('Module:Team')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -61,16 +61,16 @@ function CustomInjector:parse(id, widgets)
 				return TeamTemplates.team(nil, team)
 			end)
 			Array.extendWith(widgets,
-				{Title{name = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
-				Array.map(academyTeams, function(academyTeam) return Center{content = {academyTeam}} end)
+				{Title{children = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
+				Array.map(academyTeams, function(academyTeam) return Center{children = {academyTeam}} end)
 			)
 		end
 
 		if args.previous or args.next then
 			Array.appendWith(
 				widgets,
-				Title{name = 'Chronology'},
-				Chronology{content = {
+				Title{children = 'Chronology'},
+				Chronology{links = {
 					previous = args.previous,
 					previous2 = args.previous2,
 					next = args.next,
@@ -89,7 +89,7 @@ function CustomTeam._statisticsCells(args)
 	if Array.all(STATISTICS, function(statsData) return args[statsData.key] == nil end) then
 		return {}
 	end
-	local widgets = {Title{name = 'Team Statistics'}}
+	local widgets = {Title{children = 'Team Statistics'}}
 	Array.forEach(STATISTICS, function(statsData)
 		table.insert(widgets, Cell{name = statsData.name, content = {args[statsData.key]}})
 	end)

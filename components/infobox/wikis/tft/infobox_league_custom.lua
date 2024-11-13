@@ -13,10 +13,10 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class TftLeagueInfobox: InfoboxLeague
@@ -63,15 +63,9 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['riot-sponsored'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args['riot-sponsored']) then
+	if self.data.publishertier then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
@@ -83,6 +77,7 @@ function CustomLeague:customParseArguments(args)
 	args.mode = args.mode and GAME_MODES[string.lower(args.mode):gsub('s$', '')] or DEFAULT_MODE
 
 	self.data.mode = string.lower(args.mode)
+	self.data.publishertier = Logic.readBool(args['riot-sponsored']) and 'sponsored' or nil
 end
 
 ---@param args table

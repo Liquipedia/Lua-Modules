@@ -18,17 +18,15 @@ local _GAME_EXTRADATA_CONVERTER = {
 	champion = 'h',
 }
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy._convertParameters(match2)
@@ -85,7 +83,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponent = match2.match2opponents[index] or {}
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
-			match[prefix] = opponent.name
+			match[prefix] = opponent.name and opponent.name:gsub('_', ' ')
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			local opponentplayers = {}
 			for i = 1, 10 do
@@ -97,7 +95,7 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix..'players'] = opponentplayers
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
+			match[prefix] = player.name and player.name:gsub('_', ' ')
 			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix..'flag'] = player.flag
 		elseif opponent.type == 'literal' then

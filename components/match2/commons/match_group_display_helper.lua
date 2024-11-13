@@ -32,7 +32,9 @@ function DisplayHelper.opponentIsHighlightable(opponent)
 		return opponent.template and opponent.template ~= 'tbd' or false
 	else
 		return 0 < #opponent.players
-			and Array.all(opponent.players, function(player) return player.pageName ~= '' and player.displayName ~= 'TBD' end)
+			and Array.all(opponent.players, function(player)
+				return Logic.isNotEmpty(player.pageName) and Logic.isNotEmpty(player.displayName) and player.displayName ~= 'TBD'
+			end)
 	end
 end
 
@@ -118,31 +120,18 @@ end
 
 ---Displays the map name and link, and the status of the match if it had an unusual status.
 ---@param game MatchGroupUtilGame
----@param config {noLink: boolean}?
+---@param config {noLink: boolean?}?
 ---@return string
 function DisplayHelper.MapAndStatus(game, config)
-	config = config or {}
-	local mapText
-	if game.map and game.mapDisplayName then
-		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
-	elseif game.map and not config.noLink then
-		mapText = '[[' .. game.map .. ']]'
-	elseif game.map then
-		mapText = game.map
-	else
-		mapText = 'Unknown'
-	end
-	if game.resultType == 'np' or game.resultType == 'default' then
-		mapText = '<s>' .. mapText .. '</s>'
-	end
+	local mapText = DisplayHelper.Map(game, config)
 
 	local statusText = nil
 	if game.resultType == 'default' then
-		if game.walkover == 'L' then
+		if game.walkover == 'l' then
 			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
-		elseif game.walkover == 'FF' then
+		elseif game.walkover == 'ff' then
 			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
-		elseif game.walkover == 'DQ' then
+		elseif game.walkover == 'dq' then
 			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
 		else
 			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'
@@ -150,6 +139,56 @@ function DisplayHelper.MapAndStatus(game, config)
 	end
 
 	return mapText .. (statusText or '')
+end
+
+---Displays the map name and map-mode.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.MapAndMode(game, config)
+	local MapModes = require('Module:MapModes')
+
+	local mapText = DisplayHelper.Map(game, config)
+
+	if Logic.isEmpty(game.mode) then
+		return mapText
+	end
+	return MapModes.get{mode = game.mode} .. mapText
+end
+
+---Displays the map name and link.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.Map(game, config)
+	config = config or {}
+	local mapText
+	if game.map and game.mapDisplayName then
+		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
+	elseif game.map and not config.noLink then
+		mapText = '[[' .. game.map .. ']]'
+	else
+		mapText = game.map or 'Unknown'
+	end
+	if game.resultType == 'np' then
+		mapText = '<s>' .. mapText .. '</s>'
+	end
+	return mapText
+end
+
+---@param score string|number|nil
+---@param opponentIndex integer
+---@param resultType string?
+---@param walkover string?
+---@param winner integer?
+---@return string
+function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
+	if resultType == 'np' then
+		return ''
+	elseif resultType == 'default' then
+		return opponentIndex == winner and 'W' or string.upper(walkover or '')
+	end
+	return score and tostring(score) or ''
 end
 
 --[[

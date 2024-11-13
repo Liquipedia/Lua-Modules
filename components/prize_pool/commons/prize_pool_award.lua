@@ -18,8 +18,9 @@ local Placement = Lua.import('Module:PrizePool/Award/Placement')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local Widgets = require('Module:Widget/All')
+local TableRow = Widgets.TableRow
+local TableCell = Widgets.TableCell
 
 --- @class AwardPrizePool
 --- @field options table
@@ -52,7 +53,7 @@ end
 ---@return WidgetTableCell
 function AwardPrizePool:placeOrAwardCell(placement)
 	local awardCell = TableCell{
-		content = {placement.award},
+		children = {placement.award},
 		css = {['font-weight'] = 'bolder'},
 		classes = {'prizepooltable-place'},
 	}
@@ -62,11 +63,12 @@ function AwardPrizePool:placeOrAwardCell(placement)
 end
 
 ---@param placement AwardPlacement
----@param row WidgetTableRow
-function AwardPrizePool:applyCutAfter(placement, row)
+---@return boolean
+function AwardPrizePool:applyCutAfter(placement)
 	if (placement.previousTotalNumberOfParticipants + 1) > self.options.cutafter then
-		row:addClass('ppt-hide-on-collapse')
+		return true
 	end
+	return false
 end
 
 ---@param placement AwardPlacement?
@@ -84,12 +86,16 @@ end
 
 ---@return WidgetTableRow
 function AwardPrizePool:_toggleExpand()
-	local expandButton = TableCell{content = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'}}
-		:addClass('general-collapsible-expand-button')
-	local collapseButton = TableCell{content = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'}}
-		:addClass('general-collapsible-collapse-button')
+	local expandButton = TableCell{
+		children = {'<div>Show more Awards&nbsp;<i class="fa fa-chevron-down"></i></div>'},
+		classes = {'general-collapsible-expand-button'},
+	}
+	local collapseButton = TableCell{
+		children = {'<div>Show less Awards&nbsp;<i class="fa fa-chevron-up"></i></div>'},
+		classes = {'general-collapsible-collapse-button'},
+	}
 
-	return TableRow{classes = {'ppt-toggle-expand'}}:addCell(expandButton):addCell(collapseButton)
+	return TableRow{classes = {'ppt-toggle-expand'}, children = {expandButton, collapseButton}}
 end
 
 -- Get the lpdbObjectName depending on opponenttype

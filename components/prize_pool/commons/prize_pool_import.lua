@@ -319,7 +319,7 @@ function Import:_computeBracketPlacementEntries(matchRecords, options)
 			return not (
 				entry.opponent
 				and entry.opponent.type == Opponent.literal
-				and Opponent.toName(entry.opponent):lower() == BYE_OPPONENT_NAME
+				and (not Opponent.toName(entry.opponent) or (Opponent.toName(entry.opponent) or ''):lower() == BYE_OPPONENT_NAME)
 			) and (not self.config.ignoreNonScoreEliminations or not entry.opponent or entry.opponent.status == SCORE_STATUS)
 		end)
 	end
@@ -707,12 +707,12 @@ function Import._makeAdditionalDataFromMatch(opponentName, match)
 	end
 
 	local score, vsScore, lastVs
-	for _, opponent in pairs(match.match2opponents) do
+	for opponentIndex, opponent in pairs(match.match2opponents) do
 		if opponent.name == opponentName then
 			score = Import._getScore(opponent)
 		else
 			vsScore = Import._getScore(opponent)
-			lastVs = MatchGroupUtil.opponentFromRecord(opponent)
+			lastVs = MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 		end
 	end
 

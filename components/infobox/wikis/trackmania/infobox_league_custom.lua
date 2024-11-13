@@ -15,10 +15,10 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -67,7 +67,7 @@ function CustomInjector:parse(id, widgets)
 					end)
 		})
 	elseif id == 'customcontent' then
-		table.insert(widgets, Title{name = String.isNotEmpty(args.team_number) and 'Teams' or 'Players'})
+		table.insert(widgets, Title{children = String.isNotEmpty(args.team_number) and 'Teams' or 'Players'})
 		table.insert(widgets, Cell{
 			name = 'Number of Teams',
 			content = {args.team_number}
@@ -79,26 +79,17 @@ function CustomInjector:parse(id, widgets)
 
 		local maps = self.caller:getAllArgsForBase(args, 'map')
 		if #maps > 0 then
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 
 		if args.circuit or args.circuit_next or args.circuit_previous then
-			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Title{children = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
 	end
 
 	return widgets
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Array.any(self:getAllArgsForBase(args, 'organizer'),
-		function(organizer)
-			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
-		end)
 end
 
 ---@param args table
@@ -108,6 +99,10 @@ function CustomLeague:customParseArguments(args)
 		(String.isNotEmpty(args.team_number) and 'team' or nil),
 		DEFAULT_MODE
 	)
+	self.data.publishertier = Array.any(self:getAllArgsForBase(args, 'organizer'),
+		function(organizer)
+			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
+		end)
 end
 
 ---@param args table
@@ -133,7 +128,7 @@ function CustomLeague:getWikiCategories(args)
 		return info and (info.link .. ' Competitions') or nil
 	end)
 
-	return Array.append(categories, self:liquipediaTierHighlighted(args) and 'Ubisoft Tournaments' or nil)
+	return Array.append(categories, self.data.publishertier and 'Ubisoft Tournaments' or nil)
 end
 
 ---@param lpdbData table
@@ -166,7 +161,7 @@ function CustomLeague:_createCircuitInformation(widgets)
 		},
 		Cell{name = 'Circuit Tier', content = {args.circuittier}},
 		Cell{name = 'Tournament Region', content = {args.region}},
-		Chronology{content = {next = args.circuit_next, previous = args.circuit_previous}}
+		Chronology{links = {next = args.circuit_next, previous = args.circuit_previous}}
 	)
 end
 

@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
@@ -44,12 +44,12 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Manufacturer', content = {args.manufacturer}},
 			Cell{name = 'Production', content = {args.production}},
 			Cell{name = 'Weight', content = {args.weight}},
-			Title{name = 'Engine Output'},
+			Title{children = 'Engine Output'},
 			Cell{name = 'Power', content = {args.power}},
 			Cell{name = 'Torque', content = {args.torque}},
 			Cell{name = 'Idle RPM', content = {args.idlerpm}},
 			Cell{name = 'Peak RPM', content = {args.peakrpm}},
-			Title{name = 'Engine Layout'},
+			Title{children = 'Engine Layout'},
 			Cell{name = 'Configuration', content = {args.configuration}},
 			Cell{name = 'Displacement', content = {args.displacement}},
 			Cell{name = 'Compression', content = {args.compression}},
@@ -59,8 +59,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if String.isEmpty(args.previous) and String.isEmpty(args.next) then return widgets end
 		return {
-			Title{name = 'Chronology'},
-			Chronology{content = {previous = args.previous, next = args.next}}
+			Title{children = 'Chronology'},
+			Chronology{links = {previous = args.previous, next = args.next}}
 		}
 	end
 	return widgets

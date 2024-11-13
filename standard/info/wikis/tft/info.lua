@@ -46,8 +46,8 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 1,
 		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 0,
 }

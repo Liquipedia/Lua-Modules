@@ -94,14 +94,12 @@ Author(s): Rathoz
 		img {
 			max-width: 4rem;
 			max-height: 4rem;
-			width: 4rem;
-			height: 4rem;
+			width: auto;
+			height: auto;
 
 			@media ( min-width: 768px ) {
 				max-width: 5rem;
 				max-height: 5rem;
-				width: 5rem;
-				height: 5rem;
 			}
 		}
 	}
@@ -543,7 +541,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 
 	@media ( min-width: 768px ) {
-		grid-template-columns: auto auto;
+		grid-template-columns: 1fr 1fr;
 	}
 }
 
@@ -638,6 +636,8 @@ ul.match-bm-lol-game-veto-overview-pick {
 		border-radius: 0.25rem;
 		background-color: var( --on-background );
 		overflow: hidden;
+		padding: 0.25rem;
+		display: flex;
 
 		&.role--radiant {
 			background-color: var( --clr-atlantis-40 );
@@ -645,6 +645,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 		&.role--dire {
 			background-color: var( --clr-california-40 );
+		}
+
+		> img {
+			width: 100%;
+			height: auto;
 		}
 	}
 
@@ -674,6 +679,17 @@ ul.match-bm-lol-game-veto-overview-pick {
 		}
 	}
 
+	&-name {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		font-size: 0.9375rem;
+
+		> a {
+			font-weight: bold;
+		}
+	}
+
 	&-icon {
 		overflow: hidden;
 		border-radius: 100%;
@@ -694,9 +710,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 	&-loadout {
 		display: flex;
 		gap: 1rem;
+		flex: 0 0 7.5rem;
 
-		@media ( max-width: 1199px ), ( min-width: 1320px ) {
-			flex: 0 0 7.5rem;
+		@media ( min-width: 768px ) {
+			flex: 0 0 9.5rem;
 		}
 
 		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
@@ -707,42 +724,66 @@ ul.match-bm-lol-game-veto-overview-pick {
 			display: flex;
 			flex-direction: row;
 			align-items: flex-start;
-			gap: 0.25rem;
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 0.25rem;
+			overflow: hidden;
+			background-color: rgba( 0, 0, 0, 0.16 );
+
+			.theme--dark & {
+				background-color: rgba( 255, 255, 255, 0.16 );
+			}
+
+			&.item--backpack img {
+				opacity: 0.4;
+			}
+
+			@media ( min-width: 768px ) {
+				width: 2rem;
+				height: 2rem;
+			}
 
 			img {
-				width: 1.5rem;
-				height: 1.5rem;
-				border-radius: 0.25rem;
+				object-fit: cover;
+				height: 100%;
+				width: 100%;
 
-				@media ( min-width: 768px ) {
-					width: 2rem;
-					height: 2rem;
+				&[ title="Empty" ] {
+					opacity: 0;
 				}
 			}
 		}
 
 		&-items {
 			display: flex;
-			flex-direction: column;
 			align-items: flex-start;
 			gap: 0.25rem;
+			flex-wrap: wrap;
 		}
 
 		&-rs {
 			display: flex;
 			flex-direction: column;
 			align-items: flex-start;
-			gap: 0.125rem;
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 100%;
+			overflow: hidden;
+			background-color: rgba( 0, 0, 0, 0.16 );
+
+			@media ( min-width: 768px ) {
+				width: 2rem;
+				height: 2rem;
+			}
+
+			.theme--dark & {
+				background-color: rgba( 255, 255, 255, 0.16 );
+			}
 
 			img {
-				width: 1.5rem;
-				height: 1.5rem;
-				border-radius: 100%;
-
-				@media ( min-width: 768px ) {
-					width: 2rem;
-					height: 2rem;
-				}
+				object-fit: cover;
+				height: 100%;
+				width: 100%;
 			}
 		}
 
@@ -772,11 +813,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 		&-data {
 			font-weight: bold;
-			font-size: 1rem;
-
-			@media ( min-width: 1024px ) {
-				font-size: 1.125rem;
-			}
+			font-size: 0.9375rem;
 
 			.slash {
 				margin: 0 0.125rem;
@@ -831,15 +868,22 @@ ul.match-bm-lol-game-veto-overview-pick {
 			display: flex;
 			flex-direction: column;
 
-			img {
+			&-icon {
 				border-radius: 0.25rem 0.25rem 0 0;
 				width: 3.75rem;
 				height: 2.5rem;
+				overflow: hidden;
 
 				@media ( min-width: 834px ) {
 					width: 4.5rem;
 					height: 3rem;
 				}
+			}
+
+			img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
 			}
 
 			&-text {

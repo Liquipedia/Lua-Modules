@@ -596,8 +596,8 @@ end
 function PlayerIntroduction._displayTeam(team, date)
 	team = team:gsub('_', ' ')
 
-	if mw.ext.TeamTemplate.teamexists(team) then
-		local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+	local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+	if rawTeam then
 		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'
 	end
 

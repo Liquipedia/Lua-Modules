@@ -15,10 +15,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		if String.isNotEmpty(args.itemcost) then
 			table.insert(widgets, Breakdown{
-				content = caller:_getCostDisplay(),
+				children = caller:_getCostDisplay(),
 				classes = {
 					'infobox-header',
 					'wiki-backgroundcolor-light',
@@ -73,12 +73,12 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.itemtext) then
 			iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
 		end
-		table.insert(widgets, Center{content = {iconImage}})
+		table.insert(widgets, Center{children = {iconImage}})
 	elseif id == 'attributes' then
 		if not CustomItem._hasAttributes(args) then return {} end
 
 		if not (String.isEmpty(args.str) and String.isEmpty(args.agi) and String.isEmpty(args.int)) then
-			table.insert(widgets, Breakdown{classes = {'infobox-center'}, content = {
+			table.insert(widgets, Breakdown{classes = {'infobox-center'}, children = {
 				caller:_attributeIcons('str'),
 				caller:_attributeIcons('agi'),
 				caller:_attributeIcons('int'),
@@ -139,7 +139,7 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		return {
-			Title{name = 'Item Tier'},
+			Title{children = 'Item Tier'},
 			Cell{name = 'Category', content = {caller:_categoryDisplay()}},
 			Cell{name = 'Bought From', content = caller:_shopDisplay()},
 			Cell{name = 'Dropped From', content = {args.drop}},
@@ -152,7 +152,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{content = {args.recipe}})
+		table.insert(widgets, Center{children = {args.recipe}})
 	elseif id == 'info' then return {}
 	end
 

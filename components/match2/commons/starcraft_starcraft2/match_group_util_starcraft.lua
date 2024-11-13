@@ -16,6 +16,9 @@ local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 --[[
 Utility functions for match group related things specific to the starcraft and starcraft2 wikis.
 ]]
@@ -50,7 +53,6 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StarcraftMatchGroupUtilGame[]
----@field headToHead boolean
 ---@field isFfa boolean
 ---@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
@@ -74,7 +76,9 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Determine whether the match is a team match with different players each game
-	match.opponentMode = match.mode:match('team') and 'team' or 'uniform'
+	match.opponentMode = Array.any(match.opponents, function(opponent)
+		return opponent.type == Opponent.team
+	end) and 'team' or 'uniform'
 
 	local extradata = match.extradata
 	---@cast extradata table
@@ -104,7 +108,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.headToHead = Logic.readBool(Table.extract(extradata, 'headtohead'))
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.noScore = Logic.readBoolOrNil(Table.extract(extradata, 'noscore'))
 	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
@@ -325,9 +328,12 @@ end
 ---@param match StarcraftMatchGroupUtilMatch
 ---@return boolean
 function StarcraftMatchGroupUtil.matchHasDetails(match)
+	local linksWithoutH2H = Table.filterByKey(match.links, function(key)
+		return key ~= 'headtohead'
+	end)
 	return match.dateIsExact
 		or String.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or not Table.isEmpty(linksWithoutH2H)
 		or String.isNotEmpty(match.comment)
 		or String.isNotEmpty(match.casters)
 		or 0 < #match.vetoes

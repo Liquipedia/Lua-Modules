@@ -49,7 +49,7 @@ function PlayerDisplay.BlockPlayer(props)
 	local player = props.player
 
 	local zeroWidthSpace = '&#8203;'
-	local nameNode = mw.html.create(props.dq and 's' or 'span')
+	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 		:wikitext(props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and Logic.isNotEmpty(player.pageName)
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
@@ -57,12 +57,9 @@ function PlayerDisplay.BlockPlayer(props)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
+	local noteNode
 	if props.note then
-		nameNode = mw.html.create('span'):addClass('name')
-			:node(nameNode)
-			:tag('sup'):addClass('note'):wikitext(props.note):done()
-	else
-		nameNode:addClass('name')
+		noteNode = mw.html.create('sup'):addClass('note'):wikitext(props.note)
 	end
 
 	local flagNode
@@ -82,6 +79,7 @@ function PlayerDisplay.BlockPlayer(props)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(nameNode)
+		:node(noteNode)
 		:node(teamNode)
 end
 

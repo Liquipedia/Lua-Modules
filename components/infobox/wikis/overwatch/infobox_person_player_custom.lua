@@ -19,10 +19,10 @@ local Team = require('Module:Team')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
@@ -102,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		if args.nationalteams then
-			table.insert(widgets, 1, Center{content = {args.nationalteams}})
+			table.insert(widgets, 1, Center{children = {args.nationalteams}})
 		end
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end

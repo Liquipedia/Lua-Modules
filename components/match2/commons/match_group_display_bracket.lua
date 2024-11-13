@@ -464,10 +464,11 @@ function BracketDisplay.NodeBody(props)
 	end
 
 	-- Include results from bracketResetMatch
+	---@type MatchGroupUtilMatch?
 	local bracketResetMatch = match.bracketData.bracketResetMatchId
 		and props.matchesById[match.bracketData.bracketResetMatchId]
 	if bracketResetMatch then
-		match = MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
+		match = Logic.wrapTryOrLog(MatchGroupUtil.mergeBracketResetMatch)(match, bracketResetMatch)
 	end
 
 	-- Current match
@@ -515,8 +516,9 @@ function BracketDisplay.NodeBody(props)
 	-- Qualifier entries
 	local qualWinNode
 	if match.bracketData.qualWin then
-		local opponent = match.winner
-			and match.opponents[match.winner]
+		local winner = (bracketResetMatch or match).winner
+		local opponent = winner
+			and match.opponents[winner]
 			or MatchGroupUtil.createOpponent({
 				type = 'literal',
 				name = match.bracketData.qualWinLiteral or '',
@@ -532,7 +534,7 @@ function BracketDisplay.NodeBody(props)
 
 	local qualLoseNode
 	if match.bracketData.qualLose then
-		local opponent = BracketDisplay.getRunnerUpOpponent(match)
+		local opponent = BracketDisplay.getRunnerUpOpponent(match, bracketResetMatch)
 			or MatchGroupUtil.createOpponent({
 				type = 'literal',
 				name = match.bracketData.qualLoseLiteral or '',
@@ -583,10 +585,11 @@ function BracketDisplay.Match(props)
 	end
 
 	if props.matchHasDetails(props.match) then
+		local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-			bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+			bracketId = bracketId,
 			matchId = props.match.matchId,
-		})
+		}, require('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
 
 		local matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')
@@ -782,21 +785,30 @@ function BracketDisplay.ConnectorStub(props)
 end
 
 ---@param match MatchGroupUtilMatch
+---@param bracketResetMatch MatchGroupUtilMatch?
 ---@return standardOpponent?
-function BracketDisplay.getRunnerUpOpponent(match)
+function BracketDisplay.getRunnerUpOpponent(match, bracketResetMatch)
 	-- 2 opponents: the runner up is the one that is not the winner, assuming
 	-- there is a winner
 	if #match.opponents == 2 then
-		return match.winner
-			and match.opponents[2 + 1 - match.winner]
+		local winner = (bracketResetMatch or match).winner
+		return winner
+			and match.opponents[2 + 1 - winner]
 			or nil
 
 	-- >2 opponents: wait for the match to be finished, then look at the placement field
 	-- TODO remove match.finished requirement
 	else
 		return match.finished
-			and Array.find(match.opponents, function(opponent) return opponent.placement == 2 end)
-			or nil
+			and Array.find(match.opponents, function(opponent)
+				local place = opponent.placement
+				-- in case of reset match: need to even overwrite if placement2 is empty
+				if bracketResetMatch then
+					place = opponent.placement2
+				end
+
+				return place == 2
+			end) or nil
 	end
 end
 

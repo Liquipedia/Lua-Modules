@@ -16,10 +16,10 @@ local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_WEAPON = '25x25px'
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 				-- we have an invalid weapon entry
 				-- add warning (including tracking category)
 				table.insert(
-					caller.infobox.warnings,
+					caller.warnings,
 					'Invalid weapon input "' .. weapon .. '"[[Category:Pages with invalid weapon input]]'
 				)
 			end

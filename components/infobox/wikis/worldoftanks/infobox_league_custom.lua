@@ -14,10 +14,10 @@ local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -33,11 +33,6 @@ function CustomLeague.run(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
 	return league:createInfobox()
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
 end
 
 ---@param id string
@@ -62,8 +57,8 @@ function CustomInjector:parse(id, widgets)
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
 				return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 			end)
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
 	return widgets
@@ -75,12 +70,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 	return lpdbData
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
 end
 
 ---@return string?

@@ -15,24 +15,22 @@ local Template = require('Module:Template')
 
 local _MODES = {solo = '1v1', team = 'team'}
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match, doStore = MatchLegacy._convertParameters(match2)
 
 	if not doStore then
 		return
 	end
 
-	match.games = MatchLegacy._storeGames(match, match2, options)
+	match.games = MatchLegacy._storeGames(match, match2)
 
-	if options.storeMatch1 then
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
-function MatchLegacy._storeGames(match, match2, options)
+function MatchLegacy._storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
@@ -66,16 +64,13 @@ function MatchLegacy._storeGames(match, match2, options)
 			game.extradata.gamenumber = gameIndex
 
 			game.extradata = json.stringify(game.extradata)
-			local res = ''
-			if options.storeMatch1 then
-				res = mw.ext.LiquipediaDB.lpdb_game(
+			local res = mw.ext.LiquipediaDB.lpdb_game(
 					'legacygame_' .. match2.match2id .. gameIndex,
 					game
 				)
-			end
 
 			games = games .. res
-		elseif	game.mode == '1v1' and options.storeMatch1 then
+		elseif	game.mode == '1v1' then
 			local submatch = {}
 
 			submatch.opponent1 = game.extradata.opponent1

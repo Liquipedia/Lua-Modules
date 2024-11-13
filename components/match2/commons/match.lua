@@ -83,43 +83,49 @@ function Match.storeMatchGroup(matchRecords, options)
 	local LegacyMatchConvert = Lua.requireIfExists('Module:Match/Legacy')
 	local LegacyMatch = options.storeMatch1	and LegacyMatchConvert or nil
 
-	matchRecords = Array.map(matchRecords, function(matchRecord)
+	local function prepareMatchRecords(matchRecord)
 		local records = Match.splitRecordsByType(matchRecord)
 		Match._prepareRecordsForStore(records)
 		Match.populateSubobjectReferences(records)
 		return records.matchRecord
-	end)
+	end
+	local preparedMatchRecords = Array.map(matchRecords, Logic.wrapTryOrLog(prepareMatchRecords))
 
 	-- Store matches in a page variable to bypass LPDB on the same page
 	if options.storePageVar then
 		assert(options.bracketId, 'Match.storeMatchGroup: Expect options.bracketId to specified')
-		globalVars:set('match2bracket_' .. options.bracketId, Json.stringify(matchRecords))
+		globalVars:set('match2bracket_' .. options.bracketId, Json.stringify(preparedMatchRecords))
 		globalVars:set('match2bracketindex', (globalVars:get('match2bracketindex') or 0) + 1)
 	end
 
-	local matchRecordsCopy
-	if LegacyMatch or options.storeMatch2 then
-		matchRecordsCopy = Array.map(matchRecords, Match.copyRecords)
-		Array.forEach(matchRecordsCopy, Match.encodeJson)
+	if not LegacyMatch and not options.storeMatch2 then
+		return
 	end
+
+	local matchRecordsCopy = Array.map(preparedMatchRecords, Match.copyRecords)
+	Array.forEach(matchRecordsCopy, Match.encodeJson)
 
 	if options.storeMatch2 then
-		local recordsList
-		if LegacyMatch then
-			recordsList = Array.map(matchRecordsCopy, Match.splitRecordsByType)
-			Array.forEach(recordsList, Match.populateSubobjectReferences)
+		local function storeMatch2(matchRecord)
+			local records
+			if LegacyMatch then
+				records = Match.splitRecordsByType(matchRecord)
+				Match.populateSubobjectReferences(records)
+			end
+			Match._storeMatch2InLpdb(matchRecord)
+			if LegacyMatch then
+				Match.populateSubobjectReferences(records)
+			end
 		end
-		Array.forEach(matchRecordsCopy, Match._storeMatch2InLpdb)
-		if LegacyMatch then
-			Array.forEach(recordsList, Match.populateSubobjectReferences)
-		end
+		Array.forEach(matchRecordsCopy, Logic.wrapTryOrLog(storeMatch2))
 	end
 
-	if LegacyMatch then
-		Array.forEach(matchRecordsCopy, function(matchRecord)
-			Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord, options)
-		end)
+	if not LegacyMatch then
+		return
 	end
+	Array.forEach(matchRecordsCopy, function(matchRecord)
+		Logic.wrapTryOrLog(LegacyMatch.storeMatch)(matchRecord)
+	end)
 end
 
 ---Stores a single match from a match group. Used by standalone match pages.
@@ -158,25 +164,19 @@ end
 ---and removes direct references between a match record and its subobject records.
 ---@param match table
 ---@return {matchRecord: table, gameRecords: table[], opponentRecords: table[], playerRecords: table[]}
----@overload fun(match: table): {}
+---@overload fun(match: any): {}
 function Match.splitRecordsByType(match)
 	if match == nil or type(match) ~= 'table' then
 		return {}
 	end
 
-	local gameRecordList = Match._moveRecordsFromMatchToList(
-		match,
-		match.match2games or match.games or {},
-		'map'
-	)
+	local gameRecordList = MatchGroupUtil.normalizeSubtype(match, 'map')
+	Match._removeLegacySubobjectRecords(match, 'map')
 	match.match2games = nil
 	match.games = nil
 
-	local opponentRecordList = Match._moveRecordsFromMatchToList(
-		match,
-		match.match2opponents or match.opponents or {},
-		'opponent'
-	)
+	local opponentRecordList = MatchGroupUtil.normalizeSubtype(match, 'opponent')
+	Match._removeLegacySubobjectRecords(match, 'opponent')
 	match.match2opponents = nil
 	match.opponents = nil
 
@@ -186,15 +186,8 @@ function Match.splitRecordsByType(match)
 			break
 		end
 
-		table.insert(
-			playerRecordList,
-			Match._moveRecordsFromMatchToList(
-				match,
-				opponentRecord.match2players or opponentRecord.players or {},
-				'opponent' .. opponentIndex .. '_p'
-			)
-		)
-
+		table.insert(playerRecordList, opponentRecord.match2players or opponentRecord.players or {})
+		Match._removeLegacySubobjectRecords(match, 'opponent' .. opponentIndex .. '_p')
 		opponentRecord.match2players = nil
 		opponentRecord.players = nil
 	end
@@ -207,19 +200,13 @@ function Match.splitRecordsByType(match)
 	}
 end
 
----Moves the records found by iterating through `match` by `typePrefix`
----to `list`. Sets the original location (so in `match`) to `nil`.
+---Sets the original location (so in `match`) to `nil` of suboject of a certain type.
 ---@param match table
----@param list table[]
 ---@param typePrefix string
----@return table[]
-function Match._moveRecordsFromMatchToList(match, list, typePrefix)
-	for key, item in Table.iter.pairsByPrefix(match, typePrefix) do
+function Match._removeLegacySubobjectRecords(match, typePrefix)
+	for key in Table.iter.pairsByPrefix(match, typePrefix) do
 		match[key] = nil
-		table.insert(list, Json.parseIfTable(item) or item)
 	end
-
-	return list
 end
 
 --[[
@@ -275,6 +262,7 @@ function Match.encodeJson(matchRecord)
 	end
 	for _, gameRecord in ipairs(matchRecord.match2games) do
 		gameRecord.extradata = Json.stringify(gameRecord.extradata)
+		gameRecord.opponents = Json.stringify(gameRecord.opponents, {asArray = true})
 		gameRecord.participants = Json.stringify(gameRecord.participants)
 		gameRecord.scores = Json.stringify(gameRecord.scores, {asArray = true})
 	end
@@ -321,7 +309,7 @@ end
 ---Final processing of records before being stored to LPDB.
 ---@param records table
 function Match._prepareRecordsForStore(records)
-	Match._prepareMatchRecordForStore(records.matchRecord)
+	Match._prepareMatchRecordForStore(records.matchRecord, records.opponentRecords)
 	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
 		Match.clampFields(opponentRecord, Match.opponentFields)
 		for _, playerRecord in ipairs(records.playerRecords[opponentIndex]) do
@@ -334,7 +322,11 @@ function Match._prepareRecordsForStore(records)
 end
 
 ---@param match table
-function Match._prepareMatchRecordForStore(match)
+---@param opponents table[]?
+function Match._prepareMatchRecordForStore(match, opponents)
+	-- Backwards compatibility for API v3
+	Match._commonBackwardsCompatabilityForV3API(match, opponents)
+
 	match.dateexact = Logic.readBool(match.dateexact) and 1 or 0
 	match.finished = Logic.readBool(match.finished) and 1 or 0
 	match.match2bracketdata = match.match2bracketdata or match.bracketdata
@@ -377,11 +369,53 @@ end
 ---@param matchRecord table
 ---@param gameRecord table
 function Match._prepareGameRecordForStore(matchRecord, gameRecord)
+	-- Backwards compatibility for API v3
+	Match._commonBackwardsCompatabilityForV3API(gameRecord, gameRecord.opponents)
+
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
+	if not gameRecord.participants then
+		gameRecord.participants = {}
+		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
+			for playerId, player in pairs(opponent.players or {}) do
+				-- Deep copy have to be used here, otherwise a json.stringify complains about circular references
+				-- between participants and opponents
+				gameRecord.participants[opponentId .. '_' .. playerId] = Table.deepCopy(player)
+			end
+		end
+	end
 	Match.clampFields(gameRecord, Match.gameFields)
 end
 
+---Adds fields needed for backwards compatibility with API v3.
+---walkover and resulttype are added to record.
+---@param record table #game or match record
+---@param opponents table[]? #opponents of the record
+function Match._commonBackwardsCompatabilityForV3API(record, opponents)
+	if record.finished then
+		if not record.walkover then
+			local function calculateWalkover()
+				local walkoverOpponent = Array.find(opponents or {}, function(opponent)
+					return opponent.status == 'FF' or opponent.status == 'DQ' or opponent.status == 'L'
+				end)
+				return walkoverOpponent and walkoverOpponent.status:lower() or ''
+			end
+			record.walkover = calculateWalkover()
+		end
+
+		if not record.resulttype then
+			if record.status == 'notplayed' then
+				record.resulttype = 'np'
+			elseif record.winner == 0 then
+				record.resulttype = 'draw'
+			elseif record.walkover ~= '' then
+				record.resulttype = 'default'
+			else
+				record.resulttype = ''
+			end
+		end
+	end
+end
 
 Match.matchFields = Table.map({
 	'bestof',
@@ -403,7 +437,7 @@ Match.matchFields = Table.map({
 	'parentname',
 	'patch',
 	'publishertier',
-	'resulttype',
+	'resulttype', -- LPDB API v3: backwards compatibility
 	'series',
 	'shortname',
 	'status',
@@ -412,7 +446,7 @@ Match.matchFields = Table.map({
 	'tournament',
 	'type',
 	'vod',
-	'walkover',
+	'walkover', -- LPDB API v3: backwards compatibility
 	'winner',
 	'section',
 }, function(_, field) return field, true end)
@@ -446,14 +480,16 @@ Match.gameFields = Table.map({
 	'parent',
 	'participants',
 	'patch',
-	'resulttype',
+	'opponents',
+	'resulttype',  -- LPDB API v3: backwards compatibility
 	'rounds',
 	'scores',
+	'status',
 	'subgroup',
 	'tournament',
 	'type',
 	'vod',
-	'walkover',
+	'walkover', -- LPDB API v3: backwards compatibility
 	'winner',
 }, function(_, field) return field, true end)
 

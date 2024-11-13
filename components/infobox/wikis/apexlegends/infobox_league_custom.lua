@@ -13,14 +13,13 @@ local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -28,6 +27,13 @@ local Center = Widgets.Center
 local GAME_MODE = mw.loadData('Module:GameMode')
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
+
+local EA_TIERS = {
+	major = '[[Major]]',
+	premier = '[[Premier]]',
+	challenger = '[[Challenger]]',
+	online = '[[Online]]',
+}
 
 ---@class ApexlegendsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -71,17 +77,17 @@ function CustomInjector:parse(id, widgets)
 		end
 		table.insert(widgets, Cell{
 			name = 'EA tier',
-			content = {Tier['ea'][string.lower(args.eatier or '')]},
+			content = {EA_TIERS[string.lower(args.eatier or '')]},
 			classes = {'tournament-highlighted-bg'}
 		})
 	elseif id == 'customcontent' then
 		--maps
 		if String.isNotEmpty(args.map1) then
-			table.insert(widgets, Title{name = args.maptitle or 'Maps'})
-			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('map')})
+			table.insert(widgets, Title{children = args.maptitle or 'Maps'})
+			table.insert(widgets, Center{children = self.caller:_makeBasedListFromArgs('map')})
 		elseif String.isNotEmpty(args['2map1']) then
-			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('2map')})
+			table.insert(widgets, Title{children = args['2maptitle'] or '2v2 Maps'})
+			table.insert(widgets, Center{children = self.caller:_makeBasedListFromArgs('2map')})
 		end
 	end
 	return widgets

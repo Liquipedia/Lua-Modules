@@ -12,10 +12,10 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class FortniteLeagueInfobox: InfoboxLeague
@@ -49,19 +49,14 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.epicpremier
+	-- this entire function can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.epicpremier)
 end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.epicpremier)
 end
 
 return CustomLeague

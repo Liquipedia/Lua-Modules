@@ -10,6 +10,7 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 ---@class BrktsWikiSpecific
+---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean
 ---@field defaultIcon string?
 local WikiSpecificBase = {}
 
@@ -21,17 +22,6 @@ WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
 	return InputModule and InputModule.processMatch
 		or error('Function "processMatch" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
-end)
-
--- called from Module:Match/Subobjects
--- used to transform wiki-specific input of templates to the generalized
--- format that is required by Module:MatchGroup
--- @parameter map - a map
--- @returns the map after changes have been applied
-WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
-	return InputModule and InputModule.processMap
-		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 --[[

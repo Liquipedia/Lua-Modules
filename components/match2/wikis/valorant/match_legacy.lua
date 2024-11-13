@@ -8,6 +8,7 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -17,17 +18,15 @@ local Variables = require('Module:Variables')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -74,20 +73,24 @@ function MatchLegacy.storeGames(match, match2)
 				game.extradata.opponent2scores = table.concat(team2, ', ')
 			end
 		end
-		local participants = Json.parseIfString(game2.participants)
-		if participants then
-			for team = 1, 2 do
-				for player = 1, 5 do
-					local data = participants[team..'_'..player]
-					if data then
-						local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
-						game.extradata['t'..team..'p'..player] = playerPage
-						if data.kills and data.deaths and data.assists then
-							game.extradata['t'..team..'kda'..player] = data.kills..'/'..data.deaths..'/'..data.assists
-						end
-						game.extradata['t'..team..'acs'..player] = data.acs
-						game.extradata['t'..team..'a'..player] = data.agent
-					end
+		local addPlayer = function (teamId, playerId, data)
+			if data then
+				local playerPage = data.player and mw.ext.TeamLiquidIntegration.resolve_redirect(data.player) or ''
+				game.extradata['t' .. teamId .. 'p' .. playerId] = playerPage
+				if data.kills and data.deaths and data.assists then
+					game.extradata['t' .. teamId .. 'kda' .. playerId] = data.kills .. '/' .. data.deaths .. '/' .. data.assists
+				end
+				game.extradata['t' .. teamId .. 'acs' .. playerId] = data.acs
+				game.extradata['t' .. teamId .. 'a' .. playerId] = data.agent
+			end
+		end
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		for teamId, opponent in ipairs(opponents) do
+			local counter = 0
+			for _, player in pairs(opponent.players) do
+				if Logic.isNotEmpty(player) then
+					counter = counter + 1
+					addPlayer(teamId, counter, player)
 				end
 			end
 		end
@@ -97,12 +100,11 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(scores)
-		end
+
+		local scores = Json.parseIfString(game2.scores) or {}
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
+
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
 			Json.stringifySubTables(game)
@@ -181,23 +183,28 @@ function MatchLegacy._convertParameters(match2)
 	local handleOpponent = function (index)
 		local prefix = 'opponent'..index
 		local opponent = match2.match2opponents[index] or {}
-		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = opponent.name
-			match[prefix..'score'] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
-			local opponentplayers = {}
-			for i = 1, 5 do
-				local player = opponentmatch2players[i] or {}
-				opponentplayers['p' .. i] = player.name or ''
-				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
-				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
+			if match2.bestof == 1 then
+				if ((match2.match2games or {})[1] or {}).scores then
+					match[prefix .. 'score'] = Json.parseIfString(match2.match2games[1].scores)[index]
+				end
 			end
-			match[prefix..'players'] = opponentplayers
+			if not match[prefix..'score'] then
+				match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			end
+			local players = {}
+			Array.forEach(opponent.match2players or {}, function(player, playerIndex)
+				players['p' .. playerIndex] = player.name or ''
+				players['p' .. playerIndex .. 'flag'] = player.flag or ''
+				players['p' .. playerIndex .. 'dn'] = player.displayname or ''
+			end)
+			match[prefix .. 'players'] = players
 		elseif opponent.type == 'solo' then
-			local player = opponentmatch2players[1] or {}
+			local player = (opponent.match2players or {})[1] or {}
 			match[prefix] = player.name
-			match[prefix..'score'] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
-			match[prefix..'flag'] = player.flag
+			match[prefix .. 'score'] = tonumber(opponent.score) or 0 >= 0 and opponent.score or 0
+			match[prefix .. 'flag'] = player.flag
 		elseif opponent.type == 'literal' then
 			match[prefix] = 'TBD'
 		end

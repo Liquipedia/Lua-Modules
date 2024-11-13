@@ -33,7 +33,8 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 1,
+			gameScoresIfBo1 = true,
 		},
 	},
-	match2 = 0,
 }

@@ -23,11 +23,11 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -44,8 +44,10 @@ local OFFLINE = 'offline'
 local ONLINE = 'online'
 
 local GAME_REFORGED = 'wc3r'
-local GAME_FROZEN_THRONE = 'tft'
-local GAME_DEFAULT_SWITCH_DATE = '2020-01-01'
+local GAME_REIGN_OF_CHAOS = 'reignofchaos'
+local GAME_FROZEN_THRONE = 'frozenthrone'
+local START_DATE_FROZEN_THRONE = '2003-07-01'
+local START_DATE_REFORGED = '2020-01-01'
 
 local MODES = {
 	team = {tier = 'Team', store = 'team', category = 'Team'},
@@ -94,7 +96,8 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.game = self:_determineGame(args.game)
 	self.data.status = self:_getStatus(args)
-	self.data.publishertier = ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
+	local publishertierInput = args.publishertier or args.eslprotier
+	self.data.publishertier = ESL_TIERS[(publishertierInput or ''):lower()] and publishertierInput:lower() or nil
 	self.data.raceBreakDown = RaceBreakdown.run(args, BREAKDOWN_RACES) or {}
 	self.data.maps = self:_getMaps('map', args)
 	self.data.number = tonumber(args.number)
@@ -177,16 +180,18 @@ end
 ---@param game string?
 ---@return string?
 function CustomLeague:_determineGame(game)
-	game = Game.toIdentifier{game = game}
+	game = Game.toIdentifier{game = game, useDefault = false}
 	if game then return game end
 
 	local startDate = self.data.startDate or self.data.endDate
 
-	if startDate and startDate > GAME_DEFAULT_SWITCH_DATE then
+	if startDate and startDate > START_DATE_REFORGED then
 		return Game.toIdentifier{game = GAME_REFORGED}
+	elseif startDate and startDate > START_DATE_FROZEN_THRONE then
+		return Game.toIdentifier{game = GAME_FROZEN_THRONE}
 	end
 
-	return Game.toIdentifier{game = GAME_FROZEN_THRONE}
+	return Game.toIdentifier{game = GAME_REIGN_OF_CHAOS}
 end
 
 ---@param args table
@@ -250,7 +255,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
 			name = ESL_ICON .. 'Pro Tour Tier',
-			content = {ESL_TIERS[(args.eslprotier or ''):lower()]}
+			content = {ESL_TIERS[caller.data.publishertier]}
 		})
 	elseif id == 'dates' then
 		if args.starttime then
@@ -266,13 +271,13 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		local playerNumber = caller.data.playerNumberDisplay
 		if playerNumber or args.team_number then
-			table.insert(widgets, Title{name = 'Participants breakdown'})
+			table.insert(widgets, Title{children = 'Participants breakdown'})
 		end
 
 		if playerNumber then
 			Array.appendWith(widgets,
 				Cell{name = 'Number of Players', content = {playerNumber}},
-				Breakdown{content = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{children = caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -291,8 +296,8 @@ function CustomInjector:parse(id, widgets)
 		local displayMaps = function(prefix, defaultTitle, maps)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
-				Title{name = args[prefix .. 'title'] or defaultTitle},
-				Center{content = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
+				Title{children = args[prefix .. 'title'] or defaultTitle},
+				Center{children = caller:_mapsDisplay(maps or caller:_getMaps(prefix, args))}
 			)
 		end
 
@@ -397,7 +402,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.participantsnumber = participantsNumber
 	lpdbData.sortdate = self.data.startTime.startTime
 		and (self.data.startTime.startTime .. (self.data.startTime.timeZone or ''))
-		or self.data.firstMatch or  self.data.startDate
+		or self.data.firstMatch or self.data.startDate
 	lpdbData.mode = self:_getMode()
 	lpdbData.extradata.seriesnumber = self.data.number
 
@@ -436,7 +441,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, game .. ' Competitions')
 	end
 
-	if String.isNotEmpty(args.eslprotier) then
+	if self.data.publishertier then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 

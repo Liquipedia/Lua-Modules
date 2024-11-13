@@ -23,10 +23,10 @@ local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -80,12 +80,21 @@ function CustomPlayer.run(frame)
 		player.args.history = automatedHistory
 	else
 		args.history = tostring(mw.html.create('div')
-			:addClass("show-when-logged-in")
-			:addClass("navigation-not-searchable")
-			:tag('big'):wikitext("Automated History"):done()
-			:wikitext(automatedHistory)
-			:tag('big'):wikitext("Manual History"):done())
-			.. args.history
+			:tag('div')
+				:tag('big')
+					:addClass("show-when-logged-in")
+					:addClass("navigation-not-searchable")
+					:wikitext("Automated History")
+					:done()
+				:wikitext(automatedHistory)
+				:done()
+			:tag('div')
+				:addClass("show-when-logged-in")
+				:addClass("navigation-not-searchable")
+				:tag('big'):wikitext("Manual History"):done()
+				:wikitext(args.history)
+				:done()
+			)
 	end
 
 	-- Automatic achievements
@@ -180,7 +189,7 @@ function CustomInjector:parse(id, widgets)
 			end)
 		end
 		if Logic.isNotEmpty(ratingCells) then
-			table.insert(widgets, Title{name = 'Ratings'})
+			table.insert(widgets, Title{children = 'Ratings'})
 			Array.extendWith(widgets, ratingCells)
 		end
 	elseif id == 'status' then

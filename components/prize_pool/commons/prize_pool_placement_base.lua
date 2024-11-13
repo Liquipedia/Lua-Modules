@@ -35,7 +35,7 @@ local BasePlacement = Class.new(function(self, ...) self:init(...) end)
 ---@field opponentData standardOpponent
 ---@field prizeRewards table
 ---@field additionalData table?
----@field date osdate|string?
+---@field date osdate|osdateparam|string?
 
 --- @param args table Input information
 --- @param parent BasePrizePool The PrizePool this BasePlacement is part of
@@ -169,7 +169,7 @@ function BasePlacement:parseOpponentArgs(input, date)
 		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
 	end
 
-	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
+	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers, overwritePageVars = true})
 end
 
 ---@param opponent BasePlacementOpponent

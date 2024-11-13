@@ -69,11 +69,12 @@ end
 ---@param props {MatchSummaryContainer: function, match: MatchGroupUtilMatch}
 ---@return Html
 function SingleMatchDisplay.Match(props)
+	local bracketId = MatchGroupUtil.splitMatchId(props.match.matchId)
 	return DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = true},
-	})
+	}, require('Module:Error/Display').ErrorList)
 end
 
 return Class.export(SingleMatchDisplay)

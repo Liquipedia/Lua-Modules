@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
@@ -69,6 +70,7 @@ function HorizontallistDisplay.Bracket(props)
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
 	local sortedBracket = HorizontallistDisplay._sortMatches(props.bracket)
+	local selectedMatchIdx = HorizontallistDisplay.findMatchClosestInTime(props.bracketId, sortedBracket)
 
 	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
 		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
@@ -99,8 +101,50 @@ function HorizontallistDisplay.Bracket(props)
 	return mw.html.create('div')
 			:addClass('brkts-br-wrapper battle-royale')
 			:attr('data-js-battle-royale-id', props.bracketId)
+			:attr('data-js-battle-royale-init-tab', selectedMatchIdx - 1) -- Convert to 0-index
 			:node(bracketNode)
 			:node(matchNode)
+end
+
+---@param bracket [string, MatchGroupUtilBracketBracketData][]
+---@return integer
+function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)
+	local now = Date.getCurrentTimestamp()
+	local liveGames = {} ---@type {matchIdx: integer, distanceToNow: integer}[]
+	local otherGames = {} ---@type {matchIdx: integer, distanceToNow: integer}[]
+	for matchIdx, matchInfo in ipairs(bracket) do
+		local match = MatchGroupUtil.fetchMatchForBracketDisplay(bracketId, matchInfo[1])
+		for _, game in ipairs(match.games) do
+			local tblToInsertInto = MatchGroupUtil.computeMatchPhase(game) == 'live' and liveGames or otherGames
+			local ts = Date.readTimestampOrNil(game.date)
+			table.insert(tblToInsertInto, {
+				matchIdx = matchIdx,
+				distanceToNow = math.abs(now - ts),
+			})
+		end
+	end
+
+	local function sortFunction(g1, g2)
+		if g1.distanceToNow == g2.distanceToNow then
+			return g1.matchIdx < g2.matchIdx
+		end
+		return g1.distanceToNow < g2.distanceToNow
+	end
+
+	-- Live games are always considered the "closest" if there are any.
+	-- Pick the match with the game that's been live the longest.
+	if #liveGames > 0 then
+		Array.sortInPlaceBy(liveGames, FnUtil.identity, sortFunction)
+		return liveGames[#liveGames].matchIdx
+	end
+
+	-- If no games are live, we find the one closest to current time by absolute metric
+	if #otherGames > 0 then
+		Array.sortInPlaceBy(otherGames, FnUtil.identity, sortFunction)
+		return otherGames[1].matchIdx
+	end
+
+	return 1
 end
 
 ---@param bracket MatchGroupUtilMatchGroup
@@ -152,8 +196,6 @@ function HorizontallistDisplay.NodeHeader(props)
 		return nil
 	end
 
-	local isSelected = props.index == 1
-
 	local iconData = PHASE_ICONS[props.status] or {}
 	local icon = Icon.makeIcon{
 		iconName = iconData.iconName,
@@ -166,8 +208,6 @@ function HorizontallistDisplay.NodeHeader(props)
 			:addClass('navigation-tabs__list-item')
 			:attr('data-target-id', 'navigationContent' .. props.index)
 			:attr('role', 'tab')
-			:attr('aria-selected', tostring(isSelected))
-			:attr('aria-controls', 'panel' .. props.index)
 			:attr('tabindex', '0')
 			:attr('data-js-battle-royale', 'navigation-tab')
 			:wikitext(props.header)
@@ -181,10 +221,11 @@ function HorizontallistDisplay.Match(props)
 			:addClass('navigation-content')
 			:attr('data-js-battle-royale-content-id', 'navigationContent' .. props.index)
 
+	local bracketId = MatchGroupUtil.splitMatchId(props.matchId)
 	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = props.matchId:match('^(.*)_'), -- everything up to the final '_'
+		bracketId = bracketId,
 		matchId = props.matchId,
-	})
+	}, require('Module:Error/Display').ErrorDetails)
 	matchNode:node(matchSummaryNode)
 
 	return matchNode

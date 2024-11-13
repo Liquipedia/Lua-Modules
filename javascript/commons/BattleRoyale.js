@@ -494,7 +494,12 @@ liquipedia.battleRoyale = {
 			}
 
 			// load the first tab for nav tabs and content tabs of all nav tabs
-			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ 0 ] );
+			const instanceElement = this.battleRoyaleInstances[ instanceId ];
+			let firstTab = parseInt( instanceElement.getAttribute( 'data-js-battle-royale-init-tab' ) );
+			if ( Number.isNaN( firstTab ) ) {
+				firstTab = 0;
+			}
+			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ firstTab ] );
 			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];

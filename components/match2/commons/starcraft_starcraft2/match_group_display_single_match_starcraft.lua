@@ -42,20 +42,20 @@ function StarcraftSingleMatchDisplay.SingleMatch(props)
 	local singleMatchNode = SingleMatchDisplay.SingleMatch(props)
 
 	return singleMatchNode
-		:addClass(props.match.isFfa and 'ffa-match-summary' or nil)
+		:css('width', props.match.isFfa and 'unset' or nil)
+		:css('background-color', props.match.isFfa and 'unset' or nil)
 end
 
 ---Display component for a match in a singleMatch. Consists of the match summary.
 ---@param props {MatchSummaryContainer: function, match: StarcraftMatchGroupUtilMatch}
 ---@return Html
 function StarcraftSingleMatchDisplay.Match(props)
-	local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
-		bracketId = props.match.matchId:match('^(.*)_'), -- everything up to the final '_'
+	local bracketId = StarcraftMatchGroupUtil.splitMatchId(props.match.matchId)
+	return DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
+		bracketId = bracketId,
 		matchId = props.match.matchId,
 		config = {showScore = not props.match.noScore},
-	})
-
-	return matchSummaryNode
+	}, require('Module:Error/Display').ErrorDetails)
 end
 
 return StarcraftSingleMatchDisplay

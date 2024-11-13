@@ -40,6 +40,10 @@ describe('array', function()
 			assert.are_same({2, 4, 6}, Array.map(a, function(x)
 				return 2 * x
 			end))
+			assert.are_same({false, false, false}, Array.map(a, function(x)
+				return false
+			end))
+			assert.are_same({}, Array.map(a, function() end))
 		end)
 	end)
 
@@ -211,6 +215,12 @@ describe('array', function()
 			local a = {'test1', 'test2', 'test3'}
 			assert.are_same(a, Array.parseCommaSeparatedString('test1, test2,test3'))
 			assert.are_same(a, Array.parseCommaSeparatedString('test1 - test2-test3', '-'))
+		end)
+	end)
+
+	describe('Interleave', function ()
+		it('works', function()
+			assert.are_same({'a', ' ', 'b', ' ', 'c'}, Array.interleave({'a', 'b', 'c'}, ' '))
 		end)
 	end)
 end)

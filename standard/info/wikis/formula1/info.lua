@@ -33,7 +33,10 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 0,
+		},
+		transfers = {
+			showTeamName = true,
 		},
 	},
-	match2 = 0,
 }

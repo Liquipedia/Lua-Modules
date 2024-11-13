@@ -46,9 +46,10 @@ return {
 			allowManual = false,
 		},
 		match2 = {
+			status = 2,
 			matchWidth = 180,
+			gameScoresIfBo1 = true,
 		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 2,
 }

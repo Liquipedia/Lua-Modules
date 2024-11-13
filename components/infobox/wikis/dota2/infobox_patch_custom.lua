@@ -10,8 +10,8 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Patch = Lua.import('Module:Infobox/Patch')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local Widgets = require('Module:Infobox/Widget/All')
+local Injector = Lua.import('Module:Widget/Injector')
+local Widgets = require('Module:Widget/All')
 
 ---@class Dota2PatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)

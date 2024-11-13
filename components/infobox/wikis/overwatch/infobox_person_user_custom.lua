@@ -13,10 +13,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local User = Lua.import('Module:Infobox/Person/User')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -52,9 +52,9 @@ function CustomInjector:parse(id, widgets)
 		not (String.isEmpty(args.team_history) and String.isEmpty(args.clan_history))
 	then
 		return {
-			Title{ name = 'History' },
-			Center{content = {args.team_history}},
-			Center{content = {args.clan_history}},
+			Title{children = 'History' },
+			Center{children = {args.team_history}},
+			Center{children = {args.clan_history}},
 		}
 	end
 	return widgets
@@ -76,12 +76,12 @@ function CustomUser:addCustomCells(widgets)
 )
 
 	if not String.isEmpty(args['fav-team-1']) then
-		table.insert(widgets, Title{name = 'Favorite teams'})
-		table.insert(widgets, Center{content = {self:_getFavouriteTeams()}})
+		table.insert(widgets, Title{children = 'Favorite teams'})
+		table.insert(widgets, Center{children = {self:_getFavouriteTeams()}})
 	end
 
 	if not String.isEmpty(args.s1high) then
-		table.insert(widgets, Title{name = '[[Leaderboards|Skill Ratings]]'})
+		table.insert(widgets, Title{children = '[[Leaderboards|Skill Ratings]]'})
 	end
 
 	local index = 1

@@ -13,10 +13,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Premier Tournament held by Riot Games]]'
@@ -56,16 +56,7 @@ end
 ---@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args.riotpremier) then
-		return ' ' .. RIOT_ICON
-	end
-	return ''
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.riotpremier)
+	return String.isNotEmpty(self.data.publishertier) and (' ' .. RIOT_ICON) or ''
 end
 
 ---@param lpdbData table
@@ -74,23 +65,17 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or ''
-
-	lpdbData.extradata['is riot premier'] = String.isNotEmpty(args.riotpremier) and 'true' or ''
-
 	return lpdbData
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args.riotpremier) and '1' or nil
+	-- line below can be kicked after conversion bot runs
+	self.data.publishertier = Logic.readBool(args.highlighted or args.riotpremier)
 end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
-	-- Custom Vars
-	Variables.varDefine('tournament_riot_premier', args.riotpremier)
-	Variables.varDefine('tournament_publisher_major', args.riotpremier)
-
 	--Legacy vars
 	Variables.varDefine('tournament_ticker_name', args.tickername or '')
 	Variables.varDefine('tournament_tier', args.liquipediatier or '')

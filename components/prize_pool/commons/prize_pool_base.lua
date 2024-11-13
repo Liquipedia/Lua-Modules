@@ -20,16 +20,19 @@ local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
-local WidgetTable = require('Module:Widget/Table')
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetTable = Widgets.TableOld
+local TableRow = Widgets.TableRow
+local TableCell = Widgets.TableCell
+local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local pageVars = PageVariableNamespace('PrizePool')
 
@@ -148,7 +151,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{content = {{currencyText}}}
+			return TableCell{children = {currencyText}}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -157,7 +160,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {
+				return TableCell{children = {
 					Currency.display(BASE_CURRENCY, data,
 						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
@@ -187,7 +190,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{Currency.display(data.currency)}}}
+			return TableCell{children = {Currency.display(data.currency)}}
 		end,
 
 		row = 'localprize',
@@ -196,7 +199,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {
+				return TableCell{children = {
 					Currency.display(headerData.currency, data,
 					{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
@@ -225,7 +228,7 @@ BasePrizePool.prizeTypes = {
 			return {title = 'Percentage'}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{children = {data.title}}
 		end,
 
 		row = 'percentage',
@@ -239,7 +242,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data .. '%'}}}
+				return TableCell{children = {data .. '%'}}
 			end
 		end,
 	},
@@ -265,7 +268,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {'Qualifies To'}}
+			return TableCell{children = {'Qualifies To'}}
 		end,
 
 		row = 'qualified',
@@ -293,7 +296,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(content, '[[' .. headerData.link .. ']]')
 			end
 
-			return TableCell{content = {content}}
+			return TableCell{children = {Div{children = content}}}
 		end,
 
 		mergeDisplayColumns = true,
@@ -338,7 +341,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{content = {headerDisplay}}
+			return TableCell{children = {table.concat(headerDisplay)}}
 		end,
 
 		row = 'points',
@@ -347,7 +350,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{LANG:formatNum(data)}}}
+				return TableCell{children = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -359,7 +362,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{children = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -368,7 +371,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data}}}
+				return TableCell{children = {data}}
 			end
 		end,
 	}
@@ -555,7 +558,7 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 end
 
 ---@param isAward boolean?
----@return Html
+---@return Widget
 function BasePrizePool:build(isAward)
 	local prizePoolTable = self:_buildTable(isAward)
 
@@ -567,59 +570,38 @@ function BasePrizePool:build(isAward)
 		return prizePoolTable
 	end
 
-	local wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
-
-	if self:_shouldDisplayPrizeSummary() then
-		wrapper:tag('span'):wikitext(self:_getPrizeSummaryText())
-	end
-
-	local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables'):node(prizePoolTable)
-
-	if self.adjacentContent then
-		tablesWrapper:wikitext(self.adjacentContent)
-	end
-
-	wrapper:node(tablesWrapper)
-
-	if self.options.exchangeInfo then
-		wrapper:wikitext(self:_currencyExchangeInfo())
-	end
-
-	return wrapper
+	return Div{classes = {'prizepool-section-wrapper'}, children = WidgetUtil.collect(
+		self:_shouldDisplayPrizeSummary() and Span{children = {self:_getPrizeSummaryText()}} or nil,
+		Div{
+			classes = {'prizepool-section-tables'},
+			children = WidgetUtil.collect(prizePoolTable, self.adjacentContent)
+		},
+		self.options.exchangeInfo and self:_currencyExchangeInfo() or nil
+	)}
 end
 
 ---@param isAward boolean?
----@return Html
+---@return Widget
 function BasePrizePool:_buildTable(isAward)
-	local tbl = WidgetTable{
-		classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
-		css = {width = 'max-content'},
-	}
-
 	local headerRow = self:_buildHeader(isAward)
 
-	tbl:addRow(headerRow)
-
-	tbl.columns = headerRow:getCellCount()
-
-	for _, row in ipairs(self:_buildRows()) do
-		tbl:addRow(row)
-	end
-
-	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
-	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
-		tableNode:node(node)
-	end
-
-	return tableNode
+	return Div{
+		css = {['overflow-x'] = 'auto'},
+		children = {WidgetTable{
+			classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
+			css = {width = 'max-content'},
+			columns = headerRow:getCellCount(),
+			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
+		}},
+	}
 end
 
 ---@param isAward boolean?
 ---@return WidgetTableRow
 function BasePrizePool:_buildHeader(isAward)
-	local headerRow = TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}}
+	local children = {}
 
-	headerRow:addCell(TableCell{content = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
+	table.insert(children, TableCell{children = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
@@ -627,14 +609,14 @@ function BasePrizePool:_buildHeader(isAward)
 
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
-			headerRow:addCell(cell)
+			table.insert(children, cell)
 			previousOfType[prize.type] = cell
 		end
 	end
 
-	headerRow:addCell(TableCell{content = {'Participant'}, classes = {'prizepooltable-col-team'}})
+	table.insert(children, TableCell{children = {'Participant'}, classes = {'prizepooltable-col-team'}})
 
-	return headerRow
+	return TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}, children = children}
 end
 
 ---@return WidgetTableRow[]
@@ -647,12 +629,8 @@ function BasePrizePool:_buildRows()
 
 		self:applyToggleExpand(previousPlacement, placement, rows)
 
-		local row = TableRow{}
-		row:addClass(placement:getBackground())
-
-		self:applyCutAfter(placement, row)
-
-		row:addCell(self:placeOrAwardCell(placement))
+		local cells = {}
+		table.insert(cells, self:placeOrAwardCell(placement))
 
 		for _, opponent in ipairs(placement.opponents) do
 			local previousOfPrizeType = {}
@@ -666,11 +644,11 @@ function BasePrizePool:_buildRows()
 				local lastCellOfType = previousOfPrizeType[prize.type]
 				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
-					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
-						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('width', '100%')))
+					if Table.isNotEmpty(lastCellOfType.props.children) and Table.isNotEmpty(cell.props.children) then
+						table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
 					end
 
-					Array.extendWith(lastCellOfType.content, cell.content)
+					Array.extendWith(lastCellOfType.props.children, cell.props.children)
 					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
@@ -684,15 +662,15 @@ function BasePrizePool:_buildRows()
 				local lastInColumn = previousOpponent[columnIndex]
 
 				---@cast prizeCell -nil
-				if Table.isEmpty(prizeCell.content) then
+				if Table.isEmpty(prizeCell.props.children) then
 					prizeCell = BasePrizePool._emptyCell()
 				end
 
-				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
+				if lastInColumn and Table.deepEquals(lastInColumn.props.children, prizeCell.props.children) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
 					previousOpponent[columnIndex] = prizeCell
-					row:addCell(prizeCell)
+					table.insert(cells, prizeCell)
 				end
 			end)
 
@@ -703,8 +681,13 @@ function BasePrizePool:_buildRows()
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
-			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+			table.insert(cells, TableCell{children = {opponentDisplay}, css = opponentCss})
 		end
+		local classes = {placement:getBackground()}
+		if self:applyCutAfter(placement) then
+			table.insert(classes, 'ppt-hide-on-collapse')
+		end
+		local row = TableRow{children = cells, classes = classes}
 
 		table.insert(rows, row)
 
@@ -720,8 +703,8 @@ function BasePrizePool:placeOrAwardCell(placement)
 end
 
 ---@param placement BasePlacement
----@param row WidgetTableRow
-function BasePrizePool:applyCutAfter(placement, row)
+---@return boolean
+function BasePrizePool:applyCutAfter(placement)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
@@ -814,7 +797,7 @@ end
 --- Creates an empty table cell
 ---@return WidgetTableCell
 function BasePrizePool._emptyCell()
-	return TableCell{content = {DASH}}
+	return TableCell{children = {DASH}}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
@@ -916,20 +899,11 @@ function BasePrizePool:storeData()
 	return self
 end
 
---- Set the WidgetInjector.
----@param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
----@return self
-function BasePrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
-	self._widgetInjector = widgetInjector
-	return self
-end
-
 --- Set the LpdbInjector.
 ---@param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
 ---@return self
 function BasePrizePool:setLpdbInjector(lpdbInjector)
-	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
+	assert(Class.instanceOf(lpdbInjector, LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
 	return self
 end

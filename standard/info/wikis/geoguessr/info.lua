@@ -33,8 +33,11 @@ return {
 			allowManual = false,
 		},
 		match2 = {
+			status = 0,
+		},
+		transfers = {
+			showTeamName = true,
 		},
 	},
 	defaultRoundPrecision = 0,
-	match2 = 0,
 }

@@ -16,10 +16,10 @@ local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -71,8 +71,8 @@ function CustomInjector:parse(id, widgets)
 				)))
 			end
 			table.sort(maps)
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'gamesettings' then
 		table.insert(widgets, Cell{
@@ -111,15 +111,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['riot-highlighted'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args['riot-highlighted']) or Logic.readBool(args['riot-sponsored']) then
+	if self.data.publishertier then
 		return ' ' .. RIOT_ICON
 	end
 	return ''

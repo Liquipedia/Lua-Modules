@@ -194,6 +194,19 @@ return {
 				lightMode = 'F1 2018 allmode.png',
 			},
 		},
+		['f1 2024'] = {
+			abbreviation = 'F1 24',
+			name = 'F1 2024',
+			link = 'F1 2024',
+			logo = {
+				darkMode = 'F1 2018 allmode.png',
+				lightMode = 'F1 2018 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'F1 2018 allmode.png',
+				lightMode = 'F1 2018 allmode.png',
+			},
+		},
 		heat3 = {
 			abbreviation = 'Heat 3',
 			name = 'NASCAR Heat 3',
@@ -218,6 +231,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Nascar Heat default allmode.png',
 				lightMode = 'Nascar Heat default allmode.png',
+			},
+		},
+		lmu = {
+			abbreviation = 'LMU',
+			name = 'Le Mans Ultimate',
+			link = 'Le Mans Ultimate',
+			logo = {
+				darkMode = 'Le Mans Ultimate default allmode.png',
+				lightMode = 'Le Mans Ultimate default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Le Mans Ultimate default allmode.png',
+				lightMode = 'Le Mans Ultimate default allmode.png',
 			},
 		},
 		rf2 = {
@@ -519,6 +545,19 @@ return {
 				lightMode = 'Motogp23 default allmode.png',
 			},
 		},
+		motogp24 = {
+			abbreviation = 'MotoGP 24',
+			name = 'MotoGP 24',
+			link = 'MotoGP 24',
+			logo = {
+				darkMode = 'Motogp24 default allmode.png',
+				lightMode = 'Motogp24 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Motogp24 default allmode.png',
+				lightMode = 'Motogp24 default allmode.png',
+			},
+		},
 		['forza 2'] = {
 			abbreviation = 'FM2',
 			name = 'Forza Motorsport 2',
@@ -688,6 +727,32 @@ return {
 				lightMode = 'WRC 10 default lightmode.png',
 			},
 		},
+		['wrc generations'] = {
+			abbreviation = 'WRC Gen.',
+			name = 'WRC Generations',
+			link = 'WRC Generations',
+			logo = {
+				darkMode = 'WRC Generations default allmode.png',
+				lightMode = 'WRC Generations default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC Generations default allmode.png',
+				lightMode = 'WRC Generations default allmode.png',
+			},
+		},
+		['ea wrc'] = {
+			abbreviation = 'EA WRC',
+			name = 'EA SPORTS WRC',
+			link = 'EA SPORTS WRC',
+			logo = {
+				darkMode = 'EA SPORTS WRC default darkmode.png',
+				lightMode = 'EA SPORTS WRC default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA SPORTS WRC default darkmode.png',
+				lightMode = 'EA SPORTS WRC default lightmode.png',
+			},
+		},
 		pgr2 = {
 			abbreviation = 'PGR 2',
 			name = 'Project Gotham Racing 2',
@@ -813,7 +878,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			status = 0,
 		},
 	},
-	match2 = 0,
 }

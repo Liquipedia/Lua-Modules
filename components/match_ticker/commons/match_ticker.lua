@@ -47,6 +47,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'bestof',
 	'match2id',
 	'match2bracketdata',
+	'match2games',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
@@ -257,6 +258,8 @@ function MatchTicker:buildQueryConditions()
 		Array.forEach(config.tierTypes, function(tierType)
 			tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, tierType) }
 		end)
+
+		tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, '') }
 
 		conditions:add(tierTypeConditions)
 	end

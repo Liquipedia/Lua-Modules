@@ -7,7 +7,6 @@
 --
 
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local MatchGroupBase = {}
@@ -46,6 +45,11 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		if warning then
 			table.insert(warnings, warning)
 		end
+	end
+
+	if not Variables.varDefault('tournament_parent') then
+		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing tournament context')
 	end
 
 	if Logic.readBool(args.isLegacy) then
@@ -110,18 +114,6 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 		mw.addWarning(warning)
 		return warning
 	end
-end
-
----@deprecated
-function MatchGroupBase.luaMatchlist(_, args)
-	local MatchGroup = Lua.import('Module:MatchGroup')
-	return MatchGroup.MatchList(args) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroupBase.luaBracket(_, args)
-	local MatchGroup = Lua.import('Module:MatchGroup')
-	return MatchGroup.Bracket(args) .. MatchGroup.deprecatedCategory
 end
 
 return MatchGroupBase

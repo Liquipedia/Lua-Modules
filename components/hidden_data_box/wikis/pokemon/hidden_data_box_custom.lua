@@ -25,7 +25,7 @@ end
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	BasicHiddenDataBox.checkAndAssign(
 		'tournament_publishertier',
-		args.pokemonpremier,
+		args.highlighted or args.pokemonpremier,
 		queryResult.publishertier
 	)
 end

@@ -15,10 +15,10 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
@@ -161,7 +161,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
-			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Title{children = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
 		if args.circuit2 or args.points2 or args.circuit2_next or args.circuit2_previous then
@@ -170,14 +170,14 @@ function CustomInjector:parse(id, widgets)
 
 		local singles = Array.map(league:getAllArgsForBase(args, 's_stage'), CustomLeague._createNoWrappingSpan)
 		if #singles > 0 then
-			table.insert(widgets, Title{name = 'Singles Stages'})
-			table.insert(widgets, Center{content = {table.concat(singles, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Singles Stages'})
+			table.insert(widgets, Center{children = {table.concat(singles, '&nbsp;• ')}})
 		end
 
 		local doubles = Array.map(league:getAllArgsForBase(args, 'd_stage'), CustomLeague._createNoWrappingSpan)
 		if #doubles > 0 then
-			table.insert(widgets, Title{name = 'Doubles Stages'})
-			table.insert(widgets, Center{content = {table.concat(doubles, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Doubles Stages'})
+			table.insert(widgets, Center{children = {table.concat(doubles, '&nbsp;• ')}})
 		end
 	elseif id == 'dates' then
 		return {
@@ -400,7 +400,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
 		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
 		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{content = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
 	)
 end
 

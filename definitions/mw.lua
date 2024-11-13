@@ -43,7 +43,17 @@ function mw.loadJsonData(page) end
 ---Serializes object to a human-readable representation, then returns the resulting string.
 ---@param object any
 ---@return string
-function mw.dumpObject(object) end
+function mw.dumpObject(object)
+	local str = ''
+	for k, v in pairs(object) do
+		if type(v) == 'table' then
+			str = str .. k .. ': ' .. mw.dumpObject(v) .. '\n'
+		else
+			str = str .. k .. ': ' .. tostring(v) .. '\n'
+		end
+	end
+	return str
+end
 
 ---Passes the arguments to mw.allToString(), then appends the resulting string to the log buffer.
 ---@param ... any
@@ -76,7 +86,9 @@ function mw.frame:callParserFunction(name, args) end
 ---This is transclusion. As in transclusion, if the passed title does not contain a namespace prefix it will be assumed to be in the Template: namespace.
 ---@param params {title: string, args: table?}
 ---@return string
-function mw.frame:expandTemplate(params) end
+function mw.frame:expandTemplate(params)
+	error('Cannot expand template in fake')
+end
 
 ---This is equivalent to a call to frame:callParserFunction() with function name '#tag:' .. name and with content prepended to args.
 ---@param name string
@@ -147,7 +159,7 @@ mw.html = {}
 function mw.html.create(tagName, args) end
 
 ---Appends a child mw.html (builder) node to the current mw.html instance. If a nil parameter is passed, this is a no-op. A (builder) node is a string representation of an html element.
----@param builder? Html|string|number
+---@param builder? Html|string|number|Widget
 ---@return self
 function mw.html:node(builder) end
 
@@ -328,7 +340,7 @@ end
 ---@return number|string
 function mw.language:formatDate(format, timestamp, localTime)
 	local function localTimezoneOffset(ts)
-		local utcDt   = os.date("!*t", ts)
+		local utcDt = os.date("!*t", ts)
 		local localDt = os.date("*t", ts)
 		localDt.isdst = false
 		return os.difftime(os.time(localDt --[[@as osdateparam]]), os.time(utcDt --[[@as osdateparam]]))
@@ -588,7 +600,7 @@ function mw.text.nowiki(s)
 end
 
 ---Splits the string into substrings at boundaries matching the Ustring pattern pattern. If plain is specified and true, pattern will be interpreted as a literal string rather than as a Lua pattern.
----@param s string
+---@param s string|number
 ---@param pattern string?
 ---@param plain boolean?
 ---@return string[]
@@ -794,14 +806,14 @@ mw.ustring = {}
 
 ---Returns individual bytes; identical to string.byte().
 ---@see string.byte
----@param s  string|number
+---@param s string|number
 ---@param i? integer
 ---@param j? integer
 ---@return integer ...
 function mw.ustring.byte(s, i, j) end
 
 ---Returns the byte offset of a character in the string. The default for both l and i is 1. i may be negative, in which case it counts from the end of the string.
----@param s  string|number
+---@param s string|number
 ---@param l? integer
 ---@param i? integer
 ---@return integer ...
@@ -815,7 +827,7 @@ function mw.ustring.char(...) end
 
 ---Much like string.byte(), except that the return values are codepoints and the offsets are characters rather than bytes.
 ---@see string.byte
----@param s  string|number
+---@param s string|number
 ---@param i? integer
 ---@param j? integer
 ---@return integer ...
@@ -823,10 +835,10 @@ function mw.ustring.codepoint(s, i, j) end
 
 ---Much like string.find(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.find
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
----@param init?   integer
----@param plain?  boolean
+---@param init? integer
+---@param plain? boolean
 ---@return integer|nil start
 ---@return integer|nil end
 ---@return any|nil ... captured
@@ -840,7 +852,7 @@ function mw.ustring.find(s, pattern, init, plain) end
 function mw.ustring.format(format, ...) end
 
 ---Returns three values for iterating over the codepoints in the string. i defaults to 1, and j to -1. This is intended for use in the iterator form of for:
----@param s  string|number
+---@param s string|number
 ---@param i? integer
 ---@param j? integer
 ---@return string
@@ -848,17 +860,17 @@ function mw.ustring.gcodepoint(s, i, j) end
 
 ---Much like string.gmatch(), except that the pattern is extended as described in Ustring patterns.
 ---@see string.gmatch
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
 ---@return fun():string, ...
 function mw.ustring.gmatch(s, pattern) end
 
 ---Much like string.gmatch(), except that the pattern is extended as described in Ustring patterns.
 ---@see string.gsub
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
----@param repl    string|number|table|function
----@param n?      integer
+---@param repl string|number|table|function
+---@param n? integer
 ---@return string
 ---@return integer count
 function mw.ustring.gsub(s, pattern, repl, n) end
@@ -887,44 +899,44 @@ end
 
 ---Much like string.match(), except that the pattern is extended as described in Ustring patterns and the init offset is in characters rather than bytes.
 ---@see string.match
----@param s       string|number
+---@param s string|number
 ---@param pattern string|number
----@param init?   integer
+---@param init? integer
 ---@return any ...
 function mw.ustring.match(s, pattern, init) end
 
 ---Identical to string.rep().
 ---@see string.rep
----@param s    string|number
----@param n    integer
+---@param s string|number
+---@param n integer
 ---@return string
 function mw.ustring.rep(s, n) end
 
 ---Identical to string.sub().
 ---@see string.sub
----@param s  string|number
----@param i  integer
+---@param s string|number
+---@param i integer
 ---@param j? integer
 ---@return string
 function mw.ustring.sub(s, i, j) end
 
 ---Converts the string to Normalization Form C (also known as Normalization Form Canonical Composition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFC(s) return tostring(s) end
 
 ---Converts the string to Normalization Form D (also known as Normalization Form Canonical Decomposition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFD(s) return tostring(s) end
 
 ---Converts the string to Normalization Form KC (also known as Normalization Form Compatibility Composition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFKC(s) return tostring(s) end
 
 ---Converts the string to Normalization Form KD (also known as Normalization Form Compatibility Decomposition). Returns nil if the string is not valid UTF-8.
----@param s  string|number
+---@param s string|number
 ---@return string?
 function mw.ustring.toNFKD(s) return tostring(s) end
 
@@ -1006,63 +1018,77 @@ function mw.ext.TeamLiquidIntegration.resolve_redirect(name) return name end
 
 mw.ext.TeamTemplate = {}
 
----@param teamteplate string
+---@alias teamTemplateData {
+---templatename: string,
+---historicaltemplate: string?,
+---shortname: string,
+---name: string,
+---bracketname: string,
+---page: string,
+---icon: string,
+---image: string,
+---imagedark: string,
+---legacyimage: string,
+---legacyimagedark: string,
+---}
+
+---@param teamtemplate string
 ---@param date string|number?
----@return table
-function mw.ext.TeamTemplate.raw(teamteplate, date) end
+---@return teamTemplateData?
+function mw.ext.TeamTemplate.raw(teamtemplate, date) end
 
----@param teamteplate string
----@return table
-function mw.ext.TeamTemplate.raw_historical(teamteplate) end
+---@param teamtemplate string
+---@return {[string]: string} ## key is formated as `YYYY-MM-DD`and values are team template names
+function mw.ext.TeamTemplate.raw_historical(teamtemplate) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@return boolean
-function mw.ext.TeamTemplate.teamexists(teamteplate) end
+function mw.ext.TeamTemplate.teamexists(teamtemplate) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team(teamteplate, date) end
+function mw.ext.TeamTemplate.team(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team2(teamteplate, date) end
+function mw.ext.TeamTemplate.team2(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamshort(teamteplate, date) end
+function mw.ext.TeamTemplate.teamshort(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.team2short(teamteplate, date) end
+function mw.ext.TeamTemplate.team2short(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teambracket(teamteplate, date) end
+function mw.ext.TeamTemplate.teambracket(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamicon(teamteplate, date) end
+function mw.ext.TeamTemplate.teamicon(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teamimage(teamteplate, date) end
+function mw.ext.TeamTemplate.teamimage(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teampage(teamteplate, date) end
+function mw.ext.TeamTemplate.teampage(teamtemplate, date) end
 
----@param teamteplate string
+---@param teamtemplate string
 ---@param date string|number?
 ---@return string
-function mw.ext.TeamTemplate.teampart(teamteplate, date) end
+function mw.ext.TeamTemplate.teampart(teamtemplate, date) end
 
 mw.ext.SearchEngineOptimization = {}
 
@@ -1078,5 +1104,62 @@ mw.ext.Brackets = {}
 function mw.ext.Brackets.checkBracketDuplicate(idToCheck)
 	return 'ok'
 end
+
+mw.ext.Dota2DB = {}
+
+---@alias dota2VetoEntry {hero: string?, order: number?}
+---@alias dota2TeamVeto {bans: dota2VetoEntry[]?, picks: dota2VetoEntry[]?}
+---@alias dota2PlayerItem {name: string?, image: string?, image_url: string?}
+
+---@class dota2MatchTeamPlayer
+---@field aghanimsScepterBuff 0|1|nil
+---@field aghanimsShardBuff 0|1|nil
+---@field assists integer?
+---@field backpackItems dota2PlayerItem[]?
+---@field buildingDamage integer?
+---@field damage integer?
+---@field deaths integer?
+---@field denies integer?
+---@field facet string?
+---@field goldPerMinute integer?
+---@field heroId integer?
+---@field heroName string?
+---@field id integer?
+---@field items dota2PlayerItem[]?
+---@field kills integer?
+---@field lastHits integer?
+---@field level integer?
+---@field moonShardBuff 0|1|nil
+---@field name string?
+---@field neutralItem dota2PlayerItem?
+---@field position 1|2|3|4|5|nil
+---@field towerDamage integer?
+---@field totalGold integer?
+---@field wards {observerKills: integer?, observerPlaced: integer?, sentryKills: integer?, sentryPlaced: integer?}?
+---@field xpPerMinute integer?
+
+---@class dota2MatchTeam
+---@field barracksDestroyed integer?
+---@field players dota2MatchTeamPlayer[]
+---@field roshanKills integer?
+---@field side 'radiant'|'dire'|nil
+---@field towersDestroyed integer?
+
+---@class dota2MatchData
+---@field heroVeto {team1: dota2TeamVeto[], team2:dota2TeamVeto[]}
+---@field length string?
+---@field lengthInSeconds integer?
+---@field patch string?
+---@field startTime string?
+---@field team1 dota2MatchTeam
+---@field team2 dota2MatchTeam
+---@field team1score integer?
+---@field team2score integer?
+---@field winner 1|2|nil
+
+---@param matchId integer
+---@param reversed boolean?
+---@return dota2MatchData
+function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
 
 return mw
