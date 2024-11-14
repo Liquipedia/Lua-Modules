@@ -194,10 +194,21 @@ liquipedia.battleRoyale = {
 	},
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
-		console.log('handlePanelTabChange', instanceId, contentId, panelTab);
+
+		// Get the matchid from the navigationTab
+		const navigationTab = this.battleRoyaleMap[ instanceId ].navigationTabs.find( tab => tab.dataset.targetId === contentId );
+		const dataTargetId = navigationTab.dataset.targetId;
+		const matchId = navigationTab ? navigationTab.dataset.jsBattleRoyaleMatchid : null;
+		const gameId = panelTab.dataset.jsBattleRoyaleGameIdx;
+		console.log('matchId gameId datatargetid', matchId, gameId, navigationTab);
+
+		// Call the template with the parameters
+		if (matchId && gameId) {
+			this.callTemplate( instanceId, matchId, gameId, dataTargetId );
+		}
+
 		const tabs = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ contentId ];
 		tabs.forEach( ( item ) => {
-			console.log('handlePanelTabChange', item)
 			if ( item === panelTab ) {
 				// activate content tab
 				item.classList.add( 'is--active' );
@@ -218,6 +229,34 @@ liquipedia.battleRoyale = {
 		// } );
 
 		this.recheckNavigationStates( instanceId );
+	},
+
+	callTemplate: function( id, matchId, gameId, dataTargetId ) {
+		console.log('call template', id, matchId, gameId, dataTargetId);
+		const wikitext = `{{TemplateName|id=${id}|matchid=${matchId}|gameid=${gameId}}}`;
+		const element = document.querySelector( `[data-js-battle-royale-content-id="navigationContent${dataTargetId}"]` );
+		console.log('element', element);
+
+		mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
+			const api = new mw.Api();
+			api.get( {
+				action: 'parse',
+				format: 'json',
+				contentmodel: 'wikitext',
+				maxage: 600,
+				smaxage: 600,
+				disablelimitreport: true,
+				uselang: 'content',
+				prop: 'text',
+				text: wikitext
+			} ).done( ( data ) => {
+				if ( data.parse?.text?.[ '*' ] ) {
+					console.log('data parse', data.parse.text);
+					// append the content to the panel
+					element.append(data.parse.text[ '*' ]);
+				}
+			} );
+		} );
 	},
 
 	buildBattleRoyaleMap: function( id ) {
@@ -488,6 +527,7 @@ liquipedia.battleRoyale = {
 		Object.keys( this.battleRoyaleInstances ).forEach( ( instanceId ) => {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
+			console.log('battle royale map', this.battleRoyaleMap);
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
