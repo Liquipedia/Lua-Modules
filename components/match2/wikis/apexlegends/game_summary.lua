@@ -235,7 +235,7 @@ function CustomGameSummary._createGameStandings(game)
 end
 
 function CustomGameSummary._opponents(match)
-	-- Add match opponent data to game opponent and the other way around
+	-- Add match opponent data to game opponent
 	Array.forEach(match.games, function (game)
 		game.extradata.opponents = Array.map(game.extradata.opponents,
 			function(gameOpponent, opponentIdx)
@@ -248,11 +248,6 @@ function CustomGameSummary._opponents(match)
 				return newGameOpponent
 			end
 		)
-	end)
-	Array.forEach(match.opponents, function (opponent, idx)
-		opponent.games = Array.map(match.games, function(game)
-			return game.extradata.opponents[idx]
-		end)
 	end)
 
 	-- Sort game level based on placement

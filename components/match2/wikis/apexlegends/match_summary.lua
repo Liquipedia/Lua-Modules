@@ -199,6 +199,7 @@ function CustomMatchSummary.getByMatchId(props)
 end
 
 function CustomMatchSummary._opponents(match)
+	-- Add games opponent data to the match opponent
 	Array.forEach(match.opponents, function (opponent, idx)
 		opponent.games = Array.map(match.games, function (game)
 			return game.extradata.opponents[idx]
@@ -388,14 +389,14 @@ function CustomMatchSummary._createMatchStandings(match)
 		end)
 	end)
 
-	Array.forEach(match.opponents, function (opponentMatch, index)
+	Array.forEach(match.opponents, function (matchOpponent, index)
 		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 
 		if CustomMatchSummary._showStatusColumn(match) then
 			row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass('cell--status')
-					:addClass('bg-' .. (opponentMatch.advanceBg or ''))
+					:addClass('bg-' .. (matchOpponent.advanceBg or ''))
 					:node(CustomMatchSummary._getStatusIcon(match.extradata.status[index]))
 		end
 
@@ -407,9 +408,9 @@ function CustomMatchSummary._createMatchStandings(match)
 			local cell = row:tag('div')
 					:addClass('panel-table__cell')
 					:addClass(column.class)
-					:node(column.row.value(opponentMatch, index))
+					:node(column.row.value(matchOpponent, index))
 			if(column.sortVal and column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(opponentMatch, index)):attr('data-sort-type', column.sortType)
+				cell:attr('data-sort-val', column.sortVal.value(matchOpponent, index)):attr('data-sort-type', column.sortType)
 			end
 		end)
 
@@ -418,7 +419,7 @@ function CustomMatchSummary._createMatchStandings(match)
 				:addClass('cell--game-container')
 				:attr('data-js-battle-royale', 'game-container')
 
-		Array.forEach(opponentMatch.games, function(opponent)
+		Array.forEach(matchOpponent.games, function(opponent)
 			local gameRow = gameRowContainer:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 
 			Array.forEach(MATCH_STANDING_COLUMNS.game, function(column)
@@ -431,27 +432,6 @@ function CustomMatchSummary._createMatchStandings(match)
 	end)
 
 	return wrapper
-end
-
----@param game table
----@return boolean
-function CustomMatchSummary._isFinished(game)
-	return game.winner ~= nil
-end
-
----@param game table
----@return string?
-function CustomMatchSummary._countdownIcon(game, additionalClass)
-	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)] or {}
-	return Icon.makeIcon{iconName = iconData.iconName, color = iconData.color, additionalClasses = {additionalClass}}
-end
-
----@param status string?
----@return string?
-function CustomMatchSummary._getStatusIcon(status)
-	if STATUS_ICONS[status] then
-		return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
-	end
 end
 
 ---Determines whether the status column should be shown or not
