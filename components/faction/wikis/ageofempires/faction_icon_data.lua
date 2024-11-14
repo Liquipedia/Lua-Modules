@@ -65,8 +65,14 @@ local byFactionAoE1 = {
 }
 
 local byFactionAoE2 = {
+	achaemenids = {
+		icon = 'File:Achaemenids AoE2 icon.png'
+	},
 	armenians = {
 		icon = 'File:Armenians AoE2 icon.png'
+	},
+	athenians = {
+		icon = 'File:Athenians AoE2 icon.png'
 	},
 	aztecs = {
 		icon = 'File:Aztecs AoE2 icon.png'
@@ -187,6 +193,9 @@ local byFactionAoE2 = {
 	},
 	spanish = {
 		icon = 'File:Spanish AoE2 icon.png'
+	},
+	spartans = {
+		icon = 'File:Spartans AoE2 icon.png'
 	},
 	tatars = {
 		icon = 'File:Tatars AoE2 icon.png'
