@@ -216,7 +216,10 @@ end
 function DisplayHelper.DefaultGameSummaryContainer(props)
 	local GameSummaryModule = Lua.import('Module:GameSummary')
 
-	assert(GameSummaryModule.getGameByMatchId, 'Expected GameSummary.getGameByMatchId to be a function')
+	assert(
+		type(GameSummaryModule.getGameByMatchId) == 'function',
+		'Expected GameSummary.getGameByMatchId to be a function'
+	)
 
 	return GameSummaryModule.getGameByMatchId(props)
 end

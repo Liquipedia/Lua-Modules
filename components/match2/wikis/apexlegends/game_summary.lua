@@ -237,17 +237,20 @@ end
 function CustomGameSummary._opponents(match)
 	-- Add match opponent data to game opponent and the other way around
 	Array.forEach(match.games, function (game)
-		game.extradata.opponents = Array.map(game.extradata.opponents, function (opponent, opponentIdx)
-			local opp = Table.merge(match.opponents[opponentIdx], opponent)
-			-- These values are only allowed to come from Game and not Match
-			opp.placement = opponent.placement
-			opp.score = opponent.score
-			opp.status = opponent.status
-			return opp
-		end)
+		game.extradata.opponents = Array.map(game.extradata.opponents,
+			function(gameOpponent, opponentIdx)
+				local matchOpponent = match.opponents[opponentIdx]
+				local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
+				-- These values are only allowed to come from Game and not Match
+				newGameOpponent.placement = gameOpponent.placement
+				newGameOpponent.score = gameOpponent.score
+				newGameOpponent.status = gameOpponent.status
+				return newGameOpponent
+			end
+		)
 	end)
 	Array.forEach(match.opponents, function (opponent, idx)
-		opponent.games = Array.map(match.games, function (game)
+		opponent.games = Array.map(match.games, function(game)
 			return game.extradata.opponents[idx]
 		end)
 	end)
