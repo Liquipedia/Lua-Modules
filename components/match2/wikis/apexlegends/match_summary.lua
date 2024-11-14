@@ -22,12 +22,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games ApexMatchGroupUtilGame[]
 
-local PHASE_ICONS = {
-	finished = {iconName = 'concluded', color = 'icon--green'},
-	ongoing = {iconName = 'live', color = 'icon--red'},
-	upcoming = {iconName = 'upcomingandongoing'},
-}
-
 local PLACEMENT_BG = {
 	'cell--gold',
 	'cell--silver',
