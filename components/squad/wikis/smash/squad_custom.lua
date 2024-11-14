@@ -48,6 +48,7 @@ function CustomSquad.run(frame)
 	local props = {
 		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
 	}
 
 	local tableGame = args.game
@@ -60,7 +61,7 @@ function CustomSquad.run(frame)
 		person.flag = Variables.varDefault('nationality') or person.flag
 		person.name = Variables.varDefault('name') or person.name
 
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = props.status}))
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = props.status, type = props.type}))
 		squadPerson.extradata.game = game
 		squadPerson.extradata.mains = mains
 		SquadUtils.storeSquadPerson(squadPerson)

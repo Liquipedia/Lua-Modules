@@ -45,13 +45,14 @@ function CustomSquad.run(frame)
 	local props = {
 		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
 	local showNumber = Array.any(players, Operator.property('number'))
 
 	props.children = Array.map(players, function(player)
-		return CustomSquad._playerRow(player, props.status, showNumber)
+		return CustomSquad._playerRow(player, props.status, props.type, showNumber)
 	end)
 
 	local root = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {Squad(props)}}
@@ -69,19 +70,21 @@ function CustomSquad.run(frame)
 end
 
 ---@param playerList table[]
----@param squadStatus integer
+---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@param customTitle string?
 ---@return Widget
-function CustomSquad.runAuto(playerList, squadStatus, customTitle)
-	return SquadUtils.defaultRunAuto(playerList, squadStatus, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(playerList, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
 ---@param person table
----@param squadStatus integer
+---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@param showNumber boolean
 ---@return Widget
-function CustomSquad._playerRow(person, squadStatus, showNumber)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
+function CustomSquad._playerRow(person, squadStatus, squadType, showNumber)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.number = person.number
 	SquadUtils.storeSquadPerson(squadPerson)
 

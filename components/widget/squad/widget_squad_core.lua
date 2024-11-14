@@ -24,11 +24,24 @@ local DataTable, Tr, Th = Widgets.DataTable, Widgets.Tr, Widgets.Th
 local Squad = Class.new(Widget)
 Squad.defaultProps = {
 	status = SquadUtils.SquadStatus.ACTIVE,
+	type = SquadUtils.SquadType.PLAYER,
+}
+
+local SquadStatusToDisplay = {
+	[SquadUtils.SquadStatus.ACTIVE] = '',
+	[SquadUtils.SquadStatus.INACTIVE] = 'Inactive',
+	[SquadUtils.SquadStatus.FORMER] = 'Former',
+	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'Former',
+}
+
+local SquadTypeToDisplay = {
+	[SquadUtils.SquadType.PLAYER] = 'Players',
+	[SquadUtils.SquadType.STAFF] = 'Organization',
 }
 
 ---@return WidgetDataTable
 function Squad:render()
-	local title = self:_title(self.props.status, self.props.title)
+	local title = self:_title(self.props.status, self.props.title, self.props.type)
 	local header = self:_header(self.props.status)
 
 	local allChildren = WidgetUtil.collect(title, header, unpack(self.props.children))
@@ -40,15 +53,20 @@ function Squad:render()
 	}
 end
 
----@param status SquadStatus
+---@param squadStatus SquadStatus
 ---@param title string?
+---@param squadType SquadType
 ---@return Widget?
-function Squad:_title(status, title)
+function Squad:_title(squadStatus, title, squadType)
 	local defaultTitle
-	if status == SquadUtils.SquadStatus.FORMER or status == SquadUtils.SquadStatus.FORMER_INACTIVE then
+	-- TODO: Work away this special case
+	if squadType == SquadUtils.SquadType.PLAYER and
+		(squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE) then
+
 		defaultTitle = 'Former Squad'
-	elseif status == SquadUtils.SquadStatus.INACTIVE then
-		defaultTitle = 'Inactive Players'
+	-- No default title for Active tables
+	elseif squadStatus ~= SquadUtils.SquadStatus.ACTIVE then
+		defaultTitle = SquadStatusToDisplay[squadStatus]  .. ' ' .. SquadTypeToDisplay[squadType]
 	end
 
 	local titleText = Logic.emptyOr(title, defaultTitle)

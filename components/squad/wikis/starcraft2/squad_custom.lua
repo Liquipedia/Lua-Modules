@@ -24,13 +24,15 @@ function CustomSquad.run(frame)
 end
 
 ---@param playerList table[]
----@param squadStatus integer
+---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@param customTitle string?
 ---@return Widget
-function CustomSquad.runAuto(playerList, squadStatus, customTitle)
+function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
 	return SquadUtils.defaultRunAuto(
 		playerList,
 		squadStatus,
+		squadType,
 		Squad,
 		CustomSquad._playerRow,
 		customTitle,
@@ -47,10 +49,11 @@ function CustomSquad.personMapper(person)
 end
 
 ---@param person table
----@param squadStatus integer
+---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@return Widget
-function CustomSquad._playerRow(person, squadStatus)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
+function CustomSquad._playerRow(person, squadStatus, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())
 
 	if squadStatus == SquadUtils.SquadStatus.ACTIVE then
