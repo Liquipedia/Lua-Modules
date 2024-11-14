@@ -194,8 +194,10 @@ liquipedia.battleRoyale = {
 	},
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
+		console.log('handlePanelTabChange', instanceId, contentId, panelTab);
 		const tabs = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ contentId ];
 		tabs.forEach( ( item ) => {
+			console.log('handlePanelTabChange', item)
 			if ( item === panelTab ) {
 				// activate content tab
 				item.classList.add( 'is--active' );
@@ -204,16 +206,16 @@ liquipedia.battleRoyale = {
 				item.classList.remove( 'is--active' );
 			}
 		} );
-		const contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
-		Object.keys( contents ).forEach( ( panelId ) => {
-			if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId ) {
-				// activate content tab panel
-				contents[ panelId ].classList.remove( 'is--hidden' );
-			} else {
-				// deactivate content tab panel
-				contents[ panelId ].classList.add( 'is--hidden' );
-			}
-		} );
+		// const contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
+		// Object.keys( contents ).forEach( ( panelId ) => {
+		// 	if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId ) {
+		// 		// activate content tab panel
+		// 		contents[ panelId ].classList.remove( 'is--hidden' );
+		// 	} else {
+		// 		// deactivate content tab panel
+		// 		contents[ panelId ].classList.add( 'is--hidden' );
+		// 	}
+		// } );
 
 		this.recheckNavigationStates( instanceId );
 	},
@@ -244,11 +246,11 @@ liquipedia.battleRoyale = {
 					content.querySelector( '#' + node.dataset.jsBattleRoyaleContentTargetId );
 
 				// Query all collapsible elements and push it to the array
-				const collapsibleElements = this.battleRoyaleMap[ id ]
-					.navigationContentPanelTabContents[ brContentId ][ node.dataset.jsBattleRoyaleContentTargetId ]
-					.querySelectorAll( '[data-js-battle-royale="collapsible"]' );
-
-				this.battleRoyaleMap[ id ].collapsibles.push( ...collapsibleElements );
+				// const collapsibleElements = this.battleRoyaleMap[ id ]
+				// 	.navigationContentPanelTabContents[ brContentId ][ node.dataset.jsBattleRoyaleContentTargetId ]
+				// 	.querySelectorAll( '[data-js-battle-royale="collapsible"]' );
+				//
+				// this.battleRoyaleMap[ id ].collapsibles.push( ...collapsibleElements );
 			} );
 		} );
 	},
@@ -263,6 +265,7 @@ liquipedia.battleRoyale = {
 		Object.keys( this.battleRoyaleMap[ id ].navigationContentPanelTabs ).forEach( ( contentId ) => {
 			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ contentId ].forEach( ( panelTab ) => {
 				panelTab.addEventListener( 'click', () => {
+					console.log('click paneltab', panelTab)
 					this.handlePanelTabChange( id, contentId, panelTab );
 				} );
 			} );
@@ -501,17 +504,20 @@ liquipedia.battleRoyale = {
 			}
 			this.handleNavigationTabChange( instanceId, this.battleRoyaleMap[ instanceId ].navigationTabs[ firstTab ] );
 			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
+				// get match id
+				const matchId = navTab.dataset.jsBattleRoyaleMatchid;
+				console.log('match id', matchId);
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
 
-				if ( target && Array.isArray( panels ) && panels.length ) {
+				if ( matchId && target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
 					this.handlePanelTabChange( instanceId, target, panels[ 0 ] );
 				}
 
-				panels.forEach( ( panel, index ) => {
-					this.createBottomNav( instanceId, target, index );
-				} );
+				// panels.forEach( ( panel, index ) => {
+				// 	this.createBottomNav( instanceId, target, index );
+				// } );
 			} );
 
 			if ( !this.isMobile() ) {
