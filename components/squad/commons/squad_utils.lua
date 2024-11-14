@@ -208,7 +208,7 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	end
 
 	props.children = Array.map(players, function(player)
-		return rowCreator(player, props.status)
+		return rowCreator(player, props.status, props.type)
 	end)
 
 	if Info.config.squads.hasPosition then
@@ -234,7 +234,7 @@ function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget,
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	props.children = Array.map(mappedPlayers, function(player)
-		return rowCreator(player, props.status)
+		return rowCreator(player, props.status, props.type)
 	end)
 
 	if Info.config.squads.hasPosition then
