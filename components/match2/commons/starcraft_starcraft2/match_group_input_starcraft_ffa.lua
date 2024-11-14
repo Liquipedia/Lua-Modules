@@ -35,7 +35,7 @@ local MapFunctions = {}
 ---@param options table?
 ---@return table
 function StarcraftFfaMatchGroupInput.processMatch(match, options)
-	Table.mergeInto(match, BaseMatchFunctions.readDate(match.date))
+	Table.mergeInto(match, BaseMatchFunctions.readDate(match))
 
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.stream = Streams.processStreams(match)
@@ -169,7 +169,7 @@ function MatchFunctions.extractMaps(match, opponents)
 		local map = MapFunctions.readMap(mapInput, #opponents, hasScores)
 
 		Array.forEach(map.opponents, function(opponent, opponentIndex)
-			opponent.players = BaseMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+			opponent.players = BaseMapFunctions.getPlayersOfMapOpponent(map, opponents[opponentIndex], opponentIndex)
 		end)
 
 		map.mode = BaseMapFunctions.getMapMode(match, map, opponents)
