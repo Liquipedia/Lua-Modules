@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -73,8 +72,6 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	-- line below can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.pokemonpremier)
 	self.data.mode = self:_getGameMode()
 end
 

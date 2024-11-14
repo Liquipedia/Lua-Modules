@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
 local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
@@ -39,13 +38,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 
 	BasicHiddenDataBox.checkAndAssign('patch', args.patch, queryResult.patch)
-
-	-- can be kicked after conversion
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		Logic.readBool(args.highlighted or args.riotpremier) and '1' or nil,
-		queryResult.publishertier
-	)
 end
 
 return Class.export(CustomHiddenDataBox)

@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -59,12 +58,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	-- this entire function can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.riotpremier)
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	if args.team_number or (not String.isEmpty(args.team1)) then
 		Variables.varDefine('is_team_tournament', 1)
@@ -72,8 +65,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-	-- riotpremier only for conversion reasons
-	Variables.varDefine('tournament_riot_premier', args.highlighted or args.riotpremier)
 end
 
 ---@return string?

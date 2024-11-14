@@ -96,8 +96,7 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.game = self:_determineGame(args.game)
 	self.data.status = self:_getStatus(args)
-	local publishertierInput = args.publishertier or args.eslprotier
-	self.data.publishertier = ESL_TIERS[(publishertierInput or ''):lower()] and publishertierInput:lower() or nil
+	self.data.publishertier = ESL_TIERS[(args.publishertier or ''):lower()] and args.publishertier:lower() or nil
 	self.data.raceBreakDown = RaceBreakdown.run(args, BREAKDOWN_RACES) or {}
 	self.data.maps = self:_getMaps('map', args)
 	self.data.number = tonumber(args.number)

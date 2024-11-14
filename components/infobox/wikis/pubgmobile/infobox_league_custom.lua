@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -94,12 +93,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 
 	return lpdbData
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	-- this entire function can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.pubgpremier)
 end
 
 ---@param args table

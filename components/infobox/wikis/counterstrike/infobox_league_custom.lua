@@ -125,7 +125,7 @@ function CustomLeague.run(frame)
 	league.args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 	league.gameData = Game.raw{game = league.args.game, useDefault = false}
 	--valvetier will get removed after bot conversion
-	league.valveTier = VALVE_TIERS[(league.args.publishertier or league.args.valvetier or ''):lower()]
+	league.valveTier = VALVE_TIERS[(league.args.publishertier or ''):lower()]
 
 	return league:createInfobox()
 end

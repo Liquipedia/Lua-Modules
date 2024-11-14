@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -45,12 +44,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	-- this entire function can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.epicpremier)
 end
 
 ---@param args table

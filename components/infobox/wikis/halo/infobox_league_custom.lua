@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local MapModes = require('Module:MapModes')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -102,8 +101,6 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = args.player_number and 'solo' or self.data.mode
-	-- line below can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args['hcs-sponsored'])
 end
 
 ---@param args table

@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -56,7 +55,7 @@ end
 ---@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	return String.isNotEmpty(self.data.publishertier) and (' ' .. RIOT_ICON) or ''
+	return self.data.publishertier and (' ' .. RIOT_ICON) or ''
 end
 
 ---@param lpdbData table
@@ -66,12 +65,6 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.participants_number) or
 			String.isNotEmpty(args.individual) and 'true' or ''
 	return lpdbData
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	-- line below can be kicked after conversion bot runs
-	self.data.publishertier = Logic.readBool(args.highlighted or args.riotpremier)
 end
 
 ---@param args table
