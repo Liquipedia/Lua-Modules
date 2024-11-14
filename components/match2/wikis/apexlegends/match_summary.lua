@@ -429,6 +429,14 @@ function CustomMatchSummary._createMatchStandings(match)
 	return wrapper
 end
 
+---@param status string?
+---@return string?
+function CustomMatchSummary._getStatusIcon(status)
+	if STATUS_ICONS[status] then
+		return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
+	end
+end
+
 ---Determines whether the status column should be shown or not
 ---@param match table
 ---@return boolean
