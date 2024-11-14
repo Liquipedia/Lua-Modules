@@ -62,7 +62,7 @@ function WikiCopyPaste._getMapCode(mapIndex, bans, vod)
 		INDENT .. INDENT .. '|t2h1= |t2h2= |t2h3= |t2h4= |t2h5=',
 		bans and (INDENT .. INDENT .. '<!-- Hero bans -->') or nil,
 		bans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
-		bans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
+		bans and (INDENT .. INDENT .. '|t2b1= |t2b2= |t2b3= |t2b4= |t2b5=') or nil,
 		INDENT .. '}}'
 	), '\n')
 end
