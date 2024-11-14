@@ -25,27 +25,27 @@ local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = {}
 
----@enum SquadType
-SquadUtils.SquadType = {
+---@enum SquadStatus
+SquadUtils.SquadStatus = {
 	ACTIVE = 0,
 	INACTIVE = 1,
 	FORMER = 2,
 	FORMER_INACTIVE = 3,
 }
 
----@type {string: SquadType}
-SquadUtils.StatusToSquadType = {
-	active = SquadUtils.SquadType.ACTIVE,
-	inactive = SquadUtils.SquadType.INACTIVE,
-	former = SquadUtils.SquadType.FORMER,
+---@type {string: SquadStatus}
+SquadUtils.StatusToSquadStatus = {
+	active = SquadUtils.SquadStatus.ACTIVE,
+	inactive = SquadUtils.SquadStatus.INACTIVE,
+	former = SquadUtils.SquadStatus.FORMER,
 }
 
----@type {SquadType: string}
-SquadUtils.SquadTypeToStorageValue = {
-	[SquadUtils.SquadType.ACTIVE] = 'active',
-	[SquadUtils.SquadType.INACTIVE] = 'inactive',
-	[SquadUtils.SquadType.FORMER] = 'former',
-	[SquadUtils.SquadType.FORMER_INACTIVE] = 'former',
+---@type {SquadStatus: string}
+SquadUtils.SquadStatusToStorageValue = {
+	[SquadUtils.SquadStatus.ACTIVE] = 'active',
+	[SquadUtils.SquadStatus.INACTIVE] = 'inactive',
+	[SquadUtils.SquadStatus.FORMER] = 'former',
+	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'former',
 }
 
 SquadUtils.specialTeamsTemplateMapping = {
@@ -60,12 +60,12 @@ SquadUtils.validPersonTypes = {'player', 'staff'}
 SquadUtils.defaultPersonType = 'player'
 
 ---@param status string?
----@return SquadType?
-function SquadUtils.statusToSquadType(status)
+---@return SquadStatus?
+function SquadUtils.statusToSquadStatus(status)
 	if not status then
 		return
 	end
-	return SquadUtils.StatusToSquadType[status:lower()]
+	return SquadUtils.StatusToSquadStatus[status:lower()]
 end
 
 ---@param args table
@@ -139,7 +139,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		leavedate = ReferenceCleaner.clean(args.leavedate),
 		inactivedate = ReferenceCleaner.clean(args.inactivedate),
 
-		status = SquadUtils.SquadTypeToStorageValue[args.type],
+		status = SquadUtils.SquadStatusToStorageValue[args.status],
 
 		extradata = {
 			loanedto = args.team,
@@ -177,22 +177,22 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadType: integer):Widget
+---@param rowCreator fun(player: table, squadStatus: integer):Widget
 ---@return Widget
 function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
 	local props = {
-		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
-	if props.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
-		props.type = SquadUtils.SquadType.FORMER_INACTIVE
+	if props.status == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+		props.status = SquadUtils.SquadStatus.FORMER_INACTIVE
 	end
 
 	props.children = Array.map(players, function(player)
-		return rowCreator(player, props.type)
+		return rowCreator(player, props.status)
 	end)
 
 	if Info.config.squads.hasPosition then
@@ -202,21 +202,21 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 end
 
 ---@param players table[]
----@param squadType SquadType
+---@param squadStatus SquadStatus
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadType: integer):Widget
+---@param rowCreator fun(person: table, squadStatus: integer):Widget
 ---@param customTitle string?
 ---@param personMapper? fun(person: table): table
 ---@return Widget
-function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, personMapper)
+function SquadUtils.defaultRunAuto(players, squadStatus, squadWidget, rowCreator, customTitle, personMapper)
 	local props = {
-		type = squadType,
+		status = squadStatus,
 		title = customTitle
 	}
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	props.children = Array.map(mappedPlayers, function(player)
-		return rowCreator(player, props.type)
+		return rowCreator(player, props.status)
 	end)
 
 	if Info.config.squads.hasPosition then
@@ -226,10 +226,10 @@ function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, 
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadType: integer):Widget
+---@return fun(person: table, squadStatus: integer):Widget
 function SquadUtils.defaultRow(squadRowClass)
-	return function(person, squadType)
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	return function(person, squadStatus)
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
 		SquadUtils.storeSquadPerson(squadPerson)
 		local row = squadRowClass(squadPerson)
 
@@ -241,11 +241,11 @@ function SquadUtils.defaultRow(squadRowClass)
 		end
 		row:date('joindate', 'Join Date:&nbsp;')
 
-		if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
 
-		if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('leavedate', 'Leave Date:&nbsp;')
 			row:newteam()
 		end

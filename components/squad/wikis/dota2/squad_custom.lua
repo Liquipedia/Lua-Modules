@@ -59,8 +59,8 @@ function CustomSquad.run(frame)
 	}
 end
 
-function CustomSquad._playerRow(person, squadType)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+function CustomSquad._playerRow(person, squadStatus)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
 	squadPerson.extradata.activeteam = person.activeteam
 	squadPerson.extradata.activeteamrole = person.activeteamrole
 	SquadUtils.storeSquadPerson(squadPerson)
@@ -71,11 +71,11 @@ function CustomSquad._playerRow(person, squadType)
 	row:position()
 	row:date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		row:date('inactivedate', 'Inactive Date:&nbsp;')
 		row:activeteam()
 	end
-	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		row:date('leavedate', 'Leave Date:&nbsp;')
 		row:newteam()
 	end
