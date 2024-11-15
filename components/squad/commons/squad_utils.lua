@@ -132,11 +132,11 @@ function SquadUtils.readSquadPersonArgs(args)
 		return mw.ext.TeamTemplate.raw(page)[property]
 	end
 
-	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
+	local id, name = String.nilIFEmpty(args.id), String.nilIfEmpty(args.name)
 	local person = Lpdb.SquadPlayer:new{
-		id = id,
+		id = id or name,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
-		name = String.nilIfEmpty(args.name),
+		name = name,
 		nationality = Flags.CountryName(args.flag),
 
 		position = String.nilIfEmpty(args.position),
