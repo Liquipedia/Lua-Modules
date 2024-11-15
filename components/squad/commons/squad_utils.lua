@@ -133,9 +133,10 @@ function SquadUtils.readSquadPersonArgs(args)
 	end
 
 	local id, name = String.nilIfEmpty(args.id), String.nilIfEmpty(args.name)
+	local linkInput = args.link or id
 	local person = Lpdb.SquadPlayer:new{
 		id = id or name,
-		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
+		link = linkInput and mw.ext.TeamLiquidIntegration.resolve_redirect(linkInput) or nil,
 		name = name,
 		nationality = Flags.CountryName(args.flag),
 
