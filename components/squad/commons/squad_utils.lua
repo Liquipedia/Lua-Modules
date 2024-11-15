@@ -48,16 +48,30 @@ SquadUtils.SquadStatusToStorageValue = {
 	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'former',
 }
 
+---@enum SquadType
+SquadUtils.SquadType = {
+	PLAYER = 0,
+	STAFF = 1,
+}
+
+---@type {string: SquadType}
+SquadUtils.TypeToSquadType = {
+	player = SquadUtils.SquadType.PLAYER,
+	staff = SquadUtils.SquadType.STAFF,
+}
+
+---@type {SquadType: string}
+SquadUtils.SquadTypeToStorageValue = {
+	[SquadUtils.SquadType.PLAYER] = 'player',
+	[SquadUtils.SquadType.STAFF] = 'staff',
+}
+
 SquadUtils.specialTeamsTemplateMapping = {
 	retired = 'Team/retired',
 	inactive = 'Team/inactive',
 	['passed away'] = 'Team/passed away',
 	military = 'Team/military',
 }
-
--- TODO: Decided on all valid types
-SquadUtils.validPersonTypes = {'player', 'staff'}
-SquadUtils.defaultPersonType = 'player'
 
 ---@param status string?
 ---@return SquadStatus?
@@ -140,6 +154,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		inactivedate = ReferenceCleaner.clean(args.inactivedate),
 
 		status = SquadUtils.SquadStatusToStorageValue[args.status],
+		type = SquadUtils.SquadTypeToStorageValue[args.type],
 
 		extradata = {
 			loanedto = args.team,
@@ -177,13 +192,14 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadStatus: integer):Widget
+---@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType):Widget
 ---@return Widget
 function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
 	local props = {
 		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
@@ -192,7 +208,7 @@ function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	end
 
 	props.children = Array.map(players, function(player)
-		return rowCreator(player, props.status)
+		return rowCreator(player, props.status, props.type)
 	end)
 
 	if Info.config.squads.hasPosition then
@@ -203,20 +219,22 @@ end
 
 ---@param players table[]
 ---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadStatus: integer):Widget
+---@param rowCreator fun(person: table, squadStatus: SquadStatus, squadType: SquadType):Widget
 ---@param customTitle string?
 ---@param personMapper? fun(person: table): table
 ---@return Widget
-function SquadUtils.defaultRunAuto(players, squadStatus, squadWidget, rowCreator, customTitle, personMapper)
+function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget, rowCreator, customTitle, personMapper)
 	local props = {
 		status = squadStatus,
-		title = customTitle
+		title = customTitle,
+		type = squadType,
 	}
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	props.children = Array.map(mappedPlayers, function(player)
-		return rowCreator(player, props.status)
+		return rowCreator(player, props.status, props.type)
 	end)
 
 	if Info.config.squads.hasPosition then
@@ -226,10 +244,10 @@ function SquadUtils.defaultRunAuto(players, squadStatus, squadWidget, rowCreator
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadStatus: integer):Widget
+---@return fun(person: table, squadStatus: SquadStatus, squadType: SquadType):Widget
 function SquadUtils.defaultRow(squadRowClass)
-	return function(person, squadStatus)
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
+	return function(person, squadStatus, squadType)
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 		SquadUtils.storeSquadPerson(squadPerson)
 		local row = squadRowClass(squadPerson)
 

@@ -18,7 +18,7 @@ local SquadTldb = Class.new(SquadWidget)
 
 ---@param status SquadStatus
 ---@return Widget
-function SquadTldb:header(status)
+function SquadTldb:_header(status)
 	return Widgets.Tr{
 		classes = {'HeaderRow'},
 		cells = {
@@ -31,10 +31,11 @@ function SquadTldb:header(status)
 	}
 end
 
----@param status SquadStatus
+---@param squadStatus SquadStatus
 ---@param title string?
+---@param squadType SquadType
 ---@return Widget?
-function SquadTldb:_title(status, title)
+function SquadTldb:_title(squadStatus, title, squadType)
 	return nil
 end
 

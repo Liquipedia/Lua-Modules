@@ -44,7 +44,7 @@ function CustomSquad.run(frame)
 	local tlpd = Logic.readBool(args.tlpd)
 	local SquadClass = tlpd and SquadTldb or Squad
 
-	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadStatus)
+	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadStatus, squadType)
 		local inputId = person.id --[[@as number]]
 		person.race = CustomSquad._queryTLPD(inputId, 'race') or person.race
 		person.id = CustomSquad._queryTLPD(inputId, 'name') or person.id
@@ -53,7 +53,7 @@ function CustomSquad.run(frame)
 		person.name = (CustomSquad._queryTLPD(inputId, 'name_korean') or '') .. ' ' ..
 			(CustomSquad._queryTLPD(inputId, 'name_romanized') or person.name or '')
 
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 		squadPerson.extradata.eloCurrent = CustomSquad._queryTLPD(inputId, 'elo')
 		squadPerson.extradata.eloPeak = CustomSquad._queryTLPD(inputId, 'peak_elo')
 		SquadUtils.storeSquadPerson(squadPerson)

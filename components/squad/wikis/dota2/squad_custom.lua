@@ -59,8 +59,8 @@ function CustomSquad.run(frame)
 	}
 end
 
-function CustomSquad._playerRow(person, squadStatus)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus}))
+function CustomSquad._playerRow(person, squadStatus, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.activeteam = person.activeteam
 	squadPerson.extradata.activeteamrole = person.activeteamrole
 	SquadUtils.storeSquadPerson(squadPerson)
