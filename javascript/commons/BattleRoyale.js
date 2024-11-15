@@ -251,7 +251,7 @@ liquipedia.battleRoyale = {
 				if ( data.parse?.text?.[ '*' ] ) {
 					console.log('data parse', data.parse.text);
 					// append the content to the panel
-					element.appendChild(data.parse.text[ '*' ]);
+					element.append(data.parse.text[ '*' ]);
 				}
 			} );
 		} );
