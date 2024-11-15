@@ -56,8 +56,8 @@ SquadUtils.SquadType = {
 
 ---@type {string: SquadType}
 SquadUtils.TypeToSquadType = {
-	active = SquadUtils.SquadType.PLAYER,
-	inactive = SquadUtils.SquadType.STAFF,
+	player = SquadUtils.SquadType.PLAYER,
+	staff = SquadUtils.SquadType.STAFF,
 }
 
 ---@type {SquadType: string}
