@@ -132,7 +132,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		return mw.ext.TeamTemplate.raw(page)[property]
 	end
 
-	local id, name = String.nilIFEmpty(args.id), String.nilIfEmpty(args.name)
+	local id, name = String.nilIfEmpty(args.id), String.nilIfEmpty(args.name)
 	local person = Lpdb.SquadPlayer:new{
 		id = id or name,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
