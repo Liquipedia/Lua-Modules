@@ -194,7 +194,6 @@ liquipedia.battleRoyale = {
 	},
 
 	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
-
 		// Get the matchid from the navigationTab
 		const navigationTab = this.battleRoyaleMap[ instanceId ].navigationTabs.find( tab => tab.dataset.targetId === contentId );
 		const dataTargetId = navigationTab.dataset.targetId;
@@ -234,8 +233,7 @@ liquipedia.battleRoyale = {
 	callTemplate: function( id, matchId, gameId, dataTargetId ) {
 		console.log('call template', id, matchId, gameId, dataTargetId);
 		const wikitext = `{{TemplateName|id=${id}|matchid=${matchId}|gameid=${gameId}}}`;
-		const element = document.querySelector( `[data-js-battle-royale-content-id="navigationContent${dataTargetId}"]` );
-		console.log('element', element);
+		const element = document.querySelector( `[data-js-battle-royale-content-id="${dataTargetId}"]` );
 
 		mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
 			const api = new mw.Api();
@@ -253,7 +251,7 @@ liquipedia.battleRoyale = {
 				if ( data.parse?.text?.[ '*' ] ) {
 					console.log('data parse', data.parse.text);
 					// append the content to the panel
-					element.append(data.parse.text[ '*' ]);
+					element.appendChild(data.parse.text[ '*' ]);
 				}
 			} );
 		} );
