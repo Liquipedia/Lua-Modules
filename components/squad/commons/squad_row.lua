@@ -43,7 +43,6 @@ function SquadRow:id()
 			link = self.model.link,
 			faction = self.model.extradata.faction,
 			type = Opponent.solo,
-			showLink = self.model.link and true or false,
 		},
 		nil, {syncPlayer = true}
 	)
