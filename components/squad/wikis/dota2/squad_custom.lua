@@ -65,7 +65,14 @@ end
 ---@param customTitle string?
 ---@return Widget
 function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
-	return SquadUtils.defaultRunAuto(playerList, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+	return SquadUtils.defaultRunAuto(
+		playerList,
+		squadStatus,
+		squadType,
+		Squad,
+		SquadUtils.defaultRow(SquadRow),
+		customTitle
+	)
 end
 
 function CustomSquad._playerRow(person, squadStatus, squadType)
