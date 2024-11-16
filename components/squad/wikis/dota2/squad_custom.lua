@@ -59,6 +59,15 @@ function CustomSquad.run(frame)
 	}
 end
 
+---@param playerList table[]
+---@param squadStatus integer
+---@param squadType SquadType
+---@param customTitle string?
+---@return Widget
+function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(playerList, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+end
+
 function CustomSquad._playerRow(person, squadStatus, squadType)
 	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.activeteam = person.activeteam
