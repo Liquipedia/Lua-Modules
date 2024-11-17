@@ -236,7 +236,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 			MatchSummaryWidgets.GameCenter{children = {
 				DisplayHelper.Map(game),
 				Logic.readBool(extradata.ot) and ' - OT' or nil,
-				Logic.isNotEmpty(extradata.otlength) and '(' .. extradata.otlength .. ')' or nil
+				Logic.isNotEmpty(extradata.otlength) and ' (' .. extradata.otlength .. ')' or nil
 			}},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			CustomMatchSummary._timeoutDisplay(extradata.timeout),
