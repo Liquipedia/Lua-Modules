@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -99,16 +100,21 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 
 				return {name = character}
 			end)
-			return {
+			local participant = {
 				characters = characters,
 				player = playerIdData.name,
 			}
+			return Logic.isNotDeepEmpty(participant) and participant or nil
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
+
+	-- fill up participants with empty data to avoid errors
+	Array.forEach(opponent.match2players, function(_, playerIndex)
+		participants[playerIndex] = participants[playerIndex] or {characters = {}}
 	end)
-	return participants
+
+	-- append actually unattached participants
+	return Array.extendWith(participants, unattachedParticipants)
 end
 
 ---@param map table
