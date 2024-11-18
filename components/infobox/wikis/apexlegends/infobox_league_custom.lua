@@ -28,13 +28,6 @@ local GAME_MODE = mw.loadData('Module:GameMode')
 local EA_ICON = '&nbsp;[[File:EA icon.png|x15px|middle|link=Electronic Arts|'
 	.. 'Tournament sponsored by Electronirc Arts & Respawn.]]'
 
-local EA_TIERS = {
-	major = '[[Major]]',
-	premier = '[[Premier]]',
-	challenger = '[[Challenger]]',
-	online = '[[Online]]',
-}
-
 ---@class ApexlegendsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
@@ -75,11 +68,6 @@ function CustomInjector:parse(id, widgets)
 				classes = {'tournament-highlighted-bg'}
 			})
 		end
-		table.insert(widgets, Cell{
-			name = 'EA tier',
-			content = {EA_TIERS[string.lower(args.eatier or '')]},
-			classes = {'tournament-highlighted-bg'}
-		})
 	elseif id == 'customcontent' then
 		--maps
 		if String.isNotEmpty(args.map1) then
@@ -130,13 +118,12 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.isIndividual = String.isNotEmpty(args.player_number) and 'true' or ''
 
-	local eaTier = string.lower(args.eatier or '')
 	local algsTier = string.lower(args.algstier or '')
-	self.data.publishertier = Logic.emptyOr(
-		args.eaMajor,
-		eaTier ~= 'online' and eaTier or nil,
-		algsTier ~= 'online' and algsTier or ''
-	)
+	self.data.publishertier = Logic.readBool(args.highlighted) or Logic.nilIfEmpty(args.publishertier)
+		or Logic.emptyOr(args.eaMajor, algsTier ~= 'online' and algsTier or '')
+	--[[after cleanup bot runs:
+	self.data.publishertier = Logic.readBool(args.highlighted) or Logic.nilIfEmpty(args.publishertier)
+	]]
 end
 
 ---@param args table
@@ -230,7 +217,7 @@ function CustomLeague:getWikiCategories(args)
 	if String.isNotEmpty(args.participants_number) then
 		table.insert(categories, 'Individual Tournaments')
 	end
-	if String.isNotEmpty(args.eatier) or args['ea-sponsored'] == 'true' then
+	if args['ea-sponsored'] == 'true' then
 		table.insert(categories, 'Electronic Arts Tournaments')
 	end
 	return categories
