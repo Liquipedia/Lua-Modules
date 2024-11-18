@@ -120,7 +120,7 @@ function CustomLeague:customParseArguments(args)
 
 	local publisherTier = string.lower(args.publishertier or args.algstier or '')
 	self.data.publishertier = Logic.readBool(args.highlighted)
-		or publisherTier ~= 'online' and publisherTier
+		or publisherTier ~= 'online' and Logic.nilIfEmpty(publisherTier)
 end
 
 ---@param args table
