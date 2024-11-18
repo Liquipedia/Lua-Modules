@@ -77,7 +77,8 @@ function CustomLeague:customParseArguments(args)
 	args.mode = args.mode and GAME_MODES[string.lower(args.mode):gsub('s$', '')] or DEFAULT_MODE
 
 	self.data.mode = string.lower(args.mode)
-	self.data.publishertier = Logic.readBool(args['riot-sponsored']) and 'sponsored' or nil
+	self.data.publishertier = Logic.nilIfEmpty(args.publishertier)
+		or Logic.readBool(args['riot-sponsored']) and 'sponsored' or nil
 end
 
 ---@param args table
