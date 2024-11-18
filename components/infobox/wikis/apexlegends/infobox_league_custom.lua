@@ -60,11 +60,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Platform', content = {self.caller:_getPlatform()}}
 		)
 	elseif id == 'liquipediatier' then
-		local algsTier = args.algstier
-		if String.isNotEmpty(algsTier) then
+		local publisherTier = args.publishertier or args.algstier
+		if String.isNotEmpty(publisherTier) then
 			table.insert(widgets, 1, Cell{
 				name = 'ALGS circuit tier',
-				content = {'[[Apex Legends Global Series|' .. algsTier .. ']]'},
+				content = {'[[Apex Legends Global Series|' .. publisherTier .. ']]'},
 				classes = {'tournament-highlighted-bg'}
 			})
 		end
@@ -118,12 +118,9 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.isIndividual = String.isNotEmpty(args.player_number) and 'true' or ''
 
-	local algsTier = string.lower(args.algstier or '')
-	self.data.publishertier = Logic.readBool(args.highlighted) or Logic.nilIfEmpty(args.publishertier)
-		or Logic.emptyOr(args.eaMajor, algsTier ~= 'online' and algsTier or '')
-	--[[after cleanup bot runs:
-	self.data.publishertier = Logic.readBool(args.highlighted) or Logic.nilIfEmpty(args.publishertier)
-	]]
+	local publisherTier = string.lower(args.publishertier or args.algstier or '')
+	self.data.publishertier = Logic.readBool(args.highlighted)
+		or publisherTier ~= 'online' and publisherTier
 end
 
 ---@param args table
@@ -208,7 +205,7 @@ end
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
-	if String.isNotEmpty(args.algstier) then
+	if String.isNotEmpty(args.algstier) or String.isNotEmpty(args.publishertier) then
 		table.insert(categories, 'Apex Legends Global Series Tournaments')
 	end
 	if String.isNotEmpty(args.format) then
