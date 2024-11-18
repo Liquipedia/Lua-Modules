@@ -355,8 +355,8 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
-	toggleCollapse: function( e ) {
-		e.target.closest( '[data-js-battle-royale="collapsible"]' ).classList.toggle( 'is--collapsed' );
+	toggleCollapse: function( element ) {
+		element.target.closest( '[data-js-battle-royale="collapsible"]' ).classList.toggle( 'is--collapsed' );
 	},
 
 	createScrollHintElement: function( dir ) {
