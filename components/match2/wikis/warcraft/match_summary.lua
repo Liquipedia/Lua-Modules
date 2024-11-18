@@ -299,7 +299,7 @@ function CustomMatchSummary.TeamSubMatchGames(submatch)
 
 			return HtmlWidgets.Tr{
 				children = {
-					HtmlWidgets.Th{
+					HtmlWidgets.Td{
 						children = {CustomMatchSummary.Game({hasHeroes = true, isPartOfSubMatch = true}, game)},
 					},
 				},
