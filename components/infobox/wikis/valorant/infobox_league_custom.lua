@@ -44,7 +44,8 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
-	self.data.publishertier = Logic.readBool(args['riot-highlighted']) and 'highlighted'
+	self.data.publishertier = Logic.nilIfEmpty(args.publishertier)
+		or Logic.readBool(args['riot-highlighted']) and 'highlighted'
 		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
 		or nil
 end
