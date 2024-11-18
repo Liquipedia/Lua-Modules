@@ -259,7 +259,7 @@ liquipedia.battleRoyale = {
 		for ( let i = 1; i <= games; i++ ) {
 			wikitext += `{{ShowSingleGame|id=${ id }|matchid=${ matchId }|gameidx=${ i }}}`;
 		}
-		// const wikitext = `{{TemplateName|id=${id}|matchid=${matchId}|gameid=${gameId}}}`;
+
 		const element = document.querySelector( `[data-js-battle-royale-content-id="${ dataTargetId }"]` );
 
 		mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
