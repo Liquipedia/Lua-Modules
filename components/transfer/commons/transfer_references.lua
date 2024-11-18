@@ -230,15 +230,7 @@ function TransferRef.createReference(refData, date)
 				name = referenceKey
 			}
 		}
-	elseif refType == TOURNAMENT_TYPE then
-		return mw.getCurrentFrame():callParserFunction{
-			name = '#tag:ref',
-			args = {
-				TransferRef._getTextAndLink(refData, {linkInsideText = true}),
-				name = referenceKey
-			}
-		}
-	elseif refType == TOURNAMENT_LEAVE_TYPE then
+	elseif refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE then
 		return mw.getCurrentFrame():callParserFunction{
 			name = '#tag:ref',
 			args = {
@@ -278,12 +270,7 @@ function TransferRef.createReferenceIconDisplay(reference)
 			iconName = 'reference',
 			color = 'wiki-color-dark',
 		}, link)
-	elseif refType == TOURNAMENT_TYPE then
-		return Page.makeInternalLink(Abbreviation.make(
-			Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
-			text
-		), link)
-	elseif refType == TOURNAMENT_LEAVE_TYPE then
+	elseif refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE then
 		return Page.makeInternalLink(Abbreviation.make(
 			Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
 			text
