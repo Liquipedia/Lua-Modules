@@ -13,6 +13,7 @@ liquipedia.battleRoyale = {
 	battleRoyaleInstances: {},
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
+	loadedTabs: {},
 
 	isMobile: function() {
 		return window.matchMedia( '(max-width: 767px)' ).matches;
@@ -193,19 +194,39 @@ liquipedia.battleRoyale = {
 		this.recheckNavigationStates( instanceId );
 	},
 
-	handlePanelTabChange: function( instanceId, contentId, panelTab ) {
-		// Get the matchid from the navigationTab
-		const navigationTab = this.battleRoyaleMap[ instanceId ].navigationTabs.find( tab => tab.dataset.targetId === contentId );
+	/**
+	 * @param instanceId as string
+	 * @param contentId as string
+	 * @param panelTab as HTMLElement
+	 * @param loadTemplate
+	 */
+	handlePanelTabChange: function( instanceId, contentId, panelTab, loadTemplate = true ) {
+		const navigationTab = this.battleRoyaleMap[ instanceId ].navigationTabs.find(
+			( tab ) => tab.dataset.targetId === contentId
+		);
 		const dataTargetId = navigationTab.dataset.targetId;
 		const matchId = navigationTab ? navigationTab.dataset.jsBattleRoyaleMatchid : null;
 		const gameId = panelTab.dataset.jsBattleRoyaleGameIdx;
-		console.log('matchId gameId datatargetid', matchId, gameId, navigationTab);
 
-		// Call the template with the parameters
-		if (matchId && gameId) {
-			this.callTemplate( instanceId, matchId, gameId, dataTargetId );
+		if ( loadTemplate && !this.loadedTabs[ instanceId ] ) {
+			this.callTemplate( instanceId, matchId, gameId, dataTargetId, contentId, () => {
+				this.loadedTabs[ instanceId ] = true;
+				this.doTabChange( instanceId, contentId, panelTab );
+				this.makeCollapsibles( instanceId );
+				this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ dataTargetId ].forEach(
+					( panel, index ) => {
+						if ( index !== 0 ) {
+							this.createBottomNav( instanceId, dataTargetId, index );
+						}
+					} );
+			} );
+		} else {
+			this.doTabChange( instanceId, contentId, panelTab );
 		}
 
+	},
+
+	doTabChange: function( instanceId, contentId, panelTab ) {
 		const tabs = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ contentId ];
 		tabs.forEach( ( item ) => {
 			if ( item === panelTab ) {
@@ -216,24 +237,30 @@ liquipedia.battleRoyale = {
 				item.classList.remove( 'is--active' );
 			}
 		} );
-		// const contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
-		// Object.keys( contents ).forEach( ( panelId ) => {
-		// 	if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId ) {
-		// 		// activate content tab panel
-		// 		contents[ panelId ].classList.remove( 'is--hidden' );
-		// 	} else {
-		// 		// deactivate content tab panel
-		// 		contents[ panelId ].classList.add( 'is--hidden' );
-		// 	}
-		// } );
 
+		if ( this.loadedTabs[ instanceId ] ) {
+			const contents = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabContents[ contentId ];
+			Object.keys( contents ).forEach( ( panelId ) => {
+				if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId && panelId ) {
+					// activate content tab panel
+					contents[ panelId ].classList.remove( 'is--hidden' );
+				} else {
+					// deactivate content tab panel
+					contents[ panelId ].classList.add( 'is--hidden' );
+				}
+			} );
+		}
 		this.recheckNavigationStates( instanceId );
 	},
 
-	callTemplate: function( id, matchId, gameId, dataTargetId ) {
-		console.log('call template', id, matchId, gameId, dataTargetId);
-		const wikitext = `{{TemplateName|id=${id}|matchid=${matchId}|gameid=${gameId}}}`;
-		const element = document.querySelector( `[data-js-battle-royale-content-id="${dataTargetId}"]` );
+	callTemplate: function( id, matchId, gameId, dataTargetId, contentId, callback ) {
+		const games = Object.keys( this.battleRoyaleMap[ id ].navigationContentPanelTabContents[ contentId ] ).length;
+		let wikitext = '';
+		for ( let i = 1; i <= games; i++ ) {
+			wikitext += `{{ShowSingleGame|id=${ id }|matchid=${ matchId }|gameidx=${ i }}}`;
+		}
+		// const wikitext = `{{TemplateName|id=${id}|matchid=${matchId}|gameid=${gameId}}}`;
+		const element = document.querySelector( `[data-js-battle-royale-content-id="${ dataTargetId }"]` );
 
 		mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
 			const api = new mw.Api();
@@ -246,15 +273,44 @@ liquipedia.battleRoyale = {
 				disablelimitreport: true,
 				uselang: 'content',
 				prop: 'text',
-				text: wikitext
+				text: wikitext,
+				disabletoc: true
 			} ).done( ( data ) => {
 				if ( data.parse?.text?.[ '*' ] ) {
-					console.log('data parse', data.parse.text);
-					// append the content to the panel
-					element.append(data.parse.text[ '*' ]);
+					element.insertAdjacentHTML( 'beforeend', data.parse.text[ '*' ] );
+					this.buildBattleRoyaleMapNavigationContents( id, document.querySelector(
+						`[data-js-battle-royale-content-id="${ dataTargetId }"]` ), true );
+					if ( callback ) {
+						callback();
+					}
 				}
 			} );
 		} );
+	},
+
+	buildBattleRoyaleMapNavigationContents: function( id, content ) {
+		const navigationContentId = content.dataset.jsBattleRoyaleContentId;
+		this.battleRoyaleMap[ id ].navigationContentPanelTabs[ navigationContentId ] =
+			Array.from( content.querySelectorAll( '[data-js-battle-royale="panel-tab"]' ) );
+		this.battleRoyaleMap[ id ].navigationContentPanelTabs[ navigationContentId ].forEach( ( node ) => {
+
+			if ( !( navigationContentId in this.battleRoyaleMap[ id ].navigationContentPanelTabContents ) ) {
+				this.battleRoyaleMap[ id ].navigationContentPanelTabContents[ navigationContentId ] = {};
+			}
+			const targetId = node.dataset.jsBattleRoyaleContentTargetId;
+			this.battleRoyaleMap[ id ]
+				.navigationContentPanelTabContents[ navigationContentId ][ targetId ] =
+				content.querySelector( '#' + targetId );
+
+			const panel = this.battleRoyaleMap[ id ]
+				.navigationContentPanelTabContents[ navigationContentId ][ targetId ];
+
+			const collapsibleElements = panel ?
+				panel.querySelectorAll( '[data-js-battle-royale="collapsible"]' ) : [];
+
+			this.battleRoyaleMap[ id ].collapsibles.push( ...collapsibleElements );
+		} );
+
 	},
 
 	buildBattleRoyaleMap: function( id ) {
@@ -269,26 +325,7 @@ liquipedia.battleRoyale = {
 		};
 
 		this.battleRoyaleMap[ id ].navigationContents.forEach( ( content ) => {
-			const brContentId = content.dataset.jsBattleRoyaleContentId;
-			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ brContentId ] =
-				Array.from( content.querySelectorAll( '[data-js-battle-royale="panel-tab"]' ) );
-
-			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ brContentId ].forEach( ( node ) => {
-				// Create object keys
-				if ( !( brContentId in this.battleRoyaleMap[ id ].navigationContentPanelTabContents ) ) {
-					this.battleRoyaleMap[ id ].navigationContentPanelTabContents[ brContentId ] = {};
-				}
-				this.battleRoyaleMap[ id ]
-					.navigationContentPanelTabContents[ brContentId ][ node.dataset.jsBattleRoyaleContentTargetId ] =
-					content.querySelector( '#' + node.dataset.jsBattleRoyaleContentTargetId );
-
-				// Query all collapsible elements and push it to the array
-				// const collapsibleElements = this.battleRoyaleMap[ id ]
-				// 	.navigationContentPanelTabContents[ brContentId ][ node.dataset.jsBattleRoyaleContentTargetId ]
-				// 	.querySelectorAll( '[data-js-battle-royale="collapsible"]' );
-				//
-				// this.battleRoyaleMap[ id ].collapsibles.push( ...collapsibleElements );
-			} );
+			this.buildBattleRoyaleMapNavigationContents( id, content );
 		} );
 	},
 
@@ -302,7 +339,6 @@ liquipedia.battleRoyale = {
 		Object.keys( this.battleRoyaleMap[ id ].navigationContentPanelTabs ).forEach( ( contentId ) => {
 			this.battleRoyaleMap[ id ].navigationContentPanelTabs[ contentId ].forEach( ( panelTab ) => {
 				panelTab.addEventListener( 'click', () => {
-					console.log('click paneltab', panelTab)
 					this.handlePanelTabChange( id, contentId, panelTab );
 				} );
 			} );
@@ -313,11 +349,14 @@ liquipedia.battleRoyale = {
 		this.battleRoyaleMap[ id ].collapsibles.forEach( ( element ) => {
 			const button = element.querySelector( '[data-js-battle-royale="collapsible-button"]' );
 			if ( button && element ) {
-				button.addEventListener( 'click', () => {
-					element.classList.toggle( 'is--collapsed' );
-				} );
+				button.removeEventListener( 'click', this.toggleCollapse );
+				button.addEventListener( 'click', this.toggleCollapse );
 			}
 		} );
+	},
+
+	toggleCollapse: function( e ) {
+		e.target.closest( '[data-js-battle-royale="collapsible"]' ).classList.toggle( 'is--collapsed' );
 	},
 
 	createScrollHintElement: function( dir ) {
@@ -518,6 +557,7 @@ liquipedia.battleRoyale = {
 	init: function() {
 		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( instance ) => {
 			this.battleRoyaleInstances[ instance.dataset.jsBattleRoyaleId ] = instance;
+			this.loadedTabs[ instance.dataset.jsBattleRoyaleId ] = false;
 
 			this.makeSortableTable( instance );
 		} );
@@ -525,7 +565,6 @@ liquipedia.battleRoyale = {
 		Object.keys( this.battleRoyaleInstances ).forEach( ( instanceId ) => {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
-			console.log('battle royale map', this.battleRoyaleMap);
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
@@ -544,18 +583,16 @@ liquipedia.battleRoyale = {
 			this.battleRoyaleMap[ instanceId ].navigationTabs.forEach( ( navTab ) => {
 				// get match id
 				const matchId = navTab.dataset.jsBattleRoyaleMatchid;
-				console.log('match id', matchId);
 				const target = navTab.dataset.targetId;
 				const panels = this.battleRoyaleMap[ instanceId ].navigationContentPanelTabs[ target ];
 
 				if ( matchId && target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
-					this.handlePanelTabChange( instanceId, target, panels[ 0 ] );
+					this.handlePanelTabChange( instanceId, target, panels[ 0 ], false );
 				}
 
-				// panels.forEach( ( panel, index ) => {
-				// 	this.createBottomNav( instanceId, target, index );
-				// } );
+				this.createBottomNav( instanceId, target, 0 );
+
 			} );
 
 			if ( !this.isMobile() ) {
