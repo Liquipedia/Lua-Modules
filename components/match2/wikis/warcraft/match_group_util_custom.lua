@@ -140,8 +140,6 @@ end
 ---@param matchOpponents WarcraftStandardOpponent[]
 ---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local modeParts = mw.text.split(game.mode or '', 'v')
-
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
 		local players = Array.map(mapOpponent.players, function(player)
 			if Logic.isEmpty(player) then return end
