@@ -185,16 +185,19 @@ function Footer:addLinks(links)
 		end
 	end
 
-	local unorderedLinks = Table.copy(links)
+	local processedLinks = {}
 	Array.forEach(MATCH_LINK_PRIORITY, function(linkTypePrefix)
 		for linkType, link in Table.iter.pairsByPrefix(links, linkTypePrefix, {requireIndex = false}) do
 			processLink(linkType, link)
-			unorderedLinks[linkType] = nil
+			processedLinks[linkType] = true
 		end
 	end)
 
-	for linkType, link in Table.iter.spairs(unorderedLinks) do
-		processLink(linkType, link)
+	for linkType, link in Table.iter.spairs(links) do
+	    -- Handle linktypes not already processed via priority list
+		if not processedLinks[linkType] then
+			processLink(linkType, link)
+	    end
 	end
 
 	return self
