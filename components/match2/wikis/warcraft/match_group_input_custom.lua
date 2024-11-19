@@ -409,7 +409,7 @@ end
 ---@param opponent table
 ---@return integer
 function MapFunctions.getMapOpponentSize(opponent)
-	return Table.size(Table.filter(opponent.players or {}, Logic.isNotEmpty))
+	return Table.size(Array.filter(opponent.players or {}, Logic.isNotEmpty))
 end
 
 return CustomMatchGroupInput
