@@ -186,17 +186,17 @@ function Footer:addLinks(links)
 	end
 
 	local processedLinks = {}
-	Array.forEach(MATCH_LINK_PRIORITY, function(linkTypePrefix)
-		for linkType, link in Table.iter.pairsByPrefix(links, linkTypePrefix, {requireIndex = false}) do
-			processLink(linkType, link)
-			processedLinks[linkType] = true
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
+		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
+			processLink(linkKey, link)
+			processedLinks[linkKey] = true
 		end
 	end)
 
-	for linkType, link in Table.iter.spairs(links) do
-	    -- Handle linktypes not already processed via priority list
-		if not processedLinks[linkType] then
-			processLink(linkType, link)
+	for linkKey, link in Table.iter.spairs(links) do
+	    -- Handle links not already processed via priority list
+		if not processedLinks[linkKey] then
+			processLink(linkKey, link)
 		end
 	end
 
