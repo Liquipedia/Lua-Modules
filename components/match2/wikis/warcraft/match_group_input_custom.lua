@@ -264,6 +264,11 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end
 	)
 
+	--- fill up with empty tables to not have gaps
+	Array.forEach(opponent.match2players, function(_, playerIndex)
+		participants[playerIndex] = participants[playerIndex] or {}
+	end)
+
 	Array.forEach(unattachedParticipants, function(participant)
 		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
 		local nameUpper = name:upper()
