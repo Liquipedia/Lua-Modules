@@ -197,7 +197,7 @@ function Footer:addLinks(links)
 	    -- Handle linktypes not already processed via priority list
 		if not processedLinks[linkType] then
 			processLink(linkType, link)
-	    end
+		end
 	end
 
 	return self
