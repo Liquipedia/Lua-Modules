@@ -11,6 +11,7 @@ local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -201,6 +202,34 @@ function TransferList:fetch()
 			table.insert(currentGroup, transf)
 		end)
 		Array.appendWith(groupedData, currentGroup)
+	end)
+
+	local containsCoach = function(str)
+		return string.lower(str or ''):find('coach') ~= nil
+	end
+	local isNotPlayer = function(transfer)
+		return containsCoach(transfer.role1)
+			or containsCoach(transfer.role2)
+			or containsCoach(transfer.extradata.role1sec)
+			or containsCoach(transfer.extradata.role2sec)
+			or containsCoach(transfer.extradata.position)
+	end
+
+	Array.forEach(groupedData, function(group)
+		Array.forEach(group, function(transfer, index)
+			transfer.origSorting = index
+		end)
+		Array.sortInPlaceBy(group, FnUtil.identity, function(transfer1, transfer2)
+			local isNotPlayer1 = isNotPlayer(transfer1)
+			local isNotPlayer2 = isNotPlayer(transfer2)
+			if isNotPlayer1 and not isNotPlayer2 then
+				return false
+			end
+			if not isNotPlayer1 and isNotPlayer2 then
+				return true
+			end
+			return transfer1.origSorting < transfer2.origSorting
+		end)
 	end)
 
 	self.groupedTransfers = groupedData
