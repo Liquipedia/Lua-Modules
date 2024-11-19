@@ -20,6 +20,7 @@ local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 local StarcraftOpponent = Table.deepCopy(Opponent)
 
 ---@class StarcraftStandardPlayer:standardPlayer
+---@field position integer?
 ---@field faction string?
 
 ---@class StarcraftStandardOpponent:standardOpponent

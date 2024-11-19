@@ -72,10 +72,10 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	-- Add additional fields to opponents
 	CustomMatchGroupUtil.populateOpponents(match)
 
-	-- Compute game.opponents by looking up game.participants in match.opponents
-	for _, game in ipairs(match.games) do
+	-- Adjust game.opponents by looking up game.opponents.players in match.opponents
+	Array.forEach(match.games, function(game)
 		game.opponents = CustomMatchGroupUtil.computeGameOpponents(game, match.opponents)
-	end
+	end)
 
 	-- Determine whether the match is a team match with different players each game
 	match.opponentMode = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
@@ -135,72 +135,26 @@ function CustomMatchGroupUtil.populateOpponents(match)
 	end
 end
 
----Computes game.opponents by looking up matchOpponents.players on each participant.
+
 ---@param game WarcraftMatchGroupUtilGame
 ---@param matchOpponents WarcraftStandardOpponent[]
 ---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local function playerFromParticipant(opponentIndex, matchplayerIndex, participant)
-		local matchPlayer = matchOpponents[opponentIndex].players[matchplayerIndex]
-		if matchPlayer then
-			return Table.merge(matchPlayer, {
-				matchplayerIndex = matchplayerIndex,
-				faction = participant.faction,
-				position = tonumber(participant.position),
-				heroes = participant.heroes,
-				random = participant.random,
-			})
-		else
-			return {
-				displayName = 'TBD',
-				matchplayerIndex = matchplayerIndex,
-				faction = Faction.defaultFaction,
-			}
-		end
-	end
-
-	-- Convert participants list to players array
-	local opponentPlayers = {}
-	for key, participant in pairs(game.participants) do
-		local opponentIndex, matchplayerIndex = key:match('(%d+)_(%d+)')
-		opponentIndex = tonumber(opponentIndex)
-		-- opponentIndex can not be nil due to the format of the participants keys
-		---@cast opponentIndex -nil
-		matchplayerIndex = tonumber(matchplayerIndex)
-
-		local player = playerFromParticipant(opponentIndex, matchplayerIndex, participant)
-
-		if not opponentPlayers[opponentIndex] then
-			opponentPlayers[opponentIndex] = {}
-		end
-		table.insert(opponentPlayers[opponentIndex], player)
-	end
-
 	local modeParts = mw.text.split(game.mode or '', 'v')
 
-	-- Create game opponents
-	local opponents = {}
-	for opponentIndex = 1, #modeParts do
-		local opponent = {
-			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIndex)),
-			players = opponentPlayers[opponentIndex] or {},
-			score = game.scores[opponentIndex],
-		}
-		if opponent.placement and (opponent.placement < 1 or 99 <= opponent.placement) then
-			opponent.placement = nil
-		end
-		table.insert(opponents, opponent)
-	end
+	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
+		local players = Array.map(mapOpponent.players, function(player)
+			if Logic.isEmpty(player) then return end
+			return Table.merge({displayName = 'TBD'}, matchOpponents[opponentIndex] or {}, {
+				faction = player.faction,
+				position = tonumber(player.position),
+				heroes = player.heroes,
+				random = player.random,
+			})
+		end) --[[@as WarcraftStandardPlayer[] ]]
 
-	-- Sort players in game opponents
-	for _, opponent in pairs(opponents) do
-		-- Sort players by the order they appear in the match opponent players list
-		table.sort(opponent.players, function(a, b)
-			return a.matchplayerIndex < b.matchplayerIndex
-		end)
-	end
-
-	return opponents
+		return Table.merge(mapOpponent, {players = players})
+	end)
 end
 
 ---Group games on the subgroup field to form submatches
