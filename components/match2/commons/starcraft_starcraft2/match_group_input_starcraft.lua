@@ -354,9 +354,7 @@ end
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
-	local playerCounts = Array.map(map.opponents or {}, function(opponent)
-		return Table.size(opponent.players or {})
-	end)
+	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
@@ -389,7 +387,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 
 	if #opponents ~= 2 then
 		return extradata
-	elseif Array.any(map.opponents, function(mapOpponent) return Table.size(mapOpponent.players or {}) ~= 1 end) then
+	elseif Array.any(map.opponents, function(opponent) return MapFunctions.getMapOpponentSize(opponent) ~= 1 end) then
 		return extradata
 	end
 
@@ -432,6 +430,12 @@ function MapFunctions.getMapName(game)
 	elseif mapName then
 		return TBD
 	end
+end
+
+---@param opponent table
+---@return integer
+function MapFunctions.getMapOpponentSize(opponent)
+	return Table.size(Table.filter(opponent.players or {}, Logic.isNotEmpty))
 end
 
 return StarcraftMatchGroupInput
