@@ -63,7 +63,7 @@ function CustomInjector:parse(id, widgets)
 		local publisherTier = args.publishertier or args.algstier
 		if String.isNotEmpty(publisherTier) then
 			table.insert(widgets, 1, Cell{
-				name = 'ALGS circuit tier',
+				name = 'ALGS Circuit Tier',
 				content = {'[[Apex Legends Global Series|' .. publisherTier .. ']]'},
 				classes = {'tournament-highlighted-bg'}
 			})
