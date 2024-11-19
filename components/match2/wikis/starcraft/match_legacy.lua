@@ -81,7 +81,8 @@ function MatchLegacy._storeGames(match, match2)
 			submatch.opponent1score = scores[1] or 0
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
-			local playerdata = Table.mapValues(Json.parseIfString(game.participants or '{}') or game.participants, Logic.nilIfEmpty)
+			local playerdata = Table.mapValues(Json.parseIfString(game.participants or '{}') or game.participants,
+				Logic.nilIfEmpty)
 			for key, item in pairs(playerdata) do
 				local keyArray = mw.text.split(key or '', '_')
 				local l = tonumber(keyArray[2])
