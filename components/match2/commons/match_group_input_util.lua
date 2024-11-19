@@ -936,6 +936,7 @@ function MatchGroupInputUtil.makeLinkFromName(name)
 	return Page.pageifyLink(name) --[[@as string]]
 end
 
+---@deprecated
 ---@alias PlayerInputData {name: string?, link: string?}
 ---@param playerIds MGIParsedPlayer[]
 ---@param inputPlayers table[]
@@ -961,6 +962,34 @@ function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToP
 	Array.forEach(inputPlayers, parsePlayer)
 
 	return participants, unattachedParticipants
+end
+
+---@param playerIds MGIParsedPlayer[]
+---@param inputPlayers table[]
+---@param indexToPlayer fun(playerIndex: integer): PlayerInputData?
+---@param transform fun(playerIndex: integer, playerIdData: MGIParsedPlayer, playerInputData: PlayerInputData): table?
+---@return table
+function MatchGroupInputUtil.parseMapPlayers(playerIds, inputPlayers, indexToPlayer, transform)
+	local transformedPlayers = {}
+	local playerIdToIndex = Table.map(inputPlayers, function(playerIndex)
+		local playerInputData = indexToPlayer(playerIndex) or {}
+		if playerInputData.name and not playerInputData.link then
+			playerInputData.link = MatchGroupInputUtil.makeLinkFromName(playerInputData.name)
+		end
+		local playerId = MatchGroupInputUtil.findPlayerId(playerIds, playerInputData.name, playerInputData.link)
+		transformedPlayers[playerIndex] = transform(playerIndex, playerIds[playerId] or {}, playerInputData)
+		if playerId then
+			return playerId, playerIndex
+		end
+		return 0, nil
+	end)
+
+	local mappedPlayers = Array.map(playerIds, function(_, playerId)
+		local transformedPlayer = Table.extract(transformedPlayers, playerIdToIndex[playerId])
+		return transformedPlayer or {}
+	end)
+
+	return Array.extend(mappedPlayers, transformedPlayers)
 end
 
 ---@generic T:table
