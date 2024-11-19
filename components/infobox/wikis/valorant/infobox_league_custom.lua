@@ -12,6 +12,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
@@ -27,6 +28,11 @@ local Center = Widgets.Center
 ---@class ValorantLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
+
+local VALID_PUBLISHERTIERS = {
+	'highlighted',
+	'sponsored',
+}
 
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
@@ -44,7 +50,8 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
-	self.data.publishertier = Logic.nilIfEmpty(args.publishertier)
+	local publisherTier = (args.publishertier or ''):lower()
+	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
 		or Logic.readBool(args['riot-highlighted']) and 'highlighted'
 		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
 		or nil
