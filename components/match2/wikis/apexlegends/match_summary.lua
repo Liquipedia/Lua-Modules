@@ -196,7 +196,7 @@ function CustomMatchSummary._opponents(match)
 	-- Add games opponent data to the match opponent
 	Array.forEach(match.opponents, function (opponent, idx)
 		opponent.games = Array.map(match.games, function (game)
-			return game.extradata.opponents[idx]
+			return game.opponents[idx]
 		end)
 	end)
 
