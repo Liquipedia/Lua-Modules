@@ -219,7 +219,7 @@ function MatchLegacy._fromParticipantToOpponent(participants, opponents)
 		{match2players = {}, score = 0, type = Opponent.solo},
 		{match2players = {}, score = 0, type = Opponent.solo},
 	}
-	for participantKey in Table.iter.spairs(participants) do
+	for participantKey in Table.iter.spairs(Table.filter(participants, Logic.isNotEmpty)) do
 		local opponentKey, playerKey = string.match(participantKey, '^(%d+)_(%d+)$')
 		opponentKey = tonumber(opponentKey)
 		table.insert(submatchOpponents[opponentKey].match2players,
@@ -279,7 +279,7 @@ end
 ---@return string[][]
 function MatchLegacy._heroesAndFactionFromParticipants(participants)
 	local factions, heroes = {}, {}
-	for participantKey, participant in pairs(participants or {}) do
+	for participantKey, participant in pairs(Table.filter(participants or {}, Logic.isNotEmpty)) do
 		local opponentKey = string.match(participantKey, '^(%d+)_%d+$')
 		opponentKey = tonumber(opponentKey)
 		---@cast opponentKey -nil
