@@ -36,16 +36,16 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return string
 function CustomMatchSummary._determineWidth(match)
-	return CustomMatchSummary._isSolo(match) and '450px' or '600px'
+	return CustomMatchSummary.isTeam(match) and '500px' or '400px'
 end
 
 ---@param match MatchGroupUtilMatch
 ---@return boolean
-function CustomMatchSummary._isSolo(match)
+function CustomMatchSummary.isTeam(match)
 	if type(match.opponents[1]) ~= 'table' or type(match.opponents[2]) ~= 'table' then
 		return false
 	end
-	return match.opponents[1].type == Opponent.solo and match.opponents[2].type == Opponent.solo
+	return match.opponents[1].type == Opponent.team and match.opponents[2].type == Opponent.team
 end
 
 ---@param match MatchGroupUtilMatch
@@ -57,7 +57,7 @@ function CustomMatchSummary.createBody(match)
 		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
 			game = match.game,
-			soloMode = CustomMatchSummary._isSolo(match),
+			soloMode = CustomMatchSummary.isTeam(match),
 		})
 	end)
 
@@ -78,7 +78,7 @@ function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, oppon
 end
 
 ---@param game MatchGroupUtilGame
----@param props {game: string?, soloMode: boolean, opponents: table[]}
+---@param props {game: string?, teamMode: boolean, opponents: table[]}
 ---@return Widget?
 function CustomMatchSummary._createStandardGame(game, props)
 	if not game or not game.participants then
@@ -86,14 +86,14 @@ function CustomMatchSummary._createStandardGame(game, props)
 	end
 
 	local function makeTeamSection(opponentIndex)
-		local flipped = opponentIndex == 1
+		local flipped = opponentIndex == 2
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			CustomMatchSummary._createCharacterDisplay(
 				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, opponentIndex),
 				props.game,
 				flipped,
-				not props.soloMode
+				props.teamMode
 			),
 		}
 	end
@@ -102,9 +102,9 @@ function CustomMatchSummary._createStandardGame(game, props)
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {flex = '1'}},
-			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1), flipped = true},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-basis'] = '40%'}},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2)},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
@@ -113,7 +113,7 @@ end
 ---@param players table[]
 ---@param game string?
 ---@param reverse boolean?
----@param displayPlayerNames boolean?
+---@param displayPlayerNames boolean
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
@@ -136,10 +136,6 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, disp
 			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
 			characterDisplay:wikitext(CharacterIcons[character.name])
 			if not character.active then
-				-- We always want to show the last character, even if it's inactive
-				if characterIndex < #characters then
-					characterDisplay:addClass('hide-mobile')
-				end
 				characterDisplay:css('opacity', '0.3')
 			end
 			return characterDisplay

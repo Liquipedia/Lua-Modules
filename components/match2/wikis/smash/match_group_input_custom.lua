@@ -101,7 +101,7 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 				local remainingLife, startingLife = tonumber(splitInput[2]) or 0, tonumber(splitInput[3]) or 1
 				if remainingLife > startingLife then
 					mw.log('Warning: ' .. (playerIdData.name or playerIndex).. ' has more life remaining than starting.')
-					return nil
+					startingLife = remainingLife
 				end
 				return Array.map(Array.range(1, startingLife), function(pos)
 					return {name = character, active = characterAlive(startingLife, remainingLife, pos)}
