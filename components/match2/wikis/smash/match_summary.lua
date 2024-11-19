@@ -37,7 +37,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return string
 function CustomMatchSummary._determineWidth(match)
-	return CustomMatchSummary._isSolo(match) and '400px' or '550px'
+	return CustomMatchSummary._isSolo(match) and '450px' or '600px'
 end
 
 ---@param match MatchGroupUtilMatch
@@ -57,6 +57,7 @@ function CustomMatchSummary.createBody(match)
 	local games = Array.map(match.games, function(game)
 		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
+			game = match.game,
 			soloMode = CustomMatchSummary._isSolo(match),
 		})
 	end)
@@ -78,40 +79,46 @@ function CustomMatchSummary.fetchCharactersOfPlayers(game, matchOpponents, oppon
 end
 
 ---@param game MatchGroupUtilGame
----@param props {soloMode: boolean, opponents: table[]}
+---@param props {game: string?, soloMode: boolean, opponents: table[]}
 ---@return Widget?
 function CustomMatchSummary._createStandardGame(game, props)
 	if not game or not game.participants then
 		return
 	end
 
-	return MatchSummaryWidgets.Row{
-		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem', padding = '4px'},
-		children = WidgetUtil.collect(
+	local function makeTeamSection(opponentIndex)
+		local flipped = opponentIndex == 1
+		return {
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			CustomMatchSummary._createCharacterDisplay(
-				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 1),
-				false,
+				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, opponentIndex),
+				props.game,
+				flipped,
 				not props.soloMode
 			),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._createCharacterDisplay(
-				CustomMatchSummary.fetchCharactersOfPlayers(game, props.opponents, 2),
-				true,
-				not props.soloMode
-			)
+		}
+	end
+
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '0.75rem'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {flex = '1'}},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
 end
 
 ---@param players table[]
+---@param game string?
 ---@param reverse boolean?
 ---@param displayPlayerNames boolean?
 ---@return Html
-function CustomMatchSummary._createCharacterDisplay(players, reverse, displayPlayerNames)
-	local wrapper = mw.html.create('div'):css('flex-basis', '30%')
+function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
+	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
+	local wrapper = mw.html.create('div')
 
 	if Logic.isDeepEmpty(players) then
 		return wrapper
@@ -126,17 +133,21 @@ function CustomMatchSummary._createCharacterDisplay(players, reverse, displayPla
 			:css('display', 'flex')
 			:css('flex-direction', reverse and 'row' or 'row-reverse')
 
-		local characterDisplays = Array.map(characters, function(character)
+		local characterDisplays = Array.map(characters, function(character, characterIndex)
 			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
-			characterDisplay:wikitext(CharacterIcon.Icon{character = character.name, size = '60px'})
+			characterDisplay:wikitext(CharacterIcons[character.name])
 			if not character.active then
+				-- We always want to show the last character, even if it's inactive
+				if characterIndex < #characters then
+					characterDisplay:addClass('hide-mobile')
+				end
 				characterDisplay:css('opacity', '0.3')
 			end
 			return characterDisplay
 		end)
 
 		if displayPlayerNames then
-			local playerNode = PlayerDisplay.BlockPlayer{player = player.player, flip = not reverse}
+			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = not reverse}
 			table.insert(characterDisplays, '&nbsp;')
 			table.insert(characterDisplays, playerNode)
 		end
