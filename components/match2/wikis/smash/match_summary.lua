@@ -36,7 +36,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return string
 function CustomMatchSummary._determineWidth(match)
-	return CustomMatchSummary.isTeam(match) and '500px' or '400px'
+	return CustomMatchSummary.isTeam(match) and '550px' or '400px'
 end
 
 ---@param match MatchGroupUtilMatch
@@ -57,7 +57,7 @@ function CustomMatchSummary.createBody(match)
 		return CustomMatchSummary._createStandardGame(game, {
 			opponents = match.opponents,
 			game = match.game,
-			soloMode = CustomMatchSummary.isTeam(match),
+			teamMode = CustomMatchSummary.isTeam(match),
 		})
 	end)
 
@@ -86,7 +86,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 	end
 
 	local function makeTeamSection(opponentIndex)
-		local flipped = opponentIndex == 1
+		local flipped = opponentIndex == 2
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			CustomMatchSummary._createCharacterDisplay(
@@ -103,7 +103,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1), flipped = true},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-basis'] = '40%'}},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-basis'] = '150px'}},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2)},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -117,7 +117,11 @@ end
 ---@return Html
 function CustomMatchSummary._createCharacterDisplay(players, game, reverse, displayPlayerNames)
 	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. (game or ''))
-	local wrapper = mw.html.create('div')
+	local wrapper = mw.html.create('div'):css{
+		display = 'flex',
+		['align-items'] = 'flex-start',
+		['flex-direction'] = 'column',
+	}
 
 	if Logic.isDeepEmpty(players) then
 		return wrapper
@@ -132,19 +136,25 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, disp
 			:css('display', 'flex')
 			:css('flex-direction', reverse and 'row' or 'row-reverse')
 			:css('position', 'relative')
+			:css('width', '100%')
 
 		local charactersWrapper = mw.html.create('span')
+			:css('display', 'flex')
+			:css('flex-direction', reverse and 'row-reverse' or 'row')
 		local characterDisplays = Array.map(characters, function(character, characterIndex)
-			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
+			local characterDisplay = mw.html.create('div')
+				:addClass('brkts-popup-body-element-thumbs')
+				:css('opacity', character.status ~= 1 and '0.3' or nil)
 			characterDisplay:wikitext(CharacterIcons[character.name])
-			if character.status ~= 1 then
-				characterDisplay:css('opacity', '0.3')
-			end
 			return characterDisplay
 		end)
 		local unknownCharactersCount = #Array.filter(characters, function (character) return character.status == -1 end)
 		if unknownCharactersCount > 1 then
-			local unknownCharactersWrapper = mw.html.create('span'):css('position', 'absolute')
+			local unknownCharactersWrapper = mw.html.create('span')
+				:css('position', 'absolute')
+				:css('width', '100%')
+				:css('display', 'flex')
+				:css('flex-direction', reverse and 'row-reverse' or 'row')
 			Array.forEach(Array.range(1, unknownCharactersCount), function()
 				unknownCharactersWrapper:wikitext(CharacterIcons.Unknown)
 			end)
