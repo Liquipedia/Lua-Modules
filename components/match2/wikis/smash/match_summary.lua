@@ -86,7 +86,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 	end
 
 	local function makeTeamSection(opponentIndex)
-		local flipped = opponentIndex == 2
+		local flipped = opponentIndex == 1
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			CustomMatchSummary._createCharacterDisplay(
@@ -131,23 +131,34 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, disp
 		local playerWrapper = mw.html.create('div')
 			:css('display', 'flex')
 			:css('flex-direction', reverse and 'row' or 'row-reverse')
+			:css('position', 'relative')
 
+		local charactersWrapper = mw.html.create('span')
 		local characterDisplays = Array.map(characters, function(character, characterIndex)
 			local characterDisplay = mw.html.create('div'):addClass('brkts-popup-body-element-thumbs')
 			characterDisplay:wikitext(CharacterIcons[character.name])
-			if not character.active then
+			if character.status ~= 1 then
 				characterDisplay:css('opacity', '0.3')
 			end
 			return characterDisplay
 		end)
-
-		if displayPlayerNames then
-			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = not reverse}
-			table.insert(characterDisplays, '&nbsp;')
-			table.insert(characterDisplays, playerNode)
+		local unknownCharactersCount = #Array.filter(characters, function (character) return character.status == -1 end)
+		if unknownCharactersCount > 1 then
+			local unknownCharactersWrapper = mw.html.create('span'):css('position', 'absolute')
+			Array.forEach(Array.range(1, unknownCharactersCount), function()
+				unknownCharactersWrapper:wikitext(CharacterIcons.Unknown)
+			end)
+			playerWrapper:node(unknownCharactersWrapper)
 		end
 
-		Array.forEach(characterDisplays, FnUtil.curry(playerWrapper.node, playerWrapper))
+		Array.forEach(characterDisplays, FnUtil.curry(charactersWrapper.node, charactersWrapper))
+		playerWrapper:node(charactersWrapper)
+
+		if displayPlayerNames then
+			playerWrapper:node('&nbsp;')
+			playerWrapper:node(PlayerDisplay.BlockPlayer{player = player, flip = not reverse})
+		end
+
 		return playerWrapper
 	end)
 

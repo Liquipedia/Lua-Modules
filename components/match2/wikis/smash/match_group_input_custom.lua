@@ -8,8 +8,10 @@
 
 local Array = require('Module:Array')
 local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization')
+local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -25,6 +27,15 @@ CustomMatchGroupInput.DEFAULT_MODE = 'singles'
 CustomMatchGroupInput.DATE_FALLBACKS = {
 	'tournament_enddate',
 	'tournament_startdate',
+}
+
+local DEFAULT_STOCK_COUNT = {
+	melee = 4,
+	brawl = 3,
+	wiiu = 2,
+	ultimate = 3,
+	pm = 4,
+	['64'] = 5,
 }
 
 -- called from Module:MatchGroup
@@ -73,8 +84,12 @@ end
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
-	local function characterAlive(startingLife, remainingLife, pos)
-		return startingLife - pos < remainingLife
+	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
+	local function characterStatus(startingLife, remainingLife, pos, isLast)
+		if remainingLife == -1 then
+			return isLast and 1 or -1
+		end
+		return (startingLife - pos < remainingLife) and 1 or 0
 	end
 
 	-- Input Format is "character,remainingLife,startingLife" per index
@@ -99,12 +114,18 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 					return nil
 				end
 				local remainingLife, startingLife = tonumber(splitInput[2]) or 0, tonumber(splitInput[3]) or 1
+				if splitInput[2] == '?' then
+					remainingLife = -1
+					startingLife = assert(
+						tonumber(splitInput[3]) or DEFAULT_STOCK_COUNT[game],
+						'Could not find default stock count for game ' .. (game or '')
+					)
+				end
 				if remainingLife > startingLife then
-					mw.log('Warning: ' .. (playerIdData.name or playerIndex).. ' has more life remaining than starting.')
 					startingLife = remainingLife
 				end
 				return Array.map(Array.range(1, startingLife), function(pos)
-					return {name = character, active = characterAlive(startingLife, remainingLife, pos)}
+					return {name = character, status = characterStatus(startingLife, remainingLife, pos, pos == startingLife)}
 				end)
 			end)
 			return {
