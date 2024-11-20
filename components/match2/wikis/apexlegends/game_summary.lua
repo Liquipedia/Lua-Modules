@@ -146,20 +146,21 @@ function CustomGameSummary.getGameByMatchId(props)
 	local scoringData = SummaryHelper.createScoringData(match)
 
 	local gameSummary = mw.html.create()
-	gameSummary:node(CustomGameSummary._createGameTab(game, props.gameIdx, scoringData))
+	gameSummary:node(CustomGameSummary._createGameTab(game, match.matchId, props.gameIdx, scoringData))
 
 	return gameSummary
 end
 
 ---@param game table
+---@param matchId string
 ---@param idx integer
 ---@param scoreData table
 ---@return Html
-function CustomGameSummary._createGameTab(game, idx, scoreData)
+function CustomGameSummary._createGameTab(game, matchId, idx, scoreData)
 	local page = mw.html.create('div')
 			:addClass('panel-content')
 			:attr('data-js-battle-royale', 'panel-content')
-			:attr('id', 'panel' .. idx)
+			:attr('id', matchId .. 'panel' .. idx)
 
 	local gameDetails = page:tag('div')
 			:addClass('panel-content__container')

@@ -1,7 +1,62 @@
 /*******************************************************************************
  * Template(s): BattleRoyale
  * Author(s): Elysienna
+ * Description: This script manages the Battle Royale interface, including
+ *              navigation, tab handling, and dynamic content loading. It
+ *              ensures proper display and interaction of game tabs, panels,
+ *              and collapsible elements within the Battle Royale map.
  ******************************************************************************/
+/**
+ * Every BR instance has data attribute `data-js-battle-royale-id` with a unique id.
+ * This id is used to store the instance in the battleRoyaleInstances object.
+ * It is also used to create the battleRoyaleMap object.
+ *
+ * Inside every id instance, there are multiple elements that are used to create the battleRoyaleMap object.
+ * At the top level you have the match buttons and the match content.
+ * Inside the match content you find the game tabs and the game panels.
+ *
+ * Match buttons are the navigation tabs at the top of the BR instance.
+ * They contain a data attribute like `data-target-id="navigationContent1"` which is used to link to the match content.
+ * And a data attribute like `data-js-battle-royale-matchid="R1M1"` which is used to link to the match id.
+ *
+ * Match Content is the content that is displayed when a match button is clicked and has a data attribute like
+ * `data-js-battle-royale-content-id="navigationContent1"`. That is the same value as the match button data-target-id.
+ * Each match content contains game tabs and game panels.
+ *
+ * Game tabs are the tabs that are displayed when a match content is clicked.
+ * They contain a data attribute like `data-js-battle-royale-content-target-id="panel1"` which is used to link to the
+ * game panel.
+ * On init, only the first game tab is loaded. Which usually is the overall standings tab.
+ * When you click on one of the game tabs (except for first), an api call is made to load all games for that match.
+ * It will set the loadedTabs[instanceId] to true to prevent calling the games again.
+ * The panels that are not selected are hidden with `is--hidden` class.
+ *
+ * Table
+ * The table is the main element that contains the game data.
+ * It has a data attribute `data-js-battle-royale="table"`.
+ * Inside the table, you have the header row and the row elements.
+ * The header row contains the sorting buttons. The sorting buttons have a data attribute `data-sort-type="x"`.
+ * The row elements contain the data for the games. The data is sorted by the data-sort-val attribute. They also have
+ * a data-sort-type attribute to link to the sorting buttons.
+ * With inline css the order of the rows is set to the index of the row.
+ * The table contains the game nav holder with the horizontally scrollable game container
+ * (`data-js-battle-royale="game-container"`).
+ * The game container has a scroll event listener to check side scroll buttons.
+ * The table also includes swipe hint elements and side scroll buttons for horizontal scrolling.
+ *
+ * Collapsibles
+ * Are created on init and when new game tabs are loaded, can be collapsed to show less information.
+ * The wrapper element (`data-js-battle-royale="collapsible"`) contains the button
+ * `data-js-battle-royale="collapsible-button"` and the content `data-js-battle-royale="collapsible-content"`.
+ *
+ * Bottom navigation
+ * The bottom navigation is created dynamically on init for the first panel and for the rest of the panels after the
+ * api call. It contains links to the previous and next game tab.
+ *
+ * CreateBottomNavLinks creates the bottom navigation links.
+ * The bottom navigation is added to the content panel.
+ *
+ */
 liquipedia.battleRoyale = {
 
 	DIRECTION_LEFT: 'left',
@@ -140,6 +195,8 @@ liquipedia.battleRoyale = {
 	 * Recheck and update the state of navigation elements within the table.
 	 * This function is called when the window is resized or when an element is resized to ensure
 	 * that the navigation elements are correctly displayed and functional.
+	 *
+	 * @param instanceId
 	 */
 	recheckNavigationStates: function( instanceId ) {
 		if ( this.isMobile() ) {
@@ -157,6 +214,8 @@ liquipedia.battleRoyale = {
 	/**
 	 * Ensure that the side scroll buttons are correctly displayed based on the current scroll position
 	 * and scrollable width of the table.
+	 *
+	 * @param tableElement
 	 */
 	recheckSideScrollButtonStates: function( tableElement ) {
 		const navLeft = tableElement.querySelector( '[data-js-battle-royale="navigate-left"]' );
@@ -207,7 +266,7 @@ liquipedia.battleRoyale = {
 	 * @param instanceId as string
 	 * @param contentId as string
 	 * @param panelTab as HTMLElement
-	 * @param loadTemplate
+	 * @param loadTemplate as boolean
 	 */
 	handlePanelTabChange: function( instanceId, contentId, panelTab, loadTemplate = true ) {
 		const navigationTab = this.battleRoyaleMap[ instanceId ].matchButtons.find(
@@ -224,7 +283,7 @@ liquipedia.battleRoyale = {
 				this.loadedTabs[ instanceId ] = true;
 				this.handleTabChange( instanceId, contentId, panelTab );
 				this.makeCollapsibles( instanceId );
-				this.battleRoyaleMap[ instanceId ].tabs[ dataTargetId ].forEach(
+				this.battleRoyaleMap[ instanceId ].gameTabs[ dataTargetId ].forEach(
 					( panel, index ) => {
 						if ( index !== 0 ) {
 							this.createBottomNav( instanceId, dataTargetId, index );
@@ -238,26 +297,26 @@ liquipedia.battleRoyale = {
 	},
 
 	handleTabChange: function( instanceId, contentId, panelTab ) {
-		const tabs = this.battleRoyaleMap[ instanceId ].tabs[ contentId ];
-		tabs.forEach( ( item ) => {
-			if ( item === panelTab ) {
+		const tabs = this.battleRoyaleMap[ instanceId ].gameTabs[ contentId ];
+		tabs.forEach( ( tab ) => {
+			if ( tab === panelTab ) {
 				// activate content tab
-				item.classList.add( 'is--active' );
+				tab.classList.add( 'is--active' );
 			} else {
 				// deactivate content tab
-				item.classList.remove( 'is--active' );
+				tab.classList.remove( 'is--active' );
 			}
 		} );
 
 		if ( this.loadedTabs[ instanceId ] ) {
-			const contents = this.battleRoyaleMap[ instanceId ].tabPanels[ contentId ];
-			Object.keys( contents ).forEach( ( panelId ) => {
+			const panels = this.battleRoyaleMap[ instanceId ].gamePanels[ contentId ];
+			Object.keys( panels ).forEach( ( panelId ) => {
 				if ( panelId === panelTab.dataset.jsBattleRoyaleContentTargetId && panelId ) {
 					// activate content tab panel
-					contents[ panelId ].classList.remove( 'is--hidden' );
+					panels[ panelId ].classList.remove( 'is--hidden' );
 				} else {
 					// deactivate content tab panel
-					contents[ panelId ].classList.add( 'is--hidden' );
+					panels[ panelId ].classList.add( 'is--hidden' );
 				}
 			} );
 		}
@@ -265,7 +324,7 @@ liquipedia.battleRoyale = {
 	},
 
 	callTemplate: function( id, matchId, gameId, dataTargetId, contentId, callback ) {
-		const games = Object.keys( this.battleRoyaleMap[ id ].tabPanels[ contentId ] ).length;
+		const games = Object.keys( this.battleRoyaleMap[ id ].gamePanels[ dataTargetId ] ).length - 1;
 		let wikitext = '';
 		for ( let i = 1; i <= games; i++ ) {
 			wikitext += `{{ShowSingleGame|id=${ id }|matchid=${ matchId }|gameidx=${ i }}}`;
@@ -289,9 +348,6 @@ liquipedia.battleRoyale = {
 			} ).done( ( data ) => {
 				if ( data.parse?.text?.[ '*' ] ) {
 					element.insertAdjacentHTML( 'beforeend', data.parse.text[ '*' ] );
-					// add buildBattleRoyaleMapMatchContents to the callback
-					// this.buildBattleRoyaleMapMatchContents( id, document.querySelector(
-					// 	`[data-js-battle-royale-content-id="${ dataTargetId }"]` ), true );
 					if ( callback ) {
 						callback();
 					}
@@ -300,30 +356,31 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
-	// add comment when/why this is called
+	// Build and populate the battleRoyaleMap object with game tabs and panels.
+	// This function is used twice, once on init and once after the api call.
+	// Because the map needs to be updated when new gameTabs are loaded.
 	buildBattleRoyaleMapMatchContents: function( id, content ) {
 		const navigationContentId = content.dataset.jsBattleRoyaleContentId;
-		this.battleRoyaleMap[ id ].tabs[ navigationContentId ] =
+		this.battleRoyaleMap[ id ].gameTabs[ navigationContentId ] =
 			Array.from( content.querySelectorAll( '[data-js-battle-royale="panel-tab"]' ) );
-		this.battleRoyaleMap[ id ].tabs[ navigationContentId ].forEach( ( node ) => {
+		this.battleRoyaleMap[ id ].gameTabs[ navigationContentId ].forEach( ( node ) => {
 
-			if ( !( navigationContentId in this.battleRoyaleMap[ id ].tabPanels ) ) {
-				this.battleRoyaleMap[ id ].tabPanels[ navigationContentId ] = {};
+			if ( !( navigationContentId in this.battleRoyaleMap[ id ].gamePanels ) ) {
+				this.battleRoyaleMap[ id ].gamePanels[ navigationContentId ] = {};
 			}
 			const targetId = node.dataset.jsBattleRoyaleContentTargetId;
 			this.battleRoyaleMap[ id ]
-				.tabPanels[ navigationContentId ][ targetId ] =
+				.gamePanels[ navigationContentId ][ targetId ] =
 				content.querySelector( '#' + targetId );
 
 			const panel = this.battleRoyaleMap[ id ]
-				.tabPanels[ navigationContentId ][ targetId ];
+				.gamePanels[ navigationContentId ][ targetId ];
 
 			const collapsibleElements = panel ?
 				panel.querySelectorAll( '[data-js-battle-royale="collapsible"]' ) : [];
 
 			this.battleRoyaleMap[ id ].collapsibles.push( ...collapsibleElements );
 		} );
-		console.log(this.battleRoyaleMap);
 	},
 
 	buildBattleRoyaleMap: function( id ) {
@@ -332,8 +389,8 @@ liquipedia.battleRoyale = {
 				this.battleRoyaleInstances[ id ].querySelectorAll( '[data-js-battle-royale="navigation-tab"]' ) ),
 			matchContents: Array.from(
 				this.battleRoyaleInstances[ id ].querySelectorAll( '[data-js-battle-royale-content-id]' ) ),
-			tabs: {},
-			tabPanels: {},
+			gameTabs: {},
+			gamePanels: {},
 			collapsibles: []
 		};
 
@@ -349,8 +406,8 @@ liquipedia.battleRoyale = {
 			} );
 		} );
 
-		Object.keys( this.battleRoyaleMap[ id ].tabs ).forEach( ( contentId ) => {
-			this.battleRoyaleMap[ id ].tabs[ contentId ].forEach( ( panelTab ) => {
+		Object.keys( this.battleRoyaleMap[ id ].gameTabs ).forEach( ( contentId ) => {
+			this.battleRoyaleMap[ id ].gameTabs[ contentId ].forEach( ( panelTab ) => {
 				panelTab.addEventListener( 'click', () => {
 					this.handlePanelTabChange( id, contentId, panelTab );
 				} );
@@ -358,7 +415,7 @@ liquipedia.battleRoyale = {
 		} );
 	},
 
-	setupCollapsibles: function ( id ) {
+	makeCollapsibles: function ( id ) {
 		this.battleRoyaleMap[ id ].collapsibles.forEach( ( element ) => {
 			const button = element.querySelector( '[data-js-battle-royale="collapsible-button"]' );
 			if ( button && element ) {
@@ -400,6 +457,8 @@ liquipedia.battleRoyale = {
 	/**
 	 * Ensures that the side scroll hint elements are correctly displayed based on the current scroll
 	 * position and scrollable width of the table.
+	 *
+	 * @param table
 	 */
 	recheckSideScrollHintElements: function( table ) {
 		const swipeHintLeft = table.querySelector( '[data-js-battle-royale="swipe-hint-left"]' );
@@ -522,9 +581,9 @@ liquipedia.battleRoyale = {
 
 	createBottomNav( instanceId, navigationTab, currentPanelIndex ) {
 		const contentPanel = Object.values(
-			this.battleRoyaleMap[ instanceId ].tabPanels[ navigationTab ]
+			this.battleRoyaleMap[ instanceId ].gamePanels[ navigationTab ]
 		)[ currentPanelIndex ];
-		const navPanels = this.battleRoyaleMap[ instanceId ].tabs[ navigationTab ];
+		const navPanels = this.battleRoyaleMap[ instanceId ].gameTabs[ navigationTab ];
 		if ( navPanels.length <= 1 ) {
 			return;
 		}
@@ -582,10 +641,10 @@ liquipedia.battleRoyale = {
 		Object.keys( this.battleRoyaleInstances ).forEach( ( instanceId ) => {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
-			console.log(this.battleRoyaleMap);
+			console.log( this.battleRoyaleMap );
 
 			this.attachHandlers( instanceId );
-			this.setupCollapsibles( instanceId );
+			this.makeCollapsibles( instanceId );
 			if ( !this.isMobile() ) {
 				this.makeSideScrollElements( instanceId );
 				this.makeTableScrollHint( instanceId );
@@ -602,7 +661,7 @@ liquipedia.battleRoyale = {
 				// get match id
 				const matchId = navTab.dataset.jsBattleRoyaleMatchid;
 				const target = navTab.dataset.targetId;
-				const panels = this.battleRoyaleMap[ instanceId ].tabs[ target ];
+				const panels = this.battleRoyaleMap[ instanceId ].gameTabs[ target ];
 
 				if ( matchId && target && Array.isArray( panels ) && panels.length ) {
 					// Set on first panel on init
@@ -610,7 +669,6 @@ liquipedia.battleRoyale = {
 				}
 
 				this.createBottomNav( instanceId, target, 0 );
-
 			} );
 
 			if ( !this.isMobile() ) {
