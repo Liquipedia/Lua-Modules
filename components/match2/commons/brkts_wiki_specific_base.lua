@@ -88,4 +88,24 @@ function WikiSpecificBase.getMatchContainer(displayMode)
 	end
 end
 
+--[[
+Returns a display component for single game. The display component must
+be a container, i.e. it takes in a match ID rather than a matches.
+See the default implementation (pointed to below) for details.
+
+To customize single match display for a wiki, override this to return
+a display component with the wiki-specific customizations.
+
+Called from MatchGroup
+
+-- @returns module
+]]
+function WikiSpecificBase.getGameContainer(displayMode)
+	if displayMode == 'singlegame' then
+		-- Single match, displayed flat on a page (no popup)
+		local SingleGame = Lua.import('Module:MatchGroup/Display/SingleGame')
+		return SingleGame.SingleGameContainer
+	end
+end
+
 return WikiSpecificBase
