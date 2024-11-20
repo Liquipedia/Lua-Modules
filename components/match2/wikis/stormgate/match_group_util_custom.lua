@@ -150,15 +150,16 @@ end
 ---@return StormgateMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
-		local players = Array.map(mapOpponent.players, function(player)
+		local players = Array.map(mapOpponent.players, function(player, playerIndex)
 			if Logic.isEmpty(player) then return end
 			return Table.merge({displayName = 'TBD'}, matchOpponents[opponentIndex] or {}, {
 				faction = player.faction,
 				position = tonumber(player.position),
 				heroes = player.heroes,
 				random = player.random,
+				matchPlayerIndex = playerIndex,
 			})
-		end) --[[@as StormgateStandardPlayer[] ]]
+		end)
 
 		return Table.merge(mapOpponent, {players = players})
 	end)
