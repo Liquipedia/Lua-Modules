@@ -641,7 +641,6 @@ liquipedia.battleRoyale = {
 		Object.keys( this.battleRoyaleInstances ).forEach( ( instanceId ) => {
 			// create object based on id
 			this.buildBattleRoyaleMap( instanceId );
-			console.log( this.battleRoyaleMap );
 
 			this.attachHandlers( instanceId );
 			this.makeCollapsibles( instanceId );
