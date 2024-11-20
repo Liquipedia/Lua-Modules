@@ -277,7 +277,7 @@ liquipedia.battleRoyale = {
 		const gameId = panelTab.dataset.jsBattleRoyaleGameIdx;
 
 		if ( loadTemplate && !this.loadedTabs[ instanceId ] ) {
-			this.callTemplate( instanceId, matchId, gameId, dataTargetId, contentId, () => {
+			this.callTemplate( instanceId, matchId, gameId, dataTargetId, () => {
 				this.buildBattleRoyaleMapMatchContents( instanceId, document.querySelector(
 					`[data-js-battle-royale-content-id="${ dataTargetId }"]` ), true );
 				this.loadedTabs[ instanceId ] = true;
@@ -323,7 +323,7 @@ liquipedia.battleRoyale = {
 		this.recheckNavigationStates( instanceId );
 	},
 
-	callTemplate: function( id, matchId, gameId, dataTargetId, contentId, callback ) {
+	callTemplate: function( id, matchId, gameId, dataTargetId, callback ) {
 		const games = Object.keys( this.battleRoyaleMap[ id ].gamePanels[ dataTargetId ] ).length - 1;
 		let wikitext = '';
 		for ( let i = 1; i <= games; i++ ) {
