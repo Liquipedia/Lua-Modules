@@ -276,7 +276,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
 	end)
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	local mapPlayers = MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -298,26 +298,21 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end
 	)
 
-	--- fill up with empty tables to not have gaps
-	Array.forEach(opponent.match2players, function(_, playerIndex)
-		participants[playerIndex] = participants[playerIndex] or {}
-	end)
-
-	Array.forEach(unattachedParticipants, function(participant)
-		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
+	Array.forEach(mapPlayers, function(player, playerIndex)
+		if Logic.isEmpty(player) then return end
+		local name = mapInput['t' .. opponentIndex .. 'p' .. player.position]
 		local nameUpper = name:upper()
 		local isTBD = nameUpper == TBD or nameUpper == TBA
 
-		table.insert(opponent.match2players, {
-			name = isTBD and TBD or participant.player,
+		opponent.match2players[playerIndex] = opponent.match2players[playerIndex] or {
+			name = isTBD and TBD or player.player,
 			displayname = isTBD and TBD or name,
-			flag = participant.flag,
-			extradata = {faction = participant.faction},
-		})
-		participants[#opponent.match2players] = participant
+			flag = player.flag,
+			extradata = {faction = player.faction},
+		}
 	end)
 
-	return participants
+	return mapPlayers
 end
 
 ---@param mapInput table
