@@ -139,6 +139,7 @@ function MediaList._buildConditions(args)
 
 	return table.concat(conditions, ' AND ')
 end
+
 ---Builds a multi key condition for a given prefix and value
 ---@param value string|number
 ---@param prefix string
@@ -146,7 +147,8 @@ end
 ---@return string
 function MediaList._buildMultiKeyCondition(value, prefix, limit)
 	return table.concat(Array.map(Array.range(1, limit), function(index)
-		return '([[' .. prefix .. index .. '::' .. value .. ']] OR [['.. prefix .. index .. '::' .. value:gsub(' ', '_') .. ']])'
+		return '([[' .. prefix .. index .. '::' .. value .. ']]'
+			.. ' OR [['.. prefix .. index .. '::' .. value:gsub(' ', '_') .. ']])'
 	end), ' OR ')
 end
 
