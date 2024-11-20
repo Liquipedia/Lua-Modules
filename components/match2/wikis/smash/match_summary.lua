@@ -28,15 +28,9 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {
-		width = CustomMatchSummary._determineWidth,
+		width = '350px',
 		teamStyle = 'bracket',
 	})
-end
-
----@param match MatchGroupUtilMatch
----@return string
-function CustomMatchSummary._determineWidth(match)
-	return CustomMatchSummary.isTeam(match) and '550px' or '400px'
 end
 
 ---@param match MatchGroupUtilMatch
@@ -103,7 +97,7 @@ function CustomMatchSummary._createStandardGame(game, props)
 		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1), flipped = true},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game), css = {['flex-basis'] = '150px'}},
+			MatchSummaryWidgets.GameCenter{children = game.map, css = {['flex-basis'] = '100px', ['text-align'] = 'center'}},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2)},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -134,15 +128,20 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, disp
 		end
 		local playerWrapper = mw.html.create('div')
 			:css('display', 'flex')
-			:css('flex-direction', reverse and 'row' or 'row-reverse')
-			:css('position', 'relative')
+			:css('flex-direction', 'column')
 			:css('width', '100%')
+			:css('align-items', reverse and 'flex-start' or 'flex-end')
+
+		if displayPlayerNames then
+			playerWrapper:node(PlayerDisplay.BlockPlayer{player = player, flip = not reverse})
+		end
 
 		local charactersWrapper = mw.html.create('span')
 			:css('display', 'flex')
 			:css('flex-direction', reverse and 'row-reverse' or 'row')
+			:css('position', 'relative')
 		local characterDisplays = Array.map(characters, function(character, characterIndex)
-			local characterDisplay = mw.html.create('div')
+			local characterDisplay = mw.html.create('span')
 				:addClass('brkts-popup-body-element-thumbs')
 				:css('opacity', character.status ~= 1 and '0.3' or nil)
 			characterDisplay:wikitext(CharacterIcons[character.name])
@@ -158,16 +157,13 @@ function CustomMatchSummary._createCharacterDisplay(players, game, reverse, disp
 			Array.forEach(Array.range(1, unknownCharactersCount), function()
 				unknownCharactersWrapper:wikitext(CharacterIcons.Unknown)
 			end)
-			playerWrapper:node(unknownCharactersWrapper)
+			charactersWrapper:node(unknownCharactersWrapper)
 		end
 
 		Array.forEach(characterDisplays, FnUtil.curry(charactersWrapper.node, charactersWrapper))
 		playerWrapper:node(charactersWrapper)
 
-		if displayPlayerNames then
-			playerWrapper:node('&nbsp;')
-			playerWrapper:node(PlayerDisplay.BlockPlayer{player = player, flip = not reverse})
-		end
+
 
 		return playerWrapper
 	end)
