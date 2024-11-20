@@ -143,7 +143,8 @@ function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
 		local players = Array.map(mapOpponent.players, function(player, playerIndex)
 			if Logic.isEmpty(player) then return end
-			return Table.merge({displayName = 'TBD'}, matchOpponents[opponentIndex] or {}, {
+			local matchPlayer = (matchOpponents[opponentIndex].players or {})[playerIndex] or {}
+			return Table.merge({displayName = 'TBD'}, matchPlayer, {
 				faction = player.faction,
 				position = tonumber(player.position),
 				heroes = player.heroes,
