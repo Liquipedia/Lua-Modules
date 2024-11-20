@@ -221,7 +221,7 @@ Config.weights = {
 
 -- Currently the score ranges are used but in the future a more simple method might get added
 Config.scoreRanges = {
-    -- "Tier 1" 
+    -- "Tier 1"
     {
         {max = 4, points = 300},
         {max = 6, points = 250},
@@ -281,10 +281,10 @@ function Config.placementDropOffFunction(tier, tierType)
         -- Workaround since in the main checker module the mode modifiers are applied before this function
 		local scoreForFirst = Config.scoreRanges[tier][1]
 		local needModifier = false
-		if (score > scoreForFirst.points) then 
+		if (score > scoreForFirst.points) then
 			needModifier = true
 		end
-        
+
         -- The current notability guidelines award set amount of points based on placement and tier of event.
 		for _, range in ipairs(Config.scoreRanges[tier]) do
 			if placement <= range.max then
