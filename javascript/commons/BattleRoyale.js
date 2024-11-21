@@ -7,7 +7,7 @@
  *              and collapsible elements within the Battle Royale map.
  ******************************************************************************/
 /**
- * Example of a Battle Royale instance Map:
+ * Example of a Battle Royale Map:
  * {
  *   "bxishKhYAc": {
  *     "collapsibles": [HTMLElement, HTMLElement, HTMLElement],
