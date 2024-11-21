@@ -19,6 +19,8 @@ local League = Lua.import('Module:Infobox/League')
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
+local VALID_PUBLISHERTIERS = {'sponsored'}
+
 local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supercell'
 	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
 	.. '|x18px|link=Supercell|Tournament sponsored by Supercell.|class=show-when-dark-mode]]'
@@ -71,7 +73,9 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args['supercell-sponsored'])
+	local publisherTier = (args.publishertier or ''):lower()
+	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
+		or Logic.readBool(args['supercell-sponsored']) -- kick this line after bot runs
 end
 
 ---@param args table
