@@ -69,6 +69,7 @@ liquipedia.battleRoyale = {
 	battleRoyaleMap: {},
 	gameWidth: parseFloat( getComputedStyle( document.documentElement ).fontSize ) * 9.25,
 	loadedTabs: {},
+	isLoading: {},
 
 	isMobile: function() {
 		return window.matchMedia( '(max-width: 767px)' ).matches;
@@ -196,7 +197,7 @@ liquipedia.battleRoyale = {
 	 * This function is called when the window is resized or when an element is resized to ensure
 	 * that the navigation elements are correctly displayed and functional.
 	 *
-	 * @param instanceId
+	 * @param {string} instanceId
 	 */
 	recheckNavigationStates: function( instanceId ) {
 		if ( this.isMobile() ) {
@@ -215,7 +216,7 @@ liquipedia.battleRoyale = {
 	 * Ensure that the side scroll buttons are correctly displayed based on the current scroll position
 	 * and scrollable width of the table.
 	 *
-	 * @param tableElement
+	 * @param {HTMLElement} tableElement
 	 */
 	recheckSideScrollButtonStates: function( tableElement ) {
 		const navLeft = tableElement.querySelector( '[data-js-battle-royale="navigate-left"]' );
@@ -263,10 +264,10 @@ liquipedia.battleRoyale = {
 	},
 
 	/**
-	 * @param instanceId as string
-	 * @param contentId as string
-	 * @param panelTab as HTMLElement
-	 * @param loadTemplate as boolean
+	 * @param {string} instanceId
+	 * @param {string} contentId
+	 * @param {HTMLElement} panelTab
+	 * @param {boolean} loadTemplate
 	 */
 	handlePanelTabChange: function( instanceId, contentId, panelTab, loadTemplate = true ) {
 		const navigationTab = this.battleRoyaleMap[ instanceId ].matchButtons.find(
@@ -324,6 +325,18 @@ liquipedia.battleRoyale = {
 	},
 
 	callTemplate: function( id, matchId, gameId, dataTargetId, callback ) {
+		// Create a new object for the match if it doesn't exist
+		if ( !this.isLoading[ id ] ) {
+			this.isLoading[ id ] = {};
+		}
+
+		// Prevent multiple calls for the same match
+		if ( this.isLoading[ id ][ matchId ] ) {
+			return;
+		}
+
+		this.isLoading[ id ][ matchId ] = true;
+
 		const games = Object.keys( this.battleRoyaleMap[ id ].gamePanels[ dataTargetId ] ).length - 1;
 		let wikitext = '';
 		for ( let i = 1; i <= games; i++ ) {
@@ -352,6 +365,9 @@ liquipedia.battleRoyale = {
 						callback();
 					}
 				}
+				this.isLoading[ id ][ matchId ] = false;
+			} ).catch( () => {
+				this.isLoading[ id ][ matchId ] = false;
 			} );
 		} );
 	},
@@ -458,7 +474,7 @@ liquipedia.battleRoyale = {
 	 * Ensures that the side scroll hint elements are correctly displayed based on the current scroll
 	 * position and scrollable width of the table.
 	 *
-	 * @param table
+	 * @param {HTMLElement} table
 	 */
 	recheckSideScrollHintElements: function( table ) {
 		const swipeHintLeft = table.querySelector( '[data-js-battle-royale="swipe-hint-left"]' );
