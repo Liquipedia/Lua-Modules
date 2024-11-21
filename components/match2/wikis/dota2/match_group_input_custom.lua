@@ -92,18 +92,19 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		map.length = MapParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.publisherid = map.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
-		map.participants = MapFunctions.getParticipants(MapParser, map, opponents)
 		map.extradata = MapFunctions.getExtraData(MapParser, map, #opponents)
 
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(opponents, function(_, opponentIndex)
+		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
 				score = map['score' .. opponentIndex],
 			}, MapFunctions.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
+			local players = MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
+
 		end)
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
@@ -226,37 +227,32 @@ function MapFunctions.getExtraData(MapParser, map, opponentCount)
 	return extraData
 end
 
--- Parse participant information
 ---@param MapParser Dota2MapParserInterface
 ---@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getParticipants(MapParser, map, opponents)
-	local allParticipants = {}
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		local participantList = MapParser.getParticipants(map, opponentIndex) or {}
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			participantList,
-			function (playerIndex)
-				local participant = participantList[playerIndex]
-				return participant and {name = participant.player} or nil
-			end,
-			function(playerIndex)
-				local participant = participantList[playerIndex]
-				participant.character = getCharacterName(participant.character)
-				return participant
-			end
-		)
-		Array.forEach(unattachedParticipants, function(participant)
-			table.insert(participants, participant)
-		end)
-		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
+		participantList,
+		function (playerIndex)
+			local participant = participantList[playerIndex]
+			return participant and {name = participant.player} or nil
+		end,
+		function(playerIndex)
+			local participant = participantList[playerIndex]
+			participant.character = getCharacterName(participant.character)
+			return participant
+		end
+	)
+	Array.forEach(unattachedParticipants, function(participant)
+		table.insert(participants, participant)
 	end)
-
-	return allParticipants
+	return participants
 end
 
 ---@param winnerInput string|integer|nil

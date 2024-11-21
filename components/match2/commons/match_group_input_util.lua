@@ -963,15 +963,6 @@ function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToP
 	return participants, unattachedParticipants
 end
 
----@generic T:table
----@param opponentIndex integer
----@return fun(playerIndex: integer, data: T): string, T
-function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
-	return function(playerIndex, data)
-		return opponentIndex .. '_' .. playerIndex, data
-	end
-end
-
 ---@param match table
 ---@return table<string, string?>
 function MatchGroupInputUtil.getLinks(match)
@@ -1005,6 +996,7 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	match.games = standaloneMatch.match2games
 	for _, game in ipairs(match.games) do
 		game.scores = ensureTable(game.scores)
+		game.opponents = ensureTable(game.opponents)
 		game.participants = ensureTable(game.participants)
 		game.extradata = ensureTable(game.extradata)
 	end
@@ -1132,7 +1124,6 @@ end
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
----@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1146,7 +1137,6 @@ end
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
 --- - mapIsFinished(map, opponents): boolean
---- - getParticipants(map, opponents, finishedInput, winnerInput): table (DEPRECATED)
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1184,10 +1174,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.patch = Parser.getPatch(map)
 		end
 
-		if Parser.getParticipants then
-			-- Legacy way, to be replaced by getPlayersOfMapOpponent
-			map.participants = Parser.getParticipants(map, opponents)
-		end
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,

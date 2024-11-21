@@ -12,7 +12,6 @@ local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -99,27 +98,22 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param mapInput table
----@param opponents table[]
----@return table<string, {character: string?, player: string}>
-function MapFunctions.getParticipants(mapInput, opponents)
-	local participants = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		if opponent.type == Opponent.literal then
-			return
-		elseif opponent.type == Opponent.team then
-			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
-			return
-		end
-		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
-	end)
-
-	return participants
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]?
+function MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
+	if opponent.type == Opponent.literal then
+		return
+	elseif opponent.type == Opponent.team then
+		return MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+	end
+	return MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {character: string?, player: string}>
+---@return {character: string?, player: string}[]
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
 		return Logic.nilIfEmpty(mapInput['o' .. opponentIndex .. 'p' .. playerIndex])
@@ -152,7 +146,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		participants[#opponent.match2players] = participant
 	end)
 
-	return Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
+	return participants
 end
 
 ---@param mapInput table
@@ -164,16 +158,12 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 
 	local prefix = 'o' .. opponentIndex .. 'p'
 
-	local participants = {}
-
-	Array.forEach(players, function(player, playerIndex)
-		participants[opponentIndex .. '_' .. playerIndex] = {
+	return Array.map(players, function(player, playerIndex)
+		return {
 			character = MapFunctions.readCharacter(mapInput[prefix .. playerIndex]),
 			player = player.name,
 		}
 	end)
-
-	return participants
 end
 
 ---@param input string?
