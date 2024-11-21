@@ -123,7 +123,7 @@ function MapFunctions.readMap(mapInput, mapIndex, subGroup, opponents)
 			opponentIndex = opponentIndex,
 			score = mapInput['score' .. opponentIndex],
 		}, MapFunctions.calculateMapScore(mapInput, map.finished))
-		local players = MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+		local players = MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
 		return {score = score, status = status, players = players}
 	end)
 
