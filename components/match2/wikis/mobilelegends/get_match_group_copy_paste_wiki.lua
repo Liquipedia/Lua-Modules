@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=smite
+-- wiki=mobilelegends
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
----@class SmiteMatch2CopyPaste: Match2CopyPasteBase
+---@class MobileLegendsMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
@@ -37,7 +37,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Logic.readBool(args.hasDate) and {
-			INDENT .. '|date= |youtube= |twitch=',
+			INDENT .. '|date= |youtube=',
 			args.vod == 'series' and (INDENT .. '|vod=') or nil,
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
@@ -57,12 +57,12 @@ function WikiCopyPaste._getMapCode(mapIndex, showBans, showVod)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (showVod and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
-		INDENT .. INDENT .. '<!-- God picks -->',
-		INDENT .. INDENT .. '|t1g1= |t1g2= |t1g3= |t1g4= |t1g5=',
-		INDENT .. INDENT .. '|t2g1= |t2g2= |t2g3= |t2g4= |t2g5=',
-		showBans and (INDENT .. INDENT .. '<!-- God bans -->') or nil,
-		showBans and (INDENT .. INDENT .. '|t1b1=') or nil,
-		showBans and (INDENT .. INDENT .. '|t2b1=') or nil,
+		INDENT .. INDENT .. '<!-- Hero picks -->',
+		INDENT .. INDENT .. '|t1h1= |t1h2= |t1h3= |t1h4= |t1h5=',
+		INDENT .. INDENT .. '|t2h1= |t2h2= |t2h3= |t2h4= |t2h5=',
+		showBans and (INDENT .. INDENT .. '<!-- Hero bans -->') or nil,
+		showBans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
+		showBans and (INDENT .. INDENT .. '|t2b1= |t2b2= |t2b3= |t2b4= |t2b5=') or nil,
 		INDENT .. '}}'
 	), '\n')
 end
