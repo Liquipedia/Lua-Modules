@@ -111,7 +111,7 @@ function MediaList._buildConditions(args)
 			additionalConditions,
 			'([[extradata_subject_organization::'
 				.. args.org
-				']] OR [[extradata_subject_organization::'
+				.. ']] OR [[extradata_subject_organization::'
 				.. args.org:gsub(' ', '_')
 				.. ']])'
 		)
