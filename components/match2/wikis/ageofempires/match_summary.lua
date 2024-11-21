@@ -14,6 +14,7 @@ local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -107,12 +108,14 @@ function CustomMatchSummary._createGame(game, props)
 		end
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
-			Array.forEach(
-				Array.sortBy(game.opponents[opponentId].players, Operator.property('index')),
-				function(player)
-					display:node(createParticipant(player, opponentId == 1))
-				end
-			)
+		
+			local ordering = function(tbl, a, b)
+				return tbl[a].index < tbl[b].index
+			end
+			
+			for _, player in Table.iter.spairs(game.opponents[opponentId].players, ordering) do
+				display:node(createParticipant(player, opponentId == 1))
+			end
 			return display
 		end
 
