@@ -1,15 +1,16 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
+-- wiki=worldofwarcraft
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local HeroNames = mw.loadData('Module:HeroNames')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+local SpecNames = mw.loadData('Module:SpecNames')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -20,7 +21,7 @@ local CustomMatchGroupInput = {}
 MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
-	maxNumPlayers = 10,
+	maxNumPlayers = 5,
 }
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
@@ -47,56 +48,44 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		comment = match.comment,
-	}
-end
-
----@param map table
----@return string?
-function MapFunctions.getMapName(map)
-	return nil
-end
-
----@param match table
 ---@param map table
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
-		team1side = map.team1side,
-		team2side = map.team2side,
+		damp = map.damp,
 	}
-
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
-	for opponentIndex = 1, #opponents do
-		for _, ban, banIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			extradata['team' .. opponentIndex .. 'ban' .. banIndex] = getCharacterName(ban)
-		end
-		for _, pick, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h') do
-			extradata['team' .. opponentIndex .. 'hero' .. pickIndex] = getCharacterName(pick)
-		end
-	end
 
 	return extradata
 end
 
---- TODO FIX:This function does not attempt to attach the data to the correct player!
 ---@param map table
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
-
-	local participants = {}
-	for _, hero in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h', {requireIndex = true}) do
-		table.insert(participants, {character = getCharacterName(hero)})
-	end
-
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, SpecNames)
+	local players = Array.mapIndexes(function(playerIndex)
+		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 's' .. playerIndex])
+	end)
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData)
+			local character = map['t' .. opponentIndex .. 's' .. playerIndex]
+			return {
+				character = getCharacterName(character),
+			}
+		end
+	)
+	Array.forEach(unattachedParticipants, function(participant)
+		table.insert(participants, participant)
+	end)
 	return participants
 end
 
