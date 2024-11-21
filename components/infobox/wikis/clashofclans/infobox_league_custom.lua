@@ -59,7 +59,6 @@ end
 function CustomLeague:customParseArguments(args)
 	local publisherTier = (args.publishertier or ''):lower()
 	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
-		or Logic.readBool(args['supercell-sponsored']) -- kick this line after bot runs
 end
 
 return CustomLeague

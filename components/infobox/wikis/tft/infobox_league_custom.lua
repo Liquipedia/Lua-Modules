@@ -78,11 +78,10 @@ end
 function CustomLeague:customParseArguments(args)
 	-- Normalize Mode input
 	args.mode = args.mode and GAME_MODES[string.lower(args.mode):gsub('s$', '')] or DEFAULT_MODE
-
 	self.data.mode = string.lower(args.mode)
+
 	local publisherTier = (args.publishertier or ''):lower()
 	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
-		or Logic.readBool(args['riot-sponsored']) and 'sponsored' or nil -- kick this line after bot runs
 end
 
 ---@param args table

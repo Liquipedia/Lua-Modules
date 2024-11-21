@@ -52,9 +52,6 @@ function CustomLeague:customParseArguments(args)
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
 	local publisherTier = (args.publishertier or ''):lower()
 	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
-		or Logic.readBool(args['riot-highlighted']) and 'highlighted'
-		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
-		or nil
 end
 
 ---@param id string
