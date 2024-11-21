@@ -115,7 +115,7 @@ function MediaList._buildConditions(args)
 				.. args.org:gsub(' ', '_')
 				.. ']])'
 		)
-		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extraata_subject_organization', 5))
+		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5))
 	end
 
 	if args.author then
