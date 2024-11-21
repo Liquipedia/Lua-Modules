@@ -114,7 +114,7 @@ liquipedia.battleRoyale = {
 				}
 			}
 		} );
-		obs.observe( document.querySelector( `[data-js-battle-royale-id=${ instanceId }]` ) );
+		obs.observe( document.querySelector( `[data-js-battle-royale-id="${ instanceId }"]` ) );
 	},
 
 	implementOnWindowResize: function( instanceId ) {
@@ -305,11 +305,11 @@ liquipedia.battleRoyale = {
 		const matchId = matchButton ? matchButton.dataset.jsBattleRoyaleMatchid : null;
 		const gameId = gameTab.dataset.jsBattleRoyaleGameIdx;
 
-		if ( loadTemplate && !this.loadedTabs[ battleRoyaleId ] ) {
+		if ( loadTemplate && !this.loadedTabs[ battleRoyaleId ][ matchContentId ] ) {
 			this.callTemplate( battleRoyaleId, matchId, gameId, matchContentId, () => {
 				this.buildBattleRoyaleMapMatchContents( battleRoyaleId, document.querySelector(
 					`[data-js-battle-royale-content-id="${ matchContentId }"]` ), true );
-				this.loadedTabs[ battleRoyaleId ] = true;
+				this.loadedTabs[ battleRoyaleId ][ matchContentId ] = true;
 				this.updateGameTabDisplay( battleRoyaleId, matchContentId, gameTab );
 				this.makeCollapsibles( battleRoyaleId );
 				this.battleRoyaleMap[ battleRoyaleId ].gameTabs[ matchContentId ].forEach(
@@ -336,7 +336,7 @@ liquipedia.battleRoyale = {
 			}
 		} );
 
-		if ( this.loadedTabs[ battleRoyaleId ] ) {
+		if ( this.loadedTabs[ battleRoyaleId ][ matchContentId ] ) {
 			const gamePanels = this.battleRoyaleMap[ battleRoyaleId ].gamePanels[ matchContentId ];
 			Object.keys( gamePanels ).forEach( ( gamePanelKey ) => {
 				// match the game tab with the correct game panel
@@ -415,7 +415,7 @@ liquipedia.battleRoyale = {
 			const targetId = node.dataset.jsBattleRoyaleContentTargetId;
 			this.battleRoyaleMap[ battleRoyaleId ]
 				.gamePanels[ matchContentId ][ targetId ] =
-				matchContent.querySelector( '#' + targetId );
+				document.getElementById( targetId );
 
 			const panel = this.battleRoyaleMap[ battleRoyaleId ]
 				.gamePanels[ matchContentId ][ targetId ];
@@ -681,12 +681,12 @@ liquipedia.battleRoyale = {
 	init: function() {
 		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( battleRoyaleElement ) => {
 			this.battleRoyaleInstances[ battleRoyaleElement.dataset.jsBattleRoyaleId ] = battleRoyaleElement;
-			this.loadedTabs[ battleRoyaleElement.dataset.jsBattleRoyaleId ] = false;
-
 			this.makeSortableTable( battleRoyaleElement );
 		} );
 
 		Object.keys( this.battleRoyaleInstances ).forEach( ( battleRoyaleId ) => {
+			this.loadedTabs[ battleRoyaleId ] = {};
+
 			// create object based on id
 			this.buildBattleRoyaleMap( battleRoyaleId );
 
@@ -711,6 +711,7 @@ liquipedia.battleRoyale = {
 				const matchId = matchButton.dataset.jsBattleRoyaleMatchid;
 				const matchContentId = matchButton.dataset.targetId;
 				const gameTabs = this.battleRoyaleMap[ battleRoyaleId ].gameTabs[ matchContentId ];
+				this.loadedTabs[ battleRoyaleId ][ matchContentId ] = false;
 
 				if ( matchId && matchContentId && Array.isArray( gameTabs ) && gameTabs.length ) {
 					// Set on first panel on init
