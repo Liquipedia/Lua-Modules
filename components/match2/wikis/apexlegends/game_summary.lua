@@ -164,7 +164,6 @@ function CustomGameSummary._createGameTab(game, matchId, idx, scoreData)
 
 	local gameDetails = page:tag('div')
 			:addClass('panel-content__container')
-			:attr('id', 'panelContent1')
 			:attr('role', 'tabpanel')
 
 	local informationList = gameDetails:tag('ul'):addClass('panel-content__game-schedule')
