@@ -219,7 +219,7 @@ function CustomGameSummary._createGameStandings(game)
 			end
 	end)
 
-	Array.forEach(game.extradata.opponents, function (opponent, index)
+	Array.forEach(game.opponents, function (opponent, index)
 		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
 			local cell = row:tag('div')
@@ -237,7 +237,7 @@ end
 function CustomGameSummary._opponents(match)
 	-- Add match opponent data to game opponent
 	Array.forEach(match.games, function (game)
-		game.extradata.opponents = Array.map(game.extradata.opponents,
+		game.opponents = Array.map(game.opponents,
 			function(gameOpponent, opponentIdx)
 				local matchOpponent = match.opponents[opponentIdx]
 				local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
@@ -252,7 +252,7 @@ function CustomGameSummary._opponents(match)
 
 	-- Sort game level based on placement
 	Array.forEach(match.games, function (game)
-		Array.sortInPlaceBy(game.extradata.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
+		Array.sortInPlaceBy(game.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
 	end)
 end
 
