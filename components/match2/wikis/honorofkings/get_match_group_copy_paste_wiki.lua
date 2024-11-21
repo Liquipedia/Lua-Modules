@@ -42,7 +42,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			args.vod == 'series' and (INDENT .. '|vod=') or nil,
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return WikiCopyPaste._getMapCode(mapIndex, numberOfBans, args.vod)
+			return WikiCopyPaste._getMapCode(mapIndex, numberOfBans, args.vod == 'maps')
 		end),
 		'}}'
 	)
@@ -52,9 +52,9 @@ end
 
 ---@param mapIndex integer
 ---@param numberOfBans integer
----@param vod string
+---@param showVod boolean
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, numberOfBans, vod)
+function WikiCopyPaste._getMapCode(mapIndex, numberOfBans, showVod)
 	numberOfBans = numberOfBans or 0
 	local getBans = function(opponentIndex)
 		if numberOfBans == 0 then
@@ -64,9 +64,9 @@ function WikiCopyPaste._getMapCode(mapIndex, numberOfBans, vod)
 				return '|t' .. opponentIndex .. 'b' .. banIndex .. '='
 			end), ' ')
 	end
-
+	
 	return table.concat(Array.extend(
-		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (vod == 'maps' and '|vod=' or ''),
+		INDENT .. '|map' .. mapIndex .. '={{Map' ..  (showVod and '|vod=' or ''),
 		INDENT .. INDENT .. '|team1side= |team2side= |length= |winner=',
 		INDENT .. INDENT .. '<!-- Hero picks -->',
 		INDENT .. INDENT .. '|t1h1= |t1h2= |t1h3= |t1h4= |t1h5=',
