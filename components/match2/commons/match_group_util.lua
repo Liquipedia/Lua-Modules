@@ -212,6 +212,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field participants table
 ---@field resultType ResultType?
 ---@field scores number[]
+---@field status MatchStatus
 ---@field subgroup number?
 ---@field type string?
 ---@field vod string?
@@ -230,6 +231,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
 	scores = TypeUtil.array('number'),
+	status = TypeUtil.optional(MatchGroupUtil.types.Status),
 	subgroup = 'number?',
 	type = 'string?',
 	vod = 'string?',
@@ -623,18 +625,8 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local bestof = tonumber(matchRecord.bestof)
 	local game1 = (matchRecord.match2games or {})[1]
 	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
-		local winner = tonumber(game1.winner)
-		if game1.resulttype == 'default' then
-			score = -1
-			if winner == 0 then
-				status = 'D'
-			else
-				status = winner == opponentIndex and 'W' or string.upper(game1.walkover)
-			end
-		elseif game1.scores[opponentIndex] then
-			score = game1.scores[opponentIndex]
-			status = 'S'
-		end
+		status = (game1.opponents[opponentIndex] or {}).status
+		score = game1.scores[opponentIndex]
 	end
 
 	return {
@@ -686,36 +678,6 @@ end
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
-	local participants = Json.parseIfString(record.participants) or {}
-	local walkover = nilIfEmpty(record.walkover)
-
-	local function getParticipantsOfOpponent(allParticipants, opponentIndex)
-		local prefix = opponentIndex .. '_'
-		local function indexFromKey(key)
-			if String.startsWith(key, prefix) then
-				return tonumber(string.sub(key, #prefix + 1))
-			else
-				return nil
-			end
-		end
-		local participantsOfOpponent = Array.extractValues(Table.mapArguments(
-			allParticipants,
-			indexFromKey,
-			function (key, index)
-				if Logic.isEmpty(allParticipants[key]) then
-					return nil
-				end
-				return Table.merge({playerId = index}, allParticipants[key])
-			end,
-			true
-		))
-		return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
-	end
-
-	local opponents = Array.map(Array.range(1, opponentCount or 2), function (_, index)
-		return {players = getParticipantsOfOpponent(participants, index)}
-	end)
-
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -726,14 +688,15 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		map = nilIfEmpty(record.map),
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
-		opponents = opponents,
-		participants = participants,
+		opponents = Json.parseIfString(record.opponents) or {},
+		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
 		scores = Json.parseIfString(record.scores) or {},
+		status = nilIfEmpty(record.status),
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
-		walkover = walkover and walkover:lower() or nil,
+		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
