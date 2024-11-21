@@ -69,9 +69,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 
-		local placementOfTeams = CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
+		local placementOfOpponents = CustomMatchGroupInput.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = placementOfTeams[opponentIndex]
+			opponent.placement = placementOfOpponents[opponentIndex]
 			opponent.extradata.bg = settings.status[opponent.placement]
 		end)
 	end
@@ -113,7 +113,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = MapFunctions.getExtraData(map, map.opponents)
+		map.extradata = MapFunctions.getExtraData(map)
 
 		table.insert(maps, map)
 		match[key] = nil
@@ -135,7 +135,7 @@ end
 
 ---@param opponents table[]
 ---@return integer[]
-function CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
+function CustomMatchGroupInput.calculatePlacementOfOpponents(opponents)
 	local usedPlacements = Array.map(opponents, function()
 		return 0
 	end)
@@ -241,13 +241,11 @@ end
 
 -- Parse extradata information
 ---@param map table
----@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map, opponents)
+function MapFunctions.getExtraData(map)
 	return {
 		dateexact = map.dateexact,
 		comment = map.comment,
-		opponents = Table.deepCopy(opponents),
 	}
 end
 
