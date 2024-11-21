@@ -172,7 +172,7 @@ function MatchFunctions.extractMaps(match, opponents)
 			opponent.players = BaseMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		end)
 
-		map.mode = BaseMapFunctions.getMapMode(match, map, opponents)
+		map.mode = BaseMapFunctions.getMapMode(match, map, opponents, map.opponents)
 
 		table.insert(maps, map)
 		match[mapKey] = nil

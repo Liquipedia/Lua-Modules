@@ -346,17 +346,18 @@ end
 
 ---@param match table
 ---@param map table # has map.opponents as the games opponents
----@param opponents table[]
+---@param matchOpponents table[]
+---@param mapOpponents table[]
 ---@return string
-function MapFunctions.getMapMode(match, map, opponents)
-	local playerCounts = Array.map(map.opponents, function(opponent)
-		return Table.size(opponent.players)
+function MapFunctions.getMapMode(match, map, matchOpponents, mapOpponents)
+	local playerCounts = Array.map(mapOpponents or {}, function(opponent)
+		return Table.size(opponent.players or {})
 	end)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
 			return Opponent.literal
-		elseif count == 2 and MapFunctions.isArchon(map, opponents[opponentIndex], opponentIndex) then
+		elseif count == 2 and MapFunctions.isArchon(map, matchOpponents[opponentIndex], opponentIndex) then
 			return 'Archon'
 		elseif count == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
 			return '2S'
@@ -372,9 +373,11 @@ end
 
 ---@param match table
 ---@param map table
----@param opponents table[]
+---@param matchOpponents table[]
+---@param mapOpponents table[]
+---@param mapWinner integer?
 ---@return table
-function MapFunctions.getExtraData(match, map, opponents)
+function MapFunctions.getExtraData(match, map, matchOpponents, mapOpponents, mapWinner)
 	local extradata = {
 		comment = map.comment,
 		displayname = map.mapDisplayName,
@@ -382,28 +385,28 @@ function MapFunctions.getExtraData(match, map, opponents)
 		server = map.server,
 	}
 
-	if #opponents ~= 2 then
+	if #matchOpponents ~= 2 then
 		return extradata
-	elseif Array.any(map.opponents, function(mapOpponent) return Table.size(mapOpponent.players or {}) ~= 1 end) then
+	elseif Array.any(mapOpponents, function(mapOpponent) return Table.size(mapOpponent.players or {}) ~= 1 end) then
 		return extradata
 	end
 
 	---@type table[]
 	local players = {
-		Array.extractValues(map.opponents[1].players)[1],
-		Array.extractValues(map.opponents[2].players)[1],
+		Array.extractValues(mapOpponents[1].players)[1],
+		Array.extractValues(mapOpponents[2].players)[1],
 	}
 
 	extradata.opponent1 = players[1].player
 	extradata.opponent2 = players[2].player
 
-	if map.winner ~= 1 and map.winner ~= 2 then
+	if mapWinner ~= 1 and mapWinner ~= 2 then
 		return extradata
 	end
 
-	local loser = 3 - map.winner
+	local loser = 3 - mapWinner
 
-	extradata.winnerfaction = players[map.winner].faction
+	extradata.winnerfaction = players[mapWinner].faction
 	extradata.loserfaction = players[loser].faction
 
 	return extradata
