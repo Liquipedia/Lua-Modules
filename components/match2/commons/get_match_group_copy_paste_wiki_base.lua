@@ -64,7 +64,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), true)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
-	local lines = {'{{Match\n' .. INDENT}
+	local lines = {'{{Match'}
 	Array.extendWith(lines,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
