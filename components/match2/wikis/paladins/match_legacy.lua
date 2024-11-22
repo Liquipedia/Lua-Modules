@@ -88,12 +88,13 @@ function MatchLegacy.storeGames(match, match2)
 		local opponents = Json.parseIfString(game2.opponents) or {}
 
 		-- Extradata
+		local extradata = Json.parseIfString(game2.extradata) or {}
 		game.extradata = Array.map(opponents, function(opponent, opponentIndex)
 			local cnt = 0
 			for _, player in ipairs(opponent.players) do
 				if player.character then
 					cnt = cnt + 1
-					game.extradata['t' .. opponentIndex .. 'p' .. cnt] = player.character
+					extradata['t' .. opponentIndex .. 'p' .. cnt] = player.character
 				end
 			end
 		end)

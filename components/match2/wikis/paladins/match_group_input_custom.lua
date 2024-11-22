@@ -63,7 +63,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
 	local players = Array.mapIndexes(function(playerIndex)
-		return map['t' .. opponentIndex .. 'p' .. playerIndex]
+		return map['t' .. opponentIndex .. 'c' .. playerIndex]
 	end)
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
@@ -75,7 +75,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 		function(playerIndex, playerIdData, playerInputData)
 			return {
 				player = playerIdData.name or playerInputData.name,
-				character = getCharacterName(map['t'.. opponentIndex .. 'p' .. playerIndex]),
+				character = getCharacterName(map['t'.. opponentIndex .. 'c' .. playerIndex]),
 			}
 		end
 	)
