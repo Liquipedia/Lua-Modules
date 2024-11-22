@@ -12,7 +12,6 @@ local Faction = require('Module:Faction')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -108,11 +107,11 @@ function CustomMatchSummary._createGame(game, props)
 		end
 		local function createOpponentDisplay(opponentId)
 			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
-		
+
 			local ordering = function(tbl, a, b)
 				return tbl[a].index < tbl[b].index
 			end
-			
+
 			for _, player in Table.iter.spairs(game.opponents[opponentId].players, ordering) do
 				display:node(createParticipant(player, opponentId == 1))
 			end
