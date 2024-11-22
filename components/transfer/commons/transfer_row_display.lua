@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local IconModule = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
+local TransferData = Lua.requireIfExists('Module:Transfer/Data', {loadData = true}) or {}
 local Info = Lua.import('Module:Info', {loadData = true})
 local Platform = Lua.import('Module:Platform')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
@@ -340,19 +340,22 @@ function TransferRowDisplay:icon()
 		:addClass('divCell Icon')
 		:css('width', '70px')
 
-	if not IconModule then
+	if not TransferData.positionIcons and not TransferData.roleIcons then
 		iconCell:css('font-size','larger'):wikitext(TRANSFER_ARROW)
 		return self
 	end
 
 	---@param iconInput string?
 	---@return string
-	local getIcon = function(iconInput)
+	local getIcon = function(iconInput, roleInput)
 		if Logic.isEmpty(iconInput) then
+			if Logic.isNotEmpty(roleInput) then
+				return TransferData.roleIcons[roleInput:lower()]
+			end
 			return EMPTY_POSITION_ICON
 		end
 		---@cast iconInput -nil
-		local icon = IconModule[iconInput:lower()]
+		local icon = TransferData.positionIcons[iconInput:lower()]
 		if not icon then
 			mw.log( 'No entry found in Module:PositionIcon/data: ' .. iconInput)
 			mw.ext.TeamLiquidIntegration.add_category('Pages with transfer errors')
@@ -365,8 +368,12 @@ function TransferRowDisplay:icon()
 	local targetRoleIsSpecialRole = TransferRowDisplay:_isSpecialRole(self.transfer.to.roles[1])
 
 	local iconRows = Array.map(self.transfer.players, function(player)
-		return getIcon(player.icons[1]) .. '&nbsp;' .. TRANSFER_ARROW ..
-			'&nbsp;' .. getIcon(player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil)
+		return getIcon(player.icons[1], self.transfer.from.roles[1])
+			.. '&nbsp;' .. TRANSFER_ARROW .. '&nbsp;'
+			.. getIcon(
+				player.icons[2] or targetRoleIsSpecialRole and player.icons[1] or nil,
+				self.transfer.to.roles[1]
+			)
 	end)
 	iconCell:wikitext(table.concat(iconRows, '<br>'))
 
@@ -383,7 +390,7 @@ function TransferRowDisplay:to()
 	return self
 end
 
----@return self
+---@returnself
 function TransferRowDisplay:references()
 	self.display:tag('div')
 		:addClass('divCell Ref')
