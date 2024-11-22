@@ -22,11 +22,11 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -55,7 +55,6 @@ function CustomLeague:customParseArguments(args)
 		String.isNotEmpty(args.team_number) and 'team' or '1v1'
 	)
 
-	self.categories = {}
 	self.data.maps = self:_getMaps()
 	self.data.gameModes = self:_getGameModes(args)
 end
@@ -78,7 +77,7 @@ function CustomInjector:parse(id, widgets)
 		local playertitle = (not String.isEmpty(args.team_number)) and 'Teams' or 'Players'
 
 		Array.appendWith(widgets,
-			Title{name = playertitle},
+			Title{children = playertitle},
 			Cell{name = 'Number of Teams', content = {args.team_number}},
 			Cell{name = 'Number of Players', content = {args.player_number}}
 		)
@@ -96,13 +95,13 @@ function CustomInjector:parse(id, widgets)
 				index = index + 1
 			end
 
-			table.insert(widgets, Center{content = teams})
+			table.insert(widgets, Center{children = teams})
 		end
 
 		if not String.isEmpty(args.map1) then
 			Array.appendWith(widgets,
-				Title{name = 'Maps'},
-				Center{content = caller:_displayMaps(caller.data.maps)}
+				Title{children = 'Maps'},
+				Center{children = caller:_displayMaps(caller.data.maps)}
 			)
 		end
 	elseif id == 'sponsors' then
@@ -134,7 +133,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	return Array.append(self.categories,
+	return Array.append({},
 		String.isEmpty(args.game) and 'Tournaments without game version'
 			or (GameLookup.getName({args.game}) .. (args.beta and ' Beta' or '') .. ' Competitions')
 	)
@@ -288,7 +287,7 @@ end
 function CustomLeague:_getGameModes(args)
 	if String.isEmpty(args.gamemode) then
 		local default = GameModeLookup.getDefault(args.game or '')
-		table.insert(self.categories, default .. ' Tournaments')
+		self:categories(default .. ' Tournaments')
 		return {default}
 	end
 
@@ -297,7 +296,7 @@ function CustomLeague:_getGameModes(args)
 		function(mode, index)
 			gameModes[index] = GameModeLookup.getName(mode) or ''
 
-			table.insert(self.categories, not String.isEmpty(gameModes[index])
+			self:categories(not String.isEmpty(gameModes[index])
 				and gameModes[index] .. ' Tournaments'
 				or 'Pages with unknown game mode'
 			)
@@ -338,9 +337,9 @@ function CustomLeague:_getMaps()
 	return maps
 end
 
----@param name any
----@param link any
----@param game any
+---@param name string?
+---@param link string
+---@param game string?
 function CustomLeague:_checkMapInformation(name, link, game)
 	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::map]] AND [[pagename::' .. link:gsub(' ', '_') .. ']]',
@@ -350,7 +349,7 @@ function CustomLeague:_checkMapInformation(name, link, game)
 		local extradata = data[1].extradata or {}
 		if extradata.game ~= game then
 			mw.logObject('Map ' .. name .. ' is linking to ' .. link .. ', an ' .. extradata.game .. ' page.')
-			table.insert(self.categories, 'Tournaments linking to maps for a different game')
+			self:categories('Tournaments linking to maps for a different game')
 		end
 	end
 end

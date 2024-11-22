@@ -11,14 +11,16 @@ local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 
 local Data = Lua.requireIfExists('Module:CharacterIcon/Data', {loadData = true})
 
 ---@class IconArguments
----@field character string
+---@field character string?
 ---@field size string?
 ---@field class string?
 ---@field date string?
+---@field addTextLink boolean?
 
 ---@class CharacterIconInfo
 ---@field file string
@@ -51,7 +53,7 @@ function CharacterIcon._makeImage(info, size, class)
 		info.file,
 		info.display,
 		size,
-		Logic.isNotEmpty(info.link) and 'link=' .. info.link or nil,
+		info.link and ('link=' .. info.link) or nil,
 		Logic.isNotEmpty(class) and 'class=' .. class or nil
 	)
 
@@ -76,6 +78,9 @@ function CharacterIcon.Icon(args)
 	assert(iconInfo.file, 'Character:"' .. args.character .. '" has no file set')
 
 	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
+		.. (Logic.readBool(args.addTextLink)
+			and ('&nbsp;' .. Page.makeInternalLink(iconInfo.display or args.character, iconInfo.link or args.character))
+			or '')
 end
 
 return Class.export(CharacterIcon)

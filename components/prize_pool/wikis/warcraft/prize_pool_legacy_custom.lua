@@ -23,10 +23,15 @@ local _cache
 local TBD = 'TBD'
 
 -- Template entry point
+---@return Html
 function CustomLegacyPrizePool.run()
 	return LegacyPrizePool.run(CustomLegacyPrizePool)
 end
 
+---@param newArgs table
+---@param CACHED_DATA table
+---@param header table
+---@return table
 function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 	_cache = CACHED_DATA
 
@@ -48,6 +53,8 @@ function CustomLegacyPrizePool.customHeader(newArgs, CACHED_DATA, header)
 	return newArgs
 end
 
+---@param slot table
+---@return number
 function CustomLegacyPrizePool.opponentsInSlot(slot)
 	local slotInputSize
 	if slot.place and not SPECIAL_PLACES[string.lower(slot.place)] then
@@ -67,6 +74,10 @@ function CustomLegacyPrizePool.opponentsInSlot(slot)
 	return math.max(math.min(slotInputSize or math.huge, numberOfOpponentsFromInput), 1)
 end
 
+---@param slot table
+---@param newData table
+---@param mergeSlots boolean
+---@return table[]
 function CustomLegacyPrizePool.overwriteMapOpponents(slot, newData, mergeSlots)
 	local mapOpponent = function (opponentIndex)
 		-- Map Legacy WO flags into score
@@ -118,6 +129,8 @@ function CustomLegacyPrizePool.overwriteMapOpponents(slot, newData, mergeSlots)
 	return opponents
 end
 
+---@param props table
+---@return table?
 function CustomLegacyPrizePool._readOpponentArgs(props)
 	local slot = props.slot
 	local opponentIndex = props.opponentIndex
@@ -173,6 +186,8 @@ function CustomLegacyPrizePool._readOpponentArgs(props)
 	return opponentData
 end
 
+---@param newArgs table
+---@return table
 function CustomLegacyPrizePool.afterSlots(newArgs)
 	if _cache.opponentType == Opponent.duo then
 		for _, slot in ipairs(newArgs) do
@@ -183,6 +198,8 @@ function CustomLegacyPrizePool.afterSlots(newArgs)
 	return newArgs
 end
 
+---@param opponent table
+---@return table
 function CustomLegacyPrizePool._addDuoLastVs(opponent)
 	opponent.lastvs = _cache.duosCache[opponent.vs]
 	opponent.vs = nil

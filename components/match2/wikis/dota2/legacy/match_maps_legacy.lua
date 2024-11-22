@@ -18,7 +18,6 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -49,7 +48,6 @@ function MatchMapsLegacy._convertMaps(args)
 		for key, value in pairs(map) do
 			args[mapKey .. key] = value
 		end
-		args[mapKey] = DEFAULT
 		args[matchKey] = nil
 	end
 	return args
@@ -102,16 +100,15 @@ function MatchMapsLegacy._handleDetails(args, details)
 			end)
 		end)
 		details[prefix] = nil
-		return MatchSubobjects.luaGetMap(map)
+		return map
 	end
 
 	local getMapOnlyWithWinner = function (index)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		return MatchSubobjects.luaGetMap{
+		return {
 			winner = args['map' .. index .. 'win'],
-			map = DEFAULT
 		}
 	end
 

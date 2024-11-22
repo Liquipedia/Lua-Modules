@@ -56,7 +56,7 @@ TournamentsSummaryTable.upcomingType = conditionTypes.upcoming
 TournamentsSummaryTable.ongoingType = conditionTypes.ongoing
 TournamentsSummaryTable.recentType = conditionTypes.recent
 
-local _TYPE_TO_TITLE = {
+local TYPE_TO_TITLE = {
 	'Upcoming',
 	'Ongoing',
 	'Completed',
@@ -95,7 +95,7 @@ function TournamentsSummaryTable.run(args)
 		error('No type parameter (upcoming, ongoing, recent) specified')
 	end
 
-	local title = mw.language.getContentLanguage():ucfirst(args.title or _TYPE_TO_TITLE[type])
+	local title = mw.language.getContentLanguage():ucfirst(args.title or TYPE_TO_TITLE[type])
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
 	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
 	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')

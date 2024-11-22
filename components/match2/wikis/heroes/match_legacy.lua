@@ -19,17 +19,15 @@ local _GAME_EXTRADATA_CONVERTER = {
 	champion = 'h',
 }
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy._convertParameters(match2)
@@ -55,8 +53,6 @@ function MatchLegacy._convertParameters(match2)
 	match.extradata.matchsection = extradata.matchsection
 	match.extradata.comment = extradata.comment
 
-	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
-
 	-- Handle Opponents
 	local handleOpponent = function (index)
 		local prefix = 'opponent'..index
@@ -72,7 +68,7 @@ function MatchLegacy._convertParameters(match2)
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
 			end
-			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+			match[prefix..'players'] = opponentplayers
 		elseif opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
@@ -86,7 +82,7 @@ function MatchLegacy._convertParameters(match2)
 	handleOpponent(1)
 	handleOpponent(2)
 
-	return match
+	return Json.stringifySubTables(match)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -110,8 +106,6 @@ function MatchLegacy.storeGames(match, match2)
 			end
 		end
 
-		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
-
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2
@@ -123,7 +117,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent2score = winner == 2 and 1 or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. '_' .. gameIndex,
-			game
+			Json.stringifySubTables(game)
 		)
 		table.insert(games, res)
 	end

@@ -1,298 +1,398 @@
 /*******************************************************************************
  Template(s): Filter buttons
- Author(s): Elysienna
+ Author(s): Elysienna (original), iMarbot (refactor), SyntacticSalt (template expansion)
  *******************************************************************************/
 /**
- * Usage of module:
- *
- * Filter buttons:
+ * ### Liquipedia Filter Buttons
+ * #### Filter buttons/groups
+ * ```html
  * <span data-filter data-filter-effect="fade" data-filter-group="group1">
  *   <span data-filter-on="all">All</span>
  *   <span data-filter-on="cat1" class="filter-button--active">Category 1</span>
  *   <span data-filter-on="cat2">Category 2</span>
  * </span>
+ * ```
  *
- * - data-filter (required): property on the container to group the buttons within into the given group
- * - data-filter-group (encouraged): a unique identifier given to this group, to be used later on the items so the controls know which items to filter.
+ * - `data-filter` (required): property on the container to group the buttons within into the given group
+ * - `data-filter-group` (encouraged): unique identifier for group, used to determine which items to filter on the page.
  *     Note: this attribute is technically not required as long as one instance of the module is being used.
  *           When using multiple on a single page, ALWAYS use this attribute to distinguish between button/item groups
- * - data-filter-effect (optional): options are [fade,bounce,none]. When omitted, no effect is used.
- * - data-filter-on (required): clicking this element will toggle the items with the passed category
- *     (matching on data-filter-category on the items). Can also be 'all' to toggle all items.
+ * - `data-filter-effect` (optional): options are [fade,bounce,none]. When omitted, no effect is used.
+ * - `data-filter-on` (required): clicking this element will toggle the items with the passed category
+ *     (matching on `data-filter-category` on the items). Can also be 'all' to toggle all items.
  * Note: the class 'filter-button--active' may be given to pre-filter items on load.
  *
- * Filterable items:
+ * #### Filterable items
+ * ```html
  * <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  * <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * ```
  *
- * - data-filter-group (encouraged): group identifier for which the button group can interact with the item.
+ * - `data-filter-group` (encouraged): group identifier for which the button group can interact with the item.
  *     Note: See data-filter-group in Filter buttons above as to why it is encouraged to always provide.
- * - data-filter-category (required): identifier for 'data-filter-on'
+ * - `data-filter-category` (required): identifier for 'data-filter-on'
  *
+ * #### Replacement by template with filter options
+ * ```html
+ * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1,group2">Default content</div>
+ * ```
+ *
+ * - `data-filter-expansion-template` (required): The template to expand with the current filter options.
+ *   Expanded template will replace default content.
+ * - `data-filter-groups` (required): Identify which filter groups the template will receive current parameters from.
+ *   Should correspond to appropriate filter button groups used on the page.
+ *   For each group, the template will receive a parameter groupName holding the currently active group settings.
+ *
+ * #### Self-hiding filterable item groups
+ * Just adding this data attribute (no actual value needed) will create a group of filterable items. This group will
+ * then hide itself entierly if all the items contained within it are also hidden. Useful to hide categorizing heading
+ * items. Optionally can also add an effect type as with items which will be used on the whole group as well. The groups
+ * can also be nested, but, this will still check filterable items and not whether child groups themselves are hidden.
+ * Can also add a fallback item as a direct child of the group using `data-filter-hideable-group-fallback`; this item
+ * will instead be shown when the group is determined to be hidden instead of hiding the actual group element.
+ * ```html
+ * <div data-filter-hideable-group data-filter-effect="fade">
+ *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
+ *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ *   <span data-filter-hideable-group-fallback>DEFAULT CONTENT</span>
+ * </div>
+ * ```
  */
 
 liquipedia.filterButtons = {
-
-	buttonContainerElements: {},
-	buttonFilterAll: {},
-	filterEffect: {},
+	fallbackFilterEffect: 'none',
 	activeButtonClass: 'filter-button--active',
 	hiddenCategoryClass: 'filter-category--hidden',
-	bcFilterGroup: 'filter-group-fallback-common',
-	buttons: {},
-	items: {},
-	activeFilters: {},
-	activeAlwaysFilters: {},
-	localStorageKey: null,
-	localStorageValue: {},
+	fallbackFilterGroup: 'filter-group-fallback-common',
+
+	filterGroups: {},
+	templateExpansions: [],
+	hideableGroups: [],
 
 	init: function() {
+		const filterButtonGroups = Array.from( document.querySelectorAll( '.filter-buttons[data-filter]' ) );
+		if ( filterButtonGroups.length === 0 ) {
+			return;
+		}
 
 		this.localStorageKey = this.buildLocalStorageKey();
-
-		/**
-		 * Get all elements with data-filter attribute
-		 */
-		const elements = document.querySelectorAll( '[data-filter]' );
-		if ( elements.length === 0 ) {
-			return;
-		}
-
-		elements.forEach( function( element ) {
-			const filterGroup = element.dataset.filterGroup || this.bcFilterGroup;
-			this.buttonContainerElements[ filterGroup ] = element;
-			// Start with empty activeFilters
-			this.activeFilters[ filterGroup ] = [];
-
-			// Get buttons except for 'all' (direct childs only, this avoids catching the dropdown button
-			this.buttons[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelectorAll( ':scope > [data-filter-on]:not([data-filter-on=all])' );
-			// Get only 'all' button
-			this.buttonFilterAll[ filterGroup ] = this.buttonContainerElements[ filterGroup ].querySelector( '[data-filter-on=all]' );
-			// Get always active filters
-			this.activeAlwaysFilters[ filterGroup ] = [];
-			const activeAlwaysFilters = this.buttonContainerElements[ filterGroup ].getAttribute( 'data-filter-always-active' );
-			if ( typeof activeAlwaysFilters === 'string' ) {
-				activeAlwaysFilters.split( ',' ).forEach( function( alwaysActiveFilter ) {
-					this.activeAlwaysFilters[ filterGroup ].push( alwaysActiveFilter );
-				}, this );
-			}
-
-			let itemQS = '[data-filter-group=' + filterGroup + '][data-filter-category]';
-			if ( filterGroup === this.bcFilterGroup ) {
-				itemQS = '[data-filter-category]:not([data-filter-group])';
-			}
-			this.items[ filterGroup ] = document.querySelectorAll( itemQS );
-			this.filterEffect[ filterGroup ] = this.buttonContainerElements[ filterGroup ].dataset.filterEffect || 'none';
-
-			// Handler for 'all' button and standard buttons
-			this.filterButtonAllInit( this.buttonFilterAll[ filterGroup ], filterGroup );
-			this.filterButtonsInit( this.buttons[ filterGroup ], filterGroup );
-		}.bind( this ) );
+		this.generateFilterGroups( filterButtonGroups );
+		this.generateFilterableObjects();
+		this.initializeButtons();
+		this.performUpdate();
 	},
 
 	/**
-	 * Handles the 'all' button.
-	 *
-	 * If button contains activeClass from start, toggle items.
-	 * When a button is clicked for the first time it will be added to the local storage to remember selection.
-	 *
-	 * @param {HTMLSpanElement} button
-	 * @param {string} filterGroup
+	 * @param {HTMLElement[]} filterButtonGroups
 	 */
-	filterButtonAllInit: function( button, filterGroup ) {
-		if ( button ) {
-			this.setTabIndex( button );
+	generateFilterGroups: function( filterButtonGroups ) {
+		const localStorage = this.getLocalStorage();
 
-			if ( button.classList.contains( this.activeButtonClass ) ) {
-				this.toggleAllItems( filterGroup );
-			}
-			button.addEventListener( 'click', function() {
-				this.toggleAllItems( filterGroup );
-				this.setLocalStorage();
-				liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
-			}.bind( this ) );
-			button.addEventListener( 'keypress', function( event ) {
-				if ( event.key === 'Enter' ) {
-					this.toggleAllItems( filterGroup );
-					this.setLocalStorage();
-					liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
+		filterButtonGroups.forEach( ( buttonsDiv ) => {
+			const filterGroup = buttonsDiv.dataset.filterGroup ?? this.fallbackFilterGroup;
+			const filterGroupEntry = {
+				name: filterGroup,
+				buttons: [],
+				alwaysActive: buttonsDiv.dataset.filterAlwaysActive?.split( ',' ) ?? [],
+				effectClass: 'filter-effect-' + ( buttonsDiv.dataset.filterEffect ?? this.fallbackFilterEffect ),
+				filterStates: localStorage[ filterGroup ]?.filterStates ?? {},
+				curated: localStorage[ filterGroup ]?.curated ?? buttonsDiv.dataset.filterDefaultCurated === 'true',
+				filterableItems: [],
+				defaultStates: {},
+				defaultCurated: buttonsDiv.dataset.filterDefaultCurated === 'true'
+			};
+
+			Array.from( buttonsDiv.querySelectorAll( ':scope > .filter-button' ) ).forEach(
+				/** @param {HTMLElement} buttonElement */
+				( buttonElement ) => {
+					const filterOn = buttonElement.dataset.filterOn ?? '';
+					const defaultState = !(
+						buttonElement.dataset.filterDefault === 'false' ||
+							!buttonElement.classList.contains( 'filter-button--active' )
+					);
+					const button = {
+						element: buttonElement,
+						filter: filterOn,
+						active: true
+					};
+					switch ( filterOn ) {
+						case 'curated':
+						case 'all':
+							filterGroupEntry[ filterOn + 'Button' ] = button;
+							break;
+						default:
+							filterGroupEntry.buttons[ filterOn ] = button;
+							filterGroupEntry.filterStates[ filterOn ] =
+								filterGroupEntry.filterStates[ filterOn ] ?? defaultState;
+							filterGroupEntry.defaultStates[ filterOn ] = defaultState;
+					}
+					buttonElement.setAttribute( 'tabindex', '0' );
 				}
-			}.bind( this ) );
-		}
+			);
+
+			this.filterGroups[ filterGroup ] = filterGroupEntry;
+		} );
 	},
 
-	/**
-	 * Handles buttons except for the 'all' button.
-	 * Filter items on click and Enter key and write to localStorage.
-	 *
-	 * @param {HTMLSpanElement[]} buttons
-	 * @param {string} filterGroup
-	 */
-	filterButtonsInit: function( buttons, filterGroup ) {
-		buttons.forEach( function( button ) {
-			this.setTabIndex( button );
-			this.initButtonState( filterGroup, button );
+	generateFilterableObjects: function() {
+		Array.from( document.querySelectorAll( '[data-filter-category]' ) ).forEach(
+			/** @param {HTMLElement} filterableItem */
+			( filterableItem ) => {
+				const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
+				filterGroup.filterableItems.push( {
+					element: filterableItem,
+					value: filterableItem.dataset.filterCategory,
+					curated: filterableItem.dataset.curated !== undefined,
+					hidden: false
+				} );
+			}
+		);
 
-			button.addEventListener( 'click', function ( event ) {
-				this.filterItems( event.target );
-				this.setLocalStorage();
-				liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
-			}.bind( this ) );
-
-			button.addEventListener( 'keypress', function ( event ) {
-				if ( event.key === 'Enter' ) {
-					this.filterItems( event.target );
-					this.setLocalStorage();
-					liquipedia.tracker.track( 'Filter button clicked: ' + button.textContent, true );
+		this.templateExpansions = Array.from(
+			document.querySelectorAll( '[data-filter-expansion-template]' ),
+			/** @param {HTMLElement} templateExpansion */
+			( templateExpansion ) => ( {
+				element: templateExpansion,
+				groups: templateExpansion.dataset.filterGroups.split( ',' ),
+				template: templateExpansion.dataset.filterExpansionTemplate,
+				cache: {
+					default: templateExpansion.innerHTML
 				}
-			}.bind( this ) );
-		}.bind( this ) );
+			} )
+		);
+
+		this.hideableGroups = Array.from(
+			document.querySelectorAll( '[data-filter-hideable-group]' ),
+			/** @param {HTMLElement} hideableGroup */
+			( hideableGroup ) => ( {
+				element: hideableGroup,
+				effectClass: 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect ),
+				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' )
+			} )
+		);
 	},
 
-	/**
-	 * Initial check if button states need to be changed
-	 *
-	 * @param {string} filterGroup
-	 * @param {HTMLSpanElement} button
-	 */
-	initButtonState: function( filterGroup, button ) {
-		// Check for data in local storage
-		const localStorageValue = this.getLocalStorage();
-		if ( filterGroup in localStorageValue ) {
-			// console.log('filterGroup', filterGroup, this.activeFilters[filterGroup]);
-			// User has filter preferences. Remove all pre-set active classes and build from localstorage instead.
-			button.classList.remove( this.activeButtonClass );
-			if ( Array.isArray( localStorageValue[ filterGroup ] ) && localStorageValue[ filterGroup ].length === 0 ) {
-				// this.hideAllItems(filterGroup);
-				// console.log('if array empty', filterGroup, localStorageValue[filterGroup]);
+	initializeButtons: function() {
+		const handleClick = function( button, filterGroup, event ) {
+			if ( ( event.type === 'click' ) || ( event.type === 'keypress' && event.key === 'Enter' ) ) {
+				liquipedia.tracker.track( 'Filter button clicked: ' + button.element.textContent, true );
+				switch ( button.filter ) {
+					case 'all':
+						Object.entries( filterGroup.filterStates ).forEach( ( [ filterState ] ) => {
+							if ( !filterGroup.alwaysActive.includes( filterState ) ) {
+								filterGroup.filterStates[ filterState ] = !button.active;
+							}
+						} );
+						filterGroup.curated = false;
+						break;
+					case 'curated':
+						filterGroup.curated = !button.active;
+						break;
+					default:
+						filterGroup.filterStates[ button.filter ] = !button.active;
+						filterGroup.curated = false;
+				}
+				this.performUpdate();
 			}
-			if ( localStorageValue[ filterGroup ].includes( button.getAttribute( 'data-filter-on' ) ) ) {
-				// User has this filterGroup in localstorage, meaning they have marked a preference, so this takes priority.
-				// If the button is in the localstorage array, filter on it.
-				this.filterItems( button, true );
+		};
+
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
+			const buttons = Object.values( filterGroup.buttons );
+			buttons.push( filterGroup.allButton );
+			if ( filterGroup.curatedButton ) {
+				buttons.push( filterGroup.curatedButton );
 			}
-		} else if ( !( filterGroup in localStorageValue ) && button.classList.contains( this.activeButtonClass ) ) {
-			// If the user does not have a localstorage array for this filterGroup it means they have
-			// not interacted with the filters, so we fall back to the defaults set by html 'active' classes
-			this.filterItems( button, true );
-		}
+
+			buttons.forEach( ( button ) => {
+				const buttonEventHandler = handleClick.bind( this, button, filterGroup );
+				button.element.addEventListener( 'click', buttonEventHandler );
+				button.element.addEventListener( 'keypress', buttonEventHandler );
+			} );
+		} );
 	},
 
-	toggleItems: function( filterGroup ) {
-		this.items[ filterGroup ].forEach( function( item ) {
-			const filterCategory = item.getAttribute( 'data-filter-category' );
+	performUpdate: function() {
+		this.updateFromFilterStates();
+		this.setLocalStorage();
+		this.updateDOM();
+	},
 
-			const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
-			if ( index > -1 ) {
-				item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-				item.classList.remove( this.hiddenCategoryClass );
+	updateFromFilterStates: function() {
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
+			let allState = true;
+
+			Object.values( filterGroup.buttons ).forEach( ( button ) => {
+				if ( filterGroup.curated ) {
+					button.active = false;
+					allState = false;
+				} else {
+					button.active = filterGroup.filterStates[ button.filter ];
+					allState = allState && button.active;
+				}
+			} );
+
+			filterGroup.allButton.active = allState;
+			if ( filterGroup.curatedButton ) {
+				filterGroup.curatedButton.active = filterGroup.curated;
+			}
+
+			filterGroup.filterableItems.forEach( ( filterableItem ) => {
+				if ( filterGroup.curated ) {
+					filterableItem.hidden = !filterableItem.curated;
+				} else if ( filterableItem.value in filterGroup.filterStates ) {
+					filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
+				} else {
+					filterableItem.hidden = false;
+				}
+			} );
+		} );
+	},
+
+	updateDOM: function() {
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
+			const buttons = Object.values( filterGroup.buttons );
+			buttons.push( filterGroup.allButton );
+			if ( filterGroup.curatedButton ) {
+				buttons.push( filterGroup.curatedButton );
+			}
+
+			buttons.forEach( ( button ) => {
+				if ( button.active ) {
+					button.element.classList.add( this.activeButtonClass );
+				} else {
+					button.element.classList.remove( this.activeButtonClass );
+				}
+			} );
+
+			filterGroup.filterableItems.forEach( ( filterableItem ) => {
+				if ( filterableItem.hidden ) {
+					filterableItem.element.classList.remove( filterGroup.effectClass );
+					filterableItem.element.classList.add( this.hiddenCategoryClass );
+				} else {
+					filterableItem.element.classList.replace( this.hiddenCategoryClass, filterGroup.effectClass );
+				}
+			} );
+		} );
+
+		this.hideableGroups.forEach( ( hideableGroup ) => {
+			const groupElement = hideableGroup.element;
+			const filterableItems = this.getTopLevelFilterableItems( groupElement );
+			if ( !filterableItems.some( this.isFilterableVisible, this ) ) {
+				groupElement.classList.remove( hideableGroup.effectClass );
+				groupElement.classList.add( 'filter-category--hidden-group' );
+				hideableGroup.fallbackItem?.classList.add( hideableGroup.effectClass );
 			} else {
-				item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-				item.classList.add( this.hiddenCategoryClass );
+				groupElement.classList.replace( 'filter-category--hidden-group', hideableGroup.effectClass );
+				hideableGroup.fallbackItem?.classList.remove( hideableGroup.effectClass );
 			}
-		}.bind( this ) );
-	},
+		} );
 
-	showAllItems: function( filterGroup ) {
-		this.activeFilters[ filterGroup ] = [];
-
-		this.buttons[ filterGroup ].forEach( function( button ) {
-			button.classList.add( this.activeButtonClass );
-			this.activeFilters[ filterGroup ].push( button.getAttribute( 'data-filter-on' ) );
-		}.bind( this ) );
-
-		this.items[ filterGroup ].forEach( function( item ) {
-			if ( this.activeFilters[ filterGroup ].includes( item.getAttribute( 'data-filter-category' ) ) ) {
-				item.classList.add( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-				item.classList.remove( this.hiddenCategoryClass );
-			}
-		}.bind( this ) );
-
-		this.buttonFilterAll[ filterGroup ].classList.add( this.activeButtonClass );
-	},
-
-	hideAllItems: function( filterGroup ) {
-		this.activeFilters[ filterGroup ] = this.activeAlwaysFilters[ filterGroup ].slice( 0 );
-
-		this.buttons[ filterGroup ].forEach( function( button ) {
-			if ( !this.activeAlwaysFilters[ filterGroup ].includes( button.getAttribute( 'data-filter-on' ) ) ) {
-				button.classList.remove( this.activeButtonClass );
-			}
-		}.bind( this ) );
-
-		this.items[ filterGroup ].forEach( function( item ) {
-			if ( !this.activeAlwaysFilters[ filterGroup ].includes( item.getAttribute( 'data-filter-category' ) ) ) {
-				item.classList.remove( 'filter-effect-' + this.filterEffect[ filterGroup ] );
-				item.classList.add( this.hiddenCategoryClass );
-			}
-		}.bind( this ) );
-
-		this.buttonFilterAll[ filterGroup ].classList.remove( this.activeButtonClass );
-	},
-
-	toggleAllItems: function( filterGroup ) {
-		if ( this.activeFilters[ filterGroup ].length === this.buttons[ filterGroup ].length ) {
-			this.hideAllItems( filterGroup );
-		} else {
-			this.showAllItems( filterGroup );
-		}
-	},
-
-	filterItems: function( button, isInit ) {
-		const filterCategory = button.getAttribute( 'data-filter-on' );
-		const filterGroup = button.closest( '[data-filter]' ).getAttribute( 'data-filter-group' ) || this.bcFilterGroup;
-		if ( !( filterGroup in this.activeFilters ) ) {
-			return;
-		}
-
-		const index = this.activeFilters[ filterGroup ].indexOf( filterCategory );
-		if ( index > -1 ) {
-			if ( isInit === true ) {
+		this.templateExpansions.forEach( ( templateExpansion ) => {
+			const isDefault = templateExpansion.groups.every( ( group ) => {
+				const filterGroup = this.filterGroups[ group ];
+				if ( filterGroup.curated || filterGroup.defaultCurated ) {
+					return filterGroup.curated === filterGroup.defaultCurated;
+				}
+				return Object.keys( filterGroup.filterStates ).every(
+					( filter ) => filterGroup.filterStates[ filter ] === filterGroup.defaultStates[ filter ]
+				);
+			} );
+			if ( isDefault ) {
+				templateExpansion.element.innerHTML = templateExpansion.cache.default;
+				this.refreshScriptsAfterContentUpdate();
 				return;
 			}
-			this.activeFilters[ filterGroup ].splice( index, 1 );
-			button.classList.remove( this.activeButtonClass );
-			if ( this.buttonFilterAll[ filterGroup ] ) {
-				this.buttonFilterAll[ filterGroup ].classList.remove( this.activeButtonClass );
+			const parameters = templateExpansion.groups.map( ( group ) => {
+				if ( this.filterGroups[ group ].curated ) {
+					return group + '=curated';
+				}
+
+				const filterStates = this.filterGroups[ group ].filterStates;
+				const activeFilters = Object.keys( filterStates ).filter( ( k ) => filterStates[ k ] );
+
+				return group + '=' + activeFilters.toString();
+			} );
+			const wikitext = '{{' + templateExpansion.template + '|' + parameters.join( '|' ) + '}}';
+
+			if ( wikitext in templateExpansion.cache ) {
+				templateExpansion.element.innerHTML = templateExpansion.cache[ wikitext ];
+				this.refreshScriptsAfterContentUpdate();
+				return;
 			}
-			this.toggleItems( filterGroup );
-		} else {
-			this.activeFilters[ filterGroup ].push( filterCategory );
-			button.classList.add( this.activeButtonClass );
-			if ( this.buttonFilterAll[ filterGroup ] && this.activeFilters[ filterGroup ].length === this.buttons[ filterGroup ].length ) {
-				this.buttonFilterAll[ filterGroup ].classList.add( this.activeButtonClass );
-			}
-			this.toggleItems( filterGroup );
-		}
+
+			mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
+				const api = new mw.Api();
+				api.get( {
+					action: 'parse',
+					format: 'json',
+					contentmodel: 'wikitext',
+					maxage: 600,
+					smaxage: 600,
+					disablelimitreport: true,
+					uselang: 'content',
+					prop: 'text',
+					text: wikitext
+				} ).done( ( data ) => {
+					if ( data.parse?.text?.[ '*' ] ) {
+						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
+						templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];
+						this.refreshScriptsAfterContentUpdate();
+					}
+				} );
+			} );
+		} );
 	},
 
-	getLocalStorage: function() {
-		const check = window.localStorage.getItem( this.localStorageKey );
-		return check ? JSON.parse( window.localStorage.getItem( this.localStorageKey ) ) : {};
-	},
-
-	/**
-	 * Set local storage value with activeFilters
-	 */
-	setLocalStorage: function() {
-		window.localStorage.setItem( this.localStorageKey, JSON.stringify( this.activeFilters ) );
-	},
-
-	/**
-	 * Add tabindex attribute to element
-	 *
-	 * @param {HTMLElement} element
-	 */
-	setTabIndex: function( element ) {
-		element.setAttribute( 'tabindex', '0' );
+	refreshScriptsAfterContentUpdate: function() {
+		liquipedia.countdown.init();
+		liquipedia.switchButtons.init();
 	},
 
 	buildLocalStorageKey: function() {
-		const base = 'LiquipediaFilterButtons';
+		const base = 'LiquipediaFilterButtonsV2';
 		const scriptPath = mw.config.get( 'wgScriptPath' ).replace( /[\W]/g, '' );
 		const pageName = mw.config.get( 'wgPageName' );
 
 		return base + '-' + scriptPath + '-' + pageName;
+	},
+
+	getLocalStorage: function() {
+		const check = window.localStorage.getItem( this.localStorageKey );
+		return check ? JSON.parse( check ) : {};
+	},
+
+	setLocalStorage: function() {
+		const filterGroups = {};
+		Object.values( this.filterGroups ).forEach( ( filterGroup ) => {
+			filterGroups[ filterGroup.name ] = { filterStates: filterGroup.filterStates, curated: filterGroup.curated };
+		} );
+		window.localStorage.setItem( this.localStorageKey, JSON.stringify( filterGroups ) );
+	},
+
+	/**
+	 * @param {HTMLElement} element
+	 * @return {HTMLElement[]}
+	 */
+	getTopLevelFilterableItems: function ( element ) {
+		return Array.from(
+			element.querySelectorAll(
+				':scope [data-filter-category]:not(:scope [data-filter-category] [data-filter-category])'
+			)
+		);
+	},
+
+	/**
+	 * @param {HTMLElement} filterableItem
+	 * @return {boolean}
+	 */
+	isFilterableVisible: function ( filterableItem ) {
+		if ( filterableItem.classList.contains( this.hiddenCategoryClass ) ) {
+			return false;
+		} else {
+			const filterableChildren = this.getTopLevelFilterableItems( filterableItem );
+			return filterableChildren.length === 0 ? true : filterableChildren.some( this.isFilterableVisible, this );
+		}
 	}
 };
+
 liquipedia.core.modules.push( 'filterButtons' );

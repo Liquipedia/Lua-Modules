@@ -25,7 +25,7 @@ local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
@@ -45,7 +45,9 @@ local COUNTRIES_EASTERN_NAME_ORDER = {
 	'Hong Kong',
 	'Vietnam',
 	'South Korea',
-	'Cambodia'
+	'Cambodia',
+	'Macau',
+	'Singapore',
 }
 
 ---@enum PlayerStatus
@@ -74,9 +76,8 @@ function Person.run(frame)
 	return person:createInfobox()
 end
 
----@return Html
+---@return string
 function Person:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	self.locations = self:getLocations()
@@ -132,11 +133,12 @@ function Person:createInfobox()
 			name = self:nameDisplay(args),
 			image = args.image,
 			imageDefault = args.default,
+			imageDefaultDark = args.defaultDark,
 			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Player') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Player') .. ' Information'},
 		Customizable{id = 'names', children = {
 				Cell{name = 'Name', content = {args.name}},
 				Cell{name = 'Romanized Name', content = {args.romanized_name}},
@@ -176,7 +178,7 @@ function Person:createInfobox()
 				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
 			}
 		},
-		Cell{name = 'Nicknames', content = {args.nicknames}},
+		Cell{name = 'Nickname(s)', content = {args.nicknames}},
 		Builder{
 			builder = function()
 				if self.totalEarnings and self.totalEarnings ~= 0 then
@@ -191,8 +193,8 @@ function Person:createInfobox()
 			builder = function()
 				if Table.isNotEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = LINK_VARIANT}
+						Title{children = 'Links'},
+						Widgets.Links{links = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -202,8 +204,8 @@ function Person:createInfobox()
 				builder = function()
 					if String.isNotEmpty(args.achievements) then
 						return {
-							Title{name = 'Achievements'},
-							Center{content = {args.achievements}}
+							Title{children = 'Achievements'},
+							Center{children = {args.achievements}}
 						}
 					end
 				end
@@ -214,21 +216,21 @@ function Person:createInfobox()
 				builder = function()
 					if String.isNotEmpty(args.history) then
 						return {
-							Title{name = 'History'},
-							Center{content = {args.history}}
+							Title{children = 'History'},
+							Center{children = {args.history}}
 						}
 					end
 				end
 			},
 		}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
 
-	infobox:bottom(self:createBottomContent())
+	self:bottom(self:createBottomContent())
 
 	local statusToStore = self:getStatusToStore(args)
-	infobox:categories(unpack(self:getCategories(
+	self:categories(unpack(self:getCategories(
 				args,
 				age.birth,
 				personType.category,
@@ -245,7 +247,7 @@ function Person:createInfobox()
 		)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -262,8 +264,8 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	if team and mw.ext.TeamTemplate.teamexists(team) then
-		local teamRaw = mw.ext.TeamTemplate.raw(team)
+	local teamRaw = team and mw.ext.TeamTemplate.raw(team)
+	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
 	end
@@ -292,6 +294,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		extradata = {
 			firstname = args.givenname,
 			lastname = args.familyname,
+			banned = args.banned,
 		},
 	}
 
@@ -327,7 +330,7 @@ function Person:getStandardNationalityValue(nationality)
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
-			self.infobox.warnings,
+			self.warnings,
 			'"' .. nationality .. '" is not supported as a value for nationalities'
 		)
 		return nil
@@ -466,9 +469,9 @@ function Person:_createTeam(team, link)
 	end
 	---@cast link -nil
 
-	if mw.ext.TeamTemplate.teamexists(link) then
-		local data = mw.ext.TeamTemplate.raw(link)
-		link, team = data.page, data.name
+	local teamRaw = mw.ext.TeamTemplate.raw(link)
+	if teamRaw then
+		link, team = teamRaw.page, teamRaw.name
 	end
 
 	return Page.makeInternalLink({onlyIfExists = true}, team, link) or team

@@ -18,11 +18,11 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 local YearsActive = Lua.import('Module:YearsActive')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -117,8 +117,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'history' then
 		local getHistoryCells = function(key, title)
 			return {
-				String.isNotEmpty(args[key]) and Title{name = title} or nil,
-				Center{content = {args[key]}},
+				String.isNotEmpty(args[key]) and Title{children = title} or nil,
+				Center{children = {args[key]}},
 			}
 		end
 
@@ -221,9 +221,13 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	Array.forEach(self.locations, function(country)
 		local demonym = Flags.getLocalisation(country)
 		if demonym then
-			return
+			Array.appendWith(categories,
+				checkRole('coach', demonym .. ' Coaches'),
+				checkRole('caster', demonym .. ' Casters'),
+				checkRole('host', demonym .. ' Casters'),
+				checkRole('player', demonym .. ' Players')
+			)
 		end
-		table.insert(categories, demonym .. ' Players')
 	end)
 
 	return categories

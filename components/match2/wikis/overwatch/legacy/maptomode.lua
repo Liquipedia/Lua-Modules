@@ -1,0 +1,56 @@
+---
+-- @Liquipedia
+-- wiki=overwatch
+-- page=Module:MapToMode
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+return {
+	['control'] = 'Control',
+	['busan'] = 'Control',
+	['ilios'] = 'Control',
+	['lijiang tower'] = 'Control',
+	['nepal'] = 'Control',
+	['oasis'] = 'Control',
+	['escort'] = 'Escort',
+	['circuit royal'] = 'Escort',
+	['dorado'] = 'Escort',
+	['havana'] = 'Escort',
+	['junkertown'] = 'Escort',
+	['shambali monastery'] = 'Escort',
+	['rialto'] = 'Escort',
+	['route 66'] = 'Escort',
+	['gibraltar'] = 'Escort',
+	['watchpoint: gibraltar'] = 'Escort',
+	['hybrid'] = 'Hybrid',
+	['blizzard world'] = 'Hybrid',
+	['eichenwalde'] = 'Hybrid',
+	['hollywood'] = 'Hybrid',
+	['king\'s row'] = 'Hybrid',
+	['midtown'] = 'Hybrid',
+	['numbani'] = 'Hybrid',
+	['paraiso'] = 'Hybrid',
+	['paraíso'] = 'Hybrid',
+	['push'] = 'Push',
+	['colosseo'] = 'Push',
+	['esperanca'] = 'Push',
+	['esperança'] = 'Push',
+	['new queen street'] = 'Push',
+	['ayutthaya'] = 'Assault',
+	['black forest'] = 'Assault',
+	['castillo'] = 'Assault',
+	['château guillard'] = 'Assault',
+	['ecopoint: antarctica'] = 'Assault',
+	['kanezaka'] = 'Assault',
+	['malevento'] = 'Assault',
+	['necropolis'] = 'Assault',
+	['petra = Arena'] = 'Assault',
+	['assault'] = 'Assault',
+	['hanamura'] = 'Assault',
+	['horizon lunar colony'] = 'Assault',
+	['paris'] = 'Assault',
+	['temple of anubis'] = 'Assault',
+	['volskaya'] = 'Assault',
+	['volskaya industries'] = 'Assault',
+}

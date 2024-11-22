@@ -18,11 +18,11 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 local Shared = Lua.import('Module:Infobox/Extension/BuildingUnitShared')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -97,15 +97,15 @@ function CustomBuilding:addCustomCells(widgets)
 	local pathingMap = CustomBuilding._pathingMap(args)
 	if pathingMap then
 		Array.appendWith(widgets,
-			Title{name = 'Pathing Map'},
-			Center{content = {pathingMap}}
+			Title{children = 'Pathing Map'},
+			Center{children = {pathingMap}}
 		)
 	end
 
 	if args.icon then
 		Array.appendWith(widgets,
-			Title{name = 'Icon'},
-			Center{content = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
+			Title{children = 'Icon'},
+			Center{children = {'[[File:Wc3BTN' .. args.icon .. '.png]]'}}
 		)
 	end
 

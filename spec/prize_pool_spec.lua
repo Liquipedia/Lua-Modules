@@ -102,19 +102,23 @@ describe('prize pool', function()
 			PrizePool(prizePoolArgs):create():build()
 			assert.stub(LpdbPlacementStub).was.called_with('ranking_abc1_Rathoz', {
 				date = '2022-10-15',
+				extradata = '{"prizepoints":""}',
 				game = 'commons',
 				icon = 'test.png',
 				icondark = 'test dark.png',
 				individualprizemoney = 970.97276906869001323,
+				lastvsdata = '[]',
 				liquipediatier = '1',
 				liquipediatiertype = 'Qualifier',
 				opponentname = 'Rathoz',
+				opponentplayers = '{"p1":"Rathoz","p1dn":"Rathoz","p1flag":"Sweden"}',
 				opponenttype = 'solo',
 				parent = 'FakePage',
 				participant = 'Rathoz', -- Legacy
 				participantflag = 'Sweden', -- Legacy
 				participantlink = 'Rathoz', -- Legacy
 				placement = 1,
+				players = '{"p1":"Rathoz","p1dn":"Rathoz","p1flag":"Sweden"}', -- Legacy
 				prizemoney = 970.97276906869001323,
 				prizepoolindex = 1,
 				series = 'Test Series',

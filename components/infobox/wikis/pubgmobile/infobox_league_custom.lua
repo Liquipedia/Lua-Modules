@@ -9,16 +9,15 @@
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -74,13 +73,13 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'customcontent' then
 		if args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
+			table.insert(widgets, Title{children = 'Players'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
 		end
 
 		--teams section
 		if args.team_number then
-			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
 		end
 	end
@@ -97,20 +96,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.pubgpremier
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.pubgpremier)
 end
 
 ---@param args table

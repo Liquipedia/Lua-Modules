@@ -9,6 +9,7 @@ Author(s): Elysienna
 	width: 100%;
 	overflow-x: auto;
 	position: relative;
+	font-size: 0.875rem;
 
 	&__swipe-container {
 		width: 100%;
@@ -67,6 +68,10 @@ Author(s): Elysienna
 		box-shadow: -0.25rem 0 0.75rem 0 rgba( 0, 0, 0, 0.04 );
 		cursor: pointer;
 
+		.theme--dark & {
+			border: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+		}
+
 		&.navigate--left {
 			inset: 0 auto 0 0;
 		}
@@ -84,7 +89,7 @@ Author(s): Elysienna
 		&.row {
 			&--header {
 				font-weight: bold;
-				background-color: #f5f5f5;
+				background-color: var( --table-header-variant-background-color, #f5f5f5 );
 				font-size: 0.8125rem;
 
 				& .panel-table__cell__game-placement {
@@ -102,6 +107,17 @@ Author(s): Elysienna
 
 				& .cell--game-container-nav-holder {
 					min-width: 15.875rem;
+				}
+
+				& .cell--rank,
+				& .cell--team,
+				& .cell--match-points,
+				& .cell--total-points {
+					.panel-table__cell-icon {
+						@media ( max-width: 767px ) {
+							display: none;
+						}
+					}
 				}
 			}
 
@@ -122,14 +138,19 @@ Author(s): Elysienna
 	&__cell {
 		border-right: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		padding: 0.75rem;
+		padding: 0.5rem;
 		display: flex;
 		align-items: center;
 		flex: 0 0 auto;
 
+		.theme--dark & {
+			border-right: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+			border-bottom: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+		}
+
 		.panel-table__row.row--header & {
 			align-items: flex-end;
-			background-color: #f5f5f5;
+			background-color: var( --table-header-variant-background-color, #f5f5f5 );
 		}
 
 		&-icon {
@@ -162,6 +183,10 @@ Author(s): Elysienna
 				display: flex;
 				flex: 1 1 100%;
 				border-top: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+
+				.theme--dark & {
+					border-top: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+				}
 			}
 
 			&-title {
@@ -188,8 +213,12 @@ Author(s): Elysienna
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding: 0.75rem 0;
-				background-color: #fafafa;
+				padding: 0.5rem 0;
+				background-color: var( --table-background-color, #fafafa );
+
+				.theme--dark & {
+					border-right: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+				}
 			}
 
 			&-kills {
@@ -197,10 +226,10 @@ Author(s): Elysienna
 				display: flex;
 				justify-content: center;
 				align-items: center;
-				padding: 0.75rem 0;
+				padding: 0.5rem 0;
 
 				.panel-table__row:not( .row--header ) & {
-					background-color: #ffffff;
+					background-color: var( --table-background-color, #ffffff );
 				}
 			}
 		}
@@ -217,6 +246,10 @@ Author(s): Elysienna
 					border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 					padding: 0.75rem 1rem;
 					text-align: right;
+
+					.theme--dark & {
+						border-bottom: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+					}
 
 					&-title {
 						margin: 0;
@@ -240,7 +273,11 @@ Author(s): Elysienna
 					justify-content: center;
 					align-items: center;
 					padding: 0.75rem 0;
-					background-color: #fafafa;
+					background-color: var( --table-background-color, #fafafa );
+
+					.theme--dark & {
+						border-right: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+					}
 				}
 
 				&-kills {
@@ -297,18 +334,34 @@ Author(s): Elysienna
 	.cell {
 		&--gold {
 			background-color: #fff7d6;
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-gold-20, #fff7d6 );
+			}
 		}
 
 		&--silver {
 			background-color: #e7edee;
+
+			.theme--dark & {
+				background-color: var( --clr-secondary-25, #fff7d6 );
+			}
 		}
 
 		&--copper {
 			background-color: #ffefd6;
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-copper-20, #fff7d6 );
+			}
 		}
 
 		&--bronze {
 			background-color: #efeee6;
+
+			.theme--dark & {
+				background-color: var( --clr-semantic-bronze-20, #efeee6 );
+			}
 		}
 
 		&--game {
@@ -316,6 +369,12 @@ Author(s): Elysienna
 			padding: 0;
 			flex-wrap: wrap;
 			align-items: stretch;
+			border-left: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
+			border-right-width: 0.0625rem;
+
+			.theme--dark & {
+				border-left: 0.0625rem solid rgba( 255, 255, 255, 0.08 );
+			}
 		}
 
 		&--status {
@@ -340,6 +399,10 @@ Author(s): Elysienna
 
 		&--rank {
 			flex-basis: 6.375rem;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.6875rem;
+			}
 		}
 
 		&--team {
@@ -348,7 +411,7 @@ Author(s): Elysienna
 			overflow: hidden;
 
 			@media ( max-width: 767px ) {
-				flex-basis: 9rem;
+				flex-basis: 8.375rem;
 			}
 		}
 
@@ -357,6 +420,19 @@ Author(s): Elysienna
 			flex-grow: 0;
 			justify-content: flex-end;
 			font-weight: bold;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.25rem;
+			}
+		}
+
+		&--match-points {
+			flex-basis: 7.25rem;
+			flex-grow: 0;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 4.6875rem;
+			}
 		}
 
 		&--placements {
@@ -394,19 +470,25 @@ Author(s): Elysienna
 			padding: 0;
 			position: relative;
 			flex: 1;
-			overflow: hidden;
 			border: 0;
+
+			@media ( min-width: 768px ) {
+				overflow: hidden;
+			}
 		}
 
 		&--game-container {
 			position: relative;
 			padding: 0;
-			overflow-x: hidden;
 			flex: 1;
-			scroll-behavior: smooth;
 			border: 0;
 			align-items: unset;
 			min-width: 15.875rem;
+
+			@media ( min-width: 768px ) {
+				overflow-x: hidden;
+				scroll-behavior: smooth;
+			}
 		}
 	}
 

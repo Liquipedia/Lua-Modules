@@ -16,10 +16,10 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Skill = Lua.import('Module:Infobox/Skill')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Starcraft2SkillInfobox: SkillInfobox
@@ -35,7 +35,7 @@ local INFORMATIONTYPE_TO_CATEGORY = {
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return unknown
+---@return Html
 function CustomSkill.run(frame)
 	local skill = CustomSkill(frame)
 

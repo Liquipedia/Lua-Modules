@@ -15,10 +15,10 @@ local Opponent = OpponentLibrary.Opponent
 local TeamTemplates = require('Module:Team')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local Condition = require('Module:Condition')
@@ -52,9 +52,8 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'earnings' then
-		---@diagnostic disable-next-line: inject-field
-		widgets[1].name = 'Approx. Total Winnings'
+	if id == 'region' then
+		return {}
 	elseif id == 'custom' then
 		table.insert(widgets, Cell{name = 'Games', content = self.caller:_getGames()})
 	end

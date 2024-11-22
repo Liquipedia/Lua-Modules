@@ -11,15 +11,16 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Game = require('Module:Game')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Chronology = Widgets.Chronology
@@ -91,22 +92,23 @@ function CustomLeague:customParseArguments(args)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function CustomLeague:displayPrizePool(args)
+function CustomLeague:displayPrizePool(args, endDate)
 	local localCurrency = args.localcurrency
 	local prizePoolUSD = args.prizepoolusd
 	local prizePool = args.prizepool --[[@as number|string|nil]]
 
 	local display
 	if prizePoolUSD then
-		prizePoolUSD = self:_cleanPrizeValue(prizePoolUSD)
+		prizePoolUSD = CustomLeague._cleanPrizeValue(prizePoolUSD)
 	end
 
-	prizePool = self:_cleanPrizeValue(prizePool)
+	prizePool = CustomLeague._cleanPrizeValue(prizePool)
 
 	if not prizePoolUSD and localCurrency then
-		local exchangeDate = self.data.endDate or TODAY --[[@as string]]
-		prizePoolUSD = self:_currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
+		local exchangeDate = endDate or TODAY --[[@as string]]
+		prizePoolUSD = CustomLeague._currencyConversion(prizePool, localCurrency:upper(), exchangeDate)
 		if not prizePoolUSD then
 			error('Invalid local currency "' .. localCurrency .. '"')
 		end
@@ -122,6 +124,7 @@ function CustomLeague:displayPrizePool(args)
 	Variables.varDefine('usd prize', prizePoolUSD or prizePool)
 	Variables.varDefine('tournament_prizepoolusd', prizePoolUSD or prizePool)
 	Variables.varDefine('local prize', prizePool)
+	Variables.varDefine('tournament_prizepoollocal', prizePool)
 	Variables.varDefine('tournament_currency',
 		string.upper(Variables.varDefault('tournament_currency', localCurrency) or ''))
 
@@ -148,7 +151,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'customcontent' then
 		if args.circuit or args.points or args.circuit_next or args.circuit_previous then
-			table.insert(widgets, Title{name = 'Circuit Information'})
+			table.insert(widgets, Title{children = 'Circuit Information'})
 			self.caller:_createCircuitInformation(widgets)
 		end
 		if args.circuit2 or args.points2 or args.circuit2_next or args.circuit2_previous then
@@ -179,9 +182,11 @@ function CustomLeague:addToLpdb(lpdbData, args)
 
 	lpdbData.extradata.assumedprizepool = tostring(args.prizepoolassumed)
 	lpdbData.extradata.circuit = args.circuit
-	lpdbData.extradata.circuittier = args.circuittier
+	lpdbData.extradata.circuit_tier = args.circuittier
 	lpdbData.extradata.circuit2 = args.circuit2
-	lpdbData.extradata.circuit2tier = args.circuit2tier
+	lpdbData.extradata.circuit2_tier = args.circuit2tier
+
+	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
 	return lpdbData
 end
@@ -267,9 +272,9 @@ end
 
 ---@param localPrize string|number|nil
 ---@param currency string
----@param exchangeDate string
----@return unknown
-function CustomLeague:_currencyConversion(localPrize, currency, exchangeDate)
+---@param exchangeDate string?
+---@return number?
+function CustomLeague._currencyConversion(localPrize, currency, exchangeDate)
 	local usdPrize
 	local currencyRate = Currency.getExchangeRate{
 		currency = currency,
@@ -285,7 +290,7 @@ end
 
 ---@param value string|number|nil
 ---@return string?
-function CustomLeague:_cleanPrizeValue(value)
+function CustomLeague._cleanPrizeValue(value)
 	if Logic.isEmpty(value) then
 		return
 	end
@@ -321,7 +326,7 @@ function CustomLeague:_createCircuitInformation(widgets, circuitIndex)
 		Cell{name = 'Circuit Tier', content = {circuitArgs.tier}},
 		Cell{name = 'Tournament Region', content = {circuitArgs.region}},
 		Cell{name = 'Points', content = {circuitArgs.points}},
-		Chronology{content = {next = circuitArgs.next, previous = circuitArgs.previous}}
+		Chronology{links = {next = circuitArgs.next, previous = circuitArgs.previous}}
 	)
 end
 

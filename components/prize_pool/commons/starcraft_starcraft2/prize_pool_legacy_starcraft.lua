@@ -35,6 +35,8 @@ local CACHED_DATA = {
 	qualifiers = {},
 }
 
+---@param frame Frame
+---@return Html
 function StarcraftLegacyPrizePool.run(frame)
 	local args = Template.retrieveReturnValues('PrizePool')
 	local header = Array.sub(args, 1, 1)[1]
@@ -156,6 +158,8 @@ function StarcraftLegacyPrizePool.run(frame)
 	return CustomPrizePool.run(newArgs)
 end
 
+---@param lastOpponentData table
+---@return table
 function StarcraftLegacyPrizePool._fillerOpponent(lastOpponentData)
 	if lastOpponentData.isEmpty then
 		return lastOpponentData
@@ -180,6 +184,8 @@ function StarcraftLegacyPrizePool._fillerOpponent(lastOpponentData)
 	return fillerOpponent
 end
 
+---@param args table
+---@return boolean|string
 function StarcraftLegacyPrizePool._enableImport(args)
 	local tournamentDate = Variables.varDefault('tournament_enddate',
 		Variables.varDefault('tournament_startdate'))
@@ -191,6 +197,8 @@ function StarcraftLegacyPrizePool._enableImport(args)
 	)
 end
 
+---@param slot table
+---@return table
 function StarcraftLegacyPrizePool._mapSlot(slot)
 	if not slot.place and not slot.award then
 		return {}
@@ -251,6 +259,8 @@ function StarcraftLegacyPrizePool._mapSlot(slot)
 	return newSlot
 end
 
+---@param slot table
+---@return number?
 function StarcraftLegacyPrizePool._slotSize(slot)
 	if not slot.place then
 		return
@@ -260,6 +270,9 @@ function StarcraftLegacyPrizePool._slotSize(slot)
 	return tonumber(placeRange[#placeRange]) - tonumber(placeRange[1]) + 1
 end
 
+---@param storeTo table
+---@param input string
+---@param slotSize integer
 function StarcraftLegacyPrizePool._handleSeed(storeTo, input, slotSize)
 	local links = LegacyPrizePool.parseWikiLink(input)
 
@@ -280,6 +293,8 @@ function StarcraftLegacyPrizePool._handleSeed(storeTo, input, slotSize)
 	end
 end
 
+---@param storeTo table
+---@param input string
 function StarcraftLegacyPrizePool._handlePlainTextSeeds(storeTo, input)
 	if not input then
 		return
@@ -295,9 +310,12 @@ function StarcraftLegacyPrizePool._handlePlainTextSeeds(storeTo, input)
 		currentDisplay = currentDisplay .. '<br>'
 	end
 	storeTo['freetext' .. CACHED_DATA.plainTextSeedsIndex] = currentDisplay .. input
-
 end
 
+---@param slot table
+---@param newData table
+---@param opponentsInSlot integer
+---@return table
 function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 	local argsIndex = 1
 
@@ -382,6 +400,9 @@ function StarcraftLegacyPrizePool._mapOpponents(slot, newData, opponentsInSlot)
 	return opponents
 end
 
+---@param props table
+---@return table?
+---@return integer
 function StarcraftLegacyPrizePool._readOpponentArgs(props)
 	local slot = props.slot
 	local opponentIndex = props.opponentIndex
@@ -444,6 +465,9 @@ function StarcraftLegacyPrizePool._readOpponentArgs(props)
 	return opponentData, newArgsIndex
 end
 
+---@param assignTo table
+---@param input string?
+---@param slotParam string
 function StarcraftLegacyPrizePool._assignType(assignTo, input, slotParam)
 	if LegacyPrizePool.isValidPoints(input) then
 		local index = CACHED_DATA.next.points
@@ -455,6 +479,7 @@ function StarcraftLegacyPrizePool._assignType(assignTo, input, slotParam)
 		CACHED_DATA.inputToId[slotParam] = 'seed'
 
 	elseif String.isNotEmpty(input) then
+		---@cast input -nil
 		local index = CACHED_DATA.next.freetext
 		assignTo['freetext' .. index] = mw.getContentLanguage():ucfirst(input)
 		CACHED_DATA.inputToId[slotParam] = 'freetext' .. index
@@ -462,6 +487,9 @@ function StarcraftLegacyPrizePool._assignType(assignTo, input, slotParam)
 	end
 end
 
+---@param opponentData table
+---@param param string
+---@param value string
 function StarcraftLegacyPrizePool._setOpponentReward(opponentData, param, value)
 	if param == 'seed' then
 		StarcraftLegacyPrizePool._handleSeed(opponentData, value, 1)

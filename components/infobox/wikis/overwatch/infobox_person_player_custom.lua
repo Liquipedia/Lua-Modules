@@ -8,18 +8,21 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = mw.loadData('Module:CharacterNames')
 local GameAppearances = require('Module:GetGameAppearances')
-local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Team = require('Module:Team')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
@@ -75,8 +78,9 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local heroIcons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero)
-			return HeroIcon.getImage{hero, size = SIZE_HERO}
+		local heroes = Array.sub(caller:getAllArgsForBase(args, 'hero'), 1, MAX_NUMBER_OF_SIGNATURE_HEROES)
+		local heroIcons = Array.map(heroes, function(hero)
+			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
 
 		Array.appendWith(widgets,
@@ -98,7 +102,7 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		if args.nationalteams then
-			table.insert(widgets, 1, Center{content = {args.nationalteams}})
+			table.insert(widgets, 1, Center{children = {args.nationalteams}})
 		end
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
@@ -144,7 +148,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = HeroIcon.getHeroName(hero)
+		lpdbData.extradata['signatureHero' .. heroIndex] = CharacterNames[hero:lower()]
 		if heroIndex == MAX_NUMBER_OF_SIGNATURE_HEROES then
 			break
 		end
@@ -172,6 +176,21 @@ function CustomPlayer:_isPlayerOrStaff()
 		return 'staff'
 	else
 		return 'player'
+	end
+end
+
+---@return string?
+function CustomPlayer:createBottomContent()
+	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local team2Page = String.isNotEmpty(self.args.team2) and Team.page(mw.getCurrentFrame(), self.args.team2) or nil
+		return
+			tostring(MatchTicker.player{recentLimit = 3}) ..
+			Template.safeExpand(
+				mw.getCurrentFrame(),
+				'Upcoming and ongoing tournaments of',
+				{team = teamPage}, {team2 = team2Page}
+			)
 	end
 end
 

@@ -25,6 +25,8 @@ local CustomPrizePool = {}
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
@@ -34,14 +36,16 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart
 	)
-
-	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_publisher_major') and 'true' or ''
 
 	local lastVs = ((opponent or {}).additionalData or {}).LASTVS or {}
 	if lastVs.type == Opponent.solo then
@@ -60,6 +64,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	if Logic.isEmpty(tier) then
 		return 0

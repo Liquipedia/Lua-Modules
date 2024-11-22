@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -39,7 +39,7 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'caption' and not String.isEmpty(args.min) then
-		table.insert(widgets, Center{content = {args.quote}})
+		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		return {
 			Cell{name = 'Real Name', content = {args.realname}},
@@ -58,10 +58,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Release Date', content = {args.releasedate}},
 			Cell{name = 'Health', content = {args.hp}},
 			Cell{name = 'Movespeed', content = {args.movespeed}},
-			Title{name = 'Weapon & Super'},
+			Title{children = 'Weapon & Super'},
 			Cell{name = 'Primary Weapon', content = {args.attack}},
 			Cell{name = 'Super Ability', content = {args.super}},
-			Title{name = 'Gadgets & Star Powers'},
+			Title{children = 'Gadgets & Star Powers'},
 			Cell{name = 'Gadgets', content = {args.gadget}},
 			Cell{name = 'Star Powers', content = {args.star}}
 		)

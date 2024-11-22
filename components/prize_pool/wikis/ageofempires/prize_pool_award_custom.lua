@@ -22,6 +22,8 @@ local IS_AWARD = true
 local PRIZE_TYPE_POINTS = 'POINTS'
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomAwardPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')
@@ -38,6 +40,10 @@ function CustomAwardPrizePool.run(frame)
 	return awardsPrizePool:build(IS_AWARD)
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 

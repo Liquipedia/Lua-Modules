@@ -10,6 +10,7 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local PrizePool = Lua.import('Module:PrizePool')
@@ -22,6 +23,8 @@ local CustomPrizePool = {}
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')
@@ -32,6 +35,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
@@ -39,7 +46,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.players = lpdbData.opponentplayers
+	lpdbData.players = Table.copy(lpdbData.opponentplayers or {})
 
 	local team = lpdbData.participant or ''
 	local lpdbPrefix = Variables.varDefault('lpdb_prefix') or ''
@@ -50,6 +57,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	if Logic.isEmpty(tier) then
 		return 0

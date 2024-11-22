@@ -21,9 +21,6 @@ WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 	return CustomMatchGroupUtil.matchFromRecord
 end)
 
-WikiSpecific.processMap = FnUtil.identity
-WikiSpecific.processPlayer = FnUtil.identity
-
 ---Determine if a match has details that should be displayed via popup
 ---@param match table
 ---@return boolean

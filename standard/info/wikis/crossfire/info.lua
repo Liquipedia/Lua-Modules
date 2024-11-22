@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'crossfire',
 	name = 'Crossfire',
+	defaultGame = 'cf',
 	games = {
 		cf = {
 			abbreviation = 'CF',
@@ -51,9 +52,21 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cf',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+			matchWidthMobile = 110,
+			matchWidth = 190,
+			gameScoresIfBo1 = true,
+		},
+		transfers = {
+			showTeamName = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Crossfire default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Crossfire default darkmode.png', ---@deprecated
-	match2 = 1,
 }

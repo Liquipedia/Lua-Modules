@@ -12,11 +12,11 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local UnofficialWorldChampion = Lua.import('Module:Infobox/UnofficialWorldChampion')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -57,8 +57,8 @@ function CustomInjector:parse(id, widgets)
 
 		Array.extendWith(widgets,
 			{
-				raceBreakdown and Title{name = 'Racial Distribution of Champions'} or nil,
-				raceBreakdown and Breakdown{content = raceBreakdown.display, classes = { 'infobox-center' }} or nil,
+				raceBreakdown and Title{children = 'Racial Distribution of Champions'} or nil,
+				raceBreakdown and Breakdown{children = raceBreakdown.display, classes = { 'infobox-center' }} or nil,
 			},
 			self.caller:_buildCellsFromBase('countries with multiple champions', 'Countries with Multiple Champions'),
 			self.caller:_buildCellsFromBase('teams with multiple champions', 'Teams with Multiple Champions')
@@ -67,8 +67,8 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param base any
----@param title any
+---@param base string
+---@param title string?
 ---@return Widget[]
 function CustomUnofficialWorldChampion:_buildCellsFromBase(base, title)
 	local args = self.args
@@ -76,7 +76,7 @@ function CustomUnofficialWorldChampion:_buildCellsFromBase(base, title)
 		return {}
 	end
 
-	local widgets = {Title{name = title}}
+	local widgets = {Title{children = title}}
 	for key, value in Table.iter.pairsByPrefix(args, base .. ' ') do
 		table.insert(widgets, Cell{name = (args[key .. ' no'] or '?') .. ' champions', content = {value}})
 	end

@@ -6,13 +6,25 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local ErrorExt = require('Module:Error/Ext')
-local TypeUtil = require('Module:TypeUtil')
+local Json = require('Module:Json')
+local Page = require('Module:Page')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local ErrorDisplay = {types = {}, propTypes = {}}
 
----@param props {limit: integer?, errors: error[]}
+local FILTERED_ERROR_STACK_ITEMS = {
+	'^Module:ResultOrError:%d+: in function <Module:ResultOrError:%d+>$',
+	'^%[C%]: in function \'xpcall\'$',
+	'^Module:ResultOrError:%d+: in function \'try\'$',
+}
+
+local INLINE_ERROR_MESSAGE =
+	'Unexpected Error, report this in #report-bugs on our [https://discord.gg/liquipedia Discord]. ${errorMessage}'
+
+---@param props {limit: integer?, errors: Error[]}
 ---@return Html
 function ErrorDisplay.ErrorList(props)
 	local defaultLimit = 5
@@ -34,33 +46,6 @@ function ErrorDisplay.ErrorList(props)
 	return boxesNode
 end
 
----Entry point of Template:StashedErrors
----@param frame Frame
----@return Html
-function ErrorDisplay.TemplateStashedErrors(frame)
-	local args = Arguments.getArgs(frame)
-	return ErrorDisplay.ErrorList{
-		errors = ErrorExt.Stash.retrieve(),
-		limit = tonumber(args.limit),
-	}
-end
-
--- Error instance
-ErrorDisplay.types.Error = TypeUtil.struct{
-	childErrors = TypeUtil.optional(TypeUtil.array(ErrorDisplay.types.Error)),
-	header = 'string?',
-	innerError = 'any',
-	message = 'string',
-	originalErrors = TypeUtil.optional(TypeUtil.array(ErrorDisplay.types.Error)),
-	stacks = TypeUtil.optional(TypeUtil.array('string')),
-}
-
-ErrorDisplay.propTypes.Box = {
-	hasDetails = 'boolean?',
-	loggedInOnly = 'boolean?',
-	text = 'string',
-}
-
 ---@param props {hasDetails: boolean?, loggedInOnly: boolean?, text: string}
 ---@return Html
 function ErrorDisplay.Box(props)
@@ -80,7 +65,7 @@ function ErrorDisplay.Box(props)
 	return div:node(tbl)
 end
 
----@param error error
+---@param error Error
 ---@return Html
 function ErrorDisplay.ErrorBox(error)
 	return ErrorDisplay.Box{
@@ -90,7 +75,7 @@ function ErrorDisplay.ErrorBox(error)
 end
 
 ---Shows the message and stack trace of a lua error. Suitable for use in a popup.
----@param error error
+---@param error Error
 ---@return Html
 function ErrorDisplay.ErrorDetails(error)
 	local errorDetailsNode = mw.html.create('div'):addClass('error-details')
@@ -114,6 +99,80 @@ function ErrorDisplay.ErrorDetails(error)
 	end
 
 	return errorDetailsNode
+end
+
+---Simple error message when a short error message is needed
+---Currently used for infobox errors
+---@param error Error
+---@return Html
+function ErrorDisplay.InlineError(error)
+	local errorText = String.interpolate(INLINE_ERROR_MESSAGE, {errorMessage = error.message})
+	return mw.html.create('span'):addClass('error'):addClass('show-when-logged-in'):wikitext(errorText)
+end
+
+---Builds a JSON string for use by `liquipedia.customLuaErrors` JS module with `error()`.
+---@param error Error
+---@return Html
+function ErrorDisplay.ClassicError(error)
+	local stackTrace = {}
+
+	local processStackFrame = function(frame, frameIndex)
+		if frameIndex == 1 and frame == '[C]: ?' then
+			return
+		end
+
+		local stackEntry = {content = frame}
+		local frameSplit = mw.text.split(frame, ':', true)
+		if (frameSplit[1] == '[C]' or frameSplit[1] == '(tail call)') then
+			stackEntry.prefix = frameSplit[1]
+			stackEntry.content = mw.text.trim(table.concat(frameSplit, ':', 2))
+		elseif frameSplit[1]:sub(1, 3) == 'mw.' then
+			stackEntry.prefix = table.concat(frameSplit, ':', 1, 2)
+			stackEntry.content = table.concat(frameSplit, ':', 3)
+		elseif frameSplit[1] == 'Module' then
+			local wiki = not Page.exists(table.concat(frameSplit, ':', 1, 2)) and 'commons'
+				or mw.text.split(mw.title.getCurrentTitle():canonicalUrl(), '/', true)[4] or 'commons'
+			stackEntry.link = {wiki = wiki, title = table.concat(frameSplit, ':', 1, 2), ln = frameSplit[3]}
+			stackEntry.prefix = table.concat(frameSplit, ':', 1, 3)
+			stackEntry.content = table.concat(frameSplit, ':', 4)
+		end
+
+		table.insert(stackTrace, stackEntry)
+	end
+
+	Array.forEach(error.stacks or {}, function(stack)
+		local stackFrames = mw.text.split(stack, '\n')
+		stackFrames = Array.filter(
+			Array.map(
+				Array.sub(stackFrames, 2, #stackFrames),
+				function(frame) return String.trim(frame) end
+			),
+			function(frame) return not Table.any(FILTERED_ERROR_STACK_ITEMS, function(_, filter)
+				return string.find(frame, filter) ~= nil
+			end) end
+		)
+		Array.forEach(stackFrames, processStackFrame)
+	end)
+
+	local errorSplit = mw.text.split(error.message, ':', true)
+	local errorText
+	if #errorSplit == 4 then
+		errorText = string.format('Lua error in %s:%s at line %s:%s.', unpack(errorSplit))
+	elseif #errorSplit > 4 then
+		errorText = string.format('Lua error in %s:%s at line %s:%s', unpack(Array.sub(errorSplit, 1, 4)))
+		errorText = errorText .. ':' .. table.concat(Array.sub(errorSplit, 5), ':') .. '.'
+	else
+		errorText = string.format('Lua error: %s.', error.message)
+	end
+	local jsonData = Json.stringify({
+		errorShort = errorText,
+		stackTrace = stackTrace,
+	}, {asArray = true})
+	return mw.html.create('div')
+				:tag('strong'):addClass('error')
+				:tag('span'):addClass('scribunto-error')
+				:wikitext(jsonData):wikitext('.')
+				:allDone()
 end
 
 return ErrorDisplay

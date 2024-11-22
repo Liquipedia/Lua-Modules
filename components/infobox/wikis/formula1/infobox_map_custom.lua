@@ -10,10 +10,10 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Formula1MapInfobox: MapInfobox
@@ -39,8 +39,8 @@ function CustomInjector:parse(id, widgets)
 		return Array.appendWith(widgets,
 			Cell{name = 'Architect', content = {args.architect}},
 			Cell{name = 'Capacity', content = {args.capacity}},
-			Cell{name = 'Location', content = {args.circuitlocation}},
 			Cell{name = 'Opened', content = {args.opened}},
+			Cell{name = 'Status', content = {args.status}},
 			Cell{name = 'Turns', content = {args.turns}},
 			Cell{name = 'Laps', content = {args.laps}},
 			Cell{name = 'Direction', content = {args.direction}},

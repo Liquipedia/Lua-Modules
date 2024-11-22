@@ -10,6 +10,7 @@ return {
 	startYear = 2017,
 	wikiName = 'brawlhalla',
 	name = 'Brawlhalla',
+	defaultGame = 'brawl',
 	games = {
 		brawl = {
 			abbreviation = 'Brawl',
@@ -25,8 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'brawl',
-	defaultTeamLogo = 'Brawlhalla Default logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Brawlhalla Default logo.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 }

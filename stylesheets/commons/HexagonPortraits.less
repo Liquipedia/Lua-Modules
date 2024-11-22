@@ -1,0 +1,285 @@
+/*******************************************************************************
+Hexagon portraits
+Use case: Hexagon shaped portraits originally created for /heroes/Portal:Heroes
+Author(s): PhiLtheFisH, FO-nTTaX, salle
+*******************************************************************************/
+.wiki-heroes .hexagon-container {
+	height: 1200px;
+	position: relative;
+	margin-bottom: 24px;
+	z-index: 1;
+}
+
+.wiki-illuvium .hexagon-container {
+	height: 2500px;
+	position: relative;
+	margin-bottom: 24px;
+	z-index: 1;
+}
+
+.wiki-heroes .hexagon-row,
+.wiki-illuvium .hexagon-row {
+	line-height: 240px;
+	margin-bottom: -24px;
+	position: absolute;
+}
+
+.wiki-heroes .hexagon-row:nth-child( 2 ),
+.wiki-illuvium .hexagon-row:nth-child( 2 ) {
+	margin-left: 69px;
+	top: 120px;
+}
+
+.wiki-heroes .hexagon-tile,
+.wiki-illuvium .hexagon-tile {
+	clip-path: url( data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><clipPath id=\'heroPolygon\'><polygon points=\'72 0, 134 36, 134 108, 72 144, 10 108, 10 36\'></polygon></clipPath></svg>#heroPolygon );
+	clip-path: polygon( 72px 0, 134px 36px, 134px 108px, 72px 144px, 10px 108px, 10px 36px );
+	display: inline-block;
+	margin-left: -5px;
+	margin-right: -5px;
+	opacity: 1;
+	position: relative;
+	transition: 1s;
+	z-index: 100;
+}
+
+.wiki-heroes .hexagon-buttons-class,
+.wiki-illuvium .hexagon-buttons-affinity {
+	float: left;
+}
+
+.wiki-heroes .hexagon-buttons-faction,
+.wiki-illuvium .hexagon-buttons-class {
+	float: right;
+}
+
+.wiki-heroes .hexagon-button,
+.wiki-illuvium .hexagon-button {
+	cursor: pointer;
+}
+
+.wiki-heroes .hexagon:not( .show-assassin ) .hexagon-tile-assassin,
+.wiki-heroes .hexagon:not( .show-specialist ) .hexagon-tile-specialist,
+.wiki-heroes .hexagon:not( .show-support ) .hexagon-tile-support,
+.wiki-heroes .hexagon:not( .show-warrior ) .hexagon-tile-warrior,
+.wiki-heroes .hexagon:not( .show-multiclass ) .hexagon-tile-multiclass,
+.wiki-heroes .hexagon:not( .show-starcraft ) .hexagon-tile-starcraft,
+.wiki-heroes .hexagon:not( .show-warcraft ) .hexagon-tile-warcraft,
+.wiki-heroes .hexagon:not( .show-diablo ) .hexagon-tile-diablo,
+.wiki-illuvium .hexagon:not( .show-air ) .hexagon-tile-air,
+.wiki-illuvium .hexagon:not( .show-bloom ) .hexagon-tile-bloom,
+.wiki-illuvium .hexagon:not( .show-dust ) .hexagon-tile-dust,
+.wiki-illuvium .hexagon:not( .show-earth ) .hexagon-tile-earth,
+.wiki-illuvium .hexagon:not( .show-fire ) .hexagon-tile-fire,
+.wiki-illuvium .hexagon:not( .show-frost ) .hexagon-tile-frost,
+.wiki-illuvium .hexagon:not( .show-granite ) .hexagon-tile-granite,
+.wiki-illuvium .hexagon:not( .show-inferno ) .hexagon-tile-inferno,
+.wiki-illuvium .hexagon:not( .show-magma ) .hexagon-tile-magma,
+.wiki-illuvium .hexagon:not( .show-mud ) .hexagon-tile-mud,
+.wiki-illuvium .hexagon:not( .show-nature ) .hexagon-tile-nature,
+.wiki-illuvium .hexagon:not( .show-shock ) .hexagon-tile-shock,
+.wiki-illuvium .hexagon:not( .show-spore ) .hexagon-tile-spore,
+.wiki-illuvium .hexagon:not( .show-steam ) .hexagon-tile-steam,
+.wiki-illuvium .hexagon:not( .show-tempest ) .hexagon-tile-tempest,
+.wiki-illuvium .hexagon:not( .show-toxic ) .hexagon-tile-toxic,
+.wiki-illuvium .hexagon:not( .show-tsunami ) .hexagon-tile-tsunami,
+.wiki-illuvium .hexagon:not( .show-verdant ) .hexagon-tile-verdant,
+.wiki-illuvium .hexagon:not( .show-water ) .hexagon-tile-water,
+.wiki-illuvium .hexagon:not( .show-wildfire ) .hexagon-tile-wildfire,
+.wiki-illuvium .hexagon:not( .show-aegis ) .hexagon-tile-aegis,
+.wiki-illuvium .hexagon:not( .show-arcanite ) .hexagon-tile-arcanite,
+.wiki-illuvium .hexagon:not( .show-behemoth ) .hexagon-tile-behemoth,
+.wiki-illuvium .hexagon:not( .show-berserker ) .hexagon-tile-berserker,
+.wiki-illuvium .hexagon:not( .show-bulwark ) .hexagon-tile-bulwark,
+.wiki-illuvium .hexagon:not( .show-colossus ) .hexagon-tile-colossus,
+.wiki-illuvium .hexagon:not( .show-empath ) .hexagon-tile-empath,
+.wiki-illuvium .hexagon:not( .show-enchanter ) .hexagon-tile-enchanter,
+.wiki-illuvium .hexagon:not( .show-fighter ) .hexagon-tile-fighter,
+.wiki-illuvium .hexagon:not( .show-harbinger ) .hexagon-tile-harbinger,
+.wiki-illuvium .hexagon:not( .show-invoker ) .hexagon-tile-invoker,
+.wiki-illuvium .hexagon:not( .show-mystic ) .hexagon-tile-mystic,
+.wiki-illuvium .hexagon:not( .show-phantom ) .hexagon-tile-phantom,
+.wiki-illuvium .hexagon:not( .show-psion ) .hexagon-tile-psion,
+.wiki-illuvium .hexagon:not( .show-revenant ) .hexagon-tile-revenant,
+.wiki-illuvium .hexagon:not( .show-rogue ) .hexagon-tile-rogue,
+.wiki-illuvium .hexagon:not( .show-slayer ) .hexagon-tile-slayer,
+.wiki-illuvium .hexagon:not( .show-templar ) .hexagon-tile-templar,
+.wiki-illuvium .hexagon:not( .show-vanguard ) .hexagon-tile-vanguard,
+.wiki-heroes .hexagon:not( .show-other ) .hexagon-tile-other,
+.wiki-illuvium .hexagon:not( .show-other ) .hexagon-tile-other {
+	opacity: 0.5;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon:not( .show-assassin ):not( .show-specialist ):not( .show-support ):not( .show-warrior ):not( .show-multiclass ):not( .show-starcraft ):not( .show-warcraft ):not( .show-diablo ):not( .show-other ) .hexagon-tile,
+.wiki-illuvium .hexagon:not( .show-fire ):not( .show-nature ):not( .show-air ):not( .show-water ):not( .show-earth ):not( .show-fighter ):not( .show-psion ):not( .show-empath ):not( .show-rogue ):not( .show-bulwark ):not( .show-other ) .hexagon-tile {
+	opacity: 1;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon.show-assassin .hexagon-tile-assassin,
+.wiki-heroes .hexagon.show-specialist .hexagon-tile-specialist,
+.wiki-heroes .hexagon.show-support .hexagon-tile-support,
+.wiki-heroes .hexagon.show-warrior .hexagon-tile-warrior,
+.wiki-heroes .hexagon.show-multiclass .hexagon-tile-multiclass,
+.wiki-heroes .hexagon.show-starcraft .hexagon-tile-starcraft,
+.wiki-heroes .hexagon.show-warcraft .hexagon-tile-warcraft,
+.wiki-heroes .hexagon.show-diablo .hexagon-tile-diablo,
+.wiki-illuvium .hexagon.show-air .hexagon-tile-air,
+.wiki-illuvium .hexagon.show-bloom .hexagon-tile-bloom,
+.wiki-illuvium .hexagon.show-dust .hexagon-tile-dust,
+.wiki-illuvium .hexagon.show-earth .hexagon-tile-earth,
+.wiki-illuvium .hexagon.show-fire .hexagon-tile-fire,
+.wiki-illuvium .hexagon.show-frost .hexagon-tile-frost,
+.wiki-illuvium .hexagon.show-granite .hexagon-tile-granite,
+.wiki-illuvium .hexagon.show-inferno .hexagon-tile-inferno,
+.wiki-illuvium .hexagon.show-magma .hexagon-tile-magma,
+.wiki-illuvium .hexagon.show-mud .hexagon-tile-mud,
+.wiki-illuvium .hexagon.show-nature .hexagon-tile-nature,
+.wiki-illuvium .hexagon.show-shock .hexagon-tile-shock,
+.wiki-illuvium .hexagon.show-spore .hexagon-tile-spore,
+.wiki-illuvium .hexagon.show-steam .hexagon-tile-steam,
+.wiki-illuvium .hexagon.show-tempest .hexagon-tile-tempest,
+.wiki-illuvium .hexagon.show-toxic .hexagon-tile-toxic,
+.wiki-illuvium .hexagon.show-tsunami .hexagon-tile-tsunami,
+.wiki-illuvium .hexagon.show-verdant .hexagon-tile-verdant,
+.wiki-illuvium .hexagon.show-water .hexagon-tile-water,
+.wiki-illuvium .hexagon.show-wildfire .hexagon-tile-wildfire,
+.wiki-illuvium .hexagon.show-aegis .hexagon-tile-aegis,
+.wiki-illuvium .hexagon.show-arcanite .hexagon-tile-arcanite,
+.wiki-illuvium .hexagon.show-behemoth .hexagon-tile-behemoth,
+.wiki-illuvium .hexagon.show-berserker .hexagon-tile-berserker,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-tile-bulwark,
+.wiki-illuvium .hexagon.show-colossus .hexagon-tile-colossus,
+.wiki-illuvium .hexagon.show-empath .hexagon-tile-empath,
+.wiki-illuvium .hexagon.show-enchanter .hexagon-tile-enchanter,
+.wiki-illuvium .hexagon.show-fighter .hexagon-tile-fighter,
+.wiki-illuvium .hexagon.show-harbinger .hexagon-tile-harbinger,
+.wiki-illuvium .hexagon.show-invoker .hexagon-tile-invoker,
+.wiki-illuvium .hexagon.show-mystic .hexagon-tile-mystic,
+.wiki-illuvium .hexagon.show-phantom .hexagon-tile-phantom,
+.wiki-illuvium .hexagon.show-psion .hexagon-tile-psion,
+.wiki-illuvium .hexagon.show-revenant .hexagon-tile-revenant,
+.wiki-illuvium .hexagon.show-rogue .hexagon-tile-rogue,
+.wiki-illuvium .hexagon.show-slayer .hexagon-tile-slayer,
+.wiki-illuvium .hexagon.show-templar .hexagon-tile-templar,
+.wiki-illuvium .hexagon.show-vanguard .hexagon-tile-vanguard,
+.wiki-heroes .hexagon.show-other .hexagon-tile-other,
+.wiki-illuvium .hexagon.show-other .hexagon-tile-other {
+	opacity: 1;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-button img,
+.wiki-illuvium .hexagon-button img {
+	background-color: initial;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon.show-assassin .hexagon-button[ data-show="assassin" ] img,
+.wiki-heroes .hexagon.show-specialist .hexagon-button[ data-show="specialist" ] img,
+.wiki-heroes .hexagon.show-support .hexagon-button[ data-show="support" ] img,
+.wiki-heroes .hexagon.show-warrior .hexagon-button[ data-show="warrior" ] img,
+.wiki-heroes .hexagon.show-multiclass .hexagon-button[ data-show="multiclass" ] img,
+.wiki-heroes .hexagon.show-starcraft .hexagon-button[ data-show="starcraft" ] img,
+.wiki-heroes .hexagon.show-warcraft .hexagon-button[ data-show="warcraft" ] img,
+.wiki-heroes .hexagon.show-diablo .hexagon-button[ data-show="diablo" ] img,
+.wiki-illuvium .hexagon.show-air .hexagon-button[ data-show="air" ] img,
+.wiki-illuvium .hexagon.show-bloom .hexagon-button[ data-show="bloom" ] img,
+.wiki-illuvium .hexagon.show-dust .hexagon-button[ data-show="dust" ] img,
+.wiki-illuvium .hexagon.show-earth .hexagon-button[ data-show="earth" ] img,
+.wiki-illuvium .hexagon.show-fire .hexagon-button[ data-show="fire" ] img,
+.wiki-illuvium .hexagon.show-frost .hexagon-button[ data-show="frost" ] img,
+.wiki-illuvium .hexagon.show-granite .hexagon-button[ data-show="granite" ] img,
+.wiki-illuvium .hexagon.show-inferno .hexagon-button[ data-show="inferno" ] img,
+.wiki-illuvium .hexagon.show-magma .hexagon-button[ data-show="magma" ] img,
+.wiki-illuvium .hexagon.show-mud .hexagon-button[ data-show="mud" ] img,
+.wiki-illuvium .hexagon.show-nature .hexagon-button[ data-show="nature" ] img,
+.wiki-illuvium .hexagon.show-shock .hexagon-button[ data-show="shock" ] img,
+.wiki-illuvium .hexagon.show-spore .hexagon-button[ data-show="spore" ] img,
+.wiki-illuvium .hexagon.show-steam .hexagon-button[ data-show="steam" ] img,
+.wiki-illuvium .hexagon.show-tempest .hexagon-button[ data-show="tempest" ] img,
+.wiki-illuvium .hexagon.show-toxic .hexagon-button[ data-show="toxic" ] img,
+.wiki-illuvium .hexagon.show-tsunami .hexagon-button[ data-show="tsunami" ] img,
+.wiki-illuvium .hexagon.show-verdant .hexagon-button[ data-show="verdant" ] img,
+.wiki-illuvium .hexagon.show-water .hexagon-button[ data-show="water" ] img,
+.wiki-illuvium .hexagon.show-wildfire .hexagon-button[ data-show="wildfire" ] img,
+.wiki-illuvium .hexagon.show-aegis .hexagon-button[ data-show="aegis" ] img,
+.wiki-illuvium .hexagon.show-arcanite .hexagon-button[ data-show="arcanite" ] img,
+.wiki-illuvium .hexagon.show-behemoth .hexagon-button[ data-show="behemoth" ] img,
+.wiki-illuvium .hexagon.show-berserker .hexagon-button[ data-show="berserker" ] img,
+.wiki-illuvium .hexagon.show-bulwark .hexagon-button[ data-show="bulwark" ] img,
+.wiki-illuvium .hexagon.show-colossus .hexagon-button[ data-show="colossus" ] img,
+.wiki-illuvium .hexagon.show-empath .hexagon-button[ data-show="empath" ] img,
+.wiki-illuvium .hexagon.show-enchanter .hexagon-button[ data-show="enchanter" ] img,
+.wiki-illuvium .hexagon.show-fighter .hexagon-button[ data-show="fighter" ] img,
+.wiki-illuvium .hexagon.show-harbinger .hexagon-button[ data-show="harbinger" ] img,
+.wiki-illuvium .hexagon.show-invoker .hexagon-button[ data-show="invoker" ] img,
+.wiki-illuvium .hexagon.show-mystic .hexagon-button[ data-show="mystic" ] img,
+.wiki-illuvium .hexagon.show-phantom .hexagon-button[ data-show="phantom" ] img,
+.wiki-illuvium .hexagon.show-psion .hexagon-button[ data-show="psion" ] img,
+.wiki-illuvium .hexagon.show-revenant .hexagon-button[ data-show="revenant" ] img,
+.wiki-illuvium .hexagon.show-rogue .hexagon-button[ data-show="rogue" ] img,
+.wiki-illuvium .hexagon.show-slayer .hexagon-button[ data-show="slayer" ] img,
+.wiki-illuvium .hexagon.show-templar .hexagon-button[ data-show="templar" ] img,
+.wiki-illuvium .hexagon.show-vanguard .hexagon-button[ data-show="vanguard" ] img,
+.wiki-heroes .hexagon.show-other .hexagon-button[ data-show="other" ] img,
+.wiki-illuvium .hexagon.show-other .hexagon-button[ data-show="other" ] img {
+	background-color: #cccccc;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-tile:hover,
+.wiki-illuvium .hexagon-tile:hover {
+	opacity: 0.75;
+	transition: 1s;
+}
+
+.wiki-heroes .hexagon-tile a img,
+.wiki-illuvium .hexagon-tile a img {
+	margin-top: -100px;
+}
+
+.wiki-heroes .hexagon-tile-clear,
+.wiki-illuvium .hexagon-tile-clear {
+	visibility: hidden;
+}
+
+.wiki-heroes .hexagon-tile-name,
+.wiki-illuvium .hexagon-tile-name {
+	color: #ffffff;
+	font-weight: bold;
+	left: 10px;
+	line-height: 12px;
+	position: absolute;
+	text-shadow: -1px 1px #000000;
+	top: 98px;
+	transform: rotate( -30deg );
+	transform-origin: -115px -35px 0;
+}
+
+.wiki-heroes .hexagon label,
+.wiki-illuvium .hexagon label {
+	cursor: pointer;
+}
+
+.wiki-heroes .hexagon label > input,
+.wiki-illuvium .hexagon label > input {
+	display: none;
+}
+
+.wiki-heroes .hexagon label > span,
+.wiki-illuvium .hexagon label > span {
+	background-color: #aaaaaa;
+	border: 1px solid #aaaaaa;
+	border-radius: 5px;
+	margin: 5px;
+	padding: 5px;
+	transition: 0.5s;
+}
+
+.wiki-heroes .hexagon label > input:checked + span,
+.wiki-illuvium .hexagon label > input:checked + span {
+	background-color: #cccccc;
+	transition: 0.5s;
+}

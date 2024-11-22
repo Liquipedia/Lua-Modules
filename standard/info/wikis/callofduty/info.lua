@@ -10,6 +10,7 @@ return {
 	startYear = 2003,
 	wikiName = 'callofduty',
 	name = 'Call of Duty',
+	defaultGame = 'cod',
 	games = {
 		aw = {
 			abbreviation = 'AW',
@@ -83,6 +84,19 @@ return {
 			logo = {
 				darkMode = 'Call of Duty Black Ops Cold War darkmode.png',
 				lightMode = 'Call of Duty Black Ops Cold War lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
+			},
+		},
+		bo6 = {
+			abbreviation = 'BO6',
+			name = 'Black Ops 6',
+			link = 'Call of Duty: Black Ops 6',
+			logo = {
+				darkMode = 'Call of Duty Black Ops 6 allmode.png',
+				lightMode = 'Call of Duty Black Ops 6 allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -286,24 +300,11 @@ return {
 		},
 		wz = {
 			abbreviation = 'WZ',
-			name = 'Warzone 1.0',
+			name = 'Warzone',
 			link = 'Call of Duty: Warzone',
 			logo = {
 				darkMode = 'COD Warzone 1.0 default darkmode.png',
 				lightMode = 'COD Warzone 1.0 default lightmode.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default lightmode.png',
-			},
-		},
-		wz2 = {
-			abbreviation = 'WZ2',
-			name = 'Warzone 2.0',
-			link = 'Call of Duty: Warzone 2.0',
-			logo = {
-				darkMode = 'COD Warzone 2.0 default allmode.png',
-				lightMode = 'COD Warzone 2.0 default allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Call of Duty Default darkmode.png',
@@ -337,9 +338,17 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cod',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidthMobile = 100,
+			matchWidth = 190,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Call of Duty Default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Call of Duty Default darkmode.png', ---@deprecated
-	match2 = 1,
 }

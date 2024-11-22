@@ -7,11 +7,13 @@
 --
 
 local Array = require('Module:Array')
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local StringUtils = require('Module:StringUtils')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
@@ -20,8 +22,9 @@ local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
 local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
+local NOW = os.time()
 
-local nilIfEmpty = StringUtils.nilIfEmpty
+local nilIfEmpty = String.nilIfEmpty
 
 --[[
 Non-display utility functions for brackets, matchlists, matches, opponents,
@@ -67,6 +70,8 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field title string?
 ---@field type 'bracket'
 ---@field upperMatchId string?
+---@field matchId string?
+---@field qualifiedHeader boolean?
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
 	bracketResetMatchId = 'string?',
@@ -114,6 +119,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field title string?
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
+---@field matchId string?
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -132,6 +138,7 @@ MatchGroupUtil.types.BracketData = TypeUtil.union(
 ---@field pageName string?
 ---@field team string?
 ---@field extradata table?
+---@field pageIsResolved boolean?
 MatchGroupUtil.types.Player = TypeUtil.struct({
 	displayName = 'string?',
 	flag = 'string?',
@@ -154,7 +161,7 @@ MatchGroupUtil.types.Player = TypeUtil.struct({
 ---@field status string?
 ---@field status2 string?
 ---@field template string?
----@field type string
+---@field type OpponentType
 ---@field team string?
 MatchGroupUtil.types.Opponent = TypeUtil.struct({
 	advanceBg = 'string?',
@@ -184,18 +191,23 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	type = 'string',
 })
 
+---@alias MatchStatus 'notplayed'|''|nil
+MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
 ---@alias ResultType 'default'|'draw'|'np'
 MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
----@alias WalkoverType 'L'|'FF'|'DQ'
-MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
+---@alias WalkoverType 'l'|'ff'|'dq'
+MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
+---@field date string?
 ---@field game string?
 ---@field header string?
 ---@field length number?
 ---@field map string?
+---@field mapDisplayName string?
 ---@field mode string?
+---@field opponents {players: table[]}[]
 ---@field participants table
 ---@field resultType ResultType?
 ---@field scores number[]
@@ -207,10 +219,12 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('L', 'FF', 'DQ')
 ---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
+	date = 'string?',
 	game = 'string?',
 	header = 'string?',
 	length = 'number?',
 	map = 'string?',
+	mapDisplayName = 'string?',
 	mode = 'string?',
 	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
@@ -236,7 +250,10 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field mode string?
 ---@field opponents standardOpponent[]
 ---@field resultType ResultType?
+---@field status MatchStatus
 ---@field stream table
+---@field tickername string?
+---@field tournament string?
 ---@field type string?
 ---@field vod string?
 ---@field walkover WalkoverType?
@@ -257,7 +274,10 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
 	resultType = 'string?',
+	status = MatchGroupUtil.types.Status,
 	stream = 'table',
+	tickername = 'string?',
+	tournament = 'string?',
 	type = 'string?',
 	vod = 'string?',
 	walkover = 'string?',
@@ -278,6 +298,7 @@ MatchGroupUtil.types.Team = TypeUtil.struct({
 })
 
 ---@class MatchGroupUtilMatchlist
+---@field bracketDatasById table<string, MatchGroupUtilBracketBracketData>
 ---@field matches MatchGroupUtilMatch[]
 ---@field matchesById table<string, MatchGroupUtilMatch>
 ---@field type 'matchlist'
@@ -413,7 +434,7 @@ function MatchGroupUtil.computeRootMatchIds(bracketDatasById)
 	local rootMatchIds = {}
 	for matchId, bracketData in pairs(bracketDatasById) do
 		if not bracketData.upperMatchId
-			and not StringUtils.endsWith(matchId, 'RxMBR') then
+			and not String.endsWith(matchId, 'RxMBR') then
 			table.insert(rootMatchIds, matchId)
 		end
 	end
@@ -438,7 +459,7 @@ end
 
 ---Populate bracketData.coordinates if it is missing.
 ---This can happen if the bracket template has not been recently purged.
----@param matchGroup MatchGroupUtilMatchGroup
+---@param matchGroup MatchGroupUtilBracket
 function MatchGroupUtil.backfillCoordinates(matchGroup)
 	local bracketCoordinates = MatchGroupCoordinates.computeCoordinates(matchGroup)
 
@@ -483,12 +504,15 @@ end
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	local opponents = Array.map(record.match2opponents, MatchGroupUtil.opponentFromRecord)
+	local opponents = Array.map(record.match2opponents, FnUtil.curry(MatchGroupUtil.opponentFromRecord, record))
+	local games = Array.map(record.match2games, function(game) return MatchGroupUtil.gameFromRecord(game, #opponents) end)
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(Json.parseIfString(record.match2bracketdata))
 	if bracketData.type == 'bracket' then
 		bracketData.lowerEdges = bracketData.lowerEdges
 			or MatchGroupUtil.autoAssignLowerEdges(#bracketData.lowerMatchIds, #opponents)
 	end
+
+	local walkover = nilIfEmpty(record.walkover)
 
 	return {
 		bestof = tonumber(record.bestof) or 0,
@@ -499,7 +523,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		dateIsExact = Logic.readBool(record.dateexact),
 		finished = Logic.readBool(record.finished),
 		game = record.game,
-		games = Array.map(record.match2games, MatchGroupUtil.gameFromRecord),
+		games = games,
 		links = Json.parseIfString(record.links) or {},
 		matchId = record.match2id,
 		liquipediatier = record.liquipediatier,
@@ -507,13 +531,16 @@ function MatchGroupUtil.matchFromRecord(record)
 		mode = record.mode,
 		opponents = opponents,
 		parent = record.parent,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
+		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
+		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
 		tournament = record.tournament,
 		type = nilIfEmpty(record.type) or 'literal',
 		vod = nilIfEmpty(record.vod),
-		walkover = nilIfEmpty(record.walkover),
+		walkover = walkover and walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
@@ -583,10 +610,32 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 	}
 end
 
+---@param matchRecord table
 ---@param record table
+---@param opponentIndex integer
 ---@return standardOpponent
-function MatchGroupUtil.opponentFromRecord(record)
+function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+
+	local score = tonumber(record.score)
+	local status = record.status
+	local bestof = tonumber(matchRecord.bestof)
+	local game1 = (matchRecord.match2games or {})[1]
+	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
+		local winner = tonumber(game1.winner)
+		if game1.resulttype == 'default' then
+			score = -1
+			if winner == 0 then
+				status = 'D'
+			else
+				status = winner == opponentIndex and 'W' or string.upper(game1.walkover)
+			end
+		elseif game1.scores[opponentIndex] then
+			score = game1.scores[opponentIndex]
+			status = 'S'
+		end
+	end
+
 	return {
 		advanceBg = nilIfEmpty(Table.extract(extradata, 'bg')),
 		advances = Logic.readBoolOrNil(Table.extract(extradata, 'advances')),
@@ -595,8 +644,8 @@ function MatchGroupUtil.opponentFromRecord(record)
 		name = nilIfEmpty(record.name),
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
-		score = tonumber(record.score),
-		status = record.status,
+		score = score,
+		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
 	}
@@ -631,9 +680,11 @@ function MatchGroupUtil.playerFromRecord(record)
 end
 
 ---@param record table
+---@param opponentCount integer?
 ---@return MatchGroupUtilGame
-function MatchGroupUtil.gameFromRecord(record)
+function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -642,14 +693,16 @@ function MatchGroupUtil.gameFromRecord(record)
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
 		length = record.length,
 		map = nilIfEmpty(record.map),
+		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
+		opponents = record.opponents,
 		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
-		walkover = nilIfEmpty(record.walkover),
+		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
@@ -807,7 +860,7 @@ end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
 ---The returned extradata table can then be mutated without altering the source.
----@param recordExtradata any
+---@param recordExtradata table|string?
 ---@return table
 function MatchGroupUtil.parseOrCopyExtradata(recordExtradata)
 	return type(recordExtradata) == 'string' and Json.parse(recordExtradata)
@@ -887,6 +940,60 @@ function MatchGroupUtil.matchIdFromKey(matchKey)
 		-- Matchlist format
 		return string.format('%04d', matchKey)
 	end
+end
+
+---@param matchid string?
+---@param bracketid string?
+---@return string?
+function MatchGroupUtil.getStandaloneId(bracketid, matchid)
+	if not matchid or not bracketid then
+		return nil
+	end
+	return 'MATCH_' .. bracketid .. '_' .. matchid
+end
+
+---@class PartialMatchGameRecord
+---@field date string
+---@field dateexact boolean?
+---@field timestamp number?
+---@field finished boolean?
+---@field winner integer?
+
+---Determines the phase of a match based on its properties.
+---@param match MatchGroupUtilMatch|MatchGroupUtilGame|PartialMatchGameRecord
+---@return 'finished'|'ongoing'|'upcoming'
+function MatchGroupUtil.computeMatchPhase(match)
+	local isExact = Logic.readBoolOrNil(match.dateIsExact or match.dateexact)
+	local matchStartTimestamp = match.timestamp or Date.readTimestampOrNil(match.date) or Date.defaultTimestamp
+	if match.winner or Logic.readBool(match.finished) then
+		return 'finished'
+	elseif isExact ~= false and matchStartTimestamp ~= Date.defaultTimestamp and matchStartTimestamp <= NOW then
+		return 'ongoing'
+	else
+		return 'upcoming'
+	end
+end
+
+---Get subtypes (opponent, map) as a list
+---@param match table
+---@param type 'opponent'|'map'
+---@return any[]
+function MatchGroupUtil.normalizeSubtype(match, type)
+	local listNames
+	if type == 'opponent' then
+		listNames = {'match2opponents', 'opponents'}
+	elseif type == 'map' then
+		listNames = {'match2games', 'games'}
+	else
+		error('Invalid subtype: ' .. type)
+	end
+	for _, listName in ipairs(listNames) do
+		if match[listName] then
+			return match[listName]
+		end
+	end
+
+	return {}
 end
 
 return MatchGroupUtil

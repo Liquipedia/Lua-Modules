@@ -12,10 +12,10 @@ local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WildriftInfoboxTeam: InfoboxTeam
@@ -49,7 +49,7 @@ end
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(id, widgets)
+function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then

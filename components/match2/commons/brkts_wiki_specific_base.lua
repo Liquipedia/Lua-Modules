@@ -10,10 +10,11 @@ local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 ---@class BrktsWikiSpecific
+---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean
+---@field defaultIcon string?
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
--- called after processMap/processPlayer
 -- used to alter match related parameters, e.g. automatically setting the winner
 -- @parameter match - a match
 -- @returns the match after changes have been applied
@@ -21,28 +22,6 @@ WikiSpecificBase.processMatch = FnUtil.lazilyDefineFunction(function()
 	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
 	return InputModule and InputModule.processMatch
 		or error('Function "processMatch" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
-end)
-
--- called from Module:Match/Subobjects
--- used to transform wiki-specific input of templates to the generalized
--- format that is required by Module:MatchGroup
--- @parameter map - a map
--- @returns the map after changes have been applied
-WikiSpecificBase.processMap = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
-	return InputModule and InputModule.processMap
-		or error('Function "processMap" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
-end)
-
--- called from Module:Match/Subobjects
--- used to transform wiki-specific input of templates to the generalized
--- format that is required by Module:MatchGroup
--- @parameter player - a player
--- @returns the player after changes have been applied
-WikiSpecificBase.processPlayer = FnUtil.lazilyDefineFunction(function()
-	local InputModule = Lua.import('Module:MatchGroup/Input/Custom')
-	return InputModule and InputModule.processPlayer
-		or error('Function "processPlayer" not implemented on wiki in "Module:MatchGroup/Input/Custom"')
 end)
 
 --[[
@@ -100,6 +79,32 @@ function WikiSpecificBase.getMatchContainer(displayMode)
 		-- Single match, displayed flat on a page (no popup)
 		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch')
 		return SingleMatch.SingleMatchContainer
+	end
+
+	if displayMode == 'matchpage' then
+		-- Single match, displayed on a standalone page
+		local MatchPage = Lua.import('Module:MatchGroup/Display/MatchPage')
+		return MatchPage.MatchPageContainer
+	end
+end
+
+--[[
+Returns a display component for single game. The display component must
+be a container, i.e. it takes in a match ID rather than a matches.
+See the default implementation (pointed to below) for details.
+
+To customize single match display for a wiki, override this to return
+a display component with the wiki-specific customizations.
+
+Called from MatchGroup
+
+-- @returns module
+]]
+function WikiSpecificBase.getGameContainer(displayMode)
+	if displayMode == 'singlegame' then
+		-- Single match, displayed flat on a page (no popup)
+		local SingleGame = Lua.import('Module:MatchGroup/Display/SingleGame')
+		return SingleGame.SingleGameContainer
 	end
 end
 

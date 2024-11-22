@@ -107,7 +107,14 @@ function MediaList._buildConditions(args)
 	end
 
 	if args.org then
-		table.insert(additionalConditions, '[[extradata_subject_organization::' .. args.org .. ']]')
+		table.insert(
+			additionalConditions,
+			'([[extradata_subject_organization::'
+				.. args.org
+				.. ']] OR [[extradata_subject_organization::'
+				.. args.org:gsub(' ', '_')
+				.. ']])'
+		)
 		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5))
 	end
 
@@ -116,13 +123,23 @@ function MediaList._buildConditions(args)
 	end
 
 	if args.event then
-		table.insert(additionalConditions, '[[extradata_event_link::' .. args.event .. ']]')
+		table.insert(
+			additionalConditions,
+			'([[extradata_event_link::'
+				.. args.event
+				.. ']] OR [[extradata_event_link::'
+				.. args.event:gsub(' ', '_')
+				.. ']])'
+		)
 	end
 
-	table.insert(conditions, '(' .. table.concat(additionalConditions, args.booleanOperator) .. ')')
+	if Logic.isNotEmpty(additionalConditions) then
+		table.insert(conditions, '(' .. table.concat(additionalConditions, args.booleanOperator) .. ')')
+	end
 
 	return table.concat(conditions, ' AND ')
 end
+
 ---Builds a multi key condition for a given prefix and value
 ---@param value string|number
 ---@param prefix string
@@ -130,14 +147,15 @@ end
 ---@return string
 function MediaList._buildMultiKeyCondition(value, prefix, limit)
 	return table.concat(Array.map(Array.range(1, limit), function(index)
-		return '[[' .. prefix .. index .. '::' .. value .. ']]'
+		return '([[' .. prefix .. index .. '::' .. value .. ']]'
+			.. ' OR [['.. prefix .. index .. '::' .. value:gsub(' ', '_') .. ']])'
 	end), ' OR ')
 end
 
 ---Builds the display for the dynamic tabs per year option
 ---@param data table[]
 ---@param args table
----@return Html
+---@return Html|string?
 function MediaList._displayDynamic(data, args)
 	local tabsData = {}
 
@@ -218,7 +236,7 @@ function MediaList._row(item, args)
 	row:node(MediaList._displayTitle(item))
 
 	if String.isNotEmpty(item.translatedtitle) then
-		row:wikitext(mw.text.nowiki('[') .. '[' .. item.translatedtitle .. ']' .. mw.text.nowiki(']'))
+		row:wikitext(' ' .. mw.text.nowiki('[') .. item.translatedtitle .. mw.text.nowiki(']'))
 	end
 
 	local authors = {}

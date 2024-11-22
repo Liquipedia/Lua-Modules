@@ -224,6 +224,9 @@ Table.deepMergeInto({a = {x = 3, y = 4}}, {a = {y = 5}})
 
 -- Returns {a = {x = 3, y = 5}}
 ]]
+---@param target table
+---@param ... table
+---@return table
 function Table.deepMergeInto(target, ...)
 	local tbls = Table.pack(...)
 
@@ -239,6 +242,12 @@ function Table.deepMergeInto(target, ...)
 		end
 	end
 	return target
+end
+
+---@param ... table
+---@return table
+function Table.deepMerge(...)
+	return Table.deepMergeInto({}, ...)
 end
 
 ---Applies a function to each entry in a table and places the results as entries
@@ -286,12 +295,13 @@ f(2, 3)
 f('player4', 4, 'player')
 
 ]]
----@generic K, V, T, I
----@param args {[K] : V}
+---@generic K, T
+---@param args {[K] : any}
 ---@param prefixes string[]
----@param f function
----@return {[I] : T}
-function Table.mapArgumentsByPrefix(args, prefixes, f)
+---@param f fun(key?: K, index?: integer, prefix: string?): T
+---@param noInterleave boolean?
+---@return {[integer?] : T}
+function Table.mapArgumentsByPrefix(args, prefixes, f, noInterleave)
 	local function indexFromKey(key)
 		local prefix, index = key:match('^([%a_]+)(%d+)$')
 		if Table.includes(prefixes, prefix) then
@@ -301,7 +311,7 @@ function Table.mapArgumentsByPrefix(args, prefixes, f)
 		end
 	end
 
-	return Table.mapArguments(args, indexFromKey, f)
+	return Table.mapArguments(args, indexFromKey, f, noInterleave)
 end
 
 --- Extracts keys based on a passed `indexFromKey` function interleaved with numeric indexes
@@ -310,9 +320,9 @@ end
 -- Most common use-case will be `Table.mapArgumentsByPrefix` where
 -- the `indexFromKey` function retrieves keys based on a prefix.
 --
----@generic K, V, T, I
----@param args {[K] : V}
----@param indexFromKey fun(key?: K): integer?
+---@generic K, T, I
+---@param args {[K] : any}
+---@param indexFromKey fun(key?: K): I?, ...
 ---@param f fun(key?: K, index?: integer, ...?: any): T
 ---@param noInterleave boolean?
 ---@return {[I] : T}
@@ -554,7 +564,7 @@ will print out `p1 p2 p3`
 ---@param tbl table
 ---@param prefixes string|string[]
 ---@param options? {requireIndex: boolean}
----@return function
+---@return fun(): string?, any?, integer?
 function Table.iter.pairsByPrefix(tbl, prefixes, options)
 	options = options or {}
 

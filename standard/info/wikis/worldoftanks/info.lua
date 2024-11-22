@@ -10,6 +10,7 @@ return {
 	startYear = 2010,
 	wikiName = 'worldoftanks',
 	name = 'World of Tanks',
+	defaultGame = 'worldoftanks',
 	games = {
 		worldoftanks = {
 			abbreviation = 'WoT',
@@ -64,9 +65,16 @@ return {
 			},
 		},
 	},
-	defaultGame = 'worldoftanks',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 190,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'World of Tanks default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'World of Tanks default darkmode.png', ---@deprecated
-	match2 = 2,
 }

@@ -13,11 +13,12 @@ local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
+local Logic = require('Module:Logic')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -29,6 +30,8 @@ local CustomInjector = Class.new(Injector)
 local BLIZZARD_TIERS = {
 	owl = 'Overwatch League',
 	owc = 'Overwatch Contenders',
+	owcs = 'Overwatch Champions Series',
+	owwc = 'Overwatch World Cup',
 }
 
 ---@param frame Frame
@@ -40,11 +43,17 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
+---@param args table
+function CustomLeague:customParseArguments(args)
+	self.data.publishertier = self:_validPublisherTier(args.publishertier) and args.publishertier:lower()
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
 		Array.appendWith(widgets,
@@ -54,23 +63,20 @@ function CustomInjector:parse(id, widgets)
 	)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
-			local game = String.isNotEmpty(args.game) and ('/' .. args.game) or ''
-			local maps = {}
-
-			for _, map in ipairs(League:getAllArgsForBase(args, 'map')) do
-				table.insert(maps, tostring(self.caller:_createNoWrappingSpan(
-					PageLink.makeInternalLink({}, map, map .. game)
-				)))
-			end
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			local maps = Array.map(caller:getAllArgsForBase(args, 'map'), function(map)
+				return PageLink.makeInternalLink(map)
+			end)
+			Array.appendWith(widgets,
+				Logic.isNotEmpty(maps) and table.insert(widgets, Title{children = 'Maps'}) or nil,
+				Center{children = table.concat(maps, '&nbsp;• ')}
+			)
 		end
 	elseif id == 'liquipediatier' then
-		if self.caller:_validPublisherTier(args.blizzardtier) then
+		if caller.data.publishertier then
 			table.insert(widgets,
 				Cell{
 					name = 'Blizzard Tier',
-					content = {'[['..BLIZZARD_TIERS[args.blizzardtier:lower()]..']]'},
+					content = {'[['..BLIZZARD_TIERS[caller.data.publishertier]..']]'},
 					classes = {'valvepremier-highlighted'}
 				}
 			)
@@ -107,10 +113,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_edate', self.data.endDate)
 	Variables.varDefine('tournament_date', self.data.endDate)
 
-	if self:_validPublisherTier(args.blizzardtier) then
-		Variables.varDefine('tournament_blizzard_premier', args.blizzardtier:lower())
-	end
-
+	Variables.varDefine('tournament_blizzard_premier', tostring(self.data.publishertier or ''))
 end
 
 ---@param args table

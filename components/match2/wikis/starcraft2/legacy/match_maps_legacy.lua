@@ -134,7 +134,7 @@ function MatchMapsLegacy.close()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist') --[[@as table]]
 
 	for matchIndex, match in ipairs(matches) do
-		matches['M' .. matchIndex] = Match._toEncodedJson(match)
+		matches['M' .. matchIndex] = Match.makeEncodedJson(match)
 		matches[matchIndex] = nil
 	end
 

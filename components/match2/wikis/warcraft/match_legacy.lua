@@ -26,9 +26,8 @@ local UNKNOWNREASON_DEFAULT_LOSS = 'L'
 local TBD = 'TBD'
 
 ---@param match table
----@param options {storeMatch2:boolean, storeMatch1:boolean, storePageVar:boolean, bracketId: string}
-function MatchLegacy.storeMatch(match, options)
-	if not options.storeMatch1 or #match.match2opponents ~= 2 or not Namespace.isMain() then
+function MatchLegacy.storeMatch(match)
+	if #match.match2opponents ~= 2 or not Namespace.isMain() then
 		return
 	end
 
@@ -101,7 +100,7 @@ function MatchLegacy._convertParameters(match2)
 	local match = Table.filterByKey(match2, function(key, entry) return not String.startsWith(key, 'match2') end)
 	---@cast match table
 	match.type = match.type and string.lower(match.type) or nil
-	match.header = DisplayHelper.expandHeader(Logic.emptyOr(bracketData.header, bracketData.inheritedheader, ''))[1]
+	match.header = DisplayHelper.expandHeader(Logic.emptyOr(bracketData.header, bracketData.inheritedheader) or '')[1]
 	match.tickername = Variables.varDefault('tournament_tickername', Variables.varDefault('tournament_ticker_name'))
 
 	match.staticid = match2.match2id

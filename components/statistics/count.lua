@@ -180,24 +180,22 @@ function Count.placements(args)
 
 	elseif String.isNotEmpty(args.team) then
 		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.map(Count._getOpponentNames(args.team),
-		function(templateValue)
-			return opponentConditions:add{
+		Array.forEach(Count._getOpponentNames(args.team), function(templateValue)
+			opponentConditions:add{
 				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
 				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
 			}
-			end
-		)
+		end)
 		lpdbConditions:add{opponentConditions}
 	end
 
 	if String.isNotEmpty(args.placement) then
 		local placementConditions = ConditionTree(BooleanOperator.any)
-		Array.map(Array.map(mw.text.split(args.placement, ',', true), String.trim),
-		function(placementValue)
-			return placementConditions:add{
-				ConditionNode(ColumnName('placement'), Comparator.eq, placementValue)}
-			end)
+		Array.forEach(Array.map(mw.text.split(args.placement, ',', true), String.trim),
+			function(placementValue)
+				placementConditions:add{ConditionNode(ColumnName('placement'), Comparator.eq, placementValue)}
+			end
+		)
 		lpdbConditions:add{placementConditions}
 	end
 

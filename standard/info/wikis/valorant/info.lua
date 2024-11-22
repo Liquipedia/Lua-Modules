@@ -10,6 +10,7 @@ return {
 	startYear = 2020,
 	wikiName = 'valorant',
 	name = 'VALORANT',
+	defaultGame = 'val',
 	games = {
 		val = {
 			abbreviation = 'VAL',
@@ -25,8 +26,16 @@ return {
 			},
 		},
 	},
-	defaultGame = 'val',
-	defaultTeamLogo = 'VALORANT allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'VALORANT allmode.png', ---@deprecated
-	match2 = 2,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+			gameScoresIfBo1 = true,
+		},
+	},
 }

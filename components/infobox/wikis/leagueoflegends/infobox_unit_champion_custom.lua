@@ -15,10 +15,10 @@ local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'caption' then
-		table.insert(widgets, Center{content = {args.quote}})
+		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title, dataModule)
 			if String.isEmpty(args[key]) then return end
@@ -71,7 +71,7 @@ function CustomInjector:parse(id, widgets)
 			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
 		)
 		return {
-			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
+			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
 			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
@@ -103,7 +103,7 @@ function CustomChampion:getCustomCells(widgets)
 	)
 
 	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
-		table.insert(widgets, Title{name = 'Base Statistics'})
+		table.insert(widgets, Title{children = 'Base Statistics'})
 	end
 
 	local function bonusPerLevel(start, bonuslvl)
@@ -138,7 +138,7 @@ function CustomChampion:getCustomCells(widgets)
 	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
 
 	return Array.append(widgets,
-		Title{name = 'Esports Statistics'},
+		Title{children = 'Esports Statistics'},
 		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end

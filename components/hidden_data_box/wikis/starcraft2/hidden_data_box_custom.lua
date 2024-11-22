@@ -20,7 +20,7 @@ local CustomHiddenDataBox = {}
 ---@return Html
 function CustomHiddenDataBox.run(args)
 	args = args or {}
-	args.game = Game.toIdentifier{game = args.game}
+	args.game = Game.toIdentifier{game = args.game, useDefault = false}
 
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 
@@ -34,13 +34,6 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 
 	--custom stuff
 	Variables.varDefine('headtohead', args.headtohead)
-	args.featured = args.featured or args.publishertier
-	args.featured = Logic.readBool(args.featured) and tostring(Logic.readBool(args.featured)) or nil
-	BasicHiddenDataBox.checkAndAssign(
-		'tournament_publishertier',
-		args.featured,
-		queryResult.publishertier
-	)
 	if args.team_number then
 		Variables.varDefine('is_team_tournament', 1)
 		Variables.varDefine('participants_number', args.team_number)

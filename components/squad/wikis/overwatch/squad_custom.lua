@@ -6,216 +6,106 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Squad = Lua.import('Module:Squad')
+local Widget = Lua.import('Module:Widget/All')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local CustomSquad = {}
-local HAS_NUMBER = false
 
 ---@class OverwatchSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
----@param self Squad
----@return Squad
-function CustomSquad.header(self)
-	local makeHeader = function(wikiText)
-		local headerCell = mw.html.create('th')
-
-		if wikiText == nil then
-			return headerCell
-		end
-
-		return headerCell:wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader()) -- "Team Icon" (most commmonly used for loans)
-	if HAS_NUMBER then
-		headerRow:node(makeHeader('Number'))
-	end
-	headerRow:node(makeHeader('Name'))
-		:node(makeHeader('Position'))
-		:node(makeHeader('Join Date'))
-	if self.type == Squad.SquadType.FORMER then
-		headerRow:node(makeHeader('Leave Date'))
-			:node(makeHeader('New Team'))
-	elseif self.type == Squad.SquadType.INACTIVE then
-		headerRow:node(makeHeader('Inactive Date'))
-	end
-
-	self.content:node(headerRow)
-
-	return self
-end
-
----@param args table
 ---@return self
-function ExtendedSquadRow:position(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Position')
-
-	if String.isNotEmpty(args.position) or String.isNotEmpty(args.role) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Position:&nbsp;'))
-
-		if String.isNotEmpty(args.position) then
-			cell:wikitext(args.position)
-			if String.isNotEmpty(args.role) then
-				cell:wikitext('&nbsp;(' .. args.role .. ')')
-			end
-		elseif String.isNotEmpty(args.role) then
-			cell:wikitext(args.role)
-		end
-	end
-
-	self.content:node(cell)
-
-	self.lpdbData.position = args.position
-	self.lpdbData.role = args.role or self.lpdbData.role
-
-	return self
-end
-
----@param args table
----@return self
-function ExtendedSquadRow:number(args)
-	mw.logObject(args)
-	local cell = mw.html.create('td')
-	cell:addClass('Number')
-
-	if String.isNotEmpty(args.number) then
-		cell:node(mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'))
-
-		if String.isNotEmpty(args.number) then
-			cell:wikitext(args.number)
-		end
-	end
-
-	self.content:node(cell)
-
-	self.lpdbData.number = args.number
+function ExtendedSquadRow:number()
+	table.insert(self.children, Widget.Td{
+		classes = {'Number'},
+		children = String.isNotEmpty(self.model.extradata.number) and {
+			mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'),
+			self.model.extradata.number,
+		} or nil,
+	})
 
 	return self
 end
 
 ---@param frame Frame
----@return Html
+---@return Widget
 function CustomSquad.run(frame)
-	local squad = Squad()
+	local args = Arguments.getArgs(frame)
+	local props = {
+		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
+		title = args.title,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
+	}
+	local players = SquadUtils.parsePlayers(args)
 
-	squad:init(frame):title()
+	local showNumber = Array.any(players, Operator.property('number'))
 
-	local args = squad.args
-
-	local players = Array.mapIndexes(function(index)
-		local player = Json.parseIfString(args[index])
-		if player.number then
-			HAS_NUMBER = true
-		end
-		return player
+	props.children = Array.map(players, function(player)
+		return CustomSquad._playerRow(player, props.status, props.type, showNumber)
 	end)
 
-	squad.header = CustomSquad.header
-	squad:header()
+	local root = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {Squad(props)}}
+	if not showNumber then
+		return root
+	end
 
-	Array.forEach(players, function(player)
-		squad:row(CustomSquad._playerRow(player, squad.type))
-	end)
-
-	return squad:create()
+	return SquadContexts.NameSection{
+		value = function(widgets)
+			table.insert(widgets, 1, Widget.Th{children = {'Number'}})
+			return widgets
+		end,
+		children = {root},
+	}
 end
 
----@param playerList table[]
----@param squadType integer
----@return Html?
-function CustomSquad.runAuto(playerList, squadType)
-	if Table.isEmpty(playerList) then
-		return
-	end
-
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
-
-	squad.type = squadType
-
-	squad.header = CustomSquad.header
-	squad:title():header()
-
-	Array.forEach(playerList, function(player)
-		--Get Reference(s)
-		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
-
-		-- Map between formats
-		player.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
-		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-		player.inactivedate = player.leavedate
-
-		player.link = player.page
-		player.role = player.thisTeam.role
-		player.position = player.thisTeam.position
-		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
-
-		player.newteam = player.newTeam.team
-		player.newteamrole = player.newTeam.role
-		player.newteamdate = player.newTeam.date
-
-		squad:row(CustomSquad._playerRow(player, squad.type))
-	end)
-
-	return squad:create()
+---@param players table[]
+---@param squadStatus SquadStatus
+---@param squadType SquadType
+---@param customTitle string?
+---@return Widget
+function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(players, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
----@param player table
----@param squadType integer
----@return Html
-function CustomSquad._playerRow(player, squadType)
-	local row = ExtendedSquadRow()
+---@param person table
+---@param squadStatus SquadStatus
+---@param squadType SquadType
+---@param showNumber boolean
+---@return Widget
+function CustomSquad._playerRow(person, squadStatus, squadType, showNumber)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
+	squadPerson.extradata.number = person.number
+	SquadUtils.storeSquadPerson(squadPerson)
 
-	row:status(squadType)
-	row:id({
-		(player.idleavedate or player.id),
-		flag = player.flag,
-		link = player.link,
-		captain = player.captain,
-		role = player.role,
-		team = player.team,
-		date = player.leavedate or player.inactivedate or player.leavedate,
-	})
-	if HAS_NUMBER then
-		row:number{number = player.number}
+	local row = ExtendedSquadRow(squadPerson)
+
+	row:id()
+	if showNumber then
+		row:number()
 	end
-	row:name{name = player.name}
-	row:position{role = player.role, position = player.position}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+	row:name():position():date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == Squad.SquadType.FORMER then
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate
-		}
-	elseif squadType == Squad.SquadType.INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
 	end
 
-	return row:create(
-		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-		.. (player.role and '_' .. player.role or '')
-		.. '_' .. squadType
-	)
+	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
+	end
+
+	return row:create()
 end
 
 return CustomSquad

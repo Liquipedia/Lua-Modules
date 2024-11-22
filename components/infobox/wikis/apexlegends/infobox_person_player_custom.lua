@@ -7,8 +7,9 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = require('Module:CharacterNames')
 local Class = require('Module:Class')
-local LegendIcon = require('Module:LegendIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -17,10 +18,10 @@ local Table = require('Module:Table')
 local UpcomingMatches = require('Module:Matches Player')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local INPUTS = {
@@ -75,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		local legendIcons = Array.map(caller:getAllArgsForBase(args, 'legends'), function(legend)
-			return LegendIcon.getImage{legend, size = SIZE_LEGEND}
+			return CharacterIcon.Icon{character = CharacterNames[legend:lower()], size = SIZE_LEGEND}
 		end)
 		Array.appendWith(widgets,
 			Cell{
@@ -155,7 +156,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.retired = args.retired
 
 	for _, legend, legendIndex in Table.iter.pairsByPrefix(args, 'legends', {requireIndex = false}) do
-		lpdbData.extradata['signatureLegend' .. legendIndex] = legend
+		lpdbData.extradata['signatureLegend' .. legendIndex] = CharacterNames[legend:lower()]
 	end
 	lpdbData.type = self:_isPlayerOrStaff()
 

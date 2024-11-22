@@ -24,6 +24,9 @@ WikiCopyPaste.Indent = INDENT
 local MODES = {
 	solo = Opponent.solo,
 	team = Opponent.team,
+	duo = Opponent.duo,
+	trio = Opponent.trio,
+	quad = Opponent.quad,
 	literal = Opponent.literal,
 }
 
@@ -40,7 +43,7 @@ end
 ---subfunction used to generate the code for the Map template
 ---sets up as many maps as specified via the bestoff param
 ---@param bestof integer
----@return unknown
+---@return string
 function WikiCopyPaste._getMaps(bestof)
 	local map = '{{Map|map=}}'
 	local lines = Array.map(Array.range(1, bestof), function(mapIndex)
@@ -61,19 +64,18 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), true)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
-	local lines = {'{{Match\n' .. INDENT}
-	Array.extendWith(lines,
+	return table.concat(Array.extend({},
+		'{{Match',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
 		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|date=\n' .. INDENT .. '}}'
-	)
-	return table.concat(lines)
+	))
 end
 
 ---subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
----@param showScore boolean
+---@param showScore boolean?
 ---@return string
 function WikiCopyPaste.getOpponent(mode, showScore)
 	local score = showScore and '|score=' or ''
@@ -81,6 +83,20 @@ function WikiCopyPaste.getOpponent(mode, showScore)
 		return '{{SoloOpponent||flag=' .. score .. '}}'
 	elseif mode == Opponent.team then
 		return '{{TeamOpponent|' .. score .. '}}'
+	elseif Opponent.typeIsParty(mode) then
+		local partySize = Opponent.partySize(mode)
+		--can not be nil due to the check typeIsParty check
+		---@cast partySize -nil
+
+		local parts = {'{{' .. mw.getContentLanguage():ucfirst(mode) .. 'Opponent'}
+		Array.forEach(Array.range(1, partySize), function(playerIndex)
+			local prefix = '|p' .. playerIndex
+			Array.appendWith(parts,
+				prefix .. '=',
+				prefix .. 'flag='
+			)
+		end)
+		return table.concat(Array.append(parts, score .. '}}'))
 	elseif mode == Opponent.literal then
 		return '{{Literal|}}'
 	end

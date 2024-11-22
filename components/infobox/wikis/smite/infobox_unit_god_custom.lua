@@ -15,10 +15,10 @@ local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 			},
 		}
 	elseif id == 'caption' then
-		table.insert(widgets, Center {content = {args.quote}})
+		table.insert(widgets, Center{children = {args.quote}})
 	elseif id == 'type' then
 		local toBreakDownCell = function(key, title, dataModule)
 				if String.isEmpty(args[key]) then return end
@@ -72,7 +72,7 @@ function CustomInjector:parse(id, widgets)
 				toBreakDownCell('powertype', 'Power Type', 'PowerTypeIcon')
 			)
 		return {
-			Breakdown{classes = {'infobox-center'}, content = breakDownContents},
+			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
 			Cell{name = 'Real Name', content = {args.realname}},
 		}
 	elseif id == 'cost' then
@@ -120,7 +120,7 @@ function CustomGod:getCustomCells(widgets)
 		Cell{name = 'Attack Speed', content = {bonusPerLevel(args.attackspeed, args.attackspeedlvl)}},
 		Cell{name = 'Attack Damage', content = {bonusPerLevel(args.damage, args.damagelvl), args.damagebonus}},
 		Cell{name = 'Progression', content = {args.progression}},
-		Title{name = 'Protections'},
+		Title{children = 'Protections'},
 		Cell{name = 'Physical', content = {bonusPerLevel(args.physical, args.physicallvl)}},
 		Cell{name = 'Magical', content = {bonusPerLevel(args.magical, args.magicallvl)}}
 	)
@@ -131,7 +131,7 @@ function CustomGod:getCustomCells(widgets)
 	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
 
 	return Array.append(widgets,
-		Title{name = 'Esports Statistics'},
+		Title{children = 'Esports Statistics'},
 		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
 end

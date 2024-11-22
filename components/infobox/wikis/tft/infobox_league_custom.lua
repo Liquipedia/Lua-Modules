@@ -12,12 +12,15 @@ local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+
+local VALID_PUBLISHERTIERS = {'sponsored'}
 
 ---@class TftLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -63,15 +66,9 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['riot-sponsored'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args['riot-sponsored']) then
+	if self.data.publishertier then
 		return ' ' .. RIOT_ICON
 	end
 	return ''
@@ -83,6 +80,9 @@ function CustomLeague:customParseArguments(args)
 	args.mode = args.mode and GAME_MODES[string.lower(args.mode):gsub('s$', '')] or DEFAULT_MODE
 
 	self.data.mode = string.lower(args.mode)
+	local publisherTier = (args.publishertier or ''):lower()
+	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
+		or Logic.readBool(args['riot-sponsored']) and 'sponsored' or nil -- kick this line after bot runs
 end
 
 ---@param args table

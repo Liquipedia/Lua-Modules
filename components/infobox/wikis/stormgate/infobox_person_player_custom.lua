@@ -41,10 +41,12 @@ local ROLES = {
 	player = {category = 'Player', variable = 'Player', personType = 'Player'},
 }
 
-local Injector = require('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Injector = Lua.import('Module:Widget/Injector')
+local Widgets = Lua.import('Module:Widget/All')
+
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class StormgateInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
@@ -105,8 +107,8 @@ function CustomInjector:parse(id, widgets)
 		if not achievements then return {} end
 
 		return {
-			Title{name = 'Achievements'},
-			Center{content = {achievements}},
+			Title{children = 'Achievements'},
+			Center{children = {achievements}},
 		}
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})

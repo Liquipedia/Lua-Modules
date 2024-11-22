@@ -58,12 +58,16 @@ return {
 
 	-- Usage: Reference links in tables (ie transfers)
 	reference = 'fad fa-external-link-alt',
+	link = 'fad fa-link',
+	insidesource = 'fad fa-user-secret',
+	transferdatabase = 'fad fa-scroll',
 
-	-- Usage: Section links
+	-- Usage: Section links, navigation
 	activestage = 'fas fa-bell-exclamation',
 	prizepool = 'fas fa-sack-dollar',
 	teams = 'fas fa-users',
 	results = 'fas fa-th-list',
+	standings = 'fad fa-list-ol',
 	headlines = 'fas fa-newspaper',
 	achievements = 'fas fa-medal',
 	activeroster = 'fas fa-users',
@@ -72,4 +76,15 @@ return {
 
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
+
+	-- Usage: Squad Table
+	captain = 'fas fa-crown',
+	substitute = 'fas fa-people-arrows',
+
+	-- Usage: Deadlock
+	amberhand = 'fas fa-hand-paper',
+	sapphireflame = 'fas fa-fire',
+
+	-- Usage: Accommodations
+	accommodation = 'far fa-home-alt',
 }

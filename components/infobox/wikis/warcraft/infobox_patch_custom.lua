@@ -14,10 +14,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Patch = Lua.import('Module:Infobox/Patch')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WarcraftPatchInfobox: PatchInfobox
@@ -63,22 +63,6 @@ function CustomPatch._netEaseRelease(args)
 	end
 
 	return args.release_netease == SKIP and SKIPPED or args.release_netease
-end
-
----@param args table
-function CustomPatch:setLpdbData(args)
-	mw.ext.LiquipediaDB.lpdb_datapoint('patch_' .. self.pagename, {
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
-			beta = tostring(Logic.readBool(args.beta)),
-			version = self.name,
-			release = args.release,
-			neteaserelease = args.release_netease ~= SKIP and args.release_netease or nil,
-			ptrdate = args.release_ptr,
-			balanceupdates = tostring(CustomPatch._hasBalanceUpdate(args)),
-			previous = args.previous and ('Patch args.previous') or nil,
-			next = args.next and ('Patch args.previous') or nil,
-		})
-	})
 end
 
 ---@param lpdbData table

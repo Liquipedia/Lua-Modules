@@ -10,42 +10,46 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local TypeUtil = require('Module:TypeUtil')
 local Flags = require('Module:Flags')
 local Abbreviation = require('Module:Abbreviation')
 
 local Opponent = Lua.import('Module:Opponent')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD = 'TBD'
+local TBD_ABBREVIATION = Abbreviation.make(TBD, 'To be determined (or to be decided)')
 
---[[
-Display components for players.
-]]
-local PlayerDisplay = {propTypes = {}}
+--Display components for players.
+---@class PlayerDisplay
+local PlayerDisplay = {}
 
-PlayerDisplay.propTypes.BlockPlayer = {
-	dq = 'boolean?',
-	flip = 'boolean?',
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	player = MatchGroupUtil.types.Player,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showPlayerTeam = 'boolean?',
-	abbreviateTbd = 'boolean?',
-	note = 'string?',
-}
+---@class BlockPlayerProps
+---@field flip boolean?
+---@field player standardPlayer
+---@field overflow OverflowModes?
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field showPlayerTeam boolean?
+---@field abbreviateTbd boolean?
+---@field dq boolean?
+---@field note string|number|nil
+---@field team string?
 
---[[
-Displays a player as a block element. The width of the component is
-determined by its layout context, and not by the player name.
-]]
+---@class InlinePlayerProps
+---@field flip boolean?
+---@field player standardPlayer
+---@field showFlag boolean?
+---@field showLink boolean?
+---@field dq boolean?
+
+--Displays a player as a block element. The width of the component is
+--determined by its layout context, and not by the player name.
+---@param props BlockPlayerProps
+---@return Html
 function PlayerDisplay.BlockPlayer(props)
-	DisplayUtil.assertPropTypes(props, PlayerDisplay.propTypes.BlockPlayer)
 	local player = props.player
 
 	local zeroWidthSpace = '&#8203;'
-	local nameNode = mw.html.create(props.dq and 's' or 'span')
+	local nameNode = mw.html.create(props.dq and 's' or 'span'):addClass('name')
 		:wikitext(props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
 			or props.showLink ~= false and Logic.isNotEmpty(player.pageName)
 			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
@@ -53,12 +57,9 @@ function PlayerDisplay.BlockPlayer(props)
 		)
 	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
 
+	local noteNode
 	if props.note then
-		nameNode = mw.html.create('span'):addClass('name')
-			:node(nameNode)
-			:tag('sup'):addClass('note'):wikitext(props.note):done()
-	else
-		nameNode:addClass('name')
+		noteNode = mw.html.create('sup'):addClass('note'):wikitext(props.note)
 	end
 
 	local flagNode
@@ -67,7 +68,7 @@ function PlayerDisplay.BlockPlayer(props)
 	end
 
 	local teamNode
-	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
+	if props.showPlayerTeam and player.team and player.team:upper() ~= TBD then
 		teamNode = mw.html.create('span')
 			:wikitext('&nbsp;')
 			:node(mw.ext.TeamTemplate.teampart(player.team))
@@ -78,23 +79,14 @@ function PlayerDisplay.BlockPlayer(props)
 		:addClass(props.showPlayerTeam and 'has-team' or nil)
 		:node(flagNode)
 		:node(nameNode)
+		:node(noteNode)
 		:node(teamNode)
 end
 
-PlayerDisplay.propTypes.InlinePlayer = {
-	dq = 'boolean?',
-	flip = 'boolean?',
-	player = MatchGroupUtil.types.Player,
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-}
-
---[[
-Displays a player as an inline element. Useful for referencing players in
-prose.
-]]
+---Displays a player as an inline element. Useful for referencing players in prose.
+---@param props InlinePlayerProps
+---@return Html
 function PlayerDisplay.InlinePlayer(props)
-	DisplayUtil.assertPropTypes(props, PlayerDisplay.propTypes.InlinePlayer)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
@@ -124,6 +116,8 @@ function PlayerDisplay.InlinePlayer(props)
 end
 
 -- Note: require('Module:Flags').Icon automatically includes a span with class="flag"
+---@param name string?
+---@return string
 function PlayerDisplay.Flag(name)
 	return Flags.Icon({flag = name, shouldLink = false})
 end

@@ -17,6 +17,8 @@ local CustomAwardPrizePool = {}
 local IS_AWARD = true
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomAwardPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')

@@ -20,10 +20,10 @@ local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local GAME_MOD = 'mod'
@@ -160,7 +160,7 @@ function CustomSeries:_addCustomVariables()
 	else
 		--needed for e.g. External Cups Lists
 		local name = args.name or self.pagename
-		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.featured)))
+		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.highlighted)))
 		Variables.varDefine('headtohead', args.headtohead or '')
 		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 		Variables.varDefine('tournament_liquipediatier', tier or '')

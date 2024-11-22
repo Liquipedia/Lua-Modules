@@ -10,14 +10,15 @@ return {
 	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six',
+	defaultGame = 'siege',
 	games = {
 		siege = {
 			abbreviation = 'R6S',
 			name = 'Tom Clancy\'s Rainbow Six Siege',
 			link = 'Rainbow Six Siege',
 			logo = {
-				darkMode = 'R6S icon.png',
-				lightMode = 'R6S icon.png',
+				darkMode = 'Rainbow Six Siege gameicon darkmode.png',
+				lightMode = 'Rainbow Six Siege gameicon lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rainbow Six Siege Logo darkmode.png',
@@ -38,16 +39,17 @@ return {
 			},
 		},
 	},
-	defaultGame = 'siege',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = false,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+			gameScoresIfBo1 = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-
-	defaultTeamLogo = {
-		siege = 'Rainbow Six Siege Logo lightmode.png',
-		vegas2 = 'Rainbow Six Vegas Logo lightmode.png',
-	}, ---@deprecated
-	defaultTeamLogoDark = {
-		siege = 'Rainbow Six Siege Logo darkmode.png',
-		vegas2 = 'Rainbow Six Vegas Logo darkmode.png',
-	}, ---@deprecated
-	match2 = 2,
 }

@@ -6,26 +6,40 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local ActiveYears = require('Module:YearsActive')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Role = require('Module:Role')
+local Region = require('Module:Region')
+local Math = require('Module:MathUtil')
+local String = require('Module:StringUtils')
+local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
+
+local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 ---@class HearthstoneInfoboxPlayer: Person
+---@field role table
+---@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
-
-local GM_ICON = '[[File:HS grandmastersIconSmall.png|x15px|link=Grandmasters]]&nbsp;'
 
 ---@param frame Frame
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
+
+	player.args.autoTeam = true
+	player.role = Role.run{role = player.args.role}
+	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
@@ -34,14 +48,57 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
-		local grandMaster = args.grandmasters and (GM_ICON .. args.grandmasters) or nil
-		table.insert(widgets, Cell{name = 'Grandmasters', content = {grandMaster}})
-	end
+		local yearsActive = ActiveYears.display{player = caller.pagename}
 
+		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
+		if currentYearEarnings then
+			currentYearEarnings = Math.round(currentYearEarnings)
+			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
+		end
+
+		return {
+			Cell{name = 'Approx. Winnings ' .. CURRENT_YEAR, content = {currentYearEarnings}},
+			Cell{name = 'Years active', content = {yearsActive}},
+		}
+	elseif id == 'history' then
+		local manualHistory = args.history
+		local automatedHistory = TeamHistoryAuto.results{
+			addlpdbdata = true,
+			convertrole = true,
+			player = self.caller.pagename
+		}
+
+		if String.isNotEmpty(manualHistory) or automatedHistory then
+			return {
+				Title{children = 'History'},
+				Center{children = {manualHistory}},
+				Center{children = {automatedHistory}},
+			}
+		end
+	elseif id == 'region' then return {}
+	elseif id == 'role' then
+		return {
+			Cell{name = 'Role(s)', content = {caller.role.display, caller.role2.display}}
+		}
+	end
 	return widgets
+end
+
+---@param lpdbData table
+---@param args table
+---@param personType string
+---@return table
+function CustomPlayer:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = (self.role or {}).variable
+	lpdbData.extradata.role2 = (self.role2 or {}).variable
+
+	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
+
+	return lpdbData
 end
 
 return CustomPlayer

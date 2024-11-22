@@ -18,11 +18,11 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local MessageBox = require('Module:Message box')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Stormgate2UnitInfobox: UnitInfobox
@@ -30,9 +30,11 @@ local Cell = Widgets.Cell
 local CustomUnit = Class.new(Unit)
 local CustomInjector = Class.new(Injector)
 
-local ICON_HP = '[[File:Icon_Hitpoints.png|link=]]'
-local ICON_ARMOR = '[[File:Icon_Armor.png|link=]]'
+local ICON_HP = '[[File:Icon_Hitpoints.png|link=Health]]'
+local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
+local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
+local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
 
 ---@param frame Frame
 ---@return Html
@@ -43,7 +45,14 @@ function CustomUnit.run(frame)
 	unit.faction = Faction.read(unit.args.faction)
 	unit.args.informationType = unit.args.informationType or 'Unit'
 
-	return unit:createInfobox()
+	unit:_processPatchFromId('introduced')
+	unit:_processPatchFromId('deprecated')
+
+	local builtInfobox = unit:createInfobox()
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(CustomUnit._deprecatedWarning(unit.args.deprecatedDisplay))
 end
 
 ---@param id string
@@ -55,20 +64,20 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'type' then
 		return {
-			Cell{name = 'Type', content = caller:_displayCommaSeparatedString(args.type)},
+			Cell{name = 'Type', content = {caller:_displayCsvAsPageCsv(args.type)}},
 		}
 	elseif id == 'builtfrom' then
 		return {
-			Cell{name = 'Built From', content = caller:_displayCommaSeparatedString(args.built)},
+			Cell{name = 'Built From', content = caller:_csvToPageList(args.built)},
 		}
 	elseif id == 'requirements' then
 		return {
-			Cell{name = 'Tech. Requirement', content = caller:_displayCommaSeparatedString(args.tech_requirement)},
-			Cell{name = 'Building Requirement', content = caller:_displayCommaSeparatedString(args.building_requirement)},
+			Cell{name = 'Tech. Requirement', content = {caller:_displayCsvAsPageCsv(args.tech_requirement)}},
+			Cell{name = 'Building Requirement', content = {caller:_displayCsvAsPageCsv(args.building_requirement)}},
 		}
 	elseif id == 'cost' then
 		return {
-			Cell{name = 'Cost', content = {CostDisplay.run{
+			Cell{name = 'Cost', content = {args.informationType ~= 'Hero' and CostDisplay.run{
 				faction = caller.faction,
 				luminite = args.luminite,
 				luminiteTotal = args.totalluminite,
@@ -79,30 +88,36 @@ function CustomInjector:parse(id, widgets)
 				supply = args.supply,
 				supplyTotal = args.totalsupply,
 				supplyForced = true,
+				buildTime = args.buildtime,
+				buildTimeTotal = args.totalbuildtime,
 				animus = args.animus,
 				animusTotal = args.totalanimus,
-			}}},
-			Cell{name = 'Build Time', content = {args.buildtime and (args.buildtime .. 's') or nil}},
+			} or nil}},
 			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
 		}
 	elseif id == 'hotkey' then
-		return {
-			Cell{name = 'Hotkeys', content = {CustomUnit._hotkeys(args.hotkey, args.hotkey2)}},
-			Cell{name = 'Macrokeys', content = {CustomUnit._hotkeys(args.macro_key, args.macro_key2)}},
-		}
+		if not args.hotkey and not args.macro_key then return {} end
+		local hotkeyName = table.concat(Array.append({},
+			args.hotkey and 'Hotkeys', args.macro_key and 'Macrokeys'
+		), HOTKEY_SEPERATOR)
+		local hotkeys = table.concat(Array.append({},
+			args.hotkey and CustomUnit._hotkeys(args.hotkey, args.hotkey2),
+			args.macro_key and CustomUnit._hotkeys(args.macro_key, args.macro_key2)
+		), HOTKEY_SEPERATOR)
+		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'attack' then return {}
 	elseif id == 'defense' then
 		return {
-			Cell{name = 'Health', content = {caller:_getHealthDisplay()}},
-			Cell{name = 'Armor', content = caller:_getArmorDisplay()},
+			Cell{name = 'Defense', content = {caller:_getDefenseDisplay()}},
+			Cell{name = 'Attributes', content = {caller:_displayCsvAsPageCsv(args.armor_type)}}
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
 			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
-			Cell{name = 'Passive', content = caller:_displayCommaSeparatedString(args.passive)},
-			Cell{name = 'Upgrades To', content = caller:_displayCommaSeparatedString(args.upgrades_to)}
+			Cell{name = 'Upgrades To', content = {caller:_displayCsvAsPageCsv(args.upgrades_to)}},
+			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
 		-- moved to the bottom due to having headers that would look ugly if in place where attack is set in commons
 		for _, attackArgs, attackIndex in Table.iter.pairsByPrefix(args, 'attack') do
@@ -114,23 +129,19 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@return string?
-function CustomUnit:_getHealthDisplay()
-	if not Logic.isNumeric(self.args.health) then return end
+function CustomUnit:_getDefenseDisplay()
+	local args = self.args
+	local health = tonumber(args.health)
+	local extraHealth = health and tonumber(args.extra_health)
+	local armor = tonumber(args.armor)
 
-	return table.concat({
-		ICON_HP .. ' ' .. self.args.health,
-		Logic.isNumeric(self.args.extra_health) and ('(+' .. self.args.extra_health .. ')') or nil,
-	}, '&nbsp;')
-end
-
----@return string[]
-function CustomUnit:_getArmorDisplay()
-	local armorTypes = self:_displayCommaSeparatedString(self.args.armor_type)
-
-	return Array.append({},
-		self.args.armor and (ICON_ARMOR .. ' ' .. self.args.armor) or nil,
-		String.nilIfEmpty(table.concat(armorTypes, ', '))
-	)
+	return table.concat(Array.append({},
+		ICON_HP,
+		health or 0,
+		extraHealth and ('(+' .. extraHealth .. ')') or nil,
+		ICON_ARMOR,
+		armor or 0
+	), '&nbsp;')
 end
 
 ---@param args table
@@ -140,6 +151,18 @@ function CustomUnit:nameDisplay(args)
 	factionIcon = factionIcon and (factionIcon .. '&nbsp;') or ''
 
 	return factionIcon .. (args.name or self.pagename)
+end
+
+---@param args table
+---@return string?
+function CustomUnit:subHeaderDisplay(args)
+	if Logic.isEmpty(args.subfaction) or
+		string.find(args.subfaction, '1v1') or
+		string.find(args.subfaction, self.pagename) then return end
+	return tostring(mw.html.create('span')
+		:css('font-size', '90%')
+		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
+	)
 end
 
 ---@return string?
@@ -180,6 +203,13 @@ function CustomUnit:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
+			deprecated = args.deprecated or '',
+			introduced = args.introduced or '',
+			subfaction = Array.parseCommaSeparatedString(args.subfaction),
+			veterancybonushealth = Array.parseCommaSeparatedString(args.veterancybonushealth),
+			veterancybonusdamage = Array.parseCommaSeparatedString(args.veterancybonusdamage),
+			veterancyspecialbonus = Array.parseCommaSeparatedString(args.veterancyspecialbonus),
+			veterancyxp = Array.parseCommaSeparatedString(args.veterancyxp),
 			type = Array.parseCommaSeparatedString(args.type),
 			builtfrom = Array.parseCommaSeparatedString(args.built),
 			techrequirement = Array.parseCommaSeparatedString(args.tech_requirement),
@@ -210,6 +240,8 @@ function CustomUnit:setLpdbData(args)
 			passive = Array.parseCommaSeparatedString(args.passive),
 			armortypes = Array.parseCommaSeparatedString(args.armor_type),
 			upgradesto = Array.parseCommaSeparatedString(args.upgrades_to),
+			bountyluminite = tonumber(args.bounty_luminite),
+			bountytherium = tonumber(args.bounty_therium),
 		},
 	})
 end
@@ -243,10 +275,47 @@ end
 
 ---@param inputString string?
 ---@return string[]
-function CustomUnit:_displayCommaSeparatedString(inputString)
+function CustomUnit:_csvToPageList(inputString)
 	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
-		return Page.makeInternalLink({}, value)
+		return Page.makeInternalLink(value)
 	end)
+end
+
+---@param input string?
+---@return string
+function CustomUnit:_displayCsvAsPageCsv(input)
+	return table.concat(self:_csvToPageList(input), ', ')
+end
+
+---@param key string
+function CustomUnit:_processPatchFromId(key)
+	local args = self.args
+	local input = Table.extract(args, key)
+	if String.isEmpty(input) then return end
+
+	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = '[[type::patch]]',
+		limit = 5000,
+	})
+
+	args[key] = (Array.filter(patches, function(patch)
+		return String.endsWith(patch.pagename, '/' .. input)
+	end)[1] or {}).pagename
+	assert(args[key], 'Invalid patch "' .. input .. '"')
+
+	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
+end
+
+---@param patch string?
+---@return Html?
+function CustomUnit._deprecatedWarning(patch)
+	if not patch then return end
+
+	return MessageBox.main('ambox', {
+		image= ICON_DEPRECATED,
+		class='ambox-red',
+		text= 'This has been removed from 1v1 with Patch ' .. patch,
+	})
 end
 
 return CustomUnit

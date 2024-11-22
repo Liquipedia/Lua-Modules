@@ -11,10 +11,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class ClashroyaleLeagueInfobox: InfoboxLeague
@@ -58,7 +58,6 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = args.player_number and 'solo' or 'team'
-	self.data.publishertier = args.publisherpremier
 end
 
 return CustomLeague

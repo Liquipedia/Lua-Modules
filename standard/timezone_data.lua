@@ -39,6 +39,14 @@ return {
 		name = 'Alma-Ata Time',
 		offset = {6, 0},
 	},
+	AMT = {
+		name = 'Armenian Time',
+		offset = {4, 0},
+	},
+	AQTT = {
+		name = 'Aqtobe Time',
+		offset = {5, 0},
+	},
 	ART = {
 		name = 'Argentina Time',
 		offset = {-3, 0},
@@ -110,6 +118,10 @@ return {
 	EAT = {
 		name = 'East Africa Time',
 		offset = {3, 0},
+	},
+	ECT = {
+		name = 'Ecuador Time',
+		offset = {-5, 0}
 	},
 	EDT = {
 		name = 'Eastern Daylight Time',

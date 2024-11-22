@@ -10,6 +10,7 @@ return {
 	startYear = '1984',
 	wikiName = 'tetris',
 	name = 'Tetris',
+	defaultGame = 'tetris',
 	games = {
 		tetris = {
 			abbreviation = 'Tetris',
@@ -441,9 +442,16 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tetris',
-
-	defaultTeamLogo = 'Tetris default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Tetris default allmode.png', ---@deprecated
-	match2 = 2,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidthMobile = 110,
+			matchWidth = 180,
+		},
+	},
 }

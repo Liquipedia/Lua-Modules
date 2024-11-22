@@ -24,11 +24,6 @@ Config.MAX_NUMBER_OF_COACHES = 2
 -- How many placements should we retrieve from LPDB for a team/player?
 Config.PLACEMENT_LIMIT = 2000
 
--- Which LPDB placement parameters do we care about?
-Config.PLACEMENT_QUERY =
-	'pagename, tournament, date, placement, liquipediatier, ' ..
-	'liquipediatiertype, players, extradata, mode'
-
 -- These are the notability thresholds needed by a team/player
 Config.NOTABILITY_THRESHOLD_MIN = 12
 Config.NOTABILITY_THRESHOLD_NOTABLE = 15

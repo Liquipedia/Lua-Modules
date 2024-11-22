@@ -53,7 +53,7 @@ local ABBREVIATIONS = {
 ---@field currentMatchHeader string[]?
 local MatchesTable = Class.new(function(self, args) self:init(args) end)
 
----@param args any
+---@param args table?
 ---@return MatchesTable
 function MatchesTable:init(args)
 	args = args or {}
@@ -250,7 +250,7 @@ function MatchesTable:determineMatchHeader(match)
 	return headerArray[1]
 end
 
----@param matchHeader any
+---@param matchHeader string
 ---@return string
 function MatchesTable._applyCustomAbbreviations(matchHeader)
 	for long, short in pairs(ABBREVIATIONS) do
@@ -337,9 +337,9 @@ function MatchesTable.matchPageLinkDisplay(match)
 		:wikitext(']]')
 end
 
----@param opponent any
----@param isWinner any
----@return (string|number)?
+---@param opponent match2opponent
+---@param isWinner boolean
+---@return string|number?
 function MatchesTable.getOpponentScore(opponent, isWinner)
 	local score
 	if opponent.status == SCORE_STATUS then

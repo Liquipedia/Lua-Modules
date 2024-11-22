@@ -7,15 +7,18 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = mw.loadData('Module:HeroNames')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+
+local SIZE_HERO = '28x28px'
 
 ---@class HeroesInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
@@ -38,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		local heroIcons = Array.map(self.caller:getAllArgsForBase(args, 'hero'), function(hero)
-			return Template.safeExpand(mw.getCurrentFrame(), 'HeroIcon/' .. hero)
+			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
 		table.insert(widgets, Cell{name = 'Signature Heroes', content = {table.concat(heroIcons, '&nbsp;')}})
 	elseif id == 'history' and string.match(args.retired or '', '%d%d%d%d') then

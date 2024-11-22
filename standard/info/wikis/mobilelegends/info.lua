@@ -10,23 +10,35 @@ return {
 	startYear = 2015,
 	wikiName = 'mobilelegends',
 	name = 'Mobile Legends',
+	defaultGame = 'mobilelegends',
 	games = {
 		mobilelegends = {
 			abbreviation = 'ML',
 			name = 'Mobile Legends',
 			link = 'Mobile Legends',
 			logo = {
-				darkMode = 'Mobile Legends allmode.png',
-				lightMode = 'Mobile Legends allmode.png',
+				darkMode = 'Mobile Legends 2023 allmode.png',
+				lightMode = 'Mobile Legends 2023 allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Mobile Legends allmode.png',
-				lightMode = 'Mobile Legends allmode.png',
+				darkMode = 'Mobile Legends 2023 allmode.png',
+				lightMode = 'Mobile Legends 2023 allmode.png',
 			},
 		},
 	},
-	defaultGame = 'mobilelegends',
-	defaultTeamLogo = 'Mobile Legends allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Mobile Legends allmode.png', ---@deprecated
-	match2 = 2,
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidthMobile = 110,
+			matchWidth = 190,
+		},
+		transfers = {
+			showTeamName = true,
+		},
+	},
 }

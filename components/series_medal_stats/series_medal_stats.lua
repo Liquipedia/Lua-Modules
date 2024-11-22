@@ -9,7 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Medal = require('Module:Medal')
+local Medals = require('Module:Medals')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -163,8 +163,7 @@ function MedalStats:_getConditions()
 	addOrCondition('placement', config.placements)
 	addOrCondition('opponenttype', config.opponentTypes)
 
-	local endDate = config.endDate or TODAY
-	addOrCondition('date', {endDate, '<' .. endDate})
+	conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, (config.endDate or TODAY) .. 'T23:59:59')}
 
 	if not config.external then
 		conditions:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, 1)}
@@ -276,7 +275,7 @@ function MedalStats:header(title)
 		:tag('th'):wikitext(title):done()
 
 	for _, place in ipairs(self.config.placements) do
-		header:tag('th'):wikitext(Medal[place])
+		header:tag('th'):node(Medals.display{medal = place})
 	end
 
 	header:tag('th'):css('text-weight', 'bold'):wikitext('Total')

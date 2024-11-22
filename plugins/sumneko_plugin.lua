@@ -7,7 +7,13 @@ local liquipedia = {}
 
 local importFunctions = {}
 importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists'}
-importFunctions.prefixModules = {table = 'standard.', math = 'standard.', string = 'standard.', array = 'standard.'}
+importFunctions.prefixModules = {
+	table = 'standard.',
+	math = 'standard.',
+	string = 'standard.',
+	array = 'standard.',
+	match = 'components.match2.commons.',
+}
 
 ---Transforms a MediaWiki module name, e.g. `Module:Array`, into a lua repository name, e.g. `array`
 ---@param name string
@@ -49,14 +55,14 @@ function liquipedia.annotate(text, diffs)
 end
 
 ---@class diff
----@field start  integer # The number of bytes at the beginning of the replacement
+---@field start integer # The number of bytes at the beginning of the replacement
 ---@field finish integer # The number of bytes at the end of the replacement
----@field text   string  # What to replace
+---@field text string # What to replace
 
 -- luacheck: push ignore
 -- setting non-standard global variable 'OnSetText' (but it's mandatory)
----@param  uri  string # The uri of file
----@param  text string # The content of file
+---@param uri string # The uri of file
+---@param text string # The content of file
 ---@return nil|diff[]
 ---@diagnostic disable-next-line: global-element
 function OnSetText(uri, text)

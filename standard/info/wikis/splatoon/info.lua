@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'splatoon',
 	name = 'Splatoon',
+	defaultGame = '1',
 	games = {
 		['1'] = {
 			abbreviation = 'SP1',
@@ -51,8 +52,19 @@ return {
 			},
 		},
 	},
-	defaultGame = '1',
-	defaultTeamLogo = 'Splatoon default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Splatoon default darkmode.png', ---@deprecated
-	match2 = 2,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidthMobile = 110,
+			matchWidth = 190,
+		},
+		transfers = {
+			showTeamName = true,
+		},
+	},
 }

@@ -28,11 +28,18 @@ local PRIZE_TYPE_PERCENTAGE = 'PERCENT'
 --- It has a range from placeStart to placeEnd (e.g. 5 to 8) or a slotSize (count) or an award.
 --- @field parent BasePrizePool
 --- @field count integer
---- @field opponents table
+--- @field opponents BasePlacementOpponent
 local BasePlacement = Class.new(function(self, ...) self:init(...) end)
+
+---@class BasePlacementOpponent
+---@field opponentData standardOpponent
+---@field prizeRewards table
+---@field additionalData table?
+---@field date osdate|osdateparam|string?
 
 --- @param args table Input information
 --- @param parent BasePrizePool The PrizePool this BasePlacement is part of
+--- @return self
 function BasePlacement:init(args, parent)
 	self.args = Table.deepCopy(args)
 	self.parent = parent
@@ -47,6 +54,8 @@ end
 
 --- Parse the input for available rewards of prizes, for instance how much money a team would win.
 --- This also checks if the BasePlacement instance has a dollar reward and assigns a variable if so.
+---@param args table
+---@return table
 function BasePlacement:_readPrizeRewards(args)
 	local rewards = {}
 
@@ -80,6 +89,8 @@ function BasePlacement:_readPrizeRewards(args)
 	return rewards
 end
 
+---@param args table
+---@return table[]
 function BasePlacement:parseOpponents(args)
 	return Array.mapIndexes(function(opponentIndex)
 		local opponentInput = Json.parseIfString(args[opponentIndex])
@@ -114,6 +125,9 @@ function BasePlacement:parseOpponents(args)
 	end)
 end
 
+---@param opponentIndex integer
+---@param place any
+---@return boolean
 function BasePlacement:_shouldAddTbdOpponent(opponentIndex, place)
 	-- We want at least 1 opponent present for all placements
 	if opponentIndex == 1 then
@@ -130,10 +144,14 @@ function BasePlacement:_shouldAddTbdOpponent(opponentIndex, place)
 	return false
 end
 
+---@param args table
 function BasePlacement:readAdditionalData(args)
 	error('Function readAdditionalData needs to be implemented by child class of `PrizePool/Placement/Base`')
 end
 
+---@param input table|string?
+---@param date string|number?
+---@return standardOpponent
 function BasePlacement:parseOpponentArgs(input, date)
 	-- Allow for lua-table, json-table and just raw string input
 	local opponentArgs = Json.parseIfTable(input) or (type(input) == 'table' and input or {input})
@@ -142,7 +160,7 @@ function BasePlacement:parseOpponentArgs(input, date)
 
 	local opponentData
 	if type(opponentArgs[1]) == 'table' and opponentArgs[1].isAlreadyParsed then
-		opponentData = opponentArgs[1]
+		opponentData = opponentArgs[1] ---@type standardOpponent
 	elseif type(opponentArgs[1]) ~= 'table' then
 		opponentData = Opponent.readOpponentArgs(opponentArgs)
 	end
@@ -151,14 +169,18 @@ function BasePlacement:parseOpponentArgs(input, date)
 		opponentData = Table.deepMergeInto(Opponent.tbd(opponentArgs.type), opponentData or {})
 	end
 
-	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers})
+	return Opponent.resolve(opponentData, date, {syncPlayer = self.parent.options.syncPlayers, overwritePageVars = true})
 end
 
-
+---@param opponent BasePlacementOpponent
+---@param prize string
+---@return string|number|boolean?
 function BasePlacement:getPrizeRewardForOpponent(opponent, prize)
 	return opponent.prizeRewards[prize] or self.prizeRewards[prize]
 end
 
+---@param prizesToUse BasePrizePoolPrize[]
+---@param prizeTypes table
 function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 	Array.forEach(self.opponents, function(opponent)
 		if opponent.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] or self.prizeRewards[PRIZE_TYPE_BASE_CURRENCY .. 1] then
@@ -186,6 +208,8 @@ function BasePlacement:_setBaseFromRewards(prizesToUse, prizeTypes)
 	end)
 end
 
+---@param prizeTypes table
+---@param hasLocalCurrency boolean
 function BasePlacement:_calculateFromPercentage(prizeTypes, hasLocalCurrency)
 	local baseMoney = tonumber(Variables.varDefault(hasLocalCurrency and
 			('tournament_prizepool' .. LOCAL_CURRENCY_VARIABLE_POST_FIX) or
@@ -207,6 +231,8 @@ function BasePlacement:_calculateFromPercentage(prizeTypes, hasLocalCurrency)
 end
 
 --- Returns true if the input matches the format of a date
+---@param date string|osdate
+---@return boolean
 function BasePlacement._isValidDateFormat(date)
 	if type(date) ~= 'string' or String.isEmpty(date) then
 		return false
