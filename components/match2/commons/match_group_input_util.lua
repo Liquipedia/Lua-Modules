@@ -985,11 +985,15 @@ function MatchGroupInputUtil.parseMapPlayers(playerIds, inputPlayers, indexToPla
 	end)
 
 	local mappedPlayers = Array.map(playerIds, function(_, playerId)
-		local transformedPlayer = Table.extract(transformedPlayers, playerIdToIndex[playerId])
-		return transformedPlayer or {}
+		local playerIndex = playerIdToIndex[playerId]
+		if not playerIndex or not transformedPlayers[playerIndex] then
+			return {}
+		end
+		transformedPlayers[playerIndex] = nil
+		return transformedPlayers[playerIndex]
 	end)
 
-	return Array.extend(mappedPlayers, transformedPlayers)
+	return Array.extend(mappedPlayers, Array.extractValues(transformedPlayers))
 end
 
 ---@param match table
