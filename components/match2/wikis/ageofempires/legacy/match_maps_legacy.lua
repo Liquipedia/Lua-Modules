@@ -129,6 +129,7 @@ function MatchMapsLegacy.showmatch(frame)
 	return MatchGroup.MatchByMatchId({
 		id = MatchGroupBase.getBracketIdPrefix() .. id,
 		matchid = 'R1M1',
+		width = args.width
 	})
 end
 
