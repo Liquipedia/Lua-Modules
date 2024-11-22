@@ -989,8 +989,7 @@ function MatchGroupInputUtil.parseMapPlayers(playerIds, inputPlayers, indexToPla
 		if not playerIndex or not transformedPlayers[playerIndex] then
 			return {}
 		end
-		transformedPlayers[playerIndex] = nil
-		return transformedPlayers[playerIndex]
+		return Table.extract(transformedPlayers, playerIndex)
 	end)
 
 	return Array.extend(mappedPlayers, Array.extractValues(transformedPlayers))
