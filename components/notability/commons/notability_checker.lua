@@ -98,7 +98,7 @@ function NotabilityChecker._calculateTeamNotability(team)
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
 		conditions = '[[participant::' .. team .. ']]',
-		query = Config.PLACEMENT_QUERY,
+		query = 'pagename, tournament, date, placement, liquipediatier, liquipediatiertype, extradata, mode',
 	})
 
 	return NotabilityChecker._calculateWeight(data)
