@@ -113,10 +113,10 @@ function NotabilityChecker._calculatePersonNotability(person)
 	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
 		table.insert(conditions, '[[participant::' .. name .. ']]')
 		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
-			table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
+			table.insert(conditions, '[[opponentplayers_p' .. tostring(i) .. '::' .. name .. ']]')
 		end
 		for i = 1, Config.MAX_NUMBER_OF_COACHES do
-			table.insert(conditions, '[[players_c' .. tostring(i) .. '::' .. name .. ']]')
+			table.insert(conditions, '[[opponentplayers_c' .. tostring(i) .. '::' .. name .. ']]')
 		end
 	end
 

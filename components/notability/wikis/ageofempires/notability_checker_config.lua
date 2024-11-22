@@ -32,7 +32,7 @@ Config.MAX_NUMBER_OF_COACHES = 1
 -- Which LPDB placement parameters do we care about?
 Config.PLACEMENT_QUERY =
 	'pagename, tournament, date, placement, liquipediatier, ' ..
-	'liquipediatiertype, players, extradata, mode'
+	'liquipediatiertype, extradata, mode'
 
 -- These are the notability thresholds needed by a team/player
 Config.NOTABILITY_THRESHOLD_MIN = 1600 -- Essentially disabled since NOTABILITY_THRESHOLD_NOTABLE is checked first
