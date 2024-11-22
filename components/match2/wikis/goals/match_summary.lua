@@ -31,7 +31,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner),
 			MatchSummaryWidgets.GameCenter{children = ('Game ' .. gameIndex)},
 			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
