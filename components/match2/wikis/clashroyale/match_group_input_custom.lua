@@ -240,7 +240,7 @@ end
 function MapFunctions.getCardsExtradata(mapOpponents)
 	local extradata = {}
 	for opponentIndex, opponent in ipairs(mapOpponents) do
-		for playerIndex, player in pairs(opponent.players) do
+		for playerIndex, player in pairs(opponent.players or {}) do
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 			extradata[prefix .. 'tower'] = player.cards.tower
 			-- participant.cards is an array plus the tower value ....
