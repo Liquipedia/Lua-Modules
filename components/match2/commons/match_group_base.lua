@@ -47,7 +47,7 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		end
 	end
 
-	if not Variables.varDefault('tournament_parent') and not options.storeMatch1 and not options.storeMatch2 then
+	if not Variables.varDefault('tournament_parent') and (options.storeMatch1 or options.storeMatch2) then
 		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing tournament context')
 	end
