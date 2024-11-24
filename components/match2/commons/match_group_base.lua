@@ -47,7 +47,7 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		end
 	end
 
-	if not Variables.varDefault('tournament_parent') then
+	if not Variables.varDefault('tournament_parent') and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing tournament context')
 	end
