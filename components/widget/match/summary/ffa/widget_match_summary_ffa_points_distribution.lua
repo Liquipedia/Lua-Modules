@@ -30,18 +30,20 @@ function MatchSummaryFfaPointsDistribution:render()
 		return HtmlWidgets.Li{
 			classes = 'panel-content__points-distribution__list-item',
 			HtmlWidgets.Span{
-				classes = 'panel-content__points-distribution__icon ' .. iconColor,
+				classes = {'panel-content__points-distribution__icon', iconColor},
 				children = IconWidget{
 					iconName = icon,
 				},
 			},
-			HtmlWidgets.Span{
-				classes = 'panel-content__points-distribution__title',
-				children = title,
-			},
-			HtmlWidgets.Span{
-				children = score .. ' ' .. 'point' .. (score ~= 1 and 's' or ''),
-			},
+			children = {
+				HtmlWidgets.Span{
+					classes = 'panel-content__points-distribution__title',
+					children = title,
+				},
+				HtmlWidgets.Span{
+					children = score .. ' ' .. 'point' .. (score ~= 1 and 's' or ''),
+				},
+			}
 		}
 	end
 
