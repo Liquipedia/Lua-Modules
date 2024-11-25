@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -27,7 +26,11 @@ local PHASE_ICONS = {
 ---@return Widget
 function MatchSummaryFfaCountdownIcon:render()
 	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(self.props.game)] or {}
-	return IconWidget{iconName = iconData.iconName, color = iconData.color, additionalClasses = self.props.additionalClasses}
+	return IconWidget{
+		iconName = iconData.iconName,
+		color = iconData.color,
+		additionalClasses = self.props.additionalClasses
+	}
 end
 
 return MatchSummaryFfaCountdownIcon
