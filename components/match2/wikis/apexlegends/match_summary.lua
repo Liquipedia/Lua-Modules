@@ -225,21 +225,28 @@ end
 ---@param match table
 ---@return Widget
 function CustomMatchSummary._createSchedule(match)
-	local scheduleList = mw.html.create('ul'):addClass('panel-content__game-schedule')
-
-	Array.forEach(match.games, function (game, idx)
-		scheduleList:tag('li')
-				:node(MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}})
-				:tag('span')
-						:addClass('panel-content__game-schedule__title')
-						:wikitext('Game ', idx, ':')
-						:done()
-				:tag('div')
-					:addClass('panel-content__game-schedule__container')
-					:node(SummaryHelper.gameCountdown(game))
-					:done()
-	end)
-	return MatchSummaryWidgets.ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = scheduleList}
+	return MatchSummaryWidgets.ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = {
+		HtmlWidgets.Ul{
+			classes = 'panel-content__game-schedule',
+			children = Array.map(match.games, function (game, idx)
+				return HtmlWidgets.Li{
+					children = {
+						HtmlWidgets.Span{
+							children = MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
+						},
+						HtmlWidgets.Span{
+							classes = {'panel-content__game-schedule__title'},
+							children = 'Game ' .. idx .. ':',
+						},
+						HtmlWidgets.Div{
+							classes = {'panel-content__game-schedule__container'},
+							children = SummaryHelper.gameCountdown(game),
+						},
+					},
+				}
+			end)
+		}
+	}}
 end
 
 ---@param match table
