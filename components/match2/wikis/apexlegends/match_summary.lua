@@ -227,11 +227,7 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createOverallPage(match)
-	local page = mw.html.create('div')
-			:addClass('panel-content')
-			:attr('data-js-battle-royale', 'panel-content')
-			:attr('id', match.matchId .. 'panel0')
-	local schedule = page:tag('div')
+	local schedule = mw.html.create('div')
 			:addClass('panel-content__collapsible')
 			:addClass('is--collapsed')
 			:attr('data-js-battle-royale', 'collapsible')
@@ -265,9 +261,15 @@ function CustomMatchSummary._createOverallPage(match)
 	end)
 
 	local scoringData = SummaryHelper.createScoringData(match)
-	page:node(MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement})
-
-	return page:node(CustomMatchSummary._createMatchStandings(match))
+	return MatchSummaryWidgets.Tab{
+		matchId = match.matchId,
+		idx = 0,
+		children = {
+			schedule,
+			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+			CustomMatchSummary._createMatchStandings(match)
+		}
+	}
 end
 
 ---@param match table

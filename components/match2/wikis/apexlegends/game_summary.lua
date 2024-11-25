@@ -154,14 +154,9 @@ end
 ---@param scoringData table
 ---@return Html
 function CustomGameSummary._createGameTab(game, matchId, idx, scoringData)
-	local page = mw.html.create('div')
-			:addClass('panel-content')
-			:attr('data-js-battle-royale', 'panel-content')
-			:attr('id', matchId .. 'panel' .. idx)
-
-	local gameDetails = page:tag('div')
-			:addClass('panel-content__container')
-			:attr('role', 'tabpanel')
+	local gameDetails = mw.html.create('div')
+		:addClass('panel-content__container')
+		:attr('role', 'tabpanel')
 
 	local informationList = gameDetails:tag('ul'):addClass('panel-content__game-schedule')
 	informationList:tag('li')
@@ -178,9 +173,15 @@ function CustomGameSummary._createGameTab(game, matchId, idx, scoringData)
 				:tag('span'):wikitext(Page.makeInternalLink(game.map))
 	end
 
-	page:node(MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement})
-
-	return page:node(CustomGameSummary._createGameStandings(game))
+	return MatchSummaryWidgets.Tab{
+		matchId = matchId,
+		idx = idx,
+		children = {
+			gameDetails,
+			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+			CustomGameSummary._createGameStandings(game)
+		}
+	}
 end
 
 ---@param game table
