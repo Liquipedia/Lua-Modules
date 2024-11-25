@@ -53,7 +53,11 @@ function CustomBracketDisplay._addHeads(opponentEntry, opponent)
 	local game = opponent.players[1].game
 	local charactersNode = mw.html.create('div'):css('display', 'flex'):css('align-items', 'center')
 	Array.forEach(opponent.players[1].heads or {}, function(headData)
-		charactersNode:node(Characters.GetIconAndName{headData.name, game = game})
+		charactersNode:node(
+			mw.html.create('span')
+				:node(Characters.GetIconAndName{headData.name, game = game})
+				:css('opacity', headData.status == 0 and '0.3' or nil)
+		)
 	end)
 	opponentEntry.root:node(charactersNode)
 end
