@@ -10,6 +10,7 @@ local CustomMatchSummary = {}
 
 local Lua = require('Module:Lua')
 
+local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -30,7 +31,9 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		css = {['font-size'] = '80%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			DisplayHelper.MapScore(game.scores[1], 1, game.resultType, game.walkover, game.winner),
 			MatchSummaryWidgets.GameCenter{children = ('Game ' .. gameIndex)},
+			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)

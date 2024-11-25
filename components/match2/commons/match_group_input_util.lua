@@ -936,6 +936,7 @@ function MatchGroupInputUtil.makeLinkFromName(name)
 	return Page.pageifyLink(name) --[[@as string]]
 end
 
+---@deprecated
 ---@alias PlayerInputData {name: string?, link: string?}
 ---@param playerIds MGIParsedPlayer[]
 ---@param inputPlayers table[]
@@ -963,13 +964,35 @@ function MatchGroupInputUtil.parseParticipants(playerIds, inputPlayers, indexToP
 	return participants, unattachedParticipants
 end
 
----@generic T:table
----@param opponentIndex integer
----@return fun(playerIndex: integer, data: T): string, T
-function MatchGroupInputUtil.prefixPartcipants(opponentIndex)
-	return function(playerIndex, data)
-		return opponentIndex .. '_' .. playerIndex, data
-	end
+---@param playerIds MGIParsedPlayer[]
+---@param inputPlayers table[]
+---@param indexToPlayer fun(playerIndex: integer): PlayerInputData?
+---@param transform fun(playerIndex: integer, playerIdData: MGIParsedPlayer, playerInputData: PlayerInputData): table?
+---@return table
+function MatchGroupInputUtil.parseMapPlayers(playerIds, inputPlayers, indexToPlayer, transform)
+	local transformedPlayers = {}
+	local playerIdToIndex = Table.map(inputPlayers, function(playerIndex)
+		local playerInputData = indexToPlayer(playerIndex) or {}
+		if playerInputData.name and not playerInputData.link then
+			playerInputData.link = MatchGroupInputUtil.makeLinkFromName(playerInputData.name)
+		end
+		local playerId = MatchGroupInputUtil.findPlayerId(playerIds, playerInputData.name, playerInputData.link)
+		transformedPlayers[playerIndex] = transform(playerIndex, playerIds[playerId] or {}, playerInputData)
+		if playerId then
+			return playerId, playerIndex
+		end
+		return 0, nil
+	end)
+
+	local mappedPlayers = Array.map(playerIds, function(_, playerId)
+		local playerIndex = playerIdToIndex[playerId]
+		if not playerIndex or not transformedPlayers[playerIndex] then
+			return {}
+		end
+		return Table.extract(transformedPlayers, playerIndex)
+	end)
+
+	return Array.extend(mappedPlayers, Array.extractValues(transformedPlayers))
 end
 
 ---@param match table
@@ -1005,6 +1028,7 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	match.games = standaloneMatch.match2games
 	for _, game in ipairs(match.games) do
 		game.scores = ensureTable(game.scores)
+		game.opponents = ensureTable(game.opponents)
 		game.participants = ensureTable(game.participants)
 		game.extradata = ensureTable(game.extradata)
 	end
@@ -1132,7 +1156,6 @@ end
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
----@field getParticipants? fun(game: table, opponents:table[]): table ---@deprecated
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1146,7 +1169,6 @@ end
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
 --- - mapIsFinished(map, opponents): boolean
---- - getParticipants(map, opponents, finishedInput, winnerInput): table (DEPRECATED)
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1184,10 +1206,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.patch = Parser.getPatch(map)
 		end
 
-		if Parser.getParticipants then
-			-- Legacy way, to be replaced by getPlayersOfMapOpponent
-			map.participants = Parser.getParticipants(map, opponents)
-		end
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
 			local score, status = MatchGroupInputUtil.computeOpponentScore({
 				walkover = map.walkover,

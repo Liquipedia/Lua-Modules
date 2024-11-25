@@ -107,7 +107,14 @@ function MediaList._buildConditions(args)
 	end
 
 	if args.org then
-		table.insert(additionalConditions, '[[extradata_subject_organization::' .. args.org .. ']]')
+		table.insert(
+			additionalConditions,
+			'([[extradata_subject_organization::'
+				.. args.org
+				.. ']] OR [[extradata_subject_organization::'
+				.. args.org:gsub(' ', '_')
+				.. ']])'
+		)
 		table.insert(additionalConditions, MediaList._buildMultiKeyCondition(args.org, 'extradata_subject_organization', 5))
 	end
 
@@ -116,7 +123,14 @@ function MediaList._buildConditions(args)
 	end
 
 	if args.event then
-		table.insert(additionalConditions, '[[extradata_event_link::' .. args.event .. ']]')
+		table.insert(
+			additionalConditions,
+			'([[extradata_event_link::'
+				.. args.event
+				.. ']] OR [[extradata_event_link::'
+				.. args.event:gsub(' ', '_')
+				.. ']])'
+		)
 	end
 
 	if Logic.isNotEmpty(additionalConditions) then
@@ -125,6 +139,7 @@ function MediaList._buildConditions(args)
 
 	return table.concat(conditions, ' AND ')
 end
+
 ---Builds a multi key condition for a given prefix and value
 ---@param value string|number
 ---@param prefix string
@@ -132,7 +147,8 @@ end
 ---@return string
 function MediaList._buildMultiKeyCondition(value, prefix, limit)
 	return table.concat(Array.map(Array.range(1, limit), function(index)
-		return '[[' .. prefix .. index .. '::' .. value .. ']]'
+		return '([[' .. prefix .. index .. '::' .. value .. ']]'
+			.. ' OR [['.. prefix .. index .. '::' .. value:gsub(' ', '_') .. ']])'
 	end), ' OR ')
 end
 
