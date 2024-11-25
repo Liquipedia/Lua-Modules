@@ -9,8 +9,6 @@
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
-local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
@@ -18,16 +16,9 @@ local VodLink = require('Module:VodLink')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local CustomSummaryHelper = {}
 CustomSummaryHelper.NO_PLACEMENT = -99
-
-local PHASE_ICONS = {
-	finished = {iconName = 'concluded', color = 'icon--green'},
-	ongoing = {iconName = 'live', color = 'icon--red'},
-	upcoming = {iconName = 'upcomingandongoing'},
-}
 
 local TROPHY_COLOR = {
 	'icon--gold',
@@ -82,13 +73,6 @@ end
 ---@return boolean
 function CustomSummaryHelper.isFinished(game)
 	return game.winner ~= nil
-end
-
----@param game table
----@return string?
-function CustomSummaryHelper.countdownIcon(game, additionalClass)
-	local iconData = PHASE_ICONS[MatchGroupUtil.computeMatchPhase(game)] or {}
-	return Icon.makeIcon{iconName = iconData.iconName, color = iconData.color, additionalClasses = {additionalClass}}
 end
 
 ---@param placementStart string|number|nil

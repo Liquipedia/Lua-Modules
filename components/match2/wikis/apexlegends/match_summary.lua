@@ -10,7 +10,6 @@ local CustomMatchSummary = {}
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -18,6 +17,8 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local SummaryHelper = Lua.import('Module:Summary/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 
 ---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games ApexMatchGroupUtilGame[]
@@ -222,30 +223,10 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createHeader(match)
-	local function createHeader(title, icon, idx)
-		return mw.html.create('li')
-				:addClass('panel-tabs__list-item')
-				:attr('data-js-battle-royale', 'panel-tab')
-				:attr('data-js-battle-royale-content-target-id', match.matchId .. 'panel' .. idx)
-				:attr('role', 'tab')
-				:attr('tabindex', 0)
-				:node(icon)
-				:tag('h4'):addClass('panel-tabs__title'):wikitext(title):done()
-	end
-	local standingsIcon = Icon.makeIcon{iconName = 'standings', additionalClasses = {'panel-tabs__list-icon'}}
-	local header = mw.html.create('ul')
-			:addClass('panel-tabs__list')
-			:attr('role', 'tablist')
-			:node(createHeader('Overall standings', standingsIcon, 0))
-
-	Array.forEach(match.games, function (game, idx)
-		header:node(createHeader('Game '.. idx, SummaryHelper.countdownIcon(game, 'panel-tabs__list-icon'), idx))
-	end)
-
-	return mw.html.create('div')
-			:addClass('panel-tabs')
-			:attr('role', 'tabpanel')
-			:node(header)
+	return MatchSummaryWidgets.Header{
+		matchId = match.matchId,
+		games = match.games,
+	}
 end
 
 ---@param match table
@@ -277,7 +258,7 @@ function CustomMatchSummary._createOverallPage(match)
 
 	Array.forEach(match.games, function (game, idx)
 		scheduleList:tag('li')
-				:node(SummaryHelper.countdownIcon(game, 'panel-content__game-schedule__icon'))
+				:node(MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}})
 				:tag('span')
 						:addClass('panel-content__game-schedule__title')
 						:wikitext('Game ', idx, ':')
@@ -361,7 +342,7 @@ function CustomMatchSummary._createMatchStandings(match)
 				:addClass('panel-table__cell__game-head')
 				:tag('div')
 						:addClass('panel-table__cell__game-title')
-						:node(SummaryHelper.countdownIcon(game, 'panel-table__cell-icon'))
+						:node(MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-table__cell-icon'}})
 						:tag('span')
 								:addClass('panel-table__cell-text')
 								:wikitext('Game ', idx)

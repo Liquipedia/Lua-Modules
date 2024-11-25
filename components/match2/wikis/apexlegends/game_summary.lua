@@ -16,6 +16,7 @@ local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local SummaryHelper = Lua.import('Module:Summary/Util')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 
 ---@class ApexMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
@@ -170,7 +171,7 @@ function CustomGameSummary._createGameTab(game, matchId, idx, scoreData)
 	informationList:tag('li')
 			:tag('div')
 					:addClass('panel-content__game-schedule__container')
-					:node(SummaryHelper.countdownIcon(game, 'panel-content__game-schedule__icon'))
+					:node(MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}})
 					:node(SummaryHelper.gameCountdown(game))
 	if game.map then
 		informationList:tag('li')
