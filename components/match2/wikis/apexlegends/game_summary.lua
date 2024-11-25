@@ -17,6 +17,7 @@ local Table = require('Module:Table')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local SummaryHelper = Lua.import('Module:Summary/Util')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class ApexMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
@@ -159,22 +160,26 @@ end
 ---@param game table
 ---@return Widget
 function CustomGameSummary._createGameDetails(game)
-	local informationList = mw.html.create('ul'):addClass('panel-content__game-schedule')
-	informationList:tag('li')
-			:tag('div')
-					:addClass('panel-content__game-schedule__container')
-					:node(MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}})
-					:node(SummaryHelper.gameCountdown(game))
-	if game.map then
-		informationList:tag('li')
-				:tag('i')
-						:addClass('far fa-map')
-						:addClass('panel-content__game-schedule__icon')
-						:done()
-				:tag('span'):wikitext(Page.makeInternalLink(game.map))
-	end
-
-	return MatchSummaryWidgets.ContentItemContainer{children = informationList}
+	return MatchSummaryWidgets.ContentItemContainer{children = {
+		HtmlWidgets.Ul{
+			classes = {'panel-content__game-schedule'},
+			children = {
+				HtmlWidgets.Li{children =
+					HtmlWidgets.Div{
+						classes = {'panel-content__game-schedule__container'},
+						children = {
+							MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
+							SummaryHelper.gameCountdown(game),
+						},
+					},
+				},
+				game.map and HtmlWidgets.Li{children = {
+					HtmlWidgets.I{classes = 'far fa-map panel-content__game-schedule__icon'}, -- TODO rename with proper icon usage
+					HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+				}}} or nil,
+			}
+		}
+	}
 end
 
 ---@param game table

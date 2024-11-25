@@ -24,7 +24,7 @@ MatchSummaryFfaContentItem.defaultProps = {
 ---@return Widget
 function MatchSummaryFfaContentItem:render()
 	local contentContainer = HtmlWidgets.Div{
-		classes = 'panel-content__container',
+		classes = {'panel-content__container'},
 		attributes = {
 			['data-js-battle-royale'] = self.props.collapsible and 'collapsible-container' or nil,
 			role = 'tabpanel',
@@ -43,14 +43,15 @@ function MatchSummaryFfaContentItem:render()
 		},
 		children = {
 			HtmlWidgets.H5{
-				classes = 'panel-content__button',
+				classes = {'panel-content__button'},
 				attributes = {
 					['data-js-battle-royale'] = 'collapsible-button',
 					tabindex = 0,
 				},
 				children = {
 					IconWidget{
-						classes = 'far fa-chevron-up panel-content__button-icon',
+						-- TODO
+						classes = {'far fa-chevron-up panel-content__button-icon'},
 					},
 					HtmlWidgets.Span{children = self.props.title},
 				}
