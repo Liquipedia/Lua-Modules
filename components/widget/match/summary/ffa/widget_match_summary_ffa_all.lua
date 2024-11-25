@@ -12,5 +12,8 @@ local Lua = require('Module:Lua')
 
 Widgets.Header = Lua.import('Module:Widget/Match/Summary/Ffa/Header')
 Widgets.CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
+Widgets.PointsDistribution = Lua.import('Module:Widget/Match/Summary/Ffa/PointsDistribution')
+Widgets.RankRange = Lua.import('Module:Widget/Match/Summary/Ffa/RankRange')
+Widgets.Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 
 return Widgets

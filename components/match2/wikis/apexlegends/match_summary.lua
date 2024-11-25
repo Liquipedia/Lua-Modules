@@ -60,10 +60,10 @@ local MATCH_STANDING_COLUMNS = {
 		row = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
-				local icon, color = SummaryHelper.getTrophy(place)
+				local placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
 				return mw.html.create()
-						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(SummaryHelper.displayRank(place)):done()
+						:node(MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}})
+						:tag('span'):wikitext(placementDisplay):done()
 			end,
 		},
 	},
@@ -147,15 +147,10 @@ local MATCH_STANDING_COLUMNS = {
 					if opponent.status and opponent.status ~= 'S' then
 						placementDisplay = '-'
 					else
-						placementDisplay = SummaryHelper.displayRank(opponent.placement)
+						placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = opponent.placement})
 					end
-					local icon, color = SummaryHelper.getTrophy(opponent.placement)
 					return mw.html.create()
-							:tag('i')
-								:addClass('panel-table__cell-icon')
-								:addClass(icon)
-								:addClass(color)
-								:done()
+							:node(MatchSummaryWidgets.Trophy{place = opponent.placement, additionalClasses = {'panel-table__cell-icon'}})
 							:tag('span'):addClass('panel-table__cell-game__text')
 									:wikitext(placementDisplay):done()
 				end,
@@ -269,7 +264,8 @@ function CustomMatchSummary._createOverallPage(match)
 					:done()
 	end)
 
-	page:node(SummaryHelper.createPointsDistributionTable(SummaryHelper.createScoringData(match)))
+	local scoringData = SummaryHelper.createScoringData(match)
+	page:node(MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement})
 
 	return page:node(CustomMatchSummary._createMatchStandings(match))
 end

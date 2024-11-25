@@ -42,15 +42,14 @@ local GAME_STANDINGS_COLUMNS = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
 				local placementDisplay
-					if opponent.status and opponent.status ~= 'S' then
-						placementDisplay = '-'
-					else
-						placementDisplay = SummaryHelper.displayRank(place)
-					end
-				local icon, color = SummaryHelper.getTrophy(place)
+				if opponent.status and opponent.status ~= 'S' then
+					placementDisplay = '-'
+				else
+					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
+				end
 				return mw.html.create()
-						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(SummaryHelper.displayRank(placementDisplay)):done()
+						:node(MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}})
+						:tag('span'):wikitext(placementDisplay):done()
 			end,
 		},
 	},
@@ -146,18 +145,15 @@ function CustomGameSummary.getGameByMatchId(props)
 	CustomGameSummary._opponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
-	local gameSummary = mw.html.create()
-	gameSummary:node(CustomGameSummary._createGameTab(game, match.matchId, props.gameIdx, scoringData))
-
-	return gameSummary
+	return CustomGameSummary._createGameTab(game, match.matchId, props.gameIdx, scoringData)
 end
 
 ---@param game table
 ---@param matchId string
 ---@param idx integer
----@param scoreData table
+---@param scoringData table
 ---@return Html
-function CustomGameSummary._createGameTab(game, matchId, idx, scoreData)
+function CustomGameSummary._createGameTab(game, matchId, idx, scoringData)
 	local page = mw.html.create('div')
 			:addClass('panel-content')
 			:attr('data-js-battle-royale', 'panel-content')
@@ -182,7 +178,7 @@ function CustomGameSummary._createGameTab(game, matchId, idx, scoreData)
 				:tag('span'):wikitext(Page.makeInternalLink(game.map))
 	end
 
-	page:node(SummaryHelper.createPointsDistributionTable(scoreData))
+	page:node(MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement})
 
 	return page:node(CustomGameSummary._createGameStandings(game))
 end
