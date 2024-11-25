@@ -19,6 +19,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games ApexMatchGroupUtilGame[]
@@ -172,20 +173,26 @@ local MATCH_STANDING_COLUMNS = {
 }
 
 ---@param props {bracketId: string, matchId: string}
----@return string
+---@return Widget
 function CustomMatchSummary.getByMatchId(props)
 	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	match.matchPointThreadhold = Table.extract(match.extradata.scoring, 'matchPointThreadhold')
 	CustomMatchSummary._opponents(match)
+	local scoringData = SummaryHelper.createScoringData(match)
 
-	local matchSummary = mw.html.create()
-
-	local addNode = FnUtil.curry(matchSummary.node, matchSummary)
-	addNode(CustomMatchSummary._createHeader(match))
-	addNode(CustomMatchSummary._createOverallPage(match))
-
-	return tostring(matchSummary)
+	return HtmlWidgets.Fragment{children = {
+		MatchSummaryWidgets.Header{matchId = match.matchId, games = match.games},
+		MatchSummaryWidgets.Tab{
+			matchId = match.matchId,
+			idx = 0,
+			children = {
+				CustomMatchSummary._createSchedule(match),
+				MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+				CustomMatchSummary._createMatchStandings(match)
+			}
+		}
+	}}
 end
 
 function CustomMatchSummary._opponents(match)
@@ -217,16 +224,7 @@ end
 
 ---@param match table
 ---@return Html
-function CustomMatchSummary._createHeader(match)
-	return MatchSummaryWidgets.Header{
-		matchId = match.matchId,
-		games = match.games,
-	}
-end
-
----@param match table
----@return Html
-function CustomMatchSummary._createOverallPage(match)
+function CustomMatchSummary._createSchedule(match)
 	local schedule = mw.html.create('div')
 			:addClass('panel-content__collapsible')
 			:addClass('is--collapsed')
@@ -259,17 +257,7 @@ function CustomMatchSummary._createOverallPage(match)
 					:node(SummaryHelper.gameCountdown(game))
 					:done()
 	end)
-
-	local scoringData = SummaryHelper.createScoringData(match)
-	return MatchSummaryWidgets.Tab{
-		matchId = match.matchId,
-		idx = 0,
-		children = {
-			schedule,
-			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
-			CustomMatchSummary._createMatchStandings(match)
-		}
-	}
+	return schedule
 end
 
 ---@param match table

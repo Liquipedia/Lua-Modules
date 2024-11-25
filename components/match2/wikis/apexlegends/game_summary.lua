@@ -145,15 +145,20 @@ function CustomGameSummary.getGameByMatchId(props)
 	CustomGameSummary._opponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
-	return CustomGameSummary._createGameTab(game, match.matchId, props.gameIdx, scoringData)
+	return MatchSummaryWidgets.Tab{
+		matchId = match.matchId,
+		idx = props.gameIdx,
+		children = {
+			CustomGameSummary._createGameDetails(game),
+			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+			CustomGameSummary._createGameStandings(game)
+		}
+	}
 end
 
 ---@param game table
----@param matchId string
----@param idx integer
----@param scoringData table
 ---@return Html
-function CustomGameSummary._createGameTab(game, matchId, idx, scoringData)
+function CustomGameSummary._createGameDetails(game)
 	local gameDetails = mw.html.create('div')
 		:addClass('panel-content__container')
 		:attr('role', 'tabpanel')
@@ -173,15 +178,7 @@ function CustomGameSummary._createGameTab(game, matchId, idx, scoringData)
 				:tag('span'):wikitext(Page.makeInternalLink(game.map))
 	end
 
-	return MatchSummaryWidgets.Tab{
-		matchId = matchId,
-		idx = idx,
-		children = {
-			gameDetails,
-			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
-			CustomGameSummary._createGameStandings(game)
-		}
-	}
+	return gameDetails
 end
 
 ---@param game table
