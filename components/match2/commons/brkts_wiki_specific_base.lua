@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 
 ---@class BrktsWikiSpecific
 ---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean
----@field defaultIcon string?
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
