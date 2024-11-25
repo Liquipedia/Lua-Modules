@@ -43,18 +43,12 @@ function CustomSummaryHelper.gameCountdown(game)
 
 	local stream = Table.merge(game.stream, {
 		date = dateString,
-		finished = CustomSummaryHelper.isFinished(game) and 'true' or nil,
+		finished = game.winner ~= nil and 'true' or nil,
 	})
 
 	return mw.html.create('div'):addClass('match-countdown-block')
 			:node(require('Module:Countdown')._create(stream))
 			:node(game.vod and VodLink.display{vod = game.vod} or nil)
-end
-
----@param game table
----@return boolean
-function CustomSummaryHelper.isFinished(game)
-	return game.winner ~= nil
 end
 
 ---@param opponent1 table

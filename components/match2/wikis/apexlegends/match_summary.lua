@@ -223,27 +223,9 @@ function CustomMatchSummary._opponents(match)
 end
 
 ---@param match table
----@return Html
+---@return Widget
 function CustomMatchSummary._createSchedule(match)
-	local schedule = mw.html.create('div')
-			:addClass('panel-content__collapsible')
-			:addClass('is--collapsed')
-			:attr('data-js-battle-royale', 'collapsible')
-	local button = schedule:tag('h5')
-			:addClass('panel-content__button')
-			:attr('data-js-battle-royale', 'collapsible-button')
-			:attr('tabindex', 0)
-		button:tag('i')
-				:addClass('far fa-chevron-up')
-				:addClass('panel-content__button-icon')
-		button:tag('span'):wikitext('Schedule')
-
-	local scheduleList = schedule:tag('div')
-			:addClass('panel-content__container')
-			:attr('data-js-battle-royale', 'collapsible-container')
-			:attr('role', 'tabpanel')
-			:tag('ul')
-					:addClass('panel-content__game-schedule')
+	local scheduleList = mw.html.create('ul'):addClass('panel-content__game-schedule')
 
 	Array.forEach(match.games, function (game, idx)
 		scheduleList:tag('li')
@@ -257,7 +239,7 @@ function CustomMatchSummary._createSchedule(match)
 					:node(SummaryHelper.gameCountdown(game))
 					:done()
 	end)
-	return schedule
+	return MatchSummaryWidgets.ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = scheduleList}
 end
 
 ---@param match table

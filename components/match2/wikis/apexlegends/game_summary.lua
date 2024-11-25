@@ -157,13 +157,9 @@ function CustomGameSummary.getGameByMatchId(props)
 end
 
 ---@param game table
----@return Html
+---@return Widget
 function CustomGameSummary._createGameDetails(game)
-	local gameDetails = mw.html.create('div')
-		:addClass('panel-content__container')
-		:attr('role', 'tabpanel')
-
-	local informationList = gameDetails:tag('ul'):addClass('panel-content__game-schedule')
+	local informationList = mw.html.create('ul'):addClass('panel-content__game-schedule')
 	informationList:tag('li')
 			:tag('div')
 					:addClass('panel-content__game-schedule__container')
@@ -178,7 +174,7 @@ function CustomGameSummary._createGameDetails(game)
 				:tag('span'):wikitext(Page.makeInternalLink(game.map))
 	end
 
-	return gameDetails
+	return MatchSummaryWidgets.ContentItemContainer{children = informationList}
 end
 
 ---@param game table
