@@ -54,8 +54,7 @@ function DateExt.readTimestamp(dateInput)
 	local tzTemplateOffset = dateInput:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
 	local datePart = (mw.text.split(dateInput, '<', true)[1])
 		:gsub('-', '')
-		:gsub('T', '') -- is used as sep in forms datepicker if time is entered
-		:gsub('Z$', '') -- gets appended in forms datepicker if time is entered
+		:gsub('T', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))
 	return tonumber(timestampString)
 end
