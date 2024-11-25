@@ -29,13 +29,13 @@ function MatchSummaryFfaPointsDistribution:render()
 	local function createItem(icon, iconColor, title, score)
 		return HtmlWidgets.Li{
 			classes = 'panel-content__points-distribution__list-item',
-			HtmlWidgets.Span{
-				classes = {'panel-content__points-distribution__icon', iconColor},
-				children = IconWidget{
-					iconName = icon,
-				},
-			},
 			children = {
+				HtmlWidgets.Span{
+					classes = {'panel-content__points-distribution__icon', iconColor},
+					children = IconWidget{
+						iconName = icon,
+					},
+				},
 				HtmlWidgets.Span{
 					classes = 'panel-content__points-distribution__title',
 					children = title,
