@@ -109,9 +109,12 @@ function MatchFunctions.parseSettings(match)
 	}
 end
 
+---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@param settings table
 ---@return table
-function MatchFunctions.getExtraData(settings)
+function MatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		scoring = settings.score,
 		status = settings.status,

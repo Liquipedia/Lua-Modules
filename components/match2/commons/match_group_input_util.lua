@@ -1243,18 +1243,7 @@ end
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field parseSettings fun(match: table): table
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
----@field removeUnsetMaps? fun(maps: table[]): table[]
----@field getExtraData? fun(match: table, games: table[], opponents: table[]): table?
----@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
----@field getLinks? fun(match: table, games: table[]): table
----@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
----@field readDate? fun(match: table): {
----date: string,
----dateexact: boolean,
----timestamp: integer,
----timezoneId: string?,
----timezoneOffset:string?,
----}
+---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
 ---@field getMode? fun(opponents: table[]): string
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
@@ -1268,12 +1257,7 @@ end
 ---
 --- It may optionally have the following functions:
 --- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
---- - removeUnsetMaps(maps): table[]
---- - getExtraData(match, games, opponents): table?
---- - adjustOpponent(opponent, opponentIndex)
---- - getLinks(match, games): table?
---- - getHeadToHeadLink(match, opponents): string?
---- - readDate(match): table
+--- - getExtraData(match, games, opponents, settings): table?
 --- - getMode(opponents): string?
 ---
 --- Additionally, the Parser may have the following properties:
@@ -1332,7 +1316,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {}
 
 	match.games = games
 	match.opponents = opponents
