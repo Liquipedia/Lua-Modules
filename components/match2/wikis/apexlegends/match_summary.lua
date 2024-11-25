@@ -252,11 +252,7 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createMatchStandings(match)
-	local wrapper = mw.html.create('div')
-			:addClass('panel-table')
-			:attr('data-js-battle-royale', 'table')
-
-	local header = wrapper:tag('div')
+	local header = mw.html.create('div')
 			:addClass('panel-table__row')
 			:addClass('row--header')
 			:attr('data-js-battle-royale', 'header-row')
@@ -340,8 +336,8 @@ function CustomMatchSummary._createMatchStandings(match)
 		end)
 	end)
 
-	Array.forEach(match.opponents, function (matchOpponent, index)
-		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
+	local rows = Array.map(match.opponents, function (matchOpponent, index)
+		local row = mw.html.create('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 
 		if CustomMatchSummary._showStatusColumn(match) then
 			row:tag('div')
@@ -380,9 +376,10 @@ function CustomMatchSummary._createMatchStandings(match)
 						:addClass(column.row.class and column.row.class(opponent) or nil)
 			end)
 		end)
+		return row
 	end)
 
-	return wrapper
+	return MatchSummaryWidgets.Table{children = {header, unpack(rows)}}
 end
 
 ---@param status string?

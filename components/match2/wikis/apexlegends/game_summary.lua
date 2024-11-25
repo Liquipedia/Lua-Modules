@@ -185,10 +185,7 @@ end
 ---@param game table
 ---@return Html
 function CustomGameSummary._createGameStandings(game)
-	local wrapper = mw.html.create('div')
-			:addClass('panel-table')
-			:attr('data-js-battle-royale', 'table')
-	local header = wrapper:tag('div')
+	local header = mw.html.create('div')
 			:addClass('panel-table__row')
 			:addClass('row--header')
 			:attr('data-js-battle-royale', 'header-row')
@@ -215,8 +212,8 @@ function CustomGameSummary._createGameStandings(game)
 			end
 	end)
 
-	Array.forEach(game.opponents, function (opponent, index)
-		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
+	local rows = Array.map(game.opponents, function (opponent, index)
+		local row = mw.html.create('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
 			local cell = row:tag('div')
 					:addClass('panel-table__cell')
@@ -226,8 +223,9 @@ function CustomGameSummary._createGameStandings(game)
 				cell:attr('data-sort-val', column.sortVal.value(opponent, index)):attr('data-sort-type', column.sortType)
 			end
 		end)
+		return row
 	end)
-	return wrapper
+	return MatchSummaryWidgets.Table{children = {header, unpack(rows)}}
 end
 
 function CustomGameSummary._opponents(match)
