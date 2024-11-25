@@ -20,7 +20,7 @@ describe('Date', function()
 			DateExt.readTimestamp('2021-10-17 17:40 <abbr data-tz="-4:00">EDT</abbr>')
 			assert.stub(FormatDateSpy).was.called_with(mw.language, 'U', '20211017 17:40 -4:00')
 
-			DateExt.readTimestamp('2021-10-17 17:40 - <abbr data-tz="-4:00">EDT</abbr>')
+			DateExt.readTimestamp('2021-10-17 - 17:40 <abbr data-tz="-4:00">EDT</abbr>')
 			assert.stub(FormatDateSpy).was.called_with(mw.language, 'U', '20211017 17:40 -4:00')
 
 			DateExt.readTimestamp('2021-10-17 21:40')
