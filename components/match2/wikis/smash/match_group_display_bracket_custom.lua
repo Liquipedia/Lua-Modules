@@ -38,6 +38,9 @@ function CustomBracketDisplay.OpponentEntry(props)
 	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent)
 	if props.displayType == 'bracket' and props.opponent.type == Opponent.solo then
 		CustomBracketDisplay._addHeads(opponentEntry, props.opponent)
+		if props.opponent.placement == 1 then
+			opponentEntry.content:addClass('brkts-opponent-win')
+		end
 	elseif props.displayType == 'bracket' then
 		opponentEntry:addScores(props.opponent)
 	end
@@ -48,9 +51,11 @@ end
 ---@param opponent SmashStandardOpponent
 function CustomBracketDisplay._addHeads(opponentEntry, opponent)
 	local game = opponent.players[1].game
-	Array.forEach(opponent.players[1].heads or {}, function(head)
-		opponentEntry.root:node(Characters.GetIconAndName{head, game = game})
+	local charactersNode = mw.html.create('div'):css('display', 'flex'):css('align-items', 'center')
+	Array.forEach(opponent.players[1].heads or {}, function(headData)
+		charactersNode:node(Characters.GetIconAndName{headData.name, game = game})
 	end)
+	opponentEntry.root:node(charactersNode)
 end
 
 return Class.export(CustomBracketDisplay)

@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -33,12 +32,22 @@ function SmashMatchGroupUtil.populateOpponents(match)
 	local opponents = match.opponents
 
 	Array.forEach(opponents, function(opponent, opponentIndex)
-		if opponent.type == Opponent.solo then
-			opponent.players[1].game = match.game
-			opponent.players[1].heads = Array.map(match.games, function(map)
-				return Array.unique(Array.map(map.opponents[opponentIndex].players[1].characters, Operator.property('name')))[1]
-			end)
+		if opponent.type ~= Opponent.solo then
+			return
 		end
+		local hasMoreThanOneHeadInAnyGame = Array.any(match.games, function(game)
+			return #Array.unique(Array.map(game.opponents[opponentIndex].players[1].characters, function(character)
+				return character.name
+			end)) > 1
+		end)
+		if hasMoreThanOneHeadInAnyGame then
+			return
+		end
+
+		opponent.players[1].game = match.game
+		opponent.players[1].heads = Array.map(match.games, function(map)
+			return map.opponents[opponentIndex].players[1].characters[#map.opponents[opponentIndex].players[1].characters]
+		end)
 	end)
 end
 
