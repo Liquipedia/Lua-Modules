@@ -122,7 +122,7 @@ function CustomMatchSummary._createGame(game, props)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
-		css = {['font-size'] = '0.75rem'},
+		css = {['font-size'] = '0.75rem', ['flex-wrap'] = 'nowrap'},
 		children = WidgetUtil.collect(
 			faction1,
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
