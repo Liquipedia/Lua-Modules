@@ -51,7 +51,7 @@ function MatchSummaryFfaPointsDistribution:render()
 			children = WidgetUtil.collect(
 				createItem(IconWidget{iconName = 'kills'}, '1 kill', self.props.killScore),
 				Array.map(self.props.placementScore, function(slot)
-					local title = RankRange{rankStart = slot.rankStart, rankEnd = slot.rangeEnd}
+					local title = RankRange{rankStart = slot.rangeStart, rankEnd = slot.rangeEnd}
 					local icon = Trophy{place = slot.rangeStart}
 
 					return createItem(icon, title, slot.score)
