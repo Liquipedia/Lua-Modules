@@ -22,14 +22,14 @@ function MatchSummaryFfaTableRowCell:render()
 
 	return HtmlWidgets.Div{
 		classes = {'panel-table__cell', self.props.class},
+		attributes = {
+			['data-sort-type'] = isSortable and self.props.sortType or nil,
+			['data-sort-val'] = isSortable and self.props.sortValue or nil,
+		},
 		children = {
 			HtmlWidgets.Div{
 				classes = {'panel-table__cell-grouped'},
-				attributes = {
-					['data-sort-type'] = isSortable and self.props.sortType or nil,
-					['data-sort-val'] = isSortable and self.props.sortVal or nil,
-				},
-				children = self.props.children
+				children = self.props.value
 			}
 		}
 	}

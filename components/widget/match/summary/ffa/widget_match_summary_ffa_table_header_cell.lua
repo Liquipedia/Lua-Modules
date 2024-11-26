@@ -27,31 +27,36 @@ function MatchSummaryFfaTableHeaderCell:render()
 		attributes = {
 			['data-sort-type'] = isSortable and self.props.sortType or nil,
 		},
-		children = WidgetUtil.collect(
-			self.props.icon and IconWidget{
-				iconName = self.props.icon,
-				additionalClasses = {'panel-table__cell-icon'}
-			} or nil,
-			HtmlWidgets.Span{
-				classes = {self.props.mobileValue and 'd-none d-md-block' or nil},
-				children = self.props.value
-			},
-			self.props.mobileValue and HtmlWidgets.Span{
-				classes = {'d-block d-md-none'},
-				children = self.props.mobileValue
-			} or nil,
-			isSortable and HtmlWidgets.Div{
-				classes = {'panel-table__sort'},
-				children = {
-					IconWidget{
-						iconName = 'sort',
-						attributes = {
-							['data-js-battle-royale'] = 'sort-icon'
-						}
+		children = {
+			HtmlWidgets.Div{
+				classes = {'panel-table__cell-grouped'},
+				children = WidgetUtil.collect(
+					self.props.icon and IconWidget{
+						iconName = self.props.icon,
+						additionalClasses = {'panel-table__cell-icon'}
+					} or nil,
+					HtmlWidgets.Span{
+						classes = {self.props.mobileValue and 'd-none d-md-block' or nil},
+						children = self.props.value
 					},
-				}
-			} or nil
-		)
+					self.props.mobileValue and HtmlWidgets.Span{
+						classes = {'d-block d-md-none'},
+						children = self.props.mobileValue
+					} or nil,
+					isSortable and HtmlWidgets.Div{
+						classes = {'panel-table__sort'},
+						children = {
+							IconWidget{
+								iconName = 'sort',
+								attributes = {
+									['data-js-battle-royale'] = 'sort-icon'
+								}
+							},
+						}
+					} or nil
+				)
+			}
+		}
 	}
 end
 
