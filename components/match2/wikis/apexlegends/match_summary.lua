@@ -18,7 +18,6 @@ local SummaryHelper = Lua.import('Module:Summary/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
