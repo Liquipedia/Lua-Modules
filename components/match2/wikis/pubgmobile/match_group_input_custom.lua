@@ -76,7 +76,7 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.scores[opponentIndex] or 0
-		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
+		end), Operator.add, 0)
 	end
 end
 
@@ -86,7 +86,6 @@ function MatchFunctions.parseSettings(match)
 	-- Score Settings
 	local scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
-		matchPointThreadhold = tonumber(match.matchpoint),
 		placement = Array.mapIndexes(function(idx)
 			return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 		end)
