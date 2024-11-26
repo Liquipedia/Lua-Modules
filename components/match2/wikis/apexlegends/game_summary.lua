@@ -183,7 +183,7 @@ function CustomGameSummary._createGameDetails(game)
 					},
 				},
 				game.map and HtmlWidgets.Li{children = {
-					HtmlWidgets.I{classes = 'far fa-map panel-content__game-schedule__icon'}, -- TODO rename with proper icon usage
+					HtmlWidgets.I{classes = {'far fa-map panel-content__game-schedule__icon'}}, -- TODO rename with proper icon usage
 					HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
 				}}} or nil,
 			}

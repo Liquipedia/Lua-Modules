@@ -260,7 +260,7 @@ end
 function CustomMatchSummary._createSchedule(match)
 	return MatchSummaryWidgets.ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = {
 		HtmlWidgets.Ul{
-			classes = 'panel-content__game-schedule',
+			classes = {'panel-content__game-schedule'},
 			children = Array.map(match.games, function (game, idx)
 				return HtmlWidgets.Li{
 					children = {
@@ -327,7 +327,7 @@ function CustomMatchSummary._createMatchStandings(match)
 		return MatchSummaryWidgets.TableRow{children = children}
 	end)
 
-	local overviewCells = Array.map(OVERVIEW_COLUMNS, function(column)
+	local cells = Array.map(OVERVIEW_COLUMNS, function(column)
 		return MatchSummaryWidgets.TableHeaderCell{
 			class = column.class,
 			iconClass = column.iconClass,
@@ -339,7 +339,7 @@ function CustomMatchSummary._createMatchStandings(match)
 		}
 	end)
 
-	local gameCells = HtmlWidgets.Div{
+	table.insert(cells, HtmlWidgets.Div{
 		classes = {'panel-table__cell', 'cell--game-container-nav-holder'},
 		attributes = {
 			['data-js-battle-royale'] = 'game-nav-holder'
@@ -387,10 +387,10 @@ function CustomMatchSummary._createMatchStandings(match)
 				end)
 			}
 		}
-	}
+	})
 
 	return MatchSummaryWidgets.Table{children = {
-		MatchSummaryWidgets.TableHeader{children = WidgetUtil.collect(overviewCells, gameCells)},
+		MatchSummaryWidgets.TableHeader{children = cells},
 		unpack(rows)
 	}}
 end

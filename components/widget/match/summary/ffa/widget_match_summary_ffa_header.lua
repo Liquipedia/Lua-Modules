@@ -59,7 +59,7 @@ function MatchSummaryFfaHeader:render()
 			children = WidgetUtil.collect(
 				headerItem('Overall standings', standingsIcon, 0),
 				Array.map(self.props.games, function (game, idx)
-					return headerItem('Game '.. idx, CountdownIcon{game = game, additionalClasses = 'panel-tabs__list-icon'}, idx)
+					return headerItem('Game '.. idx, CountdownIcon{game = game, additionalClasses = {'panel-tabs__list-icon'}}, idx)
 				end)
 			)
 		},

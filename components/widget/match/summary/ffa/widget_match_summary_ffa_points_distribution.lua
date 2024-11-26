@@ -28,7 +28,7 @@ function MatchSummaryFfaPointsDistribution:render()
 	assert(self.props.placementScore, 'No placement score table provided')
 	local function createItem(icon, iconColor, title, score)
 		return HtmlWidgets.Li{
-			classes = 'panel-content__points-distribution__list-item',
+			classes = {'panel-content__points-distribution__list-item'},
 			children = {
 				HtmlWidgets.Span{
 					classes = {'panel-content__points-distribution__icon', iconColor},
@@ -37,7 +37,7 @@ function MatchSummaryFfaPointsDistribution:render()
 					},
 				},
 				HtmlWidgets.Span{
-					classes = 'panel-content__points-distribution__title',
+					classes = {'panel-content__points-distribution__title'},
 					children = title,
 				},
 				HtmlWidgets.Span{
@@ -49,7 +49,7 @@ function MatchSummaryFfaPointsDistribution:render()
 
 	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Points Distribution', children = {
 		HtmlWidgets.Ul{
-			classes = 'panel-content__points-distribution',
+			classes = {'panel-content__points-distribution'},
 			children = WidgetUtil.collect(
 				createItem('fas fa-skull', nil, '1 kill', self.props.killScore),
 				Array.map(self.props.placementScore, function(slot)
