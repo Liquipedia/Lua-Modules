@@ -50,8 +50,8 @@ function MatchSummaryFfaContentItem:render()
 				},
 				children = {
 					IconWidget{
-						-- TODO
-						classes = {'far fa-chevron-up panel-content__button-icon'},
+						iconName = 'collapse',
+						classes = {'panel-content__button-icon'},
 					},
 					HtmlWidgets.Span{children = self.props.title},
 				}

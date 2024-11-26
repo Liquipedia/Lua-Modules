@@ -21,6 +21,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local SummaryHelper = Lua.import('Module:Summary/Util')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ApexMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
@@ -30,7 +31,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
-		iconClass = 'fas fa-hashtag',
+		iconClass = 'rank',
 		header = {
 			value = 'Rank',
 		},
@@ -62,7 +63,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
-		iconClass = 'fas fa-users',
+		iconClass = 'team',
 		header = {
 			value = 'Team',
 		},
@@ -86,7 +87,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
-		iconClass = 'fas fa-star',
+		iconClass = 'points',
 		header = {
 			value = 'Total Points',
 			mobileValue = 'Pts.',
@@ -106,7 +107,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
-		iconClass = 'fas fa-trophy-alt',
+		iconClass = 'placement',
 		header = {
 			value = 'Placement Points',
 		},
@@ -125,7 +126,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
-		iconClass = 'fas fa-skull',
+		iconClass = 'kills',
 		header = {
 			value = 'Kill Points',
 		},
@@ -183,7 +184,7 @@ function CustomGameSummary._createGameDetails(game)
 					},
 				},
 				game.map and HtmlWidgets.Li{children = {
-					HtmlWidgets.I{classes = {'far fa-map panel-content__game-schedule__icon'}}, -- TODO rename with proper icon usage
+					IconWidget{iconName = 'map', additionalClasses = {'panel-content__game-schedule__icon'}},
 					HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
 				}}} or nil,
 			}

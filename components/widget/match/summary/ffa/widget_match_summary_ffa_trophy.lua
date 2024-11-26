@@ -33,7 +33,7 @@ function MatchSummaryFfaTrophy:render()
 		return nil
 	end
 	return IconWidget{
-		iconName = 'fas fa-trophy',
+		iconName = 'firstplace',
 		additionalClasses = Array.extend(self.props.additionalClasses, TROPHY_COLOR[self.props.place])
 	}
 end

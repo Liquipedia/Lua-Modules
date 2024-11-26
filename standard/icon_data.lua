@@ -87,4 +87,24 @@ return {
 
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
+
+	-- Usage: Matches etc
+	firstplace = 'fas fa-trophy',
+	map = 'far fa-map',
+	rank = 'fas fa-hashtag',
+	team = 'fas fa-users',
+	points = 'fas fa-star',
+	placement = 'fas fa-trophy-alt',
+	kills = 'fas fa-skull',
+	matchpoint = 'fad fa-diamond',
+
+	-- Usage: standings
+	standings_up = 'fas fa-chevron-double-up',
+	standings_stayup = 'fas fa-chevron-up',
+	standings_stay = 'fas fa-equals',
+	standings_staydown = 'fas fa-chevron-down',
+	standings_down = 'fas fa-skull',
+
+	-- Usage sorting
+	sort = 'far fa-arrows-alt-v',
 }

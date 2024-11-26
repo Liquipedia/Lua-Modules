@@ -12,6 +12,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class MatchSummaryFfaTableHeaderCell: Widget
 ---@operator call(table): MatchSummaryFfaTableHeaderCell
@@ -30,8 +31,9 @@ function MatchSummaryFfaTableHeaderCell:render()
 					['data-sort-type'] = isSortable and self.props.sortType or nil,
 				},
 				children = WidgetUtil.collect(
-					HtmlWidgets.I{ -- TODO
-						classes = {'panel-table__cell-icon', self.props.iconClass}
+					IconWidget{
+						iconName = self.props.icon,
+						classes = {'panel-table__cell-icon'}
 					},
 					HtmlWidgets.Span{
 						classes = {self.props.mobileValue and 'd-none d-md-block' or nil},
@@ -44,13 +46,12 @@ function MatchSummaryFfaTableHeaderCell:render()
 					isSortable and HtmlWidgets.Div{
 						classes = {'panel-table__sort'},
 						children = {
-							-- TOOO
-							HtmlWidgets.I{
-								classes = {'far fa-arrows-alt-v'},
+							IconWidget{
+								iconName = 'sort',
 								attributes = {
 									['data-js-battle-royale'] = 'sort-icon'
 								}
-							}
+							},
 						}
 					} or nil
 				)

@@ -34,15 +34,15 @@ local PLACEMENT_BG = {
 
 local STATUS_ICONS = {
 	-- Normal Status
-	up = 'fas fa-chevron-double-up',
-	stayup = 'fas fa-chevron-up',
-	stay = 'fas fa-equals',
-	staydown = 'fas fa-chevron-down',
-	down = 'fas fa-skull',
+	up = 'standings_up',
+	stayup = 'standings_stayup',
+	stay = 'standings_stay',
+	staydown = 'standings_staydown',
+	down = 'standings_down',
 
 	-- Special Status for Match Point matches
-	trophy = 'fas fa-trophy',
-	matchpoint = 'fad fa-diamond',
+	trophy = 'firstplace',
+	matchpoint = 'matchpoint',
 }
 
 local OVERVIEW_COLUMNS = {
@@ -70,7 +70,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
-		iconClass = 'fas fa-hashtag',
+		iconClass = 'rank',
 		header = {
 			value = 'Rank',
 		},
@@ -94,7 +94,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
-		iconClass = 'fas fa-users',
+		iconClass = 'team',
 		header = {
 			value = 'Team',
 		},
@@ -118,7 +118,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
-		iconClass = 'fas fa-star',
+		iconClass = 'points',
 		header = {
 			value = 'Total Points',
 			mobileValue = 'Pts.',
@@ -138,7 +138,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'match-points',
 		class = 'cell--match-points',
-		iconClass = 'fad fa-diamond',
+		iconClass = 'matchpoint',
 		show = function(match)
 				return match.matchPointThreadhold
 		end,
@@ -161,7 +161,7 @@ local OVERVIEW_COLUMNS = {
 local GAME_COLUMNS = {
 	{
 		class = 'panel-table__cell__game-placement',
-		iconClass = 'fas fa-trophy-alt',
+		iconClass = 'placement',
 		header = {
 			value = 'P',
 		},
@@ -188,7 +188,7 @@ local GAME_COLUMNS = {
 	},
 	{
 		class = 'panel-table__cell__game-kills',
-		iconClass = 'fas fa-skull',
+		iconClass = 'kills',
 		header = {
 			value = 'K',
 		},
