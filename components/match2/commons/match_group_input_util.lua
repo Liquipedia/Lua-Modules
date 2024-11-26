@@ -1239,4 +1239,148 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	return maps
 end
 
+---@class FfaMatchParserInterface
+---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
+---@field parseSettings fun(match: table): table
+---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
+---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
+---@field getMode? fun(opponents: table[]): string
+---@field DEFAULT_MODE? string
+---@field DATE_FALLBACKS? string[]
+---@field OPPONENT_CONFIG? readOpponentOptions
+
+--- The standard way to process a match input.
+---
+--- The Parser injection must have the following functions:
+--- - extractMaps(match, opponents, mapProps): table[]
+--- - parseSettings(match): table
+---
+--- It may optionally have the following functions:
+--- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
+--- - getExtraData(match, games, opponents, settings): table?
+--- - getMode(opponents): string?
+---
+--- Additionally, the Parser may have the following properties:
+--- - DEFAULT_MODE: string
+--- - DATE_FALLBACKS: string[]
+--- - OPPONENT_CONFIG: table
+---@param match table
+---@param Parser FfaMatchParserInterface
+---@param mapProps any?
+---@return table
+function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
+	local finishedInput = match.finished --[[@as string?]]
+	local winnerInput = match.winner --[[@as string?]]
+
+	local settings = Parser.parseSettings(match)
+
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+	end)
+
+	local games = Parser.extractMaps(match, opponents, settings.score)
+
+	local autoScoreFunction = Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games)
+		and Parser.calculateMatchScore(opponents, games)
+		or nil
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.extradata = opponent.extradata or {}
+		opponent.extradata.startingpoints = tonumber(opponent.pointmodifier)
+		opponent.placement = tonumber(opponent.placement)
+
+		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
+			walkover = match.walkover,
+			winner = match.winner,
+			opponentIndex = opponentIndex,
+			score = opponent.score,
+		}, autoScoreFunction)
+	end)
+
+	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+
+	if match.finished then
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
+
+		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = placementOfOpponents[opponentIndex]
+			opponent.extradata.bg = settings.status[opponent.placement]
+		end)
+	end
+
+	match.mode = Parser.getMode and Parser.getMode(opponents)
+		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+
+	match.stream = Streams.processStreams(match)
+	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {}
+
+	match.games = games
+	match.opponents = opponents
+
+	return match
+end
+
+---@param opponents table[]
+---@return integer[]
+function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+	local usedPlacements = Array.map(opponents, function()
+		return 0
+	end)
+	Array.forEach(opponents, function(opponent)
+		if opponent.placement then
+			usedPlacements[opponent.placement] = usedPlacements[opponent.placement] + 1
+		end
+	end)
+	-- Spread out placements if there are duplicates placements
+	-- For example 2 placement at 4 means 5 is also taken and the next available is 6
+	Array.forEach(usedPlacements, function(count, placement)
+		if count > 1 then
+			usedPlacements[placement + 1] = usedPlacements[placement + 1] + (count - 1)
+			usedPlacements[placement] = 1
+		end
+	end)
+
+	local placementCount = #usedPlacements
+	local function findNextSlot(placement)
+		if usedPlacements[placement] == 0 or placement > placementCount then
+			return placement
+		end
+		return findNextSlot(placement + 1)
+	end
+
+	local placementOfTeams = {}
+	local lastScore
+	local lastPlacement = 0
+
+	local function scoreSorter(tbl, key1, key2)
+		local value1 = tonumber(tbl[key1].score) or -math.huge
+		local value2 = tonumber(tbl[key2].score) or -math.huge
+		return value1 > value2
+	end
+
+	for opponentIdx, opp in Table.iter.spairs(opponents, scoreSorter) do
+		local placement = opp.placement
+		if not placement then
+			local thisPlacement = findNextSlot(lastPlacement)
+			usedPlacements[thisPlacement] = 1
+			if lastScore and opp.score == lastScore then
+				placement = lastPlacement
+			else
+				placement = thisPlacement
+			end
+		end
+		placementOfTeams[opponentIdx] = placement
+
+		lastPlacement = placement
+		lastScore = opp.score
+	end
+
+	return placementOfTeams
+end
+
+
 return MatchGroupInputUtil
