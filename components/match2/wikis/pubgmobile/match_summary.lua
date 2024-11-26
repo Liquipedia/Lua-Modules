@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local SummaryHelper = Lua.import('Module:Summary/Util')
+local SummaryHelper = Lua.import('Module:MatchSummary/Ffa')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
