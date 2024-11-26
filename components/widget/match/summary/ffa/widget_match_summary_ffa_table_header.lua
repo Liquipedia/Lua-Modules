@@ -23,7 +23,7 @@ function MatchSummaryFfaTableHeader:render()
 		attributes = {
 			['data-js-battle-royale'] = 'header-row'
 		},
-		children = {self.props.children}
+		children = self.props.children
 	}
 end
 
