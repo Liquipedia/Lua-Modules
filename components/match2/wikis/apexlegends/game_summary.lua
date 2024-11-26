@@ -194,26 +194,30 @@ end
 ---@return Html
 function CustomGameSummary._createGameStandings(game)
 	local rows = Array.map(game.opponents, function (opponent, index)
-		local row = mw.html.create('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
-		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-			local cell = row:tag('div')
-					:addClass('panel-table__cell')
-					:addClass(column.class)
-					:node(column.row.value(opponent, index))
-			if (column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(opponent, index)):attr('data-sort-type', column.sortType)
+		local children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+			if column.show and not column.show(match) then
+				return
 			end
+			return MatchSummaryWidgets.TableRowCell{
+				class = column.class,
+				sortable = column.sortable,
+				sortType = column.sortType,
+				sortValue = column.sortVal and column.sortVal.value(opponent, index) or nil,
+				value = column.row.value(opponent, index),
+			}
 		end)
-		return row
+		return MatchSummaryWidgets.TableRow{children = children}
 	end)
 
 	return MatchSummaryWidgets.Table{children = {
 		MatchSummaryWidgets.TableHeader{children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+			if column.show and not column.show(match) then
+				return
+			end
 			return MatchSummaryWidgets.TableHeaderCell{
 				class = column.class,
 				iconClass = column.iconClass,
 				mobileValue = column.header.mobileValue,
-				show = column.show,
 				sortable = column.sortable,
 				sortType = column.sortType,
 				value = column.header.value,

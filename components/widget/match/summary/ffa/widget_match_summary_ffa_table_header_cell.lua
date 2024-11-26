@@ -20,10 +20,6 @@ local MatchSummaryFfaTableHeaderCell = Class.new(Widget)
 
 ---@return Widget?
 function MatchSummaryFfaTableHeaderCell:render()
-	if self.props.show and not self.props.show(match) then
-		return
-	end
-
 	local isSortable = self.props.sortable
 
 	return HtmlWidgets.Div{

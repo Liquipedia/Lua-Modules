@@ -285,39 +285,43 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createMatchStandings(match)
-	local rows = Array.map(match.opponents, function (matchOpponent, index)
-		local row = mw.html.create('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
-
-		Array.forEach(OVERVIEW_COLUMNS, function(column)
-			if column.show and not column.show.value(match) then
+	local rows = Array.map(match.opponents, function (opponent, index)
+		local children = Array.map(OVERVIEW_COLUMNS, function(column)
+			if column.show and not column.show(match) then
 				return
 			end
-
-			local cell = row:tag('div')
-					:addClass('panel-table__cell')
-					:addClass(column.class)
-					:node(column.row.value(matchOpponent, index))
-			if(column.sortVal and column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(matchOpponent, index)):attr('data-sort-type', column.sortType)
-			end
+			return MatchSummaryWidgets.TableRowCell{
+				class = (column.class or '') .. ' ' .. (column.row.class and column.row.class(opponent) or ''),
+				sortable = column.sortable,
+				sortType = column.sortType,
+				sortValue = column.sortVal and column.sortVal.value(opponent, index) or nil,
+				value = column.row.value(opponent, index),
+			}
 		end)
 
-		local gameRowContainer = row:tag('div')
-				:addClass('panel-table__cell')
-				:addClass('cell--game-container')
-				:attr('data-js-battle-royale', 'game-container')
-
-		Array.forEach(matchOpponent.games, function(opponent)
-			local gameRow = gameRowContainer:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
-
-			Array.forEach(GAME_COLUMNS, function(column)
-				gameRow:tag('div')
-						:node(column.row.value(opponent))
-						:addClass(column.class)
-						:addClass(column.row.class and column.row.class(opponent) or nil)
+		local gameRowContainer = HtmlWidgets.Div{
+			classes = {'panel-table__cell', 'cell--game-container'},
+			attributes = {
+				['data-js-battle-royale'] = 'game-container'
+			},
+			children = Array.map(opponent.games, function(gameOpponent)
+				local gameRow = HtmlWidgets.Div{
+					classes = {'panel-table__cell', 'cell--game'},
+					children = Array.map(GAME_COLUMNS, function(column)
+						if column.show and not column.show(match) then
+							return
+						end
+						return MatchSummaryWidgets.TableRowCell{
+							class = (column.class or '') .. ' ' .. (column.row.class and column.row.class(gameOpponent) or ''),
+							value = column.row.value(gameOpponent),
+						}
+					end)
+				}
+				return gameRow
 			end)
-		end)
-		return row
+		}
+		table.insert(children, gameRowContainer)
+		return MatchSummaryWidgets.TableRow{children = children}
 	end)
 
 	local overviewCells = Array.map(OVERVIEW_COLUMNS, function(column)

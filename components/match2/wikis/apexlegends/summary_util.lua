@@ -81,7 +81,6 @@ function CustomSummaryHelper.createScoringData(match)
 	return {
 		kill = scoreSettings.kill,
 		placement = scorePlacement,
-		matchPointThreadhold = scoreSettings.matchPointThreadhold,
 	}
 end
 
