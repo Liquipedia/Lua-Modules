@@ -20,6 +20,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games ApexMatchGroupUtilGame[]
@@ -58,10 +59,12 @@ local OVERVIEW_COLUMNS = {
 				return 'bg-' .. (opponent.advanceBg or '')
 			end,
 			value = function (opponent, idx)
-				local status = opponent.placementStatus
-				if STATUS_ICONS[status] then
-					return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
+				if not STATUS_ICONS[opponent.placementStatus] then
+					return
 				end
+				return IconWidget{
+					iconName = STATUS_ICONS[opponent.placementStatus],
+				}
 			end,
 		},
 	},
