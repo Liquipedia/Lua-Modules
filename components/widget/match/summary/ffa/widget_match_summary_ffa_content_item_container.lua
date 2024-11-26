@@ -51,7 +51,7 @@ function MatchSummaryFfaContentItem:render()
 				children = {
 					IconWidget{
 						iconName = 'collapse',
-						classes = {'panel-content__button-icon'},
+						additionalClass = {'panel-content__button-icon'},
 					},
 					HtmlWidgets.Span{children = self.props.title},
 				}
