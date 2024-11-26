@@ -6,9 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 local Class = require('Module:Class')
-local IconData = require('Module:Icon/Data')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
+local IconData = Lua.import('Module:Icon/Data')
 local Icon = {}
 
 ---@class IconProps
