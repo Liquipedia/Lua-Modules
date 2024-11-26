@@ -18,6 +18,7 @@ local SummaryHelper = Lua.import('Module:Summary/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
@@ -44,7 +45,29 @@ local STATUS_ICONS = {
 	matchpoint = 'fad fa-diamond',
 }
 
-local MATCH_STANDING_COLUMNS = {
+local OVERVIEW_COLUMNS = {
+	{
+		class = 'cell--status',
+		show = {
+			value = function(match)
+				return Table.isNotEmpty(match.extradata.status)
+			end
+		},
+		header = {
+			value = '',
+		},
+		row = {
+			class = function (opponent)
+				return 'bg-' .. (opponent.advanceBg or '')
+			end,
+			value = function (opponent, idx)
+				local status = opponent.placementStatus
+				if STATUS_ICONS[status] then
+					return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
+				end
+			end,
+		},
+	},
 	{
 		sortable = true,
 		sortType = 'rank',
@@ -83,7 +106,12 @@ local MATCH_STANDING_COLUMNS = {
 		},
 		row = {
 			value = function (opponent, idx)
-				return SummaryHelper.displayOpponent(opponent)
+				return OpponentDisplay.BlockOpponent{
+					opponent = opponent,
+					showLink = true,
+					overflow = 'ellipsis',
+					teamStyle = 'hybrid',
+				}
 			end,
 		},
 	},
@@ -132,44 +160,44 @@ local MATCH_STANDING_COLUMNS = {
 			end,
 		},
 	},
-	game = {
-		{
-			class = 'panel-table__cell__game-placement',
-			iconClass = 'fas fa-trophy-alt',
-			header = {
-				value = 'P',
-			},
-			row = {
-				class = function (opponent)
-					return PLACEMENT_BG[opponent.placement]
-				end,
-				value = function (opponent)
-					local placementDisplay
-					if opponent.status and opponent.status ~= 'S' then
-						placementDisplay = '-'
-					else
-						placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = opponent.placement})
-					end
-					return mw.html.create()
-							:node(MatchSummaryWidgets.Trophy{place = opponent.placement, additionalClasses = {'panel-table__cell-icon'}})
-							:tag('span'):addClass('panel-table__cell-game__text')
-									:wikitext(placementDisplay):done()
-				end,
-			},
+}
+local GAME_COLUMNS = {
+	{
+		class = 'panel-table__cell__game-placement',
+		iconClass = 'fas fa-trophy-alt',
+		header = {
+			value = 'P',
 		},
-		{
-			class = 'panel-table__cell__game-kills',
-			iconClass = 'fas fa-skull',
-			header = {
-				value = 'K',
-			},
-			row = {
-				value = function (opponent)
-					return opponent.scoreBreakdown.kills
-				end,
-			},
+		row = {
+			class = function (opponent)
+				return PLACEMENT_BG[opponent.placement]
+			end,
+			value = function (opponent)
+				local placementDisplay
+				if opponent.status and opponent.status ~= 'S' then
+					placementDisplay = '-'
+				else
+					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = opponent.placement})
+				end
+				return mw.html.create()
+						:node(MatchSummaryWidgets.Trophy{place = opponent.placement, additionalClasses = {'panel-table__cell-icon'}})
+						:tag('span'):addClass('panel-table__cell-game__text')
+								:wikitext(placementDisplay):done()
+			end,
 		},
-	}
+	},
+	{
+		class = 'panel-table__cell__game-kills',
+		iconClass = 'fas fa-skull',
+		header = {
+			value = 'K',
+		},
+		row = {
+			value = function (opponent)
+				return opponent.scoreBreakdown.kills
+			end,
+		},
+	},
 }
 
 ---@param props {bracketId: string, matchId: string}
@@ -220,6 +248,11 @@ function CustomMatchSummary._opponents(match)
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
+
+	-- Set the status of the current placement
+	Array.forEach(match.opponents, function(opponent, idx)
+		opponent.placementStatus = match.extradata.status[idx]
+	end)
 end
 
 ---@param match table
@@ -252,102 +285,10 @@ end
 ---@param match table
 ---@return Html
 function CustomMatchSummary._createMatchStandings(match)
-	local header = mw.html.create('div')
-			:addClass('panel-table__row')
-			:addClass('row--header')
-			:attr('data-js-battle-royale', 'header-row')
-
-	if CustomMatchSummary._showStatusColumn(match) then
-		header:tag('div')
-				:addClass('panel-table__cell')
-				:addClass('cell--status')
-	end
-
-	Array.forEach(MATCH_STANDING_COLUMNS, function(column)
-		if column.show and not column.show.value(match) then
-			return
-		end
-
-		local cell = header:tag('div')
-				:addClass('panel-table__cell')
-				:addClass(column.class)
-		local groupedCell = cell:tag('div'):addClass('panel-table__cell-grouped')
-				:tag('i')
-						:addClass('panel-table__cell-icon')
-						:addClass(column.iconClass)
-						:done()
-		local span = groupedCell:tag('span')
-				:wikitext(column.header.value)
-		if column.header.mobileValue then
-				span:addClass('d-none d-md-block')
-				groupedCell:tag('span')
-						:wikitext(column.header.mobileValue)
-						:addClass('d-block d-md-none')
-		end
-		span:done()
-		if (column.sortable and column.sortType) then
-			cell:attr('data-sort-type', column.sortType)
-			groupedCell:tag('div')
-				:addClass('panel-table__sort')
-				:tag('i')
-					:addClass('far fa-arrows-alt-v')
-					:attr('data-js-battle-royale', 'sort-icon')
-		end
-	end)
-
-	local gameCollectionContainerNavHolder = header:tag('div')
-			:addClass('panel-table__cell')
-			:addClass('cell--game-container-nav-holder')
-			:attr('data-js-battle-royale', 'game-nav-holder')
-	local gameCollectionContainer = gameCollectionContainerNavHolder:tag('div')
-			:addClass('panel-table__cell')
-			:addClass('cell--game-container')
-			:attr('data-js-battle-royale', 'game-container')
-
-	Array.forEach(match.games, function (game, idx)
-		local gameContainer = gameCollectionContainer:tag('div')
-				:addClass('panel-table__cell')
-				:addClass('cell--game')
-
-		gameContainer:tag('div')
-				:addClass('panel-table__cell__game-head')
-				:tag('div')
-						:addClass('panel-table__cell__game-title')
-						:node(MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-table__cell-icon'}})
-						:tag('span')
-								:addClass('panel-table__cell-text')
-								:wikitext('Game ', idx)
-								:done()
-						:done()
-						:node(SummaryHelper.gameCountdown(game))
-						:done()
-
-		local gameDetails = gameContainer:tag('div'):addClass('panel-table__cell__game-details')
-		Array.forEach(MATCH_STANDING_COLUMNS.game, function(column)
-			gameDetails:tag('div')
-					:addClass(column.class)
-					:tag('i')
-							:addClass('panel-table__cell-icon')
-							:addClass(column.iconClass)
-							:done()
-					:tag('span')
-							:wikitext(column.header.value)
-							:done()
-		end)
-	end)
-
 	local rows = Array.map(match.opponents, function (matchOpponent, index)
 		local row = mw.html.create('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 
-		if CustomMatchSummary._showStatusColumn(match) then
-			row:tag('div')
-					:addClass('panel-table__cell')
-					:addClass('cell--status')
-					:addClass('bg-' .. (matchOpponent.advanceBg or ''))
-					:node(CustomMatchSummary._getStatusIcon(match.extradata.status[index]))
-		end
-
-		Array.forEach(MATCH_STANDING_COLUMNS, function(column)
+		Array.forEach(OVERVIEW_COLUMNS, function(column)
 			if column.show and not column.show.value(match) then
 				return
 			end
@@ -369,7 +310,7 @@ function CustomMatchSummary._createMatchStandings(match)
 		Array.forEach(matchOpponent.games, function(opponent)
 			local gameRow = gameRowContainer:tag('div'):addClass('panel-table__cell'):addClass('cell--game')
 
-			Array.forEach(MATCH_STANDING_COLUMNS.game, function(column)
+			Array.forEach(GAME_COLUMNS, function(column)
 				gameRow:tag('div')
 						:node(column.row.value(opponent))
 						:addClass(column.class)
@@ -379,22 +320,72 @@ function CustomMatchSummary._createMatchStandings(match)
 		return row
 	end)
 
-	return MatchSummaryWidgets.Table{children = {header, unpack(rows)}}
-end
+	local overviewCells = Array.map(OVERVIEW_COLUMNS, function(column)
+		return MatchSummaryWidgets.TableHeaderCell{
+			class = column.class,
+			iconClass = column.iconClass,
+			mobileValue = column.header.mobileValue,
+			show = column.show,
+			sortable = column.sortable,
+			sortType = column.sortType,
+			value = column.header.value,
+		}
+	end)
 
----@param status string?
----@return string?
-function CustomMatchSummary._getStatusIcon(status)
-	if STATUS_ICONS[status] then
-		return '<i class="' .. STATUS_ICONS[status] ..'"></i>'
-	end
-end
+	local gameCells = HtmlWidgets.Div{
+		classes = {'panel-table__cell', 'cell--game-container-nav-holder'},
+		attributes = {
+			['data-js-battle-royale'] = 'game-nav-holder'
+		},
+		children = {
+			HtmlWidgets.Div{
+				classes = {'panel-table__cell', 'cell--game-container'},
+				attributes = {
+					['data-js-battle-royale'] = 'game-container'
+				},
+				children = Array.map(match.games, function(game, idx)
+					return HtmlWidgets.Div{
+						classes = {'panel-table__cell', 'cell--game'},
+						children = {
+							HtmlWidgets.Div{
+								classes = {'panel-table__cell__game-head'},
+								children = {
+									HtmlWidgets.Div{
+										classes = {'panel-table__cell__game-title'},
+										children = {
+											MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-table__cell-icon'}},
+											HtmlWidgets.Span{
+												classes = {'panel-table__cell-text'},
+												children = 'Game ' .. idx
+											}
+										}
+									},
+									SummaryHelper.gameCountdown(game),
+								}
+							},
+							HtmlWidgets.Div{
+								classes = {'panel-table__cell__game-details'},
+								children = Array.map(GAME_COLUMNS, function(column)
+									return MatchSummaryWidgets.TableHeaderCell{
+										class = column.class,
+										iconClass = column.iconClass,
+										mobileValue = column.header.mobileValue,
+										show = column.show,
+										value = column.header.value,
+									}
+								end)
+							}
+						}
+					}
+				end)
+			}
+		}
+	}
 
----Determines whether the status column should be shown or not
----@param match table
----@return boolean
-function CustomMatchSummary._showStatusColumn(match)
-	return Table.isNotEmpty(match.extradata.status)
+	return MatchSummaryWidgets.Table{children = {
+		MatchSummaryWidgets.TableHeader{children = WidgetUtil.collect(overviewCells, gameCells)},
+		unpack(rows)
+	}}
 end
 
 return CustomMatchSummary

@@ -13,21 +13,7 @@ local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
-
 local CustomSummaryHelper = {}
-
----@param opponent standardOpponent
----@return Html
-function CustomSummaryHelper.displayOpponent(opponent)
-	return OpponentDisplay.BlockOpponent{
-		opponent = opponent,
-		showLink = true,
-		overflow = 'ellipsis',
-		teamStyle = 'hybrid',
-	}
-end
 
 ---Creates a countdown block for a given game
 ---Attaches any VODs of the game as well

@@ -17,6 +17,8 @@ Widgets.PointsDistribution = Lua.import('Module:Widget/Match/Summary/Ffa/PointsD
 Widgets.RankRange = Lua.import('Module:Widget/Match/Summary/Ffa/RankRange')
 Widgets.Tab = Lua.import('Module:Widget/Match/Summary/Ffa/Tab')
 Widgets.Table = Lua.import('Module:Widget/Match/Summary/Ffa/Table')
+Widgets.TableHeader = Lua.import('Module:Widget/Match/Summary/Ffa/TableHeader')
+Widgets.TableHeaderCell = Lua.import('Module:Widget/Match/Summary/Ffa/TableHeaderCell')
 Widgets.Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 
 return Widgets

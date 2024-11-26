@@ -15,6 +15,9 @@ local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local SummaryHelper = Lua.import('Module:Summary/Util')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -69,7 +72,12 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		row = {
 			value = function (opponent, idx)
-				return SummaryHelper.displayOpponent(opponent)
+				return OpponentDisplay.BlockOpponent{
+					opponent = opponent,
+					showLink = true,
+					overflow = 'ellipsis',
+					teamStyle = 'hybrid',
+				}
 			end,
 		},
 	},
@@ -185,33 +193,6 @@ end
 ---@param game table
 ---@return Html
 function CustomGameSummary._createGameStandings(game)
-	local header = mw.html.create('div')
-			:addClass('panel-table__row')
-			:addClass('row--header')
-			:attr('data-js-battle-royale', 'header-row')
-
-	Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-		local cell = header:tag('div')
-			:addClass('panel-table__cell')
-			:addClass(column.class)
-			local groupedCell = cell:tag('div'):addClass('panel-table__cell-grouped')
-				:tag('i')
-						:addClass('panel-table__cell-icon')
-						:addClass(column.iconClass)
-						:done()
-				:tag('span')
-						:wikitext(column.header.value)
-						:done()
-			if (column.sortable and column.sortType) then
-				cell:attr('data-sort-type', column.sortType)
-				groupedCell:tag('div')
-					:addClass('panel-table__sort')
-					:tag('i')
-						:addClass('far fa-arrows-alt-v')
-						:attr('data-js-battle-royale', 'sort-icon')
-			end
-	end)
-
 	local rows = Array.map(game.opponents, function (opponent, index)
 		local row = mw.html.create('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
 		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
@@ -225,7 +206,21 @@ function CustomGameSummary._createGameStandings(game)
 		end)
 		return row
 	end)
-	return MatchSummaryWidgets.Table{children = {header, unpack(rows)}}
+
+	return MatchSummaryWidgets.Table{children = {
+		MatchSummaryWidgets.TableHeader{children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+			return MatchSummaryWidgets.TableHeaderCell{
+				class = column.class,
+				iconClass = column.iconClass,
+				mobileValue = column.header.mobileValue,
+				show = column.show,
+				sortable = column.sortable,
+				sortType = column.sortType,
+				value = column.header.value,
+			}
+		end)},
+		unpack(rows)
+	}}
 end
 
 function CustomGameSummary._opponents(match)
