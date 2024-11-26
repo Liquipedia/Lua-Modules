@@ -18,7 +18,7 @@ local MatchSummaryFfaTableRow = Class.new(Widget)
 
 ---@return Widget
 function MatchSummaryFfaTableRow:render()
-	return HtmlWidgets.div{
+	return HtmlWidgets.Div{
 		classes = {'panel-table__row'},
 		attributes = {
 			['data-js-battle-royale'] = 'row'

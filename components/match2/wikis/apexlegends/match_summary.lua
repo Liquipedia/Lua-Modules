@@ -48,11 +48,9 @@ local STATUS_ICONS = {
 local OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
-		show = {
-			value = function(match)
-				return Table.isNotEmpty(match.extradata.status)
-			end
-		},
+		show = function(match)
+			return Table.isNotEmpty(match.extradata.status)
+		end,
 		header = {
 			value = '',
 		},
@@ -141,11 +139,9 @@ local OVERVIEW_COLUMNS = {
 		sortType = 'match-points',
 		class = 'cell--match-points',
 		iconClass = 'fad fa-diamond',
-		show = {
-			value = function(match)
+		show = function(match)
 				return match.matchPointThreadhold
-			end
-		},
+		end,
 		header = {
 			value = 'MPe Game',
 			mobileValue = 'MPe',
