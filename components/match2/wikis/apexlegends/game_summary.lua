@@ -51,9 +51,10 @@ local GAME_STANDINGS_COLUMNS = {
 				else
 					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
 				end
-				return mw.html.create()
-						:node(MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}})
-						:tag('span'):wikitext(placementDisplay):done()
+				return HtmlWidgets.Fragment{children = {
+					MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}},
+					HtmlWidgets.Span{children = placementDisplay},
+				}}
 			end,
 		},
 	},

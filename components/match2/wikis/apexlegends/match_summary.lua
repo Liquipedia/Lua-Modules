@@ -85,9 +85,10 @@ local OVERVIEW_COLUMNS = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
 				local placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
-				return mw.html.create()
-						:node(MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}})
-						:tag('span'):wikitext(placementDisplay):done()
+				return HtmlWidgets.Fragment{children = {
+					MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}},
+					HtmlWidgets.Span{children = placementDisplay},
+				}}
 			end,
 		},
 	},
@@ -179,10 +180,13 @@ local GAME_COLUMNS = {
 				else
 					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = opponent.placement})
 				end
-				return mw.html.create()
-						:node(MatchSummaryWidgets.Trophy{place = opponent.placement, additionalClasses = {'panel-table__cell-icon'}})
-						:tag('span'):addClass('panel-table__cell-game__text')
-								:wikitext(placementDisplay):done()
+				return HtmlWidgets.Fragment{children = {
+					MatchSummaryWidgets.Trophy{place = opponent.placement, additionalClasses = {'panel-table__cell-icon'}},
+					HtmlWidgets.Span{
+						classes = {'panel-table__cell-game__text'},
+						children = placementDisplay,
+					}
+				}}
 			end,
 		},
 	},
