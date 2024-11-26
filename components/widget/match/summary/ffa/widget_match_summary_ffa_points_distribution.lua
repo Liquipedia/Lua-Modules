@@ -51,7 +51,7 @@ function MatchSummaryFfaPointsDistribution:render()
 		HtmlWidgets.Ul{
 			classes = {'panel-content__points-distribution'},
 			children = WidgetUtil.collect(
-				createItem('fas fa-skull', nil, '1 kill', self.props.killScore),
+				createItem('kills', nil, '1 kill', self.props.killScore),
 				Array.map(self.props.placementScore, function(slot)
 					local title = RankRange{start = slot.rankStart, rankEnd = slot.rangeEnd}
 					local icon, iconColor = Trophy{place = slot.rangeStart}
