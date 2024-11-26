@@ -269,7 +269,10 @@ function CustomMatchSummary._createSchedule(match)
 				return HtmlWidgets.Li{
 					children = {
 						HtmlWidgets.Span{
-							children = MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
+							children = MatchSummaryWidgets.CountdownIcon{
+								game = game,
+								additionalClasses = {'panel-content__game-schedule__icon'}
+							},
 						},
 						HtmlWidgets.Span{
 							classes = {'panel-content__game-schedule__title'},

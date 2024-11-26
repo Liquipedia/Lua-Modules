@@ -196,7 +196,7 @@ end
 function CustomGameSummary._createGameStandings(game)
 	local rows = Array.map(game.opponents, function (opponent, index)
 		local children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
-			if column.show and not column.show(match) then
+			if column.show and not column.show(game) then
 				return
 			end
 			return MatchSummaryWidgets.TableRowCell{
@@ -212,7 +212,7 @@ function CustomGameSummary._createGameStandings(game)
 
 	return MatchSummaryWidgets.Table{children = {
 		MatchSummaryWidgets.TableHeader{children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
-			if column.show and not column.show(match) then
+			if column.show and not column.show(game) then
 				return
 			end
 			return MatchSummaryWidgets.TableHeaderCell{
