@@ -31,7 +31,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
-		iconClass = 'rank',
+		icon = 'rank',
 		header = {
 			value = 'Rank',
 		},
@@ -63,7 +63,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
-		iconClass = 'team',
+		icon = 'team',
 		header = {
 			value = 'Team',
 		},
@@ -87,7 +87,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
-		iconClass = 'points',
+		icon = 'points',
 		header = {
 			value = 'Total Points',
 			mobileValue = 'Pts.',
@@ -107,7 +107,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
-		iconClass = 'placement',
+		icon = 'placement',
 		header = {
 			value = 'Placement Points',
 		},
@@ -126,7 +126,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
-		iconClass = 'kills',
+		icon = 'kills',
 		header = {
 			value = 'Kill Points',
 		},
@@ -218,7 +218,7 @@ function CustomGameSummary._createGameStandings(game)
 			end
 			return MatchSummaryWidgets.TableHeaderCell{
 				class = column.class,
-				iconClass = column.iconClass,
+				icon = column.icon,
 				mobileValue = column.header.mobileValue,
 				sortable = column.sortable,
 				sortType = column.sortType,

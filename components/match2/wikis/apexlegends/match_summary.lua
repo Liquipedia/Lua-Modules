@@ -69,7 +69,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
-		iconClass = 'rank',
+		icon = 'rank',
 		header = {
 			value = 'Rank',
 		},
@@ -93,7 +93,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
-		iconClass = 'team',
+		icon = 'team',
 		header = {
 			value = 'Team',
 		},
@@ -117,7 +117,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
-		iconClass = 'points',
+		icon = 'points',
 		header = {
 			value = 'Total Points',
 			mobileValue = 'Pts.',
@@ -137,7 +137,7 @@ local OVERVIEW_COLUMNS = {
 		sortable = true,
 		sortType = 'match-points',
 		class = 'cell--match-points',
-		iconClass = 'matchpoint',
+		icon = 'matchpoint',
 		show = function(match)
 				return match.matchPointThreadhold
 		end,
@@ -160,7 +160,7 @@ local OVERVIEW_COLUMNS = {
 local GAME_COLUMNS = {
 	{
 		class = 'panel-table__cell__game-placement',
-		iconClass = 'placement',
+		icon = 'placement',
 		header = {
 			value = 'P',
 		},
@@ -187,7 +187,7 @@ local GAME_COLUMNS = {
 	},
 	{
 		class = 'panel-table__cell__game-kills',
-		iconClass = 'kills',
+		icon = 'kills',
 		header = {
 			value = 'K',
 		},
@@ -329,7 +329,7 @@ function CustomMatchSummary._createMatchStandings(match)
 	local cells = Array.map(OVERVIEW_COLUMNS, function(column)
 		return MatchSummaryWidgets.TableHeaderCell{
 			class = column.class,
-			iconClass = column.iconClass,
+			icon = column.icon,
 			mobileValue = column.header.mobileValue,
 			show = column.show,
 			sortable = column.sortable,
@@ -374,7 +374,7 @@ function CustomMatchSummary._createMatchStandings(match)
 								children = Array.map(GAME_COLUMNS, function(column)
 									return MatchSummaryWidgets.TableHeaderCell{
 										class = column.class,
-										iconClass = column.iconClass,
+										icon = column.icon,
 										mobileValue = column.header.mobileValue,
 										show = column.show,
 										value = column.header.value,
