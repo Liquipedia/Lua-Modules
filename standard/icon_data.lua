@@ -29,8 +29,8 @@ return {
 	next = 'fas fa-chevron-right',
 
 	-- Usage: Expanding and collapsing hidden sections
-	expand = 'fas fa-chevron-down',
-	collapse = 'fas fa-chevron-up',
+	expand = 'far fa-chevron-down',
+	collapse = 'far fa-chevron-up',
 
 	-- Usage: to indicate a selection of something was either left, right, down or up
 	up = 'fas fa-chevron-circle-up',
