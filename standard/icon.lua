@@ -39,7 +39,7 @@ function Icon.makeIcon(props)
 			:attr('title', props.hover)
 			:css('font-size', size)
 			:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
-			:attr(props.attributes)
+			:attr(props.attributes and props.attributes or {})
 	)
 end
 
