@@ -26,15 +26,13 @@ local MatchSummaryFfaPointsDistribution = Class.new(Widget)
 function MatchSummaryFfaPointsDistribution:render()
 	assert(self.props.killScore, 'No killscore provided')
 	assert(self.props.placementScore, 'No placement score table provided')
-	local function createItem(icon, iconColor, title, score)
+	local function createItem(icon, title, score)
 		return HtmlWidgets.Li{
 			classes = {'panel-content__points-distribution__list-item'},
 			children = WidgetUtil.collect(
 				icon and HtmlWidgets.Span{
-					classes = {'panel-content__points-distribution__icon', iconColor},
-					children = IconWidget{
-						iconName = icon,
-					},
+					classes = {'panel-content__points-distribution__icon'},
+					children = icon,
 				} or nil,
 				HtmlWidgets.Span{
 					classes = {'panel-content__points-distribution__title'},
@@ -51,12 +49,12 @@ function MatchSummaryFfaPointsDistribution:render()
 		HtmlWidgets.Ul{
 			classes = {'panel-content__points-distribution'},
 			children = WidgetUtil.collect(
-				createItem('kills', nil, '1 kill', self.props.killScore),
+				createItem(IconWidget{iconName = 'kills'}, '1 kill', self.props.killScore),
 				Array.map(self.props.placementScore, function(slot)
 					local title = RankRange{start = slot.rankStart, rankEnd = slot.rangeEnd}
-					local icon, iconColor = Trophy{place = slot.rangeStart}
+					local icon = Trophy{place = slot.rangeStart}
 
-					return createItem(icon, iconColor, title, slot.score)
+					return createItem(icon, title, slot.score)
 				end)
 			)
 		},
