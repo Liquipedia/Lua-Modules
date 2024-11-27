@@ -15,7 +15,13 @@ local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local SummaryHelper = Lua.import('Module:Summary/Util')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class ApexMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
@@ -25,7 +31,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
-		iconClass = 'fas fa-hashtag',
+		icon = 'rank',
 		header = {
 			value = 'Rank',
 		},
@@ -41,15 +47,15 @@ local GAME_STANDINGS_COLUMNS = {
 			value = function (opponent, idx)
 				local place = opponent.placement ~= -1 and opponent.placement or idx
 				local placementDisplay
-					if opponent.status and opponent.status ~= 'S' then
-						placementDisplay = '-'
-					else
-						placementDisplay = SummaryHelper.displayRank(place)
-					end
-				local icon, color = SummaryHelper.getTrophy(place)
-				return mw.html.create()
-						:tag('i'):addClass('panel-table__cell-icon'):addClass(icon):addClass(color):done()
-						:tag('span'):wikitext(SummaryHelper.displayRank(placementDisplay)):done()
+				if opponent.status and opponent.status ~= 'S' then
+					placementDisplay = '-'
+				else
+					placementDisplay = tostring(MatchSummaryWidgets.RankRange{rankStart = place})
+				end
+				return HtmlWidgets.Fragment{children = {
+					MatchSummaryWidgets.Trophy{place = place, additionalClasses = {'panel-table__cell-icon'}},
+					HtmlWidgets.Span{children = placementDisplay},
+				}}
 			end,
 		},
 	},
@@ -57,7 +63,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
-		iconClass = 'fas fa-users',
+		icon = 'team',
 		header = {
 			value = 'Team',
 		},
@@ -68,7 +74,12 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		row = {
 			value = function (opponent, idx)
-				return SummaryHelper.displayOpponent(opponent)
+				return OpponentDisplay.BlockOpponent{
+					opponent = opponent,
+					showLink = true,
+					overflow = 'ellipsis',
+					teamStyle = 'hybrid',
+				}
 			end,
 		},
 	},
@@ -76,7 +87,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
-		iconClass = 'fas fa-star',
+		icon = 'points',
 		header = {
 			value = 'Total Points',
 			mobileValue = 'Pts.',
@@ -96,7 +107,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
-		iconClass = 'fas fa-trophy-alt',
+		icon = 'placement',
 		header = {
 			value = 'Placement Points',
 		},
@@ -115,7 +126,7 @@ local GAME_STANDINGS_COLUMNS = {
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
-		iconClass = 'fas fa-skull',
+		icon = 'kills',
 		header = {
 			value = 'Kill Points',
 		},
@@ -145,93 +156,77 @@ function CustomGameSummary.getGameByMatchId(props)
 	CustomGameSummary._opponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
-	local gameSummary = mw.html.create()
-	gameSummary:node(CustomGameSummary._createGameTab(game, match.matchId, props.gameIdx, scoringData))
-
-	return gameSummary
+	return MatchSummaryWidgets.Tab{
+		matchId = match.matchId,
+		idx = props.gameIdx,
+		children = {
+			CustomGameSummary._createGameDetails(game),
+			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+			CustomGameSummary._createGameStandings(game)
+		}
+	}
 end
 
 ---@param game table
----@param matchId string
----@param idx integer
----@param scoreData table
----@return Html
-function CustomGameSummary._createGameTab(game, matchId, idx, scoreData)
-	local page = mw.html.create('div')
-			:addClass('panel-content')
-			:attr('data-js-battle-royale', 'panel-content')
-			:attr('id', matchId .. 'panel' .. idx)
-
-	local gameDetails = page:tag('div')
-			:addClass('panel-content__container')
-			:attr('role', 'tabpanel')
-
-	local informationList = gameDetails:tag('ul'):addClass('panel-content__game-schedule')
-	informationList:tag('li')
-			:tag('div')
-					:addClass('panel-content__game-schedule__container')
-					:node(SummaryHelper.countdownIcon(game, 'panel-content__game-schedule__icon'))
-					:node(SummaryHelper.gameCountdown(game))
-	if game.map then
-		informationList:tag('li')
-				:tag('i')
-						:addClass('far fa-map')
-						:addClass('panel-content__game-schedule__icon')
-						:done()
-				:tag('span'):wikitext(Page.makeInternalLink(game.map))
-	end
-
-	page:node(SummaryHelper.createPointsDistributionTable(scoreData))
-
-	return page:node(CustomGameSummary._createGameStandings(game))
+---@return Widget
+function CustomGameSummary._createGameDetails(game)
+	return MatchSummaryWidgets.ContentItemContainer{children = {
+		HtmlWidgets.Ul{
+			classes = {'panel-content__game-schedule'},
+			children = {
+				HtmlWidgets.Li{children =
+					HtmlWidgets.Div{
+						classes = {'panel-content__game-schedule__container'},
+						children = {
+							MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
+							SummaryHelper.gameCountdown(game),
+						},
+					},
+				},
+				game.map and HtmlWidgets.Li{children = {
+					IconWidget{iconName = 'map', additionalClasses = {'panel-content__game-schedule__icon'}},
+					HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+				}}} or nil,
+			}
+		}
+	}
 end
 
 ---@param game table
 ---@return Html
 function CustomGameSummary._createGameStandings(game)
-	local wrapper = mw.html.create('div')
-			:addClass('panel-table')
-			:attr('data-js-battle-royale', 'table')
-	local header = wrapper:tag('div')
-			:addClass('panel-table__row')
-			:addClass('row--header')
-			:attr('data-js-battle-royale', 'header-row')
-
-	Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-		local cell = header:tag('div')
-			:addClass('panel-table__cell')
-			:addClass(column.class)
-			local groupedCell = cell:tag('div'):addClass('panel-table__cell-grouped')
-				:tag('i')
-						:addClass('panel-table__cell-icon')
-						:addClass(column.iconClass)
-						:done()
-				:tag('span')
-						:wikitext(column.header.value)
-						:done()
-			if (column.sortable and column.sortType) then
-				cell:attr('data-sort-type', column.sortType)
-				groupedCell:tag('div')
-					:addClass('panel-table__sort')
-					:tag('i')
-						:addClass('far fa-arrows-alt-v')
-						:attr('data-js-battle-royale', 'sort-icon')
+	local rows = Array.map(game.opponents, function (opponent, index)
+		local children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+			if column.show and not column.show(game) then
+				return
 			end
-	end)
-
-	Array.forEach(game.opponents, function (opponent, index)
-		local row = wrapper:tag('div'):addClass('panel-table__row'):attr('data-js-battle-royale', 'row')
-		Array.forEach(GAME_STANDINGS_COLUMNS, function(column)
-			local cell = row:tag('div')
-					:addClass('panel-table__cell')
-					:addClass(column.class)
-					:node(column.row.value(opponent, index))
-			if (column.sortType) then
-				cell:attr('data-sort-val', column.sortVal.value(opponent, index)):attr('data-sort-type', column.sortType)
-			end
+			return MatchSummaryWidgets.TableRowCell{
+				class = column.class,
+				sortable = column.sortable,
+				sortType = column.sortType,
+				sortValue = column.sortVal and column.sortVal.value(opponent, index) or nil,
+				value = column.row.value(opponent, index),
+			}
 		end)
+		return MatchSummaryWidgets.TableRow{children = children}
 	end)
-	return wrapper
+
+	return MatchSummaryWidgets.Table{children = {
+		MatchSummaryWidgets.TableHeader{children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+			if column.show and not column.show(game) then
+				return
+			end
+			return MatchSummaryWidgets.TableHeaderCell{
+				class = column.class,
+				icon = column.icon,
+				mobileValue = column.header.mobileValue,
+				sortable = column.sortable,
+				sortType = column.sortType,
+				value = column.header.value,
+			}
+		end)},
+		unpack(rows)
+	}}
 end
 
 function CustomGameSummary._opponents(match)
