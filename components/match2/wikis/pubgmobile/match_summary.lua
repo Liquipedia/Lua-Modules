@@ -287,6 +287,9 @@ function CustomMatchSummary._createMatchStandings(match)
 	end)
 
 	local cells = Array.map(OVERVIEW_COLUMNS, function(column)
+		if column.show and not column.show(match) then
+			return
+		end
 		return MatchSummaryWidgets.TableHeaderCell{
 			class = column.class,
 			icon = column.icon,
