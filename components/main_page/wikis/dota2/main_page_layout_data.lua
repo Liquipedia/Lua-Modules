@@ -63,11 +63,22 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|limit=15}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n\t<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n\t<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">&#91;[{{FULLURL:Transfers/{{Current term}}|action=edit}} edit]&#93;</div>\n\t<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>[[Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>[[lpcommons:Special:RunQuery/Transfer|Input Form]]</div>\n</div>',
+		body = '{{Transfer List|limit=15}}\n' ..
+			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
+			'\t<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
+			'\t<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
+			'&#91;[{{FULLURL:Transfers/{{Current term}}|action=edit}} edit]&#93;</div>\n' ..
+			'\t<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px; font-size:15px; font-style:italic;">' ..
+			'[[Portal:Transfers|See more transfers]]' ..
+			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>[[Transfer query]]' ..
+			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
+			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]</div>\n' ..
+			'</div>',
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in Dota <small id="this-day-date" style = "margin-left: 5px">({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
+		heading = 'This day in Dota <small id="this-day-date" style = "margin-left: 5px">' ..
+			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
 		body = '{{Liquipedia:This day}}',
 		padding = true,
 		boxid = 1510,
@@ -82,7 +93,9 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{NewDota2MainPage_matches}}<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
+		body = '{{NewDota2MainPage_matches}}' ..
+			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; font-size:15px; ' ..
+			'font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
 	},
