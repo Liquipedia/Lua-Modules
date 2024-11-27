@@ -15,10 +15,6 @@ local Table = require('Module:Table')
 
 
 function MatchLegacy.storeMatch(match2)
-	MatchLegacy._storeMatch1(match2)
-end
-
-function MatchLegacy._storeMatch1(match2)
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local match = Table.deepCopy(match2)
 		local g2extradata = Json.parseIfString(game2.extradata) or {}
