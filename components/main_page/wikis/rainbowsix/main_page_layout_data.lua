@@ -46,7 +46,7 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:TournamentsList|run|defaultTiers=1,2,3|upcomingDays=30|concludedDays=20|ignoreTiers=-1|filterByTierTypes=true}}',
+		body = '{{#invoke:Lua|invoke|module=TournamentsList|defaultTiers=1,2,3|upcomingDays=30|concludedDays=20|ignoreTiers=-1|filterByTierTypes=true|useExternalFilters=true}}',
 		padding = true,
 		boxid = 1508,
 	},
