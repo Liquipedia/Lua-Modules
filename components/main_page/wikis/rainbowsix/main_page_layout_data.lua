@@ -9,7 +9,7 @@
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
-		body = '{{Main Page Useful Articles}}',
+		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = 1503,
 	},
@@ -46,7 +46,7 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|defaultTiers=1,2,3|upcomingDays=30|concludedDays=20|ignoreTiers=-1|filterByTierTypes=true|useExternalFilters=true}}',
+		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|defaultTiers=1,2,3|upcomingDays=30|concludedDays=20|ignoreTiers=-1|filterByTierTypes=true|useExternalFilters=true}}',
 		padding = true,
 		boxid = 1508,
 	},
@@ -115,7 +115,7 @@ return {
 				},
 				{
 					mobileOrder = 5,
-					content = CONTENT.updates,
+					content = CONTENT.usefulArticles,
 				},
 			},
 		},
