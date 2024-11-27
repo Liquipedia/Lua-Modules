@@ -9,30 +9,42 @@
 local CONTENT = {
 	aboutMain = {
 		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
+		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
+			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
 			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
+			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
+			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
+			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game' ..
+			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
 			'</div>',
 		padding = true,
 		boxid = 1500,
 	},
 	aboutEsport = {
 		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
+		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
+			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
 			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
+			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
+			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
+			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game' ..
+			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
 			'</div>',
 		padding = true,
 		boxid = 1500,
 	},
 	aboutGame = {
 		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
+		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
+			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
 			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
+			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
+			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
+			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
+			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
 			'</div>',
 		padding = true,
 		boxid = 1500,
