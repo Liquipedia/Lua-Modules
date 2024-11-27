@@ -46,6 +46,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			matchPage = true,
 			status = 2,
 			matchWidth = 180,
 		},
