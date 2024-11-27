@@ -16,7 +16,6 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local Streams = Lua.import('Module:Links/Stream')
 
 local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft')
 local BaseMatchFunctions = StarcraftMatchGroupInput.MatchFunctions
