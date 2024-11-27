@@ -1245,6 +1245,11 @@ end
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
 ---@field getMode? fun(opponents: table[]): string
+---@field readDate? fun(match: table): table
+---@field adjustOpponent? fun(opponent: table[], opponentIndex: integer, match: table)
+---@field matchIsFinished? fun(match: table, opponents: table[]): boolean
+---@field calculatePlacementOfOpponents? fun(opponents: table[]): integer[]
+---@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: table[]): integer?
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1259,6 +1264,11 @@ end
 --- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
 --- - getExtraData(match, games, opponents, settings): table?
 --- - getMode(opponents): string?
+--- - readDate(match): table
+--- - adjustOpponent(opponent, opponentIndex, match)
+--- - matchIsFinished(match, opponents): boolean
+--- - calculatePlacementOfOpponents(opponents): integer[]
+--- - getMatchWinner(status, winnerInput, opponents): integer?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1274,10 +1284,16 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 
 	local settings = Parser.parseSettings(match)
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	local dateProps = Parser.readDate and Parser.readDate(match)
+		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
+	Table.mergeInto(match, dateProps)
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		if opponent and Parser.adjustOpponent then
+			Parser.adjustOpponent(opponent, opponentIndex, match)
+		end
+		return opponent
 	end)
 
 	local games = Parser.extractMaps(match, opponents, settings.score)
@@ -1298,17 +1314,21 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		}, autoScoreFunction)
 	end)
 
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+	match.finished = Parser.matchIsFinished and Parser.matchIsFinished(match, opponents)
+		or MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 
-		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+		local placementOfOpponents = Parser.calculatePlacementOfOpponents and Parser.calculatePlacementOfOpponents(opponents)
+			or MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
 			opponent.extradata.bg = settings.status[opponent.placement]
 		end)
+
+		match.winner = Parser.getMatchWinner and Parser.getMatchWinner(match.status, winnerInput, opponents)
+			or MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
@@ -1316,6 +1336,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {}
 
 	match.games = games
