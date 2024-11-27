@@ -836,7 +836,7 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
 		return true
 	end
-	
+
 	local playall = tonumber(match.playall) or 0
 	if playall then
 		return MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
@@ -871,7 +871,7 @@ function MatchGroupInputUtil.mapIsFinished(map, opponents)
 	if Logic.isNotEmpty(map.finished) then
 		return true
 	end
-	
+
 	local bestof = map.bestof
 	if not bestof or bestof == 0 or not opponents then
 		return false
