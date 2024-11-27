@@ -13,7 +13,6 @@ local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -686,36 +685,6 @@ end
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
-	local participants = Json.parseIfString(record.participants) or {}
-	local walkover = nilIfEmpty(record.walkover)
-
-	local function getParticipantsOfOpponent(allParticipants, opponentIndex)
-		local prefix = opponentIndex .. '_'
-		local function indexFromKey(key)
-			if String.startsWith(key, prefix) then
-				return tonumber(string.sub(key, #prefix + 1))
-			else
-				return nil
-			end
-		end
-		local participantsOfOpponent = Array.extractValues(Table.mapArguments(
-			allParticipants,
-			indexFromKey,
-			function (key, index)
-				if Logic.isEmpty(allParticipants[key]) then
-					return nil
-				end
-				return Table.merge({playerId = index}, allParticipants[key])
-			end,
-			true
-		))
-		return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
-	end
-
-	local opponents = Array.map(Array.range(1, opponentCount or 2), function (_, index)
-		return {players = getParticipantsOfOpponent(participants, index)}
-	end)
-
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
@@ -726,14 +695,14 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		map = nilIfEmpty(record.map),
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
-		opponents = opponents,
-		participants = participants,
+		opponents = record.opponents,
+		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
-		walkover = walkover and walkover:lower() or nil,
+		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end

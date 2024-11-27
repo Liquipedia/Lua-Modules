@@ -7,9 +7,9 @@
 --
 
 local Class = require('Module:Class')
-local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 
+local Icon = Lua.import('Module:Icon')
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
 ---@class IconFontawesomeWidget: IconWidget

@@ -213,6 +213,19 @@ end
 
 ---@param props table
 ---@return Html
+function DisplayHelper.DefaultGameSummaryContainer(props)
+	local GameSummaryModule = Lua.import('Module:GameSummary')
+
+	assert(
+		type(GameSummaryModule.getGameByMatchId) == 'function',
+		'Expected GameSummary.getGameByMatchId to be a function'
+	)
+
+	return GameSummaryModule.getGameByMatchId(props)
+end
+
+---@param props table
+---@return Html
 function DisplayHelper.DefaultMatchPageContainer(props)
 	local MatchPageModule = Lua.import('Module:MatchPage')
 

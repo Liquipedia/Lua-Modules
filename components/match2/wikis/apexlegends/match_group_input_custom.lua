@@ -8,25 +8,21 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DEFAULT_MODE = 'team'
-
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	applyUnderScores = true,
-	maxNumPlayers = 3,
-}
-
-local MatchFunctions = {}
 local MapFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		applyUnderScores = true,
+		maxNumPlayers = 3,
+	},
+	DEFAULT_MODE = 'team'
+}
 
 local CustomMatchGroupInput = {}
 
@@ -34,61 +30,12 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	local settings = MatchFunctions.parseSetting(match)
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	local games = MatchFunctions.extractMaps(match, opponents, settings.score)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(opponents, games)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.startingpoints = tonumber(opponent.pointmodifier)
-		opponent.placement = tonumber(opponent.placement)
-
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-
-		local placementOfTeams = CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = placementOfTeams[opponentIndex]
-			opponent.extradata.bg = settings.status[opponent.placement]
-		end)
-	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(settings)
-
-	return match
+	return MatchGroupInputUtil.standardProcessFfaMatch(match, MatchFunctions)
 end
 
+--
+-- match related functions
+--
 ---@param match table
 ---@param opponents table[]
 ---@param scoreSettings table
@@ -113,7 +60,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = MapFunctions.getExtraData(map, map.opponents)
+		map.extradata = MapFunctions.getExtraData(map)
 
 		table.insert(maps, map)
 		match[key] = nil
@@ -133,73 +80,9 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
----@param opponents table[]
----@return integer[]
-function CustomMatchGroupInput.calculatePlacementOfTeams(opponents)
-	local usedPlacements = Array.map(opponents, function()
-		return 0
-	end)
-	Array.forEach(opponents, function(opponent)
-		if opponent.placement then
-			usedPlacements[opponent.placement] = usedPlacements[opponent.placement] + 1
-		end
-	end)
-	-- Spread out placements if there are duplicates placements
-	-- For example 2 placement at 4 means 5 is also taken and the next available is 6
-	Array.forEach(usedPlacements, function(count, placement)
-		if count > 1 then
-			usedPlacements[placement+1] = usedPlacements[placement + 1] + (count - 1)
-			usedPlacements[placement] = 1
-		end
-	end)
-
-	local placementCount = #usedPlacements
-	local function findNextSlot(placement)
-		if usedPlacements[placement] == 0 or placement > placementCount then
-			return placement
-		end
-		return findNextSlot(placement + 1)
-	end
-
-	local placementOfTeams = {}
-	local lastScore
-	local lastPlacement = 0
-	for opponentIdx, opp in Table.iter.spairs(opponents, CustomMatchGroupInput.scoreSorter) do
-		local placement = opp.placement
-		if not placement then
-			local thisPlacement = findNextSlot(lastPlacement)
-			usedPlacements[thisPlacement] = 1
-			if lastScore and opp.score == lastScore then
-				placement = lastPlacement
-			else
-				placement = thisPlacement
-			end
-		end
-		placementOfTeams[opponentIdx] = placement
-
-		lastPlacement = placement
-		lastScore = opp.score
-	end
-
-	return placementOfTeams
-end
-
----@param tbl table
----@param key1 string|number
----@param key2 string|number
----@return boolean
-function CustomMatchGroupInput.scoreSorter(tbl, key1, key2)
-	local value1 = tonumber(tbl[key1].score) or -math.huge
-	local value2 = tonumber(tbl[key2].score) or -math.huge
-	return value1 > value2
-end
-
---
--- match related functions
---
 ---@param match table
 ---@return {score: table, status: table}
-function MatchFunctions.parseSetting(match)
+function MatchFunctions.parseSettings(match)
 	-- Score Settings
 	local scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
@@ -226,9 +109,12 @@ function MatchFunctions.parseSetting(match)
 	}
 end
 
+---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@param settings table
 ---@return table
-function MatchFunctions.getExtraData(settings)
+function MatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		scoring = settings.score,
 		status = settings.status,
@@ -239,19 +125,15 @@ end
 -- map related functions
 --
 
--- Parse extradata information
 ---@param map table
----@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map, opponents)
+function MapFunctions.getExtraData(map)
 	return {
 		dateexact = map.dateexact,
 		comment = map.comment,
-		opponents = Table.deepCopy(opponents),
 	}
 end
 
----Calculate Score and Winner of the map
 ---@param scoreDataInput table?
 ---@param scoreSettings table
 ---@return table

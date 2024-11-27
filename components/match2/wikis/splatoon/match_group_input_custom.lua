@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local WeaponNames = mw.loadData('Module:WeaponNames')
 
@@ -31,7 +32,40 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+	local maps = {}
+	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local finishedInput = map.finished --[[@as string?]]
+		local winnerInput = map.winner --[[@as string?]]
+
+		map.extradata = MapFunctions.getExtraData(match, map, opponents)
+		map.finished = MatchGroupInputUtil.mapIsFinished(map)
+
+		local opponentInfo = Array.map(opponents, function(opponent, opponentIndex)
+			local scoreInput = map['score' .. opponentIndex]
+			if map.maptype == 'Turf War' and scoreInput then
+				scoreInput = scoreInput:gsub('%%', '')
+			end
+			local score, status = MatchGroupInputUtil.computeOpponentScore({
+				walkover = map.walkover,
+				winner = map.winner,
+				opponentIndex = opponentIndex,
+				score = scoreInput,
+			}, MapFunctions.calculateMapScore(map))
+			local players = MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+			return {score = score, status = status, players = players}
+		end)
+
+		map.scores = Array.map(opponentInfo, Operator.property('score'))
+		if map.finished then
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
+		end
+
+		table.insert(maps, map)
+		match[key] = nil
+	end
+
+	return maps
 end
 
 --
@@ -72,39 +106,33 @@ function MapFunctions.getExtraData(match, map, opponents)
 	}
 end
 
--- Parse participant information
-
 ---@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getParticipants(map, opponents)
-	local allParticipants = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		local players = Array.mapIndexes(function(playerIndex)
-			return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'w' .. playerIndex])
-		end)
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			players,
-			function(playerIndex)
-				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
-				return player and {name = player} or nil
-			end,
-			function(playerIndex, playerIdData)
-				local weapon = map['t' .. opponentIndex .. 'w' .. playerIndex]
-				return {
-					player = playerIdData.name,
-					weapon = MapFunctions._cleanWeaponName(weapon),
-				}
-			end
-		)
-		Array.forEach(unattachedParticipants, function(participant)
-			table.insert(participants, participant)
-		end)
-		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	local players = Array.mapIndexes(function(playerIndex)
+		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'w' .. playerIndex])
 	end)
-
-	return allParticipants
+	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData)
+			local weapon = map['t' .. opponentIndex .. 'w' .. playerIndex]
+			return {
+				player = playerIdData.name,
+				weapon = MapFunctions._cleanWeaponName(weapon),
+			}
+		end
+	)
+	Array.forEach(unattachedParticipants, function(participant)
+		table.insert(participants, participant)
+	end)
+	return participants
 end
 
 ---@param weaponRaw string

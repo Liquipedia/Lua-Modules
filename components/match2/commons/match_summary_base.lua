@@ -29,6 +29,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
 local TBD = Abbreviation.make('TBD', 'To Be Determined')
 
 ---@class MatchSummaryHeader
@@ -170,7 +171,7 @@ end
 ---@param links table<string, string|table>
 ---@return MatchSummaryFooter
 function Footer:addLinks(links)
-	for linkType, link in pairs(links) do
+	local processLink = function(linkType, link)
 		local currentLinkData = Links.getMatchIconData(linkType)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
@@ -181,6 +182,21 @@ function Footer:addLinks(links)
 			end)
 		else
 			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
+		end
+	end
+
+	local processedLinks = {}
+	Array.forEach(MATCH_LINK_PRIORITY, function(linkType)
+		for linkKey, link in Table.iter.pairsByPrefix(links, linkType, {requireIndex = false}) do
+			processLink(linkKey, link)
+			processedLinks[linkKey] = true
+		end
+	end)
+
+	for linkKey, link in Table.iter.spairs(links) do
+	    -- Handle links not already processed via priority list
+		if not processedLinks[linkKey] then
+			processLink(linkKey, link)
 		end
 	end
 
