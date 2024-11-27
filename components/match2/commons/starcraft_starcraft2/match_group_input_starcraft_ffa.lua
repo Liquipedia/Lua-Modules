@@ -294,11 +294,13 @@ end
 ---@param noScores boolean?
 ---@return integer[]
 function StarcraftFfaMatchGroupInput._determinePlacements(opponents, noScores)
-	if noScores then return {} end
-
-	if Array.all(opponents, function(opponent)
-		return Logic.isNotEmpty(opponent.placement)
-	end) then return {} end
+	local manualPlacements = {}
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		manualPlacements[opponentIndex] = opponent.placement
+	end)
+	if noScores or Table.size(manualPlacements) == #opponents then
+		return manualPlacements
+	end
 
 	---@param status string
 	---@return string
