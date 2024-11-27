@@ -836,6 +836,11 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
 		return true
 	end
+	
+	local playall = tonumber(match.playall) or 0
+	if playall then
+		return MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
+	end
 
 	local bestof = match.bestof
 	if not bestof then
@@ -866,7 +871,7 @@ function MatchGroupInputUtil.mapIsFinished(map, opponents)
 	if Logic.isNotEmpty(map.finished) then
 		return true
 	end
-
+	
 	local bestof = map.bestof
 	if not bestof or bestof == 0 or not opponents then
 		return false
@@ -891,11 +896,29 @@ function MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 	return false
 end
 
+-- Check if all games/rounds have been played
+---@param playall integer
+---@param opponents {score: integer?}[]
+---@return boolean
+function MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
+	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
+	if scoreSum >= playall then
+		return true
+	end
+	return false
+end
+
 ---@param bestOfInput string|integer?
 ---@param maps table[]
 ---@return integer?
 function MatchGroupInputUtil.getBestOf(bestOfInput, maps)
 	return tonumber(bestOfInput) or #maps
+end
+
+---@param playAllInput string|integer?
+---@return integer?
+function MatchGroupInputUtil.getPlayAll(playAllInput)
+	return tonumber(playAllInput) or 0
 end
 
 ---@param alias table<string, string>
@@ -1043,9 +1066,10 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	return match
 end
 
----@class MatchParserInterface
+---@class MatchInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
+---@field getPlayAll fun(playAllInput: string|integer|nil): integer?
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table?
@@ -1079,6 +1103,7 @@ end
 --- - getHeadToHeadLink(match, opponents): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
+--- - getPlayAll(playAllinput): integer?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1141,6 +1166,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 
 	match.stream = Streams.processStreams(match)
 	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	local playallData = {
+		playall = Parser.getPlayAll and Parser.getPlayAll(match.playall) or MatchGroupInputUtil.getPlayAll(match.playall)
+	}
+	match.extradata = Table.merge(playallData, match.extradata)
 
 	match.games = games
 	match.opponents = opponents

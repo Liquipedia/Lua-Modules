@@ -213,7 +213,8 @@ function MatchFunctions.getExtraData(match, opponents, finishedInput)
 		status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
-		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
+		hidden = Logic.readBool(Variables.varDefault('match_hidden')),
+		playall = match.playall
 	}
 end
 
