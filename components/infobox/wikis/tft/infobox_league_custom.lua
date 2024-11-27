@@ -9,15 +9,17 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+
+local VALID_PUBLISHERTIERS = {'sponsored'}
 
 ---@class TftLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -75,9 +77,10 @@ end
 function CustomLeague:customParseArguments(args)
 	-- Normalize Mode input
 	args.mode = args.mode and GAME_MODES[string.lower(args.mode):gsub('s$', '')] or DEFAULT_MODE
-
 	self.data.mode = string.lower(args.mode)
-	self.data.publishertier = Logic.readBool(args['riot-sponsored']) and 'sponsored' or nil
+
+	local publisherTier = (args.publishertier or ''):lower()
+	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
 end
 
 ---@param args table

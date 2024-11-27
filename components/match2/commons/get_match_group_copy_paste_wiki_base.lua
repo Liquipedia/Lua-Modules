@@ -64,14 +64,13 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), true)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
-	local lines = {'{{Match\n' .. INDENT}
-	Array.extendWith(lines,
+	return table.concat(Array.extend({},
+		'{{Match',
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return '\n' .. INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
 		'\n' .. INDENT .. '|finished=\n' .. INDENT .. '|date=\n' .. INDENT .. '}}'
-	)
-	return table.concat(lines)
+	))
 end
 
 ---subfunction used to generate the code for the Opponent template, depending on the type of opponent

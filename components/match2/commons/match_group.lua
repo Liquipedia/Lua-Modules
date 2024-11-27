@@ -180,9 +180,39 @@ function MatchGroup.MatchByMatchId(args)
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch')
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
-	return MatchGroupContainer({
+	local MatchContainer = WikiSpecific.getMatchContainer('singleMatch')
+	return MatchContainer({
 		matchId = fullMatchId,
+		config = config,
+	})
+end
+
+-- Displays a single game specified by a bracket ID, match ID and game Index.
+---@param args table
+---@return Html
+function MatchGroup.GameByMatchIdAndGameIndex(args)
+	local bracketId = args.id
+	local matchId = args.matchid
+	local gameIdx = tonumber(args.gameidx)
+	assert(bracketId, 'Missing bracket ID')
+	assert(matchId, 'Missing match ID')
+	assert(gameIdx, 'Missing game index')
+
+	matchId = MatchGroupUtil.matchIdFromKey(matchId)
+
+	local matchGroup = MatchGroupUtil.fetchMatchGroup(bracketId)
+	local fullMatchId = bracketId .. '_' .. matchId
+	local match = matchGroup.matchesById[fullMatchId]
+
+	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
+
+	local SingleGameDisplay = Lua.import('Module:MatchGroup/Display/SingleGame')
+	local config = SingleGameDisplay.configFromArgs(args)
+
+	local GameContainer = WikiSpecific.getGameContainer('singlegame')
+	return GameContainer({
+		matchId = fullMatchId,
+		gameIdx = gameIdx,
 		config = config,
 	})
 end
@@ -217,6 +247,14 @@ end
 function MatchGroup.TemplateShowSingleMatch(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.MatchByMatchId(args)
+end
+
+-- Entry point of Template:ShowSingleGame
+---@param frame Frame
+---@return Html
+function MatchGroup.TemplateShowSingleGame(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.GameByMatchIdAndGameIndex(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup

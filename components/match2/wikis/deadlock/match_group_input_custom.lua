@@ -84,19 +84,17 @@ function MapFunctions.getExtraData(match, map, opponents)
 	return extradata
 end
 
+--- TODO FIX:This function does not attempt to attach the data to the correct player!
 ---@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getParticipants(map, opponents)
-	local participants = {}
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
-	for opponentIndex in ipairs(opponents) do
-		for _, hero, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h', {requireIndex = true}) do
-			participants[opponentIndex .. '_' .. playerIndex] = {
-				character = getCharacterName(hero),
-			}
-		end
+	local participants = {}
+	for _, hero in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'h', {requireIndex = true}) do
+		table.insert(participants, {character = getCharacterName(hero)})
 	end
 
 	return participants

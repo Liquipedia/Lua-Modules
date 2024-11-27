@@ -29,8 +29,8 @@ return {
 	next = 'fas fa-chevron-right',
 
 	-- Usage: Expanding and collapsing hidden sections
-	expand = 'fas fa-chevron-down',
-	collapse = 'fas fa-chevron-up',
+	expand = 'far fa-chevron-down',
+	collapse = 'far fa-chevron-up',
 
 	-- Usage: to indicate a selection of something was either left, right, down or up
 	up = 'fas fa-chevron-circle-up',
@@ -87,4 +87,24 @@ return {
 
 	-- Usage: Accommodations
 	accommodation = 'far fa-home-alt',
+
+	-- Usage: Matches etc
+	firstplace = 'fas fa-trophy',
+	map = 'far fa-map',
+	rank = 'fas fa-hashtag',
+	team = 'fas fa-users',
+	points = 'fas fa-star',
+	placement = 'fas fa-trophy-alt',
+	kills = 'fas fa-skull',
+	matchpoint = 'fad fa-diamond',
+
+	-- Usage: standings
+	standings_up = 'fas fa-chevron-double-up',
+	standings_stayup = 'fas fa-chevron-up',
+	standings_stay = 'fas fa-equals',
+	standings_staydown = 'fas fa-chevron-down',
+	standings_down = 'fas fa-skull',
+
+	-- Usage sorting
+	sort = 'far fa-arrows-alt-v',
 }
