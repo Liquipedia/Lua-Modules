@@ -307,7 +307,7 @@ liquipedia.battleRoyale = {
 
 		if ( loadTemplate && !this.loadedTabs[ battleRoyaleId ][ matchContentId ] ) {
 			this.callTemplate( battleRoyaleId, matchId, gameId, matchContentId, () => {
-				this.buildBattleRoyaleMapMatchContents( battleRoyaleId, document.querySelector(
+				this.buildBattleRoyaleMapMatchContents( battleRoyaleId, this.battleRoyaleInstances[battleRoyaleId].querySelector(
 					`[data-js-battle-royale-content-id="${ matchContentId }"]` ), true );
 				this.loadedTabs[ battleRoyaleId ][ matchContentId ] = true;
 				this.updateGameTabDisplay( battleRoyaleId, matchContentId, gameTab );
@@ -371,7 +371,7 @@ liquipedia.battleRoyale = {
 			wikitext += `{{ShowSingleGame|id=${ battleRoyaleId }|matchid=${ matchId }|gameidx=${ i }}}`;
 		}
 
-		const element = document.querySelector( `[data-js-battle-royale-content-id="${ matchContentId }"]` );
+		const element = this.battleRoyaleInstances[battleRoyaleId].querySelector( `[data-js-battle-royale-content-id="${ matchContentId }"]` );
 
 		mw.loader.using( [ 'mediawiki.api' ] ).then( () => {
 			const api = new mw.Api();
