@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
+-- wiki=pubgmobile
 -- page=Module:GameSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -23,7 +23,7 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class ApexMatchGroupUtilGame: MatchGroupUtilGame
+---@class PubgmMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
 
 local GAME_STANDINGS_COLUMNS = {

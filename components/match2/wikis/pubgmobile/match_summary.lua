@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
+-- wiki=pubgmobile
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -22,7 +22,7 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
+---@class PungmMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games ApexMatchGroupUtilGame[]
 
 local PLACEMENT_BG = {
@@ -39,10 +39,6 @@ local STATUS_ICONS = {
 	stay = 'standings_stay',
 	staydown = 'standings_staydown',
 	down = 'standings_down',
-
-	-- Special Status for Match Point matches
-	trophy = 'firstplace',
-	matchpoint = 'matchpoint',
 }
 
 local OVERVIEW_COLUMNS = {
@@ -136,29 +132,6 @@ local OVERVIEW_COLUMNS = {
 			end,
 		},
 	},
-	{
-		sortable = true,
-		sortType = 'match-points',
-		class = 'cell--match-points',
-		icon = 'matchpoint',
-		show = function(match)
-				return match.matchPointThreadhold
-		end,
-		header = {
-			value = 'MPe Game',
-			mobileValue = 'MPe',
-		},
-		sortVal = {
-			value = function (opponent, idx)
-				return opponent.matchPointReachedIn or 999 -- High number that should not be exceeded
-			end,
-		},
-		row = {
-			value = function (opponent, idx)
-				return opponent.matchPointReachedIn and "Game " .. opponent.matchPointReachedIn or nil
-			end,
-		},
-	},
 }
 local GAME_COLUMNS = {
 	{
@@ -207,7 +180,6 @@ local GAME_COLUMNS = {
 function CustomMatchSummary.getByMatchId(props)
 	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	match.matchPointThreadhold = Table.extract(match.extradata.scoring, 'matchPointThreadhold')
 	CustomMatchSummary._opponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
@@ -232,21 +204,6 @@ function CustomMatchSummary._opponents(match)
 			return game.opponents[idx]
 		end)
 	end)
-
-	if match.matchPointThreadhold then
-		Array.forEach(match.opponents, function(opponent)
-			local matchPointReachedIn
-			local sum = opponent.extradata.startingpoints or 0
-			for gameIdx, game in ipairs(opponent.games) do
-				if sum >= match.matchPointThreadhold then
-					matchPointReachedIn = gameIdx
-					break
-				end
-				sum = sum + (game.score or 0)
-			end
-			opponent.matchPointReachedIn = matchPointReachedIn
-		end)
-	end
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)

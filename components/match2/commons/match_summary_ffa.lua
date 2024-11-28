@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
--- page=Module:Summary/Util
+-- wiki=commons
+-- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -13,13 +13,13 @@ local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
 
-local CustomSummaryHelper = {}
+local MatchSummaryFfa = {}
 
 ---Creates a countdown block for a given game
 ---Attaches any VODs of the game as well
 ---@param game table
 ---@return Html?
-function CustomSummaryHelper.gameCountdown(game)
+function MatchSummaryFfa.gameCountdown(game)
 	local timestamp = Date.readTimestamp(game.date)
 	if not timestamp then
 		return
@@ -40,7 +40,7 @@ end
 ---@param opponent1 table
 ---@param opponent2 table
 ---@return boolean
-function CustomSummaryHelper.placementSortFunction(opponent1, opponent2)
+function MatchSummaryFfa.placementSortFunction(opponent1, opponent2)
 	if opponent1.placement and opponent2.placement and opponent1.placement ~= opponent2.placement then
 		return opponent1.placement < opponent2.placement
 	end
@@ -58,7 +58,7 @@ end
 
 ---@param match table
 ---@return {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score:number}[]}
-function CustomSummaryHelper.createScoringData(match)
+function MatchSummaryFfa.createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
 	local scorePlacement = {}
@@ -84,4 +84,4 @@ function CustomSummaryHelper.createScoringData(match)
 	}
 end
 
-return CustomSummaryHelper
+return MatchSummaryFfa
