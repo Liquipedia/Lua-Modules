@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=pubgmobile
+-- wiki=pubg
 -- page=Module:Brkts/WikiSpecific
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,7 +11,7 @@ local Table = require('Module:Table')
 
 local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 
----@class PubgmBrktsWikiSpecific: BrktsWikiSpecific
+---@class PubgBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 ---@param matchGroupType string
