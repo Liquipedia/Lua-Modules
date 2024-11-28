@@ -101,7 +101,8 @@ local CONTENT = {
 	},
 	filterButtons = {
 		noPanel = true,
-		body = '<div style{{=}}"width:100%;margin-bottom:8px;">{{#invoke:FilterButtons|getFromConfig}}</div>',
+		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
+		'{{#invoke:Lua|invoke|module=:FilterButtons|getFromConfig}}</div>',
 	},
 	matches = {
 		heading = 'Matches',
