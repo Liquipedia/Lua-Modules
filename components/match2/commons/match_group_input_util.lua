@@ -649,7 +649,9 @@ end
 ---@param opponents {score: number}[]
 ---@return integer
 function MatchGroupInputUtil.getHighestScoringOpponent(opponents)
-	local scores = Array.map(opponents, Operator.property('score'))
+	local scores = Array.map(opponents, function (opponent)
+		return opponent.score or 0
+	end)
 	local maxScore = Array.max(scores)
 	return Array.indexOf(scores, FnUtil.curry(Operator.eq, maxScore))
 end

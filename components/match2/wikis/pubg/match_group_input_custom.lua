@@ -75,7 +75,7 @@ end
 function MatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
-			return map.scores[opponentIndex] or 0
+			return map.opponents[opponentIndex].score or 0
 		end), Operator.add, 0)
 	end
 end
@@ -144,12 +144,17 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 	local scoreBreakdown = {}
 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
-	if placement and kills then
-		scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
-		scoreBreakdown.killPoints = kills * scoreSettings.kill
-		scoreBreakdown.kills = kills
-		scoreBreakdown.totalPoints = scoreBreakdown.placePoints + scoreBreakdown.killPoints
+	if placement or kills then
+		if placement then
+			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
+		end
+		if kills then
+			scoreBreakdown.killPoints = kills * scoreSettings.kill
+			scoreBreakdown.kills = kills
+		end
+		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
 	end
+
 	local opponent = {
 		status = MatchGroupInputUtil.STATUS.SCORE,
 		scoreBreakdown = scoreBreakdown,
