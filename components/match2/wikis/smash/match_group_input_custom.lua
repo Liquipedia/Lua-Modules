@@ -92,13 +92,12 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 		return (startingLife - pos < remainingLife) and 1 or 0
 	end
 
-	-- Input Format is "character,remainingLife,startingLife" per index
 	local players = Array.mapIndexes(function(playerIndex)
-		return opponent.match2players[playerIndex] or
-			(map['o' .. opponentIndex .. 'p' .. playerIndex] and {}) or
-			nil
+		return map['o' .. opponentIndex .. 'p' .. playerIndex] or map['o' .. opponentIndex .. 'c' .. playerIndex]
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+
+	-- Input Format is "character,remainingLife,startingLife" per index
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -134,10 +133,6 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param map table
