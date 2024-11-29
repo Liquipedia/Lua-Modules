@@ -32,14 +32,14 @@ end
 function MatchLegacy._storeGames(match, match2)
 	local games = Array.map(match2.match2games or {}, function(game2, gameIndex)
 		local game = Table.deepCopy(game2)
-		local participants = Json.parseIfString(game2.participants) or {}
+		local opponents = Json.parseIfString(game2.opponents) or {}
 
 		-- Extradata
 		game.extradata = {}
 
 		if game.mode == 'singles' then
-			local player1 = participants['1_1'] or {}
-			local player2 = participants['2_1'] or {}
+			local player1 = (opponents[1].players or {})[1] or {}
+			local player2 = (opponents[2].players or {})[1] or {}
 			game.extradata.char1 = table.concat(Array.map(player1.characters or {}, Operator.property('name')), ',')
 			game.extradata.char2 = table.concat(Array.map(player2.characters or {}, Operator.property('name')), ',')
 		end
