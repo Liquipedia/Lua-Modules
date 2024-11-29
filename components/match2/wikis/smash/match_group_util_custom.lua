@@ -35,8 +35,12 @@ function SmashMatchGroupUtil.populateOpponents(match)
 		if opponent.type ~= Opponent.solo then
 			return
 		end
+		local function getCharacters(game)
+			return (game.opponents[opponentIndex].players[1] or {}).characters or {}
+		end
+
 		local hasMoreThanOneHeadInAnyGame = Array.any(match.games, function(game)
-			return #Array.unique(Array.map(game.opponents[opponentIndex].players[1].characters, function(character)
+			return #Array.unique(Array.map(getCharacters(game), function(character)
 				return character.name
 			end)) > 1
 		end)
@@ -45,8 +49,8 @@ function SmashMatchGroupUtil.populateOpponents(match)
 		end
 
 		opponent.players[1].game = match.game
-		opponent.players[1].heads = Array.map(match.games, function(map)
-			return map.opponents[opponentIndex].players[1].characters[#map.opponents[opponentIndex].players[1].characters]
+		opponent.players[1].heads = Array.map(match.games, function(game)
+			return getCharacters(game)[#getCharacters(game)]
 		end)
 	end)
 end

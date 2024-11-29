@@ -101,6 +101,9 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 		opponent.match2players,
 		players,
 		function(playerIndex)
+			if Opponent.typeIsParty(opponent.type) then
+				return {name = opponent.match2players[playerIndex].name}
+			end
 			return {name = map['o' .. opponentIndex .. 'p' .. playerIndex]}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
