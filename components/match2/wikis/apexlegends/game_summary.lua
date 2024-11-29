@@ -61,7 +61,7 @@ function CustomGameSummary._createGameDetails(game)
 						classes = {'panel-content__game-schedule__container'},
 						children = {
 							MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
-							SummaryHelper.gameCountdown(game),
+							MatchSummaryWidgets.GameCountdown{game = game},
 						},
 					},
 				},
