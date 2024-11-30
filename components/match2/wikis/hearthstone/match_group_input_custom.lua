@@ -26,7 +26,6 @@ MatchFunctions.OPPONENT_CONFIG = {
 	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
 }
-local TBD = 'TBD'
 
 ---@param match table
 ---@param options table?
