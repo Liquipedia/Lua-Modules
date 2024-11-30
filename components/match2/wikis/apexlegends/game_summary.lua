@@ -56,22 +56,17 @@ function CustomGameSummary._createGameDetails(game)
 		HtmlWidgets.Ul{
 			classes = {'panel-content__game-schedule'},
 			children = {
-				HtmlWidgets.Li{children =
-					HtmlWidgets.Div{
-						classes = {'panel-content__game-schedule__container'},
-						children = {
-							MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
-							MatchSummaryWidgets.GameCountdown{game = game},
-						},
-					},
-				},
+				HtmlWidgets.Li{children = {
+					MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
+					MatchSummaryWidgets.GameCountdown{game = game},
+				}},
 				game.map and HtmlWidgets.Li{children = {
 					IconWidget{iconName = 'map', additionalClasses = {'panel-content__game-schedule__icon'}},
 					HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
-				}}} or nil,
+				}} or nil,
 			}
 		}
-	}
+	}}
 end
 
 ---@param game table
