@@ -34,6 +34,10 @@ local STATUS_ICONS = {
 	stay = 'standings_stay',
 	staydown = 'standings_staydown',
 	down = 'standings_down',
+
+	-- Special Status for Match Point matches
+	trophy = 'firstplace',
+	matchpoint = 'matchpoint',
 }
 
 local MATCH_OVERVIEW_COLUMNS = {
@@ -127,6 +131,29 @@ local MATCH_OVERVIEW_COLUMNS = {
 			end,
 		},
 	},
+	{
+		sortable = true,
+		sortType = 'match-points',
+		class = 'cell--match-points',
+		icon = 'matchpoint',
+		show = function(match)
+				return match.matchPointThreadhold
+		end,
+		header = {
+			value = 'MPe Game',
+			mobileValue = 'MPe',
+		},
+		sortVal = {
+			value = function (opponent, idx)
+				return opponent.matchPointReachedIn or 999 -- High number that should not be exceeded
+			end,
+		},
+		row = {
+			value = function (opponent, idx)
+				return opponent.matchPointReachedIn and "Game " .. opponent.matchPointReachedIn or nil
+			end,
+		},
+	},
 }
 local GAME_OVERVIEW_COLUMNS = {
 	{
@@ -169,7 +196,6 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 	},
 }
-
 local GAME_STANDINGS_COLUMNS = {
 	{
 		sortable = true,
