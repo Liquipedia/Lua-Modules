@@ -57,8 +57,8 @@ function MatchGroupLegacyDefault:getMap()
 	return {
 		['$notEmpty$'] = 'win$1$',
 		winner = 'win$1$',
-		o1p1 = 'p1class$1$',
-		o2p1 = 'p2class$1$',
+		o1c1 = 'p1class$1$',
+		o2c1 = 'p2class$1$',
 		vod = 'vodgame$1$'
 	}
 end
