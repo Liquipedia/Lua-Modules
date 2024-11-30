@@ -67,7 +67,7 @@ end
 ---@param match table
 function MatchGroupLegacyDefault:handleFinished(isReset, match)
 	if isReset then return end
-	match.finished = Logic.readBool(match.finished)
+	match.finished = Logic.readBool(match.finished) or Logic.isNotEmpty(match.win)
 end
 
 ---@param isReset boolean?
