@@ -29,7 +29,7 @@ function MatchSummaryFfaGamesSchedule:render()
 	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = {
 		HtmlWidgets.Ul{
 			classes = {'panel-content__game-schedule'},
-			children = Array.map(self.props.games.games, function (game, idx)
+			children = Array.map(self.props.games, function (game, idx)
 				return HtmlWidgets.Li{
 					children = {
 						HtmlWidgets.Span{
