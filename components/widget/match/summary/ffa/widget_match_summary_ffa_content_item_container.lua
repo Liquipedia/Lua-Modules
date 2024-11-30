@@ -24,6 +24,7 @@ MatchSummaryFfaContentItem.defaultProps = {
 
 ---@return Widget
 function MatchSummaryFfaContentItem:render()
+	local hasContentClass = self.props.contentClass ~= nil
 	local contentContainer = HtmlWidgets.Div{
 		classes = {'panel-content__container'},
 		attributes = {
@@ -34,18 +35,18 @@ function MatchSummaryFfaContentItem:render()
 			classes = {self.props.contentClass},
 			children = Array.map(self.props.items, function(item)
 				return HtmlWidgets.Li{
-					classes = {self.props.contentClass .. '__list-item'},
+					classes = hasContentClass and {self.props.contentClass .. '__list-item'} or nil,
 					children = {
 						HtmlWidgets.Span{
-							classes = {self.props.contentClass .. '__icon'},
+							classes = hasContentClass {self.props.contentClass .. '__icon'} or nil,
 							children = item.icon,
 						},
 						HtmlWidgets.Span{
-							classes = {self.props.contentClass .. '__title'},
+							classes = hasContentClass {self.props.contentClass .. '__title'} or nil,
 							children = item.title,
 						},
 						HtmlWidgets.Div{
-							classes = {self.props.contentClass .. '__container'},
+							classes = hasContentClass {self.props.contentClass .. '__container'} or nil,
 							children = item.content,
 						},
 					},
