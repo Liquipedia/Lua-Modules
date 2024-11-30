@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
 local GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdown')
@@ -26,25 +25,13 @@ function MatchSummaryFfaGamesSchedule:render()
 		return nil
 	end
 
-	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', contentClass = 'panel-content__game-schedule',
-		children = Array.map(self.props.games, function (game, idx)
-			return HtmlWidgets.Li{
-				children = {
-					HtmlWidgets.Span{
-						children = CountdownIcon{
-							game = game,
-							additionalClasses = {'panel-content__game-schedule__icon'}
-						},
-					},
-					HtmlWidgets.Span{
-						classes = {'panel-content__game-schedule__title'},
-						children = 'Game ' .. idx .. ':',
-					},
-					HtmlWidgets.Div{
-						classes = {'panel-content__game-schedule__container'},
-						children = GameCountdown{game = game},
-					},
-				},
+	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule',
+		contentClass = 'panel-content__game-schedule',
+		items = Array.map(self.props.games, function (game, idx)
+			return {
+				icon =  CountdownIcon{game = game},
+				title = 'Game ' .. idx .. ':',
+				content = GameCountdown{game = game},
 			}
 		end)
 	}

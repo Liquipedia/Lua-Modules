@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -31,7 +32,25 @@ function MatchSummaryFfaContentItem:render()
 		},
 		children = HtmlWidgets.Ul{
 			classes = {self.props.contentClass},
-			children = self.props.children,
+			children = Array.map(self.props.items, function(item)
+				return HtmlWidgets.Li{
+					classes = {self.props.contentClass .. '__list-item'},
+					children = {
+						HtmlWidgets.Span{
+							classes = {self.props.contentClass .. '__icon'},
+							children = item.icon,
+						},
+						HtmlWidgets.Span{
+							classes = {self.props.contentClass .. '__title'},
+							children = item.title,
+						},
+						HtmlWidgets.Div{
+							classes = {self.props.contentClass .. '__container'},
+							children = item.content,
+						},
+					},
+				}
+			end),
 		}
 	}
 
