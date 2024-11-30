@@ -52,21 +52,18 @@ end
 ---@param game table
 ---@return Widget
 function CustomGameSummary._createGameDetails(game)
-	return MatchSummaryWidgets.ContentItemContainer{children = {
-		HtmlWidgets.Ul{
-			classes = {'panel-content__game-schedule'},
-			children = {
-				HtmlWidgets.Li{children = {
-					MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
-					MatchSummaryWidgets.GameCountdown{game = game},
-				}},
-				game.map and HtmlWidgets.Li{children = {
-					IconWidget{iconName = 'map', additionalClasses = {'panel-content__game-schedule__icon'}},
-					HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
-				}} or nil,
-			}
+	return MatchSummaryWidgets.ContentItemContainer{contentClass = 'panel-content__game-schedule',
+		children = {
+			HtmlWidgets.Li{children = {
+				MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-content__game-schedule__icon'}},
+				MatchSummaryWidgets.GameCountdown{game = game},
+			}},
+			game.map and HtmlWidgets.Li{children = {
+				IconWidget{iconName = 'map', additionalClasses = {'panel-content__game-schedule__icon'}},
+				HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+			}} or nil,
 		}
-	}}
+	}
 end
 
 ---@param game table

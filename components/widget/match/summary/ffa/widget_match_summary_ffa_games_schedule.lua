@@ -26,31 +26,28 @@ function MatchSummaryFfaGamesSchedule:render()
 		return nil
 	end
 
-	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = {
-		HtmlWidgets.Ul{
-			classes = {'panel-content__game-schedule'},
-			children = Array.map(self.props.games, function (game, idx)
-				return HtmlWidgets.Li{
-					children = {
-						HtmlWidgets.Span{
-							children = CountdownIcon{
-								game = game,
-								additionalClasses = {'panel-content__game-schedule__icon'}
-							},
-						},
-						HtmlWidgets.Span{
-							classes = {'panel-content__game-schedule__title'},
-							children = 'Game ' .. idx .. ':',
-						},
-						HtmlWidgets.Div{
-							classes = {'panel-content__game-schedule__container'},
-							children = GameCountdown{game = game},
+	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', contentClass = 'panel-content__game-schedule',
+		children = Array.map(self.props.games, function (game, idx)
+			return HtmlWidgets.Li{
+				children = {
+					HtmlWidgets.Span{
+						children = CountdownIcon{
+							game = game,
+							additionalClasses = {'panel-content__game-schedule__icon'}
 						},
 					},
-				}
-			end)
-		}
-	}}
+					HtmlWidgets.Span{
+						classes = {'panel-content__game-schedule__title'},
+						children = 'Game ' .. idx .. ':',
+					},
+					HtmlWidgets.Div{
+						classes = {'panel-content__game-schedule__container'},
+						children = GameCountdown{game = game},
+					},
+				},
+			}
+		end)
+	}
 end
 
 return MatchSummaryFfaGamesSchedule

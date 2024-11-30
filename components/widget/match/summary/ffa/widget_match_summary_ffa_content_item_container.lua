@@ -29,7 +29,10 @@ function MatchSummaryFfaContentItem:render()
 			['data-js-battle-royale'] = self.props.collapsible and 'collapsible-container' or nil,
 			role = 'tabpanel',
 		},
-		children = self.props.children,
+		children = HtmlWidgets.Ul{
+			classes = {self.props.contentClass},
+			children = self.props.children,
+		}
 	}
 
 	if not self.props.collapsible then

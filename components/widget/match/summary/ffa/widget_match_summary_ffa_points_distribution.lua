@@ -45,20 +45,17 @@ function MatchSummaryFfaPointsDistribution:render()
 		}
 	end
 
-	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Points Distribution', children = {
-		HtmlWidgets.Ul{
-			classes = {'panel-content__points-distribution'},
-			children = WidgetUtil.collect(
-				createItem(IconWidget{iconName = 'kills'}, '1 kill', self.props.killScore),
-				Array.map(self.props.placementScore, function(slot)
-					local title = RankRange{rankStart = slot.rangeStart, rankEnd = slot.rangeEnd}
-					local icon = Trophy{place = slot.rangeStart}
+	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Points Distribution', contentClass = 'panel-content__points-distribution',
+		children = WidgetUtil.collect(
+			createItem(IconWidget{iconName = 'kills'}, '1 kill', self.props.killScore),
+			Array.map(self.props.placementScore, function(slot)
+				local title = RankRange{rankStart = slot.rangeStart, rankEnd = slot.rangeEnd}
+				local icon = Trophy{place = slot.rangeStart}
 
-					return createItem(icon, title, slot.score)
-				end)
-			)
-		},
-	}}
+				return createItem(icon, title, slot.score)
+			end)
+		)
+	}
 end
 
 return MatchSummaryFfaPointsDistribution
