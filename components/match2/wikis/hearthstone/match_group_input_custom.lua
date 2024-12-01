@@ -162,6 +162,7 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	end)
 end
 
-MapFunctions.readCharacter = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterStandardization) --[[@as fun(class: string): string]]
+MapFunctions.readCharacter = FnUtil.curry(MatchGroupInputUtil.getCharacterName,
+	CharacterStandardization) --[[@as fun(class: string): string]]
 
 return CustomMatchGroupInput
