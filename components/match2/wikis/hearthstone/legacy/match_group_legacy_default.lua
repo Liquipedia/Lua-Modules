@@ -63,12 +63,16 @@ function MatchGroupLegacyDefault:getMap()
 	}
 end
 
+---@param isReset boolean
+---@param match table
+function MatchGroupLegacyDefault:handleFinished(isReset, match)
+	match.finished = Logic.readBool(match.finished) or Logic.isNotEmpty(match.win)
+end
 
 ---@param isReset boolean?
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
-	match['winner'] = Table.extract(match, 'win')
-	match['finished'] = Table.extract(match, 'finished') or Logic.isNotEmpty(match['winner'])
+	match.winner = Table.extract(match, 'win')
 end
 
 ---@param frame Frame
