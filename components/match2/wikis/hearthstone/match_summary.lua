@@ -148,7 +148,7 @@ function CustomMatchSummary._createGame(isTeamMatch, game, gameIndex)
 			} or nil,
 			CustomMatchSummary._displayOpponents(isTeamMatch, game.opponents[1].players, true),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{css = {['font-size'] = '80%', ['flex'] = 1}, children = 'Game ' .. gameIndex},
+			MatchSummaryWidgets.GameCenter{css = {['font-size'] = '80%'}, children = 'Game ' .. gameIndex},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			CustomMatchSummary._displayOpponents(isTeamMatch, game.opponents[2].players)
 		)
@@ -160,17 +160,6 @@ end
 ---@param flip boolean?
 ---@return Html?
 function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
-	local wrapper = mw.html.create('div'):css{
-		display = 'flex',
-		['align-items'] = 'flex-start',
-		['flex-direction'] = 'column',
-		flex = 2
-	}
-
-	if Logic.isDeepEmpty(players) then
-		return wrapper
-	end
-
 	local playerDisplays = Array.map(players, function (player)
 		local class = player.class
 		if Logic.isEmpty(class) then
@@ -195,13 +184,13 @@ function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
 			playerWrapper:node(PlayerDisplay.BlockPlayer{player = player, flip = flip})
 		end
 
-
 		return playerWrapper
 	end)
 
-	Array.forEach(playerDisplays, FnUtil.curry(wrapper.node, wrapper))
-
-	return wrapper
+	return MatchSummaryWidgets.GameTeamWrapper{
+		flipped = flip,
+		children = playerDisplays
+	}
 end
 
 return CustomMatchSummary
