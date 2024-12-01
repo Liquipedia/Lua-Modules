@@ -18,9 +18,7 @@ local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
-local MapFunctions = {
-	ADD_SUB_GROUP = true,
-}
+local MapFunctions = {}
 MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
@@ -53,19 +51,6 @@ end
 ---@return integer?
 function MatchFunctions.getBestOf(bestofInput)
 	return tonumber(bestofInput)
-end
-
----@param match table
----@param games table[]
----@param opponents table[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	local extradata = {}
-	Array.forEach(games, function(_, subGroupIndex)
-		extradata['subGroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
-	end)
-
-	return extradata
 end
 
 ---@param match table

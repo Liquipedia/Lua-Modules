@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -47,7 +46,6 @@ function CustomMatchSummary.createBody(match)
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, function (game, gameIndex)
-			game.header = match.extradata['subGroup' .. gameIndex .. 'header']
 			if isTeamMatch and String.startsWith(game.map or '', 'Submatch') then
 				return CustomMatchSummary._createSubmatch(game)
 			else
@@ -111,10 +109,6 @@ function CustomMatchSummary._createSubmatch(game)
 		classes = {'brkts-popup-header-dev'},
 		css = {['justify-content'] = 'center', margin = 'auto'},
 		children = WidgetUtil.collect(
-			game.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
-				MatchSummaryWidgets.Break{},
-			} or nil,
 			HtmlWidgets.Div{
 				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
 				children = {
@@ -142,10 +136,6 @@ function CustomMatchSummary._createGame(isTeamMatch, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		css = {padding = '4px', ['min-height'] = '24px'},
 		children = WidgetUtil.collect(
-			game.header and {
-				HtmlWidgets.Div{css = {margin = 'auto'}, children = {game.header}},
-				MatchSummaryWidgets.Break{},
-			} or nil,
 			CustomMatchSummary._displayOpponents(isTeamMatch, game.opponents[1].players, true),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{css = {['font-size'] = '80%'}, children = 'Game ' .. gameIndex},
