@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -23,13 +24,35 @@ MatchSummaryFfaContentItem.defaultProps = {
 
 ---@return Widget
 function MatchSummaryFfaContentItem:render()
+	local hasContentClass = self.props.contentClass ~= nil
 	local contentContainer = HtmlWidgets.Div{
 		classes = {'panel-content__container'},
 		attributes = {
 			['data-js-battle-royale'] = self.props.collapsible and 'collapsible-container' or nil,
 			role = 'tabpanel',
 		},
-		children = self.props.children,
+		children = HtmlWidgets.Ul{
+			classes = {self.props.contentClass},
+			children = Array.map(self.props.items, function(item)
+				return HtmlWidgets.Li{
+					classes = hasContentClass and {self.props.contentClass .. '__list-item'} or nil,
+					children = {
+						HtmlWidgets.Span{
+							classes = hasContentClass and {self.props.contentClass .. '__icon'} or nil,
+							children = item.icon,
+						},
+						HtmlWidgets.Span{
+							classes = hasContentClass and {self.props.contentClass .. '__title'} or nil,
+							children = item.title,
+						},
+						HtmlWidgets.Div{
+							classes = hasContentClass and {self.props.contentClass .. '__container'} or nil,
+							children = item.content,
+						},
+					},
+				}
+			end),
+		}
 	}
 
 	if not self.props.collapsible then
