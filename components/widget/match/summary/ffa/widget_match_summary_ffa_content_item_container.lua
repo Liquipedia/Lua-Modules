@@ -38,15 +38,15 @@ function MatchSummaryFfaContentItem:render()
 					classes = hasContentClass and {self.props.contentClass .. '__list-item'} or nil,
 					children = {
 						HtmlWidgets.Span{
-							classes = hasContentClass {self.props.contentClass .. '__icon'} or nil,
+							classes = hasContentClass and {self.props.contentClass .. '__icon'} or nil,
 							children = item.icon,
 						},
 						HtmlWidgets.Span{
-							classes = hasContentClass {self.props.contentClass .. '__title'} or nil,
+							classes = hasContentClass and {self.props.contentClass .. '__title'} or nil,
 							children = item.title,
 						},
 						HtmlWidgets.Div{
-							classes = hasContentClass {self.props.contentClass .. '__container'} or nil,
+							classes = hasContentClass and {self.props.contentClass .. '__container'} or nil,
 							children = item.content,
 						},
 					},
