@@ -137,7 +137,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		class = 'cell--match-points',
 		icon = 'matchpoint',
 		show = function(match)
-				return match.matchPointThreadhold
+				return match.matchPointThreshold
 		end,
 		header = {
 			value = 'MPe Game',

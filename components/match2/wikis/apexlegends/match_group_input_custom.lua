@@ -86,7 +86,7 @@ function MatchFunctions.parseSettings(match)
 	-- Score Settings
 	local scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
-		matchPointThreadhold = tonumber(match.matchpoint),
+		matchPointThreshold = tonumber(match.matchpoint),
 		placement = Array.mapIndexes(function(idx)
 			return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 		end)

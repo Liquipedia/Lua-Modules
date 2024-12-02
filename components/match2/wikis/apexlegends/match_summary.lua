@@ -27,7 +27,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 function CustomMatchSummary.getByMatchId(props)
 	---@class ApexMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	match.matchPointThreadhold = Table.extract(match.extradata.scoring, 'matchPointThreadhold')
+	match.matchPointThreshold = Table.extract(match.extradata.scoring, 'matchPointThreshold')
 	CustomMatchSummary._opponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
@@ -53,12 +53,12 @@ function CustomMatchSummary._opponents(match)
 		end)
 	end)
 
-	if match.matchPointThreadhold then
+	if match.matchPointThreshold then
 		Array.forEach(match.opponents, function(opponent)
 			local matchPointReachedIn
 			local sum = opponent.extradata.startingpoints or 0
 			for gameIdx, game in ipairs(opponent.games) do
-				if sum >= match.matchPointThreadhold then
+				if sum >= match.matchPointThreshold then
 					matchPointReachedIn = gameIdx
 					break
 				end
