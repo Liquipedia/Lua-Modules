@@ -2,9 +2,7 @@
 describe('match2', function()
 	local tournamentData = require('test_assets.tournaments').dummy
 	insulate('matchlist', function()
-		local InfoboxLeague = require('Module:Infobox/League/Custom')
 		local Json = require('Module:Json')
-
 		before_each(function ()
 			local dataSaved, dataSavedOpponent, dataSavedPlayer, dataSavedGame = {}, {}, {}, {}
 			-- Mock the lpdb functions
@@ -40,6 +38,7 @@ describe('match2', function()
 			end)
 
 			stub(mw.ext.LiquipediaDB, 'lpdb_tournament')
+			local InfoboxLeague = require('Module:Infobox/League/Custom')
 			InfoboxLeague.run(tournamentData) -- Set variable for tournament context
 		end)
 
