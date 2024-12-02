@@ -241,7 +241,6 @@ end
 function CustomMatchGroupInput._getExtraData(match)
 	return {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		playall = MatchGroupInputUtil.getPlayAll(match.playall)
 	}
 end
 
