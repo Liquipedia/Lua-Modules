@@ -217,7 +217,7 @@ function CustomMatchSummary.getByMatchId(props)
 			matchId = match.matchId,
 			idx = 0,
 			children = {
-				CustomMatchSummary._createSchedule(match),
+				MatchSummaryWidgets.GamesSchedule{games = match.games},
 				MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
 				CustomMatchSummary._createMatchStandings(match)
 			}
@@ -255,36 +255,6 @@ function CustomMatchSummary._opponents(match)
 	Array.forEach(match.opponents, function(opponent, idx)
 		opponent.placementStatus = match.extradata.status[idx]
 	end)
-end
-
----@param match table
----@return Widget
-function CustomMatchSummary._createSchedule(match)
-	return MatchSummaryWidgets.ContentItemContainer{collapsed = true, collapsible = true, title = 'Schedule', children = {
-		HtmlWidgets.Ul{
-			classes = {'panel-content__game-schedule'},
-			children = Array.map(match.games, function (game, idx)
-				return HtmlWidgets.Li{
-					children = {
-						HtmlWidgets.Span{
-							children = MatchSummaryWidgets.CountdownIcon{
-								game = game,
-								additionalClasses = {'panel-content__game-schedule__icon'}
-							},
-						},
-						HtmlWidgets.Span{
-							classes = {'panel-content__game-schedule__title'},
-							children = 'Game ' .. idx .. ':',
-						},
-						HtmlWidgets.Div{
-							classes = {'panel-content__game-schedule__container'},
-							children = SummaryHelper.gameCountdown(game),
-						},
-					},
-				}
-			end)
-		}
-	}}
 end
 
 ---@param match table
@@ -372,7 +342,7 @@ function CustomMatchSummary._createMatchStandings(match)
 											}
 										}
 									},
-									SummaryHelper.gameCountdown(game),
+									MatchSummaryWidgets.GameCountdown{game = game},
 								}
 							},
 							HtmlWidgets.Div{

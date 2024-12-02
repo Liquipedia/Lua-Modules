@@ -7,12 +7,9 @@
 --
 
 local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
-local VodLink = require('Module:VodLink')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -290,29 +287,6 @@ local GAME_STANDINGS_COLUMNS = {
 	},
 }
 
-
----Creates a countdown block for a given game
----Attaches any VODs of the game as well
----@param game table
----@return Html?
-function MatchSummaryFfa.gameCountdown(game)
-	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
-		return
-	end
-	-- TODO Use local TZ
-	local dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. Timezone.getTimezoneString('UTC')
-
-	local stream = Table.merge(game.stream, {
-		date = dateString,
-		finished = game.winner ~= nil and 'true' or nil,
-	})
-
-	return mw.html.create('div'):addClass('match-countdown-block')
-			:node(require('Module:Countdown')._create(stream))
-			:node(game.vod and VodLink.display{vod = game.vod} or nil)
-end
-
 ---@param opponent1 table
 ---@param opponent2 table
 ---@return boolean
@@ -445,7 +419,7 @@ function MatchSummaryFfa.standardMatch(match)
 											}
 										}
 									},
-									MatchSummaryFfa.gameCountdown(game),
+									MatchSummaryWidgets.GameCountdown{game = game},
 								}
 							},
 							HtmlWidgets.Div{
