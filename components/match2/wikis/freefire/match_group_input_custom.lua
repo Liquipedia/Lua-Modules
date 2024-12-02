@@ -144,6 +144,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 	local scoreBreakdown = {}
 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
+	local points = tonumber(scoreDataInput.p)
 	if placement or kills then
 		if placement then
 			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
@@ -159,7 +160,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 		status = MatchGroupInputUtil.STATUS.SCORE,
 		scoreBreakdown = scoreBreakdown,
 		placement = placement,
-		score = scoreBreakdown.totalPoints,
+		score = points or scoreBreakdown.totalPoints,
 	}
 
 	if scoreDataInput[1] == '-' then
