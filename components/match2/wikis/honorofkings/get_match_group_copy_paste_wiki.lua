@@ -39,6 +39,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube= |bilibili= |douyu= |huya=',
+			INDENT .. '|mvp=',
 			args.vod == 'series' and (INDENT .. '|vod=') or nil,
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
