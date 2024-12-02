@@ -232,8 +232,8 @@ function League:createInfobox()
 					return
 				end
 				local locations = Locale.formatLocations(args)
-				-- If more than one venue, don't show the accommodation section, as it is unclear which one the link is for
-				if locations.venue2 or locations.city2 then
+				-- If more than one city, don't show the accommodation section, as it is unclear which one the link is for
+				if locations.city2 then
 					return
 				end
 				-- Must have a venue or a city to show the accommodation section
@@ -257,7 +257,8 @@ function League:createInfobox()
 				end
 
 				local addressParts = {}
-				table.insert(addressParts, locations.venue1)
+				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
+				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
 				table.insert(addressParts, locations.city1)
 				table.insert(addressParts, Flags.CountryName(locations.country1 or locations.region1))
 
