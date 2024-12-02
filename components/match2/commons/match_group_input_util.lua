@@ -1156,7 +1156,6 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	match.stream = Streams.processStreams(match)
 	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
 	match.extradata = Table.merge({playall = tonumber(match.playall)}, match.extradata)
-	match.bestof = tonumber(match.playall) --For display in existing Bestof?
 
 	match.games = games
 	match.opponents = opponents
