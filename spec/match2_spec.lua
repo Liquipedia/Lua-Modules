@@ -38,8 +38,6 @@ describe('match2', function()
 			end)
 
 			stub(mw.ext.LiquipediaDB, 'lpdb_tournament')
-			local InfoboxLeague = require('Module:Infobox/League/Custom')
-			InfoboxLeague.run(tournamentData) -- Set variable for tournament context
 		end)
 
 		after_each(function ()
@@ -59,6 +57,9 @@ describe('match2', function()
 			if Info.config.match2.status == 0 then
 				return
 			end
+			local InfoboxLeague = require('Module:Infobox/League/Custom')
+			InfoboxLeague.run(tournamentData) -- Set variable for tournament context
+
 			local MatchGroup = require('Module:MatchGroup')
 			local Match = require('Module:Match')
 			local props = require('Module:Table').deepCopy(args)
