@@ -478,6 +478,9 @@ function MatchSummaryFfa.standardMatch(match)
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-details'},
 								children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+									if column.show and not column.show(match) then
+										return
+									end
 									return MatchSummaryWidgets.TableHeaderCell{
 										class = column.class,
 										icon = column.icon,
