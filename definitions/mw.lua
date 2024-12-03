@@ -948,6 +948,7 @@ function mw.ustring.upper(s) return string.upper(s) end
 
 mw.uri = {}
 function mw.uri.localUrl(s, s2) return '' end
+function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')

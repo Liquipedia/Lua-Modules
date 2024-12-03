@@ -235,6 +235,9 @@ return function(busted, helper, options)
 		end
 		local stub = require('luassert.stub')
 		stub(require('Module:Lua'), 'requireIfExists', attemptImport)
+		stub(require('Module:Lua'), 'moduleExists', function(file)
+			return attemptImport(file) ~= nil
+		end)
 	end
 
 	busted.subscribe({'suite', 'start'}, setupForTesting)

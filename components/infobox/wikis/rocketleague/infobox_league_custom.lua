@@ -175,7 +175,11 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
-	return {Game.name{game = args.game} .. ' Competitions'}
+	local gameName = Game.name{game = args.game}
+	if not gameName then
+		return {'Competitions'}
+	end
+	return {gameName .. ' Competitions'}
 end
 
 ---@param args table
