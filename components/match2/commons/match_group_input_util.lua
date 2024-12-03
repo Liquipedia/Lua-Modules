@@ -1289,7 +1289,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.startingpoints = tonumber(opponent.pointmodifier)
+		opponent.extradata.startingpoints = tonumber(opponent.startingpoints)
 		opponent.placement = tonumber(opponent.placement)
 
 		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({

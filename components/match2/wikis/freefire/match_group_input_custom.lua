@@ -76,9 +76,10 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.opponents[opponentIndex].score or 0
-		end), Operator.add, 0)
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
 end
+
 
 ---@param match table
 ---@return {score: table, status: table}
