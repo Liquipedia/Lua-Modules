@@ -193,12 +193,17 @@ local lpdb = {}
 ---@field type string
 
 ---@class scoreBoard
----@field match {w: number, d: number, l: number}
----@field overtime {w: number, d: number, l: number}
----@field game {w: number, d: number, l: number}
+---@field match scoreInfo
+---@field overtime scoreInfo
+---@field game scoreInfo
 ---@field points number
 ---@field diff number
 ---@field buchholz number
+
+---@class scoreInfo
+---@field w number
+---@field d number
+---@field l number
 
 ---@class standingsentry:LpdbBaseData
 ---@field parent string

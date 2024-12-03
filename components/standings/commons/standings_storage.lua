@@ -8,6 +8,7 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
@@ -22,6 +23,15 @@ local StandingsStorage = {}
 local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
+
+---@enum standingType
+StandingsStorage.STANDING_TYPES = {
+	SWISS = 'swiss',
+	LEAGUE = 'league',
+}
+
+---@class standingStorageStruct: standingstable
+---@field entries standingsentry[]
 
 ---@param data table
 function StandingsStorage.run(data)
@@ -264,6 +274,125 @@ end
 ---@param frame table
 function StandingsStorage.fromTemplate(frame)
 	StandingsStorage.fromTemplateEntry(frame)
+end
+
+---@param groupTable standardStanding
+---@return table
+function StandingsStorage.toStorageData(groupTable)
+	local standingsIndex = (tonumber(Variables.varDefault('standingsindex')) or 0) + 1
+	Variables.varDefine('standingsindex', standingsIndex)
+
+	local groupTableStatus = groupTable.status or {}
+	local roundCount = #groupTable.rounds
+
+	local finished = groupTableStatus.groupFinished
+
+	-- store to lpdb_standingstable
+	local standingsStorageData = {
+		standingsindex = standingsIndex,
+		title = groupTable.config.display.title,
+		type = groupTable.type,
+		matches = groupTable.matches,
+		roundCount = roundCount,
+		extradata = {
+			bracketindex = tonumber(Variables.varDefault('match2bracketindex')) or 0,
+			placemapping = groupTable.placeMapping,
+		},
+		enddate = StandingsStorage.getEndDate(groupTable),
+		hasovertime = groupTable.options.hasOvertime,
+		hasdraw = groupTable.options.hasDraw,
+		haspoints = groupTable.options.hasPoints,
+		finished = finished,
+	}
+
+	local entries = {}
+	Array.forEach(Array.range(1, roundCount), function(roundIndex)
+		local results = groupTable.resultsByRound[roundIndex]
+
+		local sortedOppIxs = Array.sortBy(Array.range(1, #groupTable.entries), function(oppIx)
+			return results[oppIx].slotIndex
+		end)
+
+		Array.extendWith(entries, Array.map(sortedOppIxs, function(oppIx, slotIx)
+			local result = groupTable.resultsByRound[roundIndex][oppIx]
+			local entry = groupTable.entries[oppIx]
+
+			-- not sure if needed
+			--[[
+			if (entry.opponent or {}).type == Opponent.team then
+				entry.opponent.template = entry.opponent.template or (entry.opponent.name or ''):lower():gsub('_', ' ')
+			end
+			]]
+			return Table.deepMerge(
+				StandingsStorage.entriesToStorageData(result, slotIx, groupTable, finished),
+				{
+					opponent = entry.opponent,
+					roundindex = roundIndex,
+					slotindex = slotIx,
+				}
+			)
+		end))
+	end)
+
+	standingsStorageData.entries = entries
+
+	return standingsStorageData
+end
+
+---@param groupTable standardStanding
+---@return string?
+function StandingsStorage.getEndDate(groupTable)
+	local endTime = DateExt.minTimestamp
+	Array.forEach(groupTable.rounds, function(round)
+		local time = round.range[2]
+		if not time or time == DateExt.maxTimestamp or time <= endTime then
+			return
+		end
+		endTime = time
+	end)
+
+	if not endTime then return end
+
+	return DateExt.formatTimestamp('c', endTime) --[[@as string?]]
+end
+
+---@param result standingResult
+---@param slotIndex integer
+---@param groupTable standardStanding
+---@param finished boolean
+---@return table
+function StandingsStorage.entriesToStorageData(result, slotIndex, groupTable, finished)
+	local removeDrawIfApplicable = function(scores)
+		if groupTable.options.hasDraw then
+			return scores
+		end
+
+		return {w = scores.w, l = scores.l}
+	end
+
+	result.rank = result.manualFinalTiebreak and finished and result.placeRange[1] == result.placeRange[2]
+		and result.placeRangeIsExact and result.placeRange[1]
+		or result.rank
+
+	return {
+		currentstatus = result.pbg,
+		definitestatus = result.bg,
+		diff = result.gameScore[1] - result.gameScore[3],
+		extradata = {placerangeisexact = result.placeRangeIsExact},
+		game = removeDrawIfApplicable(result.gameScore),
+		match = removeDrawIfApplicable(result.matchScore),
+		placement = result.rank,
+		placementchange = result.rankChange and -result.rankChange,
+		placerange = result.placeRange,
+		points = groupTable.options.hasPoints and result.points or nil,
+		slotindex = slotIndex,
+	}
+end
+
+---@param record standingStorageStruct
+---@return standardStanding
+function StandingsStorage.fromStorageStruct(record)
+	--todo
 end
 
 return StandingsStorage
