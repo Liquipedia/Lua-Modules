@@ -108,7 +108,7 @@ function MatchFunctions.parseSettings(match)
 		score = scoreSettings,
 		status = statusSettings,
 		settings = {
-			showGameDetails = Logic.nilOr(Logic.readBool(match.showgamedetails), true),
+			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
 		}
 	}
 end
