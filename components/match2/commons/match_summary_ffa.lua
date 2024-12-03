@@ -107,6 +107,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
+					showPlayerTeam = true,
 				}
 			end,
 		},
@@ -270,6 +271,7 @@ local GAME_STANDINGS_COLUMNS = {
 					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
+					showPlayerTeam = true,
 				}
 			end,
 		},
