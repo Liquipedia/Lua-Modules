@@ -69,11 +69,11 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 	-- Add additional fields to opponents
 	StarcraftMatchGroupUtil.populateOpponents(match)
 
-	-- Compute game.opponents by looking up game.participants in match.opponents
-	for _, game in ipairs(match.games) do
+	-- Adjust game.opponents by looking up game.opponents.players in match.opponents
+	Array.forEach(match.games, function(game)
 		game.opponents = StarcraftMatchGroupUtil.computeGameOpponents(game, match.opponents)
 		game.extradata = game.extradata or {}
-	end
+	end)
 
 	-- Determine whether the match is a team match with different players each game
 	match.opponentMode = Array.any(match.opponents, function(opponent)
@@ -138,79 +138,36 @@ function StarcraftMatchGroupUtil.populateOpponents(match)
 	end
 end
 
----Computes game.opponents by looking up matchOpponents.players on each participant.
 ---@param game StarcraftMatchGroupUtilGame
 ---@param matchOpponents StarcraftStandardOpponent[]
 ---@return StarcraftMatchGroupUtilGameOpponent[]
 function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
-	local function playerFromParticipant(opponentIndex, matchPlayerIndex, participant)
-		local matchPlayer = matchOpponents[opponentIndex].players[matchPlayerIndex]
-		if matchPlayer then
-			return Table.merge(matchPlayer, {
-				matchPlayerIndex = matchPlayerIndex,
-				faction = participant.faction,
-				position = tonumber(participant.position),
-			})
-		else
-			return {
-				displayName = 'TBD',
-				matchPlayerIndex = matchPlayerIndex,
-				faction = Faction.defaultFaction,
-			}
-		end
-	end
-
-	-- Convert participants list to players array
-	local opponentPlayers = {}
-	for key, participant in pairs(game.participants) do
-		local opponentIndex, matchPlayerIndex = key:match('(%d+)_(%d+)')
-		opponentIndex = tonumber(opponentIndex)
-		-- opponentIndex can not be nil due to the format of the participants keys
-		---@cast opponentIndex -nil
-		matchPlayerIndex = tonumber(matchPlayerIndex)
-
-		local player = playerFromParticipant(opponentIndex, matchPlayerIndex, participant)
-
-		if not opponentPlayers[opponentIndex] then
-			opponentPlayers[opponentIndex] = {}
-		end
-		table.insert(opponentPlayers[opponentIndex], player)
-	end
-
 	local modeParts = mw.text.split(game.mode or '', 'v')
 
-	-- Create game opponents
-	local opponents = {}
-	for opponentIndex = 1, #modeParts do
-		local opponent = {
-			isArchon = modeParts[opponentIndex] == 'Archon',
-			isSpecialArchon = modeParts[opponentIndex]:match('^%dS$'),
-			placement = tonumber(Table.extract(game.extradata, 'placement' .. opponentIndex)),
-			players = opponentPlayers[opponentIndex] or {},
-			score = game.scores[opponentIndex],
-		}
-		if opponent.placement and (opponent.placement < 1 or 99 <= opponent.placement) then
-			opponent.placement = nil
-		end
-		table.insert(opponents, opponent)
-	end
+	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
+		local mode = modeParts[opponentIndex]
+		local players = Array.map(mapOpponent.players, function(player, playerIndex)
+			if Logic.isEmpty(player) then return end
+			local matchPlayer = (matchOpponents[opponentIndex].players or {})[playerIndex] or {}
+			return Table.merge({displayName = 'TBD'}, matchPlayer, {
+				faction = player.faction,
+				position = tonumber(player.position),
+				matchPlayerIndex = playerIndex,
+			})
+		end) --[[@as table[] ]]
 
-	-- Sort players in game opponents
-	for _, opponent in pairs(opponents) do
-		if opponent.isSpecialArchon then
+		local isSpecialArchon = mode:match('^%dS$')
+		if isSpecialArchon then
 			-- Team melee: Sort players by the order they were inputted
-			table.sort(opponent.players, function(a, b)
-				return a.position < b.position
-			end)
-		else
-			-- Sort players by the order they appear in the match opponent players list
-			table.sort(opponent.players, function(a, b)
-				return a.matchPlayerIndex < b.matchPlayerIndex
-			end)
+			table.sort(players, function(a, b) return a.position < b.position end)
 		end
-	end
 
-	return opponents
+		return Table.merge(mapOpponent, {
+			isArchon = mode == 'Archon',
+			isSpecialArchon = isSpecialArchon,
+			players = players,
+		})
+	end)
 end
 
 ---Group games on the subgroup field to form submatches

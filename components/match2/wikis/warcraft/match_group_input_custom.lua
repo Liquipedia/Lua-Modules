@@ -233,7 +233,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
 	end)
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	local mapPlayers = MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -264,21 +264,21 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end
 	)
 
-	Array.forEach(unattachedParticipants, function(participant)
-		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
+	Array.forEach(mapPlayers, function(player, playerIndex)
+		if Logic.isEmpty(player) then return end
+		local name = mapInput['t' .. opponentIndex .. 'p' .. player.position]
 		local nameUpper = name:upper()
 		local isTBD = nameUpper == TBD
 
-		table.insert(opponent.match2players, {
-			name = isTBD and TBD or participant.player,
+		opponent.match2players[playerIndex] = opponent.match2players[playerIndex] or {
+			name = isTBD and TBD or player.player,
 			displayname = isTBD and TBD or name,
-			flag = participant.flag,
-			extradata = {faction = participant.faction},
-		})
-		participants[#opponent.match2players] = participant
+			flag = player.flag,
+			extradata = {faction = player.faction},
+		}
 	end)
 
-	return participants
+	return mapPlayers
 end
 
 ---@param mapInput table
@@ -315,9 +315,7 @@ end
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
-	local playerCounts = Array.map(map.opponents or {}, function(opponent)
-		return Table.size(opponent.players or {})
-	end)
+	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
@@ -343,7 +341,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 
 	if #opponents ~= 2 then
 		return extradata
-	elseif Array.any(map.opponents, function(mapOpponent) return Table.size(mapOpponent.players or {}) ~= 1 end) then
+	elseif Array.any(map.opponents, function(opponent) return MapFunctions.getMapOpponentSize(opponent) ~= 1 end) then
 		return extradata
 	end
 
@@ -401,6 +399,12 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 
 		return heroData.name
 	end)
+end
+
+---@param opponent table
+---@return integer
+function MapFunctions.getMapOpponentSize(opponent)
+	return Table.size(Array.filter(opponent.players or {}, Logic.isNotEmpty))
 end
 
 return CustomMatchGroupInput
