@@ -265,6 +265,7 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 				displayname = player.displayName,
 				flag = player.flag,
 				name = player.pageName,
+				team = player.team,
 				extradata = player.faction and {faction = player.faction}
 			}
 		end)

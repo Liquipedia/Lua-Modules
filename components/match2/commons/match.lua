@@ -390,7 +390,7 @@ end
 ---@param playerRecord table
 function Match._preparePlayerRecordForStore(playerRecord)
 	playerRecord.extradata = playerRecord.extradata or {}
-	playerRecord.playerteam = playerRecord.team
+	playerRecord.extradata.playerteam = playerRecord.team
 	Match.clampFields(playerRecord, Match.playerFields)
 end
 
