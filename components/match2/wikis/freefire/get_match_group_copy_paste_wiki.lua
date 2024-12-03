@@ -31,7 +31,7 @@ local INDENT = WikiCopyPaste.Indent
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local lines = Array.extend(
 		'{{Match|finished=',
-		INDENT .. '|p_kill=1 |p1=10 |p2=6 |p3=5 |p4=4 |p5=3 |p6=2 |p7=1 |p8=1',
+		INDENT .. '|p_kill=1 |p1=12 |p2=9 |p3=8 |p4=7 |p5=6 |p6=5 |p7=4 |p8=3 |p9=2 |p10=1 |p11=0 |p12=0',
 		{INDENT .. '|twitch=|youtube='},
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|map=|vod=}}'
