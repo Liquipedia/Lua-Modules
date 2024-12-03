@@ -189,6 +189,7 @@ function MatchMapsLegacy._handleMaps(match)
 			winner = match['map' .. gameIndex .. 'win'],
 			race1 = match['map' .. gameIndex .. 'p1race'],
 			race2 = match['map' .. gameIndex .. 'p2race'],
+			vod = match['vodgame' .. gameIndex],
 		}
 
 		match['map' .. gameIndex .. 'win'] = nil

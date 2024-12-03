@@ -41,7 +41,8 @@ function MatchGroupLegacyDefault:getMap()
 		map = 'map$1$',
 		winner = 'map$1$win',
 		race1 = 'map$1$p1race',
-		race2 = 'map$1$p2race'
+		race2 = 'map$1$p2race',
+		vod = 'vodgame$1$',
 	}
 end
 
