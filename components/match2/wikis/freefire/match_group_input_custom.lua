@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
@@ -106,6 +107,9 @@ function MatchFunctions.parseSettings(match)
 	return {
 		score = scoreSettings,
 		status = statusSettings,
+		settings = {
+			showGameDetails = Logic.nilOr(Logic.readBool(match.showgamedetails), true),
+		}
 	}
 end
 
@@ -118,6 +122,7 @@ function MatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		scoring = settings.score,
 		status = settings.status,
+		settings = settings.settings,
 	}
 end
 
