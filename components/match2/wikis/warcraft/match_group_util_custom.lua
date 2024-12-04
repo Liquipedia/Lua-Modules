@@ -141,7 +141,7 @@ end
 ---@return WarcraftMatchGroupUtilGameOpponent[]
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function(mapOpponent, opponentIndex)
-		local players = Array.map(mapOpponent.players, function(player, playerIndex)
+		local players = Array.map(mapOpponent.players or {}, function(player, playerIndex)
 			if Logic.isEmpty(player) then return end
 			local matchPlayer = (matchOpponents[opponentIndex].players or {})[playerIndex] or {}
 			return Table.merge({displayName = 'TBD'}, matchPlayer, {

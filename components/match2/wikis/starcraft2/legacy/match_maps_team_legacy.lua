@@ -64,7 +64,7 @@ function MatchMapsTeamLegacy._handleMaps()
 	mapWinner = _match2Args[prefix .. 'win']
 
 	if map or mapWinner then
-		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
+		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner, gameIndex)
 	end
 end
 
