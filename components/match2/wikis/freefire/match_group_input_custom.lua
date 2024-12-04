@@ -20,7 +20,7 @@ local MatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
 		applyUnderScores = true,
-		maxNumPlayers = 3,
+		maxNumPlayers = 4,
 	},
 	DEFAULT_MODE = 'team'
 }
