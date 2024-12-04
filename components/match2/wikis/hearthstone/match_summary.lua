@@ -151,30 +151,26 @@ end
 ---@return Html?
 function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
 	local playerDisplays = Array.map(players, function (player)
-		local class = player.class
-		if Logic.isEmpty(class) then
-			return
-		end
-		local playerWrapper = mw.html.create('div')
-			:css('display', 'flex')
-			:css('flex-direction', flip and 'row-reverse' or 'row')
-			:css('gap', '2px')
-			:css('width', '100%')
-
-		playerWrapper:node(HtmlWidgets.Div{
+		local char = HtmlWidgets.Div{
 			classes = {'brkts-champion-icon'},
 			children = MatchSummaryWidgets.Character{
-				character = class,
+				character = player.class,
 				showName = not isTeamMatch,
 				flipped = flip,
 			}
-		})
-
-		if isTeamMatch then
-			playerWrapper:node(PlayerDisplay.BlockPlayer{player = player, flip = flip})
-		end
-
-		return playerWrapper
+		}
+		return HtmlWidgets.Div{
+			css = {
+				display = 'flex',
+				['flex-direction'] = flip and 'row-reverse' or 'row',
+				gap = '2px',
+				width = '100%'
+			},
+			children = {
+				char,
+				isTeamMatch and PlayerDisplay.BlockPlayer{player = player, flip = flip} or nil,
+			},
+		}
 	end)
 
 	return MatchSummaryWidgets.GameTeamWrapper{
