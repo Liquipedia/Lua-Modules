@@ -157,6 +157,9 @@ local MATCH_OVERVIEW_COLUMNS = {
 }
 local GAME_OVERVIEW_COLUMNS = {
 	{
+		show = function(match)
+			return match.extradata.settings.showGameDetails
+		end,
 		class = 'panel-table__cell__game-placement',
 		icon = 'placement',
 		header = {
@@ -184,6 +187,9 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		show = function(match)
+			return match.extradata.settings.showGameDetails
+		end,
 		class = 'panel-table__cell__game-kills',
 		icon = 'kills',
 		header = {
@@ -192,6 +198,21 @@ local GAME_OVERVIEW_COLUMNS = {
 		row = {
 			value = function (opponent)
 				return opponent.scoreBreakdown.kills
+			end,
+		},
+	},
+	{
+		show = function(match)
+			return not match.extradata.settings.showGameDetails
+		end,
+		class = 'panel-table__cell__game-total-points',
+		icon = 'points',
+		header = {
+			value = 'Pts.',
+		},
+		row = {
+			value = function (opponent)
+				return opponent.score
 			end,
 		},
 	},
@@ -274,6 +295,9 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		show = function(match)
+			return match.extradata.settings.showGameDetails
+		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -293,6 +317,9 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		show = function(match)
+			return match.extradata.settings.showGameDetails
+		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
@@ -451,6 +478,9 @@ function MatchSummaryFfa.standardMatch(match)
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-details'},
 								children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+									if column.show and not column.show(match) then
+										return
+									end
 									return MatchSummaryWidgets.TableHeaderCell{
 										class = column.class,
 										icon = column.icon,

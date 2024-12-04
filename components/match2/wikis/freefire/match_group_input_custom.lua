@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
+-- wiki=freefire
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -81,13 +81,13 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
+
 ---@param match table
 ---@return {score: table, status: table}
 function MatchFunctions.parseSettings(match)
 	-- Score Settings
 	local scoreSettings = {
 		kill = tonumber(match.p_kill) or 1,
-		matchPointThreshold = tonumber(match.matchpoint),
 		placement = Array.mapIndexes(function(idx)
 			return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
 		end)
@@ -150,6 +150,7 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 	local scoreBreakdown = {}
 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
+	local points = tonumber(scoreDataInput.p)
 	if placement or kills then
 		if placement then
 			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
@@ -160,11 +161,12 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 		end
 		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
 	end
+
 	local opponent = {
 		status = MatchGroupInputUtil.STATUS.SCORE,
 		scoreBreakdown = scoreBreakdown,
 		placement = placement,
-		score = scoreBreakdown.totalPoints,
+		score = points or scoreBreakdown.totalPoints,
 	}
 
 	if scoreDataInput[1] == '-' then
