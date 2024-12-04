@@ -6,9 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
--- todo's:
--- Team logo's are currently 50x50 => need to be 80x80. Already made preparations for this in the css.
-
 -- luacheck: ignore
 return {
 	header =
