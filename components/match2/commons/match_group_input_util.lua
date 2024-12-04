@@ -1248,7 +1248,6 @@ end
 ---@field readDate? fun(match: table): table
 ---@field adjustOpponent? fun(opponent: table[], opponentIndex: integer, match: table)
 ---@field matchIsFinished? fun(match: table, opponents: table[]): boolean
----@field calculatePlacementOfOpponents? fun(opponents: table[]): integer[]
 ---@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: table[]): integer?
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
@@ -1267,7 +1266,6 @@ end
 --- - readDate(match): table
 --- - adjustOpponent(opponent, opponentIndex, match)
 --- - matchIsFinished(match, opponents): boolean
---- - calculatePlacementOfOpponents(opponents): integer[]
 --- - getMatchWinner(status, winnerInput, opponents): integer?
 ---
 --- Additionally, the Parser may have the following properties:
@@ -1320,8 +1318,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 
-		local placementOfOpponents = Parser.calculatePlacementOfOpponents and Parser.calculatePlacementOfOpponents(opponents)
-			or MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
 			opponent.extradata.bg = settings.status[opponent.placement]
@@ -1346,8 +1343,19 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 end
 
 ---@param opponents table[]
+---@param hasNoScores boolean?
 ---@return integer[]
-function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents, hasNoScores)
+	local manualPlacements = {}
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		manualPlacements[opponentIndex] = opponent.placement
+	end)
+	-- if we have no scores or a placement for each opponent return early
+	-- as there is no need to determine what is already there or can not be determined
+	if hasNoScores or Table.size(manualPlacements) == #opponents then
+		return manualPlacements
+	end
+
 	local usedPlacements = Array.map(opponents, function()
 		return 0
 	end)
@@ -1377,13 +1385,28 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 	local lastScore
 	local lastPlacement = 0
 
-	local function scoreSorter(tbl, key1, key2)
+	local function sorter(tbl, key1, key2)
+		local opponent1 = tbl[key1]
+		local opponent2 = tbl[key2]
+
+		if opponent1.status == MatchGroupInputUtil.STATUS_INPUTS.DEFAULT_WIN then
+			return true
+		elseif Table.includes(MatchGroupInputUtil.STATUS_INPUTS, opponent1.status) then
+			return false
+		end
+
 		local value1 = tonumber(tbl[key1].score) or -math.huge
 		local value2 = tonumber(tbl[key2].score) or -math.huge
-		return value1 > value2
+		if value1 ~= value2 then
+			return value1 > value2
+		end
+
+		local place1 = tonumber(opponent1.placement) or -math.huge
+		local place2 = tonumber(opponent2.placement) or -math.huge
+		return place1 < place2
 	end
 
-	for opponentIdx, opp in Table.iter.spairs(opponents, scoreSorter) do
+	for opponentIdx, opp in Table.iter.spairs(opponents, sorter) do
 		local placement = opp.placement
 		if not placement then
 			local thisPlacement = findNextSlot(lastPlacement)

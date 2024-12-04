@@ -34,7 +34,6 @@ local MatchFunctions = {
 	},
 	readDate = BaseMatchFunctions.readDate,
 	getMatchWinner = StarcraftFfaMatchGroupInput._getWinner,
-	calculatePlacementOfOpponents = StarcraftFfaMatchGroupInput._determinePlacements,
 }
 local MapFunctions = {}
 
@@ -214,7 +213,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
 		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		local placementOfOpponents = StarcraftFfaMatchGroupInput._determinePlacements(map.opponents, not hasScores)
+		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(map.opponents, not hasScores)
 		Array.forEach(map.opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
 		end)
@@ -286,98 +285,6 @@ function StarcraftFfaMatchGroupInput._getWinner(status, winnerInput, opponents)
 	local calculatedWinner = Array.indexOf(placements, FnUtil.curry(Operator.eq, bestPlace))
 
 	return calculatedWinner ~= 0 and calculatedWinner or nil
-end
-
---- helper fucntions applicable for both map and match
-
----@param opponents {placement: integer?, score: integer?, status: string}
----@param noScores boolean?
----@return integer[]
-function StarcraftFfaMatchGroupInput._determinePlacements(opponents, noScores)
-	local manualPlacements = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		manualPlacements[opponentIndex] = opponent.placement
-	end)
-	if noScores or Table.size(manualPlacements) == #opponents then
-		return manualPlacements
-	end
-
-	---@param status string
-	---@return string
-	local toSortStatus = function(status)
-		if status == MatchGroupInputUtil.STATUS.DEFAULT_WIN or status == MatchGroupInputUtil.STATUS.SCORE or not status then
-			return status
-		end
-		return MatchGroupInputUtil.STATUS.DEFAULT_LOSS
-	end
-
-	local cache = {
-		placement = 1,
-		skipped = 0,
-	}
-
-	---@param status string
-	---@param score integer?
-	---@param manualPlacement integer?
-	---@return boolean
-	local isNewPlacement = function(status, score, manualPlacement)
-		if manualPlacement then
-			return true
-		elseif cache.manualPlacement and not manualPlacement then
-			return true
-		elseif status ~= cache.status then
-			return true
-		elseif status == MatchGroupInputUtil.STATUS.SCORE and score ~= cache.score then
-			return true
-		end
-		return false
-	end
-
-	local placements = {}
-	for opponentIndex, opponent in Table.iter.spairs(opponents, StarcraftFfaMatchGroupInput._placementSortFunction) do
-		local currentStatus = toSortStatus(opponent.status)
-		local currentScore = opponent.score or 0
-		if isNewPlacement(currentStatus, currentScore, opponent.placement) then
-			cache.manualPlacement = opponent.placement
-			cache.placement = opponent.placement or (cache.placement + cache.skipped)
-			cache.skipped = 0
-			cache.score = currentScore
-			cache.status = currentStatus
-		end
-		placements[opponentIndex] = cache.placement
-		cache.skipped = cache.skipped + 1
-	end
-
-	return placements
-end
-
----@param opponents {placement: integer?, score: integer?, status: string}[]
----@param index1 integer
----@param index2 integer
----@return boolean
-function StarcraftFfaMatchGroupInput._placementSortFunction(opponents, index1, index2)
-	local opponent1 = opponents[index1]
-	local opponent2 = opponents[index2]
-
-	if opponent1.status == MatchGroupInputUtil.STATUS_INPUTS.DEFAULT_WIN then
-		return true
-	elseif Table.includes(MatchGroupInputUtil.STATUS_INPUTS, opponent1.status) then
-		return false
-	end
-
-	if (opponent1.score or -1) ~= (opponent2.score or -1) then
-		return (opponent1.score or -1) > (opponent2.score or -1)
-	end
-
-	if opponent1.placement and opponent2.placement then
-		return opponent1.placement < opponent2.placement
-	elseif opponent1.placement and not opponent2.placement then
-		return true
-	elseif opponent2.placement and not opponent1.placement then
-		return false
-	end
-
-	return index1 < index2
 end
 
 return StarcraftFfaMatchGroupInput
