@@ -626,7 +626,7 @@ end
 ---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
-	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.POSTPONED then
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
@@ -1147,6 +1147,8 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
+	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
@@ -1323,6 +1325,8 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 			opponent.placement = placementOfOpponents[opponentIndex]
 			opponent.extradata.bg = settings.status[opponent.placement]
 		end)
+	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
