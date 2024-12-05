@@ -1347,7 +1347,7 @@ end
 ---@return integer[]
 function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents, hasNoScores)
 	-- if we have no scores return only the manually entered placements
-	if hasNoScores or Table.size(manualPlacements) == #opponents then
+	if hasNoScores then
 		local manualPlacements = {}
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			manualPlacements[opponentIndex] = opponent.placement
