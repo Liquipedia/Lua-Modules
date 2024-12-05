@@ -1346,13 +1346,12 @@ end
 ---@param hasNoScores boolean?
 ---@return integer[]
 function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents, hasNoScores)
-	local manualPlacements = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		manualPlacements[opponentIndex] = opponent.placement
-	end)
-	-- if we have no scores or a placement for each opponent return early
-	-- as there is no need to determine what is already there or can not be determined
+	-- if we have no scores return only the manually entered placements
 	if hasNoScores or Table.size(manualPlacements) == #opponents then
+		local manualPlacements = {}
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			manualPlacements[opponentIndex] = opponent.placement
+		end)
 		return manualPlacements
 	end
 
