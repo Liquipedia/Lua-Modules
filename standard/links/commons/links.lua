@@ -47,6 +47,7 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
+	bluesky = {'https://bsky.app/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
