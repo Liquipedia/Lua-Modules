@@ -1244,7 +1244,7 @@ end
 
 ---@class FfaMatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
----@field parseSettings fun(match: table): table
+---@field parseSettings fun(match: table, opponentCount: integer): table
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
 ---@field getMode? fun(opponents: table[]): string
@@ -1256,7 +1256,7 @@ end
 ---
 --- The Parser injection must have the following functions:
 --- - extractMaps(match, opponents, mapProps): table[]
---- - parseSettings(match): table
+--- - parseSettings(match, opponentCount): table
 ---
 --- It may optionally have the following functions:
 --- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
@@ -1275,13 +1275,13 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	local settings = Parser.parseSettings(match)
 
 	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
 	end)
+	local settings = Parser.parseSettings(match, #opponents)
 
 	local games = Parser.extractMaps(match, opponents, settings.score)
 
