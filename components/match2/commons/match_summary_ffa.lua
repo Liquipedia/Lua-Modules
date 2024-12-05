@@ -42,6 +42,7 @@ local STATUS_ICONS = {
 
 local MATCH_OVERVIEW_COLUMNS = {
 	{
+		id = 'someId',
 		class = 'cell--status',
 		show = function(match)
 			return Table.isNotEmpty(match.extradata.status)
@@ -388,10 +389,13 @@ function MatchSummaryFfa.createScoringData(match)
 end
 
 ---@param match table
+---@param Parser table # of functions
 ---@return MatchSummaryFfaTable
-function MatchSummaryFfa.standardMatch(match)
+function MatchSummaryFfa.standardMatch(match, Parser)
+	local matchColumns = Parser.adjustMatchColumns and Parser.adjustMatchColumns(MATCH_OVERVIEW_COLUMNS, match)
+		or MATCH_OVERVIEW_COLUMNS
 	local rows = Array.map(match.opponents, function (opponent, index)
-		local children = Array.map(MATCH_OVERVIEW_COLUMNS, function(column)
+		local children = Array.map(matchColumns, function(column)
 			if column.show and not column.show(match) then
 				return
 			end
@@ -429,7 +433,7 @@ function MatchSummaryFfa.standardMatch(match)
 		return MatchSummaryWidgets.TableRow{children = children}
 	end)
 
-	local cells = Array.map(MATCH_OVERVIEW_COLUMNS, function(column)
+	local cells = Array.map(matchColumns, function(column)
 		if column.show and not column.show(match) then
 			return
 		end
