@@ -808,8 +808,9 @@ end
 
 ---@param match table
 ---@param opponents {score: integer?}[]
+---@param noThreshold boolean?
 ---@return boolean
-function MatchGroupInputUtil.matchIsFinished(match, opponents)
+function MatchGroupInputUtil.matchIsFinished(match, opponents, noThreshold)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return true
 	end
@@ -835,7 +836,7 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	-- If enough time has passed since match started, it should be marked as finished
 	local threshold = match.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
-	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
+	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW and not noThreshold then
 		return true
 	end
 
@@ -1276,7 +1277,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 
 	local settings = Parser.parseSettings(match)
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date or MatchGroupInputUtil.dateFromGames(match)))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
@@ -1300,7 +1301,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		}, autoScoreFunction)
 	end)
 
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents, true)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
@@ -1324,6 +1325,23 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.opponents = opponents
 
 	return match
+end
+
+---@param match table
+---@return string?
+function MatchGroupInputUtil.dateFromGames(match)
+	local maxDate = DateExt.toYmdInUtc(DateExt.maxTimestamp) --[[@as string]]
+	local date = maxDate
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		local mapDate = map.date
+		if Logic.isNotEmpty(mapDate) and mapDate < date then
+			date = mapDate
+		end
+	end
+
+	if date ~= maxDate then
+		return date
+	end
 end
 
 ---@param opponents table[]
