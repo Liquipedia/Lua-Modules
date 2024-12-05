@@ -11,7 +11,6 @@ local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -25,7 +24,6 @@ MatchFunctions.OPPONENT_CONFIG = {
 	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
 }
-local TBD = 'TBD'
 
 ---@param match table
 ---@param options table?
@@ -55,15 +53,6 @@ function MatchFunctions.getBestOf(bestofInput)
 	return tonumber(bestofInput)
 end
 
----@param map table
----@return string?
-function MapFunctions.getMapName(map)
-	if String.isNotEmpty(map.map) and map.map ~= TBD then
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
-	end
-	return map.map
-end
-
 ---@param match table
 ---@param map table
 ---@param opponents table[]
@@ -71,13 +60,13 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {comment = map.comment}
 
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		local prefix = 'o' .. opponentIndex .. 'p'
-		local chars = Array.mapIndexes(function(charIndex)
-			return Logic.nilIfEmpty(map[prefix .. charIndex .. 'char']) or Logic.nilIfEmpty(map[prefix .. charIndex])
+	Array.forEach(opponents, function(_, opponentIndex)
+		local prefix = 'o' .. opponentIndex .. 'c'
+		local classes = Array.mapIndexes(function(classIndex)
+			return Logic.nilIfEmpty(map[prefix .. classIndex])
 		end)
-		Array.forEach(chars, function(char, charIndex)
-			extradata[prefix .. charIndex] = MapFunctions.readCharacter(char)
+		Array.forEach(classes, function(class, classIndex)
+			extradata[prefix .. classIndex] = MapFunctions.readCharacter(class)
 		end)
 	end)
 
@@ -115,38 +104,30 @@ end
 ---@param opponentIndex integer
 ---@return {character: string?, player: string}[]
 function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+	local oppPrefix = 'o' .. opponentIndex
+
 	local players = Array.mapIndexes(function(playerIndex)
-		return Logic.nilIfEmpty(mapInput['o' .. opponentIndex .. 'p' .. playerIndex])
+		return Logic.nilIfEmpty(mapInput[oppPrefix .. 'p' .. playerIndex])
+			or Logic.nilIfEmpty(mapInput[oppPrefix .. 'c' .. playerIndex])
 	end)
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
-			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
+			local prefix = oppPrefix .. 'p' .. playerIndex
 			return {
 				name = mapInput[prefix],
 				link = Logic.nilIfEmpty(mapInput[prefix .. 'link']),
 			}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
-			local prefix = 'o' .. opponentIndex .. 'p' .. playerIndex
 			return {
 				player = playerIdData.name or playerInputData.link,
-				character = MapFunctions.readCharacter(Logic.nilIfEmpty(mapInput[prefix .. 'char']).character),
+				class = MapFunctions.readCharacter(Logic.nilIfEmpty(mapInput[oppPrefix .. 'c' .. playerIndex])),
 			}
 		end
 	)
-
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(opponent.match2players, {
-			name = participant.player,
-			displayname = participant.player,
-		})
-		participants[#opponent.match2players] = participant
-	end)
-
-	return participants
 end
 
 ---@param mapInput table
@@ -156,22 +137,17 @@ end
 function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
-	local prefix = 'o' .. opponentIndex .. 'p'
+	local prefix = 'o' .. opponentIndex .. 'c'
 
 	return Array.map(players, function(player, playerIndex)
 		return {
-			character = MapFunctions.readCharacter(mapInput[prefix .. playerIndex]),
 			player = player.name,
+			class = MapFunctions.readCharacter(mapInput[prefix .. playerIndex]),
 		}
 	end)
 end
 
----@param input string?
----@return string?
-function MapFunctions.readCharacter(input)
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterStandardization)
-
-	return getCharacterName(input)
-end
+MapFunctions.readCharacter = FnUtil.curry(MatchGroupInputUtil.getCharacterName,
+	CharacterStandardization) --[[@as fun(class: string): string]]
 
 return CustomMatchGroupInput
