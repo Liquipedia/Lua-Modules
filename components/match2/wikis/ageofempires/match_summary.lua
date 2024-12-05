@@ -106,7 +106,11 @@ function CustomMatchSummary._createGame(game, props)
 				:node(flipped and factionNode or playerNode)
 		end
 		local function createOpponentDisplay(opponentId)
-			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
+			local display = mw.html.create('div')
+				:css('display', 'flex')
+				:css('width', '90%')
+				:css('flex-direction', 'column')
+				:css('overflow', 'hidden')
 			Array.forEach(
 				Array.sortBy(game.opponents[opponentId].players, Operator.property('index')),
 				function(player)
@@ -124,11 +128,20 @@ function CustomMatchSummary._createGame(game, props)
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
-			faction1,
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			faction2,
+			MatchSummaryWidgets.GameTeamWrapper{children = {
+					faction1,
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1}
+				},
+			},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {
+					['flex'] = '0 0 30%',
+			}},
+			MatchSummaryWidgets.GameTeamWrapper{children = {
+					faction2,
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+				},
+				flipped = true
+			},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}
