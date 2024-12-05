@@ -1389,9 +1389,9 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents, hasNoScore
 		local opponent1 = tbl[key1]
 		local opponent2 = tbl[key2]
 
-		if opponent1.status == MatchGroupInputUtil.STATUS_INPUTS.DEFAULT_WIN then
+		if opponent1.status == MatchGroupInputUtil.STATUS.DEFAULT_WIN then
 			return true
-		elseif Table.includes(MatchGroupInputUtil.STATUS_INPUTS, opponent1.status) then
+		elseif Logic.isNotEmpty(opponent1.status) and opponent1.status ~= MatchGroupInputUtil.STATUS.SCORE then
 			return false
 		end
 
