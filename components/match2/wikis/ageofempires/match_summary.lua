@@ -134,9 +134,7 @@ function CustomMatchSummary._createGame(game, props)
 				},
 			},
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {
-					['flex-basis'] = '25%',
-					['flex'] = '2',
-					['overflow'] = 'hidden',
+					['flex'] = '0 0 30%',
 			}},
 			MatchSummaryWidgets.GameTeamWrapper{children = {
 					faction2,
