@@ -36,7 +36,12 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store),
 		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store),
 		storePageVar = Logic.nilOr(Logic.readBoolOrNil(args.storePageVar), show),
+
 	}
+
+	if args.matchGroupType and (args.matchGroupType == matchGroupType or matchGroupType == 'horizontallist') then
+		options.forcedMatchGroupType = args.matchGroupType
+	end
 
 	local warnings = {}
 

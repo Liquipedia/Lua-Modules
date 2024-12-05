@@ -37,7 +37,8 @@ function MatchGroup.MatchList(args)
 
 	local matchlistNode
 	if options.show then
-		local matchGroupType = #matches[1].match2opponents > 2 and 'horizontallist' or 'matchlist'
+		local matchGroupType = options.forcedMatchGroupType or
+			#matches[1].match2opponents > 2 and 'horizontallist' or 'matchlist'
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
 		local MatchlistContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 		matchlistNode = MatchlistContainer({
@@ -63,7 +64,8 @@ function MatchGroup.Bracket(args)
 
 	local bracketNode
 	if options.show then
-		local matchGroupType = #matches[1].match2opponents > 2 and 'horizontallist' or 'bracket'
+		local matchGroupType = options.forcedMatchGroupType or
+			#matches[1].match2opponents > 2 and 'horizontallist' or 'bracket'
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 		local BracketContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 		bracketNode = BracketContainer({
@@ -148,7 +150,15 @@ function MatchGroup.MatchGroupById(args)
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 		config = BracketDisplay.configFromArgs(args)
 	end
-	local matchGroupDisplayType = #matches[1].opponents > 2 and 'horizontallist' or matchGroupType
+	local inputtedMatchGroupType = args.matchGroupType
+	local matchGroupDisplayType
+	if inputtedMatchGroupType then
+		assert(inputtedMatchGroupType == matchGroupType or inputtedMatchGroupType == 'horizontallist',
+			'Invalid "|matchGroupType=" specified'
+		)
+		matchGroupDisplayType = inputtedMatchGroupType
+	end
+	matchGroupDisplayType = matchGroupDisplayType or #matches[1].opponents > 2 and 'horizontallist' or matchGroupType
 
 	if Logic.readBool(args.suppressDetails) then
 		config.matchHasDetails = function() return false end
@@ -166,7 +176,7 @@ end
 -- Displays a singleMatch specified by a bracket ID and matchID.
 ---@param args table
 ---@return Html
-function MatchGroup.MatchByMatchId(args)
+function MatchGrop.MatchByMatchId(args)
 	local bracketId = args.id
 	local matchId = args.matchid
 	assert(bracketId, 'Missing bracket ID')
