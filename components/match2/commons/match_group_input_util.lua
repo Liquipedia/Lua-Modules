@@ -79,6 +79,7 @@ MatchGroupInputUtil.STATUS.SCORE = 'S'
 
 MatchGroupInputUtil.MATCH_STATUS = {
 	NOT_PLAYED = 'notplayed',
+	POSTPONED = 'postponed',
 }
 
 MatchGroupInputUtil.SCORE_NOT_PLAYED = -1
@@ -604,10 +605,19 @@ end
 
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
+---@return boolean
+function MatchGroupInputUtil.isPostponed(winnerInput, finishedInput)
+	return winnerInput == 'postponed' or finishedInput == 'postponed'
+end
+
+---@param winnerInput integer|string|nil
+---@param finishedInput string?
 ---@return string? #Match Status
 function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.MATCH_STATUS.POSTPONED
 	end
 end
 
@@ -616,7 +626,7 @@ end
 ---@param opponents {score: number, status: string, placement: integer?}[]
 ---@return integer? # Winner
 function MatchGroupInputUtil.getWinner(status, winnerInput, opponents)
-	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED or status == MatchGroupInputUtil.MATCH_STATUS.POSTPONED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
@@ -810,7 +820,9 @@ end
 ---@param opponents {score: integer?}[]
 ---@return boolean
 function MatchGroupInputUtil.matchIsFinished(match, opponents)
-	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
+	if MatchGroupInputUtil.isPostponed(match.winner, match.finished) then
+		return false
+	elseif MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return true
 	end
 
