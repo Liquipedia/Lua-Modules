@@ -151,7 +151,7 @@ end
 ---@return Html?
 function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
 	local playerDisplays = Array.map(players, function (player)
-		local char = player.class and HtmlWidgets.Div{
+		local char = Logic.isNotEmpty(player.class) and HtmlWidgets.Div{
 			classes = {'brkts-champion-icon'},
 			children = MatchSummaryWidgets.Character{
 				character = player.class,
