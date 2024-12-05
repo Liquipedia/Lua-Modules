@@ -37,8 +37,9 @@ function MatchGroup.MatchList(args)
 
 	local matchlistNode
 	if options.show then
+		local matchGroupType = #matches[1].match2opponents > 2 and 'horizontallist' or 'matchlist'
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
-		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -62,8 +63,9 @@ function MatchGroup.Bracket(args)
 
 	local bracketNode
 	if options.show then
+		local matchGroupType = #matches[1].match2opponents > 2 and 'horizontallist' or 'bracket'
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
-		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -146,6 +148,7 @@ function MatchGroup.MatchGroupById(args)
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 		config = BracketDisplay.configFromArgs(args)
 	end
+	local matchGroupDisplayType = #matches[1].opponents > 2 and 'horizontallist' or matchGroupType
 
 	if Logic.readBool(args.suppressDetails) then
 		config.matchHasDetails = function() return false end
@@ -153,7 +156,7 @@ function MatchGroup.MatchGroupById(args)
 
 	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupDisplayType)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,
