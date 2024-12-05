@@ -297,9 +297,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
-		show = function(match)
-			return match.extradata.settings.showGameDetails
-		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -319,9 +316,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
-		show = function(match)
-			return match.extradata.settings.showGameDetails
-		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
