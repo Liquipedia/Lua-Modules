@@ -676,6 +676,7 @@ function MatchGroupUtil.playerFromRecord(record)
 		extradata = extradata,
 		flag = nilIfEmpty(record.flag),
 		pageName = record.name,
+		team = Table.extract(extradata, 'playerteam'),
 	}
 end
 
