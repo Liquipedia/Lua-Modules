@@ -324,8 +324,8 @@ function MapFunctions.getExtraData(match, map, opponents)
 
 	---@type table[]
 	local players = {
-		Array.extractValues(map.opponents[1].players)[1],
-		Array.extractValues(map.opponents[2].players)[1],
+		Array.filter(Array.extractValues(map.opponents[1].players or {}), Logic.isNotEmpty)[1],
+		Array.filter(Array.extractValues(map.opponents[2].players or {}), Logic.isNotEmpty)[1],
 	}
 
 	extradata.opponent1 = players[1].player
