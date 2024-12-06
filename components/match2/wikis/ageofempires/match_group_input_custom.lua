@@ -303,7 +303,7 @@ function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIn
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
-	local mapPlayers = MatchGroupInputUtil.parseMapPlayers(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -323,7 +323,6 @@ function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIn
 		end
 	)
 
-	return mapPlayers
 end
 
 ---@param winnerInput string|integer|nil
