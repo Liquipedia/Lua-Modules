@@ -81,38 +81,6 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
-
----@param match table
----@return {score: table, status: table}
-function MatchFunctions.parseSettings(match)
-	-- Score Settings
-	local scoreSettings = {
-		kill = tonumber(match.p_kill) or 1,
-		placement = Array.mapIndexes(function(idx)
-			return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
-		end)
-	}
-
-	-- Up/Down colors
-	local statusSettings = Array.flatMap(Array.parseCommaSeparatedString(match.bg, ','), function (status)
-		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
-		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
-		local pStartNumber = tonumber(pStart) --[[@as integer]]
-		local pEndNumber = tonumber(pEnd) or pStartNumber
-		return Array.map(Array.range(pStartNumber, pEndNumber), function()
-			return color
-		end)
-	end)
-
-	return {
-		score = scoreSettings,
-		status = statusSettings,
-		settings = {
-			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
-		}
-	}
-end
-
 ---@param match table
 ---@param games table[]
 ---@param opponents table[]
