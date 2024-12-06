@@ -260,6 +260,8 @@ function MatchTicker:buildQueryConditions()
 		end)
 
 		tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, '') }
+		tierTypeConditions:add { ConditionNode(ColumnName('liquipediatiertype'), Comparator.eq, 'General') }
+
 
 		conditions:add(tierTypeConditions)
 	end
