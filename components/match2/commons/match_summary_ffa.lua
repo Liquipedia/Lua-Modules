@@ -409,9 +409,11 @@ end
 ---@return MatchSummaryFfaTable
 function MatchSummaryFfa.standardMatch(match, Parser)
 	Parser = Parser or {}
-	local matchColumns = Parser.adjustMatchColumns and Parser.adjustMatchColumns(MATCH_OVERVIEW_COLUMNS, match)
+	local matchColumns = Parser.adjustMatchColumns
+		and Parser.adjustMatchColumns(MATCH_OVERVIEW_COLUMNS, match)
 		or MATCH_OVERVIEW_COLUMNS
-	local gameOverviewColumns = Parser.adjustGameOverviewColumns and Parser.adjustGameOverviewColumns(GAME_OVERVIEW_COLUMNS, match)
+	local gameOverviewColumns = Parser.adjustGameOverviewColumns
+		and Parser.adjustGameOverviewColumns(GAME_OVERVIEW_COLUMNS, match)
 		or GAME_OVERVIEW_COLUMNS
 
 	local rows = Array.map(match.opponents, function (opponent, index)
