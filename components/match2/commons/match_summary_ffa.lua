@@ -42,7 +42,7 @@ local STATUS_ICONS = {
 
 local MATCH_OVERVIEW_COLUMNS = {
 	{
-		id = 'someId',
+		id = 'status',
 		class = 'cell--status',
 		show = function(match)
 			return Table.isNotEmpty(match.extradata.status)
@@ -65,6 +65,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'rank',
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
@@ -89,6 +90,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'opponent',
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
@@ -113,6 +115,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'totalPoints',
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
@@ -133,6 +136,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'matchPoints',
 		sortable = true,
 		sortType = 'match-points',
 		class = 'cell--match-points',
@@ -158,6 +162,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 }
 local GAME_OVERVIEW_COLUMNS = {
 	{
+		id = 'placement',
 		show = function(match)
 			return match.extradata.settings.showGameDetails
 		end,
@@ -188,6 +193,7 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'kills',
 		show = function(match)
 			return match.extradata.settings.showGameDetails
 		end,
@@ -203,6 +209,7 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'points',
 		show = function(match)
 			return not match.extradata.settings.showGameDetails
 		end,
@@ -220,6 +227,7 @@ local GAME_OVERVIEW_COLUMNS = {
 }
 local GAME_STANDINGS_COLUMNS = {
 	{
+		id = 'rank',
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
@@ -252,6 +260,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'opponent',
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
@@ -276,6 +285,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'totalPoints',
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
@@ -296,6 +306,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'placement',
 		show = function(match)
 			return match.extradata.settings.showGameDetails
 		end,
@@ -318,6 +329,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'kills',
 		show = function(match)
 			return match.extradata.settings.showGameDetails
 		end,
@@ -388,12 +400,20 @@ function MatchSummaryFfa.createScoringData(match)
 	}
 end
 
+---@class FfaMatchSummaryParser
+---@field adjustMatchColumns? fun(defaultColumns: table[], match: table): table[]
+---@field adjustGameOverviewColumns? fun(defaultColumns: table[], match: table): table[]
+
 ---@param match table
----@param Parser table # of functions
+---@param Parser FfaMatchSummaryParser?
 ---@return MatchSummaryFfaTable
 function MatchSummaryFfa.standardMatch(match, Parser)
+	Parser = Parser or {}
 	local matchColumns = Parser.adjustMatchColumns and Parser.adjustMatchColumns(MATCH_OVERVIEW_COLUMNS, match)
 		or MATCH_OVERVIEW_COLUMNS
+	local gameOverviewColumns = Parser.adjustGameOverviewColumns and Parser.adjustGameOverviewColumns(GAME_OVERVIEW_COLUMNS, match)
+		or GAME_OVERVIEW_COLUMNS
+
 	local rows = Array.map(match.opponents, function (opponent, index)
 		local children = Array.map(matchColumns, function(column)
 			if column.show and not column.show(match) then
@@ -416,7 +436,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 			children = Array.map(opponent.games, function(gameOpponent)
 				local gameRow = HtmlWidgets.Div{
 					classes = {'panel-table__cell', 'cell--game'},
-					children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+					children = Array.map(gameOverviewColumns, function(column)
 						if column.show and not column.show(match) then
 							return
 						end
@@ -481,7 +501,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 							},
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-details'},
-								children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+								children = Array.map(gameOverviewColumns, function(column)
 									if column.show and not column.show(match) then
 										return
 									end
