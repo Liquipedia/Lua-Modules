@@ -34,6 +34,7 @@ return {
 		},
 		match2 = {
 			status = 1,
+			defaultDisplayMode = 'horizontallist',
 		},
 	},
 	defaultRoundPrecision = 0,

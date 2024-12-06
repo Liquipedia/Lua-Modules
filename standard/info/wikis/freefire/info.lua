@@ -34,6 +34,7 @@ return {
 		},
 		match2 = {
 			status = 0,
+			defaultDisplayMode = 'horizontallist',
 		},
 		transfers = {
 			showTeamName = true,
