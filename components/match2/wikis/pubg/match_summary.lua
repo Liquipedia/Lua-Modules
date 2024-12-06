@@ -36,7 +36,7 @@ function CustomMatchSummary.getByMatchId(props)
 			idx = 0,
 			children = {
 				MatchSummaryWidgets.GamesSchedule{games = match.games},
-				MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+				MatchSummaryWidgets.PointsDistribution{scores = scoringData},
 				SummaryHelper.standardMatch(match),
 			}
 		}

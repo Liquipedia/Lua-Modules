@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=freefire
+-- wiki=naraka
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -119,11 +119,12 @@ function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
 	local points = tonumber(scoreDataInput.p)
 	if placement or kills then
+		local minimumKillPoints = Array.reduce(scoreSettings.kill, math.min, math.huge)
 		if placement then
 			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
 		end
 		if kills then
-			scoreBreakdown.killPoints = kills * scoreSettings.kill
+			scoreBreakdown.killPoints = kills * (scoreSettings.kill[placement] or minimumKillPoints)
 			scoreBreakdown.kills = kills
 		end
 		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)

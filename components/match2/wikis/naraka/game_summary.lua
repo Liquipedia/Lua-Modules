@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
+-- wiki=naraka
 -- page=Module:GameSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -21,13 +21,13 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
----@class FortniteMatchGroupUtilGame: MatchGroupUtilGame
+---@class NarakaMatchGroupUtilGame: MatchGroupUtilGame
 ---@field stream table
 
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
 ---@return Html
 function CustomGameSummary.getGameByMatchId(props)
-	---@class FortniteMatchGroupUtilMatch
+	---@class NarakaMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 
 	local game = match.games[props.gameIdx]

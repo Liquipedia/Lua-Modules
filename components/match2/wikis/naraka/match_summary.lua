@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
+-- wiki=naraka
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,7 +11,6 @@ local CustomMatchSummary = {}
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local SummaryHelper = Lua.import('Module:MatchSummary/Ffa')
@@ -19,15 +18,14 @@ local SummaryHelper = Lua.import('Module:MatchSummary/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
----@field games ApexMatchGroupUtilGame[]
+---@class NarakaMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games NarakaMatchGroupUtilGame[]
 
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
 function CustomMatchSummary.getByMatchId(props)
-	---@class ApexMatchGroupUtilMatch
+	---@class NarakaMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	match.matchPointThreshold = Table.extract(match.extradata.scoring, 'matchPointThreshold')
 	CustomMatchSummary._opponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
@@ -45,6 +43,7 @@ function CustomMatchSummary.getByMatchId(props)
 	}}
 end
 
+---@param match table
 function CustomMatchSummary._opponents(match)
 	-- Add games opponent data to the match opponent
 	Array.forEach(match.opponents, function (opponent, idx)
@@ -52,21 +51,6 @@ function CustomMatchSummary._opponents(match)
 			return game.opponents[idx]
 		end)
 	end)
-
-	if match.matchPointThreshold then
-		Array.forEach(match.opponents, function(opponent)
-			local matchPointReachedIn
-			local sum = opponent.extradata.startingpoints or 0
-			for gameIdx, game in ipairs(opponent.games) do
-				if sum >= match.matchPointThreshold then
-					matchPointReachedIn = gameIdx
-					break
-				end
-				sum = sum + (game.score or 0)
-			end
-			opponent.matchPointReachedIn = matchPointReachedIn
-		end)
-	end
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
