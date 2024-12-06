@@ -44,6 +44,7 @@ function MatchLegacy.storeGames(match, match2)
 			Array.forEach(opponents, function(opponent, opponentIndex)
 				-- opponent.players can have gaps
 				for _, player in pairs(opponent.players) do
+					if Table.isEmpty(player) then return end
 					local prefix = 'o' .. opponentIndex .. 'p' .. player.index
 					game.extradata[prefix] = player.pageName
 					game.extradata[prefix .. 'faction'] = player.civ

@@ -14,6 +14,7 @@ local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -112,7 +113,10 @@ function CustomMatchSummary._createGame(game, props)
 				:css('flex-direction', 'column')
 				:css('overflow', 'hidden')
 			Array.forEach(
-				Array.sortBy(game.opponents[opponentId].players, Operator.property('index')),
+				Array.sortBy(
+					Array.filter(game.opponents[opponentId].players, Table.isNotEmpty),
+					Operator.property('index')
+				),
 				function(player)
 					display:node(createParticipant(player, opponentId == 1))
 				end
