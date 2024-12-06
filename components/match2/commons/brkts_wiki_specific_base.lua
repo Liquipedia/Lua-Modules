@@ -52,8 +52,7 @@ Called from MatchGroup
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	-- TODO Add a check if opponent count is > 2
-	if Lua.moduleExists('Module:GameSummary') then
+	if matchGroupType == 'horizontallist' then
 		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
 		return Horizontallist.BracketContainer
 	elseif matchGroupType == 'matchlist' then

@@ -62,6 +62,7 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 150,
+			defaultDisplayMode = 'default', -- kick after preping sc2 matchsummary etc
 		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
