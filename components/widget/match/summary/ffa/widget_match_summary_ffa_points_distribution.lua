@@ -37,7 +37,7 @@ function MatchSummaryFfaPointsDistribution:render()
 
 	local header = {title = 'Placement', content = {
 		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Placement Points'}},
-		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Kill Points'}}
+		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Points per Kill'}}
 	}}
 
 	local placementItems = Array.map(self.props.scores, function(slot)

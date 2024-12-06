@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -43,7 +44,9 @@ local MATCH_OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
 		show = function(match)
-			return Table.isNotEmpty(match.extradata.status)
+			return Table.any(match.extradata.status, function(_, value)
+				return Logic.isNotEmpty(value)
+			end)
 		end,
 		header = {
 			value = '',
