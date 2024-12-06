@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
@@ -79,37 +78,6 @@ function MatchFunctions.calculateMatchScore(opponents, maps)
 			return map.opponents[opponentIndex].score or 0
 		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
-end
-
----@param match table
----@return {score: table, status: table}
-function MatchFunctions.parseSettings(match)
-	-- Score Settings
-	local scoreSettings = {
-		kill = tonumber(match.p_kill) or 1,
-		placement = Array.mapIndexes(function(idx)
-			return match['opponent' .. idx] and (tonumber(match['p' .. idx]) or 0) or nil
-		end)
-	}
-
-	-- Up/Down colors
-	local statusSettings = Array.flatMap(Array.parseCommaSeparatedString(match.bg, ','), function (status)
-		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
-		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
-		local pStartNumber = tonumber(pStart) --[[@as integer]]
-		local pEndNumber = tonumber(pEnd) or pStartNumber
-		return Array.map(Array.range(pStartNumber, pEndNumber), function()
-			return color
-		end)
-	end)
-
-	return {
-		score = scoreSettings,
-		status = statusSettings,
-		settings = {
-			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
-		}
-	}
 end
 
 ---@param match table

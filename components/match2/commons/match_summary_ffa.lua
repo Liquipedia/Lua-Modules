@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -360,27 +359,26 @@ end
 function MatchSummaryFfa.createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
-	local scorePlacement = {}
-
-	local points = Table.groupBy(scoreSettings.placement, function (_, value)
-		return value
+	local scores = Array.map(scoreSettings.placement, function(placementScore, placement)
+		return {placementPoints = placementScore, killPoints = scoreSettings.kill[placement]}
 	end)
 
-	for point, placements in Table.iter.spairs(points, function (_, a, b)
-		return a > b
-	end) do
-		local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
-		table.insert(scorePlacement, {
-			rangeStart = placementRange[1],
-			rangeEnd = placementRange[#placementRange],
-			score = point,
-		})
+	local newScores = {}
+	local lastData = {}
+	for placement, score in ipairs(scores) do
+		if Table.deepEquals(lastData, score) then
+			newScores[#newScores].rangeEnd = newScores[#newScores].rangeEnd + 1
+		else
+			table.insert(newScores, {
+				rangeStart = placement,
+				rangeEnd = placement,
+				killScore = score.killPoints,
+				placementScore = score.placementPoints,
+			})
+		end
+		lastData = score
 	end
-
-	return {
-		kill = scoreSettings.kill,
-		placement = scorePlacement,
-	}
+	return newScores
 end
 
 ---@param match table
