@@ -6,10 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
+local Info = Lua.import('Module:Info')
+
 local MatchGroupBase = {}
+
+local HORIZONTAL_LIST = 'horizontallist'
 
 ---@class MatchGroupBaseOptions
 ---@field bracketId string
@@ -19,6 +25,7 @@ local MatchGroupBase = {}
 ---@field storeMatch1 boolean
 ---@field storeMatch2 boolean
 ---@field storePageVar boolean
+---@field forcedMatchGroupType 'bracket'|'matchlist'|'horizontallist'?
 
 ---@param args table
 ---@param matchGroupType string
@@ -36,12 +43,8 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		storeMatch1 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch1), store),
 		storeMatch2 = Logic.nilOr(Logic.readBoolOrNil(args.storeMatch2), store),
 		storePageVar = Logic.nilOr(Logic.readBoolOrNil(args.storePageVar), show),
-
+		forcedMatchGroupType = args.matchGroupType,
 	}
-
-	if args.matchGroupType and (args.matchGroupType == matchGroupType or matchGroupType == 'horizontallist') then
-		options.forcedMatchGroupType = args.matchGroupType
-	end
 
 	local warnings = {}
 
@@ -119,6 +122,30 @@ function MatchGroupBase._checkBracketDuplicate(bracketId)
 		mw.addWarning(warning)
 		return warning
 	end
+end
+
+---@param matches table[]
+---@param preset string
+---@param input 'bracket'|'matchlist'|'horizontallist'?
+---@return 'bracket'|'matchlist'|'horizontallist'
+function MatchGroupBase.getMatchGroupDisplayType(matches, preset, input)
+	if input then
+		assert(input == preset or input == HORIZONTAL_LIST)
+		return input
+	end
+
+	if Info.config.match2.defaultDisplayMode == HORIZONTAL_LIST then
+		return HORIZONTAL_LIST
+	elseif Info.config.match2.defaultDisplayMode == 'default' then
+		return preset
+	end
+
+	--todo: check if match.opponents or match.match2opponents is needed!
+	local hasBR = Array.any(matches, function(match)
+		return #match.match2opponents > 2
+	end)
+
+	return hasBR and 'horizontallist' or preset
 end
 
 return MatchGroupBase
