@@ -61,7 +61,7 @@ function CustomMatchSummary._fixGameOpponents(games, opponents)
 	Array.forEach(games, function (game)
 		game.opponents = Array.map(game.opponents, function (opponent, opponentIndex)
 			return Table.merge(opponent, {
-				players = Array.map(game.opponents[opponentIndex].players,function (player, playerIndex)
+				players = Array.map(game.opponents[opponentIndex].players or {},function (player, playerIndex)
 					if Logic.isEmpty(player) then return nil end
 					return Table.merge(opponents[opponentIndex].players[playerIndex] or {}, player)
 				end)
