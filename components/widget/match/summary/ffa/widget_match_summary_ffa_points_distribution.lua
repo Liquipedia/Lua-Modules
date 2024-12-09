@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
-local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local Trophy = Lua.import('Module:Widget/Match/Summary/Ffa/Trophy')
 local RankRange = Lua.import('Module:Widget/Match/Summary/Ffa/RankRange')
@@ -22,23 +22,36 @@ local MatchSummaryFfaPointsDistribution = Class.new(Widget)
 
 ---@return Widget
 function MatchSummaryFfaPointsDistribution:render()
-	assert(self.props.killScore, 'No killscore provided')
-	assert(self.props.placementScore, 'No placement score table provided')
-	local function createItem(icon, title, score)
-		return {icon = icon, title = title, content = score .. ' ' .. 'point' .. (score ~= 1 and 's' or '')}
+	assert(self.props.scores, 'No scores provided')
+
+	local function createItem(icon, title, placementPoints, killPoints)
+		local function suffixPoints(score)
+			return score .. ' ' .. 'point' .. (score ~= 1 and 's' or '')
+		end
+		local contentDisplay = {
+			HtmlWidgets.Span{children = suffixPoints(placementPoints)},
+			HtmlWidgets.Span{children = suffixPoints(killPoints)},
+		}
+		return {icon = icon, title = title, content =  contentDisplay}
 	end
+
+	local header = {title = 'Placement', content = {
+		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Placement Points'}},
+		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Points per Kill'}}
+	}}
+
+	local placementItems = Array.map(self.props.scores, function(slot)
+		local title = RankRange{rankStart = slot.rangeStart, rankEnd = slot.rangeEnd}
+		local icon = Trophy{place = slot.rangeStart}
+
+		return createItem(icon, title, slot.placementScore, slot.killScore)
+	end)
+
+	table.insert(placementItems, 1, header)
 
 	return ContentItemContainer{collapsed = true, collapsible = true, title = 'Points Distribution',
 		contentClass = 'panel-content__points-distribution',
-		items = {
-			createItem(IconWidget{iconName = 'kills'}, '1 kill', self.props.killScore),
-			unpack(Array.map(self.props.placementScore, function(slot)
-				local title = RankRange{rankStart = slot.rangeStart, rankEnd = slot.rangeEnd}
-				local icon = Trophy{place = slot.rangeStart}
-
-				return createItem(icon, title, slot.score)
-			end))
-		}
+		items = placementItems
 	}
 end
 

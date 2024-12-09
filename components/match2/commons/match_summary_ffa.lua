@@ -7,7 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -44,7 +44,9 @@ local MATCH_OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
 		show = function(match)
-			return Table.isNotEmpty(match.extradata.status)
+			return Table.any(match.extradata.status or {}, function(_, value)
+				return Logic.isNotEmpty(value)
+			end)
 		end,
 		header = {
 			value = '',
@@ -297,9 +299,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
-		show = function(match)
-			return match.extradata.settings.showGameDetails
-		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -319,9 +318,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
-		show = function(match)
-			return match.extradata.settings.showGameDetails
-		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
@@ -366,27 +362,26 @@ end
 function MatchSummaryFfa.createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
-	local scorePlacement = {}
-
-	local points = Table.groupBy(scoreSettings.placement, function (_, value)
-		return value
+	local scores = Array.map(scoreSettings.placement or {}, function(placementScore, placement)
+		return {placementPoints = placementScore, killPoints = (scoreSettings.kill or {})[placement]}
 	end)
 
-	for point, placements in Table.iter.spairs(points, function (_, a, b)
-		return a > b
-	end) do
-		local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
-		table.insert(scorePlacement, {
-			rangeStart = placementRange[1],
-			rangeEnd = placementRange[#placementRange],
-			score = point,
-		})
+	local newScores = {}
+	local lastData = {}
+	for placement, score in ipairs(scores) do
+		if Table.deepEquals(lastData, score) then
+			newScores[#newScores].rangeEnd = newScores[#newScores].rangeEnd + 1
+		else
+			table.insert(newScores, {
+				rangeStart = placement,
+				rangeEnd = placement,
+				killScore = score.killPoints,
+				placementScore = score.placementPoints,
+			})
+		end
+		lastData = score
 	end
-
-	return {
-		kill = scoreSettings.kill,
-		placement = scorePlacement,
-	}
+	return newScores
 end
 
 ---@param match table

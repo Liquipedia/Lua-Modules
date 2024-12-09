@@ -43,7 +43,7 @@ function CustomGameSummary.getGameByMatchId(props)
 		idx = props.gameIdx,
 		children = {
 			CustomGameSummary._createGameDetails(game),
-			MatchSummaryWidgets.PointsDistribution{killScore = scoringData.kill, placementScore = scoringData.placement},
+			MatchSummaryWidgets.PointsDistribution{scores = scoringData},
 			SummaryHelper.standardGame(game)
 		}
 	}

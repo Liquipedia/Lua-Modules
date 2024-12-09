@@ -1244,7 +1244,7 @@ end
 
 ---@class FfaMatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
----@field parseSettings fun(match: table): table
+---@field parseSettings? fun(match: table, opponentCount: integer): table
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
 ---@field getMode? fun(opponents: table[]): string
@@ -1260,9 +1260,9 @@ end
 ---
 --- The Parser injection must have the following functions:
 --- - extractMaps(match, opponents, mapProps): table[]
---- - parseSettings(match): table
 ---
 --- It may optionally have the following functions:
+--- - parseSettings(match, opponentCount): table
 --- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
 --- - getExtraData(match, games, opponents, settings): table?
 --- - getMode(opponents): string?
@@ -1283,7 +1283,6 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	local settings = Parser.parseSettings(match)
 
 	local dateProps = Parser.readDate and Parser.readDate(match)
 		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
@@ -1296,6 +1295,9 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		end
 		return opponent
 	end)
+
+	local settings = Parser.parseSettings and Parser.parseSettings(match, #opponents)
+		or MatchGroupInputUtil.parseSettings(match, #opponents)
 
 	local games = Parser.extractMaps(match, opponents, settings.score)
 
@@ -1419,5 +1421,42 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 	return placementOfTeams
 end
 
+---@param match table
+---@return {score: table, status: table, settings: table}
+function MatchGroupInputUtil.parseSettings(match, opponentCount)
+	-- Score Settings
+	local scoreSettings = {
+		kill = Array.map(Array.range(1, opponentCount), function(index)
+			return tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill) or 1
+		end),
+		placement = Array.map(Array.range(1, opponentCount), function(index)
+			return tonumber(match['p' .. index]) or 0
+		end)
+	}
+
+	-- Status colors (up/down etc)
+	local statusParsed = {}
+	Array.forEach(Array.parseCommaSeparatedString(match.bg, ','), function (status)
+		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
+		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
+		local pStartNumber = tonumber(pStart) --[[@as integer]]
+		local pEndNumber = tonumber(pEnd) or pStartNumber
+		Array.forEach(Array.range(pStartNumber, pEndNumber), function(placement)
+			statusParsed[placement] = color
+		end)
+	end)
+
+	local statusSettings = Array.map(Array.range(1, opponentCount), function(index)
+		return statusParsed[index] or ''
+	end)
+
+	return {
+		score = scoreSettings,
+		status = statusSettings,
+		settings = {
+			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
+		}
+	}
+end
 
 return MatchGroupInputUtil
