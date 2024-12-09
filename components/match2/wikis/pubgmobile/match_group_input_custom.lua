@@ -51,7 +51,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 
 		map.opponents = Array.map(opponents, function(matchOpponent)
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
-			return MapFunctions.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
+			return MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
 		end)
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
