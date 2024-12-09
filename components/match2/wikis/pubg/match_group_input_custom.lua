@@ -51,7 +51,7 @@ function MatchFunctions.extractMaps(match, opponents, scoreSettings)
 
 		map.opponents = Array.map(opponents, function(matchOpponent)
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
-			return MapFunctions.makeMapOpponentDetails(opponentMapInput, scoreSettings)
+			return MapFunctions.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
 		end)
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
@@ -104,43 +104,6 @@ function MapFunctions.getExtraData(map)
 		dateexact = map.dateexact,
 		comment = map.comment,
 	}
-end
-
----@param scoreDataInput table?
----@param scoreSettings table
----@return table
-function MapFunctions.makeMapOpponentDetails(scoreDataInput, scoreSettings)
-	if not scoreDataInput then
-		return {}
-	end
-
-	local scoreBreakdown = {}
-
-	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
-	if placement or kills then
-		if placement then
-			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
-		end
-		if kills then
-			scoreBreakdown.killPoints = kills * scoreSettings.kill
-			scoreBreakdown.kills = kills
-		end
-		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
-	end
-
-	local opponent = {
-		status = MatchGroupInputUtil.STATUS.SCORE,
-		scoreBreakdown = scoreBreakdown,
-		placement = placement,
-		score = scoreBreakdown.totalPoints,
-	}
-
-	if scoreDataInput[1] == '-' then
-		opponent.status = MatchGroupInputUtil.STATUS.FORFEIT
-		opponent.score = 0
-	end
-
-	return opponent
 end
 
 return CustomMatchGroupInput
