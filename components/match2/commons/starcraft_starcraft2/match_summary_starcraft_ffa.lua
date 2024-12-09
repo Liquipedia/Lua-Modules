@@ -399,7 +399,7 @@ function StarcraftMatchSummaryFfa._map(game)
 			:addClass('far fa-map')
 			:addClass('panel-content__game-schedule__icon')
 			:done()
-		:node(DisplayHelper.MapAndStatus(game, {noLink = (game.map or ''):upper() == TBD}))
+		:node(DisplayHelper.Map(game, {noLink = (game.map or ''):upper() == TBD}))
 end
 
 ---@param game table
