@@ -362,8 +362,8 @@ end
 function MatchSummaryFfa.createScoringData(match)
 	local scoreSettings = match.extradata.scoring
 
-	local scores = Array.map(scoreSettings.placement, function(placementScore, placement)
-		return {placementPoints = placementScore, killPoints = scoreSettings.kill[placement]}
+	local scores = Array.map(scoreSettings.placement or {}, function(placementScore, placement)
+		return {placementPoints = placementScore, killPoints = (scoreSettings.kill or {})[placement]}
 	end)
 
 	local newScores = {}
