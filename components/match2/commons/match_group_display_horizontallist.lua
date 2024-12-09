@@ -35,11 +35,11 @@ local PHASE_ICONS = {
 
 ---@class HorizontallistProps
 ---@field bracketId string
----@field config HorizontallistConfigOptions?
+---@field config HorizontallistConfigOptions|BracketConfigOptions|MatchlistConfigOptions?
 
 ---@class HorizontallistBracket
 ---@field bracket MatchGroupUtilMatchGroup
----@field config HorizontallistConfigOptions?
+---@field config HorizontallistConfigOptions|BracketConfigOptions|MatchlistConfigOptions?
 ---@field bracketId string
 
 ---@param args table
@@ -112,6 +112,7 @@ function HorizontallistDisplay.Bracket(props)
 			:node(matchNode)
 end
 
+---@param bracketId string
 ---@param bracket [string, MatchGroupUtilBracketBracketData][]
 ---@return integer
 function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)

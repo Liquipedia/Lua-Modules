@@ -36,6 +36,7 @@ return {
 			status = 1,
 			matchWidthMobile = 120,
 			matchWidth = 170,
+			defaultDisplayMode = 'default', -- kick after preping sc2 matchsummary etc
 		},
 	},
 	maximumNumberOfPlayersInPlacements = 35,
