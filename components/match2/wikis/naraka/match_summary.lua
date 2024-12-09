@@ -8,8 +8,6 @@
 
 local CustomMatchSummary = {}
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -26,7 +24,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 function CustomMatchSummary.getByMatchId(props)
 	---@class NarakaMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
-	CustomMatchSummary._opponents(match)
+	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)
 
 	return HtmlWidgets.Fragment{children = {
@@ -41,24 +39,6 @@ function CustomMatchSummary.getByMatchId(props)
 			}
 		}
 	}}
-end
-
----@param match table
-function CustomMatchSummary._opponents(match)
-	-- Add games opponent data to the match opponent
-	Array.forEach(match.opponents, function (opponent, idx)
-		opponent.games = Array.map(match.games, function (game)
-			return game.opponents[idx]
-		end)
-	end)
-
-	-- Sort match level based on final placement & score
-	Array.sortInPlaceBy(match.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
-
-	-- Set the status of the current placement
-	Array.forEach(match.opponents, function(opponent, idx)
-		opponent.placementStatus = match.extradata.status[idx]
-	end)
 end
 
 return CustomMatchSummary

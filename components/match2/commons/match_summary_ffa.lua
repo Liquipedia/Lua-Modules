@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -140,7 +141,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		class = 'cell--match-points',
 		icon = 'matchpoint',
 		show = function(match)
-				return match.matchPointThreshold
+				return match.extradata.settings.matchPointThreshold
 		end,
 		header = {
 			value = 'MPe Game',
@@ -537,5 +538,39 @@ function MatchSummaryFfa.standardGame(game)
 	}}
 end
 
+---@param match table
+function MatchSummaryFfa.updateMatchOpponents(match)
+	-- Add games opponent data to the match opponent
+	Array.forEach(match.opponents, function (opponent, idx)
+		opponent.games = Array.map(match.games, function (game)
+			return game.opponents[idx]
+		end)
+	end)
+
+	local matchPointThreshold = match.extradata.settings.matchPointThreshold
+	if matchPointThreshold then
+		Array.forEach(match.opponents, function(opponent)
+			local matchPointReachedIn
+			local sum = opponent.extradata.startingpoints or 0
+			for gameIdx, game in ipairs(opponent.games) do
+				if sum >= matchPointThreshold then
+					matchPointReachedIn = gameIdx
+					break
+				end
+				sum = sum + (game.score or 0)
+			end
+			opponent.matchPointReachedIn = matchPointReachedIn
+		end)
+	end
+
+	-- Sort match level based on final placement & score
+	Array.sortInPlaceBy(match.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
+
+	-- Set the status of the current placement
+	Array.forEach(match.opponents, function(opponent, idx)
+		opponent.placementStatus = match.extradata.status[idx]
+	end)
+
+end
 
 return MatchSummaryFfa
