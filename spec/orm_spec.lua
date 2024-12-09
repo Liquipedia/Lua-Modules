@@ -59,6 +59,7 @@ describe('LPDB Object-Relational Mapping', function()
 				section = '',
 				series = '',
 				shortname = '',
+				status = '',
 				stream = {},
 				tickername = '',
 				tournament = '',
