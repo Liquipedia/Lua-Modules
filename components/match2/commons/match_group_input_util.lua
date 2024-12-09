@@ -1301,9 +1301,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 
 	local games = Parser.extractMaps(match, opponents, settings.score)
 
-	local autoScoreFunction = Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games)
-		and Parser.calculateMatchScore(opponents, games)
-		or nil
+	local autoScoreFunction = Parser.calculateMatchScore and Parser.calculateMatchScore(opponents, games) or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.extradata = opponent.extradata or {}
 		opponent.extradata.startingpoints = tonumber(opponent.startingpoints)
