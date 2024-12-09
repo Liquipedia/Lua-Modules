@@ -44,7 +44,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
 		show = function(match)
-			return Table.any(match.extradata.status, function(_, value)
+			return Table.any(match.extradata.status or {}, function(_, value)
 				return Logic.isNotEmpty(value)
 			end)
 		end,
