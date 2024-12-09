@@ -38,8 +38,6 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local UTC = 'UTC'
-local DRAW = 'draw'
-local RESULT_TYPE_DEFAULT = 'default'
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
@@ -89,8 +87,9 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field opponent match2opponent
 ---@field vs match2opponent
 ---@field winner number
----@field resultType string?
+---@field status string?
 ---@field countGames boolean
+---@field isWalkover boolean
 
 ---@class MatchTable
 ---@operator call(table): MatchTable
@@ -288,7 +287,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, resulttype, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, status, extradata',
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -357,7 +356,7 @@ end
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('resulttype'), Comparator.neq, 'np')}
+		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
 	local hasAdditionalConditions = false
 
 	local getOrCondition = function(lpdbKey, input)
@@ -467,8 +466,11 @@ function MatchTable:resultFromRecord(record)
 		opponent = record.match2opponents[indexes[1]],
 		vs = record.match2opponents[indexes[2]],
 		winner = winner,
-		resultType = record.resultType,
+		status = record.status,
 		countGames = countGames,
+		isWalkover = Array.any(record.match2opponents, function(opponent)
+			return opponent.status == 'DQ' or opponent.status == 'FF'
+		end)
 	}
 
 	return result
@@ -490,9 +492,9 @@ function MatchTable:statsFromMatches()
 	end
 
 	Array.forEach(self.matches, function(match)
-		if match.result.resultType == RESULT_TYPE_DEFAULT then
+		if match.result.isWalkover then
 			return
-		elseif match.result.resultType == DRAW then
+		elseif match.result.winner == 0 then
 			totalMatches.d = totalMatches.d + 1
 		elseif match.result.winner == 1 then
 			totalMatches.w = totalMatches.w + 1
