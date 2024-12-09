@@ -184,7 +184,7 @@ function StarcraftMatchSummaryFfa._opponents(match)
 		game.extradata.opponents = Array.map(game.opponents, function (opponent, opponentIdx)
 			return Table.merge(opponent, {
 				placement = opponent.placement,
-				status = opponent.status or game.extradata['status' .. opponentIdx] or 'S',
+				status = opponent.status or 'S',
 				score = opponent.score or (game.scores or {})[opponentIdx],
 			})
 		end)
