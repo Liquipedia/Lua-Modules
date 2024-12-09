@@ -213,20 +213,12 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
 		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(map.opponents, not hasScores)
+		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(map.opponents)
 		Array.forEach(map.opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
 		end)
 		map.winner = StarcraftFfaMatchGroupInput._getWinner(map.status, mapInput.winner, map.opponents)
 	end
-
-	Array.forEach(map.opponents, function(opponent, opponentIndex)
-		map.extradata['placement' .. opponentIndex] = opponent.placement
-	end)
-
-	Array.forEach(map.opponents, function(opponent, opponentIndex)
-		map.extradata['status' .. opponentIndex] = opponent.status
-	end)
 
 	return map
 end
@@ -252,6 +244,11 @@ end
 ---@param hasScores any
 ---@return {placement: integer?, score: integer?, status: string}
 function MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
+	-- next 3 lines are temp workaround to adjust usage on the wiki after merge
+	if not hasScores and Logic.isEmpty(mapInput['placement' .. opponentIndex]) then
+		mapInput['score' .. opponentIndex] = 'L'
+	end
+
 	local score, status = MatchGroupInputUtil.computeOpponentScore{
 		walkover = mapInput.walkover,
 		winner = mapInput.winner,

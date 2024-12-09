@@ -1343,17 +1343,8 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 end
 
 ---@param opponents table[]
----@param hasNoScores boolean?
 ---@return integer[]
-function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents, hasNoScores)
-	-- if we have no scores return only the manually entered placements
-	if hasNoScores then
-		local manualPlacements = {}
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			manualPlacements[opponentIndex] = opponent.placement
-		end)
-		return manualPlacements
-	end
+function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 
 	local usedPlacements = Array.map(opponents, function()
 		return 0

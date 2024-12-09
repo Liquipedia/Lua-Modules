@@ -180,12 +180,12 @@ end
 
 function StarcraftMatchSummaryFfa._opponents(match)
 	-- Add match opponent data to game opponent and the other way around
-	Array.forEach(match.games, function (game, gameIndex)
+	Array.forEach(match.games, function (game)
 		game.extradata.opponents = Array.map(game.opponents, function (opponent, opponentIdx)
 			return Table.merge(opponent, {
 				placement = opponent.placement,
-				status = game.extradata['status' .. opponentIdx] or 'S',
-				score = (game.scores or {})[opponentIdx],
+				status = opponent.status or game.extradata['status' .. opponentIdx] or 'S',
+				score = opponent.score or (game.scores or {})[opponentIdx],
 			})
 		end)
 	end)
