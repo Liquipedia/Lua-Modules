@@ -8,11 +8,8 @@
 
 local CustomGameSummary = {}
 
-local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
