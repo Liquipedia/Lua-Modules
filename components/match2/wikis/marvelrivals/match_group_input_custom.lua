@@ -11,11 +11,11 @@ local Lua = require('Module:Lua')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf,
+}
 local MapFunctions = {}
-
-MatchFunctions.DEFAULT_MODE = 'team'
-MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
 ---@param match table
 ---@param options table?
