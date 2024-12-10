@@ -191,7 +191,12 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			return match.extradata.settings.showGameDetails and match.extradata.settings.showKills
+			if match.extradata.settings.showGameDetails == false then
+				return false
+			end
+			return Table.any(match.extradata.placementinfo or {}, function(_, value)
+				return value.killPoints ~= nil
+			end)
 		end,
 		class = 'panel-table__cell__game-kills',
 		icon = 'kills',

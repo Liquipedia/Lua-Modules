@@ -1485,7 +1485,6 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 		placementInfo = placementInfo,
 		settings = {
 			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
-			showKills = Logic.nilOr(Logic.readBoolOrNil(match.showkills), true),
 			matchPointThreshold = tonumber(match.matchpoint),
 		}
 	}
