@@ -37,8 +37,9 @@ function MatchGroup.MatchList(args)
 
 	local matchlistNode
 	if options.show then
+		local matchGroupType = MatchGroupBase.getMatchGroupDisplayType(matches, 'matchlist', options.forcedMatchGroupType)
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
-		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -62,8 +63,9 @@ function MatchGroup.Bracket(args)
 
 	local bracketNode
 	if options.show then
+		local matchGroupType = MatchGroupBase.getMatchGroupDisplayType(matches, 'bracket', options.forcedMatchGroupType)
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
-		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -153,7 +155,8 @@ function MatchGroup.MatchGroupById(args)
 
 	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
+	local matchGroupDisplayType = MatchGroupBase.getMatchGroupDisplayType(matches, matchGroupType, args.matchGroupType)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupDisplayType)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,
