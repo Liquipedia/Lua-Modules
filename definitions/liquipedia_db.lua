@@ -251,6 +251,7 @@ local lpdb = {}
 ---@field winner integer
 ---@field walkover WalkoverType
 ---@field resulttype ResultType
+---@field status MatchStatus
 ---@field finished integer
 ---@field mode string
 ---@field type string
@@ -294,9 +295,11 @@ local lpdb = {}
 ---@field subgroup integer
 ---@field scores number[]
 ---@field participants table
+---@field opponents table[]
 ---@field winner integer
 ---@field walkover WalkoverType
 ---@field resulttype ResultType
+---@field status MatchStatus
 ---@field mode string
 ---@field type string
 ---@field game string

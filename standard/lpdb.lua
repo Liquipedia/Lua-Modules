@@ -199,6 +199,7 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'winner', fieldType = 'string', default = ''},
 	{name = 'walkover', fieldType = 'string', default = ''},
 	{name = 'resulttype', fieldType = 'string', default = ''},
+	{name = 'status', fieldType = 'string', default = ''},
 	{name = 'finished', fieldType = 'number', default = 0},
 	{name = 'mode', fieldType = 'string', default = ''},
 	{name = 'type', fieldType = 'string', default = ''},
