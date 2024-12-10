@@ -19,7 +19,7 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local CustomMatchGroupInput = {}
 local MatchFunctions = {
 	OPPONENT_CONFIG = {
-		dontCheckTransferDates = true,
+		disregardTransferDates = true,
 	}
 }
 local MapFunctions = {}
