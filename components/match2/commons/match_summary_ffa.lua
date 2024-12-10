@@ -569,11 +569,6 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
-
-	-- Set the status of the current placement
-	Array.forEach(match.opponents, function(opponent, idx)
-		opponent.placementStatus = match.extradata.status[idx]
-	end)
 end
 
 ---@param game table
