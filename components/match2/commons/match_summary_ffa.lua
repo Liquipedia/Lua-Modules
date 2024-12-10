@@ -361,26 +361,22 @@ end
 ---@param match table
 ---@return {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score:number}[]}
 function MatchSummaryFfa.createScoringData(match)
-	local scoreSettings = match.extradata.scoring
-
-	local scores = Array.map(scoreSettings.placement or {}, function(placementScore, placement)
-		return {placementPoints = placementScore, killPoints = (scoreSettings.kill or {})[placement]}
-	end)
+	local scoreSettings = match.extradata.placementinfo
 
 	local newScores = {}
 	local lastData = {}
-	for placement, score in ipairs(scores) do
-		if Table.deepEquals(lastData, score) then
+	for placement, placementData in ipairs(scoreSettings) do
+		if Table.deepEquals(lastData, placementData) then
 			newScores[#newScores].rangeEnd = newScores[#newScores].rangeEnd + 1
 		else
 			table.insert(newScores, {
 				rangeStart = placement,
 				rangeEnd = placement,
-				killScore = score.killPoints,
-				placementScore = score.placementPoints,
+				killScore = placementData.killPoints,
+				placementScore = placementData.placementPoints,
 			})
 		end
-		lastData = score
+		lastData = placementData
 	end
 	return newScores
 end

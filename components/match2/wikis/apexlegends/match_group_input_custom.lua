@@ -60,8 +60,7 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		scoring = settings.score,
-		status = settings.status,
+		placementinfo = settings.placementInfo,
 		settings = settings.settings,
 	}
 end

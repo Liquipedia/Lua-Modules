@@ -1460,17 +1460,7 @@ end
 ---@param match table
 ---@return {score: table, status: table, settings: table}
 function MatchGroupInputUtil.parseSettings(match, opponentCount)
-	-- Score Settings
-	local scoreSettings = {
-		kill = Array.map(Array.range(1, opponentCount), function(index)
-			return tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill) or 1
-		end),
-		placement = Array.map(Array.range(1, opponentCount), function(index)
-			return tonumber(match['p' .. index]) or 0
-		end)
-	}
-
-	-- Status colors (up/down etc)
+	-- Pre-parse Status colors (up/down etc)
 	local statusParsed = {}
 	Array.forEach(Array.parseCommaSeparatedString(match.bg, ','), function (status)
 		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
@@ -1482,13 +1472,18 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 		end)
 	end)
 
-	local statusSettings = Array.map(Array.range(1, opponentCount), function(index)
-		return statusParsed[index] or ''
+	-- Info per Placement
+	local placementInfo = Array.map(Array.range(1, opponentCount), function(index)
+		return {
+			placement = index,
+			killPoints = tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill),
+			placementPoints = tonumber(match['p' .. index]) or 0,
+			status = statusParsed[index],
+		}
 	end)
 
 	return {
-		score = scoreSettings,
-		status = statusSettings,
+		placementInfo = placementInfo,
 		settings = {
 			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
 			showKills = Logic.nilOr(Logic.readBoolOrNil(match.showkills), true),
@@ -1498,9 +1493,9 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 end
 
 ---@param scoreDataInput table?
----@param scoreSettings {kill: integer[], placement: integer[]}
+---@param placementsInfo {killPoints: number, placement: integer, placementPoints: number}[]
 ---@return table
-function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, scoreSettings)
+function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, placementsInfo)
 	if not scoreDataInput then
 		return {}
 	end
@@ -1510,18 +1505,23 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
 	local manualPoints = tonumber(scoreDataInput.p)
 	if placement or kills then
-		local minimumKillPoints = Array.reduce(scoreSettings.kill, math.min, math.huge)
-		if placement then
-			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
-		end
-		if kills then
-			scoreBreakdown.killPoints = kills * (scoreSettings.kill[placement] or minimumKillPoints)
-			scoreBreakdown.kills = kills
+		local minimumKillPoints = Array.reduce(
+			Array.map(placementsInfo, Operator.property('killPoints')),
+			math.min,
+			math.huge
+		)
+		local placementInfo = placementsInfo[placement] or {}
+		scoreBreakdown.placePoints = placementInfo.placementPoints or 0
+		scoreBreakdown.kills = kills
+
+		local pointsPerKill = placementInfo.killPoints or minimumKillPoints
+		if kills and pointsPerKill ~= math.huge then
+			scoreBreakdown.killPoints = scoreBreakdown.kills * pointsPerKill
 		end
 		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
 	end
 
-	local opponent = {
+	local opponent ={
 		status = MatchGroupInputUtil.STATUS.SCORE,
 		scoreBreakdown = scoreBreakdown,
 		placement = placement,
