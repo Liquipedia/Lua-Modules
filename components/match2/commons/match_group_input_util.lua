@@ -1323,7 +1323,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
-			opponent.extradata.bg = (settings.placementInfo[opponent.placement] or {}).status
+			opponent.extradata.bg = ((settings.placementInfo or {})[opponent.placement] or {}).status
 		end)
 
 		match.winner = Parser.getMatchWinner and Parser.getMatchWinner(match.status, winnerInput, opponents)

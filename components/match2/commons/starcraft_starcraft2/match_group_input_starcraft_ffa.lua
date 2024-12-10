@@ -57,10 +57,7 @@ end
 ---@param match table
 ---@return table
 function MatchFunctions.parseSettings(match)
-	return {
-		status = {},
-		scores = {},
-	}
+	return {}
 end
 
 ---@param opponent table
