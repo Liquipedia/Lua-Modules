@@ -192,7 +192,7 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			return match.extradata.settings.showGameDetails
+			return match.extradata.settings.showGameDetails and match.extradata.settings.showKills
 		end,
 		class = 'panel-table__cell__game-kills',
 		icon = 'kills',

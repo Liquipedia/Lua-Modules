@@ -1491,6 +1491,7 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 		status = statusSettings,
 		settings = {
 			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
+			showKills = Logic.nilOr(Logic.readBoolOrNil(match.showkills), true),
 			matchPointThreshold = tonumber(match.matchpoint),
 		}
 	}
