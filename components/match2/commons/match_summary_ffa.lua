@@ -359,7 +359,7 @@ function MatchSummaryFfa.placementSortFunction(opponent1, opponent2)
 	if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
 		return opponent1.score > opponent2.score
 	end
-	return (opponent1.name or '') < (opponent2.name or '')
+	return (opponent1.name or ''):lower() < (opponent2.name or ''):lower()
 end
 
 ---@param match table
@@ -569,6 +569,26 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
+end
+
+---@param game table
+---@param matchOpponents table[]
+function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
+	-- Add match opponent data to game opponent
+	game.opponents = Array.map(game.opponents,
+		function(gameOpponent, opponentIdx)
+			local matchOpponent = matchOpponents[opponentIdx]
+			local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
+			-- These values are only allowed to come from Game and not Match
+			newGameOpponent.placement = gameOpponent.placement
+			newGameOpponent.score = gameOpponent.score
+			newGameOpponent.status = gameOpponent.status
+			return newGameOpponent
+		end
+	)
+
+	-- Sort game level based on placement
+	Array.sortInPlaceBy(game.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
 end
 
 return MatchSummaryFfa
