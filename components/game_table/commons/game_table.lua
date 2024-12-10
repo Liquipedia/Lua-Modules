@@ -15,7 +15,7 @@ local VodLink = require('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class GameTableMatch: MatchTableMatch
@@ -31,7 +31,7 @@ end)
 ---@return match2game?
 function GameTable:gameFromRecord(game)
 	if self.countGames == self.config.limit then return nil end
-	if game.resulttype == NOT_PLAYED or Logic.isEmpty(game.winner) then
+	if game.status == NOT_PLAYED or Logic.isEmpty(game.winner) then
 		return nil
 	end
 
