@@ -16,7 +16,6 @@ local Character = Lua.import('Module:Infobox/Character')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
 
 ---@class MarvelRivalsHeroInfobox: CharacterInfobox
 local CustomHero = Class.new(Character)
