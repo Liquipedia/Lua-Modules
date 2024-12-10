@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -45,8 +44,8 @@ local MATCH_OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
 		show = function(match)
-			return Table.any(match.extradata.status or {}, function(_, value)
-				return Logic.isNotEmpty(value)
+			return Table.any(match.extradata.placementinfo or {}, function(_, value)
+				return value.status ~= nil
 			end)
 		end,
 		header = {
@@ -57,11 +56,11 @@ local MATCH_OVERVIEW_COLUMNS = {
 				return 'bg-' .. (opponent.advanceBg or '')
 			end,
 			value = function (opponent, idx)
-				if not STATUS_ICONS[opponent.placementStatus] then
+				if not STATUS_ICONS[opponent.advanceBg] then
 					return
 				end
 				return IconWidget{
-					iconName = STATUS_ICONS[opponent.placementStatus],
+					iconName = STATUS_ICONS[opponent.advanceBg],
 				}
 			end,
 		},
@@ -192,7 +191,12 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			return match.extradata.settings.showGameDetails
+			if match.extradata.settings.showGameDetails == false then
+				return false
+			end
+			return Table.any(match.extradata.placementinfo or {}, function(_, value)
+				return value.killPoints ~= nil
+			end)
 		end,
 		class = 'panel-table__cell__game-kills',
 		icon = 'kills',
@@ -361,26 +365,26 @@ end
 ---@param match table
 ---@return {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score:number}[]}
 function MatchSummaryFfa.createScoringData(match)
-	local scoreSettings = match.extradata.scoring
-
-	local scores = Array.map(scoreSettings.placement or {}, function(placementScore, placement)
-		return {placementPoints = placementScore, killPoints = (scoreSettings.kill or {})[placement]}
-	end)
+	local scoreSettings = match.extradata.placementinfo
 
 	local newScores = {}
 	local lastData = {}
-	for placement, score in ipairs(scores) do
-		if Table.deepEquals(lastData, score) then
+	for placement, placementData in ipairs(scoreSettings or {}) do
+		local currentData = {
+			killPoints = placementData.killPoints,
+			placementPoints = placementData.placementPoints,
+		}
+		if Table.deepEquals(lastData, currentData) then
 			newScores[#newScores].rangeEnd = newScores[#newScores].rangeEnd + 1
 		else
 			table.insert(newScores, {
 				rangeStart = placement,
 				rangeEnd = placement,
-				killScore = score.killPoints,
-				placementScore = score.placementPoints,
+				killScore = currentData.killPoints,
+				placementScore = currentData.placementPoints,
 			})
 		end
-		lastData = score
+		lastData = currentData
 	end
 	return newScores
 end
@@ -565,12 +569,6 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
-
-	-- Set the status of the current placement
-	Array.forEach(match.opponents, function(opponent, idx)
-		opponent.placementStatus = match.extradata.status[idx]
-	end)
-
 end
 
 return MatchSummaryFfa

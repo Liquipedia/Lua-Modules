@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
+-- wiki=underlords
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,7 +17,7 @@ local MatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
 		applyUnderScores = true,
-		maxNumPlayers = 3,
+		maxNumPlayers = 4,
 	},
 	DEFAULT_MODE = 'team'
 }

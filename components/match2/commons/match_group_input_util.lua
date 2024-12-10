@@ -1283,7 +1283,6 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-
 	local dateProps = Parser.readDate and Parser.readDate(match)
 		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
 	Table.mergeInto(match, dateProps)
@@ -1299,7 +1298,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local settings = Parser.parseSettings and Parser.parseSettings(match, #opponents)
 		or MatchGroupInputUtil.parseSettings(match, #opponents)
 
-	local games = Parser.extractMaps(match, opponents, settings.score)
+	local games = Parser.extractMaps(match, opponents, settings.placementInfo)
 
 	local autoScoreFunction = Parser.calculateMatchScore and Parser.calculateMatchScore(opponents, games) or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -1324,7 +1323,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
-			opponent.extradata.bg = settings.status[opponent.placement]
+			opponent.extradata.bg = ((settings.placementInfo or {})[opponent.placement] or {}).status
 		end)
 
 		match.winner = Parser.getMatchWinner and Parser.getMatchWinner(match.status, winnerInput, opponents)
@@ -1458,19 +1457,9 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 end
 
 ---@param match table
----@return {score: table, status: table, settings: table}
+---@return {placementInfo: table[], settings: table}
 function MatchGroupInputUtil.parseSettings(match, opponentCount)
-	-- Score Settings
-	local scoreSettings = {
-		kill = Array.map(Array.range(1, opponentCount), function(index)
-			return tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill) or 1
-		end),
-		placement = Array.map(Array.range(1, opponentCount), function(index)
-			return tonumber(match['p' .. index]) or 0
-		end)
-	}
-
-	-- Status colors (up/down etc)
+	-- Pre-parse Status colors (up/down etc)
 	local statusParsed = {}
 	Array.forEach(Array.parseCommaSeparatedString(match.bg, ','), function (status)
 		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
@@ -1482,13 +1471,18 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 		end)
 	end)
 
-	local statusSettings = Array.map(Array.range(1, opponentCount), function(index)
-		return statusParsed[index] or ''
+	-- Info per Placement
+	local placementInfo = Array.map(Array.range(1, opponentCount), function(index)
+		return {
+			placement = index,
+			killPoints = tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill),
+			placementPoints = tonumber(match['p' .. index]) or 0,
+			status = statusParsed[index],
+		}
 	end)
 
 	return {
-		score = scoreSettings,
-		status = statusSettings,
+		placementInfo = placementInfo,
 		settings = {
 			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
 			matchPointThreshold = tonumber(match.matchpoint),
@@ -1497,9 +1491,9 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 end
 
 ---@param scoreDataInput table?
----@param scoreSettings {kill: integer[], placement: integer[]}
+---@param placementsInfo {killPoints: number, placement: integer, placementPoints: number}[]
 ---@return table
-function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, scoreSettings)
+function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, placementsInfo)
 	if not scoreDataInput then
 		return {}
 	end
@@ -1509,13 +1503,18 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
 	local manualPoints = tonumber(scoreDataInput.p)
 	if placement or kills then
-		local minimumKillPoints = Array.reduce(scoreSettings.kill, math.min, math.huge)
-		if placement then
-			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
-		end
-		if kills then
-			scoreBreakdown.killPoints = kills * (scoreSettings.kill[placement] or minimumKillPoints)
-			scoreBreakdown.kills = kills
+		local minimumKillPoints = Array.reduce(
+			Array.map(placementsInfo, Operator.property('killPoints')),
+			math.min,
+			math.huge
+		)
+		local placementInfo = placementsInfo[placement] or {}
+		scoreBreakdown.placePoints = placementInfo.placementPoints or 0
+		scoreBreakdown.kills = kills
+
+		local pointsPerKill = placementInfo.killPoints or minimumKillPoints
+		if kills and pointsPerKill ~= math.huge then
+			scoreBreakdown.killPoints = scoreBreakdown.kills * pointsPerKill
 		end
 		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
 	end
