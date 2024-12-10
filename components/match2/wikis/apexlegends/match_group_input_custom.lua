@@ -7,10 +7,8 @@
 --
 
 local Array = require('Module:Array')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -41,32 +39,7 @@ end
 ---@param scoreSettings table
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, scoreSettings)
-	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		map.opponents = Array.map(opponents, function(matchOpponent)
-			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
-			return MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		map.extradata = MapFunctions.getExtraData(map)
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, MapFunctions)
 end
 
 ---@param opponents table[]
@@ -97,9 +70,11 @@ end
 -- map related functions
 --
 
+---@param match table
 ---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		dateexact = map.dateexact,
 		comment = map.comment,
