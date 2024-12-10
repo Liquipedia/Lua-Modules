@@ -1283,7 +1283,6 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-
 	local dateProps = Parser.readDate and Parser.readDate(match)
 		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
 	Table.mergeInto(match, dateProps)
@@ -1299,7 +1298,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local settings = Parser.parseSettings and Parser.parseSettings(match, #opponents)
 		or MatchGroupInputUtil.parseSettings(match, #opponents)
 
-	local games = Parser.extractMaps(match, opponents, settings.score)
+	local games = Parser.extractMaps(match, opponents, settings.placementInfo)
 
 	local autoScoreFunction = Parser.calculateMatchScore and Parser.calculateMatchScore(opponents, games) or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
@@ -1324,7 +1323,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
-			opponent.extradata.bg = settings.status[opponent.placement]
+			opponent.extradata.bg = (settings.placementInfo[opponent.placement] or {}).status
 		end)
 
 		match.winner = Parser.getMatchWinner and Parser.getMatchWinner(match.status, winnerInput, opponents)
@@ -1458,7 +1457,7 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 end
 
 ---@param match table
----@return {score: table, status: table, settings: table}
+---@return {placementInfo: table[], settings: table}
 function MatchGroupInputUtil.parseSettings(match, opponentCount)
 	-- Pre-parse Status colors (up/down etc)
 	local statusParsed = {}
