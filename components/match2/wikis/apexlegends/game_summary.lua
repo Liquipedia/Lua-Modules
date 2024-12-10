@@ -35,7 +35,7 @@ function CustomGameSummary.getGameByMatchId(props)
 
 	game.stream = match.stream
 
-	CustomGameSummary._opponents(game, match.opponents)
+	SummaryHelper.updateGameOpponents(game, match.opponents)
 	local scoringData = SummaryHelper.createScoringData(match)
 
 	return MatchSummaryWidgets.Tab{
@@ -64,26 +64,6 @@ function CustomGameSummary._createGameDetails(game)
 			} or nil,
 		}
 	}
-end
-
----@param game table
----@param matchOpponents table[]
-function CustomGameSummary._opponents(game, matchOpponents)
-	-- Add match opponent data to game opponent
-	game.opponents = Array.map(game.opponents,
-		function(gameOpponent, opponentIdx)
-			local matchOpponent = matchOpponents[opponentIdx]
-			local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
-			-- These values are only allowed to come from Game and not Match
-			newGameOpponent.placement = gameOpponent.placement
-			newGameOpponent.score = gameOpponent.score
-			newGameOpponent.status = gameOpponent.status
-			return newGameOpponent
-		end
-	)
-
-	-- Sort game level based on placement
-	Array.sortInPlaceBy(game.opponents, FnUtil.identity, SummaryHelper.placementSortFunction)
 end
 
 return CustomGameSummary
