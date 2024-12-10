@@ -359,7 +359,7 @@ function MatchSummaryFfa.placementSortFunction(opponent1, opponent2)
 	if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
 		return opponent1.score > opponent2.score
 	end
-	return (opponent1.name or '') < (opponent2.name or '')
+	return (opponent1.name or ''):lower() < (opponent2.name or ''):lower()
 end
 
 ---@param match table
