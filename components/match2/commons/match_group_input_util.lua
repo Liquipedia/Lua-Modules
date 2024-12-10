@@ -1453,8 +1453,48 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 		status = statusSettings,
 		settings = {
 			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
+			matchPointThreshold = tonumber(match.matchpoint),
 		}
 	}
+end
+
+---@param scoreDataInput table?
+---@param scoreSettings {kill: integer[], placement: integer[]}
+---@return table
+function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, scoreSettings)
+	if not scoreDataInput then
+		return {}
+	end
+
+	local scoreBreakdown = {}
+
+	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
+	local manualPoints = tonumber(scoreDataInput.p)
+	if placement or kills then
+		local minimumKillPoints = Array.reduce(scoreSettings.kill, math.min, math.huge)
+		if placement then
+			scoreBreakdown.placePoints = scoreSettings.placement[placement] or 0
+		end
+		if kills then
+			scoreBreakdown.killPoints = kills * (scoreSettings.kill[placement] or minimumKillPoints)
+			scoreBreakdown.kills = kills
+		end
+		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
+	end
+
+	local opponent = {
+		status = MatchGroupInputUtil.STATUS.SCORE,
+		scoreBreakdown = scoreBreakdown,
+		placement = placement,
+		score = manualPoints or scoreBreakdown.totalPoints,
+	}
+
+	if scoreDataInput[1] == '-' then
+		opponent.status = MatchGroupInputUtil.STATUS.FORFEIT
+		opponent.score = 0
+	end
+
+	return opponent
 end
 
 return MatchGroupInputUtil
