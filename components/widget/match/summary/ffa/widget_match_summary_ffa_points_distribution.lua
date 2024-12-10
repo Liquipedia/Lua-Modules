@@ -24,20 +24,24 @@ local MatchSummaryFfaPointsDistribution = Class.new(Widget)
 function MatchSummaryFfaPointsDistribution:render()
 	assert(self.props.scores, 'No scores provided')
 
+	local hasKillPoints = Array.any(self.props.scores, function(slot)
+		return slot.killScore ~= nil
+	end)
+
 	local function createItem(icon, title, placementPoints, killPoints)
 		local function suffixPoints(score)
 			return score .. ' ' .. 'point' .. (score ~= 1 and 's' or '')
 		end
 		local contentDisplay = {
 			HtmlWidgets.Span{children = suffixPoints(placementPoints)},
-			HtmlWidgets.Span{children = suffixPoints(killPoints)},
+			hasKillPoints and HtmlWidgets.Span{children = suffixPoints(killPoints)} or nil,
 		}
 		return {icon = icon, title = title, content =  contentDisplay}
 	end
 
 	local header = {title = 'Placement', content = {
 		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Placement Points'}},
-		HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Points per Kill'}}
+		hasKillPoints and HtmlWidgets.Span{children = HtmlWidgets.B{children = 'Points per Kill'}} or nil,
 	}}
 
 	local placementItems = Array.map(self.props.scores, function(slot)

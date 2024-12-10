@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -45,8 +44,8 @@ local MATCH_OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
 		show = function(match)
-			return Table.any(match.extradata.status or {}, function(_, value)
-				return Logic.isNotEmpty(value)
+			return Table.any(match.extradata.placementInfo or {}, function(_, value)
+				return value.status ~= nil
 			end)
 		end,
 		header = {
@@ -564,7 +563,7 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 
 	-- Set the status of the current placement
 	Array.forEach(match.opponents, function(opponent, idx)
-		opponent.placementStatus = match.extradata.status[idx]
+		opponent.placementStatus = (match.extradata.placementInfo[idx] or {}).status
 	end)
 
 end

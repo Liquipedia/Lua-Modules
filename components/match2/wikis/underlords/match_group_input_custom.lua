@@ -60,8 +60,7 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		scoring = settings.score,
-		status = settings.status,
+		placementinfo = settings.placementInfo,
 		settings = settings.settings,
 	}
 end
@@ -75,7 +74,6 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-
 	return {
 		dateexact = map.dateexact,
 		comment = map.comment,
