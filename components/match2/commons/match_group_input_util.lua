@@ -1519,7 +1519,7 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
 	end
 
-	local opponent ={
+	local opponent = {
 		status = MatchGroupInputUtil.STATUS.SCORE,
 		scoreBreakdown = scoreBreakdown,
 		placement = placement,
