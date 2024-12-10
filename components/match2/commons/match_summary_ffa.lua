@@ -365,17 +365,21 @@ function MatchSummaryFfa.createScoringData(match)
 	local newScores = {}
 	local lastData = {}
 	for placement, placementData in ipairs(scoreSettings or {}) do
-		if Table.deepEquals(lastData, placementData) then
+		local currentData = {
+			killPoints = placementData.killPoints,
+			placementPoints = placementData.placementPoints,
+		}
+		if Table.deepEquals(lastData, currentData) then
 			newScores[#newScores].rangeEnd = newScores[#newScores].rangeEnd + 1
 		else
 			table.insert(newScores, {
 				rangeStart = placement,
 				rangeEnd = placement,
-				killScore = placementData.killPoints,
-				placementScore = placementData.placementPoints,
+				killScore = currentData.killPoints,
+				placementScore = currentData.placementPoints,
 			})
 		end
-		lastData = placementData
+		lastData = currentData
 	end
 	return newScores
 end
