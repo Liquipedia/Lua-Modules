@@ -12,7 +12,7 @@ return {
 	name = 'Marvel Rivals',
 	defaultGame = 'Marvel Rivals',
 	games = {
-		['Marvel Rivals'] = {
+		marvelrivals = {
 			abbreviation = 'Marvel Rivals',
 			name = 'Marvel Rivals',
 			link = 'Marvel Rivals',
@@ -34,6 +34,7 @@ return {
 		},
 		match2 = {
 			status = 0,
+			matchWidth = 180,
 		},
 	},
 	defaultRoundPrecision = 0,
