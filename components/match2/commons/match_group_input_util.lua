@@ -1162,7 +1162,7 @@ end
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
---- The standard way to process a match input.
+--- The standard way to process a map input.
 ---
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
@@ -1343,6 +1343,44 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.opponents = opponents
 
 	return match
+end
+
+--- The standard way to process a ffa map input.
+---
+--- The Parser injection may optionally have the following functions:
+--- - getExtraData(match, map, opponents): table?
+---
+---@param match table
+---@param opponents table[]
+---@param Parser MapParserInterface
+---@return table
+function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
+	local maps = {}
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local finishedInput = map.finished --[[@as string?]]
+		local winnerInput = map.winner --[[@as string?]]
+
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
+		map.finished = MatchGroupInputUtil.mapIsFinished(map)
+
+		map.opponents = Array.map(opponents, function(matchOpponent)
+			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
+			return MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
+		end)
+
+		map.scores = Array.map(map.opponents, Operator.property('score'))
+		if map.finished then
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
+		end
+
+		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+
+		table.insert(maps, map)
+		match[key] = nil
+	end
+
+	return maps
 end
 
 ---@param opponents table[]
