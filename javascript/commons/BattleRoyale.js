@@ -321,6 +321,9 @@ liquipedia.battleRoyale = {
 							this.createBottomNav( battleRoyaleId, matchContentId, index );
 						}
 					} );
+
+				// Trigger countdown initialization since we have new dates
+				liquipedia.countdown.init();
 			} );
 		} else {
 			this.updateGameTabDisplay( battleRoyaleId, matchContentId, gameTab );
