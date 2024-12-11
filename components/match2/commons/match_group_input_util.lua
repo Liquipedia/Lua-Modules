@@ -837,9 +837,9 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 		return true
 	end
 
-	local playall = tonumber(match.playall) or 0
-	if playall > 0 then
-		return MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
+	local playall = Logic.readBoolOrNil(match.finished)
+	if playall then
+		return MatchGroupInputUtil.allHasBeenPlayed(match.games)
 	end
 
 	local bestof = match.bestof
@@ -896,13 +896,10 @@ function MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 	return false
 end
 
--- Check if all games/rounds have been played
----@param playall integer
----@param opponents {score: integer?}[]
+---@param games table[]
 ---@return boolean
-function MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
-	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
-	return scoreSum >= playall
+function MatchGroupInputUtil.allHasBeenPlayed(games)
+	return Array.all(games, function(game) return game.finished end)
 end
 
 ---@param bestOfInput string|integer?
@@ -1155,7 +1152,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 
 	match.stream = Streams.processStreams(match)
 	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
-	match.extradata = Table.merge({playall = tonumber(match.playall)}, match.extradata)
+	match.extradata = Table.merge({playall = Logic.readBoolOrNil(match.playall)}, match.extradata)
 
 	match.games = games
 	match.opponents = opponents
