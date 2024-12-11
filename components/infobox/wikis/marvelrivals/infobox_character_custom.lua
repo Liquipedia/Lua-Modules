@@ -58,7 +58,6 @@ function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.image = args.image
 	lpdbData.date = args.released
 	lpdbData.extradata = {
-		name = args.name,
 		health = args.health,
 		movespeed = args.movespeed,
 		dificulty = args.difficulty,
