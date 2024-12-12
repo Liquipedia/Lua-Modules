@@ -1066,7 +1066,6 @@ end
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
----@field HAS_FFA? boolean
 
 --- The standard way to process a match input.
 ---
@@ -1088,7 +1087,6 @@ end
 --- - DEFAULT_MODE: string
 --- - DATE_FALLBACKS: string[]
 --- - OPPONENT_CONFIG: table
---- - HAS_FFA: boolean
 ---@param match table
 ---@param Parser MatchParserInterface?
 ---@param FfaParser FfaMatchParserInterface?
