@@ -348,11 +348,13 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 	end
 end
 
----@param matches {match2opponents: table[]}[]
+---@param matches {match2opponents: table[]?, opponents: table[]?}[]
 ---@return integer
 function MatchGroupInput.getMaxOpponentCount(matches)
 	return Array.reduce(matches, function(cur, match)
-		return math.max(#match.match2opponents, cur)
+		-- If the match comes from ShowBracket then it's opponents, otherwise it's match2opponents
+		-- Which is stupid, and needs to be fixed
+		return math.max(#(match.match2opponents or match.opponents or {}), cur)
 	end, 0)
 end
 
