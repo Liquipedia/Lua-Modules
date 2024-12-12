@@ -13,6 +13,9 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 ---@class TftMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
@@ -26,6 +29,20 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	if opponents > 2 then
+		return WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	else
+		return WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
+	end
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), bestof == 0)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
 
@@ -46,6 +63,48 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	return table.concat(lines, '\n')
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	local lines = Array.extend(
+		'{{Match|finished=',
+		INDENT .. '|p1=8|p2=7|p3=6|p4=5|p5=4|p6=3|p7=2|p8=1',
+		INDENT .. '|twitch=|youtube=',
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|vod=}}'
+		end),
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getFfaOpponent(mode, bestof)
+		end),
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param mode string
+---@param mapCount integer
+---@return string
+function WikiCopyPaste._getFfaOpponent(mode, mapCount)
+	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
+		return '|m' .. idx .. '={{MS||}}'
+	end))
+
+	if mode == Opponent.solo then
+		return '{{SoloOpponent||flag=' .. mapScores .. '}}'
+	elseif mode == Opponent.team then
+		return '{{TeamOpponent|' .. mapScores .. '}}'
+	elseif mode == Opponent.literal then
+		return '{{Literal|}}'
+	end
+
+	return ''
 end
 
 return WikiCopyPaste
