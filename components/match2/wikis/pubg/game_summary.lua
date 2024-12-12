@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
-local SummaryHelper = Lua.import('Module:MatchSummary/Ffa')
+local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 
 ---@class PubgMatchGroupUtilGame: MatchGroupUtilGame
