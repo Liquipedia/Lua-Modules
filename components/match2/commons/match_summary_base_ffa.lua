@@ -140,7 +140,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		class = 'cell--match-points',
 		icon = 'matchpoint',
 		show = function(match)
-				return match.extradata.settings.matchPointThreshold
+				return (match.extradata.settings or {}).matchPointThreshold
 		end,
 		header = {
 			value = 'MPe Game',
@@ -161,7 +161,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 local GAME_OVERVIEW_COLUMNS = {
 	{
 		show = function(match)
-			return match.extradata.settings.showGameDetails
+			return (match.extradata.settings or {}).showGameDetails
 		end,
 		class = 'panel-table__cell__game-placement',
 		icon = 'placement',
@@ -191,7 +191,7 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			if match.extradata.settings.showGameDetails == false then
+			if (match.extradata.settings or {}).showGameDetails == false then
 				return false
 			end
 			return Table.any(match.extradata.placementinfo or {}, function(_, value)
@@ -211,7 +211,7 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			return not match.extradata.settings.showGameDetails
+			return not (match.extradata.settings or {}).showGameDetails
 		end,
 		class = 'panel-table__cell__game-total-points',
 		icon = 'points',
@@ -551,7 +551,7 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 		end)
 	end)
 
-	local matchPointThreshold = match.extradata.settings.matchPointThreshold
+	local matchPointThreshold = (match.extradata.settings or {}).matchPointThreshold
 	if matchPointThreshold then
 		Array.forEach(match.opponents, function(opponent)
 			local matchPointReachedIn
