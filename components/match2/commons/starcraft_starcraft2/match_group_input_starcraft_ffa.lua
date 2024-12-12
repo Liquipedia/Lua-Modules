@@ -241,11 +241,6 @@ end
 ---@param hasScores any
 ---@return {placement: integer?, score: integer?, status: string}
 function MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
-	-- next 3 lines are temp workaround to adjust usage on the wiki after merge
-	if not hasScores and Logic.isEmpty(mapInput['placement' .. opponentIndex]) then
-		mapInput['score' .. opponentIndex] = 'L'
-	end
-
 	local score, status = MatchGroupInputUtil.computeOpponentScore{
 		walkover = mapInput.walkover,
 		winner = mapInput.winner,
