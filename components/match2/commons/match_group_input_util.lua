@@ -1342,7 +1342,6 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.stream = Streams.processStreams(match)
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {}
-	match.extradata.ffa = true
 
 	match.games = games
 	match.opponents = opponents
@@ -1357,6 +1356,7 @@ end
 ---
 ---@param match table
 ---@param opponents table[]
+---@param scoreSettings table
 ---@param Parser MapParserInterface
 ---@return table
 function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
