@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=underlords
--- page=Module:MatchSummary
+-- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --

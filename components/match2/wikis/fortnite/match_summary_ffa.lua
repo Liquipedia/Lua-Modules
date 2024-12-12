@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
--- wiki=pubg
--- page=Module:MatchSummary
+-- wiki=fortnite
+-- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -16,13 +16,13 @@ local SummaryHelper = Lua.import('Module:MatchSummary/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class PubgMatchGroupUtilMatch: MatchGroupUtilMatch
----@field games PubgMatchGroupUtilGame[]
+---@class FortniteMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games FortniteMatchGroupUtilGame[]
 
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
 function CustomMatchSummary.getByMatchId(props)
-	---@class PubgMatchGroupUtilMatch
+	---@class FortniteMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)

@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
--- page=Module:MatchSummary
+-- wiki=autochess
+-- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -16,13 +16,13 @@ local SummaryHelper = Lua.import('Module:MatchSummary/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class ApexMatchGroupUtilMatch: MatchGroupUtilMatch
----@field games ApexMatchGroupUtilGame[]
+---@class AutochessMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games AutochessMatchGroupUtilGame[]
 
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
 function CustomMatchSummary.getByMatchId(props)
-	---@class ApexMatchGroupUtilMatch
+	---@class AutochessMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)

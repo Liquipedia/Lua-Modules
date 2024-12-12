@@ -26,8 +26,9 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 end)
 
 ---@param matchGroupType string
+---@param maxOpponentCount integer
 ---@return function
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
+function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	if matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)

@@ -37,8 +37,9 @@ function MatchGroup.MatchList(args)
 
 	local matchlistNode
 	if options.show then
+		local maxOpponentCount = MatchGroupInput.getMaxOpponentCount(matches)
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
-		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist', maxOpponentCount)
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -62,8 +63,9 @@ function MatchGroup.Bracket(args)
 
 	local bracketNode
 	if options.show then
+		local maxOpponentCount = MatchGroupInput.getMaxOpponentCount(matches)
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
-		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket', maxOpponentCount)
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -153,7 +155,8 @@ function MatchGroup.MatchGroupById(args)
 
 	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
+	local maxOpponentCount = MatchGroupInput.getMaxOpponentCount(matches)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,

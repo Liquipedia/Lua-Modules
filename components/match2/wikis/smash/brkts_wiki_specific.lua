@@ -22,8 +22,9 @@ WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
 end)
 
 ---@param matchGroupType string
+---@param maxOpponentCount integer
 ---@return function
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
+function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	return matchGroupType == 'matchlist'
 		and Lua.import('Module:MatchGroup/Display/Matchlist').MatchlistContainer
 		or Lua.import('Module:MatchGroup/Display/Bracket/Custom').BracketContainer
