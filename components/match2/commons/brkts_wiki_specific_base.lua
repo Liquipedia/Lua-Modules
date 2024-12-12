@@ -52,7 +52,9 @@ Called from MatchGroup
 -- @returns module
 ]]
 function WikiSpecificBase.getMatchGroupContainer(matchGroupType, maxOpponentCount)
-	if Lua.moduleExists('Module:MatchSummary/Ffa') and maxOpponentCount > 2 then
+	if (maxOpponentCount > 2 or not Lua.moduleExists('Module:MatchSummary')) and
+		Lua.moduleExists('Module:MatchSummary/Ffa') then
+
 		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
 		return Horizontallist.BracketContainer
 	elseif matchGroupType == 'matchlist' then
