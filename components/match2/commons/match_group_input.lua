@@ -348,6 +348,14 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 	end
 end
 
+---@param matches {match2opponents: table[]}[]
+---@return integer
+function MatchGroupInput.getMaxOpponentCount(matches)
+	return Array.reduce(matches, function(cur, match)
+		return math.max(#match.match2opponents, cur)
+	end, 0)
+end
+
 ---@param headerInput string?
 ---@return string?
 function MatchGroupInput._inheritedHeader(headerInput)

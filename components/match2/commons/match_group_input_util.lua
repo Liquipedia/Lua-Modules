@@ -1088,12 +1088,13 @@ end
 --- - DATE_FALLBACKS: string[]
 --- - OPPONENT_CONFIG: table
 ---@param match table
----@param Parser MatchParserInterface
+---@param Parser MatchParserInterface?
+---@param FfaParser FfaMatchParserInterface?
 ---@param mapProps any?
 ---@return table
-function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
+function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapProps)
+	Parser = Parser or {}
+	local matchInput = Table.deepCopy(match)
 
 	local dateProps = Parser.readDate and Parser.readDate(match)
 		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
@@ -1106,6 +1107,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 		end
 		return opponent
 	end)
+
+	if FfaParser and #opponents > 2 then
+		return MatchGroupInputUtil.standardProcessFfaMatch(matchInput, FfaParser, mapProps)
+	end
 
 	local games = Parser.extractMaps(match, opponents, mapProps)
 	match.bestof = Parser.getBestOf(match.bestof, games)
@@ -1131,8 +1136,8 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
@@ -1351,6 +1356,7 @@ end
 ---
 ---@param match table
 ---@param opponents table[]
+---@param scoreSettings table
 ---@param Parser MapParserInterface
 ---@return table
 function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)

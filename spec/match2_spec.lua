@@ -80,6 +80,21 @@ describe('match2', function()
 						}
 					},
 				}
+			},
+			apexlegends = {
+				input = {
+					storeMatch1 = false, storePageVar = false,
+					matches = {
+						{
+							date = '2022-01-05',
+							comment = 'A Match Comment',
+							opponent1 = Json.stringify{name = 'A', link='abc', score = 3, type = 'solo'},
+							opponent2 = Json.stringify{name = 'B', score = 2, type = 'solo'},
+							opponent3 = Json.stringify{name = 'C', score = 4, type = 'solo'},
+							opponent4 = Json.stringify{name = 'D', score = 1, type = 'solo'},
+						}
+					},
+				}
 			}
 		})
 	end)
