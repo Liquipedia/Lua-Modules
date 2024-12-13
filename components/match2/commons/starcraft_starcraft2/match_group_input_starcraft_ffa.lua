@@ -202,7 +202,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	end
 
 	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
+		return MapFunctions.getOpponentInfo(mapInput, opponentIndex)
 	end)
 
 	map.scores = Array.map(map.opponents, Operator.property('score'))
@@ -236,16 +236,10 @@ function MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	end)
 end
 
----@param mapInput any
----@param opponentIndex any
----@param hasScores any
+---@param mapInput table
+---@param opponentIndex integer
 ---@return {placement: integer?, score: integer?, status: string}
-function MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
-	-- next 3 lines are temp workaround to adjust usage on the wiki after merge
-	if not hasScores and Logic.isEmpty(mapInput['placement' .. opponentIndex]) then
-		mapInput['score' .. opponentIndex] = 'L'
-	end
-
+function MapFunctions.getOpponentInfo(mapInput, opponentIndex)
 	local score, status = MatchGroupInputUtil.computeOpponentScore{
 		walkover = mapInput.walkover,
 		winner = mapInput.winner,
@@ -255,7 +249,7 @@ function MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
 
 	return {
 		placement = tonumber(mapInput['placement' .. opponentIndex]),
-		score = hasScores and score or nil,
+		score = score,
 		status = status,
 	}
 end
