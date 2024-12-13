@@ -33,11 +33,22 @@ Author(s): Elysienna
 			font-size: 0.75rem;
 		}
 
+		.theme--dark & {
+			background-color: var( --clr-secondary-9 );
+			border-bottom-color: var( --clr-secondary-16 );
+		}
+
 		&.is--active {
-			background-color: #ffffff;
+			background-color: var( --clr-background, #ffffff );
 			color: #282828;
 			border-color: rgba( 0, 0, 0, 0.2 );
 			border-bottom-color: transparent;
+
+			.theme--dark & {
+				color: var( --clr-secondary-70 );
+				border-color: var( --clr-secondary-16 );
+				border-bottom-color: transparent;
+			}
 		}
 
 		&:not( :first-child ) {
@@ -47,6 +58,10 @@ Author(s): Elysienna
 		@media ( hover: hover ) {
 			&:hover:not( .is--active ) {
 				background-color: rgba( 0, 0, 0, 0.08 );
+
+				.theme--dark & {
+					background-color: var( --clr-secondary-16 );
+				}
 			}
 		}
 	}
@@ -69,6 +84,11 @@ Author(s): Elysienna
 		margin: 0;
 		padding: 0;
 		color: inherit;
+
+		html.theme--light &,
+		html.theme--dark & {
+			color: var( --clr-on-background );
+		}
 	}
 }
 
@@ -79,6 +99,11 @@ Author(s): Elysienna
 
 	@media ( max-width: 767px ) {
 		font-size: 0.75rem;
+	}
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-16 );
+		box-shadow: 0 -0.0625rem 0 0 var( --clr-secondary-16 );
 	}
 
 	&.is--hidden {
@@ -126,6 +151,11 @@ Author(s): Elysienna
 
 		@media ( max-width: 767px ) {
 			font-size: 0.8125rem;
+		}
+
+		html.theme--light &,
+		html.theme--dark & {
+			color: var( --clr-on-background );
 		}
 
 		&-icon {
