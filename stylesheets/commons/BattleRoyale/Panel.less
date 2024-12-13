@@ -145,6 +145,10 @@ Author(s): Elysienna
 			.panel-content__collapsible.is--collapsed & {
 				&:hover {
 					background-color: rgba( 0, 0, 0, 0.08 );
+
+					.theme--dark & {
+						background-color: rgba( 255, 255, 255, .08 );
+					}
 				}
 			}
 		}
@@ -300,6 +304,10 @@ Author(s): Elysienna
 			cursor: pointer;
 			font-weight: bold;
 
+			.theme--dark & {
+				color: var( --clr-on-background );
+			}
+
 			&.navigate--left {
 				flex-direction: row-reverse;
 			}
@@ -310,11 +318,15 @@ Author(s): Elysienna
 		}
 
 		&__icon {
-			color: var( --clr-wiki-on-primary );
+			color: var( --clr-wiki-theme-primary, var( --clr-wiki-on-primary ) );
 			width: 1.5rem;
 			display: flex;
 			justify-content: center;
 			margin: 0 0.5rem;
+
+			.theme--dark & {
+				color: var( --clr-secondary-70 );
+			}
 		}
 	}
 }
