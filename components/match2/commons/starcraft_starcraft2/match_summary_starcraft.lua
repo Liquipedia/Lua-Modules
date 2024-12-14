@@ -42,13 +42,6 @@ function StarcraftMatchSummary.getByMatchId(args)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
 	---@cast match StarcraftMatchGroupUtilMatch
 
-	if match.isFfa then
-		return Lua.import('Module:MatchSummary/Starcraft/Ffa').getByMatchId{
-			match = match,
-			config = args.config
-		}
-	end
-
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
 end
 
