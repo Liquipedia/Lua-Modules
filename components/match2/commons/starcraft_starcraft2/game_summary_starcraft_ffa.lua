@@ -8,7 +8,9 @@
 
 local CustomGameSummary = {}
 
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 
@@ -24,6 +26,7 @@ function CustomGameSummary.getGameByMatchId(props)
 	assert(game, 'Error Game ID ' .. tostring(props.gameIdx) .. ' not found')
 
 	game.stream = match.stream
+	game.noScore = match.noScore
 
 	SummaryHelper.updateGameOpponents(game, match.opponents)
 
@@ -32,9 +35,24 @@ function CustomGameSummary.getGameByMatchId(props)
 		idx = props.gameIdx,
 		children = {
 			MatchSummaryWidgets.GameDetails{game = game},
-			SummaryHelper.standardGame(game)
+			SummaryHelper.standardGame(game, CustomGameSummary)
 		}
 	}
+end
+
+---@param columns table[]
+---@param game table
+---@return table[]
+function CustomGameSummary.adjustGameStandingsColumns(columns, game)
+	return Array.map(columns, function(column)
+		if column.id == 'totalPoints' and game.noScore then
+			return
+		elseif column.id == 'placements' or column.id == 'kills' then
+			return
+		end
+
+		return column
+	end)
 end
 
 return CustomGameSummary
