@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local StarcraftMatchSummary = {}
+local StarcraftMatchSummaryFfa = {}
 
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
@@ -28,7 +28,7 @@ local Parser = {}
 
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
-function StarcraftMatchSummary.getByMatchId(props)
+function StarcraftMatchSummaryFfa.getByMatchId(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	---@cast match StarcraftMatchGroupUtilMatch
 
@@ -40,7 +40,7 @@ function StarcraftMatchSummary.getByMatchId(props)
 			matchId = match.matchId,
 			idx = 0,
 			children = {
-				StarcraftMatchSummary._schedule(match),
+				StarcraftMatchSummaryFfa._schedule(match),
 				BaseMatchSummary.standardMatch(match, Parser),
 			}
 		}
@@ -49,7 +49,7 @@ end
 
 ---@param match StarcraftMatchGroupUtilMatch
 ---@return Widget
-function StarcraftMatchSummary._schedule(match)
+function StarcraftMatchSummaryFfa._schedule(match)
 	local dates = Array.map(match.games, Operator.property('date'))
 	if Array.any(dates, function(date) return date ~= match.date end) then
 		return MatchSummaryWidgets.GamesSchedule{games = match.games}
@@ -107,4 +107,4 @@ function Parser.adjustGameOverviewColumns(columns)
 end
 
 
-return StarcraftMatchSummary
+return StarcraftMatchSummaryFfa
