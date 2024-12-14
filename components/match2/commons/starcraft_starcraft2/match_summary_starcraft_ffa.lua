@@ -92,11 +92,11 @@ end
 function Parser.adjustGameOverviewColumns(columns)
 	Array.forEach(columns, function(column)
 		if column.id == 'placement' then
-			column.show = function(match) return not Logic.readBool(match.noScore) end
+			column.show = function(match) return true end
 		elseif column.id == 'kills' then
 			return
 		elseif column.id == 'points' then
-			column.show = function(match) return true end
+			column.show = function(match) return not Logic.readBool(match.noScore) end
 			column.row = {value = function(opponent)
 				return OpponentDisplay.InlineScore(Table.merge({extradata = {}, score = ''}, opponent))
 			end}
