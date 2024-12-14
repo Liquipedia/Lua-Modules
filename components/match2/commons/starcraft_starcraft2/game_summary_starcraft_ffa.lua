@@ -10,7 +10,6 @@ local CustomGameSummary = {}
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
 
