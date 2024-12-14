@@ -192,6 +192,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 
 	if mapInput.date then
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
+		map.extradata = map.dateexact
 	end
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then

@@ -29,7 +29,10 @@ end)
 ---@param maxOpponentCount integer
 ---@return function
 function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
-	if matchGroupType == 'matchlist' then
+	if maxOpponentCount > 2 then
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)
 	end
