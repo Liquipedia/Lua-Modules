@@ -50,11 +50,17 @@ end
 ---@param match StarcraftMatchGroupUtilMatch
 ---@return Widget
 function StarcraftMatchSummaryFfa._schedule(match)
-	local dates = Array.map(match.games, Operator.property('date'))
-	if Array.any(dates, function(date) return date ~= match.date end) then
+	if StarcraftMatchSummaryFfa._gamesHaveDates(match) then
 		return MatchSummaryWidgets.GamesSchedule{games = match.games}
 	end
 	return MatchSummaryWidgets.MatchSchedule{match = match}
+end
+
+---@param match StarcraftMatchGroupUtilMatch
+---@return boolean
+function StarcraftMatchSummaryFfa._gamesHaveDates(match)
+	local dates = Array.map(match.games, Operator.property('date'))
+	return Array.any(dates, function(date) return date ~= match.date end)
 end
 
 ---@param columns table[]
@@ -106,5 +112,24 @@ function Parser.adjustGameOverviewColumns(columns)
 	return columns
 end
 
+---@param match table
+---@param game table
+---@param gameIndex integer
+---@return table[]
+function Parser.gameHeader(match, game, gameIndex)
+	return {
+		HtmlWidgets.Div{
+			classes = {'panel-table__cell__game-title'},
+			children = {
+				MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-table__cell-icon'}},
+				HtmlWidgets.Span{
+					classes = {'panel-table__cell-text'},
+					children = 'Game ' .. gameIndex
+				}
+			}
+		},
+		StarcraftMatchSummaryFfa._gamesHaveDates(match) and MatchSummaryWidgets.GameCountdown{game = game} or nil,
+	}
+end
 
 return StarcraftMatchSummaryFfa

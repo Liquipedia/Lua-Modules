@@ -401,6 +401,7 @@ end
 ---@class FfaMatchSummaryParser
 ---@field adjustMatchColumns? fun(defaultColumns: table[]): table[]
 ---@field adjustGameOverviewColumns? fun(defaultColumns: table[]): table[]
+---@field gameHeader? fun(match: table, game: table, gameIndex: integer): Widget[]
 
 ---@param match table
 ---@param Parser FfaMatchSummaryParser?
@@ -485,7 +486,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 						children = {
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-head'},
-								children = {
+								children = Parser.gameHeader and Parser.gameHeader(match, game, idx) or {
 									HtmlWidgets.Div{
 										classes = {'panel-table__cell__game-title'},
 										children = {
