@@ -159,7 +159,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.matchPointReachedIn and "Game " .. opponent.matchPointReachedIn or nil
+				return opponent.matchPointReachedIn and 'Game ' .. opponent.matchPointReachedIn or nil
 			end,
 		},
 	},
