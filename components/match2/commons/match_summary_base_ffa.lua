@@ -236,6 +236,7 @@ local GAME_OVERVIEW_COLUMNS = {
 }
 local GAME_STANDINGS_COLUMNS = {
 	{
+		id = 'rank',
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
@@ -268,6 +269,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'opponent',
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
@@ -293,6 +295,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'totalPoints',
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
@@ -313,6 +316,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'placements',
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -332,6 +336,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'kills',
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
@@ -528,11 +533,19 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 	}}
 end
 
+---@class FfaGameSummaryParser
+---@field adjustGameStandingsColumns? fun(defaultColumns: table[], game: table): table[]
+
 ---@param game table
+---@param Parser FfaGameSummaryParser?
 ---@return MatchSummaryFfaTable
-function MatchSummaryFfa.standardGame(game)
+function MatchSummaryFfa.standardGame(game, Parser)
+	Parser = Parser or {}
+	local gameStandingsColumns = Parser.adjustGameStandingsColumns
+		and Parser.adjustGameStandingsColumns(GAME_STANDINGS_COLUMNS, game)
+		or GAME_STANDINGS_COLUMNS
 	local rows = Array.map(game.opponents, function (opponent, index)
-		local children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+		local children = Array.map(gameStandingsColumns, function(column)
 			if column.show and not column.show(game) then
 				return
 			end
@@ -548,7 +561,7 @@ function MatchSummaryFfa.standardGame(game)
 	end)
 
 	return MatchSummaryWidgets.Table{children = {
-		MatchSummaryWidgets.TableHeader{children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+		MatchSummaryWidgets.TableHeader{children = Array.map(gameStandingsColumns, function(column)
 			if column.show and not column.show(game) then
 				return
 			end
