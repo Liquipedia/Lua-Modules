@@ -96,20 +96,26 @@ end
 ---@param columns table[]
 ---@return table[]
 function Parser.adjustGameOverviewColumns(columns)
-	Array.forEach(columns, function(column)
+	return Array.map(columns, function(column)
 		if column.id == 'placement' then
 			column.show = function(match) return true end
-		elseif column.id == 'kills' then
-			return
+
+		-- css for points shifts it to the next line and expects kills to be present
 		elseif column.id == 'points' then
+			return
+
+		-- css for kills works just fine for our purposes
+		elseif column.id == 'kills' then
 			column.show = function(match) return not Logic.readBool(match.noScore) end
 			column.row = {value = function(opponent)
 				return OpponentDisplay.InlineScore(Table.merge({extradata = {}, score = ''}, opponent))
 			end}
+			column.icon = 'points'
+			column.header = {value = 'Pts.'}
 		end
-	end)
 
-	return columns
+		return column
+	end)
 end
 
 ---@param match table
