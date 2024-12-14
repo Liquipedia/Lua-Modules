@@ -502,7 +502,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 							},
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-details'},
-								children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+								children = Array.map(gameOverviewColumns, function(column)
 									if column.show and not column.show(match) then
 										return
 									end
