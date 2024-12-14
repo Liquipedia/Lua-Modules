@@ -213,7 +213,7 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 		row = {
 			value = function (opponent)
-				return opponent.scoreBreakdown.kills
+				return (opponent.scoreBreakdown or {}).kills
 			end,
 		},
 	},
@@ -322,12 +322,12 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.placePoints
+				return (opponent.scoreBreakdown or {}).placePoints
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.placePoints
+				return (opponent.scoreBreakdown or {}).placePoints
 			end,
 		},
 	},
@@ -341,12 +341,12 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.killPoints
+				return (opponent.scoreBreakdown or {}).killPoints
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.killPoints
+				return (opponent.scoreBreakdown or {}).killPoints
 			end,
 		},
 	},
