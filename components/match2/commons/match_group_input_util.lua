@@ -1164,6 +1164,7 @@ end
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1224,7 +1225,12 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			local players = Parser.getPlayersOfMapOpponent
 				and Parser.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 				or nil
-			return {score = score, status = status, players = players}
+
+			local mapOpponent = {score = score, status = status, players = players}
+			if not Parser.extendMapOpponent then
+				return mapOpponent
+			end
+			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
 
 		-- needs map.opponents available!
@@ -1463,6 +1469,7 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 end
 
 ---@param match table
+---@param opponentCount integer
 ---@return {placementInfo: table[], settings: table}
 function MatchGroupInputUtil.parseSettings(match, opponentCount)
 	-- Pre-parse Status colors (up/down etc)

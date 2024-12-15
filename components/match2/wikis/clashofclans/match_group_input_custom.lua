@@ -52,41 +52,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.map = MapFunctions.getMapName(map)
-		map.extradata = MapFunctions.getExtraData(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		map.opponents = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			return {
-				score = score,
-				status = status,
-				time = map.extradata.times[opponentIndex],
-				percentage = map.extradata.percentages[opponentIndex] or 0
-			}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestofInput string|integer?
@@ -119,9 +85,11 @@ function MapFunctions.getMapName(map)
 	return nil
 end
 
+---@param match table
 ---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
 		times = MapFunctions.readTimes(map),
@@ -159,6 +127,16 @@ function MapFunctions.readTimes(map)
 	end
 
 	return timesInSeconds
+end
+
+function MapFunctions.extendMapOpponent(map, opponentIndex)
+	local times = MapFunctions.readTimes(map)
+	local percentages = MapFunctions.readPercentages(map)
+
+	return {
+		time = times[opponentIndex],
+		percentage = percentages[opponentIndex] or 0,
+	}
 end
 
 return CustomMatchGroupInput
