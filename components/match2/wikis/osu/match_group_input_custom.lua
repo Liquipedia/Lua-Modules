@@ -86,6 +86,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 		comment = map.comment,
 	}
 end
+
 ---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
 ---@param autoScore? fun(opponentIndex: integer): integer?
 ---@return integer|string? #SCORE
