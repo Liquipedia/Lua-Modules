@@ -1159,7 +1159,7 @@ end
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
----@field getMapName? fun(game: table): string?
+---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
@@ -1190,7 +1190,7 @@ end
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(map) then
 			break
 		end
@@ -1203,7 +1203,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 
 		if Parser.getMapName then
-			map.map = Parser.getMapName(map)
+			map.map = Parser.getMapName(map, mapIndex, match)
 		end
 
 		if Parser.mapIsFinished then
