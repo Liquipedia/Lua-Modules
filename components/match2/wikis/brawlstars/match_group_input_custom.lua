@@ -30,7 +30,9 @@ local DEFAULT_BESTOF_MAP = 3
 
 -- containers for process helper functions
 local MatchFunctions = {}
-local MapFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
 
 MatchFunctions.DEFAULT_MODE = 'team'
 MatchFunctions.DATE_FALLBACKS = {
@@ -50,42 +52,11 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if map.map == nil then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
-		map.bestof = MapFunctions.getBestOf(map)
-		map.extradata = MapFunctions.getExtraData(map, #opponents)
-
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			local players = MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-		end)
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	local games = MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+	Array.forEach(games, function(game, gameINdex)
+		game.vod = game.vod or String.nilIfEmpty(match['vodgame' .. gameINdex])
+	end)
+	return games
 end
 
 --
@@ -124,7 +95,7 @@ end
 
 ---@param map table
 ---@return integer
-function MapFunctions.getBestOf(map)
+function MapFunctions.getMapBestOf(map)
 	local bestof = tonumber(Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof')))
 	Variables.varDefine('map_bestof', bestof)
 	return bestof or DEFAULT_BESTOF_MAP
@@ -163,9 +134,9 @@ end
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
 	local players = Array.mapIndexes(function(playerIndex)
-		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'c' .. playerIndex])
+		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['t' .. opponentIndex .. 'c' .. playerIndex]
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -180,10 +151,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 return CustomMatchGroupInput

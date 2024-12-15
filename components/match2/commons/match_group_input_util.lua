@@ -1165,6 +1165,7 @@ end
 ---@field getPatch? fun(game: table): string?
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
+---@field getMapBestOf? fun(map: table): integer?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1213,6 +1214,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
+		end
+
+		if Parser.getMapBestOf then
+			map.bestof = Parser.getMapBestOf(map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
