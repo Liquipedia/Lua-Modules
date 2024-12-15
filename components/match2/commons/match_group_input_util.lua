@@ -1166,6 +1166,7 @@ end
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 ---@field getMapBestOf? fun(map: table): integer?
+---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1179,6 +1180,9 @@ end
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
 --- - mapIsFinished(map, opponents): boolean
+--- - extendMapOpponent(map, opponentIndex): table
+--- - getMapBestOf(map): integer?
+--- - computeOpponentScore(props, autoScore): integer?, string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1221,7 +1225,8 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
+			local computeOpponentScore = Parser.computeOpponentScore or MatchGroupInputUtil.computeOpponentScore
+			local score, status = computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
