@@ -166,7 +166,7 @@ function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
 				gap = '2px',
 				width = '100%'
 			},
-			children = {
+			children = Array.extend{
 				char,
 				isTeamMatch and PlayerDisplay.BlockPlayer{player = player, flip = flip} or nil,
 			},
