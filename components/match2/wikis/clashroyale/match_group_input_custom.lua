@@ -12,7 +12,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 

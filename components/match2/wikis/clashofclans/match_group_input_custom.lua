@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
-local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
