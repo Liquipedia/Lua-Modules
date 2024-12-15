@@ -79,11 +79,10 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 
 	local players = Array.mapIndexes(function(playerIndex)
-		return opponent.match2players[playerIndex] or
-			(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
-			nil
+		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['o' .. opponentIndex .. 'p' .. playerIndex]
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -105,10 +104,6 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param map table
