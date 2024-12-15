@@ -11,8 +11,6 @@ local AgentNames = require('Module:AgentNames')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

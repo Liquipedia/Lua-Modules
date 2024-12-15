@@ -1210,6 +1210,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.map = Parser.getMapName(map, mapIndex, match)
 		end
 
+		if Parser.getMapBestOf then
+			map.bestof = Parser.getMapBestOf(map)
+		end
+
 		if Parser.mapIsFinished then
 			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
 		else
@@ -1218,10 +1222,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
-		end
-
-		if Parser.getMapBestOf then
-			map.bestof = Parser.getMapBestOf(map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)

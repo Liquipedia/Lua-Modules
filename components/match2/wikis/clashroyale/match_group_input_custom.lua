@@ -87,14 +87,13 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return extradata
 end
 
----@param mapInput table
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(mapInput, finished)
-	local winner = tonumber(mapInput.winner)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner and not map.finished then
 			return
 		end
 
@@ -164,15 +163,15 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 end
 
 ---@param match table
----@param mapInput table
----@param mapOpponents {players: {player: string, played: boolean, cards: table}[]}[]
+---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(match, mapInput, mapOpponents)
+function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = mapInput.comment,
+		comment = map.comment,
 	}
 
-	return Table.merge(extradata, MapFunctions.getCardsExtradata(mapOpponents))
+	return Table.merge(extradata, MapFunctions.getCardsExtradata(map.opponents))
 end
 
 --- additionally store cards info in extradata so we can condition on them

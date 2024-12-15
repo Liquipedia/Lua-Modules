@@ -7,10 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 local WeaponNames = mw.loadData('Module:WeaponNames')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')

@@ -100,10 +100,11 @@ function MapFunctions.getMapBestOf(map)
 	return bestof or DEFAULT_BESTOF_MAP
 end
 
+---@param match table
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map, opponentCount)
+function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		bestof = map.bestof,
 		comment = map.comment,
@@ -113,7 +114,7 @@ function MapFunctions.getExtraData(map, opponentCount)
 
 	local bans = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
-	for opponentIndex = 1, opponentCount do
+	for opponentIndex = 1, #opponents do
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
 			ban = getCharacterName(ban)
