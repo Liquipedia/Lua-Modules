@@ -1195,7 +1195,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
 	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(map) then
+		if Parser.BREAK_ON_EMPTY and Logic.isDeepEmpty(map) then
 			break
 		end
 		local finishedInput = map.finished --[[@as string?]]
