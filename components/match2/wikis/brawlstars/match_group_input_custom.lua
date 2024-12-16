@@ -52,8 +52,8 @@ end
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
 	local games = MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
-	Array.forEach(games, function(game, gameINdex)
-		game.vod = game.vod or String.nilIfEmpty(match['vodgame' .. gameINdex])
+	Array.forEach(games, function(game, gameIndex)
+		game.vod = game.vod or String.nilIfEmpty(match['vodgame' .. gameIndex])
 	end)
 	return games
 end
