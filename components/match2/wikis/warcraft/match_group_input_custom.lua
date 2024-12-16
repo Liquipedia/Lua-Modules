@@ -192,9 +192,12 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 end
 
 ---@param game table
+---@param gameIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(game)
-	return (MapsData[(game.map or ''):lower()] or {}).name or game.map
+---@return string?
+function MapFunctions.getMapName(game, gameIndex, match)
+	return (MapsData[(game.map or ''):lower()] or {}).name or game.map, game.mapDisplayName
 end
 
 ---@param map table
@@ -335,7 +338,6 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
-		displayname = map.mapDisplayName,
 		header = map.header,
 	}
 

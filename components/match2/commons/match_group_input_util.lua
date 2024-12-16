@@ -1159,11 +1159,15 @@ end
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
----@field getMapName? fun(game: table): string?
+---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
+---@field getMapBestOf? fun(map: table): integer?
+---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
+---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1172,11 +1176,15 @@ end
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
---- - getMapName(map): string?
+--- - getMapName(map, mapIndex, match): string?, string?
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
 --- - mapIsFinished(map, opponents): boolean
+--- - extendMapOpponent(map, opponentIndex): table
+--- - getMapBestOf(map): integer?
+--- - computeOpponentScore(props, autoScore): integer?, string?
+--- - getGame(match, map): string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1188,8 +1196,8 @@ end
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(map) then
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Parser.BREAK_ON_EMPTY and Logic.isDeepEmpty(map) then
 			break
 		end
 		local finishedInput = map.finished --[[@as string?]]
@@ -1201,7 +1209,11 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 
 		if Parser.getMapName then
-			map.map = Parser.getMapName(map)
+			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
+		end
+
+		if Parser.getMapBestOf then
+			map.bestof = Parser.getMapBestOf(map)
 		end
 
 		if Parser.mapIsFinished then
@@ -1214,8 +1226,13 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.patch = Parser.getPatch(map)
 		end
 
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
+		end
+
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
+			local computeOpponentScore = Parser.computeOpponentScore or MatchGroupInputUtil.computeOpponentScore
+			local score, status = computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
@@ -1224,7 +1241,12 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			local players = Parser.getPlayersOfMapOpponent
 				and Parser.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 				or nil
-			return {score = score, status = status, players = players}
+
+			local mapOpponent = {score = score, status = status, players = players}
+			if not Parser.extendMapOpponent then
+				return mapOpponent
+			end
+			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
 
 		-- needs map.opponents available!
@@ -1238,7 +1260,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		map.extradata = Table.merge(
+			{displayname = map.mapDisplayName},
+			Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		)
 
 		table.insert(maps, map)
 		match[key] = nil
@@ -1463,6 +1488,7 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 end
 
 ---@param match table
+---@param opponentCount integer
 ---@return {placementInfo: table[], settings: table}
 function MatchGroupInputUtil.parseSettings(match, opponentCount)
 	-- Pre-parse Status colors (up/down etc)
