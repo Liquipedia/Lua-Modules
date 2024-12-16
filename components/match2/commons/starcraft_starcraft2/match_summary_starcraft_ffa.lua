@@ -68,24 +68,9 @@ end
 function Parser.adjustMatchColumns(columns)
 	return Array.map(columns, function(column)
 		if column.id == 'status' then
-			column.show = function(match)
-				return match.finished and #Array.filter(match.opponents, function(opponent)
-					return Logic.readBool(opponent.advances)
-				end) > 1
-			end
-			column.row = {
-				value = function (opponent, idx)
-					local statusIcon = Logic.readBool(opponent.advances)
-						and BaseMatchSummary.STATUS_ICONS.advances
-						or BaseMatchSummary.STATUS_ICONS.eliminated
-					return mw.html.create('i')
-						:addClass(statusIcon)
-				end,
-			}
+			return
 		elseif column.id == 'totalPoints' then
 			column.show = function(match) return not Logic.readBool(match.noScore) end
-		elseif column.id == 'matchPoints' then
-			return
 		end
 		return column
 	end)
