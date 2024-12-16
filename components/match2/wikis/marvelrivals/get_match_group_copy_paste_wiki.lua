@@ -31,7 +31,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = Array.extendWith({},
 		'{{Match',
-		Logic.readBool(args.isFinished) and (INDENT .. '|finished=') or nil,
+		showScore and (INDENT .. '|finished=') or nil,
 		INDENT .. '|date=',
 		Logic.readBool(args.streams) and (INDENT .. '|twitch=|youtube=|vod=') or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
