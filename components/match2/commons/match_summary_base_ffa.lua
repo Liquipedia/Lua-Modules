@@ -40,7 +40,6 @@ local STATUS_ICONS = {
 	trophy = 'firstplace',
 	matchpoint = 'matchpoint',
 }
-MatchSummaryFfa.STATUS_ICONS = STATUS_ICONS
 
 local MATCH_OVERVIEW_COLUMNS = {
 	{
