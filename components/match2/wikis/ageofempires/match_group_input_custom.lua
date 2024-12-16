@@ -322,7 +322,7 @@ end
 ---@param map table
 ---@return string?
 function MapFunctions.getGame(match, map)
-	return Logic.emptyOr(map.game, match.game, Variables.varGet('tournament_game'))
+	return Logic.emptyOr(map.game, match.game, Variables.varDefault('tournament_game'))
 end
 
 return CustomMatchGroupInput
