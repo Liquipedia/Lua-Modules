@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -37,6 +38,12 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_ticker_name', Variables.varDefault('tournament_tickername'))
 	Variables.varDefine('tournament_icon_dark', Variables.varDefault('tournament_icondark'))
 	Variables.varDefine('tournament_parent_page', Variables.varDefault('tournament_parent'))
+
+	Variables.varDefine('headtohead', tostring(Logic.readBool(Logic.emptyOr(
+		args.headtohead,
+		Variables.varDefault('headtohead'),
+		(queryResult.extradata or {}).headtohead
+	))))
 
 	BasicHiddenDataBox.checkAndAssign('tournament_patch', args.patch, queryResult.patch)
 end
