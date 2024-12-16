@@ -44,12 +44,13 @@ function MatchLegacy.storeGames(match, match2)
 			Array.forEach(opponents, function(opponent, opponentIndex)
 				-- opponent.players can have gaps
 				for _, player in pairs(opponent.players) do
-					if Table.isEmpty(player) then return end
-					local prefix = 'o' .. opponentIndex .. 'p' .. player.index
-					game.extradata[prefix] = player.pageName
-					game.extradata[prefix .. 'faction'] = player.civ
-					game.extradata[prefix .. 'name'] = player.displayname
-					game.extradata[prefix .. 'flag'] = player.flag
+					if Table.isNotEmpty(player) then
+						local prefix = 'o' .. opponentIndex .. 'p' .. player.index
+						game.extradata[prefix] = player.pageName
+						game.extradata[prefix .. 'faction'] = player.civ
+						game.extradata[prefix .. 'name'] = player.displayname
+						game.extradata[prefix .. 'flag'] = player.flag
+					end
 				end
 			end)
 		elseif game.mode == '1v1' then
