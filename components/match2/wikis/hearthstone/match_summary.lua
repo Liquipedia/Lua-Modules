@@ -76,9 +76,6 @@ end
 function CustomMatchSummary._submatchHasDetails(submatch)
 	return #submatch.games > 0 and Array.any(submatch.games, function(game)
 		return not string.find(game.map or '', '^[sS]ubmatch %d+$')
-			or Array.any(game.opponents, function(opponent)
-					return Array.any(opponent.players, function(player)
-						return Table.isNotEmpty(player) end) end)
 	end)
 end
 
@@ -147,22 +144,22 @@ end
 function CustomMatchSummary.Game(options, game, gameIndex)
 	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
 
+	---@param opponentIndex any
+	---@return table[]
+	local function createOpponentDisplay(opponentIndex)
+		return Array.extend({
+			CustomMatchSummary.DisplayClass(game.opponents[opponentIndex], opponentIndex == 1),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+		})
+	end
+
 	return rowWidget{
 		classes = {'brkts-popup-body-game'},
 		css = {width = options.isPartOfSubMatch and '100%' or nil, ['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
-			MatchSummaryWidgets.GameTeamWrapper{children = {
-				CustomMatchSummary.DisplayClass(game.opponents[1], true),
-				MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-				},
-			},
+			MatchSummaryWidgets.GameTeamWrapper{children = createOpponentDisplay(1)},
 			MatchSummaryWidgets.GameCenter{css = {flex = '0 0 16%'}, children = 'Game ' .. gameIndex},
-			MatchSummaryWidgets.GameTeamWrapper{children = {
-				CustomMatchSummary.DisplayClass(game.opponents[2]),
-				MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-				},
-				flipped = true
-			}
+			MatchSummaryWidgets.GameTeamWrapper{children = createOpponentDisplay(2), flipped = true}
 		)
 	}
 end
