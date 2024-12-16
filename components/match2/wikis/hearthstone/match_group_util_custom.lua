@@ -46,8 +46,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 		return opponent.type == Opponent.team end
 	)
 
-	local extradata = match.extradata
-	---@cast extradata table
 	if match.isTeamMatch then
 		-- Compute submatches
 		match.submatches = Array.map(
@@ -55,10 +53,11 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 			function(games) return CustomMatchGroupUtil.constructSubmatch(games) end
 		)
 
-		-- Extract submatch headers from extradata
-		for _, submatch in pairs(match.submatches) do
+		local extradata = match.extradata
+		---@cast extradata table
+		Array.forEach(match.submatches, function (submatch)
 			submatch.header = Table.extract(extradata, 'subgroup' .. submatch.subgroup .. 'header')
-		end
+		end)
 	end
 
 	return match
@@ -86,7 +85,7 @@ function CustomMatchGroupUtil.groupBySubmatch(matchGames)
 	local previousSubgroup = nil
 	local currentGames = nil
 	local submatchGames = {}
-	for _, game in ipairs(matchGames) do
+	Array.forEach(matchGames, function (game)
 		if previousSubgroup == nil or previousSubgroup ~= game.subgroup then
 			currentGames = {}
 			table.insert(submatchGames, currentGames)
@@ -94,7 +93,7 @@ function CustomMatchGroupUtil.groupBySubmatch(matchGames)
 		end
 		---@cast currentGames -nil
 		table.insert(currentGames, game)
-	end
+	end)
 	return submatchGames
 end
 
@@ -106,18 +105,19 @@ function CustomMatchGroupUtil.constructSubmatch(games)
 
 	-- Sum up scores
 	local scores = {}
-	for opponentIndex, _ in pairs(opponents) do
+	Array.forEach(opponents, function (_, opponentIndex)
 		scores[opponentIndex] = 0
-	end
-	for _, game in pairs(games) do
+	end)
+
+	Array.forEach(games, function (game)
 		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
-			for opponentIndex, score in pairs(scores) do
-				scores[opponentIndex] = score + (tonumber(game.scores[opponentIndex]) or 0)
-			end
+			Array.forEach(scores, function (score, index)
+				scores[index] = score + (tonumber(game.scores[index]) or 0)
+			end)
 		elseif game.winner then
 			scores[game.winner] = (scores[game.winner] or 0) + 1
 		end
-	end
+	end)
 
 	-- Compute winner if all games have been played, skipped, or defaulted
 	local allPlayed = Array.all(games, function(game)
@@ -140,10 +140,10 @@ function CustomMatchGroupUtil.constructSubmatch(games)
 	-- Set resultType and walkover if every game is a walkover
 	local walkovers = {}
 	local resultTypes = {}
-	for _, game in pairs(games) do
+	Array.forEach(games, function (game)
 		resultTypes[game.resultType or ''] = true
 		walkovers[game.walkover or ''] = true
-	end
+	end)
 	local walkover
 	local uniqueResult = Table.uniqueKey(resultTypes)
 	if uniqueResult == 'default' then
