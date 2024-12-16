@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -86,6 +87,7 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.dpcpoints = String.isNotEmpty(args.points) or ''
+	lpdbData.extradata.headtohead = self.data.headtohead
 
 	return lpdbData
 end
@@ -93,11 +95,13 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.publishertier = (self.publisherTier or {}).name
+	self.data.headtohead = tostring(Logic.readBool(args.headtohead))
 end
 
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	-- Custom Vars
+	Variables.varDefine('headtohead', self.data.headtohead)
 	Variables.varDefine('tournament_pro_circuit_points', args.points or '')
 	local isIndividual = String.isNotEmpty(args.individual) or String.isNotEmpty(args.player_number)
 	Variables.varDefine('tournament_individual', isIndividual and 'true' or '')
