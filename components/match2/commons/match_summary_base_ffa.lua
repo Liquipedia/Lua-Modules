@@ -627,7 +627,7 @@ function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
 	Array.sortInPlaceBy(game.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
 end
 
----@param match StarcraftMatchGroupUtilMatch
+---@param match MatchGroupUtilMatch
 ---@return Widget
 function MatchSummaryFfa.schedule(match)
 	if MatchSummaryFfa.gamesHaveDifferentDates(match) then
@@ -636,7 +636,7 @@ function MatchSummaryFfa.schedule(match)
 	return MatchSummaryWidgets.MatchSchedule{match = match}
 end
 
----@param match StarcraftMatchGroupUtilMatch
+---@param match MatchGroupUtilMatch
 ---@return boolean
 function MatchSummaryFfa.gamesHaveDifferentDates(match)
 	local dates = Array.map(match.games, Operator.property('date'))
