@@ -1153,7 +1153,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
-	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+	elseif MatchGroupInputUtil.isPostponed(matchInput.winner, matchInput.finished) then
 		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
 	end
 
