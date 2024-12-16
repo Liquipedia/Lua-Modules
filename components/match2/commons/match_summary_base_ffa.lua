@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -625,6 +626,22 @@ function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
 
 	-- Sort game level based on placement
 	Array.sortInPlaceBy(game.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
+end
+
+---@param match StarcraftMatchGroupUtilMatch
+---@return Widget
+function MatchSummaryFfa.schedule(match)
+	if MatchSummaryFfa.gamesHaveDifferentDates(match) then
+		return MatchSummaryWidgets.GamesSchedule{games = match.games}
+	end
+	return MatchSummaryWidgets.MatchSchedule{match = match}
+end
+
+---@param match StarcraftMatchGroupUtilMatch
+---@return boolean
+function MatchSummaryFfa.gamesHaveDifferentDates(match)
+	local dates = Array.map(match.games, Operator.property('date'))
+	return Array.any(dates, function(date) return date ~= match.date end)
 end
 
 return MatchSummaryFfa

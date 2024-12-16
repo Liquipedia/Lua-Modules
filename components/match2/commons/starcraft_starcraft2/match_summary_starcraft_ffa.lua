@@ -40,27 +40,11 @@ function StarcraftMatchSummaryFfa.getByMatchId(props)
 			matchId = match.matchId,
 			idx = 0,
 			children = {
-				StarcraftMatchSummaryFfa._schedule(match),
+				BaseMatchSummary.schedule(match),
 				BaseMatchSummary.standardMatch(match, Parser),
 			}
 		}
 	}}
-end
-
----@param match StarcraftMatchGroupUtilMatch
----@return Widget
-function StarcraftMatchSummaryFfa._schedule(match)
-	if StarcraftMatchSummaryFfa._gamesHaveDates(match) then
-		return MatchSummaryWidgets.GamesSchedule{games = match.games}
-	end
-	return MatchSummaryWidgets.MatchSchedule{match = match}
-end
-
----@param match StarcraftMatchGroupUtilMatch
----@return boolean
-function StarcraftMatchSummaryFfa._gamesHaveDates(match)
-	local dates = Array.map(match.games, Operator.property('date'))
-	return Array.any(dates, function(date) return date ~= match.date end)
 end
 
 ---@param columns table[]
@@ -117,7 +101,7 @@ function Parser.gameHeader(match, game, gameIndex)
 				}
 			}
 		},
-		StarcraftMatchSummaryFfa._gamesHaveDates(match) and MatchSummaryWidgets.GameCountdown{game = game} or nil,
+		BaseMatchSummary.gamesHaveDifferentDates(match) and MatchSummaryWidgets.GameCountdown{game = game} or nil,
 	}
 end
 
