@@ -82,8 +82,6 @@ function Parser.adjustMatchColumns(columns)
 						:addClass(statusIcon)
 				end,
 			}
-		elseif column.id == 'opponent' then
-			column.header = {value = 'Participant'}
 		elseif column.id == 'totalPoints' then
 			column.show = function(match) return not Logic.readBool(match.noScore) end
 		elseif column.id == 'matchPoints' then
