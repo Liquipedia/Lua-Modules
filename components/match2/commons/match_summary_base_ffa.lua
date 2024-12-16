@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:MatchSummary/Ffa
+-- page=Module:MatchSummary/Base/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -44,7 +44,9 @@ local MATCH_OVERVIEW_COLUMNS = {
 	{
 		class = 'cell--status',
 		show = function(match)
-			return Table.isNotEmpty(match.extradata.status)
+			return Table.any(match.extradata.placementinfo or {}, function(_, value)
+				return value.status ~= nil
+			end)
 		end,
 		header = {
 			value = '',
@@ -54,11 +56,11 @@ local MATCH_OVERVIEW_COLUMNS = {
 				return 'bg-' .. (opponent.advanceBg or '')
 			end,
 			value = function (opponent, idx)
-				if not STATUS_ICONS[opponent.placementStatus] then
+				if not STATUS_ICONS[opponent.advanceBg] then
 					return
 				end
 				return IconWidget{
-					iconName = STATUS_ICONS[opponent.placementStatus],
+					iconName = STATUS_ICONS[opponent.advanceBg],
 				}
 			end,
 		},
@@ -107,6 +109,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
+					showPlayerTeam = true,
 				}
 			end,
 		},
@@ -137,7 +140,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		class = 'cell--match-points',
 		icon = 'matchpoint',
 		show = function(match)
-				return match.matchPointThreshold
+				return (match.extradata.settings or {}).matchPointThreshold
 		end,
 		header = {
 			value = 'MPe Game',
@@ -158,7 +161,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 local GAME_OVERVIEW_COLUMNS = {
 	{
 		show = function(match)
-			return match.extradata.settings.showGameDetails
+			return (match.extradata.settings or {}).showGameDetails
 		end,
 		class = 'panel-table__cell__game-placement',
 		icon = 'placement',
@@ -188,7 +191,12 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			return match.extradata.settings.showGameDetails
+			if (match.extradata.settings or {}).showGameDetails == false then
+				return false
+			end
+			return Table.any(match.extradata.placementinfo or {}, function(_, value)
+				return value.killPoints ~= nil
+			end)
 		end,
 		class = 'panel-table__cell__game-kills',
 		icon = 'kills',
@@ -203,7 +211,7 @@ local GAME_OVERVIEW_COLUMNS = {
 	},
 	{
 		show = function(match)
-			return not match.extradata.settings.showGameDetails
+			return not (match.extradata.settings or {}).showGameDetails
 		end,
 		class = 'panel-table__cell__game-total-points',
 		icon = 'points',
@@ -270,6 +278,7 @@ local GAME_STANDINGS_COLUMNS = {
 					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
+					showPlayerTeam = true,
 				}
 			end,
 		},
@@ -295,9 +304,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
-		show = function(match)
-			return match.extradata.settings.showGameDetails
-		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -317,9 +323,6 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
-		show = function(match)
-			return match.extradata.settings.showGameDetails
-		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
@@ -356,35 +359,34 @@ function MatchSummaryFfa.placementSortFunction(opponent1, opponent2)
 	if opponent1.score and opponent2.score and opponent1.score ~= opponent2.score then
 		return opponent1.score > opponent2.score
 	end
-	return (opponent1.name or '') < (opponent2.name or '')
+	return (opponent1.name or ''):lower() < (opponent2.name or ''):lower()
 end
 
 ---@param match table
 ---@return {kill: number, placement: {rangeStart: integer, rangeEnd: integer, score:number}[]}
 function MatchSummaryFfa.createScoringData(match)
-	local scoreSettings = match.extradata.scoring
+	local scoreSettings = match.extradata.placementinfo
 
-	local scorePlacement = {}
-
-	local points = Table.groupBy(scoreSettings.placement, function (_, value)
-		return value
-	end)
-
-	for point, placements in Table.iter.spairs(points, function (_, a, b)
-		return a > b
-	end) do
-		local placementRange = Array.sortBy(Array.extractKeys(placements), FnUtil.identity)
-		table.insert(scorePlacement, {
-			rangeStart = placementRange[1],
-			rangeEnd = placementRange[#placementRange],
-			score = point,
-		})
+	local newScores = {}
+	local lastData = {}
+	for placement, placementData in ipairs(scoreSettings or {}) do
+		local currentData = {
+			killPoints = placementData.killPoints,
+			placementPoints = placementData.placementPoints,
+		}
+		if Table.deepEquals(lastData, currentData) then
+			newScores[#newScores].rangeEnd = newScores[#newScores].rangeEnd + 1
+		else
+			table.insert(newScores, {
+				rangeStart = placement,
+				rangeEnd = placement,
+				killScore = currentData.killPoints,
+				placementScore = currentData.placementPoints,
+			})
+		end
+		lastData = currentData
 	end
-
-	return {
-		kill = scoreSettings.kill,
-		placement = scorePlacement,
-	}
+	return newScores
 end
 
 ---@param match table
@@ -540,5 +542,53 @@ function MatchSummaryFfa.standardGame(game)
 	}}
 end
 
+---@param match table
+function MatchSummaryFfa.updateMatchOpponents(match)
+	-- Add games opponent data to the match opponent
+	Array.forEach(match.opponents, function (opponent, idx)
+		opponent.games = Array.map(match.games, function (game)
+			return game.opponents[idx]
+		end)
+	end)
+
+	local matchPointThreshold = (match.extradata.settings or {}).matchPointThreshold
+	if matchPointThreshold then
+		Array.forEach(match.opponents, function(opponent)
+			local matchPointReachedIn
+			local sum = opponent.extradata.startingpoints or 0
+			for gameIdx, game in ipairs(opponent.games) do
+				if sum >= matchPointThreshold then
+					matchPointReachedIn = gameIdx
+					break
+				end
+				sum = sum + (game.score or 0)
+			end
+			opponent.matchPointReachedIn = matchPointReachedIn
+		end)
+	end
+
+	-- Sort match level based on final placement & score
+	Array.sortInPlaceBy(match.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
+end
+
+---@param game table
+---@param matchOpponents table[]
+function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
+	-- Add match opponent data to game opponent
+	game.opponents = Array.map(game.opponents,
+		function(gameOpponent, opponentIdx)
+			local matchOpponent = matchOpponents[opponentIdx]
+			local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
+			-- These values are only allowed to come from Game and not Match
+			newGameOpponent.placement = gameOpponent.placement
+			newGameOpponent.score = gameOpponent.score
+			newGameOpponent.status = gameOpponent.status
+			return newGameOpponent
+		end
+	)
+
+	-- Sort game level based on placement
+	Array.sortInPlaceBy(game.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
+end
 
 return MatchSummaryFfa

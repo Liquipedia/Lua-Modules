@@ -36,18 +36,26 @@ Author(s): Elysienna
 			font-size: 0.75rem;
 		}
 
+		.theme--dark & {
+			border-color: var( --clr-secondary-16 );
+		}
+
 		&:not( :first-child ) {
 			margin-left: 0.5rem;
 		}
 
 		&.tab--active {
-			background-color: var( --clr-wiki-primary-container );
+			background-color: var( --clr-wiki-theme-primary, var( --clr-wiki-primary-container ) );
 			color: #ffffff;
 		}
 
 		@media ( hover: hover ) {
 			&:not( .tab--active ):hover {
 				background-color: #f5f5f5;
+
+				.theme--dark & {
+					background-color: var( --clr-secondary-9 );
+				}
 			}
 		}
 

@@ -32,6 +32,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			matchPage = false,
 			status = 2,
 		},
 	},

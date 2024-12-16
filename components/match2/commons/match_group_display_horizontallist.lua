@@ -66,7 +66,7 @@ end
 ---@return Html
 function HorizontallistDisplay.Bracket(props)
 	local config = {
-		MatchSummaryContainer = DisplayHelper.DefaultMatchSummaryContainer,
+		MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer,
 	}
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 

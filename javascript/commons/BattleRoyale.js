@@ -321,6 +321,14 @@ liquipedia.battleRoyale = {
 							this.createBottomNav( battleRoyaleId, matchContentId, index );
 						}
 					} );
+
+				Object.entries( this.battleRoyaleMap[ battleRoyaleId ].gamePanels[ matchContentId ] )
+					.forEach( ( [ , panel ] ) => {
+						this.makeSortableTableFromElement( panel );
+					} );
+
+				// Trigger countdown initialization since we have new dates
+				liquipedia.countdown.init();
 			} );
 		} else {
 			this.updateGameTabDisplay( battleRoyaleId, matchContentId, gameTab );
@@ -602,9 +610,15 @@ liquipedia.battleRoyale = {
 		}
 	},
 
-	makeSortableTable: function( battleRoyaleElement ) {
-		const sortButtons =
-			battleRoyaleElement.querySelectorAll( '[data-js-battle-royale="header-row"] > [data-sort-type]' );
+	makeSortableTable: function( battleRoyaleId ) {
+		this.battleRoyaleMap[ battleRoyaleId ].matchContents.forEach( ( matchContentElement ) => {
+			this.makeSortableTableFromElement( matchContentElement );
+		} );
+	},
+
+	makeSortableTableFromElement: function( targetElement ) {
+		const sortButtons = targetElement
+			.querySelectorAll( '[data-js-battle-royale="header-row"] > [data-sort-type]' );
 
 		sortButtons.forEach( ( button ) => {
 			button.addEventListener( 'click', () => {
@@ -687,7 +701,6 @@ liquipedia.battleRoyale = {
 	init: function() {
 		Array.from( document.querySelectorAll( '[ data-js-battle-royale-id ]' ) ).forEach( ( battleRoyaleElement ) => {
 			this.battleRoyaleInstances[ battleRoyaleElement.dataset.jsBattleRoyaleId ] = battleRoyaleElement;
-			this.makeSortableTable( battleRoyaleElement );
 		} );
 
 		Object.keys( this.battleRoyaleInstances ).forEach( ( battleRoyaleId ) => {
@@ -698,6 +711,8 @@ liquipedia.battleRoyale = {
 
 			this.attachHandlers( battleRoyaleId );
 			this.makeCollapsibles( battleRoyaleId );
+			this.makeSortableTable( battleRoyaleId );
+
 			if ( !this.isMobile() ) {
 				this.makeSideScrollElements( battleRoyaleId );
 				this.makeTableScrollHint( battleRoyaleId );

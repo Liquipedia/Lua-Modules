@@ -13,6 +13,7 @@
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
+local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -129,7 +130,7 @@ function Details:create()
 			)
 			:wikitext('  Details')
 		), self.match.match2bracketdata.matchpage))
-	elseif self.match.match2id then
+	elseif self.match.match2id and Info.config.match2.matchPage then
 		local link = 'Match:ID ' .. self.match.match2id
 		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
 			:addClass('btn btn-new btn--add-match-details show-when-logged-in')

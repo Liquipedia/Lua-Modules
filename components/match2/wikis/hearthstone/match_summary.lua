@@ -61,7 +61,7 @@ function CustomMatchSummary._fixGameOpponents(games, opponents)
 	Array.forEach(games, function (game)
 		game.opponents = Array.map(game.opponents, function (opponent, opponentIndex)
 			return Table.merge(opponent, {
-				players = Array.map(game.opponents[opponentIndex].players,function (player, playerIndex)
+				players = Array.map(game.opponents[opponentIndex].players or {},function (player, playerIndex)
 					if Logic.isEmpty(player) then return nil end
 					return Table.merge(opponents[opponentIndex].players[playerIndex] or {}, player)
 				end)
@@ -151,14 +151,14 @@ end
 ---@return Html?
 function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
 	local playerDisplays = Array.map(players, function (player)
-		local char = HtmlWidgets.Div{
+		local char = Logic.isNotEmpty(player.class) and HtmlWidgets.Div{
 			classes = {'brkts-champion-icon'},
 			children = MatchSummaryWidgets.Character{
 				character = player.class,
 				showName = not isTeamMatch,
 				flipped = flip,
 			}
-		}
+		} or nil
 		return HtmlWidgets.Div{
 			css = {
 				display = 'flex',

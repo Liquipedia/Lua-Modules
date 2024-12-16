@@ -16,7 +16,6 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local Streams = Lua.import('Module:Links/Stream')
 
 local StarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft')
 local BaseMatchFunctions = StarcraftMatchGroupInput.MatchFunctions
@@ -28,94 +27,76 @@ local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
 local NOW = os.time()
 
 local StarcraftFfaMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = true,
+	},
+	readDate = BaseMatchFunctions.readDate,
+	getMatchWinner = StarcraftFfaMatchGroupInput._getWinner,
+}
 local MapFunctions = {}
 
----@param match table
+---@param matchInput table
 ---@param options table?
 ---@return table
-function StarcraftFfaMatchGroupInput.processMatch(match, options)
-	Table.mergeInto(match, BaseMatchFunctions.readDate(match))
+function StarcraftFfaMatchGroupInput.processMatch(matchInput, options)
+	matchInput.bestof = tonumber(matchInput.firstto) or tonumber(matchInput.bestof)
 
-	match.links = MatchGroupInputUtil.getLinks(match)
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
+	local match = MatchGroupInputUtil.standardProcessFfaMatch(matchInput, MatchFunctions)
 
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	local opponents = MatchFunctions.readOpponents(match)
-
-	local games = MatchFunctions.extractMaps(match, opponents)
-
-	local finishedInput = match.finished --[[@as string?]]
-	match.bestof = tonumber(match.firstto) or tonumber(match.bestof)
-
-	match.finished = MatchFunctions.isFinished(match, opponents)
-	match.mode = MODE_FFA
-
-	if MatchGroupInputUtil.isNotPlayed(match.winner, finishedInput) then
-		match.finished = true
-		match.status = MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
-		match.extradata = {ffa = 'true'}
-		return match
-	end
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and not Logic.readBool(match.noscore)
-		and MatchFunctions.calculateMatchScore(games, opponents)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.placement = tonumber(opponent.placement)
-	end)
-
-	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(match.winner, finishedInput)
-		StarcraftFfaMatchGroupInput._setPlacements(opponents)
-		match.winner = StarcraftFfaMatchGroupInput._getWinner(opponents, match.winner)
-	end
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.noscore = Logic.readBool(match.noscore)
-
+	Array.forEach(match.opponents, function(opponent)
 		opponent.extradata.advances = Logic.readBool(opponent.advances)
-			or (match.bestof and (opponent.score or 0) >= match.bestof)
+			or (matchInput.bestof and (opponent.score or 0) >= matchInput.bestof)
 			or opponent.placement == 1
 	end)
-
-	match.opponents = opponents
-	match.games = games
-
-	match.extradata = MatchFunctions.getExtraData(match)
 
 	return match
 end
 
 ---@param match table
----@return table[]
-function MatchFunctions.readOpponents(match)
-	return Array.mapIndexes(function(opponentIndex)
-		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, BaseMatchFunctions.OPPONENT_CONFIG)
-		if not opponent then return end
-		BaseMatchFunctions.adjustOpponent(opponent, opponentIndex)
-		return opponent
-	end)
+---@return table
+function MatchFunctions.parseSettings(match)
+	return {}
+end
+
+---@param opponent table
+---@param opponentIndex integer
+---@param match table
+function MatchFunctions.adjustOpponent(opponent, opponentIndex, match)
+	BaseMatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = opponent.extradata or {}
+	opponent.extradata.noscore = Logic.readBool(match.noscore)
+	-- set score to 0 for all opponents if it is a match without scores
+	if opponent.extradata.noscore then
+		opponent.score = 0
+	end
+end
+
+---@param opponents table[]
+---@param games table[]
+---@return fun(opponentIndex: integer): integer?
+function MatchFunctions.calculateMatchScore(opponents, games)
+	return function(opponentIndex)
+		local opponent = opponents[opponentIndex]
+		local sum = (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
+		Array.forEach(games, function(game)
+			sum = sum + ((game.scores or {})[opponentIndex] or 0)
+		end)
+		return sum
+	end
+end
+
+---@param opponents table[]
+---@return string
+function MatchFunctions.getMode(opponents)
+	return MODE_FFA
 end
 
 ---@param match table
 ---@param opponents {score: integer?}[]
 ---@return boolean
-function MatchFunctions.isFinished(match, opponents)
+function MatchFunctions.matchIsFinished(match, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return true
 	end
@@ -145,18 +126,24 @@ function MatchFunctions.placementHasBeenSet(opponents)
 	return Array.any(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
 end
 
----@param maps table[]
+---@param match table
+---@param games table[]
 ---@param opponents table[]
----@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, opponents)
-	return function(opponentIndex)
-		local opponent = opponents[opponentIndex]
-		local sum = (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
-		Array.forEach(maps, function(map)
-			sum = sum + ((map.scores or {})[opponentIndex] or 0)
-		end)
-		return sum
+---@param settings table
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents, settings)
+	local extradata = {
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		ffa = 'true',
+		noscore = tostring(Logic.readBool(match.noscore)),
+		showplacement = Logic.readBoolOrNil(match.showplacement),
+	}
+
+	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
+		BaseMatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
 	end
+
+	return extradata
 end
 
 ---@param match table
@@ -179,23 +166,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	end
 
 	return maps
-end
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		ffa = 'true',
-		noscore = tostring(Logic.readBool(match.noscore)),
-		showplacement = Logic.readBoolOrNil(match.showplacement),
-	}
-
-	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
-		BaseMatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
-	end
-
-	return extradata
 end
 
 ---@param mapInput table
@@ -232,7 +202,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	end
 
 	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-		return MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
+		return MapFunctions.getOpponentInfo(mapInput, opponentIndex)
 	end)
 
 	map.scores = Array.map(map.opponents, Operator.property('score'))
@@ -240,17 +210,12 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 	map.finished = MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	if map.finished then
 		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		StarcraftFfaMatchGroupInput._setPlacements(map.opponents, not hasScores)
-		map.winner = StarcraftFfaMatchGroupInput._getWinner(map.opponents, mapInput.winner)
+		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(map.opponents)
+		Array.forEach(map.opponents, function(opponent, opponentIndex)
+			opponent.placement = placementOfOpponents[opponentIndex]
+		end)
+		map.winner = StarcraftFfaMatchGroupInput._getWinner(map.status, mapInput.winner, map.opponents)
 	end
-
-	Array.forEach(map.opponents, function(opponent, opponentIndex)
-		map.extradata['placement' .. opponentIndex] = opponent.placement
-	end)
-
-	Array.forEach(map.opponents, function(opponent, opponentIndex)
-		map.extradata['status' .. opponentIndex] = opponent.status
-	end)
 
 	return map
 end
@@ -271,11 +236,10 @@ function MapFunctions.isFinished(mapInput, opponentCount, hasScores)
 	end)
 end
 
----@param mapInput any
----@param opponentIndex any
----@param hasScores any
+---@param mapInput table
+---@param opponentIndex integer
 ---@return {placement: integer?, score: integer?, status: string}
-function MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
+function MapFunctions.getOpponentInfo(mapInput, opponentIndex)
 	local score, status = MatchGroupInputUtil.computeOpponentScore{
 		walkover = mapInput.walkover,
 		winner = mapInput.winner,
@@ -285,72 +249,19 @@ function MapFunctions.getOpponentInfo(mapInput, opponentIndex, hasScores)
 
 	return {
 		placement = tonumber(mapInput['placement' .. opponentIndex]),
-		score = hasScores and score or nil,
+		score = score,
 		status = status,
 	}
 end
 
---- helper fucntions applicable for both map and match
-
----@param opponents {placement: integer?, score: integer?, status: string}
----@param noScores boolean?
-function StarcraftFfaMatchGroupInput._setPlacements(opponents, noScores)
-	if noScores then return end
-
-	if Array.all(opponents, function(opponent)
-		return Logic.isNotEmpty(opponent.placement)
-	end) then return end
-
-	---@param status string
-	---@return string
-	local toSortStatus = function(status)
-		if status == MatchGroupInputUtil.STATUS.DEFAULT_WIN or status == MatchGroupInputUtil.STATUS.SCORE or not status then
-			return status
-		end
-		return MatchGroupInputUtil.STATUS.DEFAULT_LOSS
-	end
-
-	local cache = {}
-
-	---@param status string
-	---@param score integer?
-	---@param manualPlacement integer?
-	---@return boolean
-	local isNewPlacement = function(status, score, manualPlacement)
-		if manualPlacement then
-			return true
-		elseif cache.manualPlacement and not manualPlacement then
-			return true
-		elseif status ~= cache.status then
-			return true
-		elseif status == MatchGroupInputUtil.STATUS.SCORE and score ~= cache.score then
-			return true
-		end
-		return false
-	end
-
-	cache.placement = 1
-	cache.skipped = 0
-	for _, opponent in Table.iter.spairs(opponents, StarcraftFfaMatchGroupInput._placementSortFunction) do
-		local currentStatus = toSortStatus(opponent.status)
-		local currentScore = opponent.score or 0
-		if isNewPlacement(currentStatus, currentScore, opponent.placement) then
-			cache.manualPlacement = opponent.placement
-			cache.placement = opponent.placement or (cache.placement + cache.skipped)
-			cache.skipped = 0
-			cache.score = currentScore
-			cache.status = currentStatus
-		end
-		opponent.placement = cache.placement
-		cache.skipped = cache.skipped + 1
-	end
-end
-
----@param opponents {placement: integer?, score: integer?, status: string}
+---@param status string
 ---@param winnerInput integer|string|nil
+---@param opponents {placement: integer?, score: integer?, status: string}[]
 ---@return integer?
-function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput)
-	if Logic.isNumeric(winnerInput) then
+function StarcraftFfaMatchGroupInput._getWinner(status, winnerInput, opponents)
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+		return nil
+	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
 	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
 		return MatchGroupInputUtil.WINNER_DRAW
@@ -362,35 +273,6 @@ function StarcraftFfaMatchGroupInput._getWinner(opponents, winnerInput)
 	local calculatedWinner = Array.indexOf(placements, FnUtil.curry(Operator.eq, bestPlace))
 
 	return calculatedWinner ~= 0 and calculatedWinner or nil
-end
-
----@param opponents {placement: integer?, score: integer?, status: string}[]
----@param index1 integer
----@param index2 integer
----@return boolean
-function StarcraftFfaMatchGroupInput._placementSortFunction(opponents, index1, index2)
-	local opponent1 = opponents[index1]
-	local opponent2 = opponents[index2]
-
-	if opponent1.status == MatchGroupInputUtil.STATUS_INPUTS.DEFAULT_WIN then
-		return true
-	elseif Table.includes(MatchGroupInputUtil.STATUS_INPUTS, opponent1.status) then
-		return false
-	end
-
-	if (opponent1.score or -1) ~= (opponent2.score or -1) then
-		return (opponent1.score or -1) > (opponent2.score or -1)
-	end
-
-	if opponent1.placement and opponent2.placement then
-		return opponent1.placement < opponent2.placement
-	elseif opponent1.placement and not opponent2.placement then
-		return true
-	elseif opponent2.placement and not opponent1.placement then
-		return false
-	end
-
-	return index1 < index2
 end
 
 return StarcraftFfaMatchGroupInput
