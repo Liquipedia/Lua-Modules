@@ -837,12 +837,12 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 		return true
 	end
 
-	local playall = Logic.readBoolOrNil(match.finished)
+	local playall = Logic.readBoolOrNil(match.playall)
+	local bestof = match.bestof
 	if playall then
-		return MatchGroupInputUtil.allHasBeenPlayed(match.games)
+		return MatchGroupInputUtil.allHasBeenPlayed(bestof, opponents)
 	end
 
-	local bestof = match.bestof
 	if not bestof then
 		return false
 	end
@@ -898,8 +898,9 @@ end
 
 ---@param games table[]
 ---@return boolean
-function MatchGroupInputUtil.allHasBeenPlayed(games)
-	return Array.all(games, function(game) return game.finished end)
+function MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
+	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
+	return scoreSum >= playall
 end
 
 ---@param bestOfInput string|integer?
