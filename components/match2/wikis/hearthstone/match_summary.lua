@@ -8,9 +8,9 @@
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -22,7 +22,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
-local PlayerDisplay = require('Module:Player/Display')
 
 local CustomMatchSummary = {}
 
@@ -32,48 +31,62 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '350px', teamStyle = 'bracket'})
 end
 
----@param match MatchGroupUtilMatch
+---@param match HearthstoneMatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	CustomMatchSummary._fixGameOpponents(match.games, match.opponents)
-
-	local isTeamMatch = Array.any(match.opponents, function(opponent)
-		return opponent.type == Opponent.team
-	end)
+	local submatches
+	if match.isTeamMatch then
+		submatches = match.submatches or {}
+	end
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, function (game, gameIndex)
-			if isTeamMatch and String.startsWith(game.map or '', 'Submatch') then
-				return CustomMatchSummary._createSubmatch(game)
-			else
-				return CustomMatchSummary._createGame(isTeamMatch, game, gameIndex)
-			end
-		end)
+		submatches and Array.map(submatches, CustomMatchSummary.TeamSubmatch)
+			or Array.map(match.games, FnUtil.curry(CustomMatchSummary.Game, {isPartOfSubMatch = false}))
 	)}
 end
 
----@param games MatchGroupUtilGame
----@param opponents standardOpponent[]
-function CustomMatchSummary._fixGameOpponents(games, opponents)
-	Array.forEach(games, function (game)
-		game.opponents = Array.map(game.opponents, function (opponent, opponentIndex)
-			return Table.merge(opponent, {
-				players = Array.map(game.opponents[opponentIndex].players or {},function (player, playerIndex)
-					if Logic.isEmpty(player) then return nil end
-					return Table.merge(opponents[opponentIndex].players[playerIndex] or {}, player)
-				end)
-			})
-		end)
+---@param submatch HearthstoneMatchGroupUtilSubmatch
+---@return MatchSummaryRow
+function CustomMatchSummary.TeamSubmatch(submatch)
+	local hasDetails = CustomMatchSummary._submatchHasDetails(submatch)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			submatch.header and {
+				HtmlWidgets.Div{css = {margin = 'auto', ['font-weight'] = 'bold'}, children = {submatch.header}},
+				MatchSummaryWidgets.Break{},
+			} or nil,
+			CustomMatchSummary.TeamSubMatchOpponnetRow(submatch),
+			hasDetails and Array.map(submatch.games, function(game, gameIndex)
+				return CustomMatchSummary.Game(
+					{isPartOfSubMatch = true},
+					game,
+					gameIndex
+				)
+			end) or nil
+		)
+	}
+end
+
+---@param submatch HearthstoneMatchGroupUtilSubmatch
+---@return boolean
+function CustomMatchSummary._submatchHasDetails(submatch)
+	return #submatch.games > 0 and Array.any(submatch.games, function(game)
+		return not string.find(game.map or '', '^[sS]ubmatch %d+$')
+			or Array.any(game.opponents, function(opponent)
+					return Array.any(opponent.players, function(player)
+						return Table.isNotEmpty(player) end) end)
 	end)
 end
 
----@param game MatchGroupUtilGame
+---@param submatch HearthstoneMatchGroupUtilSubmatch
 ---@return Widget
-function CustomMatchSummary._createSubmatch(game)
-	local opponents = game.opponents or {{}, {}}
+function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
+	local opponents = submatch.opponents or {{}, {}}
+
 	local createOpponent = function(opponentIndex)
 		local players = (opponents[opponentIndex] or {}).players or {}
 		if Logic.isEmpty(players) then
@@ -90,15 +103,15 @@ function CustomMatchSummary._createSubmatch(game)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == game.winner or game.resultType == 'draw'
-		if game.resultType == 'default' then
+		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
+		if submatch.resultType == 'default' then
 			return OpponentDisplay.BlockScore{
 				isWinner = isWinner,
-				scoreText = isWinner and 'W' or string.upper(game.walkover),
+				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
 			}
 		end
 
-		local score = game.resultType ~= 'np' and (game.scores or {})[opponentIndex] or nil
+		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
 		return OpponentDisplay.BlockScore{
 			isWinner = isWinner,
 			scoreText = score,
@@ -127,55 +140,58 @@ function CustomMatchSummary._createSubmatch(game)
 	}
 end
 
----@param isTeamMatch boolean
+---@param options {isPartOfSubMatch: boolean?}
 ---@param game MatchGroupUtilGame
 ---@param gameIndex number
 ---@return Widget
-function CustomMatchSummary._createGame(isTeamMatch, game, gameIndex)
-	return MatchSummaryWidgets.Row{
+function CustomMatchSummary.Game(options, game, gameIndex)
+	local rowWidget = options.isPartOfSubMatch and HtmlWidgets.Div or MatchSummaryWidgets.Row
+
+	return rowWidget{
 		classes = {'brkts-popup-body-game'},
-		css = {padding = '4px', ['min-height'] = '24px'},
+		css = {width = options.isPartOfSubMatch and '100%' or nil, ['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
-			CustomMatchSummary._displayOpponents(isTeamMatch, game.opponents[1].players, true),
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{css = {['font-size'] = '80%'}, children = 'Game ' .. gameIndex},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._displayOpponents(isTeamMatch, game.opponents[2].players)
+			MatchSummaryWidgets.GameTeamWrapper{children = {
+				CustomMatchSummary.DisplayClass(game.opponents[1], true),
+				MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+				},
+			},
+			MatchSummaryWidgets.GameCenter{css = {flex = '0 0 16%'}, children = 'Game ' .. gameIndex},
+			MatchSummaryWidgets.GameTeamWrapper{children = {
+				CustomMatchSummary.DisplayClass(game.opponents[2]),
+				MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+				},
+				flipped = true
+			}
 		)
 	}
 end
 
----@param isTeamMatch boolean
----@param players table[]
+---@param opponent table
 ---@param flip boolean?
 ---@return Html?
-function CustomMatchSummary._displayOpponents(isTeamMatch, players, flip)
-	local playerDisplays = Array.map(players, function (player)
-		local char = Logic.isNotEmpty(player.class) and HtmlWidgets.Div{
-			classes = {'brkts-champion-icon'},
-			children = MatchSummaryWidgets.Character{
-				character = player.class,
-				showName = not isTeamMatch,
-				flipped = flip,
-			}
-		} or nil
-		return HtmlWidgets.Div{
-			css = {
-				display = 'flex',
-				['flex-direction'] = flip and 'row-reverse' or 'row',
-				gap = '2px',
-				width = '100%'
-			},
-			children = Array.extend{
-				char,
-				isTeamMatch and PlayerDisplay.BlockPlayer{player = player, flip = flip} or nil,
-			},
-		}
+function CustomMatchSummary.DisplayClass(opponent, flip)
+	local player = Array.find(opponent.players or {}, function (player)
+		return Logic.isNotEmpty(player.class)
 	end)
 
-	return MatchSummaryWidgets.GameTeamWrapper{
-		flipped = flip,
-		children = playerDisplays
+	if Logic.isEmpty(player) then
+		return nil
+	end
+	---@cast player -nil
+
+	return HtmlWidgets.Div{
+		classes = {'brkts-champion-icon'},
+		css = {
+			display = 'flex',
+			flex = '1',
+			['justify-content'] = flip and 'flex-end' or 'flex-start'
+		},
+		children = MatchSummaryWidgets.Character{
+			character = player.class,
+			showName = true,
+			flipped = flip,
+		}
 	}
 end
 
