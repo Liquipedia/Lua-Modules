@@ -263,7 +263,7 @@ end
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
-function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players
 	if opponent.type == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
