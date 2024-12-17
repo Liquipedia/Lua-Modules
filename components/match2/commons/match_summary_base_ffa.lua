@@ -56,11 +56,11 @@ local MATCH_OVERVIEW_COLUMNS = {
 				return 'bg-' .. (opponent.advanceBg or '')
 			end,
 			value = function (opponent, idx)
-				if not STATUS_ICONS[opponent.advanceBg] then
+				if not STATUS_ICONS[opponent.placementStatus] then
 					return
 				end
 				return IconWidget{
-					iconName = STATUS_ICONS[opponent.advanceBg],
+					iconName = STATUS_ICONS[opponent.placementStatus],
 				}
 			end,
 		},
@@ -569,6 +569,11 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 
 	-- Sort match level based on final placement & score
 	Array.sortInPlaceBy(match.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
+
+	-- Set the status of the current placement
+	Array.forEach(match.opponents, function(opponent, idx)
+		opponent.placementStatus = ((match.extradata.placementinfo or {})[idx] or {}).status
+	end)
 end
 
 ---@param game table
