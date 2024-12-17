@@ -99,19 +99,11 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
-		if submatch.resultType == 'default' then
-			return OpponentDisplay.BlockScore{
-				isWinner = isWinner,
-				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
-			}
-		end
-
-		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
+		local isWinner = opponentIndex == submatch.winner
 		return OpponentDisplay.BlockScore{
-			isWinner = isWinner,
-			scoreText = score,
-		}
+				isWinner = isWinner,
+				scoreText = (submatch.scores or {})[opponentIndex],
+			}
 	end
 
 	return HtmlWidgets.Div{

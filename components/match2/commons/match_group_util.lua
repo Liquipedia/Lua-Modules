@@ -207,7 +207,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
----@field opponents {players: table[]}[]
+---@field opponents {status: string?, score: number, players: table[] }[]
 ---@field participants table
 ---@field resultType ResultType?
 ---@field scores number[]

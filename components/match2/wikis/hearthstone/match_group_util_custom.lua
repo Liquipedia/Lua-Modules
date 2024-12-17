@@ -9,22 +9,21 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 -- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
 local Opponent = Lua.import('Module:Opponent')
 
+local SCORE_STATUS = 'S'
+
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class HearthstoneMatchGroupUtilSubmatch
 ---@field games MatchGroupUtilGame[]
 ---@field opponents GameOpponent[]
----@field resultType ResultType
----@field scores table<number, number>
+---@field scores table<number|string, number|string>
 ---@field subgroup number
----@field walkover WalkoverType
 ---@field winner number?
 ---@field header string?
 
@@ -101,65 +100,48 @@ end
 ---@param games MatchGroupUtilGame[]
 ---@return HearthstoneMatchGroupUtilSubmatch
 function CustomMatchGroupUtil.constructSubmatch(games)
-	local opponents = Table.deepCopy(games[1].opponents)
-
-	-- Sum up scores
+	local firstGame = games[1]
+	local opponents = Table.deepCopy(firstGame.opponents)
 	local scores = {}
-	Array.forEach(opponents, function (_, opponentIndex)
-		scores[opponentIndex] = 0
-	end)
-
-	Array.forEach(games, function (game)
-		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
-			Array.forEach(scores, function (score, index)
-				scores[index] = score + (tonumber(game.scores[index]) or 0)
-			end)
-		elseif game.winner then
-			scores[game.winner] = (scores[game.winner] or 0) + 1
-		end
-	end)
-
-	-- Compute winner if all games have been played, skipped, or defaulted
-	local allPlayed = Array.all(games, function(game)
-		return game.winner ~= nil or game.resultType ~= nil
-	end)
-
-	local resultType = nil
 	local winner = nil
-	if allPlayed then
-		local diff = (scores[1] or 0) - (scores[2] or 0)
-		if diff < 0 then
-			winner = 2
-		elseif diff == 0 then
-			resultType = 'draw'
-		else
-			winner = 1
-		end
-	end
 
-	-- Set resultType and walkover if every game is a walkover
-	local walkovers = {}
-	local resultTypes = {}
-	Array.forEach(games, function (game)
-		resultTypes[game.resultType or ''] = true
-		walkovers[game.walkover or ''] = true
-	end)
-	local walkover
-	local uniqueResult = Table.uniqueKey(resultTypes)
-	if uniqueResult == 'default' then
-		resultType = 'default'
-		walkover = String.nilIfEmpty(Table.uniqueKey(walkovers)) or 'L'
-	elseif uniqueResult == 'np' then
-		resultType = 'np'
+	if string.find(firstGame.map or '', '^[sS]ubmatch %d+$') then
+		Array.forEach(firstGame.opponents, function (opponent, opponentIndex)
+			if opponent.status and opponent.status ~= SCORE_STATUS  then
+				scores[opponentIndex] = opponent.status
+			else
+				scores[opponentIndex] = opponent.score
+			end
+		end)
+		winner = firstGame.winner
+	else
+		local allPlayed = true
+		scores = {0, 0}
+		-- Sum up scores
+		Array.forEach(games, function (game)
+			if game.winner then
+				scores[game.winner] = (scores[game.winner] or 0) + 1
+			end
+			allPlayed = game.winner ~= nil
+		end)
+
+		if allPlayed then
+			local diff = (scores[1] or 0) - (scores[2] or 0)
+			if diff < 0 then
+				winner = 2
+			elseif diff == 0 then
+				winner = 0
+			else
+				winner = 1
+			end
+		end
 	end
 
 	return {
 		games = games,
 		opponents = opponents,
-		resultType = resultType,
 		scores = scores,
 		subgroup = games[1].subgroup,
-		walkover = walkover,
 		winner = winner,
 	}
 end
