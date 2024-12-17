@@ -69,7 +69,7 @@ end
 function CustomMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 	return Array.map(game.opponents, function (opponent, opponentIndex)
 		return Table.merge(opponent, {
-			players = Array.map(game.opponents[opponentIndex].players or {},function (player, playerIndex)
+			players = Array.map(game.opponents[opponentIndex].players or {}, function (player, playerIndex)
 				if Logic.isEmpty(player) then return nil end
 				return Table.merge(matchOpponents[opponentIndex].players[playerIndex] or {}, player)
 			end)
