@@ -128,7 +128,6 @@ return {
 						},
 					},
 				},
-				
 				{
 					mobileOrder = 4,
 					content = CONTENT.thisDay,
