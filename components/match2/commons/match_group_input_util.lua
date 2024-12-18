@@ -836,14 +836,14 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	local function longEnoughLiveForMap(map)
-		if not map.timestamp or map.timestamp == DateExt.defaultTimestamp then
+	local function recordLiveLongEnough(record)
+		if not record.timestamp or record.timestamp == DateExt.defaultTimestamp then
 			return false
 		end
-		local longLiveTime = map.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
-		return NOW > (map.timestamp + longLiveTime)
+		local longLiveTime = record.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
+		return NOW > (record.timestamp + longLiveTime)
 	end
-	if #maps > 0 and Array.all(maps, longEnoughLiveForMap) then
+	if #maps > 0 and Array.all(maps, recordLiveLongEnough) or #maps == 0 and recordLiveLongEnough(match) then
 		return true
 	end
 
