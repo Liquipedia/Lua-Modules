@@ -843,7 +843,7 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 		local longLiveTime = record.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
 		return NOW > (record.timestamp + longLiveTime)
 	end
-	if #maps > 0 and Array.all(maps, recordLiveLongEnough) or #maps == 0 and recordLiveLongEnough(match) then
+	if (#maps > 0 and Array.all(maps, recordLiveLongEnough)) or (#maps == 0 and recordLiveLongEnough(match)) then
 		return true
 	end
 
