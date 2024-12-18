@@ -1579,14 +1579,14 @@ function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 
 	if matchInput.date then
 		-- If there's a match date in the input, use it
-		return dateParsingFunction(match)
+		return dateParsingFunction(matchInput)
 	end
 
 	-- Otherwise, use the date from the earliest game in the match
 	local easlierGameTimestamp, earliestGameDateStruct = DateExt.maxTimestamp, nil
 
 	-- We have to loop through the maps unparsed as we haven't parsed the maps at this point yet
-	for _, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for _, map in Table.iter.pairsByPrefix(matchInput, 'map', {requireIndex = true}) do
 		if map.date then
 			local gameDateStruct = dateParsingFunction(map)
 			if gameDateStruct.timestamp < easlierGameTimestamp then
@@ -1598,7 +1598,7 @@ function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
 
 	-- We couldn't find game date neither, let's use the defaults for the match
 	if not earliestGameDateStruct then
-		return dateParsingFunction(match)
+		return dateParsingFunction(matchInput)
 	end
 
 	return earliestGameDateStruct
