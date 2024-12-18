@@ -9,8 +9,10 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 -- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
 local Opponent = Lua.import('Module:Opponent')
@@ -19,10 +21,12 @@ local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
+---@class HearthstoneMatchGroupUtilGameOpponent: GameOpponent
+---@field placement number?
+
 ---@class HearthstoneMatchGroupUtilSubmatch
 ---@field games MatchGroupUtilGame[]
----@field opponents GameOpponent[]
----@field scores table<number|string, number|string>
+---@field opponents HearthstoneMatchGroupUtilGameOpponent[]
 ---@field subgroup number
 ---@field winner number?
 ---@field header string?
@@ -45,19 +49,21 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 		return opponent.type == Opponent.team end
 	)
 
-	if match.isTeamMatch then
-		-- Compute submatches
-		match.submatches = Array.map(
-			CustomMatchGroupUtil.groupBySubmatch(match.games),
-			function(games) return CustomMatchGroupUtil.constructSubmatch(games) end
-		)
-
-		local extradata = match.extradata
-		---@cast extradata table
-		Array.forEach(match.submatches, function (submatch)
-			submatch.header = Table.extract(extradata, 'subgroup' .. submatch.subgroup .. 'header')
-		end)
+	if not match.isTeamMatch then
+		return match
 	end
+
+	-- Compute submatches
+	match.submatches = Array.map(
+		CustomMatchGroupUtil.groupBySubmatch(match.games),
+		function(games) return CustomMatchGroupUtil.constructSubmatch(games) end
+	)
+
+	local extradata = match.extradata
+	---@cast extradata table
+	Array.forEach(match.submatches, function (submatch)
+		submatch.header = Table.extract(extradata, 'subgroup' .. submatch.subgroup .. 'header')
+	end)
 
 	return match
 end
@@ -102,46 +108,34 @@ end
 function CustomMatchGroupUtil.constructSubmatch(games)
 	local firstGame = games[1]
 	local opponents = Table.deepCopy(firstGame.opponents)
-	local scores = {}
-	local winner = nil
-
-	if string.find(firstGame.map or '', '^[sS]ubmatch %d+$') then
-		Array.forEach(firstGame.opponents, function (opponent, opponentIndex)
-			if opponent.status and opponent.status ~= SCORE_STATUS  then
-				scores[opponentIndex] = opponent.status
-			else
-				scores[opponentIndex] = opponent.score
-			end
-		end)
-		winner = firstGame.winner
-	else
-		local allPlayed = true
-		scores = {0, 0}
-		-- Sum up scores
-		Array.forEach(games, function (game)
-			if game.winner then
-				scores[game.winner] = (scores[game.winner] or 0) + 1
-			end
-			allPlayed = game.winner ~= nil
-		end)
-
-		if allPlayed then
-			local diff = (scores[1] or 0) - (scores[2] or 0)
-			if diff < 0 then
-				winner = 2
-			elseif diff == 0 then
-				winner = 0
-			else
-				winner = 1
-			end
-		end
+	local isSubmatch = string.find(firstGame.map or '', '^[sS]ubmatch %d+$')
+	if isSubmatch then
+		games = {firstGame}
 	end
+
+	---@param opponent table
+	local getOpponentScoreAndStatus = function(opponent, opponentIndex)
+		local statuses = Array.unique(Array.map(games, function(game)
+			return game.opponents[opponentIndex].status
+		end))
+		opponent.status = #statuses == 1 and statuses[1] ~= SCORE_STATUS and statuses[1] or SCORE_STATUS
+		opponent.score = isSubmatch and firstGame.scores[opponentIndex] or Array.reduce(Array.map(games, function(game)
+			return (game.winner == opponentIndex and 1 or 0)
+		end), Operator.add)
+	end
+
+	Array.forEach(opponents, getOpponentScoreAndStatus)
+
+	local allPlayed = Array.all(games, function (game) return game.winner ~= nil end)
+	local winner = allPlayed and MatchGroupInputUtil.getWinner('', nil, opponents) or nil
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
+	end)
 
 	return {
 		games = games,
 		opponents = opponents,
-		scores = scores,
-		subgroup = games[1].subgroup,
+		subgroup = firstGame.subgroup,
 		winner = winner,
 	}
 end

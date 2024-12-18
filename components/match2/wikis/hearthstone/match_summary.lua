@@ -20,7 +20,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local CustomMatchSummary = {}
 
@@ -79,52 +78,22 @@ function CustomMatchSummary._submatchHasDetails(submatch)
 end
 
 ---@param submatch HearthstoneMatchGroupUtilSubmatch
----@return Widget
+---@return Html
 function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}
-
-	local createOpponent = function(opponentIndex)
-		local players = (opponents[opponentIndex] or {}).players or {}
+	Array.forEach(opponents, function (opponent, opponentIndex)
+		local players = opponent.players or {}
 		if Logic.isEmpty(players) then
 			players = Opponent.tbd(Opponent.solo).players
 		end
-		return OpponentDisplay.BlockOpponent{
-			flip = opponentIndex == 1,
-			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
-			showLink = true,
-			overflow = 'ellipsis',
-		}
-	end
+		---@cast players -nil
+		opponent.type = Opponent.partyTypes[math.max(#players, 1)]
+		opponent.players = players
+	end)
 
-	---@param opponentIndex any
-	---@return Html
-	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner
-		return OpponentDisplay.BlockScore{
-				isWinner = isWinner,
-				scoreText = (submatch.scores or {})[opponentIndex],
-			}
-	end
-
-	return HtmlWidgets.Div{
-		classes = {'brkts-popup-header-dev'},
-		css = {['justify-content'] = 'center', margin = 'auto'},
-		children = WidgetUtil.collect(
-			HtmlWidgets.Div{
-				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-left'},
-				children = {
-					createOpponent(1),
-					createScore(1):addClass('brkts-popup-header-opponent-score-left'),
-				},
-			},
-			HtmlWidgets.Div{
-				classes = {'brkts-popup-header-opponent', 'brkts-popup-header-opponent-right'},
-				children = {
-					createScore(2):addClass('brkts-popup-header-opponent-score-right'),
-					createOpponent(2),
-				},
-			}
-		)
+	return HtmlWidgets.Div {
+		css = {margin = 'auto'},
+		children = MatchSummary.createDefaultHeader({opponents = opponents}):create()
 	}
 end
 
