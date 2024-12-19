@@ -55,9 +55,10 @@ function StarcraftFfaMatchGroupInput.processMatch(matchInput, options)
 end
 
 ---@param match table
+---@param numberOfOpponents integer
 ---@return table
-function MatchFunctions.parseSettings(match)
-	return {}
+function MatchFunctions.parseSettings(match, numberOfOpponents)
+	return {noscore = Logic.readBool(match.noscore)}
 end
 
 ---@param opponent table
@@ -65,10 +66,8 @@ end
 ---@param match table
 function MatchFunctions.adjustOpponent(opponent, opponentIndex, match)
 	BaseMatchFunctions.adjustOpponent(opponent, opponentIndex)
-	opponent.extradata = opponent.extradata or {}
-	opponent.extradata.noscore = Logic.readBool(match.noscore)
 	-- set score to 0 for all opponents if it is a match without scores
-	if opponent.extradata.noscore then
+	if Logic.readBool(match.noscore) then
 		opponent.score = 0
 	end
 end
@@ -135,8 +134,8 @@ function MatchFunctions.getExtraData(match, games, opponents, settings)
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
-		noscore = tostring(Logic.readBool(match.noscore)),
 		showplacement = Logic.readBoolOrNil(match.showplacement),
+		settings = settings,
 	}
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
@@ -187,12 +186,13 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		extradata = {
 			comment = mapInput.comment,
 			displayname = mapInput.mapDisplayName,
+			settings = {noscore = not hasScores},
 		}
 	}
 
 	if mapInput.date then
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
-		map.extradata = map.dateexact
+		map.extradata.dateexact = map.dateexact
 	end
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then

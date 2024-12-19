@@ -50,10 +50,8 @@ end
 ---@return table[]
 function Parser.adjustMatchColumns(columns)
 	return Array.map(columns, function(column)
-		if column.id == 'status' then
-			return
-		elseif column.id == 'totalPoints' then
-			column.show = function(match) return not Logic.readBool(match.noScore) end
+		if column.id == 'totalPoints' then
+			column.show = function(match) return not match.extradata.settings.noscore end
 		end
 		return column
 	end)
@@ -72,7 +70,7 @@ function Parser.adjustGameOverviewColumns(columns)
 
 		-- css for kills works just fine for our purposes
 		elseif column.id == 'kills' then
-			column.show = function(match) return not Logic.readBool(match.noScore) end
+			column.show = function(match) return not match.extradata.settings.noscore end
 			column.row = {value = function(opponent)
 				return OpponentDisplay.InlineScore(Table.merge({extradata = {}, score = ''}, opponent))
 			end}
