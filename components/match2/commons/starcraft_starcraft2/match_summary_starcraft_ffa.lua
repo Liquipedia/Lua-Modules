@@ -9,7 +9,6 @@
 local StarcraftMatchSummaryFfa = {}
 
 local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
