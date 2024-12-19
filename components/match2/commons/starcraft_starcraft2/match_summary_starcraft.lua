@@ -18,7 +18,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -39,16 +38,6 @@ local StarcraftMatchSummary = {}
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-	---@cast match StarcraftMatchGroupUtilMatch
-
-	if match.isFfa then
-		return Lua.import('Module:MatchSummary/Starcraft/Ffa').getByMatchId{
-			match = match,
-			config = args.config
-		}
-	end
-
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
 end
 

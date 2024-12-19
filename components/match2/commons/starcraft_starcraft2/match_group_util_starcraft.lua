@@ -54,7 +54,6 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@class StarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StarcraftMatchGroupUtilGame[]
 ---@field isFfa boolean
----@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
 ---@field opponents StarcraftStandardOpponent[]
 ---@field vetoes StarcraftMatchGroupUtilVeto[]
@@ -109,7 +108,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	-- Misc
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
-	match.noScore = Logic.readBoolOrNil(Table.extract(extradata, 'noscore'))
 	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
