@@ -357,7 +357,7 @@ liquipedia.core.modules.push( 'talenttemplate' );
 liquipedia.creepspot = {
 	init: function() {
 		if ( document.querySelector( '.creep-spot' ) !== null ) {
-			mw.loader.using( 'skins.bruinen.scripts' ).then( () => {
+			mw.loader.using( 'skins.' + mw.config.get( 'skin' ) + '.scripts' ).then( () => {
 				document.querySelectorAll( '.creep-spot' ).forEach( ( cs ) => {
 					const $this = $( cs );
 					const options = {

@@ -82,8 +82,10 @@ end
 --
 
 ---@param map table
+---@param mapIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(map)
+function MapFunctions.getMapName(map, mapIndex, match)
 	if map.map == DUMMY_MAP then
 		return nil
 	end

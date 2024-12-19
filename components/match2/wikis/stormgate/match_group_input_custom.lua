@@ -158,8 +158,10 @@ function MatchFunctions.getExtraData(match, games, opponents)
 end
 
 ---@param game table
+---@param gameIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(game)
+function MapFunctions.getMapName(game, gameIndex, match)
 	local mapName = game.map
 	if mapName and mapName:upper() ~= TBD then
 		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map)
