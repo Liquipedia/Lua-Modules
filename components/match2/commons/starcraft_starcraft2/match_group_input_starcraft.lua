@@ -375,7 +375,6 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
-		displayname = map.mapDisplayName,
 		header = map.header,
 		server = map.server,
 	}
@@ -420,10 +419,11 @@ end
 ---@param gameIndex table
 ---@param match table
 ---@return string?
+---@return string?
 function MapFunctions.getMapName(game, gameIndex, match)
 	local mapName = game.map
 	if mapName and mapName:upper() ~= TBD then
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map)
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map), game.mapDisplayName
 	elseif mapName then
 		return TBD
 	end
