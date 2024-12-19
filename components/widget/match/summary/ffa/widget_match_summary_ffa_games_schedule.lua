@@ -50,7 +50,7 @@ end
 ---@return boolean
 function MatchSummaryFfaGamesSchedule:gamesHaveDifferentDates()
 	local dates = Array.map(self.props.match.games or {}, Operator.property('date'))
-	return Array.any(dates, function(date) return date ~= self.props.match.date end)
+	return Array.all(dates, function(date) return date == self.props.match.date end)
 end
 
 return MatchSummaryFfaGamesSchedule
