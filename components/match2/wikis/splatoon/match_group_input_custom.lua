@@ -126,7 +126,7 @@ function MapFunctions.computeOpponentScore(props, autoScore)
 		props.score = props.score:gsub('%%', '')
 	end
 
-	return MatchGroupInputUtil.computeOpponentScore(props, MapFunctions.calculateMapScore)
+	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 end
 
 return CustomMatchGroupInput

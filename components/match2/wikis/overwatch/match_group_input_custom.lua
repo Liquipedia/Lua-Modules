@@ -88,7 +88,7 @@ function MapFunctions.computeOpponentScore(props, autoScore)
 		props.score = props.score:gsub('m', '')
 	end
 
-	return MatchGroupInputUtil.computeOpponentScore(props)
+	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 end
 
 

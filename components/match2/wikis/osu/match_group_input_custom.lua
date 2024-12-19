@@ -99,7 +99,7 @@ function MapFunctions.computeOpponentScore(props, autoScore)
 
 	props.score = string.gsub(props.score or '', ',', '')
 
-	return MatchGroupInputUtil.computeOpponentScore(props)
+	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 end
 
 return CustomMatchGroupInput
