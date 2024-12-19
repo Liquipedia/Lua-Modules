@@ -96,6 +96,7 @@ end
 ---@param mapIndex integer
 ---@param match table
 ---@return string?
+---@return string?
 function MapFunctions.getMapName(map, mapIndex, match)
 	return nil
 end

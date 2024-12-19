@@ -136,6 +136,7 @@ end
 ---@param mapIndex integer
 ---@param match table
 ---@return string
+---@return string?
 function MapFunctions.getMapName(map, mapIndex, match)
 	if Logic.readBool(match.hasSubmatches) then
 		-- generic map name (not displayed)
