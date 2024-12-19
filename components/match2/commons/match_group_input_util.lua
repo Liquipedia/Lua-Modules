@@ -104,6 +104,7 @@ local contentLanguage = mw.getContentLanguage()
 ---@field maxNumPlayers integer?
 ---@field resolveRedirect boolean?
 ---@field pagifyTeamNames boolean?
+---@field disregardTransferDates boolean?
 
 ---@class MatchGroupInputSubstituteInformation
 ---@field substitute standardPlayer
@@ -466,7 +467,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	while name do
 		if options.maxNumPlayers and (playersIndex >= options.maxNumPlayers) then break end
 
-		if wasPresentInMatch(varPrefix) then
+		if options.disregardTransferDates or wasPresentInMatch(varPrefix) then
 			insertIntoPlayers{
 				pageName = name,
 				displayName = globalVars:get(varPrefix .. 'dn'),
