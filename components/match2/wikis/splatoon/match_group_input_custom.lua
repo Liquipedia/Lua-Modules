@@ -7,10 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 local WeaponNames = mw.loadData('Module:WeaponNames')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -32,40 +29,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(match, map, opponents)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		local opponentInfo = Array.map(opponents, function(opponent, opponentIndex)
-			local scoreInput = map['score' .. opponentIndex]
-			if map.maptype == 'Turf War' and scoreInput then
-				scoreInput = scoreInput:gsub('%%', '')
-			end
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = scoreInput,
-			}, MapFunctions.calculateMapScore(map))
-			local players = MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 --
@@ -112,9 +76,9 @@ end
 ---@return table[]
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
-		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'w' .. playerIndex])
+		return map['t' .. opponentIndex .. 'w' .. playerIndex] or map['t' .. opponentIndex .. 'w' .. playerIndex]
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -129,10 +93,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param weaponRaw string
@@ -155,6 +115,18 @@ function MapFunctions.calculateMapScore(map)
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
+---@param autoScore? fun(opponentIndex: integer): integer?
+---@return integer|string? #SCORE
+---@return string? #STATUS
+function MapFunctions.computeOpponentScore(props, autoScore)
+	if props.score then
+		props.score = props.score:gsub('%%', '')
+	end
+
+	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
 end
 
 return CustomMatchGroupInput
