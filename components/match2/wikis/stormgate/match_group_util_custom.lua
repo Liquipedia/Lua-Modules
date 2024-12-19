@@ -68,8 +68,6 @@ CustomMatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@class StormgateMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games StormgateMatchGroupUtilGame[]
----@field isFfa boolean
----@field noScore boolean?
 ---@field opponents StormgateStandardOpponent[]
 ---@field vetoes StormgateMatchGroupUtilVeto[]
 ---@field submatches StormgateMatchGroupUtilSubmatch[]?
@@ -117,7 +115,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.casters = Table.extract(extradata, 'casters')
 
 	return match
