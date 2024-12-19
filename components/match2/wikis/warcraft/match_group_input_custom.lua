@@ -192,8 +192,10 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 end
 
 ---@param game table
+---@param gameIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(game)
+function MapFunctions.getMapName(game, gameIndex, match)
 	return (MapsData[(game.map or ''):lower()] or {}).name or game.map
 end
 
