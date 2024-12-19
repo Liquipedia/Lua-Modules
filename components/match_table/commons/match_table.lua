@@ -66,6 +66,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showType boolean
 ---@field showYearHeaders boolean
 ---@field useTickerName boolean
+---@field useShortName boolean
 ---@field teamStyle teamStyle
 
 ---@class MatchTableMatch
@@ -76,6 +77,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field liquipediatiertype string?
 ---@field displayName string
 ---@field tickerName string?
+---@field shortName string?
 ---@field icon string?
 ---@field iconDark string?
 ---@field pageName string
@@ -153,6 +155,7 @@ function MatchTable:_readDefaultConfig()
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
+		useShortName = Logic.readBool(args.useShortName),
 		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short'
 	}
 end
@@ -288,7 +291,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, resulttype, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, shortname, vod, winner, walkover, resulttype, extradata',
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -402,6 +405,7 @@ function MatchTable:matchFromRecord(record)
 		liquipediatiertype = record.liquipediatiertype,
 		displayName = String.nilIfEmpty(record.tournament) or record.pagename:gsub('_', ' '),
 		tickerName = String.nilIfEmpty(record.tickername),
+		shortName = String.nilIfEmpty(record.shortname),
 		icon = String.nilIfEmpty(record.icon),
 		iconDark = String.nilIfEmpty(record.icondark),
 		pageName = record.pagename,
@@ -701,7 +705,9 @@ end
 ---@param match MatchTableMatch
 ---@return Html
 function MatchTable:_displayTournament(match)
-	local displayName = (self.config.useTickerName and match.tickerName) or match.displayName
+	local displayName = (self.config.useTickerName and match.tickerName)
+		or (self.config.useShortName and match.shortName)
+		or match.displayName
 	return mw.html.create('td')
 		:css('text-align', 'left')
 		:wikitext(Page.makeInternalLink(displayName, match.pageName))
