@@ -474,6 +474,9 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 		}
 	end)
 
+	local dates = Array.map(match.games, Operator.property('date'))
+	local gamesHaveDifferentDates = Array.any(dates, function(date) return date ~= match.date end)
+
 	table.insert(cells, HtmlWidgets.Div{
 		classes = {'panel-table__cell', 'cell--game-container-nav-holder'},
 		attributes = {
@@ -491,7 +494,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 						children = {
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-head'},
-								children = Parser.gameHeader and Parser.gameHeader(match, game, idx) or {
+								children = {
 									HtmlWidgets.Div{
 										classes = {'panel-table__cell__game-title'},
 										children = {
@@ -502,7 +505,7 @@ function MatchSummaryFfa.standardMatch(match, Parser)
 											}
 										}
 									},
-									MatchSummaryWidgets.GameCountdown{game = game},
+									gamesHaveDifferentDates and MatchSummaryWidgets.GameCountdown{game = game} or nil,
 								}
 							},
 							HtmlWidgets.Div{
@@ -630,22 +633,6 @@ function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
 
 	-- Sort game level based on placement
 	Array.sortInPlaceBy(game.opponents, FnUtil.identity, MatchSummaryFfa.placementSortFunction)
-end
-
----@param match MatchGroupUtilMatch
----@return Widget
-function MatchSummaryFfa.schedule(match)
-	if MatchSummaryFfa.gamesHaveDifferentDates(match) then
-		return MatchSummaryWidgets.GamesSchedule{games = match.games}
-	end
-	return MatchSummaryWidgets.MatchSchedule{match = match}
-end
-
----@param match MatchGroupUtilMatch
----@return boolean
-function MatchSummaryFfa.gamesHaveDifferentDates(match)
-	local dates = Array.map(match.games, Operator.property('date'))
-	return Array.any(dates, function(date) return date ~= match.date end)
 end
 
 return MatchSummaryFfa

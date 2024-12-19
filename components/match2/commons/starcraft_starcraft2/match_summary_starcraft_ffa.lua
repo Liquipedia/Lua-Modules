@@ -39,7 +39,7 @@ function StarcraftMatchSummaryFfa.getByMatchId(props)
 			matchId = match.matchId,
 			idx = 0,
 			children = {
-				BaseMatchSummary.schedule(match),
+				MatchSummaryWidgets.GamesSchedule{match = match},
 				BaseMatchSummary.standardMatch(match, Parser),
 			}
 		}
@@ -80,26 +80,6 @@ function Parser.adjustGameOverviewColumns(columns)
 
 		return column
 	end)
-end
-
----@param match table
----@param game table
----@param gameIndex integer
----@return table[]
-function Parser.gameHeader(match, game, gameIndex)
-	return {
-		HtmlWidgets.Div{
-			classes = {'panel-table__cell__game-title'},
-			children = {
-				MatchSummaryWidgets.CountdownIcon{game = game, additionalClasses = {'panel-table__cell-icon'}},
-				HtmlWidgets.Span{
-					classes = {'panel-table__cell-text'},
-					children = 'Game ' .. gameIndex
-				}
-			}
-		},
-		BaseMatchSummary.gamesHaveDifferentDates(match) and MatchSummaryWidgets.GameCountdown{game = game} or nil,
-	}
 end
 
 return StarcraftMatchSummaryFfa
