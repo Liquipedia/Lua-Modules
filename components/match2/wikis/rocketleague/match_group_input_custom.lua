@@ -55,6 +55,9 @@ function MatchFunctions.extractMaps(match, opponents)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		local dateToUse = map.date or match.date
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
+
 		map.extradata = MapFunctions.getExtraData(map)
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 

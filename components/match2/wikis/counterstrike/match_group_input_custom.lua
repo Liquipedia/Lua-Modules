@@ -42,7 +42,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status') --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.getMatchDate({}, match))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
@@ -64,7 +64,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		}, autoScoreFunction)
 	end)
 
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
