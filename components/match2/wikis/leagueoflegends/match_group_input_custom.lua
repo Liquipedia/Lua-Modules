@@ -82,6 +82,9 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		local dateToUse = map.date or match.date
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
+
 		map.length = MapParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.extradata = MapFunctions.getExtraData(MapParser, map, #opponents)
