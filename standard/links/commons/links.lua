@@ -50,6 +50,7 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
+	chesscom = {'https://www.chess.com/'},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
 	challengermode = {
@@ -358,6 +359,11 @@ local MATCH_ICONS = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
 		iconDark = 'File:Breaking Point GG icon darkmode.png',
 		text = 'Breaking Point matchpage'
+	},
+	chesscom = {
+		icon = 'File:ChessCom_allmode.png',
+		iconDark = 'File:ChessCom_allmode.png',
+		text = 'Chess.com matchpage'
 	},
 	cdl = {
 		icon = 'File:Call of Duty League lightmode.png',
