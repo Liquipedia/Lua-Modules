@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local MapTypeIcon = require('Module:MapType')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local WeaponIcon = require('Module:WeaponIcon')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -77,9 +78,9 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] --[[@as number|string?]]
-	if score and game.mode == 'Turf War' then
-		score = score .. '%'
+	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
+	if opponentCopy.score and game.mode == 'Turf War' then
+		opponentCopy.score = opponentCopy.score .. '%'
 	end
 	local scoreDisplay = DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 	return mw.html.create('div')
