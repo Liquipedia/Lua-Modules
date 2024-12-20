@@ -60,7 +60,7 @@ function CustomMatchSummary._createMapRow(game)
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			displayNumericScore(
-				DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+				DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 			)
 		}
 	end

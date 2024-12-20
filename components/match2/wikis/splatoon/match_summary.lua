@@ -81,7 +81,7 @@ function CustomMatchSummary._gameScore(game, opponentIndex)
 	if score and game.mode == 'Turf War' then
 		score = score .. '%'
 	end
-	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
+	local scoreDisplay = DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 	return mw.html.create('div')
 		:addClass('brkts-popup-body-element-vertical-centered')
 		:css('min-width', '24px')
