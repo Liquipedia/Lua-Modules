@@ -22,6 +22,7 @@ return {
 		'cfs',
 		'challengermode',
 		'challonge',
+		'chesscom',
 		'cybergamer',
 		'datdota',
 		'dotabuff',
