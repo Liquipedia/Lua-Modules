@@ -45,6 +45,7 @@ local StarcraftMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@class StarcraftMatchGroupUtilSubmatch
 ---@field games StarcraftMatchGroupUtilGame[]
 ---@field mode string
+---@field status string?
 ---@field opponents StarcraftMatchGroupUtilGameOpponent[]
 ---@field subgroup number
 ---@field winner number?
