@@ -38,8 +38,9 @@ function MatchLegacy._storeGames(match, match2)
 		game.extradata = {}
 
 		if game.mode == 'singles' then
-			local player1 = game2.opponents[1].players[1]
-			local player2 = game2.opponents[2].players[1]
+			local opponents = Json.parseIfString(game2.opponents) or {}
+			local player1 = opponents[1].players[1]
+			local player2 = opponents[2].players[1]
 			game.extradata.char1 = table.concat(Array.map(player1.characters or {}, Operator.property('name')), ',')
 			game.extradata.char2 = table.concat(Array.map(player2.characters or {}, Operator.property('name')), ',')
 		end
@@ -103,7 +104,8 @@ function MatchLegacy._convertParameters(match2)
 	local headList = function(opponentIndex, playerIndex)
 		local heads = Set{}
 		Array.forEach(match2.match2games or {}, function(game)
-			local player = (game.opponents[opponentIndex].players or {})[playerIndex]
+			local opponents = Json.parseIfString(game.opponents) or {}
+			local player = (opponents[opponentIndex].players or {})[playerIndex]
 			if player and Logic.isNotEmpty(player.characters) then
 				Array.forEach(
 					Array.map(player.characters, Operator.property('name')),

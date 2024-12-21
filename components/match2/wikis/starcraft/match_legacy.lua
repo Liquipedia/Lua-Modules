@@ -48,7 +48,8 @@ function MatchLegacy._storeGames(match, match2)
 			game.extradata.winnerrace = game.extradata.winnerfaction
 			game.extradata.loserrace = game.extradata.loserfaction
 
-			Array.forEach(game.opponents, function(opponent, opponentIndex)
+			local opponents = Json.parseIfString(game.opponents) or {}
+			Array.forEach(opponents, function(opponent, opponentIndex)
 				Array.forEach(opponent.players or {}, function(player, playerIndex)
 					if Logic.isDeepEmpty(player) then return end
 					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
@@ -79,7 +80,8 @@ function MatchLegacy._storeGames(match, match2)
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
 
-			Array.forEach(game.opponents, function(opponent, opponentIndex)
+			local opponents = Json.parseIfString(game.opponents) or {}
+			Array.forEach(opponents, function(opponent, opponentIndex)
 				Array.forEach(opponent.players or {}, function(player, playerIndex)
 					if Logic.isDeepEmpty(player) then return end
 					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}

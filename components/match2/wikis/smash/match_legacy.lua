@@ -104,7 +104,8 @@ function MatchLegacy._convertParameters(match2)
 	local headList = function(opponentIndex, playerIndex)
 		local heads = Set{}
 		Array.forEach(match2.match2games or {}, function(game)
-			local player = (game.opponents[opponentIndex].players or {})[playerIndex]
+			local opponents = Json.parseIfString(game.opponents) or {}
+			local player = (opponents[opponentIndex].players or {})[playerIndex]
 			if player and Logic.isNotEmpty(player.characters) then
 				Array.forEach(
 					Array.map(player.characters, Operator.property('name')),

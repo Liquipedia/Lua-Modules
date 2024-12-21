@@ -167,11 +167,13 @@ function MatchLegacy._groupIntoSubmatches(match2, objectName)
 		local submatchIndex = tonumber(game.subgroup)
 		if game.mode ~= '1v1' or not submatchIndex then return end
 
+		local opponents = Json.parseIfString(game.opponents) or {}
+
 		if not submatches[submatchIndex] then
 			submatches[submatchIndex] = {
 				games = {},
 				objectName = objectName .. '_Submatch_' .. submatchIndex,
-				opponents = MatchLegacy._constructSubmatchOpponents(game.opponents or {}, match2.match2opponents)
+				opponents = MatchLegacy._constructSubmatchOpponents(opponents, match2.match2opponents)
 			}
 		end
 		local submatch = submatches[submatchIndex]
@@ -247,7 +249,8 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	game.opponent1score = game2.scores[1]
 	game.opponent2score = game2.scores[2]
 
-	local factions, heroes = MatchLegacy._heroesAndFactionFromGameOpponents(game2.opponents)
+	local opponents = Json.parseIfString(game2.opponents) or {}
+	local factions, heroes = MatchLegacy._heroesAndFactionFromGameOpponents(opponents)
 	for opponentIndex = 1, 2 do
 		game.extradata['opponent' .. opponentIndex .. 'race'] = factions[opponentIndex]
 			or game.extradata['opponent' .. opponentIndex .. 'race']
