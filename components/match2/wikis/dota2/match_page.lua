@@ -75,12 +75,11 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local team = {players = {}}
+			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-
-			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
+			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
@@ -92,8 +91,8 @@ function MatchPage.getByMatchId(props)
 				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
 				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold)
 
-				table.insert(team.players, newPlayer)
-			end
+				return newPlayer
+			end)
 
 			if game.finished then
 				-- Aggregate stats

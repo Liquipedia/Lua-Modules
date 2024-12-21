@@ -93,26 +93,15 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return table[][]
 function CustomMatchSummary._extractPlayersFromGame(game, match)
-	local players = {{}, {}}
-
-	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
-		participantKey = mw.text.split(participantKey, '_')
-		local opponentIndex = tonumber(participantKey[1])
-		local match2playerIndex = tonumber(participantKey[2])
-
-		local player = match.opponents[opponentIndex].players[match2playerIndex]
-
-		if not player then
-			player = {
-				displayName = participant.displayname,
-				pageName = participant.name,
+	return Array.map(game.opponents, function(opponent, opponentIndex)
+		return Array.map(opponent.players, function(player, playerIndex)
+			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
+			return matchPlayer or {
+				displayName = player.displayname,
+				pageName = player.name,
 			}
-		end
-
-		table.insert(players[opponentIndex], player)
-	end
-
-	return players
+		end)
+	end)
 end
 
 ---@param score number|string|nil

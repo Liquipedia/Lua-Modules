@@ -84,7 +84,7 @@ end
 ---@param props {game: string?, soloMode: boolean, opponents: table[]}
 ---@return Widget?
 function CustomMatchSummary._createStandardGame(game, props)
-	if not game or not game.participants then
+	if not game or not Array.all(game.opponents, function(opponent) return Logic.isDeepEmpty(opponent.players) end) then
 		return
 	end
 
