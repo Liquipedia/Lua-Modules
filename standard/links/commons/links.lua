@@ -52,7 +52,7 @@ local PREFIXES = {
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
 	chesscom = {
 		'https://www.chess.com/',
-		match = 'https://www.chess.com/games/view'
+		match = 'https://www.chess.com/games/view/',
 	},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
