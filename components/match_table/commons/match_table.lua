@@ -38,8 +38,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local UTC = 'UTC'
-local DRAW = 'draw'
-local RESULT_TYPE_DEFAULT = 'default'
+local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
@@ -89,7 +88,6 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field opponent match2opponent
 ---@field vs match2opponent
 ---@field winner number
----@field resultType string?
 ---@field countGames boolean
 
 ---@class MatchTable
@@ -288,7 +286,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, resulttype, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, extradata',
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -357,7 +355,7 @@ end
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('resulttype'), Comparator.neq, 'np')}
+		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
 	local hasAdditionalConditions = false
 
 	local getOrCondition = function(lpdbKey, input)
@@ -467,7 +465,6 @@ function MatchTable:resultFromRecord(record)
 		opponent = record.match2opponents[indexes[1]],
 		vs = record.match2opponents[indexes[2]],
 		winner = winner,
-		resultType = record.resultType,
 		countGames = countGames,
 	}
 
@@ -490,10 +487,11 @@ function MatchTable:statsFromMatches()
 	end
 
 	Array.forEach(self.matches, function(match)
-		if match.result.resultType == RESULT_TYPE_DEFAULT then
-			return
-		elseif match.result.resultType == DRAW then
+		if match.result.winner == DRAW_WINNER then
 			totalMatches.d = totalMatches.d + 1
+		elseif Array.any({match.result.opponent, match.result.vs}, function(opponent)
+			return opponent.status ~= SCORE_STATUS
+		end) then return
 		elseif match.result.winner == 1 then
 			totalMatches.w = totalMatches.w + 1
 		elseif match.result.winner == 2 then

@@ -250,7 +250,7 @@ local lpdb = {}
 ---@field match2bracketid string
 ---@field winner integer
 ---@field walkover WalkoverType
----@field resulttype ResultType
+---@field resulttype ResultType ---@deprecated
 ---@field finished integer
 ---@field mode string
 ---@field type string
@@ -296,7 +296,7 @@ local lpdb = {}
 ---@field participants table
 ---@field winner integer
 ---@field walkover WalkoverType
----@field resulttype ResultType
+---@field resulttype ResultType ---@deprecated
 ---@field mode string
 ---@field type string
 ---@field game string
