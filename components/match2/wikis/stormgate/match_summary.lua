@@ -219,7 +219,7 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 	}
 end
 
----@param submatch StarcraftMatchGroupUtilSubmatch
+---@param submatch StormgateMatchGroupUtilSubmatch
 ---@return Widget
 function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}

@@ -7,8 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Logic = require('Module:Logic')
-local Operator = require('Module:Operator')
 
 
 local MatchOpponentHelper = {}

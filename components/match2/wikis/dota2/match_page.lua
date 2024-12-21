@@ -25,7 +25,7 @@ local Display = Lua.import('Module:MatchPage/Template')
 local MatchPage = {}
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
@@ -237,7 +237,7 @@ end
 ---@return string
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
-		return game.resultType ~= NOT_PLAYED
+		return game.status ~= NOT_PLAYED
 	end), function(game)
 		return TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)
