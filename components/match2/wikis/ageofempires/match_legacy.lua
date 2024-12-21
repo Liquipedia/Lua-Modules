@@ -53,8 +53,8 @@ function MatchLegacy.storeGames(match, match2)
 				end
 			end)
 		elseif game.mode == '1v1' then
-			local player1 = (game.opponents[1].players or {})[1] or {}
-			local player2 = (game.opponents[2].players or {})[1] or {}
+			local player1 = (opponents[1].players or {})[1] or {}
+			local player2 = (opponents[2].players or {})[1] or {}
 			game.extradata.opponent1civ = player1.civ
 			game.extradata.opponent2civ = player2.civ
 			game.extradata.winnerciv =
