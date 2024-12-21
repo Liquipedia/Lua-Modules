@@ -24,9 +24,10 @@ local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 local VodLink = require('Module:VodLink')
 
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 local PlayerExt = Lua.import('Module:Player/Ext')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -489,9 +490,8 @@ function MatchTable:statsFromMatches()
 	Array.forEach(self.matches, function(match)
 		if match.result.winner == DRAW_WINNER then
 			totalMatches.d = totalMatches.d + 1
-		elseif Array.any({match.result.opponent, match.result.vs}, function(opponent)
-			return opponent.status ~= SCORE_STATUS
-		end) then return
+		elseif MatchOpponentHelper.calculateWalkoverType{match.result.opponent, match.result.vs} then
+			return
 		elseif match.result.winner == 1 then
 			totalMatches.w = totalMatches.w + 1
 		elseif match.result.winner == 2 then
