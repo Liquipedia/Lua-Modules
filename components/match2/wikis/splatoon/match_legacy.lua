@@ -14,6 +14,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -63,11 +64,12 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	if match.walkover == 'ff' or match.walkover == 'dq' then
-		match.resulttype = match.walkover
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover == 'FF' or walkover == 'DQ' then
+		match.resulttype = walkover:lower()
 		match.walkover = match.winner
-	elseif match.walkover == 'l' then
-		match.resulttype = match.walkover
+	elseif walkover == 'L' then
+		match.resulttype = walkover:lower()
 		match.walkover = nil
 	end
 

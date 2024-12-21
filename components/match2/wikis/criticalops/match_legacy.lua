@@ -209,7 +209,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 
-		local walkover = MatchOpponentHelper.calculateWalkoverType(game.opponents)
+		local walkover = MatchOpponentHelper.calculateWalkoverType(game2.opponents)
 		if walkover == 'FF' or walkover == 'DQ' then
 			game.walkover = 1
 		end
