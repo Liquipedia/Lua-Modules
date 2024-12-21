@@ -13,7 +13,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent

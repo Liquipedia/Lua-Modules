@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
@@ -70,13 +71,11 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param game MatchGroupUtilGame
----@param paricipantId string
+---@param opponentIndex integer
+---@param playerIndex integer
 ---@return {displayName: string?, pageName: string?, flag: string?, civ: string?}
-function CustomMatchSummary._getPlayerData(game, paricipantId)
-	if not game or not game.participants then
-		return {}
-	end
-	return game.participants[paricipantId] or {}
+function CustomMatchSummary._getPlayerData(game, opponentIndex, playerIndex)
+	return ((game.opponents[opponentIndex] or {}).players or {})[playerIndex]
 end
 
 ---@param game MatchGroupUtilGame
@@ -95,8 +94,8 @@ function CustomMatchSummary._createGame(game, props)
 	local faction1, faction2
 
 	if props.soloMode then
-		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1').civ, normGame)
-		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1').civ, normGame)
+		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, 1, 1).civ, normGame)
+		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, 2, 1).civ, normGame)
 	else
 		local function createParticipant(player, flipped)
 			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
