@@ -50,7 +50,10 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
-	chesscom = {match = 'https://www.chess.com/'},
+	chesscom = {
+		'https://www.chess.com/',
+		match = 'https://www.chess.com/games/view'
+	},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
 	challengermode = {
