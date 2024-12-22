@@ -21,15 +21,6 @@ function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 end
 
----@param game MatchGroupUtilGame
----@param opponentIndex integer
----@return Html
-function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex]
-	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
-	return mw.html.create('div'):wikitext(scoreDisplay)
-end
-
 ---@param date string
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
@@ -38,7 +29,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	local function makeTeamSection(opponentIndex)
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 		}
 	end
 

@@ -43,7 +43,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 			MatchSummaryWidgets.Characters{characters = characterData[opponentIndex], flipped = flipped},
-			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status),
 		}
 	end
 
