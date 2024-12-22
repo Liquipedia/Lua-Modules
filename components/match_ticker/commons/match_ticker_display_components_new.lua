@@ -191,7 +191,6 @@ function Details:streamsOrVods()
 
 	---@param obj table
 	---@param index integer?
-	---@return 
 	local addVod = function(obj, index)
 		vods:node(Logic.isNotEmpty(obj.vod) and VodLink.display{
 			vod = obj.vod,
