@@ -179,8 +179,8 @@ end
 ---@param opponent table
 ---@param status string?
 ---@return string
-function DisplayHelper.MapScore(opponent, status)
-	if status == 'notplayed' then
+function DisplayHelper.MapScore(opponent, gameStatus)
+	if gameStatus == 'notplayed' then
 		return ''
 	elseif opponent.status and opponent.status ~= 'S' then
 		return opponent.status
