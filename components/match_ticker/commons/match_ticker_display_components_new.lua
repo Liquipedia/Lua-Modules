@@ -10,6 +10,7 @@
 -- It contains the new html structure intented to be use for the new Dota2 Main Page (for now)
 -- Will most likely be expanded to other games in the future and other pages
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
@@ -20,8 +21,9 @@ local Lua = require('Module:Lua')
 local Timezone = require('Module:Timezone')
 local StreamLinks = require('Module:Links/Stream')
 local Page = require('Module:Page')
-local DefaultMatchTickerDisplayComponents = require('Module:MatchTicker/DisplayComponents')
+local VodLink = require('Module:VodLink')
 
+local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -142,7 +144,7 @@ function Details:create()
 	return self.root
 		:node(mw.html.create('div'):addClass('match-links')
 			:node(self:tournament())
-			:node(self:streams())
+			:node(self:streamsOrVods())
 		)
 		:node(matchBottomBar)
 end
@@ -175,14 +177,31 @@ function Details:countdown()
 end
 
 ---@return Html?
-function Details:streams()
+function Details:streamsOrVods()
 	local match = self.match
-	local links = mw.html.create('div')
-		:addClass('match-streams')
 
-	links:wikitext(table.concat(StreamLinks.buildDisplays(StreamLinks.filterStreams(match.stream)) or {}))
+	if not Logic.readBool(match.finished) then
+		return mw.html.create('div')
+			:addClass('match-streams')
+			:wikitext(table.concat(StreamLinks.buildDisplays(StreamLinks.filterStreams(match.stream)) or {}))
+	end
 
-	return links
+	local vods = mw.html.create('div')
+			:addClass('match-streams')
+
+	---@param obj table
+	---@param index integer?
+	local addVod = function(obj, index)
+		vods:node(Logic.isNotEmpty(obj.vod) and VodLink.display{
+			vod = obj.vod,
+			gamenum = index,
+		} or nil)
+	end
+
+	addVod(match)
+	Array.forEach(match.match2games or {}, addVod)
+
+	return vods
 end
 
 ---@return Html?
