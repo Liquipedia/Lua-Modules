@@ -57,9 +57,9 @@ function CustomMatchSummary._createGame(game)
 		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[1], game.status),
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
-			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[2], game.status),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -77,11 +77,11 @@ function CustomMatchSummary._createSubMatch(game, match)
 		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._players(players[1], 1, game.winner),
-			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[1], game.status),
 			CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 1)),
 			MatchSummaryWidgets.GameCenter{children = ' vs '},
 			CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 2)),
-			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[2], game.status),
 			CustomMatchSummary._players(players[2], 2, game.winner),
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)

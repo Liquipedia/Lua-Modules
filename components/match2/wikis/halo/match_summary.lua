@@ -31,13 +31,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	end
 
 	local displayScore = function(opponentIndex)
-		local score = DisplayHelper.MapScore(
-			game.scores[opponentIndex],
-			opponentIndex,
-			game.resultType,
-			game.walkover,
-			game.winner
-		)
+		local score = DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 		local points = game.extradata['points' .. opponentIndex]
 		if not points then
 			return score

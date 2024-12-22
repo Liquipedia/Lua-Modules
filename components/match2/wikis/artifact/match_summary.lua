@@ -54,7 +54,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	end
 
 	local scoreOfOpponnent = function(opponentIndex)
-		return DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+		return DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 	end
 
 	local scoreDisplay = (scoreOfOpponnent(1) or '') .. '&nbsp;-&nbsp;' .. (scoreOfOpponnent(2) or '')
