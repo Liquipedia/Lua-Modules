@@ -215,6 +215,7 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field vod string?
 ---@field walkover WalkoverType?
 ---@field winner integer?
+---@field status string?
 ---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',

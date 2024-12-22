@@ -10,10 +10,10 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -81,7 +81,9 @@ end
 ---@param props {game: string?, soloMode: boolean}
 ---@return Widget?
 function CustomMatchSummary._createGame(game, props)
-	if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
+	if (not game.map) and (not game.winner) and Logic.isEmpty(game.status) and Logic.isDeepEmpty(game.opponents) then
+		return
+	end
 
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.mapDisplayName = game.mapDisplayName or game.map
