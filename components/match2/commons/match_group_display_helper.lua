@@ -177,19 +177,16 @@ function DisplayHelper.Map(game, config)
 	return mapText
 end
 
----@param score string|number|nil
----@param opponentIndex integer
----@param resultType string?
----@param walkover string?
----@param winner integer?
+---@param opponent table
+---@param status string?
 ---@return string
-function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
-	if resultType == 'np' then
+function DisplayHelper.MapScore(opponent, gameStatus)
+	if gameStatus == 'notplayed' then
 		return ''
-	elseif resultType == 'default' then
-		return opponentIndex == winner and 'W' or string.upper(walkover or '')
+	elseif opponent.status and opponent.status ~= 'S' then
+		return opponent.status
 	end
-	return score and tostring(score) or ''
+	return opponent.score and tostring(opponent.score) or ''
 end
 
 --[[
