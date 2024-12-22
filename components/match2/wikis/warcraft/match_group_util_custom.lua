@@ -198,7 +198,9 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 
 	Array.forEach(opponents, getOpponentScoreAndStatus)
 
-	local allPlayed = Array.all(games, function (game) return game.winner ~= nil end)
+	local allPlayed = Array.all(games, function (game)
+		return game.winner ~= nil or game.status == 'notplayed'
+	end)
 	local winner = allPlayed and MatchGroupInputUtil.getWinner('', nil, opponents) or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
