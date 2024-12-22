@@ -114,6 +114,7 @@ function CustomMatchGroupUtil.constructSubmatch(games)
 	end
 
 	---@param opponent table
+	---@param opponentIndex number
 	local getOpponentScoreAndStatus = function(opponent, opponentIndex)
 		local statuses = Array.unique(Array.map(games, function(game)
 			return game.opponents[opponentIndex].status
