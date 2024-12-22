@@ -43,14 +43,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
----@param games table[]
----@return table[]
-function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, function(map)
-		return map.map ~= nil
-	end)
-end
-
 ---@param bestofInput string|integer?
 ---@return integer?
 function MatchFunctions.getBestOf(bestofInput)
