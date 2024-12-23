@@ -88,7 +88,9 @@ function CustomMatchSummary._createStandardGame(game, props)
 		return
 	end
 
-	local scoreDisplay = (game.scores[1] or '') .. '&nbsp;-&nbsp;' .. (game.scores[2] or '')
+	local scores = Array.map(game.opponents, Operator.property('score'))
+
+	local scoreDisplay = table.concat(scores, '&nbsp;-&nbsp;')
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},

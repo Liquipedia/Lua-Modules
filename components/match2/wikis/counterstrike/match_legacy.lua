@@ -89,10 +89,8 @@ function MatchLegacy.convertParameters(match2)
 	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		local scores = game.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(game.scores)
-		end
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		opponent1Rounds = opponent1Rounds + (tonumber(scores[1] or '') or 0)
 		opponent2Rounds = opponent2Rounds + (tonumber(scores[2] or '') or 0)
 		match.extradata['vodgame' .. gameIndex] = game.vod

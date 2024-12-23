@@ -13,6 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -170,6 +171,7 @@ function MatchLegacy._groupIntoSubmatches(match2, objectName)
 		if game.mode ~= '1v1' or not submatchIndex then return end
 
 		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 
 		if not submatches[submatchIndex] then
 			submatches[submatchIndex] = {
@@ -180,8 +182,8 @@ function MatchLegacy._groupIntoSubmatches(match2, objectName)
 		end
 		local submatch = submatches[submatchIndex]
 		table.insert(submatch.games, game)
-		submatch.opponents[1].score = submatch.opponents[1].score + (tonumber((game.scores or {})[1]) or 0)
-		submatch.opponents[2].score = submatch.opponents[2].score + (tonumber((game.scores or {})[2]) or 0)
+		submatch.opponents[1].score = submatch.opponents[1].score + (scores[1] or 0)
+		submatch.opponents[2].score = submatch.opponents[2].score + (scores[2] or 0)
 	end)
 
 	return submatches
@@ -240,6 +242,9 @@ end
 function MatchLegacy._storeGame(game2, gameIndex, match)
 	if game2.status == 'notplayed' then return end
 
+	local opponents = Json.parseIfString(game2.opponents) or {}
+	local scores = Array.map(opponents, Operator.property('score'))
+
 	local objectName = match.objectName .. '_Map_' .. gameIndex
 
 	local game = Table.deepCopy(match)
@@ -247,9 +252,8 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	game.vod = game2.vod
 	game.map = game2.map
 
-	game2.scores = game2.scores or {}
-	game.opponent1score = game2.scores[1]
-	game.opponent2score = game2.scores[2]
+	game.opponent1score = scores[1]
+	game.opponent2score = scores[2]
 
 	local opponents = Json.parseIfString(game2.opponents) or {}
 	local factions, heroes = MatchLegacy._heroesAndFactionFromGameOpponents(opponents)

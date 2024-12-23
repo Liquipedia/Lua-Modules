@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
@@ -87,10 +89,8 @@ function MatchLegacy.convertParameters(match2)
 	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		local scores = game.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(game.scores)
-		end
+		local gameOpponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(gameOpponents, Operator.property('score'))
 		opponent1Rounds = opponent1Rounds + (tonumber(scores[1] or '') or 0)
 		opponent2Rounds = opponent2Rounds + (tonumber(scores[2] or '') or 0)
 		match.extradata['vodgame' .. gameIndex] = game.vod
@@ -174,6 +174,8 @@ function MatchLegacy.storeGames(match, match2)
 		local game = Table.deepCopy(game2)
 		-- Extradata
 		local extradata = Json.parseIfString(game2.extradata)
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.extradata = {}
 
 		local opponent1scores, opponent2scores = {}, {}
@@ -202,7 +204,6 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
 		if type(scores) == 'string' then
 			scores = Json.parse(scores)
 		end

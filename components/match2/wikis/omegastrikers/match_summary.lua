@@ -41,7 +41,7 @@ function CustomMatchSummary.createBody(match)
 end
 
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	return mw.html.create('div'):wikitext(game.scores[opponentIndex])
+	return mw.html.create('div'):wikitext(game.opponents[opponentIndex].score)
 end
 
 function CustomMatchSummary._createMapRow(game)

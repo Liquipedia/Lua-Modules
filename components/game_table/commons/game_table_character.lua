@@ -12,6 +12,7 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local GameTable = Lua.import('Module:GameTable')
@@ -386,11 +387,12 @@ end
 ---@return Html
 function CharacterGameTable:_displayScore(game, pickedBy, pickedVs)
 	local winner = tonumber(game.winner)
+	local scores = Array.map(game.opponents, Operator.property('score'))
 
 	local toScore = function(opponentId)
 		local isWinner = winner == opponentId
 		return mw.html.create(isWinner and 'b' or nil)
-			:wikitext(game.scores[opponentId] or (isWinner and 'W' or 'L'))
+			:wikitext(scores[opponentId] or (isWinner and 'W' or 'L'))
 	end
 
 	return mw.html.create('td')

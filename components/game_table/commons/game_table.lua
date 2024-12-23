@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local VodLink = require('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
@@ -76,9 +77,10 @@ end
 ---@param game match2game
 ---@return Html?
 function GameTable:_displayGameScore(result, game)
+	local scores = Array.map(game.opponents, Operator.property('score'))
 	local toScore = function(opponentRecord)
 		local isWinner = opponentRecord.id == tonumber(game.winner)
-		local score = (game.scores or {})[opponentRecord.id] or (isWinner and 1) or 0
+		local score = scores[opponentRecord.id] or (isWinner and 1) or 0
 		return mw.html.create(isWinner and 'b' or nil)
 			:wikitext(score)
 	end
