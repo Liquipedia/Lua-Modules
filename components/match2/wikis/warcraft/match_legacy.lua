@@ -255,7 +255,6 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	game.opponent1score = scores[1]
 	game.opponent2score = scores[2]
 
-	local opponents = Json.parseIfString(game2.opponents) or {}
 	local factions, heroes = MatchLegacy._heroesAndFactionFromGameOpponents(opponents)
 	for opponentIndex = 1, 2 do
 		game.extradata['opponent' .. opponentIndex .. 'race'] = factions[opponentIndex]

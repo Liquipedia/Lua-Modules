@@ -210,7 +210,6 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 
-		local opponents = Json.parseIfString(game2.opponents) or {}
 		local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
 		if walkover == 'FF' or walkover == 'DQ' then
 			game.walkover = 1
