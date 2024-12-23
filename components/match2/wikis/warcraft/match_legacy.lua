@@ -169,11 +169,13 @@ function MatchLegacy._groupIntoSubmatches(match2, objectName)
 		local submatchIndex = tonumber(game.subgroup)
 		if game.mode ~= '1v1' or not submatchIndex then return end
 
+		local opponents = Json.parseIfString(game.opponents) or {}
+
 		if not submatches[submatchIndex] then
 			submatches[submatchIndex] = {
 				games = {},
 				objectName = objectName .. '_Submatch_' .. submatchIndex,
-				opponents = MatchLegacy._fromParticipantToOpponent(game.participants or {}, match2.match2opponents)
+				opponents = MatchLegacy._constructSubmatchOpponents(opponents, match2.match2opponents)
 			}
 		end
 		local submatch = submatches[submatchIndex]
@@ -213,22 +215,22 @@ function MatchLegacy._storeSubMatch(submatch, submatchIndex, match)
 	mw.ext.LiquipediaDB.lpdb_match(submatchStorageObject.objectName, submatchStorageObject)
 end
 
----@param participants table<string, table>
----@param opponents table
+---@param gameOpponents table[]
+---@param matchOpponents table[]
 ---@return {match2players: table[], score: number, type: OpponentType}
-function MatchLegacy._fromParticipantToOpponent(participants, opponents)
-	local submatchOpponents = {
-		{match2players = {}, score = 0, type = Opponent.solo},
-		{match2players = {}, score = 0, type = Opponent.solo},
-	}
-	for participantKey in Table.iter.spairs(Table.mapValues(participants, Logic.nilIfEmpty)) do
-		local opponentKey, playerKey = string.match(participantKey, '^(%d+)_(%d+)$')
-		opponentKey = tonumber(opponentKey)
-		table.insert(submatchOpponents[opponentKey].match2players,
-			opponents[opponentKey].match2players[tonumber(playerKey)])
-	end
-
-	return submatchOpponents
+function MatchLegacy._constructSubmatchOpponents(gameOpponents, matchOpponents)
+	return Array.map(gameOpponents, function(gameOpponent, opponentIndex)
+		return {
+			type = Opponent.solo,
+			score = 0,
+			match2players = Table.map(gameOpponent.players, function(playerIndex, gamePlayer)
+				if Logic.isDeepEmpty(gamePlayer) then
+					return playerIndex, nil
+				end
+				return playerIndex, matchOpponents[opponentIndex].match2players[playerIndex]
+			end)
+		}
+	end)
 end
 
 ---@param game2 table
@@ -249,7 +251,8 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	game.opponent1score = game2.scores[1]
 	game.opponent2score = game2.scores[2]
 
-	local factions, heroes = MatchLegacy._heroesAndFactionFromParticipants(game2.participants)
+	local opponents = Json.parseIfString(game2.opponents) or {}
+	local factions, heroes = MatchLegacy._heroesAndFactionFromGameOpponents(opponents)
 	for opponentIndex = 1, 2 do
 		game.extradata['opponent' .. opponentIndex .. 'race'] = factions[opponentIndex]
 			or game.extradata['opponent' .. opponentIndex .. 'race']
@@ -277,18 +280,16 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	return mw.ext.LiquipediaDB.lpdb_game(objectName, game)
 end
 
----@param participants table<string, table>
+---@param opponents table[]
 ---@return string[]
 ---@return string[][]
-function MatchLegacy._heroesAndFactionFromParticipants(participants)
+function MatchLegacy._heroesAndFactionFromGameOpponents(opponents)
 	local factions, heroes = {}, {}
-	for participantKey, participant in pairs(Table.mapValues(participants or {}, Logic.nilIfEmpty)) do
-		local opponentKey = string.match(participantKey, '^(%d+)_%d+$')
-		opponentKey = tonumber(opponentKey)
-		---@cast opponentKey -nil
-		factions[opponentKey] = participant.faction
-		heroes[opponentKey] = participant.heroes
-	end
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local player = Array.map(opponent.players or {}, Logic.nilIfEmpty)[1] or {}
+		factions[opponentIndex] = player.faction
+		heroes[opponentIndex] = player.heroes
+	end)
 
 	return factions, heroes
 end

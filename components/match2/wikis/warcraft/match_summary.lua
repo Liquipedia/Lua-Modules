@@ -101,9 +101,13 @@ end
 ---@param match table
 ---@return boolean
 function CustomMatchSummary.hasHeroes(match)
-	return Array.any(match.games, function(game) return Table.any(game.participants, function(key, participant)
-		return Table.isNotEmpty(participant.heroes)
-	end) end)
+	return Array.any(match.games, function(game)
+		return Array.any(game.opponents, function(opponent)
+			return Array.any(opponent.players or {}, function(player)
+				return Logic.isNotEmpty(player.heroes)
+			end)
+		end)
+	end)
 end
 
 ---@param opponent StarcraftStandardOpponent

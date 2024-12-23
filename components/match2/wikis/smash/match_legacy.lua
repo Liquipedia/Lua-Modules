@@ -11,6 +11,7 @@ local MatchLegacy = {}
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Set = require('Module:Set')
@@ -102,13 +103,14 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	-- Handle Opponents
-	local headList = function(participant)
+	local headList = function(opponentIndex, playerIndex)
 		local heads = Set{}
 		Array.forEach(match2.match2games or {}, function(game)
-			local participants = Json.parseIfString(game.participants) or {}
-			if participants[participant] and participants[participant].characters then
+			local opponents = Json.parseIfString(game.opponents) or {}
+			local player = (opponents[opponentIndex].players or {})[playerIndex]
+			if player and Logic.isNotEmpty(player.characters) then
 				Array.forEach(
-					Array.map(participants[participant].characters, Operator.property('name')),
+					Array.map(player.characters, Operator.property('name')),
 					FnUtil.curry(heads.add, heads)
 				)
 			end
@@ -126,7 +128,7 @@ function MatchLegacy._convertParameters(match2)
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'displayname'] = player.displayname
-			match.extradata[prefix .. 'heads'] = table.concat(headList(index .. '_1'), ',')
+			match.extradata[prefix .. 'heads'] = table.concat(headList(index, 1), ',')
 			if match2.winner == index then
 				match.winner = player.name
 			end
@@ -140,7 +142,7 @@ function MatchLegacy._convertParameters(match2)
 				match.extradata[teamPrefix .. playerPrefix] = player.name or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'flag'] = player.flag or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'displayname'] = player.displayname or ''
-				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index .. '_' .. i), ',')
+				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index, i), ',')
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentPlayers)
 			match[prefix] = table.concat(Array.extractValues(opponentPlayers), '/')
@@ -157,7 +159,7 @@ function MatchLegacy._convertParameters(match2)
 				match.extradata[teamPrefix .. playerPrefix] = player.name or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'flag'] = player.flag or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'displayname'] = player.displayname or ''
-				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index .. '_' .. i), ',')
+				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index, i), ',')
 			end
 			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentPlayers)
 			match[prefix] = opponent.name

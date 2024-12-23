@@ -8,6 +8,7 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -50,22 +51,19 @@ function MatchLegacy._storeGames(match, match2)
 			game.extradata.winnerrace = game.extradata.winnerfaction
 			game.extradata.loserrace = game.extradata.loserfaction
 
-			-- participants holds additional playerdata per match, e.g. the faction (=race)
-			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is "2_1"
-			local playerdata = Table.mapValues(Json.parseIfString(game.participants or '{}') or game.participants or {},
-				Logic.nilIfEmpty)
-			for key, item in pairs(playerdata) do
-				local keyArray = mw.text.split(key or '', '_')
-				local l = tonumber(keyArray[2])
-				local k = tonumber(keyArray[1])
-				game.extradata['opponent' .. k .. 'race'] = item.faction
-				local opp = match2.match2opponents[k] or {}
-				local pl = opp.match2players or {}
-				game['opponent' .. k .. 'flag'] = (pl[l] or {}).flag
-				game.extradata['opponent' .. k .. 'name'] = (pl[l] or {}).displayname
-				game.extradata['tournament'] = match2.tournament or ''
-				game.extradata['series'] = match2.series or ''
-			end
+			local opponents = Json.parseIfString(game.opponents) or {}
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players or {}, function(player, playerIndex)
+					if Logic.isDeepEmpty(player) then return end
+					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
+					game.extradata['opponent' .. opponentIndex .. 'race'] = player.faction
+					game['opponent' .. opponentIndex .. 'flag'] = matchPlayer.flag
+					game.extradata['opponent' .. opponentIndex .. 'name'] = matchPlayer.displayname
+					game.extradata['tournament'] = match2.tournament or ''
+					game.extradata['series'] = match2.series or ''
+				end)
+			end)
+
 			game.extradata.gamenumber = gameIndex
 
 			game.extradata = Json.stringify(game.extradata)
@@ -84,18 +82,18 @@ function MatchLegacy._storeGames(match, match2)
 			submatch.opponent1score = scores[1] or 0
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
-			local playerdata = Table.mapValues(Json.parseIfString(game.participants or '{}') or game.participants,
-				Logic.nilIfEmpty)
-			for key, item in pairs(playerdata) do
-				local keyArray = mw.text.split(key or '', '_')
-				local l = tonumber(keyArray[2])
-				local k = tonumber(keyArray[1])
-				submatch.extradata['opponent' .. k .. 'race'] = item.faction
-				local opp = match2.match2opponents[k] or {}
-				local pl = opp.match2players or {}
-				submatch['opponent' .. k .. 'flag'] = (pl[l] or {}).flag
-				submatch.extradata['opponent' .. k .. 'name'] = (pl[l] or {}).displayname
-			end
+
+			local opponents = Json.parseIfString(game.opponents) or {}
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players or {}, function(player, playerIndex)
+					if Logic.isDeepEmpty(player) then return end
+					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
+					submatch.extradata['opponent' .. opponentIndex .. 'race'] = player.faction
+					submatch['opponent' .. opponentIndex .. 'flag'] = matchPlayer.flag
+					submatch.extradata['opponent' .. opponentIndex .. 'name'] = matchPlayer.displayname
+				end)
+			end)
+
 			submatch.winner = game.winner or ''
 			local walkover = MatchOpponentHelper.calculateWalkoverType(game.opponents)
 			submatch.walkover = (walkover or ''):lower()

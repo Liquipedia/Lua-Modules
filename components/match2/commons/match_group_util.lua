@@ -208,8 +208,6 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[]}[]
----@field participants table
----@field resultType ResultType? ---@deprecated
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -227,7 +225,6 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
-	participants = 'table',
 	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
@@ -689,7 +686,6 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
-		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
 		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
