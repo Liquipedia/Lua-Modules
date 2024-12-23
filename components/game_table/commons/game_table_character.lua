@@ -23,7 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local DRAW = 'draw'
+local DRAW_WINNER = 0
 local CHARACTER_MODE = 'character'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
@@ -181,6 +181,7 @@ end
 ---@param game CharacterGameTableGame
 ---@param maxNumber number
 ---@param keyMaker fun(self, opponentIndex, playerIndex)
+---@return table[]
 function CharacterGameTable:getCharacters(game, maxNumber, keyMaker)
 	---@param opponentIndex number
 	---@return table
@@ -246,7 +247,6 @@ function CharacterGameTable:resultFromRecord(record)
 		opponent = record.match2opponents[1],
 		vs = record.match2opponents[2],
 		winner = tonumber(record.winner),
-		resultType = record.resultType,
 		countGames = true,
 	}
 end
@@ -260,7 +260,7 @@ function CharacterGameTable:statsFromMatches()
 		Array.forEach(match.games, function (game, index)
 			local winner = tonumber(game.winner)
 
-			if game.resulttype == DRAW then
+			if game.winner == DRAW_WINNER then
 				totalGames.d = totalGames.d + 1
 			elseif game.pickedBy == winner then
 				totalGames.w = totalGames.w + 1

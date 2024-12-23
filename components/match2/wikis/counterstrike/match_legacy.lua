@@ -13,7 +13,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
 
-
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 local Opponent = Lua.import('Module:Opponent')
 
 local DRAW = 'draw'
@@ -40,13 +40,14 @@ function MatchLegacy.convertParameters(match2)
 		end
 	end
 
-	if match.resulttype == DRAW then
+	if match.winner == 0 then
 		match.winner = 'draw'
 	end
 
 	match.resulttype = nil
 
-	if match.walkover == 'ff' or match.walkover == 'dq' then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover == 'FF' or walkover == 'DQ' then
 		match.walkover = match.winner
 	else
 		match.walkover = nil
@@ -213,7 +214,8 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 
-		if game2.walkover == 'ff' or game2.walkover == 'dq' then
+		local walkover = MatchOpponentHelper.calculateWalkoverType(game2.opponents)
+		if walkover == 'FF' or walkover == 'DQ' then
 			game.walkover = 1
 		end
 

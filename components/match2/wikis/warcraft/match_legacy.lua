@@ -18,6 +18,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -126,9 +127,10 @@ function MatchLegacy._convertParameters(match2)
 	extradata.tournamentstagename = Logic.emptyOr(Variables.varDefault('Group_name'),
 		match.header .. ' - ' .. (match.opponent1 or '') .. ' vs ' .. (match.opponent2 or ''))
 
-	if match.resulttype == 'default' then
-		match.resulttype = string.upper(match.walkover or '')
-		if match.resulttype == UNKNOWNREASON_DEFAULT_LOSS then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover then
+		match.resulttype = walkover
+		if walkover == UNKNOWNREASON_DEFAULT_LOSS then
 			--needs to be converted because in match1 storage it was marked this way
 			match.resulttype = 'unk'
 		end
@@ -236,7 +238,7 @@ end
 ---@param match table
 ---@return string?
 function MatchLegacy._storeGame(game2, gameIndex, match)
-	if game2.resulttype == 'np' then return end
+	if game2.status == 'notplayed' then return end
 
 	local objectName = match.objectName .. '_Map_' .. gameIndex
 
@@ -265,9 +267,10 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 
 	game.resulttype = nil
 	game.walkover = nil
-	if game2.resulttype == 'default' then
-		game.resulttype = string.upper(game2.walkover or '')
-		if game.resulttype == UNKNOWNREASON_DEFAULT_LOSS then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(game2.opponents)
+	if walkover then
+		game.resulttype = walkover
+		if walkover == UNKNOWNREASON_DEFAULT_LOSS then
 			--needs to be converted because in match1 storage it was marked this way
 			game.resulttype = 'unk'
 		end

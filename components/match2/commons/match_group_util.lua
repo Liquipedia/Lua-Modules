@@ -208,7 +208,6 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[]}[]
----@field resultType ResultType?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -248,7 +247,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
----@field resultType ResultType?
+---@field resultType ResultType? ---@deprecated
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
@@ -621,18 +620,9 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local bestof = tonumber(matchRecord.bestof)
 	local game1 = (matchRecord.match2games or {})[1]
 	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
-		local winner = tonumber(game1.winner)
-		if game1.resulttype == 'default' then
-			score = -1
-			if winner == 0 then
-				status = 'D'
-			else
-				status = winner == opponentIndex and 'W' or string.upper(game1.walkover)
-			end
-		elseif game1.scores[opponentIndex] then
-			score = game1.scores[opponentIndex]
-			status = 'S'
-		end
+		local mapOpponent = (game1.opponnets or {})[opponentIndex] or {}
+		score = mapOpponent.score
+		status = mapOpponent.status
 	end
 
 	return {
@@ -697,6 +687,7 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
 		resultType = nilIfEmpty(record.resulttype),
+		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),

@@ -11,9 +11,12 @@ local MatchLegacy = {}
 local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 local _MODES = {solo = '1v1', team = 'team'}
 
@@ -92,11 +95,9 @@ function MatchLegacy._storeGames(match, match2)
 			end)
 
 			submatch.winner = game.winner or ''
-			submatch.walkover = game.walkover or ''
+			local walkover = MatchOpponentHelper.calculateWalkoverType(game.opponents)
+			submatch.walkover = (walkover or ''):lower()
 			submatch.finished = match2.finished or '0'
-			if game.resulttype ~= 'submatch' then
-				submatch.resulttype = game.resulttype
-			end
 			submatch.mode = '1v1'
 			submatch.date = game.date
 			submatch.dateexact = match2.dateexact or ''
@@ -173,8 +174,9 @@ function MatchLegacy._convertParameters(match2)
 			return nil, false
 		end
 
-		if match.resulttype == 'default' then
-			match.resulttype = string.upper(match.walkover or '')
+		local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+		if walkover then
+			match.resulttype = walkover
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
