@@ -193,10 +193,6 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@alias MatchStatus 'notplayed'|''|nil
 MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
----@alias ResultType 'default'|'draw'|'np'
-MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
----@alias WalkoverType 'l'|'ff'|'dq'
-MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
@@ -212,7 +208,6 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field subgroup number?
 ---@field type string?
 ---@field vod string?
----@field walkover WalkoverType?
 ---@field winner integer?
 ---@field status string?
 ---@field extradata table?
@@ -225,12 +220,10 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
-	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
 	vod = 'string?',
-	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
 	extradata = 'table?',
 })
@@ -247,14 +240,12 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
----@field resultType ResultType? ---@deprecated
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
 ---@field vod string?
----@field walkover WalkoverType?
 ---@field winner string?
 ---@field extradata table?
 ---@field timestamp number
@@ -271,14 +262,12 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
-	resultType = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
 	tournament = 'string?',
 	type = 'string?',
 	vod = 'string?',
-	walkover = 'string?',
 	winner = 'number?',
 	extradata = 'table?',
 })
