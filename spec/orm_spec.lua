@@ -55,7 +55,6 @@ describe('LPDB Object-Relational Mapping', function()
 				parent = '',
 				patch = '',
 				publishertier = '',
-				resulttype = '',
 				section = '',
 				series = '',
 				shortname = '',
