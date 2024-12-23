@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
@@ -39,19 +40,19 @@ function MatchLegacy._storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = Json.parseIfString(game.extradata or '{}') or game.extradata
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 
 		if game.mode == '1v1' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
-			local scores = Json.parseIfString(game.scores or '{}') or {}
 			game.opponent1score = scores[1] or 0
 			game.opponent2score = scores[2] or 0
 
 			game.extradata.winnerrace = game.extradata.winnerfaction
 			game.extradata.loserrace = game.extradata.loserfaction
 
-			local opponents = Json.parseIfString(game.opponents) or {}
 			Array.forEach(opponents, function(opponent, opponentIndex)
 				Array.forEach(opponent.players or {}, function(player, playerIndex)
 					if Logic.isDeepEmpty(player) then return end
@@ -78,12 +79,10 @@ function MatchLegacy._storeGames(match, match2)
 
 			submatch.opponent1 = game.extradata.opponent1
 			submatch.opponent2 = game.extradata.opponent2
-			local scores = Json.parseIfString(game.scores or '{}') or {}
 			submatch.opponent1score = scores[1] or 0
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
 
-			local opponents = Json.parseIfString(game.opponents) or {}
 			Array.forEach(opponents, function(opponent, opponentIndex)
 				Array.forEach(opponent.players or {}, function(player, playerIndex)
 					if Logic.isDeepEmpty(player) then return end
@@ -95,7 +94,7 @@ function MatchLegacy._storeGames(match, match2)
 			end)
 
 			submatch.winner = game.winner or ''
-			local walkover = MatchOpponentHelper.calculateWalkoverType(game.opponents)
+			local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
 			submatch.walkover = (walkover or ''):lower()
 			submatch.finished = match2.finished or '0'
 			submatch.mode = '1v1'

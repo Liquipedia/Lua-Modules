@@ -267,7 +267,7 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 
 	game.resulttype = nil
 	game.walkover = nil
-	local walkover = MatchOpponentHelper.calculateWalkoverType(game2.opponents)
+	local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
 	if walkover then
 		game.resulttype = walkover
 		if walkover == UNKNOWNREASON_DEFAULT_LOSS then

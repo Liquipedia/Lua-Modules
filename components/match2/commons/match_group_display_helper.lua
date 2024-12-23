@@ -178,7 +178,7 @@ function DisplayHelper.Map(game, config)
 end
 
 ---@param opponent table
----@param status string?
+---@param gameStatus string?
 ---@return string
 function DisplayHelper.MapScore(opponent, gameStatus)
 	if gameStatus == 'notplayed' then
