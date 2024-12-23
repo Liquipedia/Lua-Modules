@@ -64,7 +64,6 @@ describe('LPDB Object-Relational Mapping', function()
 				tournament = '',
 				type = '',
 				vod = '',
-				walkover = '',
 				winner = '',
 			})
 			stub:revert()
