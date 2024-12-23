@@ -64,8 +64,8 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
-	if walkover == 'FF' or match.walkover == 'DQ!' then
-		walkover = match.winner
+	if walkover == 'FF' or walkover == 'DQ' then
+		match.walkover = match.winner
 	elseif walkover == 'L' then
 		match.walkover = nil
 	end
