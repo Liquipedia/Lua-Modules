@@ -22,9 +22,7 @@ local MatchFunctions = {
 	},
 	DEFAULT_MODE = 'team'
 }
-local FfaMatchFunctions = {
-	DEFAULT_MODE = 'solos',
-}
+local FfaMatchFunctions = {}
 local MapFunctions = {}
 local FfaMapFunctions = {}
 
