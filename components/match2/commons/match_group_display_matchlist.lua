@@ -20,6 +20,8 @@ local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
 
+local SCORE_DRAW = 0
+
 ---@class MatchlistConfigOptions
 ---@field MatchSummaryContainer function?
 ---@field Opponent function?
@@ -126,7 +128,7 @@ function MatchlistDisplay.Match(props)
 
 		local opponentNode = props.Opponent({
 			opponent = opponent,
-			resultType = match.resultType,
+			winner = match.winner,
 			side = opponentIx == 1 and 'left' or 'right',
 		})
 		return DisplayHelper.addOpponentHighlight(opponentNode, opponent)
@@ -137,7 +139,6 @@ function MatchlistDisplay.Match(props)
 
 		local scoreNode = props.Score({
 			opponent = opponent,
-			resultType = match.resultType,
 			side = opponentIx == 1 and 'left' or 'right',
 		})
 		return DisplayHelper.addOpponentHighlight(scoreNode, opponent)
@@ -204,7 +205,7 @@ This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Opponent to the Matchlist
 component.
 ]]
----@param props {opponent: standardOpponent, resultType: ResultType, side: string}
+---@param props {opponent: standardOpponent, winner: integer?, side: string}
 ---@return Html
 function MatchlistDisplay.Opponent(props)
 	local contentNode = OpponentDisplay.BlockOpponent({
@@ -217,7 +218,7 @@ function MatchlistDisplay.Opponent(props)
 		:addClass('brkts-matchlist-cell-content')
 	return mw.html.create('div')
 		:addClass('brkts-matchlist-cell brkts-matchlist-opponent')
-		:addClass(props.resultType == 'draw' and 'brkts-matchlist-slot-bold bg-draw' or
+		:addClass(props.winner == SCORE_DRAW and 'brkts-matchlist-slot-bold bg-draw' or
 			props.opponent.placement == 1 and 'brkts-matchlist-slot-winner' or nil)
 		:node(contentNode)
 end
@@ -229,7 +230,7 @@ This is the default implementation used by the Matchlist component. Specific
 wikis may override this by passing a different props.Score to the Matchlist
 component.
 ]]
----@param props {opponent: standardOpponent, resultType: ResultType, side: string}
+---@param props {opponent: standardOpponent, side: string}
 ---@return Html
 function MatchlistDisplay.Score(props)
 	local contentNode = mw.html.create('div'):addClass('brkts-matchlist-cell-content')

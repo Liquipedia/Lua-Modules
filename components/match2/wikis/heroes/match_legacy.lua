@@ -9,10 +9,12 @@
 local MatchLegacy = {}
 
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Opponent = require('Module:Opponent')
+
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 local _GAME_EXTRADATA_CONVERTER = {
 	ban = 'b',
@@ -39,8 +41,9 @@ function MatchLegacy._convertParameters(match2)
 	end
 	match.links = nil
 
-	if Logic.isNotEmpty(match.walkover) then
-		match.resulttype = match.walkover
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover then
+		match.resulttype = walkover:lower()
 		match.walkover = match.winner
 	end
 

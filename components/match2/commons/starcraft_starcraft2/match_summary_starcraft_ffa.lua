@@ -185,7 +185,7 @@ function StarcraftMatchSummaryFfa._opponents(match)
 			return Table.merge(opponent, {
 				placement = opponent.placement,
 				status = opponent.status or 'S',
-				score = opponent.score or (game.scores or {})[opponentIdx],
+				score = opponent.score,
 			})
 		end)
 	end)

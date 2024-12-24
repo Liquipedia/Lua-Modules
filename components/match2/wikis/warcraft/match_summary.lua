@@ -101,9 +101,13 @@ end
 ---@param match table
 ---@return boolean
 function CustomMatchSummary.hasHeroes(match)
-	return Array.any(match.games, function(game) return Table.any(game.participants, function(key, participant)
-		return Table.isNotEmpty(participant.heroes)
-	end) end)
+	return Array.any(match.games, function(game)
+		return Array.any(game.opponents, function(opponent)
+			return Array.any(opponent.players or {}, function(player)
+				return Logic.isNotEmpty(player.heroes)
+			end)
+		end)
+	end)
 end
 
 ---@param opponent StarcraftStandardOpponent
@@ -220,7 +224,7 @@ function CustomMatchSummary.TeamSubmatch(submatch)
 	}
 end
 
----@param submatch StarcraftMatchGroupUtilSubmatch
+---@param submatch WarcraftMatchGroupUtilSubmatch
 ---@return Widget
 function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	local opponents = submatch.opponents or {{}, {}}
@@ -241,18 +245,9 @@ function CustomMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
-		if submatch.resultType == 'default' then
-			return OpponentDisplay.BlockScore{
-				isWinner = isWinner,
-				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
-			}
-		end
-
-		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
 		return OpponentDisplay.BlockScore{
-			isWinner = isWinner,
-			scoreText = score,
+			isWinner = opponentIndex == submatch.winner or submatch.winner == 0,
+			scoreText = DisplayHelper.MapScore(submatch.opponents[opponentIndex], submatch.status),
 		}
 	end
 

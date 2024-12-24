@@ -7,7 +7,9 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -33,8 +35,9 @@ function CustomMatchSummary.createHeader(match)
 	if match.bestof == 1 and match.games and match.games[1] and
 		not match.opponents[1].placement2 and not match.opponents[2].placement2 then
 
-		opponentLeft = Table.merge(match.opponents[1], {score = (match.games[1].scores or {})[1] or 0})
-		opponentRight = Table.merge(match.opponents[2], {score = (match.games[1].scores or {})[2] or 0})
+		local scores = Array.map(match.games[1].opponents, Operator.property('score'))
+		opponentLeft = Table.merge(match.opponents[1], {score = scores[1] or 0})
+		opponentRight = Table.merge(match.opponents[2], {score = scores[2] or 0})
 	end
 
 
@@ -79,7 +82,8 @@ end
 ---@param gameIndex integer
 ---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
-	if Table.isEmpty(game.scores) then
+	local scores = Array.map(game.opponents, Operator.property('score'))
+	if Table.isEmpty(scores) then
 		return
 	end
 

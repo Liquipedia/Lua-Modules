@@ -207,7 +207,7 @@ function CustomPlayer:_getMatchupData(player)
 			'[[finished::1]]', -- only finished matches
 			'[[winner::!]]', -- expect a winner
 			'[[walkover::]]', -- exclude default wins/losses
-			'[[resulttype::!np]]', -- i.e. ignore not played matches
+			'[[status::!notplayed]]', -- i.e. ignore not played matches
 			'[[date::!' .. DateExt.defaultDate .. ']]', --i.e. wrongly set up
 			'([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])'
 		}, ' AND '),

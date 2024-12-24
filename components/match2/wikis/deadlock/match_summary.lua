@@ -11,7 +11,7 @@ local DateExt = require('Module:Date/Ext')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+local Operator = require('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -45,15 +45,10 @@ function CustomMatchSummary.createBody(match)
 	)}
 end
 
----@param participants table
----@param opponentIndex integer
+---@param players table[]
 ---@return table
-function CustomMatchSummary._getHeroesForOpponent(participants, opponentIndex)
-	local characters = {}
-	for _, participant in Table.iter.pairsByPrefix(participants, opponentIndex .. '_') do
-		table.insert(characters, participant.character)
-	end
-	return characters
+function CustomMatchSummary._getHeroesForOpponent(players)
+	return Array.map(players or {}, Operator.property('character'))
 end
 
 ---@param game MatchGroupUtilGame
@@ -68,14 +63,14 @@ function CustomMatchSummary._createGame(game, gameIndex)
 		children = WidgetUtil.collect(
 			CustomMatchSummary._createIcon(ICONS[extradata.team1side]),
 			MatchSummaryWidgets.Characters{
-				characters = CustomMatchSummary._getHeroesForOpponent(game.participants, 1),
+				characters = CustomMatchSummary._getHeroesForOpponent(game.opponents[1].players),
 				flipped = false,
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameCenter{children = Logic.nilIfEmpty(game.length) or ('Game ' .. gameIndex)},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.Characters{
-				characters = CustomMatchSummary._getHeroesForOpponent(game.participants, 2),
+				characters = CustomMatchSummary._getHeroesForOpponent(game.opponents[2].players),
 				flipped = true,
 			},
 			CustomMatchSummary._createIcon(ICONS[extradata.team2side]),

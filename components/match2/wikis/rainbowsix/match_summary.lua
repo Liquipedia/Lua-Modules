@@ -76,7 +76,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		gameStatusBackground = 'brkts-popup-body-gradient-left'
 	elseif game.winner == 2 then
 		gameStatusBackground = 'brkts-popup-body-gradient-right'
-	elseif game.resultType == 'draw' then
+	elseif game.winner == 0 then
 		gameStatusBackground = 'brkts-popup-body-gradient-draw'
 	end
 

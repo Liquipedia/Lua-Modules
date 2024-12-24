@@ -13,7 +13,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Page = require('Module:Page')
-local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -39,14 +38,17 @@ function CustomCharacterGameTable:getCharacterPick(game)
 	end
 	local aliases = self.config.aliases
 	local found
-	Table.iter.forEachPair(game.participants, function (participantId, participant)
+
+	Array.forEach(game.opponents, function(opponent, opponentIndex)
 		if found then return end
-		if aliases[participant.player] then
-			local pKey = Array.parseCommaSeparatedString(participantId, '_')
-			game.pickedByplayer = tonumber(pKey[2])
-			found = tonumber(pKey[1])
-			return
-		end
+		Array.forEach(opponent.players, function(player, playerIndex)
+			if found then return end
+			if aliases[player.player] then
+				game.pickedByplayer = playerIndex
+				found = opponentIndex
+				return
+			end
+		end)
 	end)
 
 	return found
@@ -141,7 +143,7 @@ function CustomCharacterGameTable:displayGame(match, game)
 		:node(makeCell(Page.makeInternalLink(game.map)))
 
 	if self.config.mode ~= Opponent.team then
-		local participant = game.participants[game.pickedBy .. '_' .. game.pickedByplayer]
+		local participant = game.opponents[game.pickedBy].players[game.pickedByplayer]
 		if self.config.mode == Opponent.solo then
 			local index = Array.indexOf(game.picks[game.pickedBy], function (pick)
 				return participant.agent == pick

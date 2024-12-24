@@ -14,7 +14,6 @@ local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -66,16 +65,14 @@ end
 ---@param date string
 ---@return Widget
 function CustomMatchSummary._createGame(game, gameIndex, date)
-	local cardData = {{}, {}}
-	for participantKey, participantData in Table.iter.spairs(game.participants or {}) do
-		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
-		participantData.cards = participantData.cards or {}
-		---@type table
-		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
-			return participantData.cards[idx] or DEFAULT_CARD end)
-		cards.tower = participantData.cards.tower
-		table.insert(cardData[opponentIndex], cards)
-	end
+	local cardData = Array.map(game.opponents, function(opponent)
+		return Array.map(opponent.players, function(player)
+			if Logic.isDeepEmpty(player) then return end
+			local cards = player.cards or {}
+			return Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
+				return cards[idx] or DEFAULT_CARD end)
+		end)
+	end)
 
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
@@ -173,28 +170,15 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return table
 function CustomMatchSummary._extractPlayersFromGame(players, game, match)
-	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
-		participantKey = mw.text.split(participantKey, '_')
-		local opponentIndex = tonumber(participantKey[1])
-		local match2playerIndex = tonumber(participantKey[2])
-
-		local player = match.opponents[opponentIndex].players[match2playerIndex]
-
-		if not player then
-			player = {
-				displayName = participant.displayname,
-				pageName = participant.name,
+	return Array.map(game.opponents, function(opponent, opponentIndex)
+		return Array.map(opponent.players, function(player, playerIndex)
+			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
+			return matchPlayer or {
+				displayName = player.displayname,
+				pageName = player.name,
 			}
-		end
-
-		-- make sure we only display each player once
-		if not players.hash[opponentIndex][player.pageName] then
-			players.hash[opponentIndex][player.pageName] = true
-			table.insert(players[opponentIndex], player)
-		end
-	end
-
-	return players
+		end)
+	end)
 end
 
 ---@param players table
