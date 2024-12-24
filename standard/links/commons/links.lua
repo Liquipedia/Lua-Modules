@@ -55,16 +55,6 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
-	chessgames = {
-		'https://www.chessgames.com/perl/chess.pl?tid=',
-		player = 'https://www.chessgames.com/perl/chessplayer?pid=',
-		match = 'https://www.chessgames.com/perl/chessgame?gid=',
-	},
-	chesscom = {
-		'https://www.chess.com/',
-		player = 'https://www.chess.com/member/',
-		match = 'https://www.chess.com/games/view/',
-	},
 	cc = {'https://cc.163.com/'},
 	cdl = {match = 'https://callofdutyleague.com/en-us/match/'},
 	challengermode = {
@@ -76,6 +66,16 @@ local PREFIXES = {
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',
+	},
+	chesscom = {
+		'https://www.chess.com/',
+		player = 'https://www.chess.com/member/',
+		match = 'https://www.chess.com/games/view/',
+	},
+	chessgames = {
+		'https://www.chessgames.com/perl/chess.pl?tid=',
+		player = 'https://www.chessgames.com/perl/chessplayer?pid=',
+		match = 'https://www.chessgames.com/perl/chessgame?gid=',
 	},
 	chzzk = {'https://chzzk.naver.com/live/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
@@ -379,16 +379,6 @@ local MATCH_ICONS = {
 		iconDark = 'File:Breaking Point GG icon darkmode.png',
 		text = 'Breaking Point matchpage'
 	},
-	chessgames = {
-		icon = 'File:Chessgames_allmode.png',
-		iconDark = 'File:Chessgames_allmode.png',
-		text = 'Chessgames matchpage'
-	},
-	chesscom = {
-		icon = 'File:ChessCom_allmode.png',
-		iconDark = 'File:ChessCom_allmode.png',
-		text = 'Chess.com matchpage'
-	},
 	cdl = {
 		icon = 'File:Call of Duty League lightmode.png',
 		iconDark = 'File:Call of Duty League darkmode.png',
@@ -397,6 +387,16 @@ local MATCH_ICONS = {
 	challengermode = {
 		icon = 'File:Challengermode icon.png',
 		text = 'Match page on Challengermode'
+	},
+	chesscom = {
+		icon = 'File:ChessCom_allmode.png',
+		iconDark = 'File:ChessCom_allmode.png',
+		text = 'Chess.com matchpage'
+	},
+	chessgames = {
+		icon = 'File:Chessgames_allmode.png',
+		iconDark = 'File:Chessgames_allmode.png',
+		text = 'Chessgames matchpage'
 	},
 	civdraft = {
 		text = 'Civ Draft',
