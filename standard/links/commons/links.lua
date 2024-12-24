@@ -16,6 +16,11 @@ local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = tr
 local Links = {}
 
 local PREFIXES = {
+	['365chess'] = {
+		'https://www.365chess.com/tournaments/',
+		player = 'https://www.365chess.com/players/',
+		match = 'https://www.365chess.com/game.php?gid=',
+	},
 	['5ewin'] = {
 		'https://arena.5eplay.com/tournament/',
 		player = 'https://arena.5eplay.com/data/player/',
@@ -50,11 +55,6 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
-	['365chess'] = {
-		'https://www.365chess.com/tournaments/',
-		player = 'https://www.365chess.com/players/',
-		match = 'https://www.365chess.com/game.php?gid=',
-	},
 	chessgames = {
 		'https://www.chessgames.com/perl/chess.pl?tid=',
 		player = 'https://www.chessgames.com/perl/chessplayer?pid=',
@@ -365,6 +365,11 @@ local ICON_KEYS_TO_RENAME = {
 }
 
 local MATCH_ICONS = {
+	['365chess'] = {
+		icon = 'File:365chess_allmode.png',
+		iconDark = 'File:365chess_allmode.png',
+		text = '365Chess matchpage'
+	},
 	ballchasing = {
 		icon = 'File:Ballchasing icon.png',
 		text = 'Ballchasing replays'
@@ -373,6 +378,11 @@ local MATCH_ICONS = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
 		iconDark = 'File:Breaking Point GG icon darkmode.png',
 		text = 'Breaking Point matchpage'
+	},
+	chessgames = {
+		icon = 'File:Chessgames_allmode.png',
+		iconDark = 'File:Chessgames_allmode.png',
+		text = 'Chessgames matchpage'
 	},
 	chesscom = {
 		icon = 'File:ChessCom_allmode.png',
