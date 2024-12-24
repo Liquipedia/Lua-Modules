@@ -13,6 +13,7 @@ return {
 		'website'
 	},
 	league = {
+		'365chess',
 		'5ewin',
 		'abiosgaming',
 		'aligulac',
@@ -22,6 +23,8 @@ return {
 		'cfs',
 		'challengermode',
 		'challonge',
+		'chesscom',
+		'chessgames',
 		'cybergamer',
 		'datdota',
 		'dotabuff',
