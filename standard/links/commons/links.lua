@@ -50,6 +50,16 @@ local PREFIXES = {
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
+	['365chess'] = {
+		'https://www.365chess.com/tournaments/',
+		player = 'https://www.365chess.com/players/',
+		match = 'https://www.365chess.com/game.php?gid=',
+	},
+	chessgames = {
+		'https://www.chessgames.com/perl/chess.pl?tid=',
+		player = 'https://www.chessgames.com/perl/chessplayer?pid=',
+		match = 'https://www.chessgames.com/perl/chessgame?gid=',
+	},
 	chesscom = {
 		'https://www.chess.com/',
 		player = 'https://www.chess.com/member/',
