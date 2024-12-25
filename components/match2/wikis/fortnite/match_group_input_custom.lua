@@ -20,13 +20,12 @@ local MatchFunctions = {
 		applyUnderScores = true,
 		maxNumPlayers = 3,
 	},
-	DEFAULT_MODE = 'team'
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf,
 }
 local FfaMatchFunctions = {}
 local MapFunctions = {}
 local FfaMapFunctions = {}
-
-local DEFAULT_BESTOF = 3
 
 ---@param match table
 ---@param options table?
@@ -61,22 +60,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param bestofInput string|integer?
----@return integer
-function MatchFunctions.getBestOf(bestofInput)
-	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('match_bestof')) or DEFAULT_BESTOF
-	Variables.varDefine('match_bestof', bestof)
-	return bestof
-end
-
----@param games table[]
----@return table[]
-function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, function(map)
-		return map.map ~= nil
-	end)
 end
 
 ---@param match table
@@ -145,6 +128,5 @@ function FfaMapFunctions.getExtraData(match, map, opponents)
 		comment = map.comment,
 	}
 end
-
 
 return CustomMatchGroupInput
