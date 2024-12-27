@@ -49,13 +49,7 @@ end
 function CustomMatchSummary._gameScore(game, opponentIndex)
 	return mw.html.create('div')
 		:css('width', '16px')
-		:wikitext(DisplayHelper.MapScore(
-			game.scores[opponentIndex],
-			opponentIndex,
-			game.resultType,
-			game.walkover,
-			game.winner
-		))
+		:wikitext(DisplayHelper.MapScore(game.opponents[opponentIndex], game.status))
 end
 
 function CustomMatchSummary._percentage(game, opponentIndex)

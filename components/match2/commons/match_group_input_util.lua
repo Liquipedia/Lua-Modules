@@ -265,6 +265,7 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 				displayname = player.displayName,
 				flag = player.flag,
 				name = player.pageName,
+				team = player.team,
 				extradata = player.faction and {faction = player.faction}
 			}
 		end)
@@ -1087,12 +1088,13 @@ end
 --- - DATE_FALLBACKS: string[]
 --- - OPPONENT_CONFIG: table
 ---@param match table
----@param Parser MatchParserInterface
+---@param Parser MatchParserInterface?
+---@param FfaParser FfaMatchParserInterface?
 ---@param mapProps any?
 ---@return table
-function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
+function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapProps)
+	Parser = Parser or {}
+	local matchInput = Table.deepCopy(match)
 
 	local dateProps = Parser.readDate and Parser.readDate(match)
 		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
@@ -1105,6 +1107,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 		end
 		return opponent
 	end)
+
+	if FfaParser and #opponents > 2 then
+		return MatchGroupInputUtil.standardProcessFfaMatch(matchInput, FfaParser, mapProps)
+	end
 
 	local games = Parser.extractMaps(match, opponents, mapProps)
 	match.bestof = Parser.getBestOf(match.bestof, games)
@@ -1130,8 +1136,8 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, mapProps)
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
@@ -1153,24 +1159,32 @@ end
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
----@field getMapName? fun(game: table): string?
+---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
 ---@field mapIsFinished? fun(map: table, opponents: table[], finishedInput: string?, winnerInput: string?): boolean
+---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
+---@field getMapBestOf? fun(map: table): integer?
+---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
+---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
---- The standard way to process a match input.
+--- The standard way to process a map input.
 ---
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
---- - getMapName(map): string?
+--- - getMapName(map, mapIndex, match): string?, string?
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
 --- - mapIsFinished(map, opponents): boolean
+--- - extendMapOpponent(map, opponentIndex): table
+--- - getMapBestOf(map): integer?
+--- - computeOpponentScore(props, autoScore): integer?, string?
+--- - getGame(match, map): string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1182,8 +1196,8 @@ end
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Parser.BREAK_ON_EMPTY and Logic.isEmpty(map) then
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		if Parser.BREAK_ON_EMPTY and Logic.isDeepEmpty(map) then
 			break
 		end
 		local finishedInput = map.finished --[[@as string?]]
@@ -1195,7 +1209,11 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 
 		if Parser.getMapName then
-			map.map = Parser.getMapName(map)
+			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
+		end
+
+		if Parser.getMapBestOf then
+			map.bestof = Parser.getMapBestOf(map)
 		end
 
 		if Parser.mapIsFinished then
@@ -1208,8 +1226,13 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.patch = Parser.getPatch(map)
 		end
 
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
+		end
+
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
+			local computeOpponentScore = Parser.computeOpponentScore or MatchGroupInputUtil.computeOpponentScore
+			local score, status = computeOpponentScore({
 				walkover = map.walkover,
 				winner = map.winner,
 				opponentIndex = opponentIndex,
@@ -1218,13 +1241,162 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			local players = Parser.getPlayersOfMapOpponent
 				and Parser.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 				or nil
-			return {score = score, status = status, players = players}
+
+			local mapOpponent = {score = score, status = status, players = players}
+			if not Parser.extendMapOpponent then
+				return mapOpponent
+			end
+			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
 
 		-- needs map.opponents available!
 		if Parser.getMapMode then
 			map.mode = Parser.getMapMode(match, map, opponents)
 		end
+
+		map.scores = Array.map(map.opponents, Operator.property('score'))
+		if map.finished then
+			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
+		end
+
+		map.extradata = Table.merge(
+			{displayname = map.mapDisplayName},
+			Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		)
+
+		table.insert(maps, map)
+		match[key] = nil
+	end
+
+	return maps
+end
+
+---@class FfaMatchParserInterface
+---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
+---@field parseSettings? fun(match: table, opponentCount: integer): table
+---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
+---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
+---@field getMode? fun(opponents: table[]): string
+---@field readDate? fun(match: table): table
+---@field adjustOpponent? fun(opponent: table[], opponentIndex: integer, match: table)
+---@field matchIsFinished? fun(match: table, opponents: table[]): boolean
+---@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: table[]): integer?
+---@field DEFAULT_MODE? string
+---@field DATE_FALLBACKS? string[]
+---@field OPPONENT_CONFIG? readOpponentOptions
+
+--- The standard way to process a match input.
+---
+--- The Parser injection must have the following functions:
+--- - extractMaps(match, opponents, mapProps): table[]
+---
+--- It may optionally have the following functions:
+--- - parseSettings(match, opponentCount): table
+--- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
+--- - getExtraData(match, games, opponents, settings): table?
+--- - getMode(opponents): string?
+--- - readDate(match): table
+--- - adjustOpponent(opponent, opponentIndex, match)
+--- - matchIsFinished(match, opponents): boolean
+--- - getMatchWinner(status, winnerInput, opponents): integer?
+---
+--- Additionally, the Parser may have the following properties:
+--- - DEFAULT_MODE: string
+--- - DATE_FALLBACKS: string[]
+--- - OPPONENT_CONFIG: table
+---@param match table
+---@param Parser FfaMatchParserInterface
+---@param mapProps any?
+---@return table
+function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
+	local finishedInput = match.finished --[[@as string?]]
+	local winnerInput = match.winner --[[@as string?]]
+
+	local dateProps = Parser.readDate and Parser.readDate(match)
+		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
+	Table.mergeInto(match, dateProps)
+
+	local opponents = Array.mapIndexes(function(opponentIndex)
+		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		if opponent and Parser.adjustOpponent then
+			Parser.adjustOpponent(opponent, opponentIndex, match)
+		end
+		return opponent
+	end)
+
+	local settings = Parser.parseSettings and Parser.parseSettings(match, #opponents)
+		or MatchGroupInputUtil.parseSettings(match, #opponents)
+
+	local games = Parser.extractMaps(match, opponents, settings.placementInfo)
+
+	local autoScoreFunction = Parser.calculateMatchScore and Parser.calculateMatchScore(opponents, games) or nil
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.extradata = opponent.extradata or {}
+		opponent.extradata.startingpoints = tonumber(opponent.startingpoints)
+		opponent.placement = tonumber(opponent.placement)
+
+		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
+			walkover = match.walkover,
+			winner = match.winner,
+			opponentIndex = opponentIndex,
+			score = opponent.score,
+		}, autoScoreFunction)
+	end)
+
+	match.finished = Parser.matchIsFinished and Parser.matchIsFinished(match, opponents)
+		or MatchGroupInputUtil.matchIsFinished(match, opponents)
+
+	if match.finished then
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+
+		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+		Array.forEach(opponents, function(opponent, opponentIndex)
+			opponent.placement = placementOfOpponents[opponentIndex]
+			opponent.extradata.bg = ((settings.placementInfo or {})[opponent.placement] or {}).status
+		end)
+
+		match.winner = Parser.getMatchWinner and Parser.getMatchWinner(match.status, winnerInput, opponents)
+			or MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
+	end
+
+	match.mode = Parser.getMode and Parser.getMode(opponents)
+		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
+
+	match.stream = Streams.processStreams(match)
+	match.links = MatchGroupInputUtil.getLinks(match)
+	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {}
+
+	match.games = games
+	match.opponents = opponents
+
+	return match
+end
+
+--- The standard way to process a ffa map input.
+---
+--- The Parser injection may optionally have the following functions:
+--- - getExtraData(match, map, opponents): table?
+---
+---@param match table
+---@param opponents table[]
+---@param scoreSettings table
+---@param Parser MapParserInterface
+---@return table
+function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
+	local maps = {}
+	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local finishedInput = map.finished --[[@as string?]]
+		local winnerInput = map.winner --[[@as string?]]
+
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
+		map.finished = MatchGroupInputUtil.mapIsFinished(map)
+
+		map.opponents = Array.map(opponents, function(matchOpponent)
+			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
+			return MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
+		end)
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
@@ -1241,94 +1413,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	return maps
 end
 
----@class FfaMatchParserInterface
----@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
----@field parseSettings fun(match: table): table
----@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
----@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
----@field getMode? fun(opponents: table[]): string
----@field DEFAULT_MODE? string
----@field DATE_FALLBACKS? string[]
----@field OPPONENT_CONFIG? readOpponentOptions
-
---- The standard way to process a match input.
----
---- The Parser injection must have the following functions:
---- - extractMaps(match, opponents, mapProps): table[]
---- - parseSettings(match): table
----
---- It may optionally have the following functions:
---- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
---- - getExtraData(match, games, opponents, settings): table?
---- - getMode(opponents): string?
----
---- Additionally, the Parser may have the following properties:
---- - DEFAULT_MODE: string
---- - DATE_FALLBACKS: string[]
---- - OPPONENT_CONFIG: table
----@param match table
----@param Parser FfaMatchParserInterface
----@param mapProps any?
----@return table
-function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	local settings = Parser.parseSettings(match)
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
-	end)
-
-	local games = Parser.extractMaps(match, opponents, settings.score)
-
-	local autoScoreFunction = Parser.calculateMatchScore and MatchGroupInputUtil.canUseAutoScore(match, games)
-		and Parser.calculateMatchScore(opponents, games)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.extradata = opponent.extradata or {}
-		opponent.extradata.startingpoints = tonumber(opponent.startingpoints)
-		opponent.placement = tonumber(opponent.placement)
-
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-
-		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = placementOfOpponents[opponentIndex]
-			opponent.extradata.bg = settings.status[opponent.placement]
-		end)
-	end
-
-	match.mode = Parser.getMode and Parser.getMode(opponents)
-		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {}
-
-	match.games = games
-	match.opponents = opponents
-
-	return match
-end
-
 ---@param opponents table[]
 ---@return integer[]
 function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
+
 	local usedPlacements = Array.map(opponents, function()
 		return 0
 	end)
@@ -1358,13 +1446,28 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 	local lastScore
 	local lastPlacement = 0
 
-	local function scoreSorter(tbl, key1, key2)
+	local function sorter(tbl, key1, key2)
+		local opponent1 = tbl[key1]
+		local opponent2 = tbl[key2]
+
+		if opponent1.status == MatchGroupInputUtil.STATUS.DEFAULT_WIN then
+			return true
+		elseif Logic.isNotEmpty(opponent1.status) and opponent1.status ~= MatchGroupInputUtil.STATUS.SCORE then
+			return false
+		end
+
 		local value1 = tonumber(tbl[key1].score) or -math.huge
 		local value2 = tonumber(tbl[key2].score) or -math.huge
-		return value1 > value2
+		if value1 ~= value2 then
+			return value1 > value2
+		end
+
+		local place1 = tonumber(opponent1.placement) or -math.huge
+		local place2 = tonumber(opponent2.placement) or -math.huge
+		return place1 < place2
 	end
 
-	for opponentIdx, opp in Table.iter.spairs(opponents, scoreSorter) do
+	for opponentIdx, opp in Table.iter.spairs(opponents, sorter) do
 		local placement = opp.placement
 		if not placement then
 			local thisPlacement = findNextSlot(lastPlacement)
@@ -1384,5 +1487,83 @@ function MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 	return placementOfTeams
 end
 
+---@param match table
+---@param opponentCount integer
+---@return {placementInfo: table[], settings: table}
+function MatchGroupInputUtil.parseSettings(match, opponentCount)
+	-- Pre-parse Status colors (up/down etc)
+	local statusParsed = {}
+	Array.forEach(Array.parseCommaSeparatedString(match.bg, ','), function (status)
+		local placements, color = unpack(Array.parseCommaSeparatedString(status, '='))
+		local pStart, pEnd = unpack(Array.parseCommaSeparatedString(placements, '-'))
+		local pStartNumber = tonumber(pStart) --[[@as integer]]
+		local pEndNumber = tonumber(pEnd) or pStartNumber
+		Array.forEach(Array.range(pStartNumber, pEndNumber), function(placement)
+			statusParsed[placement] = color
+		end)
+	end)
+
+	-- Info per Placement
+	local placementInfo = Array.map(Array.range(1, opponentCount), function(index)
+		return {
+			placement = index,
+			killPoints = tonumber(match['p' .. index .. '_kill']) or tonumber(match.p_kill),
+			placementPoints = tonumber(match['p' .. index]) or 0,
+			status = statusParsed[index],
+		}
+	end)
+
+	return {
+		placementInfo = placementInfo,
+		settings = {
+			showGameDetails = Logic.nilOr(Logic.readBoolOrNil(match.showgamedetails), true),
+			matchPointThreshold = tonumber(match.matchpoint),
+		}
+	}
+end
+
+---@param scoreDataInput table?
+---@param placementsInfo {killPoints: number, placement: integer, placementPoints: number}[]
+---@return table
+function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, placementsInfo)
+	if not scoreDataInput then
+		return {}
+	end
+
+	local scoreBreakdown = {}
+
+	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
+	local manualPoints = tonumber(scoreDataInput.p)
+	if placement or kills then
+		local minimumKillPoints = Array.reduce(
+			Array.map(placementsInfo, Operator.property('killPoints')),
+			math.min,
+			math.huge
+		)
+		local placementInfo = placementsInfo[placement] or {}
+		scoreBreakdown.placePoints = placementInfo.placementPoints or 0
+		scoreBreakdown.kills = kills
+
+		local pointsPerKill = placementInfo.killPoints or minimumKillPoints
+		if kills and pointsPerKill ~= math.huge then
+			scoreBreakdown.killPoints = scoreBreakdown.kills * pointsPerKill
+		end
+		scoreBreakdown.totalPoints = (scoreBreakdown.placePoints or 0) + (scoreBreakdown.killPoints or 0)
+	end
+
+	local opponent = {
+		status = MatchGroupInputUtil.STATUS.SCORE,
+		scoreBreakdown = scoreBreakdown,
+		placement = placement,
+		score = manualPoints or scoreBreakdown.totalPoints,
+	}
+
+	if scoreDataInput[1] == '-' then
+		opponent.status = MatchGroupInputUtil.STATUS.FORFEIT
+		opponent.score = 0
+	end
+
+	return opponent
+end
 
 return MatchGroupInputUtil

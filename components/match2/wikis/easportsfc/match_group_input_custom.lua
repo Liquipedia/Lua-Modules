@@ -11,7 +11,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
 local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
@@ -19,6 +18,10 @@ local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
 CustomMatchGroupInput.DEFAULT_MODE = 'solo'
+
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
 
 ---@param match table
 ---@param options table?
@@ -54,49 +57,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
-	local maps = {}
-	for mapKey, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Table.isEmpty(map) then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		if Logic.readBool(match.hasSubmatches) then
-			-- generic map name (not displayed)
-			map.map = 'Game ' .. mapIndex
-		elseif Logic.readBool(map.penalty) then
-			map.map = 'Penalties'
-		else
-			map.map = mapIndex .. Ordinal.suffix(mapIndex) .. ' Leg'
-		end
-
-		map.mode = Opponent.toMode(opponents[1].type, opponents[2].type)
-		map.extradata = CustomMatchGroupInput.getMapExtraData(map, opponents, Logic.readBool(match.hasSubmatches))
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			local players = CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[mapKey] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestOfInput string?
@@ -132,17 +93,6 @@ end
 ---@param map table
 ---@param opponents table[]
 ---@param hasSubmatches boolean
----@return table
-function CustomMatchGroupInput.getMapExtraData(map, opponents, hasSubmatches)
-	return {
-		comment = map.comment,
-		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatches),
-	}
-end
-
----@param map table
----@param opponents table[]
----@param hasSubmatches boolean
 ---@return integer[]?
 function CustomMatchGroupInput._submatchPenaltyScores(map, opponents, hasSubmatches)
 	if not hasSubmatches then
@@ -163,11 +113,11 @@ end
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return table[]
-function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
 		return map['t' .. opponentIndex .. 'p' .. playerIndex]
 	end)
-	local participants, _ = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -180,7 +130,41 @@ function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIn
 			}
 		end
 	)
-	return participants
+end
+
+---@param map table
+---@param mapIndex integer
+---@param match table
+---@return string
+---@return string?
+function MapFunctions.getMapName(map, mapIndex, match)
+	if Logic.readBool(match.hasSubmatches) then
+		-- generic map name (not displayed)
+		return 'Game ' .. mapIndex
+	elseif Logic.readBool(map.penalty) then
+		return 'Penalties'
+	else
+		return mapIndex .. Ordinal.suffix(mapIndex) .. ' Leg'
+	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return string
+function MapFunctions.getMapMode(match, map, opponents)
+	return Opponent.toMode(opponents[1].type, opponents[2].type)
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(map, opponents, Logic.readBool(match.hasSubmatches)),
+	}
 end
 
 return CustomMatchGroupInput

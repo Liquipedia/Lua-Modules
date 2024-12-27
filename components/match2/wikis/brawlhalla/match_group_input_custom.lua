@@ -94,8 +94,11 @@ function MapFunctions.calculateMapScore(map)
 end
 
 ---@param map table
+---@param mapIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(map)
+---@return string?
+function MapFunctions.getMapName(map, mapIndex, match)
 	if String.isNotEmpty(map.map) and map.map ~= 'TBD' then
 		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map)
 	end

@@ -19,7 +19,7 @@ local MatchSummaryFfaTableHeader = Class.new(Widget)
 ---@return Widget
 function MatchSummaryFfaTableHeader:render()
 	return HtmlWidgets.Div{
-		classes = {'panel-table__row', 'row--header	'},
+		classes = {'panel-table__row', 'row--header'},
 		attributes = {
 			['data-js-battle-royale'] = 'header-row'
 		},

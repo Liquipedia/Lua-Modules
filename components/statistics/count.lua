@@ -37,7 +37,7 @@ function Count.match2(args)
 end
 
 
----Counts the number of matches played on a wiki - querying lpdb_match2
+---Counts the number of matches played on a wiki - querying lpdb_match2game
 ---@param args table?
 ---@return integer
 function Count.match2game(args)

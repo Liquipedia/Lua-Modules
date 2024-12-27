@@ -12,7 +12,6 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -23,7 +22,10 @@ local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
-local MapFunctions = {}
+local MapFunctions = {
+	ADD_SUB_GROUP = true,
+	BREAK_ON_EMPTY = true,
+}
 
 MatchFunctions.DEFAULT_MODE = 'solo'
 MatchFunctions.OPPONENT_CONFIG = {
@@ -42,24 +44,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	local subGroup = 0
-	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if Table.isEmpty(mapInput) then
-			break
-		end
-		local map
-		map, subGroup = MapFunctions.readMap(mapInput, mapIndex, subGroup, opponents)
-
-		map.extradata = MapFunctions.getExtraData(mapInput, map.opponents)
-
-		map.vod = Logic.emptyOr(mapInput.vod, match['vodgame' .. mapIndex])
-
-		table.insert(maps, map)
-		match[mapKey] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param maps table[]
@@ -102,49 +87,13 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return extradata
 end
 
----@param mapInput table
----@param mapIndex integer
----@param subGroup integer
----@param opponents table[]
----@return table
----@return integer
-function MapFunctions.readMap(mapInput, mapIndex, subGroup, opponents)
-	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
-
-	local map = {
-		subgroup = subGroup,
-	}
-
-	map.finished = MatchGroupInputUtil.mapIsFinished(mapInput)
-	map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-		local score, status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = mapInput.walkover,
-			winner = mapInput.winner,
-			opponentIndex = opponentIndex,
-			score = mapInput['score' .. opponentIndex],
-		}, MapFunctions.calculateMapScore(mapInput, map.finished))
-		local players = MapFunctions.getPlayersOfMapOpponent(mapInput, opponent, opponentIndex)
-		return {score = score, status = status, players = players}
-	end)
-
-	map.scores = Array.map(map.opponents, Operator.property('score'))
-
-	if map.finished then
-		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		map.winner = MatchGroupInputUtil.getWinner(map.status, mapInput.winner, map.opponents)
-	end
-
-	return map, subGroup
-end
-
----@param mapInput table
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(mapInput, finished)
-	local winner = tonumber(mapInput.winner)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner and not map.finished then
 			return
 		end
 
@@ -174,7 +123,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
 	end)
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -193,16 +142,6 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 			}
 		end
 	)
-
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(opponent.match2players, {
-			name = participant.player,
-			displayname = participant.player,
-		})
-		participants[#opponent.match2players] = participant
-	end)
-
-	return participants
 end
 
 ---@param mapInput table
@@ -223,15 +162,16 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 	end)
 end
 
----@param mapInput table
----@param mapOpponents {players: {player: string, played: boolean, cards: table}[]}[]
+---@param match table
+---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(mapInput, mapOpponents)
+function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = mapInput.comment,
+		comment = map.comment,
 	}
 
-	return Table.merge(extradata, MapFunctions.getCardsExtradata(mapOpponents))
+	return Table.merge(extradata, MapFunctions.getCardsExtradata(map.opponents))
 end
 
 --- additionally store cards info in extradata so we can condition on them

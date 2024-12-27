@@ -14,7 +14,7 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 ---@class TrackmaniaBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
+function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	return matchGroupType == 'matchlist'
 		and Lua.import('Module:MatchGroup/Display/Matchlist').MatchlistContainer
 		or Lua.import('Module:MatchGroup/Display/Bracket/Custom').BracketContainer

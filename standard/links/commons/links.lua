@@ -99,6 +99,7 @@ local PREFIXES = {
 		player = 'https://play.eslgaming.com/player/',
 		match = 'https://play.eslgaming.com/match/',
 	},
+	esplay = {'https://esplay.com/tournament/'},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
 		'',

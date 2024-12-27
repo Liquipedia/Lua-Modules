@@ -108,9 +108,9 @@ end
 function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 	local players = Array.mapIndexes(function(playerIndex)
-		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'h' .. playerIndex])
+		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['t' .. opponentIndex .. 'h' .. playerIndex]
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -124,10 +124,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 return CustomMatchGroupInput

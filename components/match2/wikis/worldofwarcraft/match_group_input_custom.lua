@@ -69,7 +69,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
 		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 's' .. playerIndex])
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -83,10 +83,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param map table

@@ -23,7 +23,9 @@ local Opponent = Lua.import('Module:Opponent')
 local Streams = Lua.import('Module:Links/Stream')
 
 local CustomMatchGroupInput = {}
-local MapFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
 
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
@@ -148,43 +150,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function CustomMatchGroupInput.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if map.map == nil and map.winner == nil then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(match, map, opponents)
-		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
-		map.extradata.mapmode = Table.extract(map, 'mode')
-
-		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			local players = CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestofInput string|integer?
@@ -268,10 +234,13 @@ function CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
 end
 
 ---@param map table
----@param mapsInfo {name: string, link: string}[]?
+---@param mapIndex integer
+---@param match table
 ---@return string?
 ---@return string?
-function CustomMatchGroupInput._getMapName(map, mapsInfo)
+function MapFunctions.getMapName(map, mapIndex, match)
+	---@type {name: string, link: string}[]?
+	local mapsInfo = match.mapsInfo
 	if String.isEmpty(map.map) or map.map == 'TBD' then
 		return
 	end
@@ -294,7 +263,7 @@ end
 ---@param opponent table
 ---@param opponentIndex integer
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
-function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players
 	if opponent.type == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
@@ -303,7 +272,7 @@ function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIn
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -322,21 +291,16 @@ function CustomMatchGroupInput.getPlayersOfMapOpponent(map, opponent, opponentIn
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
 
-	return participants
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner and not map.finished then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -350,7 +314,15 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
+		mapmode = Table.extract(map, 'mode'),
 	}
+end
+
+---@param match table
+---@param map table
+---@return string?
+function MapFunctions.getGame(match, map)
+	return Logic.emptyOr(map.game, match.game, Variables.varDefault('tournament_game'))
 end
 
 return CustomMatchGroupInput

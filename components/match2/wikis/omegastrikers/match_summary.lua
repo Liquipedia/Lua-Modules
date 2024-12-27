@@ -57,7 +57,7 @@ function CustomMatchSummary._createMapRow(game)
 				bg = opponentIndex == 1 and 'brkts-popup-side-color-blue' or 'brkts-popup-side-color-red',
 			},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
-			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner)
+			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status)
 		}
 	end
 
