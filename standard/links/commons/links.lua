@@ -165,6 +165,11 @@ local PREFIXES = {
 		player = 'https://gg.letsplay.live/profile/view-stats/',
 		match = 'https://old.letsplay.live/match/',
 	},
+	lichess = {
+        'https://lichess.org/broadcast/',
+        player = 'https://lichess.org/@/',
+        match = 'https://lichess.org/'
+	},
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
@@ -454,6 +459,11 @@ local MATCH_ICONS = {
 	jcg = {
 		icon = 'File:JCG-BMS icon.png',
 		text = 'JCG matchpage'
+	},
+	lichess = {
+		icon = 'File:Lichess_lightmode.png',
+		iconDark = 'File:Lichess_darkmode.png',
+		text = 'Game page on Lichess'
 	},
 	logstf = {
 		icon = 'File:Logstf_icon.png',
