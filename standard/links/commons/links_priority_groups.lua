@@ -43,6 +43,7 @@ return {
 		'halodatahive',
 		'letsplaylive',
 		'letsplaylive-old',
+		'lichess',
 		'matcherino',
 		'matcherinolink',
 		'nwc3l',
