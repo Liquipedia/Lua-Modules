@@ -64,10 +64,16 @@ function Attack._displayDamage(data)
 		return (data.damagePercentage .. '%')
 	elseif not data.damage then
 		return
-	elseif Logic.isEmpty(data.bonus) or not data.bonusDamage then
+	elseif Logic.isEmpty(data.bonusData) then
 		return data.damage
 	end
-	return data.damage .. ' (+' .. data.bonusDamage .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
+
+	local parts = Array.extend({data.damage}, Array.map(data.bonusData, function(bonusElement)
+		if Logic.isEmpty(bonusElement.bonusDamage) then return end
+		return ' +' .. bonusElement.bonusDamage .. ' vs ' .. Page.makeInternalLink(bonusElement.bonus)
+	end))
+
+	return table.concat(parts, '<br>')
 end
 
 ---@param data table
@@ -75,15 +81,32 @@ end
 function Attack._displayDPS(data)
 	if not data.dps then
 		return
-	elseif Logic.isEmpty(data.bonus) or not data.bonusDps then
+	elseif Logic.isEmpty(data.bonusData) then
 		return data.dps
 	end
-	return data.dps .. ' (+' .. data.bonusDps .. ' vs ' .. Attack._displayArray(data.bonus) .. ')'
+
+	local parts = Array.extend({data.dps}, Array.map(data.bonusData, function(bonusElement)
+		if Logic.isEmpty(bonusElement.bonusDps) then return end
+		return ' +' .. bonusElement.bonusDps .. ' vs ' .. Page.makeInternalLink(bonusElement.bonus)
+	end))
+
+	return table.concat(parts, '<br>')
 end
 
 ---@param args table
 ---@return StormgateAttackData
 function Attack._parse(args)
+	local bonusInput = Array.parseCommaSeparatedString(args.bonus)
+	local bonusDamageInput = Array.parseCommaSeparatedString(args.bonus_damage)
+	local bonusDpsInput = Array.parseCommaSeparatedString(args.bonus_dps)
+	local bonusData = Array.map(bonusInput, function(bonusElement, bonusIndex)
+		return {
+			bonus = bonusElement,
+			bonusDamage = tonumber(bonusDamageInput[bonusIndex]),
+			bonusDps = tonumber(bonusDpsInput[bonusIndex]),
+		}
+	end)
+
 	return {
 		targets = Array.map(Array.map(Array.parseCommaSeparatedString(args.target), string.lower), String.upperCaseFirst),
 		damage = tonumber(args.damage),
@@ -91,9 +114,7 @@ function Attack._parse(args)
 		effect = Array.parseCommaSeparatedString(args.effect),
 		speed = tonumber(args.speed),
 		dps = tonumber(args.dps),
-		bonus = Array.parseCommaSeparatedString(args.bonus),
-		bonusDamage = tonumber(args.bonus_damage),
-		bonusDps = tonumber(args.bonus_dps),
+		bonusData = bonusData,
 		range = tonumber(args.range),
 	}
 end
