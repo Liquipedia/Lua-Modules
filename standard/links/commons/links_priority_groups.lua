@@ -38,6 +38,7 @@ return {
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
+		'fide',
 		'gamersclub',
 		'geoguessr',
 		'halodatahive',
