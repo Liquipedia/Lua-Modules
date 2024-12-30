@@ -32,9 +32,7 @@ function MainPageLayout.make(frame)
 	assert(WikiData.title, 'MainPageLayout: Title data not found')
 
 	local args = Arguments.getArgs(frame)
-
 	local layout = WikiData.layouts[args.layout] or WikiData.layouts.main
-	local content = table.concat(MainPageLayout._makeCells(layout))
 
 	return HtmlWidgets.Div{
 		classes = {'mainpage-v2'},
@@ -50,7 +48,7 @@ function MainPageLayout.make(frame)
 				classes = {'navigation-cards'},
 				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
 			},
-			content,
+			table.concat(MainPageLayout._makeCells(layout)),
 		},
 	}
 end
@@ -112,7 +110,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 				classes = {'navigation-card__title'},
 				children = LinkWidget{link = navigationData.link, children = navigationData.text}
 			},
-			navigationData.count and HtmlWidgets.Span{
+			count and HtmlWidgets.Span{
 				classes = {'navigation-card__subtitle'},
 				children = count,
 			} or nil,
