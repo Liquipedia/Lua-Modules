@@ -72,8 +72,9 @@ function CustomMatchGroupInput.processMatch(match, options)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
 		end)
+	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
 	end
-
 	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
 	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
@@ -210,7 +211,7 @@ end
 function MatchFunctions.getExtraData(match, opponents, finishedInput)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil,
+		status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or match.status,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
