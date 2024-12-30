@@ -97,7 +97,7 @@ function MainPageLayout._makeNavigationCard(navigationData)
 		if navigationData.count.method == 'LPDB' then
 			count = LpdbCounter.count{table = navigationData.count.table, conditions = navigationData.count.conditions}
 		elseif navigationData.count.method == 'CATEGORY' then
-			count = mw.getCurrentFrame():preprocess('{{PAGESINCATEGORY:'.. navigationData.count.category .. '}}')
+			count = mw.getCurrentFrame():preprocess('{{PAGESINCATEGORY:'.. navigationData.count.category .. '|pages}}')
 		else
 			count = navigationData.count.value
 		end
