@@ -38,7 +38,7 @@ function MainPageLayout.make(frame)
 		classes = {'mainpage-v2'},
 		children = {
 			NO_TABLE_OF_CONTENTS,
-			String.interpolate(METADESC, {metadesc = WikiData.metadesc}),
+			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
 			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
 			Template.expandTemplate(frame, 'Header banner', {
 				['logo-lighttheme'] = WikiData.banner.lightmode,
@@ -85,7 +85,7 @@ function MainPageLayout._makeCells(cells)
 	return output
 end
 
----@param navigationData {file: string?, link: string?, count: table?, text: string?}
+---@param navigationData {file: string?, link: string?, count: table?, title: string?}
 ---@return WidgetHtml
 function MainPageLayout._makeNavigationCard(navigationData)
 	local count
@@ -104,11 +104,11 @@ function MainPageLayout._makeNavigationCard(navigationData)
 		children = {
 			HtmlWidgets.Div{
 				classes = {'navigation-card__image'},
-				children = Image.display(navigationData.file, nil, {size = 240}),
+				children = Image.display(navigationData.file, nil, {size = 240, link = ''}),
 			},
 			HtmlWidgets.Span{
 				classes = {'navigation-card__title'},
-				children = LinkWidget{link = navigationData.link, children = navigationData.text}
+				children = LinkWidget{link = navigationData.link, children = navigationData.title}
 			},
 			count and HtmlWidgets.Span{
 				classes = {'navigation-card__subtitle'},
