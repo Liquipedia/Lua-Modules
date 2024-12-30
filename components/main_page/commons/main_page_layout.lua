@@ -24,6 +24,8 @@ local MainPageLayout = {}
 local NO_TABLE_OF_CONTENTS = '__NOTOC__'
 local METADESC = '<metadesc>${metadesc}</metadesc>'
 
+---@param frame Frame
+---@return WidgetHtml
 function MainPageLayout.make(frame)
 	assert(WikiData.banner, 'MainPageLayout: Banner data not found')
 	assert(WikiData.layouts, 'MainPageLayout: Layout data not found')
@@ -53,6 +55,8 @@ function MainPageLayout.make(frame)
 	}
 end
 
+---@param cells table[]
+---@return string[]
 function MainPageLayout._makeCells(cells)
 	local frame = mw.getCurrentFrame()
 	local output = {}
