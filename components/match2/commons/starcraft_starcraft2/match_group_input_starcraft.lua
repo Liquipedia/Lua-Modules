@@ -110,7 +110,7 @@ function MatchFunctions.getOpponentExtradata(opponent)
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
 		score2 = opponent.score2,
-		isarchon = opponent.isarchon,
+		isarchon = tostring(Logic.readBool(opponent.isarchon)),
 	}
 end
 
@@ -294,6 +294,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
+				isarchon = isArchon,
 			}
 		end
 	)
