@@ -31,6 +31,7 @@ local DEFAULT_BESTOF_MAP = 3
 local MatchFunctions = {}
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
+	RECALCULATE_FINISHED_WITH_OPPONENTS = true,
 }
 
 MatchFunctions.DEFAULT_MODE = 'team'

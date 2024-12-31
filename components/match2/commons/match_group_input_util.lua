@@ -1170,6 +1170,7 @@ end
 ---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
+---@field RECALCULATE_FINISHED_WITH_OPPONENTS? boolean
 
 --- The standard way to process a map input.
 ---
@@ -1189,6 +1190,7 @@ end
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
 --- - BREAK_ON_EMPTY boolean?
+--- - RECALCULATE_FINISHED_WITH_OPPONENTS boolean?
 ---@param match table
 ---@param opponents table[]
 ---@param Parser MapParserInterface
@@ -1248,6 +1250,12 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			end
 			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
+
+		if Parser.RECALCULATE_FINISHED_WITH_OPPONENTS and Parser.mapIsFinished then
+			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
+		elseif Parser.RECALCULATE_FINISHED_WITH_OPPONENTS then
+			map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
+		end
 
 		-- needs map.opponents available!
 		if Parser.getMapMode then
