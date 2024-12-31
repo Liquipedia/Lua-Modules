@@ -32,7 +32,7 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field header string?
 
 ---@class HearthstoneMatchGroupUtilMatch: MatchGroupUtilMatch
----@field submatches StormgateMatchGroupUtilSubmatch[]?
+---@field submatches HearthstoneMatchGroupUtilSubmatch[]?
 ---@field isTeamMatch boolean
 
 ---@param record table
