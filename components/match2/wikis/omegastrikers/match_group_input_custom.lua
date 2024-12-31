@@ -20,7 +20,6 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
-	RECALCULATE_FINISHED_WITH_OPPONENTS = true,
 }
 
 local DEFAULT_BESTOF_MATCH = 5
