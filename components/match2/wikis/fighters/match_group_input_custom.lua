@@ -86,7 +86,10 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 		opponent.match2players,
 		players,
 		function(playerIndex)
-			return {name = map['t' .. opponentIndex .. 'p' .. playerIndex]}
+			if Opponent.typeIsParty(opponent.type) then
+				return {name = (opponent.match2players[playerIndex] or {}).name}
+			end
+			return {name = map['o' .. opponentIndex .. 'p' .. playerIndex]}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local charInputs = Json.parseIfTable(map['o' .. opponentIndex .. 'p' .. playerIndex]) or {} ---@type string[]
