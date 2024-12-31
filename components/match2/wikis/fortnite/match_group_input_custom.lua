@@ -43,17 +43,6 @@ function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
----@param match table
----@param games table[]
----@param opponents table[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	return {
-		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match),
-	}
-end
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
 function MatchFunctions.calculateMatchScore(maps)
