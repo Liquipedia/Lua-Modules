@@ -487,10 +487,14 @@ function MatchTable:statsFromMatches()
 		return math.max(tonumber(value) or 0, 0)
 	end
 
+	local hasWalkoverStatus = function(opponent)
+		return Logic.isNotEmpty(opponent.status) and opponent.status ~= 'S'
+	end
+
 	Array.forEach(self.matches, function(match)
 		if match.result.winner == DRAW_WINNER then
 			totalMatches.d = totalMatches.d + 1
-		elseif MatchOpponentHelper.calculateWalkoverType{match.result.opponent, match.result.vs} then
+		elseif hasWalkoverStatus(match.result.opponent) or hasWalkoverStatus(match.result.vs) then
 			return
 		elseif match.result.winner == 1 then
 			totalMatches.w = totalMatches.w + 1
