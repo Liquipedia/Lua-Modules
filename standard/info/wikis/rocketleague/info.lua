@@ -49,6 +49,9 @@ return {
 			status = 2,
 			matchWidth = 150,
 		},
+		transfers = {
+			showTeamName = true,
+		},
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }
