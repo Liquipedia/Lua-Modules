@@ -24,7 +24,6 @@ local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 local VodLink = require('Module:VodLink')
 
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 local PlayerExt = Lua.import('Module:Player/Ext')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
