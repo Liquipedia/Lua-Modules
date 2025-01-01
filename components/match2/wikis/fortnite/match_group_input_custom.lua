@@ -23,7 +23,9 @@ local MatchFunctions = {
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
-local FfaMatchFunctions = {}
+local FfaMatchFunctions = {
+	DEFAULT_MODE = 'solos',
+}
 local MapFunctions = {}
 local FfaMapFunctions = {}
 
