@@ -16,7 +16,6 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 local Opponent = Lua.import('Module:Opponent')
 
 local DisplayHelper = {}
@@ -127,9 +126,9 @@ function DisplayHelper.MapAndStatus(game, config)
 	local mapText = DisplayHelper.Map(game, config)
 
 	local walkoverType = (Array.find(game.opponents or {}, function(opponent)
-		return opponent.status == MatchOpponentHelper.STATUS.FORFEIT
-			or opponent.status == MatchOpponentHelper.STATUS.DISQUALIFIED
-			or opponent.status == MatchOpponentHelper.STATUS.LOSS
+		return opponent.status == 'FF'
+			or opponent.status == 'DQ'
+			or opponent.status == 'L'
 	end) or {}).status
 
 	if not walkoverType then return mapText end
@@ -140,7 +139,7 @@ function DisplayHelper.MapAndStatus(game, config)
 		return mapText .. NONBREAKING_SPACE .. '<i>(' .. walkoverDisplay .. ')</i>'
 	end
 
-	if walkoverType == MatchOpponentHelper.STATUS.LOSS then
+	if walkoverType == 'L' then
 		return toDisplay('w/o')
 	else
 		return toDisplay(walkoverType:lower())
