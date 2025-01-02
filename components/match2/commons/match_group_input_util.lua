@@ -850,8 +850,9 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 end
 
 ---@param map {winner: string|nil, finished: string?, bestof: integer?}
+---@param opponents? {score: integer?}[]
 ---@return boolean
-function MatchGroupInputUtil.mapIsFinished(map)
+function MatchGroupInputUtil.mapIsFinished(map, opponents)
 	if MatchGroupInputUtil.isNotPlayed(map.winner, map.finished) then
 		return true
 	end
@@ -867,19 +868,6 @@ function MatchGroupInputUtil.mapIsFinished(map)
 
 	if Logic.isNotEmpty(map.finished) then
 		return true
-	end
-
-	return false
-end
-
----@param map {winner: string|nil, finished: string?, bestof: integer?}
----@param opponents? {score: integer?}[]
----@param finishedInput string?
----@return boolean
-function MatchGroupInputUtil.mapIsFinishedFromBestof(map, opponents, finishedInput)
-	local finished = Logic.readBoolOrNil(finishedInput)
-	if finished ~= nil then
-		return finished
 	end
 
 	local bestof = map.bestof
@@ -1228,12 +1216,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.bestof = Parser.getMapBestOf(map)
 		end
 
-		if Parser.mapIsFinished then
-			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
-		else
-			map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		end
-
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
 		end
@@ -1261,7 +1243,11 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
 
-		map.finished = map.finished or MatchGroupInputUtil.mapIsFinishedFromBestof(map, map.opponents, finishedInput)
+		if Parser.mapIsFinished then
+			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
+		else
+			map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
+		end
 
 		-- needs map.opponents available!
 		if Parser.getMapMode then
