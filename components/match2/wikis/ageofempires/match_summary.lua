@@ -74,7 +74,7 @@ end
 ---@param playerIndex integer
 ---@return {displayName: string?, pageName: string?, flag: string?, civ: string?}
 function CustomMatchSummary._getPlayerData(game, opponentIndex, playerIndex)
-	return ((game.opponents[opponentIndex] or {}).players or {})[playerIndex]
+	return ((game.opponents[opponentIndex] or {}).players or {})[playerIndex] or {}
 end
 
 ---@param game MatchGroupUtilGame
