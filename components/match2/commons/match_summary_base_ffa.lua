@@ -95,7 +95,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		class = 'cell--team',
 		icon = 'team',
 		header = {
-			value = 'Team',
+			value = 'Participant',
 		},
 		sortVal = {
 			value = function (opponent, idx)
