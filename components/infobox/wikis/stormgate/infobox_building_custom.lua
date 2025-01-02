@@ -177,7 +177,7 @@ end
 function CustomBuilding:_parseSubfactionData(data)
     local sortTable = {'1v1', 'mayhem', 'coop'}
 	local parsedElements = Array.map(data, function(dataElement)
-        return Array.parseCommaSeparatedString(dataElement, ':')
+		return Array.parseCommaSeparatedString(dataElement, ':')
 	end)
 
 	return Array.sortBy(parsedElements, function(element)
