@@ -43,6 +43,8 @@ local CountryRepresentation = Class.new(function(self, args) self:init(args) end
 ---@field showNoCountry boolean
 ---@field staff boolean
 
+---@param frame Frame
+---@return WidgetHtml
 function CountryRepresentation.run(frame)
 	local args = Arguments.getArgs(frame)
 	return CountryRepresentation(args):fetchAndProcess():create()
@@ -130,6 +132,7 @@ function CountryRepresentation:fetchAndProcess()
 	return self
 end
 
+---@return WidgetHtml
 function CountryRepresentation:create()
 	local cache = {rank = 0, counter = 0, lastCount = 0}
 	local rows = {}
