@@ -156,14 +156,44 @@ end
 ---@param args table
 ---@return string?
 function CustomUnit:subHeaderDisplay(args)
-	if Logic.isEmpty(args.subfaction) or
-		string.find(args.subfaction, '1v1') or
-		string.find(args.subfaction, self.pagename) then return end
-	return tostring(mw.html.create('span')
+    local GAME_MODE_NAME = {
+		coop = 'Co-op',
+		mayhem = 'Team Mayhem'
+	}
+    local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+
+	if Table.includes(subfactionData, '1v1') then return tostring(mw.html.create('span')
 		:css('font-size', '90%')
-		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
-	)
+		:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+	) end
+
+    local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
+        if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_NAME[string.lower(subfactionElement[1])] then return end
+		if args.informationType == 'Hero' then return GAME_MODE_NAME[string.lower(subfactionElement[1])] end
+        return GAME_MODE_NAME[string.lower(subfactionElement[1])] .. ': ' .. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
+    end)
+
+    return tostring(mw.html.create('span')
+		:css('font-size', '90%')
+		:wikitext(table.concat(parts, '<br>'))
+    )
 end
+
+---@param data table
+---@return table?
+function CustomUnit:_parseSubfactionData(data)
+    local sortTable = {'1v1', 'mayhem', 'coop'}
+	local parsedElements = Array.map(data, function(dataElement)
+        return Array.parseCommaSeparatedString(dataElement, ':')
+	end)
+
+	return Array.sortBy(parsedElements, function(element)
+		return Array.indexOf(sortTable, function(sortElement)
+			return sortElement == string.lower(element[1])
+		end)
+	end)
+end
+
 
 ---@return string?
 function CustomUnit:_getHotkeys()
@@ -274,17 +304,19 @@ function CustomUnit._hotkeys(hotkey1, hotkey2)
 end
 
 ---@param inputString string?
+---@param sep string?
 ---@return string[]
-function CustomUnit:_csvToPageList(inputString)
-	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+function CustomUnit:_csvToPageList(inputString, sep)
+	return Array.map(Array.parseCommaSeparatedString(inputString, sep), function(value)
 		return Page.makeInternalLink(value)
 	end)
 end
 
 ---@param input string?
+---@param sep string?
 ---@return string
-function CustomUnit:_displayCsvAsPageCsv(input)
-	return table.concat(self:_csvToPageList(input), ', ')
+function CustomUnit:_displayCsvAsPageCsv(input, sep)
+	return table.concat(self:_csvToPageList(input, sep), ', ')
 end
 
 ---@param key string
@@ -314,7 +346,7 @@ function CustomUnit._deprecatedWarning(patch)
 	return MessageBox.main('ambox', {
 		image= ICON_DEPRECATED,
 		class='ambox-red',
-		text= 'This has been removed from 1v1 with Patch ' .. patch,
+		text= 'This has been removed with Patch ' .. patch,
 	})
 end
 
