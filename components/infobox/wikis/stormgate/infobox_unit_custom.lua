@@ -35,6 +35,8 @@ local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
+local GAME_MODE_NAME = {coop = 'Co-op', mayhem = 'Team Mayhem'}
+local SORT_TABLE = {'1v1', 'mayhem', 'coop'}
 
 ---@param frame Frame
 ---@return Html
@@ -156,17 +158,14 @@ end
 ---@param args table
 ---@return string?
 function CustomUnit:subHeaderDisplay(args)
-    local GAME_MODE_NAME = {
-		coop = 'Co-op',
-		mayhem = 'Team Mayhem'
-	}
-    local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+	local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
 
-	if Table.includes(subfactionData, '1v1') then return tostring(mw.html.create('span')
-		:css('font-size', '90%')
-		:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
-			.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
-	) end
+	if Table.includes(subfactionData, '1v1') then
+		return tostring(mw.html.create('span')
+			:css('font-size', '90%')
+			:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
+				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+	end
 
 	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
 		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_NAME[string.lower(subfactionElement[1])] then return end
@@ -175,22 +174,21 @@ function CustomUnit:subHeaderDisplay(args)
 			': ' .. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
 	end)
 
-    return tostring(mw.html.create('span')
+	return tostring(mw.html.create('span')
 		:css('font-size', '90%')
 		:wikitext(table.concat(parts, '<br>'))
-    )
+	)
 end
 
 ---@param data table
 ---@return table?
 function CustomUnit:_parseSubfactionData(data)
-    local sortTable = {'1v1', 'mayhem', 'coop'}
 	local parsedElements = Array.map(data, function(dataElement)
-        return Array.parseCommaSeparatedString(dataElement, ':')
+		return Array.parseCommaSeparatedString(dataElement, ':')
 	end)
 
 	return Array.sortBy(parsedElements, function(element)
-		return Array.indexOf(sortTable, function(sortElement)
+		return Array.indexOf(SORT_TABLE, function(sortElement)
 			return sortElement == string.lower(element[1])
 		end)
 	end)
