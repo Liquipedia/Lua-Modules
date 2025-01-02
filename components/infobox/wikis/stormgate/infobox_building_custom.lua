@@ -152,7 +152,7 @@ function CustomBuilding:subHeaderDisplay(args)
 		coop = 'Co-op',
 		mayhem = 'Team Mayhem'
 	}
-    local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+	local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
 
 	if Table.includes(subfactionData, '1v1') then return tostring(mw.html.create('span')
 		:css('font-size', '90%')
