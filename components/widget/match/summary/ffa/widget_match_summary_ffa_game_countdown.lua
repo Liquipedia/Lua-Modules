@@ -28,11 +28,18 @@ function MatchSummaryFfaGameCountdown:render()
 	end
 
 	local timestamp = Date.readTimestamp(game.date)
-	if not timestamp then
+	if not timestamp or timestamp == Date.defaultTimestamp then
 		return
 	end
-	-- TODO Use local TZ
-	local dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' ' .. Timezone.getTimezoneString('UTC')
+
+	local dateString
+	if game.dateIsExact == true then
+		-- TODO: Use game-TZ
+		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
+				.. Timezone.getTimezoneString('UTC')
+	else
+		dateString = mw.getContentLanguage():formatDate('F j, Y', game.date)
+	end
 
 	local streamParameters = Table.merge(game.stream, {
 		date = dateString,
