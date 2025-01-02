@@ -180,7 +180,7 @@ end
 function MapFunctions.getCardsExtradata(mapOpponents)
 	local extradata = {}
 	Array.forEach(mapOpponents, function(opponent, opponentIndex)
-		Array.forEach(Array.map(opponent.players or {}, Logic.nilIfEmpty), function(player, playerIndex)
+		Array.forEach(Array.filter(opponent.players or {}, Logic.isNotEmpty), function(player, playerIndex)
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 			extradata[prefix .. 'tower'] = player.cards.tower
 			-- participant.cards is an array plus the tower value ....
