@@ -33,7 +33,7 @@ function MatchSummaryFfaGameCountdown:render()
 	end
 
 	local dateString
-	if game.dateIsExact == true then
+	if game.dateIsExact then
 		-- TODO: Use game-TZ
 		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
 				.. Timezone.getTimezoneString('UTC')
