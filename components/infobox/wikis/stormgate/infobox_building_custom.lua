@@ -148,13 +148,43 @@ end
 ---@param args table
 ---@return string?
 function CustomBuilding:subHeaderDisplay(args)
-	if Logic.isEmpty(args.subfaction) or
-		string.find(args.subfaction, '1v1') or
-		string.find(args.subfaction, self.pagename) then return end
-	return tostring(mw.html.create('span')
+    local GAME_MODE_NAME = {
+		coop = 'Co-op',
+		mayhem = 'Team Mayhem'
+	}
+    local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+
+	if Table.includes(subfactionData, '1v1') then return tostring(mw.html.create('span')
 		:css('font-size', '90%')
-		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
-	)
+		:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
+			.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+	) end
+
+    local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
+        if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_NAME[string.lower(subfactionElement[1])] then return end
+        return GAME_MODE_NAME[string.lower(subfactionElement[1])] ..
+			': ' .. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
+    end)
+
+    return tostring(mw.html.create('span')
+		:css('font-size', '90%')
+		:wikitext(table.concat(parts, '<br>'))
+    )
+end
+
+---@param data table
+---@return table?
+function CustomBuilding:_parseSubfactionData(data)
+    local sortTable = {'1v1', 'mayhem', 'coop'}
+	local parsedElements = Array.map(data, function(dataElement)
+        return Array.parseCommaSeparatedString(dataElement, ':')
+	end)
+
+	return Array.sortBy(parsedElements, function(element)
+		return Array.indexOf(sortTable, function(sortElement)
+			return sortElement == string.lower(element[1])
+		end)
+	end)
 end
 
 ---@param hotkey1 string?
@@ -302,7 +332,7 @@ function CustomBuilding._deprecatedWarning(patch)
 	return MessageBox.main('ambox', {
 		image= ICON_DEPRECATED,
 		class='ambox-red',
-		text= 'This has been removed from 1v1 with Patch ' .. patch,
+		text= 'This has been removed with Patch ' .. patch,
 	})
 end
 
