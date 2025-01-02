@@ -66,7 +66,7 @@ end
 ---@return Widget
 function CustomMatchSummary._createGame(game, gameIndex, date)
 	local cardData = Array.map(game.opponents, function(opponent)
-		return Array.map(opponent.players, function(player)
+		return Array.map(opponent.players or {}, function(player)
 			if Logic.isDeepEmpty(player) then return end
 			local cards = player.cards or {}
 			return Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
@@ -150,33 +150,24 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return table[]
 function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
-	local players = {{}, {}, hash = {{}, {}}}
-
-	CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[1], match)
-
-	if match.extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
-		for gameIndex = 2, #subMatch.games do
-			CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[gameIndex], match)
-		end
-	end
-
-	players.hash = nil
-
-	return players
-end
-
----@param players table
----@param game MatchGroupUtilGame
----@param match MatchGroupUtilMatch
----@return table
-function CustomMatchSummary._extractPlayersFromGame(players, game, match)
-	return Array.map(game.opponents, function(opponent, opponentIndex)
-		return Array.map(opponent.players, function(player, playerIndex)
+	local processUntil = match.extradata['subgroup' .. subMatchIndex .. 'iskoth'] and #subMatch.games or 1
+	return Array.map(subMatch.games[1].opponents, function(opponent, opponentIndex)
+		local hash = {}
+		Array.forEach(Array.range(1, processUntil), function(gameIndex)
+			local game = subMatch.games[gameIndex]
+			Array.forEach(game.opponents[opponentIndex].players or {}, function(player, playerIndex)
+				if Logic.isDeepEmpty(player) then return end
+				hash[playerIndex] = {
+					displayName = player.displayname,
+					pageName = player.name,
+				}
+			end)
+		end)
+		local indexes = Logic.nilIfEmpty(Array.extractKeys(hash))
+		local maxIndex = indexes and math.max(unpack(Array.extractKeys(hash))) or 0
+		return Array.map(Array.range(1, maxIndex), function(playerIndex)
 			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
-			return matchPlayer or {
-				displayName = player.displayname,
-				pageName = player.name,
-			}
+			return hash[playerIndex] and (matchPlayer or hash[playerIndex]) or nil
 		end)
 	end)
 end
