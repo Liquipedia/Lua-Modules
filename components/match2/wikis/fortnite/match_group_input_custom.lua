@@ -18,12 +18,17 @@ local MatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
 		applyUnderScores = true,
-		maxNumPlayers = 3,
+		maxNumPlayers = 4,
 	},
 	DEFAULT_MODE = 'team',
 	getBestOf = MatchGroupInputUtil.getBestOf,
 }
 local FfaMatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		applyUnderScores = true,
+		maxNumPlayers = 3,
+	},
 	DEFAULT_MODE = 'solos',
 }
 local MapFunctions = {}
