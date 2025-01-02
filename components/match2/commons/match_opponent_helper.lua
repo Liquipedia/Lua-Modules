@@ -19,6 +19,7 @@ MatchOpponentHelper.STATUS = {
 	WIN = 'W',
 }
 
+---@deprecated
 ---@param opponents table[]
 ---@return string?
 function MatchOpponentHelper.calculateWalkoverType(opponents)

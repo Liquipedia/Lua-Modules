@@ -203,7 +203,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
----@field opponents {players: table[]}[]
+---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?

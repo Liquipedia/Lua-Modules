@@ -126,13 +126,18 @@ end
 function DisplayHelper.MapAndStatus(game, config)
 	local mapText = DisplayHelper.Map(game, config)
 
-	local walkoverType = MatchOpponentHelper.calculateWalkoverType(game.opponents)
+	local walkoverType = (Array.find(game.opponents or {}, function(opponent)
+		return opponent.status == MatchOpponentHelper.STATUS.FORFEIT
+			or opponent.status == MatchOpponentHelper.STATUS.DISQUALIFIED
+			or opponent.status == MatchOpponentHelper.STATUS.LOSS
+	end) or {}).status
+
 	if not walkoverType then return mapText end
 
 	---@param walkoverDisplay string
 	---@return string
 	local toDisplay = function(walkoverDisplay)
-		return mapText .. NONBREAKING_SPACE .. '<i>()' .. walkoverDisplay .. ')</i>'
+		return mapText .. NONBREAKING_SPACE .. '<i>(' .. walkoverDisplay .. ')</i>'
 	end
 
 	if walkoverType == MatchOpponentHelper.STATUS.LOSS then
