@@ -164,7 +164,8 @@ function CustomUnit:subHeaderDisplay(args)
 		return tostring(mw.html.create('span')
 			:css('font-size', '90%')
 			:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
-				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.')))
+				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+		)
 	end
 
 	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
