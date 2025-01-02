@@ -1216,12 +1216,6 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.bestof = Parser.getMapBestOf(map)
 		end
 
-		if Parser.mapIsFinished then
-			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
-		else
-			map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		end
-
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
 		end
@@ -1248,6 +1242,12 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			end
 			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
+
+		if Parser.mapIsFinished then
+			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
+		else
+			map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
+		end
 
 		-- needs map.opponents available!
 		if Parser.getMapMode then

@@ -175,10 +175,9 @@ end
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
-	local finished = map.finished
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
