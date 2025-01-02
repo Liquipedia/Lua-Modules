@@ -168,12 +168,12 @@ function CustomUnit:subHeaderDisplay(args)
 			.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
 	) end
 
-    local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
-        if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_NAME[string.lower(subfactionElement[1])] then return end
+	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
+		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_NAME[string.lower(subfactionElement[1])] then return end
 		if args.informationType == 'Hero' then return GAME_MODE_NAME[string.lower(subfactionElement[1])] end
-        return GAME_MODE_NAME[string.lower(subfactionElement[1])] ..
+		return GAME_MODE_NAME[string.lower(subfactionElement[1])] ..
 			': ' .. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
-    end)
+	end)
 
     return tostring(mw.html.create('span')
 		:css('font-size', '90%')
