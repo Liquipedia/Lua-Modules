@@ -120,183 +120,285 @@ local CONTENT = {
 	},
 }
 
+local LAYOUT_MAIN = {
+	{ -- Left
+		size = 6,
+		children = {
+			{
+				mobileOrder = 1,
+				content = CONTENT.aboutMain,
+			},
+			{
+				mobileOrder = 4,
+				content = CONTENT.heroes,
+			},
+			{
+				mobileOrder = 5,
+				content = CONTENT.updates,
+			},
+			{
+				mobileOrder = 9,
+				content = CONTENT.usefulArticles,
+			},
+			{
+				mobileOrder = 7,
+				content = CONTENT.wantToHelp,
+			},
+		},
+	},
+	{ -- Right
+		size = 6,
+		children = {
+			{
+				mobileOrder = 2,
+				content = CONTENT.specialEvents
+			},
+			{
+				mobileOrder = 3,
+				children = {
+					{
+						children = {
+							{
+								noPanel = true,
+								content = CONTENT.filterButtons,
+							},
+						},
+					},
+					{
+						size = 6,
+						children = {
+							{
+								noPanel = true,
+								content = CONTENT.matches,
+							},
+						},
+					},
+					{
+						size = 6,
+						children = {
+							{
+								noPanel = true,
+								content = CONTENT.tournaments,
+							},
+						},
+					},
+				},
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.transfers,
+			},
+			{
+				mobileOrder = 9,
+				content = CONTENT.thisDay,
+			},
+		},
+	},
+}
+
+local LAYOUT_ESPORTS = {
+	{ -- Left
+		size = 6,
+		children = {
+			{
+				mobileOrder = 1,
+				content = CONTENT.aboutEsport,
+			},
+			{
+				mobileOrder = 2,
+				content = CONTENT.specialEvents,
+			},
+			{
+				mobileOrder = 4,
+				content = CONTENT.transfers,
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.thisDay,
+			},
+			{
+				mobileOrder = 7,
+				content = CONTENT.wantToHelp,
+			},
+		}
+	},
+	{ -- Right
+		size = 6,
+		children = {
+			{
+				mobileOrder = 3,
+				children = {
+					{
+						children = {
+							{
+								noPanel = true,
+								content = CONTENT.filterButtons,
+							},
+						},
+					},
+					{
+						size = 6,
+						children = {
+							{
+								noPanel = true,
+								content = CONTENT.matches,
+							},
+						},
+					},
+					{
+						size = 6,
+						children = {
+							{
+								noPanel = true,
+								content = CONTENT.tournaments,
+							},
+						},
+					},
+				},
+			},
+			{
+				mobileOrder = 5,
+				content = CONTENT.updates,
+			},
+		},
+	},
+}
+
+local LAYOUT_GAME = {
+	{ -- Left
+		size = 6,
+		children = {
+			{
+				mobileOrder = 1,
+				content = CONTENT.aboutGame,
+			},
+			{
+				mobileOrder = 2,
+				content = CONTENT.heroes,
+			},
+			{
+				mobileOrder = 6,
+				content = CONTENT.wantToHelp,
+			},
+		},
+	},
+	{ -- Right
+		size = 6,
+		children = {
+			{
+				mobileOrder = 3,
+				content = CONTENT.updates
+			},
+			{
+				mobileOrder = 4,
+				content = CONTENT.thisDay,
+			},
+			{
+				mobileOrder = 5,
+				content = CONTENT.usefulArticles,
+			},
+		},
+	},
+}
+
 return {
-	main = {
-		{ -- Left
-			size = 6,
-			children = {
-				{
-					mobileOrder = 1,
-					content = CONTENT.aboutMain,
-				},
-				{
-					mobileOrder = 4,
-					content = CONTENT.heroes,
-				},
-				{
-					mobileOrder = 5,
-					content = CONTENT.updates,
-				},
-				{
-					mobileOrder = 9,
-					content = CONTENT.usefulArticles,
-				},
-				{
-					mobileOrder = 7,
-					content = CONTENT.wantToHelp,
-				},
+	banner = {
+		lightmode = 'Dota2logo-light-theme.svg',
+		darkmode = 'Dota2logo-dark-theme.svg',
+	},
+	metadesc = 'Comprehensive Dota 2 wiki with articles covering everything from heroes and items, to strategies, ' ..
+		'to tournaments, to competitive players, and teams.',
+	title = 'The Dota 2 Wiki',
+	navigation = {
+		{
+			file = 'Morphling_Large.png',
+			title = 'Heroes',
+			link = 'Heroes',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::hero]] and [[extradata_game::]]',
 			},
 		},
-		{ -- Right
-			size = 6,
-			children = {
-				{
-					mobileOrder = 2,
-					content = CONTENT.specialEvents
-				},
-				{
-					mobileOrder = 3,
-					children = {
-						{
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.filterButtons,
-								},
-							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.matches,
-								},
-							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.tournaments,
-								},
-							},
-						},
-					},
-				},
-				{
-					mobileOrder = 6,
-					content = CONTENT.transfers,
-				},
-				{
-					mobileOrder = 9,
-					content = CONTENT.thisDay,
-				},
+		{
+			file = 'Blink_Dagger Large.png',
+			title = 'Items',
+			link = 'Items',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::item]]',
+			},
+		},
+		{
+			file = 'Rune of Arcane prev.png',
+			title = 'Mechanics',
+			link = 'Mechanics',
+			count = {
+				method = 'CATEGORY',
+				category = 'Mechanics',
+			},
+		},
+		{
+			file = 'Main Page Dota 2 Cosmetics.jpg',
+			title = 'Cosmetics',
+			link = 'Cosmetics',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::cosmetic_item]]',
+			},
+		},
+		{
+			file = 'Neutral map.jpg',
+			title = 'Updates',
+			link = 'Updates',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::version]]',
+			},
+		},
+		{
+			file = 'The International 2016.jpg',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
+			},
+		},
+		{
+			file = 'Team_Spirit_win_The_International_2023.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = '7ckngMad_EPICENTER_Major_2019.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Team_Liquid_The_International_2023.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
 			},
 		},
 	},
-	esports = {
-		{ -- Left
-			size = 6,
-			children = {
-				{
-					mobileOrder = 1,
-					content = CONTENT.aboutEsport,
-				},
-				{
-					mobileOrder = 2,
-					content = CONTENT.specialEvents,
-				},
-				{
-					mobileOrder = 4,
-					content = CONTENT.transfers,
-				},
-				{
-					mobileOrder = 6,
-					content = CONTENT.thisDay,
-				},
-				{
-					mobileOrder = 7,
-					content = CONTENT.wantToHelp,
-				},
-			}
-		},
-		{ -- Right
-			size = 6,
-			children = {
-				{
-					mobileOrder = 3,
-					children = {
-						{
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.filterButtons,
-								},
-							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.matches,
-								},
-							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.tournaments,
-								},
-							},
-						},
-					},
-				},
-				{
-					mobileOrder = 5,
-					content = CONTENT.updates,
-				},
-			},
-		},
-	},
-	game = {
-		{ -- Left
-			size = 6,
-			children = {
-				{
-					mobileOrder = 1,
-					content = CONTENT.aboutGame,
-				},
-				{
-					mobileOrder = 2,
-					content = CONTENT.heroes,
-				},
-				{
-					mobileOrder = 6,
-					content = CONTENT.wantToHelp,
-				},
-			},
-		},
-		{ -- Right
-			size = 6,
-			children = {
-				{
-					mobileOrder = 3,
-					content = CONTENT.updates
-				},
-				{
-					mobileOrder = 4,
-					content = CONTENT.thisDay,
-				},
-				{
-					mobileOrder = 5,
-					content = CONTENT.usefulArticles,
-				},
-			},
-		},
+	layouts = {
+		main = LAYOUT_MAIN,
+		esports = LAYOUT_ESPORTS,
+		game = LAYOUT_GAME,
 	},
 }
