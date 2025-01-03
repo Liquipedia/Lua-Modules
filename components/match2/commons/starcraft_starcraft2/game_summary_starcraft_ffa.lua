@@ -26,7 +26,7 @@ function CustomGameSummary.getGameByMatchId(props)
 
 	game.stream = match.stream
 
-	SummaryHelper.updateGameOpponents(game, match.opponents)
+	SummaryHelper.updateGameOpponents(match, game)
 
 	return MatchSummaryWidgets.Tab{
 		matchId = match.matchId,
