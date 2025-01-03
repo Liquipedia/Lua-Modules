@@ -125,20 +125,25 @@ end
 function DisplayHelper.MapAndStatus(game, config)
 	local mapText = DisplayHelper.Map(game, config)
 
-	local statusText = nil
-	if game.resultType == 'default' then
-		if game.walkover == 'l' then
-			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
-		elseif game.walkover == 'ff' then
-			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
-		elseif game.walkover == 'dq' then
-			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
-		else
-			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'
-		end
+	local walkoverType = (Array.find(game.opponents or {}, function(opponent)
+		return opponent.status == 'FF'
+			or opponent.status == 'DQ'
+			or opponent.status == 'L'
+	end) or {}).status
+
+	if not walkoverType then return mapText end
+
+	---@param walkoverDisplay string
+	---@return string
+	local toDisplay = function(walkoverDisplay)
+		return mapText .. NONBREAKING_SPACE .. '<i>(' .. walkoverDisplay .. ')</i>'
 	end
 
-	return mapText .. (statusText or '')
+	if walkoverType == 'L' then
+		return toDisplay('w/o')
+	else
+		return toDisplay(walkoverType:lower())
+	end
 end
 
 ---Displays the map name and map-mode.
@@ -170,14 +175,14 @@ function DisplayHelper.Map(game, config)
 	else
 		mapText = game.map or 'Unknown'
 	end
-	if game.resultType == 'np' then
+	if game.status == 'notplayed' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
 	return mapText
 end
 
 ---@param opponent table
----@param status string?
+---@param gameStatus string?
 ---@return string
 function DisplayHelper.MapScore(opponent, gameStatus)
 	if gameStatus == 'notplayed' then

@@ -55,7 +55,7 @@ local KEYSTONES = Table.map({
 end)
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
@@ -216,7 +216,7 @@ end
 ---@return string
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
-		return game.resultType ~= NOT_PLAYED
+		return game.status ~= NOT_PLAYED
 	end), function(game)
 		return TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)

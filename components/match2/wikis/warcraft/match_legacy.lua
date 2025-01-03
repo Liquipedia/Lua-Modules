@@ -13,11 +13,13 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -126,9 +128,10 @@ function MatchLegacy._convertParameters(match2)
 	extradata.tournamentstagename = Logic.emptyOr(Variables.varDefault('Group_name'),
 		match.header .. ' - ' .. (match.opponent1 or '') .. ' vs ' .. (match.opponent2 or ''))
 
-	if match.resulttype == 'default' then
-		match.resulttype = string.upper(match.walkover or '')
-		if match.resulttype == UNKNOWNREASON_DEFAULT_LOSS then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover then
+		match.resulttype = walkover
+		if walkover == UNKNOWNREASON_DEFAULT_LOSS then
 			--needs to be converted because in match1 storage it was marked this way
 			match.resulttype = 'unk'
 		end
@@ -167,17 +170,20 @@ function MatchLegacy._groupIntoSubmatches(match2, objectName)
 		local submatchIndex = tonumber(game.subgroup)
 		if game.mode ~= '1v1' or not submatchIndex then return end
 
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
+
 		if not submatches[submatchIndex] then
 			submatches[submatchIndex] = {
 				games = {},
 				objectName = objectName .. '_Submatch_' .. submatchIndex,
-				opponents = MatchLegacy._fromParticipantToOpponent(game.participants or {}, match2.match2opponents)
+				opponents = MatchLegacy._constructSubmatchOpponents(opponents, match2.match2opponents)
 			}
 		end
 		local submatch = submatches[submatchIndex]
 		table.insert(submatch.games, game)
-		submatch.opponents[1].score = submatch.opponents[1].score + (tonumber((game.scores or {})[1]) or 0)
-		submatch.opponents[2].score = submatch.opponents[2].score + (tonumber((game.scores or {})[2]) or 0)
+		submatch.opponents[1].score = submatch.opponents[1].score + (scores[1] or 0)
+		submatch.opponents[2].score = submatch.opponents[2].score + (scores[2] or 0)
 	end)
 
 	return submatches
@@ -211,22 +217,22 @@ function MatchLegacy._storeSubMatch(submatch, submatchIndex, match)
 	mw.ext.LiquipediaDB.lpdb_match(submatchStorageObject.objectName, submatchStorageObject)
 end
 
----@param participants table<string, table>
----@param opponents table
+---@param gameOpponents table[]
+---@param matchOpponents table[]
 ---@return {match2players: table[], score: number, type: OpponentType}
-function MatchLegacy._fromParticipantToOpponent(participants, opponents)
-	local submatchOpponents = {
-		{match2players = {}, score = 0, type = Opponent.solo},
-		{match2players = {}, score = 0, type = Opponent.solo},
-	}
-	for participantKey in Table.iter.spairs(Table.mapValues(participants, Logic.nilIfEmpty)) do
-		local opponentKey, playerKey = string.match(participantKey, '^(%d+)_(%d+)$')
-		opponentKey = tonumber(opponentKey)
-		table.insert(submatchOpponents[opponentKey].match2players,
-			opponents[opponentKey].match2players[tonumber(playerKey)])
-	end
-
-	return submatchOpponents
+function MatchLegacy._constructSubmatchOpponents(gameOpponents, matchOpponents)
+	return Array.map(gameOpponents, function(gameOpponent, opponentIndex)
+		return {
+			type = Opponent.solo,
+			score = 0,
+			match2players = Table.map(gameOpponent.players, function(playerIndex, gamePlayer)
+				if Logic.isDeepEmpty(gamePlayer) then
+					return playerIndex, nil
+				end
+				return playerIndex, matchOpponents[opponentIndex].match2players[playerIndex]
+			end)
+		}
+	end)
 end
 
 ---@param game2 table
@@ -234,7 +240,10 @@ end
 ---@param match table
 ---@return string?
 function MatchLegacy._storeGame(game2, gameIndex, match)
-	if game2.resulttype == 'np' then return end
+	if game2.status == 'notplayed' then return end
+
+	local opponents = Json.parseIfString(game2.opponents) or {}
+	local scores = Array.map(opponents, Operator.property('score'))
 
 	local objectName = match.objectName .. '_Map_' .. gameIndex
 
@@ -243,11 +252,10 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	game.vod = game2.vod
 	game.map = game2.map
 
-	game2.scores = game2.scores or {}
-	game.opponent1score = game2.scores[1]
-	game.opponent2score = game2.scores[2]
+	game.opponent1score = scores[1]
+	game.opponent2score = scores[2]
 
-	local factions, heroes = MatchLegacy._heroesAndFactionFromParticipants(game2.participants)
+	local factions, heroes = MatchLegacy._heroesAndFactionFromGameOpponents(opponents)
 	for opponentIndex = 1, 2 do
 		game.extradata['opponent' .. opponentIndex .. 'race'] = factions[opponentIndex]
 			or game.extradata['opponent' .. opponentIndex .. 'race']
@@ -262,9 +270,10 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 
 	game.resulttype = nil
 	game.walkover = nil
-	if game2.resulttype == 'default' then
-		game.resulttype = string.upper(game2.walkover or '')
-		if game.resulttype == UNKNOWNREASON_DEFAULT_LOSS then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
+	if walkover then
+		game.resulttype = walkover
+		if walkover == UNKNOWNREASON_DEFAULT_LOSS then
 			--needs to be converted because in match1 storage it was marked this way
 			game.resulttype = 'unk'
 		end
@@ -274,18 +283,16 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 	return mw.ext.LiquipediaDB.lpdb_game(objectName, game)
 end
 
----@param participants table<string, table>
+---@param opponents table[]
 ---@return string[]
 ---@return string[][]
-function MatchLegacy._heroesAndFactionFromParticipants(participants)
+function MatchLegacy._heroesAndFactionFromGameOpponents(opponents)
 	local factions, heroes = {}, {}
-	for participantKey, participant in pairs(Table.mapValues(participants or {}, Logic.nilIfEmpty)) do
-		local opponentKey = string.match(participantKey, '^(%d+)_%d+$')
-		opponentKey = tonumber(opponentKey)
-		---@cast opponentKey -nil
-		factions[opponentKey] = participant.faction
-		heroes[opponentKey] = participant.heroes
-	end
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		local player = Array.map(opponent.players or {}, Logic.nilIfEmpty)[1] or {}
+		factions[opponentIndex] = player.faction
+		heroes[opponentIndex] = player.heroes
+	end)
 
 	return factions, heroes
 end
