@@ -16,13 +16,10 @@ local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class UnderlordsMatchGroupUtilMatch: MatchGroupUtilMatch
----@field games UnderlordsMatchGroupUtilGame[]
-
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
 function CustomMatchSummary.getByMatchId(props)
-	---@class UnderlordsMatchGroupUtilMatch
+	---@class FFAMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	SummaryHelper.updateMatchOpponents(match)
 	local scoringData = SummaryHelper.createScoringData(match)

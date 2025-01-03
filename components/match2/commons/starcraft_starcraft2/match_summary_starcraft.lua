@@ -211,7 +211,11 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		end
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
+			opponent = {
+				players = players,
+				type = Opponent.partyTypes[math.max(#players, 1)],
+				isArchon = (opponents[opponentIndex] or {}).isArchon,
+			},
 			showLink = true,
 			overflow = 'ellipsis',
 		}
@@ -220,18 +224,9 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
-		if submatch.resultType == 'default' then
-			return OpponentDisplay.BlockScore{
-				isWinner = isWinner,
-				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
-			}
-		end
-
-		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
 		return OpponentDisplay.BlockScore{
-			isWinner = isWinner,
-			scoreText = score,
+			isWinner = opponentIndex == submatch.winner or submatch.winner == 0,
+			scoreText = DisplayHelper.MapScore(submatch.opponents[opponentIndex], submatch.status),
 		}
 	end
 

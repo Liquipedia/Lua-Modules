@@ -31,8 +31,8 @@ jobs:
       - name: Personal Lua Deploy
         if: steps.changed-files.outputs.any_changed == 'true'
         env:
-          WIKI_USER: ${{ secrets.LP_BOTUSER }}
-          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_USER: ${{ secrets.LP_USER }}
+          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           LUA_DEV_ENV_NAME: "/dev/${{ github.event.inputs.luadevenv }}"

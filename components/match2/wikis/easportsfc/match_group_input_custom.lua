@@ -38,12 +38,13 @@ function CustomMatchGroupInput.processMatch(match, options)
 				return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 			elseif calculateBy == 'mapScores' then
 				return Array.reduce(Array.map(maps, function(map)
-					return map.scores[opponentIndex] or 0
+					local scores = Array.map(map.opponents, Operator.property('score'))
+					return scores[opponentIndex] or 0
 				end), Operator.add, 0)
 			elseif calculateBy == 'penalties' then
-				return Array.filter(maps, function(map)
+				return (Array.filter(maps, function(map)
 					return Logic.readBool(map.penalty)
-				end)[1].scores[opponentIndex]
+				end)[1].opponents[opponentIndex] or {}).score
 			else
 				error('Unknown calculateBy: ' .. tostring(calculateBy))
 			end
@@ -136,6 +137,7 @@ end
 ---@param mapIndex integer
 ---@param match table
 ---@return string
+---@return string?
 function MapFunctions.getMapName(map, mapIndex, match)
 	if Logic.readBool(match.hasSubmatches) then
 		-- generic map name (not displayed)

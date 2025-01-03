@@ -199,7 +199,7 @@ function CustomMatchSummary._createMap(game)
 	end
 
 	local function score(oppIdx)
-		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
 	end
 
 	-- Teams scores
@@ -221,7 +221,7 @@ function CustomMatchSummary._createMap(game)
 	local mapInfo = {
 		mapDisplayName = game.map,
 		map = game.game and (game.map .. '/' .. game.game) or game.map,
-		resultType = game.resultType,
+		status = game.status,
 	}
 
 	return MatchSummaryWidgets.Row{

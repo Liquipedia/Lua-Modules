@@ -11,7 +11,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -58,9 +57,9 @@ function CustomMatchSummary._createGame(game)
 		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[1], game.status),
 			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
-			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[2], game.status),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -78,11 +77,11 @@ function CustomMatchSummary._createSubMatch(game, match)
 		css = {['font-size'] = '84%', padding = '4px'},
 		children = WidgetUtil.collect(
 			CustomMatchSummary._players(players[1], 1, game.winner),
-			DisplayHelper.MapScore(game.scores[1], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[1], game.status),
 			CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 1)),
 			MatchSummaryWidgets.GameCenter{children = ' vs '},
 			CustomMatchSummary._score(CustomMatchSummary._subMatchPenaltyScore(game, 2)),
-			DisplayHelper.MapScore(game.scores[2], 2, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[2], game.status),
 			CustomMatchSummary._players(players[2], 2, game.winner),
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -93,26 +92,15 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return table[][]
 function CustomMatchSummary._extractPlayersFromGame(game, match)
-	local players = {{}, {}}
-
-	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
-		participantKey = mw.text.split(participantKey, '_')
-		local opponentIndex = tonumber(participantKey[1])
-		local match2playerIndex = tonumber(participantKey[2])
-
-		local player = match.opponents[opponentIndex].players[match2playerIndex]
-
-		if not player then
-			player = {
-				displayName = participant.displayname,
-				pageName = participant.name,
+	return Array.map(game.opponents, function(opponent, opponentIndex)
+		return Array.map(opponent.players, function(player, playerIndex)
+			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
+			return matchPlayer or {
+				displayName = player.displayname,
+				pageName = player.name,
 			}
-		end
-
-		table.insert(players[opponentIndex], player)
-	end
-
-	return players
+		end)
+	end)
 end
 
 ---@param score number|string|nil

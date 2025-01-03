@@ -80,7 +80,8 @@ function MatchFunctions.calculateMatchScore(opponents, games)
 		local opponent = opponents[opponentIndex]
 		local sum = (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
 		Array.forEach(games, function(game)
-			sum = sum + ((game.scores or {})[opponentIndex] or 0)
+			local scores = Array.map(game.opponents, Operator.property('score'))
+			sum = sum + ((scores or {})[opponentIndex] or 0)
 		end)
 		return sum
 	end

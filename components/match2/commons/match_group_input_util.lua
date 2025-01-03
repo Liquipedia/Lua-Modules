@@ -808,9 +808,10 @@ function MatchGroupInputUtil.placementFromWinner(status, winner, opponentIndex)
 end
 
 ---@param match table
+---@param maps table[]
 ---@param opponents {score: integer?}[]
 ---@return boolean
-function MatchGroupInputUtil.matchIsFinished(match, opponents)
+function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return true
 	end
@@ -835,8 +836,14 @@ function MatchGroupInputUtil.matchIsFinished(match, opponents)
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
-	local threshold = match.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
-	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
+	local function recordLiveLongEnough(record)
+		if not record.timestamp or record.timestamp == DateExt.defaultTimestamp then
+			return false
+		end
+		local longLiveTime = record.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
+		return NOW > (record.timestamp + longLiveTime)
+	end
+	if (#maps > 0 and Array.all(maps, recordLiveLongEnough)) or (#maps == 0 and recordLiveLongEnough(match)) then
 		return true
 	end
 
@@ -1046,6 +1053,14 @@ function MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
 	return match
 end
 
+---@alias readDateFunction fun(match: table): {
+---date: string,
+---dateexact: boolean,
+---timestamp: integer,
+---timezoneId: string?,
+---timezoneOffset:string?,
+---}
+
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
@@ -1055,13 +1070,7 @@ end
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
 ---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
----@field readDate? fun(match: table): {
----date: string,
----dateexact: boolean,
----timestamp: integer,
----timezoneId: string?,
----timezoneOffset:string?,
----}
+---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
@@ -1096,8 +1105,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	Parser = Parser or {}
 	local matchInput = Table.deepCopy(match)
 
-	local dateProps = Parser.readDate and Parser.readDate(match)
-		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
+	local dateProps = MatchGroupInputUtil.getMatchDate(Parser, matchInput)
 	Table.mergeInto(match, dateProps)
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
@@ -1133,7 +1141,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		}, autoScoreFunction)
 	end)
 
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
@@ -1159,7 +1167,7 @@ end
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
----@field getMapName? fun(game: table, mapIndex: integer, match: table): string?
+---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
@@ -1167,6 +1175,7 @@ end
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
+---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1175,7 +1184,7 @@ end
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
---- - getMapName(map): string?
+--- - getMapName(map, mapIndex, match): string?, string?
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
@@ -1183,6 +1192,7 @@ end
 --- - extendMapOpponent(map, opponentIndex): table
 --- - getMapBestOf(map): integer?
 --- - computeOpponentScore(props, autoScore): integer?, string?
+--- - getGame(match, map): string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1201,27 +1211,28 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		local dateToUse = map.date or match.date
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
+
 		if Parser.ADD_SUB_GROUP then
 			subGroup = tonumber(map.subgroup) or (subGroup + 1)
 			map.subgroup = subGroup
 		end
 
 		if Parser.getMapName then
-			map.map = Parser.getMapName(map, mapIndex, match)
+			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
 		end
 
 		if Parser.getMapBestOf then
 			map.bestof = Parser.getMapBestOf(map)
 		end
 
-		if Parser.mapIsFinished then
-			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
-		else
-			map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		end
-
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
+		end
+
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
@@ -1243,6 +1254,12 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
 
+		if Parser.mapIsFinished then
+			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
+		else
+			map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
+		end
+
 		-- needs map.opponents available!
 		if Parser.getMapMode then
 			map.mode = Parser.getMapMode(match, map, opponents)
@@ -1254,7 +1271,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		map.extradata = Table.merge(
+			{displayname = map.mapDisplayName},
+			Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		)
 
 		table.insert(maps, map)
 		match[key] = nil
@@ -1269,7 +1289,7 @@ end
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[], settings: table): table?
 ---@field getMode? fun(opponents: table[]): string
----@field readDate? fun(match: table): table
+---@field readDate? readDateFunction
 ---@field adjustOpponent? fun(opponent: table[], opponentIndex: integer, match: table)
 ---@field matchIsFinished? fun(match: table, opponents: table[]): boolean
 ---@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: table[]): integer?
@@ -1304,8 +1324,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	local finishedInput = match.finished --[[@as string?]]
 	local winnerInput = match.winner --[[@as string?]]
 
-	local dateProps = Parser.readDate and Parser.readDate(match)
-		or MatchGroupInputUtil.readDate(match.date, Parser.DATE_FALLBACKS)
+	local dateProps = MatchGroupInputUtil.getMatchDate(Parser, match)
 	Table.mergeInto(match, dateProps)
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
@@ -1336,7 +1355,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	end)
 
 	match.finished = Parser.matchIsFinished and Parser.matchIsFinished(match, opponents)
-		or MatchGroupInputUtil.matchIsFinished(match, opponents)
+		or MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
@@ -1381,7 +1400,8 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(map.date))
+		local dateToUse = map.date or match.date
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		map.opponents = Array.map(opponents, function(matchOpponent)
@@ -1555,6 +1575,42 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 	end
 
 	return opponent
+end
+
+---@param matchParser {readDate?: readDateFunction, DATE_FALLBACKS?: string[]}
+---@param matchInput table
+---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
+function MatchGroupInputUtil.getMatchDate(matchParser, matchInput)
+	local defaultDateParser = function(record)
+		return MatchGroupInputUtil.readDate(record.date, matchParser.DATE_FALLBACKS)
+	end
+	local dateParsingFunction = matchParser.readDate or defaultDateParser
+
+	if matchInput.date then
+		-- If there's a match date in the input, use it
+		return dateParsingFunction(matchInput)
+	end
+
+	-- Otherwise, use the date from the earliest game in the match
+	local easlierGameTimestamp, earliestGameDateStruct = DateExt.maxTimestamp, nil
+
+	-- We have to loop through the maps unparsed as we haven't parsed the maps at this point yet
+	for _, map in Table.iter.pairsByPrefix(matchInput, 'map', {requireIndex = true}) do
+		if map.date then
+			local gameDateStruct = dateParsingFunction(map)
+			if gameDateStruct.timestamp < easlierGameTimestamp then
+				earliestGameDateStruct = gameDateStruct
+				easlierGameTimestamp = gameDateStruct.timestamp
+			end
+		end
+	end
+
+	-- We couldn't find game date neither, let's use the defaults for the match
+	if not earliestGameDateStruct then
+		return dateParsingFunction(matchInput)
+	end
+
+	return earliestGameDateStruct
 end
 
 return MatchGroupInputUtil

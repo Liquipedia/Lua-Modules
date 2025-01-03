@@ -317,6 +317,9 @@ local GAME_STANDINGS_COLUMNS = {
 	},
 	{
 		id = 'placements',
+		show = function(game)
+			return (game.extradata.settings or {}).showGameDetails
+		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -337,6 +340,9 @@ local GAME_STANDINGS_COLUMNS = {
 	},
 	{
 		id = 'kills',
+		show = function(game)
+			return (game.extradata.settings or {}).showGameDetails
+		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',

@@ -68,13 +68,14 @@ for luaFile in $luaFiles; do
         -s \
         -b "$ckf" \
         -c "$ckf" \
-        --data-urlencode "lgname=${WIKI_USER}" \
-        --data-urlencode "lgpassword=${WIKI_PASSWORD}" \
-        --data-urlencode "lgtoken=${loginToken}" \
+        --data-urlencode "username=${WIKI_USER}" \
+        --data-urlencode "password=${WIKI_PASSWORD}" \
+        --data-urlencode "logintoken=${loginToken}" \
+        --data-urlencode "loginreturnurl=${WIKI_BASE_URL}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
         -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
-        -X POST "${wikiApiUrl}?format=json&action=login" \
+        -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
         | gunzip \
         > /dev/null
       loggedin[$wiki]=1

@@ -82,6 +82,9 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		local dateToUse = map.date or match.date
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
+
 		map.length = MapParser.getLength(map)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 		map.extradata = MapFunctions.getExtraData(MapParser, map, #opponents)
@@ -179,7 +182,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
 		function (playerIndex)
@@ -192,10 +195,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			return participant
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param winnerInput string|integer|nil
