@@ -16,6 +16,11 @@ local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = tr
 local Links = {}
 
 local PREFIXES = {
+	['365chess'] = {
+		'https://www.365chess.com/tournaments/',
+		player = 'https://www.365chess.com/players/',
+		match = 'https://www.365chess.com/game.php?gid=',
+	},
 	['5ewin'] = {
 		'https://arena.5eplay.com/tournament/',
 		player = 'https://arena.5eplay.com/data/player/',
@@ -61,6 +66,16 @@ local PREFIXES = {
 	challonge = {
 		'',
 		player = 'https://challonge.com/users/',
+	},
+	chesscom = {
+		'https://www.chess.com/',
+		player = 'https://www.chess.com/member/',
+		match = 'https://www.chess.com/games/view/',
+	},
+	chessgames = {
+		'https://www.chessgames.com/perl/chess.pl?tid=',
+		player = 'https://www.chessgames.com/perl/chessplayer?pid=',
+		match = 'https://www.chessgames.com/perl/chessgame?gid=',
 	},
 	chzzk = {'https://chzzk.naver.com/live/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
@@ -117,6 +132,7 @@ local PREFIXES = {
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
 	fanclub = {''},
+	fide = {'https://ratings.fide.com/profile/'},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
@@ -150,6 +166,11 @@ local PREFIXES = {
 		team = 'https://gg.letsplay.live/view-team/',
 		player = 'https://gg.letsplay.live/profile/view-stats/',
 		match = 'https://old.letsplay.live/match/',
+	},
+	lichess = {
+        'https://lichess.org/broadcast/',
+        player = 'https://lichess.org/@/',
+        match = 'https://lichess.org/'
 	},
 	linkedin = {'https://www.linkedin.com/in/'},
 	loco = {'https://loco.gg/streamers/'},
@@ -351,6 +372,11 @@ local ICON_KEYS_TO_RENAME = {
 }
 
 local MATCH_ICONS = {
+	['365chess'] = {
+		icon = 'File:365chess_allmode.png',
+		iconDark = 'File:365chess_allmode.png',
+		text = '365Chess matchpage'
+	},
 	ballchasing = {
 		icon = 'File:Ballchasing icon.png',
 		text = 'Ballchasing replays'
@@ -368,6 +394,16 @@ local MATCH_ICONS = {
 	challengermode = {
 		icon = 'File:Challengermode icon.png',
 		text = 'Match page on Challengermode'
+	},
+	chesscom = {
+		icon = 'File:ChessCom_allmode.png',
+		iconDark = 'File:ChessCom_allmode.png',
+		text = 'Chess.com matchpage'
+	},
+	chessgames = {
+		icon = 'File:Chessgames_allmode.png',
+		iconDark = 'File:Chessgames_allmode.png',
+		text = 'Chessgames matchpage'
 	},
 	civdraft = {
 		text = 'Civ Draft',
@@ -425,6 +461,11 @@ local MATCH_ICONS = {
 	jcg = {
 		icon = 'File:JCG-BMS icon.png',
 		text = 'JCG matchpage'
+	},
+	lichess = {
+		icon = 'File:Lichess_lightmode.png',
+		iconDark = 'File:Lichess_darkmode.png',
+		text = 'Game page on Lichess'
 	},
 	logstf = {
 		icon = 'File:Logstf_icon.png',
