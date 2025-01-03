@@ -667,6 +667,7 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
+		dateIsExact = nilIfEmpty(Table.extract(extradata, 'dateexact')),
 		extradata = extradata,
 		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
