@@ -40,7 +40,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	Table.mergeInto(match, MatchGroupInputUtil.getMatchDate({}, match))
 
 	local opponents = Array.mapIndexes(function(opponentIndex)
 		return CustomMatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
@@ -66,7 +66,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 
 	local winnerInput = match.winner --[[@as string?]]
 	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
+	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
