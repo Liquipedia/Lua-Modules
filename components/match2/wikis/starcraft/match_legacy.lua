@@ -8,11 +8,16 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
+
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 local _MODES = {solo = '1v1', team = 'team'}
 
@@ -35,34 +40,31 @@ function MatchLegacy._storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
 		game.extradata = Json.parseIfString(game.extradata or '{}') or game.extradata
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 
 		if game.mode == '1v1' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
-			local scores = Json.parseIfString(game.scores or '{}') or {}
 			game.opponent1score = scores[1] or 0
 			game.opponent2score = scores[2] or 0
 
 			game.extradata.winnerrace = game.extradata.winnerfaction
 			game.extradata.loserrace = game.extradata.loserfaction
 
-			-- participants holds additional playerdata per match, e.g. the faction (=race)
-			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is "2_1"
-			local playerdata = Table.mapValues(Json.parseIfString(game.participants or '{}') or game.participants or {},
-				Logic.nilIfEmpty)
-			for key, item in pairs(playerdata) do
-				local keyArray = mw.text.split(key or '', '_')
-				local l = tonumber(keyArray[2])
-				local k = tonumber(keyArray[1])
-				game.extradata['opponent' .. k .. 'race'] = item.faction
-				local opp = match2.match2opponents[k] or {}
-				local pl = opp.match2players or {}
-				game['opponent' .. k .. 'flag'] = (pl[l] or {}).flag
-				game.extradata['opponent' .. k .. 'name'] = (pl[l] or {}).displayname
-				game.extradata['tournament'] = match2.tournament or ''
-				game.extradata['series'] = match2.series or ''
-			end
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players or {}, function(player, playerIndex)
+					if Logic.isDeepEmpty(player) then return end
+					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
+					game.extradata['opponent' .. opponentIndex .. 'race'] = player.faction
+					game['opponent' .. opponentIndex .. 'flag'] = matchPlayer.flag
+					game.extradata['opponent' .. opponentIndex .. 'name'] = matchPlayer.displayname
+					game.extradata['tournament'] = match2.tournament or ''
+					game.extradata['series'] = match2.series or ''
+				end)
+			end)
+
 			game.extradata.gamenumber = gameIndex
 
 			game.extradata = Json.stringify(game.extradata)
@@ -77,28 +79,24 @@ function MatchLegacy._storeGames(match, match2)
 
 			submatch.opponent1 = game.extradata.opponent1
 			submatch.opponent2 = game.extradata.opponent2
-			local scores = Json.parseIfString(game.scores or '{}') or {}
 			submatch.opponent1score = scores[1] or 0
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
-			local playerdata = Table.mapValues(Json.parseIfString(game.participants or '{}') or game.participants,
-				Logic.nilIfEmpty)
-			for key, item in pairs(playerdata) do
-				local keyArray = mw.text.split(key or '', '_')
-				local l = tonumber(keyArray[2])
-				local k = tonumber(keyArray[1])
-				submatch.extradata['opponent' .. k .. 'race'] = item.faction
-				local opp = match2.match2opponents[k] or {}
-				local pl = opp.match2players or {}
-				submatch['opponent' .. k .. 'flag'] = (pl[l] or {}).flag
-				submatch.extradata['opponent' .. k .. 'name'] = (pl[l] or {}).displayname
-			end
+
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players or {}, function(player, playerIndex)
+					if Logic.isDeepEmpty(player) then return end
+					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
+					submatch.extradata['opponent' .. opponentIndex .. 'race'] = player.faction
+					submatch['opponent' .. opponentIndex .. 'flag'] = matchPlayer.flag
+					submatch.extradata['opponent' .. opponentIndex .. 'name'] = matchPlayer.displayname
+				end)
+			end)
+
 			submatch.winner = game.winner or ''
-			submatch.walkover = game.walkover or ''
+			local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
+			submatch.walkover = (walkover or ''):lower()
 			submatch.finished = match2.finished or '0'
-			if game.resulttype ~= 'submatch' then
-				submatch.resulttype = game.resulttype
-			end
 			submatch.mode = '1v1'
 			submatch.date = game.date
 			submatch.dateexact = match2.dateexact or ''
@@ -175,8 +173,9 @@ function MatchLegacy._convertParameters(match2)
 			return nil, false
 		end
 
-		if match.resulttype == 'default' then
-			match.resulttype = string.upper(match.walkover or '')
+		local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+		if walkover then
+			match.resulttype = walkover
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''

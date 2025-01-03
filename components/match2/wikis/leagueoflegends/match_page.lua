@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Operator = require('Module:Operator')
@@ -55,7 +56,7 @@ local KEYSTONES = Table.map({
 end)
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
@@ -87,13 +88,14 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
-			local team = {players = {}}
+			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
-			for _, player in ipairs(opponent.players) do
-				table.insert(team.players, Table.mergeInto(player, {
+			team.players = Array.map(opponent.players, function(player)
+				if Logic.isDeepEmpty(player) then return end
+				return Table.mergeInto(player, {
 					roleIcon = player.role .. ' ' .. team.side,
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
@@ -101,8 +103,8 @@ function MatchPage.getByMatchId(props)
 					runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
 						return KEYSTONES[rune]
 					end)[1]
-				}))
-			end
+				})
+			end)
 
 			if game.finished then
 				-- Aggregate stats
@@ -216,7 +218,7 @@ end
 ---@return string
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
-		return game.resultType ~= NOT_PLAYED
+		return game.status ~= NOT_PLAYED
 	end), function(game)
 		return TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)

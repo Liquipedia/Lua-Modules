@@ -118,6 +118,7 @@ function StarcraftPlayerDisplay.TemplatePlayer(frame)
 		pageName = pageName,
 		faction = String.nilIfEmpty(args.race) or String.nilIfEmpty(args.faction) or Faction.defaultFaction,
 	}
+	StarcraftPlayerExt.populatePageName(player)
 
 	if not args.novar then
 		StarcraftPlayerExt.saveToPageVars(player, {overwritePageVars = true})

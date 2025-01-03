@@ -6,12 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local GodNames = mw.loadData('Module:GodNames')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -19,7 +16,9 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
-local MapFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
 
 local DEFAULT_BESTOF = 3
 local MAX_NUM_PLAYERS = 15
@@ -46,14 +45,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		table.insert(maps, MapFunctions.readMap(map, #opponents))
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestofInput string|integer?
@@ -88,63 +80,29 @@ end
 --
 -- map related functions
 --
-
 ---@param map table
----@param opponentCount integer
----@return table?
-function MapFunctions.readMap(map, opponentCount)
-	local finishedInput = map.finished --[[@as string?]]
-	local winnerInput = map.winner --[[@as string?]]
-
-	if Logic.isDeepEmpty(map) then
-		return nil
-	end
-
-	map.extradata = MapFunctions.getExtraData(map, opponentCount)
-	map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-		local score, status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = map.walkover,
-			winner = map.winner,
-			opponentIndex = opponentIndex,
-			score = map['score' .. opponentIndex],
-		}, MapFunctions.calculateMapScore(map.winner, map.finished))
-		return {score = score, status = status}
-	end)
-
-	map.scores = Array.map(map.opponents, Operator.property('score'))
-	if map.finished then
-		map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-	end
-
-	return map
-end
-
----@param winnerInput string|integer|nil
----@param finished boolean
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
 	end
 end
 
+---@param match table
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map, opponentCount)
+function MapFunctions.getExtraData(match, map, opponents)
 	return Table.merge({
 		comment = map.comment,
 		team1side = string.lower(map.team1side or ''),
 		team2side = string.lower(map.team2side or ''),
-	}, MapFunctions.getPicksAndBans(map, opponentCount))
+	}, MapFunctions.getPicksAndBans(map, #opponents))
 end
 
 ---@param map table

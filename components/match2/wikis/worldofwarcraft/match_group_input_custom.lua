@@ -69,7 +69,7 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players = Array.mapIndexes(function(playerIndex)
 		return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 's' .. playerIndex])
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -83,10 +83,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param map table
@@ -95,7 +91,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0

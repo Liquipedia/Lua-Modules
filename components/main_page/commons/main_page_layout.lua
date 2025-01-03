@@ -9,20 +9,54 @@
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Grid = require('Module:Grid')
+local Image = require('Module:Image')
+local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Layouts = Lua.import('Module:MainPageLayout/data')
+local WikiData = Lua.import('Module:MainPageLayout/data')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 
 local MainPageLayout = {}
 
-function MainPageLayout.make(frame)
-	local args = Arguments.getArgs(frame)
+local NO_TABLE_OF_CONTENTS = '__NOTOC__'
+local METADESC = '<metadesc>${metadesc}</metadesc>'
 
-	local layout = Layouts[args.layout or 'main']
-	return table.concat(MainPageLayout._makeCells(layout))
+---@param frame Frame
+---@return WidgetHtml
+function MainPageLayout.make(frame)
+	assert(WikiData.banner, 'MainPageLayout: Banner data not found')
+	assert(WikiData.layouts, 'MainPageLayout: Layout data not found')
+	assert(WikiData.navigation, 'MainPageLayout: Navigation data not found')
+	assert(WikiData.metadesc, 'MainPageLayout: Metadesc data not found')
+	assert(WikiData.title, 'MainPageLayout: Title data not found')
+
+	local args = Arguments.getArgs(frame)
+	local layout = WikiData.layouts[args.layout] or WikiData.layouts.main
+
+	return HtmlWidgets.Div{
+		classes = {'mainpage-v2'},
+		children = {
+			NO_TABLE_OF_CONTENTS,
+			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
+			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
+			Template.expandTemplate(frame, 'Header banner', {
+				['logo-lighttheme'] = WikiData.banner.lightmode,
+				['logo-darktheme'] = WikiData.banner.darkmode,
+			}),
+			HtmlWidgets.Div{
+				classes = {'navigation-cards'},
+				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
+			},
+			table.concat(MainPageLayout._makeCells(layout)),
+		},
+	}
 end
 
+---@param cells table[]
+---@return string[]
 function MainPageLayout._makeCells(cells)
 	local frame = mw.getCurrentFrame()
 	local output = {}
@@ -53,6 +87,39 @@ function MainPageLayout._makeCells(cells)
 	end
 	table.insert(output, Grid._end_grid{})
 	return output
+end
+
+---@param navigationData {file: string?, link: string?, count: table?, title: string?}
+---@return WidgetHtml
+function MainPageLayout._makeNavigationCard(navigationData)
+	local count
+	if navigationData.count then
+		if navigationData.count.method == 'LPDB' then
+			count = LpdbCounter.count{table = navigationData.count.table, conditions = navigationData.count.conditions}
+		elseif navigationData.count.method == 'CATEGORY' then
+			count = mw.site.stats.pagesInCategory(navigationData.count.category, 'pages')
+		else
+			count = navigationData.count.value
+		end
+	end
+
+	return HtmlWidgets.Div{
+		classes = {'navigation-card'},
+		children = {
+			HtmlWidgets.Div{
+				classes = {'navigation-card__image'},
+				children = Image.display(navigationData.file, nil, {size = 240, link = ''}),
+			},
+			HtmlWidgets.Span{
+				classes = {'navigation-card__title'},
+				children = LinkWidget{link = navigationData.link, children = navigationData.title}
+			},
+			count and HtmlWidgets.Span{
+				classes = {'navigation-card__subtitle'},
+				children = count,
+			} or nil,
+		}
+	}
 end
 
 return MainPageLayout

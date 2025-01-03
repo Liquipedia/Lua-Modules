@@ -79,14 +79,13 @@ function CustomMatchGroupInput._hasTeamOpponent(match)
 	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -94,8 +93,11 @@ function MapFunctions.calculateMapScore(winnerInput, finished)
 end
 
 ---@param map table
+---@param mapIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(map)
+---@return string?
+function MapFunctions.getMapName(map, mapIndex, match)
 	return nil
 end
 

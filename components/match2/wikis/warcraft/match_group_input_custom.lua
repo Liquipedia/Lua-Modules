@@ -192,19 +192,21 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 end
 
 ---@param game table
+---@param gameIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(game)
-	return (MapsData[(game.map or ''):lower()] or {}).name or game.map
+---@return string?
+function MapFunctions.getMapName(game, gameIndex, match)
+	return (MapsData[(game.map or ''):lower()] or {}).name or game.map, game.mapDisplayName
 end
 
 ---@param map table
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
-	local finished = map.finished
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -335,7 +337,6 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
-		displayname = map.mapDisplayName,
 		header = map.header,
 	}
 
