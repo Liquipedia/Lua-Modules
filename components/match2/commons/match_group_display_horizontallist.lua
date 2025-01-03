@@ -70,32 +70,31 @@ function HorizontallistDisplay.Bracket(props)
 	}
 	local sortedBracket = HorizontallistDisplay._sortMatches(props.bracket)
 	local selectedMatchIdx = HorizontallistDisplay.findMatchClosestInTime(props.bracketId, sortedBracket)
-	local bracketNode = mw.html.create('div')
-			:addClass('navigation-tabs')
-			:attr('data-js-battle-royale', 'navigation')
-			:attr('role', 'tabpanel')
 
 	-- Do not show the tabs if there is only one match
-	if #sortedBracket > 1 then
-		local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
+	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
-		for index, header in ipairs(HorizontallistDisplay.computHeaders(sortedBracket)) do
-			local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
-			local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
-			---@cast matchId -nil
-			--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
-			local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
-			local nodeProps = {
-				header = header,
-				index = index,
-				status = MatchGroupUtil.computeMatchPhase(attachedMatch),
-				matchId = matchKey,
-			}
-			list:node(HorizontallistDisplay.NodeHeader(nodeProps))
-		end
-
-		bracketNode:node(list)
+	for index, header in ipairs(HorizontallistDisplay.computeHeaders(sortedBracket)) do
+		local attachedMatch = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, sortedBracket[index][1])
+		local _, matchId = MatchGroupUtil.splitMatchId(attachedMatch.matchId)
+		---@cast matchId -nil
+		--- If it's a matchList, then matchId is valid as is (also is numeric), otherwise we need to convert it to a key
+		local matchKey = Logic.isNumeric(matchId) and matchId or MatchGroupUtil.matchIdToKey(matchId)
+		local nodeProps = {
+			header = header,
+			index = index,
+			status = MatchGroupUtil.computeMatchPhase(attachedMatch),
+			matchId = matchKey,
+		}
+		list:node(HorizontallistDisplay.NodeHeader(nodeProps))
 	end
+
+	local bracketNode = mw.html.create('div')
+			:addClass('navigation-tabs')
+			:addClass(sortedBracket and 'is--hidden' or nil)
+			:attr('data-js-battle-royale', 'navigation')
+			:attr('role', 'tabpanel')
+			:node(list)
 
 	local matchNode = mw.html.create('div'):addClass('navigation-content-container')
 	for matchIndex, match in ipairs(sortedBracket) do
