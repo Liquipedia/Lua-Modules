@@ -1072,7 +1072,8 @@ end
 ---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
----@field readOpponent? fun(match: table, opponentIndex: integer, opponentConfig: readOpponentOptions?): MGIParsedOpponent
+---@field readOpponent? fun(match: table, opponentIndex: integer, opponentConfig: readOpponentOptions?):
+---MGIParsedOpponent
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
