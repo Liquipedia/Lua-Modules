@@ -25,12 +25,9 @@ function MatchSummaryFfaHeader:render()
 	assert(self.props.matchId, 'No matchId provided')
 	assert(type(self.props.games) == 'table', 'No games provided')
 
-	local function headerItem(title, icon, idx, active)
+	local function headerItem(title, icon, idx)
 		return HtmlWidgets.Li{
-			classes = {
-				'panel-tabs__list-item',
-				active and 'is--active' or nil,
-			},
+			classes = {'panel-tabs__list-item'},
 			attributes = {
 				['data-js-battle-royale'] = 'panel-tab',
 				['data-js-battle-royale-content-target-id'] = self.props.matchId .. 'panel' .. idx,
@@ -60,7 +57,7 @@ function MatchSummaryFfaHeader:render()
 				role = 'tablist',
 			},
 			children = WidgetUtil.collect(
-				headerItem('Overall standings', standingsIcon, 0, true),
+				headerItem('Overall standings', standingsIcon, 0),
 				Array.map(self.props.games, function (game, idx)
 					return headerItem('Game '.. idx, CountdownIcon{game = game, additionalClasses = {'panel-tabs__list-icon'}}, idx)
 				end)
