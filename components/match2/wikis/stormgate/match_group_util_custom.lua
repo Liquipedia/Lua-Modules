@@ -19,9 +19,8 @@ local TypeUtil = require('Module:TypeUtil')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 -- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
 local Opponent = Lua.import('Module:Opponent')
-local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
+local SCORE_STATUS = 'S'
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
@@ -210,6 +209,9 @@ function CustomMatchGroupUtil.constructSubmatch(games, match)
 	local allPlayed = Array.all(games, function (game)
 		return game.winner ~= nil or game.status == 'notplayed'
 	end)
+
+	-- can not import this at the top due to loop imports
+	local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 	local winner = allPlayed and MatchGroupInputUtil.getWinner('', nil, opponents) or nil
 	Array.forEach(opponents, function(opponent, opponentIndex)
 		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
