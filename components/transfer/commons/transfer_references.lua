@@ -20,12 +20,14 @@ local WEB_TYPE = 'web source'
 local TOURNAMENT_TYPE = 'tournament source'
 local CONTRACT_TYPE = 'contract database'
 local INSIDE_TYPE = 'inside source'
+local TOURNAMENT_LEAVE_TYPE = 'tournament leave source'
 
 ---@alias RefType
 ---| `WEB_TYPE`
 ---| `TOURNAMENT_TYPE`
 ---| `CONTRACT_TYPE`
 ---| `INSIDE_TYPE`
+---| `TOURNAMENT_LEAVE_TYPE`
 
 ---@class TransferReference
 ---@field refType RefType
@@ -53,7 +55,7 @@ function TransferRef.read(refInput)
 		assert(TransferRef.isValidRefType(refType), 'invalid reference type "' .. refType .. '"')
 
 		local link = Logic.nilIfEmpty(reference.url)
-		if not link and (refType == WEB_TYPE or refType == TOURNAMENT_TYPE) then
+		if not link and (refType == WEB_TYPE or refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE) then
 			return nil
 		end
 
@@ -79,7 +81,8 @@ function TransferRef.isValidRefType(refType)
 	return refType == WEB_TYPE or
 		refType == TOURNAMENT_TYPE or
 		refType == CONTRACT_TYPE or
-		refType == INSIDE_TYPE
+		refType == INSIDE_TYPE or
+		refType == TOURNAMENT_LEAVE_TYPE
 end
 
 ---@param references TransferReference[]
@@ -227,7 +230,7 @@ function TransferRef.createReference(refData, date)
 				name = referenceKey
 			}
 		}
-	elseif refType == TOURNAMENT_TYPE then
+	elseif refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE then
 		return mw.getCurrentFrame():callParserFunction{
 			name = '#tag:ref',
 			args = {
@@ -267,7 +270,7 @@ function TransferRef.createReferenceIconDisplay(reference)
 			iconName = 'reference',
 			color = 'wiki-color-dark',
 		}, link)
-	elseif refType == TOURNAMENT_TYPE then
+	elseif refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE then
 		return Page.makeInternalLink(Abbreviation.make(
 			Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
 			text
@@ -298,6 +301,10 @@ function TransferRef._getTextAndLink(reference, options)
 
 	if refType == TOURNAMENT_TYPE and link then
 		return 'Transfer wasn\'t formally announced, but individual represented team starting with ' ..
+			(linkInsideText and '[[' .. link .. '|this tournament]].' or 'this tournament'),
+			not linkInsideText and link or nil
+	elseif refType == TOURNAMENT_LEAVE_TYPE and link then
+		return 'Transfer wasn\'t formally announced, but individual no longer represented team starting with ' ..
 			(linkInsideText and '[[' .. link .. '|this tournament]].' or 'this tournament'),
 			not linkInsideText and link or nil
 	elseif refType == INSIDE_TYPE then
