@@ -24,10 +24,10 @@ local MatchSummaryFfaGamesSchedule = Class.new(Widget)
 ---@return Widget?
 function MatchSummaryFfaGamesSchedule:render()
 	local scheduleItems = self.props.match.games or {}
-	local showMatch = self:gamesHaveDifferentDates()
-	if showMatch and DateExt.isDefaultTimestamp(self.props.match.date) then
+	local showMatchDate = self:gamesHaveDifferentDates()
+	if showMatchDate and DateExt.isDefaultTimestamp(self.props.match.date) then
 		return nil
-	elseif showMatch then
+	elseif showMatchDate then
 		scheduleItems = {self.props.match}
 	end
 
@@ -40,7 +40,7 @@ function MatchSummaryFfaGamesSchedule:render()
 		items = Array.map(scheduleItems, function (game, idx)
 			return {
 				icon =  CountdownIcon{game = game},
-				title = showMatch and 'Match:' or ('Game ' .. idx .. ':'),
+				title = showMatchDate and 'Match:' or ('Game ' .. idx .. ':'),
 				content = GameCountdown{game = game},
 			}
 		end)
