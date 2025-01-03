@@ -1064,6 +1064,7 @@ end
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
+---@field switchToFfa? fun(match: table, opponents: table[]): boolean
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table?
@@ -1083,6 +1084,7 @@ end
 --- - getBestOf(bestOfInput, maps): integer?
 ---
 --- It may optionally have the following functions:
+--- - switchToFfa(match, opponents): boolean
 --- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
 --- - removeUnsetMaps(maps): table[]
 --- - getExtraData(match, games, opponents): table?
@@ -1116,7 +1118,11 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		return opponent
 	end)
 
-	if FfaParser and #opponents > 2 then
+	local function defaultSwitchToFfa()
+		return #opponents > 2
+	end
+	local switchToFfa = Parser.switchToFfa or defaultSwitchToFfa
+	if FfaParser and switchToFfa(match, opponents) then
 		return MatchGroupInputUtil.standardProcessFfaMatch(matchInput, FfaParser, mapProps)
 	end
 

@@ -23,7 +23,7 @@ local MatchFunctions = {
 }
 local MapFunctions = {}
 
-local FffMatchFunctions = {
+local FfaMatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
 		applyUnderScores = true,
@@ -39,7 +39,7 @@ local CustomMatchGroupInput = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FffMatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
 --- Normal 2-opponent Match
@@ -98,14 +98,14 @@ end
 ---@param opponents table[]
 ---@param scoreSettings table
 ---@return table[]
-function FffMatchFunctions.extractMaps(match, opponents, scoreSettings)
+function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
 	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
 ---@param opponents table[]
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer?
-function FffMatchFunctions.calculateMatchScore(opponents, maps)
+function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 	return function(opponentIndex)
 		return Array.reduce(Array.map(maps, function(map)
 			return map.opponents[opponentIndex].score or 0
@@ -118,7 +118,7 @@ end
 ---@param opponents table[]
 ---@param settings table
 ---@return table
-function FffMatchFunctions.getExtraData(match, games, opponents, settings)
+function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
