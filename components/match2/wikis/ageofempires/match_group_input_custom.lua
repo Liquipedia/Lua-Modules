@@ -20,78 +20,42 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
-local Streams = Lua.import('Module:Links/Stream')
 
 local CustomMatchGroupInput = {}
-local MapFunctions = {
-	BREAK_ON_EMPTY = true,
-}
-
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
 }
 
+local MatchFunctions = {
+	OPPONENT_CONFIG = OPPONENT_CONFIG,
+}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
+
+local FffMatchFunctions = {
+	OPPONENT_CONFIG = OPPONENT_CONFIG,
+}
+local FfaMapFunctions = {}
+
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
+	match.game, match.mapsInfo = MatchFunctions.getGameAndMapsFromTournament(match)
 
-	Table.mergeInto(match, MatchGroupInputUtil.getMatchDate({}, match))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return CustomMatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-	match.links = MatchGroupInputUtil.getLinks(match)
-	match.links.headtohead = CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and CustomMatchGroupInput.calculateMatchScore(games)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-	match.bestof = CustomMatchGroupInput.getBestOf(match.bestof)
-
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
-
-	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = CustomMatchGroupInput._getExtraData(match)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FffMatchFunctions)
 end
+
+--- Normal 2-opponent Match
 
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
 ---@return table?
-function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
+function MatchFunctions.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
@@ -149,13 +113,14 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
+function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestofInput string|integer?
+---@param maps table[]
 ---@return integer?
-function CustomMatchGroupInput.getBestOf(bestofInput)
+function MatchFunctions.getBestOf(bestofInput, maps)
 	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('bestof'))
 
 	if bestof then
@@ -165,9 +130,15 @@ function CustomMatchGroupInput.getBestOf(bestofInput)
 	return bestof
 end
 
+---@param opponents table[]
+---@return string
+function MatchFunctions.getMode(opponents)
+	return Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
+end
+
 ---@param match table
 ---@return string?, table?
-function CustomMatchGroupInput._getMapsAndGame(match)
+function MatchFunctions.getGameAndMapsFromTournament(match)
 	local mapsInfo = Json.parseIfString(Variables.varDefault('tournament_maps'))
 
 	if Logic.isNotEmpty(mapsInfo) and match.game then
@@ -196,15 +167,17 @@ end
 
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
-function CustomMatchGroupInput.calculateMatchScore(maps)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function CustomMatchGroupInput._getExtraData(match)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
@@ -213,7 +186,7 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@return string?
-function CustomMatchGroupInput.getHeadToHeadLink(match, opponents)
+function MatchFunctions.getHeadToHeadLink(match, opponents)
 	if opponents[1].type ~= Opponent.solo or opponents[2].type ~= Opponent.solo then
 		return
 	end
@@ -323,6 +296,50 @@ end
 ---@return string?
 function MapFunctions.getGame(match, map)
 	return Logic.emptyOr(map.game, match.game, Variables.varDefault('tournament_game'))
+end
+
+--- FFA Match
+
+---@param match table
+---@param opponents table[]
+---@param scoreSettings table
+---@return table[]
+function FffMatchFunctions.extractMaps(match, opponents, scoreSettings)
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
+end
+
+---@param opponents table[]
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function FffMatchFunctions.calculateMatchScore(opponents, maps)
+	return function(opponentIndex)
+		return Array.reduce(Array.map(maps, function(map)
+			return map.opponents[opponentIndex].score or 0
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
+	end
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@param settings table
+---@return table
+function FffMatchFunctions.getExtraData(match, games, opponents, settings)
+	return {
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
+	}
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		dateexact = map.dateexact,
+		comment = map.comment,
+	}
 end
 
 return CustomMatchGroupInput

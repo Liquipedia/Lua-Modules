@@ -1064,6 +1064,7 @@ end
 ---@class MatchParserInterface
 ---@field extractMaps fun(match: table, opponents: table[], mapProps: any?): table[]
 ---@field getBestOf fun(bestOfInput: string|integer|nil, maps: table[]): integer?
+---@field switchToFfa? fun(match: table, opponents: table[]): boolean
 ---@field calculateMatchScore? fun(maps: table[], opponents: table[]): fun(opponentIndex: integer): integer?
 ---@field removeUnsetMaps? fun(maps: table[]): table[]
 ---@field getExtraData? fun(match: table, games: table[], opponents: table[]): table?
@@ -1072,6 +1073,8 @@ end
 ---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
+---@field readOpponent? fun(match: table, opponentIndex: integer, opponentConfig: readOpponentOptions?):
+---MGIParsedOpponent
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1083,6 +1086,7 @@ end
 --- - getBestOf(bestOfInput, maps): integer?
 ---
 --- It may optionally have the following functions:
+--- - switchToFfa(match, opponents): boolean
 --- - calculateMatchScore(maps, opponents): fun(opponentIndex): integer?
 --- - removeUnsetMaps(maps): table[]
 --- - getExtraData(match, games, opponents): table?
@@ -1091,6 +1095,7 @@ end
 --- - getHeadToHeadLink(match, opponents): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
+--- - readOpponent(match, opponentIndex, opponentConfig): MGIParsedOpponent
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1108,15 +1113,20 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	local dateProps = MatchGroupInputUtil.getMatchDate(Parser, matchInput)
 	Table.mergeInto(match, dateProps)
 
+	local readOpponent = Parser.readOpponent or MatchGroupInputUtil.readOpponent
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		local opponent = readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
 		if opponent and Parser.adjustOpponent then
 			Parser.adjustOpponent(opponent, opponentIndex)
 		end
 		return opponent
 	end)
 
-	if FfaParser and #opponents > 2 then
+	local function defaultSwitchToFfa()
+		return #opponents > 2
+	end
+	local switchToFfa = Parser.switchToFfa or defaultSwitchToFfa
+	if FfaParser and switchToFfa(match, opponents) then
 		return MatchGroupInputUtil.standardProcessFfaMatch(matchInput, FfaParser, mapProps)
 	end
 
