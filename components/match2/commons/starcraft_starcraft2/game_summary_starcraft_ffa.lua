@@ -45,8 +45,6 @@ function CustomGameSummary.adjustGameStandingsColumns(columns, game)
 	return Array.map(columns, function(column)
 		if column.id == 'totalPoints' and game.extradata.settings.noscore then
 			return
-		elseif column.id == 'placements' or column.id == 'kills' then
-			return
 		end
 
 		return column

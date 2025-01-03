@@ -58,7 +58,10 @@ end
 ---@param numberOfOpponents integer
 ---@return table
 function MatchFunctions.parseSettings(match, numberOfOpponents)
-	return {noscore = Logic.readBool(match.noscore)}
+	return {
+		noscore = Logic.readBool(match.noscore),
+		showgamedetails = false,
+	}
 end
 
 ---@param opponent table
