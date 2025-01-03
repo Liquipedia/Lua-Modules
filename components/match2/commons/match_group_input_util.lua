@@ -1073,6 +1073,8 @@ end
 ---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
+---@field readOpponent? fun(match: table, opponentIndex: integer, opponentConfig: readOpponentOptions?):
+---MGIParsedOpponent
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1093,6 +1095,7 @@ end
 --- - getHeadToHeadLink(match, opponents): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
+--- - readOpponent(match, opponentIndex, opponentConfig): MGIParsedOpponent
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1110,8 +1113,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	local dateProps = MatchGroupInputUtil.getMatchDate(Parser, matchInput)
 	Table.mergeInto(match, dateProps)
 
+	local readOpponent = Parser.readOpponent or MatchGroupInputUtil.readOpponent
 	local opponents = Array.mapIndexes(function(opponentIndex)
-		local opponent = MatchGroupInputUtil.readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
+		local opponent = readOpponent(match, opponentIndex, Parser.OPPONENT_CONFIG)
 		if opponent and Parser.adjustOpponent then
 			Parser.adjustOpponent(opponent, opponentIndex)
 		end
