@@ -291,6 +291,8 @@ local lpdb = {}
 ---@field match2gameid integer
 ---@field subgroup integer
 ---@field winner integer
+---@field opponents table[]
+---@field status string
 ---@field mode string
 ---@field type string
 ---@field game string

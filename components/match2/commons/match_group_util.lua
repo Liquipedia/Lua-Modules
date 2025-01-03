@@ -604,19 +604,19 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 	}
 end
 
----@param matchRecord table
----@param record table
+---@param matchRecord match2
+---@param record match2opponent
 ---@param opponentIndex integer
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
-	local score = tonumber(record.score)
+	local score = record.score
 	local status = record.status
 	local bestof = tonumber(matchRecord.bestof)
 	local game1 = (matchRecord.match2games or {})[1]
 	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
-		local mapOpponent = (game1.opponnets or {})[opponentIndex] or {}
+		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
 		score = mapOpponent.score
 		status = mapOpponent.status
 	end
@@ -629,7 +629,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		name = nilIfEmpty(record.name),
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
-		score = score,
+		score = tonumber(score),
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
