@@ -23,11 +23,11 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Td = HtmlWidgets.Td
-local Th = HtmlWidgets.Th
-local Tr = HtmlWidgets.Tr
+local Widgets = Lua.import('Module:Widget/All')
+local Td = Widgets.Td
+local Th = Widgets.Th
+local Tr = Widgets.Tr
+local DataTable = Widgets.DataTable
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -44,7 +44,7 @@ local CountryRepresentation = Class.new(function(self, args) self:init(args) end
 ---@field staff boolean
 
 ---@param frame Frame
----@return WidgetHtml
+---@return Widget
 function CountryRepresentation.run(frame)
 	local args = Arguments.getArgs(frame)
 	return CountryRepresentation(args):fetchAndProcess():create()
@@ -132,7 +132,7 @@ function CountryRepresentation:fetchAndProcess()
 	return self
 end
 
----@return WidgetHtml
+---@return Widget
 function CountryRepresentation:create()
 	local cache = {rank = 0, counter = 0, lastCount = 0}
 	local rows = {}
@@ -163,14 +163,9 @@ function CountryRepresentation:create()
 		}
 	}
 
-	return Div{
-		classes = {'table-responsive'},
-		children = {
-			HtmlWidgets.Table{
-				classes = {'sortable wikitable'},
-				children = WidgetUtil.collect(headerRow, rows),
-			},
-		},
+	return DataTable{
+		classes = {'sortable'},
+		children = WidgetUtil.collect(headerRow, rows),
 	}
 end
 
