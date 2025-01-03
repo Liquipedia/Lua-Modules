@@ -264,7 +264,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 			}
 		end
 	)
-
 end
 
 ---@param map table
@@ -329,6 +328,31 @@ function FffMatchFunctions.getExtraData(match, games, opponents, settings)
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
 	}
+end
+
+---@param map table
+---@param opponent table
+---@param opponentMapInput table
+---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
+function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput)
+	local players = Array.map(opponent.match2players, Operator.property('name'))
+	local factions = Array.parseCommaSeparatedString(opponentMapInput['civs'])
+
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = players[playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData, playerInputData)
+			local faction = Logic.emptyOr(factions[playerIndex], Faction.defaultFaction)
+			faction = Faction.read(faction, {game = Game.abbreviation{game = map.game}:lower()})
+			return {
+				faction = faction,
+			}
+		end
+	)
 end
 
 ---@param match table

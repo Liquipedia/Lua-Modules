@@ -1398,6 +1398,7 @@ end
 ---
 --- The Parser injection may optionally have the following functions:
 --- - getExtraData(match, map, opponents): table?
+--- - getPlayersOfMapOpponent(map, opponent, opponentMapInput): table[]?
 ---
 ---@param match table
 ---@param opponents table[]
@@ -1416,7 +1417,11 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 
 		map.opponents = Array.map(opponents, function(matchOpponent)
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
-			return MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
+			local opponent = MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
+			if Parser.getPlayersOfMapOpponent then
+				opponent.players = Parser.getPlayersOfMapOpponent(map, matchOpponent, opponentMapInput)
+			end
+			return opponent
 		end)
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
