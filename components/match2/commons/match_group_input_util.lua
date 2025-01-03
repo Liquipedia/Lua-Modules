@@ -1167,7 +1167,7 @@ end
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
----@field getMapName? fun(game: table, mapIndex: integer, match: table): string?
+---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
 ---@field getPatch? fun(game: table): string?
@@ -1175,6 +1175,7 @@ end
 ---@field extendMapOpponent? fun(map: table, opponentIndex: integer): table
 ---@field getMapBestOf? fun(map: table): integer?
 ---@field computeOpponentScore? fun(props: table, autoScore?: fun(opponentIndex: integer):integer?): integer?, string?
+---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
 
@@ -1183,7 +1184,7 @@ end
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
---- - getMapName(map): string?
+--- - getMapName(map, mapIndex, match): string?, string?
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
 --- - getPatch(game): string?
@@ -1191,6 +1192,7 @@ end
 --- - extendMapOpponent(map, opponentIndex): table
 --- - getMapBestOf(map): integer?
 --- - computeOpponentScore(props, autoScore): integer?, string?
+--- - getGame(match, map): string?
 ---
 --- Additionally, the Parser may have the following properties:
 --- - ADD_SUB_GROUP boolean?
@@ -1218,21 +1220,19 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 
 		if Parser.getMapName then
-			map.map = Parser.getMapName(map, mapIndex, match)
+			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
 		end
 
 		if Parser.getMapBestOf then
 			map.bestof = Parser.getMapBestOf(map)
 		end
 
-		if Parser.mapIsFinished then
-			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
-		else
-			map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		end
-
 		if Parser.getPatch then
 			map.patch = Parser.getPatch(map)
+		end
+
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
@@ -1254,6 +1254,12 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			return Table.merge(Parser.extendMapOpponent(map, opponentIndex), mapOpponent)
 		end)
 
+		if Parser.mapIsFinished then
+			map.finished = Parser.mapIsFinished(map, opponents, finishedInput, winnerInput)
+		else
+			map.finished = MatchGroupInputUtil.mapIsFinished(map, map.opponents)
+		end
+
 		-- needs map.opponents available!
 		if Parser.getMapMode then
 			map.mode = Parser.getMapMode(match, map, opponents)
@@ -1265,7 +1271,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		map.extradata = Table.merge(
+			{displayname = map.mapDisplayName},
+			Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		)
 
 		table.insert(maps, map)
 		match[key] = nil

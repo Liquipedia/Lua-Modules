@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=underlords
+-- wiki=commons
 -- page=Module:GameSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,19 +15,17 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 
----@class UnderlordsMatchGroupUtilGame: MatchGroupUtilGame
----@field stream table
-
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
 ---@return Html
 function CustomGameSummary.getGameByMatchId(props)
-	---@class ApexMatchGroupUtilMatch
+	---@class FFAMatchGroupUtilMatch
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 
 	local game = match.games[props.gameIdx]
 	assert(game, 'Error Game ID ' .. tostring(props.gameIdx) .. ' not found')
 
 	game.stream = match.stream
+	game.extradata.settings = match.extradata.settings
 
 	SummaryHelper.updateGameOpponents(game, match.opponents)
 	local scoringData = SummaryHelper.createScoringData(match)

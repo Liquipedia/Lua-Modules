@@ -32,6 +32,7 @@ local MatchMapsLegacy = {}
 
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
+---@return string
 function MatchMapsLegacy.convertMap(frame)
 	local args = Arguments.getArgs(frame)
 	args.map = Table.extract(args, 'battleground') or UNKNOWN_MAP

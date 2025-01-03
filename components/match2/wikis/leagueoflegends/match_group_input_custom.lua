@@ -182,7 +182,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
 		function (playerIndex)
@@ -195,10 +195,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			return participant
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param winnerInput string|integer|nil

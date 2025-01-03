@@ -13,6 +13,7 @@ local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -55,13 +56,15 @@ function CustomMatchSummary._createGame(date, game, gameIndex)
 		MatchSummary.buildCharacterList(extradata, 'team2champion', NUM_CHAMPIONS_PICK),
 	}
 
-	if Logic.isEmpty(game.scores) and Logic.isEmpty(game.winner) and Logic.isDeepEmpty(characterData) then
+	local scores = Array.map(game.opponents, Operator.property('score'))
+
+	if Logic.isEmpty(scores) and Logic.isEmpty(game.winner) and Logic.isDeepEmpty(characterData) then
 		return nil
 	end
 
 	local score
-	if Logic.isNotEmpty(game.scores) then
-		score = table.concat(game.scores, '-')
+	if Logic.isNotEmpty(scores) then
+		score = table.concat(scores, '-')
 	end
 
 	return MatchSummaryWidgets.Row{

@@ -95,7 +95,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		class = 'cell--team',
 		icon = 'team',
 		header = {
-			value = 'Team',
+			value = 'Participant',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -304,6 +304,9 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		show = function(game)
+			return (game.extradata.settings or {}).showGameDetails
+		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -323,6 +326,9 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		show = function(game)
+			return (game.extradata.settings or {}).showGameDetails
+		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',

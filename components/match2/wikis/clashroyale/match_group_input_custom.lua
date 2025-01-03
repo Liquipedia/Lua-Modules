@@ -93,7 +93,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 
@@ -179,16 +179,17 @@ end
 ---@return table
 function MapFunctions.getCardsExtradata(mapOpponents)
 	local extradata = {}
-	for opponentIndex, opponent in ipairs(mapOpponents) do
-		for playerIndex, player in pairs(opponent.players or {}) do
+	Array.forEach(mapOpponents, function(opponent, opponentIndex)
+		Array.forEach(Array.filter(opponent.players or {}, Logic.isNotEmpty), function(player, playerIndex)
 			local prefix = 't' .. opponentIndex .. 'p' .. playerIndex
 			extradata[prefix .. 'tower'] = player.cards.tower
 			-- participant.cards is an array plus the tower value ....
-			for cardIndex, card in ipairs(player.cards) do
+			Array.forEach(player.cards, function(card, cardIndex)
 				extradata[prefix .. 'c' .. cardIndex] = card
-			end
-		end
-	end
+			end)
+		end)
+	end)
+
 	return extradata
 end
 
