@@ -279,6 +279,7 @@ local GAME_STANDINGS_COLUMNS = {
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
+					showPlayerFaction = true,
 				}
 			end,
 		},
