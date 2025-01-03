@@ -272,6 +272,13 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	extradata = 'table?',
 })
 
+
+---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games FFAMatchGroupUtilGame[]
+
+---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
+---@field stream table
+
 ---@class standardTeamProps
 ---@field bracketName string
 ---@field displayName string
