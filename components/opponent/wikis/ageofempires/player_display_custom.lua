@@ -24,10 +24,12 @@ local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class AoEBlockPlayerProps: BlockPlayerProps
 ---@field player AoEStandardPlayer
+---@field game string?
 ---@field showFaction boolean?
 
 ---@class AoEInlinePlayerProps: InlinePlayerProps
 ---@field player AoEStandardPlayer
+---@field game string?
 ---@field showFaction boolean?
 
 ---@class AoEPlayerDisplay: PlayerDisplay
@@ -63,7 +65,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	local factionNode
 	if props.showFaction ~= false and player.faction ~= Faction.defaultFaction then
 		factionNode = mw.html.create('span'):addClass('race')
-			:wikitext(CustomPlayerDisplay.Faction(player.faction))
+			:wikitext(CustomPlayerDisplay.Faction(player.faction, props.game))
 	end
 
 	local teamNode
@@ -118,8 +120,8 @@ function CustomPlayerDisplay.InlinePlayer(props)
 		:wikitext(text)
 end
 
-function CustomPlayerDisplay.Faction(faction)
-	return Faction.Icon{size = 'small', showLink = false, faction = faction}
+function CustomPlayerDisplay.Faction(faction, game)
+	return Faction.Icon{size = 'small', showLink = false, faction = faction, game = game}
 end
 
 return CustomPlayerDisplay

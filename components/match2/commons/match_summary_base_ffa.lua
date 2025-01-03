@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -275,11 +276,12 @@ local GAME_STANDINGS_COLUMNS = {
 			value = function (opponent, idx)
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
+					game = opponent.game,
 					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
-					showPlayerFaction = true,
+					showFaction = true,
 				}
 			end,
 		},
@@ -583,18 +585,21 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 	end)
 end
 
+---@param match table
 ---@param game table
----@param matchOpponents table[]
-function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
+function MatchSummaryFfa.updateGameOpponents(match, game)
 	-- Add match opponent data to game opponent
 	game.opponents = Array.map(game.opponents,
 		function(gameOpponent, opponentIdx)
-			local matchOpponent = matchOpponents[opponentIdx]
-			local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
+			local matchOpponent = match.opponents[opponentIdx]
+			local newGameOpponent = Table.deepMerge(matchOpponent, gameOpponent)
 			-- These values are only allowed to come from Game and not Match
 			newGameOpponent.placement = gameOpponent.placement
 			newGameOpponent.score = gameOpponent.score
 			newGameOpponent.status = gameOpponent.status
+
+			-- Other fields
+			newGameOpponent.game = Game.abbreviation{game = match.game}:lower()
 			return newGameOpponent
 		end
 	)

@@ -1419,7 +1419,7 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
 			local opponent = MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
 			if Parser.getPlayersOfMapOpponent then
-				opponent.players = Parser.getPlayersOfMapOpponent(map, opponent, opponentMapInput)
+				opponent.players = Parser.getPlayersOfMapOpponent(map, matchOpponent, opponentMapInput)
 			end
 			return opponent
 		end)

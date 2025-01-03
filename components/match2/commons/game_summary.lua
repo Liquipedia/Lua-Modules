@@ -27,7 +27,7 @@ function CustomGameSummary.getGameByMatchId(props)
 	game.stream = match.stream
 	game.extradata.settings = match.extradata.settings
 
-	SummaryHelper.updateGameOpponents(game, match.opponents)
+	SummaryHelper.updateGameOpponents(match, game)
 	local scoringData = SummaryHelper.createScoringData(match)
 
 	return MatchSummaryWidgets.Tab{
