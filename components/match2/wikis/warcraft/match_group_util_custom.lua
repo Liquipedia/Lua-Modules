@@ -56,8 +56,6 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
 ---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games WarcraftMatchGroupUtilGame[]
----@field isFfa boolean
----@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
 ---@field opponents WarcraftStandardOpponent[]
 ---@field vetoes WarcraftMatchGroupUtilVeto[]
@@ -102,7 +100,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.casters = Table.extract(extradata, 'casters')
 
 	return match
