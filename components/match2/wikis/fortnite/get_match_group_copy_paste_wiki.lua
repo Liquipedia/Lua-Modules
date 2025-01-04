@@ -9,19 +9,19 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
+
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
-
----WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class FortniteMatchCopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
 
----returns the Code for a Match, depending on the input
+--returns the Code for a Match, depending on the input
 ---@param bestof integer
 ---@param mode string
 ---@param index integer
@@ -29,6 +29,47 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	if opponents > 2 then
+		return WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	else
+		return WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
+	end
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
+	local showScore = bestof == 0
+
+	local lines = Array.extend(
+		'{{Match',
+		showScore and (INDENT .. '|finished=') or nil,
+		{INDENT .. '|date='},
+		{INDENT .. '|twitch=|youtube='},
+		{INDENT .. '|vod='},
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
+		end),
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=}}'
+		end),
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 	local defaultScoring = '|p1= |p2= |p3= |p4= |p5= |p6= |p7= |p8= |p9= |p10= |p11= |p12= |p13= |p14= |p15= |p_kill=4'
 	if mode == Opponent.duo then
 		defaultScoring = '|p1=65|p2=56|p3=52|p4=48|p5=44|p6=40|p7=38|p8=36|p9=34|p10=32|p11=30|p12=28|p13=26|p14=24' ..
@@ -46,7 +87,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|map=|vod=}}'
 		end),
 		Array.map(Array.range(1, opponents), function(opponentIndex)
-			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode, bestof)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getFfaOpponent(mode, bestof)
 		end),
 		'}}'
 	)
@@ -54,11 +95,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
 ---@param mode string
 ---@param mapCount integer
 ---@return string
-function WikiCopyPaste._getOpponent(mode, mapCount)
+function WikiCopyPaste._getFfaOpponent(mode, mapCount)
 	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
 		return '|m' .. idx .. '={{MS||}}'
 	end))
