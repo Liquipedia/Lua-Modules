@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
@@ -55,7 +54,7 @@ function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|winner=}}'
+			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=}}'
 		end),
 		'}}'
 	)
