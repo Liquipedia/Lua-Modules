@@ -96,5 +96,6 @@ return {
 			short = 'Nation',
 			link = 'National Tournaments',
 			category = 'National Tournaments',
+		},
 	},
 }
