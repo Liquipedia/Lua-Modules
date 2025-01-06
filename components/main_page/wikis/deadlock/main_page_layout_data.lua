@@ -77,7 +77,7 @@ return {
 		darkmode = 'Deadlock full logo darkmode.svg',
 	},
 	metadesc = 'Comprehensive Deadlock wiki with articles covering everything from heroes and items, to strategies, to tournaments, to competitive players, and teams.',
-	title = 'Deadlock Wiki | Liquipedia',
+	title = 'The Deadlock Wiki',
 	navigation = {
 		{
 			file = 'Deadlock gameasset Patches allmode.png',
