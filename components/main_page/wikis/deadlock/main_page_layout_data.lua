@@ -66,6 +66,7 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = '{{NewDeadlockMainPage tournaments}}',
+		padding = true,
 		boxid = 1508,
 	},
 }
