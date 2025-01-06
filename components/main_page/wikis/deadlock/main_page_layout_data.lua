@@ -66,7 +66,6 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = '{{NewDeadlockMainPage tournaments}}',
-			'completedDays=30|filterByTierTypes=true|useExternalFilters=true}}',
 		boxid = 1508,
 	},
 }
