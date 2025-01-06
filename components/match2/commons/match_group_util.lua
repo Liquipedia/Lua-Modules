@@ -610,12 +610,13 @@ end
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-
 	local score = record.score
 	local status = record.status
 	local bestof = tonumber(matchRecord.bestof)
 	local game1 = (matchRecord.match2games or {})[1]
-	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
+	local hasOnlyScores = Array.all(matchRecord.match2opponents, function(opponent)
+			return opponent.status == 'S' end)
+	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
 		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
 		score = mapOpponent.score
 		status = mapOpponent.status
