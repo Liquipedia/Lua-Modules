@@ -28,7 +28,7 @@ local INDENT = WikiCopyPaste.Indent
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	if Logic.realBool(args.bigMatch) then
 		return '{{Match}}'
-	end 
+	end
 
 	local showScore = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0)
 	local bans = Logic.readBool(args.bans)
