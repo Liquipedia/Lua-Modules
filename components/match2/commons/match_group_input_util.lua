@@ -1548,7 +1548,7 @@ function MatchGroupInputUtil.parseSettings(match, opponentCount)
 	}
 end
 
----@param scoreDataInput table?
+---@param scoreDataInput {[1]: string?, [2]: string?, p: string?}?
 ---@param placementsInfo {killPoints: number, placement: integer, placementPoints: number}[]
 ---@return table
 function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, placementsInfo)
@@ -1559,6 +1559,13 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 	local scoreBreakdown = {}
 
 	local placement, kills = tonumber(scoreDataInput[1]), tonumber(scoreDataInput[2])
+	local placementEnd = placement
+	-- If the placement input is a range (`start-end`, eg. `5-7`), let's fetch both
+	if not placement and scoreDataInput[1] and scoreDataInput[1]:match('%d+%-%d+') then
+		placement, placementEnd = unpack(Array.map(Array.parseCommaSeparatedString(scoreDataInput[1], '-'), function(place)
+			return tonumber(place)
+		end))
+	end
 	local manualPoints = tonumber(scoreDataInput.p)
 	if placement or kills then
 		local minimumKillPoints = Array.reduce(
@@ -1566,10 +1573,21 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 			math.min,
 			math.huge
 		)
-		local placementInfo = placementsInfo[placement] or {}
-		scoreBreakdown.placePoints = placementInfo.placementPoints or 0
+		-- In case there's a placement range (eg. 5-7), the placement points are calculated as the average of all 3
+		local placementPoints = 0
+		if placement and placementEnd then
+			placementPoints = Array.reduce(Array.range(placement, placementEnd), function (aggregate, place)
+				local placementInfo = placementsInfo[place] or {}
+				return aggregate + (placementInfo.placementPoints or 0)
+			end) / (placementEnd - placement + 1)
+		end
+
+		scoreBreakdown.placePoints = placementPoints
 		scoreBreakdown.kills = kills
 
+		-- For kill we points, we assume the kill multipler of the highest placement, based on stakeholder suggestion
+		-- Likely never to occur, not aware of any tournament format that has this
+		local placementInfo = placementsInfo[placement] or {}
 		local pointsPerKill = placementInfo.killPoints or minimumKillPoints
 		if kills and pointsPerKill ~= math.huge then
 			scoreBreakdown.killPoints = scoreBreakdown.kills * pointsPerKill
