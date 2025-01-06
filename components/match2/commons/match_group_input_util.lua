@@ -821,10 +821,10 @@ end
 ---@param opponents {score: integer?}[]
 ---@return boolean
 function MatchGroupInputUtil.matchIsFinished(match, opponents)
-	if MatchGroupInputUtil.isPostponed(match.winner, match.finished) then
-		return false
-	elseif MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
+	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
 		return true
+	elseif MatchGroupInputUtil.isPostponed(match.winner, match.finished) then
+		return false
 	end
 
 	local finished = Logic.readBoolOrNil(match.finished)
