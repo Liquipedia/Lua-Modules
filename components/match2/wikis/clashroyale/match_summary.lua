@@ -136,7 +136,7 @@ function CustomMatchSummary._calculateSubMatchWinner(subMatch)
 
 	local subMatchIsFinished = Array.all(subMatch.games, function(game)
 		return Logic.isNotEmpty(game.winner)
-			or game.resulttype == 'np'
+			or game.status == 'notplayed'
 
 	end)
 	if not subMatchIsFinished then return end
