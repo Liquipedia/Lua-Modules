@@ -65,7 +65,7 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|upcomingDays=120|' ..
+		body = '{{NewDeadlockMainPage tournaments}}',
 			'completedDays=30|filterByTierTypes=true|useExternalFilters=true}}',
 		boxid = 1508,
 	},
