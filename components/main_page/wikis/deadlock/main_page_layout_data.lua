@@ -49,6 +49,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1511,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -64,7 +65,7 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|upcomingDays=120|' ..
+		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|upcomingDays=90|' ..
 			'completedDays=30|filterByTierTypes=true|useExternalFilters=true}}',
 		padding = true,
 		boxid = 1508,
@@ -72,73 +73,160 @@ local CONTENT = {
 }
 
 return {
-	main = {
-		{ -- Left
-			size = 6,
-			children = {
-				{
-					mobileOrder = 1,
-					content = CONTENT.aboutEsport,
-				},
-				{
-					mobileOrder = 2,
-					content = CONTENT.specialEvents,
-				},
-				{
-					mobileOrder = 4,
-					content = CONTENT.transfers,
-				},
-				{
-					mobileOrder = 7,
-					content = CONTENT.wantToHelp,
-				},
-			}
+	banner = {
+		lightmode = 'Deadlock full logo lightmode.svg',
+		darkmode = 'Deadlock full logo darkmode.svg',
+	},
+	metadesc = 'Comprehensive Deadlock wiki with articles covering everything from heroes and items, to strategies, to tournaments, to competitive players, and teams.',
+	title = 'The Deadlock Wiki',
+	navigation = {
+		{
+			file = 'Deadlock gameasset Patches allmode.png',
+			title = 'Patches',
+			link = 'Portal:Patches',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::patch]]',
+			},
 		},
-		{ -- Right
-			size = 6,
-			children = {
-				{
-					mobileOrder = 3,
-					children = {
-						{
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.filterButtons,
+		{
+			file = 'Deadlock gameasset Art Hero Seven allmode.png',
+			title = 'Heroes',
+			link = 'Portal:Heroes',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::character]]',
+			},
+		},
+		{
+			file = 'Deadlock gameasset The Curiosity Shop allmode.png',
+			title = 'Items',
+			link = 'Portal:Items',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::item]]',
+			},
+		},
+		{
+			file = 'Deadlock gameasset Mechanics allmode.png',
+			title = 'Mechanics',
+			link = 'Mechanics',
+			count = {
+				method = 'CATEGORY',
+				category = 'Mechanics',
+			},
+		},
+		{
+			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
+			},
+		},
+		{
+			file = 'Team_Spirit_win_The_International_2023.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = 'Aurora Sunset at the ALGS London Split 2 Playoffs 2023.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Hardecki at the ALGS Stockholm Playoffs.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+	},
+	layouts = {
+		main = {
+			{ -- Left
+				size = 6,
+				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 4,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 8,
+						content = CONTENT.wantToHelp,
+					},
+				}
+			},
+			{ -- Right
+				size = 6,
+				children = {
+					{
+						mobileOrder = 2,
+						children = {
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.filterButtons,
+									},
 								},
 							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.matches,
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.matches,
+									},
 								},
 							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.tournaments,
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.tournaments,
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					mobileOrder = 4,
-					content = CONTENT.thisDay,
-				},
-				{
-					mobileOrder = 5,
-					content = CONTENT.updates,
-				},
-				{
-					mobileOrder = 6,
-					content = CONTENT.usefulArticles,
+					
+					{
+						mobileOrder = 6,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 5,
+						content = CONTENT.updates,
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.usefulArticles,
+					},
 				},
 			},
 		},
