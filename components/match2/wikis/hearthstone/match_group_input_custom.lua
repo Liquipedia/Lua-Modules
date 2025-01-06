@@ -11,6 +11,7 @@ local CharacterStandardization = mw.loadData('Module:CharacterStandardization')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -18,11 +19,13 @@ local Opponent = OpponentLibraries.Opponent
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
-local MapFunctions = {}
 MatchFunctions.OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
 	pagifyPlayerNames = true,
+}
+local MapFunctions = {
+	ADD_SUB_GROUP = true,
 }
 
 ---@param match table
@@ -51,6 +54,14 @@ end
 ---@return integer?
 function MatchFunctions.getBestOf(bestofInput)
 	return tonumber(bestofInput)
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents)
+	return Table.filterByKey(match, function(key) return key:match('subgroup%d+header') end)
 end
 
 ---@param match table
