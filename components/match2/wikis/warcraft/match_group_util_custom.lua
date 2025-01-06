@@ -176,7 +176,7 @@ end
 function CustomMatchGroupUtil.constructSubmatch(games, match)
 	local firstGame = games[1]
 	local opponents = Table.deepCopy(firstGame.opponents)
-	local isSubmatch = String.startsWith(firstGame.map, 'Submatch')
+	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
 	if isSubmatch then
 		games = {firstGame}
 	end
