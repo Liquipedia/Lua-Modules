@@ -1579,7 +1579,7 @@ function MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(scoreDataInput, 
 			placementPoints = Array.reduce(Array.range(placement, placementEnd), function (aggregate, place)
 				local placementInfo = placementsInfo[place] or {}
 				return aggregate + (placementInfo.placementPoints or 0)
-			end) / (placementEnd - placement + 1)
+			end, 0) / (placementEnd - placement + 1)
 		end
 
 		scoreBreakdown.placePoints = placementPoints

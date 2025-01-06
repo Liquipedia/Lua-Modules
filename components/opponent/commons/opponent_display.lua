@@ -471,8 +471,10 @@ function OpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
 		if opponent.score == 0 and Opponent.isTbd(opponent) then
 			return ''
+		elseif opponent.score == -1 then
+			return ''
 		else
-			return opponent.score ~= -1 and tostring(opponent.score) or ''
+			return string.format('%.2f', opponent.score)
 		end
 	else
 		return opponent.status or ''
