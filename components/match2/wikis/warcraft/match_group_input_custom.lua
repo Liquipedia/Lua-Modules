@@ -65,8 +65,6 @@ local FfaMapFunctions = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	match.bestof = tonumber(match.bestof)
-
 	match.patch = PatchAuto.retrieve{date = match.date}
 
 	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament')))
