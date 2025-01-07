@@ -65,11 +65,7 @@ local FfaMapFunctions = {}
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	if Logic.readBool(match.ffa) then
-		match.bestof = tonumber(match.bestof)
-
-		return MatchGroupInputUtil.standardProcessFfaMatch(match, FfaMatchFunctions)
-	end
+	match.bestof = tonumber(match.bestof)
 
 	match.patch = PatchAuto.retrieve{date = match.date}
 
@@ -78,7 +74,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		match.finished = match.finished or 'skip'
 	end
 
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
 ---@param matchArgs table
