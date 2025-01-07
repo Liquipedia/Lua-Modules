@@ -53,23 +53,27 @@ function CustomGameSummary.adjustGameStandingsColumns(columns, game)
 		return column
 	end)
 
+	---@param opponent table
+	---@return boolean
+	local opponnetHasPlayerWithHeroes = function(opponent)
+		return Array.any(opponent.players, function(player)
+			return Logic.isNotDeepEmpty(player.heroes)
+		end)
+	end
+
 	return Array.append(customizedColumns, {
 		id = 'heroes',
 		sortable = false,
 		class = 'cell--team',
 		show = function(currentGame)
-			return Array.any(currentGame.opponents, function(opponent)
-				return Array.any(opponent.players, function(player)
-					return Logic.isNotDeepEmpty(player.heroes)
-				end)
-			end)
+			return Array.any(currentGame.opponents, opponnetHasPlayerWithHeroes)
 		end,
 		header = {
 			value = 'Heroes',
 		},
 		row = {
 			value = function (opponent, opponentIndex)
-				return CustomMatchSummary.DisplayHeroes(opponent, {})
+				return CustomMatchSummary.DisplayHeroes(opponent, {hasHeroes = opponnetHasPlayerWithHeroes(opponent)})
 			end,
 		},
 	})
