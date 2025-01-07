@@ -54,7 +54,7 @@ end
 ---@return self
 function CountryRepresentation:init(args)
 	self.config = {
-		showNoCountry = Logic.nilOr(Logic.readBoolOrNil(args.noCountry), args.noCountry ~= 'hide'), --- todo: bot to bool ...
+		showNoCountry = Logic.nilOr(Logic.readBoolOrNil(args.noCountry), true),
 		staff = args.staff == 'show' or Logic.readBool(args.staff), --- todo: bot to bool ...
 		tournaments = Array.map(Array.extractValues(Table.filterByKey(args, function(key)
 			return key:sub(1, #'tournament') == 'tournament'
