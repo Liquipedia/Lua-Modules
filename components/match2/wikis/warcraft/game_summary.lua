@@ -9,11 +9,14 @@
 local CustomGameSummary = {}
 
 local Array = require('Module:Array')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
+local CustomMatchSummary = Lua.import('Module:MatchSummary')
 local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
+
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 
 ---@param props {bracketId: string, matchId: string, gameIdx: integer}
@@ -42,13 +45,34 @@ end
 ---@param game table
 ---@return table[]
 function CustomGameSummary.adjustGameStandingsColumns(columns, game)
-	return Array.map(columns, function(column)
+	local customizedColumns = Array.map(columns, function(column)
 		if column.id == 'totalPoints' and game.extradata.settings.noscore then
 			return
 		end
 
 		return column
 	end)
+
+	return Array.append(customizedColumns, {
+		id = 'heroes',
+		sortable = false,
+		class = 'cell--team',
+		show = function(currentGame)
+			return Array.any(currentGame.opponents, function(opponent)
+				return Array.any(opponent.players, function(player)
+					return Logic.isNotDeepEmpty(player.heroes)
+				end)
+			end)
+		end,
+		header = {
+			value = 'Heroes',
+		},
+		row = {
+			value = function (opponent, opponentIndex)
+				return CustomMatchSummary.DisplayHeroes(opponent, {})
+			end,
+		},
+	})
 end
 
 return CustomGameSummary
