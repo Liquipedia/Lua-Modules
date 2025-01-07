@@ -77,7 +77,8 @@ return {
 		lightmode = 'Deadlock full logo lightmode.svg',
 		darkmode = 'Deadlock full logo darkmode.svg',
 	},
-	metadesc = 'Comprehensive Deadlock wiki with articles covering everything from heroes and items, to strategies, to tournaments, to competitive players, and teams.',
+	metadesc = 'Comprehensive Deadlock wiki with articles covering everything from heroes and items, to strategies, ' .. 
+	'to tournaments, to competitive players, and teams.',
 	title = 'The Deadlock Wiki',
 	navigation = {
 		{
