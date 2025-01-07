@@ -544,7 +544,7 @@ function FfaMatchFunctions.extractMaps(match, opponents)
 		local map = FfaMapFunctions.readMap(mapInput, #opponents, hasScores)
 
 		Array.forEach(map.opponents, function(opponent, opponentIndex)
-			opponent.players = MapFunctions.getPlayersOfMapOpponent(map, opponents[opponentIndex], opponentIndex)
+			opponent.players = MapFunctions.getPlayersOfMapOpponent(mapInput, opponents[opponentIndex], opponentIndex)
 		end)
 
 		map.mode = MapFunctions.getMapMode(match, map, opponents)
