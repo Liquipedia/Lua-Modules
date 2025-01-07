@@ -444,7 +444,7 @@ end
 ---@return table
 function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
 	return {
-		noscore = Logic.readBool(match.noscore),
+		noscore = not Logic.readBool(match.hasscore),
 		showgamedetails = false,
 	}
 end
@@ -455,7 +455,7 @@ end
 function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
 	MatchFunctions.adjustOpponent(opponent, opponentIndex)
 	-- set score to 0 for all opponents if it is a match without scores
-	if Logic.readBool(match.noscore) then
+	if not Logic.readBool(match.hasscore) then
 		opponent.score = 0
 	end
 end
@@ -538,7 +538,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function FfaMatchFunctions.extractMaps(match, opponents)
-	local hasScores = not Logic.readBool(match.noscore)
+	local hasScores = Logic.readBool(match.hasscore)
 	local maps = {}
 	for mapKey, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = FfaMapFunctions.readMap(mapInput, #opponents, hasScores)
