@@ -27,7 +27,8 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|limit=15}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
+		body = '{{Transfer List|limit=15}}\n' ..
+		'<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
 			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|action=edit}} edit]&#93;</div>\n' ..
