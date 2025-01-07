@@ -57,6 +57,7 @@ local FfaMatchFunctions = {
 		pagifyTeamNames = true,
 	},
 	readDate = MatchFunctions.readDate,
+	DEFAULT_MODE = MODE_FFA,
 }
 local FfaMapFunctions = {}
 
@@ -65,7 +66,9 @@ local FfaMapFunctions = {}
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
 	if Logic.readBool(match.ffa) then
-		return CustomMatchGroupInput.processFFAMatch(match, options)
+		match.bestof = tonumber(match.bestof)
+
+		return MatchGroupInputUtil.standardProcessFfaMatch(match, FfaMatchFunctions)
 	end
 
 	match.patch = PatchAuto.retrieve{date = match.date}
@@ -431,9 +434,6 @@ end
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processFFAMatch(matchInput, options)
-	matchInput.bestof = tonumber(matchInput.firstto) or tonumber(matchInput.bestof)
-
-	local match = MatchGroupInputUtil.standardProcessFfaMatch(matchInput, FfaMatchFunctions)
 
 	return match
 end
@@ -475,12 +475,6 @@ function FfaMatchFunctions.calculateMatchScore(opponents, games)
 	end
 end
 
----@param opponents table[]
----@return string
-function FfaMatchFunctions.getMode(opponents)
-	return MODE_FFA
-end
-
 ---@param match table
 ---@param opponents {score: integer?}[]
 ---@return boolean
@@ -511,7 +505,7 @@ end
 ---@param opponents table[]
 ---@return boolean
 function FfaMatchFunctions.placementHasBeenSet(opponents)
-	return Array.any(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
+	return Array.all(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
 end
 
 ---@param match table
@@ -520,18 +514,11 @@ end
 ---@param settings table
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
-	local extradata = {
+	return {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
-		showplacement = Logic.readBoolOrNil(match.showplacement),
 		settings = settings,
 	}
-
-	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
-		MatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
-	end
-
-	return extradata
 end
 
 ---@param match table

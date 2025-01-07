@@ -6,7 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local StarcraftMatchSummaryFfa = {}
+local WarcraftMatchSummaryFfa = {}
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
@@ -26,7 +26,7 @@ local Parser = {}
 
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
-function StarcraftMatchSummaryFfa.getByMatchId(props)
+function WarcraftMatchSummaryFfa.getByMatchId(props)
 	local match = MatchGroupUtil.fetchMatchForBracketDisplay(props.bracketId, props.matchId)
 	---@cast match StarcraftMatchGroupUtilMatch
 
@@ -81,4 +81,4 @@ function Parser.adjustGameOverviewColumns(columns)
 	end)
 end
 
-return StarcraftMatchSummaryFfa
+return WarcraftMatchSummaryFfa
