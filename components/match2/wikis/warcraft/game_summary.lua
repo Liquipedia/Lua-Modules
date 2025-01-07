@@ -64,7 +64,7 @@ function CustomGameSummary.adjustGameStandingsColumns(columns, game)
 	return Array.append(customizedColumns, {
 		id = 'heroes',
 		sortable = false,
-		class = 'cell--team',
+		class = 'cell--total-points',
 		show = function(currentGame)
 			return Array.any(currentGame.opponents, opponnetHasPlayerWithHeroes)
 		end,
