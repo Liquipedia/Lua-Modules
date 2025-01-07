@@ -426,15 +426,6 @@ end
 --- FFA specific stuff
 ---
 
----@param matchInput table
----@param options table?
----@return table
-function CustomMatchGroupInput.processFFAMatch(matchInput, options)
-
-	return match
-end
-
-
 ---@param match table
 ---@param numberOfOpponents integer
 ---@return table
