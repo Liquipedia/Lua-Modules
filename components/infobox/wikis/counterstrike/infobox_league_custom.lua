@@ -229,7 +229,6 @@ function CustomLeague:getWikiCategories(args)
 	end
 
 	if HighlightConditions.tournament(self.data) then
-		mw.logObject(self.data, "data")
 		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 
