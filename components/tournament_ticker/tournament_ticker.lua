@@ -1,4 +1,10 @@
 ---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Tournament/Ticker
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
 
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
