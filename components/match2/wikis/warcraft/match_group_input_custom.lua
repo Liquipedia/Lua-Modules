@@ -484,7 +484,7 @@ function FfaMatchFunctions.matchIsFinished(match, opponents)
 		return true
 	end
 
-	return MatchFunctions.placementHasBeenSet(opponents)
+	return FfaMatchFunctions.placementHasBeenSet(opponents)
 end
 
 ---@param opponents table[]
