@@ -8,6 +8,9 @@
 
 return {
 	en = {
+		-- Tournament Filter
+		['tournament-ticker-no-tournaments'] = 'No tournaments found for your selected filters!',
+
 		-- Dates
 		['date-unknown'] = 'TBA',
 		['date-range-different-months'] = '${startMonth} ${startDate} - ${endDateMonth} ${endDate}',
