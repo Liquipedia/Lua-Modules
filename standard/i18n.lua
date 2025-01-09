@@ -16,7 +16,7 @@ local LANGUAGE = mw.language.getContentLanguage():getCode()
 ---Interpolates an i18n string with data
 ---TODO Add pluralization support (https://cldr.unicode.org/index/cldr-spec/plural-rules)
 ---@param key string
----@param data table<string, string|number>
+---@param data table<string, string|number>?
 ---@return string
 function I18n.translate(key, data)
 	local langMessages = I18nData[LANGUAGE] or I18nData.en
@@ -24,7 +24,7 @@ function I18n.translate(key, data)
 	if not message then
 		return '⧼' .. key .. '⧽'
 	end
-	return String.interpolate(message, data)
+	return String.interpolate(message, data or {})
 end
 
 return I18n

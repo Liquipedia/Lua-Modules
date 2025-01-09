@@ -22,58 +22,6 @@ local TournamentsTickerWidget = Class.new(Widget)
 
 ---@return Widget
 function TournamentsTickerWidget:render()
-	local getDateString = function()
-		local startdateParsed = DateExt.parseIsoDate(tournament.startdate)
-		local enddateParsed = DateExt.parseIsoDate(tournament.sortdate)
-		local startString = startdateParsed and os.date('%b %d', startdateParsed) or 'TBD'
-		local endString = enddateParsed and os.date('%b %d', enddateParsed) or 'TBD'
-
-		if startString == endString then
-			endString = ''
-		elseif endString ~= 'TBD' and os.date('%m', startdateParsed) == os.date('%m', enddateParsed) then
-			endString = os.date('%d', enddateParsed)
-		end
-		return startString .. (endString ~= '' and ' - ' .. endString or '')
-	end
-
-	local tierPill = function (tournament)
-		local liquipediatier, liquipediatiertype = Tier.parseFromQueryData(tournament)
-		if String.isEmpty(liquipediatier) then
-			liquipediatier = DEFAULT_TIER
-		end
-
-		local tier = Tier.toName(liquipediatier)
-		local tierShort, tierTypeShort = Tier.toShortName(liquipediatier, liquipediatiertype)
-
-		local tierNode, tierTypeNode
-		if String.isNotEmpty(tierTypeShort) then
-			tierNode = HtmlWidgets.Div{
-				classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[liquipediatier]},
-				children = tierShort, -- TODO: Remove later (adds tiertype)
-			}
-			tierTypeNode = HtmlWidgets.Div{
-				classes = {'tournament-badge__text'},
-				children = tierTypeShort,
-			}
-		else
-			tierNode = HtmlWidgets.Div{
-				classes = {'tournament-badge__text'},
-				children = tier,
-			}
-		end
-
-		return HtmlWidgets.Div{
-			classes = {'tournament-badge', 'badge--' .. Logic.emptyOr(
-				String.isNotEmpty(liquipediatiertype)
-					and (COLOR_CLASSES[liquipediatiertype or ''] or COLOR_CLASSES.default)
-					or nil,
-				COLOR_CLASSES[liquipediatier or ''],
-				COLOR_CLASSES['default']
-			)},
-			children = {tierNode, tierTypeNode},
-		}
-	end
-
 	local createTournament = function(tournament)
 		local wrap = HtmlWidgets.Div{
 			css = {
@@ -109,13 +57,14 @@ function TournamentsTickerWidget:render()
 		}
 
 		for _, groupName in pairs(filterCategories) do
-			wrap = mw.html.create('div')
-					 :node(wrap)
-					 :attr('data-filter-group', 'filterbuttons-' .. groupName)
-					 :attr('data-filter-category', tournament[groupName])
-			if tournament.featured then
-				wrap:attr('data-curated', '')
-			end
+			wrap = HtmlWidgets.Div{
+				attributes = {
+					['data-filter-group'] = 'filterbuttons-' .. groupName,
+					['data-filter-category'] = tournament[groupName],
+					['data-curated'] = tournament.featured and '' or nil,
+				},
+				children = wrap,
+			}
 		end
 
 		return HtmlWidgets.Li{children = wrap}
