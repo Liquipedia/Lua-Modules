@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=rainbowsix
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,11 +32,11 @@ Config.categories = {
 		load = function(category)
 			category.items = {}
 			for _, tiertype in Tier.iterate('tierTypes') do
-				table.insert(category.items, tiertype.value)
+				table.insert(category.items, Tier.toIdentifier(tiertype.value))
 			end
 		end,
 		transform = function(tiertype)
-			return tiertype
+			return select(2, Tier.toName(1, tiertype))
 		end,
 	},
 }

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -84,8 +85,9 @@ function FilterButtons.getButtonRow(category)
 			:wikitext('All')
 			:done()
 
+	local transform = category.transform or FnUtil.identity
 	for _, value in ipairs(category.items or {}) do
-		local text = category.transform and category.transform(value) or value
+		local text = transform(value)
 		local button = mw.html.create('span')
 			:addClass('filter-button')
 			:attr('data-filter-on', value)
