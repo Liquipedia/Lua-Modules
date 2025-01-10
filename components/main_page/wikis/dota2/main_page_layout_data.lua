@@ -114,7 +114,8 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{NewDota2MainPage_tournaments}}',
+		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
+			'|upcomingDays=30|completedDays=20}}',
 		padding = true,
 		boxid = 1508,
 	},
