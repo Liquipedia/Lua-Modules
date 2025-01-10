@@ -25,6 +25,7 @@ local VodLink = require('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -104,9 +105,10 @@ end
 
 ---@return Html
 function ScoreBoard:title()
+	local header = self.match.match2bracketdata.inheritedheader
 	return mw.html.create('div')
 		:addClass('versus')
-		:node(self.match.header)
+		:node(DisplayHelper.expandHeader(header)[1])
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker
