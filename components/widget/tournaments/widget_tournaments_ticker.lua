@@ -33,15 +33,15 @@ function TournamentsTickerWidget:render()
 		return tournament.status ~= 'cancelled'
 	end)
 
-	local upcomingTournaments = Array.filter(allTournaments, function(tournament)
-		return tournament.phase == 'UPCOMING'
-	end)
-	local ongoingTournaments = Array.filter(allTournaments, function(tournament)
-		return tournament.phase == 'ONGOING'
-	end)
-	local completedTournaments = Array.filter(allTournaments, function(tournament)
-		return tournament.phase == 'FINISHED'
-	end)
+	local function filterByPhase(phase)
+		return function(tournament)
+			return tournament.phase == phase
+		end
+	end
+
+	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
+	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
+	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
 
 	local fallbackElement = HtmlWidgets.Div{
 		attributes = {
@@ -67,9 +67,9 @@ function TournamentsTickerWidget:render()
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = upcomingTournaments},
-					Sublist{title = 'Ongoing', tournaments = ongoingTournaments},
-					Sublist{title = 'Completed', tournaments = completedTournaments},
+					Sublist{title = 'Upcoming', tournaments = upcomingTournaments, filterGroups = filterGroups} ,
+					Sublist{title = 'Ongoing', tournaments = ongoingTournaments, filterGroups = filterGroups},
+					Sublist{title = 'Completed', tournaments = completedTournaments, filterGroups = filterGroups},
 					fallbackElement
 				}
 			}

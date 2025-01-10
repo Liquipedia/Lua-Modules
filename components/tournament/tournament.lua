@@ -28,87 +28,37 @@ local Tournaments = {}
 ---@field status string?
 ---@field phase 'UPCOMING'|'ONGOING'|'FINISHED'
 
----@class TournamentPhase
----@field isTournamentInPhase fun(record: StandardTournament): boolean
----@field enum 'UPCOMING'|'ONGOING'|'FINISHED'
-
+---@enum TournamentPhase
 local TOURNAMENT_PHASE = {
 	UPCOMING = 'UPCOMING',
 	ONGOING = 'ONGOING',
 	FINISHED = 'FINISHED',
 }
 
----@type TournamentPhase
-local TOURNAMENT_PHASE_UPCOMING = {
-	enum = TOURNAMENT_PHASE.UPCOMING,
-	isTournamentInPhase = function(tournament)
-		-- No known startdate, technically upcoming but rather unknown
-		if tournament.startDate.timestamp == DateExt.defaultTimestamp then
-			return false
-		end
-		-- Has started
-		if DateExt.getCurrentTimestamp() >= tournament.startDate.timestamp then
-			return false
-		end
-		return true
-	end,
-}
----@type TournamentPhase
-local TOURNAMENT_PHASE_ONGOING = {
-	enum = TOURNAMENT_PHASE.ONGOING,
-	isTournamentInPhase = function(tournament)
-		-- Has eneded
-		if DateExt.getCurrentTimestamp() >= tournament.endDate.timestamp then
-			return false
-		end
-		-- Has not started
-		if DateExt.getCurrentTimestamp() < tournament.startDate.timestamp then
-			return false
-		end
-		return true
-	end,
-}
----@type TournamentPhase
-local TOURNAMENT_PHASE_CONCLUDED = {
-	enum = TOURNAMENT_PHASE.FINISHED,
-	isTournamentInPhase = function(tournament)
-		-- No known enddate, cannot have finished
-		if tournament.endDate.timestamp == DateExt.defaultTimestamp then
-			return false
-		end
-		-- Has not ended
-		if DateExt.getCurrentTimestamp() < tournament.endDate.timestamp then
-			return false
-		end
-		return true
-	end,
-}
-
 ---@param conditions ConditionTree?
 function Tournaments.getAllTournaments(conditions)
 	local tournaments = {}
-	Lpdb.executeMassQuery('tournament', {
-		conditions = conditions and conditions:toString() or nil,
-	}, function (record)
-		local tournament = Tournaments.tournamentFromRecord(
-			record,
-			Tournaments.makeFeaturedFunction(),
-			{
-				TOURNAMENT_PHASE_UPCOMING,
-				TOURNAMENT_PHASE_ONGOING,
-				TOURNAMENT_PHASE_CONCLUDED,
-			}
-		)
-		table.insert(tournaments, tournament)
-	end)
+	Lpdb.executeMassQuery(
+		'tournament',
+		{
+			conditions = conditions and conditions:toString() or nil,
+			order = 'sortdate desc',
+		},
+		function(record)
+			local tournament = Tournaments.tournamentFromRecord(
+				record,
+				Tournaments.makeFeaturedFunction()
+			)
+			table.insert(tournaments, tournament)
+		end
+	)
 	return tournaments
 end
 
 ---@param record tournament
 ---@param recordIsFeatured function
----@param statuses TournamentPhase[]
 ---@return StandardTournament?
-function Tournaments.tournamentFromRecord(record, recordIsFeatured, statuses)
+function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 	local startDate = Tournaments.parseDateRecord(record.startdate)
 	local endDate = Tournaments.parseDateRecord(record.sortdate or record.enddate)
 
@@ -119,24 +69,37 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured, statuses)
 		startDate = startDate,
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
-		liquipediaTierType = record.liquipediatiertype,
-		liquipediaTierType2 = record.extradata.liquipediatiertype2,
+		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
+		liquipediaTierType2 = Tier.toIdentifier(record.extradata.liquipediatiertype2),
 		region = record.region,
-		status = record.status
+		status = record.status,
+		featured = recordIsFeatured(record),
 	}
 
-	local phase = Array.filter(statuses, function(status)
-		return status.isTournamentInPhase(tournament)
-	end)[1]
-
-	if not phase then
-		return nil
-	end
-
-	tournament.phase = phase.enum
-	tournament.featured = recordIsFeatured(record)
+	tournament.phase = Tournaments.calculatePhase(tournament)
 
 	return tournament
+end
+
+---@param tournament StandardTournament
+---@return TournamentPhase
+function Tournaments.calculatePhase(tournament)
+	if tournament.status == 'finished' then
+		return TOURNAMENT_PHASE.FINISHED
+	end
+	if tournament.startDate.timestamp == DateExt.defaultTimestamp then
+		return TOURNAMENT_PHASE.UPCOMING
+	end
+	if DateExt.getCurrentTimestamp() < tournament.startDate.timestamp then
+		return TOURNAMENT_PHASE.UPCOMING
+	end
+	if tournament.endDate.timestamp == DateExt.defaultTimestamp then
+		return TOURNAMENT_PHASE.ONGOING
+	end
+	if DateExt.getCurrentTimestamp() < tournament.endDate.timestamp then
+		return TOURNAMENT_PHASE.ONGOING
+	end
+	return TOURNAMENT_PHASE.FINISHED
 end
 
 --- This function parses fuzzy dates into a structured format.
