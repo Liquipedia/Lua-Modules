@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local I18n = require('Module:I18n')
 local Lua = require('Module:Lua')
 
@@ -22,15 +23,39 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TournamentsTickerWidget = Class.new(Widget)
 TournamentsTickerWidget.defaultProps = {
-	filterGroups = {'liquipediatier'}
+	filterGroups = {'liquipediatier'},
+	upcomingDays = 5,
+	completedDays = 5,
 }
 
 ---@return Widget
 function TournamentsTickerWidget:render()
 	local filterGroups = self.props.filterGroups
+	local upcomingDays = self.props.upcomingDays
+	local completedDays = self.props.completedDays
+
+	--- These thresholds makes very little sense, but it's converted from legacy.
+	--- Let's revisit them with product, design and community at the later date
+	local tierThresholdModifiers = {
+		[1] = 55,
+		[2] = 55,
+		[3] = 22,
+		[4] = 0,
+		[5] = 0,
+		['qualifier'] = -2,
+	}
+
+	local function isWithinDateRange(tournament)
+		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTierType]
+			or tierThresholdModifiers[tournament.liquipediaTier]
+		local startDate = DateExt.getCurrentTimestamp() + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
+		local endDate = DateExt.getCurrentTimestamp() - (completedDays - modifiedThreshold) * 24 * 60 * 60
+
+		return tournament.startDate.timestamp >= startDate and tournament.endDate.timestamp <= endDate
+	end
 
 	local allTournaments = Array.filter(Tournament.getAllTournaments(), function(tournament)
-		return tournament.status ~= 'cancelled'
+		return tournament.status == '' and tournament.liquipediaTierType ~= 'points' and isWithinDateRange(tournament)
 	end)
 
 	local function filterByPhase(phase)
@@ -39,9 +64,23 @@ function TournamentsTickerWidget:render()
 		end
 	end
 
-	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
-	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
-	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
+	local function sortByDate(a, b)
+		if a.endDate.timestamp ~= b.endDate.timestamp then
+			return a.endDate.timestamp > b.endDate.timestamp
+		end
+		return a.startDate.timestamp > b.startDate.timestamp
+	end
+
+	local function sortByDateUpcoming(a, b)
+		if a.startDate.timestamp ~= b.startDate.timestamp then
+			return a.startDate.timestamp > b.startDate.timestamp
+		end
+		return a.endDate.timestamp > b.endDate.timestamp
+	end
+
+	local upcomingTournaments = Array.sortBy(Array.filter(allTournaments, filterByPhase('UPCOMING')), sortByDateUpcoming)
+	local ongoingTournaments = Array.sortBy(Array.filter(allTournaments, filterByPhase('ONGOING')), sortByDate)
+	local completedTournaments = Array.sortBy(Array.filter(allTournaments, filterByPhase('FINISHED')), sortByDate)
 
 	local fallbackElement = HtmlWidgets.Div{
 		attributes = {

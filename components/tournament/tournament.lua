@@ -36,6 +36,7 @@ local TOURNAMENT_PHASE = {
 ---@field phase TournamentPhase
 
 ---@param conditions ConditionTree?
+---@return StandardTournament[]
 function Tournaments.getAllTournaments(conditions)
 	local tournaments = {}
 	Lpdb.executeMassQuery(
@@ -57,7 +58,7 @@ end
 
 ---@param record tournament
 ---@param recordIsFeatured function
----@return StandardTournament?
+---@return StandardTournament
 function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 	local startDate = Tournaments.parseDateRecord(record.startdate)
 	local endDate = Tournaments.parseDateRecord(record.sortdate or record.enddate)
@@ -70,7 +71,6 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
 		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
-		liquipediaTierType2 = Tier.toIdentifier(record.extradata.liquipediatiertype2),
 		region = record.region,
 		status = record.status,
 		featured = recordIsFeatured(record),
