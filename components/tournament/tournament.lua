@@ -122,6 +122,8 @@ function Tournaments.parseDateRecord(dateRecord)
 	return {year = year, month = month, day = day, timestamp = DateExt.readTimestampOrNil(dateRecord)}
 end
 
+--- This function returns a function that can be used to determine if a tournament should be featured.
+---@return fun(record: tournament): boolean
 function Tournaments.makeFeaturedFunction()
 	local curatedData = Lua.requireIfExists('Module:TournamentsList/CuratedData', {loadData = true})
 	if not curatedData then
