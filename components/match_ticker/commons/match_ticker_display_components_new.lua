@@ -50,6 +50,12 @@ local ScoreBoard = Class.new(
 function ScoreBoard:create()
 	local match = self.match
 	local winner = tonumber(match.winner)
+	local opponents = #match.match2opponents
+
+	if opponents > 2 then
+		--- "FFA/BR" view
+		return self.root:node(self:title())
+	end
 
 	return self.root
 		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
@@ -92,8 +98,15 @@ end
 ---@return Html
 function ScoreBoard:versus()
 	return mw.html.create('div')
-	:addClass('versus')
-	:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
+		:addClass('versus')
+		:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
+end
+
+---@return Html
+function ScoreBoard:title()
+	return mw.html.create('div')
+		:addClass('versus')
+		:node(self.match.header)
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker
