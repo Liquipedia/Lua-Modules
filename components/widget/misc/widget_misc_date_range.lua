@@ -21,22 +21,25 @@ local DateRange = Class.new(Widget)
 ---@return string
 function DateRange:render()
 	local startDate, endDate = self.props.startDate, self.props.endDate
+	if type(startDate) ~= 'table' then
+		startDate = DateExt.parseIsoDate(startDate)
+	end
+	if type(endDate) ~= 'table' then
+		endDate = DateExt.parseIsoDate(endDate)
+	end
+
 	if not startDate then
 		return I18n.translate('date-unknown')
 	end
-	local startdateParsed = DateExt.parseIsoDate(startDate)
-	local enddateParsed = DateExt.parseIsoDate(endDate)
-	if not startdateParsed then
-		return I18n.translate('date-unknown')
-	end
-	local startString = os.date('%b %d', os.time(startdateParsed))
-	local endString = enddateParsed and os.date('%b %d', os.time(enddateParsed)) or nil
+
+	local startString = os.date('%b %d', os.time(startDate))
+	local endString = endDate and os.date('%b %d', os.time(endDate)) or nil
 
 	local dateData = {
-		startMonth = os.date('%b', os.time(startdateParsed)),
-		startDate = os.date('%d', os.time(startdateParsed)),
-		endMonth = os.date('%b', os.time(enddateParsed)),
-		endDate = os.date('%d', os.time(enddateParsed)),
+		startMonth = os.date('%b', os.time(startDate)),
+		startDate = os.date('%d', os.time(startDate)),
+		endMonth = os.date('%b', os.time(endDate)),
+		endDate = os.date('%d', os.time(endDate)),
 	}
 
 	if startString == endString then
