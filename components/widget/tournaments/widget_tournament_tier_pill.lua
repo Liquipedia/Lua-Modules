@@ -27,10 +27,11 @@ local COLOR_CLASSES = {
 	['qualifier'] = 'qualifier',
 	['monthly'] = 'monthly',
 	['weekly'] = 'weekly',
+	['biweekly'] = 'weekly',
+	['daily'] = 'weekly',
 	['showmatch'] = 'showmatch',
 	['misc'] = 'misc',
 	[-1] = 'misc',
-	['school'] = 'misc',
 	['default'] = 'misc', -- Fallback for when there's no match
 }
 
