@@ -49,7 +49,7 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
+		body = '{{Liquipedia:HeroTable}}',
 	},
 	filterButtons = {
 		noPanel = true,
