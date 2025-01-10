@@ -74,7 +74,7 @@ end
 ---@field root Html
 ---@field match table
 local Versus = Class.new(
-	function(self, match)
+	function(self, match, showGame)
 		self.root = mw.html.create('div')
 		self.match = match
 	end
@@ -82,7 +82,7 @@ local Versus = Class.new(
 
 ---@return Html
 function Versus:create()
-	local bestof = self:bestof()
+	local bestof = self.match.asGame and self:title() or self:bestof()
 	local scores, scores2 = self:scores()
 	local upperText, lowerText
 	if String.isNotEmpty(scores2) then
@@ -117,6 +117,15 @@ function Versus:bestof()
 end
 
 ---@return string?
+function Versus:title()
+	if not self.match.asGameIdx then
+		return
+	end
+	local mapName = Logic.nilIfEmpty(self.match.match2games[self.match.asGameIdx].map)
+	return 'Game #' .. (self.match.asGameIdx) .. (mapName and ' on ' .. mapName or '')
+end
+
+---@return string?
 ---@return string?
 function Versus:scores()
 	if self.match.date > NOW then
@@ -124,6 +133,9 @@ function Versus:scores()
 	end
 
 	local winner = tonumber(self.match.winner)
+	if self.match.asGame then
+		winner = self.match.match2games[self.match.asGameIdx].winner
+	end
 
 	local scores, scores2 = {}, {}
 	local hasSecondScore
@@ -136,7 +148,11 @@ function Versus:scores()
 		return score
 	end
 
-	Array.forEach(self.match.match2opponents, function(opponent, opponentIndex)
+	local opponents = self.match.asGame
+		and self.match.match2games[self.match.asGameIdx].opponents
+		or self.match.match2opponents
+
+	Array.forEach(opponents or {}, function(opponent, opponentIndex)
 		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 

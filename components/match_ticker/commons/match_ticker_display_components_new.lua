@@ -7,8 +7,7 @@
 --
 
 -- Holds DisplayComponents for the MatchTicker module
--- It contains the new html structure intented to be use for the new Dota2 Main Page (for now)
--- Will most likely be expanded to other games in the future and other pages
+-- It contains the new html structure intented to be use for the new Main Page
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
@@ -92,8 +91,8 @@ end
 ---@return Html
 function ScoreBoard:versus()
 	return mw.html.create('div')
-	:addClass('versus')
-	:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
+		:addClass('versus')
+		:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker

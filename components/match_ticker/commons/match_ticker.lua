@@ -195,7 +195,9 @@ function MatchTicker:query(matches)
 	})
 
 	if type(matches[1]) == 'table' then
-		matches = Array.sub(self:filterMatches(matches), 1, self.config.limit)
+		matches = self:filterMatches(matches)
+		matches = self:expandGamesOfMatches(matches)
+		matches = Array.sub(matches, 1, self.config.limit)
 		self.matches = Array.map(matches, function(match) return self:adjustMatch(match) end)
 		return self
 	end
@@ -338,6 +340,27 @@ function MatchTicker:filterMatches(matches)
 	end)
 
 	return Array.filter(matches, function(match) return not match.isTbdMatch end)
+end
+
+---Overwritable per wiki decision
+---@param matches table[]
+---@return table[]
+function MatchTicker:expandGamesOfMatches(matches)
+	return Array.flatMap(matches, function(match)
+		if not match.match2games or #match.match2games < 2 then
+			return {match}
+		end
+
+		if Array.all(match.match2games, function(game) return game.date == match.date end) then
+			return {match}
+		end
+
+		return Array.map(match.match2games, function(_, gameIndex)
+			local gameMatch = Table.copy(match)
+			gameMatch.asGame = true
+			gameMatch.asGameIdx = gameIndex
+		end)
+	end)
 end
 
 function MatchTicker:adjustMatch(match)
