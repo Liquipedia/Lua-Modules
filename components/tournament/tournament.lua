@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Utils')
 
-local TournamentTicker = {}
+local Tournaments = {}
 
 ---@class StandardTournament
 ---@field displayName string
@@ -25,22 +25,23 @@ local TournamentTicker = {}
 ---@field liquipediaTierType string
 ---@field region string
 ---@field featured boolean
----@field status 'UPCOMING'|'ONGOING'|'FINISHED'
+---@field status string?
+---@field phase 'UPCOMING'|'ONGOING'|'FINISHED'
 
----@class TournamentStatus
----@field isTournamentInStatus fun(record: StandardTournament): boolean
+---@class TournamentPhase
+---@field isTournamentInPhase fun(record: StandardTournament): boolean
 ---@field enum 'UPCOMING'|'ONGOING'|'FINISHED'
 
-local TOURNAMENT_STATUS = {
+local TOURNAMENT_PHASE = {
 	UPCOMING = 'UPCOMING',
 	ONGOING = 'ONGOING',
 	FINISHED = 'FINISHED',
 }
 
----@type TournamentStatus
-local STATUS_UPCOMING = {
-	enum = TOURNAMENT_STATUS.UPCOMING,
-	isTournamentInStatus = function(tournament)
+---@type TournamentPhase
+local TOURNAMENT_PHASE_UPCOMING = {
+	enum = TOURNAMENT_PHASE.UPCOMING,
+	isTournamentInPhase = function(tournament)
 		-- No known startdate, technically upcoming but rather unknown
 		if tournament.startDate.timestamp == DateExt.defaultTimestamp then
 			return false
@@ -51,17 +52,11 @@ local STATUS_UPCOMING = {
 		end
 		return true
 	end,
-	sort = function(tournament1, tournament2)
-		if tournament1.startdate ~= tournament2.startdate then
-			return tournament1.startdate > tournament2.startdate
-		end
-		return tournament1.sortdate > tournament2.sortdate
-	end
 }
----@type TournamentStatus
-local STATUS_ONGOING = {
-	enum = TOURNAMENT_STATUS.ONGOING,
-	isTournamentInStatus = function(tournament)
+---@type TournamentPhase
+local TOURNAMENT_PHASE_ONGOING = {
+	enum = TOURNAMENT_PHASE.ONGOING,
+	isTournamentInPhase = function(tournament)
 		-- Has eneded
 		if DateExt.getCurrentTimestamp() >= tournament.endDate.timestamp then
 			return false
@@ -72,18 +67,12 @@ local STATUS_ONGOING = {
 		end
 		return true
 	end,
-	sort = function(tournament1, tournament2)
-		if tournament1.sortdate ~= tournament2.sortdate then
-			return tournament1.sortdate < tournament2.sortdate
-		end
-		return tournament1.startdate > tournament2.startdate
-	end
 }
 
----@type TournamentStatus
-local STATUS_CONCLUDED = {
-	enum = TOURNAMENT_STATUS.FINISHED,
-	isTournamentInStatus = function(tournament)
+---@type TournamentPhase
+local TOURNAMENT_PHASE_CONCLUDED = {
+	enum = TOURNAMENT_PHASE.FINISHED,
+	isTournamentInPhase = function(tournament)
 		-- No known enddate, cannot have finished
 		if tournament.endDate.timestamp == DateExt.defaultTimestamp then
 			return false
@@ -94,39 +83,35 @@ local STATUS_CONCLUDED = {
 		end
 		return true
 	end,
-	sort = function(tournament1, tournament2)
-		if tournament1.sortdate ~= tournament2.sortdate then
-			return tournament1.sortdate < tournament2.sortdate
-		end
-		return tournament1.startdate > tournament2.startdate
-	end
 }
 
-function TournamentTicker.getTournamentsFromDB()
+---@param conditions ConditionTree?
+function Tournaments.getAllTournaments(conditions)
 	local tournaments = {}
-	Lpdb.executeMassQuery('tournament', {}, function (record)
-		local tournament = TournamentTicker.tournamentFromRecord(
+	Lpdb.executeMassQuery('tournament', {
+		conditions = conditions and conditions:toString() or nil,
+	}, function (record)
+		local tournament = Tournaments.tournamentFromRecord(
 			record,
-			TournamentTicker.makeFeaturedFunction(),
+			Tournaments.makeFeaturedFunction(),
 			{
-				STATUS_UPCOMING,
-				STATUS_ONGOING,
-				STATUS_CONCLUDED,
+				TOURNAMENT_PHASE_UPCOMING,
+				TOURNAMENT_PHASE_ONGOING,
+				TOURNAMENT_PHASE_CONCLUDED,
 			}
 		)
 		table.insert(tournaments, tournament)
-		return tournament ~= nil
 	end)
 	return tournaments
 end
 
 ---@param record tournament
 ---@param recordIsFeatured function
----@param statuses TournamentStatus[]
+---@param statuses TournamentPhase[]
 ---@return StandardTournament?
-function TournamentTicker.tournamentFromRecord(record, recordIsFeatured, statuses)
-	local startDate = TournamentTicker.parseDateRecord(record.startdate)
-	local endDate = TournamentTicker.parseDateRecord(record.sortdate or record.enddate)
+function Tournaments.tournamentFromRecord(record, recordIsFeatured, statuses)
+	local startDate = Tournaments.parseDateRecord(record.startdate)
+	local endDate = Tournaments.parseDateRecord(record.sortdate or record.enddate)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
@@ -138,17 +123,18 @@ function TournamentTicker.tournamentFromRecord(record, recordIsFeatured, statuse
 		liquipediaTierType = record.liquipediatiertype,
 		liquipediaTierType2 = record.extradata.liquipediatiertype2,
 		region = record.region,
+		status = record.status
 	}
 
-	local status = Array.filter(statuses, function(status)
-		return status.isTournamentInStatus(tournament)
+	local phase = Array.filter(statuses, function(status)
+		return status.isTournamentInPhase(tournament)
 	end)[1]
 
-	if not status then
+	if not phase then
 		return nil
 	end
 
-	tournament.status = status.enum
+	tournament.phase = phase.enum
 	tournament.featured = recordIsFeatured(record)
 
 	return tournament
@@ -157,7 +143,7 @@ end
 --- This function parses fuzzy dates into a structured format.
 ---@param dateRecord string # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
 ---@return {year: integer, month: integer?, day: integer?, timestamp: integer?}?
-function TournamentTicker.parseDateRecord(dateRecord)
+function Tournaments.parseDateRecord(dateRecord)
 	if not dateRecord then
 		return nil
 	end
@@ -174,7 +160,7 @@ function TournamentTicker.parseDateRecord(dateRecord)
 	return {year = year, month = month, day = day, timestamp = DateExt.readTimestampOrNil(dateRecord)}
 end
 
-function TournamentTicker.makeFeaturedFunction()
+function Tournaments.makeFeaturedFunction()
 	local curatedData = Lua.requireIfExists('Module:TournamentsList/CuratedData', {loadData = true})
 	if not curatedData then
 		return function() return false end
@@ -218,4 +204,4 @@ function TournamentTicker.makeFeaturedFunction()
 	return recordIsCurated
 end
 
-return TournamentTicker
+return Tournaments

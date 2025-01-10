@@ -13,8 +13,9 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Sublist = Lua.import('Module:Widget/Tournaments/Ticker/Sublist')
 
-local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
+local Tournament = Lua.import('Module:Tournament')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget
@@ -28,54 +29,19 @@ TournamentsTickerWidget.defaultProps = {
 function TournamentsTickerWidget:render()
 	local filterGroups = self.props.filterGroups
 
-	local allTournaments = TournamentTicker.getTournamentsFromDB()
-	local upcoming = Array.filter(allTournaments, function(tournament)
-		return tournament.status == 'UPCOMING'
-	end)
-	local ongoing = Array.filter(allTournaments, function(tournament)
-		return tournament.status == 'ONGOING'
-	end)
-	local completed = Array.filter(allTournaments, function(tournament)
-		return tournament.status == 'FINISHED'
+	local allTournaments = Array.filter(Tournament.getAllTournaments(), function(tournament)
+		return tournament.status ~= 'cancelled'
 	end)
 
-	local createSubList = function(name, tournaments)
-		local createFilterWrapper = function(tournament, child)
-			return Array.reduce(filterGroups, function(prev, filter)
-				return HtmlWidgets.Div{
-					attributes = {
-						['data-filter-group'] = 'filterbuttons-' .. filter,
-						['data-filter-category'] = tournament[filter],
-						['data-curated'] = tournament.featured and '' or nil,
-					},
-					children = prev,
-				}
-			end, child)
-		end
-
-		local list = HtmlWidgets.Ul{
-			classes = {'tournaments-list-type-list'},
-			children = Array.map(tournaments, function(tournament)
-				return createFilterWrapper(tournament, TournamentLabel{tournament = tournament})
-			end),
-		}
-
-		return HtmlWidgets.Li{
-			attributes = {
-				['data-filter-hideable-group'] = '',
-				['data-filter-effect'] = 'fade',
-			},
-			children = {
-				HtmlWidgets.Span{
-					classes = {'tournaments-list-heading'},
-					children = {name},
-				},
-				HtmlWidgets.Div{
-					children = {list},
-				}
-			},
-		}
-	end
+	local upcomingTournaments = Array.filter(allTournaments, function(tournament)
+		return tournament.phase == 'UPCOMING'
+	end)
+	local ongoingTournaments = Array.filter(allTournaments, function(tournament)
+		return tournament.phase == 'ONGOING'
+	end)
+	local completedTournaments = Array.filter(allTournaments, function(tournament)
+		return tournament.phase == 'FINISHED'
+	end)
 
 	local fallbackElement = HtmlWidgets.Div{
 		attributes = {
@@ -101,9 +67,9 @@ function TournamentsTickerWidget:render()
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					createSubList('Upcoming', upcoming),
-					createSubList('Ongoing', ongoing),
-					createSubList('Completed', completed),
+					Sublist{title = 'Upcoming', tournaments = upcomingTournaments},
+					Sublist{title = 'Ongoing', tournaments = ongoingTournaments},
+					Sublist{title = 'Completed', tournaments = completedTournaments},
 					fallbackElement
 				}
 			}
