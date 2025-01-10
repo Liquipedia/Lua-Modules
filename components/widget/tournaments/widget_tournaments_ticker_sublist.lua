@@ -31,7 +31,7 @@ function TournamentsTickerWidget:render()
 		return Array.reduce(self.props.filterGroups or {}, function(prev, filter)
 			return HtmlWidgets.Div{
 				attributes = {
-					['data-filter-group'] = 'filterbuttons-' .. filter,
+					['data-filter-group'] = 'filterbuttons-' .. string.lower(filter),
 					['data-filter-category'] = tournament[filter],
 					['data-curated'] = tournament.featured and '' or nil,
 				},
@@ -43,7 +43,7 @@ function TournamentsTickerWidget:render()
 	local list = HtmlWidgets.Ul{
 		classes = {'tournaments-list-type-list'},
 		children = Array.map(self.props.tournaments, function(tournament)
-			return createFilterWrapper(tournament, TournamentLabel{tournament = tournament})
+			return HtmlWidgets.Li{children = createFilterWrapper(tournament, TournamentLabel{tournament = tournament})}
 		end),
 	}
 

@@ -28,7 +28,7 @@ function TournamentsTickerWidget:render()
 	if not tournament then
 		return
 	end
-	return HtmlWidgets.Li{children = HtmlWidgets.Div{
+	return HtmlWidgets.Div{
 		css = {
 			display = 'flex',
 			gap = '5px',
@@ -68,7 +68,7 @@ function TournamentsTickerWidget:render()
 				},
 			},
 		},
-	}}
+	}
 end
 
 return TournamentsTickerWidget
