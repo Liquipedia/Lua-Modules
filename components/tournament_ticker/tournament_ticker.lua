@@ -41,8 +41,15 @@ local TOURNAMENT_STATUS = {
 local STATUS_UPCOMING = {
 	enum = TOURNAMENT_STATUS.UPCOMING,
 	isTournamentInStatus = function(tournament)
-		--- TODO return false if before threshold
-		return tournament.startDate.timestamp > DateExt.getCurrentTimestamp()
+		-- No known startdate, technically upcoming but rather unknown
+		if tournament.startDate.timestamp == DateExt.defaultTimestamp then
+			return false
+		end
+		-- Has started
+		if DateExt.getCurrentTimestamp() >= tournament.startDate.timestamp then
+			return false
+		end
+		return true
 	end,
 	sort = function(tournament1, tournament2)
 		if tournament1.startdate ~= tournament2.startdate then
@@ -55,7 +62,15 @@ local STATUS_UPCOMING = {
 local STATUS_ONGOING = {
 	enum = TOURNAMENT_STATUS.ONGOING,
 	isTournamentInStatus = function(tournament)
-		return tournament.sortdate ~= DateExt.defaultDate and tournament.endDate.timestamp < DateExt.getCurrentTimestamp()
+		-- Has eneded
+		if DateExt.getCurrentTimestamp() >= tournament.endDate.timestamp then
+			return false
+		end
+		-- Has not started
+		if DateExt.getCurrentTimestamp() < tournament.startDate.timestamp then
+			return false
+		end
+		return true
 	end,
 	sort = function(tournament1, tournament2)
 		if tournament1.sortdate ~= tournament2.sortdate then
@@ -69,9 +84,15 @@ local STATUS_ONGOING = {
 local STATUS_CONCLUDED = {
 	enum = TOURNAMENT_STATUS.FINISHED,
 	isTournamentInStatus = function(tournament)
-		--- TODO return false if after threshold
-		return tournament.startDate.timestamp < DateExt.getCurrentTimestamp()
-			and tournament.endDate.timestamp > DateExt.getCurrentTimestamp()
+		-- No known enddate, cannot have finished
+		if tournament.endDate.timestamp == DateExt.defaultTimestamp then
+			return false
+		end
+		-- Has ended
+		if DateExt.getCurrentTimestamp() >= tournament.endDate.timestamp then
+			return false
+		end
+		return true
 	end,
 	sort = function(tournament1, tournament2)
 		if tournament1.sortdate ~= tournament2.sortdate then
@@ -86,7 +107,7 @@ function TournamentTicker.getTournamentsFromDB()
 	Lpdb.executeMassQuery('tournament', {}, function (record)
 		local tournament = TournamentTicker.tournamentFromRecord(
 			record,
-			TournamentTicker.generateCuratedFunction(),
+			TournamentTicker.makeFeaturedFunction(),
 			{
 				STATUS_UPCOMING,
 				STATUS_ONGOING,
@@ -99,13 +120,13 @@ function TournamentTicker.getTournamentsFromDB()
 	return tournaments
 end
 
----@paramrecord turament
----@param recordIsCurated function
+---@param record tournament
+---@param recordIsFeatured function
 ---@param statuses TournamentStatus[]
 ---@return StandardTournament?
-function TournamentTicker.tournamentFromRecord(record, recordIsCurated, statuses)
+function TournamentTicker.tournamentFromRecord(record, recordIsFeatured, statuses)
 	local startDate = TournamentTicker.parseDateRecord(record.startdate)
-	local endDate = TournamentTicker.parseDateRecord(record.enddate)
+	local endDate = TournamentTicker.parseDateRecord(record.sortdate or record.enddate)
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
@@ -128,7 +149,7 @@ function TournamentTicker.tournamentFromRecord(record, recordIsCurated, statuses
 	end
 
 	tournament.status = status.enum
-	tournament.featured = recordIsCurated(record)
+	tournament.featured = recordIsFeatured(record)
 
 	return tournament
 end
@@ -153,7 +174,7 @@ function TournamentTicker.parseDateRecord(dateRecord)
 	return {year = year, month = month, day = day, timestamp = DateExt.readTimestampOrNil(dateRecord)}
 end
 
-function TournamentTicker.generateCuratedFunction()
+function TournamentTicker.makeFeaturedFunction()
 	local curatedData = Lua.requireIfExists('Module:TournamentsList/CuratedData', {loadData = true})
 	if not curatedData then
 		return function() return false end
@@ -182,7 +203,7 @@ function TournamentTicker.generateCuratedFunction()
 			end
 			local parentPage = mw.title.new(record.pagename).basePageTitle
 			return mw.ext.LiquipediaDB.lpdb('tournament', {
-				conditions = '[[pagename::' .. page .. ']]',
+				conditions = '[[pagename::' .. parentPage .. ']]',
 				limit = 1,
 			})[1] or parentData(parentPage, maxDepth - 1)
 		end

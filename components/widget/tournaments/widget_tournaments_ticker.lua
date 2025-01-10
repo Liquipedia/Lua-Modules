@@ -20,12 +20,28 @@ local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
 ---@operator call(table): TournamentsTickerWidget
 
 local TournamentsTickerWidget = Class.new(Widget)
+TournamentsTickerWidget.defaultProps = {
+	filterGroups = {'liquipediatier'}
+}
 
 ---@return Widget
 function TournamentsTickerWidget:render()
+	local filterGroups = self.props.filterGroups
+
+	local allTournaments = TournamentTicker.getTournamentsFromDB()
+	local upcoming = Array.filter(allTournaments, function(tournament)
+		return tournament.status == 'UPCOMING'
+	end)
+	local ongoing = Array.filter(allTournaments, function(tournament)
+		return tournament.status == 'ONGOING'
+	end)
+	local completed = Array.filter(allTournaments, function(tournament)
+		return tournament.status == 'FINISHED'
+	end)
+
 	local createSubList = function(name, tournaments)
 		local createFilterWrapper = function(tournament, child)
-			return Array.reduce(filters, function(prev, filter)
+			return Array.reduce(filterGroups, function(prev, filter)
 				return HtmlWidgets.Div{
 					attributes = {
 						['data-filter-group'] = 'filterbuttons-' .. filter,
@@ -85,9 +101,9 @@ function TournamentsTickerWidget:render()
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					createSubList('Upcoming', self.props.upcoming),
-					createSubList('Ongoing', self.props.ongoing),
-					createSubList('Completed', self.props.completed),
+					createSubList('Upcoming', upcoming),
+					createSubList('Ongoing', ongoing),
+					createSubList('Completed', completed),
 					fallbackElement
 				}
 			}
