@@ -68,7 +68,6 @@ local TOURNAMENT_PHASE_ONGOING = {
 		return true
 	end,
 }
-
 ---@type TournamentPhase
 local TOURNAMENT_PHASE_CONCLUDED = {
 	enum = TOURNAMENT_PHASE.FINISHED,
@@ -77,8 +76,8 @@ local TOURNAMENT_PHASE_CONCLUDED = {
 		if tournament.endDate.timestamp == DateExt.defaultTimestamp then
 			return false
 		end
-		-- Has ended
-		if DateExt.getCurrentTimestamp() >= tournament.endDate.timestamp then
+		-- Has not ended
+		if DateExt.getCurrentTimestamp() < tournament.endDate.timestamp then
 			return false
 		end
 		return true
