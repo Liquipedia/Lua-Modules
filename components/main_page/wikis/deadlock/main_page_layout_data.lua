@@ -169,7 +169,7 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
-						content = CONTENT.specialEvents,
+						content = CONTENT.heroes,
 					},
 					{
 						mobileOrder = 4,
