@@ -24,6 +24,7 @@ local TOURNAMENT_PHASE = {
 
 ---@class StandardTournament
 ---@field displayName string
+---@field fullName string
 ---@field pageName string
 ---@field startDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
@@ -33,23 +34,28 @@ local TOURNAMENT_PHASE = {
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
+---@field icon string?
+---@field iconDark string?
+---@field abbreviation string?
+---@field series string?
 
 ---@param conditions ConditionTree?
+---@param filterTournament fun(tournament: StandardTournament): boolean
 ---@return StandardTournament[]
-function Tournaments.getAllTournaments(conditions)
+function Tournaments.getAllTournaments(conditions, filterTournament)
 	local tournaments = {}
 	Lpdb.executeMassQuery(
 		'tournament',
 		{
 			conditions = conditions and conditions:toString() or nil,
 			order = 'sortdate desc',
+			limit = 1000,
 		},
 		function(record)
-			local tournament = Tournaments.tournamentFromRecord(
-				record,
-				Tournaments.makeFeaturedFunction()
-			)
-			table.insert(tournaments, tournament)
+			local tournament = Tournaments.tournamentFromRecord(record,	Tournaments.makeFeaturedFunction())
+			if not filterTournament or filterTournament(tournament) then
+				table.insert(tournaments, tournament)
+			end
 		end
 	)
 	return tournaments

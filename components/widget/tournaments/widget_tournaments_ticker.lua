@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Condition = require('Module:Condition')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local I18n = require('Module:I18n')
@@ -63,8 +64,12 @@ function TournamentsTickerWidget:render()
 		return tournament.endDate.timestamp <= endDateThreshold and tournament.startDate.timestamp >= startDateThreshold
 	end
 
-	local allTournaments = Array.filter(Tournament.getAllTournaments(), function(tournament)
-		return tournament.status == '' and tournament.liquipediaTierType ~= 'points' and isWithinDateRange(tournament)
+	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all)
+		:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, ''))
+		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.eq, '!Points'))
+
+	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
+		return isWithinDateRange(tournament)
 	end)
 
 	local function filterByPhase(phase)
