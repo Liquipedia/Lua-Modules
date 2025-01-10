@@ -50,21 +50,17 @@ function TournamentsTickerWidget:render()
 			or tierThresholdModifiers[tournament.liquipediaTier]
 			or 0
 
-		local startDate = DateExt.getCurrentTimestamp() - (upcomingDays + modifiedThreshold) * 24 * 60 * 60
+		local startDateThreshold = DateExt.getCurrentTimestamp() - (upcomingDays + modifiedThreshold) * 24 * 60 * 60
 		if not tournament.startDate then
 			return false
 		end
 
-		if tournament.startDate.timestamp >= startDate then
-			return true
-		end
-
-		local endDate = DateExt.getCurrentTimestamp() + (completedDays + modifiedThreshold) * 24 * 60 * 60
+		local endDateThreshold = DateExt.getCurrentTimestamp() + (completedDays + modifiedThreshold) * 24 * 60 * 60
 		if not tournament.endDate then
-			return true
+			return tournament.startDate.timestamp >= startDateThreshold
 		end
 
-		return tournament.endDate.timestamp <= endDate
+		return tournament.endDate.timestamp <= endDateThreshold and tournament.startDate.timestamp >= startDateThreshold
 	end
 
 	local allTournaments = Array.filter(Tournament.getAllTournaments(), function(tournament)
@@ -91,9 +87,12 @@ function TournamentsTickerWidget:render()
 		return a.endDate.timestamp > b.endDate.timestamp
 	end
 
-	local upcomingTournaments = Array.sortBy(Array.filter(allTournaments, filterByPhase('UPCOMING')), sortByDateUpcoming)
-	local ongoingTournaments = Array.sortBy(Array.filter(allTournaments, filterByPhase('ONGOING')), sortByDate)
-	local completedTournaments = Array.sortBy(Array.filter(allTournaments, filterByPhase('FINISHED')), sortByDate)
+	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))
+	local ongoingTournaments = Array.filter(allTournaments, filterByPhase('ONGOING'))
+	local completedTournaments = Array.filter(allTournaments, filterByPhase('FINISHED'))
+	table.sort(upcomingTournaments, sortByDateUpcoming)
+	table.sort(ongoingTournaments, sortByDate)
+	table.sort(completedTournaments, sortByDate)
 
 	local fallbackElement = HtmlWidgets.Div{
 		attributes = {

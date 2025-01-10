@@ -37,23 +37,18 @@ local COLOR_CLASSES = {
 
 ---@return Widget?
 function TournamentsTickerWidget:render()
-	if not self.props.tournament then
-		return
-	end
-	local tier, tierType = Tier.parseFromQueryData(self.props.tournament)
-	tier, tierType = Logic.nilIfEmpty(tier), Logic.nilIfEmpty(tierType)
-	if not tier then
+	local tournament = self.props.tournament
+	if not tournament then
 		return
 	end
 
-	local tierShort, tierTypeShort = Tier.toShortName(tier, tierType)
+	local tierShort, tierTypeShort = Tier.toShortName(tournament.liquipediaTier,tournament.liquipediaTierType)
 
 	local tierNode, tierTypeNode, colorClass
 	if tierTypeShort then
-		local tierTypeIdentifier = Tier.toIdentifier(tierType)
-		colorClass = COLOR_CLASSES[tierTypeIdentifier]
+		colorClass = COLOR_CLASSES[tournament.liquipediaTierType]
 		tierNode = HtmlWidgets.Div{
-			classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tier]},
+			classes = {'tournament-badge__chip', 'chip--' .. COLOR_CLASSES[tournament.liquipediaTier]},
 			children = tierShort,
 		}
 		tierTypeNode = HtmlWidgets.Div{
@@ -61,10 +56,10 @@ function TournamentsTickerWidget:render()
 			children = tierTypeShort,
 		}
 	else
-		colorClass = COLOR_CLASSES[tier]
+		colorClass = COLOR_CLASSES[tournament.liquipediaTier]
 		tierNode = HtmlWidgets.Div{
 			classes = {'tournament-badge__text'},
-			children = Tier.toName(tier),
+			children = Tier.toName(tournament.liquipediaTier),
 		}
 	end
 

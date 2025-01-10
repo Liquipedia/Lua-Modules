@@ -13,7 +13,7 @@ return {
 
 		-- Dates
 		['date-unknown'] = 'TBA',
-		['date-range-different-months'] = '${startMonth} ${startDate} - ${endDateMonth} ${endDate}',
+		['date-range-different-months'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
 		['date-range-same-month'] = '${startMonth} ${startDate} - ${endDate}',
 		['date-range-same-day'] = '${startMonth} ${startDate}',
 		['date-range-unknown-end'] = '${startMonth} ${startDate} - TBA',

@@ -49,11 +49,11 @@ function TournamentsTickerWidget:render()
 						iconDark = tournament.iconDark,
 						series = tournament.series,
 						abbreviation = tournament.abbreviation,
-						link = tournament.pagename,
+						link = tournament.pageName,
 					},
 					Link{
-						link = tournament.pagename,
-						children = tournament.tickername,
+						link = tournament.pageName,
+						children = tournament.displayName,
 					},
 				},
 			},
@@ -63,8 +63,8 @@ function TournamentsTickerWidget:render()
 					['flex-shrink'] = '0',
 				},
 				children = Link{
-					children = DateRange{startDate = tournament.startdate, endDate = tournament.enddate},
-					link = tournament.pagename
+					children = DateRange{startDate = tournament.startDate, endDate = tournament.endDate},
+					link = tournament.pageName
 				},
 			},
 		},

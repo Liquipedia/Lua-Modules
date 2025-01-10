@@ -6,9 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local I18nData = mw.loadData('Module:I18n/Data')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
+local I18nData = Lua.import('Module:I18n/Data', {loadData = true})
 local I18n = {}
 
 local LANGUAGE = mw.language.getContentLanguage():getCode()

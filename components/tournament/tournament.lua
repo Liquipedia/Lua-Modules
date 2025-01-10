@@ -65,7 +65,7 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
 		fullName = record.name,
-		pageName = record.pageName,
+		pageName = record.pagename,
 		startDate = startDate,
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
@@ -73,6 +73,10 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 		region = record.region,
 		status = record.status,
 		featured = recordIsFeatured(record),
+		icon = record.icon,
+		iconDark = record.icondark,
+		abbreviation = record.abbreviation,
+		series = record.series,
 	}
 
 	tournament.phase = Tournaments.calculatePhase(tournament)
