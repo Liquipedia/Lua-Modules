@@ -9,26 +9,28 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
+local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget
 
 local TournamentsTickerWidget = Class.new(Widget)
-TournamentsTickerWidget.defaultProps = {
-	filterGroups = {'liquipediatier'}
-}
 
 ---@return Widget?
 function TournamentsTickerWidget:render()
 	if not self.props.tournaments then
 		return
 	end
+
+	local filters = Array.map(FilterConfig.categories, Operator.propety('propety')) or {}
+
 	local createFilterWrapper = function(tournament, child)
-		return Array.reduce(self.props.filterGroups or {}, function(prev, filter)
+		return Array.reduce(filters, function(prev, filter)
 			return HtmlWidgets.Div{
 				attributes = {
 					['data-filter-group'] = 'filterbuttons-' .. string.lower(filter),

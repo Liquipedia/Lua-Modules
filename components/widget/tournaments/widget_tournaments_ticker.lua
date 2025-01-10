@@ -24,14 +24,12 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TournamentsTickerWidget = Class.new(Widget)
 TournamentsTickerWidget.defaultProps = {
-	filterGroups = {'liquipediaTier'},
 	upcomingDays = 5,
 	completedDays = 5,
 }
 
 ---@return Widget
 function TournamentsTickerWidget:render()
-	local filterGroups = self.props.filterGroups
 	local upcomingDays = self.props.upcomingDays
 	local completedDays = self.props.completedDays
 
@@ -123,9 +121,9 @@ function TournamentsTickerWidget:render()
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = upcomingTournaments, filterGroups = filterGroups} ,
-					Sublist{title = 'Ongoing', tournaments = ongoingTournaments, filterGroups = filterGroups},
-					Sublist{title = 'Completed', tournaments = completedTournaments, filterGroups = filterGroups},
+					Sublist{title = 'Upcoming', tournaments = upcomingTournaments} ,
+					Sublist{title = 'Ongoing', tournaments = ongoingTournaments},
+					Sublist{title = 'Completed', tournaments = completedTournaments},
 					fallbackElement
 				}
 			}
