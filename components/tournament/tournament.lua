@@ -16,6 +16,13 @@ local Tier = require('Module:Tier/Utils')
 
 local Tournaments = {}
 
+---@enum TournamentPhase
+local TOURNAMENT_PHASE = {
+	UPCOMING = 'UPCOMING',
+	ONGOING = 'ONGOING',
+	FINISHED = 'FINISHED',
+}
+
 ---@class StandardTournament
 ---@field displayName string
 ---@field pageName string
@@ -26,14 +33,7 @@ local Tournaments = {}
 ---@field region string
 ---@field featured boolean
 ---@field status string?
----@field phase 'UPCOMING'|'ONGOING'|'FINISHED'
-
----@enum TournamentPhase
-local TOURNAMENT_PHASE = {
-	UPCOMING = 'UPCOMING',
-	ONGOING = 'ONGOING',
-	FINISHED = 'FINISHED',
-}
+---@field phase TournamentPhase
 
 ---@param conditions ConditionTree?
 function Tournaments.getAllTournaments(conditions)
