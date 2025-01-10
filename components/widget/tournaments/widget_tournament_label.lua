@@ -15,7 +15,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local TierPill = Lua.import('Module:Widget/Tournament/Pill')
+local TierPill = Lua.import('Module:Widget/Tournament/TierPill')
 
 ---@class TournamentsTickerWidget: Widget
 ---@operator call(table): TournamentsTickerWidget

@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Tournament/Ticker
+-- page=Module:Tournament
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -86,13 +86,13 @@ function Tournaments.calculatePhase(tournament)
 	if tournament.status == 'finished' then
 		return TOURNAMENT_PHASE.FINISHED
 	end
-	if tournament.startDate.timestamp == DateExt.defaultTimestamp then
+	if not tournament.startDate then
 		return TOURNAMENT_PHASE.UPCOMING
 	end
 	if DateExt.getCurrentTimestamp() < tournament.startDate.timestamp then
 		return TOURNAMENT_PHASE.UPCOMING
 	end
-	if tournament.endDate.timestamp == DateExt.defaultTimestamp then
+	if not tournament.endDate.timestamp then
 		return TOURNAMENT_PHASE.ONGOING
 	end
 	if DateExt.getCurrentTimestamp() < tournament.endDate.timestamp then

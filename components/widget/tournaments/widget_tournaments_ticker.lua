@@ -23,7 +23,7 @@ local Tournament = Lua.import('Module:Tournament')
 
 local TournamentsTickerWidget = Class.new(Widget)
 TournamentsTickerWidget.defaultProps = {
-	filterGroups = {'liquipediatier'},
+	filterGroups = {'liquipediaTier'},
 	upcomingDays = 5,
 	completedDays = 5,
 }
@@ -48,10 +48,23 @@ function TournamentsTickerWidget:render()
 	local function isWithinDateRange(tournament)
 		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTierType]
 			or tierThresholdModifiers[tournament.liquipediaTier]
-		local startDate = DateExt.getCurrentTimestamp() + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
-		local endDate = DateExt.getCurrentTimestamp() - (completedDays - modifiedThreshold) * 24 * 60 * 60
+			or 0
 
-		return tournament.startDate.timestamp >= startDate and tournament.endDate.timestamp <= endDate
+		local startDate = DateExt.getCurrentTimestamp() - (upcomingDays + modifiedThreshold) * 24 * 60 * 60
+		if not tournament.startDate then
+			return false
+		end
+
+		if tournament.startDate.timestamp >= startDate then
+			return true
+		end
+
+		local endDate = DateExt.getCurrentTimestamp() + (completedDays + modifiedThreshold) * 24 * 60 * 60
+		if not tournament.endDate then
+			return true
+		end
+
+		return tournament.endDate.timestamp <= endDate
 	end
 
 	local allTournaments = Array.filter(Tournament.getAllTournaments(), function(tournament)
