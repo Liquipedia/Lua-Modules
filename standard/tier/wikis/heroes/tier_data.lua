@@ -46,48 +46,6 @@ return {
 			name = 'Undefined',
 			short = '?',
 		},
-
-		-- for legacy reasons until heroes switches to standardized tier/tiertype
-		monthly = {
-			value = 'Monthly',
-			sort = 'A6',
-			name = 'Monthly',
-			short = 'Mon.',
-			link = 'Monthly Tournaments',
-			category = 'Monthly Tournaments',
-		},
-		weekly = {
-			value = 'Weekly',
-			sort = 'A7',
-			name = 'Weekly',
-			short = 'Week.',
-			link = 'Weekly Tournaments',
-			category = 'Weekly Tournaments',
-		},
-		qualifier = {
-			value = 'Qualifier',
-			sort = 'A8',
-			name = 'Qualifier',
-			short = 'Qual.',
-			link = 'Qualifier Tournaments',
-			category = 'Qualifier Tournaments',
-		},
-		misc = {
-			value = 'Misc',
-			sort = 'A9',
-			name = 'Misc',
-			short = 'Misc',
-			link = 'Miscellaneous Tournaments',
-			category = 'Miscellaneous Tournaments',
-		},
-		showmatch = {
-			value = 'Showmatch',
-			sort = 'B1',
-			name = 'Showmatch',
-			short = 'Showm.',
-			link = 'Show Matches',
-			category = 'Showmatch Tournaments',
-		},
 	},
 
 	tierTypes = {
