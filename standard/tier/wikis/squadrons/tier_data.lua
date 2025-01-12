@@ -46,24 +46,6 @@ return {
 			name = 'Undefined',
 			short = '?',
 		},
-
-		-- for legacy reasons until squadrons switches to standardized tier/tiertype
-		monthly = {
-			value = 'Monthly',
-			sort = 'A6',
-			name = 'Monthly',
-			short = 'Mon.',
-			link = 'Monthly Tournaments',
-			category = 'Monthly Tournaments',
-		},
-		qualifier = {
-			value = 'Qualifier',
-			sort = 'A8',
-			name = 'Qualifier',
-			short = 'Qual.',
-			link = 'Qualifier Tournaments',
-			category = 'Qualifier Tournaments',
-		},
 	},
 
 	tierTypes = {
