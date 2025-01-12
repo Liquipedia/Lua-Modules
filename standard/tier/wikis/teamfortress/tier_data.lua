@@ -54,24 +54,6 @@ return {
 			name = 'Undefined',
 			short = '?',
 		},
-
-		-- for legacy reasons until teamfortress switches to standardized tier/tiertype
-		monthly = {
-			value = 'Monthly',
-			sort = 'A6',
-			name = 'Monthly',
-			short = 'Mon.',
-			link = 'Monthly Tournaments',
-			category = 'Monthly Tournaments',
-		},
-		showmatch = {
-			value = 'Showmatch',
-			sort = 'B1',
-			name = 'Showmatch',
-			short = 'Showm.',
-			link = 'Showmatches',
-			category = 'Showmatch Tournaments',
-		},
 	},
 
 	tierTypes = {
