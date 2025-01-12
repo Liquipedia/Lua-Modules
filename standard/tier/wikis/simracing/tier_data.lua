@@ -54,24 +54,6 @@ return {
 			name = 'Undefined',
 			short = '?',
 		},
-
-		-- for legacy reasons until simracing switches to standardized tier/tiertype
-		qualifier = {
-			value = 'Qualifier',
-			sort = 'A8',
-			name = 'Qualifier',
-			short = 'Qual.',
-			link = 'Qualifier Tournaments',
-			category = 'Qualifier Tournaments',
-		},
-		showmatch = {
-			value = 'Showmatch',
-			sort = 'B1',
-			name = 'Showmatch',
-			short = 'Showm.',
-			link = 'Showmatches',
-			category = 'Showmatch Tournaments',
-		},
 	},
 
 	tierTypes = {
