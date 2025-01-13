@@ -8,16 +8,17 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Utils')
-local FnUtil = require('Module:FnUtil')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
+local MatchUtil = Lua.import('Module:Match/Util')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -382,7 +383,9 @@ function MatchTicker:expandGamesOfMatches(matches)
 			gameMatch.date = game.date
 			gameMatch.map = game.map
 			gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-			gameMatch.match2opponents = Table.deepMerge(gameMatch.match2opponents, game.opponents)
+			gameMatch.match2opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
+				return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
+			end)
 			gameMatch.match2games = nil
 			return gameMatch
 		end)
@@ -394,7 +397,7 @@ end
 ---@return table[]
 function MatchTicker:sortMatches(matches)
 	local reverse = self.config.recent and true or false
-	return Array.sortBy(matches, FnUtil.identity,function (a, b)
+	return Array.sortBy(matches, FnUtil.identity, function (a, b)
 		if a.date ~= b.date then
 			if reverse then
 				return a.date > b.date
