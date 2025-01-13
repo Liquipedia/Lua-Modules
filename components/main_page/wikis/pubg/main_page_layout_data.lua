@@ -77,7 +77,7 @@ return {
 	title = 'PUBG',
 	navigation = {
 		{
-			file = '',
+			file = 'KSV at IEM XII Katowice.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -86,7 +86,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'T1 PUBG at EWC 2024.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -95,7 +95,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'Danawa e-sports at EWC 2024.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -104,7 +104,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'EWC 2024 PUBG Trophy closeup.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
