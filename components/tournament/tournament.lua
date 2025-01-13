@@ -52,7 +52,7 @@ function Tournaments.getAllTournaments(conditions, filterTournament)
 			limit = 1000,
 		},
 		function(record)
-			local tournament = Tournaments.tournamentFromRecord(record,	Tournaments.makeFeaturedFunction())
+			local tournament = Tournaments.tournamentFromRecord(record, Tournaments.makeFeaturedFunction())
 			if not filterTournament or filterTournament(tournament) then
 				table.insert(tournaments, tournament)
 			end

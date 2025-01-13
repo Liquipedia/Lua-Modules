@@ -134,9 +134,9 @@ function MatchTicker:init(args)
 				end) or nil,
 		tierTypes = args.tiertypes and Array.map(Array.filter(
 					Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)
-				) or nil, function(tiertype)
+				), function(tiertype)
 					return select(2, Tier.toValue(1, tiertype))
-				end),
+				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 	}
 

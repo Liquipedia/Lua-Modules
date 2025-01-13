@@ -63,7 +63,10 @@ function TournamentsTickerWidget:render()
 	end
 
 	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all)
-		:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, ''))
+		:add(Condition.Tree(Condition.BooleanOperator.any)
+			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, ''))
+			:add(Condition.Node(Condition.ColumnName('status'), Condition.Comparator.eq, 'finished'))
+		)
 		:add(Condition.Node(Condition.ColumnName('liquipediatiertype'), Condition.Comparator.eq, '!Points'))
 
 	local allTournaments = Tournament.getAllTournaments(lpdbFilter, function(tournament)
