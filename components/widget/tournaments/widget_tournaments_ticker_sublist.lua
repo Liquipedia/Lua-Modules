@@ -27,7 +27,7 @@ function TournamentsTickerWidget:render()
 		return
 	end
 
-	local filters = Array.map(FilterConfig.categories, Operator.propety('propety')) or {}
+	local filters = Array.map(FilterConfig.categories, Operator.property('property')) or {}
 
 	local createFilterWrapper = function(tournament, child)
 		return Array.reduce(filters, function(prev, filter)
