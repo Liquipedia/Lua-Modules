@@ -423,7 +423,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return a.asGameIdx < b.asGameIdx
+		return (a.asGameIdx or 0) < (b.asGameIdx or 0)
 	end)
 end
 
