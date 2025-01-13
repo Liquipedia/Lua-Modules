@@ -197,6 +197,7 @@ function MatchTicker:query(matches)
 	if type(matches[1]) == 'table' then
 		matches = self:filterMatches(matches)
 		matches = self:expandGamesOfMatches(matches)
+		matches = self:sortMatches(matches)
 		matches = Array.sub(matches, 1, self.config.limit)
 		self.matches = Array.map(matches, function(match) return self:adjustMatch(match) end)
 		return self
@@ -360,6 +361,18 @@ function MatchTicker:expandGamesOfMatches(matches)
 			gameMatch.asGame = true
 			gameMatch.asGameIdx = gameIndex
 		end)
+	end)
+end
+
+---Overwritable per wiki decision
+---@param matches table[]
+---@return table[]
+function MatchTicker:sortMatches(matches)
+	return Array.sortBy(matches, function(match)
+		if match.asGame then
+			return match.match2games[match.asGameIdx].date
+		end
+		return match.date
 	end)
 end
 
