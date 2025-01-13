@@ -313,7 +313,7 @@ function Match._prepareRecordsForStore(records)
 	for opponentIndex, opponentRecord in ipairs(records.opponentRecords) do
 		Match.clampFields(opponentRecord, Match.opponentFields)
 		for _, playerRecord in ipairs(records.playerRecords[opponentIndex]) do
-			Match.clampFields(playerRecord, Match.playerFields)
+			Match._preparePlayerRecordForStore(playerRecord)
 		end
 	end
 	for _, gameRecord in ipairs(records.gameRecords) do
@@ -385,6 +385,13 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 		end
 	end
 	Match.clampFields(gameRecord, Match.gameFields)
+end
+
+---@param playerRecord table
+function Match._preparePlayerRecordForStore(playerRecord)
+	playerRecord.extradata = playerRecord.extradata or {}
+	playerRecord.extradata.playerteam = playerRecord.team
+	Match.clampFields(playerRecord, Match.playerFields)
 end
 
 ---Adds fields needed for backwards compatibility with API v3.
@@ -478,12 +485,12 @@ Match.gameFields = Table.map({
 	'map',
 	'mode',
 	'parent',
-	'participants',
+	'participants', -- LPDB API v3: backwards compatibility
 	'patch',
 	'opponents',
 	'resulttype',  -- LPDB API v3: backwards compatibility
 	'rounds',
-	'scores',
+	'scores', -- LPDB API v3: backwards compatibility
 	'status',
 	'subgroup',
 	'tournament',

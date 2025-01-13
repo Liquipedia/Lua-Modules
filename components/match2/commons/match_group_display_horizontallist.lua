@@ -66,7 +66,7 @@ end
 ---@return Html
 function HorizontallistDisplay.Bracket(props)
 	local config = {
-		MatchSummaryContainer = DisplayHelper.DefaultMatchSummaryContainer,
+		MatchSummaryContainer = DisplayHelper.DefaultFfaMatchSummaryContainer,
 	}
 	local list = mw.html.create('ul'):addClass('navigation-tabs__list'):attr('role', 'tablist')
 
@@ -90,6 +90,8 @@ function HorizontallistDisplay.Bracket(props)
 
 	local bracketNode = mw.html.create('div')
 			:addClass('navigation-tabs')
+			-- Do not show the tabs if there is only one match
+			:addClass(#sortedBracket == 1 and 'is--hidden' or nil)
 			:attr('data-js-battle-royale', 'navigation')
 			:attr('role', 'tabpanel')
 			:node(list)

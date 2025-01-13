@@ -11,13 +11,15 @@ local AgentNames = require('Module:AgentNames')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		disregardTransferDates = true,
+	}
+}
 local MapFunctions = {}
 
 MatchFunctions.DEFAULT_MODE = 'team'
@@ -37,36 +39,7 @@ end
 ---@param opponents MGIParsedOpponent[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map))
-			local players = MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		map.extradata = MapFunctions.getExtraData(map, map.opponents)
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
@@ -109,10 +82,11 @@ function MapFunctions.keepMap(map)
 	return map.map ~= nil
 end
 
+---@param match table
 ---@param map table
----@param participants {players: {player: string?, agent: string?}[]}[]
+---@param opponents table[]
 ---@return table<string, any>
-function MapFunctions.getExtraData(map, participants)
+function MapFunctions.getExtraData(match, map, opponents)
 	---@type table<string, any>
 	local extraData = {
 		comment = map.comment,
@@ -121,7 +95,7 @@ function MapFunctions.getExtraData(map, participants)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
-	for opponentIdx, opponent in ipairs(participants) do
+	for opponentIdx, opponent in ipairs(map.opponents) do
 		for playerIdx, player in pairs(opponent.players) do
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent

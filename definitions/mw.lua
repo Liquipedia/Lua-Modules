@@ -529,7 +529,7 @@ function mw.message:isDisabled() end
 ---@field contentNamespaces table<number|string, namespaceInfo>
 ---@field subjectNamespaces table<number|string, namespaceInfo>
 ---@field talkNamespaces table<number|string, namespaceInfo>
----@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number}
+---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
 mw.site = {server = 'https://liquipedia.net/wiki/'}
 
 ---Returns a table holding data about available interwiki prefixes. If filter is the string "local", then only data for local interwiki prefixes is returned. If filter is the string "!local", then only data for non-local prefixes is returned. If no filter is specified, data for all prefixes is returned. A "local" prefix in this context is one that is for the same project.
@@ -948,6 +948,7 @@ function mw.ustring.upper(s) return string.upper(s) end
 
 mw.uri = {}
 function mw.uri.localUrl(s, s2) return '' end
+function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')

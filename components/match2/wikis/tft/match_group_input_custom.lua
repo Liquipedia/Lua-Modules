@@ -8,23 +8,31 @@
 
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	DEFAULT_MODE = 'team',
+}
+local FfaMatchFunctions = {
+	DEFAULT_MODE = 'solos',
+}
 local MapFunctions = {}
+local FfaMapFunctions = {}
 
 local DEFAULT_BESTOF = 3
-MatchFunctions.DEFAULT_MODE = 'team'
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
+
+--- Normal 2-opponent Match
 
 ---@param match table
 ---@param opponents table[]
@@ -84,11 +92,55 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+--- FFA Match
+
+---@param match table
+---@param opponents table[]
+---@param scoreSettings table
+---@return table[]
+function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
+end
+
+---@param opponents table[]
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function FfaMatchFunctions.calculateMatchScore(opponents, maps)
+	return function(opponentIndex)
+		return Array.reduce(Array.map(maps, function(map)
+			return map.opponents[opponentIndex].score or 0
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
+	end
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@param settings table
+---@return table
+function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
+	return {
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
+	}
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		dateexact = map.dateexact,
+		comment = map.comment,
+	}
 end
 
 

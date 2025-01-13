@@ -7,20 +7,22 @@
 --
 
 -- Holds DisplayComponents for the MatchTicker module
--- It contains the new html structure intented to be use for the new Dota2 Main Page (for now)
--- Will most likely be expanded to other games in the future and other pages
+-- It contains the new html structure intented to be use for the new Main Page
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
+local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Timezone = require('Module:Timezone')
 local StreamLinks = require('Module:Links/Stream')
 local Page = require('Module:Page')
-local DefaultMatchTickerDisplayComponents = require('Module:MatchTicker/DisplayComponents')
+local VodLink = require('Module:VodLink')
 
+local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -48,19 +50,22 @@ function ScoreBoard:create()
 	local match = self.match
 	local winner = tonumber(match.winner)
 
+	if #match.opponents > 2 then
+		--- When "FFA/BR" we don't want to display the opponents, as there are more than 2.
+		return self.root:node(self:versus())
+	end
+
 	return self.root
-		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(self:opponent(match.opponents[1], winner == 1, true):addClass('team-left'))
 		:node(self:versus())
-		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+		:node(self:opponent(match.opponents[2], winner == 2):addClass('team-right'))
 end
 
----@param opponentData table
+---@param opponent standardOpponent
 ---@param isWinner boolean
 ---@param flip boolean?
 ---@return Html
-function ScoreBoard:opponent(opponentData, isWinner, flip)
-	local opponent = Opponent.fromMatch2Record(opponentData)
-	---@cast opponent -nil
+function ScoreBoard:opponent(opponent, isWinner, flip)
 	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
@@ -89,8 +94,8 @@ end
 ---@return Html
 function ScoreBoard:versus()
 	return mw.html.create('div')
-	:addClass('versus')
-	:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
+		:addClass('versus')
+		:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker
@@ -129,7 +134,7 @@ function Details:create()
 			)
 			:wikitext('  Details')
 		), self.match.match2bracketdata.matchpage))
-	elseif self.match.match2id then
+	elseif self.match.match2id and Info.config.match2.matchPage then
 		local link = 'Match:ID ' .. self.match.match2id
 		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
 			:addClass('btn btn-new btn--add-match-details show-when-logged-in')
@@ -141,7 +146,7 @@ function Details:create()
 	return self.root
 		:node(mw.html.create('div'):addClass('match-links')
 			:node(self:tournament())
-			:node(self:streams())
+			:node(self:streamsOrVods())
 		)
 		:node(matchBottomBar)
 end
@@ -174,14 +179,31 @@ function Details:countdown()
 end
 
 ---@return Html?
-function Details:streams()
+function Details:streamsOrVods()
 	local match = self.match
-	local links = mw.html.create('div')
-		:addClass('match-streams')
 
-	links:wikitext(table.concat(StreamLinks.buildDisplays(StreamLinks.filterStreams(match.stream)) or {}))
+	if not Logic.readBool(match.finished) then
+		return mw.html.create('div')
+			:addClass('match-streams')
+			:wikitext(table.concat(StreamLinks.buildDisplays(StreamLinks.filterStreams(match.stream)) or {}))
+	end
 
-	return links
+	local vods = mw.html.create('div')
+			:addClass('match-streams')
+
+	---@param obj table
+	---@param index integer?
+	local addVod = function(obj, index)
+		vods:node(Logic.isNotEmpty(obj.vod) and VodLink.display{
+			vod = obj.vod,
+			gamenum = index,
+		} or nil)
+	end
+
+	addVod(match)
+	Array.forEach(match.match2games or {}, addVod)
+
+	return vods
 end
 
 ---@return Html?

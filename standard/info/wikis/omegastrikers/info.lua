@@ -33,7 +33,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
-			status = 0,
+			status = 2,
 			matchWidth = 180,
 		},
 		transfers = {

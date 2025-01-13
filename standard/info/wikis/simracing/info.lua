@@ -405,7 +405,7 @@ return {
 		['gt sport'] = {
 			abbreviation = 'GT Sport',
 			name = 'Gran Turismo Sport',
-			link = 'Gran Turismo SPort',
+			link = 'Gran Turismo Sport',
 			logo = {
 				darkMode = 'Gran Turismo default allmode.png',
 				lightMode = 'Gran Turismo default allmode.png',

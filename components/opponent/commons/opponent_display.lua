@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
@@ -471,8 +472,10 @@ function OpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
 		if opponent.score == 0 and Opponent.isTbd(opponent) then
 			return ''
+		elseif opponent.score == -1 then
+			return ''
 		else
-			return opponent.score ~= -1 and tostring(opponent.score) or ''
+			return tostring(Math.round(opponent.score, 2))
 		end
 	else
 		return opponent.status or ''

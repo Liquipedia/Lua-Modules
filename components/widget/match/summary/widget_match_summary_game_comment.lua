@@ -25,7 +25,11 @@ function MatchSummaryGameComment:render()
 	end
 	return HtmlWidgets.Fragment{children = {
 		MatchSummaryBreak{},
-		HtmlWidgets.Div{css = {margin = 'auto'}, classes = self.props.classes, children = self.props.children},
+		HtmlWidgets.Div{
+			css = {margin = 'auto', ['max-width'] = '100%'},
+			classes = self.props.classes,
+			children = self.props.children
+		},
 	}}
 end
 

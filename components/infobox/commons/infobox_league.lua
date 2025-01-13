@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -34,7 +35,7 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=infobox'..
+local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
 	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
 local Widgets = require('Module:Widget/All')
@@ -231,8 +232,8 @@ function League:createInfobox()
 					return
 				end
 				local locations = Locale.formatLocations(args)
-				-- If more than one venue, don't show the accommodation section, as it is unclear which one the link is for
-				if locations.venue2 or locations.city2 then
+				-- If more than one city, don't show the accommodation section, as it is unclear which one the link is for
+				if locations.city2 then
 					return
 				end
 				-- Must have a venue or a city to show the accommodation section
@@ -256,7 +257,8 @@ function League:createInfobox()
 				end
 
 				local addressParts = {}
-				table.insert(addressParts, locations.venue1)
+				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
+				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
 				table.insert(addressParts, locations.city1)
 				table.insert(addressParts, Flags.CountryName(locations.country1 or locations.region1))
 
@@ -278,6 +280,8 @@ function League:createInfobox()
 
 				local function buildStay22Link(address, checkin, checkout)
 					return String.interpolate(STAY22_LINK, {
+						wiki = Info.wikiName,
+						page = self.data.name,
 						address = address,
 						checkin = checkin,
 						checkout = checkout,

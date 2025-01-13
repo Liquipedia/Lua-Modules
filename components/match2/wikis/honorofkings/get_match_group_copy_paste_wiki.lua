@@ -27,7 +27,7 @@ local INDENT = WikiCopyPaste.Indent
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0)
-	local numberOfBans = tonumber(args.bans)
+	local numberOfBans = tonumber(args.bans) or 0
 
 	local lines = Array.extend(
 		'{{Match',
@@ -39,6 +39,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube= |bilibili= |douyu= |huya=',
+			INDENT .. '|mvp=',
 			args.vod == 'series' and (INDENT .. '|vod=') or nil,
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)

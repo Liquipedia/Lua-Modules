@@ -90,6 +90,7 @@ return function(busted, helper, options)
 		table.insert(paths, 'components/widget/infobox/?.lua')
 		table.insert(paths, 'components/widget/image/?.lua')
 		table.insert(paths, 'components/widget/match/summary/?.lua')
+		table.insert(paths, 'components/widget/match/summary/ffa/?.lua')
 		table.insert(paths, 'components/widget/misc/?.lua')
 		table.insert(paths, 'components/widget/squad/?.lua')
 
@@ -234,6 +235,9 @@ return function(busted, helper, options)
 		end
 		local stub = require('luassert.stub')
 		stub(require('Module:Lua'), 'requireIfExists', attemptImport)
+		stub(require('Module:Lua'), 'moduleExists', function(file)
+			return attemptImport(file) ~= nil
+		end)
 	end
 
 	busted.subscribe({'suite', 'start'}, setupForTesting)
