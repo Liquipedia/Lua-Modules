@@ -54,32 +54,6 @@ return {
 			name = 'Undefined',
 			short = '?',
 		},
-
-		-- for legacy reasons until freefire switches to standardized tier/tiertype
-		weekly = {
-			value = 'Weekly',
-			sort = 'A7',
-			name = 'Weekly',
-			short = 'Week.',
-			link = 'Weekly Tournaments',
-			category = 'Weekly Tournaments',
-		},
-		qualifier = {
-			value = 'Qualifier',
-			sort = 'A8',
-			name = 'Qualifier',
-			short = 'Qual.',
-			link = 'Qualifier Tournaments',
-			category = 'Qualifier Tournaments',
-		},
-		showmatch = {
-			value = 'Showmatch',
-			sort = 'B1',
-			name = 'Showmatch',
-			short = 'Showm.',
-			link = 'Show Matches',
-			category = 'Showmatch Tournaments',
-		},
 	},
 
 	tierTypes = {
