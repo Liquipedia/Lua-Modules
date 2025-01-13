@@ -242,8 +242,12 @@ function MatchTable:getOpponentAliases(mode, opponent)
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
+		local pagifiedName = Page.pageifyLink(name)
+		local pagifiedNameWithSpaces = pagifiedName:gsub('_', ' ')
 		aliases[name] = true
 		aliases[nameWithSpaces] = true
+		aliases[pagifiedName] = true
+		aliases[pagifiedNameWithSpaces] = true
 	end)
 
 	return aliases
