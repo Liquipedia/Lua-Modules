@@ -15,7 +15,11 @@ local Lua = require('Module:Lua')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		disregardTransferDates = true,
+	}
+}
 local MapFunctions = {}
 
 MatchFunctions.DEFAULT_MODE = 'team'
