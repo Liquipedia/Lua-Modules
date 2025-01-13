@@ -8,7 +8,9 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
@@ -24,7 +26,6 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---@field transform? fun(item: string): string
 ---@field expandKey string?
 ---@field expandable boolean?
----@field additionalClass string?
 ---@field order? fun(a: string, b: string): boolean
 ---@field load? fun(cat: FilterButtonCategory): FilterButtonCategory
 
@@ -32,7 +33,7 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---Can be used from wikicode
 ---@return Html
 function FilterButtons.getFromConfig()
-	return FilterButtons.get(require('Module:FilterButtons/Config').categories)
+	return FilterButtons.get(Lua.import('Module:FilterButtons/Config').categories)
 end
 
 ---Entrypoint building a set of FilterButtons
@@ -84,12 +85,9 @@ function FilterButtons.getButtonRow(category)
 			:wikitext('All')
 			:done()
 
-	if String.isNotEmpty(category.additionalClass) then
-		buttons:addClass(category.additionalClass)
-	end
-
+	local transform = category.transform or FnUtil.identity
 	for _, value in ipairs(category.items or {}) do
-		local text = category.transform and category.transform(value) or value
+		local text = transform(value)
 		local button = mw.html.create('span')
 			:addClass('filter-button')
 			:attr('data-filter-on', value)
@@ -115,10 +113,6 @@ function FilterButtons.getButtonRow(category)
 				:addClass('filter-button')
 				:css('display','none')
 				:attr('data-filter-on', 'all'))
-
-		if String.isNotEmpty(category.additionalClass) then
-			dropdownButton:addClass(category.additionalClass)
-		end
 
 		buttons:node(dropdownButton)
 	end

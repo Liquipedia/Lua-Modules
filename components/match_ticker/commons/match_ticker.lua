@@ -132,9 +132,11 @@ function MatchTicker:init(args)
 					local identifier = Tier.toIdentifier(tier)
 					return type(identifier) == 'number' and Tier.isValid(identifier)
 				end) or nil,
-		tierTypes = args.tiertypes and Array.filter(
+		tierTypes = args.tiertypes and Array.map(Array.filter(
 					Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)
-				) or nil,
+				), function(tiertype)
+					return select(2, Tier.toValue(1, tiertype))
+				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 	}
 
