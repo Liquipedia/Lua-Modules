@@ -374,6 +374,7 @@ function MatchTicker:expandGamesOfMatches(matches)
 
 			gameMatch.winner = game.winner
 			gameMatch.date = game.date
+			gameMatch.map = game.map
 			gameMatch.match2opponents = game.opponents
 			gameMatch.match2games = nil
 		end)

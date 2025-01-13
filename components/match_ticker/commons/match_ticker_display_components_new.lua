@@ -24,7 +24,6 @@ local VodLink = require('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -53,8 +52,8 @@ function ScoreBoard:create()
 	local opponents = #match.match2opponents
 
 	if opponents > 2 then
-		--- "FFA/BR" view
-		return self.root:node(self:title())
+		--- When "FFA/BR" we don't want to display the opponents, as there are more than 2.
+		return self.root:node(self:versus())
 	end
 
 	return self.root
@@ -100,14 +99,6 @@ function ScoreBoard:versus()
 	return mw.html.create('div')
 		:addClass('versus')
 		:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
-end
-
----@return Html
-function ScoreBoard:title()
-	local header = self.match.match2bracketdata.inheritedheader
-	return mw.html.create('div')
-		:addClass('versus')
-		:node(DisplayHelper.expandHeader(header)[1])
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker

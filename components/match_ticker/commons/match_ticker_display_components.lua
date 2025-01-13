@@ -26,6 +26,7 @@ local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -82,10 +83,16 @@ local Versus = Class.new(
 
 ---@return Html
 function Versus:create()
-	local bestof = self.match.asGame and self:title() or self:bestof()
+	local bestof = self.match.asGame and self:gameTitle() or self:bestof()
 	local scores, scores2 = self:scores()
 	local upperText, lowerText
-	if String.isNotEmpty(scores2) then
+	if #self.match.match2opponents > 2 then
+		local headerRaw = self.match.match2bracketdata.inheritedheader
+		upperText = DisplayHelper.expandHeader(headerRaw)[1]
+		if self.match.asGame then
+			upperText = upperText .. ' - ' .. self:gameTitle() .. self:mapTitle()
+		end
+	elseif String.isNotEmpty(scores2) then
 		upperText = scores2
 		lowerText = scores
 	elseif bestof then
@@ -116,13 +123,21 @@ function Versus:bestof()
 	end
 end
 
----@return string?
-function Versus:title()
+---@return string
+function Versus:gameTitle()
 	if not self.match.asGameIdx then
-		return
+		return ''
 	end
-	local mapName = Logic.nilIfEmpty(self.match.match2games[self.match.asGameIdx].map)
-	return 'Game #' .. (self.match.asGameIdx) .. (mapName and ' on ' .. mapName or '')
+	return 'Game #' .. (self.match.asGameIdx)
+end
+
+---@return string
+function Versus:mapTitle()
+	local mapName = Logic.nilIfEmpty(self.match.map)
+	if not mapName then
+		return ''
+	end
+	return ' on ' .. mapName
 end
 
 ---@return string?
@@ -145,9 +160,7 @@ function Versus:scores()
 		return score
 	end
 
-	local opponents = self.match.match2opponents
-
-	Array.forEach(opponents or {}, function(opponent, opponentIndex)
+	Array.forEach(self.match.match2opponents or {}, function(opponent, opponentIndex)
 		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 
