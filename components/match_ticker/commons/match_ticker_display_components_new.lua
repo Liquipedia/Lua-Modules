@@ -7,8 +7,7 @@
 --
 
 -- Holds DisplayComponents for the MatchTicker module
--- It contains the new html structure intented to be use for the new Dota2 Main Page (for now)
--- Will most likely be expanded to other games in the future and other pages
+-- It contains the new html structure intented to be use for the new Main Page
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
@@ -25,7 +24,6 @@ local VodLink = require('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -51,26 +49,23 @@ local ScoreBoard = Class.new(
 function ScoreBoard:create()
 	local match = self.match
 	local winner = tonumber(match.winner)
-	local opponents = #match.match2opponents
 
-	if opponents > 2 then
-		--- "FFA/BR" view
-		return self.root:node(self:title())
+	if #match.opponents > 2 then
+		--- When "FFA/BR" we don't want to display the opponents, as there are more than 2.
+		return self.root:node(self:versus())
 	end
 
 	return self.root
-		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(self:opponent(match.opponents[1], winner == 1, true):addClass('team-left'))
 		:node(self:versus())
-		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+		:node(self:opponent(match.opponents[2], winner == 2):addClass('team-right'))
 end
 
----@param opponentData table
+---@param opponent standardOpponent
 ---@param isWinner boolean
 ---@param flip boolean?
 ---@return Html
-function ScoreBoard:opponent(opponentData, isWinner, flip)
-	local opponent = Opponent.fromMatch2Record(opponentData)
-	---@cast opponent -nil
+function ScoreBoard:opponent(opponent, isWinner, flip)
 	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
@@ -101,14 +96,6 @@ function ScoreBoard:versus()
 	return mw.html.create('div')
 		:addClass('versus')
 		:node(DefaultMatchTickerDisplayComponents.Versus(self.match):create())
-end
-
----@return Html
-function ScoreBoard:title()
-	local header = self.match.match2bracketdata.inheritedheader
-	return mw.html.create('div')
-		:addClass('versus')
-		:node(DisplayHelper.expandHeader(header)[1])
 end
 
 ---Display class for the details of a match displayed at the bottom of a match ticker

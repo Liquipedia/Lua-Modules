@@ -16,6 +16,8 @@ local Table = require('Module:Table')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local MatchUtil = Lua.import('Module:Match/Util')
+
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -631,11 +633,8 @@ function MatchSummaryFfa.updateGameOpponents(match, game)
 	game.opponents = Array.map(game.opponents,
 		function(gameOpponent, opponentIdx)
 			local matchOpponent = match.opponents[opponentIdx]
-			local newGameOpponent = Table.deepMerge(matchOpponent, gameOpponent)
-			-- These values are only allowed to come from Game and not Match
-			newGameOpponent.placement = gameOpponent.placement
-			newGameOpponent.score = gameOpponent.score
-			newGameOpponent.status = gameOpponent.status
+			-- Standard merge
+			local newGameOpponent = MatchUtil.enrichGameOpponentFromMatchOpponent(matchOpponent, gameOpponent)
 
 			-- Other fields
 			newGameOpponent.game = Game.abbreviation{game = match.game}:lower()
