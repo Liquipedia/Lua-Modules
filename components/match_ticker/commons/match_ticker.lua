@@ -19,6 +19,7 @@ local Tier = require('Module:Tier/Utils')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 local MatchUtil = Lua.import('Module:Match/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -320,7 +321,7 @@ end
 ---@return table[]
 function MatchTicker:parseMatches(matches)
 	return Array.map(matches, function (match)
-		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
+		match.opponents = Array.map(match.match2opponents, MatchGroupUtil.opponentFromRecord)
 		return match
 	end)
 end
@@ -433,9 +434,9 @@ function MatchTicker:adjustMatch(match)
 	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
 	if
 		--check for the name value
-		Table.includes(opponentNames, (match.match2opponents[2].name:gsub(' ', '_')))
+		Table.includes(opponentNames, (match.opponents[2].name:gsub(' ', '_')))
 		--check inside match2players too for the player value
-		or self.config.player and Table.any(match.match2opponents[2].match2players, function(_, playerData)
+		or self.config.player and Table.any(match.opponents[2].players, function(_, playerData)
 			return (playerData.name or ''):gsub(' ', '_') == self.config.player end)
 	then
 		return MatchTicker.switchOpponents(match)

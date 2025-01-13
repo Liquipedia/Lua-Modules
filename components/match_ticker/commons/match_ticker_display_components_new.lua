@@ -49,9 +49,8 @@ local ScoreBoard = Class.new(
 function ScoreBoard:create()
 	local match = self.match
 	local winner = tonumber(match.winner)
-	local opponents = #match.opponents
 
-	if opponents > 2 then
+	if #match.opponents > 2 then
 		--- When "FFA/BR" we don't want to display the opponents, as there are more than 2.
 		return self.root:node(self:versus())
 	end
