@@ -382,7 +382,7 @@ function MatchTicker:expandGamesOfMatches(matches)
 			gameMatch.date = game.date
 			gameMatch.map = game.map
 			gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-			gameMatch.match2opponents = game.opponents
+			gameMatch.match2opponents = Table.deepMerge(gameMatch.match2opponents, game.opponents)
 			gameMatch.match2games = nil
 			return gameMatch
 		end)
