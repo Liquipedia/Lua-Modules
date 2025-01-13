@@ -102,14 +102,15 @@ function Versus:create()
 		upperText = scores
 		lowerText = VS
 	end
+	upperText = upperText or VS
 
 	if not lowerText then
-		return self.root:wikitext(VS)
+		return self.root:wikitext(upperText)
 	end
 
 	return self.root
 		:node(mw.html.create('div')
-			:addClass('versus-upper'):node(upperText or VS)
+			:addClass('versus-upper'):node(upperText)
 		):node(mw.html.create('div')
 			:addClass('versus-lower'):wikitext('(' .. lowerText .. ')')
 		)
