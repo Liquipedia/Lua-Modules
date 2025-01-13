@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -155,9 +156,11 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		children = WidgetUtil.collect(
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			DisplayHelper.MapScore(game.opponents[1], game.status),
 			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game)},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game, {noLink = true})},
 			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+			DisplayHelper.MapScore(game.opponents[2], game.status),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
@@ -168,10 +171,11 @@ end
 ---@param hoverText string|number|nil
 ---@return Html
 function CustomMatchSummary._iconDisplay(icon, hoverText)
-	return mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(icon)
-		:attr('title', hoverText)
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-spaced'},
+		attributes = {title = hoverText},
+		children = {icon},
+	}
 end
 
 return CustomMatchSummary

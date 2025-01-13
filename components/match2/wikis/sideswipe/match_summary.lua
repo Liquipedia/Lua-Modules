@@ -173,7 +173,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 	local function makeTeamSection(opponentIndex)
 		return {
-			DisplayHelper.MapScore(game.scores[opponentIndex], opponentIndex, game.resultType, game.walkover, game.winner),
+			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
 		}
 	end

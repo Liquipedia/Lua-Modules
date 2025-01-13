@@ -6,18 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {}
-local MapFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
 
 local DEFAULT_BESTOF = 3
 MatchFunctions.DEFAULT_MODE = 'team'
@@ -33,42 +32,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		if map.map == nil then
-			break
-		end
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = MapFunctions.getExtraData(map)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		map.opponents = Array.map(opponents, function(_, opponentIndex)
-			local scoreInput = map['score' .. opponentIndex]
-			if map.mode == 'Push' and scoreInput then
-				scoreInput = scoreInput:gsub('m', '')
-			end
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = scoreInput,
-			})
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 --
@@ -106,12 +70,27 @@ end
 -- map related functions
 --
 
+---@param match table
 ---@param map table
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map)
+function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
 	}
 end
+---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
+---@param autoScore? fun(opponentIndex: integer): integer?
+---@return integer? #SCORE
+---@return string? #STATUS
+function MapFunctions.computeOpponentScore(props, autoScore)
+	if props.score then
+		props.score = props.score:gsub('m', '')
+	end
+
+	return MatchGroupInputUtil.computeOpponentScore(props, autoScore)
+end
+
+
 
 return CustomMatchGroupInput

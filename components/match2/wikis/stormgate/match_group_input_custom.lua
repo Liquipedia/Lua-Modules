@@ -158,11 +158,14 @@ function MatchFunctions.getExtraData(match, games, opponents)
 end
 
 ---@param game table
+---@param gameIndex integer
+---@param match table
 ---@return string?
-function MapFunctions.getMapName(game)
+---@return string?
+function MapFunctions.getMapName(game, gameIndex, match)
 	local mapName = game.map
 	if mapName and mapName:upper() ~= TBD then
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map)
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map), game.mapDisplayName
 	elseif mapName then
 		return TBD
 	end
@@ -172,10 +175,9 @@ end
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
-	local finished = map.finished
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -204,7 +206,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
 	end)
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	local mapPlayers = MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -235,21 +237,21 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 		end
 	)
 
-	Array.forEach(unattachedParticipants, function(participant)
-		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
+	Array.forEach(mapPlayers, function(player, playerIndex)
+		if Logic.isEmpty(player) then return end
+		local name = mapInput['t' .. opponentIndex .. 'p' .. player.position]
 		local nameUpper = name:upper()
 		local isTBD = nameUpper == TBD
 
-		table.insert(opponent.match2players, {
-			name = isTBD and TBD or participant.player,
+		opponent.match2players[playerIndex] = opponent.match2players[playerIndex] or {
+			name = isTBD and TBD or player.player,
 			displayname = isTBD and TBD or name,
-			flag = participant.flag,
-			extradata = {faction = participant.faction},
-		})
-		participants[#opponent.match2players] = participant
+			flag = player.flag,
+			extradata = {faction = player.faction},
+		}
 	end)
 
-	return participants
+	return mapPlayers
 end
 
 ---@param mapInput table
@@ -283,9 +285,7 @@ end
 ---@param opponents table[]
 ---@return string
 function MapFunctions.getMapMode(match, map, opponents)
-	local playerCounts = Array.map(map.opponents or {}, function(opponent)
-		return Table.size(opponent.players or {})
-	end)
+	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
@@ -305,13 +305,12 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		comment = map.comment,
-		displayname = map.mapDisplayName,
 		header = map.header,
 	}
 
 	if #opponents ~= 2 then
 		return extradata
-	elseif Array.any(map.opponents, function(mapOpponent) return Table.size(mapOpponent.players or {}) ~= 1 end) then
+	elseif Array.any(map.opponents, function(opponent) return MapFunctions.getMapOpponentSize(opponent) ~= 1 end) then
 		return extradata
 	end
 
@@ -326,8 +325,8 @@ function MapFunctions.getExtraData(match, map, opponents)
 
 	---@type table[]
 	local players = {
-		Array.extractValues(map.opponents[1].players)[1],
-		Array.extractValues(map.opponents[2].players)[1],
+		Array.filter(Array.extractValues(map.opponents[1].players or {}), Logic.isNotEmpty)[1],
+		Array.filter(Array.extractValues(map.opponents[2].players or {}), Logic.isNotEmpty)[1],
 	}
 
 	extradata.opponent1 = players[1].player
@@ -369,6 +368,12 @@ function MapFunctions.readHeroes(heroesInput, faction, playerName, ignoreFaction
 
 		return heroData.name
 	end)
+end
+
+---@param opponent table
+---@return integer
+function MapFunctions.getMapOpponentSize(opponent)
+	return Table.size(Array.filter(opponent.players or {}, Logic.isNotEmpty))
 end
 
 return CustomMatchGroupInput

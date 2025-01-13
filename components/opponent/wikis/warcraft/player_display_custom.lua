@@ -102,7 +102,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 end
 
 function CustomPlayerDisplay.Faction(faction)
-	return Faction.Icon{size = 'small', showLink = false, showTitle = false, faction = faction}
+	return Faction.Icon{size = 'small', showLink = false, faction = faction}
 end
 
 return CustomPlayerDisplay

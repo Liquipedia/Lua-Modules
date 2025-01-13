@@ -98,6 +98,7 @@ local PREFIXES = {
 		player = 'https://play.eslgaming.com/player/',
 		match = 'https://play.eslgaming.com/match/',
 	},
+	esplay = {'https://esplay.com/tournament/'},
 	esportal = {'https://esportal.com/tournament/'},
 	etf2l = {
 		'',
@@ -150,7 +151,10 @@ local PREFIXES = {
 		player = 'https://gg.letsplay.live/profile/view-stats/',
 		match = 'https://old.letsplay.live/match/',
 	},
-	linkedin = {'https://www.linkedin.com/in/'},
+	linkedin = {
+		team = 'https://www.linkedin.com/company/',
+		player = 'https://www.linkedin.com/in/',
+	},
 	loco = {'https://loco.gg/streamers/'},
 	lolchess = {'https://lolchess.gg/profile/'},
 	lrthread = {'', match = ''},

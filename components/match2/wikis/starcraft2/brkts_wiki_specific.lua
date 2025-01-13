@@ -26,9 +26,13 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 end)
 
 ---@param matchGroupType string
+---@param maxOpponentCount integer
 ---@return function
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
+function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
+	if maxOpponentCount > 2 then
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)
 	end
@@ -52,7 +56,7 @@ end
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft')
+		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch')
 		return WikiSpecific.adjustMatchGroupContainerConfig(SingleMatch.SingleMatchContainer)
 	end
 end

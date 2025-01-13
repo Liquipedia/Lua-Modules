@@ -125,20 +125,25 @@ end
 function DisplayHelper.MapAndStatus(game, config)
 	local mapText = DisplayHelper.Map(game, config)
 
-	local statusText = nil
-	if game.resultType == 'default' then
-		if game.walkover == 'l' then
-			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
-		elseif game.walkover == 'ff' then
-			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
-		elseif game.walkover == 'dq' then
-			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
-		else
-			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'
-		end
+	local walkoverType = (Array.find(game.opponents or {}, function(opponent)
+		return opponent.status == 'FF'
+			or opponent.status == 'DQ'
+			or opponent.status == 'L'
+	end) or {}).status
+
+	if not walkoverType then return mapText end
+
+	---@param walkoverDisplay string
+	---@return string
+	local toDisplay = function(walkoverDisplay)
+		return mapText .. NONBREAKING_SPACE .. '<i>(' .. walkoverDisplay .. ')</i>'
 	end
 
-	return mapText .. (statusText or '')
+	if walkoverType == 'L' then
+		return toDisplay('w/o')
+	else
+		return toDisplay(walkoverType:lower())
+	end
 end
 
 ---Displays the map name and map-mode.
@@ -170,25 +175,22 @@ function DisplayHelper.Map(game, config)
 	else
 		mapText = game.map or 'Unknown'
 	end
-	if game.resultType == 'np' then
+	if game.status == 'notplayed' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
 	return mapText
 end
 
----@param score string|number|nil
----@param opponentIndex integer
----@param resultType string?
----@param walkover string?
----@param winner integer?
+---@param opponent table
+---@param gameStatus string?
 ---@return string
-function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
-	if resultType == 'np' then
+function DisplayHelper.MapScore(opponent, gameStatus)
+	if gameStatus == 'notplayed' then
 		return ''
-	elseif resultType == 'default' then
-		return opponentIndex == winner and 'W' or string.upper(walkover or '')
+	elseif opponent.status and opponent.status ~= 'S' then
+		return opponent.status
 	end
-	return score and tostring(score) or ''
+	return opponent.score and tostring(opponent.score) or ''
 end
 
 --[[
@@ -207,6 +209,16 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary')
 
 	assert(MatchSummaryModule.getByMatchId, 'Expected MatchSummary.getByMatchId to be a function')
+
+	return MatchSummaryModule.getByMatchId(props)
+end
+
+---@param props table
+---@return Html
+function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
+	local MatchSummaryModule = Lua.import('Module:MatchSummary/Ffa')
+
+	assert(MatchSummaryModule.getByMatchId, 'Expected MatchSummary/Ffa.getByMatchId to be a function')
 
 	return MatchSummaryModule.getByMatchId(props)
 end

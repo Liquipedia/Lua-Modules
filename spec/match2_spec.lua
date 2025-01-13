@@ -2,9 +2,7 @@
 describe('match2', function()
 	local tournamentData = require('test_assets.tournaments').dummy
 	insulate('matchlist', function()
-		local InfoboxLeague = require('Module:Infobox/League/Custom')
 		local Json = require('Module:Json')
-
 		before_each(function ()
 			local dataSaved, dataSavedOpponent, dataSavedPlayer, dataSavedGame = {}, {}, {}, {}
 			-- Mock the lpdb functions
@@ -40,7 +38,6 @@ describe('match2', function()
 			end)
 
 			stub(mw.ext.LiquipediaDB, 'lpdb_tournament')
-			InfoboxLeague.run(tournamentData) -- Set variable for tournament context
 		end)
 
 		after_each(function ()
@@ -60,6 +57,9 @@ describe('match2', function()
 			if Info.config.match2.status == 0 then
 				return
 			end
+			local InfoboxLeague = require('Module:Infobox/League/Custom')
+			InfoboxLeague.run(tournamentData) -- Set variable for tournament context
+
 			local MatchGroup = require('Module:MatchGroup')
 			local Match = require('Module:Match')
 			local props = require('Module:Table').deepCopy(args)
@@ -77,6 +77,21 @@ describe('match2', function()
 							comment = 'A Match Comment',
 							opponent1 = Json.stringify{name = 'A', link='abc', score = 3, type = 'solo'},
 							opponent2 = Json.stringify{name = 'B', score = 2, type = 'solo'},
+						}
+					},
+				}
+			},
+			apexlegends = {
+				input = {
+					storeMatch1 = false, storePageVar = false,
+					matches = {
+						{
+							date = '2022-01-05',
+							comment = 'A Match Comment',
+							opponent1 = Json.stringify{name = 'A', link='abc', score = 3, type = 'solo'},
+							opponent2 = Json.stringify{name = 'B', score = 2, type = 'solo'},
+							opponent3 = Json.stringify{name = 'C', score = 4, type = 'solo'},
+							opponent4 = Json.stringify{name = 'D', score = 1, type = 'solo'},
 						}
 					},
 				}

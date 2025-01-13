@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -227,7 +228,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	if self.valveTier then
+	if HighlightConditions.tournament(self.data) then
 		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 

@@ -10,10 +10,11 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Game = require('Module:Game')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
 local Operator = require('Module:Operator')
-local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -69,20 +70,20 @@ function CustomMatchSummary._isSolo(match)
 end
 
 ---@param game MatchGroupUtilGame
----@param paricipantId string
+---@param opponentIndex integer
+---@param playerIndex integer
 ---@return {displayName: string?, pageName: string?, flag: string?, civ: string?}
-function CustomMatchSummary._getPlayerData(game, paricipantId)
-	if not game or not game.participants then
-		return {}
-	end
-	return game.participants[paricipantId] or {}
+function CustomMatchSummary._getPlayerData(game, opponentIndex, playerIndex)
+	return ((game.opponents[opponentIndex] or {}).players or {})[playerIndex] or {}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param props {game: string?, soloMode: boolean}
 ---@return Widget?
 function CustomMatchSummary._createGame(game, props)
-	if not game.map and not game.winner and String.isEmpty(game.resultType) then return end
+	if (not game.map) and (not game.winner) and Logic.isEmpty(game.status) and Logic.isDeepEmpty(game.opponents) then
+		return
+	end
 
 	local normGame = Game.abbreviation{game = props.game}:lower()
 	game.mapDisplayName = game.mapDisplayName or game.map
@@ -94,8 +95,8 @@ function CustomMatchSummary._createGame(game, props)
 	local faction1, faction2
 
 	if props.soloMode then
-		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '1_1').civ, normGame)
-		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, '2_1').civ, normGame)
+		faction1 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, 1, 1).civ, normGame)
+		faction2 = CustomMatchSummary._createFactionIcon(CustomMatchSummary._getPlayerData(game, 2, 1).civ, normGame)
 	else
 		local function createParticipant(player, flipped)
 			local playerNode = PlayerDisplay.BlockPlayer{player = player, flip = flipped}
@@ -106,9 +107,16 @@ function CustomMatchSummary._createGame(game, props)
 				:node(flipped and factionNode or playerNode)
 		end
 		local function createOpponentDisplay(opponentId)
-			local display = mw.html.create('div'):css('display', 'flex'):css('flex-direction', 'column'):css('width', '35%')
+			local display = mw.html.create('div')
+				:css('display', 'flex')
+				:css('width', '90%')
+				:css('flex-direction', 'column')
+				:css('overflow', 'hidden')
 			Array.forEach(
-				Array.sortBy(game.opponents[opponentId].players, Operator.property('index')),
+				Array.sortBy(
+					Array.filter(game.opponents[opponentId].players, Table.isNotEmpty),
+					Operator.property('index')
+				),
 				function(player)
 					display:node(createParticipant(player, opponentId == 1))
 				end
@@ -124,11 +132,20 @@ function CustomMatchSummary._createGame(game, props)
 		classes = {'brkts-popup-body-game'},
 		css = {['font-size'] = '0.75rem'},
 		children = WidgetUtil.collect(
-			faction1,
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
-			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {['flex-grow'] = '1'}},
-			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			faction2,
+			MatchSummaryWidgets.GameTeamWrapper{children = {
+					faction1,
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1}
+				},
+			},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.MapAndStatus(game), css = {
+					['flex'] = '0 0 30%',
+			}},
+			MatchSummaryWidgets.GameTeamWrapper{children = {
+					faction2,
+					MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+				},
+				flipped = true
+			},
 			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
 	}

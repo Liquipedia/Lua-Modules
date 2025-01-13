@@ -79,14 +79,16 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 
 	local players = Array.mapIndexes(function(playerIndex)
-		return opponent.match2players[playerIndex] or
-			(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
-			nil
+		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['o' .. opponentIndex .. 'p' .. playerIndex]
 	end)
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
+			if Opponent.typeIsParty(opponent.type) then
+				return {name = (opponent.match2players[playerIndex] or {}).name}
+			end
 			return {name = map['t' .. opponentIndex .. 'p' .. playerIndex]}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
@@ -105,10 +107,6 @@ function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param map table
@@ -117,7 +115,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0

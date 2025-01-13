@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 
 ---@class BrktsWikiSpecific
 ---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean
----@field defaultIcon string?
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
@@ -52,8 +51,13 @@ Called from MatchGroup
 
 -- @returns module
 ]]
-function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
+function WikiSpecificBase.getMatchGroupContainer(matchGroupType, maxOpponentCount)
+	if (maxOpponentCount > 2 or not Lua.moduleExists('Module:MatchSummary')) and
+		Lua.moduleExists('Module:MatchSummary/Ffa') then
+
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return MatchList.MatchlistContainer
 	end

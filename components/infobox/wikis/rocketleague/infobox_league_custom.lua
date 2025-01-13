@@ -81,6 +81,12 @@ function CustomInjector:parse(id, widgets)
 				name = 'Number of teams',
 				content = {args.team_number}
 			})
+		elseif not String.isEmpty(args.player_number) then
+			table.insert(widgets, Title{children = 'Players'})
+			table.insert(widgets, Cell{
+				name = 'Number of players',
+				content = {args.player_number}
+			})
 		end
 	end
 	return widgets
@@ -169,7 +175,11 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
-	return {Game.name{game = args.game} .. ' Competitions'}
+	local gameName = Game.name{game = args.game}
+	if not gameName then
+		return {'Competitions'}
+	end
+	return {gameName .. ' Competitions'}
 end
 
 ---@param args table

@@ -57,18 +57,22 @@ function MatchGroupLegacyDefault:getMap()
 	return {
 		['$notEmpty$'] = 'win$1$',
 		winner = 'win$1$',
-		o1p1 = 'p1class$1$',
-		o2p1 = 'p2class$1$',
+		o1c1 = 'p1class$1$',
+		o2c1 = 'p2class$1$',
 		vod = 'vodgame$1$'
 	}
 end
 
+---@param isReset boolean
+---@param match table
+function MatchGroupLegacyDefault:handleFinished(isReset, match)
+	match.finished = Logic.readBool(match.finished) or Logic.isNotEmpty(match.win)
+end
 
 ---@param isReset boolean?
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
-	match['winner'] = Table.extract(match, 'win')
-	match['finished'] = Table.extract(match, 'finished') or Logic.isNotEmpty(match['winner'])
+	match.winner = Table.extract(match, 'win')
 end
 
 ---@param frame Frame
