@@ -196,6 +196,7 @@ function MatchTicker:query(matches)
 	})
 
 	if type(matches[1]) == 'table' then
+		matches = self:parseMatches(matches)
 		matches = self:filterMatches(matches)
 		matches = self:expandGamesOfMatches(matches)
 		matches = self:sortMatches(matches)
@@ -317,10 +318,19 @@ end
 ---Overwritable per wiki decision
 ---@param matches table[]
 ---@return table[]
+function MatchTicker:parseMatches(matches)
+	return Array.map(matches, function (match)
+		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
+	end)
+end
+
+---Overwritable per wiki decision
+---@param matches table[]
+---@return table[]
 function MatchTicker:filterMatches(matches)
 	--remove matches with empty/BYE opponents
 	matches = Array.filter(matches, function(match)
-		return not Array.any(match.match2opponents, Opponent.isBye)
+		return not Array.any(match.opponents, Opponent.isBye)
 	end)
 
 	if self.config.showAllTbdMatches then
@@ -329,7 +339,7 @@ function MatchTicker:filterMatches(matches)
 
 	local previousMatchWasTbd
 	Array.forEach(matches, function(match)
-		local isTbdMatch = Array.all(match.match2opponents, function(opponent)
+		local isTbdMatch = Array.all(match.opponents, function(opponent)
 			return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
 		end)
 		if isTbdMatch and previousMatchWasTbd then
@@ -383,7 +393,7 @@ function MatchTicker:expandGamesOfMatches(matches)
 			gameMatch.date = game.date
 			gameMatch.map = game.map
 			gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-			gameMatch.match2opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
+			gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
 				return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 			end)
 			gameMatch.match2games = nil
@@ -411,8 +421,11 @@ function MatchTicker:sortMatches(matches)
 	end)
 end
 
+--- Will only switch if enteredOpponentOnLeft is enabled AND there are exactly 2 opponents
+---@param match table
+---@return table
 function MatchTicker:adjustMatch(match)
-	if not self.config.enteredOpponentOnLeft or #match.match2opponents ~= 2 then
+	if not self.config.enteredOpponentOnLeft or #match.opponents ~= 2 then
 		return match
 	end
 
@@ -430,13 +443,20 @@ function MatchTicker:adjustMatch(match)
 	return match
 end
 
+--- Will only switch if there are exactly 2 opponents
+---@param match table
+---@return table
 function MatchTicker.switchOpponents(match)
+	if #match.opponents ~= 2 then
+		return match
+	end
 	local winner = tonumber(match.winner) or 0
 	match.winner = winner == 1 and 2
 		or winner == 2 and 1
 		or match.winner
 
 	match.match2opponents[1], match.match2opponents[2] = match.match2opponents[2], match.match2opponents[1]
+	match.opponents[1], match.opponents[2] = match.opponents[2], match.opponents[1]
 
 	return match
 end

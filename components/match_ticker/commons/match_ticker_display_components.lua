@@ -86,7 +86,7 @@ function Versus:create()
 	local bestof = self.match.asGame and self:gameTitle() or self:bestof()
 	local scores, scores2 = self:scores()
 	local upperText, lowerText
-	if #self.match.match2opponents > 2 then
+	if #self.match.opponents > 2 then
 		local headerRaw = self.match.match2bracketdata.inheritedheader
 		upperText = DisplayHelper.expandHeader(headerRaw)[1]
 		if self.match.asGame then
@@ -161,7 +161,7 @@ function Versus:scores()
 		return score
 	end
 
-	Array.forEach(self.match.match2opponents or {}, function(opponent, opponentIndex)
+	Array.forEach(self.match.opponents or {}, function(opponent, opponentIndex)
 		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 
@@ -199,9 +199,9 @@ function ScoreBoard:create()
 	local winner = tonumber(match.winner)
 
 	return self.root
-		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(self:opponent(match.opponents[1], winner == 1, true):addClass('team-left'))
 		:node(self:versus())
-		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+		:node(self:opponent(match.opponents[2], winner == 2):addClass('team-right'))
 end
 
 ---@param opponentData table
@@ -401,7 +401,7 @@ function Match:create()
 	local matchDisplay = mw.html.create('table')
 		:addClass('wikitable wikitable-striped infobox_matches_content')
 
-	local isBrMatch = #self.match.match2opponents ~= 2
+	local isBrMatch = #self.match.opponents ~= 2
 	if isBrMatch then
 		matchDisplay:node(self:brMatchRow())
 	else

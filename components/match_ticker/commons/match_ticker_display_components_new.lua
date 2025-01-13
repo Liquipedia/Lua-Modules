@@ -49,7 +49,7 @@ local ScoreBoard = Class.new(
 function ScoreBoard:create()
 	local match = self.match
 	local winner = tonumber(match.winner)
-	local opponents = #match.match2opponents
+	local opponents = #match.opponents
 
 	if opponents > 2 then
 		--- When "FFA/BR" we don't want to display the opponents, as there are more than 2.
@@ -57,18 +57,16 @@ function ScoreBoard:create()
 	end
 
 	return self.root
-		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(self:opponent(match.opponents[1], winner == 1, true):addClass('team-left'))
 		:node(self:versus())
-		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+		:node(self:opponent(match.opponents[2], winner == 2):addClass('team-right'))
 end
 
----@param opponentData table
+---@param opponent standardOpponent
 ---@param isWinner boolean
 ---@param flip boolean?
 ---@return Html
-function ScoreBoard:opponent(opponentData, isWinner, flip)
-	local opponent = Opponent.fromMatch2Record(opponentData)
-	---@cast opponent -nil
+function ScoreBoard:opponent(opponent, isWinner, flip)
 	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
