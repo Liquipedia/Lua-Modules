@@ -27,7 +27,8 @@ local CONTENT = {
 			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:RunQuery/Transfer history|Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
+			'[[Special:RunQuery/Transfer history|Transfer query]]' ..
+			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
 			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Portal:Rumours|Rumours]]</center></div>\n</div>',
@@ -52,7 +53,8 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = '{{MainPageMatches}}<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Upcoming and ongoing matches|See more matches]]</div>',
+			'font-size:15px; font-style:italic; text-align:center;">' ..
+			'[[Liquipedia:Upcoming and ongoing matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
 	},
