@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -634,6 +635,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
+		isArchon = Logic.readBool(extradata.isarchon),
 	}
 end
 
@@ -663,6 +665,7 @@ function MatchGroupUtil.playerFromRecord(record)
 		flag = nilIfEmpty(record.flag),
 		pageName = record.name,
 		team = Table.extract(extradata, 'playerteam'),
+		faction = Faction.read(extradata.faction) or Faction.defaultFaction
 	}
 end
 
