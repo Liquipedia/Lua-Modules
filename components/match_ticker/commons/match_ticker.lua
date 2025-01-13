@@ -321,6 +321,7 @@ end
 function MatchTicker:parseMatches(matches)
 	return Array.map(matches, function (match)
 		match.opponents = Array.map(match.match2opponents, Opponent.fromMatch2Record)
+		return match
 	end)
 end
 
