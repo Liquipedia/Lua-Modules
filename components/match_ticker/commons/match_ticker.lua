@@ -321,7 +321,9 @@ end
 ---@return table[]
 function MatchTicker:parseMatches(matches)
 	return Array.map(matches, function (match)
-		match.opponents = Array.map(match.match2opponents, MatchGroupUtil.opponentFromRecord)
+		match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
+			return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
+		end)
 		return match
 	end)
 end
