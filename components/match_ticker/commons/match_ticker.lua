@@ -347,6 +347,8 @@ end
 ---@param matches table[]
 ---@return table[]
 function MatchTicker:expandGamesOfMatches(matches)
+	local config = self.config
+
 	return Array.flatMap(matches, function(match)
 		if not match.match2games or #match.match2games < 2 then
 			return {match}
@@ -356,10 +358,24 @@ function MatchTicker:expandGamesOfMatches(matches)
 			return {match}
 		end
 
-		return Array.map(match.match2games, function(_, gameIndex)
+		return Array.map(match.match2games, function(game, gameIndex)
+			if config.recent and Logic.isEmpty(game.winner) then
+				return nil
+			end
+			if (config.upcoming or config.ongoing) and Logic.isNotEmpty(game.winner) then
+				return nil
+			end
+			if config.ongoing and game.date < NOW then
+				return nil
+			end
 			local gameMatch = Table.copy(match)
 			gameMatch.asGame = true
 			gameMatch.asGameIdx = gameIndex
+
+			gameMatch.winner = game.winner
+			gameMatch.date = game.date
+			gameMatch.match2opponents = game.opponents
+			gameMatch.match2games = nil
 		end)
 	end)
 end
@@ -369,9 +385,6 @@ end
 ---@return table[]
 function MatchTicker:sortMatches(matches)
 	return Array.sortBy(matches, function(match)
-		if match.asGame then
-			return match.match2games[match.asGameIdx].date
-		end
 		return match.date
 	end)
 end

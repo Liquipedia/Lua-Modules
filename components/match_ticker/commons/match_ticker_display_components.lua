@@ -74,7 +74,7 @@ end
 ---@field root Html
 ---@field match table
 local Versus = Class.new(
-	function(self, match, showGame)
+	function(self, match)
 		self.root = mw.html.create('div')
 		self.match = match
 	end
@@ -133,9 +133,6 @@ function Versus:scores()
 	end
 
 	local winner = tonumber(self.match.winner)
-	if self.match.asGame then
-		winner = self.match.match2games[self.match.asGameIdx].winner
-	end
 
 	local scores, scores2 = {}, {}
 	local hasSecondScore
@@ -148,9 +145,7 @@ function Versus:scores()
 		return score
 	end
 
-	local opponents = self.match.asGame
-		and self.match.match2games[self.match.asGameIdx].opponents
-		or self.match.match2opponents
+	local opponents = self.match.match2opponents
 
 	Array.forEach(opponents or {}, function(opponent, opponentIndex)
 		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
