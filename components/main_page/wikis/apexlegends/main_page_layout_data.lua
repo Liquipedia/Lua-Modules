@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=apexlegends
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +8,7 @@
 
 local CONTENT = {
 	usefulArticles = {
-		heading = 'Useful Articles',
+		heading = 'The Game',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = 1503,
@@ -24,7 +24,7 @@ local CONTENT = {
 		body = '{{Transfer List|limit=15}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|action=edit}} edit]&#93;</div>\n' ..
+			'&#91;[{{FULLURL:Player Transfers/{{Current term}}|action=edit}} edit]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
@@ -34,7 +34,7 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in Rainbow Six <small id="this-day-date" style = "margin-left: 5px">' ..
+		heading = 'This day in Apex Legends <small id="this-day-date" style = "margin-left: 5px">' ..
 			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
 		body = '{{Liquipedia:This day}}',
 		padding = true,
@@ -60,7 +60,7 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=30|completedDays=20}}',
+			'|upcomingDays=30|completedDays=30}}',
 		padding = true,
 		boxid = 1508,
 	},
@@ -68,15 +68,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'Apex Legends logo lightmode.svg',
+		darkmode = 'Apex Legends logo darkmode.svg',
 	},
-	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
-	title = 'Rainbow Six',
+	metadesc = 'Comprehensive Apex Legends wiki with articles covering everything from weapons, to strategies, '..
+		'to tournaments, to competitive players and teams.',
+	title = 'Apex Legends',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			file = 'Fnatic at the ALGS Birmingham Championship.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -85,7 +85,7 @@ return {
 			},
 		},
 		{
-			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			file = 'Falcons ImperialHal at the ALGS Mannheim Split 2 Playoffs.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -94,7 +94,7 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'ALGS Raleigh Championship Trrophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -103,7 +103,7 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -112,16 +112,21 @@ return {
 			},
 		},
 		{
-			file = 'Deimos Trophy of the Manchester major 2024.jpg',
-			title = 'Operators',
-			link = 'Portal:Operators',
+			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Alter Banner.png',
+			title = 'Legends',
+			link = 'Legends',
 			count = {
 				method = 'CATEGORY',
-				category = 'Operators',
+				category = 'Character',
 			},
 		},
 		{
-			file = 'R6s map lair.png',
+			file = 'Kings Canyon S3.png',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
