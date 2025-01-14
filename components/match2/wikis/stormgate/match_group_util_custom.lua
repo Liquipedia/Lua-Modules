@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -17,8 +16,9 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
--- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
-local Opponent = Lua.import('Module:Opponent')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local SCORE_STATUS = 'S'
 
@@ -279,20 +279,6 @@ function CustomMatchGroupUtil.computeOffFactions(gameOpponent, referenceOpponent
 		hasOffFaction = hasOffFaction or gamePlayer.faction ~= referencePlayer.faction
 	end
 	return hasOffFaction and gameFactions or nil
-end
-
----@param record table
----@return StormgateStandardPlayer
-function CustomMatchGroupUtil.playerFromRecord(record)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	return {
-		displayName = record.displayname,
-		extradata = extradata,
-		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
-		pageIsResolved = true,
-		pageName = record.name,
-		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
-	}
 end
 
 return CustomMatchGroupUtil

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -657,12 +658,15 @@ end
 ---@return standardPlayer
 function MatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	local faction = Faction.read(extradata.faction)
 	return {
 		displayName = record.displayname,
 		extradata = extradata,
 		flag = nilIfEmpty(record.flag),
 		pageName = record.name,
 		team = Table.extract(extradata, 'playerteam'),
+		faction = faction or Faction.defaultFaction,
+		pageIsResolved = Logic.isNotEmpty(faction),
 	}
 end
 

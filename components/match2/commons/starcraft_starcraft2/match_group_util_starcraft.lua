@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -278,18 +277,17 @@ function StarcraftMatchGroupUtil.computeOffFactions(gameOpponent, referenceOppon
 	return hasOffFaction and gameFactions or nil
 end
 
----@param record table
----@return StarcraftStandardPlayer
-function StarcraftMatchGroupUtil.playerFromRecord(record)
+---@param matchRecord match2
+---@param record match2opponent
+---@param opponentIndex integer
+---@return StarcraftStandardOpponent
+function StarcraftMatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	return {
-		displayName = record.displayname,
-		extradata = extradata,
-		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
-		pageIsResolved = true,
-		pageName = record.name,
-		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
-	}
+	local opponent = MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex) --[[
+	@as StarcraftStandardOpponent]]
+	opponent.isArchon = Logic.readBool(extradata.isarchon)
+
+	return opponent
 end
 
 return StarcraftMatchGroupUtil

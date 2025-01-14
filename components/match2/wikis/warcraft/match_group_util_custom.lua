@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -16,9 +15,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
--- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
-local Opponent = Lua.import('Module:Opponent')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
@@ -268,20 +268,6 @@ function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent
 		hasOfffaction = hasOfffaction or gamePlayer.faction ~= referencePlayer.faction
 	end
 	return hasOfffaction and gameFactions or nil
-end
-
----@param record table
----@return WarcraftStandardPlayer
-function CustomMatchGroupUtil.playerFromRecord(record)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	return {
-		displayName = record.displayname,
-		extradata = extradata,
-		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
-		pageIsResolved = true,
-		pageName = record.name,
-		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
-	}
 end
 
 return CustomMatchGroupUtil
