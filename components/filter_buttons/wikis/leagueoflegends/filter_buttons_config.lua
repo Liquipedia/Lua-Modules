@@ -19,7 +19,7 @@ Config.categories = {
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {'1', '2', '3'},
+		defaultItems = { '1', '2', '3' },
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
@@ -29,7 +29,10 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		items = { "Europe", "North America", "Korea", "China", "Japan", "Latin America North", "Latin America South", "Taiwan", "Oceania", "Brazil", "Other" },
+		items = {
+			"Europe", "North America", "Korea", "China", "Japan", "Latin America North",
+			"Latin America South", "Taiwan", "Oceania", "Brazil", "Other",
+		},
 		defaultItems = { "Europe", "North America", "Korea", "China", "Brazil", "Other" },
 		transform = function(region)
 			local regionToShortName = {
