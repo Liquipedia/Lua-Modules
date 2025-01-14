@@ -120,53 +120,77 @@ end
 
 ---Displays the map name and link, and the status of the match if it had an unusual status.
 ---@param game MatchGroupUtilGame
----@param config {noLink: boolean}?
+---@param config {noLink: boolean?}?
 ---@return string
 function DisplayHelper.MapAndStatus(game, config)
+	local mapText = DisplayHelper.Map(game, config)
+
+	local walkoverType = (Array.find(game.opponents or {}, function(opponent)
+		return opponent.status == 'FF'
+			or opponent.status == 'DQ'
+			or opponent.status == 'L'
+	end) or {}).status
+
+	if not walkoverType then return mapText end
+
+	---@param walkoverDisplay string
+	---@return string
+	local toDisplay = function(walkoverDisplay)
+		return mapText .. NONBREAKING_SPACE .. '<i>(' .. walkoverDisplay .. ')</i>'
+	end
+
+	if walkoverType == 'L' then
+		return toDisplay('w/o')
+	else
+		return toDisplay(walkoverType:lower())
+	end
+end
+
+---Displays the map name and map-mode.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.MapAndMode(game, config)
+	local MapModes = require('Module:MapModes')
+
+	local mapText = DisplayHelper.Map(game, config)
+
+	if Logic.isEmpty(game.mode) then
+		return mapText
+	end
+	return MapModes.get{mode = game.mode} .. mapText
+end
+
+---Displays the map name and link.
+---@param game MatchGroupUtilGame
+---@param config {noLink: boolean?}?
+---@return string
+function DisplayHelper.Map(game, config)
 	config = config or {}
 	local mapText
 	if game.map and game.mapDisplayName then
 		mapText = '[[' .. game.map .. '|' .. game.mapDisplayName .. ']]'
 	elseif game.map and not config.noLink then
 		mapText = '[[' .. game.map .. ']]'
-	elseif game.map then
-		mapText = game.map
 	else
-		mapText = 'Unknown'
+		mapText = game.map or 'Unknown'
 	end
-	if game.resultType == 'np' or game.resultType == 'default' then
+	if game.status == 'notplayed' then
 		mapText = '<s>' .. mapText .. '</s>'
 	end
-
-	local statusText = nil
-	if game.resultType == 'default' then
-		if game.walkover == 'l' then
-			statusText = NONBREAKING_SPACE .. '<i>(w/o)</i>'
-		elseif game.walkover == 'ff' then
-			statusText = NONBREAKING_SPACE .. '<i>(ff)</i>'
-		elseif game.walkover == 'dq' then
-			statusText = NONBREAKING_SPACE .. '<i>(dq)</i>'
-		else
-			statusText = NONBREAKING_SPACE .. '<i>(def.)</i>'
-		end
-	end
-
-	return mapText .. (statusText or '')
+	return mapText
 end
 
----@param score string|number|nil
----@param opponentIndex integer
----@param resultType string?
----@param walkover string?
----@param winner integer?
+---@param opponent table
+---@param gameStatus string?
 ---@return string
-function DisplayHelper.MapScore(score, opponentIndex, resultType, walkover, winner)
-	if resultType == 'np' then
+function DisplayHelper.MapScore(opponent, gameStatus)
+	if gameStatus == 'notplayed' then
 		return ''
-	elseif resultType == 'default' then
-		return opponentIndex == winner and 'W' or string.upper(walkover or '')
+	elseif opponent.status and opponent.status ~= 'S' then
+		return opponent.status
 	end
-	return score and tostring(score) or ''
+	return opponent.score and tostring(opponent.score) or ''
 end
 
 --[[
@@ -187,6 +211,29 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 	assert(MatchSummaryModule.getByMatchId, 'Expected MatchSummary.getByMatchId to be a function')
 
 	return MatchSummaryModule.getByMatchId(props)
+end
+
+---@param props table
+---@return Html
+function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
+	local MatchSummaryModule = Lua.import('Module:MatchSummary/Ffa')
+
+	assert(MatchSummaryModule.getByMatchId, 'Expected MatchSummary/Ffa.getByMatchId to be a function')
+
+	return MatchSummaryModule.getByMatchId(props)
+end
+
+---@param props table
+---@return Html
+function DisplayHelper.DefaultGameSummaryContainer(props)
+	local GameSummaryModule = Lua.import('Module:GameSummary')
+
+	assert(
+		type(GameSummaryModule.getGameByMatchId) == 'function',
+		'Expected GameSummary.getGameByMatchId to be a function'
+	)
+
+	return GameSummaryModule.getGameByMatchId(props)
 end
 
 ---@param props table

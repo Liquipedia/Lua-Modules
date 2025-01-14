@@ -10,15 +10,16 @@ local MatchLegacy = {}
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Set = require('Module:Set')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -34,11 +35,11 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	match.walkover = match.walkover and string.upper(match.walkover) or nil
-	if match.walkover == 'FF' or match.walkover == 'DQ' then
-		match.resulttype = match.walkover:lower()
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover == 'FF' or walkover == 'DQ' then
+		match.resulttype = walkover:lower()
 		match.walkover = match.winner
-	elseif match.walkover == 'L' then
+	elseif walkover == 'L' then
 		match.walkover = nil
 	end
 
@@ -57,13 +58,13 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	-- Handle Opponents
-	local headList = function (participant)
+	local headList = function (opponentIndex, playerIndex)
 		local heads = Set{}
 		Array.forEach(match2.match2games or {}, function(game)
-			local participants = Json.parseIfString(game.participants) or {}
-			if participants[participant] then
-				heads:add(participants[participant].char)
-			end
+			local opponents = Json.parseIfString(game.opponents) or {}
+			local player = ((opponents[opponentIndex] or {}).players or {})[playerIndex]
+			if Logic.isDeepEmpty(player) then return end
+			heads:add(player.char)
 		end)
 		return heads:toArray()
 	end
@@ -74,11 +75,11 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name:gsub(' ', '_')
+			match[prefix] = (player.name or ''):gsub(' ', '_')
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'displayname'] = player.displayname
-			match.extradata[prefix .. 'heads'] = table.concat(headList(index .. '_1'), ',')
+			match.extradata[prefix .. 'heads'] = table.concat(headList(index, 1), ',')
 			if match2.winner == index then
 				match.winner = player.name
 			end
@@ -92,7 +93,7 @@ function MatchLegacy._convertParameters(match2)
 				match.extradata[teamPrefix .. playerPrefix] = player.name or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'flag'] = player.flag or ''
 				match.extradata[teamPrefix .. playerPrefix .. 'displayname'] = player.displayname or ''
-				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index .. '_' .. i), ',')
+				match.extradata[teamPrefix .. playerPrefix .. 'heads'] = table.concat(headList(index, i), ',')
 			end
 			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentPlayers)
 			match[prefix] = table.concat(Array.extractValues(opponentPlayers), '/')

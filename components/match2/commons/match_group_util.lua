@@ -8,12 +8,12 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
@@ -192,10 +192,8 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 	type = 'string',
 })
 
----@alias ResultType 'default'|'draw'|'np'
-MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
----@alias WalkoverType 'l'|'ff'|'dq'
-MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
+---@alias MatchStatus 'notplayed'|''|nil
+MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
@@ -206,15 +204,13 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
----@field opponents {players: table[]}[]
----@field participants table
----@field resultType ResultType?
+---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
 ---@field vod string?
----@field walkover WalkoverType?
 ---@field winner integer?
+---@field status string?
 ---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
@@ -225,13 +221,10 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
-	participants = 'table',
-	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
 	vod = 'string?',
-	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
 	extradata = 'table?',
 })
@@ -248,13 +241,12 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
----@field resultType ResultType?
+---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
 ---@field vod string?
----@field walkover WalkoverType?
 ---@field winner string?
 ---@field extradata table?
 ---@field timestamp number
@@ -271,16 +263,22 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
-	resultType = 'string?',
+	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
 	tournament = 'string?',
 	type = 'string?',
 	vod = 'string?',
-	walkover = 'string?',
 	winner = 'number?',
 	extradata = 'table?',
 })
+
+
+---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games FFAMatchGroupUtilGame[]
+
+---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
+---@field stream table
 
 ---@class standardTeamProps
 ---@field bracketName string
@@ -530,6 +528,7 @@ function MatchGroupUtil.matchFromRecord(record)
 		parent = record.parent,
 		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
+		status = nilIfEmpty(record.status),
 		stream = Json.parseIfString(record.stream) or {},
 		tickername = record.tickername,
 		timestamp = tonumber(Table.extract(extradata, 'timestamp')),
@@ -606,30 +605,22 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 	}
 end
 
----@param matchRecord table
----@param record table
+---@param matchRecord match2
+---@param record match2opponent
 ---@param opponentIndex integer
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-
-	local score = tonumber(record.score)
+	local score = record.score
 	local status = record.status
 	local bestof = tonumber(matchRecord.bestof)
 	local game1 = (matchRecord.match2games or {})[1]
-	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
-		local winner = tonumber(game1.winner)
-		if game1.resulttype == 'default' then
-			score = -1
-			if winner == 0 then
-				status = 'D'
-			else
-				status = winner == opponentIndex and 'W' or string.upper(game1.walkover)
-			end
-		elseif game1.scores[opponentIndex] then
-			score = game1.scores[opponentIndex]
-			status = 'S'
-		end
+	local hasOnlyScores = Array.all(matchRecord.match2opponents, function(opponent)
+			return opponent.status == 'S' end)
+	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
+		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
+		score = mapOpponent.score
+		status = mapOpponent.status
 	end
 
 	return {
@@ -640,7 +631,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		name = nilIfEmpty(record.name),
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
-		score = score,
+		score = tonumber(score),
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
@@ -667,11 +658,15 @@ end
 ---@return standardPlayer
 function MatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	local faction = Faction.read(extradata.faction)
 	return {
 		displayName = record.displayname,
 		extradata = extradata,
 		flag = nilIfEmpty(record.flag),
 		pageName = record.name,
+		team = Table.extract(extradata, 'playerteam'),
+		faction = faction or Faction.defaultFaction,
+		pageIsResolved = Logic.isNotEmpty(faction),
 	}
 end
 
@@ -681,39 +676,10 @@ end
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
 
-	local participants = Json.parseIfString(record.participants) or {}
-	local walkover = nilIfEmpty(record.walkover)
-
-	local function getParticipantsOfOpponent(allParticipants, opponentIndex)
-		local prefix = opponentIndex .. '_'
-		local function indexFromKey(key)
-			if String.startsWith(key, prefix) then
-				return tonumber(string.sub(key, #prefix + 1))
-			else
-				return nil
-			end
-		end
-		local participantsOfOpponent = Array.extractValues(Table.mapArguments(
-			allParticipants,
-			indexFromKey,
-			function (key, index)
-				if Logic.isEmpty(allParticipants[key]) then
-					return nil
-				end
-				return Table.merge({playerId = index}, allParticipants[key])
-			end,
-			true
-		))
-		return Array.sortBy(participantsOfOpponent, Operator.property('playerId'))
-	end
-
-	local opponents = Array.map(Array.range(1, opponentCount or 2), function (_, index)
-		return {players = getParticipantsOfOpponent(participants, index)}
-	end)
-
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
+		dateIsExact = nilIfEmpty(Table.extract(extradata, 'dateexact')),
 		extradata = extradata,
 		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
@@ -721,14 +687,14 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		map = nilIfEmpty(record.map),
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
-		opponents = opponents,
-		participants = participants,
+		opponents = record.opponents,
 		resultType = nilIfEmpty(record.resulttype),
+		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),
 		vod = nilIfEmpty(record.vod),
-		walkover = walkover and walkover:lower() or nil,
+		walkover = nilIfEmpty(record.walkover) and record.walkover:lower() or nil,
 		winner = tonumber(record.winner),
 	}
 end
@@ -1000,7 +966,7 @@ function MatchGroupUtil.computeMatchPhase(match)
 	end
 end
 
----Normalizes subtypes (opponent, map) into a list
+---Get subtypes (opponent, map) as a list
 ---@param match table
 ---@param type 'opponent'|'map'
 ---@return any[]
@@ -1019,7 +985,7 @@ function MatchGroupUtil.normalizeSubtype(match, type)
 		end
 	end
 
-	return Array.mapIndexes(function(index) return match[type .. index] end)
+	return {}
 end
 
 return MatchGroupUtil

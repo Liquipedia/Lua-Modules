@@ -12,11 +12,13 @@ local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -35,6 +37,8 @@ function MatchLegacy.storeGames(match, match2)
 		local game = Table.deepCopy(game2)
 		-- Extradata
 		local extradata = Json.parseIfString(game2.extradata)
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		if extradata then
@@ -84,10 +88,9 @@ function MatchLegacy.storeGames(match, match2)
 				game.extradata['t' .. teamId .. 'a' .. playerId] = data.agent
 			end
 		end
-		local opponents = Json.parseIfString(game2.opponents) or {}
 		for teamId, opponent in ipairs(opponents) do
 			local counter = 0
-			for _, player in pairs(opponent.players)  do
+			for _, player in pairs(opponent.players) do
 				if Logic.isNotEmpty(player) then
 					counter = counter + 1
 					addPlayer(teamId, counter, player)
@@ -101,7 +104,6 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
 
-		local scores = Json.parseIfString(game2.scores) or {}
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 
@@ -122,10 +124,11 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	match.resulttype = match.walkover
-	if match.walkover == 'ff' or match.walkover == 'dq' then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	match.resulttype = walkover and walkover:lower() or nil
+	if walkover == 'FF' or match.walkover == 'DQ' then
 		match.walkover = match.winner
-	elseif match.walkover == 'l' then
+	elseif walkover == 'L' then
 		match.walkover = nil
 	end
 
@@ -147,9 +150,11 @@ function MatchLegacy._convertParameters(match2)
 
 	local opponent1score = 0
 	local opponent2score = 0
-	local scores = MatchLegacy._getAllInGames(match2, 'scores')
-	for _, stringScore in pairs(scores) do
-		local score = Json.parseIfString(stringScore)
+	local scores = Array.map(match2.match2games or {}, function(game)
+		local opponents = Json.parseIfString(game.opponents) or {}
+		return Array.map(opponents, Operator.property('score'))
+	end)
+	for _, score in pairs(scores) do
 		opponent1score = opponent1score + (tonumber(score[1]) or 0)
 		opponent2score = opponent2score + (tonumber(score[2]) or 0)
 	end
@@ -185,10 +190,8 @@ function MatchLegacy._convertParameters(match2)
 		local opponent = match2.match2opponents[index] or {}
 		if opponent.type == 'team' then
 			match[prefix] = opponent.name
-			if match2.bestof == 1 then
-				if ((match2.match2games or {})[1] or {}).scores then
-					match[prefix .. 'score'] = Json.parseIfString(match2.match2games[1].scores)[index]
-				end
+			if match2.bestof == 1 and scores[1] then
+				match[prefix .. 'score'] = scores[1][index]
 			end
 			if not match[prefix..'score'] then
 				match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0

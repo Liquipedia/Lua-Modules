@@ -10,109 +10,34 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
 local StrikerNames = mw.loadData('Module:StrikerNames')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
+local CustomMatchGroupInput = {}
+local MatchFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
+
 local DEFAULT_BESTOF_MATCH = 5
 local DEFAULT_BESTOF_MAP = 3
-
--- containers for process helper functions
-local MatchFunctions = {}
-local MapFunctions = {}
-
-local CustomMatchGroupInput = {}
+MatchFunctions.DEFAULT_MODE = 'team'
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
-	end)
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-	match.bestof = MatchFunctions.getBestOf(match)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, match.bestof)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.bestof = MapFunctions.getBestOf(map)
-		map.participants = MapFunctions.getParticipants(map, opponents)
-		map.extradata = MapFunctions.getExtraData(map, #opponents)
-
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			})
-			return {score = score, status = status}
-		end)
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map, opponentInfo)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 --
@@ -120,18 +45,17 @@ end
 --
 
 ---@param maps table[]
----@param bestOf integer
 ---@return fun(opponentIndex: integer): integer?
-function MatchFunctions.calculateMatchScore(maps, bestOf)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
 end
 
----@param match table
----@return integer
-function MatchFunctions.getBestOf(match)
-	local bestof = tonumber(Logic.emptyOr(match.bestof, Variables.varDefault('bestof')))
+---@param bestofInput string|integer?
+---@return integer?
+function MatchFunctions.getBestOf(bestofInput)
+	local bestof = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
 	return bestof or DEFAULT_BESTOF_MATCH
 end
@@ -142,16 +66,17 @@ end
 
 ---@param map table
 ---@return integer
-function MapFunctions.getBestOf(map)
+function MapFunctions.getMapBestOf(map)
 	local bestof = tonumber(Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof')))
 	Variables.varDefine('map_bestof', bestof)
 	return bestof or DEFAULT_BESTOF_MAP
 end
 
+---@param match table
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(map, opponentCount)
+function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		bestof = map.bestof,
 		comment = map.comment,
@@ -159,13 +84,13 @@ function MapFunctions.getExtraData(map, opponentCount)
 
 	local bans = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, StrikerNames)
-	for opponentIndex = 1, opponentCount do
+	Array.forEach(opponents, function(_, opponentIndex)
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
 			ban = getCharacterName(ban)
 			table.insert(bans['team' .. opponentIndex], ban)
 		end
-	end
+	end)
 
 	extradata.bans = bans
 
@@ -173,37 +98,29 @@ function MapFunctions.getExtraData(map, opponentCount)
 end
 
 ---@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getParticipants(map, opponents)
-	local allParticipants = {}
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, StrikerNames)
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		local players = Array.mapIndexes(function(playerIndex)
-			return opponent.match2players[playerIndex] or Logic.nilIfEmpty(map['t' .. opponentIndex .. 'c' .. playerIndex])
-		end)
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			players,
-			function(playerIndex)
-				local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
-				return player and {name = player} or nil
-			end,
-			function(playerIndex, playerIdData)
-				local striker = map['t' .. opponentIndex .. 'c' .. playerIndex]
-				return {
-					player = playerIdData.name,
-					striker = getCharacterName(striker),
-				}
-			end
-		)
-		Array.forEach(unattachedParticipants, function(participant)
-			table.insert(participants, participant)
-		end)
-		Table.mergeInto(allParticipants, Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex)))
+	local players = Array.mapIndexes(function(playerIndex)
+		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['t' .. opponentIndex .. 'c' .. playerIndex]
 	end)
-
-	return allParticipants
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData)
+			local striker = map['t' .. opponentIndex .. 'c' .. playerIndex]
+			return {
+				player = playerIdData.name,
+				striker = getCharacterName(striker),
+			}
+		end
+	)
 end
 
 return CustomMatchGroupInput

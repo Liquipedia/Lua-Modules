@@ -13,32 +13,23 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Widget = require('Module:Widget/All')
 
+local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local CustomSquad = {}
-local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
-local HAS_NUMBER = false
-
-function CustomInjector:parse(id, widgets)
-	if id == 'header_name' and HAS_NUMBER then
-		table.insert(widgets, 1, Widget.TableCellNew{content = {'Number'}, header = true})
-	end
-
-	return self._base:parse(id, widgets)
-end
 
 ---@class OverwatchSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
 
 ---@return self
 function ExtendedSquadRow:number()
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		classes = {'Number'},
-		content = String.isNotEmpty(self.model.extradata.number) and {
+		children = String.isNotEmpty(self.model.extradata.number) and {
 			mw.html.create('div'):addClass('MobileStuff'):wikitext('Number:&nbsp;'),
 			self.model.extradata.number,
 		} or nil,
@@ -48,54 +39,68 @@ function ExtendedSquadRow:number()
 end
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local props = {
-		injector = CustomInjector(),
-		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
-	HAS_NUMBER = Array.any(players, Operator.property('number'))
+	local showNumber = Array.any(players, Operator.property('number'))
 
 	props.children = Array.map(players, function(player)
-		return CustomSquad._playerRow(player, props.type)
+		return CustomSquad._playerRow(player, props.status, props.type, showNumber)
 	end)
 
-	return tostring(Squad(props))
+	local root = SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {Squad(props)}}
+	if not showNumber then
+		return root
+	end
+
+	return SquadContexts.NameSection{
+		value = function(widgets)
+			table.insert(widgets, 1, Widget.Th{children = {'Number'}})
+			return widgets
+		end,
+		children = {root},
+	}
 end
 
----@param playerList table[]
----@param squadType integer
+---@param players table[]
+---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@param customTitle string?
----@return string?
-function CustomSquad.runAuto(playerList, squadType, customTitle)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+---@return Widget
+function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(players, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
 ---@param person table
----@param squadType integer
----@return WidgetTableRowNew
-function CustomSquad._playerRow(person, squadType)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+---@param squadStatus SquadStatus
+---@param squadType SquadType
+---@param showNumber boolean
+---@return Widget
+function CustomSquad._playerRow(person, squadStatus, squadType, showNumber)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.number = person.number
 	SquadUtils.storeSquadPerson(squadPerson)
 
 	local row = ExtendedSquadRow(squadPerson)
 
 	row:id()
-	if HAS_NUMBER then
+	if showNumber then
 		row:number()
 	end
 	row:name():position():date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		row:date('inactivedate', 'Inactive Date:&nbsp;')
 	end
 
-	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		row:date('leavedate', 'Leave Date:&nbsp;')
 		row:newteam()
 	end

@@ -12,6 +12,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
@@ -27,6 +28,11 @@ local Center = Widgets.Center
 ---@class ValorantLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
+
+local VALID_PUBLISHERTIERS = {
+	'highlighted',
+	'sponsored',
+}
 
 local RIOT_ICON = '[[File:Riot Games Tier Icon.png|x12px|link=Riot Games|Tournament supported by Riot Games]]'
 
@@ -44,11 +50,12 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
+
 	-- female as a temp alias to bot the old input over
 	self.data.gameChangers = Logic.readBool(args.gc or args.female)
-	self.data.publishertier = Logic.readBool(args['riot-highlighted']) and 'highlighted'
-		or Logic.readBool(args['riot-sponsored']) and 'sponsored'
-		or nil
+
+	local publisherTier = (args.publishertier or ''):lower()
+	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
 end
 
 ---@param id string
@@ -113,15 +120,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['riot-highlighted'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	if Logic.readBool(args['riot-highlighted']) or Logic.readBool(args['riot-sponsored']) then
+	if self.data.publishertier then
 		return ' ' .. RIOT_ICON
 	end
 	return ''

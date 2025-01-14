@@ -49,7 +49,6 @@ function CustomLeague:customParseArguments(args)
 	args.player_number = args.raceBreakDown.total
 	args.maps = self:_getMaps(args)
 	self.data.status = self:_getStatus(args)
-	self.data.publishertier = tostring(Logic.readBool(args.publishertier))
 	self.data = PatchAuto.run(self.data, args)
 end
 
@@ -188,12 +187,6 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publishertier)
 end
 
 return CustomLeague

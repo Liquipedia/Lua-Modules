@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
 local Game = require('Module:Game')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -239,6 +240,8 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.circuit2 = args.circuit2
 	lpdbData.extradata.circuit_tier = args.circuittier
 	lpdbData.extradata.circuit2_tier = args.circuit2tier
+
+	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 
 	return lpdbData
 end

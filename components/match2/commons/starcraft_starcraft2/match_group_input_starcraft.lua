@@ -19,19 +19,22 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
-local Streams = Lua.import('Module:Links/Stream')
-
-local OPPONENT_CONFIG = {
-	resolveRedirect = true,
-	pagifyTeamNames = true,
-}
 local TBD = 'TBD'
 local TBA = 'TBA'
 local MODE_MIXED = 'mixed'
 
 local StarcraftMatchGroupInput = {}
-local MatchFunctions = {}
-local MapFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = true,
+	},
+}
+local MapFunctions = {
+	ADD_SUB_GROUP = true,
+	BREAK_ON_EMPTY = true,
+}
+
 -- make these available for ffa
 StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
 StarcraftMatchGroupInput.MapFunctions = MapFunctions
@@ -46,85 +49,18 @@ function StarcraftMatchGroupInput.processMatch(match, options)
 		return FfaStarcraftMatchGroupInput.processMatch(match, options)
 	end
 
-	Table.mergeInto(match, MatchFunctions.readDate(match.date))
-
-	local opponents = MatchFunctions.readOpponents(match)
-
-	local games = MatchFunctions.extractMaps(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games, opponents)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.mode = MatchFunctions.getMode(opponents)
-
-	match.bestof = MatchFunctions.getBestOf(match.bestof)
 	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament')))
 	if cancelled then
 		match.finished = match.finished or 'skip'
 	end
 
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.nilIfEmpty(match.vod)
-	match.links = MatchFunctions.getLinks(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match, #games)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
----@param match table
----@return table[]
-function MatchFunctions.readOpponents(match)
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	Array.forEach(opponents, function(opponent)
-		opponent.extradata = opponent.extradata or {}
-		Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
-		-- make sure match2players is not nil to avoid indexing nil
-		opponent.match2players = opponent.match2players or {}
-		Array.forEach(opponent.match2players, function(player)
-			player.extradata = player.extradata or {}
-			player.extradata.faction = MatchFunctions.getPlayerFaction(player)
-		end)
-	end)
-
-	return opponents
-end
-
----@param dateInput string?
+---@param matchArgs table
 ---@return {date: string, dateexact: boolean, timestamp: integer, timezoneId: string?, timezoneOffset: string?}
-function MatchFunctions.readDate(dateInput)
-	local dateProps = MatchGroupInputUtil.readDate(dateInput, {
+function MatchFunctions.readDate(matchArgs)
+	local dateProps = MatchGroupInputUtil.readDate(matchArgs.date, {
 		'match_date',
 		'tournament_startdate',
 		'tournament_enddate',
@@ -135,29 +71,24 @@ function MatchFunctions.readDate(dateInput)
 	return dateProps
 end
 
+---@param opponent MGIParsedOpponent
+---@param opponentIndex integer
+function MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	opponent.extradata = opponent.extradata or {}
+	Table.mergeInto(opponent.extradata, MatchFunctions.getOpponentExtradata(opponent))
+	-- make sure match2players is not nil to avoid indexing nil
+	opponent.match2players = opponent.match2players or {}
+	Array.forEach(opponent.match2players, function(player)
+		player.extradata = player.extradata or {}
+		player.extradata.faction = MatchFunctions.getPlayerFaction(player)
+	end)
+end
+
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	local maps = {}
-	local subGroup = 0
-	for mapKey, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local map
-		map, subGroup = MapFunctions.readMap(mapInput, subGroup, #opponents)
-
-		map.participants = MapFunctions.getParticipants(mapInput, opponents)
-
-		map.mode = MapFunctions.getMode(mapInput, map.participants, opponents)
-
-		Table.mergeInto(map.extradata, MapFunctions.getAdditionalExtraData(map, map.participants))
-
-		map.vod = Logic.emptyOr(mapInput.vod, match['vodgame' .. mapIndex])
-
-		table.insert(maps, map)
-		match[mapKey] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param maps table[]
@@ -179,7 +110,7 @@ function MatchFunctions.getOpponentExtradata(opponent)
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
 		score2 = opponent.score2,
-		isarchon = opponent.isarchon,
+		isarchon = tostring(Logic.readBool(opponent.isarchon)),
 	}
 end
 
@@ -209,39 +140,45 @@ function MatchFunctions.getBestOf(bestofInput)
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getLinks(match)
-	return {
-		preview = match.preview,
-		preview2 = match.preview2,
-		interview = match.interview,
-		interview2 = match.interview2,
-		review = match.review,
-		recap = match.recap,
-		lrthread = match.lrthread,
-	}
-end
-
----@param match table
----@param numberOfGames integer
----@return table
-function MatchFunctions.getExtraData(match, numberOfGames)
+function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		headtohead = tostring(Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')))),
 		ffa = 'false',
 	}
-	Variables.varDefine('headtohead', extradata.headtohead)
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
 		MatchFunctions.getVeto(extradata, vetoMap, match, prefix, vetoIndex)
 	end
 
-	Array.forEach(Array.range(1, numberOfGames), function(subGroupIndex)
+	Array.forEach(games, function(_, subGroupIndex)
 		extradata['subGroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
 	end)
 
 	return extradata
+end
+
+---@param match table
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(match, opponents)
+	local showH2H = Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead')))
+	Variables.varDefine('headtohead', tostring(showH2H))
+
+	if not showH2H or #opponents ~= 2 or Array.any(opponents, function(opponent)
+		return opponent.type ~= Opponent.solo or not ((opponent.match2players or {})[1] or {}).name end)
+	then
+		return
+	end
+
+	return (tostring(mw.uri.fullUrl('Special:RunQuery/Match_history'))
+		.. '?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D='
+		.. opponents[1].match2players[1].name
+		.. '&Head_to_head_query%5Bopponent%5D='
+		.. opponents[2].match2players[1].name
+		.. '&wpRunQuery=Run+query'):gsub(' ', '_')
 end
 
 ---@param extradata table
@@ -255,83 +192,42 @@ function MatchFunctions.getVeto(extradata, map, match, prefix, vetoIndex)
 	extradata[prefix .. 'displayname'] = match[prefix .. 'displayName']
 end
 
----@param mapInput table
----@param subGroup integer
----@param opponentCount integer
----@return table
----@return integer
-function MapFunctions.readMap(mapInput, subGroup, opponentCount)
-	subGroup = tonumber(mapInput.subgroup) or (subGroup + 1)
-
-	local mapName = mapInput.map
-	if mapName and mapName:upper() ~= TBD then
-		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
-	elseif mapName then
-		mapName = TBD
-	end
-
-	local map = {
-		map = mapName,
-		patch = Variables.varDefault('tournament_patch', ''),
-		subgroup = subGroup,
-		extradata = {
-			comment = mapInput.comment,
-			displayname = mapInput.mapDisplayName,
-			header = mapInput.header,
-			server = mapInput.server,
-		}
-	}
-
-	map.finished = MapFunctions.isFinished(mapInput, opponentCount)
-	local opponentInfo = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-		local score, status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = mapInput.walkover,
-			winner = mapInput.winner,
-			opponentIndex = opponentIndex,
-			score = mapInput['score' .. opponentIndex],
-		}, MapFunctions.calculateMapScore(mapInput.winner, map.finished))
-		return {score = score, status = status}
-	end)
-
-	map.scores = Array.map(opponentInfo, Operator.property('score'))
-
-	if map.finished then
-		map.resulttype = MatchGroupInputUtil.getResultType(mapInput.winner, mapInput.finished, opponentInfo)
-		map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-		map.winner = MatchGroupInputUtil.getWinner(map.resulttype, mapInput.winner, opponentInfo)
-	end
-
-	return map, subGroup
+---@param map table
+---@return string?
+function MapFunctions.getPatch(map)
+	return map.patch or Variables.varDefault('tournament_patch', '')
 end
 
----@param mapInput table
----@param opponentCount integer
+---@param map table
+---@param opponents table[]
+---@param finishedInput string?
+---@param winnerInput string?
 ---@return boolean
-function MapFunctions.isFinished(mapInput, opponentCount)
-	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
+function MapFunctions.mapIsFinished(map, opponents, finishedInput, winnerInput)
+	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return true
 	end
 
-	local finished = Logic.readBoolOrNil(mapInput.finished)
+	local finished = Logic.readBoolOrNil(winnerInput)
 	if finished ~= nil then
 		return finished
 	end
 
-	if Logic.isNotEmpty(mapInput.winner) then
+	if Logic.isNotEmpty(winnerInput) then
 		return true
 	end
 
-	if Logic.isNotEmpty(mapInput.walkover) then
+	if Logic.isNotEmpty(map.walkover) then
 		return true
 	end
 
-	if Logic.isNotEmpty(mapInput.finished) then
+	if Logic.isNotEmpty(finishedInput) then
 		return true
 	end
 
 	-- check for manual score inputs
-	for opponentIndex = 1, opponentCount do
-		if String.isNotEmpty(mapInput['score' .. opponentIndex]) then
+	for opponentIndex = 1, #opponents do
+		if String.isNotEmpty(map['score' .. opponentIndex]) then
 			return true
 		end
 	end
@@ -339,43 +235,37 @@ function MapFunctions.isFinished(mapInput, opponentCount)
 	return false
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
 	end
 end
 
----@param mapInput table
----@param opponents table[]
----@return table<string, {faction: string?, player: string, position: string, flag: string?}>
-function MapFunctions.getParticipants(mapInput, opponents)
-	local participants = {}
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		if opponent.type == Opponent.team then
-			Table.mergeInto(participants, MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex))
-			return
-		elseif opponent.type == Opponent.literal then
-			return
-		end
-		Table.mergeInto(participants, MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex))
-	end)
-
-	return participants
+---@param map table
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]?
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	if opponent.type == Opponent.literal then
+		return
+	elseif opponent.type == Opponent.team then
+		return MapFunctions.getTeamMapPlayers(map, opponent, opponentIndex)
+	end
+	return MapFunctions.getPartyMapPlayers(map, opponent, opponentIndex)
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {faction: string?, player: string, position: string, flag: string?}>
-function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
+---@return {faction: string?, player: string, position: string, flag: string?}[]
+function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 	local archonFaction = Faction.read(mapInput['t' .. opponentIndex .. 'p1race'])
 		or Faction.read(mapInput['opponent' .. opponentIndex .. 'race'])
 		or ((opponent.match2players[1] or {}).extradata or {}).faction
@@ -385,7 +275,7 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 		return Logic.nilIfEmpty(mapInput['t' .. opponentIndex .. 'p' .. playerIndex])
 	end)
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	local mapPlayers = MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
@@ -403,32 +293,33 @@ function MapFunctions.getTeamParticipants(mapInput, opponent, opponentIndex)
 				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
+				isarchon = isArchon,
 			}
 		end
 	)
 
-	Array.forEach(unattachedParticipants, function(participant)
-		local name = mapInput['t' .. opponentIndex .. 'p' .. participant.position]
+	Array.forEach(mapPlayers, function(player, playerIndex)
+		if Logic.isEmpty(player) then return end
+		local name = mapInput['t' .. opponentIndex .. 'p' .. player.position]
 		local nameUpper = name:upper()
 		local isTBD = nameUpper == TBD or nameUpper == TBA
 
-		table.insert(opponent.match2players, {
-			name = isTBD and TBD or participant.player,
+		opponent.match2players[playerIndex] = opponent.match2players[playerIndex] or {
+			name = isTBD and TBD or player.player,
 			displayname = isTBD and TBD or name,
-			flag = participant.flag,
-			extradata = {faction = participant.faction},
-		})
-		participants[#opponent.match2players] = participant
+			flag = player.flag,
+			extradata = {faction = player.faction},
+		}
 	end)
 
-	return Table.map(participants, MatchGroupInputUtil.prefixPartcipants(opponentIndex))
+	return mapPlayers
 end
 
 ---@param mapInput table
 ---@param opponent table
 ---@param opponentIndex integer
----@return table<string, {faction: string?, player: string, position: string, flag: string?}>
-function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
+---@return {faction: string?, player: string, position: string, flag: string?}[]
+function MapFunctions.getPartyMapPlayers(mapInput, opponent, opponentIndex)
 	local players = opponent.match2players
 
 	-- resolve the aliases in case they are used
@@ -442,42 +333,32 @@ function MapFunctions.getPartyParticipants(mapInput, opponent, opponentIndex)
 		or ((players[1] or {}).extradata or {}).faction
 	local isArchon = MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 
-	local participants = {}
-
-	Array.forEach(players, function(player, playerIndex)
+	return Array.map(players, function(player, playerIndex)
 		local faction = isArchon and archonFaction or
 			Logic.emptyOr(Faction.read(mapInput['t' .. opponentIndex .. 'p' .. playerIndex .. 'race']), player.Faction)
 
-		participants[opponentIndex .. '_' .. playerIndex] = {
+		return {
 			faction = Faction.read(faction or player.extradata.faction),
-			player = player.name
+			player = player.name,
 		}
 	end)
-
-	return participants
 end
 
----@param mapInput table # the input data
----@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
+---@param match table
+---@param map table # has map.opponents as the games opponents
 ---@param opponents table[]
 ---@return string
-function MapFunctions.getMode(mapInput, participants, opponents)
-	-- assume we have a min of 2 opponents in a game
-	local playerCounts = {0, 0}
-	for key in pairs(participants) do
-		local parsedOpponentIndex = key:match('(%d+)_%d+')
-		local opponetIndex = tonumber(parsedOpponentIndex) --[[@as integer]]
-		playerCounts[opponetIndex] = (playerCounts[opponetIndex] or 0) + 1
-	end
+function MapFunctions.getMapMode(match, map, opponents)
+	local playerCounts = Array.map(map.opponents or {}, MapFunctions.getMapOpponentSize)
 
 	local modeParts = Array.map(playerCounts, function(count, opponentIndex)
 		if count == 0 then
 			return Opponent.literal
-		elseif count == 2 and MapFunctions.isArchon(mapInput, opponents[opponentIndex], opponentIndex) then
+		elseif count == 2 and MapFunctions.isArchon(map, opponents[opponentIndex], opponentIndex) then
 			return 'Archon'
-		elseif count == 2 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'duoSpecial']) then
+		elseif count == 2 and Logic.readBool(map['opponent' .. opponentIndex .. 'duoSpecial']) then
 			return '2S'
-		elseif count == 4 and Logic.readBool(mapInput['opponent' .. opponentIndex .. 'quadSpecial']) then
+		elseif count == 4 and Logic.readBool(map['opponent' .. opponentIndex .. 'quadSpecial']) then
 			return '4S'
 		end
 
@@ -487,24 +368,36 @@ function MapFunctions.getMode(mapInput, participants, opponents)
 	return table.concat(modeParts, 'v')
 end
 
+---@param match table
 ---@param map table
----@param participants table<string, {faction: string?, player: string, position: string, flag: string?}>
----@return {}?
-function MapFunctions.getAdditionalExtraData(map, participants)
-	if map.mode ~= '1v1' then return end
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	local extradata = {
+		comment = map.comment,
+		header = map.header,
+		server = map.server,
+	}
 
-	local players = {}
-	for _, player in Table.iter.spairs(participants) do
-		table.insert(players, player)
+	if #opponents ~= 2 then
+		return extradata
+	elseif Array.any(map.opponents, function(opponent) return MapFunctions.getMapOpponentSize(opponent) ~= 1 end) then
+		return extradata
 	end
 
-	local extradata = {}
+	---@type table[]
+	local players = {
+		Array.filter(Array.extractValues(map.opponents[1].players or {}), Logic.isNotEmpty)[1],
+		Array.filter(Array.extractValues(map.opponents[2].players or {}), Logic.isNotEmpty)[1],
+	}
+
 	extradata.opponent1 = players[1].player
 	extradata.opponent2 = players[2].player
 
 	if map.winner ~= 1 and map.winner ~= 2 then
 		return extradata
 	end
+
 	local loser = 3 - map.winner
 
 	extradata.winnerfaction = players[map.winner].faction
@@ -520,6 +413,26 @@ end
 function MapFunctions.isArchon(mapInput, opponent, opponentIndex)
 	return Logic.readBool(mapInput['opponent' .. opponentIndex .. 'archon']) or
 		Logic.readBool(opponent.extradata.isarchon)
+end
+
+---@param game table
+---@param gameIndex table
+---@param match table
+---@return string?
+---@return string?
+function MapFunctions.getMapName(game, gameIndex, match)
+	local mapName = game.map
+	if mapName and mapName:upper() ~= TBD then
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(game.map), game.mapDisplayName
+	elseif mapName then
+		return TBD
+	end
+end
+
+---@param opponent table
+---@return integer
+function MapFunctions.getMapOpponentSize(opponent)
+	return Table.size(Array.filter(opponent.players or {}, Logic.isNotEmpty))
 end
 
 return StarcraftMatchGroupInput

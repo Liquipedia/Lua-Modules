@@ -96,7 +96,7 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.game = self:_determineGame(args.game)
 	self.data.status = self:_getStatus(args)
-	self.data.publishertier = ESL_TIERS[(args.eslprotier or ''):lower()] and args.eslprotier:lower() or nil
+	self.data.publishertier = ESL_TIERS[(args.publishertier or ''):lower()] and args.publishertier:lower() or nil
 	self.data.raceBreakDown = RaceBreakdown.run(args, BREAKDOWN_RACES) or {}
 	self.data.maps = self:_getMaps('map', args)
 	self.data.number = tonumber(args.number)
@@ -254,7 +254,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'liquipediatier' then
 		table.insert(widgets, Cell{
 			name = ESL_ICON .. 'Pro Tour Tier',
-			content = {ESL_TIERS[(args.eslprotier or ''):lower()]}
+			content = {ESL_TIERS[caller.data.publishertier]}
 		})
 	elseif id == 'dates' then
 		if args.starttime then
@@ -440,7 +440,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, game .. ' Competitions')
 	end
 
-	if String.isNotEmpty(args.eslprotier) then
+	if self.data.publishertier then
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 

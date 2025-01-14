@@ -14,26 +14,14 @@ local Lua = require('Module:Lua')
 local SquadPlayerData = require('Module:SquadPlayer/data')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
-local Widget = require('Module:Widget/All')
 
+local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
-
-local Injector = Lua.import('Module:Widget/Injector')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local CustomSquad = {}
-local CustomInjector = Class.new(Injector)
-
-function CustomInjector:parse(id, widgets)
-	if id == 'header_role' then
-		return {
-			Widget.TableCellNew{content = {'Main'}, header = true}
-		}
-	end
-
-	return widgets
-end
 
 ---@class SmashSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
@@ -45,22 +33,22 @@ function ExtendedSquadRow:mains()
 		table.insert(characters, Characters.GetIconAndName{main, game = self.model.extradata.game, large = true})
 	end)
 
-	table.insert(self.children, Widget.TableCellNew{
+	table.insert(self.children, Widget.Td{
 		css = {['text-align'] = 'center'},
-		content = characters,
+		children = characters,
 	})
 
 	return self
 end
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
 	local args = Arguments.getArgs(frame)
 	local props = {
-		injector = CustomInjector(),
-		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
 	}
 
 	local tableGame = args.game
@@ -73,7 +61,7 @@ function CustomSquad.run(frame)
 		person.flag = Variables.varDefault('nationality') or person.flag
 		person.name = Variables.varDefault('name') or person.name
 
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = props.type}))
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = props.status, type = props.type}))
 		squadPerson.extradata.game = game
 		squadPerson.extradata.mains = mains
 		SquadUtils.storeSquadPerson(squadPerson)
@@ -83,11 +71,11 @@ function CustomSquad.run(frame)
 		row:id():name()
 		row:mains():date('joindate', 'Join Date:&nbsp;')
 
-		if props.type == SquadUtils.SquadType.INACTIVE or props.type == SquadUtils.SquadType.FORMER_INACTIVE then
+		if props.status == SquadUtils.SquadStatus.INACTIVE or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
 
-		if props.type == SquadUtils.SquadType.FORMER or props.type == SquadUtils.SquadType.FORMER_INACTIVE then
+		if props.status == SquadUtils.SquadStatus.FORMER or props.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('leavedate', 'Leave Date:&nbsp;')
 			row:newteam()
 		end
@@ -99,7 +87,10 @@ function CustomSquad.run(frame)
 
 	end)
 
-	return tostring(Squad(props))
+	return SquadContexts.RoleTitle{
+		value = 'Main',
+		children = {Squad(props)}
+	}
 end
 
 return CustomSquad

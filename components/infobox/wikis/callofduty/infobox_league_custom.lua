@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
@@ -74,7 +73,6 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args['atvi-sponsored']
 	self.data.mode = args.player_number and 'solo' or self.data.mode
 end
 
@@ -83,12 +81,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['atvi-sponsored'])
 end
 
 ---@param content Html|string|number|nil

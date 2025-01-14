@@ -11,6 +11,7 @@ return {
 	header =
 		[=[
 			<div class="match-bm-lol-match-header">
+				<div class="match-bm-match-header-powered-by">[[File:DataProvidedSAP.svg|link=]]</div>
 				<div class="match-bm-lol-match-header-overview">
 					<div class="match-bm-lol-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{#seriesDots}} {{.}}{{/seriesDots}}</div>{{/opponents.1}}</div>
 					<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}</div>
@@ -33,7 +34,7 @@ return {
 				{{#vods}}
 					<div class="match-bm-lol-match-additional-list">{{#icons}}{{&.}}{{/icons}}</div>
 				{{/vods}}
-				<div class="match-bm-lol-match-additional-list">{{#links}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
+				<div class="match-bm-lol-match-additional-list">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
 				{{#patch}}
 					<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
 				{{/patch}}

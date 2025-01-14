@@ -15,7 +15,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
@@ -346,6 +346,16 @@ function MatchGroupInput.applyOverrideArgs(matches, args)
 			match.bracketData.header = args[matchKey .. 'header'] or match.bracketData.header
 		end
 	end
+end
+
+---@param matches {match2opponents: table[]?, opponents: table[]?}[]
+---@return integer
+function MatchGroupInput.getMaxOpponentCount(matches)
+	return Array.reduce(matches, function(cur, match)
+		-- If the match comes from ShowBracket then it's opponents, otherwise it's match2opponents
+		-- Which is stupid, and needs to be fixed
+		return math.max(#(match.match2opponents or match.opponents or {}), cur)
+	end, 0)
 end
 
 ---@param headerInput string?

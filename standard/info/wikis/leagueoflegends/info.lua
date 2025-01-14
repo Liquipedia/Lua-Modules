@@ -33,8 +33,12 @@ return {
 			allowManual = true,
 		},
 		match2 = {
+			matchPage = true,
 			status = 2,
 			matchWidth = 200,
+		},
+		transfers = {
+			showTeamName = true,
 		},
 	},
 	defaultRoundPrecision = 0,

@@ -81,6 +81,12 @@ function CustomInjector:parse(id, widgets)
 				name = 'Number of teams',
 				content = {args.team_number}
 			})
+		elseif not String.isEmpty(args.player_number) then
+			table.insert(widgets, Title{children = 'Players'})
+			table.insert(widgets, Cell{
+				name = 'Number of players',
+				content = {args.player_number}
+			})
 		end
 	end
 	return widgets
@@ -103,15 +109,9 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(self.data.publishertier)
-end
-
----@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.rlcsPremier = args.series == SERIES_RLCS and 1 or 0
-	self.data.publishertier = tostring(args.series == SERIES_RLCS and tonumber(self.data.liquipediatier) == TIER_1)
+	self.data.publishertier = args.series == SERIES_RLCS and tonumber(self.data.liquipediatier) == TIER_1
 end
 
 ---@param args table
@@ -175,7 +175,11 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
-	return {Game.name{game = args.game} .. ' Competitions'}
+	local gameName = Game.name{game = args.game}
+	if not gameName then
+		return {'Competitions'}
+	end
+	return {gameName .. ' Competitions'}
 end
 
 ---@param args table

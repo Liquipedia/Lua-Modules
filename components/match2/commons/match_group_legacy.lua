@@ -17,8 +17,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroup = Lua.import('Module:MatchGroup')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local globalVars = PageVariableNamespace()
 
@@ -107,9 +106,22 @@ function MatchGroupLegacy._getMatchMapping(match, match2mapping, lowerHeaders, l
 	return round, round.R
 end
 
+---@param match2mapping match2mapping
+---@param lowerHeaders {[number] : number}
+---@param lastRoundIndex number
+function MatchGroupLegacy._handleHeaderMapping(match2mapping, lowerHeaders, lastRoundIndex)
+	Array.forEach(Array.range(1, lastRoundIndex), function (roundIndex)
+		match2mapping['R' .. roundIndex .. 'M1header'] = 'R' .. roundIndex
+		if lowerHeaders[roundIndex] then
+			match2mapping['R' .. roundIndex .. 'M' .. lowerHeaders[roundIndex] .. 'header'] = 'L' .. roundIndex
+		end
+	end)
+end
+
 ---@param template string
+---@param bracketType string?
 ---@return match2mapping
-function MatchGroupLegacy.get(template)
+function MatchGroupLegacy.get(template, bracketType)
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(template)
 	assert(type(matches) == 'table')
 
@@ -123,12 +135,58 @@ function MatchGroupLegacy.get(template)
 			lastRound, roundData)
 	end)
 
-	Array.forEach(Array.range(1, lastRoundIndex), function (roundIndex)
-		match2mapping['R' .. roundIndex .. 'M1header'] = 'R' .. roundIndex
-		if lowerHeaders[roundIndex] then
-			match2mapping['R' .. roundIndex .. 'M' .. lowerHeaders[roundIndex] .. 'header'] = 'L' .. roundIndex
+	MatchGroupLegacy._handleHeaderMapping(match2mapping, lowerHeaders, lastRoundIndex)
+
+	return match2mapping
+end
+
+---@param template string
+---@param bracketType string?
+---@return match2mapping
+function MatchGroupLegacy.getAlt(template, bracketType)
+	local matches = mw.ext.Brackets.getCommonsBracketTemplate(template)
+	assert(type(matches) == 'table')
+
+	local match2mapping = {}
+	local lowerHeaders = {}
+	local lastRoundIndex = matches[1].match2bracketdata.coordinates.roundCount
+	local countMatchesInLower = 0
+	Array.forEach(matches, function (match)
+		local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)
+		---@cast baseMatchId -nil
+		local id = MatchGroupUtil.matchIdToKey(baseMatchId)
+		local bd = match.match2bracketdata
+
+		local roundNum = lastRoundIndex
+		local matchKey
+		if id == THIRD_PLACE_MATCH then
+			matchKey = 'l' .. roundNum .. 'm1'
+			match2mapping[THIRD_PLACE_MATCH .. 'header'] = 'L' .. roundNum
+		elseif id == RESET_MATCH then
+			matchKey = 'r' .. roundNum .. 'm1'
+		else
+			roundNum = id:match('R%d*'):gsub('R', '')
+			if bd.bracketsection == 'upper' then
+				countMatchesInLower = 0
+				matchKey = id:lower()
+			elseif bd.bracketsection == 'lower' then
+				if bd.coordinates.matchIndexInRound == 0 then
+					countMatchesInLower = 0
+				end
+				countMatchesInLower = countMatchesInLower + 1
+				matchKey = 'l' .. roundNum .. 'm' .. countMatchesInLower
+			end
 		end
+
+		if string.match(bd.header or '', '^!l') then
+			lowerHeaders[roundNum or ''] = roundNum
+		end
+
+
+		match2mapping[id] = {opp1 = matchKey .. 'p1', opp2 = matchKey .. 'p2', details = matchKey}
 	end)
+
+	MatchGroupLegacy._handleHeaderMapping(match2mapping, lowerHeaders, lastRoundIndex)
 
 	return match2mapping
 end
@@ -248,7 +306,7 @@ function MatchGroupLegacy:handleMap(details, mapIndex)
 		map = self:_copyAndReplace(blueprint, details, true)
 	end
 
-	return MatchSubobjects.luaGetMap(map)
+	return map
 end
 
 ---@param isReset boolean
@@ -324,13 +382,13 @@ end
 ---@param templateid string
 ---@param oldTemplateid string?
 ---@return table
-function MatchGroupLegacy._get(templateid, oldTemplateid)
+function MatchGroupLegacy:_get(templateid, oldTemplateid)
 	if Lua.moduleExists('Module:MatchGroup/Legacy/' .. templateid) then
 		mw.log('Module:MatchGroup/Legacy/' .. templateid .. ' exists')
 		return (require('Module:MatchGroup/Legacy/' .. templateid)[oldTemplateid] or function() return nil end)()
-			or MatchGroupLegacy.get(templateid)
+			or self.get(templateid, self.bracketType)
 	else
-		return MatchGroupLegacy.get(templateid)
+		return self.get(templateid, self.bracketType)
 	end
 end
 
@@ -353,9 +411,9 @@ function MatchGroupLegacy:build()
 
 	local args = self.args
 
-	local match2mapping = MatchGroupLegacy._get(args.template, args.templateOld)
-
 	self.bracketType = args.type
+	local match2mapping = self:_get(args.template, args.templateOld)
+
 	self.newArgs = {
 		args.template,
 		id = args.id,

@@ -6,9 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
--- todo's:
--- Team logo's are currently 50x50 => need to be 80x80. Already made preparations for this in the css.
-
 -- luacheck: ignore
 return {
 	header =
@@ -33,11 +30,11 @@ return {
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">VODs</div>
 						<div class="match-bm-match-additional-section-body">{{#vods}}{{&.}}{{/vods}}</div>
-					</div>{{/vods.1}}{{#links.1}}
+					</div>{{/vods.1}}{{#parsedLinks.1}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Socials</div>
-						<div class="match-bm-match-additional-section-body">{{#links}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/links}}</div>
-					</div>{{/links.1}}{{#patch}}
+						<div class="match-bm-match-additional-section-body">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
+					</div>{{/parsedLinks.1}}{{#patch}}
 					<div class="match-bm-match-additional-section">
 						<div class="match-bm-match-additional-section-header">Patch</div>
 						<div class="match-bm-match-additional-section-body">[[Version {{patch}}]]</div>

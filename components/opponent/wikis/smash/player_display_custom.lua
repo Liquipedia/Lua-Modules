@@ -56,7 +56,6 @@ function CustomPlayerDisplay.BlockPlayer(props)
 	if props.showFlag ~= false and player.flag then
 		flagNode = PlayerDisplay.Flag(player.flag)
 	end
-	mw.logObject(player.chars, 'BlockPlayer')
 
 	local characterNode = mw.html.create()
 	if player.chars then

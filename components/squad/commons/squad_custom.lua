@@ -16,7 +16,7 @@ local SquadUtils = Lua.import('Module:Squad/Utils')
 local CustomSquad = {}
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
 	if not Info.config.squads.allowManual then
 		error('This wiki does not use manual squad tables')
@@ -25,12 +25,13 @@ function CustomSquad.run(frame)
 	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow))
 end
 
----@param playerList table[]
----@param squadType integer
+---@param players table[]
+---@param squadStatus SquadStatus
+---@param squadType SquadType
 ---@param customTitle string?
----@return string
-function CustomSquad.runAuto(playerList, squadType, customTitle)
-	return SquadUtils.defaultRunAuto(playerList, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
+---@return Widget
+function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(players, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
 return CustomSquad

@@ -16,25 +16,26 @@ local SquadWidget = Lua.import('Module:Widget/Squad/Core')
 ---@operator call:SquadTldbWidget
 local SquadTldb = Class.new(SquadWidget)
 
----@param type SquadType
----@return WidgetTableRowNew
-function SquadTldb._header(type)
-	return Widgets.TableRowNew{
+---@param status SquadStatus
+---@return Widget
+function SquadTldb:_header(status)
+	return Widgets.Tr{
 		classes = {'HeaderRow'},
 		cells = {
-			Widgets.TableCellNew{content = {'ID'}, header = true},
-			Widgets.TableCellNew{header = true}, -- "Team Icon" (most commmonly used for loans)
-			Widgets.TableCellNew{content = {'Name'}, header = true},
-			Widgets.TableCellNew{content = {'ELO'}, header = true},
-			Widgets.TableCellNew{content = {'ELO Peak'}, header = true},
+			Widgets.Th{children = {'ID'}},
+			Widgets.Th{}, -- "Team Icon" (most commmonly used for loans)
+			Widgets.Th{children = {'Name'}},
+			Widgets.Th{children = {'ELO'}},
+			Widgets.Th{children = {'ELO Peak'}},
 		}
 	}
 end
 
----@param type SquadType
+---@param squadStatus SquadStatus
 ---@param title string?
----@return WidgetTableRowNew?
-function SquadTldb._title(type, title)
+---@param squadType SquadType
+---@return Widget?
+function SquadTldb:_title(squadStatus, title, squadType)
 	return nil
 end
 

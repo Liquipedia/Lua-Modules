@@ -51,7 +51,7 @@ function MatchMapsTeamLegacy._handleMaps()
 	local mapWinner = _match2Args[prefix .. 'win']
 
 	while map or mapWinner do
-		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
+		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner, gameIndex)
 
 		gameIndex = gameIndex + 1
 		prefix = 'm' .. gameIndex
@@ -64,16 +64,17 @@ function MatchMapsTeamLegacy._handleMaps()
 	mapWinner = _match2Args[prefix .. 'win']
 
 	if map or mapWinner then
-		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
+		_match2Args['map' .. gameIndex] = MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner, gameIndex)
 	end
 end
 
-function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner)
+function MatchMapsTeamLegacy._processSingleMap(prefix, map, mapWinner, gameIndex)
 	local archon = Logic.readBool(_match2Args[prefix .. 'archon'])
 
 	local mapArgs = {
 		map = map or 'unknown',
 		winner = mapWinner,
+		vod = _match2Args['vodgame' .. gameIndex],
 	}
 	mapArgs = MatchMapsTeamLegacy._processMapOpponent(1, prefix, mapArgs, archon)
 	mapArgs = MatchMapsTeamLegacy._processMapOpponent(2, prefix, mapArgs, archon)

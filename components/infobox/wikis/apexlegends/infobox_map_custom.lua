@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local TableCell = Widgets.TableCell
 local TableRow = Widgets.TableRow
-local WidgetTable = Widgets.Table
+local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
@@ -49,6 +49,11 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isEmpty(args.ring) then return widgets end
 
+		local rows = {self.caller:_createRingTableHeader()}
+		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
+			table.insert(rows, self.caller:_createRingTableRow(ringData))
+		end)
+
 		local ringTable = WidgetTable{
 			classes = {'fo-nttax-infobox' ,'wiki-bordercolor-light'}, --row alternating bg
 			css = {
@@ -58,13 +63,8 @@ function CustomInjector:parse(id, widgets)
 				['padding-bottom'] = '0px',
 				['border-top-style'] = 'none',
 			},
+			children = rows,
 		}
-
-		ringTable:addRow(self.caller:_createRingTableHeader())
-
-		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
-			ringTable:addRow(self.caller:_createRingTableRow(ringData))
-		end)
 
 		Array.appendWith(widgets,
 			Title{children = 'Ring Information'},
@@ -77,23 +77,23 @@ end
 
 ---@return WidgetTableRow
 function CustomMap:_createRingTableHeader()
-	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
-	return headerRow
-		:addCell(TableCell{children = {'Ring'}})
-		:addCell(TableCell{children = {'Wait (s)'}})
-		:addCell(TableCell{children = {'Close<br>Time (s)'}})
-		:addCell(TableCell{children = {'Damage<br>per tick'}})
-		:addCell(TableCell{children = {'End Diameter (m)'}})
+	return TableRow{css = {['font-weight'] = 'bold'}, children = {
+		TableCell{children = {'Ring'}},
+		TableCell{children = {'Wait (s)'}},
+		TableCell{children = {'Close Time (s)'}},
+		TableCell{children = {'Damage per tick'}},
+		TableCell{children = {'End Diameter (m)'}},
+	}} -- bg needed
 end
 
 ---@param ringData string
 ---@return WidgetTableRow
 function CustomMap:_createRingTableRow(ringData)
-	local row = TableRow{}
+	local cells = {}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		row:addCell(TableCell{children = {item}})
+		table.insert(cells, TableCell{children = {item}})
 	end
-	return row
+	return TableRow{children = cells}
 end
 
 ---@param args table

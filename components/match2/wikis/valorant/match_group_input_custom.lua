@@ -10,120 +10,40 @@ local Array = require('Module:Array')
 local AgentNames = require('Module:AgentNames')
 local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local DUMMY_MAP = 'null' -- Is set in Template:Map when |map= is empty.
-local DEFAULT_MODE = 'team'
-
--- containers for process helper functions
-local MatchFunctions = {}
+local CustomMatchGroupInput = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		disregardTransferDates = true,
+	}
+}
 local MapFunctions = {}
 
-local CustomMatchGroupInput = {}
+MatchFunctions.DEFAULT_MODE = 'team'
 
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = match.finished --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
-
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, {})
-	end)
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
-	games = MatchFunctions.removeUnsetMaps(games)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', DEFAULT_MODE))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-	match.links = MatchFunctions.getLinks(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match)
-
-	return match
-end
-
-
----@param match table
----@param opponents MGIParsedOpponent[]
----@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.opponents = MapFunctions.getParticipants(map, opponents)
-		map.extradata = MapFunctions.getExtraData(map, map.opponents)
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
 --
 -- match related functions
 --
 
--- Template:Map sets a default map name so we can count the number of maps.
+---@param match table
+---@param opponents MGIParsedOpponent[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+end
+
+MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
+
 -- These maps however shouldn't be stored
 -- The keepMap function will check if a map should be kept
 ---@param games table[]
@@ -141,19 +61,13 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function MatchFunctions.getLinks(match)
-	return {
-		vlr = match.vlr and 'https://vlr.gg/' .. match.vlr or nil,
-	}
-end
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		mvp = MatchGroupInputUtil.readMvp(match),
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
@@ -162,17 +76,17 @@ end
 -- map related functions
 --
 -- Check if a map should be discarded due to being redundant
--- DUMMY_MAP_NAME needs the match the default value in Template:Map
 ---@param map table
 ---@return boolean
 function MapFunctions.keepMap(map)
-	return map.map ~= DUMMY_MAP
+	return map.map ~= nil
 end
 
+---@param match table
 ---@param map table
----@param participants {players: {player: string?, agent: string?}[]}[]
+---@param opponents table[]
 ---@return table<string, any>
-function MapFunctions.getExtraData(map, participants)
+function MapFunctions.getExtraData(match, map, opponents)
 	---@type table<string, any>
 	local extraData = {
 		comment = map.comment,
@@ -181,7 +95,7 @@ function MapFunctions.getExtraData(map, participants)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
-	for opponentIdx, opponent in ipairs(participants) do
+	for opponentIdx, opponent in ipairs(map.opponents) do
 		for playerIdx, player in pairs(opponent.players) do
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
 			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent
@@ -192,41 +106,34 @@ function MapFunctions.getExtraData(map, participants)
 end
 
 ---@param map table
----@param opponents MGIParsedOpponent[]
----@return {players: table[]}[]
-function MapFunctions.getParticipants(map, opponents)
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
-	return Array.map(opponents, function(opponent, opponentIndex)
-		local players = Array.mapIndexes(function(playerIndex)
-			return opponent.match2players[playerIndex] or
-				(map['t' .. opponentIndex .. 'p' .. playerIndex] and {}) or
-				nil
-		end)
-		local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-			opponent.match2players,
-			players,
-			function(playerIndex)
-				local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
-				return data and {name = data.player} or nil
-			end,
-			function(playerIndex, playerIdData, playerInputData)
-				local stats = Json.parseIfString(map['t'.. opponentIndex .. 'p' .. playerIndex]) or {}
-				return {
-					kills = stats.kills,
-					deaths = stats.deaths,
-					assists = stats.assists,
-					acs = stats.acs,
-					player = playerIdData.name or playerInputData.name,
-					agent = getCharacterName(stats.agent),
-				}
-			end
-		)
-		Array.forEach(unattachedParticipants, function(participant)
-			table.insert(participants, participant)
-		end)
-		return {players = participants}
+	local players = Array.mapIndexes(function(playerIndex)
+		return map['t' .. opponentIndex .. 'p' .. playerIndex]
 	end)
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
+			return data and {name = data.player} or nil
+		end,
+		function(playerIndex, playerIdData, playerInputData)
+			local stats = Json.parseIfString(map['t'.. opponentIndex .. 'p' .. playerIndex]) or {}
+			return {
+				kills = stats.kills,
+				deaths = stats.deaths,
+				assists = stats.assists,
+				acs = stats.acs,
+				player = playerIdData.name or playerInputData.name,
+				agent = getCharacterName(stats.agent),
+			}
+		end
+	)
 end
 
 ---@param map table

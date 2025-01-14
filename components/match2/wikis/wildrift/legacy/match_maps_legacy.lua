@@ -11,14 +11,11 @@ local MatchMapsLegacy = {}
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Json = require('Module:Json')
 local MatchGroup = require('Module:MatchGroup')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
-
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
@@ -146,16 +143,15 @@ function MatchMapsLegacy.handleDetails(args, details)
 		details[prefix .. 'winner'] = nil
 		details[prefix .. 'length'] = nil
 		details[prefix .. 'vod'] = nil
-		return MatchSubobjects.luaGetMap(map)
+		return map
 	end
 
 	local getMapOnlyWithWinner = function (index)
 		if not args['map' .. index .. 'win'] then
 			return nil
 		end
-		return MatchSubobjects.luaGetMap{
+		return {
 			winner = args['map' .. index .. 'win'],
-			map = DEFAULT
 		}
 	end
 
@@ -197,7 +193,6 @@ function MatchMapsLegacy.convertMaps(args)
 			args[mapKey .. key] = value
 		end
 		args['vodgame' .. matchIndex] = nil
-		args[mapKey] = DEFAULT
 		args[matchKey] = nil
 	end
 	return args

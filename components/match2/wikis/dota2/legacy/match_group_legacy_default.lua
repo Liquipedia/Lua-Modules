@@ -22,7 +22,7 @@ local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 ---@return table
 function MatchGroupLegacyDefault:getMap()
 	local map = {
-		['$notEmpty$'] = 'map$1$',
+		['$notEmpty$'] = 'map$1$winner',
 		map = 'map$1$',
 		team1side = 'map$1$team1side',
 		team2side = 'map$1$team2side',

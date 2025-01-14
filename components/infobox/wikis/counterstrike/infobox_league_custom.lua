@@ -19,6 +19,7 @@ local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local Game = Lua.import('Module:Game')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -90,15 +91,20 @@ local VALVE_TIERS = {
 }
 
 local RESTRICTIONS = {
-	['female'] = {
+	female = {
 		name = 'Female Players Only',
 		link = 'Female Tournaments',
 		data = 'female',
 	},
-	['academy'] = {
+	academy = {
 		name = 'Academy Teams Only',
 		link = 'Academy Tournaments',
 		data = 'academy',
+	},
+	national = {
+		name = 'National Teams Only',
+		link = 'National Tournaments',
+		data = 'national',
 	}
 }
 
@@ -119,7 +125,8 @@ function CustomLeague.run(frame)
 	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
 	league.args.currencyDispPrecision = PRIZE_POOL_ROUND_PRECISION
 	league.gameData = Game.raw{game = league.args.game, useDefault = false}
-	league.valveTier = VALVE_TIERS[(league.args.valvetier or ''):lower()]
+	--valvetier will get removed after bot conversion
+	league.valveTier = VALVE_TIERS[(league.args.publishertier or ''):lower()]
 
 	return league:createInfobox()
 end
@@ -221,7 +228,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, 'ESL Pro Tour Tournaments')
 	end
 
-	if self.valveTier then
+	if HighlightConditions.tournament(self.data) then
 		table.insert(categories, 'Valve Sponsored Tournaments')
 	end
 

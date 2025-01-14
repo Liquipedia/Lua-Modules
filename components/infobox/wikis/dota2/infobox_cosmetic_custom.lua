@@ -100,13 +100,13 @@ function CustomInjector:parse(id, widgets)
 				}
 			end},
 			Center{children = {args.description}},
-			Center{name = '[[Trading|Tradable]]', classes = {'infobox-cosmetic-tradeable'}, content = {
+			Center{name = '[[Trading|Tradable]]', classes = {'infobox-cosmetic-tradeable'}, children = {
 				CustomCosmetic._ableText('TRADEABLE', args.tradeable, args.marketlock)
 			}},
-			Center{name = '[[Steam Community Market|Marketable]]', classes = {'infobox-cosmetic-marketable'}, content = {
+			Center{name = '[[Steam Community Market|Marketable]]', classes = {'infobox-cosmetic-marketable'}, children = {
 				CustomCosmetic._ableText('MARKETABLE', args.marketable, args.marketlock)
 			}},
-			Center{name = '[[Deleting|Deletable]]', classes = {'infobox-cosmetic-deletable'}, content = {
+			Center{name = '[[Deleting|Deletable]]', classes = {'infobox-cosmetic-deletable'}, children = {
 				CustomCosmetic._ableText('DELETABLE', args.deletable)
 			}}
 		)

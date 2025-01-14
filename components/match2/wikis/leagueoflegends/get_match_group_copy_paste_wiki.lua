@@ -26,11 +26,15 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	if Logic.readBool(args.bigMatch) then
+		return '{{Match}}'
+	end
+
 	local showScore = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0)
 	local bans = Logic.readBool(args.bans)
 
 	local lines = Array.extend(
-		'{{Match2', -- Template:Match is used by match1 for now. Using Template:Match2 until it has been worked away.
+		'{{Match|patch=',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
@@ -38,7 +42,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube=',
-			INDENT .. '|reddit= |gol=',
+			(Logic.readBool(args.reddit) and INDENT .. '|reddit= |gol=' or nil),
 			INDENT .. '|mvp='
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)

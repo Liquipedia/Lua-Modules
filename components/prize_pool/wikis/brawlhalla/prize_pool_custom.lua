@@ -70,7 +70,7 @@ end
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier)] or 1
 
-	return (tierValue * Variables.varDefault('tournament_entrants', 0) + prizeMoney * 0.5) / (place*place)
+	return (tierValue * Variables.varDefault('tournament_entrants', 0) + prizeMoney * 0.5) / (place * place)
 end
 
 return CustomPrizePool

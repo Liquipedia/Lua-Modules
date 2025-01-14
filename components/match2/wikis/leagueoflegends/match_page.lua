@@ -9,10 +9,11 @@
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchLinks = mw.loadData('Module:MatchLinks')
+local Links = require('Module:Links')
 local Operator = require('Module:Operator')
-local String = require('Module:String')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
@@ -55,7 +56,7 @@ local KEYSTONES = Table.map({
 end)
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
@@ -79,21 +80,22 @@ function MatchPage.getByMatchId(props)
 		DisplayHelper.MatchCountdownBlock(viewModel) or nil
 
 	-- Create an object array for links
-	viewModel.links = Array.extractValues(Table.map(viewModel.links, function(site, link)
-		return site, Table.mergeInto({link = link}, MatchLinks[site])
+	viewModel.parsedLinks = Array.extractValues(Table.map(viewModel.links, function(site, link)
+		return site, Table.mergeInto({link = link}, Links.getMatchIconData(site))
 	end))
 
 	-- Update the view model with game and team data
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
-			local team = {players = {}}
+			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
-			for _, player in ipairs(opponent.players) do
-				table.insert(team.players, Table.mergeInto(player, {
+			team.players = Array.map(opponent.players, function(player)
+				if Logic.isDeepEmpty(player) then return end
+				return Table.mergeInto(player, {
 					roleIcon = player.role .. ' ' .. team.side,
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
@@ -101,8 +103,8 @@ function MatchPage.getByMatchId(props)
 					runeKeystone = Array.filter(player.runes.primary.runes, function(rune)
 						return KEYSTONES[rune]
 					end)[1]
-				}))
-			end
+				})
+			end)
 
 			if game.finished then
 				-- Aggregate stats
@@ -140,10 +142,10 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.opponents, function(opponent, index)
 		opponent.opponentIndex = index
 
-		if not opponent.template or not mw.ext.TeamTemplate.teamexists(opponent.template) then
+		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
+		if not teamTemplate then
 			return
 		end
-		local teamTemplate = mw.ext.TeamTemplate.raw(opponent.template)
 
 		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
 		opponent.shortname = teamTemplate.shortname
@@ -163,6 +165,11 @@ function MatchPage.getByMatchId(props)
 			} or ''
 		end)
 	}
+	if String.isNotEmpty(viewModel.vod) then
+		table.insert(viewModel.vods, 1, VodLink.display{
+			vod = viewModel.vod,
+		})
+	end
 
 	viewModel.heroIcon = function(self)
 		local character = self
@@ -211,7 +218,7 @@ end
 ---@return string
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
-		return game.resultType ~= NOT_PLAYED
+		return game.status ~= NOT_PLAYED
 	end), function(game)
 		return TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)

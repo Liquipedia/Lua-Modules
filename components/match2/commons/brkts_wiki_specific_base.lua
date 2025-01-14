@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 
 ---@class BrktsWikiSpecific
 ---@field matchHasDetails? fun(match: MatchGroupUtilMatch): boolean
----@field defaultIcon string?
 local WikiSpecificBase = {}
 
 -- called from Module:MatchGroup
@@ -35,7 +34,7 @@ Called from MatchGroup/Util
 -- @returns match
 ]]
 WikiSpecificBase.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local MatchUtil = Lua.import('Module:MatchGroup/Util')
+	local MatchUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return MatchUtil.matchFromRecord
 end)
 
@@ -52,8 +51,13 @@ Called from MatchGroup
 
 -- @returns module
 ]]
-function WikiSpecificBase.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
+function WikiSpecificBase.getMatchGroupContainer(matchGroupType, maxOpponentCount)
+	if (maxOpponentCount > 2 or not Lua.moduleExists('Module:MatchSummary')) and
+		Lua.moduleExists('Module:MatchSummary/Ffa') then
+
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return MatchList.MatchlistContainer
 	end
@@ -85,6 +89,26 @@ function WikiSpecificBase.getMatchContainer(displayMode)
 		-- Single match, displayed on a standalone page
 		local MatchPage = Lua.import('Module:MatchGroup/Display/MatchPage')
 		return MatchPage.MatchPageContainer
+	end
+end
+
+--[[
+Returns a display component for single game. The display component must
+be a container, i.e. it takes in a match ID rather than a matches.
+See the default implementation (pointed to below) for details.
+
+To customize single match display for a wiki, override this to return
+a display component with the wiki-specific customizations.
+
+Called from MatchGroup
+
+-- @returns module
+]]
+function WikiSpecificBase.getGameContainer(displayMode)
+	if displayMode == 'singlegame' then
+		-- Single match, displayed flat on a page (no popup)
+		local SingleGame = Lua.import('Module:MatchGroup/Display/SingleGame')
+		return SingleGame.SingleGameContainer
 	end
 end
 

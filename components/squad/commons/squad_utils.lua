@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -21,33 +20,50 @@ local Variables = require('Module:Variables')
 
 local Lpdb = Lua.import('Module:Lpdb')
 local Faction = Lua.import('Module:Faction')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
-local Injector = Lua.import('Module:Widget/Injector')
-local Widget = Lua.import('Module:Widget/All')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
+local TransferRefs = Lua.import('Module:Transfer/References')
 
 local SquadUtils = {}
 
----@enum SquadType
-SquadUtils.SquadType = {
+---@enum SquadStatus
+SquadUtils.SquadStatus = {
 	ACTIVE = 0,
 	INACTIVE = 1,
 	FORMER = 2,
 	FORMER_INACTIVE = 3,
 }
 
+---@type {string: SquadStatus}
+SquadUtils.StatusToSquadStatus = {
+	active = SquadUtils.SquadStatus.ACTIVE,
+	inactive = SquadUtils.SquadStatus.INACTIVE,
+	former = SquadUtils.SquadStatus.FORMER,
+}
+
+---@type {SquadStatus: string}
+SquadUtils.SquadStatusToStorageValue = {
+	[SquadUtils.SquadStatus.ACTIVE] = 'active',
+	[SquadUtils.SquadStatus.INACTIVE] = 'inactive',
+	[SquadUtils.SquadStatus.FORMER] = 'former',
+	[SquadUtils.SquadStatus.FORMER_INACTIVE] = 'former',
+}
+
+---@enum SquadType
+SquadUtils.SquadType = {
+	PLAYER = 0,
+	STAFF = 1,
+}
+
 ---@type {string: SquadType}
-SquadUtils.StatusToSquadType = {
-	active = SquadUtils.SquadType.ACTIVE,
-	inactive = SquadUtils.SquadType.INACTIVE,
-	former = SquadUtils.SquadType.FORMER,
+SquadUtils.TypeToSquadType = {
+	player = SquadUtils.SquadType.PLAYER,
+	staff = SquadUtils.SquadType.STAFF,
 }
 
 ---@type {SquadType: string}
 SquadUtils.SquadTypeToStorageValue = {
-	[SquadUtils.SquadType.ACTIVE] = 'active',
-	[SquadUtils.SquadType.INACTIVE] = 'inactive',
-	[SquadUtils.SquadType.FORMER] = 'former',
-	[SquadUtils.SquadType.FORMER_INACTIVE] = 'former',
+	[SquadUtils.SquadType.PLAYER] = 'player',
+	[SquadUtils.SquadType.STAFF] = 'staff',
 }
 
 SquadUtils.specialTeamsTemplateMapping = {
@@ -57,17 +73,13 @@ SquadUtils.specialTeamsTemplateMapping = {
 	military = 'Team/military',
 }
 
--- TODO: Decided on all valid types
-SquadUtils.validPersonTypes = {'player', 'staff'}
-SquadUtils.defaultPersonType = 'player'
-
 ---@param status string?
----@return SquadType?
-function SquadUtils.statusToSquadType(status)
+---@return SquadStatus?
+function SquadUtils.statusToSquadStatus(status)
 	if not status then
 		return
 	end
-	return SquadUtils.StatusToSquadType[status:lower()]
+	return SquadUtils.StatusToSquadStatus[status:lower()]
 end
 
 ---@param args table
@@ -90,15 +102,15 @@ end
 ---@return table
 function SquadUtils.convertAutoParameters(player)
 	local newPlayer = Table.copy(player)
-	local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-	local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
+	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
+	local leaveReference = TransferRefs.useReferences(player.leavedateRef, player.leavedate)
 
 	-- Map between formats
 	newPlayer.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
 	newPlayer.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
 	newPlayer.inactivedate = newPlayer.leavedate
 
-	newPlayer.link = player.page
+	newPlayer.link = String.nilIfEmpty(player.page)
 	newPlayer.role = player.thisTeam.role
 	newPlayer.position = player.thisTeam.position
 	newPlayer.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
@@ -120,11 +132,14 @@ function SquadUtils.readSquadPersonArgs(args)
 		return mw.ext.TeamTemplate.raw(page)[property]
 	end
 
-	local id = assert(String.nilIfEmpty(args.id), 'Something is off with your input!')
+	local name = String.nilIfEmpty(args.name)
+	local id = String.nilIfEmpty(args.id) or name
+	assert(id, 'id or name is required')
+
 	local person = Lpdb.SquadPlayer:new{
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
-		name = String.nilIfEmpty(args.name),
+		name = name,
 		nationality = Flags.CountryName(args.flag),
 
 		position = String.nilIfEmpty(args.position),
@@ -141,7 +156,8 @@ function SquadUtils.readSquadPersonArgs(args)
 		leavedate = ReferenceCleaner.clean(args.leavedate),
 		inactivedate = ReferenceCleaner.clean(args.inactivedate),
 
-		status = SquadUtils.SquadTypeToStorageValue[args.type],
+		status = SquadUtils.SquadStatusToStorageValue[args.status],
+		type = SquadUtils.SquadTypeToStorageValue[args.type],
 
 		extradata = {
 			loanedto = args.team,
@@ -179,61 +195,62 @@ end
 
 ---@param frame table
 ---@param squadWidget SquadWidget
----@param rowCreator fun(player: table, squadType: integer):WidgetTableRowNew
----@param injector WidgetInjector?
----@return string
-function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator, injector)
+---@param rowCreator fun(player: table, squadStatus: SquadStatus, squadType: SquadType):Widget
+---@return Widget
+function SquadUtils.defaultRunManual(frame, squadWidget, rowCreator)
 	local args = Arguments.getArgs(frame)
 	local props = {
-		type = SquadUtils.statusToSquadType(args.status) or SquadUtils.SquadType.ACTIVE,
+		status = SquadUtils.statusToSquadStatus(args.status) or SquadUtils.SquadStatus.ACTIVE,
 		title = args.title,
-		injector = (injector and injector()) or
-			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-			nil,
+		type = SquadUtils.TypeToSquadType[args.type] or SquadUtils.SquadType.PLAYER,
 	}
 	local players = SquadUtils.parsePlayers(args)
 
-	if props.type == SquadUtils.SquadType.FORMER and SquadUtils.anyInactive(players) then
-		props.type = SquadUtils.SquadType.FORMER_INACTIVE
+	if props.status == SquadUtils.SquadStatus.FORMER and SquadUtils.anyInactive(players) then
+		props.status = SquadUtils.SquadStatus.FORMER_INACTIVE
 	end
 
 	props.children = Array.map(players, function(player)
-		return rowCreator(player, props.type)
+		return rowCreator(player, props.status, props.type)
 	end)
 
-	return tostring(squadWidget(props))
+	if Info.config.squads.hasPosition then
+		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
+	end
+	return squadWidget(props)
 end
 
 ---@param players table[]
+---@param squadStatus SquadStatus
 ---@param squadType SquadType
 ---@param squadWidget SquadWidget
----@param rowCreator fun(person: table, squadType: integer):WidgetTableRowNew
+---@param rowCreator fun(person: table, squadStatus: SquadStatus, squadType: SquadType):Widget
 ---@param customTitle string?
----@param injector? WidgetInjector
 ---@param personMapper? fun(person: table): table
----@return string
-function SquadUtils.defaultRunAuto(players, squadType, squadWidget, rowCreator, customTitle, injector, personMapper)
+---@return Widget
+function SquadUtils.defaultRunAuto(players, squadStatus, squadType, squadWidget, rowCreator, customTitle, personMapper)
 	local props = {
-		type = squadType,
+		status = squadStatus,
 		title = customTitle,
-		injector = (injector and injector()) or
-			(Info.config.squads.hasPosition and SquadUtils.positionHeaderInjector()()) or
-			nil,
+		type = squadType,
 	}
 
 	local mappedPlayers = Array.map(players, personMapper or SquadUtils.convertAutoParameters)
 	props.children = Array.map(mappedPlayers, function(player)
-		return rowCreator(player, props.type)
+		return rowCreator(player, props.status, props.type)
 	end)
 
-	return tostring(squadWidget(props))
+	if Info.config.squads.hasPosition then
+		return SquadContexts.RoleTitle{value = SquadUtils.positionTitle(), children = {squadWidget(props)}}
+	end
+	return squadWidget(props)
 end
 
 ---@param squadRowClass SquadRow
----@return fun(person: table, squadType: integer):WidgetTableRowNew
+---@return fun(person: table, squadStatus: SquadStatus, squadType: SquadType):Widget
 function SquadUtils.defaultRow(squadRowClass)
-	return function(person, squadType)
-		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+	return function(person, squadStatus, squadType)
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 		SquadUtils.storeSquadPerson(squadPerson)
 		local row = squadRowClass(squadPerson)
 
@@ -245,11 +262,11 @@ function SquadUtils.defaultRow(squadRowClass)
 		end
 		row:date('joindate', 'Join Date:&nbsp;')
 
-		if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('inactivedate', 'Inactive Date:&nbsp;')
 		end
 
-		if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+		if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 			row:date('leavedate', 'Leave Date:&nbsp;')
 			row:newteam()
 		end
@@ -258,21 +275,9 @@ function SquadUtils.defaultRow(squadRowClass)
 	end
 end
 
----@return WidgetInjector
-function SquadUtils.positionHeaderInjector()
-	local CustomInjector = Class.new(Injector)
-
-	function CustomInjector:parse(id, widgets)
-		if id == 'header_role' then
-			return {
-				Widget.TableCellNew{content = {'Position'}, header = true}
-			}
-		end
-
-		return widgets
-	end
-
-	return CustomInjector
+---@return string
+function SquadUtils.positionTitle()
+	return 'Position'
 end
 
 return SquadUtils

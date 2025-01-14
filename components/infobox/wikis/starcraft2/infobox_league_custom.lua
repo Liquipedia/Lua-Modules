@@ -66,7 +66,6 @@ function CustomLeague:customParseArguments(args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
-	self.data.publishertier = tostring(Logic.readBool(args.featured))
 	self.data.status = self:_getStatus(args)
 
 	self.data.startTime = Logic.wrapTryOrLog(CustomLeague._readStartTime)(self)
@@ -409,12 +408,6 @@ function CustomLeague:getWikiCategories(args)
 
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 	return {betaPrefix .. Game.abbreviation{game = self.data.game} .. ' Competitions'}
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.featured)
 end
 
 return CustomLeague

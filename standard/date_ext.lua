@@ -52,7 +52,9 @@ function DateExt.readTimestamp(dateInput)
 
 	-- Extracts the '-4:00' out of <abbr data-tz="-4:00" title="Eastern Daylight Time (UTC-4)">EDT</abbr>
 	local tzTemplateOffset = dateInput:match('data%-tz%=[\"\']([%d%-%+%:]+)[\"\']')
-	local datePart = (mw.text.split(dateInput, '<', true)[1]):gsub('-', '')
+	local datePart = (mw.text.split(dateInput, '<', true)[1])
+		:gsub('-', '')
+		:gsub('T', '')
 	local timestampString = mw.getContentLanguage():formatDate('U', datePart .. (tzTemplateOffset or ''))
 	return tonumber(timestampString)
 end
@@ -82,7 +84,7 @@ function DateExt.formatTimestamp(format, timestamp)
 end
 
 --- Converts a date string or timestamp into a format that can be used in the date param to Module:Countdown.
----@param dateOrTimestamp string|integer|osdate
+---@param dateOrTimestamp string|integer|osdate|osdateparam
 ---@return string
 function DateExt.toCountdownArg(dateOrTimestamp)
 	local timestamp = DateExt.readTimestamp(dateOrTimestamp)
@@ -91,20 +93,20 @@ end
 
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
 --- The time of day is truncated in the UTC timezone. The time of day and timezone are discarded.
----@param dateOrTimestamp string|integer|osdate
+---@param dateOrTimestamp string|integer|osdate|osdateparam
 ---@return string|number
 function DateExt.toYmdInUtc(dateOrTimestamp)
 	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end
 
----@param dateString string|integer|osdate
+---@param dateString string|integer|osdate|osdateparam
 ---@return boolean
 function DateExt.isDefaultTimestamp(dateString)
 	return DateExt.readTimestamp(dateString) == DateExt.defaultTimestamp
 end
 
----@param dateString string|integer|osdate
----@return string|integer|osdate?
+---@param dateString string|integer|osdate|osdateparam
+---@return string|integer|osdate|osdateparam?
 function DateExt.nilIfDefaultTimestamp(dateString)
 	return not DateExt.isDefaultTimestamp(dateString) and dateString or nil
 end
@@ -128,8 +130,7 @@ end
 --- YYYY is required, MM and DD are optional. They are assumed to be 1 if not supplied.
 ---@param str string
 ---@return osdateparam
----@overload fun():nil
----@overload fun(nil):nil
+---@overload fun(str: nil?):nil
 function DateExt.parseIsoDate(str)
 	if not str then
 		return

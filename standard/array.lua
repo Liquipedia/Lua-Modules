@@ -88,7 +88,8 @@ end
 function Array.map(elements, funct)
 	local mappedArray = {}
 	for index, element in ipairs(elements) do
-		table.insert(mappedArray, funct(element, index))
+		local mappedElement = funct(element, index)
+		table.insert(mappedArray, mappedElement)
 	end
 	return mappedArray
 end
@@ -662,6 +663,22 @@ function Array.parseCommaSeparatedString(inputString, sep)
 	if Logic.isEmpty(inputString) then return {} end
 	---@cast inputString -nil
 	return Array.map(mw.text.split(inputString, sep or ','), String.trim)
+end
+
+---Interleaves an array with elements
+---Array.interleave({4, 5, 4, 3}, 1) -- {4, 1, 5, 1, 4, 1, 3}
+---@generic V, T
+---@param elements V[]
+---@param x T
+---@return (V|T)[]
+function Array.interleave(elements, x)
+	local size = #elements
+	return Array.flatMap(elements, function(element, index)
+		if index == size then
+			return {element}
+		end
+		return {element, x}
+	end)
 end
 
 return Array

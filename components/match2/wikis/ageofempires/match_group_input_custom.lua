@@ -20,75 +20,42 @@ local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
-local Streams = Lua.import('Module:Links/Stream')
 
 local CustomMatchGroupInput = {}
-
 local OPPONENT_CONFIG = {
 	resolveRedirect = true,
 	pagifyTeamNames = true,
 }
 
+local MatchFunctions = {
+	OPPONENT_CONFIG = OPPONENT_CONFIG,
+}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
+
+local FffMatchFunctions = {
+	OPPONENT_CONFIG = OPPONENT_CONFIG,
+}
+local FfaMapFunctions = {}
+
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	assert(not Logic.readBool(match.ffa), 'FFA is not yet supported in AoE match2.')
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-	match.game, match.mapsInfo = CustomMatchGroupInput._getMapsAndGame(match)
+	match.game, match.mapsInfo = MatchFunctions.getGameAndMapsFromTournament(match)
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
-
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return CustomMatchGroupInput.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-
-	local games = CustomMatchGroupInput.extractMaps(match, opponents)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and CustomMatchGroupInput.calculateMatchScore(games)
-		or nil
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-	match.bestof = CustomMatchGroupInput.getBestOf(match.bestof)
-
-	local winnerInput = match.winner --[[@as string?]]
-	local finishedInput = match.finished --[[@as string?]]
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponents)
-		match.walkover = MatchGroupInputUtil.getWalkover(match.resulttype, opponents)
-		match.winner = MatchGroupInputUtil.getWinner(match.resulttype, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.resulttype, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
-	match.stream = Streams.processStreams(match)
-	match.links = CustomMatchGroupInput._getLinks(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = CustomMatchGroupInput._getExtraData(match)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FffMatchFunctions)
 end
+
+--- Normal 2-opponent Match
 
 ---@param match table
 ---@param opponentIndex integer
 ---@param options readOpponentOptions
 ---@return table?
-function CustomMatchGroupInput.readOpponent(match, opponentIndex, options)
+function MatchFunctions.readOpponent(match, opponentIndex, options)
 	options = options or {}
 	local opponentInput = Json.parseIfString(Table.extract(match, 'opponent' .. opponentIndex))
 	if not opponentInput then
@@ -146,48 +113,14 @@ end
 ---@param match table
 ---@param opponents table[]
 ---@return table[]
-function CustomMatchGroupInput.extractMaps(match, opponents)
-	local maps = {}
-	for key, map in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
-
-		map.extradata = {}
-		map.map, map.extradata.displayname = CustomMatchGroupInput._getMapName(map, match.mapsInfo)
-		map.extradata.mapmode = Table.extract(map, 'mode')
-
-		Table.mergeInto(map, MatchGroupInputUtil.getTournamentContext(map, match))
-
-		map.opponents = CustomMatchGroupInput.processPlayerMapData(map, opponents)
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		local opponentInfo = Array.map(opponents, function(_, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, CustomMatchGroupInput.calculateMapScore(map.winner, map.finished))
-			return {score = score, status = status}
-		end)
-
-		map.scores = Array.map(opponentInfo, Operator.property('score'))
-		if map.finished then
-			map.resulttype = MatchGroupInputUtil.getResultType(winnerInput, finishedInput, opponentInfo)
-			map.walkover = MatchGroupInputUtil.getWalkover(map.resulttype, opponentInfo)
-			map.winner = MatchGroupInputUtil.getWinner(map.resulttype, winnerInput, opponentInfo)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
-
-	return maps
+function MatchFunctions.extractMaps(match, opponents)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
 ---@param bestofInput string|integer?
+---@param maps table[]
 ---@return integer?
-function CustomMatchGroupInput.getBestOf(bestofInput)
+function MatchFunctions.getBestOf(bestofInput, maps)
 	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('bestof'))
 
 	if bestof then
@@ -197,9 +130,15 @@ function CustomMatchGroupInput.getBestOf(bestofInput)
 	return bestof
 end
 
+---@param opponents table[]
+---@return string
+function MatchFunctions.getMode(opponents)
+	return Opponent.toLegacyMode(opponents[1].type, opponents[2].type)
+end
+
 ---@param match table
 ---@return string?, table?
-function CustomMatchGroupInput._getMapsAndGame(match)
+function MatchFunctions.getGameAndMapsFromTournament(match)
 	local mapsInfo = Json.parseIfString(Variables.varDefault('tournament_maps'))
 
 	if Logic.isNotEmpty(mapsInfo) and match.game then
@@ -226,45 +165,55 @@ function CustomMatchGroupInput._getMapsAndGame(match)
 	return match.game or data.game, Logic.emptyOr(mapsInfo, (Json.parse(data.maps)))
 end
 
----@param match table
-function CustomMatchGroupInput._getLinks(match)
-	local links = {}
-
-	match.civdraft1 = match.civdraft1 or match.civdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'civdraft') do
-		links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-
-	match.mapdraft1 = match.mapdraft1 or match.mapdraft
-	for key, value in Table.iter.pairsByPrefix(match, 'mapdraft') do
-		links[key] = 'https://aoe2cm.net/draft/' .. value
-	end
-
-	return links
-end
-
 ---@param maps table[]
 ---@return fun(opponentIndex: integer): integer
-function CustomMatchGroupInput.calculateMatchScore(maps)
+function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
 end
 
 ---@param match table
+---@param games table[]
+---@param opponents table[]
 ---@return table
-function CustomMatchGroupInput._getExtraData(match)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
-		headtohead = Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead')),
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
+---@param match table
+---@param opponents table[]
+---@return string?
+function MatchFunctions.getHeadToHeadLink(match, opponents)
+	if opponents[1].type ~= Opponent.solo or opponents[2].type ~= Opponent.solo then
+		return
+	end
+	if not Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('tournament_headtohead'))) then
+		return nil
+	end
+	if Opponent.isEmpty(opponents[1]) or Opponent.isEmpty(opponents[2]) then
+		return nil
+	end
+
+	local player1, player2 =
+		string.gsub(opponents[1].name, ' ', '_'),
+		string.gsub(opponents[2].name, ' ', '_')
+
+	return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
+		'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' ..player1 ..
+		'&Head_to_head_query%5Bopponent%5D=' .. player2 .. '&wpRunQuery=Run+query'
+end
+
 ---@param map table
----@param mapsInfo {name: string, link: string}[]?
+---@param mapIndex integer
+---@param match table
 ---@return string?
 ---@return string?
-function CustomMatchGroupInput._getMapName(map, mapsInfo)
+function MapFunctions.getMapName(map, mapIndex, match)
+	---@type {name: string, link: string}[]?
+	local mapsInfo = match.mapsInfo
 	if String.isEmpty(map.map) or map.map == 'TBD' then
 		return
 	end
@@ -274,40 +223,30 @@ function CustomMatchGroupInput._getMapName(map, mapsInfo)
 	---@cast mapsInfo -nil
 	local info = Array.find(mapsInfo, function(m)
 		return m.name == map.map or m.link == map.map
-	end) or {}
+	end)
+	if not info then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with maps missing in infobox')
+		mw.logObject('Missing map: ' .. map.map)
+		return mw.ext.TeamLiquidIntegration.resolve_redirect(map.map or ''), map.map
+	end
 	return info.link, info.name
 end
 
 ---@param map table
----@param opponents table[]
----@return {players: table[]}[]
-function CustomMatchGroupInput.processPlayerMapData(map, opponents)
-	return Array.map(opponents, function(opponent, opponentIndex)
-		return {players = CustomMatchGroupInput._participants(
-			opponent.match2players,
-			map,
-			opponentIndex,
-			opponent.type
-		)}
-	end)
-end
-
----@param opponentPlayers table[]
----@param map table
+---@param opponent table
 ---@param opponentIndex integer
----@param opponentType OpponentType
 ---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
-function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex, opponentType)
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players
-	if opponentType == Opponent.team then
+	if opponent.type == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
 	else
-		players = Array.map(opponentPlayers, Operator.property('name'))
+		players = Array.map(opponent.match2players, Operator.property('name'))
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
-		opponentPlayers,
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
 		players,
 		function(playerIndex)
 			local player = players[playerIndex]
@@ -325,25 +264,106 @@ function CustomMatchGroupInput._participants(opponentPlayers, map, opponentIndex
 			}
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-
-	return participants
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function CustomMatchGroupInput.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
 	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+		mapmode = Table.extract(map, 'mode'),
+	}
+end
+
+---@param match table
+---@param map table
+---@return string?
+function MapFunctions.getGame(match, map)
+	return Logic.emptyOr(map.game, match.game, Variables.varDefault('tournament_game'))
+end
+
+--- FFA Match
+
+---@param match table
+---@param opponents table[]
+---@param scoreSettings table
+---@return table[]
+function FffMatchFunctions.extractMaps(match, opponents, scoreSettings)
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
+end
+
+---@param opponents table[]
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function FffMatchFunctions.calculateMatchScore(opponents, maps)
+	return function(opponentIndex)
+		return Array.reduce(Array.map(maps, function(map)
+			return map.opponents[opponentIndex].score or 0
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
+	end
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@param settings table
+---@return table
+function FffMatchFunctions.getExtraData(match, games, opponents, settings)
+	return {
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
+	}
+end
+
+---@param map table
+---@param opponent table
+---@param opponentMapInput table
+---@return {civ: string?, flag: string?, displayName: string?, pageName: string?}[]
+function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput)
+	local players = Array.map(opponent.match2players, Operator.property('name'))
+	local factions = Array.parseCommaSeparatedString(opponentMapInput['civs'])
+
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = players[playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData, playerInputData)
+			local faction = Logic.emptyOr(factions[playerIndex], Faction.defaultFaction)
+			faction = Faction.read(faction, {game = Game.abbreviation{game = map.game}:lower()})
+			return {
+				faction = faction,
+			}
+		end
+	)
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		dateexact = map.dateexact,
+		comment = map.comment,
+	}
 end
 
 return CustomMatchGroupInput

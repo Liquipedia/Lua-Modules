@@ -35,11 +35,6 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -75,12 +70,6 @@ end
 function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = table.concat(self:getAllArgsForBase(args, 'map'), ';')
 	return lpdbData
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
 end
 
 ---@return string?

@@ -6,13 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
 
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 local Opponent = Lua.import('Module:Opponent')
 
 local DRAW = 'draw'
@@ -39,13 +42,14 @@ function MatchLegacy.convertParameters(match2)
 		end
 	end
 
-	if match.resulttype == DRAW then
+	if match.winner == 0 then
 		match.winner = 'draw'
 	end
 
 	match.resulttype = nil
 
-	if match.walkover == 'ff' or match.walkover == 'dq' then
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover == 'FF' or walkover == 'DQ' then
 		match.walkover = match.winner
 	else
 		match.walkover = nil
@@ -85,10 +89,8 @@ function MatchLegacy.convertParameters(match2)
 	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		local scores = game.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(game.scores)
-		end
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		opponent1Rounds = opponent1Rounds + (tonumber(scores[1] or '') or 0)
 		opponent2Rounds = opponent2Rounds + (tonumber(scores[2] or '') or 0)
 		match.extradata['vodgame' .. gameIndex] = game.vod
@@ -172,6 +174,8 @@ function MatchLegacy.storeGames(match, match2)
 		local game = Table.deepCopy(game2)
 		-- Extradata
 		local extradata = Json.parseIfString(game2.extradata)
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.extradata = {}
 
 		local opponent1scores, opponent2scores = {}, {}
@@ -200,14 +204,14 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
 		if type(scores) == 'string' then
 			scores = Json.parse(scores)
 		end
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 
-		if game2.walkover == 'ff' or game2.walkover == 'dq' then
+		local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
+		if walkover == 'FF' or walkover == 'DQ' then
 			game.walkover = 1
 		end
 

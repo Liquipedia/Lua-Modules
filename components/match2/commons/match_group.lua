@@ -19,7 +19,7 @@ local Match = Lua.import('Module:Match')
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
@@ -37,8 +37,9 @@ function MatchGroup.MatchList(args)
 
 	local matchlistNode
 	if options.show then
+		local maxOpponentCount = MatchGroupInput.getMaxOpponentCount(matches)
 		local MatchlistDisplay = Lua.import('Module:MatchGroup/Display/Matchlist')
-		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist')
+		local MatchlistContainer = WikiSpecific.getMatchGroupContainer('matchlist', maxOpponentCount)
 		matchlistNode = MatchlistContainer({
 			bracketId = options.bracketId,
 			config = MatchlistDisplay.configFromArgs(args),
@@ -62,8 +63,9 @@ function MatchGroup.Bracket(args)
 
 	local bracketNode
 	if options.show then
+		local maxOpponentCount = MatchGroupInput.getMaxOpponentCount(matches)
 		local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
-		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket')
+		local BracketContainer = WikiSpecific.getMatchGroupContainer('bracket', maxOpponentCount)
 		bracketNode = BracketContainer({
 			bracketId = options.bracketId,
 			config = BracketDisplay.configFromArgs(args),
@@ -153,7 +155,8 @@ function MatchGroup.MatchGroupById(args)
 
 	Logic.wrapTryOrLog(MatchGroupInput.applyOverrideArgs)(matches, args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType)
+	local maxOpponentCount = MatchGroupInput.getMaxOpponentCount(matches)
+	local MatchGroupContainer = WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	return MatchGroupContainer({
 		bracketId = bracketId,
 		config = config,
@@ -180,9 +183,39 @@ function MatchGroup.MatchByMatchId(args)
 	local SingleMatchDisplay = Lua.import('Module:MatchGroup/Display/SingleMatch')
 	local config = SingleMatchDisplay.configFromArgs(args)
 
-	local MatchGroupContainer = WikiSpecific.getMatchContainer('singleMatch')
-	return MatchGroupContainer({
+	local MatchContainer = WikiSpecific.getMatchContainer('singleMatch')
+	return MatchContainer({
 		matchId = fullMatchId,
+		config = config,
+	})
+end
+
+-- Displays a single game specified by a bracket ID, match ID and game Index.
+---@param args table
+---@return Html
+function MatchGroup.GameByMatchIdAndGameIndex(args)
+	local bracketId = args.id
+	local matchId = args.matchid
+	local gameIdx = tonumber(args.gameidx)
+	assert(bracketId, 'Missing bracket ID')
+	assert(matchId, 'Missing match ID')
+	assert(gameIdx, 'Missing game index')
+
+	matchId = MatchGroupUtil.matchIdFromKey(matchId)
+
+	local matchGroup = MatchGroupUtil.fetchMatchGroup(bracketId)
+	local fullMatchId = bracketId .. '_' .. matchId
+	local match = matchGroup.matchesById[fullMatchId]
+
+	assert(match, 'Match bracketId= ' .. bracketId .. ' matchId=' .. matchId .. ' not found')
+
+	local SingleGameDisplay = Lua.import('Module:MatchGroup/Display/SingleGame')
+	local config = SingleGameDisplay.configFromArgs(args)
+
+	local GameContainer = WikiSpecific.getGameContainer('singlegame')
+	return GameContainer({
+		matchId = fullMatchId,
+		gameIdx = gameIdx,
 		config = config,
 	})
 end
@@ -217,6 +250,14 @@ end
 function MatchGroup.TemplateShowSingleMatch(frame)
 	local args = Arguments.getArgs(frame)
 	return MatchGroup.MatchByMatchId(args)
+end
+
+-- Entry point of Template:ShowSingleGame
+---@param frame Frame
+---@return Html
+function MatchGroup.TemplateShowSingleGame(frame)
+	local args = Arguments.getArgs(frame)
+	return MatchGroup.GameByMatchIdAndGameIndex(args)
 end
 
 -- Entry point of Template:ShowBracket, Template:DisplayMatchGroup

@@ -160,7 +160,7 @@ function CustomSeries:_addCustomVariables()
 	else
 		--needed for e.g. External Cups Lists
 		local name = args.name or self.pagename
-		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.featured)))
+		Variables.varDefine('tournament_publishertier', tostring(Logic.readBool(args.highlighted)))
 		Variables.varDefine('headtohead', args.headtohead or '')
 		local tier, tierType = Tier.toValue(args.liquipediatier, args.liquipediatiertype)
 		Variables.varDefine('tournament_liquipediatier', tier or '')

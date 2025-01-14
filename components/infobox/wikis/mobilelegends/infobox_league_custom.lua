@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -59,11 +58,6 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args['moonton-sponsored']) and 'true' or nil
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	if args.team_number or (not String.isEmpty(args.team1)) then
 		Variables.varDefine('is_team_tournament', 1)
@@ -71,12 +65,6 @@ function CustomLeague:defineCustomPageVariables(args)
 
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['moonton-sponsored'])
 end
 
 ---@param args table

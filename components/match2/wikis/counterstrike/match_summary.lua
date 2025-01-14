@@ -7,9 +7,7 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,130 +16,10 @@ local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-
-local GREEN_CHECK = Icon.makeIcon{iconName = 'winner', color = 'forest-green-text', size = '110%'}
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
-
-local TBD = 'TBD'
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CustomMatchSummary = {}
-
--- Score Class
----@class CounterstrikeScore
----@operator call: CounterstrikeScore
----@field root Html
----@field table Html
----@field top Html
----@field bottom Html
-local Score = Class.new(
-	function(self, direction)
-		self.root = mw.html.create('div')
-			:css('width','70px')
-			:css('text-align', 'center')
-			:css('direction', direction)
-		self.table = self.root:tag('table'):css('line-height', '29px')
-		self.top = mw.html.create('tr')
-		self.bottom = mw.html.create('tr')
-	end
-)
-
----@return self
-function Score:setLeft()
-	self.table:css('float', 'left')
-	return self
-end
-
----@return self
-function Score:setRight()
-	self.table:css('float', 'right')
-	return self
-end
-
----@param score string|number|nil
----@return self
-function Score:setMapScore(score)
-	local mapScore = mw.html.create('td')
-	mapScore
-		:attr('rowspan', 2)
-		:css('font-size', '16px')
-		:css('width', '25px')
-		:wikitext(score or '')
-
-	self.top:node(mapScore)
-
-	return self
-end
-
----@param side string
----@param score number
----@return self
-function Score:setFirstHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.top:node(halfScore)
-	return self
-end
-
----@param side string
----@param score number
----@return self
-function Score:setSecondHalfScore(score, side)
-	local halfScore = mw.html.create('td')
-	halfScore
-		:addClass('brkts-popup-body-match-sidewins')
-		:addClass('brkts-cs-score-color-' .. side)
-		:wikitext(score)
-
-	self.bottom:node(halfScore)
-	return self
-end
-
----@return Html
-function Score:create()
-	self.table:node(self.top):node(self.bottom)
-	return self.root
-end
-
----@class CounterstrikeMapVeto: VetoDisplay
----@field game string?
-local MapVeto = Class.new(MatchSummary.MapVeto, function(self, game)
-	self.game = game
-end)
-
----@param map string?
----@return string
-function MapVeto:displayMap(map)
-	return Logic.nilIfEmpty(CustomMatchSummary._createMapLink(map, self.game)) or TBD
-end
-
----@class CounterstrikeMatchStatus: MatchSummaryRowInterface
----@operator call: CounterstrikeMatchStatus
----@field root Html
-local MatchStatus = Class.new(
-	function(self)
-		self.root = mw.html.create('div')
-		self.root
-			:addClass('brkts-popup-comment')
-			:css('white-space', 'normal')
-			:css('font-size', '85%')
-	end
-)
-
----@param content string|number|Html|nil
----@return self
-function MatchStatus:content(content)
-	self.root:node(content):node(MatchSummary.Break():create())
-	return self
-end
-
----@return Html
-function MatchStatus:create()
-	return self.root
-end
 
 ---@param args table
 ---@return Html
@@ -178,37 +56,21 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	if match.dateIsExact or match.timestamp ~= DateExt.defaultTimestamp then
-		if Logic.isNotEmpty(match.extradata.status) then
-			match.stream = {rawdatetime = true}
-		end
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not default date, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
+	if Logic.isNotEmpty(match.extradata.status) then
+		match.stream = {rawdatetime = true}
 	end
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createMap(game))
-		end
-	end
-
-	-- Add the Map Vetoes
-	body:addRow(MatchSummary.defaultMapVetoDisplay(match, MapVeto(match.game)))
-
-	-- Match Status (postponed/ cancel(l)ed)
+	local matchStatusText
 	if match.extradata.status then
-		local matchStatus = MatchStatus()
-		matchStatus:content('<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>')
-		body:addRow(matchStatus)
+		matchStatusText = '<b>Match ' .. mw.getContentLanguage():ucfirst(match.extradata.status) .. '</b>'
 	end
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, CustomMatchSummary._createMap),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
+		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
+	)}
 end
 
 ---@param match MatchGroupUtilMatch
@@ -330,104 +192,50 @@ function CustomMatchSummary._createFooter(match, vods, secondVods)
 end
 
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
+---@return Widget?
 function CustomMatchSummary._createMap(game)
-	local row = MatchSummary.Row()
+	if not game.map then
+		return
+	end
+
+	local function score(oppIdx)
+		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
+	end
+
+	-- Teams scores
 	local extradata = game.extradata or {}
+	local t1sides = extradata.t1sides or {}
+	local t2sides = extradata.t2sides or {}
+	local t1halfs = extradata.t1halfs or {}
+	local t2halfs = extradata.t2halfs or {}
 
-	local function scoreDisplay(oppIdx)
-		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+	local team1Scores = {}
+	local team2Scores = {}
+	for sideIndex in ipairs(t1sides) do
+		local side1, side2 = t1sides[sideIndex], t2sides[sideIndex]
+		local score1, score2 = t1halfs[sideIndex], t2halfs[sideIndex]
+		table.insert(team1Scores, {style = side1 and ('brkts-cs-score-color-'.. side1) or nil, score = score1})
+		table.insert(team2Scores, {style = side2 and ('brkts-cs-score-color-'.. side2) or nil, score = score2})
 	end
 
-	-- Score
-	local team1Score = Score():setLeft()
-	local team2Score = Score('rtl'):setRight()
+	local mapInfo = {
+		mapDisplayName = game.map,
+		map = game.game and (game.map .. '/' .. game.game) or game.map,
+		status = game.status,
+	}
 
-	-- Teams map score
-	team1Score:setMapScore(scoreDisplay(1))
-	team2Score:setMapScore(scoreDisplay(2))
-
-	local t1sides = extradata['t1sides'] or {}
-	local t2sides = extradata['t2sides'] or {}
-	local t1halfs = extradata['t1halfs'] or {}
-	local t2halfs = extradata['t2halfs'] or {}
-
-	-- Teams half scores
-	for sideIndex, side in ipairs(t1sides) do
-		local oppositeSide = t2sides[sideIndex]
-		if math.fmod(sideIndex, 2) == 1 then
-			team1Score:setFirstHalfScore(t1halfs[sideIndex], side)
-			team2Score:setFirstHalfScore(t2halfs[sideIndex], oppositeSide)
-		else
-			team1Score:setSecondHalfScore(t1halfs[sideIndex], side)
-			team2Score:setSecondHalfScore(t2halfs[sideIndex], oppositeSide)
-		end
-	end
-
-	-- Map Info
-	local mapInfo = mw.html.create('div')
-	mapInfo	:addClass('brkts-popup-spaced')
-			:wikitext(CustomMatchSummary._createMapLink(game.map, game.game))
-			:css('text-align', 'center')
-			:css('padding','5px 2px')
-			:css('flex-grow','1')
-
-	if game.resultType == 'np' then
-		mapInfo:addClass('brkts-popup-spaced-map-skip')
-	elseif game.resultType == 'draw' then
-		mapInfo:wikitext('<i>(Draw)</i>')
-	end
-
-	-- Build the HTML
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(team1Score:create())
-
-	row:addElement(mapInfo)
-
-	row:addElement(team2Score:create())
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
-		local comment = mw.html.create('div')
-		comment :wikitext(game.comment)
-				:css('margin', 'auto')
-		row:addElement(comment)
-	end
-
-	row:addClass('brkts-popup-body-game'):css('font-size', '85%'):css('overflow', 'hidden')
-
-	return row
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-	container:addClass('brkts-popup-spaced'):css('line-height', '27px')
-
-	if isWinner then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
-end
-
----@param map string?
----@param game string?
----@return string
-function CustomMatchSummary._createMapLink(map, game)
-	if Logic.isNotEmpty(map) then
-		if Logic.isNotEmpty(game) then
-			return '[[' .. map .. '/' .. game .. '|' .. map .. ']]'
-		else
-			return '[[' .. map .. '|' .. map .. ']]'
-		end
-	end
-	return ''
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '85%'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.DetailedScore{score = score(1), partialScores = team1Scores, flipped = false},
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(mapInfo), css = {['flex-grow'] = '1'}},
+			MatchSummaryWidgets.DetailedScore{score = score(2), partialScores = team2Scores, flipped = true},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameComment{children = game.comment}
+		)
+	}
 end
 
 return CustomMatchSummary

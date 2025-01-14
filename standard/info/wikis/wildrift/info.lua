@@ -37,5 +37,8 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 200,
 		},
+		transfers = {
+			showTeamName = true,
+		},
 	},
 }

@@ -9,22 +9,14 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Widget = require('Module:Widget/All')
 
+local Widget = Lua.import('Module:Widget/All')
 local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
 local SquadUtils = Lua.import('Module:Squad/Utils')
+local SquadContexts = Lua.import('Module:Widget/Contexts/Squad')
 
 local CustomSquad = {}
-local CustomInjector = Class.new(SquadUtils.positionHeaderInjector())
-
-function CustomInjector:parse(id, widgets)
-	if id == 'header_inactive' then
-		table.insert(widgets, Widget.TableCellNew{content = {'Active Team'}, header = true})
-	end
-
-	return self._base:parse(id, widgets)
-end
 
 ---@class Dota2SquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
@@ -35,7 +27,7 @@ function ExtendedSquadRow:activeteam()
 	local date = self.model.inactivedate
 
 	if not activeTeam then
-		table.insert(self.children,Widget.TableCellNew{classes = {'NewTeam'}, content = {}})
+		table.insert(self.children,Widget.Td{classes = {'NewTeam'}, children = {}})
 		return self
 	end
 
@@ -49,20 +41,42 @@ function ExtendedSquadRow:activeteam()
 	end
 
 	table.insert(self.children,
-		Widget.TableCellNew{classes = {'NewTeam'}, content = content}
+		Widget.Td{classes = {'NewTeam'}, children = content}
 	)
 
 	return self
 end
 
 ---@param frame Frame
----@return string
+---@return Widget
 function CustomSquad.run(frame)
-	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow, CustomInjector)
+	return SquadContexts.InactiveSection{
+		value = function(widgets)
+			table.insert(widgets, Widget.Th{children = {'Active Team'}})
+			return widgets
+		end,
+		children = {SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)}
+	}
 end
 
-function CustomSquad._playerRow(person, squadType)
-	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {type = squadType}))
+---@param playerList table[]
+---@param squadStatus integer
+---@param squadType SquadType
+---@param customTitle string?
+---@return Widget
+function CustomSquad.runAuto(playerList, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(
+		playerList,
+		squadStatus,
+		squadType,
+		Squad,
+		SquadUtils.defaultRow(SquadRow),
+		customTitle
+	)
+end
+
+function CustomSquad._playerRow(person, squadStatus, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
 	squadPerson.extradata.activeteam = person.activeteam
 	squadPerson.extradata.activeteamrole = person.activeteamrole
 	SquadUtils.storeSquadPerson(squadPerson)
@@ -73,11 +87,11 @@ function CustomSquad._playerRow(person, squadType)
 	row:position()
 	row:date('joindate', 'Join Date:&nbsp;')
 
-	if squadType == SquadUtils.SquadType.INACTIVE or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		row:date('inactivedate', 'Inactive Date:&nbsp;')
 		row:activeteam()
 	end
-	if squadType == SquadUtils.SquadType.FORMER or squadType == SquadUtils.SquadType.FORMER_INACTIVE then
+	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
 		row:date('leavedate', 'Leave Date:&nbsp;')
 		row:newteam()
 	end

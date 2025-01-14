@@ -16,7 +16,6 @@ local Table = require('Module:Table')
 
 local Match = Lua.import('Module:Match')
 local MatchGroup = Lua.import('Module:MatchGroup')
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -33,6 +32,7 @@ local MatchMapsLegacy = {}
 
 -- invoked by Template:MatchMapsLua
 ---@param frame Frame
+---@return string
 function MatchMapsLegacy.convertMap(frame)
 	local args = Arguments.getArgs(frame)
 	args.map = Table.extract(args, 'battleground') or UNKNOWN_MAP
@@ -94,7 +94,7 @@ function MatchMapsLegacy._readMaps(matchArgs)
 		if map and Logic.isEmpty(map.winner) then
 			map.winner = mapWinner
 		end
-		matchArgs['map' .. index] = map and MatchSubobjects.luaGetMap(map) or nil
+		matchArgs['map' .. index] = map
 		return map
 	end)
 end

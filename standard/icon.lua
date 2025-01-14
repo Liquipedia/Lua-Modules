@@ -6,9 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 local Class = require('Module:Class')
-local IconData = require('Module:Icon/Data')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
+local IconData = Lua.import('Module:Icon/Data')
 local Icon = {}
 
 ---@class IconProps
@@ -18,6 +19,7 @@ local Icon = {}
 ---@field hover string?
 ---@field size integer|string|nil
 ---@field additionalClasses string[]?
+---@field attributes table<string, string>?
 
 ---@param props IconProps
 ---@return string?
@@ -38,6 +40,7 @@ function Icon.makeIcon(props)
 			:attr('title', props.hover)
 			:css('font-size', size)
 			:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
+			:attr(props.attributes and props.attributes or {})
 	)
 end
 
