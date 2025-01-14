@@ -43,16 +43,16 @@ function CustomItem.run(frame)
 
 	item:setWidgetInjector(CustomInjector(item))
 
-	self.data = {
-		introduced = self:_processPatchFromId(args.introduced),
-		deprecated = self:_processPatchFromId(args.deprecated),
+	item.data = {
+		introduced = item:_processPatchFromId(args.introduced),
+		deprecated = item:_processPatchFromId(args.deprecated),
 	}
 
 	local builtInfobox = item:createInfobox()
 
 	return mw.html.create()
 		:node(builtInfobox)
-		:node(CustomItem._deprecatedWarning(self.data.deprecated.display))
+		:node(CustomItem._deprecatedWarning(item.data.deprecated.display))
 end
 
 ---@param id string
