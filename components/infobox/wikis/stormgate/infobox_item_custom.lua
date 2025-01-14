@@ -44,8 +44,8 @@ function CustomItem.run(frame)
 	item:setWidgetInjector(CustomInjector(item))
 
 	item.data = {
-		introduced = item:_processPatchFromId(args.introduced),
-		deprecated = item:_processPatchFromId(args.deprecated),
+		introduced = item:_processPatchFromId(item.args.introduced),
+		deprecated = item:_processPatchFromId(item.args.deprecated),
 	}
 
 	local builtInfobox = item:createInfobox()
@@ -66,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{children = args.informationType .. ' Information'},
 			Cell{name = 'Slot', content = {tonumber(args.slot)}},
-			Cell{name = 'Introduced', content = {self.data.introduced.display}}
+			Cell{name = 'Introduced', content = {CustomItem:_processPatchFromId(args.introduced).display}}
 		}
 	elseif id == 'availability' then
 		return {
@@ -136,7 +136,7 @@ end
 
 ---@param args table
 ---@return string[]
-function CustomItem:getWikiCategories(args)
+function CustomItem:getWikiCategories()
 	return {'Gear'}
 end
 
@@ -162,7 +162,7 @@ end
 
 ---@param input string?
 ---@return {store: string?, display: string?}
-function CustomItem:_processPatchFromId(key)
+function CustomItem:_processPatchFromId(input)
 	if String.isEmpty(input) then return {} end
 
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
