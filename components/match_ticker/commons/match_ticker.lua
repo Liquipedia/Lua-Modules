@@ -485,7 +485,7 @@ end
 MatchTicker.fetchRegionOfTournament = FnUtil.memoize(function(tournamentPage)
 	local tournamentData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. tournamentPage .. ']]',
-		query = 'region',
+		query = 'locations',
 		limit = 1,
 	})[1]
 	if not tournamentData or not tournamentData.locations then
