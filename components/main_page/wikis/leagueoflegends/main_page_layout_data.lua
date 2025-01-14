@@ -72,13 +72,13 @@ local CONTENT = {
 			'[[Portal:News|See all Headlines]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div></div>',
 		padding = true,
-		boxid = 1509,
+		boxid = 1511,
 	},
 	references = {
 		heading = 'References',
 		body = '{{reflist|2}}',
 		padding = true,
-		boxid = 1510,
+		boxid = 1512,
 	},
 }
 
