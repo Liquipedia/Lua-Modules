@@ -423,7 +423,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return a.asGameIdx < b.asGameIdx
+		return (a.asGameIdx or 0) < (b.asGameIdx or 0)
 	end)
 end
 
@@ -438,10 +438,10 @@ function MatchTicker:adjustMatch(match)
 	local opponentNames = Array.extend({self.config.player}, self.config.teamPages)
 	if
 		--check for the name value
-		Table.includes(opponentNames, (match.opponents[2].name:gsub(' ', '_')))
+		Table.includes(opponentNames, ((match.opponents[2].name or ''):gsub(' ', '_')))
 		--check inside match2players too for the player value
 		or self.config.player and Table.any(match.opponents[2].players, function(_, playerData)
-			return (playerData.name or ''):gsub(' ', '_') == self.config.player end)
+			return (playerData.pageName or ''):gsub(' ', '_') == self.config.player end)
 	then
 		return MatchTicker.switchOpponents(match)
 	end
