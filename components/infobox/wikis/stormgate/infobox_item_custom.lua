@@ -25,6 +25,7 @@ local Center = Widgets.Center
 local Title = Widgets.Title
 
 ---@class StormgateItemInfobox: ItemInfobox
+---@field data table
 local CustomItem = Class.new(Item)
 local CustomInjector = Class.new(Injector)
 
@@ -42,14 +43,16 @@ function CustomItem.run(frame)
 
 	item:setWidgetInjector(CustomInjector(item))
 
-	item:_processPatchFromId('introduced')
-	item:_processPatchFromId('deprecated')
+	self.data = {
+		introduced = self:_processPatchFromId(args.introduced),
+		deprecated = self:_processPatchFromId(args.deprecated),
+	}
 
 	local builtInfobox = item:createInfobox()
 
 	return mw.html.create()
 		:node(builtInfobox)
-		:node(CustomItem._deprecatedWarning(item.args.deprecatedDisplay))
+		:node(CustomItem._deprecatedWarning(self.data.deprecated.display))
 end
 
 ---@param id string
@@ -63,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{children = args.informationType .. ' Information'},
 			Cell{name = 'Slot', content = {tonumber(args.slot)}},
-			Cell{name = 'Introduced', content = {args.introducedDisplay}}
+			Cell{name = 'Introduced', content = {self.data.introduced.display}}
 		}
 	elseif id == 'availability' then
 		return {
@@ -106,7 +109,7 @@ end
 function CustomItem._getUnlockedDisplay(unlockedArgs)
 	local parsedUnlockedArgs = Array.parseCommaSeparatedString(unlockedArgs, ':')
 
-	local hero =  mw.ext.LiquipediaDB.lpdb('datapoint', {
+	local hero = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::Hero]] AND [[pagename::' .. parsedUnlockedArgs[1] .. '/Coop]]',
 		order = 'name asc',
 		query = 'information, type, name, pagename, extradata',
@@ -148,8 +151,8 @@ function CustomItem:setLpdbData(args)
 		image = args.image,
 		imagedark = args.imagedark,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			deprecated = args.deprecated or '',
-			introduced = args.introduced or '',
+			deprecated = self.data.deprecated.store or '',
+			introduced = self.data.introduced.store or '',
 			faction = Array.parseCommaSeparatedString(args.faction),
 			subfaction = Array.parseCommaSeparatedString(args.subfaction),
 			slot = tonumber(args.slot),
@@ -159,23 +162,25 @@ function CustomItem:setLpdbData(args)
 	})
 end
 
----@param key string
+---@param input string?
+---@return {store: string?, display: string?}
 function CustomItem:_processPatchFromId(key)
-	local args = self.args
-	local input = Table.extract(args, key)
-	if String.isEmpty(input) then return end
+	if String.isEmpty(input) then return {} end
 
 	local patches = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::patch]]',
 		limit = 5000,
 	})
 
-	args[key] = (Array.filter(patches, function(patch)
+	local patchPage = (Array.filter(patches, function(patch)
 		return String.endsWith(patch.pagename, '/' .. input)
 	end)[1] or {}).pagename
-	assert(args[key], 'Invalid patch "' .. input .. '"')
+	assert(patchPage, 'Invalid patch "' .. input .. '"')
 
-	args[key .. 'Display'] = Page.makeInternalLink(input, args[key])
+	return {
+		store = patchPage,
+		display = Page.makeInternalLink(input, patchPage),
+	}
 end
 
 ---@param patch string?
@@ -184,9 +189,9 @@ function CustomItem._deprecatedWarning(patch)
 	if not patch then return end
 
 	return MessageBox.main('ambox', {
-		image= ICON_DEPRECATED,
-		class='ambox-red',
-		text= 'This has been removed with Patch ' .. patch,
+		image = ICON_DEPRECATED,
+		class ='ambox-red',
+		text = 'This has been removed with Patch ' .. patch,
 	})
 end
 
