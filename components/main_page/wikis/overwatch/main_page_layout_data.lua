@@ -54,7 +54,8 @@ local CONTENT = {
 		heading = 'Matches',
 		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
 			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Upcoming and ongoing matches|See more matches]]</div>',
+			'font-size:15px; font-style:italic; text-align:center;">' ..
+			'[[Liquipedia:Upcoming and ongoing matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
 	},
