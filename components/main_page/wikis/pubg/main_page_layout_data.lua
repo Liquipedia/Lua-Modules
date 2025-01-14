@@ -30,8 +30,7 @@ local CONTENT = {
 			'[[Special:RunQuery/Transfer history|Transfer query]]' ..
 			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
-			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Portal:Rumours|Rumours]]</center></div>\n</div>',
+			'</center></div>\n</div>',
 		boxid = 1509,
 	},
 	thisDay = {
