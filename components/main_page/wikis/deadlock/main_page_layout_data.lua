@@ -48,7 +48,7 @@ local CONTENT = {
 		boxid = 1510,
 	},
 	heroes = {
-		noPanel = true,
+		heading = 'Heroes',
 		body = '{{Liquipedia:HeroTable}}',
 		padding = true,
 		boxid = 1501,
