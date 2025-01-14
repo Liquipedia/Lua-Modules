@@ -86,7 +86,7 @@ return {
 			},
 		},
 		{
-			file = 'Proper OWCS Finals.jpeg',
+			file = 'Team Falcons OWCS 2024 Major.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -104,7 +104,7 @@ return {
 			},
 		},
 		{
-			file = 'Proper OWCS Finals.jpeg',
+			file = 'OWCS Stockholm 2024 Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -113,7 +113,7 @@ return {
 			},
 		},
 		{
-			file = 'Proper OWCS Finals.jpeg',
+			file = 'Overwatch Heroes NavCard image.jpg',
 			title = 'Heroes',
 			link = 'Portal:Heroes',
 			count = {
