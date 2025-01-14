@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
+local I18n = require('Module:I18n')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -31,6 +32,8 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---@field expandable boolean?
 ---@field order? fun(a: string, b: string): boolean
 ---@field load? fun(cat: FilterButtonCategory)
+---@field hasFeatured boolean?
+---@field featuredByDefault boolean?
 
 ---Builds filterbuttons based on config stored in Module:FilterButtons/Config
 ---Can be used from wikicode
@@ -81,16 +84,15 @@ function FilterButtons.getButtonRow(category)
 		:attr('data-filter', 'data-filter')
 		:attr('data-filter-effect','fade')
 		:attr('data-filter-group', 'filterbuttons-' .. category.name)
+		:attr('data-filter-default-curated', category.featuredByDefault and 'true' or nil)
 		:tag('span')
 			:addClass('filter-button')
 			:addClass('filter-button-all')
 			:attr('data-filter-on', 'all')
-			:wikitext('All')
+			:wikitext(I18n.translate('filterbuttons-all'))
 			:done()
 
-	local transform = category.transform or FnUtil.identity
-	for _, value in ipairs(category.items or {}) do
-		local text = transform(value)
+	local makeButton = function(value, text)
 		local button = mw.html.create('span')
 			:addClass('filter-button')
 			:attr('data-filter-on', value)
@@ -99,6 +101,16 @@ function FilterButtons.getButtonRow(category)
 			button:addClass('filter-button--active')
 		end
 		buttons:node(button)
+	end
+
+	if category.hasFeatured then
+		makeButton('curated', I18n.translate('filterbuttons-featured'))
+	end
+
+	local transformValueToText = category.transform or FnUtil.identity
+	for _, value in ipairs(category.items or {}) do
+		local text = transformValueToText(value)
+		makeButton(value, text)
 	end
 
 	if String.isNotEmpty(category.expandKey) then

@@ -11,6 +11,10 @@ return {
 		-- Tournament Filter
 		['tournament-ticker-no-tournaments'] = 'No tournaments found for your selected filters!',
 
+		-- Filter Buttons
+		['filter-buttons-all'] = 'All',
+		['filter-buttons-featured'] = 'Curated',
+
 		-- Dates
 		['date-unknown'] = 'TBA',
 		['date-range-different-months'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
