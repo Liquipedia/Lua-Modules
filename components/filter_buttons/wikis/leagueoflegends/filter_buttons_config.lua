@@ -23,20 +23,29 @@ Config.categories = {
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
-		expandKey = "liquipediatiertype",
+		expandKey = "region",
 	},
 	{
-		name = 'liquipediatiertype',
-		property = 'liquipediaTierType',
+		name = 'region',
+		property = 'region',
 		expandable = true,
-		load = function(category)
-			category.items = {}
-			for _, tiertype in Tier.iterate('tierTypes') do
-				table.insert(category.items, Tier.toIdentifier(tiertype.value))
-			end
-		end,
-		transform = function(tiertype)
-			return select(2, Tier.toName(1, tiertype))
+		items = { "Europe", "North America", "Korea", "China", "Japan", "Latin America North", "Latin America South", "Taiwan", "Oceania", "Brazil", "Other" },
+		defaultItems = { "Europe", "North America", "Korea", "China", "Brazil", "Other" },
+		transform = function(region)
+			local regionToShortName = {
+				['Europe'] = 'eu',
+				['North America'] = 'na',
+				['Korea'] = 'kr',
+				['China'] = 'ch',
+				['Japan'] = 'jp',
+				['Latin America North'] = 'latam n',
+				['Latin America South'] = 'latam s',
+				['Taiwan'] = 'tw',
+				['Oceania'] = 'oce',
+				['Brazil'] = 'br',
+				['Other'] = 'other',
+			}
+			return regionToShortName[region]
 		end,
 	},
 }
