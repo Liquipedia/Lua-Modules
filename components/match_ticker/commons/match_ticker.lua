@@ -19,7 +19,7 @@ local Tier = require('Module:Tier/Utils')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 local MatchUtil = Lua.import('Module:Match/Util')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree

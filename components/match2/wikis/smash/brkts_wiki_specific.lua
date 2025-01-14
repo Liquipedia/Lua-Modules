@@ -16,11 +16,6 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 ---@class SmashBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
-WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	return StarcraftMatchGroupUtil.matchFromRecord
-end)
-
 ---@param matchGroupType string
 ---@param maxOpponentCount integer
 ---@return function

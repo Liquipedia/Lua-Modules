@@ -18,7 +18,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')

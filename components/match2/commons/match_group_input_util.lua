@@ -22,7 +22,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Links = Lua.import('Module:Links')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')

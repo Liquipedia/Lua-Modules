@@ -19,7 +19,7 @@ local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Display = Lua.import('Module:MatchPage/Template')
 
 local MatchPage = {}

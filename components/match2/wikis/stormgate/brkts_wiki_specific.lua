@@ -16,11 +16,6 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 ---@class StormgateBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
-WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	return CustomMatchGroupUtil.matchFromRecord
-end)
-
 ---Determine if a match has details that should be displayed via popup
 ---@param match table
 ---@return boolean

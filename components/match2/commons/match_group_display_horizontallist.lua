@@ -18,7 +18,7 @@ local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 

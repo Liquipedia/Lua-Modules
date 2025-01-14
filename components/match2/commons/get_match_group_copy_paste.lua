@@ -16,7 +16,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
 
 ---@class Match2CopyPaste

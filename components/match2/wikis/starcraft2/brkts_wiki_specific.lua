@@ -61,9 +61,4 @@ function WikiSpecific.getMatchContainer(displayMode)
 	end
 end
 
-WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
-	return StarcraftMatchGroupUtil.matchHasDetails
-end)
-
 return WikiSpecific

@@ -12,7 +12,7 @@ local Table = require('Module:Table')
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local CustomOpponentDisplay = Lua.import('Module:OpponentDisplay/Custom')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomBracketDisplay = {propTypes = {}}
 

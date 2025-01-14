@@ -15,7 +15,7 @@ local Template = require('Module:Template')
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local Match = Lua.import('Module:Match')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Opponent = Lua.import('Module:Opponent')
 
 ---@class BracketTemplateBracket
