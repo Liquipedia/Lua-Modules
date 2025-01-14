@@ -17,7 +17,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomBracketDisplay = {propTypes = {}}
 

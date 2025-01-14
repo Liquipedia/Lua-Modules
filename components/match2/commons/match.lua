@@ -13,7 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local MatchGroupUtil = require('Module:MatchGroup/Util')
+local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -485,12 +485,12 @@ Match.gameFields = Table.map({
 	'map',
 	'mode',
 	'parent',
-	'participants',
+	'participants', -- LPDB API v3: backwards compatibility
 	'patch',
 	'opponents',
 	'resulttype',  -- LPDB API v3: backwards compatibility
 	'rounds',
-	'scores',
+	'scores', -- LPDB API v3: backwards compatibility
 	'status',
 	'subgroup',
 	'tournament',

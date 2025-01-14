@@ -10,9 +10,12 @@ local MatchLegacy = {}
 
 local Array = require('Module:Array')
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -33,8 +36,9 @@ function MatchLegacy._convertParameters(match2)
 	end
 	match.links = nil
 
-	if Logic.isNotEmpty(match.walkover) then
-		match.resulttype = match.walkover
+	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	if walkover then
+		match.resulttype = match.walkover:lower()
 		match.walkover = match.winner
 	end
 
@@ -105,7 +109,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = Json.parseIfString(game2.scores) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 

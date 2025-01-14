@@ -33,7 +33,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	end
 
 	local function scoreDisplay(oppIdx)
-		return DisplayHelper.MapScore(game.scores[oppIdx], oppIdx, game.resultType, game.walkover, game.winner)
+		return DisplayHelper.MapScore(game.opponents[oppIdx], game.status)
 	end
 
 	local function makePartialScores(halves, firstSide)

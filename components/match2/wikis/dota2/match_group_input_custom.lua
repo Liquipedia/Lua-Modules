@@ -17,7 +17,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -87,6 +87,9 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		local map = MapParser.getMap(mapInput)
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
+
+		local dateToUse = map.date or match.date
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
 		map.map = MapFunctions.getMapName(map)
 		map.length = MapParser.getLength(map)
@@ -236,7 +239,7 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
 	local participantList = MapParser.getParticipants(map, opponentIndex) or {}
-	local participants, unattachedParticipants = MatchGroupInputUtil.parseParticipants(
+	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		participantList,
 		function (playerIndex)
@@ -249,10 +252,6 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			return participant
 		end
 	)
-	Array.forEach(unattachedParticipants, function(participant)
-		table.insert(participants, participant)
-	end)
-	return participants
 end
 
 ---@param winnerInput string|integer|nil

@@ -28,6 +28,7 @@ return {
 		'esea',
 		'esea-d',
 		'esl',
+		'esplay',
 		'esportal',
 		'etf2l',
 		'faceit',

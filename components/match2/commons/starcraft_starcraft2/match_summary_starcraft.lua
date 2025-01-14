@@ -18,8 +18,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Starcraft')
+local MatchGroupUtilStarcraft = Lua.import('Module:MatchGroup/Util/Custom')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -39,16 +38,6 @@ local StarcraftMatchSummary = {}
 ---@param args {bracketId: string, matchId: string, config: table?}
 ---@return Html
 function StarcraftMatchSummary.getByMatchId(args)
-	local match = MatchGroupUtil.fetchMatchForBracketDisplay(args.bracketId, args.matchId)
-	---@cast match StarcraftMatchGroupUtilMatch
-
-	if match.isFfa then
-		return Lua.import('Module:MatchSummary/Starcraft/Ffa').getByMatchId{
-			match = match,
-			config = args.config
-		}
-	end
-
 	return MatchSummary.defaultGetByMatchId(StarcraftMatchSummary, args):addClass('brkts-popup-sc')
 end
 
@@ -222,7 +211,11 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 		end
 		return OpponentDisplay.BlockOpponent{
 			flip = opponentIndex == 1,
-			opponent = {players = players, type = Opponent.partyTypes[math.max(#players, 1)]},
+			opponent = {
+				players = players,
+				type = Opponent.partyTypes[math.max(#players, 1)],
+				isArchon = (opponents[opponentIndex] or {}).isArchon,
+			},
 			showLink = true,
 			overflow = 'ellipsis',
 		}
@@ -231,18 +224,9 @@ function StarcraftMatchSummary.TeamSubMatchOpponnetRow(submatch)
 	---@param opponentIndex any
 	---@return Html
 	local createScore = function(opponentIndex)
-		local isWinner = opponentIndex == submatch.winner or submatch.resultType == 'draw'
-		if submatch.resultType == 'default' then
-			return OpponentDisplay.BlockScore{
-				isWinner = isWinner,
-				scoreText = isWinner and 'W' or string.upper(submatch.walkover),
-			}
-		end
-
-		local score = submatch.resultType ~= 'np' and (submatch.scores or {})[opponentIndex] or nil
 		return OpponentDisplay.BlockScore{
-			isWinner = isWinner,
-			scoreText = score,
+			isWinner = opponentIndex == submatch.winner or submatch.winner == 0,
+			scoreText = DisplayHelper.MapScore(submatch.opponents[opponentIndex], submatch.status),
 		}
 	end
 

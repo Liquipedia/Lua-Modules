@@ -228,9 +228,13 @@ function CustomPlayer:_getMatchupData()
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
+
+		if Array.any(match.match2opponents, function(opponent) return opponent.status and opponent.status ~= 'S' end) then
+			return
+		end
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 	end
 
 	Lpdb.executeMassQuery('match2', queryParameters, processMatch)

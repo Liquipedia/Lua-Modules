@@ -34,7 +34,7 @@ Called from MatchGroup/Util
 -- @returns match
 ]]
 WikiSpecificBase.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local MatchUtil = Lua.import('Module:MatchGroup/Util')
+	local MatchUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return MatchUtil.matchFromRecord
 end)
 

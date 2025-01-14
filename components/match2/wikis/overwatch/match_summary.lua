@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -52,11 +53,12 @@ end
 ---@param opponentIndex integer
 ---@return Html
 function CustomMatchSummary._gameScore(game, opponentIndex)
-	local score = game.scores[opponentIndex] --[[@as number|string?]]
-	if score and game.mode == 'Push' then
-		score = score .. 'm'
+	local opponentCopy = Table.deepCopy(game.opponents[opponentIndex])
+	if opponentCopy.score and game.mode == 'Push' then
+		opponentCopy.score = opponentCopy.score .. 'm'
 	end
-	local scoreDisplay = DisplayHelper.MapScore(score, opponentIndex, game.resultType, game.walkover, game.winner)
+
+	local scoreDisplay = DisplayHelper.MapScore(opponentCopy, game.status)
 	return mw.html.create('div'):wikitext(scoreDisplay)
 end
 
