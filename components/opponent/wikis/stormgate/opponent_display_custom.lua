@@ -17,15 +17,9 @@ local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, types={}})
-
-CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.InlineOpponent, {
-	opponent = MatchGroupUtil.types.GameOpponent,
-	hideFaction = 'boolean?',
-})
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class StormgateBracketOpponentEntry
@@ -72,7 +66,6 @@ CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOp
 ---@param props StormgateInlineOpponentProps
 ---@return Html|string|nil
 function CustomOpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
 
 	if Opponent.typeIsParty((opponent or {}).type) then
@@ -82,12 +75,6 @@ function CustomOpponentDisplay.InlineOpponent(props)
 	return OpponentDisplay.InlineOpponent(props)
 end
 
-CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.BlockOpponent, {
-	opponent = MatchGroupUtil.types.GameOpponent,
-	hideFaction = 'boolean?',
-	playerClass = 'string?',
-})
-
 ---@class StormgateBlockOpponentProps: BlockOpponentProps
 ---@field opponent StormgateStandardOpponent
 ---@field hideFaction boolean?
@@ -95,7 +82,6 @@ CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDi
 ---@param props StormgateBlockOpponentProps
 ---@return Html
 function CustomOpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
 
 	opponent.extradata = opponent.extradata or {}
