@@ -82,7 +82,7 @@ return {
 		lightmode = 'PUBG Mobile default lightmode.png',
 		darkmode = 'PUBG Mobile default darkmode.png',
 	},
-	metadesc = 'The PUBG Mobile esports wiki covering everything from players, teams and transfers, , ' ..
+	metadesc = 'The PUBG Mobile esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, weapons, and more.',
 	title = 'PUBG Mobile',
 	navigation = {
