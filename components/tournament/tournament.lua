@@ -76,7 +76,7 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
 		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
-		region = (record.locaitons or {}).region1,
+		region = (record.locations or {}).region1,
 		status = record.status,
 		featured = recordIsFeatured(record),
 		icon = record.icon,
