@@ -58,8 +58,8 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|defaultTiers=1,2|upcomingDays=30|' ..
-			'completedDays=20|filterByTierTypes=true|useExternalFilters=true}}',
+		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
+			'|upcomingDays=30|completedDays=20}}',
 		padding = true,
 		boxid = 1508,
 	},
