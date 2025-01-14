@@ -136,10 +136,8 @@ end
 
 ---@param args table
 ---@return string[]
-function CustomItem:getCategories(args)
-	local categories = {args.informationType}
-
-	return categories
+function CustomItem:getWikiCategories(args)
+	return {'Gear'}
 end
 
 ---@param args table
