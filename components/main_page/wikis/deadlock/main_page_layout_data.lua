@@ -50,6 +50,9 @@ local CONTENT = {
 	heroes = {
 		noPanel = true,
 		body = '{{Liquipedia:HeroTable}}',
+		padding = true,
+		boxid = 1501,
+
 	},
 	filterButtons = {
 		noPanel = true,
