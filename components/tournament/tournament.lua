@@ -65,8 +65,8 @@ end
 ---@param recordIsFeatured function
 ---@return StandardTournament
 function Tournaments.tournamentFromRecord(record, recordIsFeatured)
-	local startDate = Tournaments.parseDateRecord(record.startdate)
-	local endDate = Tournaments.parseDateRecord(record.sortdate or record.enddate)
+	local startDate = Tournaments.parseDateRecord(Logic.nilOr(record.extradata.startdatetext, record.startdate))
+	local endDate = Tournaments.parseDateRecord(Logic.nilOr(record.extradata.enddatetext, record.sortdate, record.enddate))
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
@@ -112,7 +112,7 @@ function Tournaments.calculatePhase(tournament)
 end
 
 --- This function parses fuzzy dates into a structured format.
----@param dateRecord string # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
+---@param dateRecord string? # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
 ---@return {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 function Tournaments.parseDateRecord(dateRecord)
 	if not dateRecord then

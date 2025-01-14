@@ -16,7 +16,11 @@ return {
 		['date-range-different-months'] = '${startMonth} ${startDate} - ${endMonth} ${endDate}',
 		['date-range-same-month'] = '${startMonth} ${startDate} - ${endDate}',
 		['date-range-same-day'] = '${startMonth} ${startDate}',
-		['date-range-unknown-end'] = '${startMonth} ${startDate} - TBA',
+		['date-range-different-months-unknown-end'] = '${startMonth} ${startDate} - TBA',
+		['date-range-different-months-unknown-end-day'] = '${startMonth} ${startDate} - ${endMonth} TBA',
+		['date-range-different-months-unknown-days'] = '${startMonth} - ${endMonth}',
+		['date-range-different-months-unknown-days-and-end-month'] = '${startMonth} - TBA',
+		['date-range-same-month-unknown-days'] = '${startMonth}',
 
 		-- Bracket Headers
 		['brkts-header-r1'] = 'Grand Final,Final,GF',

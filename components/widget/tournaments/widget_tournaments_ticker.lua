@@ -44,22 +44,27 @@ function TournamentsTickerWidget:render()
 		['qualifier'] = -2,
 	}
 
+	local currentTimestamp = DateExt.getCurrentTimestamp()
 	local function isWithinDateRange(tournament)
 		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTierType]
 			or tierThresholdModifiers[tournament.liquipediaTier]
 			or 0
 
-		local startDateThreshold = DateExt.getCurrentTimestamp() - (upcomingDays + modifiedThreshold) * 24 * 60 * 60
 		if not tournament.startDate then
 			return false
 		end
 
-		local endDateThreshold = DateExt.getCurrentTimestamp() + (completedDays + modifiedThreshold) * 24 * 60 * 60
-		if not tournament.endDate then
-			return tournament.startDate.timestamp >= startDateThreshold
-		end
+		local startDateThreshold = currentTimestamp + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
+		local endDateThreshold = currentTimestamp - (completedDays + modifiedThreshold) * 24 * 60 * 60
 
-		return tournament.endDate.timestamp <= endDateThreshold and tournament.startDate.timestamp >= startDateThreshold
+		if tournament.phase == 'ONGOING' then
+			return true
+		elseif tournament.phase == 'UPCOMING' then
+			return tournament.startDate.timestamp < startDateThreshold
+		elseif tournament.phase == 'FINISHED' then
+			return tournament.endDate.timestamp > endDateThreshold
+		end
+		return false
 	end
 
 	local lpdbFilter = Condition.Tree(Condition.BooleanOperator.all)
@@ -80,6 +85,12 @@ function TournamentsTickerWidget:render()
 	end
 
 	local function sortByDate(a, b)
+		if not a.endDate then
+			return true
+		end
+		if not b.endDate then
+			return false
+		end
 		if a.endDate.timestamp ~= b.endDate.timestamp then
 			return a.endDate.timestamp > b.endDate.timestamp
 		end
@@ -89,6 +100,12 @@ function TournamentsTickerWidget:render()
 	local function sortByDateUpcoming(a, b)
 		if a.startDate.timestamp ~= b.startDate.timestamp then
 			return a.startDate.timestamp > b.startDate.timestamp
+		end
+		if not a.endDate then
+			return true
+		end
+		if not b.endDate then
+			return false
 		end
 		return a.endDate.timestamp > b.endDate.timestamp
 	end

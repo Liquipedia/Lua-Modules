@@ -18,6 +18,42 @@ local Widget = Lua.import('Module:Widget')
 
 local DateRange = Class.new(Widget)
 
+---@param startDate {day?: integer, month?: integer}?
+---@param endDate {day?: integer, month?: integer}?
+---@return string
+local function determineTranslateString(startDate, endDate)
+	if not startDate or not startDate.month then
+		return 'date-unknown'
+	end
+
+	if not endDate or not endDate.month then
+		if not startDate.day then
+			return 'date-range-different-months-unknown-days-and-end-month'
+		end
+		return 'date-range-different-months-unknown-end'
+	end
+
+	if not startDate.day and not endDate.day then
+		if startDate.month == endDate.month then
+			return 'date-range-same-month-unknown-days'
+		end
+		return 'date-range-different-months-unknown-days'
+	end
+
+	if not endDate.day then
+		return 'date-range-different-months-unknown-end-day'
+	end
+
+	if startDate.month == endDate.month then
+		if startDate.day == endDate.day then
+			return 'date-range-same-day'
+		end
+		return 'date-range-same-month'
+	end
+
+	return 'date-range-different-months'
+end
+
 ---@return string
 function DateRange:render()
 	local startDate, endDate = self.props.startDate, self.props.endDate
@@ -28,33 +64,27 @@ function DateRange:render()
 		endDate = DateExt.parseIsoDate(endDate)
 	end
 
-	if not startDate then
-		return I18n.translate('date-unknown')
-	end
-
-	local startString = os.date('%b %d', os.time(startDate))
-	local endString = endDate and os.date('%b %d', os.time(endDate)) or nil
+	---@type osdateparam?
+	local calculatingStartDate = startDate and {
+		year = startDate.year or 0,
+		month = startDate.month or 1,
+		day = startDate.day or 1,
+	} or nil
+	---@type osdateparam?
+	local calculatingEndDate = endDate and {
+		year = endDate.year or 0,
+		month = endDate.month or 1,
+		day = endDate.day or 1,
+	} or nil
 
 	local dateData = {
-		startMonth = os.date('%b', os.time(startDate)),
-		startDate = os.date('%d', os.time(startDate)),
-		endMonth = os.date('%b', os.time(endDate)),
-		endDate = os.date('%d', os.time(endDate)),
+		startMonth = calculatingStartDate and os.date('%b', os.time(calculatingStartDate)) or nil,
+		startDate = calculatingStartDate and os.date('%d', os.time(calculatingStartDate)) or nil,
+		endMonth = calculatingEndDate and os.date('%b', os.time(calculatingEndDate)) or nil,
+		endDate = calculatingEndDate and os.date('%d', os.time(calculatingEndDate)) or nil,
 	}
 
-	if startString == endString then
-		return I18n.translate('date-range-same-day', dateData)
-	end
-
-	if not endString then
-		return I18n.translate('date-range-unknown-end', dateData)
-	end
-
-	if dateData.startMonth == dateData.endMonth then
-		return I18n.translate('date-range-same-month', dateData)
-	end
-
-	return I18n.translate('date-range-different-months', dateData)
+	return I18n.translate(determineTranslateString(startDate, endDate), dateData)
 end
 
 return DateRange
