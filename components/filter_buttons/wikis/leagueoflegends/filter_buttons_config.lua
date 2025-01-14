@@ -23,7 +23,7 @@ Config.categories = {
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
-		expandKey = "region",
+		expandKey = 'region',
 	},
 	{
 		name = 'region',
