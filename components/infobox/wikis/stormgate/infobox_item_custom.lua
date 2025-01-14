@@ -66,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Title{children = args.informationType .. ' Information'},
 			Cell{name = 'Slot', content = {tonumber(args.slot)}},
-			Cell{name = 'Introduced', content = {CustomItem:_processPatchFromId(args.introduced).display}}
+			Cell{name = 'Introduced', content = {caller.data.introduced.display}}
 		}
 	elseif id == 'availability' then
 		return {
