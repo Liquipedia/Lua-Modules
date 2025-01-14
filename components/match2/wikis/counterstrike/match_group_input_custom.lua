@@ -51,7 +51,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = finishedInput
 
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
-	processedMatch.extradata.status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or match.status
+	processedMatch.extradata.status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+		and finishedInput or match.status
 
 	return processedMatch
 end
@@ -62,7 +63,7 @@ end
 ---@param opponents table[]
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+	return MatchGroupInputUtil.standardProcessMap(match, opponents, MapFunctions)
 end
 
 ---@param maps table[]
