@@ -30,10 +30,10 @@ Config.categories = {
 		property = 'region',
 		expandable = true,
 		items = {
-			"Europe", "North America", "Korea", "China", "Japan", "Latin America North",
-			"Latin America South", "Taiwan", "Oceania", "Brazil", "Other",
+			'Europe', 'North America', 'Korea', 'China', 'Japan', 'Latin America North',
+			'Latin America South', 'Taiwan', 'Oceania', 'Brazil', 'Other',
 		},
-		defaultItems = { "Europe", "North America", "Korea", "China", "Brazil", "Other" },
+		defaultItems = { 'Europe', 'North America', 'Korea', 'China', 'Brazil', 'Other' },
 		transform = function(region)
 			local regionToShortName = {
 				['Europe'] = 'eu',
