@@ -80,6 +80,12 @@ function TournamentsTickerWidget:render()
 	end
 
 	local function sortByDate(a, b)
+		if not a.endDate then
+			return true
+		end
+		if not b.endDate then
+			return false
+		end
 		if a.endDate.timestamp ~= b.endDate.timestamp then
 			return a.endDate.timestamp > b.endDate.timestamp
 		end
@@ -89,6 +95,12 @@ function TournamentsTickerWidget:render()
 	local function sortByDateUpcoming(a, b)
 		if a.startDate.timestamp ~= b.startDate.timestamp then
 			return a.startDate.timestamp > b.startDate.timestamp
+		end
+		if not a.endDate then
+			return true
+		end
+		if not b.endDate then
+			return false
 		end
 		return a.endDate.timestamp > b.endDate.timestamp
 	end
