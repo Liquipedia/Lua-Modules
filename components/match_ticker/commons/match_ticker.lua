@@ -55,7 +55,7 @@ local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
-local LIMIT_INCREASE = 20
+local LIMIT_INCREASE = 100
 local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local DEFAULT_LIVE_HOURS = 8
@@ -94,6 +94,7 @@ end
 ---@field onlyHighlightOnValue string?
 ---@field tiers string[]?
 ---@field tierTypes string[]?
+---@field regions string[]?
 ---@field newStyle boolean?
 
 ---@class MatchTicker
@@ -130,6 +131,7 @@ function MatchTicker:init(args)
 		enteredOpponentOnLeft = hasOpponent and Logic.readBool(args.enteredOpponentOnLeft or hasOpponent),
 		showInfoForEmptyResults = Logic.readBool(args.showInfoForEmptyResults),
 		onlyHighlightOnValue = args.onlyHighlightOnValue,
+		regions = args.regions and Array.parseCommaSeparatedString(args.regions) or nil,
 		tiers = args.tiers and Array.filter(Array.parseCommaSeparatedString(args.tiers), function (tier)
 					local identifier = Tier.toIdentifier(tier)
 					return type(identifier) == 'number' and Tier.isValid(identifier)
@@ -326,6 +328,9 @@ function MatchTicker:parseMatches(matches)
 		match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
 			return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 		end)
+		if self.config.regions then
+			match.region = MatchTicker.fetchRegionOfTournament(match.parent)
+		end
 		return match
 	end)
 end
@@ -334,6 +339,13 @@ end
 ---@param matches table[]
 ---@return table[]
 function MatchTicker:filterMatches(matches)
+	-- Remove matches with wrong region
+	if self.config.regions then
+		matches = Array.filter(matches, function(match)
+			return Table.includes(self.config.regions, match.region)
+		end)
+	end
+
 	--remove matches with empty/BYE opponents
 	matches = Array.filter(matches, function(match)
 		return not Array.any(match.opponents, Opponent.isBye)
@@ -466,6 +478,21 @@ function MatchTicker.switchOpponents(match)
 
 	return match
 end
+
+--- Fetches region of a tournament
+---@param tournamentPage string
+---@return string?
+MatchTicker.fetchRegionOfTournament = FnUtil.memoize(function(tournamentPage)
+	local tournamentData = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' .. tournamentPage .. ']]',
+		query = 'locations',
+		limit = 1,
+	})[1]
+	if not tournamentData or not tournamentData.locations then
+		return nil
+	end
+	return tournamentData.locations.region1
+end)
 
 ---@param header MatchTickerHeader?
 ---@return Html

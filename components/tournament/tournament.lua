@@ -30,7 +30,7 @@ local TOURNAMENT_PHASE = {
 ---@field endDate {year: integer, month: integer?, day: integer?, timestamp: integer?}?
 ---@field liquipediaTier string
 ---@field liquipediaTierType string
----@field region string
+---@field region string?
 ---@field featured boolean
 ---@field status string?
 ---@field phase TournamentPhase
@@ -76,7 +76,7 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 		endDate = endDate,
 		liquipediaTier = Tier.toIdentifier(record.liquipediatier),
 		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
-		region = record.region,
+		region = (record.locations or {}).region1,
 		status = record.status,
 		featured = recordIsFeatured(record),
 		icon = record.icon,
