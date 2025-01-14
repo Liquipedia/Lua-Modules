@@ -23,7 +23,7 @@ local DateRange = Class.new(Widget)
 ---@return string
 local function determineTranslateString(startDate, endDate)
 	if not startDate or not startDate.month then
-		return I18n.translate('date-unknown')
+		return 'date-unknown'
 	end
 
 	if not endDate or not endDate.month then
