@@ -26,7 +26,7 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	if Logic.realBool(args.bigMatch) then
+	if Logic.readBool(args.bigMatch) then
 		return '{{Match}}'
 	end
 
