@@ -635,7 +635,6 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
-		isArchon = Logic.readBool(extradata.isarchon),
 	}
 end
 
