@@ -659,13 +659,15 @@ end
 ---@return standardPlayer
 function MatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	local faction = Faction.read(extradata.faction)
 	return {
 		displayName = record.displayname,
 		extradata = extradata,
 		flag = nilIfEmpty(record.flag),
 		pageName = record.name,
 		team = Table.extract(extradata, 'playerteam'),
-		faction = Faction.read(extradata.faction) or Faction.defaultFaction
+		faction = faction or Faction.defaultFaction,
+		pageIsResolved = Logic.isNotEmpty(faction),
 	}
 end
 

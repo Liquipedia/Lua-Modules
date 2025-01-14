@@ -282,18 +282,4 @@ function CustomMatchGroupUtil.computeOffFactions(gameOpponent, referenceOpponent
 	return hasOffFaction and gameFactions or nil
 end
 
----@param record table
----@return StormgateStandardPlayer
-function CustomMatchGroupUtil.playerFromRecord(record)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	return {
-		displayName = record.displayname,
-		extradata = extradata,
-		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
-		pageIsResolved = true,
-		pageName = record.name,
-		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
-	}
-end
-
 return CustomMatchGroupUtil
