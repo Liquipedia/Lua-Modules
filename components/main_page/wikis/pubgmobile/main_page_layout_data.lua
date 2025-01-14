@@ -27,7 +27,8 @@ local CONTENT = {
 			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|action=edit}} edit]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:RunQuery/Transfer_history|Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
+			'[[Special:RunQuery/Transfer_history|Transfer query]]' ..
+			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
 			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Portal:Rumours|Rumours]]</center></div>\n</div>',
@@ -59,14 +60,15 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|defaultTiers=1,2,3|upcomingDays=30|' ..
-			'concludedDays=20|ignoreTiers=-1|filterByTierTypes=true|useExternalFilters=true}}',
+		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
+			'|upcomingDays=30|completedDays=30}}',
 		padding = true,
 		boxid = 1508,
 	},
 	headlines = {
 		heading = 'Headlines',
-		body = '{{ExternalMediaList|subject=!|organization=!|limit=5}}<div style="display:block; text-align:center; padding:0.5em;"> ' ..
+		body = '{{ExternalMediaList|subject=!|organization=!|limit=5}}' ..
+			'<div style="display:block; text-align:center; padding:0.5em;">' ..
 			'<div style="display:inline; margin:0 10px; white-space:nowrap; font-size:15px; font-style:italic;">' ..
 			'[[Portal:News|See all Headlines]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div>',
