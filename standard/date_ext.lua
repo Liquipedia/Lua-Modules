@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
@@ -67,12 +68,14 @@ function DateExt.readTimestampOrNil(dateString)
 	return success and timestamp or nil
 end
 
+--- Our runtime measures at most in seconds, and we don't care about that level of precision anyway.
+--- Hence we can memoize it for performane, as it's relatively expensive if called a lot.
 ---@return number
-function DateExt.getCurrentTimestamp()
+DateExt.getCurrentTimestamp = FnUtil.memoize(function()
 	local ts = tonumber(mw.getContentLanguage():formatDate('U'))
 	---@cast ts -nil
 	return ts
-end
+end)
 
 --- Formats a timestamp according to the specified format.
 --- The format string is the same used by mw.language.formatDate and {{#time}}.
