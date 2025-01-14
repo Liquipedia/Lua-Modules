@@ -64,11 +64,24 @@ function DateRange:render()
 		endDate = DateExt.parseIsoDate(endDate)
 	end
 
+	---@type osdateparam?
+	local calculatingStartDate = startDate and {
+		year = startDate.year or 0,
+		month = startDate.month or 1,
+		day = startDate.day or 1,
+	} or nil
+	---@type osdateparam?
+	local calculatingEndDate = endDate and {
+		year = endDate.year or 0,
+		month = endDate.month or 1,
+		day = endDate.day or 1,
+	} or nil
+
 	local dateData = {
-		startMonth = os.date('%b', os.time(startDate)),
-		startDate = os.date('%d', os.time(startDate)),
-		endMonth = os.date('%b', os.time(endDate)),
-		endDate = os.date('%d', os.time(endDate)),
+		startMonth = calculatingStartDate and os.date('%b', os.time(calculatingStartDate)) or nil,
+		startDate = calculatingStartDate and os.date('%d', os.time(calculatingStartDate)) or nil,
+		endMonth = calculatingEndDate and os.date('%b', os.time(calculatingEndDate)) or nil,
+		endDate = calculatingEndDate and os.date('%d', os.time(calculatingEndDate)) or nil,
 	}
 
 	return I18n.translate(determineTranslateString(startDate, endDate), dateData)
