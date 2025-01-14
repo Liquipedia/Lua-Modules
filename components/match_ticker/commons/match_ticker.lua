@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
+local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -55,7 +56,6 @@ local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
-local LIMIT_INCREASE = 40
 local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local DEFAULT_LIVE_HOURS = 8
@@ -193,17 +193,32 @@ end
 ---@param matches table?
 ---@return MatchTicker
 function MatchTicker:query(matches)
-	matches = matches or mw.ext.LiquipediaDB.lpdb('match2', {
-		conditions = self:buildQueryConditions(),
-		order = self.config.order,
-		query = table.concat(self.config.queryColumns, ','),
-		limit = self.config.limit + LIMIT_INCREASE,
-	})
+	if not matches then
+		matches = {}
+		Lpdb.executeMassQuery('match2',
+			{
+				conditions = self:buildQueryConditions(),
+				order = self.config.order,
+				query = table.concat(self.config.queryColumns, ','),
+				limit = DEFAULT_LIMIT,
+			},
+			function(record)
+				record = self:parseMatch(record)
+				if not self:keepMatch(record) then
+					return
+				end
+				for _, match in ipairs(self:expandGamesOfMatch(record)) do
+					table.insert(matches, match)
+				end
+				if #matches >= self.config.limit then
+					return false
+				end
+			end,
+			DEFAULT_LIMIT * 10
+		)
+	end
 
 	if type(matches[1]) == 'table' then
-		matches = self:parseMatches(matches)
-		matches = self:filterMatches(matches)
-		matches = self:expandGamesOfMatches(matches)
 		matches = self:sortMatches(matches)
 		matches = Array.sub(matches, 1, self.config.limit)
 		self.matches = Array.map(matches, function(match) return self:adjustMatch(match) end)
@@ -321,102 +336,95 @@ function MatchTicker:dateConditions()
 end
 
 ---Overwritable per wiki decision
----@param matches table[]
----@return table[]
-function MatchTicker:parseMatches(matches)
-	return Array.map(matches, function (match)
-		match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
-			return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
-		end)
-		if self.config.regions then
-			match.region = MatchTicker.fetchRegionOfTournament(match.parent)
-		end
-		return match
+---@param match table
+---@return table
+function MatchTicker:parseMatch(match)
+	match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
+		return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 	end)
+	if self.config.regions then
+		match.region = MatchTicker.fetchRegionOfTournament(match.parent)
+	end
+	return match
 end
 
+local previousMatchWasTbd
 ---Overwritable per wiki decision
----@param matches table[]
----@return table[]
-function MatchTicker:filterMatches(matches)
+---@param match table
+---@return boolean
+function MatchTicker:keepMatch(match)
 	-- Remove matches with wrong region
 	if self.config.regions then
-		matches = Array.filter(matches, function(match)
-			return Table.includes(self.config.regions, match.region)
-		end)
+		if not Table.includes(self.config.regions, match.region) then
+			return false
+		end
 	end
 
 	--remove matches with empty/BYE opponents
-	matches = Array.filter(matches, function(match)
-		return not Array.any(match.opponents, Opponent.isBye)
-	end)
-
-	if self.config.showAllTbdMatches then
-		return matches
+	if Array.any(match.opponents, Opponent.isBye) then
+		return false
 	end
 
-	local previousMatchWasTbd
-	Array.forEach(matches, function(match)
-		local isTbdMatch = Array.all(match.opponents, function(opponent)
-			return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
-		end)
-		if isTbdMatch and previousMatchWasTbd then
-			match.isTbdMatch = true
-		elseif isTbdMatch then
-			previousMatchWasTbd = true
-		else
-			previousMatchWasTbd = false
-		end
-	end)
+	if self.config.showAllTbdMatches then
+		return true
+	end
 
-	return Array.filter(matches, function(match) return not match.isTbdMatch end)
+	local isTbdMatch = Array.all(match.opponents, function(opponent)
+		return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
+	end)
+	local toss = isTbdMatch and previousMatchWasTbd
+	if isTbdMatch then
+		previousMatchWasTbd = true
+	else
+		previousMatchWasTbd = false
+	end
+
+	return not toss
 end
 
 ---Overwritable per wiki decision
----@param matches table[]
+---@param match table
 ---@return table[]
-function MatchTicker:expandGamesOfMatches(matches)
+function MatchTicker:expandGamesOfMatch(match)
 	local config = self.config
-	return Array.flatMap(matches, function(match)
-		if not match.match2games or #match.match2games < 2 then
-			return {match}
+	if not match.match2games or #match.match2games < 2 then
+		return {match}
+	end
+
+	if Array.all(match.match2games, function(game) return game.date == match.date end) then
+		return {match}
+	end
+
+	return Array.map(match.match2games, function(game, gameIndex)
+		if config.recent and Logic.isEmpty(game.winner) then
+			return
+		end
+		if (config.upcoming or config.ongoing) and Logic.isNotEmpty(game.winner) then
+			return
+		end
+		if not game.date then
+			return
+		end
+		if not config.upcoming and NOW < game.date then
+			return
+		end
+		if not (config.ongoing or config.recent) and NOW >= game.date then
+			return
 		end
 
-		if Array.all(match.match2games, function(game) return game.date == match.date end) then
-			return {match}
-		end
+		local gameMatch = Table.copy(match)
+		gameMatch.match2games = nil
+		gameMatch.asGame = true
+		gameMatch.asGameIdx = gameIndex
 
-		return Array.map(match.match2games, function(game, gameIndex)
-			if config.recent and Logic.isEmpty(game.winner) then
-				return
-			end
-			if (config.upcoming or config.ongoing) and Logic.isNotEmpty(game.winner) then
-				return
-			end
-			if not game.date then
-				return
-			end
-			if not config.upcoming and NOW < game.date then
-				return
-			end
-			if not (config.ongoing or config.recent) and NOW >= game.date then
-				return
-			end
-
-			local gameMatch = Table.copy(match)
-			gameMatch.asGame = true
-			gameMatch.asGameIdx = gameIndex
-
-			gameMatch.winner = game.winner
-			gameMatch.date = game.date
-			gameMatch.map = game.map
-			gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
-			gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
-				return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
-			end)
-			gameMatch.match2games = nil
-			return gameMatch
+		gameMatch.winner = game.winner
+		gameMatch.date = game.date
+		gameMatch.map = game.map
+		gameMatch.vod = Logic.nilIfEmpty(game.vod) or match.vod
+		gameMatch.opponents = Array.map(match.opponents, function(opponent, opponentIndex)
+			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
+		return gameMatch
 	end)
 end
 
