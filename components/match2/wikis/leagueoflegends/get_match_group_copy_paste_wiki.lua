@@ -34,7 +34,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local bans = Logic.readBool(args.bans)
 
 	local lines = Array.extend(
-		'{{Match|patch=|bestof=' .. bestof,
+		'{{Match|patch=',
 		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
