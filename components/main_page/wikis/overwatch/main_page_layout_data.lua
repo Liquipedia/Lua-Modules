@@ -72,8 +72,8 @@ return {
 		lightmode = 'Overwatch-logo-lightmode.svg',
 		darkmode = 'Overwatch-logo-darkmode.svg',
 	},
-	metadesc = 'The Overwatch esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
+	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
+		'to competitive players and teams.',
 	title = 'Overwatch',
 	navigation = {
 		{
