@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')

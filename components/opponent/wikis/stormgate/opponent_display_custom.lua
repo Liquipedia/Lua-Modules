@@ -8,12 +8,10 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
