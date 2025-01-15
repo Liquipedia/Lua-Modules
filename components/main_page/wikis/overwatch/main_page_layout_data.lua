@@ -77,7 +77,7 @@ return {
 			},
 		},
 		{
-			file = 'Team Falcons OWCS 2024 Major.jpg',
+			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
