@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -27,14 +26,14 @@ function TournamentsTickerWidget:render()
 		return
 	end
 
-	local filters = Array.map(FilterConfig.categories, Operator.property('property')) or {}
-
 	local createFilterWrapper = function(tournament, child)
-		return Array.reduce(filters, function(prev, filter)
+		return Array.reduce(FilterConfig.categories, function(prev, filterCategory)
+			local itemIsValid = filterCategory.itemIsValid or function(item) return true end
+			local filterValue = itemIsValid(tournament[filterCategory.property]) or filterCategory.defaultItem
 			return HtmlWidgets.Div{
 				attributes = {
-					['data-filter-group'] = 'filterbuttons-' .. string.lower(filter),
-					['data-filter-category'] = tournament[filter],
+					['data-filter-group'] = 'filterbuttons-' .. filterCategory.name,
+					['data-filter-category'] = filterValue,
 					['data-curated'] = tournament.featured and '' or nil,
 				},
 				children = prev,
