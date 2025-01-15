@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=deadlock
+-- page=Module:FilterButtons/Config
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Tier = require('Module:Tier/Utils')
 local Config = {}
 
