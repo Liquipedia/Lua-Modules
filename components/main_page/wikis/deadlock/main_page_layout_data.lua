@@ -61,7 +61,8 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{MainPageMatches}}<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
+		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
+			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
 			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
