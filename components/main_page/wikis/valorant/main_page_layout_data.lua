@@ -141,7 +141,7 @@ return {
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
 				}
