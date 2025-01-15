@@ -186,7 +186,7 @@ return {
 			{
 				children = {
 					{
-						mobileOrder = 8,
+						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},
