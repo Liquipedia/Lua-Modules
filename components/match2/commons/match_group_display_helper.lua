@@ -109,7 +109,8 @@ function DisplayHelper.MatchCountdownBlock(match)
 
 	local stream = Table.merge(match.stream, {
 		date = dateString,
-		finished = (match.finished or match.status == 'postponed') and 'true' or nil,
+		finished = match.finished,
+		rawdatetime = match.status == 'postponed',
 	})
 	return mw.html.create('div'):addClass('match-countdown-block')
 		:css('text-align', 'center')
