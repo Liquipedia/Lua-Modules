@@ -147,7 +147,7 @@ function Tournaments.parseDateRecord(dateRecord)
 end
 
 --- Determines if a tournament is featured.
----@param record tournament|StandardTournament
+---@param record StandardTournament
 ---@return boolean
 function Tournaments.isFeatured(record)
 	local curatedData = Lua.requireIfExists('Module:TournamentsList/CuratedData', {loadData = true})
@@ -155,7 +155,7 @@ function Tournaments.isFeatured(record)
 		return false
 	end
 
-	local pagename = record.pagename or record.pageName
+	local pagename = record.pageName
 	if Table.includes(curatedData.exclude, pagename) then
 		return false
 	end
@@ -185,7 +185,7 @@ function Tournaments.isFeatured(record)
 	if not parentTournament then
 		return false
 	end
-	return Tournaments.isFeatured(parentTournament)
+	return Tournaments.tournamentFromRecord(parentTournament).featured
 end
 
 return Tournaments
