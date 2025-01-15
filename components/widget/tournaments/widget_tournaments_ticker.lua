@@ -41,21 +41,24 @@ function TournamentsTickerWidget:render()
 		[3] = 22,
 		[4] = 0,
 		[5] = 0,
+	}
+
+	--- The Tier Type thresholds only affect completed tournaments.
+	local tierTypeThresholdModifiers = {
 		['qualifier'] = -2,
 	}
 
 	local currentTimestamp = DateExt.getCurrentTimestamp()
 	local function isWithinDateRange(tournament)
-		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTierType]
-			or tierThresholdModifiers[tournament.liquipediaTier]
-			or 0
+		local modifiedThreshold = tierThresholdModifiers[tournament.liquipediaTier] or 0
+		local modifiedCompletedThreshold = tierTypeThresholdModifiers[tournament.liquipediaTierType] or modifiedThreshold
 
 		if not tournament.startDate then
 			return false
 		end
 
 		local startDateThreshold = currentTimestamp + (upcomingDays + modifiedThreshold) * 24 * 60 * 60
-		local endDateThreshold = currentTimestamp - (completedDays + modifiedThreshold) * 24 * 60 * 60
+		local endDateThreshold = currentTimestamp - (completedDays + modifiedCompletedThreshold) * 24 * 60 * 60
 
 		if tournament.phase == 'ONGOING' then
 			return true
