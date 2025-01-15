@@ -15,16 +15,15 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|limit=15}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
-			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
-			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
+		body = '{{Transfer List|limit=15}}<div style="display:block; text-align:center; padding:0.5em;">' ..
+			'<div style="display:inline; float:left; font-style:italic;">[[#Top|Back to top]]</div>' ..
+			'<div style="display:inline; float:right;" class="plainlinks smalledit">' ..
+			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>' ..
+			'<div style="display:inline; margin:0 10px; white-space:nowrap; font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:RunQuery/Transfer_history|Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
-			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Portal:Rumours|Rumours]]</center></div>\n</div>',
+			'[[Transfer query]]</div><div style="display:inline; margin:0 10px; white-space:nowrap; font-size:15px; ' ..
+			'font-style:italic;">[[Special:RunQuery/Transfer|Input Form]]<span style="font-style:normal; ' ..
+			'padding:0 5px;">&#8226;</span>[[Portal:Rumours|Rumours]]</div></div>',
 		boxid = 1509,
 	},
 	specialEvents = {
