@@ -1,40 +1,55 @@
-local Config = {}
+---
+-- @Liquipedia
+-- wiki=valorant
+-- page=Module:FilterButtons/Config
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Tier = require('Module:Tier/Utils')
-local FnUtil = require('Module:FnUtil')
-local Game = require('Module:Game')
+local Config = {}
 
 Config.categories = {
 	{
 		name = 'liquipediatier',
-		query = 'liquipediatier',
+		property = 'liquipediaTier',
 		load = function(category)
 			category.items = {}
 			for _, tier in Tier.iterate('tiers') do
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {'1', '2', '3'},
+		defaultItems = { '1', '2', '3' },
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
-		expandKey = "liquipediatiertype",
-		additionalClass = ''
+		expandKey = 'region',
 	},
 	{
-		name = 'liquipediatiertype',
-		query = 'liquipediatiertype',
+		name = 'region',
+		property = 'region',
 		expandable = true,
-		load = function(category)
-			category.items = {}
-			for _, tiertype in Tier.iterate('tierTypes') do
-				table.insert(category.items, tiertype.value)
-			end
-			--table.insert(category.items, "")
+		items = {
+			'Europe', 'North America', 'Korea', 'China', 'Japan', 'Latin America North',
+			'Latin America South', 'Taiwan', 'Oceania', 'Brazil', 'Other',
+		},
+		defaultItems = { 'Europe', 'North America', 'Korea', 'China', 'Brazil', 'Other' },
+		transform = function(region)
+			local regionToShortName = {
+				['Europe'] = 'eu',
+				['North America'] = 'na',
+				['Korea'] = 'kr',
+				['China'] = 'ch',
+				['Japan'] = 'jp',
+				['Latin America North'] = 'latam n',
+				['Latin America South'] = 'latam s',
+				['Taiwan'] = 'tw',
+				['Oceania'] = 'oce',
+				['Brazil'] = 'br',
+				['Other'] = 'other',
+			}
+			return regionToShortName[region]
 		end,
-		transform = function(tiertype)
-			return tiertype
-		end,
-		additionalClass = ''
 	},
 }
 
