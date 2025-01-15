@@ -25,7 +25,7 @@ local CONTENT = {
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
 			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|action=edit}} edit]&#93;</div>\n' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
+			'<div style{{=}}"-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Special:RunQuery/Transfer_history|Transfer query]]' ..
 			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
@@ -53,7 +53,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
-			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
+			'<div style{{=}}"-space:nowrap; display: block; margin:0 10px; ' ..
 			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
@@ -69,7 +69,7 @@ local CONTENT = {
 		heading = 'Headlines',
 		body = '{{ExternalMediaList|subject=!|organization=!|limit=5}}' ..
 			'<div style="display:block; text-align:center; padding:0.5em;">' ..
-			'<div style="display:inline; margin:0 10px; white-space:nowrap; font-size:15px; font-style:italic;">' ..
+			'<div style="display:inline; margin:0 10px;white-space:nowrap; font-size:15px; font-style:italic;">' ..
 			'[[Portal:News|See all Headlines]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div>',
 		padding = true,
