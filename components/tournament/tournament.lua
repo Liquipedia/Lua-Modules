@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Lpdb = require('Module:Lpdb')
 local Logic = require('Module:Logic')
@@ -52,7 +53,7 @@ function Tournaments.getAllTournaments(conditions, filterTournament)
 			limit = 1000,
 		},
 		function(record)
-			local tournament = Tournaments.tournamentFromRecord(record, Tournaments.makeFeaturedFunction())
+			local tournament = Tournaments.tournamentFromRecord(record)
 			if not filterTournament or filterTournament(tournament) then
 				table.insert(tournaments, tournament)
 			end
@@ -61,10 +62,22 @@ function Tournaments.getAllTournaments(conditions, filterTournament)
 	return tournaments
 end
 
+local TouranmentMT = {
+	__index = function(tournament, property)
+		if property == 'featured' then
+			tournament[property] = Tournaments.isFeatured(tournament)
+		end
+		if property == 'phase' then
+			tournament[property] = Tournaments.calculatePhase(tournament)
+		end
+		return rawget(tournament, property)
+	end
+}
+
 ---@param record tournament
----@param recordIsFeatured function
 ---@return StandardTournament
-function Tournaments.tournamentFromRecord(record, recordIsFeatured)
+function Tournaments.tournamentFromRecord(record)
+
 	local startDate = Tournaments.parseDateRecord(Logic.nilOr(record.extradata.startdatetext, record.startdate))
 	local endDate = Tournaments.parseDateRecord(Logic.nilOr(record.extradata.enddatetext, record.sortdate, record.enddate))
 
@@ -78,14 +91,14 @@ function Tournaments.tournamentFromRecord(record, recordIsFeatured)
 		liquipediaTierType = Tier.toIdentifier(record.liquipediatiertype),
 		region = (record.locations or {}).region1,
 		status = record.status,
-		featured = recordIsFeatured(record),
 		icon = record.icon,
 		iconDark = record.icondark,
 		abbreviation = record.abbreviation,
 		series = record.series,
 	}
 
-	tournament.phase = Tournaments.calculatePhase(tournament)
+	-- Some properties are derived from other properies and we can calculate them when accessed.
+	setmetatable(tournament, TouranmentMT)
 
 	return tournament
 end
@@ -128,53 +141,58 @@ function Tournaments.parseDateRecord(dateRecord)
 		return
 	end
 
-	return {year = year, month = month, day = day, timestamp = DateExt.readTimestampOrNil(dateRecord)}
+	local dt = {year = year, month = month or 12, day = day or 31}
+	local timestamp = os.time(dt)
+
+	return {year = year, month = month, day = day, timestamp = timestamp}
 end
 
---- This function returns a function that can be used to determine if a tournament should be featured.
----@return fun(record: tournament): boolean
-function Tournaments.makeFeaturedFunction()
+--- Determines if a tournament is featured.
+---@param record StandardTournament
+---@return boolean
+function Tournaments.isFeatured(record)
 	local curatedData = Lua.requireIfExists('Module:TournamentsList/CuratedData', {loadData = true})
 	if not curatedData then
-		return function() return false end
+		return false
 	end
 
-	---@param record tournament
-	---@return boolean
-	local function recordIsCurated(record)
-		if Table.includes(curatedData.exclude, record.pagename) then
-			return false
-		end
-		if Table.includes(curatedData.include, record.pagename) then
-			return true
-		end
-		if Table.includes({1, 2}, record.liquipediaTier) then
-			return true
-		end
-
-		if Logic.isEmpty(record.liquipediaTierType) then
-			return false
-		end
-
-		local function parentData(page, maxDepth)
-			if maxDepth == 0 then
-				return nil
-			end
-			local parentPage = mw.title.new(record.pagename).basePageTitle
-			return mw.ext.LiquipediaDB.lpdb('tournament', {
-				conditions = '[[pagename::' .. parentPage .. ']]',
-				limit = 1,
-			})[1] or parentData(parentPage, maxDepth - 1)
-		end
-		local parentTournament = parentData(record.pagename, 2)
-
-		if not parentTournament then
-			return false
-		end
-		return recordIsCurated(parentTournament)
+	local pagename = record.pageName
+	if Table.includes(curatedData.exclude, pagename) then
+		return false
+	end
+	if Table.includes(curatedData.include, pagename) then
+		return true
+	end
+	if Table.includes({1, 2}, record.liquipediaTier) then
+		return true
 	end
 
-	return recordIsCurated
+	if Logic.isEmpty(record.liquipediaTierType) then
+		return false
+	end
+
+	local function parentData(page, maxDepth)
+		if maxDepth == 0 then
+			return nil
+		end
+
+		local parentPage = table.concat(Array.sub(mw.text.split(page, '/'), 1, -2), '/')
+		if Logic.isEmpty(parentPage) then
+			return nil
+		end
+
+		return mw.ext.LiquipediaDB.lpdb('tournament', {
+			conditions = '[[pagename::' .. parentPage .. ']]',
+			limit = 1,
+		})[1] or parentData(parentPage, maxDepth - 1)
+	end
+	local parentTournament = parentData(pagename, 2)
+
+	if not parentTournament then
+		return false
+	end
+
+	return Tournaments.tournamentFromRecord(parentTournament).featured
 end
 
 return Tournaments
