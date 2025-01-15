@@ -25,7 +25,7 @@ local CONTENT = {
 			'<div style="display:inline; float:left; font-style:italic;">[[#Top|Back to top]]</div>' ..
 			'<div style="display:inline; float:right;" class="plainlinks smalledit">' ..
 			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>' ..
-			'<div style="display:inline; white-space:nowrap; font-size:15px; font-style:italic; font-weight:bold;">' ..
+			'<div style="display:inline;white-space:nowrap; font-size:15px; font-style:italic; font-weight:bold;">' ..
 			'[[Portal:Transfers|See all Transfers]]<span style="font-style:normal; font-weight:normal; ' ..
 			'padding:0 5px;">&#8226;</span>[[Transfer query]]<br><span style="font-style:normal; padding:0 5px;">' ..
 			'&#8226;</span>[[Special:RunQuery/Transfer|Transfer Generator]]<span style="font-style:normal; padding:0 5px;">' ..
