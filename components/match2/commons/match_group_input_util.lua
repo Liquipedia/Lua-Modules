@@ -1175,6 +1175,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		end)
 	elseif MatchGroupInputUtil.isPostponed(matchInput.winner, matchInput.finished) then
 		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.dateexact = false
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
@@ -1396,6 +1397,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 			or MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
 	elseif MatchGroupInputUtil.isPostponed(winnerInput, finishedInput) then
 		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.dateexact = false
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
