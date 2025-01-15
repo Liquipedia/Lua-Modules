@@ -16,7 +16,7 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return StarcraftMatchGroupUtil.matchFromRecord
 end)
 
@@ -60,5 +60,10 @@ function WikiSpecific.getMatchContainer(displayMode)
 		return WikiSpecific.adjustMatchGroupContainerConfig(SingleMatch.SingleMatchContainer)
 	end
 end
+
+WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+	return StarcraftMatchGroupUtil.matchHasDetails
+end)
 
 return WikiSpecific
