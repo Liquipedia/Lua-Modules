@@ -68,7 +68,7 @@ local CONTENT = {
 		heading = 'Headlines',
 		body = '{{ExternalMediaList|subject=!|limit=4}}' ..
 			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">' ..
-			'<div style{{=}}"display:inline; margin:0 10px; white-space:nowrap; font-size:15px; font-style:italic;">' ..
+			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px; font-size:15px; font-style:italic;">' ..
 			'[[Portal:News|See all Headlines]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div></div>',
 		padding = true,
