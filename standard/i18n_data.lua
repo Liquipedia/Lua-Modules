@@ -12,8 +12,8 @@ return {
 		['tournament-ticker-no-tournaments'] = 'No tournaments found for your selected filters!',
 
 		-- Filter Buttons
-		['filter-buttons-all'] = 'All',
-		['filter-buttons-featured'] = 'Curated',
+		['filterbuttons-all'] = 'All',
+		['filterbuttons-featured'] = 'Curated',
 
 		-- Dates
 		['date-unknown'] = 'TBA',
