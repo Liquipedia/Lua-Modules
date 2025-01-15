@@ -21,7 +21,7 @@ local CONTENT = {
 			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>' ..
 			'<div style="display:inline; margin:0 10px;white-space:nowrap; font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Transfer query]]</div><div style="display:inline; margin:0 10px; white-space:nowrap; font-size:15px; ' ..
+			'[[Transfer query]]</div><div style="display:inline; margin:0 10px;white-space:nowrap; font-size:15px; ' ..
 			'font-style:italic;">[[Special:RunQuery/Transfer|Input Form]]<span style="font-style:normal; ' ..
 			'padding:0 5px;">&#8226;</span>[[Portal:Rumours|Rumours]]</div></div>',
 		boxid = 1509,
