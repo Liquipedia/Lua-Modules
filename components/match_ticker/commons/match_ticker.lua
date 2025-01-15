@@ -214,7 +214,7 @@ function MatchTicker:query(matches)
 					return false
 				end
 			end,
-			DEFAULT_LIMIT * 10
+			DEFAULT_LIMIT * 20
 		)
 	end
 
