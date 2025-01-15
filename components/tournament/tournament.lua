@@ -62,6 +62,19 @@ function Tournaments.getAllTournaments(conditions, filterTournament)
 	return tournaments
 end
 
+---@param pagename string
+---@return StandardTournament?
+function Tournaments.getTournament(pagename)
+	local record = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' .. pagename .. ']]',
+		limit = 1,
+	})[1]
+	if not record then
+		return nil
+	end
+	return Tournaments.tournamentFromRecord(record, Tournaments.makeFeaturedFunction())
+end
+
 local TouranmentMT = {
 	__index = function(tournament, property)
 		if property == 'featured' then
