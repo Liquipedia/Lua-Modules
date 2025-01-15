@@ -114,7 +114,7 @@ return {
 			},
 		},
 		{
-			file = 'Junkertown Overwatch map.jpg',
+			file = 'Kings row map.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
