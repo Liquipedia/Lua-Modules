@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Lpdb = require('Module:Lpdb')
 local Logic = require('Module:Logic')
@@ -174,7 +175,12 @@ function Tournaments.isFeatured(record)
 		if maxDepth == 0 then
 			return nil
 		end
-		local parentPage = tostring(mw.title.new(page).basePageTitle)
+
+		local parentPage = table.concat(Array.sub(mw.text.split(page, '/'), 1, -2), '/')
+		if Logic.isEmpty(parentPage) then
+			return nil
+		end
+
 		return mw.ext.LiquipediaDB.lpdb('tournament', {
 			conditions = '[[pagename::' .. parentPage .. ']]',
 			limit = 1,
@@ -185,6 +191,7 @@ function Tournaments.isFeatured(record)
 	if not parentTournament then
 		return false
 	end
+
 	return Tournaments.tournamentFromRecord(parentTournament).featured
 end
 
