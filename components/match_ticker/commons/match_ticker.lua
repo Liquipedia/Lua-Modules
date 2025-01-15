@@ -361,14 +361,18 @@ function MatchTicker:keepMatch(match)
 		if not match.tournamentData then
 			return false
 		end
-		return Table.includes(self.config.regions, match.tournamentData.region)
+		if not Table.includes(self.config.regions, match.tournamentData.region) then
+			return false
+		end
 	end
 
 	if self.config.featuredTournamentsOnly then
 		if not match.tournamentData then
 			return false
 		end
-		return match.tournamentData.featured
+		if not match.tournamentData.featured then
+			return false
+		end
 	end
 
 	--remove matches with empty/BYE opponents
@@ -376,21 +380,23 @@ function MatchTicker:keepMatch(match)
 		return false
 	end
 
-	if self.config.showAllTbdMatches then
-		return true
+	if not self.config.showAllTbdMatches then
+		local isTbdMatch = Array.all(match.opponents, function(opponent)
+			return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
+		end)
+		local toss = isTbdMatch and previousMatchWasTbd
+		if isTbdMatch then
+			previousMatchWasTbd = true
+		else
+			previousMatchWasTbd = false
+		end
+
+		if toss == true then
+			return false
+		end
 	end
 
-	local isTbdMatch = Array.all(match.opponents, function(opponent)
-		return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
-	end)
-	local toss = isTbdMatch and previousMatchWasTbd
-	if isTbdMatch then
-		previousMatchWasTbd = true
-	else
-		previousMatchWasTbd = false
-	end
-
-	return not toss
+	return true
 end
 
 ---Overwritable per wiki decision
