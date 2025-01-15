@@ -29,7 +29,8 @@ function TournamentsTickerWidget:render()
 	local createFilterWrapper = function(tournament, child)
 		return Array.reduce(FilterConfig.categories, function(prev, filterCategory)
 			local itemIsValid = filterCategory.itemIsValid or function(item) return true end
-			local filterValue = itemIsValid(tournament[filterCategory.property]) or filterCategory.defaultItem
+			local value = tournament[filterCategory.property]
+			local filterValue = itemIsValid(value) and value or filterCategory.defaultItem
 			return HtmlWidgets.Div{
 				attributes = {
 					['data-filter-group'] = 'filterbuttons-' .. filterCategory.name,
