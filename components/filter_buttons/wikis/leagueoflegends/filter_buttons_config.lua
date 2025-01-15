@@ -9,6 +9,21 @@
 local Tier = require('Module:Tier/Utils')
 local Config = {}
 
+local REGION_NAME_TO_SHORTNAME = {
+	['Europe'] = 'eu',
+	['North America'] = 'na',
+	['Korea'] = 'kr',
+	['China'] = 'ch',
+	['Japan'] = 'jp',
+	['Latin America North'] = 'latam n',
+	['Latin America South'] = 'latam s',
+	['Taiwan'] = 'tw',
+	['Oceania'] = 'oce',
+	['Brazil'] = 'br',
+	['Other'] = 'other',
+}
+
+---@type FilterButtonCategory[]
 Config.categories = {
 	{
 		name = 'liquipediatier',
@@ -34,21 +49,12 @@ Config.categories = {
 			'Latin America South', 'Taiwan', 'Oceania', 'Brazil', 'Other',
 		},
 		defaultItems = { 'Europe', 'North America', 'Korea', 'China', 'Brazil', 'Other' },
+		defaultItem = 'Other',
+		itemIsValid = function(region)
+			return REGION_NAME_TO_SHORTNAME[region] ~= nil
+		end,
 		transform = function(region)
-			local regionToShortName = {
-				['Europe'] = 'eu',
-				['North America'] = 'na',
-				['Korea'] = 'kr',
-				['China'] = 'ch',
-				['Japan'] = 'jp',
-				['Latin America North'] = 'latam n',
-				['Latin America South'] = 'latam s',
-				['Taiwan'] = 'tw',
-				['Oceania'] = 'oce',
-				['Brazil'] = 'br',
-				['Other'] = 'other',
-			}
-			return regionToShortName[region]
+			return REGION_NAME_TO_SHORTNAME[region]
 		end,
 	},
 }

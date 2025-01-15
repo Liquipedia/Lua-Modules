@@ -21,13 +21,16 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 
 ---@class FilterButtonCategory
 ---@field name string
+---@field property string
 ---@field items string[]?
 ---@field defaultItems string[]?
----@field transform? fun(item: string): string
+---@field defaultItem string?
+---@field itemIsValid? fun(item: string): boolean
+---@field transform? fun(item: string): string?
 ---@field expandKey string?
 ---@field expandable boolean?
 ---@field order? fun(a: string, b: string): boolean
----@field load? fun(cat: FilterButtonCategory): FilterButtonCategory
+---@field load? fun(cat: FilterButtonCategory)
 
 ---Builds filterbuttons based on config stored in Module:FilterButtons/Config
 ---Can be used from wikicode

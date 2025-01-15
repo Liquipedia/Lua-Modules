@@ -9,6 +9,7 @@
 local Tier = require('Module:Tier/Utils')
 local Config = {}
 
+---@type FilterButtonCategory[]
 Config.categories = {
 	{
 		name = 'liquipediatier',
