@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -63,7 +63,7 @@ function MatchLegacy._convertParameters(match2)
 
 	match.staticid = match2.match2id
 
-	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
 	if walkover then
 		match.resulttype = walkover:lower()
 		if walkover == 'FF' or walkover == 'DQ' then

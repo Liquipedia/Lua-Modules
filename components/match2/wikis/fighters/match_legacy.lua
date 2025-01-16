@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
@@ -77,7 +77,7 @@ function MatchLegacy._convertParameters(match2)
 		return not String.startsWith(key, 'match2')
 	end)
 
-	match.walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	match.walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
 	if match.walkover == 'FF' or match.walkover == 'DQ' then
 		match.resulttype = match.walkover:lower()
 		match.walkover = match.winner

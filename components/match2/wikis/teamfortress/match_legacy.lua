@@ -14,7 +14,7 @@ local Opponent = require('Module:Opponent')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 function MatchLegacy.storeMatch(match2)
 	return mw.ext.LiquipediaDB.lpdb_match(
@@ -31,7 +31,7 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
 	match.walkover = walkover and walkover:lower() or nil
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner

@@ -15,7 +15,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Opponent = require('Module:Opponent')
 
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -33,7 +33,7 @@ function MatchLegacy._convertParameters(match2)
 	local match = Table.filterByKey(Table.deepCopy(match2), function(key) return not String.startsWith(key, 'match2') end)
 	match.links = nil
 
-	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
 	if walkover then
 		match.resulttype = walkover:lower()
 		match.walkover = match.winner

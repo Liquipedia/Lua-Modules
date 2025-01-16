@@ -19,7 +19,7 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -128,7 +128,7 @@ function MatchLegacy._convertParameters(match2)
 	extradata.tournamentstagename = Logic.emptyOr(Variables.varDefault('Group_name'),
 		match.header .. ' - ' .. (match.opponent1 or '') .. ' vs ' .. (match.opponent2 or ''))
 
-	local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
 	if walkover then
 		match.resulttype = walkover
 		if walkover == UNKNOWNREASON_DEFAULT_LOSS then
@@ -270,7 +270,7 @@ function MatchLegacy._storeGame(game2, gameIndex, match)
 
 	game.resulttype = nil
 	game.walkover = nil
-	local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
+	local walkover = MatchLegacyUtil.calculateWalkoverType(opponents)
 	if walkover then
 		game.resulttype = walkover
 		if walkover == UNKNOWNREASON_DEFAULT_LOSS then
