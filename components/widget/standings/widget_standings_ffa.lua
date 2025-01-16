@@ -57,7 +57,7 @@ function StandingsFfaWidget:render()
 					},
 					RoundSelector{
 						rounds = roundCount,
-						hasEnded = true, -- TODO
+						hasEnded = standings.rounds[#standings.rounds].finished,
 					},
 				},
 			}},
@@ -88,7 +88,7 @@ function StandingsFfaWidget:render()
 							HtmlWidgets.Td{children = slot.points, css = {['font-weight'] = 'bold'}},
 							Array.map(standings.rounds, function(columnRound)
 								local text = ''
-								if columnRound.round <= round.round then
+								if columnRound.finished then
 									local newPoints = (Array.find(columnRound.opponents, function(columnSlot)
 										return columnSlot.opponent.name == slot.opponent.name
 									end).pointsChangeFromPreviousRound)
