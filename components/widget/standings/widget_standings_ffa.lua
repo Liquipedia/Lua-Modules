@@ -23,8 +23,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@operator call(table): StandingsFfaWidget
 
 local StandingsFfaWidget = Class.new(Widget)
-StandingsFfaWidget.defaultProps = {
-}
 
 ---@return Widget?
 function StandingsFfaWidget:render()

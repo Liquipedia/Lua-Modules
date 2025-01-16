@@ -32,7 +32,7 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config table
 ---@field rounds StandingsRound[]
----@field matchIds string[] #usage discouraged
+---@field private lpdbdata standingstable
 
 ---@class StandingsRound
 ---@field round integer
@@ -90,7 +90,7 @@ function Standings.standingsFromRecord(record)
 		type = record.type,
 		config = record.config,
 		rounds = record.rounds,
-		matchIds = record.matches,
+		lpdbdata = record,
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.
@@ -119,19 +119,23 @@ end
 ---@param standings StandingsModel
 ---@return MatchGroupUtilMatch[]
 function Standings.fetchMatches(standings)
-	local bracketIds = Array.unique(Array.map(standings.matchIds, function(matchid)
+	---@diagnostic disable-next-line: invisible
+	local matchids = standings.lpdbdata.matches
+	local bracketIds = Array.unique(Array.map(matchids, function(matchid)
 		return MatchGroupUtil.splitMatchId(matchid)
 	end))
 
 	local allMatchesFromBrackets = Array.flatMap(bracketIds, MatchGroupUtil.fetchMatches)
 	return Array.filter(allMatchesFromBrackets, function(match)
-		return Table.includes(standings.matchIds, match.matchId)
+		return Table.includes(matchids, match.matchId)
 	end)
 end
 
 ---@param standings StandingsModel
 ---@return StandingsRound[]
 function Standings.makeRounds(standings)
+	---@diagnostic disable-next-line: invisible
+	local lpdbdata = standings.lpdbdata
 	local conditions = Condition.Tree(Condition.BooleanOperator.all)
 		:add(Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, standings.pageName))
 		:add(Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standings.standingsIndex))
@@ -159,7 +163,7 @@ function Standings.makeRounds(standings)
 			round = roundIndex,
 			opponents = opponents,
 			finished = true, -- TODO
-			title = '',
+			title = (lpdbdata.extradata.rounds[roundIndex] or {}).title,
 		}
 	end)
 end
