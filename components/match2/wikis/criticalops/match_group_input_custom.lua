@@ -11,7 +11,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
