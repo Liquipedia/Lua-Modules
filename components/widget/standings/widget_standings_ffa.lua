@@ -85,7 +85,7 @@ function StandingsFfaWidget:render()
 								showPlayerTeam = true,
 							}},
 							HtmlWidgets.Td{children = PlacementChange{change = slot.positionChangeFromPreviousRound}},
-							HtmlWidgets.Td{children = slot.points, css = {['font-weight'] = 'bold'}},
+							HtmlWidgets.Td{children = slot.points, css = {['font-weight'] = 'bold', ['text-align'] = 'center'}},
 							Array.map(standings.rounds, function(columnRound)
 								local text = ''
 								if columnRound.finished then
@@ -98,7 +98,7 @@ function StandingsFfaWidget:render()
 										text = '-'
 									end
 								end
-								return HtmlWidgets.Td{children = text}
+								return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}
 							end)
 						),
 						attributes = {

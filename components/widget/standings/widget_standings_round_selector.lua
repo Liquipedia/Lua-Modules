@@ -29,7 +29,7 @@ function RoundSelectorWidget:render()
 		if not self.props.hasEnded then
 			return 'Current'
 		else
-			return 'Round ' .. tostring(#self.props.rounds)
+			return 'Round ' .. tostring(self.props.rounds)
 		end
 	end
 
