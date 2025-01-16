@@ -76,9 +76,10 @@ function StandingsFfaWidget:render()
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
+				HtmlWidgets.Th{children = ''},
 				HtmlWidgets.Th{children = 'Points'},
-				Array.map(standings.matches, function(match)
-					return ''
+				Array.map(standings.rounds, function(round)
+					return HtmlWidgets.Th{children = round.title}
 				end)
 			)},
 			-- Rows
@@ -94,13 +95,16 @@ function StandingsFfaWidget:render()
 								teamStyle = 'hybrid',
 								showPlayerTeam = true,
 							}},
+							HtmlWidgets.Td{children = slot.positionChangeFromPreviousRound},
 							HtmlWidgets.Td{children = slot.points},
-							Array.map(standings.matches, function(match, matchIdx)
+							Array.map(standings.rounds, function(columnRound)
 								local text = ''
-								if round.round >= matchIdx then
-									local matchOpponent = findOpponentInMatch(match, slot.opponent)
-									if matchOpponent then
-										text = tostring(matchOpponent.score)
+								if columnRound.round <= round.round then
+									local newPoints = (Array.find(columnRound.opponents, function(columnSlot)
+										return columnSlot.opponent.name == slot.opponent.name
+									end).pointsChangeFromPreviousRound)
+									if newPoints then
+										text = tostring(newPoints)
 									else
 										text = '-'
 									end

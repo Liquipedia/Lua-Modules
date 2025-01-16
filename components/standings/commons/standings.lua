@@ -36,16 +36,19 @@ local Standings = {}
 
 ---@class StandingsRound
 ---@field round integer
+---@field finished boolean
+---@field title string
 ---@field opponents StandingsEntryModel[]
 
 ---@class StandingsEntryModel
 ---@field opponent standardOpponent
----@field points number
 ---@field placement string
 ---@field position integer
+---@field points number
 ---@field positionStatus string?
 ---@field definitiveStatus string?
----@field changeFromPreviousRound integer
+---@field positionChangeFromPreviousRound integer
+---@field pointsChangeFromPreviousRound number
 
 ---@param pagename string
 ---@param standingsIndex integer #0-index'd on per page
@@ -105,8 +108,9 @@ function Standings.entryFromRecord(record)
 		position = tonumber(record.slotindex),
 		positionStatus = record.currentstatus,
 		definitiveStatus = record.definitestatus,
-		changeFromPreviousRound = record.placementchange,
-		points = tonumber(record.scoreboard.points),
+		points = record.scoreboard.points,
+		pointsChangeFromPreviousRound = record.extradata.pointschange,
+		positionChangeFromPreviousRound = tonumber(record.placementchange),
 	}
 
 	return entry
@@ -154,6 +158,8 @@ function Standings.makeRounds(standings)
 		return {
 			round = roundIndex,
 			opponents = opponents,
+			finished = true, -- TODO
+			title = '',
 		}
 	end)
 end
