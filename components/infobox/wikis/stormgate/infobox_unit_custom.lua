@@ -35,8 +35,15 @@ local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
-local GAME_MODE_NAME = {coop = 'Co-op', mayhem = 'Team Mayhem'}
-local SORT_TABLE = {'1v1', 'mayhem', 'coop'}
+local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
+local GAME_MODE_NAME =	{
+	coop = 'Co-op',
+	mayhem = 'Team Mayhem',
+}
+local GAME_MODE_ICON = {
+	coop = '<i class="fas fa-dungeon" title="Co-op"></i>',
+	mayhem = '<i class="fab fa-fort-awesome" title="Team Mayhem"></i>',
+}
 
 ---@param frame Frame
 ---@return Html
@@ -116,8 +123,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
+			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Upgrades To', content = {caller:_displayCsvAsPageCsv(args.upgrades_to)}},
 			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
@@ -169,10 +176,14 @@ function CustomUnit:subHeaderDisplay(args)
 	end
 
 	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
-		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_NAME[string.lower(subfactionElement[1])] then return end
-		if args.informationType == 'Hero' then return GAME_MODE_NAME[string.lower(subfactionElement[1])] end
-		return GAME_MODE_NAME[string.lower(subfactionElement[1])] ..
-			': ' .. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
+		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_ICON[string.lower(subfactionElement[1])] then return end
+		if args.informationType == 'Hero' then 
+			return GAME_MODE_ICON[string.lower(subfactionElement[1])] .. ' '
+				.. GAME_MODE_NAME[string.lower(subfactionElement[1])]
+		end
+
+		return GAME_MODE_ICON[string.lower(subfactionElement[1])] .. ' '
+			.. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
 	end)
 
 	return tostring(mw.html.create('span')
