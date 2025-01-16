@@ -32,16 +32,6 @@ function StandingsFfaWidget:render()
 		return
 	end
 
-	---@param match MatchGroupUtilMatch
-	---@param searchForOpponent standardOpponent
-	local function findOpponentInMatch(match, searchForOpponent)
-		for _, matchOpponent in ipairs(match.opponents) do
-			if matchOpponent.name == searchForOpponent.name then
-				return matchOpponent
-			end
-		end
-	end
-
 	---@type StandingsModel
 	local standings = self.props.standings
 	local roundCount = #standings.rounds
