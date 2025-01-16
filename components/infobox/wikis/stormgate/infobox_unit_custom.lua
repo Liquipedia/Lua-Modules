@@ -177,7 +177,7 @@ function CustomUnit:subHeaderDisplay(args)
 
 	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
 		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_ICON[string.lower(subfactionElement[1])] then return end
-		if args.informationType == 'Hero' then 
+		if args.informationType == 'Hero' then
 			return GAME_MODE_ICON[string.lower(subfactionElement[1])] .. ' '
 				.. GAME_MODE_NAME[string.lower(subfactionElement[1])]
 		end
