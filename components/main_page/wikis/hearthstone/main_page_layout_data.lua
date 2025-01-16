@@ -118,13 +118,13 @@ return {
 		},
 		{
 			file = 'Icon_Class_HS_Shaman.png',
-			title = 'Heroes',
-			link = 'Heroes',
+			title = 'Classes',
+			link = 'Classes',
 			count = {
 				method = 'category',
-				conditions = 'Heroes',
-		}
-			},
+				conditions = 'Classes',
+			}
+		},
 	},
 	layouts = {
 		main = {
