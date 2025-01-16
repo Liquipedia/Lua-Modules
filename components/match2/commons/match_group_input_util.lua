@@ -1245,7 +1245,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		end
 
 		if Parser.getGame then
-			map.game = Parser.getGame(math, map)
+			map.game = Parser.getGame(match, map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
