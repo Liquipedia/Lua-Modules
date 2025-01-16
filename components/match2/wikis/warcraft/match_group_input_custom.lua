@@ -513,7 +513,7 @@ function FfaMatchFunctions.extractMaps(match, opponents)
 	local hasScores = Logic.readBool(match.hasscore)
 	local maps = {}
 	for mapKey, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local map = FfaMapFunctions.readMap(mapInput, #opponents, hasScores)
+		local map = FfaMapFunctions.readMap(match, mapInput, #opponents, hasScores)
 
 		Array.forEach(map.opponents, function(opponent, opponentIndex)
 			opponent.players = MapFunctions.getPlayersOfMapOpponent(mapInput, opponents[opponentIndex], opponentIndex)
@@ -528,11 +528,12 @@ function FfaMatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
+---@param match table
 ---@param mapInput table
 ---@param opponentCount integer
 ---@param hasScores boolean
 ---@return table
-function FfaMapFunctions.readMap(mapInput, opponentCount, hasScores)
+function FfaMapFunctions.readMap(match, mapInput, opponentCount, hasScores)
 	local mapName = mapInput.map
 	if mapName and mapName:upper() ~= TBD then
 		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
@@ -551,10 +552,10 @@ function FfaMapFunctions.readMap(mapInput, opponentCount, hasScores)
 		}
 	}
 
-	if mapInput.date then
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(mapInput.date))
-		map.extradata.dateexact = map.dateexact
-	end
+	local dateProps = MatchGroupInputUtil.readDate(mapInput.date or match.date)
+	Table.mergeInto(map, dateProps)
+	dateProps.date = nil
+	Table.mergeInto(map.extradata, dateProps)
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true
