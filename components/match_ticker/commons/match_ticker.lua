@@ -21,6 +21,7 @@ local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 local MatchUtil = Lua.import('Module:Match/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local Tournament = Lua.import('Module:Tournament')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -96,6 +97,7 @@ end
 ---@field tierTypes string[]?
 ---@field regions string[]?
 ---@field newStyle boolean?
+---@field featuredTournamentsOnly boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -142,6 +144,7 @@ function MatchTicker:init(args)
 					return select(2, Tier.toValue(1, tiertype))
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
+		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -342,8 +345,8 @@ function MatchTicker:parseMatch(match)
 	match.opponents = Array.map(match.match2opponents, function(opponent, opponentIndex)
 		return MatchGroupUtil.opponentFromRecord(match, opponent, opponentIndex)
 	end)
-	if self.config.regions then
-		match.region = MatchTicker.fetchRegionOfTournament(match.parent)
+	if self.config.regions or self.config.featuredTournamentsOnly then
+		match.tournamentData = MatchTicker.fetchTournament(match.parent)
 	end
 	return match
 end
@@ -355,7 +358,19 @@ local previousMatchWasTbd
 function MatchTicker:keepMatch(match)
 	-- Remove matches with wrong region
 	if self.config.regions then
-		if not Table.includes(self.config.regions, match.region) then
+		if not match.tournamentData then
+			return false
+		end
+		if not Table.includes(self.config.regions, match.tournamentData.region) then
+			return false
+		end
+	end
+
+	if self.config.featuredTournamentsOnly then
+		if not match.tournamentData then
+			return false
+		end
+		if not match.tournamentData.featured then
 			return false
 		end
 	end
@@ -365,21 +380,23 @@ function MatchTicker:keepMatch(match)
 		return false
 	end
 
-	if self.config.showAllTbdMatches then
-		return true
+	if not self.config.showAllTbdMatches then
+		local isTbdMatch = Array.all(match.opponents, function(opponent)
+			return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
+		end)
+		local toss = isTbdMatch and previousMatchWasTbd
+		if isTbdMatch then
+			previousMatchWasTbd = true
+		else
+			previousMatchWasTbd = false
+		end
+
+		if toss == true then
+			return false
+		end
 	end
 
-	local isTbdMatch = Array.all(match.opponents, function(opponent)
-		return Opponent.isEmpty(opponent) or Opponent.isTbd(opponent)
-	end)
-	local toss = isTbdMatch and previousMatchWasTbd
-	if isTbdMatch then
-		previousMatchWasTbd = true
-	else
-		previousMatchWasTbd = false
-	end
-
-	return not toss
+	return true
 end
 
 ---Overwritable per wiki decision
@@ -489,17 +506,9 @@ end
 
 --- Fetches region of a tournament
 ---@param tournamentPage string
----@return string?
-MatchTicker.fetchRegionOfTournament = FnUtil.memoize(function(tournamentPage)
-	local tournamentData = mw.ext.LiquipediaDB.lpdb('tournament', {
-		conditions = '[[pagename::' .. tournamentPage .. ']]',
-		query = 'locations',
-		limit = 1,
-	})[1]
-	if not tournamentData or not tournamentData.locations then
-		return nil
-	end
-	return tournamentData.locations.region1
+---@return StandardTournament?
+MatchTicker.fetchTournament = FnUtil.memoize(function(tournamentPage)
+	return Tournament.getTournament(tournamentPage)
 end)
 
 ---@param header MatchTickerHeader?

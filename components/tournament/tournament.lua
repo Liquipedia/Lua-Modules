@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Utils')
 
-local Tournaments = {}
+local Tournament = {}
 
 ---@enum TournamentPhase
 local TOURNAMENT_PHASE = {
@@ -43,7 +43,7 @@ local TOURNAMENT_PHASE = {
 ---@param conditions ConditionTree?
 ---@param filterTournament fun(tournament: StandardTournament): boolean
 ---@return StandardTournament[]
-function Tournaments.getAllTournaments(conditions, filterTournament)
+function Tournament.getAllTournaments(conditions, filterTournament)
 	local tournaments = {}
 	Lpdb.executeMassQuery(
 		'tournament',
@@ -53,7 +53,7 @@ function Tournaments.getAllTournaments(conditions, filterTournament)
 			limit = 1000,
 		},
 		function(record)
-			local tournament = Tournaments.tournamentFromRecord(record)
+			local tournament = Tournament.tournamentFromRecord(record)
 			if not filterTournament or filterTournament(tournament) then
 				table.insert(tournaments, tournament)
 			end
@@ -62,13 +62,26 @@ function Tournaments.getAllTournaments(conditions, filterTournament)
 	return tournaments
 end
 
+---@param pagename string
+---@return StandardTournament?
+function Tournament.getTournament(pagename)
+	local record = mw.ext.LiquipediaDB.lpdb('tournament', {
+		conditions = '[[pagename::' .. pagename .. ']]',
+		limit = 1,
+	})[1]
+	if not record then
+		return nil
+	end
+	return Tournament.tournamentFromRecord(record)
+end
+
 local TouranmentMT = {
 	__index = function(tournament, property)
 		if property == 'featured' then
-			tournament[property] = Tournaments.isFeatured(tournament)
+			tournament[property] = Tournament.isFeatured(tournament)
 		end
 		if property == 'phase' then
-			tournament[property] = Tournaments.calculatePhase(tournament)
+			tournament[property] = Tournament.calculatePhase(tournament)
 		end
 		return rawget(tournament, property)
 	end
@@ -76,10 +89,10 @@ local TouranmentMT = {
 
 ---@param record tournament
 ---@return StandardTournament
-function Tournaments.tournamentFromRecord(record)
+function Tournament.tournamentFromRecord(record)
 
-	local startDate = Tournaments.parseDateRecord(Logic.nilOr(record.extradata.startdatetext, record.startdate))
-	local endDate = Tournaments.parseDateRecord(Logic.nilOr(record.extradata.enddatetext, record.sortdate, record.enddate))
+	local startDate = Tournament.parseDateRecord(Logic.nilOr(record.extradata.startdatetext, record.startdate))
+	local endDate = Tournament.parseDateRecord(Logic.nilOr(record.extradata.enddatetext, record.sortdate, record.enddate))
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
@@ -105,7 +118,7 @@ end
 
 ---@param tournament StandardTournament
 ---@return TournamentPhase
-function Tournaments.calculatePhase(tournament)
+function Tournament.calculatePhase(tournament)
 	if tournament.status == 'finished' then
 		return TOURNAMENT_PHASE.FINISHED
 	end
@@ -127,7 +140,7 @@ end
 --- This function parses fuzzy dates into a structured format.
 ---@param dateRecord string? # date in the format of `YYYY-MM-DD`, with `-MM-DD` optional.
 ---@return {year: integer, month: integer?, day: integer?, timestamp: integer?}?
-function Tournaments.parseDateRecord(dateRecord)
+function Tournament.parseDateRecord(dateRecord)
 	if not dateRecord then
 		return nil
 	end
@@ -150,7 +163,7 @@ end
 --- Determines if a tournament is featured.
 ---@param record StandardTournament
 ---@return boolean
-function Tournaments.isFeatured(record)
+function Tournament.isFeatured(record)
 	local curatedData = Lua.requireIfExists('Module:TournamentsList/CuratedData', {loadData = true})
 	if not curatedData then
 		return false
@@ -181,10 +194,7 @@ function Tournaments.isFeatured(record)
 			return nil
 		end
 
-		return mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = '[[pagename::' .. parentPage .. ']]',
-			limit = 1,
-		})[1] or parentData(parentPage, maxDepth - 1)
+		return Tournament.getTournament(parentPage) or parentData(parentPage, maxDepth - 1)
 	end
 	local parentTournament = parentData(pagename, 2)
 
@@ -192,7 +202,7 @@ function Tournaments.isFeatured(record)
 		return false
 	end
 
-	return Tournaments.tournamentFromRecord(parentTournament).featured
+	return parentTournament.featured
 end
 
-return Tournaments
+return Tournament
