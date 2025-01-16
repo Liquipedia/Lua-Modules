@@ -32,6 +32,16 @@ function StandingsFfaWidget:render()
 		return
 	end
 
+	---@param match MatchGroupUtilMatch
+	---@param searchForOpponent standardOpponent
+	local function findOpponentInMatch(match, searchForOpponent)
+		for _, matchOpponent in ipairs(match.opponents) do
+			if matchOpponent.name == searchForOpponent.name then
+				return matchOpponent
+			end
+		end
+	end
+
 	---@type StandingsModel
 	local standings = self.props.standings
 	local roundCount = #standings.rounds
@@ -63,16 +73,19 @@ function StandingsFfaWidget:render()
 				},
 			}},
 			-- Column Header
-			HtmlWidgets.Tr{children = {
+			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
 				HtmlWidgets.Th{children = 'Points'},
-			}},
+				Array.map(standings.matches, function(match)
+					return ''
+				end)
+			)},
 			-- Rows
 			Array.flatMap(standings.rounds, function(round)
 				return Array.map(round.opponents, function(slot)
 					return HtmlWidgets.Tr{
-						children = {
+						children = WidgetUtil.collect(
 							HtmlWidgets.Td{children = slot.placement},
 							HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
 								opponent = slot.opponent,
@@ -81,8 +94,20 @@ function StandingsFfaWidget:render()
 								teamStyle = 'hybrid',
 								showPlayerTeam = true,
 							}},
-							HtmlWidgets.Td{children = 'TODO'},
-						},
+							HtmlWidgets.Td{children = slot.points},
+							Array.map(standings.matches, function(match, matchIdx)
+								local text = ''
+								if round.round >= matchIdx then
+									local matchOpponent = findOpponentInMatch(match, slot.opponent)
+									if matchOpponent then
+										text = tostring(matchOpponent.score)
+									else
+										text = '-'
+									end
+								end
+								return HtmlWidgets.Td{children = text}
+							end)
+						),
 						attributes = {
 							['data-toggle-area-content'] = round.round,
 						}

@@ -10,8 +10,12 @@ local Array = require('Module:Array')
 local Condition = require('Module:Condition')
 local FnUtil = require('Module:FnUtil')
 local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Tournament = require('Module:Tournament')
+local Table = require('Module:Table')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local Tournament = Lua.import('Module:Tournament')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -28,6 +32,7 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config table
 ---@field rounds StandingsRound[]
+---@field matchIds string[] #usage discouraged
 
 ---@class StandingsRound
 ---@field round integer
@@ -35,6 +40,7 @@ local Standings = {}
 
 ---@class StandingsEntryModel
 ---@field opponent standardOpponent
+---@field points number
 ---@field placement string
 ---@field position integer
 ---@field positionStatus string?
@@ -81,6 +87,7 @@ function Standings.standingsFromRecord(record)
 		type = record.type,
 		config = record.config,
 		rounds = record.rounds,
+		matchIds = record.matches,
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.
@@ -99,6 +106,7 @@ function Standings.entryFromRecord(record)
 		positionStatus = record.currentstatus,
 		definitiveStatus = record.definitestatus,
 		changeFromPreviousRound = record.placementchange,
+		points = tonumber(record.scoreboard.points),
 	}
 
 	return entry
@@ -107,8 +115,14 @@ end
 ---@param standings StandingsModel
 ---@return MatchGroupUtilMatch[]
 function Standings.fetchMatches(standings)
-	--- TODO FETCH MATCHES
-	return {}
+	local bracketIds = Array.unique(Array.map(standings.matchIds, function(matchid)
+		return MatchGroupUtil.splitMatchId(matchid)
+	end))
+
+	local allMatchesFromBrackets = Array.flatMap(bracketIds, MatchGroupUtil.fetchMatches)
+	return Array.filter(allMatchesFromBrackets, function(match)
+		return Table.includes(standings.matchIds, match.matchId)
+	end)
 end
 
 ---@param standings StandingsModel
