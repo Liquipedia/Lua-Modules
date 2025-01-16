@@ -129,10 +129,6 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.aboutEsport,
-					},
-					{
 						mobileOrder = 2,
 						content = CONTENT.specialEvents,
 					},
