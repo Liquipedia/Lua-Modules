@@ -17,7 +17,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
-local MatchOpponentHelper = Lua.import('Module:MatchOpponentHelper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 local _MODES = {solo = '1v1', team = 'team'}
 
@@ -94,7 +94,7 @@ function MatchLegacy._storeGames(match, match2)
 			end)
 
 			submatch.winner = game.winner or ''
-			local walkover = MatchOpponentHelper.calculateWalkoverType(opponents)
+			local walkover = MatchLegacyUtil.calculateWalkoverType(opponents)
 			submatch.walkover = (walkover or ''):lower()
 			submatch.finished = match2.finished or '0'
 			submatch.mode = '1v1'
@@ -173,7 +173,7 @@ function MatchLegacy._convertParameters(match2)
 			return nil, false
 		end
 
-		local walkover = MatchOpponentHelper.calculateWalkoverType(match2.match2opponents)
+		local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
 		if walkover then
 			match.resulttype = walkover
 			match.walkover = match.winner
