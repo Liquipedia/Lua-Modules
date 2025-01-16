@@ -15,6 +15,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RoundSelector = Lua.import('Module:Widget/Standings/RoundSelector')
+local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -75,7 +76,7 @@ function StandingsFfaWidget:render()
 				return Array.map(round.opponents, function(slot)
 					return HtmlWidgets.Tr{
 						children = WidgetUtil.collect(
-							HtmlWidgets.Td{children = slot.placement},
+							HtmlWidgets.Td{children = {slot.placement, '.'}, css = {['font-weight'] = 'bold'}},
 							HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
 								opponent = slot.opponent,
 								showLink = true,
@@ -83,8 +84,8 @@ function StandingsFfaWidget:render()
 								teamStyle = 'hybrid',
 								showPlayerTeam = true,
 							}},
-							HtmlWidgets.Td{children = slot.positionChangeFromPreviousRound},
-							HtmlWidgets.Td{children = slot.points},
+							HtmlWidgets.Td{children = PlacementChange{change = slot.positionChangeFromPreviousRound}},
+							HtmlWidgets.Td{children = slot.points, css = {['font-weight'] = 'bold'}},
 							Array.map(standings.rounds, function(columnRound)
 								local text = ''
 								if columnRound.round <= round.round then
