@@ -121,8 +121,8 @@ return {
 			title = 'Classes',
 			link = 'Classes',
 			count = {
-				method = 'category',
-				conditions = 'Classes',
+				method = 'CATEGORY',
+				category = 'Classes',
 			}
 		},
 	},
