@@ -73,7 +73,7 @@ return {
 	},
 	metadesc = 'The Hearthstone esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, heroes, and cards.',
-	title = 'Halo',
+	title = 'Hearthstone',
 	navigation = {
 		{
 			file = 'Team Ukraine 2017 Hearthstone Global Games .jpg',
