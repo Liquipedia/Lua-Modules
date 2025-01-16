@@ -31,7 +31,7 @@ function PlacementChangeWidget:render()
 		classes = {'group-table-rank-change-' .. (positive and 'up' or 'down')},
 		children = {
 			positive and '▲' or '▼',
-			change
+			math.abs(change),
 		},
 	}
 end
