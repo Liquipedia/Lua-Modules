@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
@@ -41,7 +42,7 @@ function StandingsFfaWidget:render()
 		attributes = {
 			['data-toggle-area'] = 'toggle-area-'.. roundCount,
 		},
-		children = {
+		children = WidgetUtil.collect(
 			-- Outer header
 			HtmlWidgets.Tr{children = HtmlWidgets.Th{
 				attributes = {
@@ -68,22 +69,27 @@ function StandingsFfaWidget:render()
 				HtmlWidgets.Th{children = 'Points'},
 			}},
 			-- Rows
-			Array.map(standings.rounds, function(round)
+			Array.flatMap(standings.rounds, function(round)
 				return Array.map(round.opponents, function(slot)
-					return HtmlWidgets.Tr{children = {
-						HtmlWidgets.Td{children = slot.placement},
-						HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
-							opponent = slot.opponent,
-							showLink = true,
-							overflow = 'ellipsis',
-							teamStyle = 'hybrid',
-							showPlayerTeam = true,
-						}},
-						HtmlWidgets.Td{children = 'TODO'},
-					}}
+					return HtmlWidgets.Tr{
+						children = {
+							HtmlWidgets.Td{children = slot.placement},
+							HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
+								opponent = slot.opponent,
+								showLink = true,
+								overflow = 'ellipsis',
+								teamStyle = 'hybrid',
+								showPlayerTeam = true,
+							}},
+							HtmlWidgets.Td{children = 'TODO'},
+						},
+						attributes = {
+							['data-toggle-area-content'] = round.round,
+						}
+					}
 				end)
-			end),
-		}
+			end)
+		)
 	}
 end
 

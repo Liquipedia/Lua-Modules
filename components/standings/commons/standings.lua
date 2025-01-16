@@ -1,13 +1,14 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:StandingsModel
+-- page=Module:Standings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
 local Condition = require('Module:Condition')
+local FnUtil = require('Module:FnUtil')
 local Lpdb = require('Module:Lpdb')
 local Operator = require('Module:Operator')
 local Tournament = require('Module:Tournament')
@@ -129,10 +130,10 @@ function Standings.makeRounds(standings)
 		end
 	)
 
-	local roundCount = Array.maxBy(standingsEntries, Operator.property('roundindex'))
+	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
 
 	return Array.map(Array.range(1, roundCount), function(roundIndex)
-		local roundEntries = Array.filter(standingsEntries, Operator.property('roundindex', Operator.equals(roundIndex)))
+		local roundEntries = Array.filter(standingsEntries, Operator.property('roundindex', Operator.eq(roundIndex)))
 		local opponents = Array.sortBy(Array.map(roundEntries, Standings.entryFromRecord), Operator.property('position'))
 		return {
 			round = roundIndex,

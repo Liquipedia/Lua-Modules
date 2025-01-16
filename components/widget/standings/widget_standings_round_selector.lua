@@ -34,7 +34,7 @@ function RoundSelectorWidget:render()
 	end
 
 	local roundTitles = Array.map(Array.range(1, self.props.rounds), function (round)
-		if round == #self.props.rounds then
+		if round == self.props.rounds then
 			return finalRoundTitle()
 		else
 			return 'Round ' .. round

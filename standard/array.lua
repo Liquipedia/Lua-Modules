@@ -135,13 +135,13 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
----@generic T
----@param tbl T[]
----@param funct any
+---@generic V, T
+---@param elements V[]
+---@param funct fun(element: V, index?: integer): T[]|nil
 ---@return T[]
 ---@nodiscard
-function Array.flatMap(tbl, funct)
-	return Array.flatten(Array.map(tbl, funct))
+function Array.flatMap(elements, funct)
+	return Array.flatten(Array.map(elements, funct))
 end
 
 ---Determnines whether all elements in an array satisfy a predicate.
