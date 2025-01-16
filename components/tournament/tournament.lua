@@ -72,7 +72,7 @@ function Tournament.getTournament(pagename)
 	if not record then
 		return nil
 	end
-	return Tournament.tournamentFromRecord(record, Tournament.makeFeaturedFunction())
+	return Tournament.tournamentFromRecord(record)
 end
 
 local TouranmentMT = {
