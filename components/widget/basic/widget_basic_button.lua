@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -52,7 +53,7 @@ function Button:render()
 	end
 
 	local button = Div{
-		classes = Table.merge(cssClasses, self.props.classes or {}),
+		classes = Array.extend(cssClasses, self.props.classes or {}),
 		attributes = Table.merge({
 			title = self.props.title,
 			['aria-label'] = self.props.title,

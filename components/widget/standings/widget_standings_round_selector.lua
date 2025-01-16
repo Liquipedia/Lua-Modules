@@ -43,7 +43,7 @@ function RoundSelectorWidget:render()
 
 	local function makeRoundButtons(roundTitle, roundIndex)
 		return Button{
-			title = roundTitle,
+			children = roundTitle,
 			variant = 'primary',
 			classes = {'toggle-area-button'},
 			attributes = {['data-toggle-area-btn'] = roundIndex},
@@ -52,16 +52,16 @@ function RoundSelectorWidget:render()
 
 	return HtmlWidgets.Div{
 		classes = {'dropdown-box-wrapper'},
-		style = {float = 'left'},
+		css = {float = 'left'},
 		children = {
 			Button{
-				title = finalRoundTitle(),
+				children = finalRoundTitle(),
 				variant = 'primary',
 				classes = {'dropdown-box-button'},
 			},
 			HtmlWidgets.Div{
 				classes = {'dropdown-box'},
-				style = {padding = '0px'},
+				css = {padding = '0px'},
 				children = Array.map(roundTitles, makeRoundButtons)
 			},
 		}

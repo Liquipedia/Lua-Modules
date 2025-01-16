@@ -40,7 +40,7 @@ function StandingsFfaWidget:render()
 		wrapperClasses = {'toggle-area', 'toggle-area-' .. roundCount},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
 		attributes = {
-			['data-toggle-area'] = 'toggle-area-'.. roundCount,
+			['data-toggle-area'] = roundCount,
 		},
 		children = WidgetUtil.collect(
 			-- Outer header

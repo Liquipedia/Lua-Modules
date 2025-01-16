@@ -95,7 +95,7 @@ function Standings.entryFromRecord(record)
 	local entry = {
 		opponent = Opponent.fromLpdbStruct(record),
 		placement = record.placement,
-		position = record.slotindex,
+		position = tonumber(record.slotindex),
 		positionStatus = record.currentstatus,
 		definitiveStatus = record.definitestatus,
 		changeFromPreviousRound = record.placementchange,
@@ -133,7 +133,9 @@ function Standings.makeRounds(standings)
 	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
 
 	return Array.map(Array.range(1, roundCount), function(roundIndex)
-		local roundEntries = Array.filter(standingsEntries, Operator.property('roundindex', Operator.eq(roundIndex)))
+		local roundEntries = Array.filter(standingsEntries, function(entry)
+			return tonumber(entry.roundindex) == roundIndex
+		end)
 		local opponents = Array.sortBy(Array.map(roundEntries, Standings.entryFromRecord), Operator.property('position'))
 		return {
 			round = roundIndex,
