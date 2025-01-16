@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -51,13 +52,13 @@ function Button:render()
 	end
 
 	local button = Div{
-		classes = cssClasses,
-		attributes = {
+		classes = Table.merge(cssClasses, self.props.classes or {}),
+		attributes = Table.merge({
 			title = self.props.title,
 			['aria-label'] = self.props.title,
 			role = 'button',
 			tabindex = '0',
-		},
+		}, self.props.attributes or {}),
 		children = self.props.children,
 	}
 
