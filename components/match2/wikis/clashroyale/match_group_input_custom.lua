@@ -167,11 +167,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local extradata = {
-		comment = map.comment,
-	}
-
-	return Table.merge(extradata, MapFunctions.getCardsExtradata(map.opponents))
+	return MapFunctions.getCardsExtradata(map.opponents)
 end
 
 --- additionally store cards info in extradata so we can condition on them

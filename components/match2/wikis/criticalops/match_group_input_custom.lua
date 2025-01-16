@@ -77,9 +77,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local extradata = MapFunctions.getSideData(map)
-
-	return Table.merge(extradata, {comment = map.comment})
+	return MapFunctions.getSideData(map)
 end
 
 ---@param map table

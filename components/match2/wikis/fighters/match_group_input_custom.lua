@@ -122,14 +122,4 @@ function MapFunctions.calculateMapScore(map)
 	end
 end
 
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
-end
-
 return CustomMatchGroupInput

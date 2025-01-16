@@ -99,7 +99,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return Table.merge({
-		comment = map.comment,
 		team1side = string.lower(map.team1side or ''),
 		team2side = string.lower(map.team2side or ''),
 	}, MapFunctions.getPicksAndBans(map, #opponents))

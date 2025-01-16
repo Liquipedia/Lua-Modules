@@ -348,7 +348,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = map.comment,
 		header = map.header,
 	}
 
@@ -552,10 +551,7 @@ function FfaMapFunctions.readMap(match, mapInput, opponentCount, hasScores)
 		}
 	}
 
-	local dateProps = MatchGroupInputUtil.readDate(mapInput.date or match.date)
-	Table.mergeInto(map, dateProps)
-	dateProps.date = nil
-	Table.mergeInto(map.extradata, dateProps)
+	Table.mergeInto(map, MatchGroupInputUtil.readDate(mapInput.date or match.date))
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true

@@ -1224,8 +1224,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local winnerInput = map.winner --[[@as string?]]
 
 		local dateToUse = map.date or match.date
-		local dateProps = MatchGroupInputUtil.readDate(dateToUse)
-		Table.mergeInto(map, dateProps)
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
 		if Parser.ADD_SUB_GROUP then
 			subGroup = tonumber(map.subgroup) or (subGroup + 1)
@@ -1284,11 +1283,9 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		dateProps.date = nil
 		map.extradata = Table.merge(
 			{displayname = map.mapDisplayName},
-			Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil,
-			dateProps
+			Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
 		)
 
 		table.insert(maps, map)
@@ -1417,8 +1414,7 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		local winnerInput = map.winner --[[@as string?]]
 
 		local dateToUse = map.date or match.date
-		local dateProps = MatchGroupInputUtil.readDate(dateToUse)
-		Table.mergeInto(map, dateProps)
+		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		map.opponents = Array.map(opponents, function(matchOpponent)
@@ -1436,9 +1432,7 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or {}
-		dateProps.date = nil -- don't need this in extradata
-		Table.mergeInto(map.extradata, dateProps)
+		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
 
 		table.insert(maps, map)
 		match[key] = nil

@@ -78,7 +78,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = map.comment,
 		t1firstside = {rt = map.t1firstside, ot = map.t1firstsideot},
 		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},

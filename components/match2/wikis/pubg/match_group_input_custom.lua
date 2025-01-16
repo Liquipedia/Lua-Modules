@@ -65,19 +65,4 @@ function MatchFunctions.getExtraData(match, games, opponents, settings)
 	}
 end
 
---
--- map related functions
---
-
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		dateexact = map.dateexact,
-		comment = map.comment,
-	}
-end
-
 return CustomMatchGroupInput

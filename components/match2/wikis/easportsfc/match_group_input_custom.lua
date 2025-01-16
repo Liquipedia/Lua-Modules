@@ -163,7 +163,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		penaltyscores = CustomMatchGroupInput._submatchPenaltyScores(map, opponents, Logic.readBool(match.hasSubmatches)),
 	}
 end
