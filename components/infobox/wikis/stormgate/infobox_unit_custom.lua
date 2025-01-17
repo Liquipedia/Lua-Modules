@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -41,8 +42,8 @@ local GAME_MODE_NAME =	{
 	mayhem = 'Team Mayhem',
 }
 local GAME_MODE_ICON = {
-	coop = '<i class="fas fa-dungeon" title="Co-op"></i>',
-	mayhem = '<i class="fab fa-fort-awesome" title="Team Mayhem"></i>',
+	coop = 'dungeon',
+	mayhem = 'fort',
 }
 
 ---@param frame Frame
@@ -178,11 +179,11 @@ function CustomUnit:subHeaderDisplay(args)
 	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
 		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_ICON[string.lower(subfactionElement[1])] then return end
 		if args.informationType == 'Hero' then
-			return GAME_MODE_ICON[string.lower(subfactionElement[1])] .. ' '
+			return Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(subfactionElement[1])], size = '100%'} .. ' '
 				.. GAME_MODE_NAME[string.lower(subfactionElement[1])]
 		end
 
-		return GAME_MODE_ICON[string.lower(subfactionElement[1])] .. ' '
+		return Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(subfactionElement[1])], size = '100%'} .. ' '
 			.. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
 	end)
 
