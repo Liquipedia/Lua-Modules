@@ -54,8 +54,9 @@ local Standings = {}
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
+	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
-		conditions = '[[pagename::' .. pagename .. ']] AND [[standingsindex::' .. standingsIndex .. ']]',
+		conditions = '[[pagename::' .. pageNameInCorrectFormat .. ']] AND [[standingsindex::' .. standingsIndex .. ']]',
 		limit = 1,
 	})[1]
 	if not record then
