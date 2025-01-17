@@ -54,7 +54,7 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 
----Fetches a standng table from a page. Tries to read from page variables before fetching from LPDB.
+---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
