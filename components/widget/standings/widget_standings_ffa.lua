@@ -33,14 +33,15 @@ function StandingsFfaWidget:render()
 
 	---@type StandingsModel
 	local standings = self.props.standings
-	local roundCount = #standings.rounds
+	local lastFinishedRound = (Array.maxBy(
+		Array.filter(standings.rounds, function(round) return round.finished end),
+		function (round) return round.round end
+	) or {round = 0}).round
 
 	return DataTable{
-		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. roundCount},
+		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. lastFinishedRound},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
-		attributes = {
-			['data-toggle-area'] = roundCount,
-		},
+		attributes = {['data-toggle-area'] = lastFinishedRound},
 		children = WidgetUtil.collect(
 			-- Outer header
 			HtmlWidgets.Tr{children = HtmlWidgets.Th{
@@ -52,12 +53,12 @@ function StandingsFfaWidget:render()
 						css = {['position'] = 'relative'},
 						children = {
 							HtmlWidgets.Span{
-								children = standings.section
+								children = standings.title
 							},
 							HtmlWidgets.Span{
 								css = {['position'] = 'absolute', ['left'] = '0', ['top'] = '-6px'},
 								children = RoundSelector{
-									rounds = roundCount,
+									rounds = lastFinishedRound,
 									hasEnded = standings.rounds[#standings.rounds].finished,
 								}
 							},
@@ -77,6 +78,9 @@ function StandingsFfaWidget:render()
 			)},
 			-- Rows
 			Array.flatMap(standings.rounds, function(round)
+				if round.round > lastFinishedRound then
+					return {}
+				end
 				return Array.map(round.opponents, function(slot)
 					local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
 					local teamBackground = slot.definitiveStatus and ('bg-' .. slot.definitiveStatus) or nil

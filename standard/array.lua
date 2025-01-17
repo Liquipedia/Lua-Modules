@@ -551,7 +551,7 @@ end
 ---@param array T[]
 ---@param funct fun(item: T): V
 ---@param compare? fun(maxScore: V, score: V): boolean
----@return V
+---@return T
 ---@nodiscard
 function Array.maxBy(array, funct, compare)
 	compare = compare or Array.lexicalCompareIfTable
