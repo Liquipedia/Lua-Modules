@@ -1,7 +1,6 @@
 #!/bin/bash
 
 userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
-devWikis=('rocketleague' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
@@ -36,11 +35,6 @@ for luaFile in $luaFiles; do
     wiki="${BASH_REMATCH[1]}"
     page="${BASH_REMATCH[2]}${LUA_DEV_ENV_NAME}"
 
-    if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
-        echo '...skipping - dev wiki not applicable...'
-        continue
-    fi
-
     echo '...magic comment found - updating wiki...'
 
     echo "...wiki = $wiki"
@@ -59,7 +53,6 @@ for luaFile in $luaFiles; do
           -d "format=json&action=query&meta=tokens&type=login" \
           -H "User-Agent: ${userAgent}" \
           -H 'Accept-Encoding: gzip' \
-          -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
           -X POST "$wikiApiUrl" \
           | gunzip \
           | jq ".query.tokens.logintoken" -r
@@ -73,7 +66,6 @@ for luaFile in $luaFiles; do
         --data-urlencode "lgtoken=${loginToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=login" \
         | gunzip \
         > /dev/null
@@ -91,7 +83,6 @@ for luaFile in $luaFiles; do
         -d "format=json&action=query&meta=tokens" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "$wikiApiUrl" \
         | gunzip \
         | jq ".query.tokens.csrftoken" -r
@@ -109,7 +100,6 @@ for luaFile in $luaFiles; do
         --data-urlencode "token=${editToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip
     )
