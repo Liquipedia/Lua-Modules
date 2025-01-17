@@ -9,10 +9,12 @@
 local Array = require('Module:Array')
 local Condition = require('Module:Condition')
 local FnUtil = require('Module:FnUtil')
+local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Tournament = Lua.import('Module:Tournament')
@@ -32,7 +34,8 @@ local Standings = {}
 ---@field matches MatchGroupUtilMatch[]
 ---@field config table
 ---@field rounds StandingsRound[]
----@field private lpdbdata standingstable
+---@field private record standingstable
+---@field private entryRecords standingsentry[]
 
 ---@class StandingsRound
 ---@field round integer
@@ -51,10 +54,17 @@ local Standings = {}
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 
+---Fetches a standng table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
+	local varData = Variables.varDefault('standings2_' .. standingsIndex)
+	if varData then
+		local standings = Json.parseStringified(varData)
+		return Standings.standingsFromRecord(standings.standings, standings.entries)
+	end
+
 	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
 		conditions = '[[pagename::' .. pageNameInCorrectFormat .. ']] AND [[standingsindex::' .. standingsIndex .. ']]',
@@ -70,20 +80,21 @@ local StandingsMT = {
 	__index = function(standings, property)
 		if property == 'tournament' then
 			standings[property] = Tournament.getTournament(standings.pageName)
-		end
-		if property == 'matches' then
+		elseif property == 'matches' then
 			standings[property] = Standings.fetchMatches(standings)
-		end
-		if property == 'rounds' then
+		elseif property == 'rounds' then
 			standings[property] = Standings.makeRounds(standings)
+		elseif property == 'entryRecords' then
+			standings[property] = Standings.fetchEntries(standings)
 		end
 		return rawget(standings, property)
 	end
 }
 
 ---@param record standingstable
+---@param entries standingsentry[]?
 ---@return StandingsModel
-function Standings.standingsFromRecord(record)
+function Standings.standingsFromRecord(record, entries)
 	local standings = {
 		pageName = record.pagename,
 		standingsIndex = record.standingsindex,
@@ -91,8 +102,8 @@ function Standings.standingsFromRecord(record)
 		section = record.section,
 		type = record.type,
 		config = record.config,
-		rounds = record.rounds,
-		lpdbdata = record,
+		record = record,
+		entryRecords = entries,
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.
@@ -122,7 +133,7 @@ end
 ---@return MatchGroupUtilMatch[]
 function Standings.fetchMatches(standings)
 	---@diagnostic disable-next-line: invisible
-	local matchids = standings.lpdbdata.matches
+	local matchids = standings.record.matches or {}
 	local bracketIds = Array.unique(Array.map(matchids, function(matchid)
 		return MatchGroupUtil.splitMatchId(matchid)
 	end))
@@ -134,15 +145,13 @@ function Standings.fetchMatches(standings)
 end
 
 ---@param standings StandingsModel
----@return StandingsRound[]
-function Standings.makeRounds(standings)
-	---@diagnostic disable-next-line: invisible
-	local lpdbdata = standings.lpdbdata
+---@return standingsentry[]
+function Standings.fetchEntries(standings)
+	local standingsEntries = {}
 	local conditions = Condition.Tree(Condition.BooleanOperator.all)
 		:add(Condition.Node(Condition.ColumnName('pagename'), Condition.Comparator.eq, standings.pageName))
 		:add(Condition.Node(Condition.ColumnName('standingsindex'), Condition.Comparator.eq, standings.standingsIndex))
 
-	local standingsEntries = {}
 	Lpdb.executeMassQuery(
 		'standingsentry',
 		{
@@ -153,6 +162,16 @@ function Standings.makeRounds(standings)
 			table.insert(standingsEntries, record)
 		end
 	)
+	return standingsEntries
+end
+
+---@param standings StandingsModel
+---@return StandingsRound[]
+function Standings.makeRounds(standings)
+	---@diagnostic disable-next-line: invisible
+	local record = standings.record
+	---@diagnostic disable-next-line: invisible
+	local standingsEntries = standings.entryRecords
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
 
@@ -164,9 +183,9 @@ function Standings.makeRounds(standings)
 		return {
 			round = roundIndex,
 			opponents = opponents,
-			finished = (lpdbdata.extradata.rounds[roundIndex] or {}).finished or false,
-			started = (lpdbdata.extradata.rounds[roundIndex] or {}).started or false,
-			title = (lpdbdata.extradata.rounds[roundIndex] or {}).title or ('Round ' .. roundIndex),
+			finished = (record.extradata.rounds[roundIndex] or {}).finished or true,
+			started = (record.extradata.rounds[roundIndex] or {}).started or true,
+			title = (record.extradata.rounds[roundIndex] or {}).title or ('Round ' .. roundIndex),
 		}
 	end)
 end
