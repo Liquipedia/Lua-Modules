@@ -38,7 +38,7 @@ function StandingsFfaWidget:render()
 	local hasRoundSelector = roundCount > 1
 
 	return DataTable{
-		wrapperClasses = {'toggle-area', 'toggle-area-' .. roundCount},
+		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. roundCount},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
 		attributes = {
 			['data-toggle-area'] = roundCount,
@@ -50,17 +50,21 @@ function StandingsFfaWidget:render()
 					colspan = 100,
 				},
 				children = {
-					HtmlWidgets.Span{
-						css = {
-							['vertical-align'] = 'middle',
-							['margin-left'] = hasRoundSelector and '-70px' or nil,
+					HtmlWidgets.Div{
+						css = {['position'] = 'relative'},
+						children = {
+							HtmlWidgets.Span{
+								children = standings.section
+							},
+							HtmlWidgets.Span{
+								css = {['position'] = 'absolute', ['left'] = '0', ['top'] = '-6px'},
+								children = RoundSelector{
+									rounds = roundCount,
+									hasEnded = standings.rounds[#standings.rounds].finished,
+								}
+							},
 						},
-						children = standings.section
 					},
-					hasRoundSelector and RoundSelector{
-						rounds = roundCount,
-						hasEnded = standings.rounds[#standings.rounds].finished,
-					} or nil,
 				},
 			}},
 			-- Column Header
