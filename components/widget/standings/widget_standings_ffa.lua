@@ -33,15 +33,16 @@ function StandingsFfaWidget:render()
 
 	---@type StandingsModel
 	local standings = self.props.standings
-	local lastFinishedRound = (Array.maxBy(
-		Array.filter(standings.rounds, function(round) return round.finished end),
+	local activeRounds = (Array.maxBy(
+		Array.filter(standings.rounds, function(round) return round.started end),
 		function (round) return round.round end
 	) or {round = 0}).round
+	local hasFutureRounds = not standings.rounds[#standings.rounds].started
 
 	return DataTable{
-		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. lastFinishedRound},
+		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. activeRounds},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
-		attributes = {['data-toggle-area'] = lastFinishedRound},
+		attributes = {['data-toggle-area'] = activeRounds},
 		children = WidgetUtil.collect(
 			-- Outer header
 			HtmlWidgets.Tr{children = HtmlWidgets.Th{
@@ -58,8 +59,8 @@ function StandingsFfaWidget:render()
 							HtmlWidgets.Span{
 								css = {['position'] = 'absolute', ['left'] = '0', ['top'] = '-6px'},
 								children = RoundSelector{
-									rounds = lastFinishedRound,
-									hasEnded = standings.rounds[#standings.rounds].finished,
+									rounds = activeRounds,
+									hasEnded = not hasFutureRounds,
 								}
 							},
 						},
@@ -78,12 +79,15 @@ function StandingsFfaWidget:render()
 			)},
 			-- Rows
 			Array.flatMap(standings.rounds, function(round)
-				if round.round > lastFinishedRound then
+				if round.round > activeRounds then
 					return {}
 				end
 				return Array.map(round.opponents, function(slot)
 					local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
-					local teamBackground = slot.definitiveStatus and ('bg-' .. slot.definitiveStatus) or nil
+					local teamBackground
+					if not hasFutureRounds and slot.definitiveStatus then
+						teamBackground = 'bg-' .. slot.definitiveStatus
+					end
 					return HtmlWidgets.Tr{
 						children = WidgetUtil.collect(
 							HtmlWidgets.Td{
