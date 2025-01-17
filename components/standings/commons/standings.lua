@@ -36,6 +36,7 @@ local Standings = {}
 
 ---@class StandingsRound
 ---@field round integer
+---@field started boolean
 ---@field finished boolean
 ---@field title string
 ---@field opponents StandingsEntryModel[]
@@ -163,8 +164,9 @@ function Standings.makeRounds(standings)
 		return {
 			round = roundIndex,
 			opponents = opponents,
-			finished = (lpdbdata.extradata.rounds[roundIndex] or {}).finished,
-			title = (lpdbdata.extradata.rounds[roundIndex] or {}).title,
+			finished = (lpdbdata.extradata.rounds[roundIndex] or {}).finished or false,
+			started = (lpdbdata.extradata.rounds[roundIndex] or {}).started or false,
+			title = (lpdbdata.extradata.rounds[roundIndex] or {}).title or ('Round ' .. roundIndex),
 		}
 	end)
 end
