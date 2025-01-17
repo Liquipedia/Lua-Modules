@@ -45,6 +45,7 @@ function RoundSelectorWidget:render()
 		return Button{
 			children = roundTitle,
 			variant = 'primary',
+			size = 'sm',
 			classes = {'toggle-area-button'},
 			attributes = {['data-toggle-area-btn'] = roundIndex},
 		}
@@ -57,6 +58,7 @@ function RoundSelectorWidget:render()
 			Button{
 				children = finalRoundTitle(),
 				variant = 'primary',
+				size = 'sm',
 				classes = {'dropdown-box-button'},
 			},
 			HtmlWidgets.Div{

@@ -35,6 +35,8 @@ function StandingsFfaWidget:render()
 	local standings = self.props.standings
 	local roundCount = #standings.rounds
 
+	local hasRoundSelector = roundCount > 1
+
 	return DataTable{
 		wrapperClasses = {'toggle-area', 'toggle-area-' .. roundCount},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
@@ -50,15 +52,15 @@ function StandingsFfaWidget:render()
 				children = {
 					HtmlWidgets.Span{
 						css = {
-							['margin-left'] = '-70px',
 							['vertical-align'] = 'middle',
+							['margin-left'] = hasRoundSelector and '-70px' or nil,
 						},
 						children = standings.section
 					},
-					RoundSelector{
+					hasRoundSelector and RoundSelector{
 						rounds = roundCount,
 						hasEnded = standings.rounds[#standings.rounds].finished,
-					},
+					} or nil,
 				},
 			}},
 			-- Column Header
