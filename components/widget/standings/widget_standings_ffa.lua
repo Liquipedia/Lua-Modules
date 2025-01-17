@@ -78,18 +78,34 @@ function StandingsFfaWidget:render()
 			-- Rows
 			Array.flatMap(standings.rounds, function(round)
 				return Array.map(round.opponents, function(slot)
+					local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
+					local teamBackground = slot.definitiveStatus and ('bg-' .. slot.definitiveStatus) or nil
 					return HtmlWidgets.Tr{
 						children = WidgetUtil.collect(
-							HtmlWidgets.Td{children = {slot.placement, '.'}, css = {['font-weight'] = 'bold'}},
-							HtmlWidgets.Td{children = OpponentDisplay.BlockOpponent{
-								opponent = slot.opponent,
-								showLink = true,
-								overflow = 'ellipsis',
-								teamStyle = 'hybrid',
-								showPlayerTeam = true,
-							}},
-							HtmlWidgets.Td{children = PlacementChange{change = slot.positionChangeFromPreviousRound}},
-							HtmlWidgets.Td{children = slot.points, css = {['font-weight'] = 'bold', ['text-align'] = 'center'}},
+							HtmlWidgets.Td{
+								children = {slot.placement, '.'},
+								css = {['font-weight'] = 'bold'},
+								classes = {positionBackground},
+							},
+							HtmlWidgets.Td{
+								classes = {teamBackground},
+								children = OpponentDisplay.BlockOpponent{
+									opponent = slot.opponent,
+									showLink = true,
+									overflow = 'ellipsis',
+									teamStyle = 'hybrid',
+									showPlayerTeam = true,
+								}
+							},
+							HtmlWidgets.Td{
+								classes = {teamBackground},
+								children = PlacementChange{change = slot.positionChangeFromPreviousRound}
+							},
+							HtmlWidgets.Td{
+								classes = {teamBackground},
+								children = slot.points,
+								css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
+							},
 							Array.map(standings.rounds, function(columnRound)
 								local text = ''
 								if columnRound.round <= round.round then
