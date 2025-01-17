@@ -35,8 +35,6 @@ function StandingsFfaWidget:render()
 	local standings = self.props.standings
 	local roundCount = #standings.rounds
 
-	local hasRoundSelector = roundCount > 1
-
 	return DataTable{
 		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. roundCount},
 		classes = {'wikitable-bordered', 'wikitable-striped'},
