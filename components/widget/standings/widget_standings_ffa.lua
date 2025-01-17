@@ -94,7 +94,7 @@ function StandingsFfaWidget:render()
 							HtmlWidgets.Td{children = slot.points, css = {['font-weight'] = 'bold', ['text-align'] = 'center'}},
 							Array.map(standings.rounds, function(columnRound)
 								local text = ''
-								if columnRound.finished then
+								if columnRound.round <= round.round then
 									local newPoints = (Array.find(columnRound.opponents, function(columnSlot)
 										return columnSlot.opponent.name == slot.opponent.name
 									end).pointsChangeFromPreviousRound)

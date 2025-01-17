@@ -162,7 +162,7 @@ function Standings.makeRounds(standings)
 		return {
 			round = roundIndex,
 			opponents = opponents,
-			finished = true, -- TODO
+			finished = (lpdbdata.extradata.rounds[roundIndex] or {}).finished,
 			title = (lpdbdata.extradata.rounds[roundIndex] or {}).title,
 		}
 	end)
