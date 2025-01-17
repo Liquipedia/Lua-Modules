@@ -59,13 +59,17 @@ local Standings = {}
 ---@param standingsIndex integer #0-index'd on per page
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
-	local varData = Variables.varDefault('standings2_' .. standingsIndex)
-	if varData then
-		local standings = Json.parseStringified(varData)
-		return Standings.standingsFromRecord(standings.standings, standings.entries)
+	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
+	local myPageName = string.gsub(mw.title.getCurrentTitle().text , ' ', '_')
+
+	if pageNameInCorrectFormat == myPageName then
+		local varData = Variables.varDefault('standings2_' .. standingsIndex)
+		if varData then
+			local standings = Json.parseStringified(varData)
+			return Standings.standingsFromRecord(standings.standings, standings.entries)
+		end
 	end
 
-	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
 	local record = mw.ext.LiquipediaDB.lpdb('standingstable', {
 		conditions = '[[pagename::' .. pageNameInCorrectFormat .. ']] AND [[standingsindex::' .. standingsIndex .. ']]',
 		limit = 1,
