@@ -187,8 +187,8 @@ function Standings.makeRounds(standings)
 		return {
 			round = roundIndex,
 			opponents = opponents,
-			finished = (record.extradata.rounds[roundIndex] or {}).finished or true,
-			started = (record.extradata.rounds[roundIndex] or {}).started or true,
+			finished = (record.extradata.rounds[roundIndex] or {}).finished or false,
+			started = (record.extradata.rounds[roundIndex] or {}).started or false,
 			title = (record.extradata.rounds[roundIndex] or {}).title or ('Round ' .. roundIndex),
 		}
 	end)
