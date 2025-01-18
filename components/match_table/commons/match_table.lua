@@ -649,8 +649,8 @@ function MatchTable._calculateDateTimeString(timezone, timestamp)
 	if not tzstring then
 		error('Unsupported timezone: ' .. timezone)
 	end
-  
- 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
+
+	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
 		' ' .. tzstring
 end
 
