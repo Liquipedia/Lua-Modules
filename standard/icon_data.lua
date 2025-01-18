@@ -105,6 +105,10 @@ return {
 	standings_staydown = 'fas fa-chevron-down',
 	standings_down = 'fas fa-skull',
 
-	-- Usage sorting
+	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
+
+	-- Usage: Stormgate
+	dungeon = 'fas fa-dungeon',
+	fort = 'fab fa-fort-awesome',
 }
