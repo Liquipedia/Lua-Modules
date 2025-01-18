@@ -645,9 +645,13 @@ end
 ---@return string
 function MatchTable._calculateDateTimeString(timezone, timestamp)
 	local offset = Timezone.getOffset(timezone) or 0
+	local tzstring = Timezone.getTimezoneString(timezone)
+	if not tzstring then
+		error('Unsupported timezone: ' .. timezone)
+	end
 
 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
-		' ' .. Timezone.getTimezoneString(timezone)
+		' ' .. tzstring
 end
 
 ---@param match MatchTableMatch
