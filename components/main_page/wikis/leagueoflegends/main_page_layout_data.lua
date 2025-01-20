@@ -92,6 +92,42 @@ return {
 	title = 'League of Legends',
 	navigation = {
 		{
+			file = 'DRX Deft Worlds 2022 Champion.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'T1 Worlds 2024.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = 'G2 Worlds 2024.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'Worlds Trophy 2024.jpg',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
+			},
+		},
+		{
 			file = 'T1 Worlds23 Skins Splash Art.jpg',
 			title = 'Champions',
 			link = 'Champions',
@@ -109,42 +145,6 @@ return {
 				method = 'LPDB',
 				table = 'datapoint',
 				conditions = '[[type::patch]]',
-			},
-		},
-		{
-			file = 'Worlds Trophy 2024.jpg',
-			title = 'Tournaments',
-			link = 'Portal:Tournaments',
-			count = {
-				method = 'LPDB',
-				table = 'tournament',
-			},
-		},
-		{
-			file = 'T1 Worlds 2024.jpg',
-			title = 'Teams',
-			link = 'Portal:Teams',
-			count = {
-				method = 'LPDB',
-				table = 'team',
-			},
-		},
-		{
-			file = 'DRX Deft Worlds 2022 Champion.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'G2 Worlds 2024.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
-			count = {
-				method = 'LPDB',
-				table = 'transfer',
 			},
 		},
 	},
