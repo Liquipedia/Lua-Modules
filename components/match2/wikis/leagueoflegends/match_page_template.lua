@@ -34,7 +34,7 @@ return {
 				{{#vods}}
 					<div class="match-bm-lol-match-additional-list">{{#icons}}{{&.}}{{/icons}}</div>
 				{{/vods}}
-				<div class="match-bm-lol-match-additional-list">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
+				<div class="match-bm-lol-match-additional-list vodlink">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
 				{{#patch}}
 					<div class="match-bm-lol-match-additional-list">[[Patch {{patch}}]]</div>
 				{{/patch}}
