@@ -547,7 +547,7 @@ function MatchTable:build()
 		end
 		display:node(self:matchRow(match))
 	end)
-	
+
 	if self.config.linkSubPage then
 		local pagename = self.title.text .. '/Matches'
 		display:tag('tr')
