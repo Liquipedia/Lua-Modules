@@ -47,6 +47,9 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
 				points = pointSum,
+				extradata = {
+					pointschange = thisRoundsData.scoreboard.points,
+				}
 			}
 		end)
 	end)
@@ -91,7 +94,7 @@ end
 ---@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer?}[]
 function StandingsParser.determinePlacements(opponentsInRound)
 	table.sort(opponentsInRound, function(opponent1, opponent2)
-		return opponent1.points < opponent2.points
+		return opponent1.points > opponent2.points
 	end)
 
 	local lastPts = math.huge
