@@ -125,7 +125,7 @@ function StandingsFfaWidget:render()
 									local opponent = Array.find(columnRound.opponents, function(columnSlot)
 										return columnSlot.opponent.name == slot.opponent.name
 									end)
-									local roundStatus = opponent.specialstatus
+									local roundStatus = opponent.specialStatus
 									if roundStatus == '' then
 										text = opponent.pointsChangeFromPreviousRound
 									else
