@@ -117,8 +117,8 @@ function StandingsParser.setPlacementChange(opponents)
 		Array.sortInPlaceBy(opponentByRounds, function (opponentInRound)
 			return opponentInRound.roundindex
 		end)
+		local lastPlacement
 		Array.forEach(opponentByRounds, function(opponent)
-			local lastPlacement
 			if lastPlacement and opponent.placement then
 				opponent.placementchange = lastPlacement - opponent.placement
 			end
