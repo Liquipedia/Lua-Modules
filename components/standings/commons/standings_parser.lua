@@ -58,10 +58,12 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 			return opponentRound.roundindex == round.roundNumber
 		end))
 	end)
-	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer}[]
+	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
+	---points: number?, placement: integer?, slotindex: integer}[]
 
 	StandingsParser.setPlacementChange(entries)
-	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer, placementchange: integer?}[]
+	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
+	---points: number?, placement: integer?, slotindex: integer, placementchange: integer?}[]
 
 	StandingsParser.addStatuses(entries, bgs, 'currentstatus')
 	if isFinished then
@@ -69,7 +71,9 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 			return opponentRound.roundindex == #rounds
 		end), bgs, 'definitestatus')
 	end
-	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer, placementchange: integer?, currentstatus: string?, definitestatus: string?}[]
+	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
+	---placement: integer?, slotindex: integer, placementchange: integer?,
+	---currentstatus: string?, definitestatus: string?}[]
 
 
 	---@type StandingsTableStorage
@@ -90,7 +94,8 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 	}
 end
 
----@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer?}[]
+---@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
+---placement: integer?, slotindex: integer?}[]
 function StandingsParser.determinePlacements(opponentsInRound)
 	table.sort(opponentsInRound, function(opponent1, opponent2)
 		return opponent1.points > opponent2.points
@@ -103,7 +108,8 @@ function StandingsParser.determinePlacements(opponentsInRound)
 	end)
 end
 
----@param opponentEnties {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer, placementchange: integer?}[]
+---@param opponentEnties {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
+---placement: integer?, slotindex: integer, placementchange: integer?}[]
 ---@param bgs table<integer, string>
 ---@param field 'currentstatus'|'definitestatus'
 function StandingsParser.addStatuses(opponentEnties, bgs, field)
@@ -112,7 +118,8 @@ function StandingsParser.addStatuses(opponentEnties, bgs, field)
 	end)
 end
 
----@param opponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?, placement: integer?, slotindex: integer, placementchange: integer?}[]
+---@param opponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
+---placement: integer?, slotindex: integer, placementchange: integer?}[]
 function StandingsParser.setPlacementChange(opponents)
 	local opponentsByRounds = Array.groupBy(opponents, function (opponent)
 		return opponent.opponent
