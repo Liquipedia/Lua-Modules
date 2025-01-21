@@ -13,7 +13,7 @@ local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
-local Display = Lua.import('le:Widget/Standings/Ffa')
+local Display = Lua.import('Module:Widget/Standings/Ffa')
 
 local StandingsTable = {}
 
@@ -25,7 +25,7 @@ function StandingsTable.fromTemplate(frame)
 	if tableType ~= 'ffa' then
 		error('Unknown Standing Table Type')
 	end
-	return StandingsTable.ffa(StandingsParseWiki.parseWikiInput(args))
+	return StandingsTable.ffa(unpack(StandingsParseWiki.parseWikiInput(args)))
 end
 
 ---@param rounds any
