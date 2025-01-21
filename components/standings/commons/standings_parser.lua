@@ -32,15 +32,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			if not opponentRounds or not round.started then
-				return {}
+			local pointsFromRound
+			if opponentRounds then
+				local thisRoundsData = opponentRounds[round.roundNumber]
+				if thisRoundsData and thisRoundsData.scoreboard then
+					pointsFromRound = thisRoundsData.scoreboard.points
+				end
 			end
-			local thisRoundsData = opponentRounds[round.roundNumber]
-			if not thisRoundsData or not thisRoundsData.scoreboard then
-				return {}
-			end
-			local points = thisRoundsData.scoreboard.points or 0
-			pointSum = pointSum + points
+			pointSum = pointSum + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
 			return {
 				opponent = opponent,
@@ -48,7 +47,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 				roundindex = round.roundNumber,
 				points = pointSum,
 				extradata = {
-					pointschange = thisRoundsData.scoreboard.points,
+					pointschange = pointsFromRound,
 				}
 			}
 		end)
