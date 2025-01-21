@@ -11,8 +11,8 @@ local Variables = require('Module:Variables')
 
 local StandingsParser = {}
 
----@param rounds table[]
----@param opponents table[]
+---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
+---@param opponents {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
 ---@param bgs table<integer, string>
 ---@param title string?
 ---@param matches string[]
@@ -28,15 +28,18 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 
 	local entries = Array.flatMap(opponents, function(opponentData)
 		local opponent = opponentData.opponent
-		local opponentInput = opponentData.input
 		local pointSum = 0
+		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			if not round.started then
+			if not opponentRounds or not round.started then
 				return {}
 			end
-			-- TODO Move to wikicode parsing
-			local points = tonumber(opponentInput['r' .. round.roundNumber]) or 0
+			local thisRoundsData = opponentRounds[round.roundNumber]
+			if not thisRoundsData or not thisRoundsData.scoreboard then
+				return {}
+			end
+			local points = thisRoundsData.scoreboard.points or 0
 			pointSum = pointSum + points
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
 			return {

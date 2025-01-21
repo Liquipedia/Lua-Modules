@@ -38,10 +38,10 @@ function StandingsParseWiki.parseWikiInput(args)
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
 	end
 
-	---@type {input: table, opponent: standardOpponent}[]
+	---@type {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
 	local opponents = {}
 	for _, opponentData, _ in Table.iter.pairsByPrefix(args, 'opponent', {requireIndex = true}) do
-		table.insert(opponents, StandingsParseWiki.parseWikiOpponent(opponentData))
+		table.insert(opponents, StandingsParseWiki.parseWikiOpponent(opponentData, #rounds))
 	end
 
 	return {
@@ -54,7 +54,7 @@ end
 
 ---@param roundInput string
 ---@param roundIndex integer
----@return table
+---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parse(roundInput)
 	return {
@@ -66,10 +66,16 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 end
 
 ---@param opponentInput string
----@return table
-function StandingsParseWiki.parseWikiOpponent(opponentInput)
+---@param numberOfRounds integer
+---@return {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
+function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 	local opponentData = Json.parse(opponentInput)
-	return {input = opponentData, opponent = Opponent.readOpponentArgs(opponentData)}
+	local rounds = {}
+	for i = 1, numberOfRounds do
+		local points = tonumber(opponentData['r' .. i])
+		table.insert(rounds, {scoreboard = {points = points}})
+	end
+	return {rounds = rounds, opponent = Opponent.readOpponentArgs(opponentData)}
 end
 
 ---@param input string
