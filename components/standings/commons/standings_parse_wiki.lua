@@ -67,13 +67,13 @@ end
 
 ---@param opponentInput string
 ---@param numberOfRounds integer
----@return {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
+---@return {rounds: {specialstatus: string, scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 	local opponentData = Json.parse(opponentInput)
 	local rounds = {}
 	for i = 1, numberOfRounds do
 		local input = opponentData['r' .. i]
-		local points, specialStatus
+		local points, specialStatus = nil, ''
 		if Logic.isNumeric(input) then
 			points = tonumber(input)
 		else

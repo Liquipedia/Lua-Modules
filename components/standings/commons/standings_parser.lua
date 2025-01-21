@@ -12,7 +12,7 @@ local Variables = require('Module:Variables')
 local StandingsParser = {}
 
 ---@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
----@param opponents {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
+---@param opponents {rounds: {specialstatus: string, scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
 ---@param bgs table<integer, string>
 ---@param title string?
 ---@param matches string[]
@@ -33,12 +33,12 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 
 		return Array.map(rounds, function(round)
 			local pointsFromRound, statusInRound
-			if opponentRounds then
+			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
-				if thisRoundsData and thisRoundsData.scoreboard then
+				if thisRoundsData.scoreboard then
 					pointsFromRound = thisRoundsData.scoreboard.points
 				end
-				statusInRound = statusInRound.specialstatus
+				statusInRound = thisRoundsData.specialstatus
 			end
 			pointSum = pointSum + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
