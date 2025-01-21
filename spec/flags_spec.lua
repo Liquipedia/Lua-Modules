@@ -26,7 +26,7 @@ describe('flags', function()
 			assert.are_equal(nlOutput, Flags.Icon{shouldLink = false, flag = 'nld'})
 			assert.are_equal(nlOutput, Flags.Icon{shouldLink = false, flag = 'holland'})
 
-			assert.are_equal('<span class=\"flag\">[[File:Space filler flag.png|36x24px|link=]]</span>',
+			assert.are_equal('<span class=\"flag\">[[File:Space filler flag.png|36x24px||link=]]</span>',
 				Flags.Icon{flag = 'tbd'})
 
 			assert.are_equal('Unknown flag: dummy',
