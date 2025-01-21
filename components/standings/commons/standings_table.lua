@@ -13,7 +13,7 @@ local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
-local Display = Lua.import('Module:Widget/Standings/Ffa')
+local Display = Lua.import('Module:Widget/Standings')
 
 local StandingsTable = {}
 
@@ -25,7 +25,14 @@ function StandingsTable.fromTemplate(frame)
 	if tableType ~= 'ffa' then
 		error('Unknown Standing Table Type')
 	end
-	return StandingsTable.ffa(unpack(StandingsParseWiki.parseWikiInput(args)))
+	local parsedData = StandingsParseWiki.parseWikiInput(args)
+	return StandingsTable.ffa(
+		parsedData.rounds,
+		parsedData.opponents,
+		parsedData.bgs,
+		args.title,
+		parsedData.matches
+	)
 end
 
 ---@param rounds any
@@ -37,7 +44,7 @@ end
 function StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches)
 	StandingsStorage.run(standingsTable)
-	return Display{standings = standingsTable}
+	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 
 return StandingsTable
