@@ -79,7 +79,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 		elseif input == '-' then
 			specialStatus = 'nc'
 		else
-			specialStatus =  input
+			specialStatus = input
 		end
 		table.insert(rounds, {scoreboard = {points = points}, specialstatus = specialStatus})
 	end
