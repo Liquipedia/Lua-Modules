@@ -53,6 +53,7 @@ local Standings = {}
 ---@field definitiveStatus string?
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
+---@field specialstatus 'dq'|'nc'|''
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
@@ -127,6 +128,7 @@ function Standings.entryFromRecord(record)
 		definitiveStatus = record.definitestatus,
 		points = record.scoreboard.points,
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
+		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 	}
 

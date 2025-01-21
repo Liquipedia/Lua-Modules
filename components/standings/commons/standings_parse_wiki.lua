@@ -72,8 +72,14 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 	local opponentData = Json.parse(opponentInput)
 	local rounds = {}
 	for i = 1, numberOfRounds do
-		local points = tonumber(opponentData['r' .. i])
-		table.insert(rounds, {scoreboard = {points = points}})
+		local input = opponentData['r' .. i]
+		local points, specialStatus
+		if Logic.isNumeric(input) then
+			points = tonumber(input)
+		else
+			specialStatus = input
+		end
+		table.insert(rounds, {scoreboard = {points = points}, specialstatus = specialStatus})
 	end
 	return {rounds = rounds, opponent = Opponent.readOpponentArgs(opponentData)}
 end

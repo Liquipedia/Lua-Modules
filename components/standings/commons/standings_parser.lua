@@ -32,12 +32,13 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound
+			local pointsFromRound, statusInRound
 			if opponentRounds then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData and thisRoundsData.scoreboard then
 					pointsFromRound = thisRoundsData.scoreboard.points
 				end
+				statusInRound = statusInRound.specialstatus
 			end
 			pointSum = pointSum + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
@@ -48,6 +49,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 				points = pointSum,
 				extradata = {
 					pointschange = pointsFromRound,
+					specialstatus = statusInRound,
 				}
 			}
 		end)
@@ -74,7 +76,6 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?,
 	---placement: integer?, slotindex: integer, placementchange: integer?,
 	---currentstatus: string?, definitestatus: string?}[]
-
 
 	---@type StandingsTableStorage
 	return {
