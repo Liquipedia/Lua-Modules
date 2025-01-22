@@ -88,6 +88,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.individual = String.isNotEmpty(args.player_number) and 'true' or ''
 	lpdbData.extradata.dpcpoints = String.isNotEmpty(args.points) or ''
 	lpdbData.extradata.headtohead = self.data.headtohead
+	lpdbData.extradata.leagueid = args.leagueid
 
 	return lpdbData
 end
