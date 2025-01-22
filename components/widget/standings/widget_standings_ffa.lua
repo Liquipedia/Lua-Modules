@@ -20,6 +20,11 @@ local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local STATUS_TO_DISPLAY = {
+	dq = 'DQ',
+	nc = '-',
+}
+
 ---@class StandingsFfaWidget: Widget
 ---@operator call(table): StandingsFfaWidget
 
@@ -115,15 +120,16 @@ function StandingsFfaWidget:render()
 								css = {['font-weight'] = 'bold', ['text-align'] = 'center'}
 							},
 							Array.map(standings.rounds, function(columnRound)
-								local text = ''
+								local text
 								if columnRound.round <= round.round then
-									local newPoints = (Array.find(columnRound.opponents, function(columnSlot)
+									local opponent = Array.find(columnRound.opponents, function(columnSlot)
 										return columnSlot.opponent.name == slot.opponent.name
-									end).pointsChangeFromPreviousRound)
-									if newPoints then
-										text = tostring(newPoints)
+									end)
+									local roundStatus = opponent.specialStatus
+									if roundStatus == '' then
+										text = opponent.pointsChangeFromPreviousRound
 									else
-										text = '-'
+										text = STATUS_TO_DISPLAY[roundStatus]
 									end
 								end
 								return HtmlWidgets.Td{children = text, css = {['text-align'] = 'center'}}
