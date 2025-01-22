@@ -34,7 +34,7 @@ local DISQUALIFIED = 'dq'
 ---@field hasovertime boolean
 ---@field haspoints boolean
 ---@field finished boolean
----@field enddate string? #formated as 'Y-m-d' DEPRECATED
+---@field enddate string?
 ---@field extradata table
 
 ---@class StandingEntriesStorage
