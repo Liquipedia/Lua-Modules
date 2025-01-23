@@ -94,6 +94,7 @@ end
 function CustomMatchSummary._extractPlayersFromGame(game, match)
 	return Array.map(game.opponents, function(opponent, opponentIndex)
 		return Array.map(opponent.players, function(player, playerIndex)
+			if not player.played then return end
 			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
 			return matchPlayer or {
 				displayName = player.displayname,
