@@ -7,9 +7,11 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
+local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
@@ -25,14 +27,20 @@ function StandingsTable.fromTemplate(frame)
 	if tableType ~= 'ffa' then
 		error('Unknown Standing Table Type')
 	end
+	local title = args.title
+
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
-	return StandingsTable.ffa(
-		parsedData.rounds,
-		parsedData.opponents,
-		parsedData.bgs,
-		args.title,
-		parsedData.matches
-	)
+	local rounds = parsedData.rounds
+	local opponents = parsedData.opponents
+	local bgs = parsedData.bgs
+	local matches = parsedData.matches
+
+	if Logic.readBoolOrNil(args.import) == false then
+		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
+	end
+
+	opponents = StandingsParseLpdb.importFromMatches(rounds)
+	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 end
 
 ---@param rounds any

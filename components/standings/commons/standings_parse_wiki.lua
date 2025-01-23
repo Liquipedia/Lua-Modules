@@ -30,7 +30,10 @@ local StandingsParseWiki = {}
 ]]
 
 ---@param args table
----@return table
+---@return {rounds: {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[],
+---opponents: {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[],
+---bgs: table<integer, string>,
+---matches: string[]}
 function StandingsParseWiki.parseWikiInput(args)
 	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
 	local rounds = {}
@@ -54,7 +57,7 @@ end
 
 ---@param roundInput string
 ---@param roundIndex integer
----@return {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
+---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parse(roundInput)
 	return {
@@ -62,6 +65,7 @@ function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 		started = Logic.readBool(roundData.started),
 		finished = Logic.readBool(roundData.finished),
 		title = roundData.title,
+		matches = Array.parseCommaSeparatedString(roundData.matches),
 	}
 end
 
