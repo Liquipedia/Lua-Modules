@@ -65,7 +65,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		maptype = map.maptype,
 	}
 end

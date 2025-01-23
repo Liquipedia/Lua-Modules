@@ -11,7 +11,6 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Operator = require('Module:Operator')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -77,9 +76,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local extradata = MapFunctions.getSideData(map)
-
-	return Table.merge(extradata, {comment = map.comment})
+	return MapFunctions.getSideData(map)
 end
 
 ---@param map table

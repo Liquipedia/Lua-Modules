@@ -103,16 +103,6 @@ end
 ---@param match table
 ---@param map table
 ---@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
-end
-
----@param match table
----@param map table
----@param opponents table[]
 ---@return string?
 function MapFunctions.getMapMode(match, map, opponents)
 	return Opponent.toMode(opponents[1].type, opponents[2].type)

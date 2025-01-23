@@ -79,7 +79,6 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
 		bestof = map.bestof,
-		comment = map.comment,
 	}
 
 	local bans = {}

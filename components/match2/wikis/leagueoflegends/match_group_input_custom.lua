@@ -137,9 +137,7 @@ end
 ---@param opponentCount integer
 ---@return table
 function MapFunctions.getExtraData(MapParser, map, opponentCount)
-	local extraData = {
-		comment = map.comment,
-	}
+	local extraData = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
 	local function prefixKeyWithTeam(key, opponentIndex)

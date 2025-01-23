@@ -156,7 +156,7 @@ function MatchFunctions.extractMaps(match, opponents)
 	local hasScores = not Logic.readBool(match.noscore)
 	local maps = {}
 	for mapKey, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local map = MapFunctions.readMap(mapInput, #opponents, hasScores)
+		local map = MapFunctions.readMap(match, mapInput, #opponents, hasScores)
 
 		Array.forEach(map.opponents, function(opponent, opponentIndex)
 			opponent.players = BaseMapFunctions.getPlayersOfMapOpponent(map, opponents[opponentIndex], opponentIndex)
@@ -171,11 +171,12 @@ function MatchFunctions.extractMaps(match, opponents)
 	return maps
 end
 
+---@param match table
 ---@param mapInput table
 ---@param opponentCount integer
 ---@param hasScores boolean
 ---@return table
-function MapFunctions.readMap(mapInput, opponentCount, hasScores)
+function MapFunctions.readMap(match, mapInput, opponentCount, hasScores)
 	local mapName = mapInput.map
 	if mapName and mapName:upper() ~= TBD then
 		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
@@ -194,10 +195,7 @@ function MapFunctions.readMap(mapInput, opponentCount, hasScores)
 		}
 	}
 
-	if mapInput.date then
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(mapInput.date))
-		map.extradata.dateexact = map.dateexact
-	end
+	Table.mergeInto(map, MatchGroupInputUtil.readDate(mapInput.date or match.date))
 
 	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
 		map.finished = true
