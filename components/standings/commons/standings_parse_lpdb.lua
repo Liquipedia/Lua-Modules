@@ -39,8 +39,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	end)
 
 	local conditionsMatches = Condition.Tree(Condition.BooleanOperator.any)
-	Array.forEach(matchIds, function(match)
-		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, match))
+	Array.forEach(matchIds, function(matchid)
+		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, matchid))
 	end)
 
 	local opponents = {}
