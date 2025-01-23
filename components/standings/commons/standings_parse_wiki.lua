@@ -106,4 +106,16 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---@param args table
+---@return (fun(opponent: match2opponent): number)|nil
+function StandingsParseWiki.makeScoringFunction(args)
+	if not args['p1'] then
+		return nil
+	end
+	return function(opponent)
+		local scoreFromPlacement = tonumber(args['p' .. opponent.placement])
+		return scoreFromPlacement or 0
+	end
+end
+
 return StandingsParseWiki

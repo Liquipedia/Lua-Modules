@@ -45,7 +45,7 @@ function StandingsTable.fromTemplate(frame)
 		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 	end
 
-	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds)
+	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, StandingsParseWiki.makeScoringFunction(args))
 	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents)
 	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 end
