@@ -65,13 +65,33 @@ end
 ---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
 	local roundData = Json.parse(roundInput)
+	local matches = Array.parseCommaSeparatedString(roundData.matches)
+	local matchGroups = Array.parseCommaSeparatedString(roundData.matchgroups)
+	if Logic.isNotEmpty(matchGroups) then
+		matches = Array.extend(matches, Array.flatMap(matchGroups, function(matchGroupId)
+			return StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
+		end))
+	end
 	return {
 		roundNumber = roundIndex,
 		started = Logic.readBool(roundData.started),
 		finished = Logic.readBool(roundData.finished),
 		title = roundData.title,
-		matches = Array.parseCommaSeparatedString(roundData.matches),
+		matches = matches,
 	}
+end
+
+---@param matchGroupId string
+---@return string[]
+function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
+	local matchGroup = mw.ext.LiquipediaDB.lpdb('match2', {
+		conditions = '[[match2bracketid::'.. matchGroupId ..']]',
+		query = 'match2id',
+		limit = '1000',
+	})
+	return Array.map(matchGroup, function(match)
+		return match.match2id
+	end)
 end
 
 ---@param opponentInput string
