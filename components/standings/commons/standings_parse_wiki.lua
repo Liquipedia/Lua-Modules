@@ -24,7 +24,7 @@ local StandingsParseWiki = {}
 |round1={{Round|title=A vs B|started=true|finished=false}}
 <more rounds>
 <!-- Opponents -->
-|opponent1={{TeamOpponent|dreamfire|placement=<optional>|r1=17|r2=-|r3=-|r4=34|r5=32|r6=-}}
+|opponent1={{TeamOpponent|dreamfire|r1=17|r2=-|r3=-|r4=34|r5=32|r6=-}}
 <more opponents>
 }}
 ]]
@@ -35,7 +35,7 @@ local StandingsParseWiki = {}
 ---bgs: table<integer, string>,
 ---matches: string[]}
 function StandingsParseWiki.parseWikiInput(args)
-	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
+	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 	local rounds = {}
 	for _, roundData, roundIndex in Table.iter.pairsByPrefix(args, 'round', {requireIndex = true}) do
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
@@ -47,11 +47,16 @@ function StandingsParseWiki.parseWikiInput(args)
 		table.insert(opponents, StandingsParseWiki.parseWikiOpponent(opponentData, #rounds))
 	end
 
+	local wrapperMatches = Array.parseCommaSeparatedString(args.matches)
+	Array.extendWith(wrapperMatches, Array.flatMap(rounds, function(round)
+		return round.matches
+	end))
+
 	return {
 		rounds = rounds,
 		opponents = opponents,
 		bgs = StandingsParseWiki.parseWikiBgs(args.bg),
-		matches = Array.parseCommaSeparatedString(args.matches),
+		matches = Array.unique(wrapperMatches),
 	}
 end
 
