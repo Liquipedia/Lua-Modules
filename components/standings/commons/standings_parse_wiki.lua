@@ -63,7 +63,7 @@ end
 ---@param roundIndex integer
 ---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
-	local roundData = Json.parse(roundInput)
+	local roundData = Json.parseIfString(roundInput)
 	local matches = Array.parseCommaSeparatedString(roundData.matches)
 	local matchGroups = Array.parseCommaSeparatedString(roundData.matchgroups)
 	if Logic.isNotEmpty(matchGroups) then
@@ -97,7 +97,7 @@ end
 ---@param numberOfRounds integer
 ---@return StandingTableOpponentData[]
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
-	local opponentData = Json.parse(opponentInput)
+	local opponentData = Json.parseIfString(opponentInput)
 	local rounds = {}
 	for i = 1, numberOfRounds do
 		local input = opponentData['r' .. i]
