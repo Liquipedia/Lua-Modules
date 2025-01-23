@@ -38,6 +38,8 @@ function StandingsTable.fromTemplate(frame)
 		error('Unknown Standing Table Type')
 	end
 	local title = args.title
+	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
+	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
 
 	local parsedData = StandingsParseWiki.parseWikiInput(args)
 	local rounds = parsedData.rounds
@@ -45,19 +47,20 @@ function StandingsTable.fromTemplate(frame)
 	local bgs = parsedData.bgs
 	local matches = parsedData.matches
 
-	if Logic.readBoolOrNil(args.import) == false then
+	if importScoreFromMatches then
 		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 	end
 
 	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, StandingsParseWiki.makeScoringFunction(args))
-	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents)
+	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
 	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
 ---@param importedOpponents StandingTableOpponentData[]
+---@param addNewOpponents boolean
 ---@return StandingTableOpponentData[]
-function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents)
+function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, addNewOpponents)
 	--- Add all manual opponents to the new opponents list
 	local newOpponents = Array.map(manualOpponents, FnUtil.identity)
 
@@ -69,7 +72,9 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents)
 		end)
 		--- If there isn't one, means this is a new opponent
 		if manualOpponentId == 0 then
-			table.insert(newOpponents, importedOpponent)
+			if addNewOpponents then
+				table.insert(newOpponents, importedOpponent)
+			end
 			return
 		end
 		--- Manual data has priority over imported data

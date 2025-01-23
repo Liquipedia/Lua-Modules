@@ -48,7 +48,7 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	end)
 
 	local opponents = {}
-    Lpdb.executeMassQuery(
+	Lpdb.executeMassQuery(
 		'match2',
 		{
 			conditions = conditionsMatches:toString(),
