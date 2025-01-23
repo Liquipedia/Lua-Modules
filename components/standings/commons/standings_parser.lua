@@ -98,13 +98,13 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 end
 
 ---@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, tiebreakerPoints: number}[]
+---placement: integer?, slotindex: integer?, extradata: table}[]
 function StandingsParser.determinePlacements(opponentsInRound)
 	table.sort(opponentsInRound, function(opponent1, opponent2)
 		if opponent1.points ~= opponent2.points then
 			return opponent1.points > opponent2.points
 		end
-		return opponent1.tiebreakerPoints > opponent2.tiebreakerPoints
+		return opponent1.extradata.tiebreakerpoints > opponent2.extradata.tiebreakerpoints
 	end)
 
 	local lastPts = math.huge
