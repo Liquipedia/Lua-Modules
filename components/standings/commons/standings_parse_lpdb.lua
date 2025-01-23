@@ -34,13 +34,17 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	local matchIdToRound = {}
 	Array.forEach(rounds, function(round)
 		Array.forEach(round.matches, function(match)
-			matchIdToRound[match] = round.roundNumber
+			if matchIdToRound[match] then
+				table.insert(matchIdToRound[match], round.roundNumber)
+			else
+				matchIdToRound[match] = {round.roundNumber}
+			end
 		end)
 	end)
 
 	local conditionsMatches = Condition.Tree(Condition.BooleanOperator.any)
-	Array.forEach(matchIds, function(matchid)
-		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, matchid))
+	Array.forEach(matchIds, function(matchId)
+		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, matchId))
 	end)
 
 	local opponents = {}
@@ -51,8 +55,10 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 			query = 'match2opponents',
 		},
 		function(match2)
-			local roundNumber = matchIdToRound[match2.match2id]
-			StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+			local roundNumbers = matchIdToRound[match2.match2id]
+			Array.forEach(roundNumbers, function(roundNumber)
+				StandingsParseLpdb.parseMatch(roundNumber, match2, opponents, scoreMapper, #rounds)
+			end)
 		end
 	)
 
