@@ -31,7 +31,7 @@ local StandingsParseWiki = {}
 
 ---@param args table
 ---@return {rounds: {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[],
----opponents: {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[],
+---opponents: StandingTableOpponentData[],
 ---bgs: table<integer, string>,
 ---matches: string[]}
 function StandingsParseWiki.parseWikiInput(args)
@@ -41,7 +41,7 @@ function StandingsParseWiki.parseWikiInput(args)
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
 	end
 
-	---@type {rounds: {scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
+	---@type StandingTableOpponentData[]
 	local opponents = {}
 	for _, opponentData, _ in Table.iter.pairsByPrefix(args, 'opponent', {requireIndex = true}) do
 		table.insert(opponents, StandingsParseWiki.parseWikiOpponent(opponentData, #rounds))
@@ -96,7 +96,7 @@ end
 
 ---@param opponentInput string
 ---@param numberOfRounds integer
----@return {rounds: {specialstatus: string, scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
+---@return StandingTableOpponentData[]
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 	local opponentData = Json.parse(opponentInput)
 	local rounds = {}
@@ -110,7 +110,8 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 		else
 			specialStatus = input
 		end
-		table.insert(rounds, {scoreboard = {points = points}, specialstatus = specialStatus})
+		local tiebreakerPoints = numberOfRounds == i and tonumber(opponentData.tiebreaker) or nil
+		table.insert(rounds, {scoreboard = {points = points}, specialstatus = specialStatus, tiebreakerPoints = tiebreakerPoints})
 	end
 	return {rounds = rounds, opponent = Opponent.readOpponentArgs(opponentData)}
 end

@@ -17,7 +17,7 @@ local StandingsParseLpdb = {}
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
 ---@param scoreMapper? fun(opponent: match2opponent): number?
----@return {rounds: {specialstatus: string, scoreboard: {points: number?}?}[]?, opponent: standardOpponent}[]
+---@return StandingTableOpponentData[]
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	if not scoreMapper then
 		scoreMapper = function(opponent)
@@ -79,7 +79,7 @@ end
 
 ---@param opponentData match2opponent
 ---@param maxRounds integer
----@return {rounds: {specialstatus: string, scoreboard: {points: number?}?}[]?, opponent: match2opponent}
+---@return StandingTableOpponentData
 function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 	return {
 		opponent = opponentData,
@@ -93,7 +93,7 @@ end
 
 ---@param roundNumber integer
 ---@param match match2
----@param opponents {rounds: {specialstatus: string, scoreboard: {points: number?}?}[]?, opponent: match2opponent}[]
+---@param opponents StandingTableOpponentData[]
 ---@param scoreMapper fun(opponent: match2opponent): number?
 ---@param maxRounds integer
 function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)

@@ -25,6 +25,10 @@ local Opponent = OpponentLibrary.Opponent
 
 local StandingsTable = {}
 
+---@class StandingTableOpponentData
+---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: {points: number?}?}[]?
+---@field opponent standardOpponent
+
 ---@param frame Frame
 ---@return Widget
 function StandingsTable.fromTemplate(frame)
@@ -50,6 +54,9 @@ function StandingsTable.fromTemplate(frame)
 	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 end
 
+---@param manualOpponents StandingTableOpponentData[]
+---@param importedOpponents StandingTableOpponentData[]
+---@return StandingTableOpponentData[]
 function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents)
 	--- Add all manual opponents to the new opponents list
 	local newOpponents = Array.map(manualOpponents, FnUtil.identity)
