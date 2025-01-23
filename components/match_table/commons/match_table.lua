@@ -151,7 +151,8 @@ function MatchTable:_readDefaultConfig()
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
-		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short'
+		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
+		linkSubPage = Logic.readBool(args.linkSubPage)
 	}
 end
 
@@ -546,6 +547,15 @@ function MatchTable:build()
 		end
 		display:node(self:matchRow(match))
 	end)
+
+	if self.config.linkSubPage then
+		local pagename = self.title.text .. '/Matches'
+		display:tag('tr')
+			:tag('th')
+				:attr('colspan', 42)
+				:css('font-style', 'italic')
+				:wikitext('[[' .. pagename .. '|Extended list of matches]]')
+	end
 
 	local wrappedTableNode = mw.html.create('div')
 		:addClass('match-table-wrapper')
