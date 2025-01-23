@@ -1407,7 +1407,7 @@ local data = {
 		name = 'Iberia',
 	},
 	['latinamerica'] = {
-		flag = 'File:Space filler flag.png',
+		flag = 'File:MxUnasur hd.png',
 		localised = 'Latin American',
 		name = 'Latin America',
 	},
