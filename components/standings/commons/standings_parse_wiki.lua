@@ -111,7 +111,11 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 			specialStatus = input
 		end
 		local tiebreakerPoints = numberOfRounds == i and tonumber(opponentData.tiebreaker) or nil
-		table.insert(rounds, {scoreboard = {points = points}, specialstatus = specialStatus, tiebreakerPoints = tiebreakerPoints})
+		table.insert(rounds, {
+			scoreboard = {points = points},
+			specialstatus = specialStatus,
+			tiebreakerPoints = tiebreakerPoints
+		})
 	end
 	return {rounds = rounds, opponent = Opponent.readOpponentArgs(opponentData)}
 end
