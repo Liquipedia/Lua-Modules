@@ -7,8 +7,11 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local StandingsParseWiki = Lua.import('Module:Standings/Parse/Wiki')
 local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
@@ -16,6 +19,9 @@ local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
 local Display = Lua.import('Module:Widget/Standings')
+
+local OpponentLibrary = require('Module:OpponentLibraries')
+local Opponent = OpponentLibrary.Opponent
 
 local StandingsTable = {}
 
@@ -39,8 +45,31 @@ function StandingsTable.fromTemplate(frame)
 		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 	end
 
-	opponents = StandingsParseLpdb.importFromMatches(rounds)
+	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds)
+	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents)
 	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
+end
+
+function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents)
+	--- Add all manual opponents to the new opponents list
+	local newOpponents = Array.map(manualOpponents, FnUtil.identity)
+
+	--- Find all imported opponents
+	Array.forEach(importedOpponents, function(importedOpponent)
+		--- Find the matching manual opponent
+		local manualOpponentId = Array.indexOf(newOpponents, function(manualOpponent)
+			return Opponent.toName(manualOpponent.opponent) == Opponent.toName(importedOpponent.opponent)
+		end)
+		--- If there isn't one, means this is a new opponent
+		if manualOpponentId == 0 then
+			table.insert(newOpponents, importedOpponent)
+			return
+		end
+		--- Manual data has priority over imported data
+		newOpponents[manualOpponentId] = Table.deepMerge(importedOpponent, newOpponents[manualOpponentId])
+	end)
+
+	return newOpponents
 end
 
 ---@param rounds any
