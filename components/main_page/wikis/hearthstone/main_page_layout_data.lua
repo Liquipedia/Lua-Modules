@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
+-- wiki=hearthstone
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -21,10 +21,10 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|limit=15|title=}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
+		body = '{{Transfer List|limit=15}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
+			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}/1st_Quarter|action=edit}} edit]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
@@ -34,7 +34,7 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in League of Legends <small id="this-day-date" style = "margin-left: 5px">' ..
+		heading = 'This day in Hearthstone <small id="this-day-date" style = "margin-left: 5px">' ..
 			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
 		body = '{{Liquipedia:This day}}',
 		padding = true,
@@ -42,7 +42,7 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Eventbox}}',
+		body = '{{Liquipedia:Special Event}}',
 	},
 	filterButtons = {
 		noPanel = true,
@@ -64,44 +64,19 @@ local CONTENT = {
 		padding = true,
 		boxid = 1508,
 	},
-	headlines = {
-		heading = 'Headlines',
-		body = '{{ExternalMediaList|subject=!|limit=4}}' ..
-			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px; font-size:15px; font-style:italic;">' ..
-			'[[Portal:News|See all Headlines]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div></div>',
-		padding = true,
-		boxid = 1511,
-	},
-	references = {
-		heading = 'References',
-		body = '{{reflist|2}}',
-		padding = true,
-		boxid = 1512,
-	},
 }
 
 return {
 	banner = {
-		lightmode = 'League of Legends full allmode.png',
-		darkmode = 'League of Legends full allmode.png',
+		lightmode = 'Hearthstone_full logo.png',
+		darkmode = 'Hearthstone_full logo.png',
 	},
-	metadesc = 'Comprehensive League of Legends (LOL) wiki with articles covering everything from champions, ' ..
-		'to strategies, to tournaments, to competitive players and teams.',
-	title = 'League of Legends',
+	metadesc = 'The Hearthstone esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, heroes, and cards.',
+	title = 'Hearthstone',
 	navigation = {
 		{
-			file = 'DRX Deft Worlds 2022 Champion.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'T1 Worlds 2024.jpg',
+			file = 'Team Ukraine 2017 Hearthstone Global Games .jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -110,16 +85,16 @@ return {
 			},
 		},
 		{
-			file = 'G2 Worlds 2024.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
+			file = 'Hunterace World Championship 2019.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
 			count = {
 				method = 'LPDB',
-				table = 'transfer',
+				table = 'player',
 			},
 		},
 		{
-			file = 'Worlds Trophy 2024.jpg',
+			file = 'Masters Tour 2020 Arlington Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -128,38 +103,27 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds23 Skins Splash Art.jpg',
-			title = 'Champions',
-			link = 'Champions',
+			file = 'Casie and Surrender Grandmasters 2019 Finals.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
 			count = {
 				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::hero]]',
+				table = 'transfer',
 			},
 		},
 		{
-			file = 'LoL Patch 14.24 Art.jpg',
-			title = 'Patches',
-			link = 'Patches',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::patch]]',
-			},
-		},
-		{
-			file = 'Worlds 2024 Finalists.jpg',
-			title = 'News',
-			link = 'Portal:News',
-			count = {
-				method = 'LPDB',
-				table = 'externalmedialink',
-			},
-		},
-		{
-			file = 'Gen.G Mata Worlds 2024.jpg',
+			file = 'Masters Tour 2020 Statistics.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Icon_Class_HS_Shaman.png',
+			title = 'Classes',
+			link = 'Classes',
+			count = {
+				method = 'CATEGORY',
+				category = 'Classes',
+			}
 		},
 	},
 	layouts = {
@@ -169,22 +133,14 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
-						content = CONTENT.aboutEsport,
-					},
-					{
-						mobileOrder = 2,
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
 						mobileOrder = 6,
-						content = CONTENT.thisDay,
-					},
-					{
-						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -193,7 +149,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -223,21 +179,13 @@ return {
 							},
 						},
 					},
-				},
-			},
-			{
-				children = {
 					{
 						mobileOrder = 5,
-						content = CONTENT.headlines,
+						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 4,
 						content = CONTENT.usefulArticles,
-					},
-					{
-						mobileOrder = 9,
-						content = CONTENT.references,
 					},
 				},
 			},

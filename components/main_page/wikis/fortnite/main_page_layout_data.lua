@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=halo
+-- wiki=fortnite
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -34,7 +34,7 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in Halo <small id="this-day-date" style = "margin-left: 5px">' ..
+		heading = 'This day in Fortnite <small id="this-day-date" style = "margin-left: 5px">' ..
 			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
 		body = '{{Liquipedia:This day}}',
 		padding = true,
@@ -49,18 +49,10 @@ local CONTENT = {
 		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
 			'{{#invoke:Lua|invoke|module=FilterButtons|fn=getFromConfig}}</div>',
 	},
-	matches = {
-		heading = 'Matches',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
-			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
-		padding = true,
-		boxid = 1507,
-	},
 	tournaments = {
 		heading = 'Tournaments',
 		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=30|completedDays=20}}',
+			'|upcomingDays=14|completedDays=7}}',
 		padding = true,
 		boxid = 1508,
 	},
@@ -68,15 +60,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Halo series text_logo.svg',
-		darkmode = 'Halo series text_logo.svg',
+		lightmode = 'Fortnite-logo-lightmode.svg',
+		darkmode = 'Fortnite-logo-darkmode.svg',
 	},
-	metadesc = 'The Halo esports wiki covering everything from players, teams and transfers, ' ..
+	metadesc = 'The Fortnite esports wiki covering everything from players, teams and transfers, ' ..
 		'to tournaments and results, maps, and weapons.',
-	title = 'Halo',
+	title = 'Fortnite',
 	navigation = {
 		{
-			file = 'Spacestation Gaming at the 2024 Halo World Championship.jpg',
+			file = 'XSET Fortnite at the 2024 Esports World Cup.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -85,7 +77,7 @@ return {
 			},
 		},
 		{
-			file = 'SSG StelluR at the 2024 Atlanta Major.jpg',
+			file = 'Dignitas Khanada at the 2024 Esports World Cup.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -94,7 +86,7 @@ return {
 			},
 		},
 		{
-			file = '2024 Halo World Championship Trophy.jpg',
+			file = 'Fortnite Trophy at the 2024 Esports World Cup.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -103,7 +95,7 @@ return {
 			},
 		},
 		{
-			file = 'Quadrant Sica at the 2024 Halo World Championship.jpg',
+			file = 'Andilex and Nikof at DreamHack Summer 2023.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -112,18 +104,17 @@ return {
 			},
 		},
 		{
-			file = 'Native Hoaxer at the 2024 Halo World Championship.jpg',
+			file = 'Karmine Corp Oslo at the 2024 Esports World Cup.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
 		{
-			file = 'Halo_Infinite_Map_Streets.png',
-			title = 'Maps',
-			link = 'Portal:Maps',
+			file = 'Fortnite Heavy Sniper Rifle.png',
+			title = 'Weapons',
+			link = 'Portal:Weapons',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
+				method = 'CATEGORY',
+				category = 'Weapons',
 			},
 		},
 	},
@@ -161,16 +152,7 @@ return {
 								},
 							},
 							{
-								size = 6,
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.matches,
-									},
-								},
-							},
-							{
-								size = 6,
+								size = 12,
 								children = {
 									{
 										noPanel = true,
