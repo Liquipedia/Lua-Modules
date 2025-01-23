@@ -156,6 +156,11 @@ return {
 				table = 'externalmedialink',
 			},
 		},
+		{
+			file = 'Gen.G Mata Worlds 2024.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
 	},
 	layouts = {
 		main = {
