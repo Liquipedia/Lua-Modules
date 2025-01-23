@@ -24,7 +24,7 @@ local StandingsParseWiki = {}
 |round1={{Round|title=A vs B|started=true|finished=false}}
 <more rounds>
 <!-- Opponents -->
-|opponent1={{TeamOpponent|dreamfire|r1=17|r2=-|r3=-|r4=34|r5=32|r6=-}}
+|{{TeamOpponent|dreamfire|r1=17|r2=-|r3=-|r4=34|r5=32|r6=-}}
 <more opponents>
 }}
 ]]
@@ -42,10 +42,9 @@ function StandingsParseWiki.parseWikiInput(args)
 	end
 
 	---@type StandingTableOpponentData[]
-	local opponents = {}
-	for _, opponentData, _ in Table.iter.pairsByPrefix(args, 'opponent', {requireIndex = true}) do
-		table.insert(opponents, StandingsParseWiki.parseWikiOpponent(opponentData, #rounds))
-	end
+	local opponents = Array.map(args, function (opponentData)
+		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds)
+	end)
 
 	local wrapperMatches = Array.parseCommaSeparatedString(args.matches)
 	Array.extendWith(wrapperMatches, Array.flatMap(rounds, function(round)
