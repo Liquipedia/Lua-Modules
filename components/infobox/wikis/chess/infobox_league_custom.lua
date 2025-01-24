@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -48,6 +49,37 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
+end
+
+---@param args table
+---@return string[]
+function CustomLeague:getWikiCategories(args)
+	local categories = {}
+
+	if Logic.readBool(args.female) then
+		table.insert(categories, 'Female Tournaments')
+	elseif Logic.readBool(args.junior) then
+		table.insert(categories, 'Junior Tournaments')
+	elseif Logic.readBool(args.senior) then
+		table.insert(categories, 'Senior Tournaments')
+	elseif Logic.readBool(args.amateur) then
+		table.insert(categories, 'Amateur Tournaments')
+	end
+
+	return categories
+end
+
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomLeague:addToLpdb(lpdbData, args)
+	
+	lpdbData.extradata.female = args.female or 'false'
+	lpdbData.extradata.junior = args.junior or 'false'
+	lpdbData.extradata.senior = args.senior or 'false'
+	lpdbData.extradata.amateur = args.amateur or 'false'
+
+	return lpdbData
 end
 
 ---@param args table
