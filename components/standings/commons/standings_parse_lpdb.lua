@@ -31,6 +31,11 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		return round.matches
 	end)
 
+	-- No Matches in the round, cannot import
+	if #matchIds == 0 then
+		return {}
+	end
+
 	local matchIdToRound = {}
 	Array.forEach(rounds, function(round)
 		Array.forEach(round.matches, function(match)

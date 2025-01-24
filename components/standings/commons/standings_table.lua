@@ -47,7 +47,7 @@ function StandingsTable.fromTemplate(frame)
 	local bgs = parsedData.bgs
 	local matches = parsedData.matches
 
-	if importScoreFromMatches then
+	if not importScoreFromMatches then
 		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
 	end
 
