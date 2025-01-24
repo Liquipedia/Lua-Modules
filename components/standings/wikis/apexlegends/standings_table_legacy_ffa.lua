@@ -27,14 +27,15 @@ function StandingTableLegacyFfa.run(frame)
 	end)
 
 	---@type StandingTableOpponentData[]
-	local opponents = {}
-	for _, _, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = true}) do
-		table.insert(opponents, StandingTableLegacyFfa.parseTeamInput(args, teamIndex))
-	end
+	local opponents = Array.mapIndexes(function(teamIndex)
+		return StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
+	end)
 
 	return StandingTable.fromTemplate(Table.merge({
 		tabletype = 'ffa',
 		import = false,
+		started = true,
+		finished = true,
 		title = args.title,
 		matches = args.matches,
 		bg = StandingTableLegacyFfa.parseWikiBgs(args),
@@ -55,14 +56,20 @@ end
 
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, r1: string?}
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
-	local roundData = Array.parseCommaSeparatedString(args['standings' .. teamIndex])
+	local team = args['team' .. teamIndex] or args['p' .. teamIndex .. 'team']
+	if not team then
+		return nil
+	end
+	local pointsInput = args['standings' .. teamIndex] or args['p' .. teamIndex .. 'changes']
+	local roundData = Array.parseCommaSeparatedString(pointsInput)
 	local rounds = Table.map(roundData, function (roundIndex, value)
 		return 'r' .. roundIndex, value
 	end)
+
 	return Table.merge(
-		{type = Opponent.team, args['team' .. teamIndex], tiebreaker = args['tiebreaker' .. teamIndex]},
+		{type = Opponent.team, team, tiebreaker = args['tiebreaker' .. teamIndex]},
 		rounds
 	)
 end
