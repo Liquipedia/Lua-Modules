@@ -46,8 +46,12 @@ end
 ---@param roundIndex integer
 ---@return {title: string, started: boolean, finished: boolean}
 function StandingTableLegacyFfa.parseRoundInput(args, roundIndex)
+	local title = args['r' .. roundIndex]
+	if not title then
+		title = (args.rname or 'Round') .. ' ' .. roundIndex
+	end
 	return {
-		title = args['r' .. roundIndex],
+		title = title,
 		-- Legacy, so let's assume finished
 		started = true,
 		finished = true,
@@ -62,7 +66,7 @@ function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	if not team then
 		return nil
 	end
-	local pointsInput = args['standings' .. teamIndex] or args['p' .. teamIndex .. 'changes']
+	local pointsInput = args['standings' .. teamIndex] or args['p' .. teamIndex .. 'results']
 	local roundData = Array.parseCommaSeparatedString(pointsInput)
 	local rounds = Table.map(roundData, function (roundIndex, value)
 		return 'r' .. roundIndex, value
