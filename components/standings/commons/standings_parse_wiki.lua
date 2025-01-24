@@ -41,6 +41,10 @@ function StandingsParseWiki.parseWikiInput(args)
 		table.insert(rounds, StandingsParseWiki.parseWikiRound(roundData, roundIndex))
 	end
 
+	if Logic.isEmpty(rounds) then
+		rounds = {StandingsParseWiki.parseWikiRound(args, 1)}
+	end
+
 	---@type StandingTableOpponentData[]
 	local opponents = Array.map(args, function (opponentData)
 		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds)
@@ -59,7 +63,7 @@ function StandingsParseWiki.parseWikiInput(args)
 	}
 end
 
----@param roundInput string
+---@param roundInput string|table
 ---@param roundIndex integer
 ---@return {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 function StandingsParseWiki.parseWikiRound(roundInput, roundIndex)
@@ -93,7 +97,7 @@ function StandingsParseWiki.getMatchIdsOfMatchGroup(matchGroupId)
 	end)
 end
 
----@param opponentInput string
+---@param opponentInput string|table
 ---@param numberOfRounds integer
 ---@return StandingTableOpponentData[]
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
