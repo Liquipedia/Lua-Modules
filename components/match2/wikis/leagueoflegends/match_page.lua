@@ -166,7 +166,7 @@ function MatchPage.getByMatchId(props)
 		end)
 	}
 	if String.isNotEmpty(viewModel.vod) then
-		table.insert(viewModel.vods, 1, VodLink.display{
+		table.insert(viewModel.vods.icons, 1, VodLink.display{
 			vod = viewModel.vod,
 		})
 	end
