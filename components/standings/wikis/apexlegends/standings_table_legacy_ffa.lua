@@ -22,8 +22,8 @@ local StandingTableLegacyFfa = {}
 ---@return table
 function StandingTableLegacyFfa.run(frame)
 	local args = Arguments.getArgs(frame)
-	local rounds = Array.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
-		return StandingTableLegacyFfa.parseRoundInput(args, roundIndex)
+	local rounds = Table.map(Array.range(1, tonumber(args.rounds) or 1), function(roundIndex)
+		return 'round' .. roundIndex, StandingTableLegacyFfa.parseRoundInput(args, roundIndex)
 	end)
 
 	---@type StandingTableOpponentData[]
