@@ -73,7 +73,7 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-	
+
 	lpdbData.extradata.female = args.female or 'false'
 	lpdbData.extradata.junior = args.junior or 'false'
 	lpdbData.extradata.senior = args.senior or 'false'
