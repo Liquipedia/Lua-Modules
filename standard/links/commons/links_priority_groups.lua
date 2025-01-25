@@ -63,6 +63,7 @@ return {
 		'replay',
 	},
 	social = {
+		'bluesky',
 		'discord',
 		'facebook',
 		'instagram',
