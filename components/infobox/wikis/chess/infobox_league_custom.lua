@@ -6,9 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -30,6 +33,30 @@ local MODES = {
 	various = 'Multiple',
 }
 
+
+local RESTRICTIONS = {
+	female = {
+		name = 'Female Players Only',
+		link = 'Female Tournaments',
+		data = 'female',
+	},
+	amateur = {
+		name = 'Amateur Players Only',
+		link = 'Amateur Tournaments',
+		data = 'amateur',
+	},
+	junior = {
+		name = 'Junior Players Only',
+		link = 'Junior Tournaments',
+		data = 'junior',
+	},
+	senior = {
+		name = 'Senior Players Only',
+		link = 'Senior Tournaments',
+		data = 'Senior',
+	},
+}
+
 ---@param frame Frame
 ---@return Html
 function CustomLeague.run(frame)
@@ -43,9 +70,13 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
 
 	if id == 'gamesettings' then
-		return {Cell{name = 'Variant', content = {self.caller:_getGameMode()}},}
+		Array.appendWith(widgets,
+		Cell{name = 'Variant', content = {self.caller:_getGameMode()}},
+		Cell{name = 'Restrictions', content = self.caller:createRestrictionsCell(args.restrictions)}
+		)
 	end
 
 	return widgets
@@ -56,14 +87,9 @@ end
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
 
-	if Logic.readBool(args.female) then
-		table.insert(categories, 'Female Tournaments')
-	elseif Logic.readBool(args.junior) then
-		table.insert(categories, 'Junior Tournaments')
-	elseif Logic.readBool(args.senior) then
-		table.insert(categories, 'Senior Tournaments')
-	elseif Logic.readBool(args.amateur) then
-		table.insert(categories, 'Amateur Tournaments')
+	if String.isNotEmpty(args.restrictions) then
+		Array.extendWith(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
+				function(res) return res.link end))
 	end
 
 	return categories
@@ -74,10 +100,8 @@ end
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
 
-	lpdbData.extradata.female = args.female or 'false'
-	lpdbData.extradata.junior = args.junior or 'false'
-	lpdbData.extradata.senior = args.senior or 'false'
-	lpdbData.extradata.amateur = args.amateur or 'false'
+	Array.forEach(CustomLeague.getRestrictions(args.restrictions),
+		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
 	return lpdbData
 end
@@ -91,6 +115,25 @@ end
 ---@return string?
 function CustomLeague:_getGameMode()
 	return MODES[string.lower(self.args.mode or '')] or MODES['classical']
+end
+
+---@param restrictions string?
+---@return {name: string, data: string, link: string}[]
+function CustomLeague.getRestrictions(restrictions)
+	if String.isEmpty(restrictions) then
+		return {}
+	end
+	---@cast restrictions -nil
+
+	return Array.map(mw.text.split(restrictions, ','),
+		function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
+end
+
+---@param restrictions string?
+---@return string[]
+function CustomLeague:createRestrictionsCell(restrictions)
+	local restrictionData = CustomLeague.getRestrictions(restrictions)
+	return Array.map(restrictionData, function(res) return self:createLink(res.link, res.name) end)
 end
 
 return CustomLeague
