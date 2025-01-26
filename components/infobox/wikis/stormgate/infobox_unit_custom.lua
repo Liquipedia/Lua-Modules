@@ -13,6 +13,7 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -35,6 +36,15 @@ local ICON_ARMOR = '[[File:Icon_Armor.png|link=Armor]]'
 local ICON_ENERGY = '[[File:EnergyIcon.gif|link=]]'
 local ICON_DEPRECATED = '[[File:Cancelled Tournament.png|link=]]'
 local HOTKEY_SEPERATOR = '&nbsp;&nbsp;/&nbsp;&nbsp;'
+local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
+local GAME_MODE_NAME =	{
+	coop = 'Co-op',
+	mayhem = 'Team Mayhem',
+}
+local GAME_MODE_ICON = {
+	coop = 'dungeon',
+	mayhem = 'fort',
+}
 
 ---@param frame Frame
 ---@return Html
@@ -114,8 +124,8 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Energy', content = {caller:_energyDisplay()}},
-			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Speed', content = {args.speed}},
+			Cell{name = 'Sight', content = {args.sight}},
 			Cell{name = 'Upgrades To', content = {caller:_displayCsvAsPageCsv(args.upgrades_to)}},
 			Cell{name = 'Introduced', content = {args.introducedDisplay}}
 		)
@@ -156,14 +166,47 @@ end
 ---@param args table
 ---@return string?
 function CustomUnit:subHeaderDisplay(args)
-	if Logic.isEmpty(args.subfaction) or
-		string.find(args.subfaction, '1v1') or
-		string.find(args.subfaction, self.pagename) then return end
+	local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+
+	if Table.includes(subfactionData, '1v1') then
+		return tostring(mw.html.create('span')
+			:css('font-size', '90%')
+			:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
+				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+		)
+	end
+
+	local parts = Array.map(self:_parseSubfactionData(subfactionData), function(subfactionElement)
+		if Logic.isEmpty(subfactionElement[2]) or not GAME_MODE_ICON[string.lower(subfactionElement[1])] then return end
+		if args.informationType == 'Hero' then
+			return Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(subfactionElement[1])], size = '100%'} .. ' '
+				.. GAME_MODE_NAME[string.lower(subfactionElement[1])]
+		end
+
+		return Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(subfactionElement[1])], size = '100%'} .. ' '
+			.. self:_displayCsvAsPageCsv(subfactionElement[2], ';')
+	end)
+
 	return tostring(mw.html.create('span')
 		:css('font-size', '90%')
-		:wikitext('Hero: ' .. self:_displayCsvAsPageCsv(args.subfaction))
+		:wikitext(table.concat(parts, '<br>'))
 	)
 end
+
+---@param data table
+---@return table?
+function CustomUnit:_parseSubfactionData(data)
+	local parsedElements = Array.map(data, function(dataElement)
+		return Array.parseCommaSeparatedString(dataElement, ':')
+	end)
+
+	return Array.sortBy(parsedElements, function(element)
+		return Array.indexOf(SORT_TABLE, function(sortElement)
+			return sortElement == string.lower(element[1])
+		end)
+	end)
+end
+
 
 ---@return string?
 function CustomUnit:_getHotkeys()
@@ -274,17 +317,19 @@ function CustomUnit._hotkeys(hotkey1, hotkey2)
 end
 
 ---@param inputString string?
+---@param sep string?
 ---@return string[]
-function CustomUnit:_csvToPageList(inputString)
-	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+function CustomUnit:_csvToPageList(inputString, sep)
+	return Array.map(Array.parseCommaSeparatedString(inputString, sep), function(value)
 		return Page.makeInternalLink(value)
 	end)
 end
 
 ---@param input string?
+---@param sep string?
 ---@return string
-function CustomUnit:_displayCsvAsPageCsv(input)
-	return table.concat(self:_csvToPageList(input), ', ')
+function CustomUnit:_displayCsvAsPageCsv(input, sep)
+	return table.concat(self:_csvToPageList(input, sep), ', ')
 end
 
 ---@param key string
@@ -314,7 +359,7 @@ function CustomUnit._deprecatedWarning(patch)
 	return MessageBox.main('ambox', {
 		image= ICON_DEPRECATED,
 		class='ambox-red',
-		text= 'This has been removed from 1v1 with Patch ' .. patch,
+		text= 'This has been removed with Patch ' .. patch,
 	})
 end
 

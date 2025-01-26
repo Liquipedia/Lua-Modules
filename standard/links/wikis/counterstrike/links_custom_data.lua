@@ -19,7 +19,7 @@ return {
 			player = 'https://www.faceit.com/en/players/',
 		},
 		['faceit-l'] = {
-			'https://www.faceit.com/en//league//a14b8616-45b9-4581-8637-4dfd0b5f6af8/',
+			'https://www.faceit.com/en/-/league/-/a14b8616-45b9-4581-8637-4dfd0b5f6af8/',
 		},
 		esl = {
 			'',

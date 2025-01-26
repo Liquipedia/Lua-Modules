@@ -38,6 +38,19 @@ return {
 				lightMode = 'Action Quake 2.png',
 			},
 		},
+		avp2 = {
+			abbreviation = 'avp2',
+			name = 'Aliens Versus Predator 2',
+			link = 'Aliens Versus Predator 2',
+			logo = {
+				darkMode = 'AVP2 allmode.png',
+				lightMode = 'AVP2 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'AVP2 allmode.png',
+				lightMode = 'AVP2 allmode.png',
+			},
+		},
 		chex = {
 			abbreviation = 'chex',
 			name = 'Chex Quest',
@@ -160,12 +173,12 @@ return {
 			name = 'Painkiller',
 			link = 'Painkiller',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Painkiller darkmode.png',
+				lightMode = 'Painkiller lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake default darkmode.png',
-				lightMode = 'Quake default lightmode.png',
+				darkMode = 'Painkiller darkmode.png',
+				lightMode = 'Painkiller lightmode.png',
 			},
 		},
 		q1 = {
@@ -355,12 +368,12 @@ return {
 			name = 'Unreal Tournament 4',
 			link = 'Unreal Tournament 4',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Unreal Tournament 4 darkmode.png',
+				lightMode = 'Unreal Tournament 4 lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake default darkmode.png',
-				lightMode = 'Quake default lightmode.png',
+				darkMode = 'Unreal Tournament 4 darkmode.png',
+				lightMode = 'Unreal Tournament 4 lightmode.png',
 			},
 		},
 		ut99 = {

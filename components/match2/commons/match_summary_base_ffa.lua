@@ -8,11 +8,15 @@
 
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
+local MatchUtil = Lua.import('Module:Match/Util')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -42,6 +46,7 @@ local STATUS_ICONS = {
 
 local MATCH_OVERVIEW_COLUMNS = {
 	{
+		id = 'status',
 		class = 'cell--status',
 		show = function(match)
 			return Table.any(match.extradata.placementinfo or {}, function(_, value)
@@ -66,6 +71,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'rank',
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
@@ -90,12 +96,13 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'opponent',
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
 		icon = 'team',
 		header = {
-			value = 'Team',
+			value = 'Participant',
 		},
 		sortVal = {
 			value = function (opponent, idx)
@@ -115,6 +122,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'totalPoints',
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
@@ -135,6 +143,7 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'matchPoints',
 		sortable = true,
 		sortType = 'match-points',
 		class = 'cell--match-points',
@@ -153,13 +162,14 @@ local MATCH_OVERVIEW_COLUMNS = {
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.matchPointReachedIn and "Game " .. opponent.matchPointReachedIn or nil
+				return opponent.matchPointReachedIn and 'Game ' .. opponent.matchPointReachedIn or nil
 			end,
 		},
 	},
 }
 local GAME_OVERVIEW_COLUMNS = {
 	{
+		id = 'placement',
 		show = function(match)
 			return (match.extradata.settings or {}).showGameDetails
 		end,
@@ -190,6 +200,7 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 	},
 	{
+		id = 'kills',
 		show = function(match)
 			if (match.extradata.settings or {}).showGameDetails == false then
 				return false
@@ -205,11 +216,12 @@ local GAME_OVERVIEW_COLUMNS = {
 		},
 		row = {
 			value = function (opponent)
-				return opponent.scoreBreakdown.kills
+				return (opponent.scoreBreakdown or {}).kills
 			end,
 		},
 	},
 	{
+		id = 'points',
 		show = function(match)
 			return not (match.extradata.settings or {}).showGameDetails
 		end,
@@ -227,6 +239,7 @@ local GAME_OVERVIEW_COLUMNS = {
 }
 local GAME_STANDINGS_COLUMNS = {
 	{
+		id = 'rank',
 		sortable = true,
 		sortType = 'rank',
 		class = 'cell--rank',
@@ -259,6 +272,7 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'opponent',
 		sortable = true,
 		sortType = 'team',
 		class = 'cell--team',
@@ -275,15 +289,18 @@ local GAME_STANDINGS_COLUMNS = {
 			value = function (opponent, idx)
 				return OpponentDisplay.BlockOpponent{
 					opponent = opponent,
+					game = opponent.game,
 					showLink = true,
 					overflow = 'ellipsis',
 					teamStyle = 'hybrid',
 					showPlayerTeam = true,
+					showFaction = true,
 				}
 			end,
 		},
 	},
 	{
+		id = 'totalPoints',
 		sortable = true,
 		sortType = 'total-points',
 		class = 'cell--total-points',
@@ -304,6 +321,10 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 	},
 	{
+		id = 'placements',
+		show = function(game)
+			return (game.extradata.settings or {}).showGameDetails
+		end,
 		sortable = true,
 		sortType = 'placements',
 		class = 'cell--placements',
@@ -313,16 +334,20 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.placePoints
+				return (opponent.scoreBreakdown or {}).placePoints
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.placePoints
+				return (opponent.scoreBreakdown or {}).placePoints
 			end,
 		},
 	},
 	{
+		id = 'kills',
+		show = function(game)
+			return (game.extradata.settings or {}).showGameDetails
+		end,
 		sortable = true,
 		sortType = 'kills',
 		class = 'cell--kills',
@@ -332,12 +357,12 @@ local GAME_STANDINGS_COLUMNS = {
 		},
 		sortVal = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.killPoints
+				return (opponent.scoreBreakdown or {}).killPoints
 			end,
 		},
 		row = {
 			value = function (opponent, idx)
-				return opponent.scoreBreakdown.killPoints
+				return (opponent.scoreBreakdown or {}).killPoints
 			end,
 		},
 	},
@@ -389,11 +414,25 @@ function MatchSummaryFfa.createScoringData(match)
 	return newScores
 end
 
+---@class FfaMatchSummaryParser
+---@field adjustMatchColumns? fun(defaultColumns: table[]): table[]
+---@field adjustGameOverviewColumns? fun(defaultColumns: table[]): table[]
+---@field gameHeader? fun(match: table, game: table, gameIndex: integer): Widget[]
+
 ---@param match table
+---@param Parser FfaMatchSummaryParser?
 ---@return MatchSummaryFfaTable
-function MatchSummaryFfa.standardMatch(match)
+function MatchSummaryFfa.standardMatch(match, Parser)
+	Parser = Parser or {}
+	local matchColumns = Parser.adjustMatchColumns
+		and Parser.adjustMatchColumns(MATCH_OVERVIEW_COLUMNS)
+		or MATCH_OVERVIEW_COLUMNS
+	local gameOverviewColumns = Parser.adjustGameOverviewColumns
+		and Parser.adjustGameOverviewColumns(GAME_OVERVIEW_COLUMNS)
+		or GAME_OVERVIEW_COLUMNS
+
 	local rows = Array.map(match.opponents, function (opponent, index)
-		local children = Array.map(MATCH_OVERVIEW_COLUMNS, function(column)
+		local children = Array.map(matchColumns, function(column)
 			if column.show and not column.show(match) then
 				return
 			end
@@ -414,7 +453,7 @@ function MatchSummaryFfa.standardMatch(match)
 			children = Array.map(opponent.games, function(gameOpponent)
 				local gameRow = HtmlWidgets.Div{
 					classes = {'panel-table__cell', 'cell--game'},
-					children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+					children = Array.map(gameOverviewColumns, function(column)
 						if column.show and not column.show(match) then
 							return
 						end
@@ -431,7 +470,7 @@ function MatchSummaryFfa.standardMatch(match)
 		return MatchSummaryWidgets.TableRow{children = children}
 	end)
 
-	local cells = Array.map(MATCH_OVERVIEW_COLUMNS, function(column)
+	local cells = Array.map(matchColumns, function(column)
 		if column.show and not column.show(match) then
 			return
 		end
@@ -445,6 +484,9 @@ function MatchSummaryFfa.standardMatch(match)
 			value = column.header.value,
 		}
 	end)
+
+	local dates = Array.map(match.games, Operator.property('date'))
+	local gamesHaveDifferentDates = Array.any(dates, function(date) return date ~= match.date end)
 
 	table.insert(cells, HtmlWidgets.Div{
 		classes = {'panel-table__cell', 'cell--game-container-nav-holder'},
@@ -474,12 +516,12 @@ function MatchSummaryFfa.standardMatch(match)
 											}
 										}
 									},
-									MatchSummaryWidgets.GameCountdown{game = game},
+									gamesHaveDifferentDates and MatchSummaryWidgets.GameCountdown{game = game} or nil,
 								}
 							},
 							HtmlWidgets.Div{
 								classes = {'panel-table__cell__game-details'},
-								children = Array.map(GAME_OVERVIEW_COLUMNS, function(column)
+								children = Array.map(gameOverviewColumns, function(column)
 									if column.show and not column.show(match) then
 										return
 									end
@@ -505,11 +547,19 @@ function MatchSummaryFfa.standardMatch(match)
 	}}
 end
 
+---@class FfaGameSummaryParser
+---@field adjustGameStandingsColumns? fun(defaultColumns: table[], game: table): table[]
+
 ---@param game table
+---@param Parser FfaGameSummaryParser?
 ---@return MatchSummaryFfaTable
-function MatchSummaryFfa.standardGame(game)
+function MatchSummaryFfa.standardGame(game, Parser)
+	Parser = Parser or {}
+	local gameStandingsColumns = Parser.adjustGameStandingsColumns
+		and Parser.adjustGameStandingsColumns(GAME_STANDINGS_COLUMNS, game)
+		or GAME_STANDINGS_COLUMNS
 	local rows = Array.map(game.opponents, function (opponent, index)
-		local children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+		local children = Array.map(gameStandingsColumns, function(column)
 			if column.show and not column.show(game) then
 				return
 			end
@@ -525,7 +575,7 @@ function MatchSummaryFfa.standardGame(game)
 	end)
 
 	return MatchSummaryWidgets.Table{children = {
-		MatchSummaryWidgets.TableHeader{children = Array.map(GAME_STANDINGS_COLUMNS, function(column)
+		MatchSummaryWidgets.TableHeader{children = Array.map(gameStandingsColumns, function(column)
 			if column.show and not column.show(game) then
 				return
 			end
@@ -576,18 +626,18 @@ function MatchSummaryFfa.updateMatchOpponents(match)
 	end)
 end
 
+---@param match table
 ---@param game table
----@param matchOpponents table[]
-function MatchSummaryFfa.updateGameOpponents(game, matchOpponents)
+function MatchSummaryFfa.updateGameOpponents(match, game)
 	-- Add match opponent data to game opponent
 	game.opponents = Array.map(game.opponents,
 		function(gameOpponent, opponentIdx)
-			local matchOpponent = matchOpponents[opponentIdx]
-			local newGameOpponent = Table.merge(matchOpponent, gameOpponent)
-			-- These values are only allowed to come from Game and not Match
-			newGameOpponent.placement = gameOpponent.placement
-			newGameOpponent.score = gameOpponent.score
-			newGameOpponent.status = gameOpponent.status
+			local matchOpponent = match.opponents[opponentIdx]
+			-- Standard merge
+			local newGameOpponent = MatchUtil.enrichGameOpponentFromMatchOpponent(matchOpponent, gameOpponent)
+
+			-- Other fields
+			newGameOpponent.game = Game.abbreviation{game = match.game}:lower()
 			return newGameOpponent
 		end
 	)

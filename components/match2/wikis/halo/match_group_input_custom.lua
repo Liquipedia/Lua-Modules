@@ -123,7 +123,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		points1 = map.points1,
 		points2 = map.points2,
 	}
@@ -161,17 +160,5 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 		settings = settings.settings,
 	}
 end
-
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function FfaMapFunctions.getExtraData(match, map, opponents)
-	return {
-		dateexact = map.dateexact,
-		comment = map.comment,
-	}
-end
-
 
 return CustomMatchGroupInput

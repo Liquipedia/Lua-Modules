@@ -15,9 +15,16 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
-	return matchGroupType == 'matchlist'
-		and Lua.import('Module:MatchGroup/Display/Matchlist').MatchlistContainer
-		or Lua.import('Module:MatchGroup/Display/Bracket/Custom').BracketContainer
+	if maxOpponentCount > 4 then
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
+		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
+		return MatchList.MatchlistContainer
+	end
+
+	local Bracket = Lua.import('Module:MatchGroup/Display/Bracket/Custom')
+	return Bracket.BracketContainer
 end
 
 return WikiSpecific

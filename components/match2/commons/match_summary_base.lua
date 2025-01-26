@@ -19,7 +19,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
@@ -176,10 +176,10 @@ function Footer:addLinks(links)
 		if not currentLinkData then
 			mw.log('Unknown link: ' .. linkType)
 		elseif type(link) == 'table' then
-			Array.forEach(link, function(gameLink, gameIdx)
+			for gameIdx, gameLink in Table.iter.spairs(link) do
 				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
 				self:addLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
-			end)
+			end
 		else
 			self:addLink(link, currentLinkData.icon, currentLinkData.iconDark, currentLinkData.text)
 		end

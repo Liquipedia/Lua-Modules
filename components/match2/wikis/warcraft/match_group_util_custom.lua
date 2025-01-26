@@ -8,19 +8,21 @@
 
 local Array = require('Module:Array')
 local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
--- can not use `Module:OpponentLibraries`/`Module:Opponent/Custom` to avoid loop
-local Opponent = Lua.import('Module:Opponent')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local TEAM_DISPLAY_MODE = 'team'
 local UNIFORM_DISPLAY_MODE = 'uniform'
-local SCORE_STATUS = 'S'
+local SCORE_STATUS = MatchGroupInputUtil.STATUS.SCORE
 
 local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 
@@ -47,17 +49,13 @@ local CustomMatchGroupUtil = Table.deepCopy(MatchGroupUtil)
 ---@field games WarcraftMatchGroupUtilGame[]
 ---@field mode string
 ---@field opponents WarcraftMatchGroupUtilGameOpponent[]
----@field resultType ResultType
----@field scores table<number, number>
+---@field status string?
 ---@field subgroup number
----@field walkover WalkoverType
 ---@field winner number?
 ---@field header string?
 
 ---@class WarcraftMatchGroupUtilMatch: MatchGroupUtilMatch
 ---@field games WarcraftMatchGroupUtilGame[]
----@field isFfa boolean
----@field noScore boolean?
 ---@field opponentMode 'uniform'|'team'
 ---@field opponents WarcraftStandardOpponent[]
 ---@field vetoes WarcraftMatchGroupUtilVeto[]
@@ -89,11 +87,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 			CustomMatchGroupUtil.groupBySubmatch(match.games),
 			function(games) return CustomMatchGroupUtil.constructSubmatch(games, match) end
 		)
-
-		-- Extract submatch headers from extradata
-		for _, submatch in pairs(match.submatches) do
-			submatch.header = Table.extract(extradata, 'subgroup' .. submatch.subgroup .. 'header')
-		end
 	end
 
 	-- Add vetoes
@@ -107,7 +100,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 	end
 
 	-- Misc
-	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
 	match.casters = Table.extract(extradata, 'casters')
 
 	return match
@@ -182,71 +174,47 @@ end
 ---@param match WarcraftMatchGroupUtilMatch
 ---@return WarcraftMatchGroupUtilSubmatch
 function CustomMatchGroupUtil.constructSubmatch(games, match)
-	local opponents = Table.deepCopy(games[1].opponents)
-
-	--check the faction of the players
-	for opponentIndex in pairs(opponents) do
-		CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opponents, opponentIndex)
+	local firstGame = games[1]
+	local opponents = Table.deepCopy(firstGame.opponents)
+	local isSubmatch = String.startsWith(firstGame.map or '', 'Submatch')
+	if isSubmatch then
+		games = {firstGame}
 	end
 
-	-- Sum up scores
-	local scores = {}
-	for opponentIndex, _ in pairs(opponents) do
-		scores[opponentIndex] = 0
-	end
-	for _, game in pairs(games) do
-		if game.map and String.startsWith(game.map, 'Submatch') and not game.resultType then
-			for opponentIndex, score in pairs(scores) do
-				scores[opponentIndex] = score + (tonumber(game.scores[opponentIndex]) or 0)
-			end
-		elseif game.winner then
-			scores[game.winner] = (scores[game.winner] or 0) + 1
-		end
+	---@param opponent table
+	---@param opponentIndex integer
+	local getOpponentScoreAndStatus = function(opponent, opponentIndex)
+		local statuses = Array.unique(Array.map(games, function(game)
+			return game.opponents[opponentIndex].status
+		end))
+		opponent.status = #statuses == 1 and statuses[1] ~= SCORE_STATUS and statuses[1] or SCORE_STATUS
+		opponent.score = isSubmatch and opponent.score or Array.reduce(Array.map(games, function(game)
+			return (game.winner == opponentIndex and 1 or 0)
+		end), Operator.add)
 	end
 
-	-- Compute winner if all games have been played, skipped, or defaulted
-	local allPlayed = Array.all(games, function(game)
-		return game.winner ~= nil or game.resultType ~= nil
+	Array.forEach(opponents, getOpponentScoreAndStatus)
+
+	local allPlayed = Array.all(games, function (game)
+		return game.winner ~= nil or game.status == 'notplayed'
+	end)
+	local winner = allPlayed and MatchGroupInputUtil.getWinner('', nil, opponents) or nil
+	Array.forEach(opponents, function(opponent, opponentIndex)
+		opponent.placement = MatchGroupInputUtil.placementFromWinner('', winner, opponentIndex)
 	end)
 
-	local resultType = nil
-	local winner = nil
-	if allPlayed then
-		local diff = (scores[1] or 0) - (scores[2] or 0)
-		if diff < 0 then
-			winner = 2
-		elseif diff == 0 then
-			resultType = 'draw'
-		else
-			winner = 1
-		end
-	end
-
-	-- Set resultType and walkover if every game is a walkover
-	local walkovers = {}
-	local resultTypes = {}
-	for _, game in pairs(games) do
-		resultTypes[game.resultType or ''] = true
-		walkovers[game.walkover or ''] = true
-	end
-	local walkover
-	local uniqueResult = Table.uniqueKey(resultTypes)
-	if uniqueResult == 'default' then
-		resultType = 'default'
-		walkover = String.nilIfEmpty(Table.uniqueKey(walkovers)) or 'L'
-	elseif uniqueResult == 'np' then
-		resultType = 'np'
-	end
+	--check the faction of the players
+	Array.forEach(opponents, function(_, opponentIndex)
+		CustomMatchGroupUtil._determineSubmatchPlayerFactions(match, games, opponents, opponentIndex)
+	end)
 
 	return {
 		games = games,
-		mode = games[1].mode,
+		mode = firstGame.mode,
 		opponents = opponents,
-		resultType = resultType,
-		scores = scores,
-		subgroup = games[1].subgroup,
-		walkover = walkover,
+		subgroup = firstGame.subgroup,
 		winner = winner,
+		header = Table.extract(match.extradata or {}, 'subgroup' .. firstGame.subgroup .. 'header'),
 	}
 end
 
@@ -300,20 +268,6 @@ function CustomMatchGroupUtil.computeOfffactions(gameOpponent, referenceOpponent
 		hasOfffaction = hasOfffaction or gamePlayer.faction ~= referencePlayer.faction
 	end
 	return hasOfffaction and gameFactions or nil
-end
-
----@param record table
----@return WarcraftStandardPlayer
-function CustomMatchGroupUtil.playerFromRecord(record)
-	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-	return {
-		displayName = record.displayname,
-		extradata = extradata,
-		flag = String.nilIfEmpty(Flags.CountryName(record.flag)),
-		pageIsResolved = true,
-		pageName = record.name,
-		faction = Table.extract(record.extradata, 'faction') or Faction.defaultFaction,
-	}
 end
 
 return CustomMatchGroupUtil

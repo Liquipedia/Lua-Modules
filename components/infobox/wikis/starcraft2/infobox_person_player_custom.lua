@@ -199,6 +199,10 @@ function CustomPlayer:_getMatchupData(player)
 			table.insert(self.recentMatches, match)
 		end
 
+		if Array.any(match.match2opponents, function(opponent) return opponent.status and opponent.status ~= 'S' end) then
+			return
+		end
+
 		self:_addToStats(match, player, playerWithoutUnderscore)
 	end
 
@@ -206,8 +210,7 @@ function CustomPlayer:_getMatchupData(player)
 		conditions = table.concat({
 			'[[finished::1]]', -- only finished matches
 			'[[winner::!]]', -- expect a winner
-			'[[walkover::]]', -- exclude default wins/losses
-			'[[resulttype::!np]]', -- i.e. ignore not played matches
+			'[[status::!notplayed]]', -- i.e. ignore not played matches
 			'[[date::!' .. DateExt.defaultDate .. ']]', --i.e. wrongly set up
 			'([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])'
 		}, ' AND '),

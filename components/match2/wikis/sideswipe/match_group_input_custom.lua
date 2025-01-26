@@ -72,7 +72,6 @@ function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		ot = map.ot,
 		otlength = map.otlength,
-		comment = map.comment,
 	}
 end
 

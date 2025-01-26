@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Widget = Lua.import('Module:Widget')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 

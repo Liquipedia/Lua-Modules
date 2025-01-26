@@ -19,13 +19,13 @@ local TemplateEngine = require('Module:TemplateEngine')
 local VodLink = require('Module:VodLink')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Display = Lua.import('Module:MatchPage/Template')
 
 local MatchPage = {}
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
@@ -75,12 +75,11 @@ function MatchPage.getByMatchId(props)
 	Array.forEach(viewModel.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
-			local team = {players = {}}
+			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-
-			for _, player in Table.iter.pairsByPrefix(game.participants, teamIdx .. '_') do
+			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
@@ -92,8 +91,8 @@ function MatchPage.getByMatchId(props)
 				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
 				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold)
 
-				table.insert(team.players, newPlayer)
-			end
+				return newPlayer
+			end)
 
 			if game.finished then
 				-- Aggregate stats
@@ -237,7 +236,7 @@ end
 ---@return string
 function MatchPage.games(model)
 	local games = Array.map(Array.filter(model.games, function(game)
-		return game.resultType ~= NOT_PLAYED
+		return game.status ~= NOT_PLAYED
 	end), function(game)
 		return TemplateEngine():render(Display.game, Table.merge(model, game))
 	end)

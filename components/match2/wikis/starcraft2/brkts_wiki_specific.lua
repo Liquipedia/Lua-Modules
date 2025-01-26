@@ -16,7 +16,7 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return StarcraftMatchGroupUtil.matchFromRecord
 end)
 
@@ -29,7 +29,10 @@ end)
 ---@param maxOpponentCount integer
 ---@return function
 function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
-	if matchGroupType == 'matchlist' then
+	if maxOpponentCount > 2 then
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)
 	end
@@ -53,13 +56,13 @@ end
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft')
+		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch')
 		return WikiSpecific.adjustMatchGroupContainerConfig(SingleMatch.SingleMatchContainer)
 	end
 end
 
 WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return StarcraftMatchGroupUtil.matchHasDetails
 end)
 

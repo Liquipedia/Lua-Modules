@@ -41,7 +41,7 @@ example:
 		conditions = conditions,
 		order = 'date ' .. args.order,
 		limit = _LPDB_QUERY_LIMIT,
-		query = 'pagename, winner, walkover, finished, date, dateexact, links, '
+		query = 'pagename, winner, finished, date, dateexact, links, '
 			.. 'bestof, vod, tournament, tickername, shortname, icon, icondark, '
 			.. 'extradata, match2opponents, match2games, mode, match2id, match2bracketid',
 	}
@@ -50,9 +50,10 @@ example:
 	return foundMatchIds
 ```
 ]==]
----@param tableName string
+---@generic T
+---@param tableName `T`
 ---@param queryParameters table
----@param itemChecker fun(item: table): boolean?
+---@param itemChecker fun(item: T): boolean?
 ---@param limit number?
 function Lpdb.executeMassQuery(tableName, queryParameters, itemChecker, limit)
 	queryParameters.offset = queryParameters.offset or 0
@@ -197,8 +198,6 @@ Lpdb.Match2 = Model('match2', {
 	{name = 'match2id', fieldType = 'string'},
 	{name = 'match2bracketid', fieldType = 'string'},
 	{name = 'winner', fieldType = 'string', default = ''},
-	{name = 'walkover', fieldType = 'string', default = ''},
-	{name = 'resulttype', fieldType = 'string', default = ''},
 	{name = 'finished', fieldType = 'number', default = 0},
 	{name = 'mode', fieldType = 'string', default = ''},
 	{name = 'type', fieldType = 'string', default = ''},
