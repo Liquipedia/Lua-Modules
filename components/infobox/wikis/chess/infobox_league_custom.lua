@@ -70,11 +70,13 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if id == 'gamesettings' then
-		Array.appendWith(widgets,
-		Cell{name = 'Variant', content = {self.caller:_getGameMode()}},
-		Cell{name = 'Restrictions', content = self.caller:createRestrictionsCell(args.restrictions)}
+	if id == 'custom' then
+		table.insert(
+			widgets,
+			Cell{name = 'Restrictions', content = self.caller:createRestrictionsCell(args.restrictions)}
 		)
+	elseif id == 'gamesettings' then
+		return {Cell{name = 'Variant', content = {self.caller:_getGameMode()}}}
 	end
 
 	return widgets
