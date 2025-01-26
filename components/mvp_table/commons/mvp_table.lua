@@ -182,13 +182,14 @@ end
 ---@param args mvpTableParsedArgs
 ---@return Html
 function MvpTable._row(item, args)
+	local team = (item.team or ''):lower():gsub('_', ' ')
 	local playerCell = mw.html.create('td')
 		:css('text-align', 'left')
 		:wikitext(Flags.Icon{flag = item.flag})
 		:wikitext('&nbsp;')
 		:wikitext('[[' .. item.name .. '|' .. item.displayName .. ']]')
 		:wikitext('&nbsp;')
-		:wikitext(Team.part(mw.getCurrentFrame(), item.team or ''))
+		:wikitext(Team.part(mw.getCurrentFrame(), team or ''))
 
 	local row = mw.html.create('tr')
 		:node(playerCell)
