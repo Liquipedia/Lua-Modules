@@ -9,13 +9,13 @@
 return {
 	startYear = 2007,
 	wikiName = 'crossfire',
-	name = 'Crossfire',
+	name = 'CrossFire',
 	defaultGame = 'cf',
 	games = {
 		cf = {
 			abbreviation = 'CF',
-			name = 'Crossfire',
-			link = 'Crossfire',
+			name = 'CrossFire',
+			link = 'CrossFire',
 			logo = {
 				darkMode = 'Crossfire default darkmode.png',
 				lightMode = 'Crossfire default lightmode.png',
@@ -27,8 +27,8 @@ return {
 		},
 		cfm = {
 			abbreviation = 'CFM',
-			name = 'Crossfire Mobile',
-			link = 'Crossfire Mobile',
+			name = 'CrossFire Mobile',
+			link = 'CrossFire Mobile',
 			logo = {
 				darkMode = 'Crossfire default darkmode.png',
 				lightMode = 'Crossfire default lightmode.png',
@@ -40,8 +40,8 @@ return {
 		},
 		cfhd = {
 			abbreviation = 'CFHD',
-			name = 'Crossfire HD',
-			link = 'Crossfire HD',
+			name = 'CrossFire HD',
+			link = 'CrossFire HD',
 			logo = {
 				darkMode = 'Crossfire default darkmode.png',
 				lightMode = 'Crossfire default lightmode.png',
