@@ -31,7 +31,6 @@ local MODES = {
 	dice = 'Dice Chess',
 	various = 'Multiple',
 }
-
 local RESTRICTIONS = {
 	female = {
 		name = 'Female Players Only',
@@ -111,12 +110,7 @@ end
 ---@param restrictions string?
 ---@return {name: string, data: string, link: string}[]
 function CustomLeague.getRestrictions(restrictions)
-	if String.isEmpty(restrictions) then
-		return {}
-	end
-	---@cast restrictions -nil
-
-	return Array.map(Array.parseCommaSeparatedString(inputString, sep),
+	return Array.map(Array.parseCommaSeparatedString(inputString),
 		function(restriction) return RESTRICTIONS[restriction] end)
 end
 
