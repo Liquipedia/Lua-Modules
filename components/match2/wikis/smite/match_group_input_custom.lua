@@ -86,7 +86,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -99,7 +99,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return Table.merge({
-		comment = map.comment,
 		team1side = string.lower(map.team1side or ''),
 		team2side = string.lower(map.team2side or ''),
 	}, MapFunctions.getPicksAndBans(map, #opponents))

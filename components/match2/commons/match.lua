@@ -13,7 +13,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local MatchGroupUtil = require('Module:MatchGroup/Util')
+local MatchGroupUtil = require('Module:MatchGroup/Util/Custom')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -374,6 +374,7 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
+	gameRecord.extradata = Match._addCommonGameExtradata(gameRecord)
 	if not gameRecord.participants then
 		gameRecord.participants = {}
 		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
@@ -385,6 +386,20 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 		end
 	end
 	Match.clampFields(gameRecord, Match.gameFields)
+end
+
+---@param game table
+---@return table
+function Match._addCommonGameExtradata(game)
+	local commonExtradata = {
+		comment = game.comment,
+		dateexact = game.dateexact,
+		timestamp = tonumber(game.timestamp),
+		timezoneid = game.timezoneId,
+		timezoneoffset = game.timezoneOffset,
+	}
+
+	return Table.merge(commonExtradata, game.extradata or {})
 end
 
 ---@param playerRecord table
@@ -485,12 +500,12 @@ Match.gameFields = Table.map({
 	'map',
 	'mode',
 	'parent',
-	'participants',
+	'participants', -- LPDB API v3: backwards compatibility
 	'patch',
 	'opponents',
 	'resulttype',  -- LPDB API v3: backwards compatibility
 	'rounds',
-	'scores',
+	'scores', -- LPDB API v3: backwards compatibility
 	'status',
 	'subgroup',
 	'tournament',

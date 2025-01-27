@@ -19,7 +19,7 @@ local Match = Lua.import('Module:Match')
 local MatchGroupBase = Lua.import('Module:MatchGroup/Base')
 local MatchGroupConfig = Lua.requireIfExists('Module:MatchGroup/Config', {loadData = true})
 local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local ShortenBracket = Lua.import('Module:MatchGroup/ShortenBracket')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 

@@ -11,10 +11,12 @@ local MatchLegacy = {}
 local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
@@ -31,7 +33,6 @@ function MatchLegacy.storeGames(match, match2)
 	local games = {}
 	for gameIndex, game2 in ipairs(match2.match2games or {}) do
 		local game = Table.deepCopy(game2)
-		local participants = Json.parseIfString(game2.participants) or {}
 		local opponents = Json.parseIfString(game2.opponents) or {}
 
 		-- Extradata
@@ -54,8 +55,8 @@ function MatchLegacy.storeGames(match, match2)
 				end
 			end)
 		elseif game.mode == '1v1' then
-			local player1 = participants['1_1'] or {}
-			local player2 = participants['2_1'] or {}
+			local player1 = (opponents[1].players or {})[1] or {}
+			local player2 = (opponents[2].players or {})[1] or {}
 			game.extradata.opponent1civ = player1.civ
 			game.extradata.opponent2civ = player2.civ
 			game.extradata.winnerciv =
@@ -75,7 +76,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 
-		local scores = Json.parseIfString(game2.scores) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
@@ -95,11 +96,12 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	match.walkover = match.walkover and string.upper(match.walkover) or nil
-	if match.walkover == 'FF' or match.walkover == 'DQ' then
-		match.resulttype = match.walkover:lower()
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+	match.walkover = walkover and string.upper(walkover) or nil
+	if walkover == 'FF' or walkover == 'DQ' then
+		match.resulttype = walkover:lower()
 		match.walkover = match.winner
-	elseif match.walkover == 'L' then
+	elseif walkover == 'L' then
 		match.walkover = nil
 	end
 

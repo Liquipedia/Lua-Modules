@@ -8,12 +8,15 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
@@ -39,10 +42,8 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(scores)
-		end
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
@@ -62,6 +63,8 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+	match.walkover = walkover and walkover:lower() or nil
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
 	elseif match.walkover == 'l' then

@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
@@ -15,11 +14,6 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 
 ---@class SmashBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(BaseWikiSpecific)
-
-WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	return StarcraftMatchGroupUtil.matchFromRecord
-end)
 
 ---@param matchGroupType string
 ---@param maxOpponentCount integer

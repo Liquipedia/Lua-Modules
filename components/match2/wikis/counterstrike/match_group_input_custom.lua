@@ -11,7 +11,6 @@ local EarningsOf = require('Module:Earnings of')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Streams = require('Module:Links/Stream')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
@@ -22,75 +21,42 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local FEATURED_TIERS = {1, 2}
 local MIN_EARNINGS_FOR_FEATURED = 200000
 
-local OPPONENT_CONFIG = {
-	maxNumPlayers = 5,
-	resolveRedirect = true,
-	applyUnderScores = true
-}
-
 -- containers for process helper functions
-local MatchFunctions = {}
-local MapFunctions = {}
-
 local CustomMatchGroupInput = {}
+local MatchFunctions = {
+	DEFAULT_MODE = 'team',
+	getBestOf = MatchGroupInputUtil.getBestOf,
+	OPPONENT_CONFIG = {
+		maxNumPlayers = 5,
+		resolveRedirect = true,
+		applyUnderScores = true,
+	},
+}
+local MapFunctions = {}
+local FfaMatchFunctions = {
+	DEFAULT_MODE = 'team',
+	OPPONENT_CONFIG = {
+		maxNumPlayers = 5,
+		resolveRedirect = true,
+		applyUnderScores = true,
+	},
+}
+local FfaMapFunctions = {}
 
--- called from Module:MatchGroup
 ---@param match table
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status') --[[@as string?]]
-	local winnerInput = match.winner --[[@as string?]]
+	local finishedInput = Logic.nilIfEmpty(match.finished) or Variables.varDefault('tournament_status')
+	match.finished = finishedInput
 
-	Table.mergeInto(match, MatchGroupInputUtil.readDate(match.date))
+	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
+	processedMatch.extradata.status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil
 
-	local opponents = Array.mapIndexes(function(opponentIndex)
-		return MatchGroupInputUtil.readOpponent(match, opponentIndex, OPPONENT_CONFIG)
-	end)
-	local games = MatchFunctions.extractMaps(match, opponents)
-	match.bestof = MatchGroupInputUtil.getBestOf(nil, games)
-	games = MatchFunctions.removeUnsetMaps(games)
-	match.links = MatchFunctions.getLinks(match, games)
-
-	local autoScoreFunction = MatchGroupInputUtil.canUseAutoScore(match, games)
-		and MatchFunctions.calculateMatchScore(games)
-		or nil
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		opponent.score, opponent.status = MatchGroupInputUtil.computeOpponentScore({
-			walkover = match.walkover,
-			winner = match.winner,
-			opponentIndex = opponentIndex,
-			score = opponent.score,
-		}, autoScoreFunction)
-	end)
-
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, opponents)
-
-	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-		match.winner = MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
-		Array.forEach(opponents, function(opponent, opponentIndex)
-			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
-		end)
-	end
-
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_valve_tier'))
-	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
-
-	match.stream = Streams.processStreams(match)
-
-	match.games = games
-	match.opponents = opponents
-
-	match.extradata = MatchFunctions.getExtraData(match, opponents, finishedInput)
-
-	return match
+	return processedMatch
 end
 
---
--- match related functions
---
+-- "Normal" match
 
 ---@param match table
 ---@param opponents table[]
@@ -204,35 +170,24 @@ function MatchFunctions.isFeatured(match, opponents)
 end
 
 ---@param match table
+---@param games table[]
 ---@param opponents table[]
----@param finishedInput string?
 ---@return table
-function MatchFunctions.getExtraData(match, opponents, finishedInput)
+function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
-		status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil,
 		overturned = Logic.isNotEmpty(match.overturned),
 		featured = MatchFunctions.isFeatured(match, opponents),
 		hidden = Logic.readBool(Variables.varDefault('match_hidden'))
 	}
 end
 
---
--- map related functions
---
-
 ---@param match table
 ---@param map table
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local extradata = {
-		comment = map.comment,
-	}
-
-	Table.mergeInto(extradata, MapFunctions._getHalfScores(map))
-
-	return extradata
+	return MapFunctions._getHalfScores(map)
 end
 
 ---@param map table
@@ -288,6 +243,39 @@ function MapFunctions.calculateMapScore(map)
 	return function(opponentIndex)
 		return Array.reduce(halfs['t' .. opponentIndex .. 'halfs'], Operator.add)
 	end
+end
+
+--- FFA Match
+
+---@param match table
+---@param opponents table[]
+---@param scoreSettings table
+---@return table[]
+function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
+end
+
+---@param opponents table[]
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function FfaMatchFunctions.calculateMatchScore(opponents, maps)
+	return function(opponentIndex)
+		return Array.reduce(Array.map(maps, function(map)
+			return map.opponents[opponentIndex].score or 0
+		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
+	end
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@param settings table
+---@return table
+function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
+	return {
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
+	}
 end
 
 return CustomMatchGroupInput

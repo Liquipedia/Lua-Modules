@@ -84,7 +84,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -98,16 +98,6 @@ end
 ---@return string?
 function MapFunctions.getMapName(map, mapIndex, match)
 	return nil
-end
-
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
 end
 
 ---@param match table

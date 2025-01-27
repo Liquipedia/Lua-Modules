@@ -15,7 +15,11 @@ local Lua = require('Module:Lua')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
-local MatchFunctions = {}
+local MatchFunctions = {
+	OPPONENT_CONFIG = {
+		disregardTransferDates = true,
+	}
+}
 local MapFunctions = {}
 
 MatchFunctions.DEFAULT_MODE = 'team'
@@ -85,7 +89,6 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	---@type table<string, any>
 	local extraData = {
-		comment = map.comment,
 		t1firstside = map.t1firstside,
 		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},

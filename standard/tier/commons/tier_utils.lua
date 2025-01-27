@@ -36,7 +36,7 @@ function Tier.toIdentifier(input)
 end
 
 --- Retrieves the raw data for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return table?, table?
 function Tier.raw(tier, tierType)
@@ -45,7 +45,7 @@ function Tier.raw(tier, tierType)
 end
 
 --- Checks if a valid (tier, tierType) tuple is provided
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return boolean
 function Tier.isValid(tier, tierType)
@@ -61,7 +61,7 @@ function Tier.isValid(tier, tierType)
 end
 
 --- Converts input to (storage) values for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return integer?, string|integer|nil
 function Tier.toValue(tier, tierType)
@@ -71,7 +71,7 @@ function Tier.toValue(tier, tierType)
 end
 
 --- Converts input to displayNames for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toName(tier, tierType)
@@ -81,7 +81,7 @@ function Tier.toName(tier, tierType)
 end
 
 --- Converts input to short names for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toShortName(tier, tierType)
@@ -91,7 +91,7 @@ function Tier.toShortName(tier, tierType)
 end
 
 --- Converts input to categories for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return string?, string?
 function Tier.toCategory(tier, tierType)
@@ -101,7 +101,7 @@ function Tier.toCategory(tier, tierType)
 end
 
 --- Converts input to a sort value for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@return string
 function Tier.toSortValue(tier, tierType)
@@ -122,7 +122,7 @@ function Tier.parseFromQueryData(queryData)
 end
 
 --- Builds the display for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@param options table?
 ---@return string?

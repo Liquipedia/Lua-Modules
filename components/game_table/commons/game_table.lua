@@ -11,11 +11,12 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local VodLink = require('Module:VodLink')
 
 local MatchTable = Lua.import('Module:MatchTable')
 
-local NOT_PLAYED = 'np'
+local NOT_PLAYED = 'notplayed'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 
 ---@class GameTableMatch: MatchTableMatch
@@ -31,7 +32,7 @@ end)
 ---@return match2game?
 function GameTable:gameFromRecord(game)
 	if self.countGames == self.config.limit then return nil end
-	if game.resulttype == NOT_PLAYED or Logic.isEmpty(game.winner) then
+	if game.status == NOT_PLAYED or Logic.isEmpty(game.winner) then
 		return nil
 	end
 
@@ -76,9 +77,10 @@ end
 ---@param game match2game
 ---@return Html?
 function GameTable:_displayGameScore(result, game)
+	local scores = Array.map(game.opponents, Operator.property('score'))
 	local toScore = function(opponentRecord)
 		local isWinner = opponentRecord.id == tonumber(game.winner)
-		local score = (game.scores or {})[opponentRecord.id] or (isWinner and 1) or 0
+		local score = scores[opponentRecord.id] or (isWinner and 1) or 0
 		return mw.html.create(isWinner and 'b' or nil)
 			:wikitext(score)
 	end

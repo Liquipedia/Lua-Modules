@@ -98,9 +98,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local extraData = {
-		comment = map.comment,
-	}
+	local extraData = {}
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
@@ -123,7 +121,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0

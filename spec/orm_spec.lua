@@ -55,7 +55,6 @@ describe('LPDB Object-Relational Mapping', function()
 				parent = '',
 				patch = '',
 				publishertier = '',
-				resulttype = '',
 				section = '',
 				series = '',
 				shortname = '',
@@ -64,7 +63,6 @@ describe('LPDB Object-Relational Mapping', function()
 				tournament = '',
 				type = '',
 				vod = '',
-				walkover = '',
 				winner = '',
 			})
 			stub:revert()

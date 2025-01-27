@@ -226,6 +226,31 @@ body:not( .skin-bruinen ) div.background-color-fourth-place > *.prizepooltable-p
 	color: #ffffff;
 }
 
+body:not( .skin-bruinen ) div.prizepooltable > div.csstable-widget-row.bg-win {
+	/* need the `!important` due to bg-win (sadly) having an important in one of its definitions ... */
+	background-color: inherit !important;
+}
+
+body:not( .skin-bruinen ) div.csstable-widget-row.bg-win > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --clr-forestgreen-background-color, transparent );
+}
+
+body:not( .skin-bruinen ) div.bg-win > *.prizepooltable-place {
+	background-color: var( --clr-forestgreen-background-color, inherit );
+}
+
+body:not( .skin-bruinen ) div.csstable-widget-row.bg-lose {
+	background-color: inherit;
+}
+
+body:not( .skin-bruinen ) div.csstable-widget-row.bg-lose > .csstable-widget-cell {
+	border-bottom: 0.125rem solid var( --clr-cinnabar-background-color, transparent );
+}
+
+body:not( .skin-bruinen ) div.bg-lose > *.prizepooltable-place {
+	background-color: var( --clr-cinnabar-background-color, inherit );
+}
+
 tr.background-color-disqualified,
 div.background-color-disqualified {
 	background-color: #dee3ef;

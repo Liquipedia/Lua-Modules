@@ -15,7 +15,7 @@ local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 

@@ -46,14 +46,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	end
 end
 
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		comment = match.comment,
-	}
-end
-
 ---@param map table
 ---@param mapIndex table
 ---@param match table
@@ -69,7 +61,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = map.comment,
 		team1side = map.team1side,
 		team2side = map.team2side,
 	}
@@ -109,7 +100,7 @@ function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not map.finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0

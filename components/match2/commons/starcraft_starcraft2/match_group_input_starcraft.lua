@@ -110,7 +110,7 @@ function MatchFunctions.getOpponentExtradata(opponent)
 		advantage = tonumber(opponent.advantage),
 		penalty = tonumber(opponent.penalty),
 		score2 = opponent.score2,
-		isarchon = opponent.isarchon,
+		isarchon = tostring(Logic.readBool(opponent.isarchon)),
 	}
 end
 
@@ -239,10 +239,9 @@ end
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
-	local finished = map.finished
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
@@ -294,6 +293,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
 				flag = Flags.CountryName(playerIdData.flag),
 				position = playerIndex,
+				isarchon = isArchon,
 			}
 		end
 	)
@@ -374,7 +374,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = map.comment,
 		header = map.header,
 		server = map.server,
 	}

@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local Faction = require('Module:Faction')
 local FnUtil = require('Module:FnUtil')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -193,10 +194,6 @@ MatchGroupUtil.types.GameOpponent = TypeUtil.struct({
 
 ---@alias MatchStatus 'notplayed'|''|nil
 MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed', ''))
----@alias ResultType 'default'|'draw'|'np'
-MatchGroupUtil.types.ResultType = TypeUtil.literalUnion('default', 'draw', 'np')
----@alias WalkoverType 'l'|'ff'|'dq'
-MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 
 ---@class MatchGroupUtilGame
 ---@field comment string?
@@ -207,15 +204,13 @@ MatchGroupUtil.types.Walkover = TypeUtil.literalUnion('l', 'ff', 'dq')
 ---@field map string?
 ---@field mapDisplayName string?
 ---@field mode string?
----@field opponents {players: table[]}[]
----@field participants table
----@field resultType ResultType?
+---@field opponents {players: table[], score: number?, status: string?}[]
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
 ---@field vod string?
----@field walkover WalkoverType?
 ---@field winner integer?
+---@field status string?
 ---@field extradata table?
 MatchGroupUtil.types.Game = TypeUtil.struct({
 	comment = 'string?',
@@ -226,13 +221,10 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
-	participants = 'table',
-	resultType = TypeUtil.optional(MatchGroupUtil.types.ResultType),
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
 	vod = 'string?',
-	walkover = TypeUtil.optional(MatchGroupUtil.types.Walkover),
 	winner = 'number?',
 	extradata = 'table?',
 })
@@ -249,14 +241,12 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field matchId string?
 ---@field mode string?
 ---@field opponents standardOpponent[]
----@field resultType ResultType?
 ---@field status MatchStatus
 ---@field stream table
 ---@field tickername string?
 ---@field tournament string?
 ---@field type string?
 ---@field vod string?
----@field walkover WalkoverType?
 ---@field winner string?
 ---@field extradata table?
 ---@field timestamp number
@@ -273,17 +263,22 @@ MatchGroupUtil.types.Match = TypeUtil.struct({
 	matchId = 'string?',
 	mode = 'string',
 	opponents = TypeUtil.array(MatchGroupUtil.types.Opponent),
-	resultType = 'string?',
 	status = MatchGroupUtil.types.Status,
 	stream = 'table',
 	tickername = 'string?',
 	tournament = 'string?',
 	type = 'string?',
 	vod = 'string?',
-	walkover = 'string?',
 	winner = 'number?',
 	extradata = 'table?',
 })
+
+
+---@class FFAMatchGroupUtilMatch: MatchGroupUtilMatch
+---@field games FFAMatchGroupUtilGame[]
+
+---@class FFAMatchGroupUtilGame: MatchGroupUtilGame
+---@field stream table
 
 ---@class standardTeamProps
 ---@field bracketName string
@@ -610,30 +605,22 @@ function MatchGroupUtil.bracketDataToRecord(bracketData)
 	}
 end
 
----@param matchRecord table
----@param record table
+---@param matchRecord match2
+---@param record match2opponent
 ---@param opponentIndex integer
 ---@return standardOpponent
 function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
-
-	local score = tonumber(record.score)
+	local score = record.score
 	local status = record.status
 	local bestof = tonumber(matchRecord.bestof)
 	local game1 = (matchRecord.match2games or {})[1]
-	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 then
-		local winner = tonumber(game1.winner)
-		if game1.resulttype == 'default' then
-			score = -1
-			if winner == 0 then
-				status = 'D'
-			else
-				status = winner == opponentIndex and 'W' or string.upper(game1.walkover)
-			end
-		elseif game1.scores[opponentIndex] then
-			score = game1.scores[opponentIndex]
-			status = 'S'
-		end
+	local hasOnlyScores = Array.all(matchRecord.match2opponents, function(opponent)
+			return opponent.status == 'S' end)
+	if bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1 and hasOnlyScores then
+		local mapOpponent = (game1.opponents or {})[opponentIndex] or {}
+		score = mapOpponent.score
+		status = mapOpponent.status
 	end
 
 	return {
@@ -644,7 +631,7 @@ function MatchGroupUtil.opponentFromRecord(matchRecord, record, opponentIndex)
 		name = nilIfEmpty(record.name),
 		placement = tonumber(record.placement),
 		players = Array.map(record.match2players, MatchGroupUtil.playerFromRecord),
-		score = score,
+		score = tonumber(score),
 		status = status,
 		template = nilIfEmpty(record.template),
 		type = nilIfEmpty(record.type) or 'literal',
@@ -671,12 +658,15 @@ end
 ---@return standardPlayer
 function MatchGroupUtil.playerFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
+	local faction = Faction.read(extradata.faction)
 	return {
 		displayName = record.displayname,
 		extradata = extradata,
 		flag = nilIfEmpty(record.flag),
 		pageName = record.name,
 		team = Table.extract(extradata, 'playerteam'),
+		faction = faction or Faction.defaultFaction,
+		pageIsResolved = Logic.isNotEmpty(faction),
 	}
 end
 
@@ -689,6 +679,7 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 	return {
 		comment = nilIfEmpty(Table.extract(extradata, 'comment')),
 		date = record.date,
+		dateIsExact = nilIfEmpty(Table.extract(extradata, 'dateexact')),
 		extradata = extradata,
 		game = record.game,
 		header = nilIfEmpty(Table.extract(extradata, 'header')),
@@ -697,8 +688,8 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
-		participants = Json.parseIfString(record.participants) or {},
 		resultType = nilIfEmpty(record.resulttype),
+		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},
 		subgroup = tonumber(record.subgroup),
 		type = nilIfEmpty(record.type),

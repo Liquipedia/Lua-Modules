@@ -18,7 +18,7 @@ local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HorizontallistDisplay = {propTypes = {}, types = {}}
 
@@ -90,6 +90,8 @@ function HorizontallistDisplay.Bracket(props)
 
 	local bracketNode = mw.html.create('div')
 			:addClass('navigation-tabs')
+			-- Do not show the tabs if there is only one match
+			:addClass(#sortedBracket == 1 and 'is--hidden' or nil)
 			:attr('data-js-battle-royale', 'navigation')
 			:attr('role', 'tabpanel')
 			:node(list)

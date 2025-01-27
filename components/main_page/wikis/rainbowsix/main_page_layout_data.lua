@@ -51,84 +51,147 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{MainPageMatches}}<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
+		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
+			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
 			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=TournamentsList|fn=run|defaultTiers=1,2,3|upcomingDays=30|' ..
-			'concludedDays=20|ignoreTiers=-1|filterByTierTypes=true|useExternalFilters=true}}',
+		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
+			'|upcomingDays=30|completedDays=20}}',
 		padding = true,
 		boxid = 1508,
 	},
 }
 
 return {
-	main = {
-		{ -- Left
-			size = 6,
-			children = {
-				{
-					mobileOrder = 1,
-					content = CONTENT.aboutEsport,
-				},
-				{
-					mobileOrder = 2,
-					content = CONTENT.specialEvents,
-				},
-				{
-					mobileOrder = 4,
-					content = CONTENT.transfers,
-				},
-				{
-					mobileOrder = 6,
-					content = CONTENT.thisDay,
-				},
-				{
-					mobileOrder = 7,
-					content = CONTENT.wantToHelp,
-				},
-			}
+	banner = {
+		lightmode = 'Rainbow Six Siege logo lightmode.svg',
+		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+	},
+	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps, weapons, and operators.',
+	title = 'Rainbow Six',
+	navigation = {
+		{
+			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
 		},
-		{ -- Right
-			size = 6,
-			children = {
-				{
-					mobileOrder = 3,
-					children = {
-						{
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.filterButtons,
+		{
+			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
+			},
+		},
+		{
+			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'Deimos Trophy of the Manchester major 2024.jpg',
+			title = 'Operators',
+			link = 'Portal:Operators',
+			count = {
+				method = 'CATEGORY',
+				category = 'Operators',
+			},
+		},
+		{
+			file = 'R6s map lair.png',
+			title = 'Maps',
+			link = 'Portal:Maps',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::map]]',
+			},
+		},
+	},
+	layouts = {
+		main = {
+			{ -- Left
+				size = 6,
+				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 3,
+						content = CONTENT.transfers,
+					},
+					{
+						mobileOrder = 6,
+						content = CONTENT.wantToHelp,
+					},
+				}
+			},
+			{ -- Right
+				size = 6,
+				children = {
+					{
+						mobileOrder = 2,
+						children = {
+							{
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.filterButtons,
+									},
 								},
 							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.matches,
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.matches,
+									},
 								},
 							},
-						},
-						{
-							size = 6,
-							children = {
-								{
-									noPanel = true,
-									content = CONTENT.tournaments,
+							{
+								size = 6,
+								children = {
+									{
+										noPanel = true,
+										content = CONTENT.tournaments,
+									},
 								},
 							},
 						},
 					},
-				},
-				{
-					mobileOrder = 5,
-					content = CONTENT.usefulArticles,
+					{
+						mobileOrder = 5,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 4,
+						content = CONTENT.usefulArticles,
+					},
 				},
 			},
 		},

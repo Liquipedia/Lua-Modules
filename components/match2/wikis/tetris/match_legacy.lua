@@ -9,8 +9,11 @@
 local MatchLegacy = {}
 
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 function MatchLegacy.storeMatch(match2)
 	return MatchLegacy.convertParameters(match2)
@@ -57,8 +60,9 @@ function MatchLegacy.convertParameters(match2)
 			return nil
 		end
 
-		if match.resulttype == 'default' then
-			match.resulttype = string.upper(match.walkover or '')
+		local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+		if walkover then
+			match.resulttype = walkover
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''

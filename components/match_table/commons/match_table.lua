@@ -26,7 +26,7 @@ local VodLink = require('Module:VodLink')
 
 local PlayerExt = Lua.import('Module:Player/Ext')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -38,8 +38,7 @@ local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
 local UTC = 'UTC'
-local DRAW = 'draw'
-local RESULT_TYPE_DEFAULT = 'default'
+local DRAW_WINNER = 0
 local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
@@ -89,7 +88,6 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field opponent match2opponent
 ---@field vs match2opponent
 ---@field winner number
----@field resultType string?
 ---@field countGames boolean
 
 ---@class MatchTable
@@ -153,7 +151,8 @@ function MatchTable:_readDefaultConfig()
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
-		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short'
+		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
+		linkSubPage = Logic.readBool(args.linkSubPage)
 	}
 end
 
@@ -244,8 +243,12 @@ function MatchTable:getOpponentAliases(mode, opponent)
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
+		local pagifiedName = Page.pageifyLink(name)
+		local pagifiedNameWithSpaces = pagifiedName:gsub('_', ' ')
 		aliases[name] = true
 		aliases[nameWithSpaces] = true
+		aliases[pagifiedName] = true
+		aliases[pagifiedNameWithSpaces] = true
 	end)
 
 	return aliases
@@ -288,7 +291,8 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, walkover, resulttype, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata',
+		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -357,7 +361,7 @@ end
 function MatchTable:buildAdditionalConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('resulttype'), Comparator.neq, 'np')}
+		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
 	local hasAdditionalConditions = false
 
 	local getOrCondition = function(lpdbKey, input)
@@ -467,7 +471,6 @@ function MatchTable:resultFromRecord(record)
 		opponent = record.match2opponents[indexes[1]],
 		vs = record.match2opponents[indexes[2]],
 		winner = winner,
-		resultType = record.resultType,
 		countGames = countGames,
 	}
 
@@ -489,11 +492,15 @@ function MatchTable:statsFromMatches()
 		return math.max(tonumber(value) or 0, 0)
 	end
 
+	local hasWalkoverStatus = function(opponent)
+		return Logic.isNotEmpty(opponent.status) and opponent.status ~= 'S'
+	end
+
 	Array.forEach(self.matches, function(match)
-		if match.result.resultType == RESULT_TYPE_DEFAULT then
-			return
-		elseif match.result.resultType == DRAW then
+		if match.result.winner == DRAW_WINNER then
 			totalMatches.d = totalMatches.d + 1
+		elseif hasWalkoverStatus(match.result.opponent) or hasWalkoverStatus(match.result.vs) then
+			return
 		elseif match.result.winner == 1 then
 			totalMatches.w = totalMatches.w + 1
 		elseif match.result.winner == 2 then
@@ -541,6 +548,15 @@ function MatchTable:build()
 		end
 		display:node(self:matchRow(match))
 	end)
+
+	if self.config.linkSubPage then
+		local pagename = self.title.text .. '/Matches'
+		display:tag('tr')
+			:tag('th')
+				:attr('colspan', 42)
+				:css('font-style', 'italic')
+				:wikitext('[[' .. pagename .. '|Extended list of matches]]')
+	end
 
 	local wrappedTableNode = mw.html.create('div')
 		:addClass('match-table-wrapper')
@@ -640,9 +656,13 @@ end
 ---@return string
 function MatchTable._calculateDateTimeString(timezone, timestamp)
 	local offset = Timezone.getOffset(timezone) or 0
+	local tzstring = Timezone.getTimezoneString(timezone)
+	if not tzstring then
+		error('Unsupported timezone: ' .. timezone)
+	end
 
 	return DateExt.formatTimestamp('M d, Y - H:i', timestamp + offset) ..
-		' ' .. Timezone.getTimezoneString(timezone)
+		' ' .. tzstring
 end
 
 ---@param match MatchTableMatch

@@ -70,15 +70,6 @@ end
 -- map related functions
 --
 
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
-end
 ---@param props {walkover: string|integer?, winner: string|integer?, score: string|integer?, opponentIndex: integer}
 ---@param autoScore? fun(opponentIndex: integer): integer?
 ---@return integer? #SCORE

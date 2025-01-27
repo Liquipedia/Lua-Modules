@@ -59,6 +59,13 @@ return {
 		isMapStats = true
 	},
 	{
+		name = 'esplay',
+		icon = 'Esplay icon allmode.png',
+		prefixLink = 'https://esplay.com/m/',
+		label = 'Matchpage and Stats on Esplay',
+		isMapStats = true
+	},
+	{
 		name = 'sltv',
 		icon = 'StarLadder icon.png',
 		prefixLink = 'http://csgo.starladder.tv/match/',

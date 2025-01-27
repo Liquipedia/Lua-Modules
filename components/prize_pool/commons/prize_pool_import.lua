@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Placement = Lua.import('Module:PrizePool/Placement')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
