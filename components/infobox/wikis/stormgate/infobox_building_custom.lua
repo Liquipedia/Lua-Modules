@@ -125,11 +125,11 @@ function CustomInjector:parse(id, widgets)
 		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_getBuildsUnlocksDisplay(args.builds)},
+			Cell{name = 'Builds', content = caller:_getBuildsOrUnlocksDisplay(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_getBuildsUnlocksDisplay(args.unlocks)},
+			Cell{name = 'Unlocks', content = caller:_getBuildsOrUnlocksDisplay(args.unlocks)},
 			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply_gained)},
 			Cell{name = 'Power Gained', content = Array.parseCommaSeparatedString(args.power_gained)},
 		}
@@ -205,15 +205,16 @@ end
 
 ---@param inputString string?
 ---@return string[]
-function CustomBuilding:_getBuildsUnlocksDisplay(inputString)
+function CustomBuilding:_getBuildsOrUnlocksDisplay(inputString)
 	if not Table.includes(Array.parseCommaSeparatedString(self.args.subfaction) or {}, '1v1') then
 		return self:_csvToPageList(inputString)
 	end
 
 	return Array.map(Array.parseCommaSeparatedString(inputString), function(csvValue)
 		local entity = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '([[type::Unit]] OR [[type::Hero]] or [[type::building]]) AND [[pagename::'
-				.. string.gsub(csvValue, ' ', '_') .. ']]',
+			conditions = '([[type::Unit]] OR [[type::Hero]] OR [[type::building]] OR '
+				.. '[[type::Ability]] OR [[type::Trait]] OR [[type::Spell]] OR [[type::Upgrade]])'
+				.. ' AND [[pagename::' .. string.gsub(csvValue, ' ', '_') .. ']]',
 			limit = 1,
 		})[1] or {}
 
