@@ -110,7 +110,7 @@ end
 ---@param restrictions string?
 ---@return {name: string, data: string, link: string}[]
 function CustomLeague.getRestrictions(restrictions)
-	return Array.map(Array.parseCommaSeparatedString(inputString),
+	return Array.map(Array.parseCommaSeparatedString(restrictions),
 		function(restriction) return RESTRICTIONS[restriction] end)
 end
 
