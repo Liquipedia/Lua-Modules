@@ -125,11 +125,11 @@ function CustomInjector:parse(id, widgets)
 		return {Cell{name = hotkeyName, content = {hotkeys}}}
 	elseif id == 'builds' then
 		return {
-			Cell{name = 'Builds', content = caller:_csvToPageList(args.builds)},
+			Cell{name = 'Builds', content = caller:_getBuildsUnlocksDisplay(args.builds)},
 		}
 	elseif id == 'unlocks' then
 		return {
-			Cell{name = 'Unlocks', content = caller:_csvToPageList(args.unlocks)},
+			Cell{name = 'Unlocks', content = caller:_getBuildsUnlocksDisplay(args.unlocks)},
 			Cell{name = 'Supply Gained', content = Array.parseCommaSeparatedString(args.supply_gained)},
 			Cell{name = 'Power Gained', content = Array.parseCommaSeparatedString(args.power_gained)},
 		}
@@ -177,31 +177,6 @@ function CustomBuilding:subHeaderDisplay(args)
 	)
 end
 
----@param data table
----@return table?
-function CustomBuilding:_parseSubfactionData(data)
-	local parsedElements = Array.map(data, function(dataElement)
-		return Array.parseCommaSeparatedString(dataElement, ':')
-	end)
-
-	return Array.sortBy(parsedElements, function(element)
-		return Array.indexOf(SORT_TABLE, function(sortElement)
-			return sortElement == string.lower(element[1])
-		end)
-	end)
-end
-
----@param hotkey1 string?
----@param hotkey2 string?
----@return string?
-function CustomBuilding._hotkeys(hotkey1, hotkey2)
-	if String.isEmpty(hotkey1) then return end
-	if String.isEmpty(hotkey2) then
-		return Hotkeys.hotkey(hotkey1)
-	end
-	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
-end
-
 ---@return string?
 function CustomBuilding:_energyDisplay()
 	local energy = tonumber(self.args.energy) or 0
@@ -215,6 +190,57 @@ function CustomBuilding:_energyDisplay()
 		'/' .. (maxEnergy == 0 and '?' or maxEnergy),
 		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make('+ varies', self.args.energy_desc),
 	})
+end
+
+---@param hotkey1 string?
+---@param hotkey2 string?
+---@return string?
+function CustomBuilding._hotkeys(hotkey1, hotkey2)
+	if String.isEmpty(hotkey1) then return end
+	if String.isEmpty(hotkey2) then
+		return Hotkeys.hotkey(hotkey1)
+	end
+	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+end
+
+---@param inputString string?
+---@return string[]
+function CustomBuilding:_getBuildsUnlocksDisplay(inputString)
+	if not Table.includes(Array.parseCommaSeparatedString(self.args.subfaction) or {}, '1v1') then
+		return self:_csvToPageList(inputString)
+	end
+
+	return Array.map(Array.parseCommaSeparatedString(inputString), function(csvValue)
+		local entity = mw.ext.LiquipediaDB.lpdb('datapoint', {
+			conditions = '([[type::Unit]] OR [[type::Hero]] or [[type::building]]) AND [[pagename::'
+				.. string.gsub(csvValue, ' ', '_') .. ']]',
+			limit = 1,
+		})[1] or {}
+
+		if type(entity) ~= 'table' or Logic.isEmpty(entity) then return end
+
+		local extraData = entity.extradata or {}
+
+		if Table.includes(extraData.subfaction or {}, '1v1') then
+			return Page.makeInternalLink({}, entity.name, entity.pagename)
+		end
+	end)
+end
+
+---@return string?
+function CustomBuilding:_getDefenseDisplay()
+	local args = self.args
+	local health = tonumber(args.health)
+	local extraHealth = health and tonumber(args.extra_health)
+	local armor = tonumber(args.armor)
+
+	return table.concat(Array.append({},
+		ICON_HP,
+		health or 0,
+		extraHealth and ('(+' .. extraHealth .. ')') or nil,
+		ICON_ARMOR,
+		armor or 0
+	), '&nbsp;')
 end
 
 ---@param args table
@@ -279,34 +305,32 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
----@return string?
-function CustomBuilding:_getDefenseDisplay()
-	local args = self.args
-	local health = tonumber(args.health)
-	local extraHealth = health and tonumber(args.extra_health)
-	local armor = tonumber(args.armor)
+---@param data table
+---@return table?
+function CustomBuilding:_parseSubfactionData(data)
+	local parsedElements = Array.map(data, function(dataElement)
+		return Array.parseCommaSeparatedString(dataElement, ':')
+	end)
 
-	return table.concat(Array.append({},
-		ICON_HP,
-		health or 0,
-		extraHealth and ('(+' .. extraHealth .. ')') or nil,
-		ICON_ARMOR,
-		armor or 0
-	), '&nbsp;')
+	return Array.sortBy(parsedElements, function(element)
+		return Array.indexOf(SORT_TABLE, function(sortElement)
+			return sortElement == string.lower(element[1])
+		end)
+	end)
 end
 
 ---@param inputString string?
 ---@return string[]
-function CustomBuilding:_csvToPageList(inputString)
-	return Array.map(Array.parseCommaSeparatedString(inputString), function(value)
+function CustomBuilding:_csvToPageList(inputString, sep)
+	return Array.map(Array.parseCommaSeparatedString(inputString, sep), function(value)
 		return Page.makeInternalLink(value)
 	end)
 end
 
 ---@param input string?
 ---@return string
-function CustomBuilding:_displayCsvAsPageCsv(input)
-	return table.concat(self:_csvToPageList(input), ', ')
+function CustomBuilding:_displayCsvAsPageCsv(input, sep)
+	return table.concat(self:_csvToPageList(input, sep), ', ')
 end
 
 ---@param key string
