@@ -31,7 +31,6 @@ local MODES = {
 	various = 'Multiple',
 }
 
-
 local RESTRICTIONS = {
 	female = {
 		name = 'Female Players Only',
@@ -68,38 +67,29 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
-
+	local caller = self.caller
+	local args = caller.args
 	if id == 'custom' then
 		table.insert(
 			widgets,
-			Cell{name = 'Restrictions', content = self.caller:createRestrictionsCell(args.restrictions)}
+			Cell{name = 'Restrictions', content = caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'gamesettings' then
-		return {Cell{name = 'Variant', content = {self.caller:_getGameMode()}}}
+		return {Cell{name = 'Variant', content = {caller.data.mode}}}
 	end
-
 	return widgets
 end
 
 ---@param args table
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
-	local categories = {}
-
-	if String.isNotEmpty(args.restrictions) then
-		Array.extendWith(categories, Array.map(CustomLeague.getRestrictions(args.restrictions),
-				function(res) return res.link end))
-	end
-
-	return categories
+	return Array.map(CustomLeague.getRestrictions(args.restrictions), Operator.property('link'))
 end
 
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomLeague:addToLpdb(lpdbData, args)
-
 	Array.forEach(CustomLeague.getRestrictions(args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
@@ -125,8 +115,8 @@ function CustomLeague.getRestrictions(restrictions)
 	end
 	---@cast restrictions -nil
 
-	return Array.map(mw.text.split(restrictions, ','),
-		function(restriction) return RESTRICTIONS[mw.text.trim(restriction)] end)
+	return Array.map(Array.parseCommaSeparatedString(inputString, sep),
+		function(restriction) return RESTRICTIONS[restriction] end)
 end
 
 ---@param restrictions string?
