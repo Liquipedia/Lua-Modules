@@ -167,10 +167,10 @@ local PREFIXES = {
 		player = 'https://gg.letsplay.live/profile/view-stats/',
 		match = 'https://old.letsplay.live/match/',
 	},
-  lichess = {
-    'https://lichess.org/broadcast/',
-    player = 'https://lichess.org/@/',
-    match = 'https://lichess.org/'
+	lichess = {
+		'https://lichess.org/broadcast/',
+		player = 'https://lichess.org/@/',
+		match = 'https://lichess.org/'
 	},
 	linkedin = {
 		team = 'https://www.linkedin.com/company/',
