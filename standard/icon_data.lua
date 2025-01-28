@@ -113,6 +113,6 @@ return {
 	fort = 'fab fa-fort-awesome',
 
 	-- Usage: Chess
-	chesskingwhite = 'far fa-chess-king',
-	chesskingblack = 'fas fa-chess-king',
+	chesskingoutline = 'far fa-chess-king',
+	chesskingfull = 'fas fa-chess-king',
 }

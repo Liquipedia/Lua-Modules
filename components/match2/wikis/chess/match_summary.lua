@@ -26,20 +26,20 @@ local Span = HtmlWidgets.Span
 local KING_ICON_SIZE = '150%'
 local KING_ICONS = {
 	white = Icon.makeIcon{
-		iconName = 'chesskingwhite',
+		iconName = 'chesskingoutline',
 		additionalClasses = {'show-when-light-mode'},
 		size = KING_ICON_SIZE,
 	} .. Icon.makeIcon{
-		iconName = 'chesskingblack',
+		iconName = 'chesskingfull',
 		additionalClasses = {'show-when-dark-mode'},
 		size = KING_ICON_SIZE,
 	},
 	black = Icon.makeIcon{
-		iconName = 'chesskingblack',
+		iconName = 'chesskingfull',
 		additionalClasses = {'show-when-light-mode'},
 		size = KING_ICON_SIZE,
 	} .. Icon.makeIcon{
-		iconName = 'chesskingwhite',
+		iconName = 'chesskingoutline',
 		additionalClasses = {'show-when-dark-mode'},
 		size = KING_ICON_SIZE,
 	},
