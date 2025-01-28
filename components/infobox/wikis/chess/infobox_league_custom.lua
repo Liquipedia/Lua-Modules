@@ -49,7 +49,7 @@ local RESTRICTIONS = {
 	senior = {
 		name = 'Senior Players Only',
 		link = 'Senior Tournaments',
-		data = 'Senior',
+		data = 'senior',
 	},
 }
 
@@ -99,7 +99,6 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.mode = self:_getGameMode()
 end
-
 
 ---@return string?
 function CustomLeague:_getGameMode()
