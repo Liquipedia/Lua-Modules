@@ -67,7 +67,6 @@ Widgets.Abbr = createHtmlTag('abbr', function (self)
 	self.props.attributes.title = self.props.attributes.title or self.props.title
 end)
 Widgets.B = createHtmlTag('b')
-Widgets.Br = createHtmlTag('br')
 Widgets.Center = createHtmlTag('center')
 Widgets.Div = createHtmlTag('div')
 Widgets.Fragment = createHtmlTag(nil)

@@ -130,13 +130,14 @@ function MatchSummaryWidgets._getCenterContent(match, game, gameIndex)
 	return Div{
 		children = {
 			Span{
+				classes = {'brkts-popup-spaced'},
 				children = {
 					'Game ' .. gameIndex,
 					game.length and (' - ' .. game.length .. ' moves') or '',
 				},
 			},
-			Br(),
 			Span{
+				classes = {'brkts-popup-spaced'},
 				css = {['font-size'] = '85%'},
 				children = {Eco.getName(game.extradata.eco, true)},
 			},
