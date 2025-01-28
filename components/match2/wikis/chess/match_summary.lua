@@ -25,23 +25,25 @@ local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
 local KING_ICON_SIZE = '150%'
-local WHITE_KING = Icon.makeIcon{
-	iconName = 'chesskingwhite',
-	additionalClasses = {'show-when-light-mode'},
-	size = KING_ICON_SIZE,
-} .. Icon.makeIcon{
-	iconName = 'chesskingblack',
-	additionalClasses = {'show-when-dark-mode'},
-	size = KING_ICON_SIZE,
-}
-local BLACK_KING = Icon.makeIcon{
-	iconName = 'chesskingblack',
-	additionalClasses = {'show-when-light-mode'},
-	size = KING_ICON_SIZE,
-} .. Icon.makeIcon{
-	iconName = 'chesskingwhite',
-	additionalClasses = {'show-when-dark-mode'},
-	size = KING_ICON_SIZE,
+local KING_ICONS = {
+	white = Icon.makeIcon{
+		iconName = 'chesskingwhite',
+		additionalClasses = {'show-when-light-mode'},
+		size = KING_ICON_SIZE,
+	} .. Icon.makeIcon{
+		iconName = 'chesskingblack',
+		additionalClasses = {'show-when-dark-mode'},
+		size = KING_ICON_SIZE,
+	},
+	black = Icon.makeIcon{
+		iconName = 'chesskingblack',
+		additionalClasses = {'show-when-light-mode'},
+		size = KING_ICON_SIZE,
+	} .. Icon.makeIcon{
+		iconName = 'chesskingwhite',
+		additionalClasses = {'show-when-dark-mode'},
+		size = KING_ICON_SIZE,
+	},
 }
 
 ---@param args table
@@ -62,7 +64,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		css = {padding = '4px'},
 		children = WidgetUtil.collect(
 			-- Player 1
-			CustomMatchSummary._getSideIcon(1, game.extradata.white),
+			CustomMatchSummary._getSideIcon(game.opponents[1]),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
 			MatchSummaryWidgets.GameTeamWrapper{flipped = false},
 
@@ -82,7 +84,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 			-- Player 2
 			MatchSummaryWidgets.GameTeamWrapper{flipped = true},
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
-			CustomMatchSummary._getSideIcon(2, game.extradata.white),
+			CustomMatchSummary._getSideIcon(game.opponents[2]),
 
 			-- Comment
 			MatchSummaryWidgets.GameComment{children = game.comment}
@@ -121,13 +123,10 @@ function MatchSummaryWidgets._getCenterContent(game, gameIndex)
 	}
 end
 
----@param opponentIndex integer
----@param white integer?
+---@param gameOpponent table
 ---@return Widget
-function CustomMatchSummary._getSideIcon(opponentIndex, white)
-	local icon = white == opponentIndex and WHITE_KING or white and BLACK_KING or ''
-
-	return Div{classes = {'brkts-popup-spaced'}, css = {['padding'] = '0px 4px'}, children = icon}
+function CustomMatchSummary._getSideIcon(gameOpponent)
+	return Div{classes = {'brkts-popup-spaced'}, css = {['padding'] = '0px 4px'}, children = KING_ICONS[gameOpponent.color]}
 end
 
 return CustomMatchSummary

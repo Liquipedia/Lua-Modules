@@ -58,9 +58,20 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
-		white = tonumber(map.white),
 		eco = Eco.sanitise(map.eco),
 		links = MatchGroupInputUtil.getLinks(map),
+	}
+end
+
+---@param map table
+---@param opponentIndex integer
+---@return table
+function MapFunctions.extendMapOpponent(map, opponentIndex)
+	local whiteSide = tonumber(map.white)
+	return {
+		color = whiteSide == opponentIndex and 'white'
+			or whiteSide and 'black'
+			or nil
 	}
 end
 
