@@ -105,14 +105,4 @@ function MapFunctions.getMapName(map, mapIndex, match)
 	return map.map
 end
 
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
-end
-
 return CustomMatchGroupInput

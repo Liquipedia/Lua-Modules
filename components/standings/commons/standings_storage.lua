@@ -23,6 +23,37 @@ local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
 
+---@class StandingsTableStorage
+---@field standingsindex integer
+---@field title string?
+---@field type 'ffa'|'swiss'|'league'
+---@field entries StandingEntriesStorage[]
+---@field matches string[]
+---@field roundcount integer
+---@field hasdraw boolean
+---@field hasovertime boolean
+---@field haspoints boolean
+---@field finished boolean
+---@field enddate string?
+---@field extradata table
+
+---@class StandingEntriesStorage
+---@field standingsindex integer
+---@field roundindex integer
+---@field slotindex integer
+---@field opponent standardOpponent
+---@field participant string?
+---@field placement string?
+---@field points number
+---@field definitestatus string?
+---@field currentstatus string?
+---@field placementchange integer?
+---@field diff integer?
+---@field match table?
+---@field game table?
+---@field overtime table?
+---@field extradata table
+
 ---@param data table
 function StandingsStorage.run(data)
 	if Table.isEmpty(data) then

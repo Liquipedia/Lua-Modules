@@ -285,7 +285,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		mapmode = Table.extract(map, 'mode'),
 	}
 end
@@ -353,17 +352,6 @@ function FfaMapFunctions.getPlayersOfMapOpponent(map, opponent, opponentMapInput
 			}
 		end
 	)
-end
-
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function FfaMapFunctions.getExtraData(match, map, opponents)
-	return {
-		dateexact = map.dateexact,
-		comment = map.comment,
-	}
 end
 
 return CustomMatchGroupInput

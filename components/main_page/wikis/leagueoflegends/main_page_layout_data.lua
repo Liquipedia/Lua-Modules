@@ -147,6 +147,20 @@ return {
 				conditions = '[[type::patch]]',
 			},
 		},
+		{
+			file = 'Worlds 2024 Finalists.jpg',
+			title = 'News',
+			link = 'Portal:News',
+			count = {
+				method = 'LPDB',
+				table = 'externalmedialink',
+			},
+		},
+		{
+			file = 'Gen.G Mata Worlds 2024.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
 	},
 	layouts = {
 		main = {

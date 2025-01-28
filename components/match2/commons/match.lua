@@ -374,6 +374,7 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 
 	gameRecord.parent = matchRecord.parent
 	gameRecord.tournament = matchRecord.tournament
+	gameRecord.extradata = Match._addCommonGameExtradata(gameRecord)
 	if not gameRecord.participants then
 		gameRecord.participants = {}
 		for opponentId, opponent in ipairs(gameRecord.opponents or {}) do
@@ -385,6 +386,20 @@ function Match._prepareGameRecordForStore(matchRecord, gameRecord)
 		end
 	end
 	Match.clampFields(gameRecord, Match.gameFields)
+end
+
+---@param game table
+---@return table
+function Match._addCommonGameExtradata(game)
+	local commonExtradata = {
+		comment = game.comment,
+		dateexact = game.dateexact,
+		timestamp = tonumber(game.timestamp),
+		timezoneid = game.timezoneId,
+		timezoneoffset = game.timezoneOffset,
+	}
+
+	return Table.merge(commonExtradata, game.extradata or {})
 end
 
 ---@param playerRecord table

@@ -81,16 +81,6 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	)
 end
 
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
-end
-
 ---@param map table
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)

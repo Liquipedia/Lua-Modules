@@ -125,7 +125,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		overtime = Logic.readBool(map.overtime)
 	}
 end
@@ -160,17 +159,6 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
-	}
-end
-
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function FfaMapFunctions.getExtraData(match, map, opponents)
-	return {
-		dateexact = map.dateexact,
-		comment = map.comment,
 	}
 end
 

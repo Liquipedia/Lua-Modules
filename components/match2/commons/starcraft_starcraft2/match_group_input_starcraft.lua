@@ -374,7 +374,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	local extradata = {
-		comment = map.comment,
 		header = map.header,
 		server = map.server,
 	}

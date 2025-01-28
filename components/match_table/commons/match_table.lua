@@ -151,7 +151,8 @@ function MatchTable:_readDefaultConfig()
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
-		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short'
+		teamStyle = String.nilIfEmpty(args.teamStyle) or 'short',
+		linkSubPage = Logic.readBool(args.linkSubPage)
 	}
 end
 
@@ -291,6 +292,7 @@ function MatchTable:query()
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
 			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata',
+		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
@@ -546,6 +548,15 @@ function MatchTable:build()
 		end
 		display:node(self:matchRow(match))
 	end)
+
+	if self.config.linkSubPage then
+		local pagename = self.title.text .. '/Matches'
+		display:tag('tr')
+			:tag('th')
+				:attr('colspan', 42)
+				:css('font-style', 'italic')
+				:wikitext('[[' .. pagename .. '|Extended list of matches]]')
+	end
 
 	local wrappedTableNode = mw.html.create('div')
 		:addClass('match-table-wrapper')

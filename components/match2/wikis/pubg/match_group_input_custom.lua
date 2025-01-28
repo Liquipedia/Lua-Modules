@@ -125,15 +125,4 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	}
 end
 
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function FfaMapFunctions.getExtraData(match, map, opponents)
-	return {
-		dateexact = map.dateexact,
-		comment = map.comment,
-	}
-end
-
 return CustomMatchGroupInput

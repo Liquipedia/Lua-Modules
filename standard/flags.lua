@@ -24,7 +24,7 @@ local Flags = {}
 ---@param args flagIconArgs?
 ---@param flagName string?
 ---@return string
----@overload fun(args: string): string
+---@overload fun(flagName: string): string
 function Flags.Icon(args, flagName)
 	local shouldLink
 	if type(args) == 'string' then
@@ -42,28 +42,19 @@ function Flags.Icon(args, flagName)
 	shouldLink = Logic.readBool(shouldLink)
 
 	local flagKey = Flags._convertToKey(flagName)
+	local flagData = MasterData.data[flagKey]
 
-	if flagKey then
-		local flagData = MasterData.data[flagKey]
-		if flagData.flag ~= 'File:Space filler flag.png' then
-			local link = ''
-			if flagData.name and shouldLink then
-				link = 'Category:' .. flagData.name
-			end
-			return '<span class="flag">[[' .. flagData.flag ..
-				'|36x24px|' .. flagData.name .. '|link=' .. link .. ']]</span>'
-		else
-			return '<span class="flag">[[' .. flagData.flag .. '|36x24px|link=]]</span>'
-		end
-	elseif shouldLink then
+	if not flagKey or not flagData then
 		mw.log('Unknown flag: ', flagName)
 		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
-		return Template.safeExpand(mw.getCurrentFrame(), 'Flag/' .. mw.ustring.lower(flagName))
-	else
-		mw.log('Unknown flag: ', flagName)
-		mw.ext.TeamLiquidIntegration.add_category('Pages with unknown flags')
-		return Template.safeExpand(mw.getCurrentFrame(), 'FlagNoLink/' .. mw.ustring.lower(flagName))
+		return 'Unknown flag: ' .. flagName
 	end
+
+	local link = ''
+	if String.isNotEmpty(flagData.name) and shouldLink then
+		link = 'Category:' .. flagData.name
+	end
+	return '<span class="flag">[[' .. flagData.flag .. '|36x24px|' .. flagData.name .. '|link=' .. link .. ']]</span>'
 end
 
 -- Returns the localisation/country-adjective of a country or region

@@ -93,7 +93,6 @@ end
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		times = MapFunctions.readTimes(map),
 		percentages = MapFunctions.readPercentages(map),
 	}

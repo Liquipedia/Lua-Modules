@@ -53,6 +53,7 @@ local Standings = {}
 ---@field definitiveStatus string?
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
+---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
@@ -127,6 +128,7 @@ function Standings.entryFromRecord(record)
 		definitiveStatus = record.definitestatus,
 		points = record.scoreboard.points,
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
+		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
 	}
 
@@ -179,7 +181,7 @@ function Standings.makeRounds(standings)
 
 	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
 
-	return Array.map(Array.range(1, roundCount), function(roundIndex)
+	return Array.map(Array.range(1, roundCount or 1), function(roundIndex)
 		local roundEntries = Array.filter(standingsEntries, function(entry)
 			return tonumber(entry.roundindex) == roundIndex
 		end)

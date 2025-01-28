@@ -83,9 +83,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MapFunctions.getExtraData(match, map, opponents)
-	local extraData = {
-		comment = map.comment,
-	}
+	local extraData = {}
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, ChampionNames)
 
