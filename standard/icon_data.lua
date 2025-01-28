@@ -111,4 +111,8 @@ return {
 	-- Usage: Stormgate
 	dungeon = 'fas fa-dungeon',
 	fort = 'fab fa-fort-awesome',
+
+	-- Usage: Chess
+	chesskingwhite = 'far fa-chess-king',
+	chesskingblack = 'fas fa-chess-king',
 }
