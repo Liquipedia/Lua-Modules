@@ -104,7 +104,7 @@ function MatchSummaryWidgets._getCenterContent(game, gameIndex)
 			Span{
 				children = {
 					'Game ' .. gameIndex,
-					game.extradata.movecount and (' - ' .. game.extradata.movecount .. ' moves') or '',
+					game.length and (' - ' .. game.length .. ' moves') or '',
 				},
 			},
 			Br(),
