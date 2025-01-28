@@ -59,7 +59,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
 		white = tonumber(map.white),
-		movecount = tonumber(map.moves),
+		movecount = tonumber(map.length),
 		eco = Eco.sanitise(map.eco),
 		links = MatchGroupInputUtil.getLinks(map),
 	}
