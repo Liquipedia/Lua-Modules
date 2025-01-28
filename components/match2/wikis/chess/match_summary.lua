@@ -22,7 +22,6 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local Table = Lua.import('Module:Table')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local Br = HtmlWidgets.Br
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
 
