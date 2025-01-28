@@ -11,7 +11,6 @@ local CustomMatchSummary = {}
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:Chess/ECO')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Icon')
@@ -126,7 +125,11 @@ end
 ---@param gameOpponent table
 ---@return Widget
 function CustomMatchSummary._getSideIcon(gameOpponent)
-	return Div{classes = {'brkts-popup-spaced'}, css = {['padding'] = '0px 4px'}, children = KING_ICONS[gameOpponent.color]}
+	return Div{
+		classes = {'brkts-popup-spaced'},
+		css = {['padding'] = '0px 4px'},
+		children = KING_ICONS[gameOpponent.color],
+	}
 end
 
 return CustomMatchSummary
