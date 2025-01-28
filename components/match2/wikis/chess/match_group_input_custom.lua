@@ -47,6 +47,26 @@ function MatchFunctions.calculateMatchScore(maps)
 	end
 end
 
+---@param match table
+---@param games table[]
+---@return table
+function MatchFunctions.getLinks(match, games)
+	---@type table<string, string|table|nil>
+	local links = MatchGroupInputUtil.getLinks(match)
+
+	Array.forEach(games, function(game, gameIndex)
+		local gameLinks = MatchGroupInputUtil.getLinks(game)
+		for key, link in pairs(gameLinks) do
+			if type(links[key]) ~= table then
+				links[key] = {[0] = links[key]}
+			end
+			links[key][gameIndex] = link
+		end
+	end)
+
+	return links
+end
+
 --
 -- map related functions
 --
@@ -59,7 +79,6 @@ function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		comment = map.comment,
 		eco = Eco.sanitise(map.eco),
-		links = MatchGroupInputUtil.getLinks(map),
 	}
 end
 

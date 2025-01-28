@@ -11,7 +11,10 @@ local CustomMatchSummary = {}
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:Chess/ECO')
+local FnUtil = Lua.import('Module:FnUtil')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Icon')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -53,11 +56,27 @@ function CustomMatchSummary.getByMatchId(args)
 		:css('max-height', '50vh')
 end
 
----@param date string
+---@param match table
+---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
+---@return Widget
+function CustomMatchSummary.createBody(match, createGame)
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		--need the match available in map display instead of just the date
+		Array.map(match.games, FnUtil.curry(createGame, match)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+	)}
+end
+
+---@param match MatchGroupUtilMatch
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return MatchSummaryRow
-function CustomMatchSummary.createGame(date, game, gameIndex)
+function CustomMatchSummary.createGame(match, game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {padding = '4px'},
@@ -77,7 +96,7 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 					['line-height'] = '12px',
 					['max-width'] = '200px'
 				},
-				children = MatchSummaryWidgets._getCenterContent(game, gameIndex),
+				children = MatchSummaryWidgets._getCenterContent(match, game, gameIndex),
 			},
 
 			-- Player 2
@@ -91,14 +110,22 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 	}
 end
 
+---@param match MatchGroupUtilMatch
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Widget
-function MatchSummaryWidgets._getCenterContent(game, gameIndex)
+function MatchSummaryWidgets._getCenterContent(match, game, gameIndex)
+	---@type table<string, string|table|nil>
+	local links = Table.mapValues(match.links, function(link)
+		if type(link) ~= 'table' then return nil end
+		return link[gameIndex]
+	end)
+
 	local vod = Table.extract(game, 'vod')
+
 	local linksFooter = MatchSummary.Footer()
 	MatchSummary.addVodsToFooter({vod = vod, games = {}}, linksFooter)
-	linksFooter:addLinks(game.extradata.links)
+	linksFooter:addLinks(links)
 
 	return Div{
 		children = {

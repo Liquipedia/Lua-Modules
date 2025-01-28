@@ -168,7 +168,7 @@ function Footer:addLink(link, icon, iconDark, text)
 	return self
 end
 
----@param links table<string, string|table>
+---@param links table<string, string|table|nil>
 ---@return MatchSummaryFooter
 function Footer:addLinks(links)
 	local processLink = function(linkType, link)
@@ -177,7 +177,7 @@ function Footer:addLinks(links)
 			mw.log('Unknown link: ' .. linkType)
 		elseif type(link) == 'table' then
 			for gameIdx, gameLink in Table.iter.spairs(link) do
-				local newText = currentLinkData.text .. ' on Game ' .. gameIdx
+				local newText = gameIdx ~= 0 and currentLinkData.text .. ' on Game ' .. gameIdx or currentLinkData.text
 				self:addLink(gameLink, currentLinkData.icon, currentLinkData.iconDark, newText)
 			end
 		else
