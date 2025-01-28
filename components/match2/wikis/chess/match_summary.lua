@@ -63,7 +63,7 @@ function CustomMatchSummary.createBody(match, createGame)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		--need the match available in map display instead of just the date
+		--need the match available in map display instead of just the date so we can access the links
 		Array.map(match.games, FnUtil.curry(createGame, match)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
