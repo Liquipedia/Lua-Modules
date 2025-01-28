@@ -99,10 +99,13 @@ function StandingTableLegacyFfa.templateEnd(frame)
 	if not cnt then
 		return
 	end
-	local startArgs = Json.parse(Variables.varDefault('standings_legacy_start'))
+	local startArgs = Json.parseIfString(Variables.varDefault('standings_legacy_start'))
+	if not startArgs then
+		return
+	end
 	Variables.varDefine('standings_legacy_start', nil)
-	local slots = Array.mapIndexes(function(index)
-		local data = (Json.parse(Variables.varDefault('standings_legacy_slot_' .. index)))
+	local slots = Array.map(Array.range(1, cnt), function(index)
+		local data = (Json.parseIfString(Variables.varDefault('standings_legacy_slot_' .. index)))
 		Variables.varDefine('standings_legacy_slot_' .. index, nil)
 		return data
 	end)
@@ -112,8 +115,8 @@ function StandingTableLegacyFfa.templateEnd(frame)
 	end)
 
 	---@type StandingTableOpponentData[]
-	local opponents = Array.mapIndexes(function(teamIndex)
-		return StandingTableLegacyFfa.parseTeamInputManualSlots(slots[teamIndex])
+	local opponents = Array.map(slots, function(slot)
+		return StandingTableLegacyFfa.parseTeamInputManualSlots(slot)
 	end)
 
 	-- TODO BGS are gonna be impossible to do cleanly? Ignoring them for now
@@ -141,7 +144,7 @@ end
 
 ---@param args table
 ---@param teamIndex integer
----@return {type: OpponentType, [1]: string, tiebreaker: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, tiebreaker: string?, startingpoints: string?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	local team = args['team' .. teamIndex] or args['p' .. teamIndex .. 'team']
 	if not team then
@@ -163,7 +166,7 @@ function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 end
 
 ---@param args table
----@return {type: OpponentType, [1]: string, tiebreaker: string?, r1: string?}?
+---@return {type: OpponentType, [1]: string, startingpoints: string?, r1: string?}?
 function StandingTableLegacyFfa.parseTeamInputManualSlots(args)
 	if not args then
 		return nil
