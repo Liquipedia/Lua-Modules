@@ -87,8 +87,8 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 			-- Center.
 			MatchSummaryWidgets.GameCenter{
-				css = {['text-align'] = 'center', ['align-content'] = 'center', ['min-height'] = '42px', ['font-size'] = '85%', 
-						['line-height'] = '12px', ['max-width'] = '200px'},
+				css = {['text-align'] = 'center', ['align-content'] = 'center', ['min-height'] = '42px', ['font-size'] = '85%',
+					['line-height'] = '12px', ['max-width'] = '200px'},
 				children = centerContent
 			},
 
