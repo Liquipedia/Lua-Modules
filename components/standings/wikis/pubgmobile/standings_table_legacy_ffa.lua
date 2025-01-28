@@ -50,7 +50,7 @@ function StandingTableLegacyFfa.withoutLobby(frame)
 	local bgs = StandingTableLegacyFfa.parseWikiBgs(args, 'bg')
 
 	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacyFfa.getStandardParameter(args), bgs, rounds, opponents
+		StandingTableLegacyFfa.getStandardParameter(args), {bg = bgs}, rounds, opponents
 	))
 end
 
@@ -71,7 +71,7 @@ function StandingTableLegacyFfa.pastResults(frame)
 	local bgs = StandingTableLegacyFfa.parseWikiBgs(args, 'pbg')
 
 	return StandingTable.fromTemplate(Table.merge(
-		StandingTableLegacyFfa.getStandardParameter(args), bgs, rounds, opponents
+		StandingTableLegacyFfa.getStandardParameter(args), {bg = bgs}, rounds, opponents
 	))
 end
 
@@ -153,8 +153,11 @@ function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 		return 'r' .. roundIndex, value
 	end)
 
+	local tiebreaker = args['tiebreaker' .. teamIndex] or args['p' .. teamIndex .. 'temp_tie']
+	local startingPoints = args['changes' .. teamIndex] or args['p' .. teamIndex .. 'changes']
+
 	return Table.merge(
-		{type = Opponent.team, team, tiebreaker = args['tiebreaker' .. teamIndex]},
+		{type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints},
 		rounds
 	)
 end

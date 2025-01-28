@@ -118,10 +118,13 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 			scoreboard = {points = points},
 			specialstatus = specialStatus,
 			tiebreakerPoints = tiebreakerPoints,
-			startingPoints = opponentData.startingpoints,
 		})
 	end
-	return {rounds = rounds, opponent = Opponent.readOpponentArgs(opponentData)}
+	return {
+		rounds = rounds,
+		opponent = Opponent.readOpponentArgs(opponentData),
+		startingPoints = opponentData.startingpoints,
+	}
 end
 
 ---@param input string
