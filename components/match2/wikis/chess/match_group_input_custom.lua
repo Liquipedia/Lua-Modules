@@ -57,7 +57,7 @@ function MatchFunctions.getLinks(match, games)
 	Array.forEach(games, function(game, gameIndex)
 		local gameLinks = MatchGroupInputUtil.getLinks(game)
 		for key, link in pairs(gameLinks) do
-			if type(links[key]) ~= table then
+			if type(links[key]) ~= 'table' then
 				links[key] = {[0] = links[key]}
 			end
 			links[key][gameIndex] = link
