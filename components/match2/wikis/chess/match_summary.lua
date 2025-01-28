@@ -118,7 +118,7 @@ function MatchSummaryWidgets._getCenterContent(match, game, gameIndex)
 	---@type table<string, string|table|nil>
 	local links = Table.mapValues(match.links, function(link)
 		if type(link) ~= 'table' then return nil end
-		return link[gameIndex]
+		return Table.extract(link, gameIndex)
 	end)
 
 	local vod = Table.extract(game, 'vod')
