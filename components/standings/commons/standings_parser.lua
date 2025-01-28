@@ -111,6 +111,7 @@ function StandingsParser.determinePlacements(opponentsInRound)
 	Array.forEach(opponentsInRound, function(opponent, slotindex)
 		opponent.slotindex = slotindex
 		opponent.placement = lastPts == opponent.points and opponentsInRound[slotindex - 1].placement or slotindex
+		lastPts = opponent.points
 	end)
 end
 
