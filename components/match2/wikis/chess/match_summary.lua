@@ -11,7 +11,6 @@ local CustomMatchSummary = {}
 local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:Chess/ECO')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Icon')
@@ -88,7 +87,8 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 
 			-- Center.
 			MatchSummaryWidgets.GameCenter{
-				css = {['text-align'] = 'center', ['align-content'] = 'center', ['min-height'] = '42px', ['font-size'] = '85%', ['line-height'] = '12px', ['max-width'] = '200px'},
+				css = {['text-align'] = 'center', ['align-content'] = 'center', ['min-height'] = '42px', ['font-size'] = '85%', 
+						['line-height'] = '12px', ['max-width'] = '200px'},
 				children = centerContent
 			},
 
