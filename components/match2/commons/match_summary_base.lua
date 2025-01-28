@@ -194,7 +194,7 @@ function Footer:addLinks(links)
 	end)
 
 	for linkKey, link in Table.iter.spairs(links) do
-	    -- Handle links not already processed via priority list
+		-- Handle links not already processed via priority list
 		if not processedLinks[linkKey] then
 			processLink(linkKey, link)
 		end
