@@ -73,9 +73,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Restrictions', content = caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'gamesettings' then
+		local isVariant = caller.data.game ~= Game.toIdentifier()
 		Array.appendWith(widgets,
 			Cell{name = 'Time Control', content = {caller.data.mode}},
-			caller.data.game ~= Game.toIdentifier() and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
+			isVariant and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
 		)
 	end
 	return widgets
