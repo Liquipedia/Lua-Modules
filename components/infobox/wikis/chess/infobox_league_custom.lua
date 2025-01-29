@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
@@ -26,12 +27,6 @@ local MODES = {
 	classical = 'Classical',
 	blitz = 'Blitz',
 	rapid = 'Rapid',
-}
-
--- Game: Variants.
-local GAMES = {
-	chess = 'Chess',
-	chess960 = 'Chess960',
 }
 
 local RESTRICTIONS = {
@@ -80,7 +75,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'gamesettings' then
 		Array.appendWith(widgets,
 			Cell{name = 'Time Control', content = {caller.data.mode}},
-			caller.data.game ~= GAMES['chess'] and Cell{name = 'Variant', content = {caller.data.game}} or nil
+			caller.data.game ~= Game.toIdentifier() and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
 		)
 	end
 	return widgets
@@ -104,18 +99,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = self:_getMode()
-	self.data.game = self:_getGame()
-end
-
----@return string?
-function CustomLeague:_getMode()
-	return MODES[string.lower(self.args.mode or '')] or MODES['classical']
-end
-
----@return string?
-function CustomLeague:_getGame()
-	return GAMES[string.lower(self.args.game or '')] or GAMES['chess']
+	self.data.mode = MODES[string.lower(self.args.mode or '')] or MODES.classical
 end
 
 ---@param restrictions string?
