@@ -10,7 +10,7 @@ return {
 	startYear = 1834,
 	wikiName = 'chess',
 	name = 'Chess',
-	defaultGame = 'Chess',
+	defaultGame = 'chess',
 	games = {
 		chess = {
 			abbreviation = 'Chess',
