@@ -39,6 +39,7 @@ local VALID_SKILLS = {
 	'Upgrade',
 	'Effect',
 }
+local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
 local GAME_MODE_ICON = {
 	coop = 'dungeon',
 	mayhem = 'fort',
@@ -142,7 +143,7 @@ end
 
 function CustomSkill:_castersDisplay()
 	local casters = self:getAllArgsForBase(self.args, 'caster')
-	
+
 	return Array.map(casters, function(caster)
 		local casterUnit = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '([[type::Unit]] OR [[type::Hero]] or [[type::building]]) AND [[pagename::'
@@ -154,7 +155,9 @@ function CustomSkill:_castersDisplay()
 
 		local extraData = casterUnit.extradata or {}
 
-		if Table.includes(extraData.subfaction or {}, '1v1') then return Page.makeInternalLink({}, casterUnit.name, caster) end
+		if Table.includes(extraData.subfaction or {}, '1v1') then
+			return Page.makeInternalLink({}, casterUnit.name, caster)
+		end
 
 		if casterUnit.type == 'Hero' then
 			local sfData = Array.parseCommaSeparatedString(extraData.subfaction[1] or {}, ':')
