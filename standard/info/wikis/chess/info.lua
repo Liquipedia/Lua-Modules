@@ -25,6 +25,19 @@ return {
 				lightMode = 'Chess default lightmode.png',
 			},
 		},
+		chess960 = {
+			abbreviation = 'Chess960',
+			name = 'Chess960',
+			link = 'Chess960',
+			logo = {
+				darkMode = 'Chess default darkmode.png',
+				lightMode = 'Chess default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Chess default darkmode.png',
+				lightMode = 'Chess default lightmode.png',
+			},
+		},
 	},
 	config = {
 		squads = {
