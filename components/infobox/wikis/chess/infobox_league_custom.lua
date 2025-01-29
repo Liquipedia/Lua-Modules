@@ -78,16 +78,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Restrictions', content = caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'gamesettings' then
-		table.insert(
-			widgets,
-			Cell{name = 'Time Control', content = {caller.data.mode}}
+		Array.appendWith(widgets,
+			Cell{name = 'Time Control', content = {caller.data.mode}},
+			caller.data.game ~= GAMES['chess'] and Cell{name = 'Variant', content = {caller.data.game}} or nil
 		)
-		if caller.data.game ~= GAMES['chess'] then
-			table.insert(
-				widgets,
-				Cell{name = 'Variant', content = {caller.data.game}}
-			)
-		end
 	end
 	return widgets
 end
