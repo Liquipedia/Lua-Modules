@@ -41,8 +41,8 @@ local VALID_SKILLS = {
 }
 local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
 local GAME_MODE_ICON = {
-	coop = 'dungeon',
-	mayhem = 'fort',
+	coop = 'coop',
+	mayhem = 'mayhem',
 }
 
 ---@param frame Frame
