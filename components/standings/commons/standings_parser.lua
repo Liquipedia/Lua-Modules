@@ -28,7 +28,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 
 	local entries = Array.flatMap(opponents, function(opponentData)
 		local opponent = opponentData.opponent
-		local pointSum = 0
+		local pointSum = opponentData.startingPoints or 0
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)

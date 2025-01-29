@@ -117,10 +117,14 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 		table.insert(rounds, {
 			scoreboard = {points = points},
 			specialstatus = specialStatus,
-			tiebreakerPoints = tiebreakerPoints
+			tiebreakerPoints = tiebreakerPoints,
 		})
 	end
-	return {rounds = rounds, opponent = Opponent.readOpponentArgs(opponentData)}
+	return {
+		rounds = rounds,
+		opponent = Opponent.readOpponentArgs(opponentData),
+		startingPoints = opponentData.startingpoints,
+	}
 end
 
 ---@param input string
