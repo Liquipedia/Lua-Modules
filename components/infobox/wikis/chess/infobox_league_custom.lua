@@ -21,15 +21,19 @@ local Cell = Widgets.Cell
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+-- Mode: Time controls.
 local MODES = {
 	classical = 'Classical',
 	blitz = 'Blitz',
 	rapid = 'Rapid',
-	chess960 = 'Chess960',
-	puzzle = 'Puzzle Rush',
-	dice = 'Dice Chess',
-	various = 'Multiple',
 }
+
+-- Game: Variants.
+local GAMES = {
+	chess = 'Chess',
+	chess960 = 'Chess960',
+}
+
 local RESTRICTIONS = {
 	female = {
 		name = 'Female Players Only',
@@ -74,7 +78,16 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Restrictions', content = caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'gamesettings' then
-		return {Cell{name = 'Variant', content = {caller.data.mode}}}
+		table.insert(
+			widgets,
+			Cell{name = 'Time Control', content = {caller.data.mode}}
+		)
+		if caller.data.game ~= GAMES['chess'] then
+			table.insert(
+				widgets,
+				Cell{name = 'Variant', content = {caller.data.game}}
+			)
+		end
 	end
 	return widgets
 end
@@ -97,12 +110,18 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = self:_getGameMode()
+	self.data.mode = self:_getMode()
+	self.data.game = self:_getGame()
 end
 
 ---@return string?
-function CustomLeague:_getGameMode()
+function CustomLeague:_getMode()
 	return MODES[string.lower(self.args.mode or '')] or MODES['classical']
+end
+
+---@return string?
+function CustomLeague:_getGame()
+	return GAMES[string.lower(self.args.game or '')] or GAMES['chess']
 end
 
 ---@param restrictions string?
