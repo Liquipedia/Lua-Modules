@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
-local Page = require('Module:Page')
 local Table = require('Module:Table')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
