@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
@@ -45,9 +46,11 @@ function StandingsParseWiki.parseWikiInput(args)
 		rounds = {StandingsParseWiki.parseWikiRound(args, 1)}
 	end
 
+	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
+
 	---@type StandingTableOpponentData[]
 	local opponents = Array.map(args, function (opponentData)
-		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds)
+		return StandingsParseWiki.parseWikiOpponent(opponentData, #rounds, date)
 	end)
 
 	local wrapperMatches = Array.parseCommaSeparatedString(args.matches)
@@ -100,7 +103,7 @@ end
 ---@param opponentInput string|table
 ---@param numberOfRounds integer
 ---@return StandingTableOpponentData[]
-function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
+function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate)
 	local opponentData = Json.parseIfString(opponentInput)
 	local rounds = {}
 	for i = 1, numberOfRounds do
@@ -120,9 +123,13 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds)
 			tiebreakerPoints = tiebreakerPoints,
 		})
 	end
+
+	local opponent = Opponent.readOpponentArgs(opponentData)
+	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
+
 	return {
 		rounds = rounds,
-		opponent = Opponent.readOpponentArgs(opponentData),
+		opponent = opponent,
 		startingPoints = opponentData.startingpoints,
 	}
 end
