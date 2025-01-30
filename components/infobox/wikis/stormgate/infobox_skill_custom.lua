@@ -160,20 +160,22 @@ function CustomSkill:_castersDisplay()
 		end
 
 		if casterUnit.type == 'Hero' then
-			local sfData = Array.parseCommaSeparatedString(extraData.subfaction[1] or {}, ':')
-			return GAME_MODE_ICON[sfData[1]] and Page.makeInternalLink({},
-				Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(sfData[1])], size = '100%'}
+			local heroSubfactionData = Array.parseCommaSeparatedString(extraData.subfaction[1] or {}, ':')
+			return GAME_MODE_ICON[heroSubfactionData[1]] and Page.makeInternalLink({},
+				Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(heroSubfactionData[1])], size = '100%'}
 				.. ' ' .. casterUnit.name, caster)
 		end
 
-		local sfOutput = table.concat(Array.map(self:_parseSubfactionData(extraData.subfaction or {}), function(sfElement)
+		local casterSubfactions = table.concat(Array.map(self:_parseSubfactionData(extraData.subfaction or {}),
+			function(sfElement)
 				local gameModeIcon = GAME_MODE_ICON[sfElement[1]]
 					and Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(sfElement[1])], size = '100%'}
 				return gameModeIcon and sfElement[2]
 					and (gameModeIcon .. ' ' .. string.gsub(sfElement[2], ';', ', ')) or nil
-		end), ', ')
+			end),
+		', ')
 
-		return Page.makeInternalLink({}, casterUnit.name .. ' (' .. sfOutput .. ')', caster)
+		return Page.makeInternalLink({}, casterUnit.name .. ' (' .. casterSubfactions .. ')', caster)
 	end)
 end
 
