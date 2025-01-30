@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
@@ -124,7 +125,7 @@ function StandingsFfaWidget:render()
 								local text
 								if columnRound.round <= round.round then
 									local opponent = Array.find(columnRound.opponents, function(columnSlot)
-										return columnSlot.opponent.name == slot.opponent.name
+										return Table.deepEquals(columnSlot.opponent, slot.opponent)
 									end)
 									local roundStatus = opponent.specialStatus
 									if roundStatus == '' then
