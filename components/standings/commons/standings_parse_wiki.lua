@@ -126,14 +126,7 @@ function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, res
 	end
 
 	local opponent = Opponent.readOpponentArgs(opponentData)
-	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = 1})
-	-- temp until we standardized name building to have underscores ...
-	if Opponent.typeIsParty(opponent.type) then
-		Array.forEach(opponent.players, function(player)
-			player.pageName = Page.pageifyLink(player.pageName or player.displayName)
-		end)
-	end
-	opponent.name = Opponent.toName(opponent)
+	opponent = Opponent.resolve(opponent, resolveDate, {syncPlayer = true})
 
 	return {
 		rounds = rounds,
