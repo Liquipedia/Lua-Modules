@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=pubgmobile
+-- wiki=commons
 -- page=Module:Standings/Table/Legacy/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -33,7 +33,7 @@ function StandingTableLegacyFfa.getStandardParameter(args)
 	}
 end
 
----Template:League standings without lobby
+---Template:League standings without lobby & Template:League standings without lobby ranked
 ---@param frame Frame
 ---@return table
 function StandingTableLegacyFfa.withoutLobby(frame)
@@ -54,7 +54,7 @@ function StandingTableLegacyFfa.withoutLobby(frame)
 	))
 end
 
----Template:League_standings_with_past_results
+---Template:League_standings_with_past_results & Template:League standings without lobby custom
 ---@param frame Frame
 ---@return table
 function StandingTableLegacyFfa.pastResults(frame)
