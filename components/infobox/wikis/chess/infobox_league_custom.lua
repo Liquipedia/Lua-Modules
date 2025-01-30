@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
@@ -21,15 +22,13 @@ local Cell = Widgets.Cell
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
+-- Mode: Time controls.
 local MODES = {
 	classical = 'Classical',
 	blitz = 'Blitz',
 	rapid = 'Rapid',
-	chess960 = 'Chess960',
-	puzzle = 'Puzzle Rush',
-	dice = 'Dice Chess',
-	various = 'Multiple',
 }
+
 local RESTRICTIONS = {
 	female = {
 		name = 'Female Players Only',
@@ -74,7 +73,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Restrictions', content = caller:createRestrictionsCell(args.restrictions)}
 		)
 	elseif id == 'gamesettings' then
-		return {Cell{name = 'Variant', content = {caller.data.mode}}}
+		local isVariant = caller.data.game ~= Game.toIdentifier()
+		Array.appendWith(widgets,
+			Cell{name = 'Time Control', content = {caller.data.mode}},
+			isVariant and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
+		)
 	end
 	return widgets
 end
@@ -97,12 +100,7 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = self:_getGameMode()
-end
-
----@return string?
-function CustomLeague:_getGameMode()
-	return MODES[string.lower(self.args.mode or '')] or MODES['classical']
+	self.data.mode = MODES[string.lower(self.args.mode or '')] or MODES.classical
 end
 
 ---@param restrictions string?
