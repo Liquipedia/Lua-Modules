@@ -94,6 +94,7 @@ end
 
 ---Template:league standings end & Template:league standings end2
 ---@param frame Frame
+---@return table?
 function StandingTableLegacyFfa.templateEnd(frame)
 	local cnt = tonumber(Variables.varDefault('standings_legacy_count'))
 	if not cnt then
