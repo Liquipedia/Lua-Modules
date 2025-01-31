@@ -2,9 +2,8 @@
 describe('Page', function()
 	local Page = require('Module:Page')
 
-	local orig = mw.title.new
 	before_each(function()
-		mw.title.new = spy.new(function(page)
+		stub(mw.title, 'new', function (page)
 			if page == 'https://google.com' then
 				return nil
 			end
@@ -12,7 +11,8 @@ describe('Page', function()
 		end)
 	end)
 	after_each(function()
-		mw.title.new = orig
+		---@diagnostic disable-next-line: undefined-field
+		mw.title.new:revert()
 	end)
 
 	describe('exists', function()

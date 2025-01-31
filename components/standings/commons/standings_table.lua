@@ -33,6 +33,14 @@ local StandingsTable = {}
 ---@field opponent standardOpponent
 ---@field startingPoints number?
 
+---@class StandingsTableProps
+---@field rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
+---@field opponents StandingTableOpponentData[]
+---@field bgs table<integer, string>
+---@field title string?
+---@field endDate string #formated as YYYY-MM-DD
+---@field matches string[]
+
 ---@param frame Frame
 ---@return Widget
 function StandingsTable.fromTemplate(frame)
@@ -41,23 +49,22 @@ function StandingsTable.fromTemplate(frame)
 	if tableType ~= 'ffa' then
 		error('Unknown Standing Table Type')
 	end
-	local title = args.title
 	local importScoreFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.import), true)
 	local importOpponentFromMatches = Logic.nilOr(Logic.readBoolOrNil(args.importopponents), importScoreFromMatches)
 
-	local parsedData = StandingsParseWiki.parseWikiInput(args)
-	local rounds = parsedData.rounds
-	local opponents = parsedData.opponents
-	local bgs = parsedData.bgs
-	local matches = parsedData.matches
+	local parsedProps = StandingsParseWiki.parseWikiInput(args)
 
 	if not importScoreFromMatches then
-		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
+		return StandingsTable.ffa(parsedProps)
 	end
 
+	local rounds = parsedProps.rounds
+	local opponents = parsedProps.opponents
+
 	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, StandingsParseWiki.makeScoringFunction(args))
-	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
+	parsedProps.opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
+
+	return StandingsTable.ffa(parsedProps)
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -88,14 +95,10 @@ function StandingsTable.mergeOpponentsData(manualOpponents, importedOpponents, a
 	return newOpponents
 end
 
----@param rounds any
----@param opponents any
----@param bgs any
----@param title any
----@param matches any
+---@param props StandingsTableProps
 ---@return Widget
-function StandingsTable.ffa(rounds, opponents, bgs, title, matches)
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches)
+function StandingsTable.ffa(props)
+	local standingsTable = StandingsParser.parse(props)
 	StandingsStorage.run(standingsTable)
 	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end

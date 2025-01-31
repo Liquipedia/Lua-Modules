@@ -30,6 +30,7 @@ local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local GSL_GROUP_OPPONENT_NUMBER = 4
 local SWISS_GROUP_TYPE = 'swiss'
+local FFA_GROUP_TYPE = 'ffa'
 local GSL_STYLE_SCORES = {
 	{w = 2, d = 0, l = 0},
 	{w = 2, d = 0, l = 1},
@@ -234,7 +235,11 @@ function Import:_computeGroupTablePlacementEntries(standingRecords, options)
 	local placementEntries = {}
 	local placementIndexes = {}
 
-	for _, record in ipairs(standingRecords) do
+	Array.forEach(standingRecords, function (record)
+		--- We do not yet support importing FFA groups
+		if record.type == FFA_GROUP_TYPE then
+			return
+		end
 		if options.importWinners or Table.includes(options.groupElimStatuses, record.currentstatus) then
 			local entry = {
 				date = record.extradata.enddate,
@@ -265,7 +270,7 @@ function Import:_computeGroupTablePlacementEntries(standingRecords, options)
 				table.insert(placementEntries[placementIndexes[record.placement]], entry)
 			end
 		end
-	end
+	end)
 
 	return placementEntries
 end
