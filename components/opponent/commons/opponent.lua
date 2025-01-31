@@ -475,11 +475,13 @@ function Opponent.fromLpdbStruct(storageStruct)
 	if partySize then
 		local players = storageStruct.opponentplayers
 		local function playerFromLpdbStruct(playerIndex)
+			local prefix = 'p' .. playerIndex
+
 			return {
-				displayName = players['p' .. playerIndex .. 'dn'],
-				flag = Flags.CountryName(players['p' .. playerIndex .. 'flag']),
-				pageName = players['p' .. playerIndex],
-				team = players['p' .. playerIndex .. 'team'],
+				displayName = players[prefix .. 'dn'],
+				flag = Flags.CountryName(players[prefix .. 'flag']),
+				pageName = players[prefix],
+				team = players[prefix .. 'template'] or players[prefix .. 'team'],
 			}
 		end
 		local opponent = {
