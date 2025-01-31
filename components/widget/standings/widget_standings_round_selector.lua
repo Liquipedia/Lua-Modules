@@ -21,24 +21,20 @@ local RoundSelectorWidget = Class.new(Widget)
 
 ---@return Widget?
 function RoundSelectorWidget:render()
-	if not self.props.rounds or self.props.rounds <= 1 then
+	local rounds = self.props.rounds
+	local numOfRounds = #rounds
+	if not rounds or numOfRounds == 0 then
 		return
 	end
 
 	local function finalRoundTitle()
 		if not self.props.hasEnded then
 			return 'Current'
-		else
-			return 'Round ' .. tostring(self.props.rounds)
 		end
 	end
 
-	local roundTitles = Array.map(Array.range(1, self.props.rounds), function (round)
-		if round == self.props.rounds then
-			return finalRoundTitle()
-		else
-			return 'Round ' .. round
-		end
+	local roundTitles = Array.map(rounds, function (round, roundIndex)
+		return roundIndex == numOfRounds and finalRoundTitle() or round.title
 	end)
 
 	local function makeRoundButtons(roundTitle, roundIndex)
