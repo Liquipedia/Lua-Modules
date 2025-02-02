@@ -31,7 +31,7 @@ local CONTENT = {
 		'<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|action=edit}} edit]&#93;</div>\n' ..
+			'&#91;[{{FULLURL:Player Transfers/{{CURRENTYEAR}}|action=edit}} edit]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
