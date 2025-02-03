@@ -1306,6 +1306,7 @@ end
 ---@field adjustOpponent? fun(opponent: table[], opponentIndex: integer, match: table)
 ---@field matchIsFinished? fun(match: table, opponents: table[]): boolean
 ---@field getMatchWinner? fun(status: string, winnerInput: integer|string|nil, opponents: table[]): integer?
+---@field extendOpponentIfFinished? fun(match: table, opponent:table)
 ---@field DEFAULT_MODE? string
 ---@field DATE_FALLBACKS? string[]
 ---@field OPPONENT_CONFIG? readOpponentOptions
@@ -1324,6 +1325,7 @@ end
 --- - adjustOpponent(opponent, opponentIndex, match)
 --- - matchIsFinished(match, opponents): boolean
 --- - getMatchWinner(status, winnerInput, opponents): integer?
+--- - extendOpponentIfFinished(match, opponent)
 ---
 --- Additionally, the Parser may have the following properties:
 --- - DEFAULT_MODE: string
@@ -1381,6 +1383,10 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 
 		match.winner = Parser.getMatchWinner and Parser.getMatchWinner(match.status, winnerInput, opponents)
 			or MatchGroupInputUtil.getWinner(match.status, winnerInput, opponents)
+
+		if Parser.extendOpponentIfFinished then
+			Array.forEach(opponents, FnUtil.curry(Parser.extendOpponentIfFinished, match))
+		end
 	end
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)

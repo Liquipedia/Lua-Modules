@@ -7,8 +7,10 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Flags = require('Module:Flags')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -19,9 +21,13 @@ local Variables = require('Module:Variables')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
+
+local ASSUME_FINISHED_AFTER = MatchGroupInputUtil.ASSUME_FINISHED_AFTER
+local NOW = os.time()
 local TBD = 'TBD'
 local TBA = 'TBA'
 local MODE_MIXED = 'mixed'
+local MODE_FFA = 'FFA'
 
 local StarcraftMatchGroupInput = {}
 local MatchFunctions = {
@@ -34,27 +40,29 @@ local MapFunctions = {
 	ADD_SUB_GROUP = true,
 	BREAK_ON_EMPTY = true,
 }
-
--- make these available for ffa
-StarcraftMatchGroupInput.MatchFunctions = MatchFunctions
-StarcraftMatchGroupInput.MapFunctions = MapFunctions
+local FfaMatchFunctions = {
+	OPPONENT_CONFIG = {
+		resolveRedirect = true,
+		pagifyTeamNames = true,
+	},
+	readDate = MatchFunctions.readDate,
+	getMatchWinner = StarcraftMatchGroupInput._getFfAWinner,
+}
+local FfaMapFunctions = {
+	getMapMode = MapFunctions.getMapMode,
+}
 
 ---@param match table
 ---@param options table?
 ---@return table
 function StarcraftMatchGroupInput.processMatch(match, options)
-	if Logic.readBool(match.ffa) then
-		-- have to import here to avoid import loops
-		local FfaStarcraftMatchGroupInput = Lua.import('Module:MatchGroup/Input/Starcraft/Ffa')
-		return FfaStarcraftMatchGroupInput.processMatch(match, options)
-	end
-
 	local cancelled = Logic.readBool(Logic.emptyOr(match.cancelled, Variables.varDefault('cancelled tournament')))
 	if cancelled then
 		match.finished = match.finished or 'skip'
 	end
+	match.bestof = tonumber(match.bestof)
 
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
 end
 
 ---@param matchArgs table
@@ -432,6 +440,205 @@ end
 ---@return integer
 function MapFunctions.getMapOpponentSize(opponent)
 	return Table.size(Array.filter(opponent.players or {}, Logic.isNotEmpty))
+end
+
+---
+--- FFA stuff
+---
+
+---@param match table
+---@param numberOfOpponents integer
+---@return table
+function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
+	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
+	Table.mergeInto(settings.settings, {
+		noscore = Logic.readBool(match.noscore),
+		showGameDetails = false,
+	})
+	return settings
+end
+
+---@param opponents table[]
+---@return string
+function FfaMatchFunctions.getMode(opponents)
+	return MODE_FFA
+end
+
+---@param opponent table
+---@param opponentIndex integer
+---@param match table
+function FfaMatchFunctions.adjustOpponent(opponent, opponentIndex, match)
+	MatchFunctions.adjustOpponent(opponent, opponentIndex)
+	-- set score to 0 for all opponents if it is a match without scores
+	if Logic.readBool(match.noscore) then
+		opponent.score = 0
+	end
+end
+
+---@param opponents table[]
+---@param games table[]
+---@return fun(opponentIndex: integer): integer?
+function FfaMatchFunctions.calculateMatchScore(opponents, games)
+	return function(opponentIndex)
+		local opponent = opponents[opponentIndex]
+		local sum = (opponent.extradata.advantage or 0) - (opponent.extradata.penalty or 0)
+		Array.forEach(games, function(game)
+			local scores = Array.map(game.opponents, Operator.property('score'))
+			sum = sum + ((scores or {})[opponentIndex] or 0)
+		end)
+		return sum
+	end
+end
+
+---@param match table
+---@param opponents {score: integer?}[]
+---@return boolean
+function FfaMatchFunctions.matchIsFinished(match, opponents)
+	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
+		return true
+	end
+
+	local finished = Logic.readBoolOrNil(match.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	-- If a winner has been set
+	if Logic.isNotEmpty(match.winner) then
+		return true
+	end
+
+	-- If enough time has passed since match started, it should be marked as finished
+	local threshold = match.dateexact and ASSUME_FINISHED_AFTER.EXACT or ASSUME_FINISHED_AFTER.ESTIMATE
+	if match.timestamp ~= DateExt.defaultTimestamp and (match.timestamp + threshold) < NOW then
+		return true
+	end
+
+	return FfaMatchFunctions.placementHasBeenSet(opponents)
+end
+
+---@param opponents table[]
+---@return boolean
+function FfaMatchFunctions.placementHasBeenSet(opponents)
+	return Array.all(opponents, function(opponent) return Logic.isNumeric(opponent.placement) end)
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@param settings table
+---@return table
+function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
+	return {
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		ffa = 'true',
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
+	}
+end
+
+---@param match table
+---@param opponents table[]
+---@param scoreSettings table
+---@return table[]
+function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
+end
+
+---@param match table
+---@param opponent table
+function FfaMatchFunctions.extendOpponentIfFinished(match, opponent)
+	opponent.extradata.advances = Logic.readBool(opponent.advances)
+		or (match.bestof and (opponent.score or 0) >= match.bestof)
+		or opponent.placement == 1
+end
+
+---@param mapInput table
+---@param mapIndex integer
+---@param match table
+---@return string?
+---@return string?
+function FfaMapFunctions.getMapName(mapInput, mapIndex, match)
+	local mapName = mapInput.map
+	if mapName and mapName:upper() ~= TBD then
+		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
+	elseif mapName then
+		mapName = TBD
+	end
+
+	return mapName, mapInput.mapDisplayName
+end
+
+---@param map any
+---@return string
+function FfaMapFunctions.getPatch(map)
+	return Variables.varDefault('tournament_patch', '')
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		settings = {noscore = Logic.readBool(match.noscore)},
+	}
+end
+
+---@param map table
+---@param matchOpponent table
+---@param opponentIndex integer
+---@return table
+function FfaMapFunctions.readMapOpponent(map, matchOpponent, opponentIndex)
+	local score, status = MatchGroupInputUtil.computeOpponentScore{
+		walkover = map.walkover,
+		winner = map.winner,
+		opponentIndex = opponentIndex,
+		score = map['score' .. opponentIndex],
+	}
+
+	return {
+		placement = tonumber(map['placement' .. opponentIndex]),
+		score = score,
+		status = status,
+		players = MapFunctions.getPlayersOfMapOpponent(map, matchOpponent, opponentIndex),
+	}
+end
+
+---@param status string?
+---@param winnerInput string?
+---@param mapOpponents table[]
+---@return integer?
+function FfaMapFunctions.getMapWinner(status, winnerInput, mapOpponents)
+	local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(mapOpponents)
+	Array.forEach(mapOpponents, function(opponent, opponentIndex)
+		opponent.placement = placementOfOpponents[opponentIndex]
+	end)
+
+	return StarcraftMatchGroupInput._getFfAWinner(status, winnerInput, mapOpponents)
+end
+
+---@param status string?
+---@param winnerInput integer|string|nil
+---@param opponents {placement: integer?, score: integer?, status: string}[]
+---@return integer?
+function StarcraftMatchGroupInput._getFfAWinner(status, winnerInput, opponents)
+	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
+		return nil
+	elseif Logic.isNumeric(winnerInput) then
+		return tonumber(winnerInput)
+	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
+		return MatchGroupInputUtil.WINNER_DRAW
+	end
+
+	local placements = Array.map(opponents, Operator.property('placement'))
+	local bestPlace = Array.min(placements)
+
+	local calculatedWinner = Array.indexOf(placements, FnUtil.curry(Operator.eq, bestPlace))
+
+	return calculatedWinner ~= 0 and calculatedWinner or nil
 end
 
 return StarcraftMatchGroupInput
