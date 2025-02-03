@@ -51,6 +51,7 @@ local MatchGroupInputUtil = {}
 ---@field status string?
 ---@field placement integer?
 ---@field match2players MGIParsedPlayer[]
+---@field startingpoints number?
 ---@field extradata table
 
 local NOT_PLAYED_INPUTS = {
