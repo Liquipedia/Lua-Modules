@@ -104,7 +104,7 @@ function CustomMatchSummary.createGame(match, game, gameIndex)
 			CustomMatchSummary._getSideIcon(game.opponents[2]),
 
 			-- Comment
-			MatchSummaryWidgets.GameComment{children = game.comment}
+			MatchSummaryWidgets.GameComment{classes = {'brkts-popup-sc-game-comment'}, children = game.comment}
 		)
 	}
 end
