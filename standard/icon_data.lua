@@ -109,8 +109,8 @@ return {
 	sort = 'far fa-arrows-alt-v',
 
 	-- Usage: Stormgate
-	dungeon = 'fas fa-dungeon',
-	fort = 'fab fa-fort-awesome',
+	coop = 'fas fa-dungeon',
+	mayhem = 'fab fa-fort-awesome',
 
 	-- Usage: Chess
 	chesskingoutline = 'far fa-chess-king',

@@ -13,6 +13,7 @@ return {
 		'website'
 	},
 	league = {
+		'365chess',
 		'5ewin',
 		'abiosgaming',
 		'aligulac',
@@ -22,6 +23,8 @@ return {
 		'cfs',
 		'challengermode',
 		'challonge',
+		'chesscom',
+		'chessgames',
 		'cybergamer',
 		'datdota',
 		'dotabuff',
@@ -36,11 +39,13 @@ return {
 		'faceit-c',
 		'faceit-hub',
 		'faceit-org',
+		'fide',
 		'gamersclub',
 		'geoguessr',
 		'halodatahive',
 		'letsplaylive',
 		'letsplaylive-old',
+		'lichess',
 		'matcherino',
 		'matcherinolink',
 		'nwc3l',
@@ -63,6 +68,7 @@ return {
 		'replay',
 	},
 	social = {
+		'bluesky',
 		'discord',
 		'facebook',
 		'instagram',

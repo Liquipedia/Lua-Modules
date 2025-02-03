@@ -25,9 +25,13 @@ local Opponent = OpponentLibrary.Opponent
 
 local StandingsTable = {}
 
+---@class Scoreboard
+---@field points number?
+
 ---@class StandingTableOpponentData
----@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: {points: number?}?}[]?
+---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?}[]?
 ---@field opponent standardOpponent
+---@field startingPoints number?
 
 ---@param frame Frame
 ---@return Widget

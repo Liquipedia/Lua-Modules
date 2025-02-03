@@ -11,6 +11,8 @@ local Class = require('Module:Class')
 local CostDisplay = require('Module:Infobox/Extension/CostDisplay')
 local Faction = require('Module:Faction')
 local Hotkeys = require('Module:Hotkey')
+local Icon = require('Module:Icon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -36,6 +38,11 @@ local VALID_SKILLS = {
 	'Trait',
 	'Upgrade',
 	'Effect',
+}
+local SORT_TABLE = {'1v1', 'coop', 'mayhem'}
+local GAME_MODE_ICON = {
+	coop = 'coop',
+	mayhem = 'mayhem',
 }
 
 ---@param frame Frame
@@ -78,7 +85,11 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'cost' then
+	if id == 'caster' then
+		return {
+			Cell{name = 'Caster(s)', content = caller:_castersDisplay()},
+		}
+	elseif id == 'cost' then
 		return {
 			Cell{name = 'Cost', content = {caller:_costDisplay()}},
 			Cell{name = 'Recharge Time', content = {args.charge_time and (args.charge_time .. 's') or nil}},
@@ -128,6 +139,58 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
+end
+
+function CustomSkill:_castersDisplay()
+	local casters = self:getAllArgsForBase(self.args, 'caster')
+
+	return Array.map(casters, function(caster)
+		local casterUnit = mw.ext.LiquipediaDB.lpdb('datapoint', {
+			conditions = '([[type::Unit]] OR [[type::Hero]] or [[type::building]]) AND [[pagename::'
+				.. string.gsub(caster, ' ', '_') .. ']]',
+			limit = 1,
+		})[1] or {}
+
+		if type(casterUnit) ~= 'table' or Logic.isEmpty(casterUnit) then return end
+
+		local extraData = casterUnit.extradata or {}
+
+		if Table.includes(extraData.subfaction or {}, '1v1') then
+			return Page.makeInternalLink({}, casterUnit.name, caster)
+		end
+
+		if casterUnit.type == 'Hero' then
+			local heroSubfactionData = Array.parseCommaSeparatedString(extraData.subfaction[1] or {}, ':')
+			return GAME_MODE_ICON[heroSubfactionData[1]] and Page.makeInternalLink({},
+				Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(heroSubfactionData[1])], size = '100%'}
+				.. ' ' .. casterUnit.name, caster)
+		end
+
+		local casterSubfactions = table.concat(Array.map(self:_parseSubfactionData(extraData.subfaction or {}),
+			function(sfElement)
+				local gameModeIcon = GAME_MODE_ICON[sfElement[1]]
+					and Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(sfElement[1])], size = '100%'}
+				return gameModeIcon and sfElement[2]
+					and (gameModeIcon .. ' ' .. string.gsub(sfElement[2], ';', ', ')) or nil
+			end),
+		', ')
+
+		return Page.makeInternalLink({}, casterUnit.name .. ' (' .. casterSubfactions .. ')', caster)
+	end)
+end
+
+---@param data table
+---@return table?
+function CustomSkill:_parseSubfactionData(data)
+	local parsedElements = Array.map(data, function(dataElement)
+		return Array.parseCommaSeparatedString(dataElement, ':')
+	end)
+
+	return Array.sortBy(parsedElements, function(element)
+		return Array.indexOf(SORT_TABLE, function(sortElement)
+			return sortElement == string.lower(element[1])
+		end)
+	end)
 end
 
 ---@param prefix string

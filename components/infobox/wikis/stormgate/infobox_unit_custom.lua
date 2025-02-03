@@ -42,8 +42,8 @@ local GAME_MODE_NAME =	{
 	mayhem = 'Team Mayhem',
 }
 local GAME_MODE_ICON = {
-	coop = 'dungeon',
-	mayhem = 'fort',
+	coop = 'coop',
+	mayhem = 'mayhem',
 }
 
 ---@param frame Frame
