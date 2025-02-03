@@ -28,7 +28,7 @@ jobs:
           luacheck ./ --formatter=JUnit > report.xml
 
       - name: Report lint
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v5
         if: always()
         with:
           report_paths: 'report.xml'
@@ -58,7 +58,7 @@ jobs:
           busted -v --run=ci --output=junit > busted.xml
 
       - name: Report test
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v5
         if: always()
         with:
           report_paths: 'busted.xml'
