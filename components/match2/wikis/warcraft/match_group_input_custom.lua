@@ -427,10 +427,12 @@ end
 ---@param numberOfOpponents integer
 ---@return table
 function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
-	return {
+	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
+	Table.mergeInto(settings.settings, {
 		noscore = not Logic.readBool(match.hasscore),
 		showgamedetails = false,
-	}
+	})
+	return settings
 end
 
 ---@param opponent table
@@ -501,14 +503,16 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
-		settings = settings,
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
 	}
 end
 
 ---@param match table
 ---@param opponents table[]
+---@param placementInfo table[]
 ---@return table[]
-function FfaMatchFunctions.extractMaps(match, opponents)
+function FfaMatchFunctions.extractMaps(match, opponents, placementInfo)
 	local hasScores = Logic.readBool(match.hasscore)
 	local maps = {}
 	for mapKey, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do

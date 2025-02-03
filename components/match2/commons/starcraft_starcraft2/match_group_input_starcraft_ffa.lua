@@ -58,10 +58,12 @@ end
 ---@param numberOfOpponents integer
 ---@return table
 function MatchFunctions.parseSettings(match, numberOfOpponents)
-	return {
+	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
+	Table.mergeInto(settings.settings, {
 		noscore = Logic.readBool(match.noscore),
 		showgamedetails = false,
-	}
+	})
+	return settings
 end
 
 ---@param opponent table
@@ -139,7 +141,8 @@ function MatchFunctions.getExtraData(match, games, opponents, settings)
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
 		showplacement = Logic.readBoolOrNil(match.showplacement),
-		settings = settings,
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
 	}
 
 	for prefix, vetoMap, vetoIndex in Table.iter.pairsByPrefix(match, 'veto') do
