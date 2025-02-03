@@ -577,7 +577,7 @@ end
 ---@param mapOpponents table[]
 ---@return integer?
 function FfaMapFunctions.getMapWinner(status, winnerInput, mapOpponents)
-	local placementOfOpponents = MatchGroupInputUtil.calcuatePlacementOfOpponents(mapOpponents)
+	local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(mapOpponents)
 	Array.forEach(mapOpponents, function(opponent, opponentIndex)
 		opponent.placement = placementOfOpponents[opponentIndex]
 	end)
