@@ -91,7 +91,7 @@ function CustomHero:addToLpdb(lpdbData, args)
 		damagebullet = args.damagebullet,
 		damagemeleelight = args.damagemeleelight,
 		damagemeleeheavy = args.damagemeleeheavy,
-		playable = tostring(Logic.readBool(args.playable or true)),
+		playable = tostring(Logic.nilOr(Logic.readBoolOrNil(args.playable), true)),
 		removed = tostring(Logic.readBool(args.removed))
 	}
 
