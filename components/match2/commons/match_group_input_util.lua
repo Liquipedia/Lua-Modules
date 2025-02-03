@@ -1400,16 +1400,30 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	return match
 end
 
+---@class FfaMapParserInterface
+---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
+---@field getPatch? fun(game: table): string?
+---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
+---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
+---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
+---@field readMapOpponent? fun(map: table, matchOpponent: table, opponentIndex: integer): table
+---@field getMapWinner? fun(status: string?, winnerInput: integer|string?, mapOpponents: table[]): integer?
+
 --- The standard way to process a ffa map input.
 ---
 --- The Parser injection may optionally have the following functions:
+--- - getMapName(map, mapIndex, match): string?, string?
+--- - getPatch(map): string?
+--- - getMapMode(match, map, opponents): string?
+--- - readMapOpponent(map, matchOpponent, opponentIndex): table
+--- - getMapWinner(status, winnerInput, mapOpponents)
 --- - getExtraData(match, map, opponents): table?
 --- - getPlayersOfMapOpponent(map, opponent, opponentMapInput): table[]?
 ---
 ---@param match table
 ---@param opponents table[]
 ---@param scoreSettings table
----@param Parser MapParserInterface
+---@param Parser FfaMapParserInterface
 ---@return table
 function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, Parser)
 	local maps = {}
@@ -1417,23 +1431,40 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		local finishedInput = map.finished --[[@as string?]]
 		local winnerInput = map.winner --[[@as string?]]
 
+		if Parser.getMapName then
+			map.map, map.mapDisplayName = Parser.getMapName(map, mapIndex, match)
+		end
+
+		if Parser.getPatch then
+			map.patch = Parser.getPatch(map)
+		end
+
 		local dateToUse = map.date or match.date
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
-		map.opponents = Array.map(opponents, function(matchOpponent)
+		local opponentParser = Parser.readMapOpponent and FnUtil.curry(Parser.readMapOpponent, map) or function(matchOpponent)
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
 			local opponent = MatchGroupInputUtil.makeBattleRoyaleMapOpponentDetails(opponentMapInput, scoreSettings)
 			if Parser.getPlayersOfMapOpponent then
 				opponent.players = Parser.getPlayersOfMapOpponent(map, matchOpponent, opponentMapInput)
 			end
 			return opponent
-		end)
+		end
+
+		map.opponents = Array.map(opponents, opponentParser)
+
+		-- needs map.opponents available!
+		if Parser.getMapMode then
+			map.mode = Parser.getMapMode(match, map, opponents)
+		end
+
 
 		map.scores = Array.map(map.opponents, Operator.property('score'))
 		if map.finished then
 			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
+			local getWinner = Parser.getMapWinner or MatchGroupInputUtil.getWinner
+			map.winner = getWinner(map.status, winnerInput, map.opponents)
 		end
 
 		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
