@@ -27,6 +27,7 @@ local StandingsTable = {}
 
 ---@class Scoreboard
 ---@field points number?
+---@field hiddenpoints number?
 
 ---@class StandingTableOpponentData
 ---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?}[]?

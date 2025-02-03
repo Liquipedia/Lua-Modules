@@ -32,16 +32,17 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, hiddenPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
 					pointsFromRound = thisRoundsData.scoreboard.points
+					hiddenPoints = thisRoundsData.scoreboard.hiddenpoints
 				end
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 			end
-			pointSum = pointSum + (pointsFromRound or 0)
+			pointSum = pointSum + (pointsFromRound or 0) + (hiddenPoints or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
 			return {
 				opponent = opponent,
