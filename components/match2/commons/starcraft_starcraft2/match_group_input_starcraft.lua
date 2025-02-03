@@ -618,6 +618,21 @@ function FfaMapFunctions.getMapWinner(status, winnerInput, mapOpponents)
 	return StarcraftMatchGroupInput._getFfAWinner(status, winnerInput, mapOpponents)
 end
 
+---@param match table
+---@param map table
+---@return boolean
+function FfaMapFunctions.mapIsFinished(match, map)
+	local finished = Logic.readBoolOrNil(map.finished)
+	if finished ~= nil then
+		return finished
+	end
+
+	return Array.any(Array.range(1, #map.opponents), function(opponentIndex)
+		return Logic.isNotEmpty(map['placement' .. opponentIndex]) or
+			Logic.isNotEmpty(map['score' .. opponentIndex])
+	end)
+end
+
 ---@param status string?
 ---@param winnerInput integer|string|nil
 ---@param opponents {placement: integer?, score: integer?, status: string}[]

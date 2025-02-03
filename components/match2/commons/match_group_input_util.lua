@@ -1414,6 +1414,7 @@ end
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
 ---@field readMapOpponent? fun(map: table, matchOpponent: table, opponentIndex: integer): table
 ---@field getMapWinner? fun(status: string?, winnerInput: integer|string?, mapOpponents: table[]): integer?
+---@field mapIsFinished? fun(match: table, map: table): boolean
 
 --- The standard way to process a ffa map input.
 ---
@@ -1447,7 +1448,6 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 
 		local dateToUse = map.date or match.date
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
 
 		local opponentParser = Parser.readMapOpponent and FnUtil.curry(Parser.readMapOpponent, map) or function(matchOpponent)
 			local opponentMapInput = Json.parseIfString(matchOpponent['m' .. mapIndex])
@@ -1457,8 +1457,9 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 			end
 			return opponent
 		end
-
 		map.opponents = Array.map(opponents, opponentParser)
+
+		map.finished = Parser.mapIsFinished and Parser.mapIsFinished(match, map) or MatchGroupInputUtil.mapIsFinished(map)
 
 		-- needs map.opponents available!
 		if Parser.getMapMode then
