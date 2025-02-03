@@ -51,7 +51,8 @@ function CustomMatchGroupInput.processMatch(match, options)
 	match.finished = finishedInput
 
 	local processedMatch = MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, FfaMatchFunctions)
-	processedMatch.extradata.status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED and finishedInput or nil
+	processedMatch.extradata.status = match.status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+		and finishedInput or match.status
 
 	return processedMatch
 end
