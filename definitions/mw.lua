@@ -334,10 +334,11 @@ function mw.language:formatNum(num, options)
 end
 
 ---Formats a date according to the given format string. If timestamp is omitted, the default is the current time. The value for local must be a boolean or nil; if true, the time is formatted in the wiki's local time rather than in UTC.
----@param format string
+---@param format 'U'
 ---@param timestamp string|osdateparam?
 ---@param localTime boolean?
----@return number|string
+---@return number
+---@overload fun(format: string, timestamp: string|osdateparam, localTime:boolean?):string
 function mw.language:formatDate(format, timestamp, localTime)
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)

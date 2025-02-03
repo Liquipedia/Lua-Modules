@@ -31,10 +31,7 @@ local StandingsParseWiki = {}
 ]]
 
 ---@param args table
----@return {rounds: {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[],
----opponents: StandingTableOpponentData[],
----bgs: table<integer, string>,
----matches: string[]}
+---@return StandingsTableProps
 function StandingsParseWiki.parseWikiInput(args)
 	---@type {roundNumber: integer, started: boolean, finished:boolean, title: string?, matches: string[]}[]
 	local rounds = {}
@@ -46,7 +43,7 @@ function StandingsParseWiki.parseWikiInput(args)
 		rounds = {StandingsParseWiki.parseWikiRound(args, 1)}
 	end
 
-	local date = DateExt.readTimestamp(args.date) or DateExt.getContextualDateOrNow()
+	local date = DateExt.toYmdInUtc(args.date) or DateExt.getContextualDateOrNow()
 
 	---@type StandingTableOpponentData[]
 	local opponents = Array.map(args, function (opponentData)
@@ -58,10 +55,13 @@ function StandingsParseWiki.parseWikiInput(args)
 		return round.matches
 	end))
 
+	---@type StandingsTableProps
 	return {
 		rounds = rounds,
 		opponents = opponents,
 		bgs = StandingsParseWiki.parseWikiBgs(args.bg),
+		title = args.title,
+		endDate = date,
 		matches = Array.unique(wrapperMatches),
 	}
 end
@@ -102,6 +102,7 @@ end
 
 ---@param opponentInput string|table
 ---@param numberOfRounds integer
+---@param resolveDate string
 ---@return StandingTableOpponentData[]
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate)
 	local opponentData = Json.parseIfString(opponentInput)

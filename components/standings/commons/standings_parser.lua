@@ -11,18 +11,16 @@ local Variables = require('Module:Variables')
 
 local StandingsParser = {}
 
----@param rounds {roundNumber: integer, started: boolean, finished:boolean, title: string?}[]
----@param opponents StandingTableOpponentData[]
----@param bgs table<integer, string>
----@param title string?
----@param matches string[]
+---@param props StandingsTableProps
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches)
+function StandingsParser.parse(props)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
 	local standingsindex = lastStandingsIndex + 1
 	Variables.varDefine('standingsindex', standingsindex)
+
+	local rounds, opponents, bgs = props.rounds, props.opponents, props.bgs
 
 	local isFinished = Array.all(rounds, function(round) return round.finished end)
 
@@ -82,15 +80,16 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 	---@type StandingsTableStorage
 	return {
 		standingsindex = standingsindex,
-		title = title,
+		title = props.title,
 		type = 'ffa', -- We only deal with ffa atm
 		entries = entries,
-		matches = matches,
+		matches = props.matches,
 		roundcount = #rounds,
 		hasdraw = false,
 		hasovertime = false,
 		haspoints = true,
 		finished = isFinished,
+		enddate = props.endDate,
 		extradata = {
 			rounds = rounds,
 		},
