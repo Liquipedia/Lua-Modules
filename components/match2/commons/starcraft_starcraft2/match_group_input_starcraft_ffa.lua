@@ -61,7 +61,7 @@ function MatchFunctions.parseSettings(match, numberOfOpponents)
 	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
 	Table.mergeInto(settings.settings, {
 		noscore = Logic.readBool(match.noscore),
-		showgamedetails = false,
+		showGameDetails = false,
 	})
 	return settings
 end

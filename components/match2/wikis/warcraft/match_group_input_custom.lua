@@ -432,7 +432,7 @@ function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
 	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
 	Table.mergeInto(settings.settings, {
 		noscore = not Logic.readBool(match.hasscore),
-		showgamedetails = false,
+		showGameDetails = false,
 	})
 	return settings
 end
