@@ -627,7 +627,7 @@ function FfaMapFunctions.mapIsFinished(match, map)
 		return finished
 	end
 
-	return Array.any(Array.range(1, #map.opponents), function(opponentIndex)
+	return Array.all(Array.range(1, #map.opponents), function(opponentIndex)
 		return Logic.isNotEmpty(map['placement' .. opponentIndex]) or
 			Logic.isNotEmpty(map['score' .. opponentIndex])
 	end)
