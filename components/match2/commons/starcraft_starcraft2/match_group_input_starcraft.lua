@@ -45,12 +45,8 @@ local FfaMatchFunctions = {
 		resolveRedirect = true,
 		pagifyTeamNames = true,
 	},
-	readDate = MatchFunctions.readDate,
-	getMatchWinner = StarcraftMatchGroupInput._getFfAWinner,
 }
-local FfaMapFunctions = {
-	getMapMode = MapFunctions.getMapMode,
-}
+local FfaMapFunctions = {}
 
 ---@param match table
 ---@param options table?
@@ -78,6 +74,7 @@ function MatchFunctions.readDate(matchArgs)
 	end
 	return dateProps
 end
+FfaMatchFunctions.readDate = MatchFunctions.readDate
 
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
@@ -375,6 +372,7 @@ function MapFunctions.getMapMode(match, map, opponents)
 
 	return table.concat(modeParts, 'v')
 end
+FfaMapFunctions.getMapMode = MapFunctions.getMapMode
 
 ---@param match table
 ---@param map table
@@ -640,5 +638,6 @@ function StarcraftMatchGroupInput._getFfAWinner(status, winnerInput, opponents)
 
 	return calculatedWinner ~= 0 and calculatedWinner or nil
 end
+FfaMatchFunctions.getMatchWinner = StarcraftMatchGroupInput._getFfAWinner
 
 return StarcraftMatchGroupInput

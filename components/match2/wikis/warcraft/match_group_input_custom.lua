@@ -56,12 +56,9 @@ local FfaMatchFunctions = {
 		resolveRedirect = true,
 		pagifyTeamNames = true,
 	},
-	readDate = MatchFunctions.readDate,
 	DEFAULT_MODE = MODE_FFA,
 }
-local FfaMapFunctions = {
-	getMapMode = MapFunctions.getMapMode,
-}
+local FfaMapFunctions = {}
 
 ---@param match table
 ---@param options table?
@@ -100,6 +97,7 @@ function MatchFunctions.readDate(matchArgs)
 		'tournament_enddate',
 	})
 end
+FfaMatchFunctions.readDate = MatchFunctions.readDate
 
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
@@ -343,6 +341,7 @@ function MapFunctions.getMapMode(match, map, opponents)
 
 	return table.concat(modeParts, 'v')
 end
+FfaMapFunctions.getMapMode = MapFunctions.getMapMode
 
 ---@param match table
 ---@param map table
