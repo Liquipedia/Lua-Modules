@@ -53,17 +53,26 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
+		-- This is a bit stupid that we need to use one region from each superRegion
 		items = { 'EMEA', 'Korea', 'China', 'Americas', 'Pacific', 'Other', },
-		defaultItems = { 'EMEA', 'Korea', 'China', 'Americas', 'Pacific', 'Other' },
 		defaultItem = 'Other',
 		itemToPropertyValues = function(region)
-			return table.concat(REGIONS_IN_SUPERREGION[REGION_TO_SUPERREGION[region]], ',')
+			-- Input is a region
+			if REGION_TO_SUPERREGION[region] then
+				return table.concat(REGIONS_IN_SUPERREGION[REGION_TO_SUPERREGION[region]], ',')
+			end
+			-- Input is a superRegion
+			if REGIONS_IN_SUPERREGION[region] then
+				return table.concat(REGIONS_IN_SUPERREGION[region], ',')
+			end
+			-- Unknown input
+			return ''
 		end,
 		itemIsValid = function(region)
 			return REGION_TO_SUPERREGION[region] ~= nil
 		end,
 		transform = function(region)
-			return REGION_TO_SUPERREGION[region]
+			return REGION_TO_SUPERREGION[region] or region
 		end,
 	},
 }

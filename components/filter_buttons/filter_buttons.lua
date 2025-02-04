@@ -109,9 +109,11 @@ function FilterButtons.getButtonRow(category)
 	end
 
 	local transformValueToText = category.transform or FnUtil.identity
+	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
 	for _, value in ipairs(category.items or {}) do
 		local text = transformValueToText(value)
-		makeButton(value, text)
+		local filterValue = itemToPropertyValues(value) or value
+		makeButton(filterValue, text)
 	end
 
 	if String.isNotEmpty(category.expandKey) then
