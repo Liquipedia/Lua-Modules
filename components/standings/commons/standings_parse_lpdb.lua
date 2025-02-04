@@ -68,8 +68,14 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	)
 
 	return Array.map(opponents, function(opponentData)
+		local opponent = Opponent.fromMatch2Record(opponentData.opponent)
+
+		if Opponent.isTbd(opponent) then
+			return
+		end
+
 		return {
-			opponent = Opponent.fromMatch2Record(opponentData.opponent),
+			opponent = opponent,
 			rounds = Array.map(opponentData.rounds, function(roundData)
 				return {
 					scoreboard = {
