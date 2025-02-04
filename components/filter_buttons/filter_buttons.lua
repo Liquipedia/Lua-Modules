@@ -26,6 +26,7 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 ---@field items string[]?
 ---@field defaultItems string[]?
 ---@field defaultItem string?
+---@field itemToPropertyValues? fun(item: string): string?
 ---@field itemIsValid? fun(item: string): boolean
 ---@field transform? fun(item: string): string?
 ---@field expandKey string?
