@@ -53,7 +53,6 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		-- This is a bit stupid that we need to use one region from each superRegion
 		items = { 'EMEA', 'Korea', 'China', 'Americas', 'Pacific', 'Other', },
 		defaultItem = 'Other',
 		itemToPropertyValues = function(region)
