@@ -29,11 +29,7 @@ local CustomOpponent = Table.deepCopy(Opponent)
 function CustomOpponent.readOpponentArgs(args)
 	local opponent = Opponent.readOpponentArgs(args) --[[@as FightersStandardOpponent?]]
 
-	if not opponent then return nil end
-
-	local partySize = Opponent.partySize(opponent.type)
-
-	if not partySize then return opponent end
+	if not opponent or not Opponent.typeIsParty(opponent.type) then return opponent end
 
 	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 	opponent.players[1].game = game
