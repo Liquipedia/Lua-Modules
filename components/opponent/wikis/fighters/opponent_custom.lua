@@ -41,7 +41,8 @@ function CustomOpponent.readOpponentArgs(args)
 	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 
 	Array.forEach(opponent.players, function (player, playerIndex)
-		local charInputs = Array.parseCommaSeparatedString(args['chars' .. playerIndex])
+		local stringInput = args['chars' .. playerIndex] or (playerIndex == 1 and args.chars) or nil
+		local charInputs = Array.parseCommaSeparatedString(stringInput)
 		player.chars = Array.map(charInputs, function(characterInput)
 			if Logic.isEmpty(characterInput) then return nil end
 			---@cast characterInput -nil
