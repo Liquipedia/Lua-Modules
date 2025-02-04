@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Info = require('Module:Info')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -39,6 +40,41 @@ function CustomOpponent.readOpponentArgs(args)
 		Array.forEach(opponent.players, function (player, playerIndex)
 			player.chars = Array.parseCommaSeparatedString(args['chars' .. playerIndex])
 		end)
+	end
+
+	return opponent
+end
+
+---@param opponent FightersStandardOpponent
+---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
+function CustomOpponent.toLpdbStruct(opponent)
+	local storageStruct = Opponent.toLpdbStruct(opponent)
+
+	if not Opponent.typeIsParty(opponent.type) then
+		return storageStruct
+	end
+
+	for playerIndex, player in pairs(opponent.players) do
+		storageStruct.opponentplayers['p' .. playerIndex .. 'chars'] = player.chars and table.concat(player.chars, ',') or nil
+	end
+
+	return storageStruct
+end
+
+---Reads a standings or placement lpdb structure and builds an opponent struct from it
+---@param storageStruct table
+---@return FightersStandardOpponent?
+function CustomOpponent.fromLpdbStruct(storageStruct)
+	local opponent = Opponent.fromLpdbStruct(storageStruct) --[[@as FightersStandardOpponent?]]
+
+	if not opponent or not Opponent.typeIsParty(opponent.type) then
+		return opponent
+	end
+
+	for playerIndex, player in pairs(opponent.players) do
+		player.chars = Logic.nilIfEmpty(Array.parseCommaSeparatedString(
+			storageStruct.opponentplayers['p' .. playerIndex .. 'chars']
+		))
 	end
 
 	return opponent
