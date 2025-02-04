@@ -33,14 +33,21 @@ function CustomOpponent.readOpponentArgs(args)
 
 	local partySize = Opponent.partySize(opponent.type)
 
-	if partySize == 1 then
-		opponent.players[1].chars = Array.parseCommaSeparatedString(args.chars)
-		opponent.players[1].game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
-	elseif partySize then
-		Array.forEach(opponent.players, function (player, playerIndex)
-			player.chars = Array.parseCommaSeparatedString(args['chars' .. playerIndex])
+	if not partySize then return opponent end
+
+	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
+	opponent.players[1].game = game
+
+	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+
+	Array.forEach(opponent.players, function (player, playerIndex)
+		local charInputs = Array.parseCommaSeparatedString(args['chars' .. playerIndex])
+		player.chars = Array.map(charInputs, function(characterInput)
+			if Logic.isEmpty(characterInput) then return nil end
+			---@cast characterInput -nil
+			return (assert(CharacterStandardizationData[characterInput:lower()], 'Invalid character:' .. characterInput))
 		end)
-	end
+	end)
 
 	return opponent
 end
