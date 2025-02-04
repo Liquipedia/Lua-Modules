@@ -186,6 +186,7 @@ function CustomItem:setLpdbData(args)
 			cost = args.itemcost,
 			category = args.category,
 			removed = tostring(Logic.readBool(args.removed)),
+			tier = tonumber(args.tier),
 		})
 	}
 	mw.ext.LiquipediaDB.lpdb_datapoint('item_' .. (args.name or self.pagename), lpdbData)
