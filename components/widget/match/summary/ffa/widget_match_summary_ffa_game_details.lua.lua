@@ -35,6 +35,10 @@ function MatchSummaryFfaGameDetails:render()
 			icon = IconWidget{iconName = 'map'},
 			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
 		} or nil,
+		game.comment and {
+			icon = IconWidget{iconName = 'comment'},
+			content = HtmlWidgets.Span{children = game.comment},
+		} or nil,
 	}}
 end
 
