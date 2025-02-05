@@ -16,6 +16,7 @@ local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/Content
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
 local GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdown')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchSummaryFfaGameDetails: Widget
 ---@operator call(table): MatchSummaryFfaGameDetails
@@ -26,7 +27,7 @@ function MatchSummaryFfaGameDetails:render()
 	local game = self.props.game
 	assert(game, 'No game provided')
 
-	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = {
+	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = WidgetUtil.collect(
 		{
 			icon = CountdownIcon{game = game},
 			content = GameCountdown{game = game},
@@ -38,8 +39,8 @@ function MatchSummaryFfaGameDetails:render()
 		game.comment and {
 			icon = IconWidget{iconName = 'comment'},
 			content = HtmlWidgets.Span{children = game.comment},
-		} or nil,
-	}}
+		} or nil
+	)}
 end
 
 return MatchSummaryFfaGameDetails
