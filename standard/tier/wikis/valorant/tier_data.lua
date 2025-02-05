@@ -40,14 +40,6 @@ return {
 			link = 'C-Tier Tournaments',
 			category = 'C-Tier Tournaments',
 		},
-		{
-			value = '5',
-			sort = 'A5',
-			name = 'D-Tier',
-			short = 'D',
-			link = 'D-Tier Tournaments',
-			category = 'D-Tier Tournaments',
-		},
 		[''] = {
 			value = nil,
 			sort = 'B2',
