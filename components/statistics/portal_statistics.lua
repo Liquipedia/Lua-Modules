@@ -580,6 +580,9 @@ function StatisticsPortal.pieChartBreakdown(args)
 	)
 
 	if args.multiGame then
+		local games = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES), function(game)
+			return Game.toIdentifier{game = args.game, useDefault = false} or args.game
+		end)
 		wrapper:node(mw.html.create('div')
 			:addClass('template-box')
 			:css('padding-right', '5em')
@@ -587,7 +590,7 @@ function StatisticsPortal.pieChartBreakdown(args)
 			:css('text-align', 'center')
 			:wikitext('Game Breakdown')
 			:node(StatisticsPortal._getPieChartData(
-				args, 'game', 'Other', StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES)
+				args, 'game', 'Other', games
 			))
 		)
 	end
