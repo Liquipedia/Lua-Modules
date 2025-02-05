@@ -71,11 +71,15 @@ Section: Chart Entry Functions
 function StatisticsPortal.gameEarningsChart(args)
 	args = args or {}
 
+	local games = Array.map(StatisticsPortal._isTableOrSplitOrDefault(args.customGames, GAMES), function(game)
+		return Game.toIdentifier{game = args.game, useDefault = false} or args.game
+	end)
+
 	local params = {
 		variable = 'game',
 		processFunction = StatisticsPortal._defaultProcessFunction,
 		catLabel = 'Year',
-		defaultInputs = GAMES,
+		defaultInputs = games,
 		axisRotate = tonumber(args.axisRotate),
 	}
 
