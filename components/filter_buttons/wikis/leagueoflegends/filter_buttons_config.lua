@@ -15,16 +15,17 @@ local Config = {}
 local REGION_TO_SUPERREGION = {
 	['Europe'] = 'EMEA',
 	['Turkey'] = 'EMEA',
+	['Arab States'] = 'EMEA',
 	['Korea'] = 'Korea',
 	['China'] = 'China',
 	['North America'] = 'Americas',
 	['Latin America North'] = 'Americas',
 	['Latin America South'] = 'Americas',
 	['Brazil'] = 'Americas',
-	['Taiwan'] = 'Pacific',
-	['Oceania'] = 'Pacific',
-	['Japan'] = 'Pacific',
-	['Vietnam'] = 'Pacific',
+	['Taiwan'] = 'APAC',
+	['Oceania'] = 'APAC',
+	['Japan'] = 'APAC',
+	['Vietnam'] = 'APAC',
 	['Other'] = 'Other',
 }
 
@@ -55,7 +56,7 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		items = { 'EMEA', 'Korea', 'China', 'Americas', 'Pacific', 'Other', },
+		items = { 'Korea', 'China', 'EMEA', 'Americas', 'APAC', 'Other', },
 		defaultItem = 'Other',
 		itemToPropertyValues = function(region)
 			-- Input is a region
