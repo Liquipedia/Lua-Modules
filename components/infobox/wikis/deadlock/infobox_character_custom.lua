@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 
 local Lua = require('Module:Lua')
 
@@ -90,6 +91,8 @@ function CustomHero:addToLpdb(lpdbData, args)
 		damagebullet = args.damagebullet,
 		damagemeleelight = args.damagemeleelight,
 		damagemeleeheavy = args.damagemeleeheavy,
+		playable = tostring(Logic.nilOr(Logic.readBoolOrNil(args.playable), true)),
+		removed = tostring(Logic.readBool(args.removed))
 	}
 
 	return lpdbData

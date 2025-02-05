@@ -56,7 +56,6 @@ local FfaMatchFunctions = {
 		resolveRedirect = true,
 		pagifyTeamNames = true,
 	},
-	readDate = MatchFunctions.readDate,
 	DEFAULT_MODE = MODE_FFA,
 }
 local FfaMapFunctions = {}
@@ -98,6 +97,7 @@ function MatchFunctions.readDate(matchArgs)
 		'tournament_enddate',
 	})
 end
+FfaMatchFunctions.readDate = MatchFunctions.readDate
 
 ---@param opponent MGIParsedOpponent
 ---@param opponentIndex integer
@@ -341,6 +341,7 @@ function MapFunctions.getMapMode(match, map, opponents)
 
 	return table.concat(modeParts, 'v')
 end
+FfaMapFunctions.getMapMode = MapFunctions.getMapMode
 
 ---@param match table
 ---@param map table
@@ -427,10 +428,12 @@ end
 ---@param numberOfOpponents integer
 ---@return table
 function FfaMatchFunctions.parseSettings(match, numberOfOpponents)
-	return {
+	local settings = MatchGroupInputUtil.parseSettings(match, numberOfOpponents)
+	Table.mergeInto(settings.settings, {
 		noscore = not Logic.readBool(match.hasscore),
-		showgamedetails = false,
-	}
+		showGameDetails = false,
+	})
+	return settings
 end
 
 ---@param opponent table
@@ -501,38 +504,25 @@ function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
 		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
-		settings = settings,
+		placementinfo = settings.placementInfo,
+		settings = settings.settings,
 	}
 end
 
 ---@param match table
 ---@param opponents table[]
+---@param scoreSettings table
 ---@return table[]
-function FfaMatchFunctions.extractMaps(match, opponents)
-	local hasScores = Logic.readBool(match.hasscore)
-	local maps = {}
-	for mapKey, mapInput in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local map = FfaMapFunctions.readMap(match, mapInput, #opponents, hasScores)
-
-		Array.forEach(map.opponents, function(opponent, opponentIndex)
-			opponent.players = MapFunctions.getPlayersOfMapOpponent(mapInput, opponents[opponentIndex], opponentIndex)
-		end)
-
-		map.mode = MapFunctions.getMapMode(match, map, opponents)
-
-		table.insert(maps, map)
-		match[mapKey] = nil
-	end
-
-	return maps
+function FfaMatchFunctions.extractMaps(match, opponents, scoreSettings)
+	return MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSettings, FfaMapFunctions)
 end
 
----@param match table
 ---@param mapInput table
----@param opponentCount integer
----@param hasScores boolean
----@return table
-function FfaMapFunctions.readMap(match, mapInput, opponentCount, hasScores)
+---@param mapIndex integer
+---@param match table
+---@return string?
+---@return string?
+function FfaMapFunctions.getMapName(mapInput, mapIndex, match)
 	local mapName = mapInput.map
 	if mapName and mapName:upper() ~= TBD then
 		mapName = mw.ext.TeamLiquidIntegration.resolve_redirect(mapInput.map)
@@ -540,78 +530,66 @@ function FfaMapFunctions.readMap(match, mapInput, opponentCount, hasScores)
 		mapName = TBD
 	end
 
-	local map = {
-		map = mapName,
-		patch = Variables.varDefault('tournament_patch', ''),
-		vod = mapInput.vod,
-		extradata = {
-			comment = mapInput.comment,
-			displayname = mapInput.mapDisplayName,
-			settings = {noscore = not hasScores},
-		}
-	}
-
-	Table.mergeInto(map, MatchGroupInputUtil.readDate(mapInput.date or match.date))
-
-	if MatchGroupInputUtil.isNotPlayed(mapInput.winner, mapInput.finished) then
-		map.finished = true
-		map.status = MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
-		map.scores = {}
-		return map
-	end
-
-	map.opponents = Array.map(Array.range(1, opponentCount), function(opponentIndex)
-		return FfaMapFunctions.getOpponentInfo(mapInput, opponentIndex)
-	end)
-
-	map.scores = Array.map(map.opponents, Operator.property('score'))
-
-	map.finished = MatchGroupInputUtil.mapIsFinished(mapInput)
-
-	if map.finished then
-		map.status = MatchGroupInputUtil.getMatchStatus(mapInput.winner, mapInput.finished)
-		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(map.opponents)
-		Array.forEach(map.opponents, function(opponent, opponentIndex)
-			opponent.placement = placementOfOpponents[opponentIndex]
-		end)
-		map.winner = CustomMatchGroupInput._getFfaWinner(map.status, mapInput.winner, map.opponents)
-	end
-
-	return map
+	return mapName, mapInput.mapDisplayName
 end
 
----@param mapInput table
+---@param map any
+---@return string
+function FfaMapFunctions.getPatch(map)
+	return Variables.varDefault('tournament_patch', '')
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		comment = map.comment,
+		displayname = map.mapDisplayName,
+		settings = {noscore = not Logic.readBool(match.hasscore)},
+	}
+end
+
+---@param map table
+---@param matchOpponent table
 ---@param opponentIndex integer
----@return {placement: integer?, score: integer?, status: string}
-function FfaMapFunctions.getOpponentInfo(mapInput, opponentIndex)
+---@return table
+function FfaMapFunctions.readMapOpponent(map, matchOpponent, opponentIndex)
 	local score, status = MatchGroupInputUtil.computeOpponentScore{
-		walkover = mapInput.walkover,
-		winner = mapInput.winner,
+		walkover = map.walkover,
+		winner = map.winner,
 		opponentIndex = opponentIndex,
-		score = mapInput['score' .. opponentIndex],
+		score = map['score' .. opponentIndex],
 	}
 
 	return {
-		placement = tonumber(mapInput['placement' .. opponentIndex]),
+		placement = tonumber(map['placement' .. opponentIndex]),
 		score = score,
 		status = status,
+		players = MapFunctions.getPlayersOfMapOpponent(map, matchOpponent, opponentIndex),
 	}
 end
 
----@param status string
----@param winnerInput integer|string|nil
----@param opponents {placement: integer?, score: integer?, status: string}[]
+---@param status string?
+---@param winnerInput string?
+---@param mapOpponents table[]
 ---@return integer?
-function CustomMatchGroupInput._getFfaWinner(status, winnerInput, opponents)
+function FfaMapFunctions.getMapWinner(status, winnerInput, mapOpponents)
+	local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(mapOpponents)
+	Array.forEach(mapOpponents, function(opponent, opponentIndex)
+		opponent.placement = placementOfOpponents[opponentIndex]
+	end)
+
 	if status == MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED then
 		return nil
 	elseif Logic.isNumeric(winnerInput) then
 		return tonumber(winnerInput)
-	elseif MatchGroupInputUtil.isDraw(opponents, winnerInput) then
+	elseif MatchGroupInputUtil.isDraw(mapOpponents, winnerInput) then
 		return MatchGroupInputUtil.WINNER_DRAW
 	end
 
-	local placements = Array.map(opponents, Operator.property('placement'))
+	local placements = Array.map(mapOpponents, Operator.property('placement'))
 	local bestPlace = Array.min(placements)
 
 	local calculatedWinner = Array.indexOf(placements, FnUtil.curry(Operator.eq, bestPlace))

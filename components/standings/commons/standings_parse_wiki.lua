@@ -102,6 +102,7 @@ end
 
 ---@param opponentInput string|table
 ---@param numberOfRounds integer
+---@param resolveDate string|number?
 ---@return StandingTableOpponentData[]
 function StandingsParseWiki.parseWikiOpponent(opponentInput, numberOfRounds, resolveDate)
 	local opponentData = Json.parseIfString(opponentInput)
