@@ -8,9 +8,9 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
-
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
@@ -242,7 +242,12 @@ function Count._baseConditions(args, isTournament)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	if args.game then
-		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
+		local gameIdentifier = Game.toIdentifier{game = args.game, useDefault = false}
+		local gameConditions = ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('game'), Comparator.eq, args.game),
+			gameIdentifier and ConditionNode(ColumnName('game'), Comparator.eq, gameIdentifier) or nil,
+		}
+		conditions:add(gameConditions)
 	end
 
 	if args.type then
