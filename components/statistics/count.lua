@@ -242,12 +242,8 @@ function Count._baseConditions(args, isTournament)
 	local conditions = ConditionTree(BooleanOperator.all)
 
 	if args.game then
-		local gameIdentifier = Game.toIdentifier{game = args.game, useDefault = false}
-		local gameConditions = ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('game'), Comparator.eq, args.game),
-			gameIdentifier and ConditionNode(ColumnName('game'), Comparator.eq, gameIdentifier) or nil,
-		}
-		conditions:add(gameConditions)
+		local gameIdentifier = Game.toIdentifier{game = args.game, useDefault = false} or args.game
+		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, gameIdentifier)}
 	end
 
 	if args.type then
