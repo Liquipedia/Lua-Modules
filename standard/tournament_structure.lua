@@ -339,7 +339,7 @@ function TournamentStructure.getGroupTableFilter(spec)
 			return TournamentStructure.getPageNameFilter('standingstable', pageName)
 		end)
 
-	return '(' .. table.concat(whereClauses, ' OR ') .. ')'
+	return '(' .. table.concat(whereClauses, ' OR ') .. ') AND [[type::!ffa]]'
 end
 
 --- Fetches bracket data (matches) for a given match group spec.
