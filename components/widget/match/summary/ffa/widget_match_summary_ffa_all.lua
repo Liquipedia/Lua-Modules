@@ -16,6 +16,7 @@ Widgets.GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdow
 Widgets.GameDetails = Lua.import('Module:Widget/Match/Summary/Ffa/GameDetails')
 Widgets.GamesSchedule = Lua.import('Module:Widget/Match/Summary/Ffa/GamesSchedule')
 Widgets.Header = Lua.import('Module:Widget/Match/Summary/Ffa/Header')
+Widgets.MatchComment = Lua.import('Module:Widget/Match/Summary/Ffa/MatchComment')
 Widgets.PointsDistribution = Lua.import('Module:Widget/Match/Summary/Ffa/PointsDistribution')
 Widgets.RankRange = Lua.import('Module:Widget/Match/Summary/Ffa/RankRange')
 Widgets.Tab = Lua.import('Module:Widget/Match/Summary/Ffa/Tab')

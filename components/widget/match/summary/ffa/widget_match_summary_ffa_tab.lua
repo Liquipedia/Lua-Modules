@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchSummaryFfaTab: Widget
 ---@operator call(table): MatchSummaryFfaTab
@@ -24,7 +25,7 @@ function MatchSummaryFfaTab:render()
 			['data-js-battle-royale'] = 'panel-content',
 			id = self.props.matchId .. 'panel' .. self.props.idx,
 		},
-		children = self.props.children,
+		children = WidgetUtil.collect(unpack(self.props.children or {})),
 	}
 end
 
