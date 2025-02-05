@@ -194,7 +194,9 @@ function TournamentStructure.getPageNameFilter(matchGroupType, pageName)
 		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName) .. ']]') or nil,
 		('[[pagename::' .. basePageName:gsub('%s', '_') .. ']]'),
 		stageName and (matchGroupType == 'bracket') and ('[[match2bracketdata_sectionheader::' .. stageName .. ']]') or nil,
-		stageName and (matchGroupType == 'standingstable') and ('[[extradata_stagename::' .. stageName .. ']]') or nil
+		stageName and (matchGroupType == 'standingstable') and ('[[extradata_stagename::' .. stageName .. ']]') or nil,
+		-- exclude ffa standings for now due to them causing issues
+		matchGroupType == 'standingstable' and ('[[type::!ffa]]') or nil
 	)
 	return table.concat(clauses, ' AND ')
 end
@@ -339,7 +341,7 @@ function TournamentStructure.getGroupTableFilter(spec)
 			return TournamentStructure.getPageNameFilter('standingstable', pageName)
 		end)
 
-	return '(' .. table.concat(whereClauses, ' OR ') .. ') AND [[type::!ffa]]'
+	return '(' .. table.concat(whereClauses, ' OR ') .. ')'
 end
 
 --- Fetches bracket data (matches) for a given match group spec.
