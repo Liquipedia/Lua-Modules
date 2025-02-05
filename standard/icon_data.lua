@@ -15,6 +15,7 @@ return {
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
+	comment = 'far fa-comment',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
