@@ -15,6 +15,7 @@ local SummaryHelper = Lua.import('Module:MatchSummary/Base/Ffa')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@param props {bracketId: string, matchId: string}
 ---@return Widget
@@ -29,12 +30,12 @@ function CustomMatchSummary.getByMatchId(props)
 		MatchSummaryWidgets.Tab{
 			matchId = match.matchId,
 			idx = 0,
-			children = {
+			children = WidgetUtil.collect(
 				MatchSummaryWidgets.GamesSchedule{match = match},
 				MatchSummaryWidgets.PointsDistribution{scores = scoringData},
 				MatchSummaryWidgets.MatchComment{match = match},
-				SummaryHelper.standardMatch(match),
-			}
+				SummaryHelper.standardMatch(match)
+			)
 		}
 	}}
 end
