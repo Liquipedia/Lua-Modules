@@ -545,7 +545,6 @@ end
 ---@return table
 function FfaMapFunctions.getExtraData(match, map, opponents)
 	return {
-		comment = map.comment,
 		displayname = map.mapDisplayName,
 		settings = {noscore = not Logic.readBool(match.hasscore)},
 	}
