@@ -48,14 +48,14 @@ function RatingsDisplayGraph.build(teamRankings)
 		legend = {
 			show = true,
 			selected = Table.map(teams, function(rank, team)
-				return team.shortName, rank <= LIMIT_TEAMS_SELECTED and true or false
+				return team.opponent.name, rank <= LIMIT_TEAMS_SELECTED and true or false
 			end)
 		},
 		series = Array.map(teams, function(team)
 			return {
 				data = Array.map(team.progression, Operator.property('rating')),
 				type = 'line',
-				name = team.shortName
+				name = team.opponent.name
 			}
 		end)
 	})

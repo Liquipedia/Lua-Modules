@@ -8,6 +8,8 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local RatingsStorageLpdb = {}
 
@@ -17,8 +19,8 @@ local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHO
 local LIMIT_TEAMS = 100 -- How many teams to do the calculations for
 
 ---@param id string
----@param progressionLimit integer
----@return table[]
+---@param progressionLimit integer?
+---@return RatingsEntry[]
 function RatingsStorageLpdb.getRankings(id, progressionLimit)
 	local snapshot = RatingsStorageLpdb._getSnapshot(id)
 	if not snapshot then
@@ -29,15 +31,18 @@ function RatingsStorageLpdb.getRankings(id, progressionLimit)
 	-- Toss away teams that are lower ranked than what is interesting
 	local teams = {}
 	for rank, teamName in ipairs(snapshot.extradata.ranks) do
+		local teamInfo = RatingsStorageLpdb._getTeamInfo(teamName)
 		local team = snapshot.extradata.table[teamName] or {}
-		team.name = teamName
+		team.opponent = Opponent.resolve(Opponent.readOpponentArgs({type = Opponent.team, teamName}))
+		team.region = teamInfo.region
+
 		table.insert(teams, team)
 		if rank >= LIMIT_TEAMS then
 			break
 		end
 	end
 
-	teams = RatingsStorageLpdb._addProgressionData(teams, id, progressionLimit)
+	teams = RatingsStorageLpdb._addProgressionData(teams, id, progressionLimit or 0)
 
 	return teams
 end
@@ -96,6 +101,36 @@ function RatingsStorageLpdb._createProgressionEntry(timestamp, rating)
 		date = os.date('%Y-%m-%d', timestamp),
 		rating = rating and tostring(math.floor(rating + 0.5)) or '',
 	}
+end
+
+--- Get team information from Team Template and Team Page
+---@param teamName string
+---@return {region: string?}
+function RatingsStorageLpdb._getTeamInfo(teamName)
+	local teamInfo = RatingsStorageLpdb._fetchTeamInfo(teamName)
+
+	return {
+		region = teamInfo.region or '???',
+	}
+end
+
+--- Fetch team information from Team Page
+---@param name string
+---@return {region: string?}
+function RatingsStorageLpdb._fetchTeamInfo(name)
+	local res = mw.ext.LiquipediaDB.lpdb(
+		'team',
+		{
+			query = 'region',
+			limit = 1,
+			conditions = '[[pagename::' .. string.gsub(name, ' ', '_') .. ']]'
+		}
+	)
+	if not res[1] then
+		mw.log('Warning: Cannot find teampage for ' .. name)
+	end
+
+	return res[1] or {}
 end
 
 return RatingsStorageLpdb

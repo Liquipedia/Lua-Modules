@@ -10,6 +10,9 @@ local Array = require('Module:Array')
 local Operator = require('Module:Operator')
 local Template = require('Module:Template')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 ---@class RatingsDisplayList: RatingsDisplayInterface
 local RatingsDisplayList = {}
 
@@ -62,7 +65,7 @@ function RatingsDisplayList.build(teamRankings)
 
 		local popup = Template.expandTemplate(mw.getCurrentFrame(), 'Popup', {
 			label = 'show',
-			title = 'Details for ' .. mw.ext.TeamTemplate.team(team.name),
+			title = 'Details for ' .. OpponentDisplay.InlineOpponent{opponent = team.opponent},
 			content = chart,
 		})
 
@@ -73,7 +76,7 @@ function RatingsDisplayList.build(teamRankings)
 
 		htmlTable:tag('tr')
 			:tag('td'):css('font-weight', 'bold'):wikitext(rank):done()
-			:tag('td'):css('text-align', 'left'):wikitext(mw.ext.TeamTemplate.team(team.name)):done()
+			:tag('td'):css('text-align', 'left'):node(OpponentDisplay.InlineOpponent{opponent = team.opponent}):done()
 			:tag('td'):wikitext(math.floor(team.rating + 0.5)):done()
 			:tag('td'):wikitext(string.upper(team.region or '')):done()
 			:tag('td'):wikitext(team.matches):done()
