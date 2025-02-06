@@ -6,11 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 
 local RatingsStorageFactory = {}
 
----@param args {storageType: 'lpdb'|'extension', id: string?}
+---@param args {storageType: 'lpdb'|'extension', id: string?, date: string?}
 ---@return RatingsDisplayGetRankings
 function RatingsStorageFactory.createGetRankings(args)
 	local storageType = args.storageType
@@ -21,7 +22,8 @@ function RatingsStorageFactory.createGetRankings(args)
 		return FnUtil.curry(RatingsStorageLpdb.getRankings, args.id)
 	elseif storageType == 'extension' then
 		local RatingsStorageExtension = require('Module:Ratings/Storage/Extension')
-		return RatingsStorageExtension.getRankings
+		local date = args.date or Date.getContextualDateOrNow()
+		return FnUtil.curry(RatingsStorageExtension.getRankings, date)
 	end
 
 	error('Unknown storage type: ' .. (storageType or ''))
