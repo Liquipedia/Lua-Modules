@@ -35,7 +35,7 @@ local CONTENT = {
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
+			'[[Special:RunQuery/Transfer|Input Form]]' ..
 			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Portal:Rumours|Rumours]]</center></div>\n</div>',
 		boxid = 1509,
