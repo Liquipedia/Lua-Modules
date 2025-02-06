@@ -87,7 +87,7 @@ function RatingsList:render()
 		return {
 			HtmlWidgets.Td{children = rank},
 			HtmlWidgets.Td{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
-			HtmlWidgets.Td{children = math.floor(team.rating + 0.5)},
+			HtmlWidgets.Td{children = team.rating},
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
 			HtmlWidgets.Td{children = popup},
