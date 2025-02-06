@@ -14,28 +14,31 @@ local RatingsStorageLpdb = {}
 
 local PROGRESSION_STEP_DAYS = 7 -- How many days each progression step is
 
----@param endDate string
+---@param date string
+---@param teamLimit integer?
 ---@param progressionLimit integer?
 ---@return RatingsEntry[]
-function RatingsStorageLpdb.getRankings(endDate, progressionLimit)
-	local now = Date.getContextualDateOrNow()
-	if endDate > now then
+function RatingsStorageLpdb.getRankings(date, teamLimit, progressionLimit)
+	if not date then
+		error('No date provided')
+	end
+	if date > Date.getContextualDateOrNow() then
 		error('Cannot get rankings for future date')
 	end
 	-- Calculate Start Date
 	progressionLimit = progressionLimit or 0
-	local startDateOsdate = Date.parseIsoDate(endDate)
+	local startDateOsdate = Date.parseIsoDate(date)
 	startDateOsdate.day = startDateOsdate.day - (progressionLimit * PROGRESSION_STEP_DAYS)
 
 	local startDate = os.date('%F', os.time(startDateOsdate)) --[[@as string]]
 
 	-- Get the ratings and progression
-	local teams = mw.ext.Dota2Ranking.get(startDate, endDate)
+	local teams = mw.ext.Dota2Ranking.get(startDate, date)
 
 	-- Add additional data to the teams
 	for _, team in ipairs(teams) do
 		local teamInfo = RatingsStorageLpdb._getTeamInfo(team.name)
-		team.opponent = Opponent.resolve(Opponent.readOpponentArgs({type = Opponent.team, team.name}), endDate)
+		team.opponent = Opponent.resolve(Opponent.readOpponentArgs({type = Opponent.team, team.name}), date)
 		team.region = teamInfo.region
 	end
 

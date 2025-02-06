@@ -9,20 +9,29 @@
 local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 
+---@class RatingsEntry
+---@field opponent standardOpponent
+---@field rating number
+---@field region string
+---@field streak integer
+---@field progression table[]
+
+---@alias RatingsDisplayGetRankings fun(teamLimit: integer, progressionLimit?: integer):RatingsEntry[]
+
 local RatingsStorageFactory = {}
 
----@param args {storageType: 'lpdb'|'extension', id: string?, date: string?}
+---@param props {storageType: 'lpdb'|'extension', id: string?, date: string?}
 ---@return RatingsDisplayGetRankings
-function RatingsStorageFactory.createGetRankings(args)
-	local storageType = args.storageType
+function RatingsStorageFactory.createGetRankings(props)
+	local storageType = props.storageType
 
 	if storageType == 'lpdb' then
 		local RatingsStorageLpdb = require('Module:Ratings/Storage/Lpdb')
-		assert(args.id, 'ID is required for LPDB storage')
-		return FnUtil.curry(RatingsStorageLpdb.getRankings, args.id)
+		assert(props.id, 'ID is required for LPDB storage')
+		return FnUtil.curry(RatingsStorageLpdb.getRankings, props.id)
 	elseif storageType == 'extension' then
 		local RatingsStorageExtension = require('Module:Ratings/Storage/Extension')
-		local date = args.date or Date.getContextualDateOrNow()
+		local date = props.date
 		return FnUtil.curry(RatingsStorageExtension.getRankings, date)
 	end
 

@@ -16,12 +16,11 @@ local RatingsStorageLpdb = {}
 -- static conditions for LPDB
 local STATIC_CONDITIONS_LPR_SNAPSHOT = '[[namespace::4]] AND [[type::LPR_SNAPSHOT]]'
 
-local LIMIT_TEAMS = 100 -- How many teams to do the calculations for
-
 ---@param id string
+---@param teamLimit integer?
 ---@param progressionLimit integer?
 ---@return RatingsEntry[]
-function RatingsStorageLpdb.getRankings(id, progressionLimit)
+function RatingsStorageLpdb.getRankings(id, teamLimit, progressionLimit)
 	local snapshot = RatingsStorageLpdb._getSnapshot(id)
 	if not snapshot then
 		error('Could not find a Rating with this ID')
@@ -37,7 +36,7 @@ function RatingsStorageLpdb.getRankings(id, progressionLimit)
 		team.region = teamInfo.region
 
 		table.insert(teams, team)
-		if rank >= LIMIT_TEAMS then
+		if rank >= teamLimit then
 			break
 		end
 	end
