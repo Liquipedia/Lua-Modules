@@ -35,12 +35,13 @@ RatingsList.defaultProps = {
 ---@return Widget
 function RatingsList:render()
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
+	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
 	local getRankings = RatingsStorageFactory.createGetRankings{
 		storageType = self.props.storageType,
 		date = self.props.date,
 		id = self.props.id,
 	}
-	local teams = getRankings(teamLimit, self.props.progressionLimit)
+	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
 		local chart = mw.ext.Charts.chart{
