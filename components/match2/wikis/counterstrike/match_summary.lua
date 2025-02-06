@@ -67,9 +67,9 @@ function CustomMatchSummary.createBody(match)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil,
 		Array.map(match.games, CustomMatchSummary._createMap),
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game})),
-		MatchSummaryWidgets.MatchComment{children = matchStatusText} or nil
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
 	)}
 end
 
