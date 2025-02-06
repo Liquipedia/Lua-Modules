@@ -84,13 +84,21 @@ function RatingsList:render()
 				or (team.streak < -1 and 'group-table-rank-change-down')
 				or nil
 
-		return {
+		local teamRow = {
 			HtmlWidgets.Td{children = rank},
 			HtmlWidgets.Td{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
 			HtmlWidgets.Td{children = team.rating},
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
 			HtmlWidgets.Td{children = popup},
+		}
+
+		local graphRow = {
+			HtmlWidgets.Td{attributes = {colspan = '6'}, children = chart, classes = {'graph-row-td'}}
+		}
+
+		return {
+			teamRow, graphRow
 		}
 	end)
 
@@ -100,8 +108,11 @@ function RatingsList:render()
 				return HtmlWidgets.Th{children = title}
 			end),
 		},
-		Array.map(teamRows, function(teamCells)
-			return HtmlWidgets.Tr{children = teamCells}
+		Array.flatMap(teamRows, function(rows)
+			return {
+				HtmlWidgets.Tr{children = rows[1]},
+				HtmlWidgets.Tr{children = rows[2], classes = {'graph-row', 'hidden'}}
+			}
 		end)
 	)}
 end
