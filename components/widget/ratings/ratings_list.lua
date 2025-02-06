@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Template = require('Module:Template')
@@ -87,7 +88,7 @@ function RatingsList:render()
 			HtmlWidgets.Td{children = rank},
 			HtmlWidgets.Td{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
 			HtmlWidgets.Td{children = math.floor(team.rating + 0.5)},
-			HtmlWidgets.Td{children = string.upper(team.region or '')},
+			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
 			HtmlWidgets.Td{children = popup},
 		}

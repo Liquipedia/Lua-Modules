@@ -109,7 +109,7 @@ function RatingsStorageLpdb._getTeamInfo(teamName)
 	local teamInfo = RatingsStorageLpdb._fetchTeamInfo(teamName)
 
 	return {
-		region = teamInfo.region or '???',
+		region = teamInfo.region,
 	}
 end
 
