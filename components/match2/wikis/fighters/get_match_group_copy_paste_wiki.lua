@@ -13,6 +13,9 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 ---WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class FightersMatchCopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
@@ -51,9 +54,9 @@ end
 function WikiCopyPaste._getMap(mode)
 	local lines = Array.extend(
 		'={{Map',
-		INDENT .. INDENT .. '|map=|winner=',
+		mode == Opponent.team and INDENT .. INDENT .. '|t1p1=|t2p1=' or nil,
 		INDENT .. INDENT .. '|o1p1={{Chars|}}|o2p1={{Chars|}}',
-		INDENT .. INDENT .. '|score1=|score2=',
+		INDENT .. INDENT .. '|score1=|score2=|winner=',
 		INDENT .. '}}'
 	)
 	return table.concat(lines, '\n')
