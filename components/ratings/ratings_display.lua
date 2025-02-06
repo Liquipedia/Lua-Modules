@@ -26,14 +26,6 @@ local RatingsDisplay = {}
 
 local LIMIT_HISTORIC_ENTRIES = 24 -- How many historic entries are fetched
 
---- Entry point for the ratings display in graph display mode
----@param frame Frame
----@return string
-function RatingsDisplay.graph(frame)
-	local Display = require('Module:Ratings/Display/Graph')
-	return RatingsDisplay.make(frame, Display)
-end
-
 --- Entry point for the ratings display in table list display mode
 ---@param frame Frame
 ---@return string
