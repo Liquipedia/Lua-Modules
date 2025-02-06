@@ -194,9 +194,7 @@ function TournamentStructure.getPageNameFilter(matchGroupType, pageName)
 		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName) .. ']]') or nil,
 		('[[pagename::' .. basePageName:gsub('%s', '_') .. ']]'),
 		stageName and (matchGroupType == 'bracket') and ('[[match2bracketdata_sectionheader::' .. stageName .. ']]') or nil,
-		stageName and (matchGroupType == 'standingstable') and ('[[extradata_stagename::' .. stageName .. ']]') or nil,
-		-- exclude ffa standings for now due to them causing issues
-		matchGroupType == 'standingstable' and ('[[type::!ffa]]') or nil
+		stageName and (matchGroupType == 'standingstable') and ('[[extradata_stagename::' .. stageName .. ']]') or nil
 	)
 	return table.concat(clauses, ' AND ')
 end
