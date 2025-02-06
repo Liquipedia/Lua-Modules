@@ -205,10 +205,23 @@ end
 ---@param filter string
 ---@return table
 function TournamentStructure.fetchBracketsFromFilter(filter)
-	return mw.ext.LiquipediaDB.lpdb('match2', {
+	local matches = mw.ext.LiquipediaDB.lpdb('match2', {
 			conditions = filter .. ' AND [[match2bracketdata_type::bracket]]',
 			limit = 5000,
 		})
+
+	---@param match match2
+	---@return boolean
+	local isFfaMatch = function(match)
+		return #(match.match2opponents or {}) > 2
+	end
+
+	-- exclude FFA/BR Brackets, due to them causing issues
+	if Array.any(matches, isFfaMatch) then
+		return {}
+	end
+
+	return matches
 end
 
 --- Fetches groups (standings tables) for a given filter (condition string).
