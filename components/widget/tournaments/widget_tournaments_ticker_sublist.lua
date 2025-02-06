@@ -29,12 +29,13 @@ function TournamentsTickerWidget:render()
 	local createFilterWrapper = function(tournament, child)
 		return Array.reduce(FilterConfig.categories, function(prev, filterCategory)
 			local itemIsValid = filterCategory.itemIsValid or function(item) return true end
+			local itemToPropertyValues = filterCategory.itemToPropertyValues or function(item) return item end
 			local value = tournament[filterCategory.property]
 			local filterValue = itemIsValid(value) and value or filterCategory.defaultItem
 			return HtmlWidgets.Div{
 				attributes = {
 					['data-filter-group'] = 'filterbuttons-' .. filterCategory.name,
-					['data-filter-category'] = filterValue,
+					['data-filter-category'] = itemToPropertyValues(filterValue),
 					['data-curated'] = tournament.featured and '' or nil,
 				},
 				children = prev,

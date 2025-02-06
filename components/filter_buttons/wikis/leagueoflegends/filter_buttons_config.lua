@@ -6,22 +6,34 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local Table = require('Module:Table')
 local Tier = require('Module:Tier/Utils')
+
 local Config = {}
 
-local REGION_NAME_TO_SHORTNAME = {
-	['Europe'] = 'eu',
-	['North America'] = 'na',
-	['Korea'] = 'kr',
-	['China'] = 'ch',
-	['Japan'] = 'jp',
-	['Latin America North'] = 'latam n',
-	['Latin America South'] = 'latam s',
-	['Taiwan'] = 'tw',
-	['Oceania'] = 'oce',
-	['Brazil'] = 'br',
-	['Other'] = 'other',
+local REGION_TO_SUPERREGION = {
+	['Europe'] = 'EMEA',
+	['Turkey'] = 'EMEA',
+	['Arab States'] = 'EMEA',
+	['Korea'] = 'Korea',
+	['China'] = 'China',
+	['North America'] = 'Americas',
+	['Latin America North'] = 'Americas',
+	['Latin America South'] = 'Americas',
+	['Brazil'] = 'Americas',
+	['Taiwan'] = 'APAC',
+	['Oceania'] = 'APAC',
+	['Japan'] = 'APAC',
+	['Vietnam'] = 'APAC',
+	['Other'] = 'Other',
 }
+
+local REGIONS_IN_SUPERREGION = Table.mapValues(Table.groupBy(REGION_TO_SUPERREGION, function(region, superRegion)
+	return superRegion
+end), function(superRegion)
+	return Array.extractKeys(superRegion)
+end)
 
 ---@type FilterButtonCategory[]
 Config.categories = {
@@ -44,17 +56,25 @@ Config.categories = {
 		name = 'region',
 		property = 'region',
 		expandable = true,
-		items = {
-			'Europe', 'North America', 'Korea', 'China', 'Japan', 'Latin America North',
-			'Latin America South', 'Taiwan', 'Oceania', 'Brazil', 'Other',
-		},
-		defaultItems = { 'Europe', 'North America', 'Korea', 'China', 'Brazil', 'Other' },
+		items = { 'Korea', 'China', 'EMEA', 'Americas', 'APAC', 'Other', },
 		defaultItem = 'Other',
+		itemToPropertyValues = function(region)
+			-- Input is a region
+			if REGION_TO_SUPERREGION[region] then
+				return table.concat(REGIONS_IN_SUPERREGION[REGION_TO_SUPERREGION[region]], ',')
+			end
+			-- Input is a superRegion
+			if REGIONS_IN_SUPERREGION[region] then
+				return table.concat(REGIONS_IN_SUPERREGION[region], ',')
+			end
+			-- Unknown input
+			return ''
+		end,
 		itemIsValid = function(region)
-			return REGION_NAME_TO_SHORTNAME[region] ~= nil
+			return REGION_TO_SUPERREGION[region] ~= nil
 		end,
 		transform = function(region)
-			return REGION_NAME_TO_SHORTNAME[region]
+			return REGION_TO_SUPERREGION[region] or region
 		end,
 	},
 }
