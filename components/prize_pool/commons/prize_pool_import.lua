@@ -30,6 +30,7 @@ local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local GSL_GROUP_OPPONENT_NUMBER = 4
 local SWISS_GROUP_TYPE = 'swiss'
+local BRKT_GROUP_TYPE = 'bracket'
 local GSL_STYLE_SCORES = {
 	{w = 2, d = 0, l = 0},
 	{w = 2, d = 0, l = 1},
@@ -275,7 +276,7 @@ end
 function Import:_needsLastVs(standingRecords)
 	if self.config.allGroupsUseWdl then
 		return false
-	elseif (standingRecords[1] or {}).type == SWISS_GROUP_TYPE then
+	elseif (standingRecords[1] or {}).type == SWISS_GROUP_TYPE or (standingRecords[1] or {}).type == BRKT_GROUP_TYPE then
 		return true
 	elseif #standingRecords ~= GSL_GROUP_OPPONENT_NUMBER then
 		return false
