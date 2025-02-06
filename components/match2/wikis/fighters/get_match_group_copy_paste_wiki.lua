@@ -56,8 +56,7 @@ function WikiCopyPaste._getMap(mode)
 		'={{Map',
 		mode == Opponent.team and INDENT .. INDENT .. '|t1p1=|t2p1=' or nil,
 		INDENT .. INDENT .. '|o1p1={{Chars|}}|o2p1={{Chars|}}',
-		INDENT .. INDENT .. '|score1=|score2=',
-		INDENT .. INDENT .. '|winner=',
+		INDENT .. INDENT .. '|score1=|score2=|winner=',
 		INDENT .. '}}'
 	)
 	return table.concat(lines, '\n')
