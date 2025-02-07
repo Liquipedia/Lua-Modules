@@ -850,7 +850,12 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 		return true
 	end
 
+	local playall = Logic.readBoolOrNil(match.playall)
 	local bestof = match.bestof
+	if playall then
+		return MatchGroupInputUtil.allHasBeenPlayed(bestof, opponents)
+	end
+
 	if not bestof then
 		return false
 	end
@@ -902,6 +907,13 @@ function MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
 		return true
 	end
 	return false
+end
+
+---@param games table[]
+---@return boolean
+function MatchGroupInputUtil.allHasBeenPlayed(playall, opponents)
+	local scoreSum = Array.reduce(opponents, function(sum, opponent) return sum + (opponent.score or 0) end, 0)
+	return scoreSum >= playall
 end
 
 ---@param bestOfInput string|integer?
@@ -1170,6 +1182,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 
 	match.stream = Streams.processStreams(match)
 	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	match.extradata = Table.merge({playall = Logic.readBoolOrNil(match.playall)}, match.extradata)
 
 	match.games = games
 	match.opponents = opponents
