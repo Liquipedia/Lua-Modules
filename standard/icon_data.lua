@@ -16,6 +16,7 @@ return {
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
 	comment = 'far fa-comment',
+	mvp = 'far fa-users-crown',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
