@@ -30,6 +30,7 @@ local DEFAULT_ELIMINATION_STATUS = 'down'
 local THIRD_PLACE_MATCH_ID = 'RxMTP'
 local GSL_GROUP_OPPONENT_NUMBER = 4
 local SWISS_GROUP_TYPE = 'swiss'
+local FFA_GROUP_TYPE = 'ffa'
 local GSL_STYLE_SCORES = {
 	{w = 2, d = 0, l = 0},
 	{w = 2, d = 0, l = 1},
@@ -234,38 +235,45 @@ function Import:_computeGroupTablePlacementEntries(standingRecords, options)
 	local placementEntries = {}
 	local placementIndexes = {}
 
-	for _, record in ipairs(standingRecords) do
-		if options.importWinners or Table.includes(options.groupElimStatuses, record.currentstatus) then
-			local entry = {
-				date = record.extradata.enddate,
-				hasDraw = record.hasDraw,
-				hasOvertime = record.hasOvertime,
-			}
+	Array.forEach(standingRecords, function (record)
+		--- We do not yet support importing FFA groups
+		if record.type == FFA_GROUP_TYPE then
+			return
+		end
 
-			if not record.extradata.placeRange and Logic.readBool(record.extradata.finished) then
-				record.extradata.placeRange = {record.placement, record.placement}
-			end
-			if record.extradata.placeRange and record.extradata.placeRange[1] == record.extradata.placeRange[2] then
-				Table.mergeInto(entry, {
-					scoreBoard = record.scoreboard,
-					opponent = record.opponent,
-				})
-				if entry.opponent.name then
-					entry.opponent.isResolved = true
-				end
-			end
+		if not options.importWinners and not Table.includes(options.groupElimStatuses, record.currentstatus) then
+			return
+		end
 
-			entry.needsLastVs = needsLastVs
-			entry.matches = record.matches
+		local entry = {
+			date = record.extradata.enddate,
+			hasDraw = record.hasDraw,
+			hasOvertime = record.hasOvertime,
+		}
 
-			if not placementIndexes[record.placement] then
-				table.insert(placementEntries, {entry})
-				placementIndexes[record.placement] = #placementEntries
-			else
-				table.insert(placementEntries[placementIndexes[record.placement]], entry)
+		if not record.extradata.placeRange and Logic.readBool(record.extradata.finished) then
+			record.extradata.placeRange = {record.placement, record.placement}
+		end
+		if record.extradata.placeRange and record.extradata.placeRange[1] == record.extradata.placeRange[2] then
+			Table.mergeInto(entry, {
+				scoreBoard = record.scoreboard,
+				opponent = record.opponent,
+			})
+			if entry.opponent.name then
+				entry.opponent.isResolved = true
 			end
 		end
-	end
+
+		entry.needsLastVs = needsLastVs
+		entry.matches = record.matches
+
+		if not placementIndexes[record.placement] then
+			table.insert(placementEntries, {entry})
+			placementIndexes[record.placement] = #placementEntries
+		else
+			table.insert(placementEntries[placementIndexes[record.placement]], entry)
+		end
+	end)
 
 	return placementEntries
 end
