@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
+local FnUtil = require('Module:FnUtil')
 local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -129,8 +130,15 @@ function RatingsList:render()
 			}
 		} or nil
 
+		local isEven = rank % 2 == 0
+		local rowClasses = {'ranking-table__row'}
+		if isEven then
+			table.insert(rowClasses, 'ranking-table__row--even')
+		end
+
 		return {
-			teamRow, graphRow
+			HtmlWidgets.Tr{children = teamRow, classes = rowClasses},
+			showGraph and HtmlWidgets.Tr{children = graphRow, classes = {'graph-row', 'hidden'}} or nil
 		}
 	end)
 
@@ -138,7 +146,9 @@ function RatingsList:render()
 	local tableHeader = HtmlWidgets.Tr{
 		children = HtmlWidgets.Th{
 			attributes = {colspan = '7'},
-			children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' },
+			children = HtmlWidgets.Div{
+				children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' }
+			},
 			classes = {'ranking-table__top-row'},
 		}
 	}
@@ -157,12 +167,7 @@ function RatingsList:render()
 			),
 			classes = {'ranking-table__header-row'},
 		},
-		Array.flatMap(teamRows, function(rows)
-			return {
-				HtmlWidgets.Tr{children = rows[1], classes = {'ranking-table__row'}},
-				HtmlWidgets.Tr{children = rows[2], classes = {'graph-row', 'hidden'}}
-			}
-		end)
+		Array.flatMap(teamRows, FnUtil.identity)
 	)}
 end
 
