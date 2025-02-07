@@ -34,7 +34,7 @@ function CustomOpponent.readOpponentArgs(args)
 	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 	opponent.players[1].game = game
 
-	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization')
 
 	Array.forEach(opponent.players, function (player, playerIndex)
 		local stringInput = args['chars' .. playerIndex] or (playerIndex == 1 and args.chars) or nil
