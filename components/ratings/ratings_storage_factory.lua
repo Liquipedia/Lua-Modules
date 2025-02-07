@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Date = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 
 ---@class RatingsEntry
