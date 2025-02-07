@@ -108,7 +108,7 @@ return {
 			},
 		},
 		{
-			file = 'Valorant-champions-seoul-2024.jpg',
+			file = 'MIBR GC Coaches VCT GC Championship 2024.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
