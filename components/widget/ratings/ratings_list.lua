@@ -10,9 +10,9 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
+local Icon = require('Module:Icon')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Template = require('Module:Template')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -20,7 +20,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 
 ---@class RatingsList: Widget
@@ -63,7 +62,7 @@ function RatingsList:render()
 			},
 			size = {
 				height = 300,
-				width = 500
+				width = '100%'
 			},
 			series = {
 				{
@@ -72,12 +71,6 @@ function RatingsList:render()
 				}
 			}
 		}
-
-		local popup = Template.safeExpand(mw.getCurrentFrame(), 'Popup', {
-			label = 'show',
-			title = 'Details for ' .. OpponentDisplay.InlineOpponent{opponent = team.opponent},
-			content = chart,
-		})
 
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
@@ -90,11 +83,18 @@ function RatingsList:render()
 			HtmlWidgets.Td{children = team.rating},
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
-			HtmlWidgets.Td{children = popup},
+			HtmlWidgets.Td{children = HtmlWidgets.Span {
+				attributes = { class = 'toggle-graph' },
+				children = Icon.makeIcon { iconName = 'expand' }
+			}},
 		}
 
 		local graphRow = {
-			HtmlWidgets.Td{attributes = {colspan = '6'}, children = chart, classes = {'graph-row-td'}}
+			HtmlWidgets.Td{
+				attributes = {colspan = '6'},
+				children = { OpponentDisplay.InlineOpponent{opponent = team.opponent}, chart },
+				classes = {'graph-row-td'}
+			}
 		}
 
 		return {
@@ -102,9 +102,14 @@ function RatingsList:render()
 		}
 	end)
 
-	return DataTable{children = WidgetUtil.collect(
+	local tableHeader = HtmlWidgets.Tr{
+		children = HtmlWidgets.Th{children = { 'Last updated: Apr 22, 2024', '[[File:DataProvidedSAP.svg|link=]]' }}
+	}
+
+	return HtmlWidgets.Table{ classes = {'ranking-table'}, children = WidgetUtil.collect(
+		tableHeader,
 		HtmlWidgets.Tr{
-			children = Array.map({ '#', 'Team', 'Rating', 'Region', 'Streak', 'History' }, function(title)
+			children = Array.map({ 'Rank', 'Team', 'Points', 'Region', 'Streak', Icon.makeIcon{iconName='chart'} }, function(title)
 				return HtmlWidgets.Th{children = title}
 			end),
 		},
