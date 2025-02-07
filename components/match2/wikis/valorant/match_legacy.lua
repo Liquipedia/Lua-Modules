@@ -139,7 +139,7 @@ function MatchLegacy._convertParameters(match2)
 	local extradata = Json.parseIfString(match2.extradata)
 
 	match.extradata.matchsection = extradata.matchsection
-	match.extradata.female = Variables.varDefault('female')
+	match.extradata.gamechangers = Variables.varDefault('gamechangers')
 	match.extradata.hidden = Logic.readBool(Variables.varDefault('match_hidden')) and '1' or '0'
 	match.extradata.cancelled = Logic.readBool(Variables.varDefault('cancelled')) and '1' or '0'
 	match.extradata.bestofx = match2.bestof ~= 0 and tostring(match2.bestof) or ''
