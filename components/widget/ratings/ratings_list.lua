@@ -123,7 +123,7 @@ function RatingsList:render()
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
 			showGraph and (HtmlWidgets.Td{children = HtmlWidgets.Span{
-				attributes = { class = 'toggle-graph' },
+				attributes = { class = 'toggle-graph', ['data-ranking-table'] = 'toggle', tabindex = '1' },
 				children = Icon.makeIcon { iconName = 'expand' }
 			}}) or nil
 		)
