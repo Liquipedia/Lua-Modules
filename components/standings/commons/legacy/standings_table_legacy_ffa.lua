@@ -156,13 +156,17 @@ function StandingTableLegacyFfa.parseTeamInput(args, teamIndex)
 	local rounds = Table.map(roundData, function (roundIndex, value)
 		return 'r' .. roundIndex, value
 	end)
+	local roundsChanges = Table.map(roundData, function (roundIndex)
+		return 'r' .. roundIndex .. 'change', args['round' .. roundIndex .. 'changes' .. teamIndex]
+	end)
 
 	local tiebreaker = args['tiebreaker' .. teamIndex] or args['p' .. teamIndex .. 'temp_tie']
 	local startingPoints = args['changes' .. teamIndex] or args['p' .. teamIndex .. 'changes']
 
 	return Table.merge(
 		{type = Opponent.team, team, tiebreaker = tiebreaker, startingpoints = startingPoints},
-		rounds
+		rounds,
+		roundsChanges
 	)
 end
 
