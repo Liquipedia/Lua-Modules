@@ -11,11 +11,11 @@ local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Icon = require('Module:Icon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Widget = Lua.import('Module:Widget')
@@ -32,6 +32,7 @@ RatingsList.defaultProps = {
 	progressionLimit = 10,
 	storageType = 'lpdb',
 	date = Date.getContextualDateOrNow(),
+	showGraph = true,
 }
 
 ---@param teamData RatingsEntry
@@ -87,6 +88,8 @@ function RatingsList:render()
 
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
+	local showGraph = Logic.readBool(self.props.showGraph)
+
 	local getRankings = RatingsStorageFactory.createGetRankings{
 		storageType = self.props.storageType,
 		date = self.props.date,
@@ -95,8 +98,6 @@ function RatingsList:render()
 	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
-		local chart = makeTeamChart(team, teamLimit)
-
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
 				or (team.streak < -1 and 'group-table-rank-change-down')
@@ -104,26 +105,29 @@ function RatingsList:render()
 
 		local changeText = (not team.change and 'NEW') or PlacementChange{change = team.change}
 
-		local teamRow = {
+		local teamRow = WidgetUtil.collect(
 			HtmlWidgets.Td{children = rank},
 			HtmlWidgets.Td{children = changeText},
 			HtmlWidgets.Td{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
 			HtmlWidgets.Td{children = team.rating},
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
-			HtmlWidgets.Td{children = HtmlWidgets.Span{
+			showGraph and (HtmlWidgets.Td{children = HtmlWidgets.Span{
 				attributes = { class = 'toggle-graph' },
 				children = Icon.makeIcon { iconName = 'expand' }
-			}},
-		}
+			}}) or nil
+		)
 
-		local graphRow = {
+		local graphRow = showGraph and {
 			HtmlWidgets.Td{
 				attributes = {colspan = '7'},
-				children = { OpponentDisplay.InlineOpponent{opponent = team.opponent}, chart },
+				children = {
+					OpponentDisplay.InlineOpponent{opponent = team.opponent},
+					makeTeamChart(team, teamLimit),
+				},
 				classes = {'graph-row-td'}
 			}
-		}
+		} or nil
 
 		return {
 			teamRow, graphRow
@@ -142,14 +146,20 @@ function RatingsList:render()
 	return HtmlWidgets.Table{ classes = {'ranking-table'}, children = WidgetUtil.collect(
 		tableHeader,
 		HtmlWidgets.Tr{
-			children = Array.map({ 'Rank', '+/-', 'Team', 'Points', 'Region', 'Streak', Icon.makeIcon{iconName='chart'} }, function(title)
-				return HtmlWidgets.Th{children = title}
-			end),
+			children = WidgetUtil.collect(
+				HtmlWidgets.Th{children = 'Rank'},
+				HtmlWidgets.Th{children = '+/-'},
+				HtmlWidgets.Th{children = 'Team'},
+				HtmlWidgets.Th{children = 'Points'},
+				HtmlWidgets.Th{children = 'Region'},
+				HtmlWidgets.Th{children = 'Streak'},
+				showGraph and HtmlWidgets.Th{children = Icon.makeIcon{iconName='chart'}} or nil
+			),
 			classes = {'ranking-table__header-row'},
 		},
 		Array.flatMap(teamRows, function(rows)
 			return {
-				HtmlWidgets.Tr{children = rows[1]},
+				HtmlWidgets.Tr{children = rows[1], classes = {'ranking-table__row'}},
 				HtmlWidgets.Tr{children = rows[2], classes = {'graph-row', 'hidden'}}
 			}
 		end)
