@@ -12,6 +12,7 @@ local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local I18n = require('Module:I18n')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -87,30 +88,48 @@ function TournamentsTickerWidget:render()
 		end
 	end
 
-	local function sortByDate(a, b)
-		if not a.endDate then
+	---@param a StandardTournament
+	---@param b StandardTournament
+	---@param dateProperty 'endDate' | 'startDate'
+	---@param operator fun(a: StandardTournament, b: StandardTournament): boolean
+	local function sortByDateProperty(a, b, dateProperty, operator)
+		if not a[dateProperty] and not b[dateProperty] then
+			return nil
+		end
+		if not a[dateProperty] then
 			return true
 		end
-		if not b.endDate then
+		if not b[dateProperty] then
 			return false
 		end
-		if a.endDate.timestamp ~= b.endDate.timestamp then
-			return a.endDate.timestamp > b.endDate.timestamp
+		if a[dateProperty].timestamp ~= b[dateProperty].timestamp then
+			return operator(a[dateProperty].timestamp, b[dateProperty].timestamp)
 		end
-		return a.startDate.timestamp > b.startDate.timestamp
+		return nil
+	end
+
+	local function sortByDate(a, b)
+		local endDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
+		if endDateSort ~= nil then
+			return endDateSort
+		end
+		local startDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
+		if startDateSort ~= nil then
+			return startDateSort
+		end
+		return a.pageName < b.pageName
 	end
 
 	local function sortByDateUpcoming(a, b)
-		if a.startDate.timestamp ~= b.startDate.timestamp then
-			return a.startDate.timestamp > b.startDate.timestamp
+		local endDateSort = sortByDateProperty(a, b, 'startDate', Operator.gt)
+		if endDateSort ~= nil then
+			return endDateSort
 		end
-		if not a.endDate then
-			return true
+		local startDateSort = sortByDateProperty(a, b, 'endDate', Operator.gt)
+		if startDateSort ~= nil then
+			return startDateSort
 		end
-		if not b.endDate then
-			return false
-		end
-		return a.endDate.timestamp > b.endDate.timestamp
+		return a.pageName < b.pageName
 	end
 
 	local upcomingTournaments = Array.filter(allTournaments, filterByPhase('UPCOMING'))

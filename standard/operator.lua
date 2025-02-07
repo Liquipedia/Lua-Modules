@@ -66,6 +66,38 @@ function Operator.neq(a, b)
 	return a ~= b
 end
 
+--- Uses the __lt metamethod (a < b)
+---@param a any
+---@param b any
+---@return any
+function Operator.lt(a, b)
+	return a < b
+end
+
+--- Uses the __le metamethod (a <= b)
+---@param a any
+---@param b any
+---@return any
+function Operator.le(a, b)
+	return a <= b
+end
+
+--- Uses the __lt metamethod (b < a)
+---@param a any
+---@param b any
+---@return any
+function Operator.gt(a, b)
+	return a > b
+end
+
+--- Uses the __le metamethod (b <= a)
+---@param a any
+---@param b any
+---@return any
+function Operator.ge(a, b)
+	return a >= b
+end
+
 ---@param item string|number
 ---@return fun(tbl: table): any
 function Operator.property(item)
