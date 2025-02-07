@@ -69,16 +69,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	}
 end
 
----@param match table
----@param map table
----@param opponents table[]
----@return table
-function MapFunctions.getExtraData(match, map, opponents)
-	return {
-		comment = map.comment,
-	}
-end
-
 ---@param map table
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
@@ -111,6 +101,26 @@ function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 			return map.opponents[opponentIndex].score or 0
 		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMatchFunctions.getExtraData(match, map, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(map, opponents),
+	}
 end
 
 return CustomMatchGroupInput
