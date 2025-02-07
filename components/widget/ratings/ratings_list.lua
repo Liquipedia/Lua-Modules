@@ -34,6 +34,11 @@ RatingsList.defaultProps = {
 
 ---@return Widget
 function RatingsList:render()
+	local parsedDate = Date.parseIsoDate(self.props.date)
+	if not parsedDate then
+		error('Invalid date provided')
+	end
+
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
 	local getRankings = RatingsStorageFactory.createGetRankings{
@@ -44,15 +49,17 @@ function RatingsList:render()
 	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
+		local progression = Array.reverse(team.progression)
 		local chart = mw.ext.Charts.chart{
 			xAxis = {
 				type = 'category',
-				data = Array.map(team.progression, Operator.property('date'))
+				data = Array.map(progression, Operator.property('date'))
 			},
 			yAxis = {
 				type = 'value',
-				min = 1000,
-				max = 3500,
+				inverse = true,
+				min = 1,
+				max = 20,
 			},
 			tooltip = {
 				trigger = 'axis'
@@ -62,11 +69,13 @@ function RatingsList:render()
 			},
 			size = {
 				height = 300,
-				width = '100%'
+				pwidth = 100
 			},
 			series = {
 				{
-					data = Array.map(team.progression, Operator.property('rating')),
+					data = Array.map(progression, function(progress)
+						return progress.rank and tostring(progress.rank) or ''
+					end),
 					type = 'line'
 				}
 			}
@@ -102,8 +111,9 @@ function RatingsList:render()
 		}
 	end)
 
+	local formattedDate = os.date('%b %d, %Y', os.time(parsedDate)) --[[@as string]]
 	local tableHeader = HtmlWidgets.Tr{
-		children = HtmlWidgets.Th{children = { 'Last updated: Apr 22, 2024', '[[File:DataProvidedSAP.svg|link=]]' }}
+		children = HtmlWidgets.Th{children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' }}
 	}
 
 	return HtmlWidgets.Table{ classes = {'ranking-table'}, children = WidgetUtil.collect(

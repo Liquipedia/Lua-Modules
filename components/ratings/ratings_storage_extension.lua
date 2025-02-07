@@ -26,19 +26,41 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 	if date > Date.getContextualDateOrNow() then
 		error('Cannot get rankings for future date')
 	end
-	-- Calculate Start Date
-	progressionLimit = progressionLimit or 0
-	local startDateOsdate = Date.parseIsoDate(date)
-	startDateOsdate.day = startDateOsdate.day - (progressionLimit * PROGRESSION_STEP_DAYS)
-
-	local startDate = os.date('%F', os.time(startDateOsdate)) --[[@as string]]
+	-- Calculate Progression Points
+	local progressionDates = {}
+	progressionLimit = progressionLimit or 1
+	local nextProgression = Date.parseIsoDate(date)
+	table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
+	for i = 1, progressionLimit do
+		nextProgression.day = nextProgression.day - PROGRESSION_STEP_DAYS
+		table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
+	end
 
 	-- Get the ratings and progression
-	local teams = mw.ext.Dota2Ranking.get(startDate, date)
+	local teams = mw.ext.Dota2Ranking.get(progressionDates[#progressionDates], date)
 
 	-- Add additional data to the teams
 	return Array.map(teams, function(team)
 		local teamInfo = RatingsStorageExtension._getTeamInfo(team.name)
+		local teamProgressionParsed = Array.map(team.progression, function(progression)
+			return {
+				date = progression.date,
+				rating = RatingsStorageExtension._normalizeRating(progression.rating),
+				rank = progression.rank,
+			}
+		end)
+		local progression = Array.map(progressionDates, function(progressionDate)
+			return Array.find(teamProgressionParsed, function(progression)
+				return progression.date == progressionDate
+			end) or {
+				date = progressionDate,
+			}
+		end)
+
+		if not progression[1].rank then
+			error('Badly formated data')
+		end
+		local isNew = not progression[2].rank
 		---@type RatingsEntry
 		local newTeam = {
 			name = team.name,
@@ -46,14 +68,9 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 			rating = RatingsStorageExtension._normalizeRating(team.rating),
 			region = teamInfo.region,
 			opponent = Opponent.resolve(Opponent.readOpponentArgs({type = Opponent.team, team.name}), date),
+			change = not isNew and progression[2].rank - progression[1].rank or nil,
 			streak = team.streak,
-			progression = Array.map(team.progression, function(progression)
-				return {
-					date = progression.date,
-					rating = RatingsStorageExtension._normalizeRating(progression.rating),
-					rank = progression.rank,
-				}
-			end),
+			progression = progression,
 		}
 		return newTeam
 	end)

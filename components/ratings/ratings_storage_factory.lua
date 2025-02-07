@@ -13,6 +13,7 @@ local FnUtil = require('Module:FnUtil')
 ---@field rating number
 ---@field region string
 ---@field streak integer
+---@field change integer? # nil = new, otherwise indicate change in rank
 ---@field progression {date: string, rating: number?, rank: integer?}[]
 
 ---@alias RatingsDisplayGetRankings fun(teamLimit: integer, progressionLimit?: integer):RatingsEntry[]
