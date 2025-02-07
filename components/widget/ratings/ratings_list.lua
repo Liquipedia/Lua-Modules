@@ -55,25 +55,29 @@ function RatingsList:render()
 		local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 		local chart = mw.ext.Charts.chart{
 			xAxis = {
+				name = 'Date',
+				nameLocation = 'middle',
 				type = 'category',
 				data = Array.map(progression, Operator.property('date')),
-				interval = 4, -- TODO: DOESN'T WORK!
 			},
 			yAxis = {
+				name = 'Rank',
+				nameLocation = 'middle',
+				nameRotate = 90,
 				type = 'value',
 				inverse = true,
 				min = 1,
 				max = math.max(worstRankOfTeam, teamLimit),
 			},
 			tooltip = {
-				trigger = 'axis'
+				trigger = 'axis',
 			},
 			grid = {
-				show = true
+				show = true,
 			},
 			size = {
 				height = 300,
-				pwidth = 100
+				pwidth = 100,
 			},
 			series = {
 				{
@@ -124,6 +128,7 @@ function RatingsList:render()
 		children = HtmlWidgets.Th{
 			attributes = {colspan = '7'},
 			children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' },
+			classes = {'ranking-table__top-row'},
 		}
 	}
 
@@ -133,6 +138,7 @@ function RatingsList:render()
 			children = Array.map({ 'Rank', '+/-', 'Team', 'Points', 'Region', 'Streak', Icon.makeIcon{iconName='chart'} }, function(title)
 				return HtmlWidgets.Th{children = title}
 			end),
+			classes = {'ranking-table__header-row'},
 		},
 		Array.flatMap(teamRows, function(rows)
 			return {
