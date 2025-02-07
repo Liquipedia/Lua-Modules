@@ -374,7 +374,7 @@ function StatisticsPortal._coverageTournamentTableRow(args, parameters)
 				function(typeCounts, index)
 					return Table.isNotEmpty(typeCounts) and Array.extractValues(typeCounts) or 0
 				end
-			)), Operator.add, 0)
+			)), Operator.add, 0) --[[@as number]]
 		runningTally = runningTally + countOther
 		resultsRow:tag(tagType)
 			:wikitext(LANG:formatNum(countOther))
@@ -448,10 +448,12 @@ function StatisticsPortal.prizepoolBreakdown(args)
 
 	local wrapper = mw.html.create('div')
 
-	local prizepoolTable = wrapper:tag('table')
-		:addClass('wikitable wikitable-striped')
-		:css('width', '100%')
-		:css('text-align', 'center')
+	local prizepoolTable = wrapper:tag('div')
+		:addClass('table-responsive')
+		:tag('table')
+			:addClass('wikitable wikitable-striped')
+			:css('width', '100%')
+			:css('text-align', 'center')
 
 	prizepoolTable:tag('caption')
 		:wikitext('Prize Money Awarded')
@@ -504,10 +506,12 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			colIndex = 1
 			wrapper:tag('span'):wikitext('<br>')
 
-			prizepoolTable = wrapper:tag('table')
-				:addClass('wikitable wikitable-striped')
-				:css('width', '100%')
-				:css('text-align', 'center')
+			prizepoolTable = wrapper:tag('div')
+				:addClass('table-responsive')
+				:tag('table')
+					:addClass('wikitable wikitable-striped')
+					:css('width', '100%')
+					:css('text-align', 'center')
 
 			headerRow = prizepoolTable:tag('tr')
 			resultsRow = prizepoolTable:tag('tr')
