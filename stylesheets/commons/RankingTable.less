@@ -1,0 +1,76 @@
+.ranking-table {
+    --_border-color: rgba(0, 0, 0, 0.16);
+    --_background-color: rgba(0, 0, 0, 0.08);
+    --_background-color-even: rgba(0, 0, 0, 0.04);
+    --_border: 0.0625rem solid var(--_border-color);
+
+    .theme--dark & {
+        --_border-color: rgba(255, 255, 255, 0.16);
+        --_background-color: rgba(255, 255, 255, 0.08);
+        --_background-color-even: rgba(255, 255, 255, 0.04);
+    }
+
+    border: var(--_border);
+
+    &__top-row {
+        background-color: var(--_background-color);
+        padding: 1rem 0.75rem;
+        border-bottom: var(--_border);
+        font-weight: normal;
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    }
+
+    &__header-row {
+        background-color: var(--_background-color);
+        border-bottom: var(--_border);
+
+        th {
+            padding: 0.5rem 1rem;
+
+            &:not(:first-child) {
+                border-left: var(--_border);
+            }
+        }
+    }
+
+    &__row {
+        &:not(:first-child) {
+            border-top: var(--_border);
+        }
+
+        &:not(:last-child) {
+            border-bottom: var(--_border);
+        }
+
+        &--even {
+            background-color: var(--_background-color-even);
+        }
+
+        > td {
+            padding: 0.5rem 1rem;
+
+            &:not(:first-child) {
+                border-left: var(--_border);
+            }
+
+            .flag {
+                margin-right: 0.5rem;
+            }
+        }
+    }
+
+    &__graph-row-container {
+        padding: 1.5rem;
+
+        .team-template-team-standard {
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
+        }
+    }
+}
