@@ -118,8 +118,10 @@ function RatingsList:render()
 
 	local formattedDate = os.date('%b %d, %Y', os.time(parsedDate)) --[[@as string]]
 	local tableHeader = HtmlWidgets.Tr{
-		attributes = {colspan = '7'},
-		children = HtmlWidgets.Th{children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' }}
+		children = HtmlWidgets.Th{
+			attributes = {colspan = '7'},
+			children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' },
+		}
 	}
 
 	return HtmlWidgets.Table{ classes = {'ranking-table'}, children = WidgetUtil.collect(
