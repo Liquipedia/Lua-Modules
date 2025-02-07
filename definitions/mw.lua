@@ -958,7 +958,7 @@ mw.ext.Dota2Ranking = {}
 ---@param startDate string #YYYY-MM-DD
 ---@param endDate string #YYYY-MM-DD
 ---@return {name: string, rank: integer, rating: number, streak: integer,
----progression: {date: string, rating: number, rank: integer}[]}
+---progression: {date: string, rating: number, rank: integer}[]}[]
 function mw.ext.Dota2Ranking.get(startDate, endDate) end
 
 mw.ext.VariablesLua = {}

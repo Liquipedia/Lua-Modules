@@ -14,7 +14,7 @@ local FnUtil = require('Module:FnUtil')
 ---@field rating number
 ---@field region string
 ---@field streak integer
----@field progression {date: string, rating: number?, ranking: integer?}[]
+---@field progression {date: string, rating: number?, rank: integer?}[]
 
 ---@alias RatingsDisplayGetRankings fun(teamLimit: integer, progressionLimit?: integer):RatingsEntry[]
 
