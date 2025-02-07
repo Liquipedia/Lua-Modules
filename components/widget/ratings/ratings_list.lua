@@ -105,7 +105,7 @@ function RatingsList:render()
 
 		local graphRow = {
 			HtmlWidgets.Td{
-				attributes = {colspan = '6'},
+				attributes = {colspan = '7'},
 				children = { OpponentDisplay.InlineOpponent{opponent = team.opponent}, chart },
 				classes = {'graph-row-td'}
 			}
@@ -118,6 +118,7 @@ function RatingsList:render()
 
 	local formattedDate = os.date('%b %d, %Y', os.time(parsedDate)) --[[@as string]]
 	local tableHeader = HtmlWidgets.Tr{
+		attributes = {colspan = '7'},
 		children = HtmlWidgets.Th{children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' }}
 	}
 
