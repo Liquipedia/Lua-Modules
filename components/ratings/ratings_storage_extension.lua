@@ -38,6 +38,8 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 
 	-- Get the ratings and progression
 	local teams = mw.ext.Dota2Ranking.get(progressionDates[#progressionDates], date)
+	-- Endpoint doesn't support team limit (yet?), so we'll have to cut it short here
+	teams = Array.sub(teams, 1, math.min(teamLimit or #teams))
 
 	-- Add additional data to the teams
 	return Array.map(teams, function(team)
