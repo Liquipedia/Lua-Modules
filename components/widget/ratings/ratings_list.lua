@@ -122,11 +122,13 @@ function RatingsList:render()
 		local graphRow = showGraph and {
 			HtmlWidgets.Td{
 				attributes = {colspan = '7'},
-				children = {
-					OpponentDisplay.InlineOpponent{opponent = team.opponent},
-					makeTeamChart(team, teamLimit),
-				},
-				classes = {'graph-row-td'}
+				children = HtmlWidgets.Div{
+					children = {
+						OpponentDisplay.InlineOpponent{opponent = team.opponent},
+						makeTeamChart(team, teamLimit),
+					},
+					classes = {'ranking-table__graph-row-container'}
+				}
 			}
 		} or nil
 
@@ -138,7 +140,7 @@ function RatingsList:render()
 
 		return {
 			HtmlWidgets.Tr{children = teamRow, classes = rowClasses},
-			showGraph and HtmlWidgets.Tr{children = graphRow, classes = {'graph-row', 'hidden'}} or nil
+			showGraph and HtmlWidgets.Tr{children = graphRow, classes = {'ranking-table__graph-row'}} or nil
 		}
 	end)
 

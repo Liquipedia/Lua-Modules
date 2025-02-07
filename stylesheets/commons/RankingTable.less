@@ -16,6 +16,13 @@
         background-color: var(--_background-color);
         padding: 1rem 0.75rem;
         border-bottom: var(--_border);
+        font-weight: normal;
+
+        div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     }
 
     &__header-row {
@@ -50,6 +57,20 @@
             &:not(:first-child) {
                 border-left: var(--_border);
             }
+
+            .flag {
+                margin-right: 0.5rem;
+            }
+        }
+    }
+
+    &__graph-row-container {
+        padding: 1.5rem;
+
+        .team-template-team-standard {
+            display: flex;
+            justify-content: center;
+            font-weight: bold;
         }
     }
 }
