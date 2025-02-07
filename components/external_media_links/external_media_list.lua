@@ -15,9 +15,7 @@ local PlayerExt = require('Module:Player/Ext')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-
-local OpponentLibraries = require('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
+local Team = require('Module:Team')
 
 local MediaList = {}
 
@@ -339,12 +337,11 @@ end
 ---@return string?
 function MediaList._displayTeam(subject, date)
 	local team = PlayerExt.syncTeam(subject, nil, {date=date})
-
 	if not team then
 		return
 	end
 	---@cast team -nil
-	return OpponentDisplay.InlineTeamContainer{template=team, style='icon'}
+	return Team.icon(nil, team)
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
