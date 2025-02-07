@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Widget = Lua.import('Module:Widget')
@@ -55,7 +56,8 @@ function RatingsList:render()
 		local chart = mw.ext.Charts.chart{
 			xAxis = {
 				type = 'category',
-				data = Array.map(progression, Operator.property('date'))
+				data = Array.map(progression, Operator.property('date')),
+				interval = 4, -- TODO: DOESN'T WORK!
 			},
 			yAxis = {
 				type = 'value',
@@ -78,7 +80,8 @@ function RatingsList:render()
 					data = Array.map(progression, function(progress)
 						return progress.rank and tostring(progress.rank) or ''
 					end),
-					type = 'line'
+					type = 'line',
+					name = Opponent.toName(team.opponent),
 				}
 			}
 		}
