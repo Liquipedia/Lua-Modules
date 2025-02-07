@@ -42,12 +42,17 @@ RatingsList.defaultProps = {
 local function makeTeamChart(teamData, stanardYMax)
 	local progression = Array.reverse(teamData.progression) -- TODO: Sort instead
 	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
+
+	local dates = Array.map(Array.map(progression, Operator.property('date')), function (isoDate)
+		return os.date('%b %d', os.time(Date.parseIsoDate(isoDate)))
+	end)
+
 	return mw.ext.Charts.chart{
 		xAxis = {
 			name = 'Date',
 			nameLocation = 'middle',
 			type = 'category',
-			data = Array.map(progression, Operator.property('date')),
+			data = dates,
 		},
 		yAxis = {
 			name = 'Rank',
@@ -65,7 +70,7 @@ local function makeTeamChart(teamData, stanardYMax)
 			show = true,
 		},
 		size = {
-			height = 300,
+			height = 250,
 			pwidth = 100,
 		},
 		series = {
@@ -75,6 +80,10 @@ local function makeTeamChart(teamData, stanardYMax)
 				end),
 				type = 'line',
 				name = 'Rank',
+				symbolSize = 8,
+				itemStyle = {
+					color = '#EE6666',
+				},
 			}
 		}
 	}
