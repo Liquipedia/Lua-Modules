@@ -34,6 +34,50 @@ RatingsList.defaultProps = {
 	date = Date.getContextualDateOrNow(),
 }
 
+---@param teamData RatingsEntry
+---@param stanardYMax integer
+---@return string
+local function makeTeamChart(teamData, stanardYMax)
+	local progression = Array.reverse(teamData.progression) -- TODO: Sort instead
+	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
+	return mw.ext.Charts.chart{
+		xAxis = {
+			name = 'Date',
+			nameLocation = 'middle',
+			type = 'category',
+			data = Array.map(progression, Operator.property('date')),
+		},
+		yAxis = {
+			name = 'Rank',
+			nameLocation = 'middle',
+			nameRotate = 90,
+			type = 'value',
+			inverse = true,
+			min = 1,
+			max = math.max(worstRankOfTeam, stanardYMax),
+		},
+		tooltip = {
+			trigger = 'axis',
+		},
+		grid = {
+			show = true,
+		},
+		size = {
+			height = 300,
+			pwidth = 100,
+		},
+		series = {
+			{
+				data = Array.map(progression, function(progress)
+					return progress.rank and tostring(progress.rank) or ''
+				end),
+				type = 'line',
+				name = 'Rank',
+			}
+		}
+	}
+end
+
 ---@return Widget
 function RatingsList:render()
 	local parsedDate = Date.parseIsoDate(self.props.date)
@@ -51,44 +95,7 @@ function RatingsList:render()
 	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
-		local progression = Array.reverse(team.progression)
-		local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
-		local chart = mw.ext.Charts.chart{
-			xAxis = {
-				name = 'Date',
-				nameLocation = 'middle',
-				type = 'category',
-				data = Array.map(progression, Operator.property('date')),
-			},
-			yAxis = {
-				name = 'Rank',
-				nameLocation = 'middle',
-				nameRotate = 90,
-				type = 'value',
-				inverse = true,
-				min = 1,
-				max = math.max(worstRankOfTeam, teamLimit),
-			},
-			tooltip = {
-				trigger = 'axis',
-			},
-			grid = {
-				show = true,
-			},
-			size = {
-				height = 300,
-				pwidth = 100,
-			},
-			series = {
-				{
-					data = Array.map(progression, function(progress)
-						return progress.rank and tostring(progress.rank) or ''
-					end),
-					type = 'line',
-					name = Opponent.toName(team.opponent),
-				}
-			}
-		}
+		local chart = makeTeamChart(team, teamLimit)
 
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
