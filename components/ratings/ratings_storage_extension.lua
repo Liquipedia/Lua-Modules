@@ -31,7 +31,7 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 	progressionLimit = progressionLimit or 1
 	local nextProgression = Date.parseIsoDate(date)
 	table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
-	for i = 1, progressionLimit do
+	for _ = 1, progressionLimit do
 		nextProgression.day = nextProgression.day - PROGRESSION_STEP_DAYS
 		table.insert(progressionDates, os.date('%F', os.time(nextProgression)) --[[@as string]])
 	end
