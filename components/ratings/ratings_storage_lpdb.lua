@@ -84,21 +84,17 @@ function RatingsStorageLpdb._addProgressionData(teams, id, limit)
 		end)
 	end
 
-	-- Put progression in the correct order (oldest to newest)
-	Array.forEach(teams, function(team)
-		team.progression = Array.reverse(team.progression)
-	end)
-
 	return teams
 end
 
 ---@param timestamp integer
 ---@param rating number
----@return {date: string, rating: string}
+---@return {date: string, rating: number?}
 function RatingsStorageLpdb._createProgressionEntry(timestamp, rating)
 	return {
 		date = os.date('%Y-%m-%d', timestamp),
-		rating = rating and tostring(math.floor(rating + 0.5)) or '',
+		rating = rating,
+		-- TODO: Add rank!
 	}
 end
 
