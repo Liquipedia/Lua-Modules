@@ -112,4 +112,8 @@ return {
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
+
+	-- Usage: Chess
+	chesskingoutline = 'far fa-chess-king',
+	chesskingfull = 'fas fa-chess-king',
 }
