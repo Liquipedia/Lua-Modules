@@ -20,6 +20,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 
 ---@class RatingsList: Widget
@@ -86,13 +87,16 @@ function RatingsList:render()
 				or (team.streak < -1 and 'group-table-rank-change-down')
 				or nil
 
+		local changeText = (not team.change and 'NEW') or PlacementChange{change = team.change}
+
 		local teamRow = {
 			HtmlWidgets.Td{children = rank},
+			HtmlWidgets.Td{children = changeText},
 			HtmlWidgets.Td{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
 			HtmlWidgets.Td{children = team.rating},
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
-			HtmlWidgets.Td{children = HtmlWidgets.Span {
+			HtmlWidgets.Td{children = HtmlWidgets.Span{
 				attributes = { class = 'toggle-graph' },
 				children = Icon.makeIcon { iconName = 'expand' }
 			}},
@@ -119,7 +123,7 @@ function RatingsList:render()
 	return HtmlWidgets.Table{ classes = {'ranking-table'}, children = WidgetUtil.collect(
 		tableHeader,
 		HtmlWidgets.Tr{
-			children = Array.map({ 'Rank', 'Team', 'Points', 'Region', 'Streak', Icon.makeIcon{iconName='chart'} }, function(title)
+			children = Array.map({ 'Rank', '+/-', 'Team', 'Points', 'Region', 'Streak', Icon.makeIcon{iconName='chart'} }, function(title)
 				return HtmlWidgets.Th{children = title}
 			end),
 		},
