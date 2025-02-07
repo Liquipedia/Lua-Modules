@@ -51,6 +51,7 @@ function RatingsList:render()
 
 	local teamRows = Array.map(teams, function(team, rank)
 		local progression = Array.reverse(team.progression)
+		local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 		local chart = mw.ext.Charts.chart{
 			xAxis = {
 				type = 'category',
@@ -60,7 +61,7 @@ function RatingsList:render()
 				type = 'value',
 				inverse = true,
 				min = 1,
-				max = 20,
+				max = math.max(worstRankOfTeam, teamLimit),
 			},
 			tooltip = {
 				trigger = 'axis'
