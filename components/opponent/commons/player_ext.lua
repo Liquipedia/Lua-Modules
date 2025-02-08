@@ -276,7 +276,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
 	local pageVarEntry = options.useTimeless ~= false and history.timeless
-		or Array.find(history, function(entry) return date < entry.leaveDate end)
+		or Array.find(history, function(entry) return entry.joinDate <= date and date < entry.leaveDate end)
 
 	local timelessEntry = template and {
 		isResolved = pageVarEntry and template == pageVarEntry.template,
