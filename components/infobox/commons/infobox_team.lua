@@ -196,11 +196,13 @@ function Team:createInfobox()
 		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	-- Store LPDB data and Wiki-variables
+	-- Store LPDB data
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		self:_definePageVariables(args)
 	end
+
+	-- Store Wiki-variables
+	self:_definePageVariables(args)
 
 	return self:build(widgets)
 end
