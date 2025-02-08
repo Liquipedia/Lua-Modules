@@ -74,7 +74,8 @@ function FilterButtons._loadCategories(category)
 		Array.orderInPlaceBy(category.items, category.order)
 	end
 
-	category.defaultItems = Logic.emptyOr(category.defaultItems, category.items)
+	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
+	category.defaultItems = Logic.emptyOr(category.defaultItems, Array.map(category.items, itemToPropertyValues))
 end
 
 ---@param category FilterButtonCategory
