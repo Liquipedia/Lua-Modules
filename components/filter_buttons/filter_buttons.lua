@@ -75,7 +75,7 @@ function FilterButtons._loadCategories(category)
 	end
 
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
-	category.defaultItems = Logic.emptyOr(category.defaultItems, Array.map(category.items, itemToPropertyValues))
+	category.defaultItems = Array.map(Logic.emptyOr(category.defaultItems, category.items), itemToPropertyValues)
 end
 
 ---@param category FilterButtonCategory
