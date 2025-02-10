@@ -3,7 +3,9 @@
 ![Code Style](https://github.com/Liquipedia/LiquipediaMediaWikiMessages/workflows/Code%20Style/badge.svg)
 
 Lua Modules are an integral part of Liquipedia. They allow for more complex logic for rendering elements. The website supports adding and editing these modules straight from the browser. For more complex modules however, a more integrated developer environment has been requested by several users. To provide in this need this github repository has been constructed.
-Any modules added in this repository will, after a review process, be added to the modules and templates of the website. Note that the modules in this repository are only a subset off those on the website. Any 'duplicates' on the website will be overwritten by those in this repository.
+Any modules added in this repository will, after a review process, be added to the modules and templates of the website.
+
+**Note:** Modules in this repository are only a subset off those on the website. Any 'duplicates' on the website will be overwritten by those in this repository.
 
 ## Contributing
 
@@ -51,6 +53,10 @@ The project is divided into folders based on language. Even though the project i
 - The modules written in lua are found in the standard folder.
   - Most(read:some) modules are covered by unit tests. Tests are placed in the spec folder.
 - Styling is found in the stylesheets folder. For styling we use [less](https://lesscss.org/). Check out their documentation for getting up to speed on how this differs from traditional css.
+
+## Committing changes
+
+You need to be a member of the Liquipedia organization before you are allowed to push to this repository. In most workflows, you will make a fork of this repository to your own repository, and request a merge request from there.
 
 ## Support
 
