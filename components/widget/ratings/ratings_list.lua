@@ -108,6 +108,8 @@ function RatingsList:render()
 	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
+		--todo: replace team.name with shortname
+		local uniqueId = rank .. '-' .. team.name .. '-' .. team.rating
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
 				or (team.streak < -1 and 'group-table-rank-change-down')
@@ -123,14 +125,21 @@ function RatingsList:render()
 			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
 			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
 			showGraph and (HtmlWidgets.Td{children = HtmlWidgets.Span{
-				attributes = { class = 'toggle-graph', ['data-ranking-table'] = 'toggle', tabindex = '1' },
+				attributes = {
+					class = 'toggle-graph',
+					['data-ranking-table'] = 'toggle',
+					['data-ranking-table-id'] = uniqueId,
+					tabindex = '1'
+				},
 				children = Icon.makeIcon { iconName = 'expand' }
 			}}) or nil
 		)
 
 		local graphRow = showGraph and {
 			HtmlWidgets.Td{
-				attributes = {colspan = '7'},
+				attributes = {
+					colspan = '7',
+				},
 				children = HtmlWidgets.Div{
 					children = {
 						OpponentDisplay.InlineOpponent{opponent = team.opponent},
@@ -149,7 +158,15 @@ function RatingsList:render()
 
 		return {
 			HtmlWidgets.Tr{children = teamRow, classes = rowClasses},
-			showGraph and HtmlWidgets.Tr{children = graphRow, classes = {'ranking-table__graph-row'}} or nil
+			showGraph and HtmlWidgets.Tr{
+				children = graphRow,
+				classes = {'ranking-table__graph-row'},
+				attributes = {
+					['data-ranking-table'] = 'graph-row',
+					['aria-expanded'] = 'false',
+					['data-ranking-table-id'] = uniqueId
+				},
+			} or nil
 		}
 	end)
 
