@@ -98,4 +98,24 @@ function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMatchFunctions.getExtraData(match, map, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(map, opponents),
+	}
+end
+
 return CustomMatchGroupInput
