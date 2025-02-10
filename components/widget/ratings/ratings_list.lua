@@ -37,9 +37,9 @@ RatingsList.defaultProps = {
 }
 
 ---@param teamData RatingsEntry
----@param stanardYMax integer
+---@param standardYMax integer
 ---@return string
-local function makeTeamChart(teamData, stanardYMax)
+local function makeTeamChart(teamData, standardYMax)
 	local progression = Array.reverse(teamData.progression) -- TODO: Sort instead
 	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 
@@ -61,7 +61,7 @@ local function makeTeamChart(teamData, stanardYMax)
 			type = 'value',
 			inverse = true,
 			min = 1,
-			max = math.max(worstRankOfTeam, stanardYMax),
+			max = math.max(worstRankOfTeam, standardYMax),
 		},
 		tooltip = {
 			trigger = 'axis',
@@ -160,7 +160,7 @@ function RatingsList:render()
 			HtmlWidgets.Tr{children = teamRow, classes = rowClasses},
 			showGraph and HtmlWidgets.Tr{
 				children = graphRow,
-				classes = {'ranking-table__graph-row'},
+				classes = {'ranking-table__graph-row d-none'},
 				attributes = {
 					['data-ranking-table'] = 'graph-row',
 					['aria-expanded'] = 'false',

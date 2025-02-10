@@ -18,6 +18,9 @@ liquipedia.rankingTable = {
                     // Set existing aria-expanded attribute to the opposite value
                     const isExpanded = element.getAttribute('aria-expanded') === 'true';
                     element.setAttribute('aria-expanded', String(!isExpanded));
+                    graphRow.querySelectorAll('[_echarts_instance_]').forEach(chart => {
+                        echarts.getInstanceByDom(chart).resize();
+                    });
                 }
             });
         });
