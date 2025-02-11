@@ -9,8 +9,10 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -74,8 +76,9 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'gamesettings' then
 		local isVariant = caller.data.game ~= Game.toIdentifier()
+		local modes = Json.parse(caller.data.mode)
 		Array.appendWith(widgets,
-			Cell{name = 'Time Control', content = {caller.data.mode}},
+			Cell{name = 'Time Control' .. (#modes > 1 and 's' or ''), content = modes},
 			isVariant and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
 		)
 	end
@@ -100,7 +103,15 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = MODES[string.lower(self.args.mode or '')] or MODES.classical
+	local modes = {}
+	local modePairs = Table.iter.pairsByPrefix(self.args, 'mode', {requireIndex = false})
+	for _, mode, _ in modePairs do
+		table.insert(modes, MODES[string.lower(mode)])
+	end
+	if Table.isEmpty(modes) then
+		modes = {MODES.classical}
+	end
+	self.data.mode = Json.stringify(modes)
 end
 
 ---@param restrictions string?
