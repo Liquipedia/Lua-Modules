@@ -32,6 +32,13 @@ local PlayerExt = {globalVars = globalVars}
 ---@field fetchMatch2Player boolean?
 ---@field date string|number|osdate?
 
+---@class PlayerExtSyncTeamOptions
+---@field date string|number|osdate?
+---@field useTimeless boolean?
+---@field fetchPlayer boolean?
+---@field savePageVar boolean?
+---@field returnRaw boolean?
+
 --[===[
 Splits a wiki link of a player into a pageName and displayName.
 
@@ -266,7 +273,7 @@ options.returnRaw: Whether to return the template without resolving. Disabled by
 ]]
 ---@param pageName string
 ---@param template string?
----@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean, returnRaw: boolean}
+---@param options PlayerExtSyncTeamOptions
 ---@return string?
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
@@ -315,7 +322,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 
 	if options.returnRaw then
 		return entry and entry.raw or nil
-	end		
+	end
 	return entry and entry.template or nil
 end
 
