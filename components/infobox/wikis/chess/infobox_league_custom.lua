@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
@@ -76,7 +75,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'gamesettings' then
 		local isVariant = caller.data.game ~= Game.toIdentifier()
-		local modes = Json.parse(caller.data.mode)
+		local modes = mw.text.split(caller.data.mode, ',')
 		Array.appendWith(widgets,
 			Cell{name = 'Time Control' .. (#modes > 1 and 's' or ''), content = modes},
 			isVariant and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
@@ -111,7 +110,7 @@ function CustomLeague:customParseArguments(args)
 	if Table.isEmpty(modes) then
 		modes = {MODES.classical}
 	end
-	self.data.mode = Json.stringify(modes)
+	self.data.mode = table.concat(modes, ',')
 end
 
 ---@param restrictions string?
