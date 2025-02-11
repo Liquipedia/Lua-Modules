@@ -456,7 +456,7 @@ function BaseTournamentsListing:_fetchPlacementData(tournamentData)
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions,
-		query = 'opponentname, opponenttype, opponenttemplate, opponentplayers, placement, extradata',
+		query = 'opponentname, opponenttype, opponenttemplate, opponentplayers, placement, extradata, game',
 		order = 'placement asc',
 		limit = 50,
 	})
