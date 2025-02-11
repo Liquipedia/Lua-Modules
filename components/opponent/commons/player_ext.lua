@@ -262,10 +262,11 @@ options.savePageVar: Whether to save results to page variables. Enabled by
 default.
 options.useTimeless: Whether to use the template passed to a previous call of
 PlayerExt.syncTeam. Enabled by default.
+options.returnRaw: Whether to return the template without resolving. Disabled by default.
 ]]
 ---@param pageName string
 ---@param template string?
----@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean}
+---@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean, returnRaw: boolean}
 ---@return string?
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
@@ -296,6 +297,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 		or options.fetchPlayer ~= false and PlayerExt.fetchTeamHistoryEntry(pageName, options.date)
 
 	if entry and not entry.isResolved then
+		entry.raw = entry.template
 		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
 		entry.isResolved = true
 	end
@@ -311,6 +313,9 @@ function PlayerExt.syncTeam(pageName, template, options)
 		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
 	end
 
+	if options.returnRaw then
+		return entry and entry.raw or nil
+	end		
 	return entry and entry.template or nil
 end
 
