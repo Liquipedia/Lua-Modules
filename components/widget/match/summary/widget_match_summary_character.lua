@@ -38,6 +38,7 @@ function MatchSummaryCharacter:render()
 
 	return Div{
 		classes = {self.props.bg},
+		css = self.props.css,
 		children = self.props.flipped and Array.reverse(children) or children
 	}
 end

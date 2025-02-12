@@ -17,8 +17,8 @@ local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ICONS = {
-	left = Icon.makeIcon{iconName = 'left', size = '110%'},
-	right = Icon.makeIcon{iconName = 'right', size = '110%'},
+	left = Icon.makeIcon{iconName = 'startleft', size = '110%'},
+	right = Icon.makeIcon{iconName = 'startright', size = '110%'},
 	empty = '[[File:NoCheck.png|link=|16px]]',
 }
 
@@ -95,19 +95,33 @@ function CustomMatchSummary.BanRow(game)
 	return HtmlWidgets.Fragment{children = {
 		MatchSummaryWidgets.Break{},
 		HtmlWidgets.Div{
-			css = {margin = 'auto', ['max-width'] = '100%'},
+			classes = {'brkts-popup-body-game'},
+			css = {width = '100%'},
 			children = {
-				MatchSummaryWidgets.Character{character = team1Ban},
-				startIndicator(1),
+				MatchSummaryWidgets.Character{
+					character = team1Ban,
+					size = '16px',
+					showName = true,
+					flipped = true,
+					css = {width = '40%'},
+				},
 				HtmlWidgets.Div{
 					classes = {'brkts-popup-spaced'},
-					children = {'Ban'},
+					css = {width = '20%'},
+					children = {
+						startIndicator(1),
+						'Ban',
+						startIndicator(2),
+					},
 				},
-				startIndicator(2),
-				MatchSummaryWidgets.Character{character = team2Ban},
+				MatchSummaryWidgets.Character{
+					character = team2Ban,
+					size = '16px',
+					showName = true,
+					css = {width = '40%', ['text-align'] = 'right'},
+				},
 			}
 		},
 	}}
 end
-
 return CustomMatchSummary
