@@ -15,6 +15,8 @@ local Icon = require('Module:Icon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
+local Link = Lua.import('Module:Widget/Basic/Link')
+
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
@@ -183,12 +185,17 @@ function RatingsList:render()
 			classes = { 'ranking-table__top-row' },
 		}
 	}
+	local buttonDiv = HtmlWidgets.Div {
+		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'gotorankings' } },
+	}
 
 	local tableFooter = HtmlWidgets.Tr {
 		children = HtmlWidgets.Th {
 			attributes = { colspan = '7' },
-			children = HtmlWidgets.Div {
-				children = { "See Rankings Page", Icon.makeIcon { iconName = 'gotorankings' } },
+			children = Link {
+				link = 'Portal:Rating',
+				linktype = 'internal',
+				children = { buttonDiv },
 			},
 			classes = { 'ranking-table__footer-row' },
 		}
