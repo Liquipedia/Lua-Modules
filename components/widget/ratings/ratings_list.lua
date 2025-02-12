@@ -36,7 +36,7 @@ RatingsList.defaultProps = {
 	storageType = 'lpdb',
 	date = Date.getContextualDateOrNow(),
 	showGraph = true,
-	addNavigationButton = false,
+	isSmallerVersion = false,
 }
 
 ---@param teamData RatingsEntry
@@ -102,7 +102,7 @@ function RatingsList:render()
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
 	local showGraph = Logic.readBool(self.props.showGraph)
-	local addNavigationButton = Logic.readBool(self.props.addNavigationButton)
+	local isSmallerVersion = Logic.readBool(self.props.isSmallerVersion)
 
 	local getRankings = RatingsStorageFactory.createGetRankings {
 		storageType = self.props.storageType,
@@ -160,6 +160,9 @@ function RatingsList:render()
 		if isEven then
 			table.insert(rowClasses, 'ranking-table__row--even')
 		end
+		if rank > 5 and isSmallerVersion then
+			table.insert(rowClasses, 'ranking-table__row--overfive')
+		end
 
 		return {
 			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
@@ -216,7 +219,7 @@ function RatingsList:render()
 			classes = { 'ranking-table__header-row' },
 		},
 		Array.flatMap(teamRows, FnUtil.identity),
-		addNavigationButton and tableFooter
+		isSmallerVersion and tableFooter
 	) }
 end
 

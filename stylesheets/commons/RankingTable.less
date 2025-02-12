@@ -69,7 +69,13 @@
 		}
 
 		&--even {
-			background-color: var(--_background-color-even);
+			background-color: var(--_background-color-even);			
+		}
+
+		&--overfive {
+			@media (max-width: 768px) {
+				display: none;
+			}
 		}
 
 		> td {
