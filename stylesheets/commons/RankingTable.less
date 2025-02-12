@@ -12,16 +12,25 @@
 
 	border: var(--_border);
 
+	@media (max-width: 768px) {
+		font-size: 0.875rem;
+	}
+
 	&__top-row {
 		background-color: var(--_background-color);
 		padding: 1rem 0.75rem;
 		border-bottom: var(--_border);
 		font-weight: normal;
 
-		div {
+		> div {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+
+			@media (max-width: 768px) {
+				flex-direction: column;
+				align-items: flex-start;
+			}
 		}
 	}
 
@@ -54,12 +63,26 @@
 		> td {
 			padding: 0.5rem 1rem;
 
+			@media (max-width: 768px) {
+				padding: 0.5rem 0.75rem;
+			}
+
 			&:not(:first-child) {
 				border-left: var(--_border);
 			}
 
 			.flag {
 				margin-right: 0.5rem;
+			}
+		}
+
+		.toggle-graph {
+			&[aria-expanded="true"] > i {
+				transform: rotate(180deg);
+			}
+
+			& > i {
+				transition: transform 0.2s linear;
 			}
 		}
 	}
@@ -71,6 +94,14 @@
 			display: flex;
 			justify-content: center;
 			font-weight: bold;
+		}
+	}
+
+	// Hide table cells region and streak on mobile due to limited horizontal space
+	@media (max-width: 768px) {
+		[data-ranking-table-cell="region"],
+		[data-ranking-table-cell="streak"] {
+			display: none;
 		}
 	}
 }

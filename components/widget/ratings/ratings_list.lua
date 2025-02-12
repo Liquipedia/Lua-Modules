@@ -120,13 +120,13 @@ function RatingsList:render()
 		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local teamRow = WidgetUtil.collect(
-			HtmlWidgets.Td { children = rank },
-			HtmlWidgets.Td { children = changeText },
-			HtmlWidgets.Td { children = OpponentDisplay.InlineOpponent { opponent = team.opponent } },
-			HtmlWidgets.Td { children = team.rating },
-			HtmlWidgets.Td { children = Flags.Icon(team.region) .. Flags.CountryName(team.region) },
-			HtmlWidgets.Td { children = streakText, classes = { streakClass } },
-			showGraph and (HtmlWidgets.Td { children = HtmlWidgets.Span {
+			HtmlWidgets.Td{ attributes = { ['data-ranking-table-cell'] = 'rank' }, children = rank },
+			HtmlWidgets.Td{ attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
+			HtmlWidgets.Td{ attributes = { ['data-ranking-table-cell'] = 'team' }, children = OpponentDisplay.InlineOpponent{ opponent = team.opponent } },
+			HtmlWidgets.Td{ attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating},
+			HtmlWidgets.Td{ attributes = { ['data-ranking-table-cell'] = 'region' }, children = Flags.Icon(team.region) .. Flags.CountryName(team.region) },
+			HtmlWidgets.Td{ attributes = { ['data-ranking-table-cell'] = 'streak' }, children = streakText, classes = { streakClass } },
+			showGraph and (HtmlWidgets.Td{children = HtmlWidgets.Span{
 				attributes = {
 					class = 'toggle-graph',
 					['data-ranking-table'] = 'toggle',
@@ -141,6 +141,7 @@ function RatingsList:render()
 			HtmlWidgets.Td {
 				attributes = {
 					colspan = '7',
+					['data-ranking-table-cell'] = 'graph'
 				},
 				children = HtmlWidgets.Div {
 					children = {
@@ -197,13 +198,13 @@ function RatingsList:render()
 		tableHeader,
 		HtmlWidgets.Tr {
 			children = WidgetUtil.collect(
-				HtmlWidgets.Th { children = 'Rank' },
-				HtmlWidgets.Th { children = '+/-' },
-				HtmlWidgets.Th { children = 'Team' },
-				HtmlWidgets.Th { children = 'Points' },
-				HtmlWidgets.Th { children = 'Region' },
-				HtmlWidgets.Th { children = 'Streak' },
-				showGraph and HtmlWidgets.Th { children = Icon.makeIcon { iconName = 'chart' } } or nil
+				HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'rank'}, children = 'Rank'},
+				HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'change'}, children = '+/-'},
+				HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'team'}, children = 'Team'},
+				HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'rating'}, children = 'Points'},
+				HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'region'}, children = 'Region'},
+				HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'streak'}, children = 'Streak'},
+				showGraph and HtmlWidgets.Th{attributes = {['data-ranking-table-cell'] = 'graph'}, children = Icon.makeIcon{iconName='chart'}} or nil
 			),
 			classes = { 'ranking-table__header-row' },
 		},

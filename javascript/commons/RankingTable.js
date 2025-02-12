@@ -15,12 +15,21 @@ liquipedia.rankingTable = {
                 const graphRow = document.querySelector(`[data-ranking-table="graph-row"][data-ranking-table-id="${graphRowId}"]`);
                 if (graphRow) {
                     graphRow.classList.toggle('d-none');
-                    // Set existing aria-expanded attribute to the opposite value
                     const isExpanded = element.getAttribute('aria-expanded') === 'true';
                     element.setAttribute('aria-expanded', String(!isExpanded));
-                    graphRow.querySelectorAll('[_echarts_instance_]').forEach(chart => {
-                        echarts.getInstanceByDom(chart).resize();
-                    });
+
+                    if (!graphRow.classList.contains('d-none')) {
+                        // Initialize or resize charts when the div is visible
+                        graphRow.querySelectorAll('[_echarts_instance_]').forEach(chart => {
+                            let chartInstance = echarts.getInstanceByDom(chart);
+                            if (chartInstance) {
+                                chartInstance.resize();
+                            } else {
+                                // Initialize the chart if it is not already initialized
+                                chartInstance = echarts.init(chart);
+                            }
+                        });
+                    }
                 }
             });
         });
