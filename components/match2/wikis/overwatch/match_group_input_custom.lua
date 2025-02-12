@@ -90,9 +90,8 @@ end
 ---@param opponents table[]
 ---@return table?
 function MapFunctions.getExtraData(match, game, opponents)
-	local banStart = tonumber(game.banStart)
-	if not banStart then return end
-	assert(banStart == 1 or banStart == 2, 'Invalid "|banstart="')
+	local banStart = tonumber(game.banstart)
+	assert(banStart == 1 or banStart == 2 or not banStart, 'Invalid "|banstart="')
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	return {
