@@ -12,7 +12,7 @@ liquipedia.rankingTable = {
         elements.forEach(element => {
             element.addEventListener('click', () => {
                 const graphRowId = element.getAttribute(this.identifierAttribute);
-                const graphRow = document.querySelector(`[data-ranking-table="graph-row"][data-ranking-table-id="${graphRowId}"]`);
+                const graphRow = document.querySelector(`${this.graphRow}[${this.identifierAttribute}="${graphRowId}"]`);
                 if (graphRow) {
                     graphRow.classList.toggle('d-none');
                     const isExpanded = element.getAttribute('aria-expanded') === 'true';

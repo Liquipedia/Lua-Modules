@@ -93,15 +93,21 @@
 				margin-right: 0.5rem;
 			}
 		}
+	}
 
-		.toggle-graph {
-			&[aria-expanded="true"] > i {
-				transform: rotate(180deg);
-			}
+	&__toggle-graph {
+		cursor: pointer;
 
-			& > i {
-				transition: transform 0.2s linear;
-			}
+		&[aria-expanded="true"] > i {
+			transform: rotate(180deg);
+		}
+
+		& > i {
+			transition: transform 0.2s linear;
+		}
+
+		&-cell {
+			padding: 0;
 		}
 	}
 

@@ -128,14 +128,20 @@ function RatingsList:render()
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'region' }, children = Flags.Icon(team.region) .. Flags.CountryName(team.region) },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = streakText, classes = { streakClass } },
-			showGraph and (HtmlWidgets.Td { children = HtmlWidgets.Span {
+			showGraph and (HtmlWidgets.Td {
 				attributes = {
-					class = 'toggle-graph',
-					['data-ranking-table'] = 'toggle',
-					['data-ranking-table-id'] = uniqueId,
-					tabindex = '1'
+					class = 'ranking-table__toggle-graph-cell',
+					['data-ranking-table-cell'] = 'graph'
 				},
-				children = Icon.makeIcon { iconName = 'expand' }
+				children = HtmlWidgets.Span {
+					attributes = {
+						class = 'ranking-table__toggle-graph',
+						['data-ranking-table'] = 'toggle',
+						['data-ranking-table-id'] = uniqueId,
+						['aria-controls'] = uniqueId,
+						tabindex = '1'
+					},
+					children = Icon.makeIcon { iconName = 'expand' }
 			} }) or nil
 		)
 
