@@ -216,7 +216,7 @@ function RatingsList:render()
 			classes = { 'ranking-table__header-row' },
 		},
 		Array.flatMap(teamRows, FnUtil.identity),
-		tableFooter
+		addNavigationButton and tableFooter
 	) }
 end
 
