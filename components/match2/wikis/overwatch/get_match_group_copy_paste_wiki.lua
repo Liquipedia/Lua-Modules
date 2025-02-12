@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -30,6 +31,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), bestof == 0)
 	local streams = Logic.readBool(args.streams)
 	local opponent = WikiCopyPaste.getOpponent(mode, showScore)
+	local hasBans = Logic.readBool(args.bans)
 
 	local lines = Array.extendWith({},
 		'{{Match',
@@ -41,14 +43,24 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=}}'
-		end) or nil,
+		bestof ~= 0 and Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste._getMapCode, hasBans)) or nil,
 		Logic.readBool(args.faceit) and (INDENT .. '|faceit=') or nil,
 		INDENT .. '}}'
 	)
 
 	return table.concat(lines, '\n')
+end
+
+---@param mapIndex integer
+---@param hasBans boolean
+---@return string
+function WikiCopyPaste._getMapCode(hasBans, mapIndex)
+	if not hasBans then return INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=winner=}}' end
+
+	return table.concat({
+		INDENT .. '|map' .. mapIndex .. '={{Map|map=|mode=|score1=|score2=|winner=',
+		INDENT .. INDENT .. '|t1b1=|t2b1=|banstart=}}',
+	}, '\n')
 end
 
 return WikiCopyPaste
