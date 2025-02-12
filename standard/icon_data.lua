@@ -115,4 +115,5 @@ return {
 
 	-- Usage: Ranking table
 	chart = 'far fa-chart-line',
+	gotorankings = 'far fa-arrow-right',
 }

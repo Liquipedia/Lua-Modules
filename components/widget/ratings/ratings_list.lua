@@ -34,6 +34,7 @@ RatingsList.defaultProps = {
 	storageType = 'lpdb',
 	date = Date.getContextualDateOrNow(),
 	showGraph = true,
+	addNavigationButton = false,
 }
 
 ---@param teamData RatingsEntry
@@ -43,11 +44,11 @@ local function makeTeamChart(teamData, standardYMax)
 	local progression = Array.reverse(teamData.progression) -- TODO: Sort instead
 	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 
-	local dates = Array.map(Array.map(progression, Operator.property('date')), function (isoDate)
+	local dates = Array.map(Array.map(progression, Operator.property('date')), function(isoDate)
 		return os.date('%b %d', os.time(Date.parseIsoDate(isoDate)))
 	end)
 
-	return mw.ext.Charts.chart{
+	return mw.ext.Charts.chart {
 		xAxis = {
 			name = 'Date',
 			nameLocation = 'middle',
@@ -99,8 +100,9 @@ function RatingsList:render()
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
 	local showGraph = Logic.readBool(self.props.showGraph)
+	local addNavigationButton = Logic.readBool(self.props.addNavigationButton)
 
-	local getRankings = RatingsStorageFactory.createGetRankings{
+	local getRankings = RatingsStorageFactory.createGetRankings {
 		storageType = self.props.storageType,
 		date = self.props.date,
 		id = self.props.id,
@@ -112,19 +114,19 @@ function RatingsList:render()
 		local uniqueId = rank .. '-' .. team.name .. '-' .. team.rating
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
-				or (team.streak < -1 and 'group-table-rank-change-down')
-				or nil
+			or (team.streak < -1 and 'group-table-rank-change-down')
+			or nil
 
-		local changeText = (not team.change and 'NEW') or PlacementChange{change = team.change}
+		local changeText = (not team.change and 'NEW') or PlacementChange { change = team.change }
 
 		local teamRow = WidgetUtil.collect(
-			HtmlWidgets.Td{children = rank},
-			HtmlWidgets.Td{children = changeText},
-			HtmlWidgets.Td{children = OpponentDisplay.InlineOpponent{opponent = team.opponent}},
-			HtmlWidgets.Td{children = team.rating},
-			HtmlWidgets.Td{children = Flags.Icon(team.region) .. Flags.CountryName(team.region)},
-			HtmlWidgets.Td{children = streakText, classes = {streakClass}},
-			showGraph and (HtmlWidgets.Td{children = HtmlWidgets.Span{
+			HtmlWidgets.Td { children = rank },
+			HtmlWidgets.Td { children = changeText },
+			HtmlWidgets.Td { children = OpponentDisplay.InlineOpponent { opponent = team.opponent } },
+			HtmlWidgets.Td { children = team.rating },
+			HtmlWidgets.Td { children = Flags.Icon(team.region) .. Flags.CountryName(team.region) },
+			HtmlWidgets.Td { children = streakText, classes = { streakClass } },
+			showGraph and (HtmlWidgets.Td { children = HtmlWidgets.Span {
 				attributes = {
 					class = 'toggle-graph',
 					['data-ranking-table'] = 'toggle',
@@ -132,35 +134,35 @@ function RatingsList:render()
 					tabindex = '1'
 				},
 				children = Icon.makeIcon { iconName = 'expand' }
-			}}) or nil
+			} }) or nil
 		)
 
 		local graphRow = showGraph and {
-			HtmlWidgets.Td{
+			HtmlWidgets.Td {
 				attributes = {
 					colspan = '7',
 				},
-				children = HtmlWidgets.Div{
+				children = HtmlWidgets.Div {
 					children = {
-						OpponentDisplay.InlineOpponent{opponent = team.opponent},
+						OpponentDisplay.InlineOpponent { opponent = team.opponent },
 						makeTeamChart(team, teamLimit),
 					},
-					classes = {'ranking-table__graph-row-container'}
+					classes = { 'ranking-table__graph-row-container' }
 				}
 			}
 		} or nil
 
 		local isEven = rank % 2 == 0
-		local rowClasses = {'ranking-table__row'}
+		local rowClasses = { 'ranking-table__row' }
 		if isEven then
 			table.insert(rowClasses, 'ranking-table__row--even')
 		end
 
 		return {
-			HtmlWidgets.Tr{children = teamRow, classes = rowClasses},
-			showGraph and HtmlWidgets.Tr{
+			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
+			showGraph and HtmlWidgets.Tr {
 				children = graphRow,
-				classes = {'ranking-table__graph-row d-none'},
+				classes = { 'ranking-table__graph-row d-none' },
 				attributes = {
 					['data-ranking-table'] = 'graph-row',
 					['aria-expanded'] = 'false',
@@ -171,32 +173,43 @@ function RatingsList:render()
 	end)
 
 	local formattedDate = os.date('%b %d, %Y', os.time(parsedDate)) --[[@as string]]
-	local tableHeader = HtmlWidgets.Tr{
-		children = HtmlWidgets.Th{
-			attributes = {colspan = '7'},
-			children = HtmlWidgets.Div{
+	local tableHeader = HtmlWidgets.Tr {
+		children = HtmlWidgets.Th {
+			attributes = { colspan = '7' },
+			children = HtmlWidgets.Div {
 				children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' }
 			},
-			classes = {'ranking-table__top-row'},
+			classes = { 'ranking-table__top-row' },
 		}
 	}
 
-	return HtmlWidgets.Table{ classes = {'ranking-table'}, children = WidgetUtil.collect(
+	local tableFooter = HtmlWidgets.Tr {
+		children = HtmlWidgets.Th {
+			attributes = { colspan = '7' },
+			children = HtmlWidgets.Div {
+				children = { "See Rankings Page", Icon.makeIcon { iconName = 'gotorankings' } },
+			},
+			classes = { 'ranking-table__footer-row' },
+		}
+	}
+
+	return HtmlWidgets.Table { classes = { 'ranking-table' }, children = WidgetUtil.collect(
 		tableHeader,
-		HtmlWidgets.Tr{
+		HtmlWidgets.Tr {
 			children = WidgetUtil.collect(
-				HtmlWidgets.Th{children = 'Rank'},
-				HtmlWidgets.Th{children = '+/-'},
-				HtmlWidgets.Th{children = 'Team'},
-				HtmlWidgets.Th{children = 'Points'},
-				HtmlWidgets.Th{children = 'Region'},
-				HtmlWidgets.Th{children = 'Streak'},
-				showGraph and HtmlWidgets.Th{children = Icon.makeIcon{iconName='chart'}} or nil
+				HtmlWidgets.Th { children = 'Rank' },
+				HtmlWidgets.Th { children = '+/-' },
+				HtmlWidgets.Th { children = 'Team' },
+				HtmlWidgets.Th { children = 'Points' },
+				HtmlWidgets.Th { children = 'Region' },
+				HtmlWidgets.Th { children = 'Streak' },
+				showGraph and HtmlWidgets.Th { children = Icon.makeIcon { iconName = 'chart' } } or nil
 			),
-			classes = {'ranking-table__header-row'},
+			classes = { 'ranking-table__header-row' },
 		},
-		Array.flatMap(teamRows, FnUtil.identity)
-	)}
+		Array.flatMap(teamRows, FnUtil.identity),
+		tableFooter
+	) }
 end
 
 return RatingsList
