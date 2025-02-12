@@ -16,6 +16,15 @@ return {
 			text = 'د.إ',
 		},
 	},
+	amd = {
+		code = 'AMD',
+		name = 'Armenian dram',
+		symbol = {
+			hasSpace = false,
+			isAfter = false,
+			text = '֏',
+		},
+	},
 	ars = {
 		code = 'ARS',
 		name = 'Argentine peso',
