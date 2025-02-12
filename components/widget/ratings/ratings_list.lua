@@ -210,7 +210,7 @@ function RatingsList:render()
 		}
 	}
 
-	return HtmlWidgets.Table { classes = { 'ranking-table' }, children = WidgetUtil.collect(
+	return HtmlWidgets.Table { classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil }, children = WidgetUtil.collect(
 		tableHeader,
 		HtmlWidgets.Tr {
 			children = WidgetUtil.collect(
