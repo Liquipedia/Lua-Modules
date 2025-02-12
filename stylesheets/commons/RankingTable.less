@@ -97,6 +97,12 @@
 
 	&__toggle-graph {
 		cursor: pointer;
+		display: flex;
+		height: 100%;
+		position: absolute;
+		inset: 0;
+		align-items: center;
+		justify-content: center;
 
 		&[aria-expanded="true"] > i {
 			transform: rotate(180deg);
@@ -106,8 +112,9 @@
 			transition: transform 0.2s linear;
 		}
 
-		&-cell {
+		td&-cell {
 			padding: 0;
+			position: relative;
 		}
 	}
 
