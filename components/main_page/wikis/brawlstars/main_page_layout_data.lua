@@ -125,7 +125,7 @@ return {
 				table = 'datapoint',
 				conditions = '[[type::brawler]]',
 			},
-		},		
+		},
 		{
 			file = 'BSWiki Gem Mine.png',
 			title = 'Maps',
@@ -135,7 +135,7 @@ return {
 				table = 'datapoint',
 				conditions = '[[type::map]]',
 			},
-		},	
+		},
 	},
 	layouts = {
 		main = {
