@@ -32,7 +32,7 @@ Ratings.defaultProps = {
 function Ratings:render()
     return HtmlWidgets.Div {
         children = {
-            RatingsDropdown,
+            RatingsDropdown {},
             RatingsList {
                 teamLimit = self.props.teamLimit,
                 progressionLimit = self.props.progressionLimit,

@@ -13,7 +13,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widget = Lua.import('Module:Widget')
 
 ---@class RatingsDropdown: Widget
----@operator call: RatingsDropdown
+---@operator call(table): RatingsDropdown
 local RatingsDropdown = Class.new(Widget)
 
 function RatingsDropdown.render()
