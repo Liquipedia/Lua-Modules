@@ -64,6 +64,16 @@ local CONTENT = {
 		padding = true,
 		boxid = 1508,
 	},
+	headlines = {
+		heading = 'Headlines',
+		body = '{{ExternalMediaList|subject=!|limit=4}}' ..
+			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">' ..
+			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px; font-size:15px; font-style:italic;">' ..
+			'[[Portal:News|See all Headlines]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
+			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div></div>',
+		padding = true,
+		boxid = 1511,
+	},
 }
 
 return {
@@ -190,11 +200,15 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 5,
+						content = CONTENT.headlines,
+					},
+					{
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},
