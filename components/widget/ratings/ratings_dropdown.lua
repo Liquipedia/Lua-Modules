@@ -13,20 +13,20 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widget = Lua.import('Module:Widget')
 
 ---@class RatingsDropdown: Widget
----@operator call(table): RatingsDropdown
+---@operator call: RatingsDropdown
 local RatingsDropdown = Class.new(Widget)
 
 function RatingsDropdown.render()
-    return HtmlWidgets.Select{
-        attributes = {id = 'weekSelector'},
+    return HtmlWidgets.Select {
+        attributes = { id = 'weekSelector' },
         children = {
-            HtmlWidgets.Option{
-                attributes = {value = 'week1'},
-                children = {'Week 1'},
+            HtmlWidgets.Option {
+                attributes = { value = 'week1' },
+                children = { 'Week 1' },
             },
-            HtmlWidgets.Option{
-                attributes = {value = 'week2'},
-                children = {'Week 2'},
+            HtmlWidgets.Option {
+                attributes = { value = 'week2' },
+                children = { 'Week 2' },
             },
         },
     }
