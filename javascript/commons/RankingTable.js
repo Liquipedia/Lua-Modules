@@ -1,25 +1,45 @@
 liquipedia.rankingTable = {
+    identifierAttribute: 'data-ranking-table-id',
     toggleButton: '[data-ranking-table="toggle"]',
     graphRow: '[data-ranking-table="graph-row"]',
-    identifierAttribute: 'data-ranking-table-id',
+    dropdownContainer: '[data-ranking-table="dropdown-container"]',
+    patchLabel: '[data-ranking-table="patch-label"]',
+    patchLabelElement: null,
+    dropdownOptions: [
+        {
+            value: 'option1',
+            text: 'April 22, 2024',
+            patch: 'Patch 1.2.3'
+        },
+        {
+            value: 'option2',
+            text: 'April 15, 2024',
+            patch: 'Patch 1.2.2'
+        },
+        {
+            value: 'option3',
+            text: 'April 08, 2024',
+            patch: 'Patch 1.2.1'
+        }
+    ],
 
     init: function () {
         this.toggleGraphVisibility();
-        this.addCallbackForDropdown();
+        this.createAndAppendSelectElementWithOptions();
     },
 
-    addCallbackForDropdown: function () {
-        const selectElement = document.querySelector('#weekSelector');
-        if (selectElement) {
-            selectElement.addEventListener('change', (event) => {
-                console.log('change', event.target.tagName);
-                if (event.target.tagName === 'SELECT') {
-                    const week = event.target.value;
-                    this.fetchRatingsData(week);
-                }
-            });
-        }
-    },
+    // addCallbackForDropdown: function () {
+    //     const selectElement = document.querySelector('#weekSelector');
+    //     if (selectElement) {
+    //         selectElement.addEventListener('change', (event) => {
+    //             console.log('change', event.target.tagName);
+    //             if (event.target.tagName === 'SELECT') {
+    //                 const week = event.target.value;
+    //                 this.fetchRatingsData(week);
+    //             }
+    //         });
+    //     }
+    // },
 
     fetchRatingsData: function(week) {
     const api = new mw.Api();
@@ -45,6 +65,34 @@ liquipedia.rankingTable = {
         if (ratingsListTable) {
             ratingsListTable.outerHTML = htmlContent;
         }
+    },
+
+    updatePatchLabel: function (patch) {
+        if (!this.patchLabelElement) {
+            this.patchLabelElement = document.querySelector(this.patchLabel);
+        }
+        this.patchLabel.textContent = patch;
+    },
+
+    createAndAppendSelectElementWithOptions: function (options) {
+        const selectContainer = document.querySelector('#weekSelector');
+
+        if (!selectContainer) {
+            return;
+        }
+
+        const selectElement = document.createElement('select');
+        selectElement.id = 'weekSelector';
+        selectElement.classList.add('form-control');
+
+        this.dropdownOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.text;
+            selectElement.appendChild(optionElement);
+        });
+
+        selectContainer.appendChild(selectElement);
     },
 
     toggleGraphVisibility: function () {
