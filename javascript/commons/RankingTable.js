@@ -5,8 +5,10 @@ liquipedia.rankingTable = {
 
     init: function () {
         this.toggleGraphVisibility();
+        this.addCallbackForDropdown();
+    },
 
-        // find select element
+    addCallbackForDropdown: function () {
         const selectElement = document.querySelector('#weekSelector');
         if (selectElement) {
             selectElement.addEventListener('change', (event) => {
