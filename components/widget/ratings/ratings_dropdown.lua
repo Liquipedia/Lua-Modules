@@ -16,31 +16,20 @@ local Widget = Lua.import('Module:Widget')
 ---@operator call(table): RatingsDropdown
 local RatingsDropdown = Class.new(Widget)
 
+--todo: rename to select instead of dropdown later
 function RatingsDropdown.render()
     return HtmlWidgets.Div{
         attributes = {
-            attributes = {
-                class = 'rankings-table__dropdown',
-                ['data-ranking-table'] = 'dropdown-container',
-            },
+            class = 'rankings-table__dropdown',
+            ['data-ranking-table'] = 'dropdown-container',
         },
-        --children = {
-        --    HtmlWidgets.Option{
-        --        attributes = {value = 'week1'},
-        --        children = {'Week 1'},
-        --    },
-        --    HtmlWidgets.Option{
-        --        attributes = {value = 'week2'},
-        --        children = {'Week 2'},
-        --    },
-        --},
-        --// create a span with text
-        HtmlWidgets.Span{
-            attributes = {
-                class = 'rankings-table__patch-label',
-                ['data-ranking-table'] = 'patch-label',
+        children = {
+            HtmlWidgets.Span{
+                attributes = {
+                    class = 'rankings-table__patch-label',
+                    ['data-ranking-table'] = 'patch-label',
+                },
             },
-            children = { 'Patch 7.36a' },
         },
     }
 end

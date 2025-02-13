@@ -5,7 +5,8 @@ liquipedia.rankingTable = {
     dropdownContainer: '[data-ranking-table="dropdown-container"]',
     patchLabel: '[data-ranking-table="patch-label"]',
     patchLabelElement: null,
-    dropdownOptions: [
+    // temp test data
+    options: [
         {
             value: 'option1',
             text: 'April 22, 2024',
@@ -71,28 +72,47 @@ liquipedia.rankingTable = {
         if (!this.patchLabelElement) {
             this.patchLabelElement = document.querySelector(this.patchLabel);
         }
-        this.patchLabel.textContent = patch;
+        this.patchLabelElement.innerText = patch;
     },
 
-    createAndAppendSelectElementWithOptions: function (options) {
-        const selectContainer = document.querySelector('#weekSelector');
+    createAndAppendSelectElementWithOptions: function () {
+        const selectContainer = document.querySelector(this.dropdownContainer);
 
         if (!selectContainer) {
             return;
         }
 
+        const selectElement = this.createSelectElement();
+        const optionElements = this.createOptions();
+
+        selectElement.append(...optionElements);
+        selectContainer.insertBefore(selectElement, selectContainer.firstChild);
+    },
+
+    createSelectElement: function () {
         const selectElement = document.createElement('select');
         selectElement.id = 'weekSelector';
-        selectElement.classList.add('form-control');
+        selectElement.classList.add('ranking-table__dropdown-select');
+        return selectElement;
+    },
 
-        this.dropdownOptions.forEach(option => {
+    createOptions: function () {
+        const options = [];
+
+        this.options.forEach( (option, index ) => {
             const optionElement = document.createElement('option');
+
+            // Set the first option as selected by default
+            if (index === 0) {
+                optionElement.selected = true;
+                this.updatePatchLabel(option.patch);
+            }
             optionElement.value = option.value;
-            optionElement.textContent = option.text;
-            selectElement.appendChild(optionElement);
+            optionElement.innerText = option.text;
+            options.push(optionElement);
         });
 
-        selectContainer.appendChild(selectElement);
+        return options;
     },
 
     toggleGraphVisibility: function () {
