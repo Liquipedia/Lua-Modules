@@ -84,5 +84,7 @@ Widgets.Td = createHtmlTag('td')
 Widgets.Th = createHtmlTag('th')
 Widgets.Tr = createHtmlTag('tr')
 Widgets.Ul = createHtmlTag('ul')
+Widgets.Option = createHtmlTag('option')
+Widgets.Select = createHtmlTag('select')
 
 return Widgets
