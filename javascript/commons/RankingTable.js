@@ -5,6 +5,44 @@ liquipedia.rankingTable = {
 
     init: function () {
         this.toggleGraphVisibility();
+
+        // find select element
+        const selectElement = document.querySelector('#weekSelector');
+        if (selectElement) {
+            selectElement.addEventListener('change', (event) => {
+                console.log('change', event.target.tagName);
+                if (event.target.tagName === 'SELECT') {
+                    const week = event.target.value;
+                    this.fetchRatingsData(week);
+                }
+            });
+        }
+    },
+
+    fetchRatingsData: function(week) {
+    const api = new mw.Api();
+        api.get({
+            action: 'parse',
+            format: 'json',
+            contentmodel: 'wikitext',
+            maxage: 600,
+            smaxage: 600,
+            disablelimitreport: true,
+            uselang: 'content',
+            prop: 'text',
+            text: `{{RatingsList|week=${week}}}`
+        }).done((data) => {
+            if (data.parse?.text?.['*']) {
+                this.updateRatingListTable(data.parse.text['*']);
+            }
+        });
+    },
+
+    updateRatingListTable: function (htmlContent) {
+        const ratingsListTable = document.getElementById('ratingsListTable');
+        if (ratingsListTable) {
+            ratingsListTable.outerHTML = htmlContent;
+        }
     },
 
     toggleGraphVisibility: function () {
