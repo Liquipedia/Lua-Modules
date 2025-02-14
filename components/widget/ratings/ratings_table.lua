@@ -26,7 +26,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
-local dropdownHtml = Lua.import('Module:Widget/Ratings/Dropdown')
 
 ---@class RatingsList: Widget
 ---@operator call(table): RatingsList
@@ -211,50 +210,27 @@ function RatingsList:render()
 		}
 	}
 
-	return HtmlWidgets.Div {
+	return HtmlWidgets.Table {
+		attributes = { ['data-ranking-table'] = 'table' },
+		classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
 		children = WidgetUtil.collect(
-			dropdownHtml(),
-			HtmlWidgets.Table {
-				id = 'ratingsListTable',
-				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
+			tableHeader,
+			HtmlWidgets.Tr {
 				children = WidgetUtil.collect(
-					tableHeader,
-					HtmlWidgets.Tr {
-						children = WidgetUtil.collect(
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
-							showGraph and HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'graph' }, children = Icon.makeIcon { iconName = 'chart' } } or nil
-						),
-						classes = { 'ranking-table__header-row' },
-					},
-					Array.flatMap(teamRows, FnUtil.identity),
-					isSmallerVersion and tableFooter
-				)
-			}
+					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
+					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
+					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
+					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
+					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
+					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
+					showGraph and HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'graph' }, children = Icon.makeIcon { iconName = 'chart' } } or nil
+				),
+				classes = { 'ranking-table__header-row' },
+			},
+			Array.flatMap(teamRows, FnUtil.identity),
+			isSmallerVersion and tableFooter
 		)
 	}
-
-	--return HtmlWidgets.Table { id = 'ratingsListTable', classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil }, children = WidgetUtil.collect(
-	--	tableHeader,
-	--	HtmlWidgets.Tr {
-	--		children = WidgetUtil.collect(
-	--			HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
-	--			HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
-	--			HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
-	--			HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
-	--			HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-	--			HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
-	--			showGraph and HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'graph' }, children = Icon.makeIcon { iconName = 'chart' } } or nil
-	--		),
-	--		classes = { 'ranking-table__header-row' },
-	--	},
-	--	Array.flatMap(teamRows, FnUtil.identity),
-	--	isSmallerVersion and tableFooter
-	--) }
 end
 
 return RatingsList
