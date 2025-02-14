@@ -210,25 +210,32 @@ function RatingsList:render()
 		}
 	}
 
-	return HtmlWidgets.Table {
-		attributes = { ['data-ranking-table'] = 'table' },
-		classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
+	return HtmlWidgets.Div {
+		attributes = {
+			['data-ranking-table'] = 'content',
+		},
 		children = WidgetUtil.collect(
-			tableHeader,
-			HtmlWidgets.Tr {
+			HtmlWidgets.Table {
+				attributes = { ['data-ranking-table'] = 'table' },
+				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
 				children = WidgetUtil.collect(
-					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
-					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
-					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
-					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
-					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
-					HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
-					showGraph and HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'graph' }, children = Icon.makeIcon { iconName = 'chart' } } or nil
-				),
-				classes = { 'ranking-table__header-row' },
-			},
-			Array.flatMap(teamRows, FnUtil.identity),
-			isSmallerVersion and tableFooter
+					tableHeader,
+					HtmlWidgets.Tr {
+						children = WidgetUtil.collect(
+							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = 'Rank' },
+							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'change' }, children = '+/-' },
+							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'team' }, children = 'Team' },
+							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = 'Points' },
+							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'region' }, children = 'Region' },
+							HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = 'Streak' },
+							showGraph and HtmlWidgets.Th { attributes = { ['data-ranking-table-cell'] = 'graph' }, children = Icon.makeIcon { iconName = 'chart' } } or nil
+						),
+						classes = { 'ranking-table__header-row' },
+					},
+					Array.flatMap(teamRows, FnUtil.identity),
+					isSmallerVersion and tableFooter
+				)
+			}
 		)
 	}
 end
