@@ -20,13 +20,13 @@ local RatingsDropdown = Class.new(Widget)
 function RatingsDropdown.render()
     return HtmlWidgets.Div{
         attributes = {
-            class = 'rankings-table__dropdown',
-            ['data-ranking-table'] = 'dropdown-container',
+            class = 'ranking-table__select-container',
+            ['data-ranking-table'] = 'select-container',
         },
         children = {
             HtmlWidgets.Span{
                 attributes = {
-                    class = 'rankings-table__patch-label',
+                    class = 'ranking-table__patch-label',
                     ['data-ranking-table'] = 'patch-label',
                 },
             },

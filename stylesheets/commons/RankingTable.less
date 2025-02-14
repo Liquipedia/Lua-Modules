@@ -1,25 +1,28 @@
 .ranking-table {
-	--_border-color: rgba(0, 0, 0, 0.16);
-	--_background-color: rgba(0, 0, 0, 0.08);
-	--_background-color-even: rgba(0, 0, 0, 0.04);
-	--_border: 0.0625rem solid var(--_border-color);
+	&__wrapper {
+		--_border-color: rgba( 0, 0, 0, 0.16 );
+		--_background-color: rgba( 0, 0, 0, 0.08 );
+		--_background-color-even: rgba( 0, 0, 0, 0.04 );
+		--_border: 0.0625rem solid var( --_border-color );
+		--_patch-label-color: var( --clr-secondary-16 );
 
-	.theme--dark & {
-		--_border-color: rgba(255, 255, 255, 0.16);
-		--_background-color: rgba(255, 255, 255, 0.08);
-		--_background-color-even: rgba(255, 255, 255, 0.04);
+		.theme--dark & {
+			--_border-color: rgba( 255, 255, 255, 0.16 );
+			--_background-color: rgba( 255, 255, 255, 0.08 );
+			--_background-color-even: rgba( 255, 255, 255, 0.04 );
+			--_patch-label-color: #ffffff;
+		}
 	}
+	border: var( --_border );
 
-	border: var(--_border);
-
-	@media (max-width: 768px) {
+	@media ( max-width: 768px ) {
 		font-size: 0.875rem;
 	}
 
 	&__top-row {
-		background-color: var(--_background-color);
+		background-color: var( --_background-color );
 		padding: 1rem 0.75rem;
-		border-bottom: var(--_border);
+		border-bottom: var( --_border );
 		font-weight: normal;
 
 		> div {
@@ -27,7 +30,7 @@
 			justify-content: space-between;
 			align-items: center;
 
-			@media (max-width: 768px) {
+			@media ( max-width: 768px ) {
 				flex-direction: column;
 				align-items: flex-start;
 			}
@@ -37,7 +40,7 @@
 	&__footer-row {
 		padding: 1rem 0.75rem;
 		font-weight: bold;
-		
+
 		div {
 			display: flex;
 			align-items: center;
@@ -47,33 +50,33 @@
 	}
 
 	&__header-row {
-		background-color: var(--_background-color);
-		border-bottom: var(--_border);
+		background-color: var( --_background-color );
+		border-bottom: var( --_border );
 
 		th {
 			padding: 0.5rem 1rem;
 
-			&:not(:first-child) {
-				border-left: var(--_border);
+			&:not( :first-child ) {
+				border-left: var( --_border );
 			}
 		}
 	}
 
 	&__row {
-		&:not(:first-child) {
-			border-top: var(--_border);
+		&:not( :first-child ) {
+			border-top: var( --_border );
 		}
 
-		&:not(:last-child) {
-			border-bottom: var(--_border);
+		&:not( :last-child ) {
+			border-bottom: var( --_border );
 		}
 
 		&--even {
-			background-color: var(--_background-color-even);			
+			background-color: var( --_background-color-even );
 		}
 
 		&--overfive {
-			@media (max-width: 768px) {
+			@media ( max-width: 768px ) {
 				display: none;
 			}
 		}
@@ -81,12 +84,12 @@
 		> td {
 			padding: 0.5rem 1rem;
 
-			@media (max-width: 768px) {
+			@media ( max-width: 768px ) {
 				padding: 0.5rem 0.75rem;
 			}
 
-			&:not(:first-child) {
-				border-left: var(--_border);
+			&:not( :first-child ) {
+				border-left: var( --_border );
 			}
 
 			.flag {
@@ -104,8 +107,8 @@
 		align-items: center;
 		justify-content: center;
 
-		&[aria-expanded="true"] > i {
-			transform: rotate(180deg);
+		&[ aria-expanded="true" ] > i {
+			transform: rotate( 180deg );
 		}
 
 		& > i {
@@ -129,30 +132,34 @@
 	}
 
 	// Hide table cells region and streak on mobile due to limited horizontal space
-	@media (max-width: 768px) {
-		[data-ranking-table-cell="region"],
-		[data-ranking-table-cell="streak"] {
+	@media ( max-width: 768px ) {
+		[ data-ranking-table-cell="region" ],
+		[ data-ranking-table-cell="streak" ] {
 			display: none;
 		}
 	}
 
 	&--small {
-		[data-ranking-table-cell="region"],
-		[data-ranking-table-cell="streak"] {
+		[ data-ranking-table-cell="region" ],
+		[ data-ranking-table-cell="streak" ] {
 			display: none;
 		}
 	}
 
-	&__dropdown {
-		color: #1B1B1B;
+	&__select-container {
 		margin-bottom: 1rem;
 		display: flex;
 		align-items: center;
 		gap: 1rem;
+
+		& > select.ranking-table__select {
+			border-color: var( --_border-color );
+			background-color: var( --_background-color );
+		}
 	}
 
 	&__patch-label {
-		color: #282828;
+		color: var( --_patch-label-color );
 		opacity: 0.7;
 	}
 }

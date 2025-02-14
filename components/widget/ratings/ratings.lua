@@ -31,6 +31,10 @@ Ratings.defaultProps = {
 ---@return Widget
 function Ratings:render()
     return HtmlWidgets.Div {
+        attributes = {
+            class = 'ranking-table__wrapper',
+            ['data-ranking-table'] = 'wrapper',
+        },
         children = {
             RatingsDropdown {},
             RatingsList {
