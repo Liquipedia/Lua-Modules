@@ -6,6 +6,7 @@ liquipedia.rankingTable = {
 	patchLabelSelector: '[data-ranking-table="patch-label"]',
 	patchLabelElement: null,
 	activeSelectOption: null,
+	rankingTable: null,
 	// temp test data
 	options: [
 		{
@@ -26,6 +27,11 @@ liquipedia.rankingTable = {
 	],
 
 	init: function () {
+		this.rankingTable = document.querySelector( '.ranking-table' );
+		if ( !this.rankingTable ) {
+			return;
+		}
+
 		this.toggleGraphVisibility();
 		this.initSelectElement();
 
@@ -55,16 +61,10 @@ liquipedia.rankingTable = {
 			text: `{{RatingsList|week=${ week }}}`
 		} ).done( ( data ) => {
 			if ( data.parse?.text?.[ '*' ] ) {
-				this.updateRatingListTable( data.parse.text[ '*' ] );
+				// this.updateRatingListTable( data.parse.text[ '*' ] );
+				this.rankingTable.outerHTML = data.parse.text[ '*' ];
 			}
 		} );
-	},
-
-	updateRatingListTable: function ( htmlContent ) {
-		const ratingsListTable = document.getElementById( 'ratingsListTable' );
-		if ( ratingsListTable ) {
-			ratingsListTable.outerHTML = htmlContent;
-		}
 	},
 
 	updatePatchLabel: function ( patch ) {
