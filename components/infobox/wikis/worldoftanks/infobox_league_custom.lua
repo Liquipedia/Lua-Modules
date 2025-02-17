@@ -14,10 +14,10 @@ local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -35,16 +35,12 @@ function CustomLeague.run(frame)
 	return league:createInfobox()
 end
 
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = tostring(Logic.readBool(args.publisherpremier))
-end
-
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
 
 	if id == 'custom' then
 		return {
@@ -52,14 +48,17 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Number of players', content = {args.player_number}},
 		}
 	elseif id == 'gamesettings' then
-		return {Cell{name = 'Game', content = {Game.name{game = args.game}}}}
+		Array.appendWith(widgets,
+			Cell{name = 'Patch', content = {caller:_createPatchCell()}},
+			Cell{name = 'Game', content = {Game.name{game = args.game}}}
+		)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.map1) then
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
 				return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 			end)
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
 	return widgets
@@ -73,10 +72,20 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
+---@return string?
+function CustomLeague:_createPatchCell()
+	local data = self.data
+	if Logic.isEmpty(data.patch) then return end
+
+	local displayPatch = function(patch)
+		return PageLink.makeInternalLink({}, patch, 'Patch ' .. patch)
+	end
+
+	if data.endPatch == data.patch then
+		return displayPatch(data.patch)
+	end
+
+	return displayPatch(data.patch) .. ' &ndash; ' .. displayPatch(data.endPatch)
 end
 
 ---@param args table

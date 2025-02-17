@@ -1,0 +1,87 @@
+---
+-- @Liquipedia
+-- wiki=smash
+-- page=Module:Opponent/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Array = require('Module:Array')
+local Info = require('Module:Info')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
+
+local Opponent = Lua.import('Module:Opponent')
+
+local CustomOpponent = Table.deepCopy(Opponent)
+
+---@class SmashStandardPlayer:standardPlayer
+---@field chars string[]?
+---@field game string?
+
+---@class SmashStandardOpponent:standardOpponent
+---@field players SmashStandardPlayer[]
+
+---@param args table
+---@return SmashStandardOpponent?
+function CustomOpponent.readOpponentArgs(args)
+	local opponent = Opponent.readOpponentArgs(args) --[[@as SmashStandardOpponent?]]
+
+	if not opponent or not Opponent.typeIsParty(opponent.type) then return opponent end
+
+	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
+	opponent.players[1].game = game
+
+	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+
+	Array.forEach(opponent.players, function (player, playerIndex)
+		local stringInput = args['chars' .. playerIndex] or (playerIndex == 1 and args.chars) or nil
+		local charInputs = Array.parseCommaSeparatedString(stringInput)
+		player.chars = Array.map(charInputs, function(characterInput)
+			if Logic.isEmpty(characterInput) then return nil end
+			---@cast characterInput -nil
+			return (assert(CharacterStandardizationData[characterInput:lower()], 'Invalid character:' .. characterInput))
+		end)
+	end)
+
+	return opponent
+end
+
+---@param opponent SmashStandardOpponent
+---@return {opponentname: string, opponenttemplate: string?, opponenttype: OpponentType, opponentplayers: table?}
+function CustomOpponent.toLpdbStruct(opponent)
+	local storageStruct = Opponent.toLpdbStruct(opponent)
+
+	if not Opponent.typeIsParty(opponent.type) then
+		return storageStruct
+	end
+
+	for playerIndex, player in pairs(opponent.players) do
+		storageStruct.opponentplayers['p' .. playerIndex .. 'chars'] = player.chars and table.concat(player.chars, ',') or nil
+	end
+
+	return storageStruct
+end
+
+---Reads a standings or placement lpdb structure and builds an opponent struct from it
+---@param storageStruct table
+---@return SmashStandardOpponent?
+function CustomOpponent.fromLpdbStruct(storageStruct)
+	local opponent = Opponent.fromLpdbStruct(storageStruct) --[[@as SmashStandardOpponent?]]
+
+	if not opponent or not Opponent.typeIsParty(opponent.type) then
+		return opponent
+	end
+
+	for playerIndex, player in pairs(opponent.players) do
+		player.chars = Logic.nilIfEmpty(Array.parseCommaSeparatedString(
+			storageStruct.opponentplayers['p' .. playerIndex .. 'chars']
+		))
+	end
+
+	return opponent
+end
+
+return CustomOpponent

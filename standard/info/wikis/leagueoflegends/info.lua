@@ -10,6 +10,7 @@ return {
 	startYear = 2009,
 	wikiName = 'leagueoflegends',
 	name = 'League of Legends',
+	defaultGame = 'leagueoflegends',
 	games = {
 		leagueoflegends = {
 			abbreviation = 'LoL',
@@ -25,9 +26,20 @@ return {
 			},
 		},
 	},
-	defaultGame = 'leagueoflegends',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			matchPage = true,
+			status = 2,
+			matchWidth = 200,
+		},
+		transfers = {
+			showTeamName = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'League of Legends allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'League of Legends allmode.png', ---@deprecated
-	match2 = 2,
 }

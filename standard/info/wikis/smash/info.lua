@@ -10,6 +10,7 @@ return {
 	startYear = 1999,
 	wikiName = 'smash',
 	name = 'Smash',
+	defaultGame = 'melee',
 	games = {
 		melee = {
 			abbreviation = 'Melee',
@@ -90,8 +91,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'melee',
-	defaultTeamLogo = 'Smashlogo std.png', ---@deprecated
-	defaultTeamLogoDark = 'Smashlogo std.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
+	opponentLibrary = 'Opponent/Custom',
 }

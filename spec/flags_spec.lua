@@ -1,7 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('flags', function()
 	local Flags = require('Module:Flags')
-	local Template = require('Module:Template')
 
 	describe('icon', function()
 		it('check', function()
@@ -27,18 +26,11 @@ describe('flags', function()
 			assert.are_equal(nlOutput, Flags.Icon{shouldLink = false, flag = 'nld'})
 			assert.are_equal(nlOutput, Flags.Icon{shouldLink = false, flag = 'holland'})
 
-			assert.are_equal('<span class=\"flag\">[[File:Space filler flag.png|36x24px|link=]]</span>',
+			assert.are_equal('<span class=\"flag\">[[File:Space filler flag.png|36x24px||link=]]</span>',
 				Flags.Icon{flag = 'tbd'})
 
-			local TemplateMock = stub(Template, "safeExpand")
-
-			Flags.Icon{shouldLink = true, flag = 'dummy'}
-			assert.stub(TemplateMock).was.called_with(nil, 'Flag/dummy')
-
-			Flags.Icon{shouldLink = false, flag = 'dummy'}
-			assert.stub(TemplateMock).was.called_with(nil, 'FlagNoLink/dummy')
-
-			TemplateMock:revert()
+			assert.are_equal('Unknown flag: dummy',
+				Flags.Icon{shouldLink = true, flag = 'dummy'})
 		end)
 	end)
 

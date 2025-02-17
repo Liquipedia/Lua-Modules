@@ -11,12 +11,12 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
 ---@class ApexlegendsWeaponInfobox: WeaponInfobox
@@ -94,8 +94,8 @@ function CustomInjector:parse(id, widgets)
 			for index, attachment in ipairs(self.caller:getAllArgsForBase(args, 'attachment')) do
 				table.insert(attachments, self.caller:_createContextualNoWrappingSpan(attachment, index))
 			end
-			table.insert(widgets, Title{name = 'Attachment Slots'})
-			table.insert(widgets, Center{content = {table.concat(attachments, '&nbsp;&nbsp;')}})
+			table.insert(widgets, Title{children = 'Attachment Slots'})
+			table.insert(widgets, Center{children = {table.concat(attachments, '&nbsp;&nbsp;')}})
 		end
 
 		if String.isNotEmpty(args.hopup) then
@@ -105,8 +105,8 @@ function CustomInjector:parse(id, widgets)
 				table.insert(hopups, self.caller:_createContextualNoWrappingSpan(hopup, index))
 				table.insert(hopups, args['hopupdesc' .. index])
 			end
-			table.insert(widgets, Title{name = 'Hop-Ups'})
-			table.insert(widgets, Center{content = {table.concat(hopups, '<br>')}})
+			table.insert(widgets, Title{children = 'Hop-Ups'})
+			table.insert(widgets, Center{children = {table.concat(hopups, '<br>')}})
 		end
 
 		Array.appendWith(

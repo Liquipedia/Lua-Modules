@@ -12,10 +12,10 @@ local Flags = require('Module:Flags')
 local Lua = require('Module:Lua')
 local PageLink = require('Module:Page')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -54,8 +54,8 @@ function CustomInjector:parse(id, widgets)
 		end)
 
 		if #maps > 0 then
-			table.insert(widgets, Title{name = 'Battlegrounds'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Battlegrounds'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
 

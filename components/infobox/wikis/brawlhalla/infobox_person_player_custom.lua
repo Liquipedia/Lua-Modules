@@ -31,8 +31,9 @@ local CLEAN_OTHER_ROLES = {
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
-local Cell = require('Module:Infobox/Widget/Cell')
+local Widgets = require('Module:Widget/All')
+local Injector = Lua.import('Module:Widget/Injector')
+local Cell = Widgets.Cell
 
 ---@class BrawlhallaInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
@@ -60,7 +61,7 @@ function CustomInjector:parse(id, widgets)
 		local currentYearEarnings = caller.earningsPerYear[CURRENT_YEAR]
 		if currentYearEarnings then
 			currentYearEarnings = Math.round(currentYearEarnings)
-			currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
+			currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 		end
 
 		return {

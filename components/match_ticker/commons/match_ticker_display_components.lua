@@ -13,15 +13,20 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
-local String = require('Module:StringUtils')
+local I18n = require('Module:I18n')
+local Icon = require('Module:Icon')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
+local Operator = require('Module:Operator')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 local VodLink = require('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -78,10 +83,16 @@ local Versus = Class.new(
 
 ---@return Html
 function Versus:create()
-	local bestof = self:bestof()
+	local bestof = self.match.asGame and self:gameTitle() or self:bestof()
 	local scores, scores2 = self:scores()
 	local upperText, lowerText
-	if String.isNotEmpty(scores2) then
+	if #self.match.opponents > 2 then
+		local headerRaw = self.match.match2bracketdata.inheritedheader
+		upperText = DisplayHelper.expandHeader(headerRaw)[1]
+		if self.match.asGame then
+			upperText = upperText .. ' - ' .. self:gameTitle() .. self:mapTitle()
+		end
+	elseif String.isNotEmpty(scores2) then
 		upperText = scores2
 		lowerText = scores
 	elseif bestof then
@@ -91,14 +102,15 @@ function Versus:create()
 		upperText = scores
 		lowerText = VS
 	end
+	upperText = upperText or VS
 
 	if not lowerText then
-		return self.root:wikitext(VS)
+		return self.root:wikitext(upperText)
 	end
 
 	return self.root
 		:node(mw.html.create('div')
-			:css('line-height', '1.1'):node(upperText or VS)
+			:addClass('versus-upper'):node(upperText)
 		):node(mw.html.create('div')
 			:addClass('versus-lower'):wikitext('(' .. lowerText .. ')')
 		)
@@ -112,6 +124,23 @@ function Versus:bestof()
 	end
 end
 
+---@return string
+function Versus:gameTitle()
+	if not self.match.asGameIdx then
+		return ''
+	end
+	return 'Game #' .. (self.match.asGameIdx)
+end
+
+---@return string
+function Versus:mapTitle()
+	local mapName = Logic.nilIfEmpty(self.match.map)
+	if not mapName then
+		return ''
+	end
+	return ' on ' .. mapName
+end
+
 ---@return string?
 ---@return string?
 function Versus:scores()
@@ -123,6 +152,7 @@ function Versus:scores()
 
 	local scores, scores2 = {}, {}
 	local hasSecondScore
+	local delimiter = '<span>:</span>'
 
 	local setWinner = function(score, opponentIndex)
 		if winner == opponentIndex then
@@ -131,24 +161,24 @@ function Versus:scores()
 		return score
 	end
 
-	Array.forEach(self.match.match2opponents, function(opponent, opponentIndex)
+	Array.forEach(self.match.opponents or {}, function(opponent, opponentIndex)
 		local score = Logic.isNotEmpty(opponent.status) and opponent.status ~= SCORE_STATUS and opponent.status
 			or tonumber(opponent.score) or -1
 
-		table.insert(scores, setWinner(score ~= -1 and score or 0, opponentIndex))
+		table.insert(scores, '<span>' .. setWinner(score ~= -1 and score or 0, opponentIndex) .. '</span>' )
 
 		local score2 = tonumber((opponent.extradata or {}).score2) or 0
-		table.insert(scores2, setWinner(score2, opponentIndex))
+		table.insert(scores2, '<span>' .. setWinner(score2, opponentIndex) .. '</span>' )
 		if score2 > 0 then
 			hasSecondScore = true
 		end
 	end)
 
 	if hasSecondScore then
-		return table.concat(scores, ':'), table.concat(scores2, ':')
+		return table.concat(scores, delimiter), table.concat(scores2, delimiter)
 	end
 
-	return table.concat(scores, ':')
+	return table.concat(scores, delimiter)
 end
 
 ---Display class for matches shown within a match ticker
@@ -169,18 +199,16 @@ function ScoreBoard:create()
 	local winner = tonumber(match.winner)
 
 	return self.root
-		:node(self:opponent(match.match2opponents[1], winner == 1, true):addClass('team-left'))
+		:node(self:opponent(match.opponents[1], winner == 1, true):addClass('team-left'))
 		:node(self:versus())
-		:node(self:opponent(match.match2opponents[2], winner == 2):addClass('team-right'))
+		:node(self:opponent(match.opponents[2], winner == 2):addClass('team-right'))
 end
 
----@param opponentData table
+---@param opponent table
 ---@param isWinner boolean
 ---@param flip boolean?
 ---@return Html
-function ScoreBoard:opponent(opponentData, isWinner, flip)
-	local opponent = Opponent.fromMatch2Record(opponentData)
-	---@cast opponent -nil
+function ScoreBoard:opponent(opponent, isWinner, flip)
 	if Opponent.isEmpty(opponent) or Opponent.isTbd(opponent) and opponent.type ~= Opponent.literal then
 		opponent = Opponent.tbd(Opponent.literal)
 	end
@@ -234,10 +262,12 @@ local Details = Class.new(
 
 ---@return Html
 function Details:create()
+	local matchPageIcon = self:_matchPageIcon()
 	local td = mw.html.create('td')
 		:addClass('match-filler')
-		:node(mw.html.create('span')
-			:node(self:countdown())
+		:node(mw.html.create('div')
+			:addClass(matchPageIcon and 'has-matchpage' or nil)
+			:node(self:countdown(matchPageIcon))
 			:node(self:tournament())
 		)
 
@@ -254,8 +284,21 @@ function Details:create()
 	return self.root:node(td)
 end
 
+---@return string?
+function Details:_matchPageIcon()
+	local matchPage = (self.match.match2bracketdata or {}).matchpage
+	if Logic.isEmpty(matchPage) then return end
+
+	local display = mw.html.create('div')
+		:addClass('btn btn-secondary')
+		:wikitext(Icon.makeIcon{iconName = 'matchpopup'})
+
+	return Page.makeInternalLink(tostring(display), matchPage)
+end
+
+---@param matchPageIcon string?
 ---@return Html
-function Details:countdown()
+function Details:countdown(matchPageIcon)
 	local match = self.match
 
 	local dateString
@@ -277,13 +320,30 @@ function Details:countdown()
 	local countdownDisplay = mw.html.create('span')
 		:addClass('match-countdown')
 		:node(Countdown._create(countdownArgs))
-		:node('&nbsp;&nbsp;')
 
-	if String.isNotEmpty(match.vod) then
-		countdownDisplay:node(VodLink.display{vod = match.vod})
+	if Logic.readBool(match.finished) then
+		local function makeVod(vod, num)
+			if Logic.isEmpty(vod) then
+				return nil
+			end
+			return VodLink.display{
+				vod = vod,
+				gamenum = num,
+			}
+		end
+
+		local gameVods = Array.map(Array.map(match.match2games, Operator.property('vod')), makeVod)
+
+		countdownDisplay:node(makeVod(match.vod))
+		Array.forEach(gameVods, function(vod)
+			countdownDisplay:node(vod)
+		end)
 	end
 
-	return countdownDisplay
+	return mw.html.create('div')
+		:addClass('match-countdown-wrapper')
+		:node(countdownDisplay)
+		:node(matchPageIcon)
 end
 
 ---@return Html?
@@ -309,16 +369,14 @@ function Details:tournament()
 	)
 
 	return mw.html.create('div')
-		:addClass('tournament')
+		:addClass('tournament-flex')
+		:node(mw.html.create('div')
+			:addClass('tournament-text-flex')
+			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]')
+		)
 		:node(mw.html.create('span')
-			:css('float', 'right')
 			:node(icon)
 		)
-		:node(mw.html.create('div')
-			:addClass('tournament-text')
-			:wikitext('[[' .. match.pagename .. '|' .. displayName .. ']]&nbsp;&nbsp;')
-		)
-
 end
 
 ---Display class for matches shown within a match ticker
@@ -341,7 +399,7 @@ function Match:create()
 	local matchDisplay = mw.html.create('table')
 		:addClass('wikitable wikitable-striped infobox_matches_content')
 
-	local isBrMatch = #self.match.match2opponents ~= 2
+	local isBrMatch = #self.match.opponents ~= 2
 	if isBrMatch then
 		matchDisplay:node(self:brMatchRow())
 	else
@@ -370,9 +428,7 @@ function Match:_expandHeader(inheritedHeader)
 	end
 
 	local headerInput = 'brkts-header-' .. headerArray[index]
-	local expandedHeader = mw.message.new('brkts-header-' .. headerArray[index])
-			---@diagnostic disable-next-line: param-type-mismatch
-			:params(headerArray[index + 1] or ''):plain() --[[@as string]]
+	local expandedHeader = I18n.translate('brkts-header-' .. headerArray[index], {round = headerArray[index + 1]})
 	local failedExpandedHeader = '⧼' .. headerInput .. '⧽'
 	if Logic.isEmpty(expandedHeader) or failedExpandedHeader == expandedHeader then
 		return inheritedHeader

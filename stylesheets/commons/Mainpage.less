@@ -347,16 +347,36 @@ table.infobox_matches_content {
 	white-space: nowrap;
 }
 
+.infobox_matches_content .tournament-flex {
+	width: 185px;
+	display: flex;
+}
+
+.infobox_matches_content .has-matchpage .tournament-flex {
+	width: ~"min( calc( 50% - 20px ), 185px )";
+}
+
 .infobox_matches_content .tournament-text {
 	overflow: hidden;
 	text-overflow: ellipsis;
+	white-space: nowrap;
 	max-width: 130px;
 	vertical-align: middle;
-	white-space: nowrap;
 	font-size: 11px;
 	height: 16px;
 	margin-top: 3px;
 	float: right;
+}
+
+.infobox_matches_content .tournament-text-flex {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 100%;
+	font-size: 11px;
+	height: 16px;
+	margin: auto;
+	text-align: center;
 }
 
 .infobox_matches_content a.hasStream {
@@ -371,6 +391,11 @@ table.infobox_matches_content {
 	& .match-countdown {
 		padding: 0;
 	}
+}
+
+.infobox_matches_content td.match-filler > div {
+	display: flex;
+	justify-content: space-between;
 }
 
 .infobox_matches_content:last-child {
@@ -392,6 +417,22 @@ span.countdown.match-countdown-countdown {
 
 .match-countdown .timer-object {
 	font-size: 11px;
+}
+
+div.match-countdown-wrapper {
+	display: flex;
+	gap: 5px;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.infobox_matches_content .has-matchpage div.match-countdown-wrapper {
+	width: calc( ~"50% + 20px" );
+}
+
+.infobox_matches_content .has-matchpage .match-countdown-wrapper .btn-secondary {
+	min-height: 1.5rem;
+	padding: 0 0.75rem;
 }
 
 /* result gradients for match boxes */

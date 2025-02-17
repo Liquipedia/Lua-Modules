@@ -44,7 +44,7 @@ liquipedia.bracket = {
 		init: function() {
 			liquipedia.bracket.highlighting.createBinds();
 			liquipedia.bracket.highlighting.createHoverCache();
-			document.querySelectorAll( 'tr.match-row' ).forEach( function( element ) {
+			document.querySelectorAll( 'tr.match-row' ).forEach( ( element ) => {
 				element.addEventListener( 'mouseover', function() {
 					this.classList.add( 'bracket-hover' );
 				} );
@@ -52,10 +52,10 @@ liquipedia.bracket = {
 					this.classList.remove( 'bracket-hover' );
 				} );
 			} );
-			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( function( element ) {
-				element.addEventListener( 'mouseover', function() {
-					if ( liquipedia.bracket.highlighting.filteredSelectors.indexOf( element.dataset.highlightingkey ) === -1 ) {
-						liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( function( node ) {
+			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( ( element ) => {
+				element.addEventListener( 'mouseover', () => {
+					if ( !liquipedia.bracket.highlighting.filteredSelectors.includes( element.dataset.highlightingkey ) ) {
+						liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( ( node ) => {
 							node.classList.add( 'bracket-hover' );
 							if ( typeof node.dataset.backgroundColorHover !== 'undefined' ) {
 								node.style.backgroundColor = node.dataset.backgroundColorHover;
@@ -63,8 +63,8 @@ liquipedia.bracket = {
 						} );
 					}
 				} );
-				element.addEventListener( 'mouseleave', function() {
-					liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( function( node ) {
+				element.addEventListener( 'mouseleave', () => {
+					liquipedia.bracket.highlighting.hoverCache[ element.dataset.highlightingkey ].forEach( ( node ) => {
 						node.classList.remove( 'bracket-hover' );
 						if ( typeof node.dataset.backgroundColor !== 'undefined' ) {
 							node.style.backgroundColor = node.dataset.backgroundColor;
@@ -77,7 +77,7 @@ liquipedia.bracket = {
 			const urlparts = url.split( '/' );
 			let value = urlparts[ urlparts.length - 1 ];
 			value.replace( '-icon', '_std' );
-			if ( value.indexOf( '-' ) !== -1 ) {
+			if ( value.includes( '-' ) ) {
 				value = value.replace( '-logo', '' ).replace( '-std', '' );
 				value = value.split( '-' );
 				value = value[ value.length - 1 ];
@@ -87,7 +87,7 @@ liquipedia.bracket = {
 		getTextSelector: function( node ) {
 			const clonedNode = node.cloneNode( true );
 			const children = clonedNode.querySelectorAll( 'div.bracket-score, div.team-template-team-bracket' );
-			children.forEach( function( child ) {
+			children.forEach( ( child ) => {
 				clonedNode.removeChild( child );
 			} );
 			let value = clonedNode.innerHTML;
@@ -99,7 +99,7 @@ liquipedia.bracket = {
 		binds: { },
 		createBinds: function() {
 			const bindingtemplates = document.querySelectorAll( '.bind-highlighting' );
-			bindingtemplates.forEach( function( element ) {
+			bindingtemplates.forEach( ( element ) => {
 				const from = element.querySelector( '.bind-highlighting-from' );
 				const to = element.querySelector( '.bind-highlighting-to' );
 				const fromteamicon = from.querySelector( '.team-template-image img' );
@@ -110,7 +110,7 @@ liquipedia.bracket = {
 				} else {
 					// Team highlighting
 					fromselector = liquipedia.bracket.highlighting.getImageSelector( fromteamicon.src );
-					if ( liquipedia.bracket.highlighting.standardIcons.indexOf( fromselector ) !== -1 ) {
+					if ( liquipedia.bracket.highlighting.standardIcons.includes( fromselector ) ) {
 						fromselector = liquipedia.bracket.highlighting.getTextSelector( from );
 					}
 				}
@@ -122,7 +122,7 @@ liquipedia.bracket = {
 				} else {
 					// Team highlighting
 					toselector = liquipedia.bracket.highlighting.getImageSelector( toteamicon.src );
-					if ( liquipedia.bracket.highlighting.standardIcons.indexOf( toselector ) !== -1 ) {
+					if ( liquipedia.bracket.highlighting.standardIcons.includes( toselector ) ) {
 						toselector = liquipedia.bracket.highlighting.getTextSelector( to );
 					}
 				}
@@ -131,7 +131,7 @@ liquipedia.bracket = {
 		},
 		hoverCache: { },
 		createHoverCache: function() {
-			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( function( element ) {
+			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-middle, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-middle, .bracket-player-inner, .matchlistslot, .matchslot, .grouptableslot' ).forEach( ( element ) => {
 				const teamicon = element.querySelector( '.team-template-image img' );
 				let selector;
 				if ( teamicon === null ) {
@@ -168,7 +168,7 @@ liquipedia.bracket = {
 				} else {
 					// Team highlighting
 					selector = liquipedia.bracket.highlighting.getImageSelector( teamicon.src );
-					if ( liquipedia.bracket.highlighting.standardIcons.indexOf( selector ) !== -1 ) {
+					if ( liquipedia.bracket.highlighting.standardIcons.includes( selector ) ) {
 						selector = liquipedia.bracket.highlighting.getTextSelector( element );
 					}
 				}
@@ -191,7 +191,7 @@ liquipedia.bracket = {
 		},
 		popupBox: null,
 		createIcons: function() {
-			document.querySelectorAll( '.bracket-game' ).forEach( function( element ) {
+			document.querySelectorAll( '.bracket-game' ).forEach( ( element ) => {
 				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
 					const icon = document.createElement( 'div' );
@@ -204,13 +204,13 @@ liquipedia.bracket = {
 						icon.style.right = '16px';
 					}
 					element.appendChild( icon );
-					element.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-player-top, .bracket-player-bottom' ).forEach( function( node ) {
+					element.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-player-top, .bracket-player-bottom' ).forEach( ( node ) => {
 						node.style.cursor = 'pointer';
 						node.title = 'Click for further information';
 					} );
 				}
 			} );
-			document.querySelectorAll( '.match-row' ).forEach( function( element ) {
+			document.querySelectorAll( '.match-row' ).forEach( ( element ) => {
 				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
 					const icon = document.createElement( 'div' );
@@ -220,7 +220,7 @@ liquipedia.bracket = {
 					icon.appendChild( iconinner );
 					let iconHolder;
 					let i = 0;
-					element.childNodes.forEach( function( node ) {
+					element.childNodes.forEach( ( node ) => {
 						if ( typeof node.tagName !== 'undefined' && node.tagName.toLowerCase() === 'td' ) {
 							i++;
 							if ( i === 3 ) {
@@ -229,17 +229,17 @@ liquipedia.bracket = {
 						}
 					} );
 					iconHolder.insertBefore( icon, iconHolder.firstChild );
-					element.querySelectorAll( '.matchlistslot' ).forEach( function( node ) {
+					element.querySelectorAll( '.matchlistslot' ).forEach( ( node ) => {
 						node.style.cursor = 'pointer';
 						node.title = 'Click for further information';
-						node.querySelectorAll( 'a' ).forEach( function( link ) {
+						node.querySelectorAll( 'a' ).forEach( ( link ) => {
 							link.href = '#';
 							link.classList.remove( 'new' );
 						} );
 					} );
 				}
 			} );
-			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( function( element ) {
+			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( ( element ) => {
 				const popupwrapper = element.querySelector( '.bracket-popup-wrapper' );
 				if ( popupwrapper !== null ) {
 					const icon = document.createElement( 'div' );
@@ -252,7 +252,7 @@ liquipedia.bracket = {
 			} );
 		},
 		createToggles: function() {
-			document.querySelector( 'html' ).addEventListener( 'click', function( ev ) {
+			document.querySelector( 'html' ).addEventListener( 'click', ( ev ) => {
 				if ( ev.target.closest( '.bracket-popup-wrapper' ) === null ) {
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
@@ -261,13 +261,13 @@ liquipedia.bracket = {
 					}
 				}
 			} );
-			document.querySelectorAll( '.bracket-popup-wrapper' ).forEach( function( el ) {
-				el.addEventListener( 'click', function( ev ) {
+			document.querySelectorAll( '.bracket-popup-wrapper' ).forEach( ( el ) => {
+				el.addEventListener( 'click', ( ev ) => {
 					ev.stopPropagation();
 				} );
 			} );
-			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-inner, .bracket-game .icon' ).forEach( function( element ) {
-				element.addEventListener( 'click', function( event ) {
+			document.querySelectorAll( '.bracket-team-top, .bracket-team-bottom, .bracket-team-inner, .bracket-player-top, .bracket-player-bottom, .bracket-player-inner, .bracket-game .icon' ).forEach( ( element ) => {
+				element.addEventListener( 'click', ( event ) => {
 					const newPopupWrapper = element.closest( '.bracket-game' );
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
@@ -288,8 +288,8 @@ liquipedia.bracket = {
 					event.stopPropagation();
 				} );
 			} );
-			document.querySelectorAll( '.match-row' ).forEach( function( element ) {
-				element.addEventListener( 'click', function( event ) {
+			document.querySelectorAll( '.match-row' ).forEach( ( element ) => {
+				element.addEventListener( 'click', ( event ) => {
 					const newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
@@ -310,8 +310,8 @@ liquipedia.bracket = {
 					event.stopPropagation();
 				} );
 			} );
-			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( function( element ) {
-				element.addEventListener( 'click', function( event ) {
+			document.querySelectorAll( '.table-battleroyale-results-round' ).forEach( ( element ) => {
+				element.addEventListener( 'click', ( event ) => {
 					const newPopupWrapper = element;
 					if ( liquipedia.bracket.popup.popupBox !== null ) {
 						liquipedia.bracket.popup.popupBox.querySelector( '.bracket-popup-wrapper' ).style.display = 'none';
@@ -428,7 +428,7 @@ liquipedia.bracket = {
 					bruinenBracketScroll.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
 				}
 				window.addEventListener( 'resize', liquipedia.bracket.popup.positionBracketPopup );
-				document.querySelectorAll( '.bracket-wrapper' ).forEach( function( element ) {
+				document.querySelectorAll( '.bracket-wrapper' ).forEach( ( element ) => {
 					element.addEventListener( 'scroll', liquipedia.bracket.popup.positionBracketPopup );
 				} );
 			}

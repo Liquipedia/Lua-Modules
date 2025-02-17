@@ -10,6 +10,7 @@ return {
 	startYear = 2015,
 	wikiName = 'overwatch',
 	name = 'Overwatch',
+	defaultGame = 'overwatch2',
 	games = {
 		overwatch = {
 			abbreviation = 'OW',
@@ -38,8 +39,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'overwatch2',
-	defaultTeamLogo = 'Overwatch Logo lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Overwatch Logo darkmode.png', ---@deprecated
-	match2 = 1,
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+		},
+	},
 }

@@ -4,7 +4,7 @@
  ******************************************************************************/
 liquipedia.selectall = {
 	init: function() {
-		document.querySelectorAll( '.selectall' ).forEach( function( selectall ) {
+		document.querySelectorAll( '.selectall' ).forEach( ( selectall ) => {
 			const wrapper = document.createElement( 'div' );
 			wrapper.classList.add( 'selectall-wrapper' );
 			const buttonwrapper = document.createElement( 'div' );

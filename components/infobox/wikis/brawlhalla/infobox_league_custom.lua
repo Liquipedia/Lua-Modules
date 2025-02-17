@@ -11,10 +11,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -41,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'customcontent' then
 		if not String.isEmpty(args.player_number) or not String.isEmpty(args.doubles_number) then
-			table.insert(widgets, Title{name = 'Player Breakdown'})
+			table.insert(widgets, Title{children = 'Player Breakdown'})
 			table.insert(widgets, Cell{
 				name = 'Number of Players',
 				content = {args.player_number}

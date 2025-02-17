@@ -13,10 +13,10 @@ local Page = require('Module:Page')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
@@ -46,7 +46,7 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{convertrole = 'true'}
+	player.args.history = TeamHistoryAuto.results{convertrole = true}
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 

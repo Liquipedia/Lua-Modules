@@ -10,6 +10,7 @@ return {
 	startYear = 2010,
 	wikiName = 'worldoftanks',
 	name = 'World of Tanks',
+	defaultGame = 'worldoftanks',
 	games = {
 		worldoftanks = {
 			abbreviation = 'WoT',
@@ -18,19 +19,6 @@ return {
 			logo = {
 				darkMode = 'World of Tanks default darkmode.png',
 				lightMode = 'World of Tanks default lightmode.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'World of Tanks default darkmode.png',
-				lightMode = 'World of Tanks default lightmode.png',
-			},
-		},
-		['wot blitz'] = {
-			abbreviation = 'WoT Blitz',
-			name = 'World of Tanks Blitz',
-			link = 'World of Tanks Blitz',
-			logo = {
-				darkMode = 'World of Tanks Blitz default darkmode.png',
-				lightMode = 'World of Tanks Blitz default lightmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'World of Tanks default darkmode.png',
@@ -50,23 +38,17 @@ return {
 				lightMode = 'World of Tanks default lightmode.png',
 			},
 		},
-		['tanks blitz'] = {
-			abbreviation = 'Tanks Blitz',
-			name = 'Tanks Blitz',
-			link = 'Tanks Blitz',
-			logo = {
-				darkMode = 'Tanks Blitz default darkmode.png',
-				lightMode = 'Tanks Blitz default lightmode.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'World of Tanks default darkmode.png',
-				lightMode = 'World of Tanks default lightmode.png',
-			},
+	},
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 190,
 		},
 	},
-	defaultGame = 'worldoftanks',
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'World of Tanks default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'World of Tanks default darkmode.png', ---@deprecated
-	match2 = 2,
 }

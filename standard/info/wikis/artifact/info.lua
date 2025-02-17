@@ -10,6 +10,7 @@ return {
 	startYear = 2018,
 	wikiName = 'artifact',
 	name = 'Artifact',
+	defaultGame = 'artifact',
 	games = {
 		artifact = {
 			abbreviation = 'Artifact',
@@ -25,8 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'artifact',
-	defaultTeamLogo = 'Artifact allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Artifact allmode.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 }

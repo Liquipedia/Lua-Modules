@@ -8,10 +8,8 @@
 
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Flags = require('Module:Flags')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -20,7 +18,9 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _PAGENAME = mw.title.getCurrentTitle().text
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MvpTable = {}
 
@@ -110,7 +110,7 @@ function MvpTable._parseArgs(args)
 	end
 
 	if Table.isEmpty(parsedArgs.matchGroupIds) and Table.isEmpty(parsedArgs.tournaments) then
-		table.insert(parsedArgs.tournaments, _PAGENAME)
+		table.insert(parsedArgs.tournaments, mw.title.getCurrentTitle().text)
 	end
 
 	return parsedArgs
@@ -184,16 +184,18 @@ end
 ---@param args mvpTableParsedArgs
 ---@return Html
 function MvpTable._row(item, args)
-	local playerCell = mw.html.create('td')
-		:css('text-align', 'left')
-		:wikitext(Flags.Icon{flag = item.flag})
-		:wikitext('&nbsp;')
-		:wikitext('[[' .. item.name .. '|' .. item.displayName .. ']]')
-		:wikitext('&nbsp;')
-		:wikitext(Team.part(mw.getCurrentFrame(), item.team or ''))
-
 	local row = mw.html.create('tr')
-		:node(playerCell)
+		:tag('td'):node(OpponentDisplay.BlockOpponent{
+			opponent = {type = Opponent.solo, players = {{
+				displayName = item.displayName,
+				flag = item.flag,
+				pageName = item.name,
+				team = item.team and (item.team:gsub('_', ' '):lower()) or nil,
+			}}},
+			showLink = true,
+			overflow = 'ellipsis',
+			showPlayerTeam = true,
+		}):done()
 		:tag('td'):wikitext(item.mvp):done()
 
 	if args.points then

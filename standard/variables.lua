@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Variables = {}
 
 ---Stores a wiki-variable and returns the empty string
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@param value wikiVariableValue Value of the wiki-variable
 ---@return string #always the empty string
 function Variables.varDefine(name, value)
@@ -19,7 +19,7 @@ function Variables.varDefine(name, value)
 end
 
 ---Stores a wiki-variable and returns the stored value
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@param value wikiVariableValue Value of the wiki-variable
 ---@return string
 function Variables.varDefineEcho(name, value)
@@ -28,17 +28,17 @@ end
 
 ---Gets the stored value of a wiki-variable
 ---@generic T
----@param name wikiVaribleKey Key of the wiki-variable
+---@param name wikiVariableKey Key of the wiki-variable
 ---@param default T fallback value if wiki-variable is not defined
 ---@return string|T
----@overload fun(name: wikiVaribleKey):string?
+---@overload fun(name: wikiVariableKey):string?
 function Variables.varDefault(name, default)
 	local val = mw.ext.VariablesLua.var(name)
 	return (val ~= '' and val ~= nil) and val or default
 end
 
 ---
----@param ... wikiVaribleKey wiki-variable keys
+---@param ... wikiVariableKey wiki-variable keys
 ---@return string
 function Variables.varDefaultMulti(...)
 	--pack varargs
@@ -53,6 +53,12 @@ function Variables.varDefaultMulti(...)
 
 	-- If even the last var didn't bring anything return the last argument
 	return varargs[varargs.n]
+end
+
+---@param name wikiVariableKey Key of the wiki-variable
+---@return boolean
+function Variables.varExists(name)
+	return Variables.varDefault(name) ~= nil
 end
 
 return Class.export(Variables, {removeBlanks = false})

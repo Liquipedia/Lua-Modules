@@ -11,30 +11,14 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local CustomOpponent = Table.deepCopy(Opponent)
 
-CustomOpponent.types.Player = TypeUtil.extendStruct(Opponent.types.Player, {
-	race = 'string?',
-})
-
-CustomOpponent.types.PartyOpponent = TypeUtil.struct{
-	players = TypeUtil.array(CustomOpponent.types.Player),
-	type = TypeUtil.literalUnion(unpack(Opponent.partyTypes)),
-}
-
-CustomOpponent.types.Opponent = TypeUtil.union(
-	Opponent.types.TeamOpponent,
-	CustomOpponent.types.PartyOpponent,
-	Opponent.types.LiteralOpponent
-)
-
 ---@class WarcraftStandardPlayer:standardPlayer
----@field race string?
+---@field faction string?
 
 ---@class WarcraftStandardOpponent:standardOpponent
 ---@field players WarcraftStandardPlayer[]
@@ -53,10 +37,10 @@ function CustomOpponent.readOpponentArgs(args)
 	end
 
 	if partySize == 1 then
-		opponent.players[1].race = Faction.read(args.race)
+		opponent.players[1].faction = Faction.read(args.faction or args.race or args.p1race)
 	elseif partySize then
 		for playerIx, player in ipairs(opponent.players) do
-			player.race = Faction.read(args['p' .. playerIx .. 'race'])
+			player.faction = Faction.read(args['p' .. playerIx .. 'faction'] or args['p' .. playerIx .. 'race'])
 		end
 	end
 
@@ -75,7 +59,7 @@ function CustomOpponent.fromMatch2Record(record)
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIx, player in ipairs(opponent.players) do
 			local playerRecord = record.match2players[playerIx]
-			player.race = Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction
+			player.faction = Faction.read(playerRecord.extradata.faction) or Faction.defaultFaction
 		end
 	end
 
@@ -89,7 +73,7 @@ function CustomOpponent.toLpdbStruct(opponent)
 
 	if Opponent.typeIsParty(opponent.type) then
 		for playerIndex, player in pairs(opponent.players) do
-			storageStruct.opponentplayers['p' .. playerIndex .. 'faction'] = player.race
+			storageStruct.opponentplayers['p' .. playerIndex .. 'faction'] = player.faction
 		end
 	end
 
@@ -107,7 +91,7 @@ function CustomOpponent.fromLpdbStruct(storageStruct)
 
 	if Opponent.partySize(storageStruct.opponenttype) then
 		for playerIndex, player in pairs(opponent.players) do
-			player.race = storageStruct.opponentplayers['p' .. playerIndex .. 'faction']
+			player.faction = storageStruct.opponentplayers['p' .. playerIndex .. 'faction']
 		end
 	end
 
@@ -116,7 +100,7 @@ end
 
 ---@param opponent WarcraftStandardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}?
 ---@return WarcraftStandardOpponent
 function CustomOpponent.resolve(opponent, date, options)
 	options = options or {}
@@ -125,12 +109,22 @@ function CustomOpponent.resolve(opponent, date, options)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
-				local hasRace = String.isNotEmpty(player.race)
+				local hasFaction = String.isNotEmpty(player.faction)
 				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {savePageVar = savePageVar, date = date})
-				player.team =
-					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
-				player.race = (hasRace or player.race ~= Faction.defaultFaction) and player.race or nil
+				PlayerExt.syncPlayer(player, {
+					savePageVar = savePageVar,
+					date = date,
+					overwritePageVars = options.overwritePageVars,
+				})
+				player.team = PlayerExt.syncTeam(
+					player.pageName:gsub(' ', '_'),
+					player.team,
+					{
+							date = date,
+							savePageVar = savePageVar,
+						}
+				)
+				player.faction = (hasFaction or player.faction ~= Faction.defaultFaction) and player.faction or nil
 			else
 				PlayerExt.populatePageName(player)
 			end

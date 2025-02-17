@@ -11,8 +11,10 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Lpdb = require('Module:Lpdb')
 local MatchTicker = require('Module:MatchTicker/Custom')
@@ -26,6 +28,7 @@ local YearsActive = require('Module:YearsActive')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 local Opponent = Lua.import('Module:Opponent/Starcraft')
+local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -47,11 +50,12 @@ local NUMBER_OF_RECENT_MATCHES = 10
 local RACE_FIELD_AS_CATEGORY_LINK = true
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
+local Widgets = Lua.import('Module:Widget/All')
 
-local Cell = require('Module:Infobox/Widget/Cell')
-local Title = require('Module:Infobox/Widget/Title')
-local Center = require('Module:Infobox/Widget/Center')
+local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class Starcraft2InfoboxPlayer: SC2CustomPerson
 ---@field shouldQueryData boolean
@@ -75,6 +79,16 @@ function CustomPlayer.run(frame)
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
 
+	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
+
+	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
+		player = player.pagename,
+		convertrole = true,
+		addlpdbdata = Logic.emptyOr(player.args.addlpdbdata, true),
+		cleanRoles = 'Module:TeamHistoryAuto/cleanRole',
+		specialRoles = true,
+	}
+
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)
 	end
@@ -96,7 +110,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Approx. Winnings ' .. CURRENT_YEAR,
-				content = {currentYearEarnings > 0 and ('$' .. mw.language.new('en'):formatNum(currentYearEarnings)) or nil}
+				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{name = ranks[1].name or 'Rank', content = {ranks[1].rank}},
 			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
@@ -126,8 +140,8 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		return {
-			Title{name = 'Achievements'},
-			Center{content = {Achievements.display(caller.infoboxAchievements)}},
+			Title{children = 'Achievements'},
+			Center{children = {Achievements.display(caller.infoboxAchievements)}},
 			Cell{name = 'All-Kills', content = {allkills > 0 and (ALL_KILL_ICON .. allkills) or nil}}
 		}
 	elseif id == 'achievements' then return {}
@@ -185,6 +199,10 @@ function CustomPlayer:_getMatchupData(player)
 			table.insert(self.recentMatches, match)
 		end
 
+		if Array.any(match.match2opponents, function(opponent) return opponent.status and opponent.status ~= 'S' end) then
+			return
+		end
+
 		self:_addToStats(match, player, playerWithoutUnderscore)
 	end
 
@@ -192,9 +210,8 @@ function CustomPlayer:_getMatchupData(player)
 		conditions = table.concat({
 			'[[finished::1]]', -- only finished matches
 			'[[winner::!]]', -- expect a winner
-			'[[walkover::]]', -- exclude default wins/losses
-			'[[resulttype::!np]]', -- i.e. ignore not played matches
-			'[[date::!1970-01-01]]', --i.e. wrongly set up
+			'[[status::!notplayed]]', -- i.e. ignore not played matches
+			'[[date::!' .. DateExt.defaultDate .. ']]', --i.e. wrongly set up
 			'([[opponent::' .. player .. ']] OR [[opponent::' .. playerWithoutUnderscore .. ']])'
 		}, ' AND '),
 		order = 'date desc',
@@ -317,7 +334,7 @@ function CustomPlayer:calculateEarnings(args)
 			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
 			playerConditions,
 		},
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{

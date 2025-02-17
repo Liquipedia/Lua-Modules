@@ -10,13 +10,14 @@ local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Links = require('Module:Links')
 local Locale = require('Module:Locale')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local ReferenceCleaner = require('Module:ReferenceCleaner')
 local Table = require('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -24,7 +25,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
 
 ---@class CompanyInfobox: BasicInfobox
 local Company = Class.new(BasicInfobox)
@@ -38,9 +39,8 @@ function Company.run(frame)
 	return company:createInfobox()
 end
 
----@return Html
+---@return string
 function Company:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -50,8 +50,8 @@ function Company:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Company Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Company Information'},
 		Customizable{id = 'parent', children = {
 			Cell{
 				name = 'Parent Company',
@@ -75,24 +75,24 @@ function Company:createInfobox()
 		Builder{
 			builder = function()
 				if args.companytype == COMPANY_TYPE_ORGANIZER then
-					infobox:categories('Tournament organizers')
+					self:categories('Tournament organizers')
 					return {
 						Cell{
-							name = 'Total Prize Money',
+							name = 'Awarded Prize Pools',
 							content = {self:_getOrganizerPrizepools()}
 						}
 					}
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Builder{
 			builder = function()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end
@@ -123,9 +123,9 @@ function Company:createInfobox()
 		})
 	})
 
-	infobox:categories('Companies')
+	self:categories('Companies')
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param location string?
@@ -141,13 +141,14 @@ end
 
 ---@return string?
 function Company:_getOrganizerPrizepools()
+	local queryName = Logic.readBool(self.args.queryByBasename) and mw.title.getCurrentTitle().baseText or self.pagename
 	local queryData = mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions =
-			'[[organizers_organizer1::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer2::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer3::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer4::' .. self.pagename .. ']] OR ' ..
-			'[[organizers_organizer5::' .. self.pagename .. ']]',
+			'[[organizers_organizer1::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer2::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer3::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer4::' .. queryName .. ']] OR ' ..
+			'[[organizers_organizer5::' .. queryName .. ']]',
 		query = 'sum::prizepool'
 	})
 

@@ -14,7 +14,7 @@ local Namespace = require('Module:Namespace')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -25,9 +25,8 @@ local Builder = Widgets.Builder
 ---@class ManufacturerInfobox: BasicInfobox
 local Manufacturer = Class.new(BasicInfobox)
 
----@return Html
+---@return string
 function Manufacturer:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -46,10 +45,10 @@ function Manufacturer:createInfobox()
 		Customizable{
 			id = 'caption',
 			children = {
-				Center{content = {args.caption}},
+				Center{children = {args.caption}},
 			}
 		},
-		Title{name = (args.informationType or 'Manufacturer') .. ' Information'},
+		Title{children = (args.informationType or 'Manufacturer') .. ' Information'},
 		Cell{name = 'Former Name(s)', content = {args.formernames}},
 		Cell{name = 'Description', content = {args.description}},
 		Cell{name = 'Season(s)', content = {args.seasons}},
@@ -62,7 +61,7 @@ function Manufacturer:createInfobox()
 					builder = function()
 						if args.founded or args.dissolved then
 							return {
-								Title{name = 'History'},
+								Title{children = 'History'},
 								Cell{name = 'Founded', content = {args.founded}},
 								Cell{name = 'Dissolved', content = {args.dissolved}}
 							}
@@ -73,15 +72,13 @@ function Manufacturer:createInfobox()
 		}
 	}
 
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
-
 	if Namespace.isMain() then
 		self:setLpdbData(args)
-		infobox:categories('Manufacturers')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Manufacturers')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return builtInfobox
+	return self:build(widgets)
 end
 
 ---@param args table

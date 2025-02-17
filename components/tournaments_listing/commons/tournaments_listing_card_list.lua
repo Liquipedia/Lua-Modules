@@ -16,7 +16,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
-local Medal = require('Module:Medal')
+local Medals = require('Module:Medals')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -29,7 +29,7 @@ local Conditions = Lua.import('Module:TournamentsListing/Conditions')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local Tier = Lua.import('Module:Tier/Custom')
 
-local LANG = mw.language.new('en')
+local LANG = mw.getContentLanguage()
 local NONBREAKING_SPACE = '&nbsp;'
 local POSTPONED = 'postponed'
 local DELAYED = 'delayed'
@@ -312,7 +312,7 @@ function BaseTournamentsListing:_row(tournamentData)
 	if placements.qualified then
 		row:tag('div')
 			:addClass('gridCell Placement Qualified')
-			:node(mw.html.create('span'):addClass('Medal'):wikitext(Medal.qual .. NONBREAKING_SPACE))
+			:node(Medals.display{medal = 'qualified'}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
 			:node(self:_buildParticipantsSpan(placements.qualified))
 
 		self.display:node(row)
@@ -321,14 +321,14 @@ function BaseTournamentsListing:_row(tournamentData)
 
 	local firstPlaceCell = mw.html.create('div')
 		:addClass('gridCell Placement FirstPlace')
-		:node(mw.html.create('span'):addClass('Medal'):wikitext(Medal['1'] .. NONBREAKING_SPACE))
+		:node(Medals.display{medal = 1}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
 		:node(self:_buildParticipantsSpan(placements[1]))
 
 	row:node(firstPlaceCell:done())
 
 	local secondPlaceCell = mw.html.create('div')
 		:addClass('gridCell Placement SecondPlace')
-		:node(mw.html.create('span'):addClass('Medal'):wikitext(Medal['2'] .. NONBREAKING_SPACE))
+		:node(Medals.display{medal = 2}:addClass('Medal'):wikitext(NONBREAKING_SPACE))
 		:node(self:_buildParticipantsSpan(placements[2]))
 
 	row:node(secondPlaceCell:done())

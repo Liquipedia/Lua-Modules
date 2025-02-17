@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'osu',
 	name = 'osu!',
+	defaultGame = 'osu',
 	games = {
 		osu = {
 			abbreviation = 'osu!',
@@ -38,9 +39,16 @@ return {
 			},
 		},
 	},
-	defaultGame = 'osu',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'osu! default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'osu! default allmode.png', ---@deprecated
-	match2 = 2,
 }

@@ -22,6 +22,8 @@ local CustomPrizePool = {}
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
@@ -31,6 +33,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
@@ -38,22 +44,24 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.publishertier = Variables.varDefault('tournament_pro_circuit_tier', '')
-	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_valve_premier', '')
 	lpdbData.extradata.lis = Variables.varDefault('tournament_lis', '')
 	lpdbData.extradata.series2 = Variables.varDefault('tournament_series2', '')
 
 	local redirectedTeam = mw.ext.TeamLiquidIntegration.resolve_redirect(lpdbData.participant)
-	local smwPrefix = Variables.varDefault('smw_prefix')
-	smwPrefix = smwPrefix and (smwPrefix .. '_') or ''
+	local lpdbPrefix = Variables.varDefault('lpdb_prefix')
+	lpdbPrefix = lpdbPrefix and (lpdbPrefix .. '_') or ''
 
-	Variables.varDefine(redirectedTeam .. '_' .. smwPrefix .. 'date', lpdbData.date)
-	Variables.varDefine(smwPrefix .. (redirectedTeam:lower()) .. '_prizepoints', lpdbData.extradata.prizepoints)
+	Variables.varDefine(redirectedTeam .. '_' .. lpdbPrefix .. 'date', lpdbData.date)
+	Variables.varDefine(lpdbPrefix .. (redirectedTeam:lower()) .. '_prizepoints', lpdbData.extradata.prizepoints)
 
 
 	return lpdbData
 end
 
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	if Logic.isEmpty(tier) then
 		return 0

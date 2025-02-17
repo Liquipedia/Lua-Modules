@@ -7,5 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
+local PlayerExt = Lua.import('Module:Player/Ext')
 
-return Lua.import('Module:Player/Ext')
+return PlayerExt

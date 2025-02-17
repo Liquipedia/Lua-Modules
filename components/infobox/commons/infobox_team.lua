@@ -7,18 +7,19 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Date = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Image = require('Module:Image')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local MatchTicker = require('Module:MatchTicker/Custom')
-local Table = require('Module:Table')
-local Template = require('Module:Template')
 local String = require('Module:StringUtils')
-local WarningBox = require('Module:WarningBox')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -27,8 +28,9 @@ local Flags = Lua.import('Module:Flags')
 local Links = Lua.import('Module:Links')
 local Locale = Lua.import('Module:Locale')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
+local Region = Lua.import('Module:Region')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -41,15 +43,15 @@ local Team = Class.new(BasicInfobox)
 
 local LINK_VARIANT = 'team'
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
+
+local CREATED_STRING = '<span class="icon-16px">${icon}</span> ${date}'
 
 ---@enum statuses
 local Status = {
 	ACTIVE = 'active',
 	DISBANDED = 'disbanded',
 }
-
-Team.warnings = {}
 
 ---@param frame Frame
 ---@return Html
@@ -58,9 +60,8 @@ function Team.run(frame)
 	return team:createInfobox()
 end
 
----@return Html
+---@return string
 function Team:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	--- Transform data
@@ -79,6 +80,11 @@ function Team:createInfobox()
 	args.teamcardimagedark = self.teamTemplate.imagedark or args.teamcardimagedark or args.teamcardimage
 	args.teamcardimage = self.teamTemplate.image or args.teamcardimage
 
+	self.region = self:createRegion(args.region)
+
+	local created
+	args.created, created = self:processCreateDates()
+
 	--- Display
 	local widgets = {
 		Header{
@@ -89,8 +95,8 @@ function Team:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Team Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Team Information'},
 		Customizable{id = 'topcustomcontent', children = {}},
 		Cell{
 			name = 'Location',
@@ -102,12 +108,7 @@ function Team:createInfobox()
 		Customizable{
 			id = 'region',
 			children = {
-				Cell{
-					name = 'Region',
-					content = {
-						self:_createRegion(args.region)
-					}
-				},
+				Cell{name = 'Region', content = {self.region.display}},
 			}
 		},
 		Customizable{
@@ -123,11 +124,13 @@ function Team:createInfobox()
 		Customizable{
 			id = 'earnings',
 			children = {
-				Cell{name = Abbreviation.make(
-					'Approx. Total Winnings',
-					'Includes individual player earnings won&#10;while representing this team'
-				),
-				content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}}
+				Cell{
+					name = not Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make(
+						'Approx. Total Winnings',
+						'Includes individual player winnings&#10;while representing this team'
+					) or 'Approx. Total Winnings',
+					content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
+				}
 			}
 		},
 		Customizable{id = 'custom', children = {}},
@@ -135,8 +138,8 @@ function Team:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links, variant = LINK_VARIANT}
+						Title{children = 'Links'},
+						Widgets.Links{links = links, variant = LINK_VARIANT}
 					}
 				end
 			end
@@ -148,8 +151,8 @@ function Team:createInfobox()
 					builder = function()
 						if String.isNotEmpty(args.achievements) then
 							return {
-								Title{name = 'Achievements'},
-								Center{content = {args.achievements}}
+								Title{children = 'Achievements'},
+								Center{children = {args.achievements}}
 							}
 						end
 					end
@@ -161,10 +164,10 @@ function Team:createInfobox()
 			children = {
 				Builder{
 					builder = function()
-						if args.created or args.disbanded then
+						if Table.isNotEmpty(created) or args.disbanded then
 							return {
-								Title{name = 'History'},
-								Cell{name = 'Created', content = {args.created}},
+								Title{children = 'History'},
+								Cell{name = 'Created', content = created},
 								Cell{name = 'Disbanded', content = {args.disbanded}}
 							}
 						end
@@ -176,45 +179,107 @@ function Team:createInfobox()
 			builder = function()
 				if args.trades then
 					return {
-						Center{content = {args.trades}}
+						Center{children = {args.trades}}
 					}
 				end
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
-	infobox:bottom(self:_createUpcomingMatches())
-	infobox:bottom(self:createBottomContent())
+	self:bottom(self:_createUpcomingMatches())
+	self:bottom(self:createBottomContent())
 
 	-- Categories
 	if self:shouldStore(args) then
-		infobox:categories('Teams')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Teams')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
-
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
 
 	-- Store LPDB data and Wiki-variables
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		self:defineCustomPageVariables(args)
+		self:_definePageVariables(args)
 	end
 
-	return mw.html.create()
-		:node(builtInfobox)
-		:node(WarningBox.displayAll(self.warnings))
+	return self:build(widgets)
 end
 
---to be reworked in another PR
----@param region string?
+---@return string|number|nil # storage date
+---@return string[] # display elements
+function Team:processCreateDates()
+	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean(self.args.created)) or Date.maxTimestamp
+
+	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
+		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
+		if #splitInput ~= 2 then
+			-- Legacy Input
+			return creation
+		end
+
+		local icon
+		local game, date = unpack(splitInput)
+		local cleanDate = ReferenceCleaner.clean(date)
+
+		if game:lower() == 'org' then
+			icon = Image.display(self:_getTeamIcon(cleanDate))
+		else
+			local timestamp = Team._parseDate(cleanDate)
+			if timestamp and timestamp < earliestGameTimestamp then
+				earliestGameTimestamp = timestamp
+			end
+
+			icon = Game.icon{game = game, useDefault = false}
+		end
+
+		return String.interpolate(CREATED_STRING, {icon = icon or '', date = date})
+	end)
+
+	local storageDate = earliestGameTimestamp ~= Date.maxTimestamp and Date.toYmdInUtc(earliestGameTimestamp) or nil
+	return storageDate, created
+end
+
+---@param date? string
 ---@return string?
-function Team:_createRegion(region)
-	if String.isEmpty(region) then
+---@return string?
+function Team:_getTeamIcon(date)
+	if not self.teamTemplate then
 		return
 	end
 
-	return Template.safeExpand(self.infobox.frame, 'Region', {region})
+	local icon = self.teamTemplate.historicaltemplate
+		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).image
+		or self.teamTemplate.image
+
+	local iconDark = self.teamTemplate.historicaltemplate
+		and mw.ext.TeamTemplate.raw(self.teamTemplate.historicaltemplate, date).imagedark
+		or self.teamTemplate.imagedark
+
+	return icon, iconDark
+end
+
+---@param date? string
+---@return boolean
+function Team._isValidDate(date)
+	return date and date:match('%d%d%d%d-[%d%?]?[%d%?]?-[%d%?]?[%d%?]?')
+end
+
+---@param date string
+---@return integer?
+function Team._parseDate(date)
+	if not Team._isValidDate(date) then
+		return
+	end
+
+	return Date.readTimestampOrNil(date)
+end
+
+---@param region string?
+---@return {display: string?, region: string?}
+function Team:createRegion(region)
+	if Logic.isEmpty(region) then return {} end
+
+	return Region.run{region = region, linkToCategory = true} or {}
 end
 
 ---@param location string?
@@ -233,7 +298,7 @@ function Team:_createLocation(location)
 	end
 
 	if String.isNotEmpty(demonym) and self:shouldStore(self.args) then
-		self.infobox:categories(demonym .. ' Teams')
+		self:categories(demonym .. ' Teams')
 	end
 
 	return Flags.Icon({flag = location, shouldLink = true}) ..
@@ -243,8 +308,9 @@ end
 
 ---@return Html?
 function Team:_createUpcomingMatches()
-	if self:shouldStore(self.args) and Info.match2 > 0 then
-		return MatchTicker.team{short = true}
+	if self:shouldStore(self.args) and Info.config.match2.status > 0 then
+		local frame = {short = true} ---@type Frame
+		return MatchTicker.team(frame)
 	end
 end
 
@@ -277,7 +343,7 @@ function Team:_setLpdbData(args, links)
 		name = name,
 		location = self:getStandardLocationValue(args.location),
 		location2 = self:getStandardLocationValue(args.location2),
-		region = args.region,
+		region = self.region.region,
 		locations = Locale.formatLocations(args),
 		logo = args.image,
 		logodark = args.imagedark,
@@ -304,6 +370,14 @@ function Team:_setLpdbData(args, links)
 	lpdbData = self:addToLpdb(lpdbData, args)
 
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, Json.stringifySubTables(lpdbData))
+end
+
+--- Allows for overriding this functionality
+---@param args table
+function Team:_definePageVariables(args)
+	Variables.varDefine('region', self.region.region)
+
+	self:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality

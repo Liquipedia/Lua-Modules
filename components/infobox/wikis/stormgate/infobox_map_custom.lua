@@ -14,10 +14,10 @@ local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -26,9 +26,12 @@ local CustomMap = Class.new(Map)
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {
-	{key = 'resourcecamps', name = 'Resource Camp(s)'},
+	{key = 'luminitecamps', name = 'Luminite Camp(s)'},
+	{key = 'theriumcamps', name = 'Therium Camp(s)'},
 	{key = 'speedcamps', name = 'Speed Camp(s)'},
+	{key = 'visioncamps', name = 'Vision Camp(s)'},
 	{key = 'healthcamps', name = 'Health Camp(s)'},
+	{key = 'energycamps', name = 'Energy Camp(s)'},
 	{key = 'siegecamps', name = 'Siege Camp(s)'},
 }
 --currently the ingame icons are still temporary
@@ -83,7 +86,7 @@ function CustomMap._parseArgs(args)
 		local value = tonumber(args[key])
 		args[key] = value ~= 0 and value or nil
 	end)
-	args.types =  Array.map(mw.text.split((args.type or ManualMapTypes.MISC):upper(), ','), String.trim)
+	args.types = Array.map(mw.text.split((args.type or ManualMapTypes.MISC):upper(), ','), String.trim)
 
 	--check for invalid type input
 	assert(
@@ -126,9 +129,9 @@ function CustomInjector:parse(id, widgets)
 				Cell{name = 'Rush distance', content = {args.rushDistance and (args.rushDistance .. ' seconds') or nil}},
 				Cell{name = 'Available Resources', content = {self.caller:_resourcesDisplay(args)}},
 			},
-			self.caller:addCellsFromDataTable(args, LADDER_HISTORY),
-			{hasCampData and Title{name = 'Camp Information'} or nil},
-			self.caller:addCellsFromDataTable(args, CAMPS)
+			self.caller:_addCellsFromDataTable(args, LADDER_HISTORY),
+			{hasCampData and Title{children = 'Camp Information'} or nil},
+			self.caller:_addCellsFromDataTable(args, CAMPS)
 		)
 	end
 

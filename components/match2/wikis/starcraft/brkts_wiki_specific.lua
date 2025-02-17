@@ -16,7 +16,7 @@ local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 local WikiSpecific = Table.copy(BaseWikiSpecific)
 
 WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return StarcraftMatchGroupUtil.matchFromRecord
 end)
 
@@ -26,9 +26,13 @@ WikiSpecific.processMatch = FnUtil.lazilyDefineFunction(function()
 end)
 
 ---@param matchGroupType string
+---@param maxOpponentCount integer
 ---@return function
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
-	if matchGroupType == 'matchlist' then
+function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
+	if maxOpponentCount > 2 then
+		local Horizontallist = Lua.import('Module:MatchGroup/Display/Horizontallist')
+		return Horizontallist.BracketContainer
+	elseif matchGroupType == 'matchlist' then
 		local MatchList = Lua.import('Module:MatchGroup/Display/Matchlist')
 		return WikiSpecific.adjustMatchGroupContainerConfig(MatchList.MatchlistContainer)
 	end
@@ -42,7 +46,7 @@ end
 function WikiSpecific.adjustMatchGroupContainerConfig(displayContainer)
 	local StarcraftMatchSummary = Lua.import('Module:MatchSummary/Starcraft')
 	return function(props, matches)
-		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.MatchSummaryContainer})
+		local config = Table.merge(props.config, {MatchSummaryContainer = StarcraftMatchSummary.getByMatchId})
 		return displayContainer(Table.merge(props, {config = config}), matches)
 	end
 end
@@ -52,18 +56,14 @@ end
 function WikiSpecific.getMatchContainer(displayMode)
 	if displayMode == 'singleMatch' then
 		-- Single match, displayed flat on a page (no popup)
-		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch/Starcraft')
-		return SingleMatch.SingleMatchContainer
+		local SingleMatch = Lua.import('Module:MatchGroup/Display/SingleMatch')
+		return WikiSpecific.adjustMatchGroupContainerConfig(SingleMatch.SingleMatchContainer)
 	end
 end
 
 WikiSpecific.matchHasDetails = FnUtil.lazilyDefineFunction(function()
-	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Starcraft')
+	local StarcraftMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	return StarcraftMatchGroupUtil.matchHasDetails
 end)
-
--- useless functions that should be present for some default checks
--- would get called from Module:Match/Subobjects if we wouldn't circumvent that module completly
-WikiSpecific.processMap = FnUtil.identity
 
 return WikiSpecific

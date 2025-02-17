@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -14,7 +15,7 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)
@@ -38,10 +39,13 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_icon_dark', Variables.varDefault('tournament_icondark'))
 	Variables.varDefine('tournament_parent_page', Variables.varDefault('tournament_parent'))
 
+	Variables.varDefine('headtohead', tostring(Logic.readBool(Logic.emptyOr(
+		args.headtohead,
+		Variables.varDefault('headtohead'),
+		(queryResult.extradata or {}).headtohead
+	))))
+
 	BasicHiddenDataBox.checkAndAssign('tournament_patch', args.patch, queryResult.patch)
-	BasicHiddenDataBox.checkAndAssign('tournament_valve_premier', args.valvepremier, queryResult.extradata.valvepremier)
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args.pctier, queryResult.publishertier)
-	BasicHiddenDataBox.checkAndAssign('tournament_pro_circuit_tier', args.pctier, queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)

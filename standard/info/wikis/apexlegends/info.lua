@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'apexlegends',
 	name = 'Apex Legends',
+	defaultGame = 'apexlegends',
 	games = {
 		apexlegends = {
 			abbreviation = 'APEX',
@@ -25,9 +26,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'apexlegends',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Apex Legends default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Apex Legends default darkmode.png', ---@deprecated
-	match2 = 0,
 }

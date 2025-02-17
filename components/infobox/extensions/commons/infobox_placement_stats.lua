@@ -9,7 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Medal = require('Module:Medal')
+local Medals = require('Module:Medals')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Custom')
 
@@ -26,7 +26,7 @@ local PlacementStats = {}
 ---@field totals {top3: integer, all: integer, placement: {[1]: integer, [2]: integer, [3]: integer}}}
 
 ---Entry Point: Queries placement statistics and builds a table for display of them below infoboxes
----@param args any
+---@param args table
 ---@return Html|string
 function PlacementStats.run(args)
 	args = args or {}
@@ -104,7 +104,7 @@ end
 ---@param baseConditions string
 ---@param placementData InfoboxPlacementStatsData
 function PlacementStats._fetchForTier(tier, baseConditions, placementData)
-	placementData.tiers[tier] =  {top3 = 0, all = 0, placement = {}}
+	placementData.tiers[tier] = {top3 = 0, all = 0, placement = {}}
 
 	local queryData = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,
@@ -164,9 +164,9 @@ end
 function PlacementStats._header()
 	return mw.html.create('tr')
 		:tag('th'):wikitext('Tier'):css('text-align', 'left'):css('width', '100%'):done()
-		:tag('th'):wikitext(Medal['1']):done()
-		:tag('th'):wikitext(Medal['2']):done()
-		:tag('th'):wikitext(Medal['3']):done()
+		:tag('th'):node(Medals.display{medal = 1}):done()
+		:tag('th'):node(Medals.display{medal = 2}):done()
+		:tag('th'):node(Medals.display{medal = 3}):done()
 		:tag('th'):wikitext(Abbreviation.make('Top3', 'Total of top 3')):done()
 		:tag('th'):wikitext('All'):done()
 end

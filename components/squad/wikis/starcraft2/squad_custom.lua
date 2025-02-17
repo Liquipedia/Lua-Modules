@@ -6,99 +6,79 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Faction = require('Module:Faction')
-local Json = require('Module:Json')
+local Arguments = require('Module:Arguments')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
-local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
-
-SquadRow.specialTeamsTemplateMapping = {
-	retirement = 'Team/retired',
-	retired = 'Team/retired',
-	inactive = 'Team/inactive',
-	military = 'Team/military',
-}
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
+---@param frame Frame
+---@return Widget
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame):title():header()
+	return SquadUtils.defaultRunManual(frame, Squad, CustomSquad._playerRow)
+end
 
-	local args = squad.args
+---@param players table[]
+---@param squadStatus SquadStatus
+---@param squadType SquadType
+---@param customTitle string?
+---@return Widget
+function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(
+		players,
+		squadStatus,
+		squadType,
+		Squad,
+		CustomSquad._playerRow,
+		customTitle,
+		CustomSquad.personMapper
+	)
+end
 
-	local isFormer = squad.type == Squad.TYPE_FORMER
-	local isInactive = squad.type == Squad.TYPE_INACTIVE
-	local isMainSquad = Logic.readBool(args.main)
-	local squadName = args.squad or mw.title.getCurrentTitle().prefixedText
-	local status = (isFormer and 'former')
-		or (isInactive and 'inactive')
-		or (isMainSquad and 'main')
-		or 'active'
+---@param person table
+---@return table
+function CustomSquad.personMapper(person)
+	local newPerson = SquadUtils.convertAutoParameters(person)
+	newPerson.faction = Logic.emptyOr(person.thisTeam.position, person.newTeam.position)
+	return newPerson
+end
 
-	local index = 1
-	while args['p' .. index] or args[index] do
-		local player = Json.parseIfString(args['p' .. index] or args[index])
-		local row = SquadRow{useTemplatesForSpecialTeams = true}
-		row:status(squad.type)
-		row:id({
-			player.id,
-			flag = player.flag,
-			race = Faction.read(player.race),
-			link = player.link,
-			captain = player.captain,
-			role = player.role,
-			team = player.team,
-			date = player.leavedate or player.inactivedate or player.leavedate,
-		})
-			:name({name = player.name})
-			:role({role = player.role})
-			:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+---@param person table
+---@param squadStatus SquadStatus
+---@param squadType SquadType
+---@return Widget
+function CustomSquad._playerRow(person, squadStatus, squadType)
+	local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
+	local squadArgs = Arguments.getArgs(mw.getCurrentFrame())
 
-		if isFormer then
-			if String.isEmpty(player.newteam) then
-				if Logic.readBool(player.retired) then
-					player.newteam = 'retired'
-				elseif Logic.readBool(player.military) then
-					player.newteam = 'military'
-				end
-			end
+	if squadStatus == SquadUtils.SquadStatus.ACTIVE then
+		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
+		squadPerson.extradata = Table.merge({ismain = tostring(isMain)}, squadPerson.extradata)
+	end
+	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
+		Logic.readBool(person.retired) and 'retired' or nil,
+		Logic.readBool(person.military) and 'military' or nil)
 
-			row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-			row:newteam({
-				newteam = player.newteam,
-				newteamrole = player.newteamrole,
-				newteamdate = player.newteamdate,
-				leavedate = player.leavedate
-			})
-		elseif isInactive then
-			row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-		end
+	SquadUtils.storeSquadPerson(squadPerson)
 
-		local factions = Faction.readMultiFaction(player.race, {alias = false})
+	local row = SquadRow(squadPerson)
 
-		row:setExtradata({
-			faction = Faction.toName(factions[1]),
-			faction2 = Faction.toName(factions[2]),
-			faction3 = Faction.toName(factions[3]),
-			squadname = squadName,
-			status = status
-		})
+	row:id():name():role():date('joindate', 'Join Date:&nbsp;')
 
-		squad:row(row:create(
-			squadName .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
-
-		index = index + 1
+	if squadStatus == SquadUtils.SquadStatus.INACTIVE or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
+		row:date('inactivedate', 'Inactive Date:&nbsp;')
+	end
+	if squadStatus == SquadUtils.SquadStatus.FORMER or squadStatus == SquadUtils.SquadStatus.FORMER_INACTIVE then
+		row:date('leavedate', 'Leave Date:&nbsp;')
+		row:newteam()
 	end
 
-	return squad:create()
+	return row:create()
 end
 
 return CustomSquad

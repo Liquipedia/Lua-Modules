@@ -14,7 +14,7 @@ local String = require('Module:StringUtils')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -33,9 +33,8 @@ function Building.run(frame)
 end
 
 ---creates the infobox
----@return Html
+---@return string
 function Building:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -45,10 +44,11 @@ function Building:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
+			subHeader = self:subHeaderDisplay(args),
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Building Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Building') .. ' Information'},
 		Cell{name = 'Built by', content = {args.builtby}},
 		Customizable{
 			id = 'cost',
@@ -93,17 +93,17 @@ function Building:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
-	infobox:categories('Buildings')
-	infobox:categories(unpack(self:getWikiCategories(args)))
+	self:categories('Buildings')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -135,6 +135,13 @@ end
 
 ---@param args table
 function Building:setLpdbData(args)
+end
+
+--- Allows for overriding this functionality
+---@param args table
+---@return string?
+function Building:subHeaderDisplay(args)
+	return args.title
 end
 
 return Building

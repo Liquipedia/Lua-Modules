@@ -8,7 +8,9 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Info = require('Module:Info')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -19,10 +21,10 @@ local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Tier = require('Module:Tier/Custom')
 local Variables = require('Module:Variables')
-local WarningBox = require('Module:WarningBox')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Links = Lua.import('Module:Links')
@@ -33,9 +35,10 @@ local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 local VENUE_DESCRIPTION = '<br><small><small>(${desc})</small></small>'
-local DEFAULT_DATE = '1970-01-01'
+local STAY22_LINK = 'https://www.stay22.com/allez/roam?aid=liquipedia&campaign=${wiki}_${page}'..
+	'&address=${address}&checkin=${checkin}&checkout=${checkout}'
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -43,11 +46,11 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Chronology = Widgets.Chronology
+local Button = Lua.import('Module:Widget/Basic/Button')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class InfoboxLeague: BasicInfobox
 local League = Class.new(BasicInfobox)
-
-League.warnings = {}
 
 ---@param frame Frame
 ---@return string
@@ -70,8 +73,8 @@ function League:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'League Information'},
+		Center{children = {args.caption}},
+		Title{children = 'League Information'},
 		Cell{
 			name = 'Series',
 			content = {
@@ -124,13 +127,13 @@ function League:createInfobox()
 						local value = tostring(args.type):lower()
 						if self:shouldStore(args) then
 							if value == 'offline' then
-								self.infobox:categories('Offline Tournaments')
+								self:categories('Offline Tournaments')
 							elseif value == 'online' then
-								self.infobox:categories('Online Tournaments')
+								self:categories('Online Tournaments')
 							elseif value:match('online') and value:match('offline') then
-								self.infobox:categories('Online/Offline Tournaments')
+								self:categories('Online/Offline Tournaments')
 							else
-								self.infobox:categories('Unknown Type Tournaments')
+								self:categories('Unknown Type Tournaments')
 							end
 						end
 
@@ -156,15 +159,9 @@ function League:createInfobox()
 		}}},
 		Builder{
 			builder = function()
-				local venues = {}
-				for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
-					local description
-					if String.isNotEmpty(args[prefix .. 'desc']) then
-						description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
-					end
-
-					table.insert(venues, self:createLink(venueName, args[prefix .. 'name'], args[prefix .. 'link'], description))
-				end
+				local venues = Array.map(League._parseVenues(args), function(venue)
+					return self:createLink(venue.id, venue.name, venue.link, venue.description)
+				end)
 
 				return {Cell{
 					name = 'Venue',
@@ -199,22 +196,22 @@ function League:createInfobox()
 			builder = function()
 				if Table.isNotEmpty(self.links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = self.links}
+						Title{children = 'Links'},
+						Widgets.Links{links = self.links}
 					}
 				end
 			end
 		},
 		Customizable{id = 'customcontent', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 		Customizable{id = 'chronology', children = {
 				Builder{
 					builder = function()
 						if self:_isChronologySet(args.previous, args.next) then
 							return {
-								Title{name = 'Chronology'},
+								Title{children = 'Chronology'},
 								Chronology{
-									content = Table.filterByKey(args, function(key)
+									links = Table.filterByKey(args, function(key)
 										return type(key) == 'string' and (key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
 									end)
 								}
@@ -224,24 +221,128 @@ function League:createInfobox()
 				}
 			}
 		},
+		Builder{
+			builder = function()
+				local startDate, endDate = self.data.startDate, self.data.endDate
+				if not startDate or not endDate then
+					return
+				end
+				local onlineOrOffline = tostring(args.type or ''):lower()
+				if not onlineOrOffline:match('offline') then
+					return
+				end
+				local locations = Locale.formatLocations(args)
+				-- If more than one city, don't show the accommodation section, as it is unclear which one the link is for
+				if locations.city2 then
+					return
+				end
+				-- Must have a venue or a city to show the accommodation section
+				if not locations.venue1 and not locations.city1 then
+					return
+				end
+
+				local function invalidLocation(location)
+					-- Not allowed to contain HTML Tags
+					return (location or ''):lower():match('<')
+				end
+				if invalidLocation(locations.venue1) or invalidLocation(locations.city1) then
+					return
+				end
+
+				-- if the event is finished do not show the button
+				local osdateCutoff = DateExt.parseIsoDate(endDate)
+				osdateCutoff.day = osdateCutoff.day + 1
+				if os.difftime(os.time(), os.time(osdateCutoff)) > 0 then
+					return
+				end
+
+				local addressParts = {}
+				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
+				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
+				table.insert(addressParts, locations.city1)
+				table.insert(addressParts, Flags.CountryName(locations.country1 or locations.region1))
+
+				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
+				-- End date for the accommodation should be 1 day after the event
+				local osdateEnd = DateExt.parseIsoDate(endDate)
+				osdateEnd.day = osdateEnd.day + 1
+				local osdateFictiveStart = DateExt.parseIsoDate(endDate)
+				osdateFictiveStart.day = osdateFictiveStart.day - 4
+				local osdateRealStart = DateExt.parseIsoDate(startDate)
+				osdateRealStart.day = osdateRealStart.day - 1
+
+				local osdateStart
+				if os.difftime(os.time(osdateFictiveStart), os.time(osdateRealStart)) > 0 then
+					osdateStart = osdateFictiveStart
+				else
+					osdateStart = osdateRealStart
+				end
+
+				local function buildStay22Link(address, checkin, checkout)
+					return String.interpolate(STAY22_LINK, {
+						wiki = Info.wikiName,
+						page = self.data.name,
+						address = address,
+						checkin = checkin,
+						checkout = checkout,
+					})
+				end
+
+				return {
+					Title{children = 'Accommodation'},
+					Center{children = {
+						Button{
+							linktype = 'external',
+							variant = 'primary',
+							size = 'md',
+							link = buildStay22Link(
+								table.concat(addressParts, ', '),
+								DateExt.toYmdInUtc(osdateStart),
+								DateExt.toYmdInUtc(osdateEnd)
+							),
+							children = {
+								IconFa{iconName = 'accommodation'},
+								' ',
+								'Find My Accommodation',
+							}
+						},
+						Center{children = 'Bookings earn Liquipedia a small commission.'}
+					}}
+				}
+			end
+		}
 	}
 
 	self.name = TextSanitizer.stripHTML(self.name)
 
-	self.infobox:bottom(self:createBottomContent())
-
-	local builtInfobox = self.infobox:build(widgets)
+	self:bottom(self:createBottomContent())
 
 	if self:shouldStore(args) then
-		self.infobox:categories(unpack(self:_getCategories(args)))
+		self:categories(unpack(self:_getCategories(args)))
 		self:_setLpdbData(args, self.links)
 		self:_setSeoTags(args)
 	end
 
 	return mw.html.create()
-		:node(builtInfobox)
-		:node(WarningBox.displayAll(League.warnings))
-		:node(Logic.readBool(args.autointro) and ('<br>' .. self:seoText(args)) or nil)
+		:node(self:build(widgets))
+		:node(Logic.readBool(args.autointro) and ('br>' .. self:seoText(args)) or nil)
+end
+
+---@param args table
+---@return {id: string?, name: string?, link: string?, description: string?}[]
+function League._parseVenues(args)
+	local venues = {}
+	for prefix, venueName in Table.iter.pairsByPrefix(args, 'venue', {requireIndex = false}) do
+		local name = args[prefix .. 'name']
+		local link = args[prefix .. 'link']
+		local description
+		if String.isNotEmpty(args[prefix .. 'desc']) then
+			description = String.interpolate(VENUE_DESCRIPTION, {desc = args[prefix .. 'desc']})
+		end
+
+		table.insert(venues, {id = venueName, name = name, link = link, description = description})
+	end
+	return venues
 end
 
 function League:_parseArgs()
@@ -281,6 +382,7 @@ function League:_parseArgs()
 		mode = args.mode,
 		patch = args.patch,
 		endPatch = args.endpatch or args.epatch or args.patch,
+		publishertier = Logic.readBool(args.highlighted),
 	}
 
 	data.liquipediatier, data.liquipediatiertype =
@@ -288,7 +390,7 @@ function League:_parseArgs()
 
 	self.data = data
 
-	self:_parsePrizePool(args)
+	self.prizepoolDisplay, self.data.prizepoolUsd, self.data.localCurrency = self:_parsePrizePool(args, data.endDate)
 
 	data.icon, data.iconDark, self.iconDisplay = self:getIcons{
 		displayManualIcons = Logic.readBool(args.display_series_icon_from_manual_input),
@@ -304,29 +406,31 @@ function League:_parseArgs()
 end
 
 ---@param args table
-function League:_parsePrizePool(args)
+---@param endDate string?
+---@return number|string?, number?, string?
+function League:_parsePrizePool(args, endDate)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return
 	end
 
 	--need to get the display here since it sets variables we want/need to get the clean values
 	--overwritable since sometimes display is supposed to look a bit different
-	local display = self:displayPrizePool(args)
-
-	self.prizepoolDisplay = display
-	self.data.prizepoolUsd = tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0
-	self.data.localCurrency = Variables.varDefault('tournament_currency', args.localcurrency)
+	return self:displayPrizePool(args, endDate),
+		tonumber(Variables.varDefault('tournament_prizepoolusd')) or 0,
+		Variables.varDefault('tournament_currency', args.localcurrency)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function League:displayPrizePool(args)
+function League:displayPrizePool(args, endDate)
 	return InfoboxPrizePool.display{
 		prizepool = args.prizepool,
 		prizepoolusd = args.prizepoolusd,
 		currency = args.localcurrency,
 		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, self.data.endDate),
+		date = Logic.emptyOr(args.currency_date, endDate),
+		setvariables = args.setvariables,
 		displayRoundPrecision = args.currencyDispPrecision,
 		varRoundPrecision = args.currencyVarPrecision
 	}
@@ -380,7 +484,8 @@ function League:addTierCategories(args)
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 
@@ -419,7 +524,7 @@ end
 ---@param args table
 ---@return boolean
 function League:liquipediaTierHighlighted(args)
-	return false
+	return HighlightConditions.tournament(self.data)
 end
 
 --- Allows for overriding this functionality
@@ -453,7 +558,7 @@ function League:_definePageVariables(args)
 
 	Variables.varDefine('tournament_liquipediatier', self.data.liquipediatier)
 	Variables.varDefine('tournament_liquipediatiertype', self.data.liquipediatiertype)
-	Variables.varDefine('tournament_publishertier', self.data.publishertier)
+	Variables.varDefine('tournament_publishertier', tostring(self.data.publishertier or ''))
 
 	Variables.varDefine('tournament_type', args.type)
 	Variables.varDefine('tournament_mode', self.data.mode)
@@ -496,7 +601,11 @@ function League:_setLpdbData(args, links)
 		icon = self.data.icon,
 		icondark = self.data.iconDark,
 		series = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''),
-		seriespage = mw.ext.TeamLiquidIntegration.resolve_redirect(args.series or ''):gsub(' ', '_'),
+		seriespage = Page.pageifyLink(args.series),
+		serieslist = {
+			Page.pageifyLink(args.series),
+			Page.pageifyLink(args.series2),
+		},
 		previous = self:_getPageNameFromChronology(args.previous),
 		previous2 = self:_getPageNameFromChronology(args.previous2),
 		next = self:_getPageNameFromChronology(args.next),
@@ -510,9 +619,9 @@ function League:_setLpdbData(args, links)
 			League:_getNamedTableofAllArgsForBase(args, 'organizer'),
 			mw.ext.TeamLiquidIntegration.resolve_redirect
 		),
-		startdate = self.data.startDate or self.data.endDate or DEFAULT_DATE,
-		enddate = self.data.endDate or DEFAULT_DATE,
-		sortdate = self.data.endDate or DEFAULT_DATE,
+		startdate = self.data.startDate or self.data.endDate or DateExt.defaultDate,
+		enddate = self.data.endDate or DateExt.defaultDate,
+		sortdate = self.data.endDate or DateExt.defaultDate,
 		location = mw.text.decode(Locale.formatLocation({city = args.city or args.location, country = args.country})),
 		location2 = mw.text.decode(Locale.formatLocation({city = args.city2 or args.location2, country = args.country2})),
 		venue = args.venue,
@@ -520,7 +629,7 @@ function League:_setLpdbData(args, links)
 		prizepool = self.data.prizepoolUsd,
 		liquipediatier = self.data.liquipediatier,
 		liquipediatiertype = self.data.liquipediatiertype,
-		publishertier = self.data.publishertier,
+		publishertier = tostring(self.data.publishertier or ''),
 		participantsnumber = tonumber(args.participants_number)
 			or tonumber(args.team_number)
 			or tonumber(args.player_number)
@@ -580,7 +689,7 @@ function League:_createLocation(args)
 		local nationality = Flags.getLocalisation(country)
 
 		if String.isEmpty(nationality) then
-			self.infobox:categories('Unrecognised Country')
+			self:categories('Unrecognised Country')
 
 		else
 			local location = args['city' .. index] or args['location' .. index]
@@ -591,7 +700,7 @@ function League:_createLocation(args)
 			end
 
 			if self:shouldStore(args) then
-				self.infobox:categories(nationality .. ' Tournaments')
+				self:categories(nationality .. ' Tournaments')
 			end
 			table.insert(display, Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. displayText .. '<br>')
 		end

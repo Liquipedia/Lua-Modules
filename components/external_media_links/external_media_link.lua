@@ -74,8 +74,7 @@ function ExternalMediaLink._store(args)
 
 	local authors = {}
 	for _, author, authorIndex in Table.iter.pairsByPrefix(args, 'by') do
-		authors['author' .. authorIndex] =
-			mw.ext.TeamLiquidIntegration.resolve_redirect(args['by_link' .. authorIndex] or author)
+		authors['author' .. authorIndex] = Page.pageifyLink(args['by_link' .. authorIndex] or author)
 		authors['author' .. authorIndex .. 'dn'] = author
 	end
 	-- set a maximum for authors due to the same being used in queries
@@ -87,15 +86,15 @@ function ExternalMediaLink._store(args)
 		translation = args.translation,
 		translator = args.translator,
 		event = args.event,
-		event_link = mw.ext.TeamLiquidIntegration.resolve_redirect(
-			Logic.emptyOr(args['event-link'], args.event, '')
+		event_link = Page.pageifyLink(
+			Logic.emptyOr(args['event-link'], args.event) or ''
 		),
 		subject_organization = args.subject_organization1, --legacy
 	}
 
 	local orgs = {}
 	for _, org, orgIndex in Table.iter.pairsByPrefix(args, 'subject_organization') do
-		orgs['subject_organization' .. orgIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(org)
+		orgs['subject_organization' .. orgIndex] = Page.pageifyLink(org)
 	end
 	-- set a maximum for orgs due to the same being used in queries
 	assert(Table.size(orgs) <= MAXIMUM_VALUES.organisations,
@@ -103,7 +102,7 @@ function ExternalMediaLink._store(args)
 
 	local subjects = {}
 	for _, subject, subjectIndex in Table.iter.pairsByPrefix(args, 'subject') do
-		subjects['subject' .. subjectIndex] = mw.ext.TeamLiquidIntegration.resolve_redirect(subject)
+		subjects['subject' .. subjectIndex] = Page.pageifyLink(subject)
 	end
 	-- set a maximum for subjects due to the same being used in queries
 	assert(Table.size(subjects) <= MAXIMUM_VALUES.subjects,
@@ -251,6 +250,7 @@ function ExternalMediaLink.wrapper(args)
 		language = args.language,
 		translation = args.translation,
 		translator = args.translator,
+		trans_title = args.trans_title,
 	}
 
 	if args.authors then

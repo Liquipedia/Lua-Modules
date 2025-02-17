@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local ModeIcon = require('Module:ModeIcon')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -42,8 +42,8 @@ function CustomInjector:parse(id, widgets)
 		local modes = self.caller:_getModes(args)
 		Array.appendWith(widgets,
 			Cell{name = 'Environment', content = {args.environment}},
-			Title{name = modes and 'Mode' or nil},
-			Center{content = modes and {table.concat(modes, '<br>')} or nil}
+			Title{children = modes and 'Mode' or nil},
+			Center{children = modes and {table.concat(modes, '<br>')} or nil}
 		)
 	end
 	return widgets

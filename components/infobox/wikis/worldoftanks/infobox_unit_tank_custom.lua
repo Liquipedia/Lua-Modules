@@ -13,12 +13,12 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local TankTypes = require('Module:TankTypes')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
 
 local Nation = Lua.import('Module:Infobox/Extension/Nation')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class WorldofTanksUnitInfobox: UnitInfobox

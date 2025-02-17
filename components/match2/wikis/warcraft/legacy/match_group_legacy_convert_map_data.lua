@@ -134,6 +134,7 @@ function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, pref
 		local parsedPrefix = 'map' .. mapIndex
 		parsedArgs[parsedPrefix] = map
 		parsedArgs[parsedPrefix .. 'subgroup'] = submatchIndex
+		parsedArgs[parsedPrefix .. 'finished'] = true
 
 		local winner = tonumber(args[prefix .. 'win' .. submatchMapIndex])
 		parsedArgs[parsedPrefix .. 'win'] = winner
@@ -167,8 +168,8 @@ function ConvertMapData._convertSubmatch(opponentPlayers, parsedArgs, args, pref
 	parsedArgs[parsedPrefix .. 'subgroup'] = submatchIndex
 	parsedArgs[parsedPrefix .. 'p1score'] = score1
 	parsedArgs[parsedPrefix .. 'p2score'] = score2
-	parsedArgs[parsedPrefix .. 'walkover'] = score1 == DEFAULT_WIN and 1 or score2 == DEFAULT_WIN and 2 or nil
 	parsedArgs[parsedPrefix] = submatchIsNotDefaultWin and 'Submatch Score Fix' or 'Submatch'
+	parsedArgs[parsedPrefix .. 'finished'] = true
 
 	Array.forEach(playersArrays, function(players, opponentIndex)
 		Array.forEach(players, function(player, playerIndex)

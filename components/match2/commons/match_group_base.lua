@@ -7,11 +7,23 @@
 --
 
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local MatchGroupBase = {}
 
+---@class MatchGroupBaseOptions
+---@field bracketId string
+---@field matchGroupType 'bracket'|'matchlist'
+---@field shouldWarnMissing boolean
+---@field show boolean
+---@field storeMatch1 boolean
+---@field storeMatch2 boolean
+---@field storePageVar boolean
+
+---@param args table
+---@param matchGroupType string
+---@return MatchGroupBaseOptions
+---@return string[]
 function MatchGroupBase.readOptions(args, matchGroupType)
 	local store = Logic.nilOr(Logic.readBoolOrNil(args.store),
 		not Logic.readBool(Variables.varDefault('disable_LPDB_storage')))
@@ -35,6 +47,12 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		end
 	end
 
+	if not Variables.varDefault('tournament_parent') then
+		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
+		local userSpacePrefix = mw.title.getCurrentTitle().nsText == 'User' and 'User space ' or ''
+		mw.ext.TeamLiquidIntegration.add_category(userSpacePrefix .. 'Pages with missing tournament context')
+	end
+
 	if Logic.readBool(args.isLegacy) then
 		if matchGroupType == 'matchlist' then
 			table.insert(warnings, 'This is a legacy matchlist! Please use the new matchlist instead.')
@@ -46,6 +64,8 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 	return options, warnings
 end
 
+---@param baseBracketId string
+---@return string
 function MatchGroupBase.readBracketId(baseBracketId)
 	assert(baseBracketId, 'Argument \'id\' is empty')
 
@@ -57,6 +77,9 @@ function MatchGroupBase.readBracketId(baseBracketId)
 	return MatchGroupBase.getBracketIdPrefix() .. baseBracketId
 end
 
+---@param baseBracketId string
+---@return boolean
+---@return string?
 function MatchGroupBase.validateBaseBracketId(baseBracketId)
 	local subbed, count = baseBracketId:gsub('[0-9a-zA-Z]', '')
 	if subbed ~= '' then
@@ -67,10 +90,9 @@ function MatchGroupBase.validateBaseBracketId(baseBracketId)
 	return true
 end
 
---[[
-Non-mainspace match groups are used for testing. Their IDs are prefixed with
-the namespace so that they don't collide with mainspace IDs.
-]]
+---Non-mainspace match groups are used for testing. Their IDs are prefixed with the namespace
+---so that they don't collide with mainspace IDs.
+---@return string
 function MatchGroupBase.getBracketIdPrefix()
 	local namespace = mw.title.getCurrentTitle().nsText
 
@@ -83,26 +105,16 @@ function MatchGroupBase.getBracketIdPrefix()
 	end
 end
 
+---@param bracketId string
+---@return string?
 function MatchGroupBase._checkBracketDuplicate(bracketId)
 	local status = mw.ext.Brackets.checkBracketDuplicate(bracketId)
 	if status ~= 'ok' then
 		local warning = 'This match group uses the duplicate ID \'' .. bracketId .. '\'.'
-		local category = '[[Category:Pages with duplicate Bracketid]]'
+		mw.ext.TeamLiquidIntegration.add_category('Pages with duplicate Bracketid')
 		mw.addWarning(warning)
-		return warning .. category
+		return warning
 	end
-end
-
----@deprecated
-function MatchGroupBase.luaMatchlist(_, args)
-	local MatchGroup = Lua.import('Module:MatchGroup')
-	return MatchGroup.MatchList(args) .. MatchGroup.deprecatedCategory
-end
-
----@deprecated
-function MatchGroupBase.luaBracket(_, args)
-	local MatchGroup = Lua.import('Module:MatchGroup')
-	return MatchGroup.Bracket(args) .. MatchGroup.deprecatedCategory
 end
 
 return MatchGroupBase

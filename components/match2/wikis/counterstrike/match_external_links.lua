@@ -47,7 +47,7 @@ return {
 	{
 		name = 'faceit',
 		icon = 'FACEIT-icon.png',
-		prefixLink = 'https://www.faceit.com/en/csgo/room/',
+		prefixLink = 'https://www.faceit.com/en/match/room/',
 		label = 'Match Room and Stats on FACEIT',
 		isMapStats = true
 	},
@@ -56,6 +56,13 @@ return {
 		icon = 'Esportal icon32.png',
 		prefixLink = 'https://esportal.com/match/',
 		label = 'Matchpage and Stats on Esportal',
+		isMapStats = true
+	},
+	{
+		name = 'esplay',
+		icon = 'Esplay icon allmode.png',
+		prefixLink = 'https://esplay.com/m/',
+		label = 'Matchpage and Stats on Esplay',
 		isMapStats = true
 	},
 	{
@@ -71,10 +78,17 @@ return {
 		label = 'Matchpage and Stats on SLTV',
 	},
 	{
-		name = 'lpl',
+		name = 'lpl-old',
 		icon = 'LPL Play icon.png',
 		prefixLink = 'https://old.letsplay.live/match/',
 		label = 'Matchpage on LPL Play',
+	},
+	{
+		name = 'lpl',
+		icon = 'letsplay.live 2024 icon lightmode.png',
+		iconDark = 'letsplay.live 2024 icon darkmode.png',
+		prefixLink = 'https://gg.letsplay.live/report-score/',
+		label = 'Matchpage on letsplay.live',
 	},
 	{
 		name = 'epiclan',
@@ -83,10 +97,17 @@ return {
 		label = 'Matchpage on epic.LAN',
 	},
 	{
-		name = 'pinger',
+		name = 'pinger-csgo',
 		icon = 'Pinger icon lightmode.png',
 		iconDark = 'Pinger icon darkmode.png',
 		prefixLink = 'https://pinger.kz/matches/csgo/',
+		label = 'Matchpage and Stats on Pinger',
+	},
+	{
+		name = 'pinger',
+		icon = 'Pinger icon lightmode.png',
+		iconDark = 'Pinger icon darkmode.png',
+		prefixLink = 'https://pinger.kz/tournaments/cs2/event/matches/',
 		label = 'Matchpage and Stats on Pinger',
 	},
 	{

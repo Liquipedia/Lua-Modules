@@ -127,6 +127,11 @@
 .brkts-match.brkts-hover {
 	box-shadow: 0 0 2px rgba( 0, 0, 0, 0.5 );
 	border: 1px solid rgba( 0, 0, 0, 0.5 );
+
+	.theme--dark & {
+		box-shadow: 0 0 2px rgba( 255, 255, 255, 0.5 );
+		border: 1px solid rgba( 255, 255, 255, 0.5 );
+	}
 }
 
 .brkts-br-wrapper.brkts-br-wrapper {
@@ -281,12 +286,28 @@
 	text-align: center;
 }
 
-.brkts-cs-score-color-ct {
-	color: #0000ff;
-}
-
 .brkts-cs-score-color-t {
 	color: #ff0000;
+
+	.theme--light & {
+		color: var( --clr-sun-30, #ff0000 );
+	}
+
+	.theme--dark & {
+		color: var( --clr-sun-80, #ff0000 );
+	}
+}
+
+.brkts-cs-score-color-ct {
+	color: var( --clr-primary, #0000ff );
+}
+
+.brkts-valorant-score-color-def {
+	color: #46b09c;
+}
+
+.brkts-valorant-score-color-atk {
+	color: #c04845;
 }
 
 /**
@@ -395,6 +416,10 @@
 
 .brkts-hover > .brkts-matchlist-cell {
 	box-shadow: inset 0 6px 8px -5px rgba( 0, 0, 0, 0.4 ), inset 0 -6px 8px -5px rgba( 0, 0, 0, 0.4 );
+
+	.theme--dark & {
+		box-shadow: inset 0 6px 8px -5px rgba( 255, 255, 255, 0.4 ), inset 0 -6px 8px -5px rgba( 255, 255, 255, 0.4 );
+	}
 }
 
 .brkts-matchlist-cell.brkts-opponent-hover-active {
@@ -404,11 +429,19 @@
 .brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 1 )::after,
 .brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 4 )::after {
 	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 );
+
+	.theme--dark & {
+		box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ), 0 1px 2px rgba( 255, 255, 255, 0.7 ), 0 -1px 2px rgba( 255, 255, 255, 0.7 );
+	}
 }
 
 .brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 2 )::after,
 .brkts-matchlist-cell.brkts-opponent-hover-active:nth-child( 5 )::after {
 	box-shadow: 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 );
+
+	.theme--dark & {
+		box-shadow: 1px 0 2px rgba( 255, 255, 255, 0.7 ), 0 1px 2px rgba( 255, 255, 255, 0.7 ), 0 -1px 2px rgba( 255, 255, 255, 0.7 );
+	}
 }
 
 .brkts-matchlist-match > .brkts-match-info-icon {
@@ -430,10 +463,6 @@
 .brkts-matchlist-slot-winner {
 	font-weight: bold;
 	background-color: #ddf4dd;
-}
-
-.theme--dark .brkts-matchlist-slot-winner:not( .bg-draw ) {
-	box-shadow: inset 0 0 0 2px var( --table-green-border-color, transparent );
 }
 
 .brkts-matchlist-slot-winner .flag + .name {
@@ -480,6 +509,20 @@
 	}
 }
 
+@media ( min-width: 769px ) {
+	.brkts-match-info-popup-sc-ffa:not( .brkts-match-info-flat ) {
+		overflow: auto;
+		bottom: 16%;
+		left: 1px !important;
+		max-height: 60vh;
+		position: fixed;
+		right: 1px;
+		top: auto !important;
+		width: auto !important;
+		background-color: var( --table-background-color, #f9f9f9 );
+	}
+}
+
 .brkts-match-info-flat {
 	border: 1px solid var( --table-border-color, #aaaaaa );
 	border-radius: 2px;
@@ -496,9 +539,6 @@
 	//overflow: auto;
 	width: 330px;
 	flex-wrap: unset;
-}
-
-.brkts-popup:not( .ffa-match-summary ) {
 	font-size: 13px;
 }
 
@@ -542,20 +582,13 @@
 	flex-basis: 100%;
 }
 
-.brkts-popup-body-element-thumbs {
-	flex: 1;
+div.brkts-popup-body-element-thumbs {
+	display: inline-flex;
 	min-width: 0.01%;
 }
 
-.brkts-popup-body-element-thumbs.brkts-popup-body-element-thumbs-left {
-	display: inline-flex;
-	flex-direction: row;
-	justify-content: left;
-}
-
+/* TODO: Remove when able, but is currently needed for hero picks no to lack of wrapper */
 .brkts-popup-body-element-thumbs.brkts-popup-body-element-thumbs-right {
-	display: inline-flex;
-	flex-direction: row-reverse;
 	justify-content: right;
 }
 
@@ -581,6 +614,10 @@
 	display: inline-block;
 }
 
+.brkts-popup-body-element > .brkts-popup-body-game {
+	display: flex;
+}
+
 .brkts-popup-body-element:nth-of-type( odd ) {
 	background-color: var( --table-background-color, #f9f9f9 );
 }
@@ -601,6 +638,13 @@
 	align-items: center;
 	justify-content: center;
 	gap: 4px;
+}
+
+.brkts-popup-winloss-icon {
+	width: 16px;
+	line-height: 17px;
+	margin-left: 1%;
+	margin-right: 1%;
 }
 
 .brkts-popup-footer .brkts-popup-spaced > a {
@@ -784,11 +828,22 @@
 .brkts-popup-body-match-sidewins {
 	padding: 0 0 3px 3px;
 	line-height: 11px;
+	width: 10px;
 }
 
-.brkts-popup-body-match-sidewins-overtime {
-	padding: 0 0 3px 3px;
-	line-height: 11px;
+.brkts-popup-body-match-sidewins-icon {
+	width: 24px;
+
+	& img {
+		[ data-darkreader-scheme="dark" ] &,
+		.theme--dark & {
+			filter: invert( 1 );
+		}
+	}
+}
+
+.skin-lakesideview .brkts-popup-body-match-sidewins {
+	font-weight: 800;
 }
 
 .brkts-popup-body-operator-bans {
@@ -814,22 +869,22 @@
 
 .brkts-popup-body-gradient-left {
 	padding: 4px 0;
-	background: linear-gradient( to left, #fbdfdf 35%, #ffffff 35%, #ffffff 65%, #ddf4dd 65% ) !important;
+	background: linear-gradient( to left, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forestgreen-background-color, #ddf4dd ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-right {
 	padding: 4px 0;
-	background: linear-gradient( to right, #fbdfdf 35%, #ffffff 35%, #ffffff 65%, #ddf4dd 65% ) !important;
+	background: linear-gradient( to right, var( --clr-cinnabar-background-color, #fbdfdf ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-forestgreen-background-color, #ddf4dd ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-draw {
 	padding: 4px 0;
-	background: linear-gradient( to left, #f9f9c7 35%, #ffffff 35%, #ffffff 65%, #f9f9c7 65% ) !important;
+	background: linear-gradient( to left, var( --clr-pear-background-color, #f9f9c7 ) 35%, var( --table-background-color, #ffffff ) 35%, var( --table-background-color, #ffffff ) 65%, var( --clr-pear-background-color, #f9f9c7 ) 65% ) !important;
 }
 
 .brkts-popup-body-gradient-default {
 	padding: 4px 0;
-	background: #ffffff !important;
+	background: var( --table-background-color, #ffffff ) !important;
 }
 
 .brkts-popup-side-color-blue {
@@ -854,41 +909,25 @@
 
 .brkts-popup-side-color-radiant {
 	background-color: #bcd985 !important;
+	padding: 2px 1px 2px 1px;
 }
 
 .brkts-popup-side-color-dire {
 	background-color: #e79e7e !important;
+	padding: 2px 1px 2px 1px;
 }
 
-.brkts-popup-side-hero {
-	padding: 2px;
-	margin: -2px;
-}
-
-.brkts-popup-side-hero-hover img {
-	width: 29px;
-	height: 16px;
-}
-
-@media ( hover: hover ) {
-	.brkts-popup-side-hero-hover img:hover {
-		-ms-transform: scale( 2, 2 );
-		-webkit-transform: scale( 2, 2 );
-		transform: scale( 2, 2 );
-	}
-}
-
-/* First case is backwards comptability (Wild Rift, Others?), Second case is the proper usage (League) */
-img.brkts-champion-icon,
 .brkts-champion-icon img {
 	height: 24px;
 	width: 24px;
+	object-fit: cover;
 }
 
 @media only screen and ( max-width: 768px ) {
 	img.brkts-champion-icon {
 		height: 20px;
 		width: 20px;
+		object-fit: cover;
 	}
 }
 
@@ -896,14 +935,16 @@ img.brkts-champion-icon,
 	.brkts-champion-icon img {
 		height: 20px;
 		width: 20px;
+		object-fit: cover;
 	}
 }
 
 @media ( hover: hover ) {
 	.brkts-champion-icon img:hover {
-		-ms-transform: scale( 2, 2 );
-		-webkit-transform: scale( 2, 2 );
-		transform: scale( 2, 2 );
+		-ms-transform: scale( 2.5, 2.5 );
+		-webkit-transform: scale( 2.5, 2.5 );
+		transform: scale( 2.5, 2.5 );
+		object-fit: contain;
 	}
 }
 
@@ -917,180 +958,8 @@ img.brkts-champion-icon,
 	padding-right: 4px;
 }
 
-/**
- * FFA Match Summary
- */
-
-.ffa-match-summary {
-	background: var( --table-background-color, #f9f9f9 );
-	max-height: 80vh;
-	overflow: hidden auto;
-}
-
-@media ( max-width: 768px ) {
-	.ffa-match-summary {
-		max-height: 50vh;
-	}
-}
-
-.ffa-match-summary-grid {
-	align-items: flex-start;
-	background: var( --table-striped-background-color, #f5f5f5 );
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	display: flex;
-}
-
 .brkts-popup:not( .brkts-match-info-flat ) {
 	border-top: 1px solid var( --table-border-color, #bbbbbb );
-}
-
-.ffa-match-summary-grid-left {
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
-	display: grid;
-	flex: 1 1 auto;
-	margin: -1px 0 -1px -1px;
-	max-width: 360px;
-	min-width: 0;
-}
-
-.ffa-match-summary-right {
-	border-left: 1px solid var( --table-border-color, #bbbbbb );
-	flex: 0 3 auto;
-	margin: -1px -1px -1px 0;
-	min-width: 0;
-	overflow: auto;
-}
-
-.ffa-match-summary-grid-right {
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-	display: inline-grid;
-	margin: 0 0 0 -1px;
-	text-align: center;
-}
-
-.ffa-match-summary-bg-rows {
-	display: contents;
-}
-
-.ffa-match-summary-header-bg-row {
-	background: var( --table-header-variant-background-color, #eaecf0 );
-}
-
-.ffa-match-summary-body-bg-row {
-	background: var( --table-background-color, #ffffff );
-}
-
-.ffa-match-summary-body-bg-row:nth-of-type( 2n ) {
-	background: var( --table-striped-background-color, #f5f5f5 );
-}
-
-.ffa-match-summary-grid-header,
-.ffa-match-summary-grid-body {
-	display: contents;
-}
-
-.ffa-match-summary-grid-header {
-	font-weight: bold;
-}
-
-.ffa-match-summary-cell {
-	align-items: center;
-	border-left: 1px solid var( --table-border-color, #bbbbbb );
-	border-top: 1px solid var( --table-border-color, #bbbbbb );
-	display: flex;
-	justify-content: center;
-	min-width: 0;
-	padding: 3px;
-}
-
-.ffa-match-summary-cell-content {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.ffa-match-summary-game-title {
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
-}
-
-.ffa-match-summary-placement {
-	font-weight: bold;
-	min-width: 36px;
-	text-align: center;
-	white-space: normal;
-	word-wrap: break-word;
-}
-
-.ffa-match-summary-opponent {
-	justify-content: flex-start;
-	padding: 3px 10px;
-}
-
-@media ( max-width: 768px ) {
-	.ffa-match-summary-opponent {
-		padding: 3px 5px;
-	}
-}
-
-.ffa-match-summary-grid-header > .ffa-match-summary-opponent {
-	text-align: center;
-}
-
-.ffa-match-summary-total-score {
-	font-weight: bold;
-	min-width: 36px;
-	text-align: center;
-}
-
-.ffa-match-summary-grid-header > .ffa-match-summary-total-score {
-	text-underline-position: under;
-}
-
-.ffa-match-summary-game-placement {
-	min-width: 36px;
-}
-
-.ffa-match-summary-game-score {
-	border-right: 1px solid var( --table-border-color, #bbbbbb );
-	min-width: 36px;
-}
-
-.ffa-match-summary-maps {
-	background: var( --table-background-color, #ffffff );
-	padding: 4px 10px;
-}
-
-.ffa-match-summary-unique-map {
-	text-align: center;
-	border-bottom: 1px solid var( --table-border-color, #bbbbbb );
-}
-
-.ffa-match-summary-unique-map:last-child {
-	border-bottom: 0;
-}
-
-.ffa-match-summary-game-comment {
-	padding-left: 16px;
-}
-
-.ffa-match-summary-comment {
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	padding: 2px 10px;
-	text-align: center;
-}
-
-.ffa-match-summary-footer {
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	padding: 2px 10px;
-	text-align: center;
-}
-
-/**
- * Wiki specific FFA Match Summary
- */
-
-.ffa-match-summary-game-placement > .brkts-popup-sc-game-offrace-icons {
-	margin-left: -7px;
 }
 
 /**
@@ -1106,7 +975,7 @@ img.brkts-champion-icon,
 	width: 100%;
 }
 
-.player-has-team {
+.block-players-wrapper {
 	width: 100%;
 }
 
@@ -1137,13 +1006,6 @@ img.brkts-champion-icon,
 	font-size: smaller;
 	line-height: 1;
 	margin-left: 4px;
-}
-
-.block-player > .note,
-.block-team > .note,
-.block-literal > .note {
-	align-self: flex-start;
-	font-weight: bold;
 }
 
 .block-team {
@@ -1225,6 +1087,10 @@ div.brkts-opponent-hover::after {
 
 div.brkts-opponent-hover-active::after {
 	box-shadow: -1px 0 2px rgba( 0, 0, 0, 0.7 ), 1px 0 2px rgba( 0, 0, 0, 0.7 ), 0 -1px 2px rgba( 0, 0, 0, 0.7 ), 0 1px 2px rgba( 0, 0, 0, 0.7 );
+
+	.theme--dark & {
+		box-shadow: -1px 0 2px rgba( 255, 255, 255, 0.7 ), 1px 0 2px rgba( 255, 255, 255, 0.7 ), 0 -1px 2px rgba( 255, 255, 255, 0.7 ), 0 1px 2px rgba( 255, 255, 255, 0.7 );
+	}
 }
 
 /**
@@ -1379,13 +1245,6 @@ div.brkts-opponent-hover-active::after {
 	margin-right: 0;
 }
 
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-submatch .block-player > .flag,
-	.brkts-popup-sc-submatch .block-player > .race {
-		margin: 0 1px;
-	}
-}
-
 .starcraft-block-archon {
 	display: flex;
 	align-items: center;
@@ -1417,23 +1276,7 @@ div.brkts-opponent-hover-active::after {
 	display: block;
 	overflow-wrap: break-word;
 	white-space: normal;
-}
-
-.brkts-popup-sc-team-match {
-	width: 500px;
-}
-
-.brkts-popup-sc-body {
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	display: block;
-}
-
-.brkts-popup-sc-footer.brkts-popup-sc-footer {
-	padding: 4px 10px;
-}
-
-.brkts-popup-sc-footer-links {
-	line-height: 1;
+	overflow: auto;
 }
 
 .brkts-popup-sc-game {
@@ -1455,10 +1298,7 @@ div.brkts-opponent-hover-active::after {
 	text-align: center;
 }
 
-.brkts-popup-sc-header-opponent-with-score {
-	width: 50%;
-}
-
+// can probably be kicked with MatchSummary refactor on WC/SG
 .brkts-popup-sc-game-body {
 	align-items: center;
 	display: flex;
@@ -1474,6 +1314,7 @@ div.brkts-opponent-hover-active::after {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
+	align-items: center;
 	line-height: 0.75;
 	width: 20px;
 }
@@ -1484,83 +1325,11 @@ div.brkts-opponent-hover-active::after {
 	text-align: center;
 }
 
-.brkts-popup-sc-submatch {
-	padding: 0;
-}
-
-.brkts-popup-sc-submatch-header {
-	border-bottom: 1px solid var( --table-border-color, #dddddd );
-	border-top: 1px solid var( --table-border-color, #dddddd );
-	display: block;
-	font-weight: bold;
-	text-align: center;
-}
-
-.brkts-popup-sc-submatch-body {
-	align-items: center;
-	display: flex;
-	padding: 2px 0;
-}
-
-.brkts-popup-sc-submatch-side {
-	align-items: center;
-	border-radius: 12px 0 0 12px;
-	display: flex;
-	padding: 2px 6px;
-	width: 32%;
-}
-
-.brkts-popup-left.brkts-popup-sc-submatch-side {
-	border-radius: 0 12px 12px 0;
-}
-
-.brkts-popup-sc-submatch-has-score > .brkts-popup-sc-submatch-side {
-	align-self: stretch;
-	border-radius: 0;
-}
-
-.brkts-popup-sc-submatch-opponent {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.brkts-popup-sc-submatch-center {
-	flex: 1 1;
-	min-width: 0;
-}
-
-.brkts-popup-sc-submatch-has-score > .brkts-popup-sc-submatch-center {
-	padding: 4px;
-}
-
-.brkts-popup-sc-submatch-center > .brkts-popup-sc-game {
-	padding: 2px 10px;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-submatch-center > .brkts-popup-sc-game {
-		padding: 2px 4px;
-	}
-}
-
-.brkts-popup-sc-submatch-score {
-	min-width: 24px;
-}
-
-.brkts-popup-left > .brkts-popup-sc-submatch-score {
-	text-align: right;
-}
-
-@media ( max-width: 768px ) {
-	.brkts-popup-sc-submatch-score {
-		min-width: 16px;
-	}
-}
-
 .brkts-popup-sc-veto {
 	padding: 0;
 }
 
+// can probably be kicked with MatchSummary refactor on WC/SG
 .brkts-popup-sc-veto-body {
 	align-items: center;
 	display: flex;
@@ -1568,6 +1337,7 @@ div.brkts-opponent-hover-active::after {
 	padding: 4px 10px;
 }
 
+// can probably be kicked with MatchSummary refactor on WC/SG
 @media ( max-width: 768px ) {
 	.brkts-popup-sc-veto-body {
 		padding: 4px 4px;
@@ -1586,9 +1356,9 @@ div.brkts-opponent-hover-active::after {
 
 .button-link {
 	background-color: #e6e6e6;
+	border: 1px solid transparent;
 	border-color: #e6e6e6;
 	border-radius: 0;
-	border: 1px solid transparent;
 	color: #212529;
 	font-size: 1rem;
 	font-weight: normal;

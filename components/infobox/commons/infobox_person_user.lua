@@ -28,8 +28,8 @@ function User:_getFavouriteTeams()
 	return display
 end
 
----@param base any
----@param default any
+---@param base string
+---@param default string|number
 ---@return string[]
 function User:_getArgsfromBaseDefault(base, default)
 	return Array.appendWith(self:getAllArgsForBase(self.args, base), self.args[default])

@@ -241,7 +241,7 @@ function CustomResultsTable._buildPlayerStruct(args, prefix)
 		displayName = displayName,
 		pageName = args[prefix .. 'link'] or displayName,
 		flag = args[prefix .. 'flag'],
-		race = args[prefix .. 'race']
+		faction = args[prefix .. 'race']
 	}
 end
 

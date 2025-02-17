@@ -6,63 +6,69 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---[[
-
-bracket finder (and code generator) / matchlist code generator
-
-]]--
-
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
+local BracketAlias = mw.loadData('Module:BracketAlias')
+local Class = require('Module:Class')
+local I18n = require('Module:I18n')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:GetMatchGroupCopyPaste/wiki')
-local getArgs = require('Module:Arguments').getArgs
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
-local BracketAlias = Lua.requireIfExists('Module:BracketAlias', {loadData = true})
+---@class Match2CopyPaste
+local CopyPaste = Class.new()
 
-local copyPaste = {}
-
-function copyPaste.generateID()
+---@return string
+function CopyPaste.generateID()
 	--initiate the rnd generator
 	math.randomseed(os.time())
-	return copyPaste._generateID()
+	return CopyPaste._generateID()
 end
 
-function copyPaste._generateID()
-	local id = ''
-
-	for _ = 1, 10 do
-		local rnd = math.random(62)
-		if rnd <= 10 then
-			id = id .. (rnd-1)
-		elseif rnd <= 36 then
-			id = id .. string.char(54 + rnd)
-		else
-			id = id .. string.char(60 + rnd)
+---@return string
+function CopyPaste._generateID()
+	---@param num integer
+	---@return string|integer
+	local charFromNumber = function(num)
+		if num <= 10 then
+			return num - 1
+		elseif num <= 36 then
+			return string.char(54 + num)
 		end
+
+		return string.char(60 + num)
 	end
 
-	if mw.ext.Brackets.checkBracketDuplicate(id) ~= 'ok' then
-		id = copyPaste._generateID()
+	local id = table.concat(Array.map(Array.range(1, 10), function()
+		return charFromNumber(math.random(62))
+	end))
+
+	if mw.ext.Brackets.checkBracketDuplicate(id) == 'ok' then
+		return id
 	end
 
-	return id
+	return CopyPaste._generateID()
 end
 
-function copyPaste._getBracketData(templateid)
+---@param templateid string
+---@return table
+function CopyPaste._getBracketData(templateid)
 	templateid = 'Bracket/' .. templateid
 	local matches = mw.ext.Brackets.getCommonsBracketTemplate(templateid)
-	assert(type(matches) == 'table')
-	if #matches == 0 then
-		error(templateid .. ' does not exist. If you should need it please ask a contributor with reviewer+ rights for help.')
-	end
+
+	assert(type(matches) == 'table' and #matches > 0,
+		templateid .. ' does not exist. If you should need it please ask a contributor with reviewer+ rights for help.')
 
 	local bracketDataList = Array.map(matches, function(match)
 		local _, baseMatchId = MatchGroupUtil.splitMatchId(match.match2id)
+		---@cast baseMatchId -nil
 		local bracketData = MatchGroupUtil.bracketDataFromRecord(match.match2bracketdata)
-		bracketData.matchKey = MatchGroupUtil.matchIdToKey(baseMatchId)
-		return bracketData
+		---@cast bracketData MatchGroupUtilBracketBracketData
+		return Table.merge(bracketData, {matchKey = MatchGroupUtil.matchIdToKey(baseMatchId)})
 	end)
 
 	local function sortKey(bracketData)
@@ -87,38 +93,39 @@ function copyPaste._getBracketData(templateid)
 	return bracketDataList
 end
 
-function copyPaste._getHeader(headerCode, customHeader)
-	local header = ''
-
+---@param headerCode string?
+---@param customHeader boolean
+---@return string
+---@return boolean
+function CopyPaste._getHeader(headerCode, customHeader)
 	if not headerCode then
-		return header, false
+		return '', false
 	end
 
-	headerCode = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
-	local index = 1
-	if (headerCode[1] or '') == '' then
-		index = 2
-	end
-	header = mw.message.new('brkts-header-' .. headerCode[index]):params(headerCode[index + 1] or ''):plain()
+	local headerCodeArray = mw.text.split(string.gsub(headerCode, '$', '!'), '!')
+	local index = Logic.isEmpty(headerCodeArray[1]) and 2 or 1
 
-	header = mw.text.split(header, ',')[1]
-
-	header = '\n\n' .. '<!-- ' .. header .. ' -->'
+	local headerMessage = I18n.translate('brkts-header-' .. headerCodeArray[index], {round = headerCodeArray[index + 1]})
+	local header = mw.text.split(headerMessage, ',')[1]
+	header = '\n' .. '<!-- ' .. header .. ' -->'
 
 	return header, customHeader
 end
 
-function copyPaste.bracket(frame, args)
+---@param frame Frame
+---@param args table
+---@return Html
+function CopyPaste.bracket(frame, args)
 	if not args then
-		args = getArgs(frame)
+		args = Arguments.getArgs(frame)
 	end
-	local out
+	local display
 
 	args.id = (args.id or '') and args.id or (args.template or '') and args.template or args.name or ''
 	args.id = string.gsub(string.gsub(args.id, '^Bracket/', ''), '^bracket/', '')
 	local templateid = BracketAlias[string.lower(args.id)] or args.id
 
-	out, args = WikiSpecific.getStart(templateid, copyPaste.generateID(), 'bracket', args)
+	display, args = WikiSpecific.getStart(templateid, CopyPaste.generateID(), 'bracket', args)
 
 	local empty = Logic.readBool(args.empty)
 	local customHeader = Logic.readBool(args.customHeader)
@@ -127,49 +134,51 @@ function copyPaste.bracket(frame, args)
 	local mode = WikiSpecific.getMode(args.mode)
 	local headersUpTop = Logic.readBool(Logic.emptyOr(args.headersUpTop, true))
 
-	local bracketDataList = copyPaste._getBracketData(templateid)
+	local bracketDataList = CopyPaste._getBracketData(templateid)
 
-	local matchOut = ''
-	for index, bracketData in ipairs(bracketDataList) do
+	local matchesCopyPaste = Array.map(bracketDataList, function(bracketData, matchIndex)
 		local matchKey = bracketData.matchKey
+
+		if not Logic.readBool(args.extra) and (matchKey == 'RxMTP' or matchKey == 'RxMBR') then
+			return nil
+		end
+
 		local header, hasHeaderEntryParam
-		if Logic.readBool(args.extra) and (matchKey == 'RxMTP' or matchKey == 'RxMBR') then
-			header = ''
+		if matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR' then
+			header, hasHeaderEntryParam = CopyPaste._getHeader(bracketData.header, customHeader)
+		elseif Logic.readBool(args.extra) then
+			header = matchKey == 'RxMTP' and ('\n' .. '<!-- Third Place Match -->') or ''
 			hasHeaderEntryParam = customHeader
-			if matchKey == 'RxMTP' then
-				header = '\n\n' .. '<!-- Third Place Match -->'
-			end
-		elseif matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR' then
-			header, hasHeaderEntryParam = copyPaste._getHeader(bracketData.header, customHeader)
 		end
 
-		if Logic.readBool(args.extra) or (matchKey ~= 'RxMTP' and matchKey ~= 'RxMBR') then
-			matchOut = matchOut .. header
-			if hasHeaderEntryParam and headersUpTop then
-				out = out .. '\n|' .. matchKey .. 'header='
-			elseif hasHeaderEntryParam then
-				matchOut = matchOut .. '\n|' .. matchKey .. 'header='
-			end
-			if empty then
-				matchOut = matchOut .. '\n|' .. matchKey .. '='
-			else
-				matchOut = matchOut .. '\n|' .. matchKey .. '=' ..
-					WikiSpecific.getMatchCode(bestof, mode, index, opponents, args)
-			end
+		if hasHeaderEntryParam and headersUpTop then
+			display = display .. '\n|' .. matchKey .. 'header='
 		end
-	end
 
-	out = out .. matchOut .. '\n}}'
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
+		local match = empty and '' or WikiSpecific.getMatchCode(bestof, mode, matchIndex, opponents, args)
+
+		return '\n' .. table.concat(Array.append({},
+			String.nilIfEmpty(header),
+			hasHeaderEntryParam and not headersUpTop and ('|' .. matchKey .. 'header=') or nil,
+			'|' .. matchKey .. '=' .. match
+		), '\n')
+	end)
+
+	display = display .. table.concat(matchesCopyPaste) .. '\n}}'
+
+	return CopyPaste._generateCopyPaste(display)
 end
 
-function copyPaste.matchlist(frame, args)
+---@param frame Frame
+---@param args table
+---@return Html
+function CopyPaste.matchlist(frame, args)
 	if not args then
-		args = getArgs(frame)
+		args = Arguments.getArgs(frame)
 	end
-	local out
 
-	out, args = WikiSpecific.getStart(nil, copyPaste.generateID(), 'matchlist', args)
+	local display
+	display, args = WikiSpecific.getStart(nil, CopyPaste.generateID(), 'matchlist', args)
 
 	local empty = Logic.readBool(args.empty)
 	local customHeader = Logic.readBool(args.customHeader)
@@ -180,38 +189,51 @@ function copyPaste.matchlist(frame, args)
 	local namedMatchParams = Logic.readBool(Logic.nilOr(args.namedMatchParams, true))
 	local headersUpTop = Logic.readBool(args.headersUpTop)
 
-	local matchOut = ''
-	for index = 1, matches do
+	local matchesCopyPaste = Array.map(Array.range(1, matches), function(matchIndex)
 		if customHeader and headersUpTop then
-			out = out .. '\n|M' .. index .. 'header='
-		elseif customHeader then
-			matchOut = matchOut .. '\n|M' .. index .. 'header='
+			display = display .. '\n|M' .. matchIndex .. 'header='
 		end
 
-		matchOut = matchOut .. '\n|' .. (namedMatchParams and ('M' .. index .. '=') or '') ..
-			(not empty and WikiSpecific.getMatchCode(bestof, mode, index, opponents, args) or '')
-	end
+		local matchKey = namedMatchParams and ('M' .. matchIndex .. '=') or ''
+		local match = empty and '' or WikiSpecific.getMatchCode(bestof, mode, matchIndex, opponents, args)
 
-	out = out .. matchOut .. '\n}}'
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
+		return '\n' .. table.concat(Array.append({},
+			customHeader and not headersUpTop and ('|M' .. matchIndex .. 'header=') or nil,
+			'|' .. matchKey .. match
+		), '\n')
+	end)
+
+	display = display .. table.concat(matchesCopyPaste) .. '\n}}'
+
+	return CopyPaste._generateCopyPaste(display)
 end
 
-function copyPaste.singleMatch(frame, args)
+---@param frame Frame
+---@param args table
+---@return Html
+function CopyPaste.singleMatch(frame, args)
 	if not args then
-		args = getArgs(frame)
+		args = Arguments.getArgs(frame)
 	end
 
-	local out
-	out, args = WikiSpecific.getStart(nil, copyPaste.generateID(), 'singlematch', args)
+	local display
+	display, args = WikiSpecific.getStart(nil, CopyPaste.generateID(), 'singlematch', args)
 
 	local bestof = tonumber(args.bestof) or 3
 	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
 
-	out = out .. '\n|' ..
-		WikiSpecific.getMatchCode(bestof, mode, 1, opponents, args)
-		.. '\n}}'
-	return '<pre class="selectall" width=50%>' .. mw.text.nowiki(out) .. '</pre>'
+	display = display .. '\n|' .. WikiSpecific.getMatchCode(bestof, mode, 1, opponents, args) .. '\n}}'
+
+	return CopyPaste._generateCopyPaste(display)
 end
 
-return copyPaste
+---@param display string
+---@return Html
+function CopyPaste._generateCopyPaste(display)
+	return mw.html.create('pre')
+		:addClass('selectall')
+		:node(mw.text.nowiki(display))
+end
+
+return CopyPaste

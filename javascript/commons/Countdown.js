@@ -3,24 +3,36 @@
  * Author(s): FO-nTTaX, Machunki
  ******************************************************************************/
 liquipedia.countdown = {
-	init: function() {
+	timerHiddenClass: 'timer--hidden',
+	timeoutFunctions: null,
+	timerObjectNodes: null,
+	lastCountdownId: null,
+	init: function () {
+		// // Cancels last countdown loop if it exists to prevent multiple countdowns running at the same time
+		if ( liquipedia.countdown.timeoutFunctions && liquipedia.countdown.lastCountdownId ) {
+			liquipedia.countdown.timeoutFunctions.clear( liquipedia.countdown.lastCountdownId );
+		}
+
 		liquipedia.countdown.timerObjectNodes = document.querySelectorAll( '.timer-object' );
 		if ( liquipedia.countdown.timerObjectNodes.length > 0 ) {
-			mw.loader.using( 'user.options', function() {
-				liquipedia.countdown.timerObjectNodes.forEach( function( timerObjectNode ) {
+			mw.loader.using( 'user.options', () => {
+				liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 					const dateObject = liquipedia.countdown.parseTimerObjectNodeToDateObj( timerObjectNode );
-					const dateChild = document.createElement( 'span' );
-					if ( typeof dateObject === 'object' ) {
-						const disableTimeZoneAdjust = mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === '1' || mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) === 1;
-						if ( disableTimeZoneAdjust ) {
+					let dateChild;
+					if ( timerObjectNode.firstChild instanceof HTMLSpanElement ) {
+						dateChild = timerObjectNode.firstChild;
+					} else {
+						dateChild = document.createElement( 'span' );
+						if (
+							mw.user.options.get( 'teamliquidintegration-disable-countdown-timezone-adjust' ) ||
+							typeof dateObject !== 'object'
+						) {
 							dateChild.innerHTML = timerObjectNode.innerHTML;
 						} else {
 							dateChild.innerHTML = liquipedia.countdown.getCorrectTimeZoneString( dateObject );
 						}
-					} else {
-						dateChild.innerHTML = timerObjectNode.innerHTML;
+						dateChild.classList.add( 'timer-object-date' );
 					}
-					dateChild.classList.add( 'timer-object-date' );
 					timerObjectNode.innerHTML = '';
 					timerObjectNode.appendChild( dateChild );
 					let separatorChild;
@@ -37,130 +49,130 @@ liquipedia.countdown = {
 					countdownChild.classList.add( 'timer-object-countdown' );
 					timerObjectNode.appendChild( countdownChild );
 				} );
-				// Only run when the window is actually in the front, not in background tabs (on browsers that support it)
-				mw.loader.using( 'mediawiki.visibleTimeout' ).then( function( require ) {
+
+				liquipedia.countdown.setupCountdownsIfSwitchToggleExists();
+
+				// Only run when the window is actually in the front,
+				// not in background tabs (on browsers that support it)
+				mw.loader.using( 'mediawiki.visibleTimeout' ).then( ( require ) => {
 					liquipedia.countdown.timeoutFunctions = require( 'mediawiki.visibleTimeout' );
 					liquipedia.countdown.runCountdown();
 				} );
 			} );
 		}
 	},
-	timeoutFunctions: null,
-	timerObjectNodes: null,
-	parseTimerObjectNodeToDateObj: function( timerObjectNode ) {
+	setupCountdownsIfSwitchToggleExists: async function () {
+		const switchToggleGroup = await liquipedia.switchButtons.getSwitchGroup( 'countdown' );
+		if ( !switchToggleGroup || switchToggleGroup.type !== 'toggle' || switchToggleGroup.value === null ) {
+			return;
+		}
+
+		// Default state
+		liquipedia.countdown.toggleCountdowns( switchToggleGroup.value );
+
+		// Reacting state switch
+		switchToggleGroup.nodes.forEach( ( switchNode ) => {
+			switchNode.addEventListener( liquipedia.switchButtons.triggerEventName, ( event ) => {
+				liquipedia.countdown.toggleCountdowns( event.detail.data.value );
+			} );
+		} );
+	},
+	toggleCountdowns: function ( isCountdownToggled ) {
+		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
+			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
+			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+		} );
+	},
+	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {
 		if ( timerObjectNode.dataset.timestamp === 'error' ) {
 			return false;
 		}
 		return new Date( 1000 * parseInt( timerObjectNode.dataset.timestamp ) );
 	},
-	runCountdown: function() {
-		liquipedia.countdown.timerObjectNodes.forEach( function( timerObjectNode ) {
+	runCountdown: function () {
+		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
 			liquipedia.countdown.setCountdownString( timerObjectNode );
 		} );
-		liquipedia.countdown.timeoutFunctions.set( liquipedia.countdown.runCountdown, 1000 );
+
+		liquipedia.countdown.lastCountdownId = liquipedia.countdown.timeoutFunctions.set(
+			liquipedia.countdown.runCountdown,
+			1000
+		);
 	},
-	setCountdownString: function( timerObjectNode ) {
-		const streamsarr = [ ];
-		let datestr = '', live = 'LIVE!';
-		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
-			live = timerObjectNode.dataset.countdownEndText;
-		}
+	setCountdownString: function ( timerObjectNode ) {
+		const countdownElem = timerObjectNode.querySelector( '.timer-object-countdown' );
+		let datestr = '';
+
 		if ( timerObjectNode.dataset.timestamp !== 'error' ) {
-			const differenceInSeconds = Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
-			if ( differenceInSeconds <= 0 ) {
-				if ( differenceInSeconds > -43200 && timerObjectNode.dataset.finished !== 'finished' ) {
-					datestr = '<span class="timer-object-countdown-live">' + live + '</span>';
-				}
-			} else {
-				let differenceInSecondsMath = differenceInSeconds;
-				const weeks = Math.floor( differenceInSecondsMath / 604800 );
-				differenceInSecondsMath = differenceInSecondsMath % 604800;
-				const days = Math.floor( differenceInSecondsMath / 86400 );
-				differenceInSecondsMath = differenceInSecondsMath % 86400;
-				const hours = Math.floor( differenceInSecondsMath / 3600 );
-				differenceInSecondsMath = differenceInSecondsMath % 3600;
-				const minutes = Math.floor( differenceInSecondsMath / 60 );
-				const seconds = Math.floor( differenceInSecondsMath % 60 );
-				if ( differenceInSeconds >= 604800 ) {
-					datestr = weeks + 'w ' + days + 'd';
-				} else if ( differenceInSeconds >= 86400 ) {
-					datestr = days + 'd ' + hours + 'h ' + minutes + 'm';
-				} else if ( differenceInSeconds >= 3600 ) {
-					datestr = hours + 'h ' + minutes + 'm ' + seconds + 's';
-				} else if ( differenceInSeconds >= 60 ) {
-					datestr = minutes + 'm ' + seconds + 's';
-				} else {
-					datestr = seconds + 's';
-				}
+			const { text, className } = this.getCountdownStringAndClassName( timerObjectNode, countdownElem );
+			datestr = text;
+
+			if ( className !== '' ) {
+				countdownElem.classList.add( className );
 			}
-		} else {
-			datestr = ''; // DATE ERROR!
 		}
-		if ( timerObjectNode.dataset.streamTwitch ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/twitch/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTwitch ) + '"><i class="lp-icon lp-icon-21 lp-twitch"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTwitch2 ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/twitch/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTwitch2 ) + '"><i class="lp-icon lp-icon-21 lp-twitch"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamYoutube ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/youtube/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamYoutube ) + '"><i class="lp-icon lp-icon-21 lp-youtube"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamAfreeca ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/afreeca/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamAfreeca ) + '"><i class="lp-icon lp-icon-21 lp-afreeca"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamAfreecatv ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/afreecatv/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamAfreecatv ) + '"><i class="lp-icon lp-icon-21 lp-afreeca"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamBilibili ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/bilibili/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamBilibili ) + '"><i class="lp-icon lp-icon-21 lp-bilibili"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamBooyah ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/booyah/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamBooyah ) + '"><i class="lp-icon lp-icon-21 lp-booyah"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamCc163 ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/cc163/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamCc163 ) + '"><i class="lp-icon lp-icon-21 lp-cc"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamDailymotion ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/dailymotion/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamDailymotion ) + '"><i class="lp-icon lp-icon-21 lp-dailymotion"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamDouyu ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/douyu/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamDouyu ) + '"><i class="lp-icon lp-icon-21 lp-douyutv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamFacebook ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/facebook/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamFacebook ) + '"><i class="lp-icon lp-icon-21 lp-facebook"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamHuomao ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huomao/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuomao ) + '"><i class="lp-icon lp-icon-21 lp-huomaotv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamHuya ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/huya/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamHuya ) + '"><i class="lp-icon lp-icon-21 lp-huyatv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamLoco ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/loco/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamLoco ) + '"><i class="lp-icon lp-icon-21 lp-loco"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamMildom ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/mildom/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamMildom ) + '"><i class="lp-icon lp-icon-21 lp-mildom"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamNimo ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/nimo/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamNimo ) + '"><i class="lp-icon lp-icon-21 lp-nimotv"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTrovo ) {
-			streamsarr.push( '<a href="' + mw.config.get( 'wgScriptPath' ) + '/Special:Stream/trovo/' + liquipedia.countdown.getStreamName( timerObjectNode.dataset.streamTrovo ) + '"><i class="lp-icon lp-icon-21 lp-trovo"></i></a>' );
-		}
-		if ( timerObjectNode.dataset.streamTl ) {
-			streamsarr.push( '<a href="https://tl.net/video/streams/' + timerObjectNode.dataset.streamTl + '" target="_blank"><i class="lp-icon lp-icon-21 lp-stream"></i></a>' );
-		}
-		let html = '<span class="timer-object-countdown-time">' + datestr + '</span>';
-		if ( datestr.length > 0 && streamsarr.length > 0 ) {
+
+		let html = `<span class="timer-object-countdown-time">${ datestr }</span>`;
+		if ( datestr.length > 0 && timerObjectNode.dataset.hasstreams === 'true' ) {
 			html += ' - ';
 		}
-		if ( timerObjectNode.dataset.finished !== 'finished' ) {
-			html += streamsarr.join( ' ' );
-		}
-		timerObjectNode.querySelector( '.timer-object-countdown' ).innerHTML = html;
+		countdownElem.innerHTML = html;
 	},
-	getStreamName: function( url ) {
-		return url.replace( /\s/g, '_' );
+	getCountdownStringAndClassName: function ( timerObjectNode ) {
+		if ( timerObjectNode.dataset.finished === 'finished' && timerObjectNode.dataset.showCompleted === 'true' ) {
+			return {
+				text: 'COMPLETED',
+				className: 'timer-object-countdown-completed'
+			};
+		}
+
+		const differenceInSeconds =
+			Math.floor( parseInt( timerObjectNode.dataset.timestamp ) - ( Date.now().valueOf() / 1000 ) );
+
+		if ( differenceInSeconds > 0 ) {
+			return {
+				text: this.formatTimeDifference( differenceInSeconds ),
+				className: ''
+			};
+		}
+
+		if ( differenceInSeconds <= -43200 || timerObjectNode.dataset.finished === 'finished' ) {
+			return {
+				text: '',
+				className: ''
+			};
+		}
+
+		if ( typeof timerObjectNode.dataset.countdownEndText !== 'undefined' ) {
+			return {
+				text: timerObjectNode.dataset.countdownEndText,
+				className: 'timer-object-countdown-live'
+			};
+		}
+
+		return {
+			text: 'LIVE',
+			className: 'timer-object-countdown-live'
+		};
+	},
+	formatTimeDifference: function ( differenceInSeconds ) {
+		const weeks = Math.floor( differenceInSeconds / 604800 );
+		const days = Math.floor( ( differenceInSeconds % 604800 ) / 86400 );
+		const hours = Math.floor( ( differenceInSeconds % 86400 ) / 3600 );
+		const minutes = Math.floor( ( differenceInSeconds % 3600 ) / 60 );
+		const seconds = Math.floor( differenceInSeconds % 60 );
+
+		if ( differenceInSeconds >= 604800 ) {
+			return `${ weeks }w ${ days }d`;
+		} else if ( differenceInSeconds >= 86400 ) {
+			return `${ days }d ${ hours }h ${ minutes }m`;
+		} else if ( differenceInSeconds >= 3600 ) {
+			return `${ hours }h ${ minutes }m ${ seconds }s`;
+		} else if ( differenceInSeconds >= 60 ) {
+			return `${ minutes }m ${ seconds }s`;
+		} else {
+			return `${ seconds }s`;
+		}
 	},
 	timeZoneAbbr: new Map( [
 		[ 'Acre Time', 'ACT' ],
@@ -179,6 +191,7 @@ liquipedia.countdown = {
 		[ 'Australian Eastern Daylight Time', 'AEDT' ],
 		[ 'Australian Eastern Standard Time', 'AEST' ],
 		[ 'Australian Western Standard Time', 'AWST' ],
+		[ 'Aqtobe Time', 'AQTT' ],
 		[ 'Azerbaijan Summer Time', 'AZST' ],
 		[ 'Azerbaijan Time', 'AZT' ],
 		[ 'Azores Summer Time', 'AZOST' ],
@@ -210,6 +223,7 @@ liquipedia.countdown = {
 		[ 'Eastern European Standard Time', 'EET' ],
 		[ 'Eastern European Summer Time', 'EEST' ],
 		[ 'Eastern Standard Time', 'EST' ],
+		[ 'Ecuador Time', 'ECT' ],
 		[ 'Fiji Standard Time', 'FJST' ],
 		[ 'French Guiana Time', 'GFT' ],
 		[ 'Georgia Standard Time', 'GET' ],
@@ -280,17 +294,17 @@ liquipedia.countdown = {
 		[ 'Yakutsk Standard Time', 'YAKT' ],
 		[ 'Yekaterinburg Standard Time', 'YEKT' ]
 	] ),
-	getMonthNameFromMonthNumber: function( newFutureMonth ) {
+	getMonthNameFromMonthNumber: function ( newFutureMonth ) {
 		const monthNames = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
 		return monthNames[ newFutureMonth ];
 	},
-	getTimeZoneNameLong: function( dateObject ) {
+	getTimeZoneNameLong: function ( dateObject ) {
 		let date;
 		let result;
 		const dateTimeFormat = new Intl.DateTimeFormat( 'en', { timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone, timeZoneName: 'long' } );
 		if ( typeof Intl.DateTimeFormat.prototype.formatToParts === 'function' ) {
 			date = dateTimeFormat.formatToParts( dateObject );
-			date.forEach( function( element ) {
+			date.forEach( ( element ) => {
 				if ( element.type === 'timeZoneName' ) {
 					result = element.value;
 				}
@@ -305,7 +319,7 @@ liquipedia.countdown = {
 		}
 		return result;
 	},
-	getCorrectTimeZoneString: function( dateObject ) {
+	getCorrectTimeZoneString: function ( dateObject ) {
 		const userTime = {
 			localYear: dateObject.getFullYear(),
 			localMonth: dateObject.getMonth(),

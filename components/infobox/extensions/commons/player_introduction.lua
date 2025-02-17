@@ -10,6 +10,7 @@ local AnOrA = require('Module:A or an')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
@@ -23,7 +24,6 @@ local TRANSFER_STATUS_CURRENT = 'current'
 local TYPE_PLAYER = 'player'
 local SKIP_ROLE = 'skip'
 local INACTIVE_ROLE = 'inactive'
-local DEFAULT_DATE = '1970-01-01'
 
 ---@class playerIntroArgsValues
 ---@field [1] string?
@@ -211,8 +211,8 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		type = personType:lower(),
 		game = Logic.emptyOr(args.game, playerInfo.extradata.game, args.defaultGame),
 		id = Logic.emptyOr(args.id, playerInfo.id),
-		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate, DEFAULT_DATE),
-		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate, DEFAULT_DATE),
+		birthDate = Logic.emptyOr(args.birthdate, playerInfo.birthdate, DateExt.defaultDate),
+		deathDate = Logic.emptyOr(args.deathdate, playerInfo.deathdate, DateExt.defaultDate),
 		nationality = Logic.emptyOr(args.nationality, playerInfo.nationality),
 		nationality2 = Logic.emptyOr(args.nationality2, playerInfo.nationality2),
 		nationality3 = Logic.emptyOr(args.nationality3, playerInfo.nationality3),
@@ -309,7 +309,7 @@ end
 function PlayerIntroduction._readTransferFromTransfers(player)
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = '([[player::' .. player .. ']] OR [[player::' .. player:gsub('_', ' ') .. ']]) AND '
-			.. '[[date::>1971-01-01]]',
+			.. '[[date::!' .. DateExt.defaultDate .. ']]',
 		order = 'date desc',
 		limit = 1,
 		query = 'fromteam, toteam, role2, date, extradata'
@@ -396,17 +396,17 @@ function PlayerIntroduction:create()
 		return ''
 	end
 
-	local isDeceased = self.playerInfo.deathDate ~= '1970-01-01' or self.playerInfo.status == 'passed away'
+	local isDeceased = self.playerInfo.deathDate ~= DateExt.defaultDate or self.playerInfo.status == 'passed away'
 
 	local statusDisplay = self:_statusDisplay(isDeceased)
 	local nationalityDisplay = self:_nationalityDisplay()
 	local gameDisplay = self:_gameDisplay()
 	local factionDisplay = self:_factionDisplay()
-	local typeDisplay = self:_typeDisplay()
+	local typeDisplay = self:typeDisplay()
 
 	return String.interpolate('${name}${born} ${tense} ${a}${status}${nationality}${game}'
 		.. '${faction}${type}${team}${subText}.${freeText}', {
-			name = self:_nameDisplay(),
+			name = self:nameDisplay(),
 			born = self:_bornDisplay(isDeceased),
 			tense = isDeceased and 'was' or 'is',
 			a = AnOrA._main{
@@ -427,7 +427,7 @@ end
 
 --- builds the name display
 ---@return string
-function PlayerIntroduction:_nameDisplay()
+function PlayerIntroduction:nameDisplay()
 	local nameQuotes = String.isNotEmpty(self.playerInfo.name) and '"' or ''
 
 	local nameDisplay = self._addConcatText(self.playerInfo.firstName, nil, true)
@@ -453,7 +453,7 @@ end
 ---@param isDeceased boolean
 ---@return string
 function PlayerIntroduction:_bornDisplay(isDeceased)
-	if self.playerInfo.birthDate == DEFAULT_DATE then
+	if self.playerInfo.birthDate == DateExt.defaultDate then
 		return ''
 	end
 
@@ -463,7 +463,7 @@ function PlayerIntroduction:_bornDisplay(isDeceased)
 
 	if not isDeceased then
 		return ' (born ' .. displayDate(self.playerInfo.birthDate) .. ')'
-	elseif self.playerInfo.deathDate ~= DEFAULT_DATE then
+	elseif self.playerInfo.deathDate ~= DateExt.defaultDate then
 		return ' ('
 			.. displayDate(self.playerInfo.birthDate)
 			.. ' – '
@@ -528,7 +528,7 @@ end
 
 --- builds the type display
 ---@return string?
-function PlayerIntroduction:_typeDisplay()
+function PlayerIntroduction:typeDisplay()
 	return self._addConcatText(self.playerInfo.type)
 		.. self._addConcatText(
 			self.playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(self.playerInfo.role2) and self.playerInfo.role2 or nil,
@@ -556,7 +556,7 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 	return String.interpolate(' ${tense} ${playedOrWorked} ${team}${team2}${roleDisplay}', {
 		tense = isCurrentTense and 'who is currently' or 'who last',
-		playedOrWorked = self:_playedOrWorked(isCurrentTense),
+		playedOrWorked = self:playedOrWorked(isCurrentTense),
 		team = PlayerIntroduction._displayTeam(isCurrentTense and playerInfo.team or transferInfo.team, transferInfo.date),
 		team2 = shouldDisplayTeam2
 			and (' on loan from' .. PlayerIntroduction._displayTeam(playerInfo.team2, transferInfo.date))
@@ -566,7 +566,9 @@ function PlayerIntroduction:_teamDisplay(isDeceased)
 
 end
 
-function PlayerIntroduction:_playedOrWorked(isCurrentTense)
+---@param isCurrentTense boolean
+---@return string
+function PlayerIntroduction:playedOrWorked(isCurrentTense)
 	local playerInfo = self.playerInfo
 	local transferInfo = self.transferInfo
 	local role = self.transferInfo.standardizedRole
@@ -588,11 +590,14 @@ function PlayerIntroduction:_playedOrWorked(isCurrentTense)
 	return ' playing for'
 end
 
+---@param team string
+---@param date string
+---@return string
 function PlayerIntroduction._displayTeam(team, date)
 	team = team:gsub('_', ' ')
 
-	if mw.ext.TeamTemplate.teamexists(team) then
-		local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+	local rawTeam = mw.ext.TeamTemplate.raw(team, date)
+	if rawTeam then
 		return ' [[' .. rawTeam.page .. '|' .. rawTeam.name .. ']]'
 	end
 

@@ -31,6 +31,8 @@ local TIER_VALUE = {16, 8, 4, 2, Monthly = 2}
 local TYPE_MODIFIER = {offline = 1, ['offline/online'] = 0.75, ['online/offline'] = 0.75, default = 0.65}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -48,6 +50,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,

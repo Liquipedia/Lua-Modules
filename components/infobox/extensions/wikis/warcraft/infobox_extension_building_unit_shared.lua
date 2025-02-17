@@ -18,7 +18,7 @@ local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local BreakDown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -144,10 +144,10 @@ function CustomBuildingUnit.attackDisplay(args)
 		if Array.all(data, Logic.isEmpty) then
 			return nil
 		end
-		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, content = {desc, unpack(data)}}
+		return BreakDown{contentClasses = {content1 = {'infobox-description'}}, children = {desc, unpack(data)}}
 	end
 
-	return Array.append({Title{name = 'Combat'}},
+	return Array.append({Title{children = 'Combat'}},
 		toWidget('Requirement:', 'requirement'),
 		toWidget('[[Attack Damage|Damage]]:', 'attackTypeAndDamage'),
 		toWidget(CustomBuildingUnit.getAreaHeader(args) or '', 'area'),
@@ -302,7 +302,7 @@ function CustomBuildingUnit.calculateMaxDamage(args, index)
 	local diceDamage = tonumber(args['dmgdice' .. index]) or 1
 	local sidesDamage = tonumber(args['dmgsides' .. index] or args.dmgsides) or 2
 
-	return baseDamage + diceDamage + sidesDamage
+	return baseDamage + (diceDamage * sidesDamage)
 end
 
 ---@param args table
@@ -340,7 +340,7 @@ function CustomBuildingUnit.mercenaryStats(args)
 	end
 
 	return {
-		Title{name = 'Mercenary Stats'},
+		Title{children = 'Mercenary Stats'},
 		Cell{name = 'Stock Maximum', content = {args.stock}},
 		Cell{name = 'Stock Start Delay', content = {
 			Abbreviation.make(args.stockstart .. 's', 'First available at ' .. GameClock.run(args.stockstart))}},
@@ -360,7 +360,7 @@ function CustomBuildingUnit.movement(args, title)
 	end
 
 	return {
-		Title{name = title},
+		Title{children = title},
 		Cell{name = '[[Movement Speed|Speed]]', content = {speed}},
 		Cell{name = 'Turn Rate', content = {args.turnrate}},
 		Cell{name = 'Move Type', content = {args.movetype}},

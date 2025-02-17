@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Center = Widgets.Center
 
@@ -25,9 +25,8 @@ function Campaign.run(frame)
 	return campaign:createInfobox()
 end
 
----@return Html
+---@return string
 function Campaign:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -37,12 +36,12 @@ function Campaign:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
+		Center{children = {args.caption}},
 	}
 
-	infobox:categories('Campaign')
+	self:categories('Campaign')
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self:build(widgets)
 end
 
 

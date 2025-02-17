@@ -8,14 +8,18 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
-local CardIcon = require('Module:CardIcon')
+local CharacterIcon = require('Module:CharacterIcon')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+local Operator = require('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -24,20 +28,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local NUM_CARDS_PER_PLAYER = 8
 local CARD_COLOR_1 = 'blue'
 local CARD_COLOR_2 = 'red'
-local DEFAULT_CARD = 'transparent'
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
--- Normal links, from input/lpdb
-local LINK_DATA = {
-	preview = {icon = 'File:Preview Icon32.png', text = 'Preview'},
-	interview = {icon = 'File:Interview32.png', text = 'Interview'},
-	recap = {icon = 'File:Reviews32.png', text = 'Recap'},
-	vod = {icon = 'File:VOD Icon.png', text = 'Watch VOD'},
-	royaleapi = {icon = 'File:RoyaleAPI_allmode.png', text = 'RoyaleAPI Match Page'},
-}
-LINK_DATA.review = LINK_DATA.recap
-LINK_DATA.preview2 = LINK_DATA.preview
-LINK_DATA.interview2 = LINK_DATA.interview
+local DEFAULT_CARD = 'default'
 
 local CustomMatchSummary = {}
 
@@ -48,256 +39,160 @@ function CustomMatchSummary.getByMatchId(args)
 end
 
 ---@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addLinks(LINK_DATA, match.links)
-end
-
----@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
-	if match.dateIsExact or (match.timestamp ~= DateExt.epochZero) then
-		-- dateIsExact means we have both date and time. Show countdown
-		-- if match is not epoch=0, we have a date, so display the date
-		body:addRow(MatchSummary.Row():addElement(
-			DisplayHelper.MatchCountdownBlock(match)
-		))
+	local isTeamGame = Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end)
+	local games
+	if isTeamGame then
+		games = CustomMatchSummary._createTeamMatchBody(match)
+	else
+		games = Array.map(match.games, function (game, gameIndex)
+			return CustomMatchSummary._createGame(game, gameIndex, match.date)
+		end)
 	end
 
-	if Array.any(match.opponents, function(opponent) return opponent.type == Opponent.team end) then
-		return CustomMatchSummary._createTeamMatchBody(body, match, match.matchId)
-	end
-
-	-- Iterate each map
-	for gameIndex, game in ipairs(match.games) do
-		body:addRow(CustomMatchSummary._createGame(game, gameIndex, match.date))
-	end
-
-	local extradata = match.extradata or {}
-	if Table.isNotEmpty(extradata.t1bans) or Table.isNotEmpty(extradata.t2bans) then
-		body:addRow(CustomMatchSummary._banRow(extradata.t1bans, extradata.t2bans, match.date))
-	end
-
-	return body
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		games,
+		MatchSummaryWidgets.Mvp(match.extradata.mvp)
+	)}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@param date string
----@return MatchSummaryRow
+---@return Widget
 function CustomMatchSummary._createGame(game, gameIndex, date)
-	local row = MatchSummary.Row()
+	local cardData = Array.map(game.opponents, function(opponent)
+		return Array.map(opponent.players or {}, function(player)
+			if Logic.isDeepEmpty(player) then return end
+			local cards = player.cards or {}
+			return Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
+				return cards[idx] or DEFAULT_CARD end)
+		end)
+	end)
 
-	-- Add game header
-	if not Logic.isEmpty(game.header) then
-		row:addElement(mw.html.create('div')
-			:wikitext(game.header)
-			:css('margin', 'auto')
-			:css('font-weight', 'bold')
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		css = {['font-size'] = '90%', padding = '4px'},
+		children = WidgetUtil.collect(
+			CustomMatchSummary._opponentCardsDisplay{
+				data = cardData[1],
+				flip = true,
+				date = date,
+			},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			MatchSummaryWidgets.GameCenter{children = 'Game ' .. gameIndex},
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			CustomMatchSummary._opponentCardsDisplay{
+				data = cardData[2],
+				flip = false,
+				date = date,
+			},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-		row:addElement(MatchSummary.Break():create())
-	end
-
-	local cardData = {{}, {}}
-	for participantKey, participantData in Table.iter.spairs(game.participants or {}) do
-		local opponentIndex = tonumber(mw.text.split(participantKey, '_')[1])
-		participantData.cards = participantData.cards or {}
-		local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
-			return participantData.cards[idx] or DEFAULT_CARD end)
-		table.insert(cardData[opponentIndex], cards)
-	end
-
-	row:addClass('brkts-popup-body-game')
-		:css('font-size', '80%')
-		:css('padding', '4px')
-		:css('min-height', '32px')
-
-	row:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = cardData[1],
-		flip = true,
-		date = date,
-	})
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 1))
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext('Game ' .. gameIndex)
-	)
-	row:addElement(CustomMatchSummary._createCheckMark(game.winner == 2))
-	row:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = cardData[2],
-		flip = false,
-		date = date,
-	})
-
-	-- Add Comment
-	if not Logic.isEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
-		row:addElement(mw.html.create('div')
-			:wikitext(game.comment)
-			:css('margin', 'auto')
-		)
-	end
-
-	return row
+	}
 end
 
----@param t1bans string[]?
----@param t2bans string[]?
----@param date string
----@return MatchSummaryRow
-function CustomMatchSummary._banRow(t1bans, t2bans, date)
-	t1bans = t1bans or {}
-	t2bans = t2bans or {}
-	local maxAmountOfBans = math.max(#t1bans, #t2bans)
-	for banIndex = 1, maxAmountOfBans do
-		t1bans[banIndex] = t1bans[banIndex] or DEFAULT_CARD
-		t2bans[banIndex] = t2bans[banIndex] or DEFAULT_CARD
-	end
-
-	local banRow = MatchSummary.Row()
-
-	banRow:addClass('brkts-popup-body-game')
-		:css('font-size', '80%')
-		:css('padding', '4px')
-		:css('min-height', '32px')
-
-	banRow:addElement(mw.html.create('div')
-		:wikitext('Bans')
-		:css('margin', 'auto')
-		:css('font-weight', 'bold')
-	)
-	banRow:addElement(MatchSummary.Break():create())
-
-	banRow:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = {t1bans},
-		flip = true,
-		date = date,
-	})
-	banRow:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:wikitext('Bans')
-	)
-	banRow:addElement(CustomMatchSummary._opponentCardsDisplay{
-		data = {t2bans},
-		flip = false,
-		date = date,
-	})
-
-	return banRow
-end
-
----@param body MatchSummaryBody
 ---@param match MatchGroupUtilMatch
----@param matchId string
----@return MatchSummaryBody
-function CustomMatchSummary._createTeamMatchBody(body, match, matchId)
-	local subMatches = match.extradata.submatches
-	for _, game in ipairs(match.games) do
-		local subMatch = subMatches[game.subgroup]
-		if not subMatch.games then
-			subMatch.games = {}
-		end
+---@return Widget[]
+function CustomMatchSummary._createTeamMatchBody(match)
+	local _, subMatches = Array.groupBy(match.games, Operator.property('subgroup'))
+	subMatches = Array.map(subMatches, function(subMatch)
+		return {games = subMatch}
+	end)
 
-		table.insert(subMatch.games, game)
-	end
-
-	for subMatchIndex, subMatch in ipairs(subMatches) do
-		local players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
-		body:addRow(CustomMatchSummary._createSubMatch(
-			players,
+	Array.forEach(subMatches, FnUtil.curry(CustomMatchSummary._getSubMatchOpponentsAndPlayers, match))
+	Array.forEach(subMatches, CustomMatchSummary._calculateSubMatchWinner)
+	return Array.map(subMatches, function(subMatch, subMatchIndex)
+		return CustomMatchSummary._createSubMatch(
+			subMatch.players,
 			subMatchIndex,
 			subMatch,
 			match.extradata
-		))
-	end
-
-	if match.extradata.hasbigmatch then
-		local matchPageLinkRow = MatchSummary.Row()
-		matchPageLinkRow:addElement(mw.html.create('div')
-			:addClass('brkts-popup-comment')
-			:wikitext('[[Match:ID_' .. matchId .. '|More details on the match page]]')
 		)
-		body:addRow(matchPageLinkRow)
-	end
+	end)
+end
 
-	return body
+---@param match MatchGroupUtilMatch
+---@param subMatch table
+---@param subMatchIndex integer
+function CustomMatchSummary._getSubMatchOpponentsAndPlayers(match, subMatch, subMatchIndex)
+	subMatch.players = CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
+	subMatch.opponents = Array.map(Array.range(1, #subMatch.players), function(opponentIndex)
+		local score, status = MatchGroupInputUtil.computeOpponentScore(
+			{opponentIndex = opponentIndex},
+			FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, subMatch.games)
+		)
+		return {score = score, status = status}
+	end)
+end
+
+---@param subMatch table
+function CustomMatchSummary._calculateSubMatchWinner(subMatch)
+	subMatch.scores = Array.map(subMatch.opponents, Operator.property('score'))
+
+	local subMatchIsFinished = Array.all(subMatch.games, function(game)
+		return Logic.isNotEmpty(game.winner)
+			or game.status == 'notplayed'
+
+	end)
+	if not subMatchIsFinished then return end
+
+	subMatch.finished = true
+	subMatch.winner = MatchGroupInputUtil.getHighestScoringOpponent(subMatch.opponents)
 end
 
 ---@param subMatchIndex integer
 ---@param subMatch table
 ---@param match MatchGroupUtilMatch
----@return table
+---@return table[]
 function CustomMatchSummary._fetchPlayersForSubmatch(subMatchIndex, subMatch, match)
-	local players = {{}, {}, hash = {{}, {}}}
-
-	CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[1], match)
-
-	if match.extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
-		for gameIndex = 2, #subMatch.games do
-			CustomMatchSummary._extractPlayersFromGame(players, subMatch.games[gameIndex], match)
-		end
-	end
-
-	return players
+	local processUntil = match.extradata['subgroup' .. subMatchIndex .. 'iskoth'] and #subMatch.games or 1
+	return Array.map(subMatch.games[1].opponents, function(opponent, opponentIndex)
+		local hash = {}
+		Array.forEach(Array.range(1, processUntil), function(gameIndex)
+			local game = subMatch.games[gameIndex]
+			Array.forEach(game.opponents[opponentIndex].players or {}, function(player, playerIndex)
+				if Logic.isDeepEmpty(player) then return end
+				hash[playerIndex] = {
+					displayName = player.displayname,
+					pageName = player.name,
+				}
+			end)
+		end)
+		local indexes = Logic.nilIfEmpty(Array.extractKeys(hash))
+		local maxIndex = indexes and math.max(unpack(Array.extractKeys(hash))) or 0
+		return Array.map(Array.range(1, maxIndex), function(playerIndex)
+			local matchPlayer = match.opponents[opponentIndex].players[playerIndex]
+			return hash[playerIndex] and (matchPlayer or hash[playerIndex]) or nil
+		end)
+	end)
 end
 
----@param players any
----@param game MatchGroupUtilGame
----@param match MatchGroupUtilMatch
----@return table
-function CustomMatchSummary._extractPlayersFromGame(players, game, match)
-	for participantKey, participant in Table.iter.spairs(game.participants or {}) do
-		participantKey = mw.text.split(participantKey, '_')
-		local opponentIndex = tonumber(participantKey[1])
-		local match2playerIndex = tonumber(participantKey[2])
-
-		local player = match.opponents[opponentIndex].players[match2playerIndex]
-
-		if not player then
-			player = {
-				displayName = participant.displayname,
-				pageName = participant.name,
-			}
-		end
-
-		-- make sure we only display each player once
-		if not players.hash[opponentIndex][player.pageName] then
-			players.hash[opponentIndex][player.pageName] = true
-			table.insert(players[opponentIndex], player)
-		end
-	end
-
-	return players
-end
----comment
 ---@param players table
 ---@param subMatchIndex integer
 ---@param subMatch table
 ---@param extradata table
----@return MatchSummaryRow
+---@return Widget
 function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, extradata)
-	local row = MatchSummary.Row()
-
-	row:addClass('brkts-popup-body-game')
-		:css('min-height', '32px')
-
 	-- Add submatch header
-	if not Logic.isEmpty(extradata['subgroup' .. subMatchIndex .. 'header']) then
-		row:addElement(mw.html.create('div')
-			:wikitext(extradata['subgroup' .. subMatchIndex .. 'header'])
-			:css('margin', 'auto')
-			:css('font-weight', 'bold')
-		)
-		row:addElement(MatchSummary.Break():create())
+	local header
+	if Logic.isNotEmpty(extradata['subgroup' .. subMatchIndex .. 'header']) then
+		header = {
+			mw.html.create('div')
+				:wikitext(extradata['subgroup' .. subMatchIndex .. 'header'])
+				:css('margin', 'auto')
+				:css('font-weight', 'bold')
+			,
+			MatchSummaryWidgets.Break{}
+		}
 	end
 
 	-- players left side
-	row:addElement(mw.html.create('div')
+	local playersLeft = mw.html.create('div')
 		:addClass(subMatch.winner == 1 and 'bg-win' or nil)
 		:css('align-items', 'center')
 		:css('border-radius', '0 12px 12px 0')
@@ -310,8 +205,8 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			showLink = true,
 			flip = true,
 		})
-	)
 
+	-- Center element
 	local scoreDisplay = table.concat(subMatch.scores, ' - ')
 	local scoreElement
 	if extradata['subgroup' .. subMatchIndex .. 'iskoth'] then
@@ -323,13 +218,8 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			)
 	end
 
-	row:addElement(mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:node(scoreElement or scoreDisplay)
-	)
-
 	-- players right side
-	row:addElement(mw.html.create('div')
+	local playersRight = mw.html.create('div')
 		:addClass(subMatch.winner == 2 and 'bg-win' or nil)
 		:css('align-items', 'center')
 		:css('border-radius', '12px 0 0 12px')
@@ -342,27 +232,16 @@ function CustomMatchSummary._createSubMatch(players, subMatchIndex, subMatch, ex
 			showLink = true,
 			flip = false,
 		})
-	)
 
-	return row
-end
-
----@param isWinner boolean?
----@return Html
-function CustomMatchSummary._createCheckMark(isWinner)
-	local container = mw.html.create('div')
-		:addClass('brkts-popup-body-element-vertical-centered')
-		:css('line-height', '17px')
-		:css('margin-left', '1%')
-		:css('margin-right', '1%')
-
-	if Logic.readBool(isWinner) then
-		container:node(GREEN_CHECK)
-	else
-		container:node(NO_CHECK)
-	end
-
-	return container
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			header,
+			playersLeft,
+			MatchSummaryWidgets.GameCenter{children = scoreElement or scoreDisplay},
+			playersRight
+		)
+	}
 end
 
 ---@param args table
@@ -373,36 +252,66 @@ function CustomMatchSummary._opponentCardsDisplay(args)
 	local date = args.date
 
 	local color = flip and CARD_COLOR_2 or CARD_COLOR_1
-	local wrapper = mw.html.create('div')
+
+	local sideWrapper = mw.html.create('div')
+		:css('display', 'flex')
+		:css('flex-direction', 'column')
 
 	for _, cardData in ipairs(cardDataSets) do
+		local wrapper = mw.html.create('div')
+			:css('flex-basis', '1px')
+			:css('display', 'inline-flex')
+			:css('flex-direction', (flip and 'row' or 'row-reverse'))
+			:css('align-items', 'center')
+		local wrapperCards = mw.html.create('div')
+			:css('display', 'flex')
+			:css('flex-direction', 'column')
+
 		local cardDisplays = {}
 		for _, card in ipairs(cardData) do
 			table.insert(cardDisplays, mw.html.create('div')
 				:addClass('brkts-popup-side-color-' .. color)
 				:addClass('brkts-champion-icon')
-				:css('float', flip and 'right' or 'left')
-				:node(CardIcon._getImage{card, date = date})
+				:node(CharacterIcon.Icon{
+					character = card,
+					date = date,
+					size = '48px'
+				})
 			)
 		end
 
 		local display
-
 		for cardIndex, card in ipairs(cardDisplays) do
 			-- break the card rows into fragments of 4 cards each
 			if cardIndex % 4 == 1 then
-				wrapper:node(display)
+				wrapperCards:node(display)
 				display = mw.html.create('div')
 					:addClass('brkts-popup-body-element-thumbs')
+					:addClass(flip and 'brkts-popup-body-element-thumbs-right' or nil)
 			end
 
 			display:node(card)
 		end
+		wrapperCards:node(display)
+		wrapper:node(wrapperCards)
 
-		wrapper:node(display)
+		if Logic.isNotEmpty(cardData.tower) then
+			local towerCardDisplay = mw.html.create('div')
+					:addClass('brkts-popup-body-element-thumbs')
+					:tag('div')
+						:addClass('brkts-popup-side-color-' .. color)
+						:addClass('brkts-champion-icon')
+						:node(CharacterIcon.Icon{
+							character = cardData.tower,
+							date = date
+						})
+			wrapper:node(towerCardDisplay)
+		end
+
+		sideWrapper:node(wrapper)
 	end
 
-	return wrapper
+	return sideWrapper
 end
 
 return CustomMatchSummary

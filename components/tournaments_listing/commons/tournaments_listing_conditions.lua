@@ -6,6 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
@@ -27,7 +30,7 @@ function TournamentsListingConditions.base(args)
 	local endDate = args.enddate or args.edate
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('startdate'), Comparator.neq, '1970-01-01')}
+		:add{ConditionNode(ColumnName('startdate'), Comparator.neq, DateExt.defaultDate)}
 
 	if args.year then
 		conditions:add{ConditionNode(ColumnName('enddate_year'), Comparator.eq, args.year)}
@@ -64,11 +67,15 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('game'), Comparator.eq, args.game)}
 	end
 
-	if args.series then
-		conditions:add{ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('series'), Comparator.eq, args.series),
-			ConditionNode(ColumnName('extradata_series2'), Comparator.eq, args.series)
-		}}
+	if args.series1 or args.series then
+		local seriesConditions = ConditionTree(BooleanOperator.any)
+		for _, series in Table.iter.pairsByPrefix(args, 'series', {requireIndex = false}) do
+			seriesConditions:add{
+				ConditionNode(ColumnName('series'), Comparator.eq, series),
+				ConditionNode(ColumnName('extradata_series2'), Comparator.eq, series)
+			}
+		end
+		conditions:add{seriesConditions}
 	end
 
 	if args.location then
@@ -88,30 +95,30 @@ function TournamentsListingConditions.base(args)
 		conditions:add{ConditionNode(ColumnName('shortname'), Comparator.neq, '')}
 	end
 
-	if args.organizer then
-		local organizerConditions = ConditionTree(BooleanOperator.any)
-		for _, organizer in ipairs(mw.text.split(args.organizer, ',', true)) do
-			organizer = mw.text.trim(organizer)
-			organizerConditions:add{
-				ConditionNode(ColumnName('organizers_organizer1'), Comparator.eq, organizer),
-				ConditionNode(ColumnName('organizers_organizer2'), Comparator.eq, organizer),
-				ConditionNode(ColumnName('organizers_organizer3'), Comparator.eq, organizer),
-			}
-		end
-		conditions:add{organizerConditions}
-	end
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.organizer,
+		lpdbKey = 'organizers_organizer',
+		maxNumber = 3,
+	})
 
-	if args.region then
-		local regionConditions = ConditionTree(BooleanOperator.any)
-		for _, region in ipairs(mw.text.split(args.region, ',', true)) do
-			region = mw.text.trim(region)
-			regionConditions:add{
-				ConditionNode(ColumnName('locations_region1'), Comparator.eq, region),
-				ConditionNode(ColumnName('locations_region2'), Comparator.eq, region),
-			}
-		end
-		conditions:add{regionConditions}
-	end
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.region,
+		lpdbKey = 'locations_region',
+		maxNumber = 2,
+	})
+
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.country,
+		lpdbKey = 'locations_country',
+		maxNumber = tonumber(args.numberOfCountries) or 2,
+		normalize = Flags.CountryCode,
+	})
+
+	TournamentsListingConditions._addConditionsFromCsv(conditions, {
+		input = args.city,
+		lpdbKey = 'locations_city',
+		maxNumber = tonumber(args.numberOfCities) or 2,
+	})
 
 	args.tier1 = args.tier1 or args.tier or '!'
 	local tierConditions = ConditionTree(BooleanOperator.any)
@@ -168,5 +175,30 @@ function TournamentsListingConditions.placeConditions(tournamentData, config)
 
 	return conditions:toString()
 end
+
+---@param conditions ConditionTree
+---@param props {input: string, lpdbKey: string, maxNumber: integer, normalize?: fun(val: string): string?}
+function TournamentsListingConditions._addConditionsFromCsv(conditions, props)
+	local values = Array.parseCommaSeparatedString(props.input)
+
+	if props.normalize then
+		values = Array.map(values, props.normalize)
+	end
+
+	if Logic.isEmpty(values) then
+		return
+	end
+
+	local csvConditions = ConditionTree(BooleanOperator.any)
+	Array.forEach(values, function(value)
+		Array.forEach(Array.range(1, props.maxNumber), function(index)
+			csvConditions:add{ConditionNode(ColumnName(props.lpdbKey .. index), Comparator.eq, value)}
+		end)
+	end)
+
+	conditions:add{csvConditions}
+end
+
+
 
 return TournamentsListingConditions

@@ -13,27 +13,39 @@ local Json = require('Module:Json')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Currency = Lua.import('Module:Currency')
 local LpdbInjector = Lua.import('Module:Lpdb/Injector')
-local WidgetInjector = Lua.import('Module:Infobox/Widget/Injector')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local WidgetFactory = require('Module:Infobox/Widget/Factory')
-local WidgetTable = require('Module:Widget/Table')
-local TableRow = require('Module:Widget/Table/Row')
-local TableCell = require('Module:Widget/Table/Cell')
+local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetTable = Widgets.TableOld
+local TableRow = Widgets.TableRow
+local TableCell = Widgets.TableCell
+local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
+local pageVars = PageVariableNamespace('PrizePool')
 
 --- @class BasePrizePool
 local BasePrizePool = Class.new(function(self, ...) self:init(...) end)
 
-local TODAY = os.date('%Y-%m-%d')
+---@class BasePrizePoolPrize
+---@field id string
+---@field type string
+---@field index integer
+---@field data table
+
+local TODAY = os.date('%Y-%m-%d') --[[@as string]]
 
 local LANG = mw.language.getContentLanguage()
 local DASH = '&#045;'
@@ -116,7 +128,7 @@ BasePrizePool.config = {
 	lpdbPrefix = {
 		default = '',
 		read = function(args)
-			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix') or Variables.varDefault('smw_prefix')
+			return args.lpdb_prefix or Variables.varDefault('lpdb_prefix')
 		end
 	},
 	abbreviateTbd = {
@@ -139,7 +151,7 @@ BasePrizePool.prizeTypes = {
 
 		headerDisplay = function (data)
 			local currencyText = Currency.display(BASE_CURRENCY)
-			return TableCell{content = {{currencyText}}}
+			return TableCell{children = {currencyText}}
 		end,
 
 		row = BASE_CURRENCY:lower() .. 'prize',
@@ -148,7 +160,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {
+				return TableCell{children = {
 					Currency.display(BASE_CURRENCY, data,
 						{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
@@ -178,7 +190,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{Currency.display(data.currency)}}}
+			return TableCell{children = {Currency.display(data.currency)}}
 		end,
 
 		row = 'localprize',
@@ -187,7 +199,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {
+				return TableCell{children = {
 					Currency.display(headerData.currency, data,
 					{formatValue = true, formatPrecision = headerData.roundPrecision, displayCurrencyCode = false})
 				}}
@@ -207,8 +219,35 @@ BasePrizePool.prizeTypes = {
 			return (tonumber(data) or 0) * rate
 		end,
 	},
-	[PRIZE_TYPE_QUALIFIES] = {
+	[PRIZE_TYPE_PERCENTAGE] = {
 		sortOrder = 30,
+
+		header = 'percentage',
+		headerParse = function (prizePool, input, context, index)
+			assert(index == 1, 'Percentage only supports index 1')
+			return {title = 'Percentage'}
+		end,
+		headerDisplay = function (data)
+			return TableCell{children = {data.title}}
+		end,
+
+		row = 'percentage',
+		rowParse = function (placement, input, context, index)
+			local value = BasePrizePool._parseInteger(input)
+			if value then
+				placement.hasPercentage = true
+			end
+
+			return value
+		end,
+		rowDisplay = function (headerData, data)
+			if String.isNotEmpty(data) then
+				return TableCell{children = {data .. '%'}}
+			end
+		end,
+	},
+	[PRIZE_TYPE_QUALIFIES] = {
+		sortOrder = 40,
 
 		header = 'qualifies',
 		headerParse = function (prizePool, input, context, index)
@@ -229,7 +268,7 @@ BasePrizePool.prizeTypes = {
 			}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {'Qualifies To'}}
+			return TableCell{children = {'Qualifies To'}}
 		end,
 
 		row = 'qualified',
@@ -257,13 +296,13 @@ BasePrizePool.prizeTypes = {
 				table.insert(content, '[[' .. headerData.link .. ']]')
 			end
 
-			return TableCell{content = {content}}
+			return TableCell{children = {Div{children = content}}}
 		end,
 
 		mergeDisplayColumns = true,
 	},
 	[PRIZE_TYPE_POINTS] = {
-		sortOrder = 40,
+		sortOrder = 50,
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
@@ -302,7 +341,7 @@ BasePrizePool.prizeTypes = {
 				table.insert(headerDisplay, text)
 			end
 
-			return TableCell{content = {headerDisplay}}
+			return TableCell{children = {table.concat(headerDisplay)}}
 		end,
 
 		row = 'points',
@@ -311,34 +350,7 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if data > 0 then
-				return TableCell{content = {{LANG:formatNum(data)}}}
-			end
-		end,
-	},
-	[PRIZE_TYPE_PERCENTAGE] = {
-		sortOrder = 50,
-
-		header = 'percentage',
-		headerParse = function (prizePool, input, context, index)
-			assert(index == 1, 'Percentage only supports index 1')
-			return {title = 'Percentage'}
-		end,
-		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
-		end,
-
-		row = 'percentage',
-		rowParse = function (placement, input, context, index)
-			local value = BasePrizePool._parseInteger(input)
-			if value then
-				placement.hasPercentage = true
-			end
-
-			return value
-		end,
-		rowDisplay = function (headerData, data)
-			if String.isNotEmpty(data) then
-				return TableCell{content = {{data .. '%'}}}
+				return TableCell{children = {LANG:formatNum(data)}}
 			end
 		end,
 	},
@@ -350,7 +362,7 @@ BasePrizePool.prizeTypes = {
 			return {title = input}
 		end,
 		headerDisplay = function (data)
-			return TableCell{content = {{data.title}}}
+			return TableCell{children = {data.title}}
 		end,
 
 		row = 'freetext',
@@ -359,13 +371,14 @@ BasePrizePool.prizeTypes = {
 		end,
 		rowDisplay = function (headerData, data)
 			if String.isNotEmpty(data) then
-				return TableCell{content = {{data}}}
+				return TableCell{children = {data}}
 			end
 		end,
 	}
 }
 
-
+---@param args table
+---@return self
 function BasePrizePool:init(args)
 	self.args = self:_parseArgs(args)
 
@@ -384,6 +397,8 @@ function BasePrizePool:init(args)
 	return self
 end
 
+---@param args table
+---@return table
 function BasePrizePool:_parseArgs(args)
 	local parsedArgs = Table.deepCopy(args)
 	local typeStruct = Json.parseIfString(args.type)
@@ -395,8 +410,8 @@ function BasePrizePool:_parseArgs(args)
 	return parsedArgs
 end
 
-
-function BasePrizePool:create(args)
+---@return self
+function BasePrizePool:create()
 	self.options = self:_readConfig(self.args)
 	self.prizes = self:_readPrizes(self.args)
 	self:readPlacements(self.args)
@@ -428,10 +443,13 @@ function BasePrizePool:create(args)
 	return self
 end
 
+---@param args table
 function BasePrizePool:readPlacements(args)
 	error('Function readPlacements needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@param args table
+---@return table
 function BasePrizePool:_readConfig(args)
 	for name, configData in pairs(self.config) do
 		local value = configData.default
@@ -444,11 +462,17 @@ function BasePrizePool:_readConfig(args)
 	return self.options
 end
 
+---@param option string
+---@param value string|number|boolean
+---@return self
 function BasePrizePool:setConfig(option, value)
 	self.options[option] = value
 	return self
 end
 
+---@param option string
+---@param value string|number|boolean
+---@return self
 function BasePrizePool:setConfigDefault(option, value)
 	if self.config[option] then
 		self.config[option].default = value
@@ -458,6 +482,10 @@ function BasePrizePool:setConfigDefault(option, value)
 	return self
 end
 
+---@param name string
+---@param default string|number|boolean
+---@param func function?
+---@return self
 function BasePrizePool:addCustomConfig(name, default, func)
 	self.config[name] = {
 		default = default,
@@ -467,6 +495,8 @@ function BasePrizePool:addCustomConfig(name, default, func)
 end
 
 --- Parse the input for available prize types overall.
+---@param args table
+---@return BasePrizePoolPrize[]
 function BasePrizePool:_readPrizes(args)
 	for name, prizeData in pairs(self.prizeTypes) do
 		local fieldName = prizeData.header
@@ -481,6 +511,10 @@ function BasePrizePool:_readPrizes(args)
 	return self.prizes
 end
 
+---@param prizeType string
+---@param index integer
+---@param data table
+---@return self
 function BasePrizePool:addPrize(prizeType, index, data)
 	assert(self.prizeTypes[prizeType], 'addPrize: Not a valid prize!')
 	assert(Logic.isNumeric(index), 'addPrize: Index is not numeric!')
@@ -489,18 +523,25 @@ function BasePrizePool:addPrize(prizeType, index, data)
 end
 
 --- Add a Custom Prize Type
+---@param prizeType string
+---@param data table
+---@return self
 function BasePrizePool:addCustomPrizeType(prizeType, data)
 	self.prizeTypes[prizeType] = data
 	return self
 end
 
 --- Compares the sort value of two prize entries
+---@param x BasePrizePoolPrize
+---@param y BasePrizePoolPrize
+---@return boolean
 function BasePrizePool._comparePrizes(x, y)
 	local sortX = BasePrizePool.prizeTypes[x.type].sortOrder
 	local sortY = BasePrizePool.prizeTypes[y.type].sortOrder
 	return sortX == sortY and x.index < y.index or sortX < sortY
 end
 
+---@return boolean?
 function BasePrizePool:_shouldDisplayPrizeSummary()
 	-- if prizeSummary is disabled do not show it
 	if not self.options.prizeSummary then
@@ -516,6 +557,8 @@ function BasePrizePool:_shouldDisplayPrizeSummary()
 	end
 end
 
+---@param isAward boolean?
+---@return Widget
 function BasePrizePool:build(isAward)
 	local prizePoolTable = self:_buildTable(isAward)
 
@@ -527,56 +570,38 @@ function BasePrizePool:build(isAward)
 		return prizePoolTable
 	end
 
-	local wrapper = mw.html.create('div'):addClass('prizepool-section-wrapper')
-
-	if self:_shouldDisplayPrizeSummary() then
-		wrapper:tag('span'):wikitext(self:_getPrizeSummaryText())
-	end
-
-	local tablesWrapper = mw.html.create('div'):addClass('prizepool-section-tables'):node(prizePoolTable)
-
-	if self.adjacentContent then
-		tablesWrapper:wikitext(self.adjacentContent)
-	end
-
-	wrapper:node(tablesWrapper)
-
-	if self.options.exchangeInfo then
-		wrapper:wikitext(self:_currencyExchangeInfo())
-	end
-
-	return wrapper
+	return Div{classes = {'prizepool-section-wrapper'}, children = WidgetUtil.collect(
+		self:_shouldDisplayPrizeSummary() and Span{children = {self:_getPrizeSummaryText()}} or nil,
+		Div{
+			classes = {'prizepool-section-tables'},
+			children = WidgetUtil.collect(prizePoolTable, self.adjacentContent)
+		},
+		self.options.exchangeInfo and self:_currencyExchangeInfo() or nil
+	)}
 end
 
+---@param isAward boolean?
+---@return Widget
 function BasePrizePool:_buildTable(isAward)
-	local tbl = WidgetTable{
-		classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
-		css = {width = 'max-content'},
-	}
-
 	local headerRow = self:_buildHeader(isAward)
 
-	tbl:addRow(headerRow)
-
-	tbl.columns = headerRow:getCellCount()
-
-	for _, row in ipairs(self:_buildRows()) do
-		tbl:addRow(row)
-	end
-
-	tbl:setContext{self._widgetInjector}
-	local tableNode = mw.html.create('div'):css('overflow-x', 'auto')
-	for _, node in ipairs(WidgetFactory.work(tbl, self._widgetInjector)) do
-		tableNode:node(node)
-	end
-
-	return tableNode
+	return Div{
+		css = {['overflow-x'] = 'auto'},
+		children = {WidgetTable{
+			classes = {'collapsed', 'general-collapsible', 'prizepooltable'},
+			css = {width = 'max-content'},
+			columns = headerRow:getCellCount(),
+			children = WidgetUtil.collect(headerRow, unpack(self:_buildRows()))
+		}},
+	}
 end
 
+---@param isAward boolean?
+---@return WidgetTableRow
 function BasePrizePool:_buildHeader(isAward)
-	local headerRow = TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}}
+	local children = {}
 
-	headerRow:addCell(TableCell{content = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
+	table.insert(children, TableCell{children = {isAward and 'Award' or 'Place'}, css = {['min-width'] = '80px'}})
 
 	local previousOfType = {}
 	for _, prize in ipairs(self.prizes) do
@@ -584,16 +609,17 @@ function BasePrizePool:_buildHeader(isAward)
 
 		if not prizeTypeData.mergeDisplayColumns or not previousOfType[prize.type] then
 			local cell = prizeTypeData.headerDisplay(prize.data)
-			headerRow:addCell(cell)
+			table.insert(children, cell)
 			previousOfType[prize.type] = cell
 		end
 	end
 
-	headerRow:addCell(TableCell{content = {'Participant'}, classes = {'prizepooltable-col-team'}})
+	table.insert(children, TableCell{children = {'Participant'}, classes = {'prizepooltable-col-team'}})
 
-	return headerRow
+	return TableRow{classes = {'prizepooltable-header'}, css = {['font-weight'] = 'bold'}, children = children}
 end
 
+---@return WidgetTableRow[]
 function BasePrizePool:_buildRows()
 	local rows = {}
 	local previousPlacement = nil
@@ -603,12 +629,8 @@ function BasePrizePool:_buildRows()
 
 		self:applyToggleExpand(previousPlacement, placement, rows)
 
-		local row = TableRow{}
-		row:addClass(placement:getBackground())
-
-		self:applyCutAfter(placement, row)
-
-		row:addCell(self:placeOrAwardCell(placement))
+		local cells = {}
+		table.insert(cells, self:placeOrAwardCell(placement))
 
 		for _, opponent in ipairs(placement.opponents) do
 			local previousOfPrizeType = {}
@@ -622,11 +644,11 @@ function BasePrizePool:_buildRows()
 				local lastCellOfType = previousOfPrizeType[prize.type]
 				if lastCellOfType and prizeTypeData.mergeDisplayColumns then
 
-					if Table.isNotEmpty(lastCellOfType.content) and Table.isNotEmpty(cell.content) then
-						lastCellOfType:addContent(tostring(mw.html.create('hr'):css('width', '100%')))
+					if Table.isNotEmpty(lastCellOfType.props.children) and Table.isNotEmpty(cell.props.children) then
+						table.insert(lastCellOfType.props.children, tostring(mw.html.create('hr'):css('width', '100%')))
 					end
 
-					Array.extendWith(lastCellOfType.content, cell.content)
+					Array.extendWith(lastCellOfType.props.children, cell.props.children)
 					lastCellOfType.css['flex-direction'] = 'column'
 
 					return nil
@@ -640,15 +662,15 @@ function BasePrizePool:_buildRows()
 				local lastInColumn = previousOpponent[columnIndex]
 
 				---@cast prizeCell -nil
-				if Table.isEmpty(prizeCell.content) then
+				if Table.isEmpty(prizeCell.props.children) then
 					prizeCell = BasePrizePool._emptyCell()
 				end
 
-				if lastInColumn and Table.deepEquals(lastInColumn.content, prizeCell.content) then
+				if lastInColumn and Table.deepEquals(lastInColumn.props.children, prizeCell.props.children) then
 					lastInColumn.rowSpan = (lastInColumn.rowSpan or 1) + 1
 				else
 					previousOpponent[columnIndex] = prizeCell
-					row:addCell(prizeCell)
+					table.insert(cells, prizeCell)
 				end
 			end)
 
@@ -659,8 +681,13 @@ function BasePrizePool:_buildRows()
 			})
 			local opponentCss = {['justify-content'] = 'start'}
 
-			row:addCell(TableCell{content = {opponentDisplay}, css = opponentCss})
+			table.insert(cells, TableCell{children = {opponentDisplay}, css = opponentCss})
 		end
+		local classes = {placement:getBackground()}
+		if self:applyCutAfter(placement) then
+			table.insert(classes, 'ppt-hide-on-collapse')
+		end
+		local row = TableRow{children = cells, classes = classes}
 
 		table.insert(rows, row)
 
@@ -670,18 +697,25 @@ function BasePrizePool:_buildRows()
 	return rows
 end
 
+---@param placement BasePlacement
 function BasePrizePool:placeOrAwardCell(placement)
 	error('Function placeOrAwardCell needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
-function BasePrizePool:applyCutAfter(placement, row)
+---@param placement BasePlacement
+---@return boolean
+function BasePrizePool:applyCutAfter(placement)
 	error('Function applyCutAfter needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@param placement BasePlacement?
+---@param nextPlacement BasePlacement
+---@param row WidgetTableRow
 function BasePrizePool:applyToggleExpand(placement, nextPlacement, row)
 	error('Function applyToggleExpand needs to be implemented by a child class of "Module:PrizePool/Base"')
 end
 
+---@return string
 function BasePrizePool:_getPrizeSummaryText()
 	local tba = Abbreviation.make('TBA', 'To Be Announced')
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
@@ -705,6 +739,7 @@ function BasePrizePool:_getPrizeSummaryText()
 	return table.concat(displayText)
 end
 
+---@return string?
 function BasePrizePool:_currencyExchangeInfo()
 	if self.usedAutoConvertedCurrency then
 		local currencyText = Currency.display(BASE_CURRENCY)
@@ -728,7 +763,7 @@ function BasePrizePool:_currencyExchangeInfo()
 		wrapper:wikitext('Converted ' .. currencyText .. ' prizes are ')
 		wrapper:wikitext('based on the ' .. exchangeProvider ..' on ' .. exchangeDateText .. ': ')
 		wrapper:wikitext(table.concat(Array.map(Array.filter(self.prizes, function (prize)
-			return BasePrizePool.prizeTypes[prize.type].convertToBaseCurrency
+			return BasePrizePool.prizeTypes[prize.type].convertToBaseCurrency ~= nil
 		end), BasePrizePool._CurrencyConvertionText), ', '))
 		wrapper:wikitext(')</i>')
 
@@ -736,6 +771,8 @@ function BasePrizePool:_currencyExchangeInfo()
 	end
 end
 
+---@param prize BasePrizePoolPrize
+---@return string
 function BasePrizePool._CurrencyConvertionText(prize)
 	local exchangeRate = BasePrizePool.prizeTypes[PRIZE_TYPE_LOCAL_CURRENCY].convertToBaseCurrency(
 		prize.data, 1, BasePrizePool._getTournamentDate()
@@ -748,6 +785,7 @@ end
 --- Returns true if this PrizePool has a Base Currency money reward.
 -- This is true if any placement has a Base Currency input,
 -- or if there is a money reward in another currency whilst currency conversion is active
+---@return boolean
 function BasePrizePool:_hasBaseCurrency()
 	return (Array.any(self.placements, function (placement)
 		return placement.hasBaseCurrency or placement.hasPercentage
@@ -757,12 +795,15 @@ function BasePrizePool:_hasBaseCurrency()
 end
 
 --- Creates an empty table cell
+---@return WidgetTableCell
 function BasePrizePool._emptyCell()
-	return TableCell{content = {DASH}}
+	return TableCell{children = {DASH}}
 end
 
 --- Remove all non-numeric characters from an input and changes it to a number.
 -- Most commonly used on money inputs, as they often contain , or .
+---@param input number|string
+---@return number?
 function BasePrizePool._parseInteger(input)
 	if type(input) == 'number' then
 		return input
@@ -783,6 +824,8 @@ function BasePrizePool:assertOpponentStructType(typeStruct)
 end
 
 --- Fetches the LPDB object of a tournament
+---@param pageName string
+---@return tournament
 function BasePrizePool._getTournamentInfo(pageName)
 	return mw.ext.LiquipediaDB.lpdb('tournament', {
 		conditions = '[[pagename::' .. pageName .. ']]',
@@ -791,10 +834,12 @@ function BasePrizePool._getTournamentInfo(pageName)
 end
 
 --- Returns the default date based on wiki-variables set in the Infobox League
+---@return string
 function BasePrizePool._getTournamentDate()
 	return Variables.varDefault('tournament_enddate', TODAY)
 end
 
+---@return self
 function BasePrizePool:storeData()
 	local prizePoolIndex = (tonumber(Variables.varDefault('prizepool_index')) or 0) + 1
 	Variables.varDefine('prizepool_index', prizePoolIndex)
@@ -814,46 +859,51 @@ function BasePrizePool:storeData()
 		icondark = Variables.varDefault('tournament_icondark'),
 		game = Variables.varDefault('tournament_game'),
 		prizepoolindex = prizePoolIndex,
-		lastvsdata = {},
-		opponentplayers = {},
-		players = {},
-		extradata = {},
 	}
 
 	local lpdbData = {}
 	for _, placement in ipairs(self.placements) do
 		local lpdbEntries = placement:_getLpdbData(prizePoolIndex, self.options.lpdbPrefix)
 
-		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry) return Table.merge(lpdbTournamentData, lpdbEntry) end)
+		lpdbEntries = Array.map(lpdbEntries, function(lpdbEntry)
+			return Table.merge(
+				lpdbTournamentData,
+				{
+					lastvsdata = {},
+					opponentplayers = {},
+					players = {},
+					extradata = {},
+				},
+				lpdbEntry
+			)
+		end)
 
 		Array.extendWith(lpdbData, lpdbEntries)
 	end
 
 	for _, lpdbEntry in ipairs(lpdbData) do
 		lpdbEntry = Json.stringifySubTables(lpdbEntry)
+		local objectName = Table.extract(lpdbEntry, 'objectName')
 
 		if self.options.storeLpdb then
-			mw.ext.LiquipediaDB.lpdb_placement(lpdbEntry.objectName, lpdbEntry)
+			mw.ext.LiquipediaDB.lpdb_placement(objectName, lpdbEntry)
 		end
 
-		Variables.varDefine(lpdbEntry.objectName .. '_placementdate', lpdbEntry.date)
+		Variables.varDefine(objectName .. '_placementdate', lpdbEntry.date)
+	end
+
+	if self.options.storeLpdb then
+		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(lpdbData))
 	end
 
 	return self
 end
 
---- Set the WidgetInjector.
--- @param widgetInjector WidgetInjector An instance of a class that implements the WidgetInjector interface
-function BasePrizePool:setWidgetInjector(widgetInjector)
-	assert(widgetInjector:is_a(WidgetInjector), 'setWidgetInjector: Not a Widget Injector')
-	self._widgetInjector = widgetInjector
-	return self
-end
-
 --- Set the LpdbInjector.
--- @param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
+---@param lpdbInjector LpdbInjector An instance of a class that implements the LpdbInjector interface
+---@return self
 function BasePrizePool:setLpdbInjector(lpdbInjector)
-	assert(lpdbInjector:is_a(LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
+	assert(Class.instanceOf(lpdbInjector, LpdbInjector), 'setLpdbInjector: Not an LPDB Injector')
 	self._lpdbInjector = lpdbInjector
 	return self
 end

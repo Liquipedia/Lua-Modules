@@ -7,14 +7,16 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+
+local VALID_PUBLISHERTIERS = {'sponsored'}
 
 local SUPERCELL_SPONSORED_ICON = '[[File:Supercell lightmode.png|x18px|link=Supercell'
 	.. '|Tournament sponsored by Supercell.|class=show-when-light-mode]][[File:Supercell darkmode.png'
@@ -47,20 +49,15 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['supercell-sponsored'])
-end
-
----@param args table
 ---@return string
 function CustomLeague:appendLiquipediatierDisplay(args)
-	return Logic.readBool(args['supercell-sponsored']) and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
+	return self.data.publishertier and ('&nbsp;' .. SUPERCELL_SPONSORED_ICON) or ''
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = Logic.readBool(args['supercell-sponsored']) and 'true' or nil
+	local publisherTier = (args.publishertier or ''):lower()
+	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
 end
 
 return CustomLeague

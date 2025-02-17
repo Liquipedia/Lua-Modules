@@ -7,25 +7,16 @@
 --
 
 local Array = require('Module:Array')
-local Json = require('Module:Json')
+local BrawlerNames = mw.loadData('Module:BrawlerNames')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
-local TypeUtil = require('Module:TypeUtil')
 local Variables = require('Module:Variables')
-local Streams = require('Module:Links/Stream')
-local BrawlerNames = mw.loadData('Module:BrawlerNames')
 
-local Opponent = Lua.import('Module:Opponent')
-local MatchGroupInput = Lua.import('Module:MatchGroup/Input')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
-local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
-local STATUS_TO_WALKOVER = { FF = 'ff', DQ = 'dq', L = 'l' }
-local _NOT_PLAYED = {'skip', 'np'}
-local MAX_NUM_OPPONENTS = 2
-local MAX_NUM_VODGAMES = 20
 local FIRST_PICK_CONVERSION = {
 	blue = 1,
 	['1'] = 1,
@@ -33,403 +24,132 @@ local FIRST_PICK_CONVERSION = {
 	['2'] = 2,
 }
 
+local DEFAULT_BESTOF_MATCH = 5
+local DEFAULT_BESTOF_MAP = 3
+
 -- containers for process helper functions
-local matchFunctions = {}
-local mapFunctions = {}
-local opponentFunctions = {}
+local MatchFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true,
+}
+
+MatchFunctions.DEFAULT_MODE = 'team'
+MatchFunctions.DATE_FALLBACKS = {
+	'tournament_enddate',
+}
 
 local CustomMatchGroupInput = {}
 
--- called from Module:MatchGroup
+---@param match table
+---@param options table?
+---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	Table.mergeInto(
-		match,
-		matchFunctions.readDate(match)
-	)
-	match = matchFunctions.getOpponents(match)
-	match = matchFunctions.getTournamentVars(match)
-	match = matchFunctions.getVodStuff(match)
-	match = matchFunctions.getExtraData(match)
-
-	return match
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
 end
 
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processMap(map)
-	map = mapFunctions.getExtraData(map)
-	map = mapFunctions.getScoresAndWinner(map)
-	map = mapFunctions.getTournamentVars(map)
-	map = mapFunctions.getParticipantsData(map)
-
-	return map
-end
-
-function CustomMatchGroupInput.processOpponent(record, date)
-	local opponent = Opponent.readOpponentArgs(record)
-		or Opponent.blank()
-
-	-- Convert byes to literals
-	if opponent.type == Opponent.team and opponent.template:lower() == 'bye' then
-		opponent = {type = Opponent.literal, name = 'BYE'}
-	end
-
-	Opponent.resolve(opponent, date)
-	MatchGroupInput.mergeRecordWithOpponent(record, opponent)
-end
-
--- called from Module:Match/Subobjects
-function CustomMatchGroupInput.processPlayer(player)
-	return player
-end
-
---
---
--- function to sort out winner/placements
-function CustomMatchGroupInput._placementSortFunction(table, key1, key2)
-	local op1 = table[key1]
-	local op2 = table[key2]
-	local op1norm = op1.status == 'S'
-	local op2norm = op2.status == 'S'
-	if op1norm then
-		if op2norm then
-			local op1setwins = CustomMatchGroupInput._getSetWins(op1)
-			local op2setwins = CustomMatchGroupInput._getSetWins(op2)
-			if op1setwins + op2setwins > 0 then
-				return op1setwins > op2setwins
-			else
-				return tonumber(op1.score) > tonumber(op2.score)
-			end
-		else return true end
-	else
-		if op2norm then return false
-		elseif op1.status == 'W' then return true
-		elseif op1.status == 'DQ' then return false
-		elseif op2.status == 'W' then return false
-		elseif op2.status == 'DQ' then return true
-		else return true end
-	end
-end
-
-function CustomMatchGroupInput._getSetWins(opp)
-	local extradata = opp.extradata or {}
-	local set1win = extradata.set1win and 1 or 0
-	local set2win = extradata.set2win and 1 or 0
-	local set3win = extradata.set3win and 1 or 0
-	local sum = set1win + set2win + set3win
-	return sum
+---@param match table
+---@param opponents table[]
+---@return table[]
+function MatchFunctions.extractMaps(match, opponents)
+	local games = MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+	Array.forEach(games, function(game, gameIndex)
+		game.vod = game.vod or String.nilIfEmpty(match['vodgame' .. gameIndex])
+	end)
+	return games
 end
 
 --
 -- match related functions
 --
 
-function matchFunctions.readDate(matchArgs)
-	return matchArgs.date
-		and MatchGroupInput.readDate(matchArgs.date)
-		or {date = MatchGroupInput.getInexactDate(), dateexact = false}
-end
-
-function matchFunctions.getTournamentVars(match)
-	match.mode = Logic.emptyOr(match.mode, Variables.varDefault('tournament_mode', 'team'))
-	match.publishertier = Logic.emptyOr(match.publishertier, Variables.varDefault('tournament_publishertier'))
-	return MatchGroupInput.getCommonTournamentVars(match)
-end
-
-function matchFunctions.getVodStuff(match)
-	match.stream = Streams.processStreams(match)
-	match.vod = Logic.emptyOr(match.vod, Variables.varDefault('vod'))
-
-	-- apply vodgames
-	for index = 1, MAX_NUM_VODGAMES do
-		local vodgame = match['vodgame' .. index]
-		if not Logic.isEmpty(vodgame) then
-			local map = match['map' .. index] or {}
-			map.vod = map.vod or vodgame
-			match['map' .. index] = map
-		end
+---@param maps table[]
+---@return fun(opponentIndex: integer): integer?
+function MatchFunctions.calculateMatchScore(maps)
+	return function(opponentIndex)
+		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-	return match
 end
 
-function matchFunctions.getExtraData(match)
-	match.extradata = {
-		mvp = MatchGroupInput.readMvp(match),
-	}
-	return match
-end
-
-function matchFunctions.getOpponents(args)
-	-- read opponents and ignore empty ones
-	local opponents = {}
-	local isScoreSet = false
-
-	local sumscores = {}
-	for _, map in Table.iter.pairsByPrefix(args, 'map') do
-		if map.winner then
-			sumscores[map.winner] = (sumscores[map.winner] or 0) + 1
-		end
-	end
-
-	local bestof = Logic.emptyOr(args.bestof, Variables.varDefault('bestof', 5))
-	bestof = tonumber(bestof) or 5
+---@param bestofInput string|integer?
+---@return integer?
+function MatchFunctions.getBestOf(bestofInput)
+	local bestof = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('bestof')))
 	Variables.varDefine('bestof', bestof)
-	local firstTo = bestof / 2
-
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		-- read opponent
-		local opponent = args['opponent' .. opponentIndex]
-		if not Logic.isEmpty(opponent) then
-			CustomMatchGroupInput.processOpponent(opponent, args.date)
-
-			-- Retrieve icon and legacy name for team
-			if opponent.type == Opponent.team then
-				opponent.icon, opponent.icondark = opponentFunctions.getTeamIcon(opponent.template)
-				if not opponent.icon then
-					opponent.icon, opponent.icondark = opponentFunctions.getLegacyTeamIcon(opponent.template)
-				end
-				opponent.name = opponent.name or opponentFunctions.getLegacyTeamName(opponent.template)
-			end
-
-			opponent.score = opponent.score or sumscores[opponentIndex]
-
-			-- apply status
-			if TypeUtil.isNumeric(opponent.score) then
-				opponent.status = 'S'
-				isScoreSet = true
-				if firstTo < tonumber(opponent.score) then
-					args.finished = true
-				end
-			elseif Table.includes(ALLOWED_STATUSES, opponent.score) then
-				opponent.status = opponent.score
-				opponent.score = -1
-				args.finished = true
-			end
-
-			--set Walkover from Opponent status
-			args.walkover = args.walkover or STATUS_TO_WALKOVER[opponent.status]
-
-			opponents[opponentIndex] = opponent
-
-			-- get players from vars for teams
-			if opponent.type == 'team' and not Logic.isEmpty(opponent.name) then
-				args = MatchGroupInput.readPlayersOfTeam(args, opponentIndex, opponent.name)
-			end
-		end
-	end
-
-	--set resulttype to 'default' if walkover is set
-	if args.walkover then
-		args.resulttype = 'default'
-	elseif isScoreSet then
-		-- if isScoreSet is true we have scores from at least one opponent
-		-- in case the other opponent(s) have no score set manually and
-		-- no sumscore set we have to set them to 0 now so they are
-		-- not displayed as blank
-		for _, opponent in pairs(opponents) do
-			if
-				String.isEmpty(opponent.status)
-				and Logic.isEmpty(opponent.score)
-			then
-				opponent.score = 0
-				opponent.status = 'S'
-			end
-		end
-	end
-
-	-- see if match should actually be finished if score is set
-	if isScoreSet and not Logic.readBool(args.finished) then
-		local currentUnixTime = os.time(os.date('!*t') --[[@as osdateparam]])
-		local lang = mw.getContentLanguage()
-		local matchUnixTime = tonumber(lang:formatDate('U', args.date))
-		local threshold = args.dateexact and 30800 or 86400
-		if matchUnixTime + threshold < currentUnixTime then
-			args.finished = true
-		end
-	end
-
-	if not args.winner then
-		matchFunctions._checkDraw(opponents, firstTo, args)
-	end
-
-	-- apply placements and winner if finshed
-	if Logic.readBool(args.finished) then
-		matchFunctions._setPlacementsAndWinner(opponents, args)
-	end
-
-	Array.forEach(opponents, function(opponent, opponentIndex)
-		args['opponent' .. opponentIndex] = opponent
-	end)
-
-	return args
+	return bestof or DEFAULT_BESTOF_MATCH
 end
 
----@param opponents table
 ---@param match table
-function matchFunctions._setPlacementsAndWinner(opponents, match)
-	local counter = 0
-	local lastScore
-	local lastPlacement
-
-	match.winner = tonumber(match.winner)
-
-	for opponentIndex, opponent in Table.iter.spairs(opponents, CustomMatchGroupInput._placementSortFunction) do
-		local score = tonumber(opponent.score)
-		counter = counter + 1
-		if not match.winner then
-			match.winner = opponentIndex
-		end
-		if lastScore == score then
-			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or lastPlacement
-		else
-			opponents[opponentIndex].placement = tonumber(opponents[opponentIndex].placement) or counter
-			lastPlacement = counter
-			lastScore = score or nil
-		end
-	end
-end
-
----@param opponents table
----@param firstTo number
----@param match table
-function matchFunctions._checkDraw(opponents, firstTo, match)
-	local finished = Logic.readBool(match.finished)
-	local score1 = opponents[1].score
-	local isDraw = Array.all(opponents, function(opponent)
-		return opponent.score == firstTo
-			or finished and opponent.score == score1
-	end)
-
-	if not isDraw then return end
-
-	match.winner = 0
-	match.finished = true
-	match.resulttype = 'draw'
+---@param games table[]
+---@param opponents table[]
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents)
+	return {
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}
 end
 
 --
 -- map related functions
 --
-function mapFunctions.getExtraData(map)
-	local bestof = Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof', 3))
-	bestof = tonumber(bestof) or 3
+
+---@param map table
+---@return integer
+function MapFunctions.getMapBestOf(map)
+	local bestof = tonumber(Logic.emptyOr(map.bestof, Variables.varDefault('map_bestof')))
 	Variables.varDefine('map_bestof', bestof)
-	map.extradata = {
-		bestof = bestof,
-		comment = map.comment,
-		header = map.header,
+	return bestof or DEFAULT_BESTOF_MAP
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+---@return table
+function MapFunctions.getExtraData(match, map, opponents)
+	local extradata = {
+		bestof = map.bestof,
 		maptype = map.maptype,
 		firstpick = FIRST_PICK_CONVERSION[string.lower(map.firstpick or '')]
 	}
 
 	local bans = {}
-
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
+	for opponentIndex = 1, #opponents do
 		bans['team' .. opponentIndex] = {}
 		for _, ban in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'b') do
-			ban = mapFunctions._cleanBrawlerName(ban)
+			ban = getCharacterName(ban)
 			table.insert(bans['team' .. opponentIndex], ban)
 		end
 	end
 
-	map.extradata.bans = Json.stringify(bans)
-	map.bestof = bestof
+	extradata.bans = bans
 
-	return map
+	return extradata
 end
 
-function mapFunctions.getScoresAndWinner(map)
-	map.score1 = tonumber(map.score1 or '')
-	map.score2 = tonumber(map.score2 or '')
-	map.scores = { map.score1, map.score2 }
-	if Table.includes(_NOT_PLAYED, string.lower(map.winner or '')) then
-		map.winner = 0
-		map.resulttype = 'np'
-	elseif Logic.isNumeric(map.winner) then
-		map.winner = tonumber(map.winner)
-	end
-	local firstTo = math.ceil( map.bestof / 2 )
-	if (map.score1 or 0) >= firstTo then
-		map.winner = 1
-		map.finished = true
-	elseif (map.score2 or 0) >= firstTo then
-		map.winner = 2
-		map.finished = true
-	end
-
-	return map
-end
-
-function mapFunctions.getTournamentVars(map)
-	map.mode = Logic.emptyOr(map.mode, Variables.varDefault('tournament_mode', 'team'))
-	return MatchGroupInput.getCommonTournamentVars(map)
-end
-
-function mapFunctions.getParticipantsData(map)
-	local participants = {}
-
-	local maximumPickIndex = 0
-	for opponentIndex = 1, MAX_NUM_OPPONENTS do
-		for _, player, playerIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'p') do
-			participants[opponentIndex .. '_' .. playerIndex] = {player = player}
+---@param map table
+---@param opponent table
+---@param opponentIndex integer
+---@return table[]
+function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, BrawlerNames)
+	local players = Array.mapIndexes(function(playerIndex)
+		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['t' .. opponentIndex .. 'c' .. playerIndex]
+	end)
+	return MatchGroupInputUtil.parseMapPlayers(
+		opponent.match2players,
+		players,
+		function(playerIndex)
+			local player = map['t' .. opponentIndex .. 'p' .. playerIndex]
+			return player and {name = player} or nil
+		end,
+		function(playerIndex, playerIdData)
+			local brawler = map['t' .. opponentIndex .. 'c' .. playerIndex]
+			return {
+				player = playerIdData.name,
+				brawler = getCharacterName(brawler),
+			}
 		end
-
-		for _, brawler, pickIndex in Table.iter.pairsByPrefix(map, 't' .. opponentIndex .. 'c') do
-			brawler = mapFunctions._cleanBrawlerName(brawler)
-			participants[opponentIndex .. '_' .. pickIndex] = participants[opponentIndex .. '_' .. pickIndex] or {}
-			participants[opponentIndex .. '_' .. pickIndex].brawler = brawler
-			if maximumPickIndex < pickIndex then
-				maximumPickIndex = pickIndex
-			end
-		end
-	end
-
-	map.extradata.maximumpickindex = maximumPickIndex
-	map.participants = participants
-	return map
-end
-
-function mapFunctions._cleanBrawlerName(brawlerRaw)
-	local brawler = BrawlerNames[string.lower(brawlerRaw)]
-	if not brawler then
-		error('Unsupported brawler input: ' .. brawlerRaw)
-	end
-
-	return brawler
-end
-
---
--- opponent related functions
---
-function opponentFunctions.getTeamIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
-	end
-end
-
---the following 2 functions are a fallback
---they are only useful if the team template doesn't exist
---in the team template extension
-function opponentFunctions.getLegacyTeamName(template)
-	local team = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	if not team then return end
-	team = team:gsub('%&', '')
-	team = String.split(team, 'link=')[2]
-	team = String.split(team, ']]')[1]
-	return team
-end
-
-function opponentFunctions.getLegacyTeamIcon(template)
-	local iconTemplate = Template.expandTemplate(mw.getCurrentFrame(), 'Team', { template })
-	if not iconTemplate then return end
-	iconTemplate = iconTemplate:gsub('%&', '')
-	local icon = String.split(iconTemplate, 'File:')[2]
-	local iconDark = String.split(iconTemplate, 'File:')[3] or icon
-	icon = String.split(icon, '|')[1]
-	iconDark = String.split(iconDark, '|')[1]
-	return icon, iconDark
+	)
 end
 
 return CustomMatchGroupInput

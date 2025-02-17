@@ -10,6 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
+local DateExt = require('Module:Date/Ext')
 local HiddenSort = require('Module:HiddenSort')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -52,7 +53,7 @@ local ABBREVIATIONS = {
 ---@field currentMatchHeader string[]?
 local MatchesTable = Class.new(function(self, args) self:init(args) end)
 
----@param args any
+---@param args table?
 ---@return MatchesTable
 function MatchesTable:init(args)
 	args = args or {}
@@ -110,7 +111,7 @@ function MatchesTable:buildConditions()
 	local config = self.config
 
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add{ConditionNode(ColumnName('date'), Comparator.gt, '1970-01-01')}
+		:add{ConditionNode(ColumnName('date'), Comparator.gt, DateExt.defaultDate)}
 
 	local pageConditions = ConditionTree(BooleanOperator.any)
 	for _, page in pairs(config.pages --[[@as string[] ]]) do
@@ -191,7 +192,7 @@ function MatchesTable:dateDisplay(match)
 			:wikitext('To be announced')
 	end
 
-	return dateCell:wikitext(mw.language.new('en'):formatDate('F j, Y', match.date))
+	return dateCell:wikitext(mw.getContentLanguage():formatDate('F j, Y', match.date))
 end
 
 ---@param match table
@@ -249,7 +250,7 @@ function MatchesTable:determineMatchHeader(match)
 	return headerArray[1]
 end
 
----@param matchHeader any
+---@param matchHeader string
 ---@return string
 function MatchesTable._applyCustomAbbreviations(matchHeader)
 	for long, short in pairs(ABBREVIATIONS) do
@@ -336,9 +337,9 @@ function MatchesTable.matchPageLinkDisplay(match)
 		:wikitext(']]')
 end
 
----@param opponent any
----@param isWinner any
----@return (string|number)?
+---@param opponent match2opponent
+---@param isWinner boolean
+---@return string|number?
 function MatchesTable.getOpponentScore(opponent, isWinner)
 	local score
 	if opponent.status == SCORE_STATUS then

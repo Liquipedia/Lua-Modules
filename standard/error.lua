@@ -6,15 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@class error
----@field childErrors? error[]
----@field header string?
----@field innerError any
----@field message string
----@field originalErrors? error[]
----@field stacks? string[]
----@field is_a? function
-
 local Class = require('Module:Class')
 
 --[[
@@ -47,9 +38,14 @@ preamble-like text here to give some context to the error.
 error.noStack: Disables the stack trace
 
 ]]
----@class Error
+---@class Error: BaseClass
 ---@operator call(string|table|nil|any):Error
----@field message string?
+---@field message string
+---@field childErrors? Error[]
+---@field header string?
+---@field innerError any
+---@field originalErrors? Error[]
+---@field stacks? string[]
 local Error = Class.new(function(self, any)
 	-- Normalize the various ways an error can be thrown
 	if type(any) == 'string' then
@@ -67,13 +63,10 @@ local Error = Class.new(function(self, any)
 	self.message = self.message or 'Unknown error'
 end)
 
----@param error error
+---@param error Error
 ---@return boolean
 function Error.isError(error)
-	return type(error) == 'table'
-		and type(error.is_a) == 'function'
-		and error:is_a(Error)
-		and type(error.message) == 'string'
+	return Class.instanceOf(error, Error) and type(error.message) == 'string'
 end
 
 function Error:__tostring()

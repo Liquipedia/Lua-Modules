@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'splitgate',
 	name = 'Splitgate',
+	defaultGame = 'splitgate',
 	games = {
 		splitgate = {
 			abbreviation = 'SG',
@@ -25,11 +26,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'splitgate',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Splitgate allmode.png (2019) Change date '
-		.. '(2021-06-01) Splitgate 2021 lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Splitgate allmode.png (2019) Change date '
-		.. '(2021-06-01) Splitgate 2021 darkmode.png', ---@deprecated
-	match2 = 2,
 }

@@ -26,12 +26,14 @@ local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia '
 local INVALID_PARENT = '${parent} is not a Liquipedia Tournament[[Category:Pages with invalid parent]]'
 local DEFAULT_TIER_TYPE = 'general'
 
+local Language = mw.getContentLanguage()
+
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 ---Entry point
 ---@param args table?
----@return string
+---@return Html
 function HiddenDataBox.run(args)
 	args = args or {}
 	local doQuery = not Logic.readBool(args.noQuery)
@@ -80,13 +82,22 @@ function HiddenDataBox.run(args)
 
 	HiddenDataBox.checkAndAssign('tournament_liquipediatier', args.liquipediatier, queryResult.liquipediatier)
 	HiddenDataBox.checkAndAssign('tournament_liquipediatiertype', args.liquipediatiertype, queryResult.liquipediatiertype)
-	HiddenDataBox.checkAndAssign('tournament_publishertier', args.publishertier, queryResult.publishertier)
+	HiddenDataBox.checkAndAssign(
+		'tournament_publishertier',
+		Logic.readBool(args.highlighted) and 'true' or args.publishertier,
+		queryResult.publishertier
+	)
 
 	HiddenDataBox.checkAndAssign('tournament_type', args.type, queryResult.type)
 	HiddenDataBox.checkAndAssign('tournament_status', args.status, queryResult.status)
 	HiddenDataBox.checkAndAssign('tournament_mode', args.mode, queryResult.mode)
 
-	HiddenDataBox.checkAndAssign('tournament_game', Game.toIdentifier{game = args.game}, queryResult.game)
+	HiddenDataBox.checkAndAssign(
+		'tournament_game',
+		Game.toIdentifier{game = args.game, useDefault = false},
+		queryResult.game
+	)
+
 	HiddenDataBox.checkAndAssign('tournament_parent', parent)
 	HiddenDataBox.checkAndAssign('tournament_parentname', args.parentname, queryResult.name)
 
@@ -172,6 +183,8 @@ end
 ---@param key string
 ---@param value string|number
 function HiddenDataBox._setWikiVariableForParticipantKey(participant, participantResolved, key, value)
+	Variables.varDefine(participant .. '_' .. key, value)
+	participant = Language:ucfirst(participant)
 	Variables.varDefine(participant .. '_' .. key, value)
 	if participant ~= participantResolved then
 		Variables.varDefine(participantResolved .. '_' .. key, value)

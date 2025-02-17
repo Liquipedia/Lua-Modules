@@ -9,14 +9,18 @@
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local WikiSpecific = Table.copy(Lua.import('Module:Brkts/WikiSpecific/Base'))
+local BaseWikiSpecific = Lua.import('Module:Brkts/WikiSpecific/Base')
 
-function WikiSpecific.getMatchGroupContainer(matchGroupType)
+---@class RocketleagueBrktsWikiSpecific: BrktsWikiSpecific
+local WikiSpecific = Table.copy(BaseWikiSpecific)
+
+---@param matchGroupType string
+---@param maxOpponentCount integer
+---@return function
+function WikiSpecific.getMatchGroupContainer(matchGroupType, maxOpponentCount)
 	return matchGroupType == 'matchlist'
 		and Lua.import('Module:MatchGroup/Display/Matchlist').MatchlistContainer
 		or Lua.import('Module:MatchGroup/Display/Bracket/Custom').BracketContainer
 end
-
-WikiSpecific.defaultIcon = 'Rllogo_std.png'
 
 return WikiSpecific

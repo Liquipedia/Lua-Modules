@@ -1,0 +1,331 @@
+/*******************************************************************************
+Template(s): Tournament Cards
+Author(s): spazer
+*******************************************************************************/
+.tournament-card {
+	width: 100%;
+}
+
+.tournament-card > div.tournament-card-premier {
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+}
+
+.tournament-card > div > div {
+	vertical-align: middle;
+}
+
+.tournament-card > div > div > .Medal,
+.tournament-card > div.divRow > div > .PlayerNumberSuffix,
+.tournament-card > div.divRow > div > .CountryText,
+.tournament-card > div.divRow > div > .MobileOnly {
+	display: none;
+}
+
+.tournament-card > div.divRow > div > .Tier {
+	display: inline;
+	width: 64px;
+	padding: 0 5px 0 0;
+	float: left;
+}
+
+.tournament-card > div.divRow > div > .Name {
+	display: inline;
+	padding: 0;
+	float: none;
+}
+
+.BlankCell {
+	width: 0;
+	padding: 0;
+	font-size: 0;
+}
+
+.tournament-card > div > div.LeftPlace {
+	text-align: right;
+}
+
+.tournament-card > div > div.RightPlace {
+	text-align: left;
+}
+
+.tournament-card > div > div.Score {
+	text-align: center;
+}
+
+.tournament-card > div > div.FirstPlaceBlank {
+	max-width: 155px;
+	width: 155px;
+	border: 0;
+}
+
+.tournament-card > div > div.QualifiedPlace {
+	margin-left: -155px;
+	margin-top: -0.5px;
+	display: block;
+}
+
+@media ( max-width: 601px ) {
+	.tournament-card {
+		width: 100% !important;
+	}
+
+	.tournament-card > .divRow > .divCell {
+		border: 0;
+	}
+
+	.tournament-card > div {
+		display: block;
+		position: relative;
+		text-align: center;
+		border-top: 2px solid #d3d3d3;
+		border-bottom: 2px solid #d3d3d3;
+		border-left: 2px solid #d3d3d3;
+		border-right: 2px solid #d3d3d3;
+		overflow: auto;
+	}
+
+	.tournament-card > div.tournament-card-premier {
+		background-color: transparent;
+	}
+
+	.tournament-card > div:not( :last-of-type ) {
+		margin-bottom: 15px;
+	}
+
+	.tournament-card > div > div.Header {
+		background-color: #f5f5f5;
+		font-weight: bold;
+	}
+
+	.tournament-card > div.tournament-card-premier > div.Header {
+		background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+		font-weight: bold;
+	}
+
+	.tournament-card > div > div.Header-Premier {
+		background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+		font-weight: bold;
+	}
+
+	.tournament-card > div > div.EventDetails {
+		display: inline-block;
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-35,
+	.tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Left-45,
+	.tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Left-55,
+	.tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Left-65,
+	.tournament-card > div > div.EventDetails-Right-35,
+	.tournament-card > div > div.EventDetails-Right-40,
+	.tournament-card > div > div.EventDetails-Right-45,
+	.tournament-card > div > div.EventDetails-Right-50,
+	.tournament-card > div > div.EventDetails-Right-55,
+	.tournament-card > div > div.EventDetails-Right-60,
+	.tournament-card > div > div.EventDetails-Right-65 {
+		display: inline-block;
+		font-size: 80%;
+		color: #757575;
+		font-style: italic;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-35,
+	.tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Left-45,
+	.tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Left-55,
+	.tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Left-65 {
+		float: left;
+		text-align: left;
+		padding: 0 0 2px 18px;
+	}
+
+	.tournament-card > div > div.EventDetails-Right-35,
+	.tournament-card > div > div.EventDetails-Right-40,
+	.tournament-card > div > div.EventDetails-Right-45,
+	.tournament-card > div > div.EventDetails-Right-50,
+	.tournament-card > div > div.EventDetails-Right-55,
+	.tournament-card > div > div.EventDetails-Right-60,
+	.tournament-card > div > div.EventDetails-Right-65 {
+		float: right;
+		text-align: right;
+		padding: 0 18px 2px 0;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-35,
+	.tournament-card > div > div.EventDetails-Right-35 {
+		width: 35%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-40,
+	.tournament-card > div > div.EventDetails-Right-40 {
+		width: 40%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-45,
+	.tournament-card > div > div.EventDetails-Right-45 {
+		width: 45%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-50,
+	.tournament-card > div > div.EventDetails-Right-50 {
+		width: 50%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-55,
+	.tournament-card > div > div.EventDetails-Right-55 {
+		width: 55%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-60,
+	.tournament-card > div > div.EventDetails-Right-60 {
+		width: 60%;
+	}
+
+	.tournament-card > div > div.EventDetails-Left-65,
+	.tournament-card > div > div.EventDetails-Right-65 {
+		width: 65%;
+	}
+
+	.tournament-card > div > div.Tier {
+		display: block;
+		float: none;
+		width: 100% !important;
+		font-size: 80%;
+		padding: 0;
+	}
+
+	.tournament-card > div > div.Tournament {
+		display: block;
+		float: none;
+		width: 100% !important;
+	}
+
+	.tournament-card > div > div > div.Tier {
+		width: auto !important;
+		font-size: 90%;
+	}
+	/* organizer */
+	.tournament-card > div > div.Organizer {
+		text-align: left;
+		padding: 0 36px 2px 36px;
+		width: 100%;
+		white-space: normal;
+	}
+	/* rank */
+	.tournament-card > div > div.Rank {
+		float: left;
+	}
+	/* date */
+	.tournament-card > div > div.Date {
+		float: left;
+		text-align: left;
+		padding: 0 0 2px 36px;
+		width: 55%;
+	}
+	/* prize */
+	.tournament-card > div > div.Prize {
+		float: right;
+		text-align: right;
+		padding: 0 36px 2px 0;
+		width: 45%;
+	}
+	/* additional prize */
+	.tournament-card > div > div.Prize2 {
+		float: right;
+		text-align: right;
+		padding: 0 36px 0 0;
+		width: 45%;
+	}
+	/* entrant numbers */
+	.tournament-card > div.divRow > div.PlayerNumber {
+		float: right;
+		text-align: right;
+		padding: 0 36px 2px 0;
+		width: 40%;
+	}
+	/* location */
+	.tournament-card > div.divRow > div.Location {
+		float: left;
+		text-align: left;
+		padding: 0 0 2px 36px;
+		width: 60%;
+	}
+
+	.NoIcon,
+	.tournament-card > div.divRow > div > .CountryFlag,
+	.tournament-card > div.divRow > div > .WideOnly {
+		display: none;
+	}
+
+	.tournament-card > div.divRow > div > .PlayerNumberSuffix,
+	.tournament-card > div.divRow > div > .CountryText,
+	.tournament-card > div > div > span.Medal,
+	.tournament-card > div > div > span.Player,
+	.tournament-card > div.divRow > div > .MobileOnly {
+		display: inline-block;
+		text-indent: 0;
+	}
+
+	.tournament-card > div.divRow > div > .NonMobileOnly {
+		display: none;
+	}
+	/* Player Placements */
+	.tournament-card > div > div.Placement {
+		float: none;
+		width: 100% !important;
+		height: 35px;
+		text-indent: 1em;
+		text-align: left;
+		padding: 7px 1px 1px 1px;
+	}
+
+	.tournament-card > div > div.LeftPlace,
+	.tournament-card > div > div.RightPlace {
+		display: inline-block;
+		width: 39%;
+	}
+
+	.tournament-card > div.divRow > div > span > .Heads {
+		display: none;
+	}
+
+	.tournament-card > div > div.Score {
+		display: inline-block;
+		width: 20%;
+		font-weight: bold;
+		font-size: 120%;
+	}
+
+	.tournament-card > div > div.FirstPlace {
+		display: inline-block;
+		border-bottom: 1px solid #d3d3d3 !important;
+	}
+
+	.tournament-card > div > div.SecondPlace {
+		display: inline-block;
+	}
+
+	.tournament-card > div.divHeaderRow,
+	.tournament-card > div > div.FirstPlaceBlank {
+		display: none;
+	}
+
+	.tournament-card > div > div.QualifiedPlace {
+		margin-left: unset;
+		display: inline-block;
+		height: auto;
+	}
+}

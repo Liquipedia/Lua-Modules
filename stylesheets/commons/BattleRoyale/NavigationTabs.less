@@ -11,7 +11,13 @@ Author(s): Elysienna
 	overflow-x: auto;
 
 	@media ( min-width: 1320px ) {
-		padding: 0.75rem;
+		padding: 0.75rem 0;
+	}
+
+	&.is--hidden {
+		visibility: hidden;
+		padding: 0;
+		height: 0;
 	}
 
 	ul&__list {
@@ -30,19 +36,32 @@ Author(s): Elysienna
 		font-size: 0.875rem;
 		transition: background-color 0.2s linear;
 		cursor: pointer;
+		border: 0.0625rem solid rgba( 0, 0, 0, 0.2 );
+
+		@media ( max-width: 767px ) {
+			font-size: 0.75rem;
+		}
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-16 );
+		}
 
 		&:not( :first-child ) {
 			margin-left: 0.5rem;
 		}
 
 		&.tab--active {
-			background-color: var( --clr-wiki-primary-container );
+			background-color: var( --clr-wiki-theme-primary, var( --clr-wiki-primary-container ) );
 			color: #ffffff;
 		}
 
 		@media ( hover: hover ) {
 			&:not( .tab--active ):hover {
 				background-color: #f5f5f5;
+
+				.theme--dark & {
+					background-color: var( --clr-secondary-9 );
+				}
 			}
 		}
 
@@ -52,6 +71,20 @@ Author(s): Elysienna
 
 		&:focus-visible {
 			outline: 0.125rem solid #212529;
+		}
+
+		&:not( .tab--active ) {
+			& .icon--green {
+				color: #1d7c1d;
+			}
+
+			& .icon--red {
+				color: #b81414;
+			}
+		}
+
+		&-icon {
+			margin-right: 0.5rem;
 		}
 	}
 }

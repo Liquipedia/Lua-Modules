@@ -8,24 +8,16 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DisplayUtil = require('Module:DisplayUtil')
 local Faction = require('Module:Faction')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent/Custom')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local CustomOpponentDisplay = Table.merge(OpponentDisplay, {propTypes = {}, types={}})
-
-CustomOpponentDisplay.propTypes.InlineOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.InlineOpponent, {
-	opponent = MatchGroupUtil.types.GameOpponent,
-	showRace = 'boolean?',
-})
 
 ---Display component for an opponent entry appearing in a bracket match.
 ---@class WarcraftBracketOpponentEntry
@@ -37,10 +29,10 @@ CustomOpponentDisplay.BracketOpponentEntry = Class.new(
 	---@param opponent WarcraftStandardOpponent
 	---@param options {forceShortName: boolean}
 	function(self, opponent, options)
-		local showRaceBackground = opponent.type == Opponent.solo or opponent.extradata.hasRaceOrFlag
+		local showFactionBackground = opponent.type == Opponent.solo or opponent.extradata.hasFactionOrFlag
 
 		self.content = mw.html.create('div'):addClass('brkts-opponent-entry-left')
-			:addClass(showRaceBackground and Faction.bgClass(opponent.players[1].race) or nil)
+			:addClass(showFactionBackground and Faction.bgClass(opponent.players[1].faction) or nil)
 
 		if opponent.type == Opponent.team then
 			self.content:node(OpponentDisplay.BlockTeamContainer({
@@ -67,12 +59,11 @@ CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOp
 
 ---@class WarcraftInlineOpponentProps: InlineOpponentProps
 ---@field opponent WarcraftStandardOpponent
----@field showRace boolean?
+---@field showFaction boolean?
 
 ---@param props WarcraftInlineOpponentProps
 ---@return Html|string|nil
 function CustomOpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.InlineOpponent)
 	local opponent = props.opponent
 
 	if Opponent.typeIsParty((opponent or {}).type) then
@@ -82,27 +73,20 @@ function CustomOpponentDisplay.InlineOpponent(props)
 	return OpponentDisplay.InlineOpponent(props)
 end
 
-CustomOpponentDisplay.propTypes.BlockOpponent = TypeUtil.extendStruct(OpponentDisplay.propTypes.BlockOpponent, {
-	opponent = MatchGroupUtil.types.GameOpponent,
-	showRace = 'boolean?',
-	playerClass = 'string?',
-})
-
 ---@class WarcraftBlockOpponentProps: BlockOpponentProps
 ---@field opponent WarcraftStandardOpponent
----@field showRace boolean?
+---@field showFaction boolean?
 
 ---@param props WarcraftBlockOpponentProps
 ---@return Html
 function CustomOpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, CustomOpponentDisplay.propTypes.BlockOpponent)
 	local opponent = props.opponent
 
 	opponent.extradata = opponent.extradata or {}
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
 
-	if opponent.type == Opponent.literal and opponent.extradata.hasRaceOrFlag then
+	if opponent.type == Opponent.literal and opponent.extradata.hasFactionOrFlag then
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
 	elseif Opponent.typeIsParty((opponent or {}).type) then
 		return CustomOpponentDisplay.BlockPlayers(Table.merge(props, {showLink = showLink}))
@@ -114,11 +98,11 @@ end
 ---@param props WarcraftInlineOpponentProps
 ---@return Html
 function CustomOpponentDisplay.InlinePlayers(props)
-	local showRace = props.showRace ~= false
+	local showFaction = props.showFaction ~= false
 	local opponent = props.opponent
 
 	local playerTexts = Array.map(opponent.players, function(player)
-		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player, showRace = showRace})))
+		return tostring(PlayerDisplay.InlinePlayer(Table.merge(props, {player = player, showFaction = showFaction})))
 	end)
 
 	if props.flip then
@@ -133,7 +117,7 @@ end
 ---@return Html
 function CustomOpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
-	local showRace = props.showRace ~= false
+	local showFaction = props.showFaction ~= false
 
 	--only apply note to first player, hence extract it here
 	local note = Table.extract(props, 'note')
@@ -142,13 +126,13 @@ function CustomOpponentDisplay.BlockPlayers(props)
 		return PlayerDisplay.BlockPlayer(Table.merge(props, {
 			team = player.team,
 			player = player,
-			showRace = showRace,
+			showFaction = showFaction,
 			note = playerIndex == 1 and note or nil,
 		})):addClass(props.playerClass)
 	end)
 
 	local playersNode = mw.html.create('div')
-		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+		:addClass('block-players-wrapper')
 
 	for _, playerNode in ipairs(playerNodes) do
 		playersNode:node(playerNode)

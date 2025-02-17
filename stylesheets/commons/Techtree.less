@@ -101,3 +101,78 @@ Author(s): FO-nTTaX, based on http://thecodeplayer.com/walkthrough/css3-family-t
 	vertical-align: middle;
 	white-space: nowrap;
 }
+
+/*******************************************************************************
+Template(s): Techtree on stormgate wiki
+Author(s): sentihs, hjpalpha
+*******************************************************************************/
+.sg-techtree,
+.sg-techtree :not( .sg-techtree-building ) {
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+.sg-techtree-building {
+	width: 200px;
+	text-align: center;
+	font-size: 0.875rem;
+}
+
+.sg-techtree .sg-techtree-building > tbody > tr > th,
+.sg-techtree .sg-techtree-building > tbody > tr > td {
+	padding: 4px;
+}
+
+.sg-techtree-left-branch {
+	width: 24px;
+}
+
+.sg-techtree .sg-techtree-left-branch > tbody > tr,
+.sg-techtree .sg-techtree-left-branch > tbody > tr > td {
+	height: 50%;
+}
+
+.sg-techtree-left-branch > tbody > tr > td {
+	width: 24px;
+	vertical-align: bottom;
+	text-align: center;
+}
+
+.sg-techtree-left-branch-one-child-border {
+	border-top: 1px dashed;
+}
+
+.sg-techtree-left-branch-first-child-border {
+	border-left: 1px dashed;
+	border-top: 1px dashed;
+}
+
+.sg-techtree-left-branch-last-child-border {
+	border-left: 1px dashed;
+	border-bottom: 1px dashed;
+}
+
+.sg-techtree-left-branch-middle-child-border-top {
+	border-left: 1px dashed;
+}
+
+.sg-techtree-left-branch-middle-child-border-bottom {
+	border-left: 1px dashed;
+	border-top: 1px dashed;
+}
+
+.sg-techtree-right-branch {
+	padding: 0;
+	margin: 0;
+}
+
+.sg-techtree .sg-techtree-right-branch > tbody > tr,
+.sg-techtree .sg-techtree-right-branch > tbody > tr > td {
+	height: 50%;
+	width: 24px;
+}
+
+.sg-techtree-right-branch-div-border {
+	border-top: 1px dashed;
+}

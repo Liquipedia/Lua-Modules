@@ -8,7 +8,7 @@ liquipedia.commonsmainpage = {
 		liquipedia.commonsmainpage.showRecentUploads();
 	},
 	redirectUpload: function() {
-		window.addEventListener( 'load', function() {
+		window.addEventListener( 'load', () => {
 			if ( ( mw.config.get( 'wgPageName' ) === 'Special:Upload' ) && ( mw.config.get( 'wgNamespaceNumber' ) === -1 ) && ( typeof mw.user.isAnon === 'function' ) && ( mw.user.isAnon() ) ) {
 				let url = document.querySelector( '#mw-content-text a' ).href;
 				if ( !url.startsWith( 'http' ) ) {
@@ -19,7 +19,7 @@ liquipedia.commonsmainpage = {
 		} );
 	},
 	showRecentUploads: function() {
-		mw.loader.using( 'mediawiki.api' ).then( function() {
+		mw.loader.using( 'mediawiki.api' ).then( () => {
 			const latestUploads = document.getElementById( 'latest-uploads' );
 			if ( latestUploads !== null ) {
 				const api = new mw.Api();
@@ -30,9 +30,9 @@ liquipedia.commonsmainpage = {
 					lelimit: 20,
 					continue: '',
 					format: 'json'
-				} ).done( function( logEntries ) {
+				} ).done( ( logEntries ) => {
 					const imageNames = [ ];
-					logEntries.query.logevents.forEach( function( title ) {
+					logEntries.query.logevents.forEach( ( title ) => {
 						imageNames.push( title.title );
 					} );
 					api.get( {
@@ -42,12 +42,12 @@ liquipedia.commonsmainpage = {
 						iiprop: 'url',
 						iiurlheight: 150,
 						format: 'json'
-					} ).done( function( imageData ) {
+					} ).done( ( imageData ) => {
 						// let imageUrls = [ ];
 						// imageUrls = imageUrls.reverse();
 						let output = '';
 						let counter = 0;
-						Object.keys( imageData.query.pages ).reverse().forEach( function( key ) {
+						Object.keys( imageData.query.pages ).reverse().forEach( ( key ) => {
 							const image = imageData.query.pages[ key ];
 							if ( typeof image.imageinfo !== 'undefined' ) {
 								if ( counter++ < 10 ) {

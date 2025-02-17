@@ -124,6 +124,10 @@ Author(s): FO-nTTaX
 	text-align: right;
 }
 
+.fo-nttax-infobox > div.infobox-image-wrapper {
+	position: relative;
+}
+
 .fo-nttax-infobox > div > div.infobox-image {
 	padding: 0;
 	width: 100%;
@@ -137,6 +141,15 @@ Author(s): FO-nTTaX
 .fo-nttax-infobox > div > div.infobox-fixed-size-image img {
 	width: auto;
 	height: auto;
+}
+
+.fo-nttax-infobox > div > div.infobox-image-text {
+	position: absolute;
+	bottom: 4px;
+	right: 8px;
+	padding: 0;
+	text-align: right;
+	font-weight: bold;
 }
 
 .fo-nttax-infobox > div > div.infobox-center {
@@ -222,26 +235,6 @@ Author(s): FO-nTTaX
 	line-height: 0.1px;
 }
 
-.fo-nttax-infobox-wrapper .infobox-color-always {
-	background-color: #ccffcc;
-}
-
-.fo-nttax-infobox-wrapper .infobox-color-very.often {
-	background-color: #eeffaa;
-}
-
-.fo-nttax-infobox-wrapper .infobox-color-often {
-	background-color: #ffff99;
-}
-
-.fo-nttax-infobox-wrapper .infobox-color-seldom {
-	background-color: #ffddaa;
-}
-
-.fo-nttax-infobox-wrapper .infobox-color-never {
-	background-color: #ffcccc;
-}
-
 .fo-nttax-infobox-wrapper.popout {
 	position: absolute;
 	top: 0;
@@ -251,10 +244,6 @@ Author(s): FO-nTTaX
 /** Game colors **/
 
 /* StarCraft II - Wings of Liberty */
-.fo-nttax-infobox-wrapper.infobox-wol .infobox-header {
-	background-color: #b6cfe5;
-}
-
 .theme--light .fo-nttax-infobox-wrapper.infobox-wol .infobox-header {
 	background-color: var( --clr-sapphire-90 );
 }
@@ -264,10 +253,6 @@ Author(s): FO-nTTaX
 }
 
 /* StarCraft II - Heart of the Swarm */
-.fo-nttax-infobox-wrapper.infobox-hots .infobox-header {
-	background-color: #deb0b0;
-}
-
 .theme--light .fo-nttax-infobox-wrapper.infobox-hots .infobox-header {
 	background-color: var( --clr-cinnabar-90 );
 }
@@ -277,10 +262,6 @@ Author(s): FO-nTTaX
 }
 
 /* Starcraft II - Legacy of the Void */
-.fo-nttax-infobox-wrapper.infobox-lotv .infobox-header {
-	background-color: #b0deb0;
-}
-
 .theme--light .fo-nttax-infobox-wrapper.infobox-lotv .infobox-header {
 	background-color: var( --clr-forestgreen-90 );
 }
@@ -290,10 +271,6 @@ Author(s): FO-nTTaX
 }
 
 /* Starcraft II - Custom mods */
-.fo-nttax-infobox-wrapper.infobox-mod .infobox-header {
-	background-color: #f2e8b8;
-}
-
 .theme--light .fo-nttax-infobox-wrapper.infobox-mod .infobox-header {
 	background-color: var( --clr-sun-80 );
 }
@@ -304,45 +281,27 @@ Author(s): FO-nTTaX
 
 /* Smash */
 .fo-nttax-infobox-wrapper.infobox-64 .infobox-header {
-	background-color: #d5e5b6;
+	background-color: var( --clr-atlantis-background-color, #d5e5b6 );
 }
 
 .fo-nttax-infobox-wrapper.infobox-melee .infobox-header {
-	background-color: #b6e5c6;
+	background-color: var( --clr-forestgreen-background-color, #b6e5c6 );
 }
 
 .fo-nttax-infobox-wrapper.infobox-brawl .infobox-header {
-	background-color: #b6d5e5;
+	background-color: var( --clr-elm-background-color, #b6d5e5 );
 }
 
 .fo-nttax-infobox-wrapper.infobox-pm .infobox-header {
-	background-color: #c6b6e5;
+	background-color: var( --clr-vividviolet-background-color, #c6b6e5 );
 }
 
 .fo-nttax-infobox-wrapper.infobox-wiiu .infobox-header {
-	background-color: #e5c6b6;
+	background-color: var( --clr-california-background-color, #e5c6b6 );
 }
 
 .fo-nttax-infobox-wrapper.infobox-ultimate .infobox-header {
-	background-color: #e5b6d5;
-}
-
-/* Counter-Strike */
-.fo-nttax-infobox-wrapper.infobox-csgo .infobox-header {
-	background-color: #cde5b6;
-}
-
-.fo-nttax-infobox-wrapper.infobox-css .infobox-header {
-	background-color: #deb0b0;
-}
-
-.fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header,
-.fo-nttax-infobox-wrapper.infobox-cs1 .infobox-header {
-	background-color: #f2e8b8;
-}
-
-.fo-nttax-infobox-wrapper.infobox-cscz .infobox-header {
-	background-color: #b6cfe5;
+	background-color: var( --clr-redviolet-background-color, #e5b6d5 );
 }
 
 /*******************************************************************************

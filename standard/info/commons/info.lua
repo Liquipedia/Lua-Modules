@@ -9,6 +9,7 @@
 return {
 	wikiName = 'commons',
 	name = 'Commons',
+	defaultGame = 'commons',
 	games = {
 		commons = {
 			abbreviation = 'Commons',
@@ -24,9 +25,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'commons',
-
-	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
-	match2 = 2,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			matchPage = false,
+			status = 2,
+		},
+	},
 }

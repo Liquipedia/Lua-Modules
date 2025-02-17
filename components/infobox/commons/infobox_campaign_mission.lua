@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -30,9 +30,8 @@ function Mission.run(frame)
 	return mission:createInfobox()
 end
 
----@return Html
+---@return string
 function Mission:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -45,23 +44,23 @@ function Mission:createInfobox()
 				},
 			}
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Mission Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Mission Information'},
 		Breakdown{
-			content = {'Mission Objective'},
+			children = {'Mission Objective'},
 			classes = {'infobox-header', 'wiki-backgroundcolor-light', 'infobox-header-3'}
 		},
-		Breakdown{content = { args.objective }},
+		Breakdown{children = { args.objective }},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Missions', 'Campaign')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories('Missions', 'Campaign')
+		self:categories(unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self:build(widgets)
 end
 
 return Mission

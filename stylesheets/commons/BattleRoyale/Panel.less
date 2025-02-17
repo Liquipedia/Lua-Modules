@@ -25,14 +25,44 @@ Author(s): Elysienna
 		color: #404040;
 		flex: 0 0 auto;
 		cursor: pointer;
+		border: 0.0625rem solid transparent;
+		border-bottom-color: rgba( 0, 0, 0, 0.2 );
+		transition: background-color 0.2s linear;
+
+		@media ( max-width: 767px ) {
+			font-size: 0.75rem;
+		}
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-9 );
+			border-bottom-color: var( --clr-secondary-16 );
+		}
 
 		&.is--active {
-			background-color: #ffffff;
+			background-color: var( --clr-background, #ffffff );
 			color: #282828;
+			border-color: rgba( 0, 0, 0, 0.2 );
+			border-bottom-color: transparent;
+
+			.theme--dark & {
+				color: var( --clr-secondary-70 );
+				border-color: var( --clr-secondary-16 );
+				border-bottom-color: transparent;
+			}
 		}
 
 		&:not( :first-child ) {
 			margin-left: 0.25rem;
+		}
+
+		@media ( hover: hover ) {
+			&:hover:not( .is--active ) {
+				background-color: rgba( 0, 0, 0, 0.08 );
+
+				.theme--dark & {
+					background-color: var( --clr-secondary-16 );
+				}
+			}
 		}
 	}
 
@@ -42,6 +72,10 @@ Author(s): Elysienna
 		&.icon--green {
 			color: #1d7c1d;
 		}
+
+		&.icon--red {
+			color: #b81414;
+		}
 	}
 
 	&__title {
@@ -50,21 +84,43 @@ Author(s): Elysienna
 		margin: 0;
 		padding: 0;
 		color: inherit;
+
+		html.theme--light &,
+		html.theme--dark & {
+			color: var( --clr-on-background );
+		}
 	}
 }
 
 .panel-content {
+	border: 0.0625rem solid rgba( 0, 0, 0, 0.2 );
+	border-top: 0;
+	box-shadow: 0 -0.0625rem 0 0 rgba( 0, 0, 0, 0.2 );
+
+	@media ( max-width: 767px ) {
+		font-size: 0.75rem;
+	}
+
+	.theme--dark & {
+		border-color: var( --clr-secondary-16 );
+		box-shadow: 0 -0.0625rem 0 0 var( --clr-secondary-16 );
+	}
+
 	&.is--hidden {
 		display: none;
 	}
 
-	&__collapsible.is--collapsed {
-		.panel-content__container {
-			max-height: 0;
-		}
+	&__collapsible {
+		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 
-		.panel-content__button-icon {
-			transform: rotate( -180deg );
+		&.is--collapsed {
+			.panel-content__container {
+				max-height: 0;
+			}
+
+			.panel-content__button-icon {
+				transform: rotate( 180deg );
+			}
 		}
 	}
 
@@ -82,15 +138,28 @@ Author(s): Elysienna
 		padding: 0;
 		display: flex;
 		align-items: center;
-		border-top: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		border-bottom: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
 		cursor: pointer;
 		transition: background-color 0.2s linear;
 
 		@media ( hover: hover ) {
-			&:hover {
-				background-color: rgba( 0, 0, 0, 0.08 );
+			.panel-content__collapsible.is--collapsed & {
+				&:hover {
+					background-color: rgba( 0, 0, 0, 0.08 );
+
+					.theme--dark & {
+						background-color: rgba( 255, 255, 255, 0.08 );
+					}
+				}
 			}
+		}
+
+		@media ( max-width: 767px ) {
+			font-size: 0.8125rem;
+		}
+
+		html.theme--light &,
+		html.theme--dark & {
+			color: var( --clr-on-background );
 		}
 
 		&-icon {
@@ -117,16 +186,25 @@ Author(s): Elysienna
 			}
 		}
 
+		&__container {
+			display: flex;
+			align-items: center;
+
+			@media ( max-width: 767px ) {
+				flex-basis: 100%;
+			}
+		}
+
 		&__icon {
 			margin: 0 0.5rem;
 			font-size: 0.75rem;
 			color: #3c585d;
 
-			&.icon--green {
+			& > i.icon--green {
 				color: #1d7c1d;
 			}
 
-			&.icon--red {
+			& > i.icon--red {
 				color: #b81414;
 			}
 		}
@@ -140,12 +218,8 @@ Author(s): Elysienna
 			padding: 0;
 			font-size: unset;
 			display: flex;
+			align-items: center;
 			text-align: initial;
-
-			@media ( max-width: 767px ) {
-				flex-basis: 100%;
-				margin-bottom: 0.5rem;
-			}
 
 			.vodlink {
 				margin-left: 0.25rem;
@@ -185,34 +259,40 @@ Author(s): Elysienna
 			width: 1.5rem;
 			font-size: 0.875rem;
 
-			&.icon--gold {
+			& > i.icon--gold {
 				color: #ccab00;
 			}
 
-			&.icon--silver {
+			& > i.icon--silver {
 				color: #557177;
 			}
 
-			&.icon--bronze {
+			& > i.icon--bronze {
 				color: #80704c;
 			}
 
-			&.icon--copper {
+			& > i.icon--copper {
 				color: #cc7800;
 			}
 		}
 
 		&__title {
 			font-weight: bold;
-			min-width: 5rem;
+			min-width: 7rem;
 			padding-left: 0.5rem;
+		}
+
+		&__container {
+			display: flex;
+
+			& > span {
+				min-width: 10rem;
+			}
 		}
 	}
 
 	&__bottom-navigation {
 		height: 3.125rem;
-		border: 0.0625rem solid rgba( 0, 0, 0, 0.08 );
-		border-top: 0;
 		display: flex;
 		align-items: center;
 
@@ -224,6 +304,10 @@ Author(s): Elysienna
 			cursor: pointer;
 			font-weight: bold;
 
+			.theme--dark & {
+				color: var( --clr-on-background );
+			}
+
 			&.navigate--left {
 				flex-direction: row-reverse;
 			}
@@ -234,11 +318,15 @@ Author(s): Elysienna
 		}
 
 		&__icon {
-			color: var( --clr-wiki-on-primary );
+			color: var( --clr-wiki-theme-primary, var( --clr-wiki-on-primary ) );
 			width: 1.5rem;
 			display: flex;
 			justify-content: center;
 			margin: 0 0.5rem;
+
+			.theme--dark & {
+				color: var( --clr-secondary-70 );
+			}
 		}
 	}
 }

@@ -9,14 +9,13 @@
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class OsuLeagueInfobox: InfoboxLeague
@@ -90,17 +89,6 @@ end
 ---@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_game', Game.name{game = args.game})
-end
-
----@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.publisherpremier
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.publisherpremier)
 end
 
 ---@param args table

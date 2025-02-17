@@ -12,7 +12,7 @@ local Namespace = require('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -31,9 +31,8 @@ function Tool.run(frame)
 	return tool:createInfobox()
 end
 
----@return Html
+---@return string
 function Tool:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -42,8 +41,8 @@ function Tool:createInfobox()
 			image = args.image,
 			imageDark = args.imagedark or args.imagedarkmode,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Tool Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Tool Information'},
 		Cell{name = 'Game', content = {
 				(args.game or args.defaultGame) .. (args.gameversion and (' ' .. args.gameversion) or '')
 		}},
@@ -51,14 +50,14 @@ function Tool:createInfobox()
 		Cell{name = 'Current Version', content = {args.version or UNKNOWN}},
 		Cell{name = 'Thread', content = {args.thread and ('[' .. args.thread .. ' Thread]') or nil}},
 		Cell{name = 'Download', content = {args.download}},
-		Center{content = {args.footnotes and ('<small>' .. args.footnotes .. '</small>') or nil}},
+		Center{children = {args.footnotes and ('<small>' .. args.footnotes .. '</small>') or nil}},
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Tools', unpack(self:getWikiCategories(args)))
+		self:categories('Tools', unpack(self:getWikiCategories(args)))
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self:build(widgets)
 end
 
 --- Allows for overriding this functionality

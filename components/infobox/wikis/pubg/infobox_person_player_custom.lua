@@ -14,10 +14,10 @@ local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -85,8 +85,8 @@ function CustomInjector:parse(id, widgets)
 			}},
 		}
 	elseif id == 'history' and args.nationalteams then
-		table.insert(widgets, 1, Title{name = 'National Teams'})
-		table.insert(widgets, 2, Center{content = {args.nationalteams}})
+		table.insert(widgets, 1, Title{children = 'National Teams'})
+		table.insert(widgets, 2, Center{children = {args.nationalteams}})
 	end
 	return widgets
 end

@@ -1,8 +1,10 @@
 /*******************************************************************************
 Template(s): Filter buttons
-Author(s): Elysienna
+Author(s): Elysienna, Nadox
 *******************************************************************************/
-.filter-category--hidden {
+.filter-category--hidden,
+.filter-category--hidden-group > :not( [ data-filter-hideable-group-fallback ] ),
+:not( .filter-category--hidden-group ) > [ data-filter-hideable-group-fallback ] {
 	clip: rect( 0 0 0 0 );
 	clip-path: inset( 50% );
 	height: 1px;
@@ -14,16 +16,44 @@ Author(s): Elysienna
 }
 
 .filter-buttons {
+	font-size: 10pt;
 	display: flex;
+	margin: 0.125rem;
+	justify-content: center;
+	align-items: center;
+	flex-flow: row wrap;
+
+	&.filter-buttons--left {
+		justify-content: left;
+	}
+
+	&.filter-buttons--right {
+		justify-content: right;
+	}
 }
 
 .filter-button {
-	padding: 0.25rem 0.75rem;
+	margin-top: 0.375rem;
+	padding: 0.125rem;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	text-align: center;
 	background-color: transparent;
 	border: 0.125rem solid var( --clr-primary-container, #c1cee8 );
 	color: var( --clr-primary, #3366cc );
 	border-radius: 0.25rem;
 	transition: border-color 0.2s ease-in-out, background-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.filter-button-all {
+	padding: 0.125rem;
+	max-width: none;
+	margin-right: 0.5rem;
+}
+
+.filter-button:not( :first-child ) {
+	flex-grow: 1;
+	max-width: 33%;
 }
 
 .filter-button:not( :last-child ) {
@@ -56,6 +86,62 @@ Author(s): Elysienna
 .filter-effect-bounce {
 	animation-name: bounceIn;
 	animation-duration: 0.8s;
+}
+
+.mainpage-v2 {
+	.filter-button {
+		display: flex;
+		align-items: center;
+		border-radius: 0.5rem;
+		padding: 0 0.75rem;
+		font-weight: bold;
+		flex-grow: initial;
+		position: relative;
+		border: 0;
+		min-height: 2rem;
+		color: #3366cc;
+		font-size: 0.875rem;
+
+		.theme--light & {
+			color: var( --clr-wiki-theme-primary );
+		}
+
+		.theme--dark & {
+			color: #ffffff;
+		}
+
+		&:not( .is--active )::after {
+			content: "";
+			opacity: 0.12;
+			position: absolute;
+			inset: 0;
+			z-index: -1;
+			border-radius: 0.5rem;
+			background-color: #c1cee8;
+
+			.theme--light & {
+				background-color: var( --clr-wiki-theme-primary );
+			}
+
+			.theme--dark & {
+				background-color: #ffffff;
+			}
+		}
+
+		&:hover {
+			color: #ffffff;
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+
+			&::after {
+				opacity: 0.24;
+			}
+		}
+
+		&.filter-button--active {
+			background-color: var( --clr-wiki-theme-primary, #1f3d7a );
+			color: #ffffff;
+		}
+	}
 }
 
 /* Keyframes filter effects */

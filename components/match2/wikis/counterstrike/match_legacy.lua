@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local TextSanitizer = require('Module:TextSanitizer')
 
-
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 local Opponent = Lua.import('Module:Opponent')
 
 local DRAW = 'draw'
@@ -21,17 +23,15 @@ local LOSER_STATUSES = {'FF', 'DQ', 'L'}
 
 local MatchLegacy = {}
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy.convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy.convertParameters(match2)
@@ -42,13 +42,14 @@ function MatchLegacy.convertParameters(match2)
 		end
 	end
 
-	if match.resulttype == DRAW then
+	if match.winner == 0 then
 		match.winner = 'draw'
 	end
 
 	match.resulttype = nil
 
-	if match.walkover == 'ff' or match.walkover == 'dq' then
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+	if walkover == 'FF' or walkover == 'DQ' then
 		match.walkover = match.winner
 	else
 		match.walkover = nil
@@ -88,10 +89,8 @@ function MatchLegacy.convertParameters(match2)
 	local opponent1Rounds, opponent2Rounds = 0, 0
 	local maps = {}
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		local scores = ''
-		if type(scores) == 'string' then
-			scores = Json.parse(game.scores)
-		end
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		opponent1Rounds = opponent1Rounds + (tonumber(scores[1] or '') or 0)
 		opponent2Rounds = opponent2Rounds + (tonumber(scores[2] or '') or 0)
 		match.extradata['vodgame' .. gameIndex] = game.vod
@@ -155,7 +154,7 @@ function MatchLegacy.convertParameters(match2)
 				opponentplayers['p' .. i] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or '')
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 			end
-			match[prefix .. 'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+			match[prefix .. 'players'] = opponentplayers
 		elseif opponent.type == Opponent.solo then
 			if String.isEmpty(opponent.name) then
 				match[prefix] = 'TBD'
@@ -171,9 +170,7 @@ function MatchLegacy.convertParameters(match2)
 	handleOpponent(1)
 	handleOpponent(2)
 
-	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
-
-	return match
+	return Json.stringifySubTables(match)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -182,6 +179,8 @@ function MatchLegacy.storeGames(match, match2)
 		local game = Table.deepCopy(game2)
 		-- Extradata
 		local extradata = Json.parseIfString(game2.extradata)
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.extradata = {}
 
 		local opponent1scores, opponent2scores = {}, {}
@@ -204,27 +203,26 @@ function MatchLegacy.storeGames(match, match2)
 
 		game.extradata.opponent1scores = table.concat(opponent1scores, ',')
 		game.extradata.opponent2scores = table.concat(opponent2scores, ',')
-		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
 		if type(scores) == 'string' then
 			scores = Json.parse(scores)
 		end
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 
-		if game2.walkover == 'ff' or game2.walkover == 'dq' then
+		local walkover = MatchLegacyUtil.calculateWalkoverType(opponents)
+		if walkover == 'FF' or walkover == 'DQ' then
 			game.walkover = 1
 		end
 
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
-			game
+			Json.stringifySubTables(game)
 		)
 		games = games .. res
 	end

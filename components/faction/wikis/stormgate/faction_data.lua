@@ -23,15 +23,27 @@ local factionProps = {
 		pageName = 'Infernal Host',
 		faction = 'i',
 	},
+	c = {
+		bgClass = 'stormgate-celestial',
+		index = 3,
+		name = 'Celestial',
+		pageName = 'Celestial Armada',
+		faction = 'c',
+	},
 	r = {
 		bgClass = 'Random',
-		index = 3,
+		index = 4,
 		name = 'Random',
 		pageName = 'Random',
 		faction = 'r',
 	},
+	n = {
+		index = 5,
+		name = 'Neutral',
+		faction = 'n',
+	},
 	u = {
-		index = 4,
+		index = 6,
 		name = 'Unknown',
 		faction = 'u',
 	},
@@ -44,14 +56,17 @@ return {
 	},
 	defaultFaction = 'u',
 	factions = {
-		[Info.defaultGame] = {'v', 'i', 'r', 'u'},
+		[Info.defaultGame] = {'v', 'i', 'c', 'r', 'u'},
 	},
-	knownFactions = {'v', 'i', 'r'},
-	coreFactions = {'v', 'i'},
+	knownFactions = {'v', 'i', 'c', 'r'},
+	coreFactions = {'v', 'i', 'c'},
 	aliases = {
 		[Info.defaultGame] = {
 			human = 'v',
+			van = 'v',
 			host = 'i',
+			inf = 'i',
+			cel = 'c',
 		},
 	}
 }

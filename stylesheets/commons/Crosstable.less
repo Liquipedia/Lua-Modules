@@ -8,8 +8,8 @@ Author(s): FO-nTTaX
 @crosstable-green: var( --table-green-background-color, #ddf4dd );
 @crosstable-red: var( --table-red-background-color, #fbdfdf );
 
-.crosstable[ class*="row-" ] td,
-.crosstable[ class*="col-" ] td {
+.crosstable[ class*="crosstable-row-" ] td,
+.crosstable[ class*="crosstable-col-" ] td {
 	opacity: 0.5;
 	-moz-box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
 	-webkit-box-shadow: inset 0 0 10px -7px rgba( 0, 0, 0, 1 ), inset 0 0 10px -7px rgba( 0, 0, 0, 1 );
@@ -24,26 +24,26 @@ Author(s): FO-nTTaX
 }
 .crosstable-col(@id, @max) when (@id <= @max) {
 	@idp1: @id + 1;
-	.crosstable.col-@{idp1} td:nth-child(@{id}) {
+	.crosstable.crosstable-col-@{idp1} td:nth-child(@{id}) {
 		&:extend( .crosstable-row-left );
 	}
-	.crosstable.col-@{id} td:nth-child(@{idp1}) {
+	.crosstable.crosstable-col-@{id} td:nth-child(@{idp1}) {
 		&:extend( .crosstable-row-right );
 	}
-	.crosstable.col-@{id} td:nth-child(@{id}) {
+	.crosstable.crosstable-col-@{id} td:nth-child(@{id}) {
 		&:extend( .crosstable-row-standard );
 	}
 	.crosstable-col(@id + 1, @max);
 }
 .crosstable-row(@id, @max) when (@id <= @max) {
 	@idp1: @id + 1;
-	.crosstable.row-@{idp1} tr:nth-child(@{id}) td {
+	.crosstable.crosstable-row-@{idp1} tr:nth-child(@{id}) td {
 		&:extend( .crosstable-row-over );
 	}
-	.crosstable.row-@{id} tr:nth-child(@{idp1}) td {
+	.crosstable.crosstable-row-@{id} tr:nth-child(@{idp1}) td {
 		&:extend( .crosstable-row-under );
 	}
-	.crosstable.row-@{id} tr:nth-child(@{id}) td {
+	.crosstable.crosstable-row-@{id} tr:nth-child(@{id}) td {
 		&:extend( .crosstable-row-standard );
 	}
 	.crosstable-row(@id + 1, @max);

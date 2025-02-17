@@ -7,14 +7,17 @@
 --
 
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Hotkey = require('Module:Hotkey')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -31,9 +34,8 @@ function Skill.run(frame)
 	return skill:createInfobox()
 end
 
----@return Html
+---@return string
 function Skill:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	if String.isEmpty(args.informationType) then
@@ -42,14 +44,19 @@ function Skill:createInfobox()
 
 	local widgets = {
 		Header{
-			name = args.name,
+			name = self:nameDisplay(args),
 			image = args.image,
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = args.informationType .. ' Information'},
-		Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', { makeLink = true })},
+		Center{children = {args.caption}},
+		Title{children = args.informationType .. ' Information'},
+		Customizable{
+			id = 'caster',
+			children = {
+				Cell{name = 'Caster(s)', content = self:getAllArgsForBase(args, 'caster', {makeLink = true})},
+			}
+		},
 		Customizable{
 			id = 'cost',
 			children = {
@@ -77,15 +84,22 @@ function Skill:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
 		local categories = self:getCategories(args)
-		infobox:categories(unpack(categories))
+		self:categories(unpack(categories))
+		self:_setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
+end
+
+---@param args table
+---@return string?
+function Skill:nameDisplay(args)
+	return args.name
 end
 
 --- Allows for overriding this functionality
@@ -93,6 +107,32 @@ end
 ---@return string[]
 function Skill:getCategories(args)
 	return {}
+end
+
+---@param args table
+function Skill:_setLpdbData(args)
+	local skillIndex = (tonumber(Variables.varDefault('skill_index')) or 0) + 1
+	Variables.varDefine('skill_index', skillIndex)
+
+	local lpdbData = {
+		objectName = 'skill_' .. skillIndex .. '_' .. self.name,
+		name = args.name,
+		type = args.informationType,
+		image = args.image,
+		imagedark = args.imagedark,
+		extradata = {},
+	}
+	lpdbData = self:addToLpdb(lpdbData, args)
+	local objectName = Table.extract(lpdbData, 'objectName')
+
+	mw.ext.LiquipediaDB.lpdb_datapoint(objectName, Json.stringifySubTables(lpdbData))
+end
+
+---@param lpdbData table
+---@param args table
+---@return table
+function Skill:addToLpdb(lpdbData, args)
+	return lpdbData
 end
 
 ---@param args table

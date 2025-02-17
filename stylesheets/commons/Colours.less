@@ -35,7 +35,19 @@ Besides these twelve there is Gray which will fit in with them very well. There 
 .gray-theme-light-alt-bg,
 ul.nav-tabs li.game-none,
 .overview.game-none {
-	background-color: #d3d3d3;
+	background-color: var( --clr-moon-80, #d3d3d3 );
+
+	.theme--dark & {
+		background: var( --clr-moon-30 );
+	}
+}
+
+.gray-bg-soft {
+	background-color: var( --clr-moon-90, #d3d3d3 );
+
+	.theme--dark & {
+		background: var( --clr-moon-20 );
+	}
 }
 
 .gray-bg-alt,
@@ -102,19 +114,19 @@ div.NavPic,
 
 /* BLACK */
 .black-text {
-	color: #272727;
+	color: var( --clr-on-surface, #272727 );
 }
 
 .black-non-text {
-	color: #2c2c2c;
+	color: var( --clr-on-surface, #2c2c2c );
 }
 
 .black-bg {
-	background-color: #272727;
+	background-color: var( --clr-on-surface, #272727 );
 }
 
 .black-border {
-	border-color: #272727;
+	border-color: var( --clr-on-surface, #272727 );
 }
 
 /* CINNABAR */
@@ -143,7 +155,7 @@ div.NavPic,
 .cinnabar-theme-dark-bg,
 .wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.red,
 .wiki-battlerite .bracket-popup-body-match .match-row .draft.red,
-.wiki-arenaofvalor .bracket-popup-body-match .match-row .draft.red,
+.wiki-honorofkings .bracket-popup-body-match .match-row .draft.red,
 .wiki-wildrift .bracket-popup-body-match .match-row .draft.red {
 	background-color: var( --clr-cinnabar-40, #b12a2a );
 }
@@ -301,7 +313,7 @@ div.NavFrame div.NavHead,
 .sapphire-theme-dark-bg,
 .wiki-leagueoflegends .bracket-popup-body-match .match-row .draft.blue,
 .wiki-battlerite .bracket-popup-body-match .match-row .draft.blue,
-.wiki-arenaofvalor .bracket-popup-body-match .match-row .draft.blue,
+.wiki-honorofkings .bracket-popup-body-match .match-row .draft.blue,
 .wiki-wildrift .bracket-popup-body-match .match-row .draft.blue {
 	background-color: var( --clr-sapphire-40, #31519c );
 }
@@ -523,6 +535,7 @@ ul.nav-tabs li.game-64,
 .bright-theme-light-alt-bg,
 .bg-s,
 .bg-stay,
+.fo-nttax-infobox-wrapper.infobox-cs1 .infobox-header,
 .fo-nttax-infobox-wrapper.infobox-cs16 .infobox-header {
 	background-color: var( --clr-sun-background-color, #f9f0c7 );
 }
@@ -574,7 +587,7 @@ ul.nav-tabs li.game-64,
 .background-color-first-place,
 .bg-first,
 .bg-p1 {
-	background-color: var( --clr-semantic-gold-80, #ffe982 );
+	background-color: var( --prize-pool-gold, #ffe982 );
 }
 
 /* TULIP TREE */
@@ -661,6 +674,15 @@ ul.nav-tabs li.game-wiiu,
 
 .california-theme-light-alt-text {
 	color: var( --clr-california-80, #f9dec7 );
+}
+
+/* Deadlock */
+.deadlock-amberhand-text {
+	color: #c09b54;
+}
+
+.deadlock-sapphireflame-text {
+	color: #5c7ae6;
 }
 
 /* OTHER */

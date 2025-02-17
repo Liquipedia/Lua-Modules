@@ -51,7 +51,7 @@ function MatchMapsLegacy._matchlist(args)
 			local header = string.match(args['match' .. inputIndex], '<tr.-> ?<td.->(.-)</td')
 			matches['M' .. matchIndex .. 'header'] = header
 		else
-			matches['M' .. matchIndex] = Match._toEncodedJson(match)
+			matches['M' .. matchIndex] = Match.makeEncodedJson(match)
 			matchIndex = matchIndex + 1
 		end
 
@@ -189,6 +189,7 @@ function MatchMapsLegacy._handleMaps(match)
 			winner = match['map' .. gameIndex .. 'win'],
 			race1 = match['map' .. gameIndex .. 'p1race'],
 			race2 = match['map' .. gameIndex .. 'p2race'],
+			vod = match['vodgame' .. gameIndex],
 		}
 
 		match['map' .. gameIndex .. 'win'] = nil

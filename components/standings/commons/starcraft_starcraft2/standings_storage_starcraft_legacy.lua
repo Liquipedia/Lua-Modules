@@ -33,7 +33,7 @@ function Wrapper.table(frame)
 	end
 
 	args.roundcount = 1
-	return StandingsStorage.fromTemplateHeader(args)
+	StandingsStorage.fromTemplateHeader(args)
 end
 
 ---@param frame Frame
@@ -131,13 +131,14 @@ function Wrapper._processPlayer(playerInput, opponentArgs, prefix)
 	opponentArgs[prefix .. 'link'] = link
 	opponentArgs[prefix .. 'flag'] = playerInput:match('<span class="flag">%[%[File:[^|]-%.png|36x24px|([^|]-)|')
 
-	-- get the race
+	-- get the faction
 	-- first remove the flag so that only 1 image is left
 	playerInput = playerInput:gsub('<span class="flag">.-</span>', '')
-	-- now read the race from the remaining file
-	opponentArgs[prefix .. 'race'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+	-- now read the faction from the remaining file
+	opponentArgs[prefix .. 'faction'] = playerInput:match('&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
 end
 
+---@param args table
 ---@return boolean
 function Wrapper._shouldStore(args)
 	return Logic.readBool(Logic.emptyOr(args.store, Namespace.isMain()))

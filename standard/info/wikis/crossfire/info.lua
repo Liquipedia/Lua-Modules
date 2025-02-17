@@ -9,12 +9,13 @@
 return {
 	startYear = 2007,
 	wikiName = 'crossfire',
-	name = 'Crossfire',
+	name = 'CrossFire',
+	defaultGame = 'cf',
 	games = {
 		cf = {
 			abbreviation = 'CF',
-			name = 'Crossfire',
-			link = 'Crossfire',
+			name = 'CrossFire',
+			link = 'CrossFire',
 			logo = {
 				darkMode = 'Crossfire default darkmode.png',
 				lightMode = 'Crossfire default lightmode.png',
@@ -26,8 +27,8 @@ return {
 		},
 		cfm = {
 			abbreviation = 'CFM',
-			name = 'Crossfire Mobile',
-			link = 'Crossfire Mobile',
+			name = 'CrossFire Mobile',
+			link = 'CrossFire Mobile',
 			logo = {
 				darkMode = 'Crossfire default darkmode.png',
 				lightMode = 'Crossfire default lightmode.png',
@@ -39,8 +40,8 @@ return {
 		},
 		cfhd = {
 			abbreviation = 'CFHD',
-			name = 'Crossfire HD',
-			link = 'Crossfire HD',
+			name = 'CrossFire HD',
+			link = 'CrossFire HD',
 			logo = {
 				darkMode = 'Crossfire default darkmode.png',
 				lightMode = 'Crossfire default lightmode.png',
@@ -51,9 +52,21 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cf',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+			matchWidthMobile = 110,
+			matchWidth = 190,
+			gameScoresIfBo1 = true,
+		},
+		transfers = {
+			showTeamName = true,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Crossfire default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Crossfire default darkmode.png', ---@deprecated
-	match2 = 1,
 }

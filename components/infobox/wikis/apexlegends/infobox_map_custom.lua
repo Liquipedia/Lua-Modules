@@ -12,15 +12,15 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector', {requireDevIfEnabled = true})
-local Map = Lua.import('Module:Infobox/Map', {requireDevIfEnabled = true})
-local TableCell = Lua.import('Module:Widget/Table/Cell', {requireDevIfEnabled = true})
-local TableRow = Lua.import('Module:Widget/Table/Row', {requireDevIfEnabled = true})
-local WidgetTable = Lua.import('Module:Widget/Table', {requireDevIfEnabled = true})
+local Injector = Lua.import('Module:Widget/Injector')
+local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
+local TableCell = Widgets.TableCell
+local TableRow = Widgets.TableRow
+local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
@@ -49,6 +49,11 @@ function CustomInjector:parse(id, widgets)
 
 		if String.isEmpty(args.ring) then return widgets end
 
+		local rows = {self.caller:_createRingTableHeader()}
+		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
+			table.insert(rows, self.caller:_createRingTableRow(ringData))
+		end)
+
 		local ringTable = WidgetTable{
 			classes = {'fo-nttax-infobox' ,'wiki-bordercolor-light'}, --row alternating bg
 			css = {
@@ -58,16 +63,11 @@ function CustomInjector:parse(id, widgets)
 				['padding-bottom'] = '0px',
 				['border-top-style'] = 'none',
 			},
+			children = rows,
 		}
 
-		ringTable:addRow(self.caller:_createRingTableHeader())
-
-		Array.forEach(self.caller:getAllArgsForBase(args, 'ring'), function(ringData)
-			ringTable:addRow(self.caller:_createRingTableRow(ringData))
-		end)
-
 		Array.appendWith(widgets,
-			Title{name = 'Ring Information'},
+			Title{children = 'Ring Information'},
 			ringTable
 		)
 	end
@@ -77,23 +77,23 @@ end
 
 ---@return WidgetTableRow
 function CustomMap:_createRingTableHeader()
-	local headerRow = TableRow{css = {['font-weight'] = 'bold'}} -- bg needed
-	return headerRow
-		:addCell(TableCell{content = {'Ring'}})
-		:addCell(TableCell{content = {'Wait (s)'}})
-		:addCell(TableCell{content = {'Close<br>Time (s)'}})
-		:addCell(TableCell{content = {'Damage<br>per tick'}})
-		:addCell(TableCell{content = {'End Diameter (m)'}})
+	return TableRow{css = {['font-weight'] = 'bold'}, children = {
+		TableCell{children = {'Ring'}},
+		TableCell{children = {'Wait (s)'}},
+		TableCell{children = {'Close Time (s)'}},
+		TableCell{children = {'Damage per tick'}},
+		TableCell{children = {'End Diameter (m)'}},
+	}} -- bg needed
 end
 
 ---@param ringData string
 ---@return WidgetTableRow
 function CustomMap:_createRingTableRow(ringData)
-	local row = TableRow{}
+	local cells = {}
 	for _, item in ipairs(mw.text.split(ringData, ',')) do
-		row:addCell(TableCell{content = {item}})
+		table.insert(cells, TableCell{children = {item}})
 	end
-	return row
+	return TableRow{children = cells}
 end
 
 ---@param args table

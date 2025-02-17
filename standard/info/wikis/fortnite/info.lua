@@ -10,23 +10,30 @@ return {
 	startYear = 2018,
 	wikiName = 'fortnite',
 	name = 'Fortnite',
+	defaultGame = 'fortnite',
 	games = {
 		fortnite = {
 			abbreviation = 'Fortnite',
 			name = 'Fortnite',
 			link = 'Fortnite',
 			logo = {
-				darkMode = 'Fortnite logo.png',
-				lightMode = 'Fortnite logo.png',
+				darkMode = 'Fortnite default allmode.png',
+				lightMode = 'Fortnite default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Fortnite logo.png',
-				lightMode = 'Fortnite logo.png',
+				darkMode = 'Fortnite default allmode.png',
+				lightMode = 'Fortnite default allmode.png',
 			},
 		},
 	},
-	defaultGame = 'fortnite',
-	defaultTeamLogo = 'Fortnite logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Fortnite logo.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 }

@@ -11,10 +11,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Building = Lua.import('Module:Infobox/Building')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -54,7 +54,7 @@ function CustomInjector:parse(id, widgets)
 		)
 
 		if Table.any(args, function(key) return MODE_AVAILABILITY[key] end) then
-			table.insert(widgets, Title{name = 'Mode Availability'})
+			table.insert(widgets, Title{children = 'Mode Availability'})
 			local modeAvailabilityOrder = function(tbl, a, b) return tbl[a].order < tbl[b].order end
 			for key, item in Table.iter.spairs(MODE_AVAILABILITY, modeAvailabilityOrder) do
 				table.insert(widgets, Cell{name = item.name, content = {args[key]}})

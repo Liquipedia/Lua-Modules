@@ -108,6 +108,7 @@ function MatchMapsLegacy._handleMaps()
 			winner = mapWinner,
 			race1 = storageArgs['map' .. gameIndex .. 'p1race'],
 			race2 = storageArgs['map' .. gameIndex .. 'p2race'],
+			vod = storageArgs['vodgame' .. gameIndex],
 		}
 
 		storageArgs['map' .. gameIndex .. 'win'] = nil
@@ -134,7 +135,7 @@ function MatchMapsLegacy.close()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist') --[[@as table]]
 
 	for matchIndex, match in ipairs(matches) do
-		matches['M' .. matchIndex] = Match._toEncodedJson(match)
+		matches['M' .. matchIndex] = Match.makeEncodedJson(match)
 		matches[matchIndex] = nil
 	end
 

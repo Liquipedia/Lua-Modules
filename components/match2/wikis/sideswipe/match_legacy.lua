@@ -8,23 +8,26 @@
 
 local p = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
+local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
+
 local MAX_NUM_PLAYERS = 10
 
-function p.storeMatch(match2, options)
-	if options.storeMatch1 then
-		local match = p._convertParameters(match2)
+function p.storeMatch(match2)
+	local match = p._convertParameters(match2)
 
-		match.games = p.storeGames(match, match2)
+	match.games = p.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function p.storeGames(match, match2)
@@ -36,10 +39,8 @@ function p.storeGames(match, match2)
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(scores)
-		end
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
@@ -90,8 +91,9 @@ function p._convertParameters(match2)
 	handleOpponent(1)
 	handleOpponent(2)
 
-	if match2.walkover then
-		match.resulttype = match2.walkover
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+	if walkover then
+		match.resulttype = walkover:lower()
 		match.walkover = nil
 	end
 

@@ -7,8 +7,9 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
-local HeroIcon = require('Module:HeroIcon')
+local HeroNames = mw.loadData('Module:HeroNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -19,10 +20,10 @@ local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -99,7 +100,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		local icons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero)
-			return HeroIcon._getImage{hero = hero, size = SIZE_HERO}
+			return CharacterIcon.Icon{character = HeroNames[hero:lower()], size = SIZE_HERO}
 		end)
 		return {
 			Cell{name = 'Signature Hero', content = {table.concat(icons, '&nbsp;')}}
@@ -129,16 +130,16 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'history' then
 		if not String.isEmpty(args.history_iwo) then
-			table.insert(widgets, Title{name = '[[Intel World Open|Intel World Open]] History'})
-			table.insert(widgets, Center{content = {args.history_iwo}})
+			table.insert(widgets, Title{children = '[[Intel World Open|Intel World Open]] History'})
+			table.insert(widgets, Center{children = {args.history_iwo}})
 		end
 		if not String.isEmpty(args.history_gfinity) then
-			table.insert(widgets, Title{name = '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'})
-			table.insert(widgets, Center{content = {args.history_gfinity}})
+			table.insert(widgets, Title{children = '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'})
+			table.insert(widgets, Center{children = {args.history_gfinity}})
 		end
 		if not String.isEmpty(args.history_odl) then
-			table.insert(widgets, Title{name = '[[Oceania Draft League|Oceania Draft League]] History'})
-			table.insert(widgets, Center{content = {args.history_odl}})
+			table.insert(widgets, Title{children = '[[Oceania Draft League|Oceania Draft League]] History'})
+			table.insert(widgets, Center{children = {args.history_odl}})
 		end
 	elseif id == 'role' then
 		return {
@@ -178,11 +179,12 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.status = lpdbData.status or 'Unknown'
 
+	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
+		lpdbData.extradata['hero' .. heroIndex] = HeroNames[hero:lower()]
+	end
+
 	lpdbData.extradata.role = (self.role or {}).variable
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
-	lpdbData.extradata.hero = args.hero
-	lpdbData.extradata.hero2 = args.hero2
-	lpdbData.extradata.hero3 = args.hero3
 	lpdbData.extradata['lc_id'] = self.basePageName:lower()
 	lpdbData.extradata.team2 = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		not String.isEmpty(args.team2link) and args.team2link or args.team2 or '')

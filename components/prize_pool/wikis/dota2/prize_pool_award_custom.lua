@@ -21,6 +21,8 @@ local CustomAwardPrizePool = {}
 local IS_AWARD = true
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomAwardPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.localcurrency = args.localcurrency or Variables.varDefault('tournament_currency')
@@ -37,6 +39,10 @@ function CustomAwardPrizePool.run(frame)
 	return awardsPrizePool:build(IS_AWARD)
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.series2 = Variables.varDefault('tournament_series2', '')
 

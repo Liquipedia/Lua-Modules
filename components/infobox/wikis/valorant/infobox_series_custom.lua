@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Series = Lua.import('Module:Infobox/Series')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Chronology = Widgets.Chronology
 local Title = Widgets.Title
@@ -56,9 +56,9 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if String.isNotEmpty(args.previous) or String.isNotEmpty(args.next) then
 			return {
-				Title{name = 'Chronology'},
+				Title{children = 'Chronology'},
 				Chronology{
-					content = {
+					links = {
 						previous = args.previous,
 						next = args.next,
 					}

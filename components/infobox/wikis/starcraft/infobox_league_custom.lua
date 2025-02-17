@@ -15,11 +15,11 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -152,10 +152,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
-				Title{name = 'Participants'},
+				Title{children = 'Participants'},
 				Cell{name = 'Number of Players', content = {self.caller.data.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{children = self.caller.data.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -166,8 +166,8 @@ function CustomInjector:parse(id, widgets)
 		local displayMaps = function(prefix, defaultTitle, maps)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
-				Title{name = args[prefix .. 'title'] or defaultTitle},
-				Center{content = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
+				Title{children = args[prefix .. 'title'] or defaultTitle},
+				Center{children = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
 			)
 		end
 

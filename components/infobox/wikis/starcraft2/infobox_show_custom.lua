@@ -11,10 +11,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Show = Lua.import('Module:Infobox/Show')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Starcraft2ShowInfobox: ShowInfobox
@@ -29,7 +29,7 @@ function CustomShow.run(frame)
 	show:setWidgetInjector(CustomInjector(show))
 
 	if Namespace.isMain() and show.args.edate == nil then
-		show.infobox:categories('Active Shows')
+		show:categories('Active Shows')
 	end
 
 	return show:createInfobox()

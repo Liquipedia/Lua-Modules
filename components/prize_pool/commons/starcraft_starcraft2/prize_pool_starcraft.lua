@@ -9,11 +9,9 @@
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Info = require('Module:Info')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 local Weight = require('Module:Weight')
@@ -27,20 +25,18 @@ local Opponent = OpponentLibrary.Opponent
 
 local CustomLpdbInjector = Class.new(LpdbInjector)
 
-local pageVars = PageVariableNamespace('PrizePool')
-
 local CustomPrizePool = {}
 
 local PRIZE_TYPE_POINTS = 'POINTS'
 local SC2 = 'starcraft2'
 
-local _lpdb_stash = {}
 local _series
 local _tier
 local _tournament_name
-local _series_number
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -64,9 +60,6 @@ function CustomPrizePool.run(frame)
 	args.resolveRedirect = true
 	args.groupScoreDelimiter = '-'
 
-	-- stash seriesNumber
-	_series_number = CustomPrizePool._seriesNumber()
-
 	local prizePool = PrizePool(args)
 
 	prizePool:setConfigDefault('storeLpdb', Namespace.isMain())
@@ -81,19 +74,18 @@ function CustomPrizePool.run(frame)
 	-- set an additional wiki-var for legacy reasons so that combination with award prize pools still work
 	Variables.varDefine('prize pool table id', prizePoolIndex)
 
-	if prizePool.options.storeLpdb then
-		-- stash the lpdb_placement data so teamCards can use them
-		pageVars:set('placementRecords.' .. prizePoolIndex, Json.stringify(_lpdb_stash))
-	end
-
 	return builtPrizePool
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	-- make these available for the stash further down
-	lpdbData.liquipediatier = _tier
-	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype')
-	lpdbData.type = Variables.varDefault('tournament_type')
+	lpdbData.liquipediatier = _tier or lpdbData.liquipediatier
+	lpdbData.liquipediatiertype = Variables.varDefault('tournament_liquipediatiertype') or lpdbData.liquipediatiertype
+	lpdbData.type = Variables.varDefault('tournament_type') or lpdbData.type
 
 	lpdbData.weight = Weight.calc(
 		lpdbData.individualprizemoney,
@@ -111,7 +103,7 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	end
 
 	lpdbData.extradata = Table.mergeInto(lpdbData.extradata, {
-		seriesnumber = _series_number,
+		seriesnumber = CustomPrizePool._seriesNumber(),
 
 		-- to be removed once poinst storage is standardized
 		points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1),
@@ -124,11 +116,12 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	local prizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
 	lpdbData.objectName = CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 
-	table.insert(_lpdb_stash, Table.deepCopy(lpdbData))
-
 	return lpdbData
 end
 
+---@param lpdbData placement
+---@param prizePoolIndex integer
+---@return string
 function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	if lpdbData.opponenttype == Opponent.team then
 		return lpdbData.objectName .. '_' .. prizePoolIndex
@@ -137,14 +130,7 @@ function CustomPrizePool._overwriteObjectName(lpdbData, prizePoolIndex)
 	return lpdbData.objectName
 end
 
-function CustomPrizePool._getMode(opponentType, opponent)
-	if (opponent or {}).isArchon then
-		return 'archon'
-	end
-
-	return Opponent.toLegacyMode(opponentType or '', opponentType or '')
-end
-
+---@return integer?
 function CustomPrizePool._defaultImportLimit()
 	if Info.wikiName ~= SC2 then
 		return
@@ -161,6 +147,7 @@ function CustomPrizePool._defaultImportLimit()
 		or nil
 end
 
+---@return string
 function CustomPrizePool._seriesNumber()
 	local seriesNumber = tonumber(Variables.varDefault('tournament_series_number'))
 	return seriesNumber and string.format('%05d', seriesNumber) or ''

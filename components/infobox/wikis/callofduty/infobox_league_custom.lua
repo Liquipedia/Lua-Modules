@@ -10,15 +10,14 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -54,8 +53,8 @@ function CustomInjector:parse(id, widgets)
 			local maps = Array.map(self.caller:getAllArgsForBase(args, 'map'), function(map)
 				return tostring(self.caller:_createNoWrappingSpan(PageLink.makeInternalLink(map)))
 			end)
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = {table.concat(maps, '&nbsp;• ')}})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	end
 	return widgets
@@ -74,7 +73,6 @@ end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args['atvi-sponsored']
 	self.data.mode = args.player_number and 'solo' or self.data.mode
 end
 
@@ -83,12 +81,6 @@ function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_ticker_name', args.tickername)
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args['atvi-sponsored'])
 end
 
 ---@param content Html|string|number|nil

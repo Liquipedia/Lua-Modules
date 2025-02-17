@@ -10,6 +10,7 @@ return {
 	startYear = 2020,
 	wikiName = 'squadrons',
 	name = 'Star Wars: Squadrons',
+	defaultGame = 'squadrons',
 	games = {
 		squadrons = {
 			abbreviation = 'Squadrons',
@@ -25,8 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'squadrons',
-	defaultTeamLogo = 'Star Wars Squadrons allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Star Wars Squadrons allmode.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 }

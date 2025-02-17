@@ -78,7 +78,7 @@ function LegacyMatchMaps._readSoloMatch(matchInput)
 	LegacyMatchMaps._readSoloOpponents(args)
 	LegacyMatchMaps._readMaps(args)
 
-	return Match._toEncodedJson(args)
+	return Match.makeEncodedJson(args)
 end
 
 ---@param args table
@@ -121,7 +121,7 @@ function LegacyMatchMaps._readMaps(args)
 	for mapIndex = 1, MAX_NUM_MAPS do
 		local prefix = 'map' .. mapIndex
 		local map = Table.filterByKey(args, function(key)
-			return key == prefix or string.find(key, '^' .. prefix .. '[^%d]')
+			return key == prefix or string.find(key, '^' .. prefix .. '[^%d]') ~= nil
 		end)
 		map = Table.map(map, function(key, value)
 			args[key] = nil
@@ -144,6 +144,7 @@ function LegacyMatchMaps._readMaps(args)
 		end)
 		map.vod = args['vodgame' .. mapIndex]
 		args['vodgame' .. mapIndex] = nil
+		args[prefix .. 'finished'] = true
 
 		if Table.isNotEmpty(map) then
 			args[prefix] = map
@@ -230,7 +231,7 @@ function LegacyMatchMaps.teamClose()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist')
 
 	Array.forEach(matches, function(match, matchIndex)
-		args['M' .. matchIndex] = Match._toEncodedJson(match)
+		args['M' .. matchIndex] = Match.makeEncodedJson(match)
 	end)
 
 	-- generate Display

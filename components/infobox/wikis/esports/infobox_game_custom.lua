@@ -13,9 +13,9 @@ local Lua = require('Module:Lua')
 
 local Game = Lua.import('Module:Infobox/Game')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class EsportsGameInfobox: GameInfobox
@@ -34,7 +34,7 @@ end
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:addCustomCells(id, widgets)
+function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		Array.append(widgets,

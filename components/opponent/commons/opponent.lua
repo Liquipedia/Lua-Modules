@@ -15,8 +15,7 @@ local Table = require('Module:Table')
 local TeamTemplate = require('Module:TeamTemplate')
 local TypeUtil = require('Module:TypeUtil')
 
-local PlayerExtCustom = Lua.requireIfExists('Module:Player/Ext/Custom')
-local PlayerExt = PlayerExtCustom or Lua.import('Module:Player/Ext')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
 local BYE = 'bye'
 
@@ -216,6 +215,13 @@ function Opponent.assertOpponent(opponent)
 	assert(Opponent.isOpponent(opponent), 'Invalid opponent')
 end
 
+---Validates that an arbitary value is a valid representation of an opponent
+---@param opponent any
+---@return boolean
+function Opponent.isOpponent(opponent)
+	error('Opponent.isOpponent: Not Implemented')
+end
+
 ---Coerces an arbitary table into an opponent
 ---@param opponent table
 function Opponent.coerce(opponent)
@@ -295,19 +301,26 @@ options.syncPlayer: Whether to fetch player information from variables or LPDB. 
 ]]
 ---@param opponent standardOpponent
 ---@param date string|number|nil
----@param options {syncPlayer: boolean?}?
+---@param options {syncPlayer: boolean?, overwritePageVars: boolean?}?
 ---@return standardOpponent
 function Opponent.resolve(opponent, date, options)
 	options = options or {}
 	if opponent.type == Opponent.team then
 		opponent.template = TeamTemplate.resolve(opponent.template, date) or opponent.template or 'tbd'
+		opponent.icon, opponent.icondark = TeamTemplate.getIcon(opponent.template)
 	elseif Opponent.typeIsParty(opponent.type) then
 		for _, player in ipairs(opponent.players) do
 			if options.syncPlayer then
 				local savePageVar = not Opponent.playerIsTbd(player)
-				PlayerExt.syncPlayer(player, {savePageVar = savePageVar})
-				player.team =
-					PlayerExt.syncTeam(player.pageName:gsub(' ', '_'), player.team, {date = date, savePageVar = savePageVar})
+				PlayerExt.syncPlayer(player, {
+					savePageVar = savePageVar,
+					overwritePageVars = options.overwritePageVars,
+				})
+				player.team = PlayerExt.syncTeam(
+					player.pageName:gsub(' ', '_'),
+					player.team,
+					{date = date, savePageVar = savePageVar}
+				)
 			else
 				PlayerExt.populatePageName(player)
 			end
@@ -334,6 +347,7 @@ function Opponent.toName(opponent)
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName
 		end)
+		table.sort(pageNames)
 		return table.concat(pageNames, ' / ')
 	else -- opponent.type == Opponent.literal
 		return opponent.name
@@ -351,7 +365,7 @@ Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
 ---@param args table
----@return standardOpponent?
+---@return standardOpponent
 function Opponent.readOpponentArgs(args)
 	local partySize = Opponent.partySize(args.type)
 
@@ -374,9 +388,6 @@ function Opponent.readOpponentArgs(args)
 	elseif partySize then
 		local players = Array.map(Array.range(1, partySize), function(playerIndex)
 			local playerTeam = args['p' .. playerIndex .. 'team']
-			if playerTeam then
-				playerTeam = playerTeam
-			end
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
@@ -390,6 +401,7 @@ function Opponent.readOpponentArgs(args)
 		return {type = Opponent.literal, name = args.name or args[1] or ''}
 
 	end
+	error("Unknown opponent type: " .. args.type)
 end
 
 --[[
@@ -400,7 +412,7 @@ Wikis sometimes provide variants of this function that include wiki specific
 transformations.
 ]]
 ---@param record table
----@return standardOpponent?
+---@return standardOpponent
 function Opponent.fromMatch2Record(record)
 	if record.type == Opponent.team then
 		return {type = Opponent.team, template = record.template}
@@ -420,9 +432,8 @@ function Opponent.fromMatch2Record(record)
 	elseif record.type == Opponent.literal then
 		return {type = Opponent.literal, name = record.name or ''}
 
-	else
-		return nil
 	end
+	error("Unknown opponent type: " .. record.type)
 end
 
 ---Reads an opponent struct and builds a standings/placement lpdb struct from it
@@ -458,17 +469,19 @@ end
 
 ---Reads a standings or placement lpdb structure and builds an opponent struct from it
 ---@param storageStruct table
----@return standardOpponent?
+---@return standardOpponent
 function Opponent.fromLpdbStruct(storageStruct)
 	local partySize = Opponent.partySize(storageStruct.opponenttype)
 	if partySize then
 		local players = storageStruct.opponentplayers
 		local function playerFromLpdbStruct(playerIndex)
+			local prefix = 'p' .. playerIndex
+
 			return {
-				displayName = players['p' .. playerIndex .. 'dn'],
-				flag = Flags.CountryName(players['p' .. playerIndex .. 'flag']),
-				pageName = players['p' .. playerIndex],
-				team = players['p' .. playerIndex .. 'team'],
+				displayName = players[prefix .. 'dn'],
+				flag = Flags.CountryName(players[prefix .. 'flag']),
+				pageName = players[prefix],
+				team = players[prefix .. 'template'] or players[prefix .. 'team'],
 			}
 		end
 		local opponent = {
@@ -488,6 +501,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 			type = Opponent.literal,
 		}
 	end
+	error("Unknown opponent type: " .. storageStruct.type)
 end
 
 return Opponent

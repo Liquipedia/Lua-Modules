@@ -10,18 +10,19 @@ return {
 	startYear = 1995,
 	wikiName = 'arenafps',
 	name = 'Arena FPS',
+	defaultGame = 'qc',
 	games = {
 		ag = {
 			abbreviation = 'ag',
 			name = 'Aim Gods',
 			link = 'Aim Gods',
 			logo = {
-				darkMode = 'Aim Gods logo.png',
-				lightMode = 'Aim Gods logo.png',
+				darkMode = 'Aim Gods default allmode.png',
+				lightMode = 'Aim Gods default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Aim Gods logo.png',
-				lightMode = 'Aim Gods logo.png',
+				darkMode = 'Aim Gods default allmode.png',
+				lightMode = 'Aim Gods default allmode.png',
 			},
 		},
 		aq2 = {
@@ -37,17 +38,30 @@ return {
 				lightMode = 'Action Quake 2.png',
 			},
 		},
+		avp2 = {
+			abbreviation = 'avp2',
+			name = 'Aliens Versus Predator 2',
+			link = 'Aliens Versus Predator 2',
+			logo = {
+				darkMode = 'AVP2 allmode.png',
+				lightMode = 'AVP2 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'AVP2 allmode.png',
+				lightMode = 'AVP2 allmode.png',
+			},
+		},
 		chex = {
 			abbreviation = 'chex',
 			name = 'Chex Quest',
 			link = 'Chex Quest',
 			logo = {
-				darkMode = 'Chex Quest.png',
-				lightMode = 'Chex Quest.png',
+				darkMode = 'Chex Quest default allmode.png',
+				lightMode = 'Chex Quest default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Chex Quest.png',
-				lightMode = 'Chex Quest.png',
+				darkMode = 'Chex Quest default allmode.png',
+				lightMode = 'Chex Quest default allmode.png',
 			},
 		},
 		cpma = {
@@ -55,12 +69,25 @@ return {
 			name = 'Quake III Arena: CPMA',
 			link = 'Quake III Arena: CPMA',
 			logo = {
-				darkMode = 'CPMA logo.png',
-				lightMode = 'CPMA logo.png',
+				darkMode = 'CPMA default allmode.png',
+				lightMode = 'CPMA default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'CPMA logo.png',
-				lightMode = 'CPMA logo.png',
+				darkMode = 'CPMA default allmode.png',
+				lightMode = 'CPMA default allmode.png',
+			},
+		},
+		doom = {
+			abbreviation = 'doom',
+			name = 'DOOM',
+			link = 'DOOM',
+			logo = {
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		d16 = {
@@ -68,12 +95,12 @@ return {
 			name = 'DOOM 2016',
 			link = 'DOOM 2016',
 			logo = {
-				darkMode = 'DOOM 2016 logo.png',
-				lightMode = 'DOOM 2016 logo.png',
+				darkMode = 'DOOM 2016 default darkmode.png',
+				lightMode = 'DOOM 2016 default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'DOOM 2016 logo.png',
-				lightMode = 'DOOM 2016 logo.png',
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		d2 = {
@@ -81,12 +108,12 @@ return {
 			name = 'DOOM II',
 			link = 'DOOM II',
 			logo = {
-				darkMode = 'DOOM II logo.png',
-				lightMode = 'DOOM II logo.png',
+				darkMode = 'DOOM II default allmode.png',
+				lightMode = 'DOOM II default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'DOOM II logo.png',
-				lightMode = 'DOOM II logo.png',
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		d3 = {
@@ -94,12 +121,12 @@ return {
 			name = 'DOOM 3',
 			link = 'DOOM 3',
 			logo = {
-				darkMode = 'DOOM 3 logo.png',
-				lightMode = 'DOOM 3 logo.png',
+				darkMode = 'DOOM 3 default allmode.png',
+				lightMode = 'DOOM 3 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'DOOM 3 logo.png',
-				lightMode = 'DOOM 3 logo.png',
+				darkMode = 'Doom default allmode.png',
+				lightMode = 'Doom default allmode.png',
 			},
 		},
 		dbt = {
@@ -120,25 +147,12 @@ return {
 			name = 'DOOMBRINGER',
 			link = 'DOOMBRINGER',
 			logo = {
-				darkMode = 'Doombringer logo.png',
-				lightMode = 'Doombringer logo.png',
+				darkMode = 'Doombringer default allmode.png',
+				lightMode = 'Doombringer default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Doombringer logo.png',
-				lightMode = 'Doombringer logo.png',
-			},
-		},
-		doom = {
-			abbreviation = 'doom',
-			name = 'DOOM',
-			link = 'DOOM',
-			logo = {
-				darkMode = 'Doom Logo.png',
-				lightMode = 'Doom Logo.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Doom Logo.png',
-				lightMode = 'Doom Logo.png',
+				darkMode = 'Doombringer default allmode.png',
+				lightMode = 'Doombringer default allmode.png',
 			},
 		},
 		ma = {
@@ -146,12 +160,12 @@ return {
 			name = 'Master Arena',
 			link = 'Master Arena',
 			logo = {
-				darkMode = 'Master Arena logo.png',
-				lightMode = 'Master Arena logo.png',
+				darkMode = 'Master Arena default allmode.png',
+				lightMode = 'Master Arena default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Master Arena logo.png',
-				lightMode = 'Master Arena logo.png',
+				darkMode = 'Master Arena default allmode.png',
+				lightMode = 'Master Arena default allmode.png',
 			},
 		},
 		pk = {
@@ -159,12 +173,12 @@ return {
 			name = 'Painkiller',
 			link = 'Painkiller',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Painkiller darkmode.png',
+				lightMode = 'Painkiller lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Painkiller darkmode.png',
+				lightMode = 'Painkiller lightmode.png',
 			},
 		},
 		q1 = {
@@ -172,12 +186,12 @@ return {
 			name = 'Quake',
 			link = 'Quake',
 			logo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q2 = {
@@ -189,8 +203,8 @@ return {
 				lightMode = 'Quake 2 logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake 2 logo.png',
-				lightMode = 'Quake 2 logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q3 = {
@@ -202,8 +216,8 @@ return {
 				lightMode = 'Quake 3 logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake 3 logo.png',
-				lightMode = 'Quake 3 logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		q4 = {
@@ -215,8 +229,8 @@ return {
 				lightMode = 'Quake 4 logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake 4 logo.png',
-				lightMode = 'Quake 4 logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		qc = {
@@ -224,12 +238,12 @@ return {
 			name = 'Quake Champions',
 			link = 'Quake Champions',
 			logo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		qcde = {
@@ -237,12 +251,12 @@ return {
 			name = 'Quake Champions: DOOM Edition',
 			link = 'Quake Champions: DOOM Edition',
 			logo = {
-				darkMode = 'QCDoom.png',
-				lightMode = 'QCDoom.png',
+				darkMode = 'Quake Champions Doom Edition default allmode.png',
+				lightMode = 'Quake Champions Doom Edition default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'QCDoom.png',
-				lightMode = 'QCDoom.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		ql = {
@@ -250,12 +264,12 @@ return {
 			name = 'Quake Live',
 			link = 'Quake Live',
 			logo = {
-				darkMode = 'Quake Live logo.png',
-				lightMode = 'Quake Live logo.png',
+				darkMode = 'Quake Live default allmode.png',
+				lightMode = 'Quake Live default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake Live logo.png',
-				lightMode = 'Quake Live logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		qw = {
@@ -267,8 +281,8 @@ return {
 				lightMode = 'QuakeWorld logo.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'QuakeWorld logo.png',
-				lightMode = 'QuakeWorld logo.png',
+				darkMode = 'Quake default darkmode.png',
+				lightMode = 'Quake default lightmode.png',
 			},
 		},
 		ra = {
@@ -276,12 +290,12 @@ return {
 			name = 'Rocket Arena',
 			link = 'Rocket Arena',
 			logo = {
-				darkMode = 'Rocket Arena logo.png',
-				lightMode = 'Rocket Arena logo.png',
+				darkMode = 'Rocket Arena default allmode.png',
+				lightMode = 'Rocket Arena default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Rocket Arena logo.png',
-				lightMode = 'Rocket Arena logo.png',
+				darkMode = 'Rocket Arena default allmode.png',
+				lightMode = 'Rocket Arena default allmode.png',
 			},
 		},
 		re = {
@@ -289,12 +303,12 @@ return {
 			name = 'Reflex',
 			link = 'Reflex',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Reflex Arena default full darkmode.png',
+				lightMode = 'Reflex Arena default full lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Reflex Arena default allmode.png',
+				lightMode = 'Reflex Arena default allmode.png',
 			},
 		},
 		sm = {
@@ -341,12 +355,12 @@ return {
 			name = 'Unreal Tournament 3',
 			link = 'Unreal Tournament 3',
 			logo = {
-				darkMode = 'Unreal Tournament 3 logo.png',
-				lightMode = 'Unreal Tournament 3 logo.png',
+				darkMode = 'Unreal Tournament 3 default allmode.png',
+				lightMode = 'Unreal Tournament 3 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Unreal Tournament 3 logo.png',
-				lightMode = 'Unreal Tournament 3 logo.png',
+				darkMode = 'Unreal Tournament 3 default allmode.png',
+				lightMode = 'Unreal Tournament 3 default allmode.png',
 			},
 		},
 		ut4 = {
@@ -354,12 +368,12 @@ return {
 			name = 'Unreal Tournament 4',
 			link = 'Unreal Tournament 4',
 			logo = {
-				darkMode = 'Logo filler event.png',
-				lightMode = 'Logo filler event.png',
+				darkMode = 'Unreal Tournament 4 darkmode.png',
+				lightMode = 'Unreal Tournament 4 lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Quake logo.png',
-				lightMode = 'Quake logo.png',
+				darkMode = 'Unreal Tournament 4 darkmode.png',
+				lightMode = 'Unreal Tournament 4 lightmode.png',
 			},
 		},
 		ut99 = {
@@ -380,12 +394,12 @@ return {
 			name = 'Warsow',
 			link = 'Warsow',
 			logo = {
-				darkMode = 'Warsow logo.png',
-				lightMode = 'Warsow logo.png',
+				darkMode = 'Warsow default allmode.png',
+				lightMode = 'Warsow default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Warsow logo.png',
-				lightMode = 'Warsow logo.png',
+				darkMode = 'Warsow default allmode.png',
+				lightMode = 'Warsow default allmode.png',
 			},
 		},
 		xo = {
@@ -402,8 +416,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'qc',
-	defaultTeamLogo = 'Quake logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Quake logo.png', ---@deprecated
-	match2 = 1,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidth = 180,
+		},
+	},
 }

@@ -249,8 +249,6 @@ local lpdb = {}
 ---@field match2id string
 ---@field match2bracketid string
 ---@field winner integer
----@field walkover WalkoverType
----@field resulttype ResultType
 ---@field finished integer
 ---@field mode string
 ---@field type string
@@ -292,11 +290,9 @@ local lpdb = {}
 ---@field match2id string
 ---@field match2gameid integer
 ---@field subgroup integer
----@field scores number[]
----@field participants table
 ---@field winner integer
----@field walkover WalkoverType
----@field resulttype ResultType
+---@field opponents table[]
+---@field status string
 ---@field mode string
 ---@field type string
 ---@field game string
@@ -319,7 +315,10 @@ local lpdb = {}
 ---@param obj table
 ---@return string
 ---Encode a table to a JSON object. Errors are raised if the passed value cannot be encoded in JSON.
-function lpdb.lpdb_create_json(obj) end
+function lpdb.lpdb_create_json(obj)
+	-- TODO This is not fully correct mock (should be {"1": ..., "2": ...} instead of [...,...])
+	return require('3rd.jsonlua.mock_json'):encode(obj)
+end
 
 ---@param obj any[]
 ---@return string

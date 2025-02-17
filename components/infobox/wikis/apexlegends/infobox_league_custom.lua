@@ -13,14 +13,13 @@ local Logic = require('Module:Logic')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tier = require('Module:Tier')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -61,27 +60,21 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Platform', content = {self.caller:_getPlatform()}}
 		)
 	elseif id == 'liquipediatier' then
-		local algsTier = args.algstier
-		if String.isNotEmpty(algsTier) then
+		if String.isNotEmpty(args.publishertier) then
 			table.insert(widgets, 1, Cell{
-				name = 'ALGS circuit tier',
-				content = {'[[Apex Legends Global Series|' .. algsTier .. ']]'},
+				name = 'ALGS Circuit Tier',
+				content = {'[[Apex Legends Global Series|' .. args.publishertier .. ']]'},
 				classes = {'tournament-highlighted-bg'}
 			})
 		end
-		table.insert(widgets, Cell{
-			name = 'EA tier',
-			content = {Tier['ea'][string.lower(args.eatier or '')]},
-			classes = {'tournament-highlighted-bg'}
-		})
 	elseif id == 'customcontent' then
 		--maps
 		if String.isNotEmpty(args.map1) then
-			table.insert(widgets, Title{name = args.maptitle or 'Maps'})
-			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('map')})
+			table.insert(widgets, Title{children = args.maptitle or 'Maps'})
+			table.insert(widgets, Center{children = self.caller:_makeBasedListFromArgs('map')})
 		elseif String.isNotEmpty(args['2map1']) then
-			table.insert(widgets, Title{name = args['2maptitle'] or '2v2 Maps'})
-			table.insert(widgets, Center{content = self.caller:_makeBasedListFromArgs('2map')})
+			table.insert(widgets, Title{children = args['2maptitle'] or '2v2 Maps'})
+			table.insert(widgets, Center{children = self.caller:_makeBasedListFromArgs('2map')})
 		end
 	end
 	return widgets
@@ -124,13 +117,9 @@ end
 function CustomLeague:customParseArguments(args)
 	self.data.isIndividual = String.isNotEmpty(args.player_number) and 'true' or ''
 
-	local eaTier = string.lower(args.eatier or '')
-	local algsTier = string.lower(args.algstier or '')
-	self.data.publishertier = Logic.emptyOr(
-		args.eaMajor,
-		eaTier ~= 'online' and eaTier or nil,
-		algsTier ~= 'online' and algsTier or ''
-	)
+	local publisherTier = string.lower(args.publishertier or '')
+	self.data.publishertier = Logic.readBool(args.highlighted)
+		or publisherTier ~= 'online' and Logic.nilIfEmpty(publisherTier)
 end
 
 ---@param args table
@@ -215,7 +204,7 @@ end
 ---@return string[]
 function CustomLeague:getWikiCategories(args)
 	local categories = {}
-	if String.isNotEmpty(args.algstier) then
+	if String.isNotEmpty(args.publishertier) then
 		table.insert(categories, 'Apex Legends Global Series Tournaments')
 	end
 	if String.isNotEmpty(args.format) then
@@ -224,7 +213,7 @@ function CustomLeague:getWikiCategories(args)
 	if String.isNotEmpty(args.participants_number) then
 		table.insert(categories, 'Individual Tournaments')
 	end
-	if String.isNotEmpty(args.eatier) or args['ea-sponsored'] == 'true' then
+	if args['ea-sponsored'] == 'true' then
 		table.insert(categories, 'Electronic Arts Tournaments')
 	end
 	return categories

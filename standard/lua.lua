@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local StringUtils = require('Module:StringUtils')
 
@@ -70,12 +71,15 @@ function Lua.import(name, options)
 			error('Lua.import: Module name should not end in \'/dev\'')
 		end
 
-		local devName = name .. '/dev'
-		local devEnabled = require('Module:FeatureFlag').get('dev')
-		if devEnabled and require('Module:Namespace').isMain() then
+		local devFlag = FeatureFlag.get('dev')
+		if not devFlag then
+			return importFunction(name)
+		end
+		local devName = name .. '/dev' .. (type(devFlag) == 'string' and ('/' .. devFlag) or '')
+		if require('Module:Namespace').isMain() then
 			mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
 		end
-		if devEnabled and Lua.moduleExists(devName) then
+		if Lua.moduleExists(devName) then
 			return importFunction(devName)
 		else
 			return importFunction(name)
@@ -125,21 +129,77 @@ function Lua.invoke(frame)
 	frame.args.module = nil
 	frame.args.fn = nil
 
-	local devEnabled = function(startFrame)
+	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
 		while currentFrame do
-			if Logic.readBoolOrNil(currentFrame.args.dev) ~= nil then
-				return Logic.readBool(currentFrame.args.dev)
+			if currentFrame.args.dev ~= nil then
+				if Logic.readBoolOrNil(currentFrame.args.dev) ~= nil then
+					return Logic.readBool(currentFrame.args.dev)
+				else
+					return currentFrame.args.dev
+				end
 			end
 			currentFrame = currentFrame:getParent()
 		end
 	end
 
-	local flags = {dev = devEnabled(frame)}
-	return require('Module:FeatureFlag').with(flags, function()
+	local devFlag = getDevFlag(frame)
+	local flags = {dev = devFlag}
+	return FeatureFlag.with(flags, function()
 		local module = Lua.import('Module:' .. moduleName)
-		return module[fnName](frame)
+		local context = {baseModuleName = 'Module:' .. moduleName, module = module}
+		return Lua.withPerfSetup(context, function()
+			return Lua.callAndDisplayErrors(module[fnName], frame, devFlag)
+		end)
 	end)
+end
+
+---@param fn function
+---@param frame Frame
+---@param hardErrors boolean|string?
+---@return string
+function Lua.callAndDisplayErrors(fn, frame, hardErrors)
+	local ErrorDisplay = require('Module:Error/Display')
+	local ErrorExt = require('Module:Error/Ext')
+
+	local result = Logic.tryOrElseLog(function() return fn(frame) end)
+	local parts = result and {tostring(result)} or {}
+
+	local errors = ErrorExt.Stash.retrieve()
+	if #errors > 0 then
+		if hardErrors then
+			for _, error in ipairs(errors) do
+				table.insert(parts, tostring(ErrorDisplay.ClassicError(error)))
+			end
+		else
+			table.insert(parts, tostring(ErrorDisplay.ErrorList{errors = errors}))
+		end
+		if mw.title.getCurrentTitle().namespace == 2 then
+			mw.ext.TeamLiquidIntegration.add_category('User pages with script errors')
+		else
+			mw.ext.TeamLiquidIntegration.add_category('Pages with script errors')
+		end
+	end
+
+	return table.concat(parts)
+end
+
+
+---Automatically sets up performance instrumentation if using Lua.invoke
+---@param context {baseModuleName: string, module: unknown}
+---@param f fun(): ...
+---@return ...
+function Lua.withPerfSetup(context, f)
+	if FeatureFlag.get('perf') then
+		require('Module:Performance/Util').startFromInvoke(context)
+	end
+	local function post(...)
+		if FeatureFlag.get('perf') then
+			require('Module:Performance/Util').stopAndSave()
+		end
+		return ...
+	end
+	return post(f())
 end
 
 --[[
@@ -177,7 +237,7 @@ function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
 		end
 
 		local flags = {dev = Logic.readBoolOrNil(dev)}
-		return require('Module:FeatureFlag').with(flags, function()
+		return FeatureFlag.with(flags, function()
 			local variantModule = Lua.import(baseModuleName)
 			local fn = module == variantModule and moduleFn or variantModule[fnName]
 			return fn(frame)

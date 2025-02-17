@@ -8,24 +8,25 @@
 
 local MatchLegacy = {}
 
+local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -34,6 +35,8 @@ function MatchLegacy.storeGames(match, match2)
 		local game = Table.deepCopy(game2)
 		-- Extradata
 		local extradata = Json.parseIfString(game2.extradata)
+		local opponents = Json.parseIfString(game2.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 		game.extradata = {}
 		game.extradata.gamenumber = gameIndex
 		if extradata.t1bans and extradata.t2bans then
@@ -71,22 +74,17 @@ function MatchLegacy.storeGames(match, match2)
 			game.extradata.opponent1scores = table.concat(team1, ', ')
 			game.extradata.opponent2scores = table.concat(team2, ', ')
 		end
-		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2
 		game.opponent1flag = match.opponent1flag
 		game.opponent2flag = match.opponent2flag
 		game.date = match.date
-		local scores = game2.scores or {}
-		if type(scores) == 'string' then
-			scores = Json.parse(scores)
-		end
 		game.opponent1score = scores[1] or 0
 		game.opponent2score = scores[2] or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
-			game
+			Json.stringifySubTables(game)
 		)
 		games = games .. res
 	end
@@ -101,6 +99,8 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+	match.walkover = walkover and walkover:lower() or nil
 	if match.walkover == 'ff' or match.walkover == 'dq' then
 		match.walkover = match.winner
 	elseif match.walkover == 'l' then
@@ -138,8 +138,6 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
-
 	-- Handle Opponents
 	local handleOpponent = function (index)
 		local prefix = 'opponent'..index
@@ -147,15 +145,22 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == 'team' then
 			match[prefix] = mw.ext.TeamTemplate.teampage(opponent.template)
-			match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
-			local opponentplayers = {}
+			local firstGame = (match2.match2games or {})[1]
+			if match2.bestof == 1 and firstGame then
+				local opponents = Json.parseIfString(firstGame.opponents) or {}
+				local firstGameScores = Array.map(opponents, Operator.property('score'))
+				match[prefix..'score'] = firstGameScores[index]
+			end
+			if not match[prefix..'score'] then
+				match[prefix..'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
+			end			local opponentplayers = {}
 			for i = 1,10 do
 				local player = opponentmatch2players[i] or {}
 				opponentplayers['p' .. i] = mw.ext.TeamLiquidIntegration.resolve_redirect(player.name or '')
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
 			end
-			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+			match[prefix..'players'] = opponentplayers
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
@@ -169,7 +174,7 @@ function MatchLegacy._convertParameters(match2)
 	handleOpponent(1)
 	handleOpponent(2)
 
-	return match
+	return Json.stringifySubTables(match)
 end
 
 return MatchLegacy

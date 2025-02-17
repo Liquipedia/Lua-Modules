@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Faction = require('Module:Faction')
 local Info = require('Module:Info')
 local Json = require('Module:Json')
@@ -22,11 +23,11 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Opponent = Lua.import('Module:Opponent')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local Condition = require('Module:Condition')
@@ -133,7 +134,7 @@ function CustomPlayer:_addCustomCells(args)
 	local currentYearEarnings = self.earningsPerYear[CURRENT_YEAR]
 	if currentYearEarnings then
 		currentYearEarnings = Math.round(currentYearEarnings)
-		currentYearEarnings = '$' .. mw.language.new('en'):formatNum(currentYearEarnings)
+		currentYearEarnings = '$' .. mw.getContentLanguage():formatNum(currentYearEarnings)
 	end
 
 	return {
@@ -227,9 +228,13 @@ function CustomPlayer:_getMatchupData()
 	local foundData = false
 	local processMatch = function(match)
 		foundData = true
-		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 		local year = string.sub(match.date, 1, 4)
 		years[tonumber(year)] = year
+
+		if Array.any(match.match2opponents, function(opponent) return opponent.status and opponent.status ~= 'S' end) then
+			return
+		end
+		vs = CustomPlayer._addScoresToVS(vs, match.match2opponents, player, playerWithoutUnderscore)
 	end
 
 	Lpdb.executeMassQuery('match2', queryParameters, processMatch)
@@ -292,9 +297,9 @@ function CustomPlayer._getYearsActive(years)
 	return yearsActive
 end
 
----@param table table<string, table<string, table<string, number>>>
-function CustomPlayer._setVarsForVS(table)
-	for key1, item1 in pairs(table) do
+---@param tbl table<string, table<string, table<string, number>>>
+function CustomPlayer._setVarsForVS(tbl)
+	for key1, item1 in pairs(tbl) do
 		for key2, item2 in pairs(item1) do
 			for key3, item3 in pairs(item2) do
 				Variables.varDefine(key1 .. '_vs_' .. key2 .. '_' .. key3, item3)
@@ -368,7 +373,7 @@ function CustomPlayer:calculateEarnings(args)
 			ConditionNode(ColumnName('opponentname'), Comparator.eq, playerWithUnderScores),
 			playerConditions,
 		},
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('individualprizemoney'), Comparator.gt, '0'),
@@ -459,9 +464,9 @@ function CustomPlayer:_addPlacementToMedals(medals, data)
 	return medals
 end
 
----@param table table<string, table<string, number>>
-function CustomPlayer._setVarsFromTable(table)
-	for key1, item1 in pairs(table) do
+---@param tbl table<string, table<string, number>>
+function CustomPlayer._setVarsFromTable(tbl)
+	for key1, item1 in pairs(tbl) do
 		for key2, item2 in pairs(item1) do
 			Variables.varDefine(key1 .. '_' .. key2, item2)
 		end

@@ -8,7 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Icon = require('Module:Icon')
+local MobileLegendIcon = require('Module:MobileLegendIcon')
 local ItemIcon = require('Module:ItemIcon')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -16,10 +16,10 @@ local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -59,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'header' then
 		if String.isNotEmpty(args.itemcost) then
 			table.insert(widgets, Breakdown{
-				content = caller:_getCostDisplay(),
+				children = caller:_getCostDisplay(),
 				classes = {
 					'infobox-header',
 					'wiki-backgroundcolor-light',
@@ -73,38 +73,36 @@ function CustomInjector:parse(id, widgets)
 			if String.isNotEmpty(args.itemtext) then
 				iconImage = iconImage .. '<br><i>' .. args.itemtext .. '</i>'
 			end
-			table.insert(widgets, Center{content = {iconImage}})
+			table.insert(widgets, Center{children = {iconImage}})
 		end
 		return widgets
 	elseif id == 'attributes' then
 		local attributeCells = {
 			{name = 'Health', parameter = 'hp'},
-			{name = 'Max Health', parameter = 'maxhealth'},
 			{name = 'Health Regen', parameter = 'hpregen'},
 			{name = 'Mana', parameter = 'mana'},
 			{name = 'Mana Regen', parameter = 'manaregen'},
-			{name = 'Mana Loss', parameter = 'manaloss', funct = '_positivePercentDisplay'},
-			{name = 'Lifesteal', parameter = 'lifesteal'},
-			{name = 'Physical Lifesteal', parameter = 'physsteal'},
-			{name = 'Magical Lifesteal', parameter = 'magicsteal'},
-			{name = 'Armor', parameter = 'armor'},
-			{name = 'Evasion', parameter = 'evasion', funct = '_positivePercentDisplay'},
-			{name = 'Magic Resistance', parameter = 'magicresist'},
-			{name = 'Status Resistance', parameter = 'statusresist', funct = '_positivePercentDisplay'},
-			{name = 'Attack Speed', parameter = 'attackspeed'},
-			{name = 'Cooldown Reduction', parameter = 'cdreduction'},
-			{name = 'Magic Power', parameter = 'mp'},
-			{name = 'Attack Damage', parameter = 'ad'},
+			{name = 'Lifesteal', parameter = 'lifesteal', funct = '_positivePercentDisplay'},
+			{name = 'Hybrid Lifesteal', parameter = 'hybridsteal', funct = '_positivePercentDisplay'},
+			{name = 'Healing Effect', parameter = 'healeffect'},
+			{name = 'Spell Vamp', parameter = 'spellvamp', funct = '_positivePercentDisplay'},
+			{name = 'Physical Defense', parameter = 'physdefense'},
+			{name = 'Magic Defense', parameter = 'magicdefense'},
+			{name = 'Attack Speed', parameter = 'attackspeed', funct = '_positivePercentDisplay'},
 			{name = 'Physical Attack', parameter = 'physatk'},
+			{name = 'Magic Power', parameter = 'mp'},
+			{name = 'Adaptive Attack', parameter = 'adaptiveatk'},
 			{name = 'Physical Penetration', parameter = 'physpen'},
-			{name = 'Magical Penetration', parameter = 'magicpen'},
-			{name = 'Cooldown Reduction', parameter = 'cdreduction'},
-			{name = 'Critical Chance', parameter = 'critchance'},
-			{name = 'Movement Speed', funct = '_movementSpeedDisplay'},
+			{name = 'Magic Penetration', parameter = 'magicpen'},
+			{name = 'Cooldown Reduction', parameter = 'cdreduction', funct = '_positivePercentDisplay'},
+			{name = 'Critical Chance', parameter = 'critchance', funct = '_positivePercentDisplay'},
+			{name = 'Critical Damage', parameter = 'critdmg'},
+			{name = 'Movement Speed', parameter = 'movespeed'},
+			{name = 'Slow Reduction', parameter = 'slowreduction'},
 		}
 		widgets = caller:_getAttributeCells(attributeCells)
 		if not Table.isEmpty(widgets) then
-			table.insert(widgets, 1, Title{name = 'Attributes'})
+			table.insert(widgets, 1, Title{children = 'Attributes'})
 		end
 		return widgets
 	elseif id == 'ability' then
@@ -119,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'availability' then
 		if String.isEmpty(args.category) and String.isEmpty(args.drop) then return {} end
 		return {
-			Title{name = 'Item Tier'},
+			Title{children = 'Item Tier'},
 			Cell{name = 'Category', content = {caller:_categoryDisplay()}},
 			Cell{name = 'Dropped From', content = {args.drop}},
 		}
@@ -133,7 +131,7 @@ function CustomInjector:parse(id, widgets)
 		)
 	elseif id == 'recipe' then
 		if String.isEmpty(args.recipe) then return {} end
-		table.insert(widgets, Center{content = {args.recipe}})
+		table.insert(widgets, Center{children = {args.recipe}})
 	elseif id == 'info' then return {}
 	end
 
@@ -155,16 +153,12 @@ function CustomItem:getWikiCategories(args)
 	end
 
 	local possibleCategories = {
-		['Strength Items'] = 'str',
-		['Agility Items'] = 'agi',
-		['Intelligence Items'] = 'int',
 		['Health Items'] = 'hp',
 		['Mana Pool Items'] = 'mana',
 		['Health Regeneration Items'] = 'hpregen',
 		['Mana Regeneration Items'] = 'manaregen',
-		['Armor Bonus Items'] = 'armor',
-		['Evasion Items'] = 'evasion',
-		['Magic Resistance Items'] = 'magicresist',
+		['Physical Defense Items'] = 'physicaldefense',
+		['Magic Defense Items'] = 'magicdefense',
 		['Damage Items'] = 'damage',
 		['Items with Active Abilities'] = 'active',
 		['Items with Passive Abilities'] = 'passive',
@@ -174,12 +168,6 @@ function CustomItem:getWikiCategories(args)
 			table.insert(categories, category)
 		end
 	end
-
-	if not self:_categoryDisplay() then
-		table.insert(categories, 'Unknown Type')
-	end
-
-
 	return categories
 end
 
@@ -195,14 +183,14 @@ function CustomItem:_getCostDisplay()
 
 	local innerDiv = CustomItem._costInnerDiv(table.concat(costs, '&nbsp;/&nbsp;'))
 	local outerDiv = mw.html.create('div')
-		:wikitext(Icon.display({}, 'gold', '21') .. ' ' .. tostring(innerDiv))
+		:wikitext(MobileLegendIcon.display({}, 'gold', '21') .. ' ' .. tostring(innerDiv))
 	local display = tostring(outerDiv)
 
 	if String.isNotEmpty(self.args.recipecost) then
 		innerDiv = CustomItem._costInnerDiv('(' .. self.args.recipecost .. ')')
 		outerDiv = mw.html.create('div')
 			:css('padding-top', '3px')
-			:wikitext(Icon.display({}, 'recipe', '21') .. ' ' .. tostring(innerDiv))
+			:wikitext(MobileLegendIcon.display({}, 'recipe', '21') .. ' ' .. tostring(innerDiv))
 		display = display .. tostring(outerDiv)
 	end
 
@@ -240,19 +228,7 @@ function CustomItem._positivePercentDisplay(caller, base)
 		error('"' .. base .. '" has to be numerical')
 	end
 	---@cast base -nil
-	return '+ ' .. (tonumber(caller.args[base]) * 100) .. '%'
-end
-
----@param caller MobilelegendsItemInfobox
----@param base string?
----@return string?
-function CustomItem._movementSpeedDisplay(caller, base)
-	local display = Array.append({},
-		String.nilIfEmpty(caller.args.movespeed),
-		Logic.isNumeric(caller.args.movespeedmult) and ((tonumber(caller.args.movespeedmult) + 100) .. '%') or nil
-	)
-	if Table.isEmpty(display) then return end
-	return '+ ' .. table.concat(display)
+	return '+ ' .. caller.args[base] .. '%'
 end
 
 ---@return string?
@@ -266,7 +242,7 @@ function CustomItem:_getAttributeCells(attributeCells)
 	return Array.map(attributeCells, function(attribute)
 		local funct = attribute.funct or DEFAULT_ATTRIBUTE_DISPLAY_FUNCTION
 		local content = CustomItem[funct](self, attribute.parameter)
-		if String.isEmpty(content) then return end
+		if String.isEmpty(content) then return nil end
 		return Cell{name = attribute.name, content = {content}}
 	end)
 end

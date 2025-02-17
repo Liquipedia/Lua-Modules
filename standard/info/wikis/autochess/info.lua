@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'autochess',
 	name = 'Auto Chess',
+	defaultGame = 'autochess',
 	games = {
 		autochess = {
 			abbreviation = 'Auto Chess',
@@ -25,8 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'autochess',
-	defaultTeamLogo = 'Auto Chess lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Auto Chess darkmode.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+		},
+	},
 }

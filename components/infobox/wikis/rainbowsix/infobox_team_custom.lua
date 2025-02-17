@@ -35,15 +35,6 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = Variables.varDefault('region', '')
-
-	return lpdbData
-end
-
 ---@param args table
 function CustomTeam:defineCustomPageVariables(args)
 	Variables.varDefine('team_captain', args.captain)

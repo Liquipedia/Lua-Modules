@@ -7,5 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
+local Base = Lua.import('Module:Brkts/WikiSpecific/Base')
 
-return Lua.import('Module:Brkts/WikiSpecific/Base')
+return Base

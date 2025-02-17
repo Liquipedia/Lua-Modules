@@ -10,6 +10,8 @@ local AllowedServers = require('Module:Server')
 local Array = require('Module:Array')
 local Autopatch = require('Module:Automated Patch')
 local Class = require('Module:Class')
+local Countdown = require('Module:Countdown')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
@@ -21,11 +23,11 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -64,11 +66,33 @@ function CustomLeague:customParseArguments(args)
 	args.number = tonumber(args.number)
 	self.data.mode = args.mode or DEFAULT_MODE
 	self.data.game = (args.game or ''):lower() == GAME_MOD and GAME_MOD or self.data.game
-	self.data.publishertier = tostring(Logic.readBool(args.featured))
 	self.data.status = self:_getStatus(args)
+
+	self.data.startTime = Logic.wrapTryOrLog(CustomLeague._readStartTime)(self)
 
 	self:_computeChronology(args)
 	self:_computePatch(args)
+end
+
+---@return {display: string?, storage: string?}
+function CustomLeague:_readStartTime()
+	---@type string?
+	local timePart = self.args.start_time
+	local startDate = self.data.startDate
+	if Logic.isEmpty(timePart) or Logic.isEmpty(startDate) then return {} end
+	---@cast timePart -nil
+	---@cast startDate -nil
+
+	local dateString = startDate .. ' - ' .. timePart
+	local timestamp = DateExt.readTimestamp(dateString)
+
+	assert(timestamp, 'Invalid date time combination: '
+		.. '"|start_time=' .. timePart .. '" with "|(s)date=' .. startDate .. '"')
+
+	return {
+		display = dateString,
+		storage = DateExt.formatTimestamp('c', timestamp),
+	}
 end
 
 ---@param args table
@@ -166,20 +190,32 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
+	local args = caller.args
+	local data = caller.data
 
 	if id == 'gamesettings' then
 		return {
-			Cell{name = 'Game Version', content = {self.caller:_getGameVersion(args)}},
-			Cell{name = 'Server', content = {self.caller:_getServer(args)}}
+			Cell{name = 'Game Version', content = {caller:_getGameVersion(args)}},
+			Cell{name = 'Server', content = {caller:_getServer(args)}}
+		}
+	elseif id == 'dates' and data.startTime.display then
+		local startTime = Countdown._create{date = data.startTime.display, rawdatetime = true}
+
+		if data.startDate == data.endDate then
+			return {Cell{name = 'Start Time', content = {startTime}}}
+		end
+		return {
+			Cell{name = 'Start Time', content = {startTime}},
+			Cell{name = 'End Date', content = {args.edate}},
 		}
 	elseif id == 'customcontent' then
 		if args.player_number and args.player_number > 0 or args.team_number then
 			Array.appendWith(widgets,
-				Title{name = 'Participants'},
+				Title{children = 'Participants'},
 				Cell{name = 'Number of Players', content = {args.raceBreakDown.total}},
 				Cell{name = 'Number of Teams', content = {args.team_number}},
-				Breakdown{content = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
+				Breakdown{children = args.raceBreakDown.display or {}, classes = { 'infobox-center' }}
 			)
 		end
 
@@ -190,8 +226,8 @@ function CustomInjector:parse(id, widgets)
 		local displayMaps = function(prefix, defaultTitle, maps)
 			if String.isEmpty(args[prefix .. 1]) then return end
 			Array.appendWith(widgets,
-				Title{name = args[prefix .. 'title'] or defaultTitle},
-				Center{content = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
+				Title{children = args[prefix .. 'title'] or defaultTitle},
+				Center{children = self.caller:_mapsDisplay(maps or self.caller:_getMaps(prefix, args))}
 			)
 		end
 
@@ -217,8 +253,9 @@ function CustomLeague:_mapsDisplay(maps)
 end
 
 ---@param args table
+---@param endDate string?
 ---@return number|string?
-function CustomLeague:displayPrizePool(args)
+function CustomLeague:displayPrizePool(args, endDate)
 	if String.isEmpty(args.prizepool) and String.isEmpty(args.prizepoolusd) then
 		return
 	end
@@ -238,15 +275,15 @@ function CustomLeague:displayPrizePool(args)
 	end
 
 	local hasPlus
-	prizePoolUSD, hasPlus = self:_removePlus(prizePoolUSD)
-	prizePool, hasPlus = self:_removePlus(prizePool, hasPlus)
+	prizePoolUSD, hasPlus = CustomLeague._removePlus(prizePoolUSD)
+	prizePool, hasPlus = CustomLeague._removePlus(prizePool, hasPlus)
 
 	return (hasPlus and (GREATER_EQUAL .. ' ') or '') .. InfoboxPrizePool.display{
 		prizepool = prizePool,
 		prizepoolusd = prizePoolUSD,
 		currency = localCurrency,
 		rate = args.currency_rate,
-		date = Logic.emptyOr(args.currency_date, self.data.endDate),
+		date = Logic.emptyOr(args.currency_date, endDate),
 		displayRoundPrecision = PRIZE_POOL_ROUND_PRECISION,
 	}
 end
@@ -255,7 +292,7 @@ end
 ---@param alreadyHasPlus boolean?
 ---@return string?
 ---@return boolean?
-function CustomLeague:_removePlus(inputValue, alreadyHasPlus)
+function CustomLeague._removePlus(inputValue, alreadyHasPlus)
 	if not inputValue then
 		return inputValue, alreadyHasPlus
 	end
@@ -322,6 +359,7 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('headtohead', args.headtohead or 'true')
 	Variables.varDefine('tournament_maps', Json.stringify(args.maps))
 	Variables.varDefine('tournament_series_number', args.number and string.format('%05i', args.number) or nil)
+	Variables.varDefine('match_date', self.data.startTime.storage)
 end
 
 ---@param prefix string
@@ -347,6 +385,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.maps = Json.stringify(args.maps)
 
 	lpdbData.extradata.seriesnumber = args.number and string.format('%05i', args.number) or nil
+	lpdbData.extradata.starttime = self.data.startTime.storage
 
 	return lpdbData
 end
@@ -369,12 +408,6 @@ function CustomLeague:getWikiCategories(args)
 
 	local betaPrefix = String.isNotEmpty(args.beta) and 'Beta ' or ''
 	return {betaPrefix .. Game.abbreviation{game = self.data.game} .. ' Competitions'}
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.featured)
 end
 
 return CustomLeague

@@ -37,6 +37,7 @@ local DASH = '&#8211;'
 local DEFAULT_TIERTYPE = 'General'
 local DEFAULT_ABOUT_LINK = 'Template:Weight/doc'
 local ACHIEVEMENTS_SORT_ORDER = 'weight desc, date desc'
+local ACHIEVEMENTS_IGNORED_STATUSES = {'cancelled', 'postponed'}
 local RESULTS_SORT_ORDER = 'date desc'
 
 ---@class BroadcastTalentTable
@@ -138,6 +139,12 @@ function BroadcastTalentTable:_fetchTournaments()
 		if args.endDate then
 			conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, args.endDate)}
 		end
+	end
+
+	if args.isAchievementsTable then
+		Array.forEach(ACHIEVEMENTS_IGNORED_STATUSES, function(ignoredStatus)
+			conditions:add{ConditionNode(ColumnName('extradata_status'), Comparator.neq, ignoredStatus)}
+		end)
 	end
 
 	-- double the limit for the query due to potentional merging of results further down the line

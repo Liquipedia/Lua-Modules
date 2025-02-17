@@ -8,21 +8,17 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local OVERTIME = '[[File:Cooldown_Clock.png|14x14px|link=]]'
-
-local HEADTOHEAD = '[[File:Match Info Stats.png|14x14px|link=%s|Head to Head history]]'
 
 -- Custom Header Class
 ---@class TrackmaniaMatchSummaryHeader: MatchSummaryHeader
@@ -146,150 +142,40 @@ function CustomMatchSummary.createHeader(match, options)
 		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
----@param match MatchGroupUtilMatch
----@param footer MatchSummaryFooter
----@return MatchSummaryFooter
-function CustomMatchSummary.addToFooter(match, footer)
-	footer = MatchSummary.addVodsToFooter(match, footer)
-
-	return footer:addElement(match.extradata.showh2h and CustomMatchSummary._getHeadToHead(match) or nil)
-end
-
----@param match MatchGroupUtilMatch
----@return string
-function CustomMatchSummary._getHeadToHead(match)
-	local opponents = match.opponents
-	local team1, team2 = mw.uri.encode(opponents[1].name), mw.uri.encode(opponents[2].name)
-	local buildQueryFormLink = function(form, template, arguments)
-		return tostring(mw.uri.fullUrl('Special:RunQuery/' .. form,
-			mw.uri.buildQueryString(Table.map(arguments, function(key, value) return template .. key, value end))
-			.. '&_run'
-		))
-	end
-
-	local headtoheadArgs = {
-		['[team1]'] = team1,
-		['[team2]'] = team2,
-		['[games][is_list]'] = 1,
-		['[tiers][is_list]'] = 1,
-		['[fromdate][day]'] = '01',
-		['[fromdate][month]'] = '01',
-		['[fromdate][year]'] = string.sub(match.date,1,4)
-	}
-
-	local link = buildQueryFormLink('Head2head', 'Headtohead', headtoheadArgs)
-	return HEADTOHEAD:format(link)
-end
-
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	body:addRow(MatchSummary.Row():addElement(DisplayHelper.MatchCountdownBlock(match)))
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			body:addRow(CustomMatchSummary._createGame(game))
-		end
-	end
-
-	-- casters
-	if String.isNotEmpty(match.extradata.casters) then
-		local casters = Json.parseIfString(match.extradata.casters)
-		local casterRow = MatchSummary.Casters()
-		for _, caster in pairs(casters) do
-			casterRow:addCaster(caster)
-		end
-
-		body:addRow(casterRow)
-	end
-
-	return body
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
-function CustomMatchSummary._createGame(game)
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
+---@param gameIndex integer
+---@return Widget?
+function CustomMatchSummary.createGame(date, game, gameIndex)
+	if not game.map then
+		return
+	end
 	local extradata = game.extradata or {}
 
-	if String.isNotEmpty(game.header) then
-		local gameHeader = mw.html.create('div')
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-			:node(game.header)
-
-		row:addElement(gameHeader)
-		row:addElement(MatchSummary.Break():create())
-	end
-
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(mw.html.create('div'):node(game.map))
-
-	row:addElement(CustomMatchSummary._iconDisplay(
-		GREEN_CHECK,
-		game.winner == 1,
-		game.scores[1],
-		1
-	))
-	if extradata.overtime then
-		row:addElement(CustomMatchSummary._iconDisplay(
-			OVERTIME,
-			true,
-			nil,
-			nil,
-			'Overtime'
-		))
-	end
-	row:addElement(centerNode)
-	if extradata.overtime then
-		row:addElement(CustomMatchSummary._iconDisplay(
-			OVERTIME,
-			true,
-			nil,
-			nil,
-			'Overtime'
-		))
-	end
-	row:addElement(CustomMatchSummary._iconDisplay(
-		GREEN_CHECK,
-		game.winner == 2,
-		game.scores[2],
-		2
-	))
-
-	if String.isNotEmpty(game.comment) then
-		row:addElement(MatchSummary.Break():create())
-
-		row:addElement(mw.html.create('div')
-			:css('margin','auto')
-			:css('max-width', '60%')
-			:node(game.comment)
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
+			DisplayHelper.MapScore(game.opponents[1], game.status),
+			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+			MatchSummaryWidgets.GameCenter{children = DisplayHelper.Map(game, {noLink = true})},
+			extradata.overtime and CustomMatchSummary._iconDisplay(OVERTIME, 'Overtime') or nil,
+			DisplayHelper.MapScore(game.opponents[2], game.status),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 2},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-	end
-
-	return row
+	}
 end
 
----@param icon string
----@param shouldDisplay boolean?
----@param additionalElement number|string|Html|nil
----@param side integer?
+---@param icon string?
 ---@param hoverText string|number|nil
 ---@return Html
-function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement, side, hoverText)
-	local flip = side == 2
-	return mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
-		:node(shouldDisplay and icon or NO_CHECK)
-		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
-		:attr('title', hoverText)
+function CustomMatchSummary._iconDisplay(icon, hoverText)
+	return HtmlWidgets.Div{
+		classes = {'brkts-popup-spaced'},
+		attributes = {title = hoverText},
+		children = {icon},
+	}
 end
 
 return CustomMatchSummary

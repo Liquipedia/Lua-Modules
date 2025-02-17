@@ -17,6 +17,8 @@ local PlacementInfo = require('Module:Placement')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+---@class PrizePoolPlacement: BasePlacement
+---@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -32,13 +34,11 @@ local SPECIAL_SCORES = {'W', 'FF' , 'L', 'DQ', 'D'}
 
 local _tbd_index = 0
 
---- @class PrizePoolPlacement
+--- @class PrizePoolPlacement: BasePlacement
 --- A Placement is a set of opponents who all share the same final place in the tournament.
 --- Its input is generally a table created by `Template:Slot`.
 --- It has a range from placeStart to placeEnd, for example 5 to 8, or count (slotSize)
 --- and is expected to have at maximum the same amount of opponents as the range allows (4 in the 5-8 example).
---- @field parseOpponents function
---- @field getPrizeRewardForOpponent function
 --- @field parent PrizePool
 --- @field args table
 local Placement = Class.new(BasePlacement)
@@ -147,9 +147,16 @@ Placement.additionalData = {
 			return {score = scores[1], vsscore = scores[2]}
 		end
 	},
+	LASTVSMATCHID = {
+		field = 'lastvsmatchid',
+		parse = function (placement, input, context)
+			return input
+		end
+	},
 }
 
---- @param lastPlacement integer The previous placement's end
+---@param lastPlacement integer The previous placement's end
+---@return self
 function Placement:create(lastPlacement)
 	self:_parseArgs()
 
@@ -193,6 +200,8 @@ end
 
 --- Parse and set additional data fields for opponents.
 -- This includes fields such as group stage score (wdl) and last versus (lastvs).
+---@param args table
+---@return table
 function Placement:readAdditionalData(args)
 	local data = {}
 
@@ -206,6 +215,8 @@ function Placement:readAdditionalData(args)
 	return data
 end
 
+---@param ... string|number
+---@return placement[]
 function Placement:_getLpdbData(...)
 	local entries = {}
 	for _, opponent in ipairs(self.opponents) do
@@ -267,6 +278,7 @@ function Placement:_getLpdbData(...)
 		}
 
 		lpdbData = Table.mergeInto(lpdbData, Opponent.toLpdbStruct(opponent.opponentData))
+		lpdbData.players = lpdbData.players or Table.copy(lpdbData.opponentplayers or {})
 
 		lpdbData.objectName = self.parent:_lpdbObjectName(lpdbData, ...)
 		if Opponent.isTbd(opponent.opponentData) then
@@ -284,6 +296,7 @@ function Placement:_getLpdbData(...)
 	return entries
 end
 
+---@return string|number
 function Placement:_lpdbValue()
 	for _, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
@@ -298,6 +311,7 @@ function Placement:_lpdbValue()
 	return self.placeStart
 end
 
+---@return string?
 function Placement:_displayPlace()
 	for _, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
@@ -313,6 +327,7 @@ function Placement:_displayPlace()
 	return start
 end
 
+---@return string?
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
@@ -323,6 +338,7 @@ function Placement:getBackground()
 	return PlacementInfo.getBgClass(self.placeStart)
 end
 
+---@return string?
 function Placement:getMedal()
 	if self:hasSpecialStatus() then
 		return
@@ -334,6 +350,7 @@ function Placement:getMedal()
 	end
 end
 
+---@return boolean
 function Placement:hasSpecialStatus()
 	return Table.any(Placement.specialStatuses, function(_, status) return status.active(self.args) end)
 end

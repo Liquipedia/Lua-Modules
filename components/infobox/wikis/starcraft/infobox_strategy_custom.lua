@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Strategy = Lua.import('Module:Infobox/Strategy')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 
@@ -35,7 +35,7 @@ function CustomStrategy.run(frame)
 
 	if Namespace.isMain() then
 		local categories = strategy:_getCategories(strategy.args.race, strategy.args.matchups)
-		strategy.infobox:categories(unpack(categories))
+		strategy:categories(unpack(categories))
 	end
 
 	return strategy:createInfobox()
@@ -105,7 +105,7 @@ function CustomStrategy:_getCategories(race, matchups)
 
 	table.insert(categories, race .. ' ' .. informationType .. 's')
 
-	matchups = (matchups or ''):lower()
+	matchups = matchups or ''
 	if informationType == 'Build Order' then
 		for _, raceMatchupItem in pairs(CustomStrategy._raceMatchups()) do
 			if String.contains(matchups, raceMatchupItem) then
@@ -122,7 +122,7 @@ function CustomStrategy._raceMatchups()
 	local raceMatchups = {}
 	for _, faction1 in pairs(Faction.coreFactions) do
 		for _, faction2 in pairs(Faction.coreFactions) do
-			table.insert(raceMatchups, faction1 .. 'v' .. faction2)
+			table.insert(raceMatchups, faction1:upper() .. 'v' .. faction2:upper())
 		end
 	end
 

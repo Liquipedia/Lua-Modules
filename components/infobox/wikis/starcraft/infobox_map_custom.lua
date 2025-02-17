@@ -12,10 +12,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class StarcraftMapInfobox: MapInfobox
@@ -110,9 +110,12 @@ end
 ---@return string[]
 function CustomMap:getWikiCategories(args)
 	local players = args.players or self:_tlpdMap(args.id, 'players')
-	if String.isEmpty(players) then return {} end
+	local tileset = args.tileset or self:_tlpdMap(args.id, 'tileset')
 
-	return {'Maps (' .. players .. ' Players)'}
+	return Array.append({},
+		String.isNotEmpty(players) and ('Maps (' .. players .. ' Players)') or nil,
+		String.isNotEmpty(tileset) and (tileset .. ' Tileset') or nil
+	)
 end
 
 return CustomMap

@@ -93,7 +93,7 @@ return {
 			value = 'FFA',
 			sort = 'B2',
 			name = 'FFA',
-			short = 'Showm.',
+			short = 'FFA',
 			link = 'Free For All Tournaments',
 			category = 'FFA Tournaments',
 		},

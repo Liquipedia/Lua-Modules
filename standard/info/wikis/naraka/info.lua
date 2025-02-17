@@ -10,6 +10,7 @@ return {
 	startYear = 2021,
 	wikiName = 'naraka',
 	name = 'Naraka: Bladepoint',
+	defaultGame = 'naraka',
 	games = {
 		naraka = {
 			abbreviation = 'Naraka',
@@ -25,8 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'naraka',
-	defaultTeamLogo = 'NARAKA lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'NARAKA darkmode.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 }

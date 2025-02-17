@@ -8,99 +8,95 @@
 
 local MatchLegacy = {}
 
-local json = require('Module:Json')
+local Array = require('Module:Array')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
+
 local _MODES = {solo = '1v1', team = 'team'}
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match, doStore = MatchLegacy._convertParameters(match2)
 
 	if not doStore then
 		return
 	end
 
-	match.games = MatchLegacy._storeGames(match, match2, options)
+	match.games = MatchLegacy._storeGames(match, match2)
 
-	if options.storeMatch1 then
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
-function MatchLegacy._storeGames(match, match2, options)
+function MatchLegacy._storeGames(match, match2)
 	local games = ''
 	for gameIndex, game in ipairs(match2.match2games or {}) do
-		game.extradata = json.parseIfString(game.extradata or '{}') or game.extradata
+		game.extradata = Json.parseIfString(game.extradata or '{}') or game.extradata
+		local opponents = Json.parseIfString(game.opponents) or {}
+		local scores = Array.map(opponents, Operator.property('score'))
 
 		if game.mode == '1v1' then
 			game.opponent1 = game.extradata.opponent1
 			game.opponent2 = game.extradata.opponent2
 			game.date = match.date
-			local scores = json.parseIfString(game.scores or '{}') or {}
 			game.opponent1score = scores[1] or 0
 			game.opponent2score = scores[2] or 0
 
 			game.extradata.winnerrace = game.extradata.winnerfaction
 			game.extradata.loserrace = game.extradata.loserfaction
 
-			-- participants holds additional playerdata per match, e.g. the faction (=race)
-			-- participants is stored as opponentID_playerID, so e.g. for opponent2, player1 it is "2_1"
-			local playerdata = json.parseIfString(game.participants or '{}') or game.participants
-			for key, item in pairs(playerdata) do
-				local keyArray = mw.text.split(key or '', '_')
-				local l = tonumber(keyArray[2])
-				local k = tonumber(keyArray[1])
-				game.extradata['opponent' .. k .. 'race'] = item.faction
-				local opp = match2.match2opponents[k] or {}
-				local pl = opp.match2players or {}
-				game['opponent' .. k .. 'flag'] = (pl[l] or {}).flag
-				game.extradata['opponent' .. k .. 'name'] = (pl[l] or {}).displayname
-				game.extradata['tournament'] = match2.tournament or ''
-				game.extradata['series'] = match2.series or ''
-			end
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players or {}, function(player, playerIndex)
+					if Logic.isDeepEmpty(player) then return end
+					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
+					game.extradata['opponent' .. opponentIndex .. 'race'] = player.faction
+					game['opponent' .. opponentIndex .. 'flag'] = matchPlayer.flag
+					game.extradata['opponent' .. opponentIndex .. 'name'] = matchPlayer.displayname
+					game.extradata['tournament'] = match2.tournament or ''
+					game.extradata['series'] = match2.series or ''
+				end)
+			end)
+
 			game.extradata.gamenumber = gameIndex
 
-			game.extradata = json.stringify(game.extradata)
-			local res = ''
-			if options.storeMatch1 then
-				res = mw.ext.LiquipediaDB.lpdb_game(
+			game.extradata = Json.stringify(game.extradata)
+			local res = mw.ext.LiquipediaDB.lpdb_game(
 					'legacygame_' .. match2.match2id .. gameIndex,
 					game
 				)
-			end
 
 			games = games .. res
-		elseif	game.mode == '1v1' and options.storeMatch1 then
+		elseif	game.mode == '1v1' then
 			local submatch = {}
 
 			submatch.opponent1 = game.extradata.opponent1
 			submatch.opponent2 = game.extradata.opponent2
-			local scores = json.parseIfString(game.scores or '{}') or {}
 			submatch.opponent1score = scores[1] or 0
 			submatch.opponent2score = scores[2] or 0
 			submatch.extradata = {}
-			local playerdata = json.parseIfString(game.participants or '{}') or game.participants
-			for key, item in pairs(playerdata) do
-				local keyArray = mw.text.split(key or '', '_')
-				local l = tonumber(keyArray[2])
-				local k = tonumber(keyArray[1])
-				submatch.extradata['opponent' .. k .. 'race'] = item.faction
-				local opp = match2.match2opponents[k] or {}
-				local pl = opp.match2players or {}
-				submatch['opponent' .. k .. 'flag'] = (pl[l] or {}).flag
-				submatch.extradata['opponent' .. k .. 'name'] = (pl[l] or {}).displayname
-			end
+
+			Array.forEach(opponents, function(opponent, opponentIndex)
+				Array.forEach(opponent.players or {}, function(player, playerIndex)
+					if Logic.isDeepEmpty(player) then return end
+					local matchPlayer = match2.match2opponents[opponentIndex].match2players[playerIndex] or {}
+					submatch.extradata['opponent' .. opponentIndex .. 'race'] = player.faction
+					submatch['opponent' .. opponentIndex .. 'flag'] = matchPlayer.flag
+					submatch.extradata['opponent' .. opponentIndex .. 'name'] = matchPlayer.displayname
+				end)
+			end)
+
 			submatch.winner = game.winner or ''
-			submatch.walkover = game.walkover or ''
+			local walkover = MatchLegacyUtil.calculateWalkoverType(opponents)
+			submatch.walkover = (walkover or ''):lower()
 			submatch.finished = match2.finished or '0'
-			if game.resulttype ~= 'submatch' then
-				submatch.resulttype = game.resulttype
-			end
 			submatch.mode = '1v1'
 			submatch.date = game.date
 			submatch.dateexact = match2.dateexact or ''
@@ -114,7 +110,7 @@ function MatchLegacy._storeGames(match, match2, options)
 			submatch.liquipediatier = match2.liquipediatier
 			submatch.type = match2.type
 			submatch.game = match2.game
-			submatch.extradata = json.stringify(submatch.extradata --[[@as table]])
+			submatch.extradata = Json.stringify(submatch.extradata --[[@as table]])
 
 			mw.ext.LiquipediaDB.lpdb_match(
 			'legacymatch_' .. match2.match2id .. gameIndex,
@@ -135,7 +131,7 @@ function MatchLegacy._convertParameters(match2)
 	end
 
 	match.staticid = match2.match2id
-	match.extradata = json.parseIfString(match.extradata) or {}
+	match.extradata = Json.parseIfString(match.extradata) or {}
 	local opponent1 = match2.match2opponents[1] or {}
 	local opponent1match2players = opponent1.match2players or {}
 	local opponent2 = match2.match2opponents[2] or {}
@@ -150,14 +146,14 @@ function MatchLegacy._convertParameters(match2)
 			match.opponent1score = (tonumber(opponent1.score or 0) or 0) >= 0 and opponent1.score or 0
 			match.opponent1flag = player.flag
 			match.extradata.opponent1name = player.displayname
-			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
+			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
 			match.extradata.opponent1race = player.extradata.faction
 			player = opponent2match2players[1] or {}
 			match.opponent2 = player.name
 			match.opponent2score = (tonumber(opponent2.score or 0) or 0) >= 0 and opponent2.score or 0
 			match.opponent2flag = player.flag
 			match.extradata.opponent2name = player.displayname
-			player.extradata = json.parseIfString(player.extradata or '{}') or player.extradata
+			player.extradata = Json.parseIfString(player.extradata or '{}') or player.extradata
 			match.extradata.opponent2race = player.extradata.faction
 		elseif opponent1.type == 'team' then
 			match.opponent1 = Template.safeExpand(
@@ -177,12 +173,13 @@ function MatchLegacy._convertParameters(match2)
 			return nil, false
 		end
 
-		if match.resulttype == 'default' then
-			match.resulttype = string.upper(match.walkover or '')
+		local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+		if walkover then
+			match.resulttype = walkover
 			match.walkover = match.winner
 		end
 		match.extradata.bestof = match2.bestof ~= 0 and tostring(match2.bestof) or ''
-		match.extradata = json.stringify(match.extradata)
+		match.extradata = Json.stringify(match.extradata)
 	else
 		return nil, false
 	end

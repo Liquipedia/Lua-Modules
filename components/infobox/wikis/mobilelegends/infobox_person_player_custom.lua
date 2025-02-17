@@ -7,8 +7,8 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
-local HeroIcon = require('Module:HeroIcon')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
@@ -16,10 +16,10 @@ local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -64,7 +64,7 @@ function CustomInjector:parse(id, widgets)
 					'Invalid hero input "' .. hero .. '"[[Category:Pages with invalid hero input]]'
 				)
 			end
-			return HeroIcon.getImage{standardizedHero or hero, size = SIZE_HERO}
+			return CharacterIcon.Icon{character = standardizedHero or hero, size = SIZE_HERO}
 		end)
 
 		table.insert(widgets, Cell{
@@ -73,17 +73,17 @@ function CustomInjector:parse(id, widgets)
 		})
 	elseif id == 'history' then
 		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto._results{
-			convertrole = 'true',
+		local automatedHistory = TeamHistoryAuto.results{
+			convertrole = true,
 			iconModule = 'Module:PositionIcon/data',
 			player = caller.pagename
 		}
 
 		if String.isNotEmpty(manualHistory) or automatedHistory then
 			return {
-				Title{name = 'History'},
-				Center{content = {manualHistory}},
-				Center{content = {automatedHistory}},
+				Title{children = 'History'},
+				Center{children = {manualHistory}},
+				Center{children = {automatedHistory}},
 			}
 		end
 	elseif id == 'region' then return {}

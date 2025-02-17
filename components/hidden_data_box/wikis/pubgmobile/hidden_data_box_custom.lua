@@ -15,7 +15,7 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	BasicHiddenDataBox.addCustomVariables = CustomHiddenDataBox.addCustomVariables
 	return BasicHiddenDataBox.run(args)
@@ -25,8 +25,6 @@ end
 ---@param queryResult table
 function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
-
-	BasicHiddenDataBox.checkAndAssign('tournament_publishertier', args.pubgpremier, queryResult.publishertier)
 end
 
 return Class.export(CustomHiddenDataBox)

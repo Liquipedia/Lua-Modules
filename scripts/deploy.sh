@@ -1,7 +1,6 @@
 #!/bin/bash
 
 userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
-devWikis=('rocketleague' 'commons')
 pat='\-\-\-\
 \-\- @Liquipedia\
 \-\- wiki=([^
@@ -34,12 +33,7 @@ for luaFile in $luaFiles; do
     echo '...skipping - no magic comment found'
   else
     wiki="${BASH_REMATCH[1]}"
-    page="${BASH_REMATCH[2]}"
-
-    if [[ ! ( ("${DEV_WIKI_BASIC_AUTH}" == "") || ("${devWikis[*]}" =~ ${wiki}) ) ]]; then
-        echo '...skipping - dev wiki not applicable...'
-        continue
-    fi
+    page="${BASH_REMATCH[2]}${LUA_DEV_ENV_NAME}"
 
     echo '...magic comment found - updating wiki...'
 
@@ -59,7 +53,6 @@ for luaFile in $luaFiles; do
           -d "format=json&action=query&meta=tokens&type=login" \
           -H "User-Agent: ${userAgent}" \
           -H 'Accept-Encoding: gzip' \
-          -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
           -X POST "$wikiApiUrl" \
           | gunzip \
           | jq ".query.tokens.logintoken" -r
@@ -68,14 +61,12 @@ for luaFile in $luaFiles; do
         -s \
         -b "$ckf" \
         -c "$ckf" \
-        --data-urlencode "username=${WIKI_USER}" \
-        --data-urlencode "password=${WIKI_PASSWORD}" \
-        --data-urlencode "logintoken=${loginToken}" \
-        --data-urlencode "loginreturnurl=${WIKI_BASE_URL}" \
+        --data-urlencode "lgname=${WIKI_USER}" \
+        --data-urlencode "lgpassword=${WIKI_PASSWORD}" \
+        --data-urlencode "lgtoken=${loginToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
-        -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
+        -X POST "${wikiApiUrl}?format=json&action=login" \
         | gunzip \
         > /dev/null
       loggedin[$wiki]=1
@@ -92,7 +83,6 @@ for luaFile in $luaFiles; do
         -d "format=json&action=query&meta=tokens" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "$wikiApiUrl" \
         | gunzip \
         | jq ".query.tokens.csrftoken" -r
@@ -110,7 +100,6 @@ for luaFile in $luaFiles; do
         --data-urlencode "token=${editToken}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
-        -H "Authorization: Basic ${DEV_WIKI_BASIC_AUTH}" \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
         | gunzip
     )

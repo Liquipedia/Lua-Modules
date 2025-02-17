@@ -18,10 +18,10 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -93,15 +93,15 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
-		return {
-			args.desc and Title{name = 'Description'} or nil,
-			Center{content = {args.desc}},
-			args.history and Title{name = 'Item History'} or nil,
-			Center{content = {args.history}}
-		}
+		return Array.append(
+			args.desc and Title{children = 'Description'} or nil,
+			Center{children = {args.desc}},
+			args.history and Title{children = 'Item History'} or nil,
+			Center{children = {args.history}}
+		)
 	elseif id == 'info' then
 		return {
-			Title{name = 'Item Information'},
+			Title{children = 'Item Information'},
 			Cell{name = 'Level', content = {args.level}},
 			Cell{name = 'Class', content = {CLASSES[(args.class or ''):lower()] or args.class}},
 			Cell{name = 'Charges', content = {args.charges}},
@@ -151,7 +151,7 @@ function CustomItem:setLpdbData(args)
 		stock = args.stock,
 		stockstart = args.stockstart,
 		stockreplenish = args.stockreplenish,
-		requirement = args.requirement,
+		requirement = args.requires,
 		purchasedfromgoblinshop = tostring(class == PURCHASABLE and String.contains(args.soldfrom, GOBLIN_MERCHANT)),
 	}
 

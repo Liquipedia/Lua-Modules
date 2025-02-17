@@ -10,6 +10,7 @@ return {
 	startYear = 2010,
 	wikiName = 'starcraft2',
 	name = 'StarCraft II',
+	defaultGame = 'wol',
 	games = {
 		wol = {
 			abbreviation = 'WoL',
@@ -51,11 +52,18 @@ return {
 			},
 		},
 	},
-	defaultGame = 'wol',
-	defaultTeamLogo = 'StarCraft 2 Default logo.png', ---@deprecated
-	defaultTeamLogoDark = 'StarCraft 2 Default logo.png', ---@deprecated
-
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = true,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidthMobile = 110,
+			matchWidth = 150,
+		},
+	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
-	match2 = 2,
 }

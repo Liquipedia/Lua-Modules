@@ -15,9 +15,9 @@ local Table = require('Module:Table')
 
 local NotabilityChecker = {}
 
-local _lang = mw.language.new('en')
-local _NOW = os.time()
-local _SECONDS_IN_YEAR = 365.2425 * 86400
+local LANG = mw.getContentLanguage()
+local NOW = os.time()
+local SECONDS_IN_YEAR = 365.2425 * 86400
 
 NotabilityChecker.LOGGING = true
 
@@ -98,7 +98,7 @@ function NotabilityChecker._calculateTeamNotability(team)
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
 		conditions = '[[participant::' .. team .. ']]',
-		query = Config.PLACEMENT_QUERY,
+		query = 'pagename, tournament, date, placement, liquipediatier, liquipediatiertype, extradata, mode',
 	})
 
 	return NotabilityChecker._calculateWeight(data)
@@ -113,10 +113,10 @@ function NotabilityChecker._calculatePersonNotability(person)
 	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
 		table.insert(conditions, '[[participant::' .. name .. ']]')
 		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
-			table.insert(conditions, '[[players_p' .. tostring(i) .. '::' .. name .. ']]')
+			table.insert(conditions, '[[opponentplayers_p' .. tostring(i) .. '::' .. name .. ']]')
 		end
 		for i = 1, Config.MAX_NUMBER_OF_COACHES do
-			table.insert(conditions, '[[players_c' .. tostring(i) .. '::' .. name .. ']]')
+			table.insert(conditions, '[[opponentplayers_c' .. tostring(i) .. '::' .. name .. ']]')
 		end
 	end
 
@@ -260,8 +260,8 @@ function NotabilityChecker._parseNotabilityMod(notabilityMod)
 end
 
 function NotabilityChecker._calculateDateLoss(date)
-	local timestamp = _lang:formatDate('U', date)
-	local differenceSeconds = _NOW - timestamp
+	local timestamp = LANG:formatDate('U', date)
+	local differenceSeconds = NOW - timestamp
 
 	-- If given received a date in the future, set the modifier from date to 1
 	-- This can happen due to editor mistake on a prizepool, or due to incorrectly setup prizepool/teamcard interaction
@@ -269,7 +269,7 @@ function NotabilityChecker._calculateDateLoss(date)
 		return 1
 	end
 
-	return math.floor(differenceSeconds / _SECONDS_IN_YEAR) + 1
+	return math.floor(differenceSeconds / SECONDS_IN_YEAR) + 1
 end
 
 return Class.export(NotabilityChecker)

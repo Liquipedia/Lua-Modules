@@ -11,49 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
       - name: Resource Deploy
         env:
-          WIKI_USER: ${{ secrets.LP_USER }}
-          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
         run: bash scripts/deploy_res.sh
 
       - name: Lua Deploy
         env:
-          WIKI_USER: ${{ secrets.LP_USER }}
-          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-        run: bash scripts/deploy.sh
-
-  dev-deploy:
-    name: Dev Wikis
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - name: Deploy Old Dev
-        env:
-          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
-          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
-          WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL }}
-          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
-        run: bash scripts/deploy.sh
-
-      - name: Deploy New Dev
-        env:
-          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
-          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
-          WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL2 }}
-          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
         run: bash scripts/deploy.sh

@@ -27,3 +27,70 @@ Author(s): FO-nTTaX
 .panel-box-body {
 	padding: 10px;
 }
+
+/* New */
+.mainpage-v2 {
+	.panel-box {
+		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+		border: 0;
+		border-radius: 0.5rem;
+
+		&.is--collapsed {
+			.panel-box-heading {
+				border-radius: 0.5rem;
+
+				&-icon {
+					transform: rotate( 180deg );
+				}
+			}
+
+			.panel-box-collapsible-content {
+				display: none;
+			}
+		}
+	}
+
+	.panel-box-heading {
+		display: flex;
+		align-items: center;
+		background-color: var( --clr-wiki-theme-primary, var( --wiki-color-medium ) );
+		color: #ffffff;
+		border: 0;
+		border-radius: 0.5rem 0.5rem 0 0;
+		min-height: 3rem;
+		padding: 0 1rem;
+		font-size: 1rem;
+
+		&-icon {
+			height: 1.5rem;
+			width: 1.5rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			opacity: 0.7;
+			margin-right: 0.75rem;
+			transform-origin: center;
+			transition: transform 0.2s linear;
+
+			@media ( hover: hover ) {
+				&:hover {
+					opacity: 1;
+				}
+			}
+		}
+	}
+
+	.panel-box-body {
+		border-radius: 0 0 0.5rem 0.5rem;
+		padding: 1rem;
+
+		.theme--light & {
+			background-color: #ffffff;
+		}
+
+		.theme--dark & {
+			background-color: #26292d;
+		}
+	}
+}

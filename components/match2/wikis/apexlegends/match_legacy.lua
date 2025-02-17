@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=apexlegends
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,13 +10,12 @@ local MatchLegacy = {}
 
 local DisplayHelper = require('Module:MatchGroup/Display/Helper')
 local Json = require('Module:Json')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 
-function MatchLegacy.storeMatch(match2, options)
-	if options.storeMatch1 then
-		MatchLegacy._storeMatch1(match2)
-	end
+function MatchLegacy.storeMatch(match2)
+	MatchLegacy._storeMatch1(match2)
 end
 
 function MatchLegacy._storeMatch1(match2)
@@ -27,11 +26,12 @@ function MatchLegacy._storeMatch1(match2)
 		match.date = game2.date
 		match.vod = game2.vod
 		match.dateexact = g2extradata.dateexact
+		match.finished = String.isNotEmpty(game2.winner)
 		match.staticid = match2.match2id .. '_' .. gameIndex
 
 		-- Handle extradata fields
 		local bracketData = Json.parseIfString(match2.match2bracketdata)
-		if type(bracketData) == 'table' and bracketData.type == 'bracket' and bracketData.inheritedheader then
+		if type(bracketData) == 'table' and bracketData.inheritedheader then
 			match.header = (DisplayHelper.expandHeader(bracketData.inheritedheader) or {})[1]
 		end
 		local m1extradata = {}

@@ -10,9 +10,10 @@ return {
 	startYear = 1996,
 	wikiName = 'pokemon',
 	name = 'Pokémon',
+	defaultGame = 'sv',
 	games = {
 		bw = {
-			abbreviation = 'bw',
+			abbreviation = 'BW1',
 			name = 'Black & White',
 			link = 'Main Page',
 			logo = {
@@ -25,7 +26,7 @@ return {
 			},
 		},
 		bw2 = {
-			abbreviation = 'bw2',
+			abbreviation = 'BW2',
 			name = 'Black 2 & White 2',
 			link = 'Main Page',
 			logo = {
@@ -38,7 +39,7 @@ return {
 			},
 		},
 		dpp = {
-			abbreviation = 'dpp',
+			abbreviation = 'DPP',
 			name = 'Diamond, Pearl & Platnium',
 			link = 'Main Page',
 			logo = {
@@ -51,7 +52,7 @@ return {
 			},
 		},
 		go = {
-			abbreviation = 'go',
+			abbreviation = 'GO',
 			link = 'Main Page',
 			name = 'Pokemon Go',
 			logo = {
@@ -64,7 +65,7 @@ return {
 			},
 		},
 		gsc = {
-			abbreviation = 'gsc',
+			abbreviation = 'GSC',
 			link = 'Main Page',
 			name = 'Gold, Silver & Crystal',
 			logo = {
@@ -77,7 +78,7 @@ return {
 			},
 		},
 		oras = {
-			abbreviation = 'oras',
+			abbreviation = 'ORAS',
 			name = 'Omega Ruby & Alpha Sapphire',
 			link = 'Main Page',
 			logo = {
@@ -90,7 +91,7 @@ return {
 			},
 		},
 		rby = {
-			abbreviation = 'rby',
+			abbreviation = 'RBY',
 			name = 'Red, Blue & Yellow',
 			link = 'Main Page',
 			logo = {
@@ -103,7 +104,7 @@ return {
 			},
 		},
 		rse = {
-			abbreviation = 'rse',
+			abbreviation = 'RSE',
 			name = 'Ruby, Sapphire & Emerald',
 			link = 'Main Page',
 			logo = {
@@ -116,7 +117,7 @@ return {
 			},
 		},
 		sm = {
-			abbreviation = 'sm',
+			abbreviation = 'SM',
 			name = 'Sun & Moon',
 			link = 'Main Page',
 			logo = {
@@ -129,7 +130,7 @@ return {
 			},
 		},
 		sv = {
-			abbreviation = 'sv',
+			abbreviation = 'SV',
 			name = 'Scarlet & Violet',
 			link = 'Main Page',
 			logo = {
@@ -142,7 +143,7 @@ return {
 			},
 		},
 		swsh = {
-			abbreviation = 'swsh',
+			abbreviation = 'SWSH',
 			name = 'Sword & Shield',
 			link = 'Main Page',
 			logo = {
@@ -155,7 +156,7 @@ return {
 			},
 		},
 		tcg = {
-			abbreviation = 'tcg',
+			abbreviation = 'TCG',
 			name = 'Trading Card Game',
 			link = 'Main Page',
 			logo = {
@@ -167,8 +168,21 @@ return {
 				lightMode = 'Pokemon allmode.png',
 			},
 		},
+		tcgp = {
+			abbreviation = 'TCG-P',
+			name = 'Trading Card Game Pocket',
+			link = 'Main Page',
+			logo = {
+				darkMode = 'Pokemon allmode.png',
+				lightMode = 'Pokemon allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Pokemon allmode.png',
+				lightMode = 'Pokemon allmode.png',
+			},
+		},
 		tcgl = {
-			abbreviation = 'tcgl',
+			abbreviation = 'TCG-L',
 			name = 'Trading Card Game Live',
 			link = 'Main Page',
 			logo = {
@@ -181,7 +195,7 @@ return {
 			},
 		},
 		tcgo = {
-			abbreviation = 'tcgo',
+			abbreviation = 'TCG-O',
 			name = 'Trading Card Game Online',
 			link = 'Main Page',
 			logo = {
@@ -194,7 +208,7 @@ return {
 			},
 		},
 		unite = {
-			abbreviation = 'unite',
+			abbreviation = 'UNITE',
 			name = 'Unite',
 			link = 'Main Page',
 			logo = {
@@ -207,7 +221,7 @@ return {
 			},
 		},
 		usum = {
-			abbreviation = 'usum',
+			abbreviation = 'USUM',
 			name = 'Ultra Sun & Ultra Moon',
 			link = 'Main Page',
 			logo = {
@@ -220,8 +234,16 @@ return {
 			},
 		},
 	},
-	defaultGame = 'sv',
-	defaultTeamLogo = 'Pokemon logo std.png', ---@deprecated
-	defaultTeamLogoDark = 'Pokemon logo std.png', ---@deprecated
-	match2 = 1,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+			matchWidthMobile = 110,
+			matchWidth = 190,
+		},
+	},
 }

@@ -9,29 +9,26 @@
 local LegacyMatchList = {}
 
 local Logic = require('Module:Logic')
-local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local getArgs = require('Module:Arguments').getArgs
-local json = require('Module:Json')
-
-local MatchSubobjects = Lua.import('Module:Match/Subobjects')
+local Arguments = require('Module:Arguments')
+local Json = require('Module:Json')
 
 local ALLOWED_STATUSES = { 'W', 'FF', 'DQ', 'L' }
 local _MAX_NUMBER_OF_MATCHES = 64
 local _MAX_NUMBER_OF_MAPS = 15
 
 function LegacyMatchList.convertMatchList(frame)
-	local args = getArgs(frame)
+	local args = Arguments.getArgs(frame)
 
 	--switch matches (and headers) to the correct parameters for the new system
 	for index = 1, _MAX_NUMBER_OF_MATCHES do
 		if not Logic.isEmpty(args['match' .. index]) then
-			local match = json.parse(args['match' .. index])
+			local match = Json.parse(args['match' .. index])
 			--header adjusting
 			args['M' .. index .. 'header'] = match.header
 			match.header = nil
 			--stringify match again and asign new key
-			args['M' .. index] = json.stringify(match)
+			args['M' .. index] = Json.stringify(match)
 			--kick old key
 			args['match' .. index] = nil
 		else
@@ -59,8 +56,8 @@ function LegacyMatchList.convertMatchList(frame)
 end
 
 function LegacyMatchList.convertMatchMaps(frame)
-	local args = getArgs(frame)
-	local details = json.parseIfString(args.details or '{}')
+	local args = Arguments.getArgs(frame)
+	local details = Json.parseIfString(args.details or '{}')
 
 	--process maps
 	args, details = LegacyMatchList.processMaps(args, details)
@@ -114,12 +111,12 @@ function LegacyMatchList.convertMatchMaps(frame)
 
 	args = LegacyMatchList.handleLiteralsForOpponents(args)
 
-	return json.stringify(args)
+	return Json.stringify(args)
 end
 
 function LegacyMatchList.convertSwissMatchMaps(frame)
-	local args = getArgs(frame)
-	local details = json.parseIfString(args.details or '{}')
+	local args = Arguments.getArgs(frame)
+	local details = Json.parseIfString(args.details or '{}')
 
 	--process maps
 	args, details = LegacyMatchList.processMaps(args, details)
@@ -179,7 +176,7 @@ function LegacyMatchList.convertSwissMatchMaps(frame)
 
 	args = LegacyMatchList.handleLiteralsForOpponents(args)
 
-	return json.stringify(args)
+	return Json.stringify(args)
 end
 
 --functions shared between convertMatchMaps and convertSwissMatchMaps
@@ -203,7 +200,7 @@ function LegacyMatchList.processMaps(args, details)
 			local score2 = details['map' .. index .. 't2score'] or
 				LegacyMatchList.getMapScoreFromGoals(details['map' .. index .. 't2goals'])
 
-			local map = MatchSubobjects.luaGetMap{
+			local map = {
 				map = details['map' .. index],
 				winner = details['map' .. index .. 'win'],
 				score1 = score1,
@@ -215,6 +212,8 @@ function LegacyMatchList.processMaps(args, details)
 				t1goals = details['map' .. index .. 't1goals'],
 				t2goals = details['map' .. index .. 't2goals'],
 			}
+			---can not be nil due to details['map' .. index] being set
+			---@cast map -nil
 			args['map' .. index] = map
 			if map.winner == '1' then
 				t1wins = t1wins + 1

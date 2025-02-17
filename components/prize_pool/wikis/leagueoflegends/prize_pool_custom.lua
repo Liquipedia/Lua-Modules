@@ -22,6 +22,8 @@ local CustomPrizePool = {}
 local TIER_VALUE = {8, 4, 2}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.allGroupsUseWdl = true
@@ -32,6 +34,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
@@ -39,19 +45,20 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 		placement.placeStart
 	)
 
-	lpdbData.publishertier = Variables.varDefault('tournament_riot_premier', '')
-	lpdbData.extradata.publisherpremier = Variables.varDefault('tournament_publisher_major') and 'true' or ''
-
 	local team = lpdbData.participant or ''
-	local smwPrefix = Variables.varDefault('smw_prefix', '')
+	local lpdbPrefix = Variables.varDefault('lpdb_prefix', '')
 
-	Variables.varDefine('enddate_' .. smwPrefix .. team, lpdbData.date)
-	Variables.varDefine('ranking' .. smwPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
+	Variables.varDefine('enddate_' .. lpdbPrefix .. team, lpdbData.date)
+	Variables.varDefine('ranking' .. lpdbPrefix .. '_' .. (team:lower()) .. '_pointprize', lpdbData.extradata.prizepoints)
 
 
 	return lpdbData
 end
 
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place)
 	if Logic.isEmpty(tier) then
 		return 0

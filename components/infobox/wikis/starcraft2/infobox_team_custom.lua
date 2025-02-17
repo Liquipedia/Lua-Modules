@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
@@ -19,14 +20,14 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local RaceBreakdown = Lua.import('Module:Infobox/Extension/RaceBreakdown')
 local Team = Lua.import('Module:Infobox/Team')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local Center = Widgets.Center
@@ -64,25 +65,26 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'earnings' then
-		local displayEarnings = function(value)
-			return value > 0 and '$' .. mw.language.new('en'):formatNum(value) or nil
+		local displayEarnings = function(earningsData)
+			local totalEarnings = Math.sum(Array.extractValues(earningsData or {}))
+			return totalEarnings > 0 and '$' .. mw.getContentLanguage():formatNum(totalEarnings) or nil
 		end
 
 		return {
-			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings.total)}},
-			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings.total)}},
+			Cell{name = 'Approx. Total Winnings', content = {displayEarnings(self.caller.teamEarnings)}},
+			Cell{name = PLAYER_EARNINGS_ABBREVIATION, content = {displayEarnings(self.caller.playerEarnings)}},
 		}
 	elseif id == 'achievements' then
 		local achievements, soloAchievements = Achievements.teamAndTeamSolo()
 		widgets = {}
 		if achievements then
-			table.insert(widgets, Title{name = 'Achievements'})
-			table.insert(widgets, Center{content = {achievements}})
+			table.insert(widgets, Title{children = 'Achievements'})
+			table.insert(widgets, Center{children = {achievements}})
 		end
 
 		if soloAchievements then
-			table.insert(widgets, Title{name = 'Solo Achievements'})
-			table.insert(widgets, Center{content = {soloAchievements}})
+			table.insert(widgets, Title{children = 'Solo Achievements'})
+			table.insert(widgets, Center{children = {soloAchievements}})
 		end
 
 		--need this ABOVE the history display and below the
@@ -90,9 +92,9 @@ function CustomInjector:parse(id, widgets)
 		local raceBreakdown = RaceBreakdown.run(args)
 		if raceBreakdown then
 			Array.appendWith(widgets,
-				Title{name = 'Player Breakdown'},
+				Title{children = 'Player Breakdown'},
 				Cell{name = 'Number of Players', content = {raceBreakdown.total}},
-				Breakdown{content = raceBreakdown.display, classes = {'infobox-center'}}
+				Breakdown{children = raceBreakdown.display, classes = {'infobox-center'}}
 			)
 		end
 
@@ -110,11 +112,16 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
+---@param region string?
+---@return {display: string?, region: string?}
+function CustomTeam:createRegion(region)
+	return {}
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
-	lpdbData.region = nil
 	lpdbData.extradata.subteams = self:_listSubTeams()
 
 	lpdbData.extradata.playerearnings = Table.extract(self.playerEarnings, 'total')
@@ -203,7 +210,7 @@ function CustomTeam:getEarningsAndMedalsData()
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all):add{
-		ConditionNode(ColumnName('date'), Comparator.neq, '1970-01-01 00:00:00'),
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('liquipediatier'), Comparator.neq, '-1'),
 		ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, 'Charity'),
 		ConditionTree(BooleanOperator.any):add{

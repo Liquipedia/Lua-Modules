@@ -1,0 +1,1626 @@
+/* Temporary: Hide Errors from logged out users */
+.logged-out .scribunto-error {
+	display: none;
+}
+
+/* Invert colors for dark theme */
+html.theme--dark .componentsinvert {
+	filter: invert( 1 );
+}
+
+// Hero infobox-related
+.healthbar {
+	background: linear-gradient( to right, #286323, #7af03c );
+	color: #ffffff;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+	font-weight: bold;
+}
+
+.manabar {
+	background: linear-gradient( to right, #1056db, #73f5fe );
+	color: #ffffff;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+	font-weight: bold;
+}
+
+.primaryAttribute {
+	&_str {
+		background: var( --clr-semantic-negative-40 ); // #b81414 (Old #b9500b)
+	}
+
+	&_agi {
+		background: var( --clr-semantic-positive-30 ); // #1d7c1d (Old #167c13)
+	}
+
+	&_int {
+		background: var( --clr-sapphire-base ); // #3a5ba9 (Old #257dae)
+	}
+
+	&_uni {
+		background: var( --clr-semantic-negative-40 ); // #732b9c (Old 5d3fd3)
+	}
+} // Colors the Attribute base + gain section
+
+#primaryAttribute img,
+.primaryAttribute img {
+	border: 0.125rem solid var( --clr-primary-100 ); // #fff
+	border-radius: 50%;
+} // Circles the Primary Attribute.
+
+.secondaryAttribute img {
+	border: 0.125rem solid var( --clr-secondary-7 ); // #121212
+	border-radius: 50%;
+} // Circles the Secondary Attribute.
+
+.ib-tooltip {
+	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
+	border-style: solid;
+	text-align: center;
+	font-size: 70%; // convert to rem
+	font-weight: bold;
+
+	&:hover {
+		background-color: rgba( 255, 215, 0, 0.5 );
+	}
+} // Mainly for Hero infobox tooltip. Can be expanded to other usage in the future.
+
+/* Infobox Cosmetic */
+.infobox-cosmetic-tradeable,
+.infobox-cosmetic-marketable {
+	background: radial-gradient( 50% 50% at 50% 50%, #03386f 0%, #030d1a 100% );
+	font-weight: bold;
+	color: #4898ed; // TODO: Need support for both true and false, this is the true color, false is #9f7669
+}
+
+.infobox-cosmetic-deletable {
+	background: radial-gradient( 50% 50% at 50% 50%, #262a30 0%, #000000 100% );
+	font-weight: bold;
+	color: #747b82; // TODO: Need support for both true and false, this is the false color, true is not defined
+}
+
+/* Text Colors */
+.text-color-gold {
+	color: #daa520;
+}
+
+// Template:Cf-related
+a.cf {
+	font-weight: bold;
+	color: #ffffff;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+}
+
+// Spellcard Ability Borders
+// The smaller sizes are for sub-sections.
+.target_passive,
+.target_aura {
+	border: 0;
+} // Applies a caved-in img overlay for passive abilities instead.
+
+.target_no,
+.target_unit,
+.target_area,
+.target_ground,
+.target_point {
+	border-top: 0.375rem solid #899499;
+	border-bottom: 0.375rem solid #212f3d;
+	border-right: 0.375rem solid #595959;
+	border-left: 0.375rem solid #a7a7a7;
+} // Mimics an active button.
+
+.target_toggle {
+	border: 0.375rem solid #fc9303;
+} // Mimics a toggled-on state.
+
+.target_altcast {
+	outline: 0.25rem solid #f5f5f5;
+	outline-offset: -0.375rem;
+	border-top: 0.375rem solid #899499;
+	border-bottom: 0.375rem solid #212f3d;
+	border-right: 0.375rem solid #595959;
+	border-left: 0.375rem solid #a7a7a7;
+} // Mimics an Alt-Cast-on state.
+
+@keyframes rotate {
+	100% {
+		transform: rotate( 1turn );
+	}
+}
+
+.target_autocast {
+	width: 5rem; // 80px
+	height: 5rem; // 80px
+	padding: 0.375rem;
+} // Mimics an Autocast-able ability.
+
+.target_autocast1 {
+	width: 2.5rem; //40px
+	height: 2.5rem; //40px
+	padding: 0.1875rem;
+}
+
+.target_autocast1,
+.target_autocast {
+	position: relative;
+	z-index: 0;
+	overflow: hidden;
+	outline: 0.0625rem solid #333333;
+	outline-offset: -0.25rem;
+
+	&::before {
+		content: "";
+		position: absolute;
+		z-index: -2;
+		left: -50%;
+		top: -50%;
+		width: 200%;
+		height: 200%;
+		background-color: transparent;
+		background-repeat: no-repeat;
+		background-image: linear-gradient( #000000, #fbb300 );
+		animation: rotate 1.2s cubic-bezier( 0.46, 0.03, 0.52, 0.96 ) infinite;
+	}
+
+	&::after {
+		content: "";
+		position: absolute;
+		z-index: -1;
+		left: 0.375rem;
+		top: 0.375rem;
+		width: calc( 100% - 0.75rem );
+		height: calc( 100% - 0.7rem );
+		border-radius: 0;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+} // Mimics an Autocast-on state.
+
+.target_autocast-off {
+	border: 0.375rem ridge #899499;
+}
+
+.target_aam {
+	border: 0.375rem solid #999999;
+	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
+}
+
+.target_no1,
+.target_unit1,
+.target_area1,
+.target_ground1,
+.target_point1 {
+	border-width: 0.1875rem;
+	border-style: solid;
+	border-color: #899499 #595959 #212f3d #a7a7a7;
+}
+
+.target_toggle1 {
+	border: 0.1875rem solid #fc9303;
+}
+
+.target_altcast1 {
+	outline: 0.125rem solid #f5f5f5;
+	outline-offset: -0.1875rem;
+	border-width: 0.1875rem;
+	border-style: solid;
+	border-color: #899499 #595959 #212f3d #a7a7a7;
+}
+
+.target_autocast-off1 {
+	border: 0.1875rem ridge #899499;
+}
+
+.target_aam1 {
+	border: 0.1875rem solid #999999;
+	border-image: linear-gradient( -45deg, #fc9303, #899499 73% ) 1;
+}
+
+.target_downtime1 {
+	width: 5.375rem; // 86px
+	height: 5.375rem; //86px
+	border: 0;
+} // Downtime should always be within the sub-section.
+
+.target_downtime1:before,
+.item_cdshare:before {
+	content: "";
+	position: absolute;
+	inset: 0; /* Replaces top: 0; left: 0; right: 0; bottom: 0; */
+	background: rgba( 117, 117, 117, 0.55 );
+	animation: abilityDowntime 2.5s linear infinite;
+}
+
+@keyframes abilityDowntime {
+	0%,
+	25%,
+	50% {
+		height: 0;
+	}
+
+	75%,
+	100% {
+		height: 100%;
+	}
+}
+
+/* Spellcard Item-cooldown Sharing */
+.item_cdshare {
+	width: 5.5rem; // 88px
+	height: 4rem; // 64px
+	border: 0;
+}
+
+// Spellcard-related
+.spelltad {
+	display: inline-block;
+	font-size: 90%; // convert to rem
+	vertical-align: top;
+	width: 13%;
+	text-align: right;
+} // Spellcard Target/Affect/Damage (TAD)
+
+.spelltad_value {
+	flex: 1 0 auto;
+	display: inline-block;
+	padding-left: 0.3125rem;
+	font-size: 90%; // convert to rem
+	vertical-align: top;
+}
+
+.spelldesc {
+	border-top: 0.0625rem solid #333333;
+
+	&:hover {
+		border-top: 0.0625rem solid #999999;
+	}
+}
+
+.spellagh {
+	font-weight: bold;
+	color: #a885ff;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+}
+
+.spelltrait_value {
+	vertical-align: middle;
+	font-size: 95%; // convert to rem
+	min-height: 1.4375rem; //23px
+	height: auto;
+	width: 100%;
+	max-width: 28.125rem; // 450px
+}
+
+.spellcost {
+	&_icon {
+		vertical-align: text-top;
+		text-align: center;
+		width: 1.5625rem; // 25px
+		height: 1.5625rem; // 25px
+	}
+
+	&_value {
+		font-size: 90%; // convert to rem
+		vertical-align: text-top;
+		padding: 0 0.0625rem;
+	}
+}
+
+.spelltype {
+	&_mpcost,
+	&_hpcost {
+		border-top: 0.25rem double;
+		display: inline-block;
+		text-align: center;
+		width: 100%;
+		max-width: 28.125rem; // 450px
+	}
+
+	&_mpcost {
+		border-top-color: #3590e8;
+	}
+
+	&_hpcost {
+		border-top-color: #55b231;
+	}
+
+	&_sublink {
+		border-top: 0.0625rem solid #333333;
+		width: 100%;
+		max-width: 28.125rem; // 450px
+	}
+}
+
+.spelllore {
+	display: inline-block;
+	text-align: center;
+	background-color: #282828c4;
+	padding: 0.125rem;
+	font-size: 85%; // convert to rem
+	font-style: italic;
+	color: #e2e2e2;
+	outline: 0.0625rem solid rgba( 226, 226, 226, 0.2 );
+	width: 100%;
+	max-width: 28.125rem; // 450px
+}
+
+.spellintern {
+	cursor: default;
+	padding: 0.1875rem;
+	font-size: 70%; // convert to rem
+	border: 0.0625rem solid #7681968c;
+
+	&:hover {
+		border: 0.0625rem solid #768196;
+	}
+}
+
+.iconrotate {
+	transition: all 6s;
+
+	&:hover {
+		transform: rotate( 1080deg );
+	}
+}
+
+.spellvalueTable {
+	display: table;
+}
+
+.i-row,
+.spellvalueTableRow {
+	display: table-row;
+} // Hero infobox row uses the same value.
+
+.spellvalueTableCell {
+	display: table-cell;
+	text-align: center;
+	padding: 0.1875rem;
+	border-bottom: 1px solid;
+	height: 35px;
+}
+
+// Spellunit-related
+.spellunit {
+	&_link,
+	&_topage {
+		color: #e2e2e6;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		font-weight: bold;
+	}
+
+	&_topage:hover {
+		color: #daa520;
+	}
+
+	&_mp,
+	&_hp {
+		display: flex;
+		max-width: 8rem; // 128px
+		height: 1.3125rem; // 21px
+		padding: 0.125rem;
+		border-bottom: 0.0625rem solid #333333;
+		align-items: center;
+		justify-content: center;
+		font-weight: bold;
+		font-size: 80%; // convert to rem
+		text-shadow: 0.7px 0.7px 1.2px #000000; //subpixel necessary?
+		text-align: center;
+	}
+
+	&_hp {
+		background: linear-gradient( to right, #286323, #7af03c );
+	}
+
+	&_mp {
+		background: linear-gradient( to right, #1056db, #73f5fe );
+	}
+
+	&_cellt {
+		display: table-cell;
+		width: 1.875rem; // 30px
+		height: 1.3125rem; // 21px
+		text-align: right;
+	}
+
+	&_cellv {
+		display: table-cell;
+		padding-left: 0.5rem;
+		width: 12.5rem; // 200px
+		height: 1.3125rem; // 21px
+		text-align: left;
+	}
+}
+
+// ValueColor (Will eventually move all color-related stuff to this stylesheet.
+// ValueColor section end.
+
+// $craft-related
+// This is mainly for the mini-infobox within the Spellcard.
+.craft {
+	&_base {
+		background-color: #93000d2e;
+		font-size: 15px;
+		padding: 5px;
+	}
+
+	&_title {
+		font-size: 85%;
+		border-bottom: 1px solid #333333;
+	}
+
+	&_icon {
+		position: relative;
+		flex-shrink: 0;
+	}
+
+	&_overlay {
+		position: absolute;
+		top: 0;
+		left: 0;
+		pointer-events: none;
+	} // Applies a caved-in img overlay for visual purposes.
+}
+
+// Invokecard-related
+.invokeCard {
+	font-size: 85%; // convert to rem
+	width: 6.25rem; // 100px
+	height: 6.25rem; // 100px
+	margin: 0.3125rem;
+	border: 0.0625rem solid rgba( 51, 51, 51, 0.5 );
+	background-color: rgba( 51, 51, 51, 0.5 );
+
+	&:hover {
+		border: 0.0625rem solid #f7f7f7;
+	}
+}
+
+.invokePad {
+	padding: 0.25rem;
+}
+
+// Facetcard-related
+.facetBox {
+	background: rgba( 35, 46, 52, 0.25 );
+	padding: 0.3125rem;
+	border: 0.0625rem solid #505050;
+	color: #ffffff;
+	transition: 0.35s;
+
+	&:hover {
+		border: 0.0625rem solid var( --clr-elm-10 );
+	}
+
+	.theme--dark &:hover {
+		border: 0.0625rem solid var( --clr-moon-90 );
+	}
+}
+
+.facetTitle {
+	cursor: help;
+}
+
+.facetLink {
+	font-weight: bold;
+	color: #e2e2e6;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+}
+
+.facetDesc {
+	border-top: 0.125rem solid #505050;
+	padding-top: 0.3125rem;
+
+	&:hover {
+		border-top: 0.125rem solid var( --clr-moon-80 );
+	}
+}
+
+/* Aghcard-related */
+.aghupg {
+	&Body {
+		display: inline-block;
+		max-width: 28.75rem; // 460px
+		width: 100%;
+		font-size: 90%; // convert to rem
+		background: rgba( 35, 46, 52, 0.75 );
+		text-align: left;
+		padding-left: 0.3125rem;
+		padding-right: 0.3125rem;
+		padding-top: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		color: #d9e0e8;
+	}
+
+	&Title {
+		font-weight: bold;
+		color: #a885ff;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		flex-grow: 1;
+	}
+
+	&New {
+		text-align: center;
+		border-radius: 0.1875rem;
+		font-weight: bold;
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		background-color: #1c2e50;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		border: 0.125rem solid #505050;
+		padding-left: 0.125rem;
+		padding-right: 0.125rem;
+	}
+
+	&Shadow {
+		display: inline-block;
+		background: rgba( 18, 26, 33, 0.7 );
+		text-align: left;
+		margin-top: 0;
+		margin-bottom: 0.3125rem;
+		padding: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		width: 100%;
+
+		&:hover {
+			background-color: rgba( 9, 13, 17, 1 );
+			transition: 0.15s;
+		}
+	}
+
+	&Desc {
+		vertical-align: top;
+		padding: 0;
+	}
+}
+
+/* HeroGameplay-related */
+.gameplay_ {
+	color: #227722;
+	font-weight: bold;
+
+	&_agh {
+		color: #a50f79;
+		font-weight: bold;
+	}
+
+	&_shd {
+		color: #4b69ff;
+		font-weight: bold;
+	}
+
+	&_tal {
+		color: #cf6a32;
+		font-weight: bold;
+	}
+
+	&_talbutton {
+		color: #f3e494;
+
+		&:hover {
+			text-shadow: 0.0625rem 0.0625rem 0.5rem #ff751b, -0.0625rem -0.0625rem 0.5rem #ff751b;
+			cursor: default;
+		}
+	}
+
+	&_tallvl {
+		max-width: 28.125rem; // 450px
+		color: #f3e494;
+		text-shadow: 0.0625rem 0.0625rem 0.5rem transparent, -0.0625rem -0.0625rem 0.5rem transparent;
+		border-left: 0.125rem solid #131313;
+		border-right: 0.125rem solid #131313;
+
+		&:hover {
+			text-shadow: 0.0625rem 0.0625rem 0.5rem #ff751b, -0.0625rem -0.0625rem 0.5rem #ff751b;
+			cursor: default;
+			border-left: 0.125rem solid #f3e494;
+			border-right: 0.125rem solid #f3e494;
+		}
+	}
+
+	&_taldesc {
+		color: #e2e2e6;
+		display: table-cell;
+		min-width: 12.5rem; // 200px;
+		text-shadow: initial;
+		font-weight: initial;
+
+		&:hover {
+			color: #e2e2e6;
+			text-shadow: initial;
+			font-weight: initial;
+		}
+	}
+}
+
+/* these two styles are same for the talent level hover glow */
+div.gameplay_nav {
+	display: block;
+	font-size: 1.5rem; // 24px
+
+	ul {
+		margin: 0 !important; // is important necessary?
+
+		li {
+			list-style: none;
+			display: inline-block;
+			padding: 0.3125rem;
+			position: relative;
+			text-decoration: none;
+			text-align: center;
+
+			&:hover {
+				background-color: rgba( 78, 85, 87, 0.5 );
+			}
+
+			ul {
+				opacity: 0;
+				position: absolute;
+				padding-left: 0;
+				left: 0;
+				display: inline-block;
+			}
+		}
+	}
+}
+
+div.gameplay_nav ul li:hover > ul,
+div.gameplay_nav ul li ul:hover {
+	opacity: 1;
+	display: block;
+	min-width: 28.125rem; // 450px
+	padding: 0.3125rem;
+	box-shadow: 0 0.1875rem 0.3125rem -0.0625rem rgba( 88, 88, 88, 0.5 );
+	background-color: #131313;
+	color: #e2e2e6;
+	font-size: 0.8125rem; // 13px
+}
+
+div.gameplay_nav ul li ul li {
+	clear: both;
+	width: 100%;
+	text-align: center;
+	padding: 0.3125rem;
+	border-style: hidden;
+}
+
+// treeview-related
+.treeview {
+	ul {
+		padding: 0 !important; // is important necessary?
+		margin: 0 !important; // is important necessary?
+	}
+
+	li {
+		padding: 0;
+		margin: 0;
+		list-style-type: none;
+		list-style-image: none;
+
+		&::after {
+			display: block;
+			content: "";
+			clear: both;
+		}
+
+		li {
+			/* @noflip */
+			padding-left: 1.3125rem; // 21px
+			text-indent: 0.3em;
+
+			&:last-child {
+				background-position: 0 -5971px;
+			}
+		}
+	}
+}
+
+/* first line here deals with new situation after RemexHTML switch,
+ * where emptyline cause the first child to become the 2nd child. Such a mess
+ */
+.treeview li.emptyline > ul > .mw-empty-elt:first-child + .emptyline,
+.treeview li.emptyline > ul > li:first-child {
+	background-position: 0 0.5625rem;
+} // Treelist will be removed for something else in the future.
+
+/***************************
+* Used by [[Template:Key press]] *
+****************************/
+.key {
+	display: inline-block;
+	white-space: nowrap;
+
+	kbd {
+		padding: 0.1em 0.6em 0.1em 0.6em; // convert to rem
+		margin-right: 0.125rem;
+		font-size: 85%; // convert to rem
+		font-family: inherit;
+		font-style: normal;
+		border-radius: 0.4em; // convert to rem
+	}
+}
+
+.keys {
+	border: 0.0625rem solid #111111;
+	box-shadow: 0 0.2em rgba( 0, 0, 0, 0.5 ); // convert to rem
+	background-color: #505459;
+	background-image: linear-gradient( to bottom, #505459, #282828 );
+	color: #eeeeee;
+}
+
+/******************************
+* End Template:Key press coloration *
+*******************************/
+
+/* Recent Changes */
+.mw-rcfilters-ui-changesListWrapperWidget {
+	right: 3.125rem; // 50px
+
+	h4 {
+		padding-left: 3.125rem; // 50px
+	}
+
+	&-previousChangesIndicator {
+		margin-left: 3.125rem; // 50px
+	}
+}
+
+.cosm-inf-setname {
+	background-color: var( --table-green-background-color );
+}
+
+// Update table styling ([[Template:VersionTableStart]], [[Template:PatchTableStart]]
+// Will revisit this soon.
+.updatetablehead {
+	display: flex;
+	border-top: 0.0625rem solid #aaaaaa;
+	border-right: 0.0625rem solid #aaaaaa;
+	border-left: 0.0625rem solid #aaaaaa;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updatetablebody {
+	overflow-x: auto;
+	border: 0.0625rem solid #aaaaaa;
+	border-top: 0;
+}
+
+.updatetablehead #patch,
+.updatetablehead #version,
+.updatetablehead #date,
+.updatetablebody #patch,
+.updatetablebody #version {
+	flex: 0 0 7.5rem;
+	text-align: center;
+	font-weight: bold;
+}
+
+.updatetablebody #date {
+	max-width: 6.25rem; // 100px
+	text-align: center;
+	font-size: 85%; // convert to rem
+}
+
+.updatetablehead #description,
+.updatetablebody #description {
+	flex: 1 1 auto;
+}
+
+.updatetablebody #description {
+	padding: 0.25rem 0;
+}
+
+.updatetablebody #entry {
+	display: flex;
+	align-items: center;
+	border-top: 0.0625rem solid #aaaaaa;
+}
+
+.updatetablebody ul {
+	margin: 0 0 0 1.6em; // convert to rem
+}
+
+/* Template:GameVersionTableElement */
+.gvt-el-significant {
+	background-color: var( --publisher-premier-highlight-background-color, #ffffcc );
+}
+
+/* Template:Talent table el */
+.tte-right-tal-slot {
+	height: 2.5rem; // 40px
+	padding: 0;
+	border-bottom: solid 0.125rem #000000;
+	background: #eff5ff;
+}
+
+/* Item Grid Styling on [[Item Grid]] */
+
+ul.shopnav {
+	margin: 0;
+	list-style: none;
+
+	li {
+		margin: 0.25rem;
+		box-shadow: 0 0 0.0625rem 0.125rem #008000;
+	}
+}
+
+/* Item List Styling on [[Items]] */
+
+div.itemlist {
+	display: flex;
+	flex-wrap: wrap;
+	font-weight: 500;
+
+	> div {
+		flex-basis: 25rem; // 400px;
+		padding: 0.1875rem 0;
+	}
+}
+
+/* Hero Infostrip */
+
+div.infostripe {
+	display: flex;
+	overflow: hidden;
+	align-items: stretch;
+	justify-content: center;
+	color: #ffffff;
+	vertical-align: top;
+	text-align: center;
+	text-shadow: 0 0 0.3125rem #000000;
+	font-size: 1.25rem;
+
+	a,
+	a:link,
+	a:visited,
+	a:hover,
+	a:active {
+		color: #ffffff;
+		text-decoration: none;
+	}
+}
+
+.gradient {
+	&_gameplay {
+		background: linear-gradient( 15deg, #b24343 0%, #c65c49 17%, #bf7f4e 62%, #a8413e 100% );
+	}
+
+	&_cosmetics {
+		background: linear-gradient( 15deg, #4a4a4a 0%, #699f9f 17%, #abd8d6 62%, #4a4a4a 100% );
+	}
+
+	&_audio {
+		background: linear-gradient( 15deg, #17542b 0%, #01a476 17%, #4db974 62%, #17542b 100% );
+	}
+
+	&_history {
+		background: linear-gradient( 15deg, #b4720f 0%, #bcb902 17%, #d4d85c 62%, #b4720f 100% );
+	}
+}
+
+div.infostripe div {
+	margin: 0 -0.125rem;
+	padding: 0.9375rem 1.5625rem 0.625rem;
+	border-right: 0.25rem solid rgba( 75, 75, 75, 0.5 );
+	border-left: 0.25rem solid rgba( 75, 75, 75, 0.5 );
+}
+
+// Template:Hero Entry-related
+// Used in Portal:Heroes, hero tables and cosmetic infoboxes
+.vercheck_,
+.vercheck_no {
+	filter: grayscale( 90% ); // Difficult for colorblind users at low percentage.
+} // Grayscales the hero portrait based on the Template:VersionControl values stored in LPDB.
+
+div.heroentry {
+	position: relative;
+	display: inline-block;
+	overflow: hidden;
+	margin: 0.0625rem;
+	width: 6.875rem; // 110px
+	height: 3.875rem; // 62px
+
+	div {
+		position: absolute;
+	}
+}
+
+div.heroentrytext {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	margin: 0.0625rem 0.125rem;
+	width: 6.625rem; // 106px
+	height: 3.75rem; // 60px
+	color: #ffffff;
+	text-align: center;
+	text-shadow: -0.0625rem 0 0.2em #000000, 0 0.0625rem 0.2em #000000, 0.0625rem 0 0.2em #000000, 0 -0.0625rem 0.2em #000000;
+	font-size: 0.6875rem;
+	line-height: 0.9375rem;
+	pointer-events: none;
+}
+
+/* Main Page styling */
+
+.mp-content-table {
+	/* Main border color */
+	margin: 0.5em 0; // convert to rem
+	width: 100%;
+	/* Body background color */
+	border: 0.0625rem solid #b44335;
+	background: #fefeff;
+}
+
+.mp-content-header {
+	padding: 0.5em 0; // convert to rem
+	/* Header background color */
+	border: 0;
+	border-bottom: 0.0625rem solid #b44335;
+	background: #b44335;
+	color: #ffffff;
+	font-size: 140%; // convert to rem
+	/* Main border color		*/
+}
+
+.mp-content-body {
+	padding: 0.5em; // convert to rem
+}
+
+/* Don't wordwrap top links on main page */
+
+.mp-content-table ul > li a.external.text,
+.mp-content-table ul > li > b > a {
+	white-space: nowrap;
+}
+
+.mp-content-header-alt,
+.mp-title-gradient {
+	background: #b44335;
+	color: #ffffff;
+}
+
+.mp-content-header-alt {
+	margin: -0.5em -0.5em 0; // convert to rem
+	padding: 0.5em 0.75em 0.5em  0.5em; // convert to rem
+	border: 0;
+	border-bottom: 0.0625rem solid #b44335;
+	color: #ffffff;
+	/* Main border color		*/
+	text-align: left;
+	font-weight: bold;
+	font-size: 140%; // convert to rem
+}
+
+/* Auto-size main page index icons */
+
+.mp-index-icon {
+	min-width: 4rem; // 64px
+	max-width: 8rem; // 128px
+	width: 100%;
+	/* Image sizes. Re-produce larger? */
+	height: auto;
+}
+
+/* The main page banner */
+
+.giant-banner {
+	margin-bottom: 1.25rem;
+}
+
+.giant-banner img {
+	object-fit: cover;
+	object-position: center;
+	width: 100%;
+	height: 100%;
+}
+
+#mw-js-message,
+.usermessage {
+	margin-bottom: 2.4375rem !important; // 39px
+}
+
+#mp-layout {
+	display: flex;
+	flex-direction: row;
+}
+
+#mp-layout #mp-left {
+	flex: 1 1 auto;
+	margin-right: 1em; // convert to rem
+}
+
+#mp-layout #mp-right {
+	flex: 0 0 31.25rem; // 500px
+}
+
+#mp-layout .mp-block {
+	margin-bottom: 1em; // convert to rem
+	padding: 1em; // convert to rem
+	border: solid 0.0625rem #660000;
+}
+
+#mp-layout .mp-block#battle-pass {
+	padding: 0;
+	border: 0;
+	background: #000000;
+	text-align: center;
+}
+
+#mp-layout .mp-heading {
+	height: 3.125rem; // 50px
+	border-bottom: solid 0.0625rem #cccccc;
+	text-align: center;
+	font-weight: bold;
+	font-size: 170%; // convert to rem
+}
+
+#mp-layout #heroes .mp-content {
+	text-align: center;
+}
+
+.useful-articles-layout {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+.useful-articles-layout > div {
+	flex: 0 0 33%;
+	max-width: 33%;
+	word-wrap: break-word;
+	min-width: 160px;
+}
+
+.useful-articles-layout > div > div:first-child {
+	text-align: center;
+	font-weight: bold;
+}
+
+/* End Main Page style */
+
+/* Sidebar */
+
+div#bodyContent2 {
+	margin-right: 20rem; // 320px
+	min-height: 57.5rem; // 920px
+	width: auto;
+	font-size: 0.8em; // convert to rem
+	line-height: 1.5em; // convert to rem
+}
+
+/* Fixing vector/main-ltr.css putting a white background on the Quotation template */
+
+table.quotation {
+	background: transparent !important;
+}
+
+/* Client-side image scaling */
+
+.images40pxwidth img {
+	width: 2.5rem;
+	height: auto;
+}
+
+/* Cosmetic label styles [[Template:Cosmetic]] */
+
+.cosmetic-label {
+	display: inline-block;
+	margin: 0.4375rem 0.3125rem 0;
+	vertical-align: top;
+	text-align: center;
+	line-height: normal;
+
+	> div {
+		margin-bottom: 0.3125rem;
+	}
+}
+
+/* Skill list styles [[Template:SkillListRich]] */
+
+div.skilllist {
+	width: 100%;
+
+	&-title {
+		border: 0.0625rem solid #aaaaaa;
+		background-color: #ffaea3;
+		color: #000000;
+		text-align: center;
+		font-weight: bold;
+		font-size: 100%;
+	}
+
+	ul {
+		display: flex;
+		overflow: hidden;
+		flex-wrap: wrap;
+		margin: 0;
+		padding: 0;
+	}
+}
+
+li.skilllist-lite,
+li.skilllist-rich {
+	display: inline-block;
+	box-sizing: border-box; // shouldn't be necessary?
+	margin: 0;
+	padding: 0.1875rem;
+	border: 0.0625rem solid #aaaaaa;
+	list-style: none;
+	vertical-align: top;
+	text-align: left;
+}
+
+li.skilllist-lite {
+	color: #ffffff;
+	text-decoration: none;
+	font-weight: bold;
+	font-size: 110%; // convert to rem
+}
+
+div.skilllist-rich {
+	&-head {
+		padding: 0.1875rem 0.3125rem;
+		border-bottom: 0.0625rem solid #000000;
+		color: #ffffff;
+		text-decoration: none;
+		font-weight: bold;
+		font-size: 110%; // convert to rem
+	}
+
+	&-image {
+		display: inline-block;
+		width: 4rem; // 64px
+		vertical-align: top;
+	}
+
+	&-desc {
+		display: inline-block;
+		padding: 0.1875rem 0.3125rem;
+		max-width: calc( ~"100% - 74px" );
+		vertical-align: top;
+	}
+}
+
+div.skilllist li.skilllist-lite a,
+div.skilllist li.skilllist-lite a:link,
+div.skilllist li.skilllist-lite a:visited,
+div.skilllist li.skilllist-lite a:hover,
+div.skilllist li.skilllist-lite a:active,
+li.skilllist-rich div.skilllist-rich-head a,
+li.skilllist-rich div.skilllist-rich-head a:link,
+li.skilllist-rich div.skilllist-rich-head a:visited,
+li.skilllist-rich div.skilllist-rich-head a:hover,
+li.skilllist-rich div.skilllist-rich-head a:active {
+	color: #ffffff;
+	text-decoration: none;
+}
+
+/***************************
+* Desktop Specific Styles *
+***************************/
+
+/* Skill list styles [[Template:SkillListRich]] */
+
+div.skilllist-col1 ul li {
+	flex: 1 0 100%;
+	width: 100%;
+}
+
+div.skilllist-col2 ul li {
+	flex: 1 0 50%;
+	width: 50%;
+}
+
+div.skilllist-col3 ul li {
+	flex: 1 0 calc( 100%/3 );
+	width: calc( 100%/3 );
+}
+
+div.skilllist-col4 ul li {
+	flex: 1 0 25%;
+	width: 25%;
+}
+
+div.skilllist-col5 ul li {
+	flex: 1 0 20%;
+	width: 20%;
+}
+
+/******************************************
+* Custom Context Menu for Audio Download *
+*******************************************/
+
+#context-menu {
+	position: absolute;
+	display: none;
+}
+
+#context-menu ul,
+#context-menu li {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	background: #ffaea3;
+}
+
+#context-menu {
+	border: solid 0.0625rem #cccccc;
+}
+
+#context-menu li {
+	border-bottom: solid 0.0625rem #cccccc;
+
+	&:last-child {
+		border: 0;
+	}
+}
+
+#context-menu li a {
+	display: block;
+	padding: 0.125rem 0.3125rem;
+	text-decoration: none;
+	color: #000000;
+	font-family: sans-serif;
+	font-size: 0.875em; // convert to rem
+
+	&:hover {
+		background: #b44335;
+		color: #ffffff;
+	}
+}
+
+.ability-description {
+	display: block;
+	float: right;
+	width: 19.5rem; // 312px
+
+	&.adItemOrRune {
+		width: 28.125rem; // 450px
+	}
+}
+
+.aml50 {
+	margin-left: 3.125rem; // 50px
+}
+
+.talsymbolbg {
+	display: inline-block;
+	vertical-align: top;
+	background-color: #151515;
+	box-shadow: 0.0625rem 0.0625rem 0.0625rem #000000;
+	border-width: 0.0625rem;
+	border-radius: 50%;
+	padding: 0 0;
+	margin: 0 0;
+	overflow: hidden;
+}
+
+/* Import fonts */
+// Is it needed to import all these fonts? It's extra load time for the user
+@font-face {
+	font-family: "Radiance";
+	src: url( https://steamcdn-a.akamaihd.net/apps/underlords/fonts/Radiance-Regular.woff ) format( "woff" );
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-bold.woff ) format( "woff" );
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-black.woff ) format( "woff" );
+	font-weight: 900;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Radiance";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/radiance-semibold.woff ) format( "woff" );
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular.ttf ) format( "truetype" );
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-SemiBold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-SemiBold.ttf ) format( "truetype" );
+	font-weight: 600;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Bold.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Bold.ttf ) format( "truetype" );
+	font-weight: bold;
+	font-style: normal;
+	font-display: swap;
+}
+
+@font-face {
+	font-family: "Reaver";
+	src: url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Black.woff ) format( "woff" ), url( https://cdn.cloudflare.steamstatic.com/apps/dota2/fonts/Reaver-Regular-Black.ttf ) format( "truetype" );
+	font-weight: 800;
+	font-style: normal;
+	font-display: swap;
+}
+
+/*
+* === Ability template ===
+*/
+.ability-background {
+	flex: 0 1 28.75rem; // 460px
+	margin-right: 0.9375rem;
+	vertical-align: top;
+}
+
+/*
+* === Relics ===
+*/
+.relics {
+	width: 8.75rem; // 140px
+	margin: 0.3125rem;
+	border: 0.0625rem solid #111111;
+	font-size: 80%; // convert to rem
+}
+
+/*
+* === GENERAL STYLES ===
+*/
+
+/*
+* Horizontal list (.hlist) styles
+*/
+
+.hlist ul {
+	margin: 0;
+}
+
+.hlist li {
+	display: inline;
+	margin: 0;
+	white-space: nowrap;
+
+	/* Generate interpuncts */
+	&:after {
+		content: " ·";
+		font-weight: bold;
+	}
+
+	&:last-child:after {
+		content: none;
+	}
+}
+
+/* Display nested lists inline */
+.hlist ul ul {
+	display: inline;
+
+	/* Add parens around nested lists */
+	&:before {
+		content: "(";
+	}
+
+	&:after {
+		content: ")";
+	}
+}
+
+/*
+* Webm autoloop spacing fix
+*/
+
+.autoloop,
+.loop {
+	display: block;
+}
+
+td .autoloop,
+td .loop {
+	width: 100% !important;
+	height: 100% !important;
+	object-fit: unset;
+	max-width: 50rem !important; // 800px
+}
+
+/*
+* Pixel-art images
+*/
+
+img.pixelart {
+	// can be simplified to image-rendering: pixelated;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: crisp-edges;
+	image-rendering: pixelated;
+	-ms-interpolation-mode: nearest-neighbor;
+}
+
+/* Image links ([[Template:Ability ID]], [[Template:Hero ID]], ...) */
+.image-link {
+	white-space: nowrap;
+}
+
+/*
+* Animatrion styles ([[Template:Animate]])
+*/
+
+.animated > *:not( .animated-active ),
+.animated-paused > *:not( .animated-active ),
+.animated > .animated-subframe > *:not( .animated-active ),
+.animated-paused > .animated-subframe > *:not( .animated-active ) {
+	display: none;
+}
+
+/*
+* Cosmetic Item infobox styles ([[Template:Cosmetic item infobox]])
+*/
+
+.buynow_wrapper {
+	height: 1.5rem; // 24px
+
+	> a {
+		width: 100%;
+		color: #ffffff;
+		text-decoration: none;
+	}
+}
+
+.buynow_button {
+	display: block;
+	padding-left: 1.875rem;
+	height: 1.5rem; // 24px
+	background: linear-gradient( 0deg, #000000 0%, #666666 100% );
+	color: #ffffff;
+	text-align: left;
+	text-decoration: none;
+	font-size: 90%;
+	line-height: 1.5rem; // 24px
+
+	&:hover {
+		background: linear-gradient( 0deg, #000000 0%, #999999 100% );
+	}
+}
+
+.buynow_store:before,
+.buynow_market:before {
+	position: absolute;
+	margin-left: -1.9375rem; // -31px;
+	width: 1.5rem; // 24px
+	height: 1.5rem; // 24px
+	// TODO: Steam icon
+	content: "";
+	pointer-events: none;
+}
+
+// Patch styles ([[Template:Patch layout]])
+html.theme--dark .patch-layout {
+	border: 0.0625rem solid #555555;
+}
+
+.patch-layout {
+	width: 100%;
+	border: 0.0625rem solid #aaaaaa;
+	border-collapse: unset;
+	text-align: center;
+}
+
+.patch-layout-last {
+	background: #b2d7e9;
+
+	html.theme--dark & {
+		background: #202d78;
+	}
+}
+
+.patch-layout-all {
+	width: 27%;
+	background: #dee8ed;
+
+	html.theme--dark & {
+		background: #313c7e;
+	}
+}
+
+.patch-layout-background {
+	background-color: #fdfaf8;
+	border: 0.0625rem solid #aaaaaa;
+	margin: 0.75em 0; // convert to rem
+	padding: 0.75em 1em 1em 1em; // convert to rem
+
+	html.theme--dark & {
+		background-color: rgba( 41, 41, 41, 0.7 );
+		border: 0.0625rem solid #555555;
+	}
+}
+
+/*
+* Event Currency Colors
+*/
+
+.bp2020 {
+	color: #f0b000;
+}
+
+.bp2019 {
+	color: #8c1bcd;
+}
+
+.bp2018 {
+	color: #3ec415;
+}
+
+.bp2017 {
+	color: #08d8d8;
+}
+
+.bp2016 {
+	color: #e60000;
+}
+
+.dotaplus {
+	color: #d37708;
+}
+
+// AudioButton-related styles (<ab>)
+a.ext-audiobutton {
+	/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
+	font-family: "Font Awesome 5 Pro";
+
+	&[ data-state="play" ]:before {
+		.theme--light & {
+			color: #131313;
+		}
+
+		.theme--dark & {
+			color: #e2e2e6;
+		}
+		content: "\f144" !important;
+	}
+
+	&[ data-state="pause" ]:before {
+		content: "\f28b" !important;
+	}
+
+	&[ data-state="error" ]:before {
+		color: #91663d;
+		content: "\f059" !important;
+	}
+
+	&:before {
+		display: inline-block;
+		width: 1em; // convert to rem
+		vertical-align: middle;
+	}
+}
+
+// Template:Quote (Quote.less) style overrides for RU
+.wiki-dota2gameru & {
+	blockquote.quote::before {
+		top: -2.5rem; // -40px
+	}
+
+	blockquote.quote::after {
+		top: -2.5rem; // -40px
+		bottom: 0;
+	}
+}

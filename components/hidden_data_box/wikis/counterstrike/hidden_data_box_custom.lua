@@ -18,7 +18,7 @@ local BasicHiddenDataBox = Lua.import('Module:HiddenDataBox')
 local CustomHiddenDataBox = {}
 
 ---@param args table
----@return string
+---@return Html
 function CustomHiddenDataBox.run(args)
 	args = args or {}
 	args.liquipediatier = Tier.toNumber(args.liquipediatier)
@@ -45,7 +45,7 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_icon_darkmode', Variables.varDefault('tournament_icondark'))
 
 	Variables.varDefine('match_featured_override', args.featured)
-	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.valvetier, queryResult.publishertier)
+	BasicHiddenDataBox.checkAndAssign('tournament_valve_tier', args.publishertier, queryResult.publishertier)
 
 	Variables.varDefine('match_hidden', tostring(
 		Logic.readBool(args.hidden)

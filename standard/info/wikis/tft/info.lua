@@ -10,6 +10,7 @@ return {
 	startYear = 2019,
 	wikiName = 'tft',
 	name = 'Teamfight Tactics',
+	defaultGame = 'tft',
 	games = {
 		tft = {
 			abbreviation = 'TFT',
@@ -38,9 +39,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tft',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Teamfight Tactics Double Up lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Teamfight Tactics Double Up darkmode.png', ---@deprecated
-	match2 = 0,
 }

@@ -14,7 +14,7 @@ local Namespace = require('Module:Namespace')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -32,9 +32,8 @@ function Weapon.run(frame)
 	return weapon:createInfobox()
 end
 
----@return Html
+---@return string
 function Weapon:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -47,8 +46,8 @@ function Weapon:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Weapon') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Weapon') .. ' Information'},
 		Cell{
 			name = 'Class',
 			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
@@ -104,19 +103,17 @@ function Weapon:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
-	infobox:categories('Weapons')
-	infobox:categories(unpack(self:getWikiCategories(args)))
-
-	local builtInfobox = infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	self:categories('Weapons')
+	self:categories(unpack(self:getWikiCategories(args)))
 
 	if Namespace.isMain() then
 		self:setLpdbData(args)
 	end
 
-	return builtInfobox
+	return self:build(widgets)
 end
 
 ---@param location string?

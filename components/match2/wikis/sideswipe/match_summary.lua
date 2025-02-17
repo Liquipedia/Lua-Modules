@@ -8,19 +8,14 @@
 
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
-
-local GREEN_CHECK = '[[File:GreenCheck.png|14x14px|link=]]'
-local NO_CHECK = '[[File:NoCheck.png|link=]]'
-local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
 local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
@@ -166,136 +161,36 @@ function CustomMatchSummary.createHeader(match, options)
 		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
 end
 
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local body = MatchSummary.Body()
-
-	body:addRow(MatchSummary.Row():addElement(DisplayHelper.MatchCountdownBlock(match)))
-
-	-- Iterate each map
-	for _, game in ipairs(match.games) do
-		if game.map then
-			local rowDisplay = CustomMatchSummary._createGame(game)
-			body:addRow(rowDisplay)
-		end
-	end
-
-	return body
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
----@return MatchSummaryRow
-function CustomMatchSummary._createGame(game)
-	local row = MatchSummary.Row()
-		:addClass('brkts-popup-body-game')
+---@param gameIndex integer
+---@return Widget?
+function CustomMatchSummary.createGame(date, game, gameIndex)
+	if not game.map then
+		return
+	end
 	local extradata = game.extradata or {}
 
-	if String.isNotEmpty(game.header) then
-		local gameHeader = mw.html.create('div')
-			:css('font-weight','bold')
-			:css('font-size','85%')
-			:css('margin','auto')
-			:node(game.header)
-
-		row:addElement(gameHeader)
-		row:addElement(MatchSummary.Break():create())
+	local function makeTeamSection(opponentIndex)
+		return {
+			DisplayHelper.MapScore(game.opponents[opponentIndex], game.status),
+			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
+		}
 	end
 
-	local centerNode = mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(mw.html.create('div'):node('[[' .. game.map .. ']]'))
-	if Logic.readBool(extradata.ot) then
-		centerNode:node(mw.html.create('div'):node('- OT'))
-		if Logic.isNotEmpty(extradata.otlength) then
-			centerNode:node(mw.html.create('div'):node('(' .. extradata.otlength .. ')'))
-		end
-	end
-
-	row:addElement(CustomMatchSummary._iconDisplay(
-		GREEN_CHECK,
-		game.winner == 1,
-		game.scores[1],
-		1
-	))
-	row:addElement(centerNode)
-	row:addElement(CustomMatchSummary._iconDisplay(
-		GREEN_CHECK,
-		game.winner == 2,
-		game.scores[2],
-		2
-	))
-
-	if extradata.timeout then
-		local timeouts = Json.parseIfString(extradata.timeout)
-		row:addElement(MatchSummary.Break():create())
-		row:addElement(CustomMatchSummary._iconDisplay(
-			TIMEOUT,
-			Table.includes(timeouts, 1)
-		))
-		row:addElement(mw.html.create('div')
-			:addClass('brkts-popup-spaced')
-			:node(mw.html.create('div'):node('Timeout'))
+	return MatchSummaryWidgets.Row{
+		classes = {'brkts-popup-body-game'},
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
+			MatchSummaryWidgets.GameCenter{children = {
+				DisplayHelper.Map(game),
+				Logic.readBool(extradata.ot) and ' - OT' or nil,
+				Logic.isNotEmpty(extradata.otlength) and '(' .. extradata.otlength .. ')' or nil
+			}},
+			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
+			MatchSummaryWidgets.GameComment{children = game.comment}
 		)
-		row:addElement(CustomMatchSummary._iconDisplay(
-			TIMEOUT,
-			Table.includes(timeouts, 2)
-		))
-	end
-
-	if
-		Logic.isNotEmpty(extradata.t1goals)
-		or Logic.isNotEmpty(extradata.t2goals)
-		or Logic.isNotEmpty(game.comment)
-	then
-		row:addElement(MatchSummary.Break():create())
-	end
-	if Logic.isNotEmpty(extradata.t1goals) then
-		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t1goals, 1))
-	end
-	if String.isNotEmpty(game.comment) then
-		row:addElement(mw.html.create('div')
-			:css('margin','auto')
-			:css('max-width', '60%')
-			:node(game.comment)
-		)
-	end
-	if Logic.isNotEmpty(extradata.t2goals) then
-		row:addElement(CustomMatchSummary._goalDisaplay(extradata.t2goals, 2))
-	end
-
-	return row
-end
-
----@param goalesValue string|number
----@param side 1|2
----@return Html
-function CustomMatchSummary._goalDisaplay(goalesValue, side)
-	local goalsDisplay = mw.html.create('div')
-		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
-		:node(Abbreviation.make(
-			goalesValue,
-			'Team ' .. side .. ' Goaltimes')
-		)
-
-	return mw.html.create('div')
-			:css('max-width', '50%')
-			:css('maxfont-size', '11px;')
-			:node(goalsDisplay)
-end
-
----@param icon string
----@param shouldDisplay boolean?
----@param additionalElement number|string|Html|nil
----@param side integer?
----@return Html
-function CustomMatchSummary._iconDisplay(icon, shouldDisplay, additionalElement, side)
-	local flip = side == 2
-	return mw.html.create('div')
-		:addClass('brkts-popup-spaced')
-		:node(additionalElement and flip and mw.html.create('div'):node(additionalElement) or nil)
-		:node(shouldDisplay and icon or NO_CHECK)
-		:node(additionalElement and (not flip) and mw.html.create('div'):node(additionalElement) or nil)
+	}
 end
 
 return CustomMatchSummary

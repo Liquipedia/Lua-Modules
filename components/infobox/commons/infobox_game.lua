@@ -15,7 +15,7 @@ local Json = require('Module:Json')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -33,9 +33,8 @@ function Game.run(frame)
 	return game:createInfobox()
 end
 
----@return Html
+---@return string
 function Game:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 	local links = Links.transform(args)
 
@@ -46,8 +45,8 @@ function Game:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Game Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Game Information'},
 		Customizable{
 			id = 'developer',
 			children = {
@@ -102,21 +101,21 @@ function Game:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
-		infobox:categories('Games')
+		self:categories('Games')
 		self:_setLpdbData(args)
 	end
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self:build(widgets)
 end
 
 ---@param args table

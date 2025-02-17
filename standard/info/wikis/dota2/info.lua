@@ -10,6 +10,7 @@ return {
 	startYear = 2011,
 	wikiName = 'dota2',
 	name = 'Dota 2',
+	defaultGame = 'dota2',
 	games = {
 		dota = {
 			abbreviation = 'DotA',
@@ -20,8 +21,8 @@ return {
 				lightMode = 'Logo filler event.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Dota2 logo.png',
-				lightMode = 'Dota2 logo.png',
+				darkMode = 'Dota 2 default allmode.png',
+				lightMode = 'Dota 2 default allmode.png',
 			},
 		},
 		dota2 = {
@@ -29,18 +30,26 @@ return {
 			name = 'Dota 2',
 			link = 'Dota 2',
 			logo = {
-				darkMode = 'Dota2 logo.png',
-				lightMode = 'Dota2 logo.png',
+				darkMode = 'Dota 2 default allmode.png',
+				lightMode = 'Dota 2 default allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Dota2 logo.png',
-				lightMode = 'Dota2 logo.png',
+				darkMode = 'Dota 2 default allmode.png',
+				lightMode = 'Dota 2 default allmode.png',
 			},
 		},
 	},
-	defaultGame = 'dota2',
+	config = {
+		squads = {
+			hasPosition = true,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			matchPage = true,
+			status = 2,
+			matchWidth = 180,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'Dota2 logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Dota2 logo.png', ---@deprecated
-	match2 = 1,
 }

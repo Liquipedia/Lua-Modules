@@ -11,13 +11,13 @@ local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local Opponent = Lua.import('Module:Opponent')
-local PlayerDisplay = Lua.import('Module:Player/Display')
+local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -113,15 +113,6 @@ function OpponentDisplay.BracketOpponentEntry:addScores(opponent)
 	end
 end
 
-OpponentDisplay.propTypes.InlineOpponent = {
-	flip = 'boolean?',
-	opponent = MatchGroupUtil.types.GameOpponent,
-	showFlag = 'boolean?', -- only affects parties
-	showLink = 'boolean?', -- only affects parties
-	dq = 'boolean?', -- only affects parties
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle), -- only affects Opponent.team
-}
-
 ---@class InlineOpponentProps
 ---@field flip boolean?
 ---@field opponent standardOpponent
@@ -134,7 +125,6 @@ OpponentDisplay.propTypes.InlineOpponent = {
 ---@param props InlineOpponentProps
 ---@return Html|string|nil
 function OpponentDisplay.InlineOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 
 	if opponent.type == Opponent.team then
@@ -169,17 +159,6 @@ function OpponentDisplay.InlinePlayers(props)
 		:node(table.concat(playerTexts, ' / '))
 end
 
-OpponentDisplay.propTypes.BlockOpponent = {
-	flip = 'boolean?',
-	opponent = MatchGroupUtil.types.GameOpponent,
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	showFlag = 'boolean?',
-	showLink = 'boolean?',
-	showPlayerTeam = 'boolean?',
-	teamStyle = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-	abbreviateTbd = 'boolean?',
-}
-
 ---@class BlockOpponentProps
 ---@field flip boolean?
 ---@field opponent standardOpponent
@@ -200,7 +179,6 @@ determined by its layout context, and not of the opponent.
 ---@param props BlockOpponentProps
 ---@return Html
 function OpponentDisplay.BlockOpponent(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockOpponent, {maxDepth = 2})
 	local opponent = props.opponent
 	-- Default TBDs to not show links
 	local showLink = Logic.nilOr(props.showLink, not Opponent.isTbd(opponent))
@@ -226,7 +204,7 @@ function OpponentDisplay.BlockOpponent(props)
 	end
 end
 
----@class BlockPlayerProps
+---@class BlockPlayersProps
 ---@field flip boolean?
 ---@field opponent {players: standardPlayer[]?}
 ---@field overflow OverflowModes?
@@ -238,7 +216,7 @@ end
 ---@field dq boolean?
 ---@field note string|number|nil
 
----@param props BlockPlayerProps
+---@param props BlockPlayersProps
 ---@return Html
 function OpponentDisplay.BlockPlayers(props)
 	local opponent = props.opponent
@@ -255,7 +233,7 @@ function OpponentDisplay.BlockPlayers(props)
 	end)
 
 	local playersNode = mw.html.create('div')
-		:addClass(props.showPlayerTeam and 'player-has-team' or nil)
+		:addClass('block-players-wrapper')
 	for _, playerNode in ipairs(playerNodes) do
 		playersNode:node(playerNode)
 	end
@@ -263,18 +241,10 @@ function OpponentDisplay.BlockPlayers(props)
 	return playersNode
 end
 
-OpponentDisplay.propTypes.InlineTeamContainer = {
-	flip = 'boolean?',
-	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-	template = 'string',
-}
-
 ---Displays a team as an inline element. The team is specified by a template.
 ---@param props {flip: boolean?, template: string, style: teamStyle?}
 ---@return string?
 function OpponentDisplay.InlineTeamContainer(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeamContainer)
-
 	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
 	if props.style == 'standard' or not props.style then
 		if not props.flip then
@@ -307,12 +277,6 @@ function OpponentDisplay.InlineTeamContainer(props)
 	end
 end
 
-OpponentDisplay.propTypes.InlineTeam = {
-	flip = 'boolean?',
-	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-	team = MatchGroupUtil.types.Team,
-}
-
 --[[
 Displays a team as an inline element. The team is specified by a team struct.
 Only the default icon is supported.
@@ -320,7 +284,6 @@ Only the default icon is supported.
 ---@param props {flip: boolean?, style: teamStyle?, team: standardTeamProps}
 ---@return string
 function OpponentDisplay.InlineTeam(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.InlineTeam)
 	return (OpponentDisplay.InlineTeamContainer(Table.merge(props, {
 		template = 'default',
 	}))
@@ -330,14 +293,6 @@ function OpponentDisplay.InlineTeam(props)
 		:gsub('DefaultBracket', props.team.bracketName))
 end
 
-OpponentDisplay.propTypes.BlockTeamContainer = {
-	flip = 'boolean?',
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	showLink = 'boolean?',
-	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-	template = 'string',
-}
-
 --[[
 Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
@@ -345,8 +300,8 @@ its layout context, and not of the team name. The team is specified by template.
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
 ---@return Html
 function OpponentDisplay.BlockTeamContainer(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeamContainer)
-
+	-- only import here to avoid dependency loop (OpponentDisplay <-> MatchGroup/Util)
+	local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 	local team = MatchGroupUtil.fetchTeam(props.template)
 	if not team then
 		return mw.html.create('div'):addClass('error')
@@ -358,15 +313,6 @@ function OpponentDisplay.BlockTeamContainer(props)
 		team = team,
 	}))
 end
-
-OpponentDisplay.propTypes.BlockTeam = {
-	flip = 'boolean?',
-	icon = 'any',
-	overflow = TypeUtil.optional(DisplayUtil.types.OverflowModes),
-	showLink = 'boolean?',
-	style = TypeUtil.optional(OpponentDisplay.types.TeamStyle),
-	team = MatchGroupUtil.types.Team,
-}
 
 ---@class blockTeamProps
 ---@field flip boolean
@@ -385,7 +331,6 @@ struct and icon wikitext.
 ---@param props blockTeamProps
 ---@return Html
 function OpponentDisplay.BlockTeam(props)
-	DisplayUtil.assertPropTypes(props, OpponentDisplay.propTypes.BlockTeam)
 	local style = props.style or 'standard'
 
 	local function createNameNode(name)
@@ -471,8 +416,10 @@ function OpponentDisplay.InlineScore(opponent)
 	if opponent.status == 'S' then
 		if opponent.score == 0 and Opponent.isTbd(opponent) then
 			return ''
+		elseif opponent.score == -1 then
+			return ''
 		else
-			return opponent.score ~= -1 and tostring(opponent.score) or ''
+			return tostring(Math.round(opponent.score, 2))
 		end
 	else
 		return opponent.status or ''

@@ -12,19 +12,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
       - id: lua-changed-files
-        uses: tj-actions/changed-files@v32
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             components/**/*.lua
             standard/**/*.lua
 
       - id: res-changed-files
-        uses: tj-actions/changed-files@v32
+        uses: tj-actions/changed-files@v42
         with:
           files: |
             stylesheets/**/*.css
@@ -35,8 +35,8 @@ jobs:
       - name: Resource Deploy
         if: steps.res-changed-files.outputs.any_changed == 'true'
         env:
-          WIKI_USER: ${{ secrets.LP_USER }}
-          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
         run: bash scripts/deploy_res.sh "${{ steps.res-changed-files.outputs.all_changed_files }}"
@@ -44,44 +44,8 @@ jobs:
       - name: Lua Deploy
         if: steps.lua-changed-files.outputs.any_changed == 'true'
         env:
-          WIKI_USER: ${{ secrets.LP_USER }}
-          WIKI_PASSWORD: ${{ secrets.LP_PASSWORD }}
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
         run: bash scripts/deploy.sh "${{ steps.lua-changed-files.outputs.all_changed_files }}"
-
-  dev-deploy:
-    name: Dev Wikis
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 2
-
-      - id: changed-files
-        uses: tj-actions/changed-files@v32
-        with:
-          files: |
-            components/**/*.lua
-            standard/**/*.lua
-
-      - name: Deploy Old Dev
-        if: steps.changed-files.outputs.any_changed == 'true'
-        env:
-          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
-          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
-          WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL }}
-          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
-        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
-
-      - name: Deploy New Dev
-        if: steps.changed-files.outputs.any_changed == 'true'
-        env:
-          WIKI_USER: ${{ secrets.DEV_WIKI_USER }}
-          WIKI_PASSWORD: ${{ secrets.DEV_WIKI_PASSWORD }}
-          WIKI_UA_EMAIL: ${{ secrets.DEV_WIKI_UA_EMAIL }}
-          WIKI_BASE_URL: ${{ secrets.DEV_WIKI_BASE_URL2 }}
-          DEV_WIKI_BASIC_AUTH: ${{ secrets.DEV_WIKI_BASIC_AUTH }}
-        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"

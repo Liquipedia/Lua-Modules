@@ -10,6 +10,7 @@ return {
 	startYear = 2007,
 	wikiName = 'worldofwarcraft',
 	name = 'World of Warcraft',
+	defaultGame = 'wow',
 	games = {
 		wow = {
 			abbreviation = 'WoW',
@@ -25,8 +26,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'wow',
-	defaultTeamLogo = 'WoWlogo Default allmode.png', ---@deprecated
-	defaultTeamLogoDark = 'WoWlogo Default allmode.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 }

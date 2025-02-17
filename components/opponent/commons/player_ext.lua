@@ -20,7 +20,17 @@ local TeamTemplate = require('Module:TeamTemplate')
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 
+---@class PlayerExt
 local PlayerExt = {globalVars = globalVars}
+
+---@class PlayerExtSyncOptions: PlayerExtPopulateOptions
+---@field savePageVar boolean?
+---@field overwritePageVars boolean?
+
+---@class PlayerExtPopulateOptions
+---@field fetchPlayer boolean?
+---@field fetchMatch2Player boolean?
+---@field date string|number|osdate?
 
 --[===[
 Splits a wiki link of a player into a pageName and displayName.
@@ -29,6 +39,9 @@ For example:
 PlayerExt.extractFromLink('[[Dream (Korean Terran player)|Dream]]')
 -- returns 'Dream (Korean Terran player)', 'Dream'
 --]===]
+---@param name string
+---@return string? #pageName
+---@return string? #displayName
 function PlayerExt.extractFromLink(name)
 	name = name
 		:gsub('%b{}', '')
@@ -43,11 +56,11 @@ function PlayerExt.extractFromLink(name)
 	return nil, String.nilIfEmpty(name)
 end
 
---[[
-Asks LPDB for the flag of a player using the player record.
-
-For specific uses only.
-]]
+---Asks LPDB for the flag of a player using the player record.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@return string?
 PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
 	local rows = mw.ext.LiquipediaDB.lpdb('player', {
 		conditions = '[[pagename::' .. resolvedPageName:gsub(' ', '_') .. ']]',
@@ -60,12 +73,11 @@ PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
 	end
 end)
 
---[[
-Asks LPDB for the flag of a player using an arbitary sample of match2player
-records.
-
-For specific uses only.
-]]
+---Asks LPDB for the flag of a player using an arbitary sample of match2player records.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@return {flag: string?}
 PlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
 	local conditions = {
 		'[[name::' .. resolvedPageName .. ']]',
@@ -92,12 +104,12 @@ PlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
 	}
 end)
 
---[[
-Asks LPDB for the team a player belonged to on a particular date, using the
-teamhistory data point.
-
-For specific uses only.
-]]
+--Asks LPDB for the team a player belonged to on a particular date, using the teamhistory data point.
+---
+---For specific uses only.
+---@param resolvedPageName string
+---@param date string|number|osdate?
+---@return {joinDate: string, leaveDate: string, template: string}?
 function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	date = date or DateExt.getContextualDateOrNow()
 
@@ -115,6 +127,8 @@ function PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
 	return records[1] and PlayerExt.teamHistoryEntryFromRecord(records[1])
 end
 
+---@param entryRecord datapoint
+---@return {joinDate: string, leaveDate: string, template: string}
 function PlayerExt.teamHistoryEntryFromRecord(entryRecord)
 	return {
 		joinDate = entryRecord.extradata.joindate,
@@ -123,12 +137,13 @@ function PlayerExt.teamHistoryEntryFromRecord(entryRecord)
 	}
 end
 
---[[
-For specific uses only.
-]]
+--For specific uses only.
+---@param resolvedPageName string
+---@param date string|number|osdate?
+---@return string?
 function PlayerExt.fetchTeamTemplate(resolvedPageName, date)
 	local entry = PlayerExt.fetchTeamHistoryEntry(resolvedPageName, date)
-	return entry and TeamTemplate.resolve(entry.template, date)
+	return entry and TeamTemplate.resolve(entry.template, date) or nil
 end
 
 --[[
@@ -150,6 +165,9 @@ options.fetchPlayer: Whether to use the LPDB player record. Enabled by default.
 options.fetchMatch2Player: Whether to use the player's recent matches. Disabled by default.
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
+---@param player standardPlayer
+---@param options PlayerExtSyncOptions?
+---@return standardPlayer
 function PlayerExt.syncPlayer(player, options)
 	options = options or {}
 
@@ -167,23 +185,22 @@ function PlayerExt.syncPlayer(player, options)
 		or match2Player() and match2Player().flag
 
 	if options.savePageVar ~= false then
-		PlayerExt.saveToPageVars(player)
+		PlayerExt.saveToPageVars(player, {overwritePageVars = options.overwritePageVars})
 	end
 
 	return player
 end
 
---[[
-Same as PlayerExt.syncPlayer, except it does not save the player's
-flag to page variables.
-]]
+---Same as PlayerExt.syncPlayer, except it does not save the player's flag to page variables.
+---@param player standardPlayer
+---@param options PlayerExtPopulateOptions?
+---@return standardPlayer
 function PlayerExt.populatePlayer(player, options)
 	return PlayerExt.syncPlayer(player, Table.merge(options, {savePageVar = false}))
 end
 
---[[
-For specific uses only.
-]]
+---For specific uses only.
+---@param player standardPlayer
 function PlayerExt.populatePageName(player)
 	player.pageName = player.pageIsResolved and player.pageName
 		or player.pageName and mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName)
@@ -193,17 +210,38 @@ function PlayerExt.populatePageName(player)
 	player.pageIsResolved = player.pageName and true or nil
 end
 
---[[
-Saves the pageName and flag of a player to page variables, so that editors do
-not have to duplicate the same info later on.
-]]
-function PlayerExt.saveToPageVars(player)
-	if player.pageName then
-		globalVars:set(player.displayName .. '_page', player.pageName)
+---Saves the pageName and flag of a player to page variables,
+---so that editors do not have to duplicate the same info later on.
+---@param player standardPlayer
+---@param options {overwritePageVars: boolean?}?
+function PlayerExt.saveToPageVars(player, options)
+	local displayName = player.displayName
+	if not displayName then return end
+
+	options = options or {}
+	local overwrite = options.overwritePageVars
+
+	if PlayerExt.shouldWritePageVar(displayName .. '_page', player.pageName, overwrite) then
+		globalVars:set(displayName .. '_page', player.pageName)
 	end
-	if player.flag then
-		globalVars:set(player.displayName .. '_flag', player.flag)
+	if PlayerExt.shouldWritePageVar(displayName .. '_flag', player.flag, overwrite) then
+		globalVars:set(displayName .. '_flag', player.flag)
 	end
+end
+
+---@param varName string
+---@param input string?
+---@param overwrite boolean?
+---@return boolean
+function PlayerExt.shouldWritePageVar(varName, input, overwrite)
+	if not input then
+		return false
+	elseif overwrite then
+		return true
+	end
+
+	local varValue = globalVars:get(varName)
+	return Logic.isEmpty(varValue)
 end
 
 --[[
@@ -225,6 +263,10 @@ default.
 options.useTimeless: Whether to use the template passed to a previous call of
 PlayerExt.syncTeam. Enabled by default.
 ]]
+---@param pageName string
+---@param template string?
+---@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean}
+---@return string?
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
 	local dateInput = Logic.emptyOr(options.date, DateExt.getContextualDateOrNow())
@@ -258,7 +300,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 		entry.isResolved = true
 	end
 
-	if options.savePageVar ~= false
+	if options.savePageVar ~= false and entry
 		and (entry and entry.template) ~= (pageVarEntry and pageVarEntry.template) then
 		if entry.isTimeless then
 			history.timeless = entry
@@ -269,13 +311,14 @@ function PlayerExt.syncTeam(pageName, template, options)
 		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
 	end
 
-	return entry and entry.template
+	return entry and entry.template or nil
 end
 
---[[
-Same as PlayerExt.syncTeam, except it does not save the player's
-team to page variables.
-]]
+---Same as PlayerExt.syncTeam, except it does not save the player's team to page variables.
+---@param pageName string
+---@param template string?
+---@param options {date: string?, useTimeless: boolean, fetchPlayer: boolean}
+---@return string?
 function PlayerExt.populateTeam(pageName, template, options)
 	return PlayerExt.syncTeam(pageName, template, Table.merge(options, {savePageVar = false}))
 end

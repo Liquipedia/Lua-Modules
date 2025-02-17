@@ -14,12 +14,13 @@ Generates the list of upcoming/ongoing/recent tournaments needed for the Tournam
 
 local TournamentsSummaryTable = {}
 
-local Class = require('Module:Class')
-local Table = require('Module:Table')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
-local Template = require('Module:Template')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
+local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Condition = require('Module:Condition')
@@ -55,7 +56,7 @@ TournamentsSummaryTable.upcomingType = conditionTypes.upcoming
 TournamentsSummaryTable.ongoingType = conditionTypes.ongoing
 TournamentsSummaryTable.recentType = conditionTypes.recent
 
-local _TYPE_TO_TITLE = {
+local TYPE_TO_TITLE = {
 	'Upcoming',
 	'Ongoing',
 	'Completed',
@@ -94,7 +95,7 @@ function TournamentsSummaryTable.run(args)
 		error('No type parameter (upcoming, ongoing, recent) specified')
 	end
 
-	local title = mw.language.getContentLanguage():ucfirst(args.title or _TYPE_TO_TITLE[type])
+	local title = mw.language.getContentLanguage():ucfirst(args.title or TYPE_TO_TITLE[type])
 	local limit = args.limit and tonumber(args.limit) or TournamentsSummaryTable.defaultLimit
 	local sort = args.sort or (type == TournamentsSummaryTable.recentType and 'end' or 'start')
 	local order = args.order or (type == TournamentsSummaryTable.recentType and 'desc' or 'asc')
@@ -282,7 +283,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 	local iconFile = ''
 	if String.isNotEmpty(eventInformation.icon) then
 		local iconInput = string.gsub(eventInformation.icon, 'File:', '')
-		if mw.title.new('Media:' .. iconInput).exists then
+		if (mw.title.new('Media:' .. iconInput) or {}).exists then
 			iconFile = 'File:' .. iconInput
 		end
 	end
@@ -290,7 +291,7 @@ function TournamentsSummaryTable.row(eventInformation, type)
 	local iconDarkFile
 	if String.isNotEmpty(eventInformation.icondark) then
 		local iconInput = string.gsub(eventInformation.icondark, 'File:', '')
-		if mw.title.new('Media:' .. iconInput).exists then
+		if (mw.title.new('Media:' .. iconInput) or {}).exists then
 			iconDarkFile = 'File:' .. iconInput
 		end
 	end
@@ -315,20 +316,15 @@ end
 ---@return string
 function TournamentsSummaryTable._dateDisplay(dateString)
 	local year, month, day = dateString:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
-	-- fallback
-	if String.isEmpty(year) then
-		year = 1970
-	end
-	-- defaults
-	if String.isEmpty(month) then
-		month = 1
-	end
-	if String.isEmpty(day) then
-		day = 1
-	end
+	local defaultYear, defaultMonth, defaultDay = DateExt.defaultDateTime:match('(%d%d%d%d)-?(%d?%d?)-?(%d?%d?)$')
 
 	-- create time
-	local date = os.time{year=year, month=month, day=day, hour=0}
+	local date = os.time{
+		year = Logic.emptyOr(year, defaultYear),
+		month = Logic.emptyOr(month, defaultMonth),
+		day = Logic.emptyOr(day, defaultDay),
+		hour = 0
+	}
 
 	-- return date display
 	return os.date('%b %d', date) --[[@as string]]

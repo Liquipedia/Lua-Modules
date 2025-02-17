@@ -6,119 +6,84 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
+local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
-local Squad = Lua.import('Module:Squad')
+local Widget = Lua.import('Module:Widget/All')
+local Squad = Lua.import('Module:Widget/Squad/Core')
+local SquadTldb = Lua.import('Module:Widget/Squad/Core/Tldb')
 local SquadRow = Lua.import('Module:Squad/Row')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
-function CustomSquad:headerTlpd()
-	local makeHeader = function(wikiText)
-		return mw.html.create('th'):wikitext(wikiText):addClass('divCell')
-	end
-
-	local headerRow = mw.html.create('tr'):addClass('HeaderRow')
-
-	headerRow:node(makeHeader('ID'))
-		:node(makeHeader(''))
-		:node(makeHeader('Name'))
-		:node(makeHeader('ELO'))
-		:node(makeHeader('ELO Peak'))
-
-	self.content:node(headerRow)
-
-	return self
-end
-
+---@class StarcraftSquadRow: SquadRow
 local ExtendedSquadRow = Class.new(SquadRow)
-function ExtendedSquadRow:elo(args)
-	self.content:node(mw.html.create('td'):wikitext(args.eloCurrent and (args.eloCurrent .. ' pts') or '-'))
-	self.content:node(mw.html.create('td'):wikitext(args.eloPeak and (args.eloPeak .. ' pts') or '-'))
+
+---@return self
+function ExtendedSquadRow:elo()
+	local eloCurrent, eloPeak = self.model.extradata.eloCurrent, self.model.extradata.eloPeak
+	table.insert(self.children,
+		Widget.Td{children = {eloCurrent and (eloCurrent .. ' pts') or '-'}}
+	)
+	table.insert(self.children,
+		Widget.Td{children = {eloPeak and (eloPeak .. ' pts') or '-'}}
+	)
 
 	return self
 end
 
+---@param frame Frame
+---@return Widget
 function CustomSquad.run(frame)
-	local squad = Squad()
-	squad:init(frame)
-
-	local args = squad.args
-
+	local args = Arguments.getArgs(frame)
 	local tlpd = Logic.readBool(args.tlpd)
-	if tlpd then
-		squad.header = CustomSquad.headerTlpd
-	else
-		squad:title()
-	end
+	local SquadClass = tlpd and SquadTldb or Squad
 
-	squad:header()
+	return SquadUtils.defaultRunManual(frame, SquadClass, function(person, squadStatus, squadType)
+		local inputId = person.id --[[@as number]]
+		person.race = CustomSquad._queryTLPD(inputId, 'race') or person.race
+		person.id = CustomSquad._queryTLPD(inputId, 'name') or person.id
+		person.link = person.link or person.altname or person.id
+		person.team = CustomSquad._queryTLPD(inputId, 'team_name')
+		person.name = (CustomSquad._queryTLPD(inputId, 'name_korean') or '') .. ' ' ..
+			(CustomSquad._queryTLPD(inputId, 'name_romanized') or person.name or '')
 
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
+		local squadPerson = SquadUtils.readSquadPersonArgs(Table.merge(person, {status = squadStatus, type = squadType}))
+		squadPerson.extradata.eloCurrent = CustomSquad._queryTLPD(inputId, 'elo')
+		squadPerson.extradata.eloPeak = CustomSquad._queryTLPD(inputId, 'peak_elo')
+		SquadUtils.storeSquadPerson(squadPerson)
 
-	Array.forEach(players, function(player)
-		local row = ExtendedSquadRow()
+		local row = ExtendedSquadRow(squadPerson)
 
-		local faction = CustomSquad._queryTLPD(player.id, 'race') or player.race
-		local id = CustomSquad._queryTLPD(player.id, 'name') or player.id
-		local link = player.link or player.altname or id
-		local currentTeam = CustomSquad._queryTLPD(player.id, 'team_name')
-		local name = CustomSquad._queryTLPD(player.id, 'name_korean') or ''
-		local localizedName = CustomSquad._queryTLPD(player.id, 'name_romanized') or player.name or ''
-		local elo = CustomSquad._queryTLPD(player.id, 'elo')
-		local eloPeak = CustomSquad._queryTLPD(player.id, 'peak_elo')
-
-		row:status(squad.type)
-		row:id{
-			id,
-			race = faction,
-			link = link,
-			team = currentTeam,
-			flag = player.flag,
-			captain = player.captain,
-			role = player.role,
-			date = player.leavedate or player.inactivedate or player.leavedate,
-		}
-		row:name{name = name .. ' ' .. localizedName}
+		row:id():name()
 
 		if tlpd then
-			row:elo{eloCurrent = elo, eloPeak = eloPeak}
+			row:elo()
 		else
-			row:role{role = player.role}
-			row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
+			row:role()
+			row:date('joindate', 'Join Date:&nbsp;')
 
-			if squad.type == Squad.TYPE_FORMER then
-				row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-				row:newteam{
-					newteam = player.newteam,
-					newteamrole = player.newteamrole,
-					newteamdate = player.newteamdate,
-					leavedate = player.leavedate
-				}
-			elseif squad.type == Squad.TYPE_INACTIVE then
-				row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
+			if squadStatus == SquadUtils.SquadStatus.FORMER then
+				row:date('leavedate', 'Leave Date:&nbsp;')
+				row:newteam()
+			elseif squadStatus == SquadUtils.SquadStatus.INACTIVE then
+				row:date('inactivedate', 'Inactive Date:&nbsp;')
 			end
 		end
 
-		squad:row(row:create(
-			mw.title.getCurrentTitle().prefixedText
-			.. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-			.. (player.role and '_' .. player.role or '')
-			.. '_' .. squad.type
-		))
+		return row:create()
 	end)
-
-	return squad:create()
 end
 
+
+---@param id number?
+---@param value string
+---@return string?
 function CustomSquad._queryTLPD(id, value)
 	if not Logic.isNumeric(id) then
 		return

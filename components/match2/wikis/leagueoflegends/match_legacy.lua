@@ -9,26 +9,24 @@
 local MatchLegacy = {}
 
 local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchLegacyUtil = Lua.import('Module:MatchGroup/Legacy/Util')
 
 local _NUMBER_OF_PLAYERS_TO_STORE = 10
 
-function MatchLegacy.storeMatch(match2, options)
+function MatchLegacy.storeMatch(match2)
 	local match = MatchLegacy._convertParameters(match2)
 
-	if options.storeMatch1 then
-		match.games = MatchLegacy.storeGames(match, match2)
+	match.games = MatchLegacy.storeGames(match, match2)
 
-		return mw.ext.LiquipediaDB.lpdb_match(
-			'legacymatch_' .. match2.match2id,
-			match
-		)
-	end
+	return mw.ext.LiquipediaDB.lpdb_match(
+		'legacymatch_' .. match2.match2id,
+		match
+	)
 end
 
 function MatchLegacy._convertParameters(match2)
@@ -40,12 +38,13 @@ function MatchLegacy._convertParameters(match2)
 	end
 	match.links = nil
 
-	if Logic.isNotEmpty(match.walkover) then
-		match.resulttype = match.walkover
+	local walkover = MatchLegacyUtil.calculateWalkoverType(match2.match2opponents)
+	if walkover then
+		match.resulttype = walkover:lower()
 		match.walkover = match.winner
 	end
 
-	if match.resulttype == 'draw' then
+	if match.winner == 0 then
 		match.resulttype = ''
 		match.winner = 'draw'
 	end
@@ -88,8 +87,6 @@ function MatchLegacy._convertParameters(match2)
 		end
 	end
 
-	match.extradata = mw.ext.LiquipediaDB.lpdb_create_json(match.extradata)
-
 	-- Handle Opponents
 	local handleOpponent = function (index)
 		local prefix = 'opponent'..index
@@ -105,7 +102,7 @@ function MatchLegacy._convertParameters(match2)
 				opponentplayers['p' .. i .. 'flag'] = player.flag or ''
 				opponentplayers['p' .. i .. 'dn'] = player.displayname or ''
 			end
-			match[prefix..'players'] = mw.ext.LiquipediaDB.lpdb_create_json(opponentplayers)
+			match[prefix..'players'] = opponentplayers
 		elseif opponent.type == 'solo' then
 			local player = opponentmatch2players[1] or {}
 			match[prefix] = player.name
@@ -119,7 +116,7 @@ function MatchLegacy._convertParameters(match2)
 	handleOpponent(1)
 	handleOpponent(2)
 
-	return match
+	return Json.stringifySubTables(match)
 end
 
 function MatchLegacy.storeGames(match, match2)
@@ -143,8 +140,6 @@ function MatchLegacy.storeGames(match, match2)
 
 		game.extradata.parent = game2.parent
 
-		game.extradata = mw.ext.LiquipediaDB.lpdb_create_json(game.extradata)
-
 		-- Other stuff
 		game.opponent1 = match.opponent1
 		game.opponent2 = match.opponent2
@@ -156,7 +151,7 @@ function MatchLegacy.storeGames(match, match2)
 		game.opponent2score = winner == 2 and 1 or 0
 		local res = mw.ext.LiquipediaDB.lpdb_game(
 			'legacygame_' .. match2.match2id .. gameIndex,
-			game
+			Json.stringifySubTables(game)
 		)
 		games = games .. res
 	end

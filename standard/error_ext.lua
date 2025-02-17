@@ -18,13 +18,13 @@ local _local_errors = {}
 
 local ErrorExt = {}
 
----@param error error
+---@param error Error
 function ErrorExt.logAndStash(error)
 	ErrorExt.Stash.add(error)
 	ErrorExt.log(error)
 end
 
----@param error error
+---@param error Error
 function ErrorExt.log(error)
 	mw.log(ErrorExt.makeFullDetails(error))
 	mw.log()
@@ -37,7 +37,7 @@ local function tableOrEmpty(tbl)
 	return type(tbl) == 'table' and tbl or {}
 end
 
----@param error error
+---@param error Error
 ---@return string
 function ErrorExt.makeFullDetails(error)
 	local parts = Array.extend(
@@ -51,7 +51,7 @@ end
 
 ---Builds a string for fields not covered by the other functions in this module.
 ---Returns nil if there are no extra fields.
----@param error error
+---@param error Error
 ---@return string?
 function ErrorExt.printExtraProps(error)
 	local extraProps = Table.copy(error)
@@ -70,7 +70,7 @@ function ErrorExt.printExtraProps(error)
 	end
 end
 
----@param error error
+---@param error Error
 ---@return string
 function ErrorExt.makeFullStackTrace(error)
 	local parts = Array.extend(
@@ -91,7 +91,7 @@ local Stash = {}
 ErrorExt.Stash = Stash
 
 ---Adds an Error instance to the local store.
----@param error error
+---@param error Error
 ---@param storeAsPageVar boolean?
 function Stash.add(error, storeAsPageVar)
 	if storeAsPageVar then
@@ -104,7 +104,7 @@ function Stash.add(error, storeAsPageVar)
 end
 
 ---Returns all errors (locally and from page variables), and clears the store.
----@return error[]
+---@return Error[]
 function Stash.retrieve()
 	local errors = {}
 

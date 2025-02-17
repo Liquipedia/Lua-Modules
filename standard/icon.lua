@@ -6,29 +6,41 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
 local Class = require('Module:Class')
-local IconData = require('Module:Icon/Data')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
+local IconData = Lua.import('Module:Icon/Data')
 local Icon = {}
 
----@param args {iconName: string, color: string?, screenReaderHidden: boolean?, hover: string?, size: integer|string?}
+---@class IconProps
+---@field iconName string
+---@field color string?
+---@field screenReaderHidden boolean?
+---@field hover string?
+---@field size integer|string|nil
+---@field additionalClasses string[]?
+---@field attributes table<string, string>?
+
+---@param props IconProps
 ---@return string?
-function Icon.makeIcon(args)
-	local icon = IconData[(args.iconName or ''):lower()]
+function Icon.makeIcon(props)
+	local icon = IconData[(props.iconName or ''):lower()]
 	if not icon then
 		return
 	end
 
-	local size = args.size
+	local size = props.size
 	if Logic.isNumeric(size) then
 		size = size .. 'px'
 	end
 	return tostring(mw.html.create('i')
 			:addClass(icon)
-			:addClass(args.color)
-			:attr('title', args.hover)
+			:addClass(props.color)
+			:addClass(Logic.isNotEmpty(props.additionalClasses) and table.concat(props.additionalClasses, ' ') or nil)
+			:attr('title', props.hover)
 			:css('font-size', size)
-			:attr('aria-hidden', args.screenReaderHidden and 'true' or nil)
+			:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
+			:attr(props.attributes and props.attributes or {})
 	)
 end
 

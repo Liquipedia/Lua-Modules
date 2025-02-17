@@ -9,16 +9,15 @@
 local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
@@ -26,27 +25,29 @@ local Title = Widgets.Title
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
-local _MODES = {
+local MODES = {
 	solo = 'Solos[[Category:Solos Mode Tournaments]]',
 	duo = 'Duos[[Category:Duos Mode Tournaments]]',
 	squad = 'Squads[[Category:Squads Mode Tournaments]]',
+	['1v1'] = '1v1 TDM[[Category:1v1 TDM Tournaments]]',
 	['2v2'] = '2v2 TDM[[Category:2v2 TDM Tournaments]]',
 	['4v4'] = '4v4 TDM[[Category:4v4 TDM Tournaments]]',
 	['war mode'] = 'War Mode[[Category:War Mode Tournaments]]',
 	default = '[[Category:Unknown Mode Tournaments]]',
 }
-_MODES.solos = _MODES.solo
-_MODES.duos = _MODES.duo
-_MODES.squads = _MODES.squad
-_MODES.tdm = _MODES['2v2']
+MODES.solos = MODES.solo
+MODES.duos = MODES.duo
+MODES.squads = MODES.squad
+MODES.tdm = MODES['2v2']
+MODES.tdm1 = MODES['1v1']
 
-local _PERSPECTIVES = {
+local PERSPECTIVES = {
 	fpp = {'FPP'},
 	tpp = {'TPP'},
 	mixed = {'FPP', 'TPP'},
 }
-_PERSPECTIVES.first = _PERSPECTIVES.fpp
-_PERSPECTIVES.third = _PERSPECTIVES.tpp
+PERSPECTIVES.first = PERSPECTIVES.fpp
+PERSPECTIVES.third = PERSPECTIVES.tpp
 
 ---@param frame Frame
 ---@return Html
@@ -72,13 +73,13 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'customcontent' then
 		if args.player_number then
-			table.insert(widgets, Title{name = 'Players'})
+			table.insert(widgets, Title{children = 'Players'})
 			table.insert(widgets, Cell{name = 'Number of players', content = {args.player_number}})
 		end
 
 		--teams section
 		if args.team_number then
-			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{name = 'Number of teams', content = {args.team_number}})
 		end
 	end
@@ -95,20 +96,9 @@ function CustomLeague:addToLpdb(lpdbData, args)
 end
 
 ---@param args table
-function CustomLeague:customParseArguments(args)
-	self.data.publishertier = args.pubgpremier
-end
-
----@param args table
 function CustomLeague:defineCustomPageVariables(args)
 	--Legacy Vars:
 	Variables.varDefine('tournament_edate', self.data.endDate)
-end
-
----@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	return Logic.readBool(args.pubgpremier)
 end
 
 ---@param args table
@@ -123,14 +113,14 @@ function CustomLeague._getGameMode(args)
 		-- Clean unnecessary data from the input
 		perspective = string.gsub(perspective, ' person', '')
 		perspective = string.gsub(perspective, ' perspective', '')
-		return _PERSPECTIVES[perspective] or {}
+		return PERSPECTIVES[perspective] or {}
 	end
 	local getPerspectiveDisplay = function(perspective)
 		return Template.safeExpand(mw.getCurrentFrame(), 'Abbr/' .. perspective)
 	end
 	local displayPerspectives = Table.mapValues(getPerspectives(args.perspective), getPerspectiveDisplay)
 
-	local mode = _MODES[string.lower(args.mode or '')] or _MODES['default']
+	local mode = MODES[string.lower(args.mode or '')] or MODES['default']
 
 	return mode .. '&nbsp;' .. table.concat(displayPerspectives, '&nbsp;')
 end

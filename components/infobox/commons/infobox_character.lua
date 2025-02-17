@@ -14,7 +14,7 @@ local Namespace = require('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -31,9 +31,8 @@ function Character.run(frame)
 	return character:createInfobox()
 end
 
----@return Html
+---@return string
 function Character:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -46,8 +45,8 @@ function Character:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = (args.informationType or 'Character') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Character') .. ' Information'},
 		Cell{name = 'Real Name', content = {args.realname}},
 		Customizable{
 			id = 'country',
@@ -88,16 +87,16 @@ function Character:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', children = {}},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
-		infobox:categories(args.informationType or 'Character')
-		infobox:categories(unpack(self:getWikiCategories(args)))
+		self:categories(args.informationType or 'Character')
+		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
-	return infobox:build(widgets)
+	return self:build(widgets)
 end
 
 ---@param location string?

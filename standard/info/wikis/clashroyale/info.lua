@@ -10,6 +10,7 @@ return {
 	startYear = 2016,
 	wikiName = 'clashroyale',
 	name = 'Clash Royale',
+	defaultGame = 'cr',
 	games = {
 		cr = {
 			abbreviation = 'CR',
@@ -25,8 +26,16 @@ return {
 			},
 		},
 	},
-	defaultGame = 'cr',
-	defaultTeamLogo = 'Clash Royale.png', ---@deprecated
-	defaultTeamLogoDark = 'Clash Royale.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+			matchWidthMobile = 110,
+			matchWidth = 170,
+		},
+	},
 }

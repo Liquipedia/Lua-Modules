@@ -6,42 +6,41 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local PlayerIntroduction = require('Module:PlayerIntroduction')
+local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
 	-- staff
-	coach = {category = 'Coaches', variable = 'Coach', isplayer = false, personType = 'staff'},
+	coach = {category = 'Coache', variable = 'Coach', isplayer = false, personType = 'staff'},
 	manager = {category = 'Manager', variable = 'Manager', isplayer = false, personType = 'staff'},
 
 	-- talent
-	analyst = {category = 'Analysts', variable = 'Analyst', isplayer = false, personType = 'talent'},
-	caster = {category = 'Casters', variable = 'Caster', isplayer = false, personType = 'talent'},
+	analyst = {category = 'Analyst', variable = 'Analyst', isplayer = false, personType = 'talent'},
+	caster = {category = 'Caster', variable = 'Caster', isplayer = false, personType = 'talent'},
 	['content creator'] = {
-		category = 'Content Creators', variable = 'Content Creator', isplayer = false, personType = 'talent'},
+		category = 'Content Creator', variable = 'Content Creator', isplayer = false, personType = 'talent'},
 	host = {category = 'Host', variable = 'Host', isplayer = false, personType = 'talent'},
 }
 ROLES['assistant coach'] = ROLES.coach
 ROLES.commentator = ROLES.caster
 
 ---@class BrawlstarsInfoboxPlayer: Person
----@field role {category: string, variable: string, isplayer: boolean?, personType: string}?
----@field role2 {category: string, variable: string, isplayer: boolean?, personType: string}?
+---@field role {category?: string, variable: string?, isplayer: boolean?, personType: string?}
+---@field role2 {category?: string, variable: string?, isplayer: boolean?, personType: string?}
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -175,7 +174,7 @@ end
 
 ---@param role string?
 ---@return {category: string, variable: string, isplayer: boolean?, personType: string}?
-function CustomPlayer:_getRoleData(role)
+function CustomPlayer._getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
@@ -210,10 +209,10 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
+	if self.role2.category then
+		table.insert(categories, self.role2.category .. 's')
+	end
+	return categories
 end
 
 return CustomPlayer

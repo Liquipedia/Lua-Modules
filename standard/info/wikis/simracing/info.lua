@@ -10,6 +10,7 @@ return {
 	startYear = 2000,
 	wikiName = 'simracing',
 	name = 'Sim Racing',
+	defaultGame = 'sr',
 	games = {
 		sr = {
 			abbreviation = 'SR',
@@ -193,6 +194,19 @@ return {
 				lightMode = 'F1 2018 allmode.png',
 			},
 		},
+		['f1 2024'] = {
+			abbreviation = 'F1 24',
+			name = 'F1 2024',
+			link = 'F1 2024',
+			logo = {
+				darkMode = 'F1 2018 allmode.png',
+				lightMode = 'F1 2018 allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'F1 2018 allmode.png',
+				lightMode = 'F1 2018 allmode.png',
+			},
+		},
 		heat3 = {
 			abbreviation = 'Heat 3',
 			name = 'NASCAR Heat 3',
@@ -217,6 +231,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Nascar Heat default allmode.png',
 				lightMode = 'Nascar Heat default allmode.png',
+			},
+		},
+		lmu = {
+			abbreviation = 'LMU',
+			name = 'Le Mans Ultimate',
+			link = 'Le Mans Ultimate',
+			logo = {
+				darkMode = 'Le Mans Ultimate default allmode.png',
+				lightMode = 'Le Mans Ultimate default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Le Mans Ultimate default allmode.png',
+				lightMode = 'Le Mans Ultimate default allmode.png',
 			},
 		},
 		rf2 = {
@@ -378,7 +405,7 @@ return {
 		['gt sport'] = {
 			abbreviation = 'GT Sport',
 			name = 'Gran Turismo Sport',
-			link = 'Gran Turismo SPort',
+			link = 'Gran Turismo Sport',
 			logo = {
 				darkMode = 'Gran Turismo default allmode.png',
 				lightMode = 'Gran Turismo default allmode.png',
@@ -516,6 +543,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Motogp23 default allmode.png',
 				lightMode = 'Motogp23 default allmode.png',
+			},
+		},
+		motogp24 = {
+			abbreviation = 'MotoGP 24',
+			name = 'MotoGP 24',
+			link = 'MotoGP 24',
+			logo = {
+				darkMode = 'Motogp24 default allmode.png',
+				lightMode = 'Motogp24 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Motogp24 default allmode.png',
+				lightMode = 'Motogp24 default allmode.png',
 			},
 		},
 		['forza 2'] = {
@@ -687,6 +727,32 @@ return {
 				lightMode = 'WRC 10 default lightmode.png',
 			},
 		},
+		['wrc generations'] = {
+			abbreviation = 'WRC Gen.',
+			name = 'WRC Generations',
+			link = 'WRC Generations',
+			logo = {
+				darkMode = 'WRC Generations default allmode.png',
+				lightMode = 'WRC Generations default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'WRC Generations default allmode.png',
+				lightMode = 'WRC Generations default allmode.png',
+			},
+		},
+		['ea wrc'] = {
+			abbreviation = 'EA WRC',
+			name = 'EA SPORTS WRC',
+			link = 'EA SPORTS WRC',
+			logo = {
+				darkMode = 'EA SPORTS WRC default darkmode.png',
+				lightMode = 'EA SPORTS WRC default lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'EA SPORTS WRC default darkmode.png',
+				lightMode = 'EA SPORTS WRC default lightmode.png',
+			},
+		},
 		pgr2 = {
 			abbreviation = 'PGR 2',
 			name = 'Project Gotham Racing 2',
@@ -805,8 +871,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'sr',
-	defaultTeamLogo = 'Sim Racing default lightmode.png', ---@deprecated
-	defaultTeamLogoDark = 'Sim Racing default darkmode.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 0,
+		},
+	},
 }

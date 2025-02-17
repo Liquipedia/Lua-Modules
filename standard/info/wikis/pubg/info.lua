@@ -10,6 +10,7 @@ return {
 	startYear = 2017,
 	wikiName = 'pubg',
 	name = 'PUBG',
+	defaultGame = 'pubg',
 	games = {
 		pubg = {
 			abbreviation = 'PUBG',
@@ -25,9 +26,15 @@ return {
 			},
 		},
 	},
-	defaultGame = 'pubg',
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 1,
+		},
+	},
 	defaultRoundPrecision = 0,
-	defaultTeamLogo = 'PUBG Default logo.png', ---@deprecated
-	defaultTeamLogoDark = 'PUBG Default logo.png', ---@deprecated
-	match2 = 0,
 }

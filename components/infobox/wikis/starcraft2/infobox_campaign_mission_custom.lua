@@ -11,10 +11,10 @@ local Lua = require('Module:Lua')
 local Game = require('Module:Game')
 local String = require('Module:StringUtils')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Mission = Lua.import('Module:Infobox/CampaignMission')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 

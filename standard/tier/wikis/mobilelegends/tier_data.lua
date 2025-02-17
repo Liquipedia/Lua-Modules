@@ -105,5 +105,13 @@ return {
 			link = 'Showmatches',
 			category = 'Showmatch Tournaments',
 		},
+		national = {
+			value = 'National',
+			sort = 'B2',
+			name = 'National',
+			short = 'Nation',
+			link = 'National Tournaments',
+			category = 'National Tournaments',
+		},
 	},
 }

@@ -13,7 +13,7 @@ local Table = require('Module:Table')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Links = Lua.import('Module:Links')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
@@ -31,9 +31,8 @@ function Website.run(frame)
 	return website:createInfobox()
 end
 
----@return Html
+---@return string
 function Website:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	local widgets = {
@@ -43,8 +42,8 @@ function Website:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Website Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Website Information'},
 		Cell{name = 'Type', content = {args.type}},
 		Cell{name = 'Available Language(s)', content = self:getAllArgsForBase(args, 'language')},
 		Cell{name = 'Content License', content = {args.content_license}},
@@ -56,16 +55,16 @@ function Website:createInfobox()
 				local links = Links.transform(args)
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end
 		},
-		Center{content = {args.footnotes}},
+		Center{children = {args.footnotes}},
 	}
 
-	return infobox:widgetInjector(self:createWidgetInjector()):build(widgets)
+	return self:build(widgets)
 end
 
 return Website

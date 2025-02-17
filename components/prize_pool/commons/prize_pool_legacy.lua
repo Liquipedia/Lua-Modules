@@ -39,6 +39,8 @@ local IS_SOLO = false
 
 LegacyPrizePool.BASE_CURRENCY = 'USD'
 
+---@param dependency table<string, function>?
+---@return Html
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
 	local header = Array.sub(args, 1, 1)[1]
@@ -55,7 +57,7 @@ function LegacyPrizePool.run(dependency)
 
 	newArgs.prizesummary = (header.prizeinfo and not header.noprize) and true or false
 	newArgs.cutafter = header.cutafter
-	newArgs.lpdb_prefix = header.lpdb_prefix or header.smw_prefix
+	newArgs.lpdb_prefix = header.lpdb_prefix
 	newArgs.fillPlaceRange = Logic.readBool(header.fillPlaceRange) or false
 
 	if Currency.raw(header.localcurrency) then
@@ -125,6 +127,7 @@ function LegacyPrizePool.run(dependency)
 	return CustomPrizePool.run(newArgs)
 end
 
+---@param args table
 function LegacyPrizePool.sortQualifiers(args)
 	local qualifiersSortValue = function (qualifier1, qualifier2)
 		return qualifier1.occurance == qualifier2.occurance and qualifier1.id < qualifier2.id
@@ -161,6 +164,10 @@ function LegacyPrizePool.sortQualifiers(args)
 	end)
 end
 
+---@param slot table
+---@param mergeSlots boolean
+---@param headerArgs table
+---@return table
 function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	if not slot.place and not slot.award then
 		return {}
@@ -246,6 +253,8 @@ function LegacyPrizePool.mapSlot(slot, mergeSlots, headerArgs)
 	return newData
 end
 
+---@param slot table
+---@return integer
 function LegacyPrizePool.opponentsInSlot(slot)
 	if CUSTOM_HANDLER.opponentsInSlot then
 		return CUSTOM_HANDLER.opponentsInSlot(slot)
@@ -254,6 +263,9 @@ function LegacyPrizePool.opponentsInSlot(slot)
 	return #slot
 end
 
+---@param storeTo table
+---@param input string?
+---@param slotSize integer
 function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	local links = LegacyPrizePool.parseWikiLink(input)
 	for _, linkData in ipairs(links) do
@@ -269,6 +281,10 @@ function LegacyPrizePool.handleSeed(storeTo, input, slotSize)
 	end
 end
 
+---@param slot table
+---@param newData table
+---@param mergeSlots boolean
+---@return table[]
 function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 	local mapOpponent = function (opponentIndex)
 		if not slot[opponentIndex] then
@@ -331,6 +347,9 @@ function LegacyPrizePool.mapOpponents(slot, newData, mergeSlots)
 	return Array.mapIndexes(mapOpponent)
 end
 
+---@param assignTo table
+---@param input string?
+---@param slotParam string
 function LegacyPrizePool.assignType(assignTo, input, slotParam)
 	if LegacyPrizePool.isValidPoints(input) then
 		local index = CACHED_DATA.next.points
@@ -342,6 +361,7 @@ function LegacyPrizePool.assignType(assignTo, input, slotParam)
 		CACHED_DATA.inputToId[slotParam] = 'seed'
 
 	elseif String.isNotEmpty(input) then
+		---@cast input -nil
 		local index = CACHED_DATA.next.freetext
 		assignTo['freetext' .. index] = mw.getContentLanguage():ucfirst(input)
 		CACHED_DATA.inputToId[slotParam] = 'freetext' .. index
@@ -349,10 +369,14 @@ function LegacyPrizePool.assignType(assignTo, input, slotParam)
 	end
 end
 
+---@param input string?
+---@return boolean
 function LegacyPrizePool.isValidPoints(input)
 	return Points[input] and true or false
 end
 
+---@param input string?
+---@return table
 function LegacyPrizePool.parseWikiLink(input)
 	if not input then
 		return {}

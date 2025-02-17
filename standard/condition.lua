@@ -34,7 +34,7 @@ local ConditionTree = Class.new(_ConditionNode,
 function ConditionTree:add(node)
 	if not node then
 		return self
-	elseif node.is_a ~= nil and node:is_a(_ConditionNode) then
+	elseif Class.instanceOf(node, _ConditionNode) then
 		table.insert(self._nodes, node)
 	else
 		-- List of nodes
@@ -50,7 +50,7 @@ function ConditionTree:toString()
 	assert(self.booleanOperator ~= nil)
 	return table.concat(Array.map(self._nodes,
 		function(node)
-			if node:is_a(ConditionTree) then
+			if Class.instanceOf(node, ConditionTree) then
 				return String.interpolate('(${node})', {node = node:toString()})
 			end
 
@@ -66,7 +66,6 @@ end
 ---@field name ColumnName
 ---@field comparator lpdbComparator
 ---@field value string|number
----@field is_a function
 local ConditionNode = Class.new(_ConditionNode,
 	function(self, name, comparator, value)
 		self.name = name

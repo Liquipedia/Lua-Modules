@@ -11,10 +11,10 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local TeamRanking = require('Module:TeamRanking')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RocketleagueInfoboxTeam: InfoboxTeam

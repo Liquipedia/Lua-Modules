@@ -8,10 +8,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v9
+        uses: leafo/gh-actions-lua@v10
         with:
           luaVersion: '5.1'
 
@@ -28,7 +28,7 @@ jobs:
           luacheck ./ --formatter=JUnit > report.xml
 
       - name: Report lint
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v5
         if: always()
         with:
           report_paths: 'report.xml'
@@ -39,10 +39,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v9
+        uses: leafo/gh-actions-lua@v10
         with:
           luaVersion: '5.1'
 
@@ -58,7 +58,7 @@ jobs:
           busted -v --run=ci --output=junit > busted.xml
 
       - name: Report test
-        uses: mikepenz/action-junit-report@v3
+        uses: mikepenz/action-junit-report@v5
         if: always()
         with:
           report_paths: 'busted.xml'

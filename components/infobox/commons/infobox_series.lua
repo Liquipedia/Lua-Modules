@@ -15,7 +15,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
-local WarningBox = require('Module:WarningBox')
 local Variables = require('Module:Variables')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -28,7 +27,7 @@ local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
 local INVALID_TIER_WARNING = '${tierString} is not a known Liquipedia ${tierMode}'
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -39,8 +38,6 @@ local Builder = Widgets.Builder
 ---@class SeriesInfobox: BasicInfobox
 local Series = Class.new(BasicInfobox)
 
-Series.warnings = {}
-
 ---@param frame Frame
 ---@return string
 function Series.run(frame)
@@ -48,9 +45,8 @@ function Series.run(frame)
 	return series:createInfobox()
 end
 
----@return Html
+---@return string
 function Series:createInfobox()
-	local infobox = self.infobox
 	local args = self.args
 
 	-- define this here so we can use it in lpdb data and the display
@@ -77,8 +73,8 @@ function Series:createInfobox()
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
 		},
-		Center{content = {args.caption}},
-		Title{name = 'Series Information'},
+		Center{children = {args.caption}},
+		Title{children = 'Series Information'},
 		Builder{
 			builder = function()
 				local organizers = self:_createOrganizers(args)
@@ -149,7 +145,7 @@ function Series:createInfobox()
 			builder = function()
 				if self.totalSeriesPrizepool then
 					return {Cell{
-						name = 'Total prize money',
+						name = 'Cumulative Prize Pool',
 						content = {InfoboxPrizePool.display{prizepoolusd = self.totalSeriesPrizepool}}
 					}}
 				end
@@ -169,8 +165,8 @@ function Series:createInfobox()
 			builder = function()
 				if not Table.isEmpty(links) then
 					return {
-						Title{name = 'Links'},
-						Widgets.Links{content = links}
+						Title{children = 'Links'},
+						Widgets.Links{links = links}
 					}
 				end
 			end
@@ -180,12 +176,10 @@ function Series:createInfobox()
 
 	if self:shouldStore(args) then
 		self:_setLpdbData(args, links)
-		infobox:categories(unpack(self:_getCategories(args)))
+		self:categories(unpack(self:_getCategories(args)))
 	end
 
-	return mw.html.create()
-		:node(infobox:widgetInjector():build(widgets))
-		:node(WarningBox.displayAll(self.warnings))
+	return self:build(widgets)
 end
 
 ---@param args table
@@ -405,7 +399,8 @@ function Series:addTierCategories(args)
 		table.insert(categories, 'Pages with invalid Tier')
 	end
 	if not isValidTierTuple and not tierTypeCategory and String.isNotEmpty(tierType) then
-		table.insert(self.warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
+		table.insert(self.warnings,
+			String.interpolate(INVALID_TIER_WARNING, {tierString = tierType, tierMode = 'Tiertype'}))
 		table.insert(categories, 'Pages with invalid Tiertype')
 	end
 

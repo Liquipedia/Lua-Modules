@@ -23,6 +23,37 @@ local ALLOWED_SCORE_BOARD_KEYS = {'w', 'd', 'l'}
 local SCOREBOARD_FALLBACK = {w = 0, d = 0, l = 0}
 local DISQUALIFIED = 'dq'
 
+---@class StandingsTableStorage
+---@field standingsindex integer
+---@field title string?
+---@field type 'ffa'|'swiss'|'league'
+---@field entries StandingEntriesStorage[]
+---@field matches string[]
+---@field roundcount integer
+---@field hasdraw boolean
+---@field hasovertime boolean
+---@field haspoints boolean
+---@field finished boolean
+---@field enddate string?
+---@field extradata table
+
+---@class StandingEntriesStorage
+---@field standingsindex integer
+---@field roundindex integer
+---@field slotindex integer
+---@field opponent standardOpponent
+---@field participant string?
+---@field placement string?
+---@field points number
+---@field definitestatus string?
+---@field currentstatus string?
+---@field placementchange integer?
+---@field diff integer?
+---@field match table?
+---@field game table?
+---@field overtime table?
+---@field extradata table
+
 ---@param data table
 function StandingsStorage.run(data)
 	if Table.isEmpty(data) then
@@ -33,19 +64,16 @@ function StandingsStorage.run(data)
 		Array.map(data.entries, function (entry) return tonumber (entry.roundindex) end),
 		math.max)
 
-	StandingsStorage.table(data)
-
-	Array.forEach(data.entries, function (entry)
-		StandingsStorage.entry(entry, data.standingsindex)
+	local entries = Array.map(data.entries, function (entry)
+		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
+
+	StandingsStorage.save(StandingsStorage.table(data), entries)
 end
 
 ---@param data table
+---@return table
 function StandingsStorage.table(data)
-	if not StandingsStorage.shouldStore() then
-		return
-	end
-
 	local title = data.title or ''
 	local cleanedTitle = title:gsub('<.->.-</.->', '')
 
@@ -70,28 +98,23 @@ function StandingsStorage.table(data)
 		haspoints = data.haspoints,
 	}
 
-	mw.ext.LiquipediaDB.lpdb_standingstable('standingsTable_' .. data.standingsindex,
-		{
-			tournament = Variables.varDefault('tournament_name', ''),
-			parent = Variables.varDefault('tournament_parent', ''),
-			standingsindex = standingsIndex,
-			title = mw.text.trim(cleanedTitle),
-			section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
-			type = data.type,
-			matches = Json.stringify(data.matches or {}, {asArray = true}),
-			config = mw.ext.LiquipediaDB.lpdb_create_json(config),
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, data.extradata)),
-		}
-	)
+	return {
+		tournament = Variables.varDefault('tournament_name', ''),
+		parent = Variables.varDefault('tournament_parent', ''),
+		standingsindex = standingsIndex,
+		title = mw.text.trim(cleanedTitle),
+		section = Variables.varDefault('last_heading', ''):gsub('<.->', ''),
+		type = data.type,
+		matches = Json.stringify(data.matches or {}, {asArray = true}),
+		config = config,
+		extradata = Table.merge(extradata, data.extradata),
+	}
 end
 
 ---@param entry table
 ---@param standingsIndex number
+---@return table?
 function StandingsStorage.entry(entry, standingsIndex)
-	if not StandingsStorage.shouldStore() then
-		return
-	end
-
 	local roundIndex = tonumber(entry.roundindex)
 	local slotIndex = tonumber(entry.slotindex)
 	local standingsIndexNumber = tonumber(standingsIndex)
@@ -114,7 +137,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 		definitestatus = entry.definitestatus or entry.bg,
 		currentstatus = entry.currentstatus or entry.pbg,
 		placementchange = entry.placementchange or entry.change,
-		scoreboard = mw.ext.LiquipediaDB.lpdb_create_json{
+		scoreboard = {
 			match = StandingsStorage.toScoreBoardEntry(entry.match),
 			overtime = StandingsStorage.toScoreBoardEntry(entry.overtime),
 			game = StandingsStorage.toScoreBoardEntry(entry.game),
@@ -124,19 +147,62 @@ function StandingsStorage.entry(entry, standingsIndex)
 		},
 		roundindex = roundIndex,
 		slotindex = slotIndex,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json(Table.merge(extradata, entry.extradata)),
+		extradata = Table.merge(extradata, entry.extradata),
 	}
 
 	lpdbEntry.currentstatus = lpdbEntry.currentstatus or lpdbEntry.definitestatus
 
-	mw.ext.LiquipediaDB.lpdb_standingsentry(
-		'standing_' .. standingsIndexNumber .. '_' .. roundIndex .. '_' .. slotIndex,
-		Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
-	)
+	return Table.merge(lpdbEntry, Opponent.toLpdbStruct(entry.opponent))
+end
+
+---@param standingsTable table?
+---@param standingsEntries table[]?
+function StandingsStorage.save(standingsTable, standingsEntries)
+	if StandingsStorage.shouldStoreLpdb() then
+		if standingsTable then
+			mw.ext.LiquipediaDB.lpdb_standingstable(
+				'standingsTable_' .. standingsTable.standingsindex,
+				Json.stringifySubTables(standingsTable)
+			)
+		end
+
+		Array.forEach(standingsEntries or {}, function(entry)
+			mw.ext.LiquipediaDB.lpdb_standingsentry(
+				'standing_' .. entry.standingsindex .. '_' .. entry.roundindex .. '_' .. entry.slotindex,
+				Json.stringifySubTables(entry)
+			)
+		end)
+	end
+
+	if standingsTable then
+		-- We have a full standings here for storage, very simple
+		-- Entries may be supplied later
+		local wikiVariable = 'standings2_' .. standingsTable.standingsindex
+		Variables.varDefine(wikiVariable, Json.stringify({
+			standings = standingsTable,
+			entries = standingsEntries or {},
+		}))
+	elseif standingsEntries and standingsEntries[1] then
+		-- Entry that was supplied later on
+		local wikiVariable = 'standings2_' .. standingsEntries[1].standingsindex
+		local standings = Json.parseIfString(Variables.varDefault(wikiVariable))
+		if not standings then
+			mw.log('Could not store standings entry in wiki variables, unable to locate the standings table')
+			return
+		end
+		if not standings.entries then
+			mw.log('Could not store standings entry in wiki variables, invalid format')
+			return
+		end
+		for _, entry in ipairs(standingsEntries) do
+			table.insert(standings.entries, entry)
+		end
+		Variables.varDefine(wikiVariable, Json.stringify(standings))
+	end
 end
 
 ---@return boolean
-function StandingsStorage.shouldStore()
+function StandingsStorage.shouldStoreLpdb()
 	return Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage'))
 end
 
@@ -172,7 +238,7 @@ function StandingsStorage.fromTemplateHeader(frame)
 	data.roundcount = tonumber(data.roundcount) or 1
 	data.finished = Logic.readBool(data.finished)
 
-	StandingsStorage.table(data)
+	StandingsStorage.save(StandingsStorage.table(data))
 end
 
 ---@param frame table
@@ -208,9 +274,9 @@ function StandingsStorage.fromTemplateEntry(frame)
 			flag = data.participantflag or data.flag,
 			team = data.team
 		}
-		local race = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
-		if String.isNotEmpty(race) then
-			opponentArgs.race = race:sub(1, 1):lower()
+		local faction = string.match(data.player, '&nbsp;%[%[File:[^]]-|([^|]-)%]%]')
+		if String.isNotEmpty(faction) then
+			opponentArgs.faction = faction:sub(1, 1):lower()
 		end
 
 	elseif data.team then
@@ -256,7 +322,7 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
-	StandingsStorage.entry(data, data.standingsindex)
+	StandingsStorage.save(nil, {StandingsStorage.entry(data, data.standingsindex)})
 end
 
 -- Legacy input method

@@ -6,9 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Table = require('Module:Table')
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+
+---@class RainbowsixMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
+
+local INDENT = WikiCopyPaste.Indent
 
 local VETOES = {
 	[0] = '',
@@ -24,73 +32,90 @@ local VETOES = {
 }
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local showScore = args.score == 'true'
-	local mapDetails = args.detailedMap == 'true'
-	local mapDetailsOT = args.detailedMapOT == 'true'
-	local mapVeto = args.mapVeto == 'true'
-	local streams = args.streams == 'true'
-	local out = '{{Match' .. '\n\t|date=|finished='
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local casters = Logic.readBool(args.casters)
+	local mapDetails = Logic.readBool(args.detailedMap)
+	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
+	local mapScore = Logic.readBool(args.mapScore)
+	local mapVeto = Logic.readBool(args.mapVeto)
+	local matchLinks = args.matchLinks and Array.unique(Array.parseCommaSeparatedString(args.matchLinks)) or {}
+	local mvps = Logic.readBool(args.mvp)
+	local showScore = Logic.readBool(args.score)
+	local streams = Logic.readBool(args.streams)
 
-	if streams then
-		out = out .. '\n\t|twitch=|youtube=|vod='
+	---@param list string[]
+	---@param indents integer
+	---@return string?
+	local buildListLine = function(list, indents)
+		if #list == 0 then return nil end
+
+		return string.rep(INDENT, indents) .. table.concat(Array.map(list, function(elemenmt)
+			return '|' .. elemenmt:lower() .. '='
+		end))
 	end
 
-	for i = 1, opponents do
-		out = out .. '\n\t|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, showScore)
-	end
+	local lines = Array.extend(
+		'{{Match',
+		INDENT .. '|date=|finished=',
+		streams and (INDENT .. '|twitch=|youtube=|vod=') or nil,
+		buildListLine(matchLinks, 1),
+		casters and (INDENT .. '|caster1=|caster2=') or nil,
+		mvps and (INDENT .. '|mvp=') or nil,
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
+		end)
+	)
 
 	if mapVeto and VETOES[bestof] then
-		out = out .. '\n\t|mapveto={{MapVeto'
-		out = out .. '\n\t\t|firstpick='
-		out = out .. '\n\t\t|types=' .. VETOES[bestof]
-		out = out .. '\n\t\t|t1map1=|t2map1='
-		out = out .. '\n\t\t|t1map2=|t2map2='
-		out = out .. '\n\t\t|t1map3=|t2map3='
-		out = out .. '\n\t\t|t1map4=|t2map4='
-		out = out .. '\n\t\t|decider='
-		out = out .. '\n\t}}'
-	end
-	for i = 1, bestof do
-		out = out .. '\n\t|map' .. i .. '={{Map|map='
-		if showScore then
-			out = out .. '|score1=|score2='
-		end
-		out = out .. '|finished='
-		if mapDetails then
-			out = out .. '\n\t\t|t1ban1=|t1ban2='
-			out = out .. '\n\t\t|t2ban1=|t2ban2='
-			out = out .. '\n\t\t|t1firstside='
-			if mapDetailsOT then
-				out = out .. '|t1firstsideot='
-			end
-			out = out .. '\n\t\t|t1atk=|t1def='
-			if mapDetailsOT then
-				out = out .. '|t1otatk=|t1otdef='
-			end
-			out = out .. '\n\t\t|t2atk=|t2def='
-			if mapDetailsOT then
-				out = out .. '|t2otatk=|t2otdef='
-			end
-			out = out .. '\n\t'
-		end
-		out = out .. '}}'
+		Array.appendWith(lines,
+			INDENT .. '|mapveto={{MapVeto',
+			INDENT .. INDENT .. '|firstpick=',
+			INDENT .. INDENT .. '|types=' .. VETOES[bestof],
+			INDENT .. INDENT .. '|t1map1=|t2map1=',
+			INDENT .. INDENT .. '|t1map2=|t2map2=',
+			INDENT .. INDENT .. '|t1map3=|t2map3=',
+			INDENT .. INDENT .. '|t1map4=|t2map4=',
+			INDENT .. INDENT .. '|decider=',
+			INDENT .. '}}'
+		)
 	end
 
-	return out .. '\n\t}}'
+	local score = mapScore and '|score1=|score2=' or ''
+	local atkDefParams = function(opponentIndex)
+		local prefix = '|t' .. opponentIndex
+		return table.concat(Array.extend(
+			INDENT .. INDENT .. prefix .. 'atk=' .. prefix .. 'def=',
+			mapDetailsOT and (prefix .. 'otatk=' .. prefix .. 'otdef=') or nil
+		))
+	end
+
+	Array.forEach(Array.range(1, bestof), function(mapIndex)
+		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score .. '|finished='
+		if not mapDetails then
+			Array.appendWith(lines, firstMapLine .. '}}')
+			return
+		end
+
+		Array.appendWith(lines,
+			firstMapLine,
+			INDENT .. INDENT .. '|t1ban1=|t1ban2=',
+			INDENT .. INDENT .. '|t2ban1=|t2ban2=',
+			INDENT .. INDENT .. '|t1firstside=' .. (mapDetailsOT and '|t1firstsideot=' or ''),
+			atkDefParams(1),
+			atkDefParams(2),
+			INDENT .. '}}'
+		)
+	end)
+
+	Array.appendWith(lines, INDENT .. '}}')
+
+	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, showScore)
-	local score = showScore and '|score=' or ''
-
-	if mode == 'solo' then
-		return '{{PlayerOpponent||flag=|team=' .. score .. '}}'
-	elseif mode == 'team' then
-		return '{{TeamOpponent|' .. score .. '}}'
-	elseif mode == 'literal' then
-		return '{{LiteralOpponent|}}'
-	end
-end
-
-return wikiCopyPaste
+return WikiCopyPaste

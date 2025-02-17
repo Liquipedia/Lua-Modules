@@ -9,7 +9,9 @@
 local Region = {}
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -19,33 +21,33 @@ local COUNTRY_TO_REGION_DATA = Lua.requireIfExists('Module:Region/CountryData', 
 local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'
 
 ---Retrieves the name of a region as well as the display for it.
----@param args {region: string?, country: string?}?
+---@param args {region: string?, country: string?, linkToCategory: boolean?}?
 ---@return {display: string?, region: string?}
 function Region.run(args)
 	local regionValues = Region._raw(args)
 
 	return {
-		display = Region._toDisplay(regionValues),
+		display = Region._toDisplay(regionValues, {linkToCategory = Logic.readBool((args or {}).linkToCategory)}),
 		region = regionValues.region or regionValues.input
 	}
 end
 
 ---Builds the display for a region.
----@param args {region: string?, country: string?}?
+---@param args {region: string?, country: string?, linkToCategory: boolean?}?
 ---@return string
 function Region.display(args)
-	return Region._toDisplay(Region._raw(args)) or ''
+	return Region._toDisplay(Region._raw(args), {linkToCategory = Logic.readBool((args or {}).linkToCategory)}) or ''
 end
 
 ---Retrieves the name for a region.
----@param args {region: string?, country: string?}?
+---@param args {region: string?, country: string?, linkToCategory: boolean?}?
 ---@return string
 function Region.name(args)
 	return Region._raw(args).region or ''
 end
 
 ---Fetches the (raw) data for a region
----@param args {region: string?, country: string?}?
+---@param args {region: string?, country: string?, linkToCategory: boolean?}?
 ---@return {region: string?, flag: string?, file: string?, input: string?}
 function Region._raw(args)
 	args = args or {}
@@ -70,11 +72,14 @@ end
 
 ---Builds the display of a region from its (raw) data
 ---@param regionValues {region: string?, flag: string?, file: string?, input: string?}
+---@param options {linkToCategory: boolean?}?
 ---@return string?
-function Region._toDisplay(regionValues)
+function Region._toDisplay(regionValues, options)
 	if Table.isEmpty(regionValues) then
 		return
 	end
+
+	options = options or {}
 
 	local display = ''
 	if regionValues.flag then
@@ -92,7 +97,13 @@ function Region._toDisplay(regionValues)
 		mw.ext.TeamLiquidIntegration.add_category(NO_ENTRY_FOUND_CATEGORY)
 	end
 
-	return display .. (regionValues.region or regionValues.input)
+	local text = regionValues.region or regionValues.input
+
+	if not options.linkToCategory then
+		return display .. text
+	end
+
+	return display .. Page.makeInternalLink({}, text, ':Category:' .. text)
 end
 
 return Class.export(Region, {frameOnly = true})

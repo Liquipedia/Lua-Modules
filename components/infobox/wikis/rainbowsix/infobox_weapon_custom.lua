@@ -7,14 +7,17 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = require('Module:CharacterNames')
 local Class = require('Module:Class')
-local Cell = require('Module:Infobox/Widget/Cell')
 local Lua = require('Module:Lua')
-local OperatorIcon = require('Module:OperatorIcon')
 local Table = require('Module:Table')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
+
+local Widgets = Lua.import('Module:Widget/All')
+local Cell = Widgets.Cell
 
 ---@class RainbowsixWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
@@ -46,7 +49,7 @@ end
 ---@return string
 function CustomWeapon:_getOperators()
 	local operatorIcons = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator)
-		return OperatorIcon.getImage{operator, size = SIZE_OPERATOR}
+		return CharacterIcon.Icon{character = CharacterNames[operator:lower()], size = SIZE_OPERATOR}
 	end)
 
 	return table.concat(operatorIcons, '&nbsp;')
@@ -56,6 +59,9 @@ end
 ---@param args table
 ---@return table
 function CustomWeapon:addToLpdb(lpdbData, args)
+	local operators = Array.map(self:getAllArgsForBase(self.args, 'operator'), function(operator)
+		return CharacterNames[operator:lower()]
+	end)
 	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		desc = args.desc,
 		class = args.class,
@@ -65,7 +71,7 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		reloadspeed = args.reloadspeed,
 		rateoffire = args.rateoffire,
 		firemode = table.concat(self:getAllArgsForBase(args, 'firemode'), ';'),
-		operators = table.concat(self:getAllArgsForBase(args, 'operator'), ';'),
+		operators = table.concat(operators, ';'),
 		games = table.concat(self:getAllArgsForBase(args, 'game'), ';'),
 	})
 	return lpdbData

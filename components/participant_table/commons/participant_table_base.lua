@@ -30,6 +30,7 @@ local PlayerExt = Lua.import('Module:Player/Ext')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
+local prizePoolVars = PageVariableNamespace('PrizePool')
 
 ---@class ParticipantTableConfig
 ---@field lpdbPrefix string?
@@ -49,6 +50,7 @@ local pageVars = PageVariableNamespace('ParticipantTable')
 ---@field display boolean
 ---@field width string
 ---@field columnWidth string
+---@field showTitle boolean only applies for the title of the whole table
 
 ---@class ParticipantTableSection
 ---@field config ParticipantTableConfig
@@ -108,7 +110,8 @@ function ParticipantTable.readConfig(args, parentConfig)
 		showTeams = not Logic.readBool(args.disable_teams),
 		title = args.title,
 		importOnlyQualified = Logic.readBool(args.onlyQualified),
-		display = not Logic.readBool(args.hidden)
+		display = not Logic.readBool(args.hidden),
+		showTitle = not Logic.readBool(args.hideTitle),
 	}
 
 	config.width = parentConfig.width
@@ -164,8 +167,16 @@ function ParticipantTable:readSection(args)
 	local section = {config = config}
 
 	local entriesByName = {}
+	local tbds = {}
 	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
+
+		if entry.opponent and Opponent.isTbd(entry.opponent) then
+			table.insert(tbds, entry)
+			--needed so index is increased
+			return entry
+		end
+
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
 		end
@@ -177,7 +188,10 @@ function ParticipantTable:readSection(args)
 	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
-		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {syncPlayer = config.syncPlayers})
+		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {
+			syncPlayer = config.syncPlayers,
+			overwritePageVars = true,
+		})
 		self:setCustomPageVariables(entry, config)
 		return entry
 	end)
@@ -185,6 +199,8 @@ function ParticipantTable:readSection(args)
 	Array.sortInPlaceBy(section.entries, function(entry)
 		return config.sortOpponents and entry.name:lower() or entry.inputIndex or -1
 	end)
+
+	Array.extendWith(section.entries, tbds)
 
 	table.insert(self.sections, section)
 end
@@ -263,11 +279,20 @@ function ParticipantTable:store()
 	Array.forEach(self.sections, function(section) Array.forEach(section.entries, function(entry)
 		local lpdbData = Opponent.toLpdbStruct(entry.opponent)
 
-		if placements[lpdbData.opponentname] or section.config.noStorage or
-			Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
+		if section.config.noStorage or Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
-
-		lpdbData = Table.merge(lpdbTournamentData, lpdbData, {date = section.config.resolveDate, extradata = {}})
+		if placements[lpdbData.opponentname] then
+			lpdbData = Table.deepMerge(
+				lpdbData,
+				placements[lpdbData.opponentname]
+			)
+		else
+			lpdbData = Table.merge(
+				lpdbTournamentData,
+				lpdbData,
+				{date = section.config.resolveDate, extradata = {dq = entry.dq and 'true' or nil}}
+			)
+		end
 
 		self:adjustLpdbData(lpdbData, entry, section.config)
 
@@ -277,14 +302,17 @@ function ParticipantTable:store()
 	return self
 end
 
----Get placements already set on the page from prize pools
----@return table<string, true>
+---Get placements already set on the page from prize pools ABOVE the participant table
+---@return table<string, placement>
 function ParticipantTable:getPlacements()
 	local placements = {}
-	Array.forEach(mw.ext.LiquipediaDB.lpdb('placement', {
-		limit = 5000,
-		conditions = '[[placement::!]] AND [[pagename::' .. string.gsub(mw.title.getCurrentTitle().text, ' ', '_') .. ']]',
-	}), function(placement) placements[placement.opponentname] = true end)
+	local maxPrizePoolIndex = tonumber(Variables.varDefault('prizepool_index')) or 0
+
+	for prizePoolIndex = 1, maxPrizePoolIndex do
+		Array.forEach(Json.parseIfTable(prizePoolVars:get('placementRecords.' .. prizePoolIndex)) or {}, function(placement)
+			placements[placement.opponentname] = placement
+		end)
+	end
 
 	return placements
 end
@@ -292,6 +320,16 @@ end
 ---@param lpdbData table
 ---@return string
 function ParticipantTable:objectName(lpdbData)
+	--this objectName comes from lpdbData passed along as wiki vars, e.g. sc, sc2, sg
+	if Logic.isNotEmpty(lpdbData.objectName) then return lpdbData.objectName end
+
+	--this objectName comes from queried lpdb data and has a prefixed pageid
+	if Logic.isNotEmpty(lpdbData.objectname) then
+		--remove then prefixed pageid from the objectName
+		local objectName = lpdbData.objectname:gsub('^%d*_', '')
+		return objectName
+	end
+
 	local lpdbPrefix = self.config.lpdbPrefix and ('_' .. self.config.lpdbPrefix) or ''
 	return 'ranking' .. lpdbPrefix .. lpdbData.prizepoolindex .. '_' .. lpdbData.opponentname
 end
@@ -312,7 +350,9 @@ function ParticipantTable:create()
 		:addClass('participantTable')
 		:css('max-width', '100%!important')
 		:css('width', config.width)
-		:node(mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants'))
+		:node(config.showTitle and
+			mw.html.create('div'):addClass('participantTable-title'):wikitext(config.title or 'Participants')
+			or nil)
 
 	Array.forEach(self.sections, function(section) self:displaySection(section) end)
 
@@ -343,7 +383,15 @@ function ParticipantTable:displaySection(section)
 		sectionNode:node(self:displayEntry(entry):css('width', self.config.columnWidth))
 	end)
 
-	local currentColumn = (#entries) % self.config.colSpan
+	local tbdsAdded = 0
+	if section.config.count and section.config.count > sectionEntryCount then
+		Array.forEach(Array.range(sectionEntryCount + 1, section.config.count), function(index)
+			tbdsAdded = tbdsAdded + 1
+			sectionNode:node(self:tbdEntry():css('width', self.config.columnWidth))
+		end)
+	end
+
+	local currentColumn = (#entries + tbdsAdded) % self.config.colSpan
 	if currentColumn ~= 0 then
 		Array.forEach(Array.range(currentColumn + 1, self.config.colSpan), function() sectionNode:node(self:empty()) end)
 	end
@@ -376,6 +424,15 @@ function ParticipantTable:sectionTitle(section, amountOfEntries)
 	if not section.config.showCountBySection then return title end
 
 	return title:tag('i'):wikitext(' (' .. (section.config.count or amountOfEntries) .. ')'):done()
+end
+
+---@return Html
+function ParticipantTable:tbdEntry()
+	return mw.html.create('div')
+		:addClass('participantTable-entry')
+		:node(OpponentDisplay.BlockOpponent{
+			opponent = Opponent.tbd(),
+		})
 end
 
 ---@param entry ParticipantTableEntry

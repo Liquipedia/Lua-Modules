@@ -7,8 +7,9 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
+local CharacterNames = mw.loadData('Module:CharacterNames')
 local Class = require('Module:Class')
-local HeroIcon = require('Module:HeroIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -18,10 +19,10 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local ROLES = {
@@ -52,7 +53,7 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto._results{addlpdbdata = 'true'}
+	player.args.history = TeamHistoryAuto.results{addlpdbdata = true}
 	player.args.autoTeam = true
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
@@ -69,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 
 	if id == 'custom' then
 		local heroIcons = Array.map(caller:getAllArgsForBase(args, 'hero'), function(hero, _)
-			return HeroIcon.getImage{hero, size = SIZE_HERO}
+			return CharacterIcon.Icon{character = CharacterNames[hero:lower()], size = SIZE_HERO}
 		end)
 
 		return {
@@ -103,7 +104,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
 	for _, hero, heroIndex in Table.iter.pairsByPrefix(args, 'hero', {requireIndex = false}) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = hero
+		lpdbData.extradata['signatureHero' .. heroIndex] = CharacterNames[hero:lower()]
 	end
 	lpdbData.type = self:_isPlayerOrStaff()
 

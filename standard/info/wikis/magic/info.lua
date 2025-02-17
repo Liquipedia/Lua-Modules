@@ -10,6 +10,7 @@ return {
 	startYear = 1993,
 	wikiName = 'magic',
 	name = 'Magic: The Gathering',
+	defaultGame = 'tabletop',
 	games = {
 		mtga = {
 			abbreviation = 'MTGA',
@@ -51,8 +52,14 @@ return {
 			},
 		},
 	},
-	defaultGame = 'tabletop',
-	defaultTeamLogo = 'Liquipedia logo.png', ---@deprecated
-	defaultTeamLogoDark = 'Liquipedia logo.png', ---@deprecated
-	match2 = 0,
+	config = {
+		squads = {
+			hasPosition = false,
+			hasSpecialTeam = false,
+			allowManual = true,
+		},
+		match2 = {
+			status = 2,
+		},
+	},
 }

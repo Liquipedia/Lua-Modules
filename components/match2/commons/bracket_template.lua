@@ -15,11 +15,18 @@ local Template = require('Module:Template')
 local BracketDisplay = Lua.import('Module:MatchGroup/Display/Bracket')
 local Match = Lua.import('Module:Match')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local Opponent = Lua.import('Module:Opponent')
+
+---@class BracketTemplateBracket
+---@field bracketDatasById table<string,MatchGroupUtilBracketBracketData>
+---@field rootMatchIds string[]
+---@field templateId string
 
 local BracketTemplate = {}
 
 -- Entry point of Template:BracketDocumentation
+---@return string
 function BracketTemplate.TemplateBracketDocumentation()
 	local argsList = Template.retrieveReturnValues('BracketTemplate')
 	local bracket = BracketTemplate.readBracket(argsList)
@@ -28,6 +35,8 @@ function BracketTemplate.TemplateBracketDocumentation()
 	return BracketTemplate.BracketDocumentation({templateId = bracket.templateId})
 end
 
+---@param props {templateId: string}
+---@return string
 function BracketTemplate.BracketDocumentation(props)
 	local parts = {
 		[[
@@ -36,17 +45,24 @@ function BracketTemplate.BracketDocumentation(props)
 		BracketTemplate.BracketContainer({bracketId = props.templateId}),
 		[[
 
-==Template==
-Refresh the page to generate a new ID.
+==Copy-Paste==
+For copy-pastable code please use <code>Special:RunQuery/BracketCopyPaste</code> on the respective wiki(s).
 ]],
-		mw.html.create('pre'):addClass('brkts-template-container'),
 	}
 	return table.concat(Array.map(parts, tostring))
 end
 
+---@param props {bracketId: string, config: table?}
+---@return Html
 function BracketTemplate.BracketContainer(props)
+	local matchRecords = MatchGroupUtil.fetchMatchRecords(props.bracketId)
+	Array.forEach(matchRecords, function(match)
+		match.match2opponents = {{type = Opponent.literal, name = '', match2players = {}}}
+	end)
+	local bracket = MatchGroupUtil.makeMatchGroup(matchRecords) --[[@as MatchGroupUtilBracket]]
+
 	return BracketDisplay.Bracket({
-		bracket = MatchGroupUtil.fetchMatchGroup(props.bracketId),
+		bracket = bracket,
 		config = Table.merge(props.config, {
 			OpponentEntry = function() return mw.html.create('div'):addClass('brkts-opponent-entry') end,
 			matchHasDetails = function() return false end,
@@ -54,6 +70,8 @@ function BracketTemplate.BracketContainer(props)
 	})
 end
 
+---@param argsList table[]
+---@return BracketTemplateBracket
 function BracketTemplate.readBracket(argsList)
 	local bracketDataList = Array.map(argsList, BracketTemplate.readBracketData)
 
@@ -86,6 +104,8 @@ function BracketTemplate.readBracket(argsList)
 	return bracket
 end
 
+---@param args table
+---@return MatchGroupUtilBracketBracketData
 function BracketTemplate.readBracketData(args)
 	local pageName = mw.title.getCurrentTitle().text
 	local function joinPageName(baseMatchId)
@@ -94,6 +114,8 @@ function BracketTemplate.readBracketData(args)
 
 	args.type = 'bracket'
 	local bracketData = MatchGroupUtil.bracketDataFromRecord(args)
+	--bracketData is of type bracket
+	---@cast bracketData - MatchGroupUtilMatchlistBracketData
 	bracketData.bracketResetMatchId = bracketData.bracketResetMatchId and joinPageName(bracketData.bracketResetMatchId)
 	bracketData.lowerMatchIds = Array.map(bracketData.lowerMatchIds, joinPageName)
 	bracketData.matchId = joinPageName(args.matchid)
@@ -102,17 +124,18 @@ function BracketTemplate.readBracketData(args)
 	return bracketData
 end
 
+---@param bracket BracketTemplateBracket
 function BracketTemplate.store(bracket)
 	BracketTemplate.storeBracket(bracket)
 	BracketTemplate.storeDatapoint(bracket.templateId)
 end
 
---[[
-Store bracket with placeholder match and opponent data in commons wiki LPDB
-]]
+---Store bracket with placeholder match and opponent data in commons wiki LPDB
+---@param bracket BracketTemplateBracket
 function BracketTemplate.storeBracket(bracket)
 	for matchId, bracketData in pairs(bracket.bracketDatasById) do
 		local bracketId, baseMatchId = MatchGroupUtil.splitMatchId(matchId)
+		assert(baseMatchId, 'Invalid matchId "' .. matchId .. '"')
 		bracketData.matchId = nil
 
 		local opponent = {
@@ -129,6 +152,7 @@ function BracketTemplate.storeBracket(bracket)
 	end
 end
 
+---@param templateId string
 function BracketTemplate.storeDatapoint(templateId)
 	mw.ext.LiquipediaDB.lpdb_datapoint('ExtensionBracket_' .. templateId, {
 		type = 'extension bracket',

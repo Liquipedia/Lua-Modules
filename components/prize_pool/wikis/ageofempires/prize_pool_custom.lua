@@ -30,10 +30,12 @@ local QUALIFIER = 'Qualifier'
 local TIER_VALUE = {10, 6, 4, 2}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	args.syncPlayers = true
-	args.import = false
+	args.import = Logic.nilOr(Logic.readBoolOrNil(args.import), false)
 
 	local prizePool = PrizePool(args)
 		:create()
@@ -43,12 +45,17 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
 		Variables.varDefault('tournament_liquipediatier'),
 		placement.placeStart,
-		Variables.varDefault('tournament_type')
+		Variables.varDefault('tournament_type'),
+		Variables.varDefault('tournament_liquipediatiertype')
 	)
 	if opponent.opponentData.type == Opponent.solo then
 		-- legacy extradata, to be removed once unused
@@ -64,9 +71,15 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.extradata.patch = Variables.varDefault('tournament_patch')
 
 	-- legacy points, to be standardized
-	lpdbData.extradata.points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	local points = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 1)
+	---for points it can never be boolean
+	---@cast points -boolean
+	lpdbData.extradata.points = points
 	Variables.varDefine(lpdbData.objectName .. '_pointprize', lpdbData.extradata.points)
-	lpdbData.extradata.points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+	local points2 = placement:getPrizeRewardForOpponent(opponent, PRIZE_TYPE_POINTS .. 2)
+	---for points it can never be boolean
+	---@cast points2 -boolean
+	lpdbData.extradata.points2 = points2
 	Variables.varDefine(lpdbData.objectName .. '_pointprize2', lpdbData.extradata.points2)
 
 	local prizeIsQualifier = function(prize)
@@ -88,12 +101,21 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
-function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type)
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@param type string?
+---@param tiertype string?
+---@return integer
+function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, tiertype)
 	if Logic.isEmpty(tier) then
 		return 0
 	end
 
 	local tierValue = TIER_VALUE[tier] or TIER_VALUE[tonumber(tier) or ''] or 1
+	if tiertype == QUALIFIER then
+		tierValue = tierValue * 0.1
+	end
 	local onlineFactor = type == 'Online' and 0.65 or 1
 
 	return tierValue * math.max(prizeMoney, 0.001) / place * onlineFactor

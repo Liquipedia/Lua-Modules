@@ -6,105 +6,32 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
+local Info = require('Module:Info')
 local Lua = require('Module:Lua')
-local ReferenceCleaner = require('Module:ReferenceCleaner')
 
-local Squad = Lua.import('Module:Squad')
+local Squad = Lua.import('Module:Widget/Squad/Core')
 local SquadRow = Lua.import('Module:Squad/Row')
-local SquadAutoRefs = Lua.import('Module:SquadAuto/References')
+local SquadUtils = Lua.import('Module:Squad/Utils')
 
 local CustomSquad = {}
 
+---@param frame Frame
+---@return Widget
 function CustomSquad.run(frame)
-	local squad = Squad()
-
-	squad:init(frame):title():header()
-
-	local args = squad.args
-
-	local players = Array.mapIndexes(function(index)
-		return Json.parseIfString(args[index])
-	end)
-
-	Array.forEach(players, function(player)
-		squad:row(CustomSquad._playerRow(player, squad.type))
-	end)
-
-	return squad:create()
-end
-
-function CustomSquad.runAuto(playerList, squadType)
-	if #playerList == 0 then
-		return
+	if not Info.config.squads.allowManual then
+		error('This wiki does not use manual squad tables')
 	end
 
-	local squad = Squad()
-	squad:init(mw.getCurrentFrame())
-
-	squad.type = squadType
-
-	squad:title():header()
-
-	Array.forEach(playerList, function(player)
-		--Get Reference(s)
-		local joinReference = SquadAutoRefs.useReferences(player.joindateRef, player.joindate)
-		local leaveReference = SquadAutoRefs.useReferences(player.leavedateRef, player.leavedate)
-
-		-- Map between formats
-		player.joindate = (player.joindatedisplay or player.joindate) .. ' ' .. joinReference
-		player.leavedate = (player.leavedatedisplay or player.leavedate) .. ' ' .. leaveReference
-		player.inactivedate = player.leavedate
-
-		player.link = player.page
-		player.role = player.thisTeam.role
-		player.position = player.thisTeam.position
-		player.team = player.thisTeam.role == 'Loan' and player.oldTeam.team
-
-		player.newteam = player.newTeam.team
-		player.newteamrole = player.newTeam.role
-		player.newteamdate = player.newTeam.date
-
-		squad:row(CustomSquad._playerRow(player, squad.type))
-	end)
-
-	return squad:create()
+	return SquadUtils.defaultRunManual(frame, Squad, SquadUtils.defaultRow(SquadRow))
 end
 
-function CustomSquad._playerRow(player, squadType)
-	local row = SquadRow()
-
-	row:status(squadType)
-	row:id{
-		(player.idleavedate or player.id),
-		flag = player.flag,
-		link = player.link,
-		captain = player.captain,
-		role = player.role,
-		team = player.team,
-		date = player.leavedate or player.inactivedate or player.leavedate,
-	}
-	row:name{name = player.name}
-	row:role{role = player.role}
-	row:date(player.joindate, 'Join Date:&nbsp;', 'joindate')
-
-	if squadType == Squad.TYPE_FORMER then
-		row:date(player.leavedate, 'Leave Date:&nbsp;', 'leavedate')
-		row:newteam{
-			newteam = player.newteam,
-			newteamrole = player.newteamrole,
-			newteamdate = player.newteamdate,
-			leavedate = player.leavedate
-		}
-	elseif squadType == Squad.TYPE_INACTIVE then
-		row:date(player.inactivedate, 'Inactive Date:&nbsp;', 'inactivedate')
-	end
-
-	return row:create(
-		mw.title.getCurrentTitle().prefixedText .. '_' .. player.id .. '_' .. ReferenceCleaner.clean(player.joindate)
-		.. (player.role and '_' .. player.role or '')
-	)
+---@param players table[]
+---@param squadStatus SquadStatus
+---@param squadType SquadType
+---@param customTitle string?
+---@return Widget
+function CustomSquad.runAuto(players, squadStatus, squadType, customTitle)
+	return SquadUtils.defaultRunAuto(players, squadStatus, squadType, Squad, SquadUtils.defaultRow(SquadRow), customTitle)
 end
 
 return CustomSquad

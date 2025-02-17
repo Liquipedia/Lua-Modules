@@ -1,0 +1,181 @@
+.header-banner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-bottom: 1.5rem;
+	position: relative;
+	border-radius: 0.5rem;
+
+	.wiki-arenafps & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/b/ba/Arenafps-banner.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-deadlock & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/8/8f/Deadlock_mainpage_banner.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-dota2 & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/1/19/Bgdota2.jpg ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-fortnite & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/1/1a/Fortnite-banner.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-hearthstone & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/4/4d/Hearthstone_banner_bg.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-rainbowsix & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/c/c0/R6_bg.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-apexlegends & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/3/3d/Apex_Legends_Banner_bg.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-leagueoflegends & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/b/bb/League_of_Legends_Banner_bg.jpg ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-pubg & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/2/2d/PUBG_Banner_bg.jpg ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-pubgmobile & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/1/1a/PUBG_Mobile_banner_bg.jpg ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-halo & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/f/f8/Halo_Banner_bg.png ) no-repeat center / cover;
+		}
+	}
+
+	.wiki-valorant & {
+		@media ( min-width: 768px ) {
+			background: url( https://liquipedia.net/commons/images/a/a6/Valorant-bg-2.png ) no-repeat center / cover;
+		}
+	}
+
+	@media ( min-width: 768px ) {
+		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+		height: 8.875rem;
+		flex-direction: row;
+		justify-content: space-between;
+		padding: 0 2.5rem;
+		overflow: hidden;
+	}
+
+	&::before {
+		@media ( min-width: 768px ) {
+			content: "";
+			background-color: #000000;
+			opacity: 0.5;
+			position: absolute;
+			inset: 0;
+			z-index: 0;
+		}
+	}
+
+	> * {
+		z-index: 1;
+	}
+
+	&__logo {
+		position: relative;
+
+		img {
+			width: auto;
+
+			@media ( max-width: 767px ) {
+				max-height: 2.375rem;
+			}
+
+			@media ( min-width: 768px ) {
+				max-height: 3.25rem;
+			}
+		}
+
+		.logo--light-theme {
+			display: none;
+
+			.theme--light & {
+				@media ( max-width: 767px ) {
+					display: block;
+				}
+			}
+		}
+
+		.logo--dark-theme {
+			display: block;
+
+			.theme--light & {
+				@media ( max-width: 767px ) {
+					display: none;
+				}
+			}
+		}
+	}
+
+	form.searchbox {
+		display: flex;
+
+		@media ( max-width: 767px ) {
+			margin-top: 1.5rem;
+			width: 100%;
+		}
+
+		@media ( min-width: 768px ) {
+			margin-top: 0;
+		}
+
+		// needed higher specificity to override the default input styles
+		input.searchbox-text:not( .search-input ):not( .oo-ui-inputWidget-input ) {
+			min-height: 2.75rem;
+			border-radius: 0.5rem;
+			box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+			border: 0.0625rem solid rgba( 0, 0, 0, 0.12 );
+
+			@media ( max-width: 767px ) {
+				flex-grow: 1;
+			}
+
+			@media ( min-width: 768px ) {
+				width: 25rem;
+			}
+
+			.theme--dark & {
+				background-color: #ffffff;
+				color: var( --clr-secondary-7 );
+			}
+		}
+
+		button.searchbox-button {
+			min-height: 2.75rem;
+			margin-left: 0.5rem;
+			padding: 0 1rem;
+			border: 0;
+		}
+	}
+}

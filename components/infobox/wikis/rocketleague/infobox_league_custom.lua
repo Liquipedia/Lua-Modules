@@ -11,17 +11,16 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 local Tier = require('Module:Tier/Custom')
-local TournamentNotability = require('Module:TournamentNotability')
 local Variables = require('Module:Variables')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 local ReferenceCleaner = Lua.import('Module:ReferenceCleaner')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
@@ -29,6 +28,7 @@ local Center = Widgets.Center
 ---@class RocketleagueLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
+local NotabilityCalculator = {}
 
 local SERIES_RLCS = 'Rocket League Championship Series'
 local MODE_2v2 = '2v2'
@@ -36,8 +36,6 @@ local MODE_2v2 = '2v2'
 local TIER_1 = 1
 local MISC_TIER = -1
 local H2H_TIER_THRESHOLD = 5
-
-local PSYONIX = 'Psyonix'
 
 ---@param frame Frame
 ---@return Html
@@ -73,15 +71,21 @@ function CustomInjector:parse(id, widgets)
 				)
 				index = index + 1
 			end
-			table.insert(widgets, Title{name = 'Maps'})
-			table.insert(widgets, Center{content = maps})
+			table.insert(widgets, Title{children = 'Maps'})
+			table.insert(widgets, Center{children = maps})
 		end
 
 		if not String.isEmpty(args.team_number) then
-			table.insert(widgets, Title{name = 'Teams'})
+			table.insert(widgets, Title{children = 'Teams'})
 			table.insert(widgets, Cell{
 				name = 'Number of teams',
 				content = {args.team_number}
+			})
+		elseif not String.isEmpty(args.player_number) then
+			table.insert(widgets, Title{children = 'Players'})
+			table.insert(widgets, Cell{
+				name = 'Number of players',
+				content = {args.player_number}
 			})
 		end
 	end
@@ -105,31 +109,9 @@ function CustomLeague:createLiquipediaTierDisplay(args)
 end
 
 ---@param args table
----@return boolean
-function CustomLeague:liquipediaTierHighlighted(args)
-	if (
-		String.isNotEmpty(args.liquipediatiertype) or
-		tonumber(args.liquipediatier) ~= TIER_1
-	) then
-		return false
-	end
-
-	return self:containsPsyonix('organizer') or
-		self:containsPsyonix('sponsor')
-end
-
----@param prefix string
----@return boolean
-function CustomLeague:containsPsyonix(prefix)
-	return Table.any(
-		League:getAllArgsForBase(self.args, prefix),
-		function (_, value) return value == PSYONIX end
-	)
-end
-
----@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.rlcsPremier = args.series == SERIES_RLCS and 1 or 0
+	self.data.publishertier = args.series == SERIES_RLCS and tonumber(self.data.liquipediatier) == TIER_1
 end
 
 ---@param args table
@@ -185,8 +167,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.mode = args.mode
 	lpdbData.extradata.notabilitymod = args.notabilitymod
 	lpdbData.extradata.liquipediatiertype2 = args.liquipediatiertype2
-	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and TournamentNotability.run() or ''
-	lpdbData.extradata['is rlcs'] = self.data.rlcsPremier
+	lpdbData.extradata.notabilitypercentage = args.edate ~= 'tba' and NotabilityCalculator.run() or ''
 
 	return lpdbData
 end
@@ -194,7 +175,11 @@ end
 ---@param args table
 ---@return table
 function CustomLeague:getWikiCategories(args)
-	return {Game.name{game = args.game} .. ' Competitions'}
+	local gameName = Game.name{game = args.game}
+	if not gameName then
+		return {'Competitions'}
+	end
+	return {gameName .. ' Competitions'}
 end
 
 ---@param args table
@@ -225,5 +210,87 @@ end
 function CustomLeague:_makeInternalLink(content)
 	return '[[' .. content .. ']]'
 end
+
+---@return number
+function NotabilityCalculator.run()
+	local pagename = mw.title.getCurrentTitle().text:gsub(' ', '_')
+	local placements = NotabilityCalculator._getPlacements(pagename)
+	local allTeams = NotabilityCalculator._getAllTeams()
+
+	local teamsWithAPage = 0
+
+	-- We need this because sometimes we get a placement like "tbd"
+	local numberOfPlacements = 0
+
+	for _, placement in ipairs(placements) do
+		if placement.participant:lower() ~= '' and placement.participant:lower() ~= 'tbd' then
+			local doesTeamExist = NotabilityCalculator._findTeam(allTeams, placement.participant)
+			numberOfPlacements = numberOfPlacements + 1
+
+			if doesTeamExist == true then
+				teamsWithAPage = teamsWithAPage + 1
+			end
+		end
+	end
+
+	if numberOfPlacements == 0 then
+		return 0
+	end
+
+	return Math.round((teamsWithAPage / numberOfPlacements) * 100, 2)
+end
+
+---@param allTeams table
+---@param teamToFind string
+---@return boolean
+function NotabilityCalculator._findTeam(allTeams, teamToFind)
+	local firstLetter = string.sub(teamToFind, 1, 1):lower()
+
+	if not allTeams[firstLetter] then
+		return false
+	end
+
+	for _, team in ipairs(allTeams[firstLetter]) do
+		if team:lower() == teamToFind:lower() then
+			return true
+		end
+	end
+
+	return false
+end
+
+---@return table
+function NotabilityCalculator._getAllTeams()
+	local teams = mw.ext.LiquipediaDB.lpdb('team', {
+		query = 'name',
+		limit = 5000,
+	})
+
+	-- Make a table of letters, with each letter mapping to an
+	-- array of names, to aid in faster lookup
+	local indexedTeams = {}
+
+	for _, team in pairs(teams) do
+		local firstLetter = string.sub(team.name, 1, 1):lower()
+
+		if indexedTeams[firstLetter] == nil then
+			indexedTeams[firstLetter] = {}
+		end
+
+		table.insert(indexedTeams[firstLetter], team.name)
+	end
+
+	return indexedTeams
+end
+
+---@param pagename string
+---@return {participant: string, participantflag: string, mode: string}[]
+function NotabilityCalculator._getPlacements(pagename)
+	return mw.ext.LiquipediaDB.lpdb('placement', {
+		conditions = '[[pagename::' .. pagename .. ']] AND [[mode::3v3]]',
+		query = 'participant, participantflag, mode'
+	})
+end
+
 
 return CustomLeague

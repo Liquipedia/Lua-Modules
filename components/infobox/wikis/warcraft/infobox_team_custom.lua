@@ -15,10 +15,10 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
@@ -76,8 +76,8 @@ function CustomInjector:parse(id, widgets)
 			return param, self.caller:_createProfile(profileData, args[param])
 		end))
 		if not Table.isEmpty(profiles) then
-			table.insert(widgets, Title{name = 'Profiles'})
-			table.insert(widgets, Center{content = profiles})
+			table.insert(widgets, Title{children = 'Profiles'})
+			table.insert(widgets, Center{children = profiles})
 		end
 	end
 	return widgets

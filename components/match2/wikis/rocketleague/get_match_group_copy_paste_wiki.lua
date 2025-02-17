@@ -7,80 +7,67 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Table = require('Module:Table')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
---allowed opponent types on the wiki
-local MODES = { ['solo'] = 'solo', ['team'] = 'team' }
-local indent = '    '
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
---default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = 'team'
+---@class RocketleagueMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
---returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DefaultMode
+local INDENT = WikiCopyPaste.Indent
+
+---@param mapIndex integer
+---@return string
+function WikiCopyPaste._getMapCode(mapIndex)
+	return INDENT .. '|map' .. mapIndex .. '=' .. table.concat({
+		'{{Map',
+		INDENT .. INDENT .. '|map=',
+		INDENT .. INDENT .. '|score1=|score2=',
+		INDENT .. INDENT .. '|ot=|otlength=',
+		INDENT .. INDENT .. '|vod=',
+		INDENT .. '}}'
+	}, '\n')
 end
 
---subfunction used to generate the code for the Map template
---sets up as many maps as specified via the bestoff param
-wikiCopyPaste._getMaps = FnUtil.memoize(function(bestof)
-	local map = table.concat({
-		'{{Map',
-		indent .. indent .. '|map=',
-		indent .. indent .. '|score1=|score2=',
-		indent .. indent .. '|ot=|otlength=',
-		indent .. indent .. '|vod=',
-		indent .. '}}'
-	}, '\n')
-
-	local lines = {}
-	for i = 1, bestof do
-		table.insert(lines, indent .. '|map' .. i .. '=' .. map)
-	end
-	Array.appendWith(lines,
-		indent .. '|finished=',
-		indent .. '|date=',
+--returns the Code for a Match, depending on the input
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local lines = Array.extend(
+		'{{Match',
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getOpponent(mode)
+		end),
+		Array.map(Array.range(1, bestof), WikiCopyPaste._getMapCode),
+		INDENT .. '|finished=',
+		INDENT .. '|date=',
+		'}}',
 		''
 	)
 
 	return table.concat(lines, '\n')
-end)
-
---returns the Code for a Match, depending on the input
---for more customization please change stuff here^^
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
-	if out == '⧼BracketConfigMatchTemplate⧽' then
-		local opponentLines = {}
-		for i = 1, opponents do
-			table.insert(opponentLines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode))
-		end
-
-		local lines = Array.extend({
-			'{{Match',
-			opponentLines,
-			indent .. '|finished=',
-			indent .. '|tournament=',
-			'}}',
-			''
-		})
-		return table.concat(lines, '\n')
-	else
-		out = out:gsub('<nowiki>', '')
-		out = out:gsub('</nowiki>', '')
-		for i = 1, opponents do
-			out = out:gsub('[ \t]*|opponent' .. i .. '=' , indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode))
-		end
-
-		out = out:gsub('[ \t]*|map1=.*\n' , '<<maps>>')
-			:gsub('[ \t]*|map%d+=.*\n' , '')
-			:gsub('<<maps>>' , wikiCopyPaste._getMaps(bestof))
-
-		return out .. '\n'
-	end
 end
 
-return wikiCopyPaste
+---@param mode string
+---@return string
+function WikiCopyPaste._getOpponent(mode)
+	if mode == Opponent.solo then
+		return '{{SoloOpponent||flag=|team=|score=}}'
+	elseif mode == Opponent.team then
+		return '{{TeamOpponent||score=}}'
+	elseif mode == Opponent.literal then
+		return '{{Literal|}}'
+	end
+
+	return ''
+end
+
+return WikiCopyPaste

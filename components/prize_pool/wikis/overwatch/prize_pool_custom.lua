@@ -26,6 +26,8 @@ local TYPE_MODIFIER = {Online = 0.65}
 local TIER_TYPE_MODIFIER = {Qualifier = 0.001}
 
 -- Template entry point
+---@param frame Frame
+---@return Html
 function CustomPrizePool.run(frame)
 	local args = Arguments.getArgs(frame)
 	local prizePool = PrizePool(args):create()
@@ -35,6 +37,10 @@ function CustomPrizePool.run(frame)
 	return prizePool:build()
 end
 
+---@param lpdbData placement
+---@param placement PrizePoolPlacement
+---@param opponent BasePlacementOpponent
+---@return placement
 function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	lpdbData.weight = CustomPrizePool.calculateWeight(
 		lpdbData.prizemoney,
@@ -56,6 +62,12 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 	return lpdbData
 end
 
+---@param prizeMoney number
+---@param tier string?
+---@param place integer
+---@param type string?
+---@param tierType string?
+---@return integer
 function CustomPrizePool.calculateWeight(prizeMoney, tier, place, type, tierType)
 	if Logic.isEmpty(tier) then
 		return 0

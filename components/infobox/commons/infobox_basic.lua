@@ -7,13 +7,14 @@
 --
 
 local Arguments = require('Module:Arguments')
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Table = require('Module:Table')
 
 local Info = Lua.import('Module:Info')
-local Infobox = Lua.import('Module:Infobox')
+local Infobox = Lua.import('Module:Widget/Infobox/Core')
 
 ---@class BasicInfobox
 ---@operator call(Frame): BasicInfobox
@@ -21,29 +22,42 @@ local Infobox = Lua.import('Module:Infobox')
 ---@field pagename string
 ---@field name string
 ---@field wiki string
----@field infobox Infobox
+---@field injector WidgetInjector?
+---@field warnings string[]
+---@field bottomContent string[]
 local BasicInfobox = Class.new(
 	function(self, frame)
 		self.args = Arguments.getArgs(frame)
 		self.pagename = mw.title.getCurrentTitle().text
 		self.name = self.args.name or self.pagename
 		self.wiki = self.args.wiki or Info.wikiName
-
-		self.infobox = Infobox:create(frame, self.wiki, Logic.readBool(self.args.darkmodeforced))
+		self.bottomContent = {}
+		self.warnings = {}
+		self.injector = nil
 	end
 )
+
+---Adds categories
+---@param ... string?
+---@return self
+function BasicInfobox:categories(...)
+	Array.forEach({...}, function(cat) return mw.ext.TeamLiquidIntegration.add_category(cat) end)
+	return self
+end
+
+---Adds bottom content
+---@param content string|number|Html|nil
+---@return self
+function BasicInfobox:bottom(content)
+	table.insert(self.bottomContent, content)
+	return self
+end
 
 ---@param injector WidgetInjector?
 ---@return self
 function BasicInfobox:setWidgetInjector(injector)
-	self.infobox:widgetInjector(injector)
+	self.injector = injector
 	return self
-end
-
----Creates an empty WidgetInjector
----@return WidgetInjector?
-function BasicInfobox:createWidgetInjector()
-	return nil
 end
 
 --- Allows for overriding this functionality
@@ -83,6 +97,24 @@ function BasicInfobox:getAllArgsForBase(args, base, options)
 	end
 
 	return foundArgs
+end
+
+---@param widgets Widget[]
+---@return string
+function BasicInfobox:build(widgets)
+	local infobox = Infobox{
+		gameName = self.wiki,
+		forceDarkMode = Logic.readBool(self.args.darkmodeforced),
+		bottomContent = self.bottomContent,
+		warnings = self.warnings,
+		children = widgets,
+	}
+	if self.injector then
+		-- Customizable backwards compatibility
+		local CustomizableContext = Lua.import('Module:Widget/Contexts/Customizable')
+		return CustomizableContext.LegacyCustomizable{value = self.injector, children = {infobox}}:tryMake()
+	end
+	return infobox:tryMake()
 end
 
 return BasicInfobox

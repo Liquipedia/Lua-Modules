@@ -7,20 +7,10 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
-local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 ---@class WarcraftBrktsWikiSpecific: BrktsWikiSpecific
 local WikiSpecific = Table.copy(require('Module:Brkts/WikiSpecific/Base'))
-
-WikiSpecific.matchFromRecord = FnUtil.lazilyDefineFunction(function()
-	local CustomMatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	return CustomMatchGroupUtil.matchFromRecord
-end)
-
-WikiSpecific.processMap = FnUtil.identity
-WikiSpecific.processPlayer = FnUtil.identity
 
 ---Determine if a match has details that should be displayed via popup
 ---@param match table

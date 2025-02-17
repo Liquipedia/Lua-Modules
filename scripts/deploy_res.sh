@@ -32,13 +32,12 @@ curl \
   -s \
   -b "$ckf" \
   -c "$ckf" \
-  --data-urlencode "username=${WIKI_USER}" \
-  --data-urlencode "password=${WIKI_PASSWORD}" \
-  --data-urlencode "logintoken=${loginToken}" \
-  --data-urlencode "loginreturnurl=${WIKI_BASE_URL}" \
+  --data-urlencode "lgname=${WIKI_USER}" \
+  --data-urlencode "lgpassword=${WIKI_PASSWORD}" \
+  --data-urlencode "lgtoken=${loginToken}" \
   -H "User-Agent: ${userAgent}" \
   -H 'Accept-Encoding: gzip' \
-  -X POST "${wikiApiUrl}?format=json&action=clientlogin" \
+  -X POST "${wikiApiUrl}?format=json&action=login" \
   | gunzip \
   > /dev/null
 

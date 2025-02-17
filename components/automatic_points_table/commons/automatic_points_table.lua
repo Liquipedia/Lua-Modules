@@ -23,7 +23,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local _POINTS_TYPE = {
+local POINTS_TYPE = {
 	MANUAL = 'MANUAL',
 	PRIZE = 'PRIZE',
 	SECURED = 'SECURED'
@@ -303,7 +303,7 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 	if manualPoints ~= nil then
 		return {
 			amount = manualPoints,
-			type = _POINTS_TYPE.MANUAL
+			type = POINTS_TYPE.MANUAL
 		}
 	-- placement points get next priority
 	elseif placement ~= nil then
@@ -312,14 +312,14 @@ function AutomaticPointsTable:calculatePointsForTournament(placement, manualPoin
 		if prizePoints ~= nil then
 			return {
 				amount = prizePoints,
-				type = _POINTS_TYPE.PRIZE
+				type = POINTS_TYPE.PRIZE
 			}
 		-- secured points are the points that are guaranteed for a team in a tournament
 		-- a team with X secured points will get X or more points at the end of the tournament
 		elseif securedPoints ~= nil then
 			return {
 				amount = securedPoints,
-				type = _POINTS_TYPE.SECURED
+				type = POINTS_TYPE.SECURED
 			}
 		end
 	end

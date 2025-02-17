@@ -13,10 +13,10 @@ local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class HearthstoneLeagueInfobox: InfoboxLeague
@@ -27,6 +27,8 @@ local MODES = {
 	standard = 'Standard',
 	wild = 'Wild',
 	battlegrounds = 'Battlegrounds',
+	arena = 'Arena',
+	duels = 'Duels',
 }
 
 ---@param frame Frame
@@ -60,7 +62,7 @@ function CustomInjector:parse(id, widgets)
 					prizepool = args.bin,
 					prizepoolusd = args.binusd,
 					currency = args.localcurrency,
-					setVariables = false,
+					setvariables = false,
 				}
 			}})
 		end
