@@ -81,15 +81,11 @@ end
 ---@return string|Widget
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
-	if String.isNotEmpty(game.extradata.maptype) then
-		mapDisplay = MapTypeIcon.display(game.extradata.maptype) .. mapDisplay
-	end
 
-	if game.status == 'notplayed' then
-		return HtmlWidgets.S{children = mapDisplay}
-	end
-
-	return mapDisplay
+	return HtmlWidgets.Fragment{children = WidgetUtil.collect(
+		String.isNotEmpty(game.extradata.maptype) and MapTypeIcon.display(game.extradata.maptype) or nil,
+		game.status == 'notplayed' and HtmlWidgets.S{children = mapDisplay} or mapDisplay
+	)}
 end
 
 return CustomMatchSummary
