@@ -11,24 +11,7 @@ liquipedia.rankingTable = {
 	rankingContent: null,
 	cache: {},
 	toggleButtonListeners: [],
-	// temp test data
-	options: [
-		{
-			value: '2023-10-31',
-			text: 'October 31, 2023',
-			patch: 'Patch 1.2.3'
-		},
-		{
-			value: '2023-10-24',
-			text: 'October 24, 2023',
-			patch: 'Patch 1.2.2'
-		},
-		{
-			value: '2023-10-17',
-			text: 'October 17, 2023',
-			patch: 'Patch 1.2.1'
-		}
-	],
+	options: [],
 
 	init: function () {
 		this.rankingContent = document.querySelector( this.ContentSelector );
@@ -36,6 +19,7 @@ liquipedia.rankingTable = {
 			return;
 		}
 
+		this.populateOptions();
 		this.toggleGraphVisibility();
 		this.initSelectElement();
 
@@ -52,6 +36,30 @@ liquipedia.rankingTable = {
 
 		// Store initial HTML content in cache
 		this.cache[ this.activeSelectOption.value ] = this.rankingContent.outerHTML;
+	},
+
+	populateOptions: function () {
+		const firstEverMondayForFeature = new Date('2025-02-17');
+		const today = new Date();
+		const dayOfWeek = today.getDay();
+		const daysSinceMonday = (dayOfWeek + 6) % 7;
+		const lastMonday = new Date(today);
+		lastMonday.setDate(today.getDate() - daysSinceMonday);
+		
+		for (let i = 0; i < 12; i++) {
+			const monday = new Date(lastMonday);
+			monday.setDate(lastMonday.getDate() - i * 7);
+			if( monday < firstEverMondayForFeature ) {
+				break;
+			}
+			const value = monday.toISOString().slice(0, 10);
+			const text = monday.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+			this.options.push({
+				value: value,
+				text: text,
+				patch: `Patch ${i + 1}` //This should be returned on the data we receive from the API
+			});
+		}
 	},
 
 	fetchRatingsData: function( date ) {
