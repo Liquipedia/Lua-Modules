@@ -19,7 +19,7 @@ Clone the repository. This requires [git](https://git-scm.com/downloads) to be i
 
 ### Mac/Unix
 
-- Install Lua. We use version 5.1. There are some 5.2 features which are available, but nothing from 5.3 onwards. Using a newer version is not recommended or supported. The lua version is restricted as we use [LuaJit](https://luajit.org/). if you're [curious](https://github.com/LuaJIT/LuaJIT/issues/929).
+- Install Lua. We use version 5.1. There are some 5.2 features which are available, but nothing from 5.3 onwards. Using a newer version is not recommended or supported. The lua version is restricted as we use [LuaJit](https://luajit.org/). If you're [curious](https://github.com/LuaJIT/LuaJIT/issues/929).
   Using brew will warn you that lua 5.1 has been deprecated and installing is disabled. I installed this version by editing the file with `brew edit lua@5.1`. Remove the line that says `disable! date: "2022-07-31", because: :unmaintained`
   Finally run `HOMEBREW_NO_INSTALL_FROM_API=1 brew install lua@5.1` which will then install it anyway.
 - Install the package manager, [LuaRocks](https://luarocks.org/) `brew install luarocks`
@@ -32,7 +32,7 @@ Clone the repository. This requires [git](https://git-scm.com/downloads) to be i
 
 ### Adding a module
 
-Modules always start with the following header:
+Modules start with a header like:
 
 ```
 ---
@@ -43,20 +43,22 @@ Modules always start with the following header:
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 ```
 
-The header is important, it used by our automation to place a module in the correct wiki and path.
+The header is important, it is used by our automation to place a module in the correct wiki (commons here, other values are dota2, deadlock, rainbowsix etc. See the [Api Docs](https://api.liquipedia.net/documentation/api/v3) under Available Wikis for all wikis).
+The page is like the path. It determines where within the wiki the file is deployed/hosted. Other files refer to each other based on this path.
 
 ## Project
 
 The project is divided into folders based on language. Even though the project is called Lua-Modules, a part of this repository is in different languages/techniques.
 
-- In the javascript folder are scripts that do xyz. This is because abc can't be done in lua.
-- The modules written in lua are found in the standard folder.
+- In the javascript folder are scripts that run in the client. Our current setup does not fully support all available features in html. So for example a dropdown (select) element can't be rendered from our back end properly. We use javascript to add these kind of features. Essentially anything that makes an element interactable, buttons mostly, are constructed or configured from javascript.
+- The modules written in lua are found in the `standard` or `components` folder.
   - Most(read:some) modules are covered by unit tests. Tests are placed in the spec folder.
 - Styling is found in the stylesheets folder. For styling we use [less](https://lesscss.org/). Check out their documentation for getting up to speed on how this differs from traditional css.
 
 ## Committing changes
 
 You need to be a member of the Liquipedia organization before you are allowed to push to this repository. In most workflows, you will make a fork of this repository to your own repository, and request a merge request from there.
+Trusted contributers may be given the privilege of directly branching within the repository. These privileges are always up to the discretion of Liquipedia staff.
 
 ## Support
 
