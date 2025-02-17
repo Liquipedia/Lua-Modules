@@ -28,6 +28,7 @@ local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 
 ---@class RatingsList: Widget
+---@field _base Widget
 ---@operator call(table): RatingsList
 local RatingsList = Class.new(Widget)
 RatingsList.defaultProps = {
@@ -154,7 +155,10 @@ function RatingsList:render()
 				children = HtmlWidgets.Div {
 					children = {
 						OpponentDisplay.InlineOpponent { opponent = team.opponent },
-						makeTeamChart(team, teamLimit),
+						Logic.tryOrElseLog(
+							function() return makeTeamChart(team, teamLimit) end,
+							function() return 'Failed to make graph for team' end
+						)
 					},
 					classes = { 'ranking-table__graph-row-container' }
 				}
@@ -167,8 +171,7 @@ function RatingsList:render()
 			table.insert(rowClasses, 'ranking-table__row--even')
 		end
 		if rank > 5 and isSmallerVersion then
-			table.insert(rowClasses, 'ranking-table__row--overfive')
-		end
+			table.insert(rowClasses, 'ranking-table__row--overfive')		end
 
 		return {
 			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
@@ -238,6 +241,13 @@ function RatingsList:render()
 			}
 		)
 	}
+end
+
+---@param error Error
+---@return string
+function RatingsList:getDerivedStateFromError(error)
+	error.message = 'Could not load the selected week.'
+	return self._base:getDerivedStateFromError(error)
 end
 
 return RatingsList
