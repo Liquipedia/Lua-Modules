@@ -113,7 +113,6 @@ function RatingsList:render()
 	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
-		--todo: replace team.name with shortname
 		local uniqueId = self.props.date .. '-' .. rank
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
