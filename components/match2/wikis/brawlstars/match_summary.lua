@@ -14,6 +14,7 @@ local MapTypeIcon = require('Module:MapType')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -77,12 +78,17 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param game MatchGroupUtilGame
----@return string
+---@return string|Widget
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
 	if String.isNotEmpty(game.extradata.maptype) then
-		return MapTypeIcon.display(game.extradata.maptype) .. mapDisplay
+		mapDisplay = MapTypeIcon.display(game.extradata.maptype) .. mapDisplay
 	end
+
+	if game.status == 'notplayed' then
+		return HtmlWidgets.S{children = mapDisplay}
+	end
+
 	return mapDisplay
 end
 
