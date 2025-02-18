@@ -78,7 +78,7 @@ function CustomMatchSummary._createMapRow(game)
 end
 
 ---@param game MatchGroupUtilGame
----@return string|Widget
+---@return Widget
 function CustomMatchSummary._getMapDisplay(game)
 	local mapDisplay = '[[' .. game.map .. ']]'
 
