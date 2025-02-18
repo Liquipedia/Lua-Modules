@@ -20,17 +20,11 @@ local FnUtil = require('Module:FnUtil')
 
 local RatingsStorageFactory = {}
 
----@param props {storageType: 'lpdb'|'extension', id: string?, date: string?}
+---@param props {storageType: 'extension', id: string?, date: string?}
 ---@return RatingsDisplayGetRankings
 function RatingsStorageFactory.createGetRankings(props)
 	local storageType = props.storageType
-
-	if storageType == 'lpdb' then
-		error('LPDB Not Yet Supported by the revamp')
-		local RatingsStorageLpdb = require('Module:Ratings/Storage/Lpdb')
-		assert(props.id, 'ID is required for LPDB storage')
-		return FnUtil.curry(RatingsStorageLpdb.getRankings, props.id)
-	elseif storageType == 'extension' then
+	if storageType == 'extension' then
 		local RatingsStorageExtension = require('Module:Ratings/Storage/Extension')
 		local date = props.date
 		return FnUtil.curry(RatingsStorageExtension.getRankings, date)
