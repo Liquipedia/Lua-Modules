@@ -148,7 +148,7 @@ function StarcraftMatchGroupUtil.computeGameOpponents(game, matchOpponents)
 			})
 		end) --[[@as table[] ]]
 
-		local isSpecialArchon = mode:match('^%dS$')
+		local isSpecialArchon = (mode or ''):match('^%dS$')
 		if isSpecialArchon then
 			-- Team melee: Sort players by the order they were inputted
 			table.sort(players, function(a, b) return a.position < b.position end)
