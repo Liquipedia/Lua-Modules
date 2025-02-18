@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=rocketleague
 -- page=Module:Ratings/Storage/Lpdb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

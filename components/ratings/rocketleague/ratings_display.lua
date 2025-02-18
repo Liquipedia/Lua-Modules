@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=rocketleague
 -- page=Module:Ratings/Display
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +12,7 @@ local RatingsStorageLpdb = require('Module:Ratings/Storage/Lpdb')
 
 local RatingsDisplay = {}
 
----@class RatingsEntry
+---@class RatingsEntryOld
 ---@field matches integer
 ---@field name string
 ---@field rating number
@@ -22,7 +22,7 @@ local RatingsDisplay = {}
 ---@field progression table[]
 
 ---@class RatingsDisplayInterface
----@field build fun(teamRankings: RatingsEntry[]):string
+---@field build fun(teamRankings: RatingsEntryOld[]):string
 
 local LIMIT_HISTORIC_ENTRIES = 24 -- How many historic entries are fetched
 
@@ -55,7 +55,7 @@ end
 
 ---@param id string
 ---@param progressionLimit integer
----@return RatingsEntry[]
+---@return RatingsEntryOld[]
 function RatingsDisplay._getTeamRankings(id, progressionLimit)
 	local teams = RatingsStorageLpdb.getRankings(id, progressionLimit)
 

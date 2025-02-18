@@ -953,6 +953,14 @@ function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
+mw.ext.Dota2Ranking = {}
+
+---@param startDate string #YYYY-MM-DD
+---@param endDate string #YYYY-MM-DD
+---@return {name: string, rank: integer, rating: number, streak: integer,
+---progression: {date: string, rating: number, rank: integer}[]}[]
+function mw.ext.Dota2Ranking.get(startDate, endDate) end
+
 mw.ext.VariablesLua = {}
 ---@alias wikiVariableKey string|number
 ---@alias wikiVariableValue string|number|nil
