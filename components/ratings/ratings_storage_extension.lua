@@ -44,11 +44,16 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 	-- Add additional data to the teams
 	return Array.map(teams, function(team)
 		local teamInfo = RatingsStorageExtension._getTeamInfo(team.name)
+
+		-- Parse progression data
 		local teamProgressionParsed = Array.map(team.progression, function(progression)
 			return RatingsStorageExtension._progressionRecord(progression.date, progression.rating, progression.rank)
 		end)
+		-- We need to add the current day to the progression too
 		local progressionToday = RatingsStorageExtension._progressionRecord(progressionDates[1], team.rating, team.rank)
 		table.insert(teamProgressionParsed, 1, progressionToday)
+
+		-- Map to correct order and prepare for missing data
 		local progression = Array.map(progressionDates, function(progressionDate)
 			return Array.find(teamProgressionParsed, function(progression)
 				return progression.date == progressionDate
