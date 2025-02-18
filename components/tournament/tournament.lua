@@ -90,9 +90,9 @@ local TouranmentMT = {
 ---@param record tournament
 ---@return StandardTournament
 function Tournament.tournamentFromRecord(record)
-
-	local startDate = Tournament.parseDateRecord(Logic.nilOr(record.extradata.startdatetext, record.startdate))
-	local endDate = Tournament.parseDateRecord(Logic.nilOr(record.extradata.enddatetext, record.sortdate, record.enddate))
+	local extradata = record.extradata or {}
+	local startDate = Tournament.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
+	local endDate = Tournament.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
