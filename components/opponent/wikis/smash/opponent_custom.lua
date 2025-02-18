@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local CharacterStandardizationData = Lua.import('module:CharacterStandardization', {loadData = true})
 local Opponent = Lua.import('Module:Opponent')
 
 local CustomOpponent = Table.deepCopy(Opponent)
@@ -33,8 +34,6 @@ function CustomOpponent.readOpponentArgs(args)
 
 	local game = args.game or Variables.varDefault('tournament_game') or Info.defaultGame
 	opponent.players[1].game = game
-
-	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
 
 	Array.forEach(opponent.players, function (player, playerIndex)
 		local stringInput = args['chars' .. playerIndex] or (playerIndex == 1 and args.chars) or nil
