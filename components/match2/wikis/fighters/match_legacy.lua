@@ -124,7 +124,7 @@ function MatchLegacy._convertParameters(match2)
 		local opponentmatch2players = opponent.match2players or {}
 		if opponent.type == Opponent.solo then
 			local player = opponentmatch2players[1] or {}
-			match[prefix] = player.name
+			match[prefix] = player.name:gsub('_', ' ')
 			match[prefix .. 'score'] = (tonumber(opponent.score) or 0) > 0 and opponent.score or 0
 			match[prefix .. 'flag'] = player.flag
 			match.extradata[prefix .. 'displayname'] = player.displayname
