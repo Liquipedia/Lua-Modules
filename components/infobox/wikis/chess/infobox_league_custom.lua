@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -75,7 +76,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'gamesettings' then
 		local isVariant = caller.data.game ~= Game.toIdentifier()
 		Array.appendWith(widgets,
-			Cell{name = 'Time Control', content = {caller.data.mode}},
+			Cell{name = 'Time Control' .. (#args.modes > 1 and 's' or ''), content = args.modes},
 			isVariant and Cell{name = 'Variant', content = {Game.name{game = caller.data.game}}} or nil
 		)
 	end
@@ -95,12 +96,23 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	Array.forEach(CustomLeague.getRestrictions(args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
+	lpdbData.extradata.modes = args.modes
+
 	return lpdbData
 end
 
 ---@param args table
 function CustomLeague:customParseArguments(args)
-	self.data.mode = MODES[string.lower(self.args.mode or '')] or MODES.classical
+	-- Modes.
+	self.args.modes = {}
+	local modePairs = Table.iter.pairsByPrefix(self.args, 'mode', {requireIndex = false})
+	for _, mode, _ in modePairs do
+		table.insert(self.args.modes, MODES[string.lower(mode)])
+	end
+	if Table.isEmpty(self.args.modes) then
+		self.args.modes = {MODES.classical}
+	end
+	self.data.mode = self.args.modes[1]
 end
 
 ---@param restrictions string?
