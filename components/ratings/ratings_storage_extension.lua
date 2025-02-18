@@ -45,12 +45,10 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 	return Array.map(teams, function(team)
 		local teamInfo = RatingsStorageExtension._getTeamInfo(team.name)
 		local teamProgressionParsed = Array.map(team.progression, function(progression)
-			return {
-				date = progression.date,
-				rating = RatingsStorageExtension._normalizeRating(progression.rating),
-				rank = progression.rank,
-			}
+			return RatingsStorageExtension._progressionRecord(progression.date, progression.rating, progression.rank)
 		end)
+		local progressionToday = RatingsStorageExtension._progressionRecord(progressionDates[1], team.rating, team.rank)
+		table.insert(teamProgressionParsed, 1, progressionToday)
 		local progression = Array.map(progressionDates, function(progressionDate)
 			return Array.find(teamProgressionParsed, function(progression)
 				return progression.date == progressionDate
@@ -59,9 +57,6 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 			}
 		end)
 
-		if not progression[1].rank then
-			error('Badly formated data')
-		end
 		local isNew = not progression[2].rank
 		---@type RatingsEntry
 		local newTeam = {
@@ -76,6 +71,19 @@ function RatingsStorageExtension.getRankings(date, teamLimit, progressionLimit)
 		}
 		return newTeam
 	end)
+end
+
+--- Create a progression entry
+---@param date string
+---@param rating number
+---@param rank integer
+---@return {date: string, rating: number, rank: integer}
+function RatingsStorageExtension._progressionRecord(date, rating, rank)
+	return {
+		date = date,
+		rating = RatingsStorageExtension._normalizeRating(rating),
+		rank = rank,
+	}
 end
 
 --- Normalize a rating
