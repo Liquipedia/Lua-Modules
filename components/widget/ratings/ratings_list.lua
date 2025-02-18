@@ -116,7 +116,7 @@ function RatingsList:render()
 		local teamRow = WidgetUtil.collect(
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rank' }, children = rank },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'change' }, children = changeText },
-			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'team' }, children = OpponentDisplay.InlineOpponent { opponent = team.opponent } },
+			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'team' }, children = OpponentDisplay.BlockOpponent { opponent = team.opponent, teamStyle = 'hybrid' } },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'region' }, children = Flags.Icon(team.region) .. Flags.CountryName(team.region) },
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'streak' }, children = streakText, classes = { streakClass } },
