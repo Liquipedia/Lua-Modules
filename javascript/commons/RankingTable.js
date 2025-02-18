@@ -3,10 +3,16 @@ liquipedia.rankingTable = {
 	ContentSelector: '[data-ranking-table="content"]',
 	toggleButtonSelector: '[data-ranking-table="toggle"]',
 	graphRowSelector: '[data-ranking-table="graph-row"]',
+	selectContainerSelector: '[data-ranking-table="select-container"]',
+	patchLabelSelector: '[data-ranking-table="patch-label"]',
+	optionDataSelector: '[data-ranking-table="select-data"]',
 	patchLabelElement: null,
 	activeSelectOption: null,
+	rankingTable: null,
 	rankingContent: null,
+	cache: {},
 	toggleButtonListeners: [],
+	options: [],
 
 	init: function () {
 		this.rankingContent = document.querySelector( this.ContentSelector );
@@ -14,7 +20,79 @@ liquipedia.rankingTable = {
 			return;
 		}
 
+		this.populateOptions();
 		this.toggleGraphVisibility();
+		this.initSelectElement();
+
+		// Set active select option to the first option object on init
+		if ( this.activeSelectOption === null && this.options.length > 0 ) {
+			this.activeSelectOption = this.options[ 0 ];
+		}
+
+		// Set patch label to the active select option patch
+		this.patchLabelElement = document.querySelector( this.patchLabelSelector );
+		if ( this.patchLabelElement && this.activeSelectOption !== null ) {
+			this.updatePatchLabel( this.activeSelectOption.patch );
+		}
+
+		// Store initial HTML content in cache
+		this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+	},
+
+	populateOptions: function () {
+		document.querySelectorAll( this.optionDataSelector ).forEach( ( option ) => {
+			const date = new Date( option.getAttribute( 'data-date' ) );
+			const patch = option.getAttribute( 'data-name' );
+			const value = date.toISOString().slice( 0, 10 );
+			const text = date.toLocaleDateString( 'en-US', { year: 'numeric', month: 'long', day: 'numeric' } );
+			this.options.push( {
+				value: value,
+				text: text,
+				patch: patch
+			} );
+		} );
+	},
+
+	fetchRatingsData: function( date ) {
+		// Convert string to date format
+		const dateValue = new Date( date ).toISOString().slice( 0, 10 );
+
+		// Check if data is already fetched
+		if ( this.cache[ dateValue ] ) {
+			this.removeToggleButtonListeners();
+			this.rankingContent.innerHTML = this.cache[ dateValue ];
+			this.toggleGraphVisibility();
+			return;
+		}
+
+		const wikiText =
+			`{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Ratings|teamLimit=20|
+			progressionLimit=12|date=${ dateValue }|storageType=extension}}`;
+		const api = new mw.Api();
+		api.get( {
+			action: 'parse',
+			format: 'json',
+			contentmodel: 'wikitext',
+			maxage: 600,
+			smaxage: 600,
+			disablelimitreport: true,
+			uselang: 'content',
+			prop: 'text',
+			text: wikiText
+		} ).done( ( data ) => {
+			if ( data.parse?.text?.[ '*' ] ) {
+				this.removeToggleButtonListeners();
+				// Insert fetched HTML content
+				this.rankingContent.insertAdjacentHTML( 'beforeend', data.parse.text[ '*' ] );
+				// Remove the original list
+				this.rankingContent.firstElementChild.remove();
+				// Remove non-list elements
+				this.rankingContent.innerHTML = this.rankingContent.querySelector( this.ContentSelector ).innerHTML;
+				// Store fetched HTML content in cache
+				this.cache[ dateValue ] = this.rankingContent.outerHTML;
+				this.toggleGraphVisibility();
+			}
+		} );
 	},
 
 	removeToggleButtonListeners: function () {
@@ -29,6 +107,52 @@ liquipedia.rankingTable = {
 			this.patchLabelElement = document.querySelector( this.patchLabelSelector );
 		}
 		this.patchLabelElement.innerText = patch;
+	},
+
+	initSelectElement: function () {
+		const selectContainer = document.querySelector( this.selectContainerSelector );
+
+		if ( !selectContainer ) {
+			return;
+		}
+
+		const selectElement = this.createSelectElement();
+		const optionElements = this.createOptions();
+
+		selectElement.append( ...optionElements );
+		selectContainer.insertBefore( selectElement, selectContainer.firstChild );
+
+		// Add change event listener to update activeSelectOption and patch label
+		selectElement.addEventListener( 'change', this.onSelectChange.bind( this ) );
+	},
+
+	onSelectChange: function ( event ) {
+		const selectedOption = this.options.find( ( option ) => option.value === event.target.value );
+		if ( selectedOption ) {
+			this.activeSelectOption = selectedOption;
+			this.updatePatchLabel( selectedOption.patch );
+			this.fetchRatingsData( selectedOption.value );
+		}
+	},
+
+	createSelectElement: function () {
+		const selectElement = document.createElement( 'select' );
+		selectElement.ariaLabel = 'Select a week';
+		selectElement.classList.add( 'ranking-table__select' );
+		return selectElement;
+	},
+
+	createOptions: function () {
+		const optionsElements = [];
+
+		this.options.forEach( ( option ) => {
+			const optionElement = document.createElement( 'option' );
+			optionElement.value = option.value;
+			optionElement.innerText = option.text;
+			optionsElements.push( optionElement );
+		} );
+
+		return optionsElements;
 	},
 
 	toggleGraphVisibility: function () {
