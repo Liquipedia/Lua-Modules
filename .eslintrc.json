@@ -7,6 +7,7 @@
 	],
 	"globals": {
 		"liquipedia": "readonly",
+		"echarts": "readonly",
 		"_paq": "readonly",
 		"gtag": "readonly",
 		"Share": "readonly"

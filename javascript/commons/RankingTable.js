@@ -185,14 +185,11 @@ liquipedia.rankingTable = {
 	resizeCharts: function ( graphRow ) {
 		const instances = graphRow.querySelectorAll( '[_echarts_instance_]' );
 		instances.forEach( ( chart ) => {
-			// echarts is a global variable which eslint doesn't understand
-			/* eslint-disable-next-line no-undef */
 			let chartInstance = echarts.getInstanceByDom( chart );
 			if ( chartInstance ) {
 				chartInstance.resize();
 			} else {
 				// Initialize the chart if it is not already initialized
-				/* eslint-disable-next-line no-undef */
 				chartInstance = echarts.init( chart );
 			}
 		} );
