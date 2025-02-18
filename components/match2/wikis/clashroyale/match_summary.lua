@@ -68,9 +68,11 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 	local cardData = Array.map(game.opponents, function(opponent)
 		return Array.map(opponent.players or {}, function(player)
 			if Logic.isDeepEmpty(player) then return end
-			local cards = player.cards or {}
-			return Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
-				return cards[idx] or DEFAULT_CARD end)
+			local playerCards = player.cards or {}
+			local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
+				return playerCards[idx] or DEFAULT_CARD end)
+			cards.tower = playerCards.tower
+			return cards
 		end)
 	end)
 
