@@ -113,4 +113,7 @@ return {
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
+
+	-- Usage: Charts
+	chart = 'far fa-chart-line',
 }
