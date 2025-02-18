@@ -9,6 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Icon = require('Module:Icon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -17,6 +19,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlacementChange = Lua.import('Module:Widget/Standings/PlacementChange')
 local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 
@@ -35,6 +38,7 @@ function RatingsList:render()
 
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
+	local isSmallerVersion = Logic.readBool(self.props.isSmallerVersion)
 
 	local getRankings = RatingsStorageFactory.createGetRankings {
 		storageType = self.props.storageType,
@@ -75,6 +79,10 @@ function RatingsList:render()
 		if isEven then
 			table.insert(rowClasses, 'ranking-table__row--even')
 		end
+		if rank > 5 and isSmallerVersion then
+			table.insert(rowClasses, 'ranking-table__row--overfive')
+		end
+
 		return {
 			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
 		}
@@ -91,6 +99,22 @@ function RatingsList:render()
 		}
 	}
 
+	local buttonDiv = HtmlWidgets.Div {
+		children = { 'See Rankings Page', Icon.makeIcon { iconName = 'goto' } },
+	}
+
+	local tableFooter = HtmlWidgets.Tr {
+		children = HtmlWidgets.Th {
+			attributes = { colspan = '7' },
+			children = Link {
+				link = 'Portal:Rating',
+				linktype = 'internal',
+				children = { buttonDiv },
+			},
+			classes = { 'ranking-table__footer-row' },
+		}
+	}
+
 	return HtmlWidgets.Div {
 		attributes = {
 			['data-ranking-table'] = 'content',
@@ -98,7 +122,7 @@ function RatingsList:render()
 		children = WidgetUtil.collect(
 			HtmlWidgets.Table {
 				attributes = { ['data-ranking-table'] = 'table' },
-				classes = { 'ranking-table' },
+				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },
 				children = WidgetUtil.collect(
 					tableHeader,
 					HtmlWidgets.Tr {
@@ -112,7 +136,8 @@ function RatingsList:render()
 						),
 						classes = { 'ranking-table__header-row' },
 					},
-					Array.flatten(teamRows)
+					Array.flatten(teamRows),
+					isSmallerVersion and tableFooter or nil
 				)
 			}
 		)

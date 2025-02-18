@@ -74,6 +74,7 @@ return {
 	activeroster = 'fas fa-users',
 	history = 'fas fa-books',
 	media = 'fas fa-newspaper',
+	['goto'] = 'far fa-arrow-right',
 
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
