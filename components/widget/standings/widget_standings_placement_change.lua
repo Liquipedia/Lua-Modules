@@ -24,7 +24,7 @@ PlacementChangeWidget.defaultProps = {
 function PlacementChangeWidget:render()
 	local change = self.props.change
 	if change == 0 then
-		return
+		return HtmlWidgets.Span{children = '-'}
 	end
 	local positive = change > 0
 	return HtmlWidgets.Span{
