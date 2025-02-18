@@ -26,6 +26,7 @@ Ratings.defaultProps = {
 	storageType = 'lpdb',
 	date = os.date('%F') --[[@as string]],
 	showGraph = true,
+	isSmallerVersion = false,
 }
 
 --- Finds the latest valid start date for the ratings
@@ -69,6 +70,7 @@ function Ratings:render()
 				storageType = self.props.storageType,
 				date = startDate,
 				showGraph = self.props.showGraph,
+				isSmallerVersion = self.props.isSmallerVersion,
 			}
 		),
 	}
