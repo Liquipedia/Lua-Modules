@@ -20,9 +20,15 @@ local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
-local PositionConvert = Lua.requireIfExists('Module:PositionName/data', {loadData = true})
 local TransferRowDisplay = Lua.import('Module:TransferRow/Display')
 local References = Lua.import('Module:Transfer/References')
+
+---@class TransferData
+---@field positionConvert table
+---@field roleConvert table
+---@field positionIcons table
+---@field roleIcons table
+local TransferData = Lua.requireIfExists('Module:Transfer/Data', {loadData = true}) or {}
 
 local HAS_PLATFORM_ICONS = Lua.moduleExists('Module:Platform/data')
 local VALID_CONFIDENCES = {
@@ -267,9 +273,9 @@ function TransferRow:readIconsAndPosition(playerIndex)
 
 	local positions = Array.map(postfixes, function(postfix) return args['pos' .. postfix] end)
 
-	if PositionConvert then
+	if TransferData.positionConvert then
 		positions = Array.map(positions, function(pos)
-			return PositionConvert[(pos or ''):lower()] or pos
+			return TransferData.positionConvert[(pos or ''):lower()] or pos
 		end)
 	end
 
