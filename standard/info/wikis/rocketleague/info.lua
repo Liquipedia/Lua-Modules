@@ -52,6 +52,9 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		ratings = {
+			interval = 'monthly',
+		}
 	},
 	opponentDisplayLibrary = 'OpponentDisplay/Custom',
 }

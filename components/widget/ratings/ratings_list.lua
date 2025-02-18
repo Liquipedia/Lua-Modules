@@ -17,7 +17,6 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
-
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -31,14 +30,6 @@ local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 ---@field _base Widget
 ---@operator call(table): RatingsList
 local RatingsList = Class.new(Widget)
-RatingsList.defaultProps = {
-	teamLimit = 20,
-	progressionLimit = 10,
-	storageType = 'lpdb',
-	date = Date.getContextualDateOrNow(),
-	showGraph = true,
-	isSmallerVersion = false,
-}
 
 ---@param teamData RatingsEntry
 ---@param standardYMax integer
@@ -95,10 +86,11 @@ end
 
 ---@return Widget
 function RatingsList:render()
-	local parsedDate = Date.parseIsoDate(self.props.date)
-	if not parsedDate then
-		error('Invalid date provided')
-	end
+	-- Simple check to verify that the input is a osdate
+	assert(self.props.date and self.props.date.wday, 'Invalid date provided')
+	---@type osdate
+	local date = self.props.date
+	local dateAsString = os.date('%F', os.time(date)) --[[@as string]]
 
 	local teamLimit = tonumber(self.props.teamLimit) or self.defaultProps.teamLimit
 	local progressionLimit = tonumber(self.props.progressionLimit) or self.defaultProps.progressionLimit
@@ -107,13 +99,13 @@ function RatingsList:render()
 
 	local getRankings = RatingsStorageFactory.createGetRankings {
 		storageType = self.props.storageType,
-		date = self.props.date,
+		date = dateAsString,
 		id = self.props.id,
 	}
 	local teams = getRankings(teamLimit, progressionLimit)
 
 	local teamRows = Array.map(teams, function(team, rank)
-		local uniqueId = self.props.date .. '-' .. rank
+		local uniqueId = dateAsString .. '-' .. rank
 		local streakText = team.streak > 1 and team.streak .. 'W' or (team.streak < -1 and (-team.streak) .. 'L') or '-'
 		local streakClass = (team.streak > 1 and 'group-table-rank-change-up')
 			or (team.streak < -1 and 'group-table-rank-change-down')
@@ -170,7 +162,8 @@ function RatingsList:render()
 			table.insert(rowClasses, 'ranking-table__row--even')
 		end
 		if rank > 5 and isSmallerVersion then
-			table.insert(rowClasses, 'ranking-table__row--overfive')		end
+			table.insert(rowClasses, 'ranking-table__row--overfive')
+		end
 
 		return {
 			HtmlWidgets.Tr { children = teamRow, classes = rowClasses },
@@ -186,7 +179,7 @@ function RatingsList:render()
 		}
 	end)
 
-	local formattedDate = os.date('%b %d, %Y', os.time(parsedDate)) --[[@as string]]
+	local formattedDate = os.date('%b %d, %Y', os.time(date)) --[[@as string]]
 	local tableHeader = HtmlWidgets.Tr {
 		children = HtmlWidgets.Th {
 			attributes = { colspan = '7' },
