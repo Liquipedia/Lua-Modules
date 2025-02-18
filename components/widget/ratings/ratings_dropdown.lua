@@ -27,14 +27,18 @@ function RatingsDropdown:render()
 		},
 		children = {
 			HtmlWidgets.Div{
+				attributes = {
+					['data-ranking-table'] = 'select-data-container',
+				},
 				children = Array.map(self.props.dates, function(date)
 					local patchOnDate = Patch.getPatchByDate(date)
 					local patchName = patchOnDate and patchOnDate.displayName or 'Unknown'
 
 					return HtmlWidgets.Div{
 						attributes = {
-							['data-ranking-table-dropdown-date'] = date,
-							['data-ranking-table-dropdown-patch'] = patchName,
+							['data-ranking-table'] = 'select-data',
+							['data-date'] = date,
+							['data-name'] = patchName,
 						},
 					}
 				end),

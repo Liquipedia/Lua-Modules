@@ -5,6 +5,7 @@ liquipedia.rankingTable = {
 	graphRowSelector: '[data-ranking-table="graph-row"]',
 	selectContainerSelector: '[data-ranking-table="select-container"]',
 	patchLabelSelector: '[data-ranking-table="patch-label"]',
+	optionDataSelector: '[data-ranking-table="select-data"]',
 	patchLabelElement: null,
 	activeSelectOption: null,
 	rankingTable: null,
@@ -39,27 +40,17 @@ liquipedia.rankingTable = {
 	},
 
 	populateOptions: function () {
-		const firstEverMondayForFeature = new Date( '2025-02-17' );
-		const today = new Date();
-		const dayOfWeek = today.getDay();
-		const daysSinceMonday = ( dayOfWeek + 6 ) % 7;
-		const lastMonday = new Date( today );
-		lastMonday.setDate( today.getDate() - daysSinceMonday );
-
-		for ( let i = 0; i < 12; i++ ) {
-			const monday = new Date( lastMonday );
-			monday.setDate( lastMonday.getDate() - i * 7 );
-			if ( monday < firstEverMondayForFeature ) {
-				break;
-			}
-			const value = monday.toISOString().slice( 0, 10 );
-			const text = monday.toLocaleDateString( 'en-US', { year: 'numeric', month: 'long', day: 'numeric' } );
+		document.querySelectorAll( this.optionDataSelector ).forEach( ( option ) => {
+			const date = new Date( option.getAttribute( 'data-date' ) );
+			const patch = option.getAttribute( 'data-name' );
+			const value = date.toISOString().slice( 0, 10 );
+			const text = date.toLocaleDateString( 'en-US', { year: 'numeric', month: 'long', day: 'numeric' } );
 			this.options.push( {
 				value: value,
 				text: text,
-				patch: `Patch ${ i + 1 }` // This should be returned on the data we receive from the API
+				patch: patch
 			} );
-		}
+		} );
 	},
 
 	fetchRatingsData: function( date ) {
