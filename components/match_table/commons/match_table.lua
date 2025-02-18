@@ -773,7 +773,7 @@ end
 ---@return Html
 function MatchTable:_displayScore(result)
 	---@param opponentRecord match2opponent
-	---@return unknown
+	---@return Html|string
 	local toScore = function(opponentRecord)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
