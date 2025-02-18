@@ -25,6 +25,7 @@ Ratings.defaultProps = {
 	dropdownLimit = 12,
 	storageType = 'lpdb',
 	date = os.date('%F') --[[@as string]],
+	isSmallerVersion = false,
 }
 
 --- Finds the latest valid start date for the ratings
@@ -67,6 +68,7 @@ function Ratings:render()
 				progressionLimit = self.props.progressionLimit,
 				storageType = self.props.storageType,
 				date = startDate,
+				isSmallerVersion = self.props.isSmallerVersion,
 			}
 		),
 	}
