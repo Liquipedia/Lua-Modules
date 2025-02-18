@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local Patch = Lua.import('Module:Patch')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Widget = Lua.import('Module:Widget')
 
@@ -17,21 +19,34 @@ local Widget = Lua.import('Module:Widget')
 local RatingsDropdown = Class.new(Widget)
 
 --todo: rename to select instead of dropdown later
-function RatingsDropdown.render()
-    return HtmlWidgets.Div{
-        attributes = {
-            class = 'ranking-table__select-container',
-            ['data-ranking-table'] = 'select-container',
-        },
-        children = {
-            HtmlWidgets.Span{
-                attributes = {
-                    class = 'ranking-table__patch-label',
-                    ['data-ranking-table'] = 'patch-label',
-                },
-            },
-        },
-    }
+function RatingsDropdown:render()
+	return HtmlWidgets.Div{
+		attributes = {
+			class = 'ranking-table__select-container',
+			['data-ranking-table'] = 'select-container',
+		},
+		children = {
+			HtmlWidgets.Div{
+				children = Array.map(self.props.dates, function(date)
+					local patchOnDate = Patch.getPatchByDate(date)
+					local patchName = patchOnDate and patchOnDate.displayName or 'Unknown'
+
+					return HtmlWidgets.Div{
+						attributes = {
+							['data-ranking-table-dropdown-date'] = date,
+							['data-ranking-table-dropdown-patch'] = patchName,
+						},
+					}
+				end),
+			},
+			HtmlWidgets.Span{
+				attributes = {
+					class = 'ranking-table__patch-label',
+					['data-ranking-table'] = 'patch-label',
+				},
+			},
+		},
+	}
 end
 
 return RatingsDropdown

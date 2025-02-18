@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Info = Lua.import('Module:Info')
 local Widget = Lua.import('Module:Widget')
@@ -58,14 +60,20 @@ end
 ---@return Widget
 function Ratings:render()
 	local actualDate = earlierValidDate(self.props.date, Info.config.ratings.interval)
+
+	local dropdownDates = Array.map(Array.range(1, self.props.dropdownLimit), function(i)
+		local dateCopy = Table.deepCopy(actualDate)
+		dateCopy.day = dateCopy.day - (i - 1) * 7 -- TODO Make based on interval
+		return os.date('%F', os.time(dateCopy))
+	end)
+
 	return HtmlWidgets.Div {
 		attributes = {
 			class = 'ranking-table__wrapper',
 		},
 		children = WidgetUtil.collect(
 			not self.props.isSmallerVersion and RatingsDropdown {
-				date = actualDate,
-				limit = self.props.dropdownLimit,
+				dates = dropdownDates,
 			} or nil,
 			RatingsList {
 				teamLimit = self.props.teamLimit,
