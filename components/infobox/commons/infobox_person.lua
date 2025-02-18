@@ -238,7 +238,6 @@ function Person:createInfobox()
 			)))
 
 	if self:shouldStoreData(args) then
-		self:_definePageVariables(args)
 		self:_setLpdbData(
 			args,
 			links,
@@ -246,6 +245,8 @@ function Person:createInfobox()
 			personType.store
 		)
 	end
+
+	self:_definePageVariables(args)
 
 	return self:build(widgets)
 end
