@@ -256,6 +256,13 @@ function League:createInfobox()
 					return
 				end
 
+				local exclusionList = Page.exists('MediaWiki:AccomodationExclusionList.json')
+					and mw.loadJsonData('MediaWiki:AccomodationExclusionList.json') or {}
+				Array.forEach(exclusionList, Page.pageifyLink)
+				if Table.includes(exclusionList, Page.pageifyLink(self.pagename)) then
+					return
+				end
+
 				local addressParts = {}
 				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
 				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
