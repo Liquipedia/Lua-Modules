@@ -76,7 +76,7 @@ return {
 	title = 'Overwatch',
 	navigation = {
 		{
-			file = 'Stalk3r OWCS Finals 2024.jpeg',
+			file = 'Team Falcons ChiYo at the 2024 Esports World Cup.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -94,7 +94,7 @@ return {
 			},
 		},
 		{
-			file = 'Proper OWCS Finals.jpeg',
+			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
