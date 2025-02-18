@@ -36,7 +36,7 @@ liquipedia.rankingTable = {
 		}
 
 		// Store initial HTML content in cache
-		this.cache[ this.activeSelectOption.value ] = this.rankingContent.outerHTML;
+		this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
 	},
 
 	populateOptions: function () {
@@ -54,19 +54,19 @@ liquipedia.rankingTable = {
 	},
 
 	fetchRatingsData: function( date ) {
+		// Convert string to date format
+		const dateValue = new Date( date ).toISOString().slice( 0, 10 );
+
 		// Check if data is already fetched
-		if ( this.cache[ date ] ) {
+		if ( this.cache[ dateValue ] ) {
 			this.removeToggleButtonListeners();
-			this.rankingContent.outerHTML = this.cache[ date ];
+			this.rankingContent.innerHTML = this.cache[ dateValue ];
 			this.toggleGraphVisibility();
 			return;
 		}
 
-		// Convert string to date format, don't know if this is needed
-		const dateValue = new Date( date ).toISOString().slice( 0, 10 );
-
 		const wikiText =
-			`{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Ratings/List|teamLimit=20|
+			`{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Ratings|teamLimit=20|
 			progressionLimit=12|date=${ dateValue }|storageType=extension}}`;
 		const api = new mw.Api();
 		api.get( {
@@ -82,9 +82,14 @@ liquipedia.rankingTable = {
 		} ).done( ( data ) => {
 			if ( data.parse?.text?.[ '*' ] ) {
 				this.removeToggleButtonListeners();
-				this.rankingContent.outerHTML = data.parse.text[ '*' ];
+				// Insert fetched HTML content
+				this.rankingContent.insertAdjacentHTML( 'beforeend', data.parse.text[ '*' ] );
+				// Remove the original list
+				this.rankingContent.firstElementChild.remove();
+				// Remove non-list elements
+				this.rankingContent.innerHTML = this.rankingContent.querySelector( this.ContentSelector ).innerHTML;
 				// Store fetched HTML content in cache
-				this.cache[ date ] = data.parse.text[ '*' ];
+				this.cache[ dateValue ] = this.rankingContent.outerHTML;
 				this.toggleGraphVisibility();
 			}
 		} );
