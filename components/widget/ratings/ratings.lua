@@ -21,12 +21,13 @@ local RatingsDropdown = Lua.import('Module:Widget/Ratings/Dropdown')
 ---@operator call(table): Ratings
 local Ratings = Class.new(Widget)
 Ratings.defaultProps = {
-    teamLimit = 20,
-    progressionLimit = 10,
-    storageType = 'lpdb',
-    date = os.date('%F') --[[@as string]],
-    showGraph = true,
-    isSmallerVersion = false,
+	teamLimit = 20,
+	progressionLimit = 10,
+	dropdownLimit = 12,
+	storageType = 'lpdb',
+	date = os.date('%F') --[[@as string]],
+	showGraph = true,
+	isSmallerVersion = false,
 }
 
 ---@param date string #iso formated date string (YYYY-MM-DD)
@@ -57,22 +58,25 @@ end
 ---@return Widget
 function Ratings:render()
 	local actualDate = earlierValidDate(self.props.date, Info.config.ratings.interval)
-    return HtmlWidgets.Div {
-        attributes = {
-            class = 'ranking-table__wrapper',
-        },
-        children = WidgetUtil.collect(
-            not self.props.isSmallerVersion and RatingsDropdown {} or nil,
-            RatingsList {
-                teamLimit = self.props.teamLimit,
-                progressionLimit = self.props.progressionLimit,
-                storageType = self.props.storageType,
-                date = actualDate,
-                showGraph = self.props.showGraph,
-                isSmallerVersion = self.props.isSmallerVersion,
-            }
+	return HtmlWidgets.Div {
+		attributes = {
+			class = 'ranking-table__wrapper',
+		},
+		children = WidgetUtil.collect(
+			not self.props.isSmallerVersion and RatingsDropdown {
+				date = actualDate,
+				limit = self.props.dropdownLimit,
+			} or nil,
+			RatingsList {
+				teamLimit = self.props.teamLimit,
+				progressionLimit = self.props.progressionLimit,
+				storageType = self.props.storageType,
+				date = actualDate,
+				showGraph = self.props.showGraph,
+				isSmallerVersion = self.props.isSmallerVersion,
+			}
 		),
-    }
+	}
 end
 
 return Ratings
