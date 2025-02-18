@@ -112,4 +112,8 @@ return {
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
+
+	-- Usage: Ranking table
+	chart = 'far fa-chart-line',
+	gotorankings = 'far fa-arrow-right',
 }

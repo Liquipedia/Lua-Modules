@@ -50,6 +50,9 @@ return {
 			status = 2,
 			matchWidth = 180,
 		},
+		ratings = {
+			interval = 'weekly',
+		}
 	},
 	defaultRoundPrecision = 0,
 }
