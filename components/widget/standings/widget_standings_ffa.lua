@@ -39,12 +39,13 @@ function StandingsFfaWidget:render()
 
 	---@type StandingsModel
 	local standings = self.props.standings
+	local rounds = standings.rounds
 	local activeRounds = (Array.maxBy(
-		Array.filter(standings.rounds, function(round) return round.started end),
+		Array.filter(rounds, function(round) return round.started end),
 		function (round) return round.round end
 	) or {round = 0}).round
-	local hasFutureRounds = not standings.rounds[#standings.rounds].started
-	local showRoundColumns = #standings.rounds > 1
+	local hasFutureRounds = not rounds[#rounds].started
+	local showRoundColumns = #rounds > 1
 
 	return DataTable{
 		wrapperClasses = {'standings-ffa', 'toggle-area', 'toggle-area-' .. activeRounds},
@@ -66,7 +67,7 @@ function StandingsFfaWidget:render()
 							HtmlWidgets.Span{
 								css = {['position'] = 'absolute', ['left'] = '0', ['top'] = '-6px'},
 								children = RoundSelector{
-									rounds = activeRounds,
+									rounds = Array.sub(rounds, 1, activeRounds),
 									hasEnded = not hasFutureRounds,
 								}
 							},
@@ -80,12 +81,12 @@ function StandingsFfaWidget:render()
 				HtmlWidgets.Th{children = 'Participant'},
 				HtmlWidgets.Th{children = ''},
 				HtmlWidgets.Th{children = 'Points'},
-				showRoundColumns and Array.map(standings.rounds, function(round)
+				showRoundColumns and Array.map(rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
 				end) or nil
 			)},
 			-- Rows
-			Array.flatMap(standings.rounds, function(round)
+			Array.flatMap(rounds, function(round)
 				if round.round > activeRounds then
 					return {}
 				end
