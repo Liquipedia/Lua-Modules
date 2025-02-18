@@ -955,10 +955,11 @@ mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 
 mw.ext.Dota2Ranking = {}
 
+---@alias Dota2RankingRecord {name: string, rank: integer, rating: number, streak: integer,
+---progression: {date: string, rating: number, rank: integer}[]}
 ---@param startDate string #YYYY-MM-DD
 ---@param endDate string #YYYY-MM-DD
----@return {name: string, rank: integer, rating: number, streak: integer,
----progression: {date: string, rating: number, rank: integer}[]}[]
+---@return Dota2RankingRecord[]
 function mw.ext.Dota2Ranking.get(startDate, endDate) end
 
 mw.ext.VariablesLua = {}
