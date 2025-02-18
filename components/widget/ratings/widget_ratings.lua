@@ -27,15 +27,18 @@ Ratings.defaultProps = {
 	date = os.date('%F') --[[@as string]],
 }
 
+--- Finds the latest valid start date for the ratings
+--- For example, if the interval is weekly and the date is a Wednesday
+--- the latest valid start date is the Monday, 2 days earlier
 ---@param date string #iso formated date string (YYYY-MM-DD)
----@param interval 'weekly' | 'monthly'
----@return unknown
-local function earlierValidDate(date, interval)
+---@param interval 'weekly'
+---@return osdate
+local function calculateStartDate(date, interval)
 	local simplifiedParsedDate = Date.parseIsoDate(date)
 	if not simplifiedParsedDate then
 		error('Invalid date provided')
 	end
-	local parsedDate = os.date('*t', os.time(simplifiedParsedDate))
+	local parsedDate = os.date('*t', os.time(simplifiedParsedDate)) --[[@as osdate]]
 	if interval == 'weekly' then
 		-- 1 is Sunday, 2 is Monday, ..., 7 is Saturday
 		-- american week counting
@@ -45,16 +48,14 @@ local function earlierValidDate(date, interval)
 			parsedDate.day = parsedDate.day - parsedDate.wday + 2
 		end
 		return parsedDate
-	elseif interval == 'monthly' then
-		parsedDate.day = 1
-		return parsedDate
 	end
 	error('Invalid interval specific for ratings')
 end
 
 ---@return Widget
 function Ratings:render()
-	local actualDate = earlierValidDate(self.props.date, Info.config.ratings.interval)
+	assert(Info.config.ratings, 'Ratings config not found')
+	local startDate = calculateStartDate(self.props.date, Info.config.ratings.interval)
 
 	return HtmlWidgets.Div {
 		attributes = {
@@ -65,7 +66,7 @@ function Ratings:render()
 				teamLimit = self.props.teamLimit,
 				progressionLimit = self.props.progressionLimit,
 				storageType = self.props.storageType,
-				date = actualDate,
+				date = startDate,
 			}
 		),
 	}
