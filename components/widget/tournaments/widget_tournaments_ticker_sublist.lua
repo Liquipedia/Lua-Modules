@@ -46,7 +46,10 @@ function TournamentsTickerWidget:render()
 	local list = HtmlWidgets.Ul{
 		classes = {'tournaments-list-type-list'},
 		children = Array.map(self.props.tournaments, function(tournament)
-			return HtmlWidgets.Li{children = createFilterWrapper(tournament, TournamentLabel{tournament = tournament})}
+			return HtmlWidgets.Li{children = createFilterWrapper(tournament, TournamentLabel{
+				tournament = tournament,
+				displayGameIcon = self.props.displayGameIcons
+			})}
 		end),
 	}
 
