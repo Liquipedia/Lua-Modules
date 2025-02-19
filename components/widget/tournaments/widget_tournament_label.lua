@@ -47,7 +47,7 @@ function TournamentsTickerWidget:render()
 				children = {
 					self.props.displayGameIcon and Game.icon{
 						game = tournament.game,
-					} or nil,
+					} or '',
 					LeagueIcon.display {
 						icon = tournament.icon,
 						iconDark = tournament.iconDark,

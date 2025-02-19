@@ -48,7 +48,7 @@ function TournamentsTickerWidget:render()
 		children = Array.map(self.props.tournaments, function(tournament)
 			return HtmlWidgets.Li{children = createFilterWrapper(tournament, TournamentLabel{
 				tournament = tournament,
-				displayGame = self.props.displayGameIcon
+				displayGameIcon = self.props.displayGameIcons
 			})}
 		end),
 	}

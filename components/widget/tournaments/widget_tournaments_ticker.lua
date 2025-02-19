@@ -137,7 +137,7 @@ function TournamentsTickerWidget:render()
 	}
 
 
-	local displayGameIcon = Logic.readBool(self.props.displayGameIcon)
+	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
 
 	return HtmlWidgets.Div{
 		children = {
@@ -148,9 +148,9 @@ function TournamentsTickerWidget:render()
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = upcomingTournaments, displayGameIcon = displayGameIcon} ,
-					Sublist{title = 'Ongoing', tournaments = ongoingTournaments, displayGameIcon = displayGameIcon},
-					Sublist{title = 'Completed', tournaments = completedTournaments, displayGameIcon = displayGameIcon},
+					Sublist{title = 'Upcoming', tournaments = upcomingTournaments, displayGameIcons = displayGameIcons} ,
+					Sublist{title = 'Ongoing', tournaments = ongoingTournaments, displayGameIcons = displayGameIcons},
+					Sublist{title = 'Completed', tournaments = completedTournaments, displayGameIcons = displayGameIcons},
 					fallbackElement
 				}
 			}
