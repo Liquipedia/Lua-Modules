@@ -108,6 +108,7 @@ function Tournament.tournamentFromRecord(record)
 		iconDark = record.icondark,
 		abbreviation = record.abbreviation,
 		series = record.series,
+		game = record.game
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.

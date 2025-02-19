@@ -42,11 +42,22 @@ function TournamentsTickerWidget:render()
 				classes = {'tournaments-list-name'},
 				css = {
 					['flex-grow'] = '1',
-					['padding-left'] = '25px',
+					['padding-left'] = self.props.displayGameIcon and '50px' or '25px',
 				},
 				children = {
-					self.props.displayGameIcon and Game.icon{
-						game = tournament.game,
+					self.props.displayGameIcon and HtmlWidgets.Span{
+						css = {
+							['margin-left'] = '-50px'
+						},
+						classes = {'league-icon-small-image'},
+						children  = {
+							Game.icon{
+								game = tournament.game,
+								noSpan = true,
+								size = '50',
+								noLink = true
+							}
+						}
 					} or '',
 					LeagueIcon.display {
 						icon = tournament.icon,
