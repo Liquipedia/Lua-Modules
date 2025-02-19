@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 
@@ -44,6 +45,9 @@ function TournamentsTickerWidget:render()
 					['padding-left'] = '25px',
 				},
 				children = {
+					self.props.displayGameIcon and Game.icon{
+						game = tournament.game,
+					} or nil,
 					LeagueIcon.display {
 						icon = tournament.icon,
 						iconDark = tournament.iconDark,
