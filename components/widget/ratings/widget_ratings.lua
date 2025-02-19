@@ -25,6 +25,7 @@ Ratings.defaultProps = {
 	dropdownLimit = 12,
 	storageType = 'lpdb',
 	date = os.date('%F') --[[@as string]],
+	showGraph = true,
 	isSmallerVersion = false,
 }
 
@@ -68,6 +69,7 @@ function Ratings:render()
 				progressionLimit = self.props.progressionLimit,
 				storageType = self.props.storageType,
 				date = startDate,
+				showGraph = self.props.showGraph,
 				isSmallerVersion = self.props.isSmallerVersion,
 			}
 		),
