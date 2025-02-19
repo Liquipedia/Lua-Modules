@@ -106,7 +106,7 @@ function CustomLeague:customParseArguments(args)
 	-- Modes.
 	self.args.modes = {}
 	local modePairs = Table.iter.pairsByPrefix(self.args, 'mode', {requireIndex = false})
-	for _, mode, _ in modePairs do
+	for _, mode in modePairs do
 		table.insert(self.args.modes, MODES[string.lower(mode)])
 	end
 	if Table.isEmpty(self.args.modes) then
