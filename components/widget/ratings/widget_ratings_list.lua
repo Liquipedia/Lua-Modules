@@ -31,10 +31,10 @@ local RatingsStorageFactory = Lua.import('Module:Ratings/Storage/Factory')
 local RatingsList = Class.new(Widget)
 
 ---@param teamData RatingsEntry
----@param standardYMax integer
+---@param defaultMaxY integer
 ---@return string
-local function makeTeamChart(teamData, standardYMax)
-	local progression = Array.reverse(teamData.progression) -- TODO: Sort instead
+local function makeTeamChart(teamData, defaultMaxY)
+	local progression = Array.sortBy(teamData.progression, Operator.property('date'))
 	local worstRankOfTeam = Array.max(Array.map(progression, Operator.property('rank')))
 
 	local dates = Array.map(Array.map(progression, Operator.property('date')), function(isoDate)
@@ -55,7 +55,7 @@ local function makeTeamChart(teamData, standardYMax)
 			type = 'value',
 			inverse = true,
 			min = 1,
-			max = math.max(worstRankOfTeam, standardYMax),
+			max = math.max(worstRankOfTeam, defaultMaxY),
 		},
 		tooltip = {
 			trigger = 'axis',
