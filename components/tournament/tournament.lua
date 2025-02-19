@@ -154,7 +154,7 @@ function Tournament.parseDateRecord(dateRecord)
 		return
 	end
 
-	local dt = {year = year, month = month or 12, day = day or 31}
+	local dt = {year = year, month = month or 12, day = day or 31, hour = 0}
 	local timestamp = os.time(dt)
 
 	return {year = year, month = month, day = day, timestamp = timestamp}
