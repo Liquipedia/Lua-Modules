@@ -90,6 +90,7 @@ liquipedia.rankingTable = {
 				// Store fetched HTML content in cache
 				this.cache[ dateValue ] = this.rankingContent.outerHTML;
 				this.toggleGraphVisibility();
+				mw.ext.Charts.createCharts();
 			}
 		} );
 	},
