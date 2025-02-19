@@ -63,7 +63,7 @@ function Ratings:render()
 	local startDate = calculateStartDate(self.props.date, Info.config.ratings.interval)
 
 	local dropdownDates = Array.map(Array.range(1, self.props.dropdownLimit), function(i)
-		local dateCopy = Table.deepCopy(actualDate)
+		local dateCopy = Table.deepCopy(startDate)
 		dateCopy.day = dateCopy.day - (i - 1) * 7 -- TODO Make based on interval
 		return os.date('%F', os.time(dateCopy))
 	end)
