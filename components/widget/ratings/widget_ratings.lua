@@ -57,15 +57,26 @@ local function calculateStartDate(date, interval)
 	error('Invalid interval specific for ratings')
 end
 
+---@param date osdate
+---@param interval 'weekly'
+---@param amount integer
+---@return string
+local function getPreviousDate(date, interval, amount)
+	if interval == 'weekly' then
+		local dateCopy = Table.deepCopy(date)
+		dateCopy.day = dateCopy.day - amount * 7
+		return os.date('%F', os.time(dateCopy)) --[[@as string]]
+	end
+	error('Invalid interval specific for ratings')
+end
+
 ---@return Widget
 function Ratings:render()
 	assert(Info.config.ratings, 'Ratings config not found')
 	local startDate = calculateStartDate(self.props.date, Info.config.ratings.interval)
 
 	local dropdownDates = Array.map(Array.range(1, self.props.dropdownLimit), function(i)
-		local dateCopy = Table.deepCopy(startDate)
-		dateCopy.day = dateCopy.day - (i - 1) * 7 -- TODO Make based on interval
-		return os.date('%F', os.time(dateCopy))
+		return getPreviousDate(startDate, Info.config.ratings.interval, i - 1)
 	end)
 
 	return HtmlWidgets.Div {
