@@ -1,6 +1,6 @@
 liquipedia.rankingTable = {
 	identifierAttribute: 'data-ranking-table-id',
-	ContentSelector: '[data-ranking-table="content"]',
+	contentSelector: '[data-ranking-table="content"]',
 	toggleButtonSelector: '[data-ranking-table="toggle"]',
 	graphRowSelector: '[data-ranking-table="graph-row"]',
 	selectContainerSelector: '[data-ranking-table="select-container"]',
@@ -16,7 +16,7 @@ liquipedia.rankingTable = {
 
 	init: function () {
 		mw.loader.using( 'ext.Charts.scripts', () => {
-			this.rankingContent = document.querySelector( this.ContentSelector );
+			this.rankingContent = document.querySelector( this.contentSelector );
 			if ( !this.rankingContent ) {
 				return;
 			}
@@ -89,7 +89,7 @@ liquipedia.rankingTable = {
 				// Remove the original list
 				this.rankingContent.firstElementChild.remove();
 				// Remove non-list elements
-				this.rankingContent.innerHTML = this.rankingContent.querySelector( this.ContentSelector ).innerHTML;
+				this.rankingContent.innerHTML = this.rankingContent.querySelector( this.contentSelector ).innerHTML;
 				// Store fetched HTML content in cache
 				this.cache[ dateValue ] = this.rankingContent.outerHTML;
 				this.toggleGraphVisibility();
