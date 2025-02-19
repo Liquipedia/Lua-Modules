@@ -130,7 +130,7 @@ function MatchLegacy._convertParameters(match2)
 			match.extradata[prefix .. 'displayname'] = player.displayname
 			match.extradata[prefix .. 'heads'] = table.concat(headList(index, 1), ',')
 			if match2.winner == index then
-				match.winner = player.name
+				match.winner = player.name:gsub('_', ' ')
 			end
 		elseif opponent.type == Opponent.duo then
 			local teamPrefix = 'team' .. index
