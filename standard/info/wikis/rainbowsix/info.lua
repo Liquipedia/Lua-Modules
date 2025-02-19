@@ -21,8 +21,8 @@ return {
 				lightMode = 'Rainbow Six Siege gameicon lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Rainbow Six Siege Logo darkmode.png',
-				lightMode = 'Rainbow Six Siege Logo lightmode.png',
+				darkMode = 'Rainbow Six Siege default darkmode.png',
+				lightMode = 'Rainbow Six Siege default lightmode.png',
 			},
 		},
 		vegas2 = {
@@ -34,8 +34,8 @@ return {
 				lightMode = 'R6 Vegas 2 icon.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Rainbow Six Vegas Logo darkmode.png',
-				lightMode = 'Rainbow Six Vegas Logo lightmode.png',
+				darkMode = 'Rainbow Six Vegas default darkmode.png',
+				lightMode = 'Rainbow Six Vegas default lightmode.png',
 			},
 		},
 	},
