@@ -15,28 +15,30 @@ liquipedia.rankingTable = {
 	options: [],
 
 	init: function () {
-		this.rankingContent = document.querySelector( this.ContentSelector );
-		if ( !this.rankingContent ) {
-			return;
-		}
+		mw.loader.using( 'ext.Charts.scripts', () => {
+			this.rankingContent = document.querySelector( this.ContentSelector );
+			if ( !this.rankingContent ) {
+				return;
+			}
 
-		this.populateOptions();
-		this.toggleGraphVisibility();
-		this.initSelectElement();
+			this.populateOptions();
+			this.toggleGraphVisibility();
+			this.initSelectElement();
 
-		// Set active select option to the first option object on init
-		if ( this.activeSelectOption === null && this.options.length > 0 ) {
-			this.activeSelectOption = this.options[ 0 ];
-		}
+			// Set active select option to the first option object on init
+			if ( this.activeSelectOption === null && this.options.length > 0 ) {
+				this.activeSelectOption = this.options[ 0 ];
+			}
 
-		// Set patch label to the active select option patch
-		this.patchLabelElement = document.querySelector( this.patchLabelSelector );
-		if ( this.patchLabelElement && this.activeSelectOption !== null ) {
-			this.updatePatchLabel( this.activeSelectOption.patch );
-		}
+			// Set patch label to the active select option patch
+			this.patchLabelElement = document.querySelector( this.patchLabelSelector );
+			if ( this.patchLabelElement && this.activeSelectOption !== null ) {
+				this.updatePatchLabel( this.activeSelectOption.patch );
+			}
 
-		// Store initial HTML content in cache
-		this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+			// Store initial HTML content in cache
+			this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+		} );
 	},
 
 	populateOptions: function () {
@@ -61,6 +63,7 @@ liquipedia.rankingTable = {
 			this.removeToggleButtonListeners();
 			this.rankingContent.innerHTML = this.cache[ dateValue ];
 			this.toggleGraphVisibility();
+			mw.ext.Charts.recreateCharts();
 			return;
 		}
 
@@ -90,7 +93,7 @@ liquipedia.rankingTable = {
 				// Store fetched HTML content in cache
 				this.cache[ dateValue ] = this.rankingContent.outerHTML;
 				this.toggleGraphVisibility();
-				mw.ext.Charts.createCharts();
+				mw.ext.Charts.recreateCharts();
 			}
 		} );
 	},
