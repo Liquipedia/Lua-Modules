@@ -43,7 +43,7 @@ liquipedia.rankingTable = {
 		document.querySelectorAll( this.optionDataSelector ).forEach( ( option ) => {
 			const date = new Date( option.getAttribute( 'data-date' ) );
 			const patch = option.getAttribute( 'data-name' );
-			const value = date.toISOString().slice( 0, 10 );
+			const value = this.standardizeDateFormat( date );
 			const text = date.toLocaleDateString( 'en-US', { year: 'numeric', month: 'long', day: 'numeric' } );
 			this.options.push( {
 				value: value,
@@ -54,8 +54,7 @@ liquipedia.rankingTable = {
 	},
 
 	fetchRatingsData: function( date ) {
-		// Convert string to date format
-		const dateValue = new Date( date ).toISOString().slice( 0, 10 );
+		const dateValue = this.standardizeDateFormat( new Date( date ) );
 
 		// Check if data is already fetched
 		if ( this.cache[ dateValue ] ) {
@@ -193,6 +192,10 @@ liquipedia.rankingTable = {
 				chartInstance = echarts.init( chart );
 			}
 		} );
+	},
+
+	standardizeDateFormat: function ( date ) {
+		return date.toISOString().slice( 0, 10 );
 	}
 };
 
