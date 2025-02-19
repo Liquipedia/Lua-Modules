@@ -37,12 +37,12 @@ local CONTENT = {
 			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
 		body = '{{Liquipedia:This day}}',
 		padding = true,
-		boxid = 1510,
+		boxid = 1509,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1511,
+		boxid = 1510,
 	},
 	filterButtons = {
 		noPanel = true,
