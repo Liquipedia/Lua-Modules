@@ -80,13 +80,13 @@ function Ratings:render()
 	end)
 
 	return HtmlWidgets.Div {
-		not self.props.isSmallerVersion and RatingsDropdown {
-			dates = dropdownDates,
-		} or nil,
 		attributes = {
 			class = 'ranking-table__wrapper',
 		},
 		children = WidgetUtil.collect(
+			not self.props.isSmallerVersion and RatingsDropdown {
+				dates = dropdownDates,
+			} or nil,
 			RatingsList {
 				teamLimit = self.props.teamLimit,
 				progressionLimit = self.props.progressionLimit,
