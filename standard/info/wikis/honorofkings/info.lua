@@ -9,8 +9,8 @@
 return {
 	startYear = 2015,
 	wikiName = 'honorofkings',
-	name = 'Arena of Valor',
-	defaultGame = 'aov',
+	name = 'Honor of Kings',
+	defaultGame = 'hok',
 
 	games = {
 		aov = {
