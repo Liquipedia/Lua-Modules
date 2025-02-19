@@ -37,6 +37,18 @@ return {
 				darkMode = 'Rainbow Six Vegas default darkmode.png',
 				lightMode = 'Rainbow Six Vegas default lightmode.png',
 			},
+		vegas = {
+			abbreviation = 'R6V',
+			name = 'Tom Clancy\'s Rainbow Six Vegas',
+			link = 'Rainbow Six Vegas',
+			logo = {
+				darkMode = 'R6 Vegas 2 icon.png',
+				lightMode = 'R6 Vegas 2 icon.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Rainbow Six Vegas default darkmode.png',
+				lightMode = 'Rainbow Six Vegas default lightmode.png',
+			},
 		},
 	},
 	config = {
