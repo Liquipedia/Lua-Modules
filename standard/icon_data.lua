@@ -74,6 +74,7 @@ return {
 	activeroster = 'fas fa-users',
 	history = 'fas fa-books',
 	media = 'fas fa-newspaper',
+	['goto'] = 'far fa-arrow-right',
 
 	-- Usage: buildtime, duration, cooldown, ...
 	time = 'far fa-clock',
@@ -112,4 +113,7 @@ return {
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
+
+	-- Usage: Charts
+	chart = 'far fa-chart-line',
 }

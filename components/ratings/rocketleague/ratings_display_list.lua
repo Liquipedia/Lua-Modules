@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=rocketleague
 -- page=Module:Ratings/Display/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,7 +15,7 @@ local RatingsDisplayList = {}
 
 local LIMIT_TEAMS = 100 -- How many teams to show in the list/table
 
----@param teamRankings RatingsEntry[]
+---@param teamRankings RatingsEntryOld[]
 ---@return string
 function RatingsDisplayList.build(teamRankings)
 	local teams = Array.sub(teamRankings, 1, LIMIT_TEAMS)

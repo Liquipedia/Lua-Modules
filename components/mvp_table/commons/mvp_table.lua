@@ -185,7 +185,7 @@ end
 ---@return Html
 function MvpTable._row(item, args)
 	local row = mw.html.create('tr')
-		:tag('td'):node(OpponentDisplay.BlockOpponent{
+		:tag('td'):css('text-align', 'left'):node(OpponentDisplay.BlockOpponent{
 			opponent = {type = Opponent.solo, players = {{
 				displayName = item.displayName,
 				flag = item.flag,

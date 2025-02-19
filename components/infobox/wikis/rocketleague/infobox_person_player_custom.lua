@@ -123,6 +123,7 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		Array.extendWith(widgets,
+			getHistoryCells('history_fwc', '[[FIFAe World Cup|FIFAe World Cup]] History'),
 			getHistoryCells('history_iwo', '[[Intel World Open|Intel World Open]] History'),
 			getHistoryCells('history_gfinity', '[[Gfinity/Elite_Series|Gfinity Elite Series]] History'),
 			getHistoryCells('history_odl', '[[Oceania Draft League|Oceania Draft League]] History'),
