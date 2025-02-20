@@ -145,6 +145,12 @@ function CustomSkill:_castersDisplay()
 	local casters = self:getAllArgsForBase(self.args, 'caster')
 
 	return Array.map(casters, function(caster)
+		local factionPageNames = Array.map(Faction.coreFactions, function (faction)
+			return Faction.getProps(faction)['pageName']
+		end)
+
+		if Table.includes(factionPageNames, caster) then return Page.makeInternalLink({}, caster, caster) end
+
 		local casterUnit = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '([[type::Unit]] OR [[type::Hero]] or [[type::building]]) AND [[pagename::'
 				.. string.gsub(caster, ' ', '_') .. ']]',

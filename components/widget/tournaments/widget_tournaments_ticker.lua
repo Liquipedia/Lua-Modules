@@ -11,6 +11,7 @@ local Condition = require('Module:Condition')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local I18n = require('Module:I18n')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -135,6 +136,9 @@ function TournamentsTickerWidget:render()
 		}
 	}
 
+
+	local displayGameIcons = Logic.readBool(self.props.displayGameIcons)
+
 	return HtmlWidgets.Div{
 		children = {
 			HtmlWidgets.Ul{
@@ -144,9 +148,9 @@ function TournamentsTickerWidget:render()
 					['data-filter-effect'] = 'fade',
 				},
 				children = {
-					Sublist{title = 'Upcoming', tournaments = upcomingTournaments} ,
-					Sublist{title = 'Ongoing', tournaments = ongoingTournaments},
-					Sublist{title = 'Completed', tournaments = completedTournaments},
+					Sublist{title = 'Upcoming', tournaments = upcomingTournaments, displayGameIcons = displayGameIcons} ,
+					Sublist{title = 'Ongoing', tournaments = ongoingTournaments, displayGameIcons = displayGameIcons},
+					Sublist{title = 'Completed', tournaments = completedTournaments, displayGameIcons = displayGameIcons},
 					fallbackElement
 				}
 			}
