@@ -68,8 +68,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch-logo-lightmode.svg',
-		darkmode = 'Overwatch-logo-darkmode.svg',
+		lightmode = 'Overwatch 2 full lightmode.png',
+		darkmode = 'Overwatch 2 full darkmode.png',
 	},
 	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
 		'to competitive players and teams.',
