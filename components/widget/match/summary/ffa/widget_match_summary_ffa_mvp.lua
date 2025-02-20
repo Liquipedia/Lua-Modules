@@ -37,7 +37,8 @@ function MatchSummaryFfaMvp:render()
 	end)
 
 	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = {{
-		icon = IconWidget{iconName = 'mvp', color = 'bright-sun-0-text'},
+		icon = IconWidget{iconName = 'mvp', color = 'bright-sun-0-text', size = '0.875rem'},
+		title = 'MVP:',
 		content = HtmlWidgets.Span{children = Array.extend(
 			players,
 			points and points > 1 and (' (' .. points .. ' pts)') or nil
