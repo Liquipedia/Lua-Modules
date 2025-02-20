@@ -30,20 +30,21 @@ return {
 			name = 'Tom Clancy\'s Rainbow Six Vegas 2',
 			link = 'Rainbow Six Vegas 2',
 			logo = {
-				darkMode = 'R6 Vegas 2 icon.png',
-				lightMode = 'R6 Vegas 2 icon.png',
+				darkMode = 'Rainbow Six Vegas 2 icon allmode.png',
+				lightMode = 'Rainbow Six Vegas 2 icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rainbow Six Vegas default darkmode.png',
 				lightMode = 'Rainbow Six Vegas default lightmode.png',
 			},
+		},
 		vegas = {
 			abbreviation = 'R6V',
 			name = 'Tom Clancy\'s Rainbow Six Vegas',
 			link = 'Rainbow Six Vegas',
 			logo = {
-				darkMode = 'R6 Vegas 2 icon.png',
-				lightMode = 'R6 Vegas 2 icon.png',
+				darkMode = 'Rainbow Six Vegas 2 icon allmode.png',
+				lightMode = 'Rainbow Six Vegas 2 icon allmode.png',
 			},
 			defaultTeamLogo = {
 				darkMode = 'Rainbow Six Vegas default darkmode.png',
