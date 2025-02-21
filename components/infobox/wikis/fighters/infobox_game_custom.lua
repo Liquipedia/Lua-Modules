@@ -40,24 +40,23 @@ end
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
-		return Array.append(widgets,
-			Builder {
-				builder = function()
-					if self:_isChronologySet(args.previous, args.next) then
-						return {
-							Title { children = 'Chronology' },
-							Chronology {
-								links = Table.filterByKey(args, function(key)
-									return type(key) == 'string' and
-										(key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
-								end)
-							}
+		return {
+			Builder { builder = function()
+				if self:_isChronologySet(args.previous, args.next) then
+					return {
+						Title { children = 'Chronology' },
+						Chronology {
+							links = Table.filterByKey(args, function(key)
+								return type(key) == 'string' and
+									(key:match('^previous%d?$') ~= nil or key:match('^next%d?$') ~= nil)
+							end)
 						}
-					end
+					}
 				end
-			}
-		)
+			end}
+		}
 	end
+
 	return widgets
 end
 
