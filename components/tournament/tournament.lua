@@ -90,9 +90,9 @@ local TouranmentMT = {
 ---@param record tournament
 ---@return StandardTournament
 function Tournament.tournamentFromRecord(record)
-
-	local startDate = Tournament.parseDateRecord(Logic.nilOr(record.extradata.startdatetext, record.startdate))
-	local endDate = Tournament.parseDateRecord(Logic.nilOr(record.extradata.enddatetext, record.sortdate, record.enddate))
+	local extradata = record.extradata or {}
+	local startDate = Tournament.parseDateRecord(Logic.nilOr(extradata.startdatetext, record.startdate))
+	local endDate = Tournament.parseDateRecord(Logic.nilOr(extradata.enddatetext, record.sortdate, record.enddate))
 
 	local tournament = {
 		displayName = Logic.emptyOr(record.tickername, record.name) or record.pagename:gsub('_', ' '),
@@ -108,6 +108,7 @@ function Tournament.tournamentFromRecord(record)
 		iconDark = record.icondark,
 		abbreviation = record.abbreviation,
 		series = record.series,
+		game = record.game
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.
@@ -154,7 +155,7 @@ function Tournament.parseDateRecord(dateRecord)
 		return
 	end
 
-	local dt = {year = year, month = month or 12, day = day or 31}
+	local dt = {year = year, month = month or 12, day = day or 31, hour = 0}
 	local timestamp = os.time(dt)
 
 	return {year = year, month = month, day = day, timestamp = timestamp}

@@ -20,6 +20,7 @@ local BaseMatchSummary = Lua.import('Module:MatchSummary/Base/Ffa')
 
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/Ffa/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@type FfaMatchSummaryParser
 local Parser = {}
@@ -37,10 +38,11 @@ function StarcraftMatchSummaryFfa.getByMatchId(props)
 		MatchSummaryWidgets.Tab{
 			matchId = match.matchId,
 			idx = 0,
-			children = {
+			children = WidgetUtil.collect(
 				MatchSummaryWidgets.GamesSchedule{match = match},
-				BaseMatchSummary.standardMatch(match, Parser),
-			}
+				MatchSummaryWidgets.MatchComment{match = match},
+				BaseMatchSummary.standardMatch(match, Parser)
+			)
 		}
 	}}
 end

@@ -11,9 +11,11 @@ local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
+local PlayerExt = require('Module:Player/Ext')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
+local Team = require('Module:Team')
 
 local MediaList = {}
 
@@ -60,13 +62,15 @@ function MediaList._parseArgs(args)
 	args.subject1 = args.subject1 or args.subject
 	args.player1 = args.player1 or args.player
 
+	local subjects = Array.mapIndexes(function(subjectIndex)
+		local subject = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
+		return subject and mw.ext.TeamLiquidIntegration.resolve_redirect(subject) or nil
+	end)
+
 	return {
 		types = args.type and Array.map(Array.map(mw.text.split(args.type, ','), String.trim), string.lower) or nil,
 		author = args.author and mw.ext.TeamLiquidIntegration.resolve_redirect(args.author) or nil,
-		subjects = Array.mapIndexes(function(subjectIndex)
-			local subject = args['subject' .. subjectIndex] or args['player' .. subjectIndex]
-			return subject and mw.ext.TeamLiquidIntegration.resolve_redirect(subject) or nil
-		end),
+		subjects = subjects,
 		org = args.organization and mw.ext.TeamLiquidIntegration.resolve_redirect(args.organization) or nil,
 		showUsUk = Logic.readBool(args.show_usuk),
 		year = tonumber(args.year),
@@ -79,7 +83,8 @@ function MediaList._parseArgs(args)
 		event = Logic.readBool(args.event)
 			and mw.title.getCurrentTitle().prefixedText
 			or (args.event and mw.ext.TeamLiquidIntegration.resolve_redirect(args.event))
-			or nil
+			or nil,
+		showSubjectTeam = Logic.readBool(args.showSubjectTeam) and #subjects == 1
 	}
 end
 
@@ -227,6 +232,7 @@ end
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
+		:wikitext(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
 		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 
 	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
@@ -323,6 +329,18 @@ function MediaList._displayTranslation(item)
 	end
 
 	return translation .. NON_BREAKING_SPACE .. 'by' .. NON_BREAKING_SPACE .. item.extradata.translator .. ')'
+end
+
+---Displays the subject's team for a given External Media Link
+---@param subject string
+---@param date string
+---@return string?
+function MediaList._displayTeam(subject, date)
+	local team = PlayerExt.syncTeam(subject, nil, {date = date})
+	if not team then
+		return
+	end
+	return Team.icon(nil, team)
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.

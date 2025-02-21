@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=rocketleague
 -- page=Module:Ratings/Display/Graph
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,7 +16,7 @@ local RatingsDisplayGraph = {}
 local LIMIT_TEAMS = 10 -- How many teams to show in the combined graph
 local LIMIT_TEAMS_SELECTED = 5 -- How many teams are preselected in the graph
 
----@param teamRankings RatingsEntry[]
+---@param teamRankings RatingsEntryOld[]
 ---@return string
 function RatingsDisplayGraph.build(teamRankings)
 	local teams = Array.sub(teamRankings, 1, LIMIT_TEAMS)
