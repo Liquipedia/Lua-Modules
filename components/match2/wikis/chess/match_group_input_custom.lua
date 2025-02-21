@@ -78,7 +78,6 @@ end
 function MapFunctions.getExtraData(match, map, opponents)
 	return {
 		header = map.header,
-		comment = map.comment,
 		eco = Eco.sanitise(map.eco),
 	}
 end
@@ -89,8 +88,8 @@ end
 function MapFunctions.extendMapOpponent(map, opponentIndex)
 	local whiteSide = tonumber(map.white)
 	return {
-		color = whiteSide == opponentIndex and 'white'
-			or whiteSide and 'black'
+		color = (whiteSide == opponentIndex and 'white')
+			or (whiteSide ~= nil and 'black')
 			or nil
 	}
 end
