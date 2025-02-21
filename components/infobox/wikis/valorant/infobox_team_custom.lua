@@ -35,12 +35,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'staff' then
-		table.insert(widgets, Cell{
-			name = 'In-Game Leader',
-			content = {args.igl}
-		})
-	elseif id == 'custom' then
+	if id == 'custom' then
 		return {
 			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
 				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}

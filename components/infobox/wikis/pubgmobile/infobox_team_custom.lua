@@ -41,7 +41,7 @@ end
 
 ---@param args table
 function CustomTeam:defineCustomPageVariables(args)
-	Variables.varDefine('team_captain', args.captain)
+	Variables.varDefine('team_captain', args.captain) -- used in `Module:SquadAuto`
 end
 
 return CustomTeam
