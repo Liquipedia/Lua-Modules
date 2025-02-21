@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
 local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
@@ -86,13 +85,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	if String.isNotEmpty(args.league) then
 		lpdbData.extradata.competesin = string.upper(args.league)
 	end
-
-	-- Automatic org people - sets some wiki vars used for below storage
-	RoleOf.get{role = 'Coach'}
-	RoleOf.get{role = 'Manager'}
-
-	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
-	lpdbData.manager = Variables.varDefault('managerid') or args.manager
 
 	return lpdbData
 end
