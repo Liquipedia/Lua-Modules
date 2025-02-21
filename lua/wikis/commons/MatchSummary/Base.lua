@@ -353,8 +353,10 @@ end
 -- Default body function
 ---@param match table
 ---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
+---@param options {emptyVetoMapDisplay: string?}?
 ---@return Widget
-function MatchSummary.createDefaultBody(match, createGame)
+function MatchSummary.createDefaultBody(match, createGame, options)
+	options = options or {}
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
@@ -362,7 +364,10 @@ function MatchSummary.createDefaultBody(match, createGame)
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {
+			game = match.game,
+			emptyMapDisplay = options.emptyVetoMapDisplay,
+		}))
 	)}
 end
 
@@ -452,7 +457,7 @@ end
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData table?
 ---@param CustomMatchSummary table
----@param options {teamStyle: teamStyle?, noScore: boolean?}?
+---@param options {teamStyle: teamStyle?, noScore: boolean?, emptyVetoMapDisplay: string?}?
 ---@return MatchSummaryMatch?
 function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	if not matchData then
@@ -465,7 +470,7 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	match:header(createHeader(matchData, options))
 
 	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
-	match:body(createBody(matchData, CustomMatchSummary.createGame))
+	match:body(createBody(matchData, CustomMatchSummary.createGame, options))
 
 	local substituteComment = MatchSummary.createSubstitutesComment(matchData)
 
@@ -482,7 +487,8 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamStyle: teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
+---@param options {teamStyle: teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?,
+---noScore:boolean?, emptyVetoMapDisplay: string?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
