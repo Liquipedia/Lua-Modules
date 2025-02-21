@@ -23,26 +23,14 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {emptyVetoMapDisplay = NONE})
 end
 
----@param match MatchGroupUtilMatch
----@return MatchSummaryBody
-function CustomMatchSummary.createBody(match)
-	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-
-	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		Array.map(match.games, CustomMatchSummary._createMapRow),
-		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
-		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = NONE}))
-	)}
-end
-
+---@param date string
 ---@param game MatchGroupUtilGame
+---@param gameIndex integer
 ---@return Widget?
-function CustomMatchSummary._createMapRow(game)
+function CustomMatchSummary.createGame(date, game, gameIndex)
 	if not game.map then
 		return
 	end
