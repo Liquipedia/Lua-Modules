@@ -6,7 +6,7 @@ insulate('Squad', function()
 			return
 		end
 
-    local LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
+		local LpdbSquadStub = stub(mw.ext.LiquipediaDB, 'lpdb_squadplayer')
 		local LpdbQueryStub = stub(mw.ext.LiquipediaDB, 'lpdb', {})
 		local SquadCustom = require('Module:Squad/Custom')
 
