@@ -119,27 +119,33 @@ end
 ---@field showFlag boolean?
 ---@field showLink boolean?
 ---@field dq boolean?
+---@field note string|number|nil
 ---@field teamStyle teamStyle?
 
 ---Displays an opponent as an inline element. Useful for describing opponents in prose.
 ---@param props InlineOpponentProps
----@return Html|string|nil
+---@return Html|nil
 function OpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
+	local opponentNode
 	if opponent.type == Opponent.team then
-		return OpponentDisplay.InlineTeamContainer({
+		opponentNode = OpponentDisplay.InlineTeamContainer({
 			flip = props.flip,
 			style = props.teamStyle,
 			template = opponent.template or 'tbd',
 		})
 	elseif opponent.type == Opponent.literal then
-		return opponent.name or ''
+		opponentNode = opponent.name or ''
 	elseif Opponent.typeIsParty(opponent.type) then
-		return OpponentDisplay.InlinePlayers(props)
+		opponentNode = OpponentDisplay.InlinePlayers(props)
 	else
 		error('Unrecognized opponent.type ' .. opponent.type)
 	end
+
+	return mw.html.create()
+		:node(opponentNode)
+		:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or '')
 end
 
 ---@param props InlineOpponentProps
