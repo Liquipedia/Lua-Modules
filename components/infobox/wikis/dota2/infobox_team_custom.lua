@@ -38,12 +38,6 @@ function CustomTeam.run(frame)
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
 
-	-- Automatic org people
-	team.args.coach = RoleOf.get{role = 'Coach'}
-	team.args.director = RoleOf.get{role = 'Director'}
-	team.args.manager = RoleOf.get{role = 'Manager'}
-	team.args.captain = RoleOf.get{role = 'Captain'}
-
 	return team:createInfobox()
 end
 
@@ -72,6 +66,11 @@ end
 ---@param args table
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
+
+	-- Automatic org people - sets some wiki vars used for below storage
+	RoleOf.get{role = 'Coach'}
+	RoleOf.get{role = 'Manager'}
+
 	lpdbData.extradata.teamid = args.teamid
 	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
 	lpdbData.manager = Variables.varDefault('managerid') or args.manager

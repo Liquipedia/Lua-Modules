@@ -112,16 +112,6 @@ function Team:createInfobox()
 			}
 		},
 		Customizable{
-			id = 'staff',
-			children = {
-				Cell{name = 'Coaches', content = {args.coaches}},
-				Cell{name = 'Coach', content = {args.coach}},
-				Cell{name = 'Director', content = {args.director}},
-				Cell{name = 'Manager', content = {args.manager}},
-				Cell{name = 'Team Captain', content = {args.captain}},
-			}
-		},
-		Customizable{
 			id = 'earnings',
 			children = {
 				Cell{

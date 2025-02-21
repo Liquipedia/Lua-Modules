@@ -40,11 +40,6 @@ function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
 
-	-- Automatic org people
-	team.args.coach = RoleOf.get{role = 'Coach'}
-	team.args.manager = RoleOf.get{role = 'Manager'}
-	team.args.captain = RoleOf.get{role = 'Captain'}
-
 	return team:createInfobox()
 end
 
@@ -91,6 +86,10 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	if String.isNotEmpty(args.league) then
 		lpdbData.extradata.competesin = string.upper(args.league)
 	end
+
+	-- Automatic org people - sets some wiki vars used for below storage
+	RoleOf.get{role = 'Coach'}
+	RoleOf.get{role = 'Manager'}
 
 	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
 	lpdbData.manager = Variables.varDefault('managerid') or args.manager
