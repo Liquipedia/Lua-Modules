@@ -13,10 +13,10 @@ local Tier = require('Module:Tier/Utils')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
----@class TournamentsTickerWidget: Widget
----@operator call(table): TournamentsTickerWidget
+---@class TournamentsTickerPillWidget: Widget
+---@operator call(table): TournamentsTickerPillWidget
 
-local TournamentsTickerWidget = Class.new(Widget)
+local TournamentsTickerPillWidget = Class.new(Widget)
 
 local COLOR_CLASSES = {
 	[1] = 'tier1',
@@ -36,7 +36,7 @@ local COLOR_CLASSES = {
 }
 
 ---@return Widget?
-function TournamentsTickerWidget:render()
+function TournamentsTickerPillWidget:render()
 	local tournament = self.props.tournament
 	if not tournament then
 		return
@@ -71,4 +71,4 @@ function TournamentsTickerWidget:render()
 	}
 end
 
-return TournamentsTickerWidget
+return TournamentsTickerPillWidget
