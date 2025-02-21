@@ -60,7 +60,7 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=30|completedDays=20}}',
+			'|upcomingDays=30|completedDays=20|modifierTypeQualifier=-2|modifierTier1=55|modifierTier2=55|modifierTier3=10}}',
 		padding = true,
 		boxid = 1508,
 	},
