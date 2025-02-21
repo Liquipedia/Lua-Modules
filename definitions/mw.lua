@@ -606,11 +606,19 @@ end
 ---@return string[]
 function mw.text.split(s, pattern, plain)
 	pattern = pattern or "%s"
-	local t = {}
-	for str in string.gmatch(s, "([^"..pattern.."]+)") do
-			table.insert(t, str)
+
+	local results = {}
+	local start = 1
+	local splitStart, splitEnd = string.find(s, pattern, start, plain)
+
+	while splitStart do
+		table.insert(results, string.sub(s, start, splitStart - 1))
+		start = splitEnd + 1
+		splitStart, splitEnd = string.find(s, pattern, start, plain)
 	end
-	return t
+
+	table.insert(results, string.sub(s, start))
+	return results
 end
 
 ---Returns an iterator function that will iterate over the substrings that would be returned by the equivalent call to mw.text.split().
