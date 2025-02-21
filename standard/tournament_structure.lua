@@ -266,7 +266,7 @@ function TournamentStructure.fetchGroupTableEntries(group)
 	local records = mw.ext.LiquipediaDB.lpdb('standingsentry', {
 		conditions = '[[standingsindex::' .. group.standingsindex .. ']] AND '
 			.. '[[pagename::' .. group.pagename .. ']] AND [[roundindex::' .. roundIndex .. ']]',
-		limit = '100',
+		limit = 1000,
 		query = 'scoreboard, currentstatus, extradata, opponenttype, '
 			.. 'opponentname, opponenttemplate, opponentplayers, placement'
 	})
