@@ -46,9 +46,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '|mvp='
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|vodgame'.. mapIndex ..'='
-		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
 			return WikiCopyPaste._getMapCode(mapIndex, bans)
 		end),
 		'}}'
@@ -63,6 +60,7 @@ end
 function WikiCopyPaste._getMapCode(mapIndex, bans)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map',
+		INDENT .. INDENT .. '|vod=',
 		INDENT .. INDENT .. '|team1side=',
 		INDENT .. INDENT .. '|t1c1= |t1c2= |t1c3= |t1c4= |t1c5=',
 		bans and (INDENT .. INDENT .. '|t1b1= |t1b2= |t1b3= |t1b4= |t1b5=') or nil,
