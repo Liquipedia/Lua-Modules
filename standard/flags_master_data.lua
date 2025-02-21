@@ -1797,6 +1797,7 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
+	['su'] = 'ussr',
 	['un'] = 'unitednations',
 
 	--   ISO 3166-1 alpha-2 Traditional Reservations
@@ -2059,6 +2060,9 @@ local threeLetter = {
 	['zaf'] = 'southafrica',
 	['zmb'] = 'zambia',
 	['zwe'] = 'zimbabwe',
+
+	--   ISO 3166-1 alpha-2 Exceptional Reservations
+	['sun'] = 'ussr',
 
 	-- ISO 3166-2:GB
 	['eng'] = 'england',
