@@ -19,6 +19,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Icon')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -80,6 +81,9 @@ function CustomMatchSummary.createGame(match, game, gameIndex)
 		classes = {'brkts-popup-body-game'},
 		css = {padding = '4px'},
 		children = WidgetUtil.collect(
+			-- Header
+			CustomMatchSummary._getHeader(game),
+
 			-- Player 1
 			CustomMatchSummary._getSideIcon(game.opponents[1]),
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = 1},
@@ -95,7 +99,7 @@ function CustomMatchSummary.createGame(match, game, gameIndex)
 					['line-height'] = '12px',
 					['max-width'] = '200px'
 				},
-				children = MatchSummaryWidgets._getCenterContent(match, game, gameIndex),
+				children = CustomMatchSummary._getCenterContent(match, game, gameIndex),
 			},
 
 			-- Player 2
@@ -113,7 +117,7 @@ end
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Widget
-function MatchSummaryWidgets._getCenterContent(match, game, gameIndex)
+function CustomMatchSummary._getCenterContent(match, game, gameIndex)
 	---@type table<string, string|table|nil>
 	local links = Table.mapValues(match.links, function(link)
 		if type(link) ~= 'table' then return nil end
@@ -132,7 +136,7 @@ function MatchSummaryWidgets._getCenterContent(match, game, gameIndex)
 				classes = {'brkts-popup-spaced'},
 				children = {
 					'Game ' .. gameIndex,
-					game.length and (' - ' .. game.length .. ' moves') or '',
+					tonumber(game.length) and (' - ' .. game.length .. ' moves') or '',
 				},
 			},
 			Span{
@@ -157,6 +161,22 @@ function CustomMatchSummary._getSideIcon(gameOpponent)
 		css = {['padding'] = '0px 4px'},
 		children = KING_ICONS[gameOpponent.color],
 	}
+end
+
+---@param game MatchGroupUtilGame
+---@return Widget
+function CustomMatchSummary._getHeader(game)
+	return String.isNotEmpty(game.header) and {
+		Div{
+			children = game.header,
+			css = {
+				['font-weight'] = 'bold',
+				['font-size'] = '85%',
+				margin = 'auto'
+			}
+		},
+		MatchSummaryWidgets.Break{}
+	} or nil
 end
 
 return CustomMatchSummary
