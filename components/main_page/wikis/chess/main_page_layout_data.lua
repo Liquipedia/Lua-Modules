@@ -20,13 +20,13 @@ local CONTENT = {
 		boxid = 1504,
 	},
 	transfers = {
-		heading = 'Transfers',
+		heading = 'Signings',
 		body = '{{Transfer List|limit=15|title=}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
 			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
-			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
+			'[[Portal:Transfers|See more signings]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[Special:RunQuery/Transfer history|Transfer query]]' ..
 			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
@@ -96,7 +96,7 @@ return {
 		},
 		{
 			file = 'Maxime Vachier-Lagrave Interview at Norway Chess 2019.jpg',
-			title = 'Transfers',
+			title = 'Player Signings',
 			link = 'Portal:Transfers',
 			count = {
 				method = 'LPDB',
