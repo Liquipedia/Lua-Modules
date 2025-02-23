@@ -97,7 +97,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	Array.forEach(CustomLeague.getRestrictions(args.restrictions),
 		function(res) lpdbData.extradata['restriction_' .. res.data] = 1 end)
 
-	lpdbData.extradata.modes = data.modes
+	lpdbData.extradata.modes = self.data.modes
 
 	return lpdbData
 end
