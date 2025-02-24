@@ -99,7 +99,7 @@ return {
 			},
 		},
 		{
-			file = 'Stalk3r OWCS Finals 2024.jpeg',
+			file = 'EDward Gaming VALORANT Masters Shanghai 2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
