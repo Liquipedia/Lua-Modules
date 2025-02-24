@@ -6,11 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
-local GameAppearances = require('Module:GetGameAppearances')
+local GameAppearances = require('Module:Infobox/Extension/GameAppearances')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
-local String = require('Module:StringUtils')
+local Page = require('Module:Page')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -18,8 +18,17 @@ local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
+
+local ROLES = {
+	-- Staff and Talents
+	['analyst'] = {category = 'Analysts', display = 'Analyst'},
+	['observer'] = {category = 'Observers', display = 'Observer'},
+	['host'] = {category = 'Hosts', display = 'Host'},
+	['coach'] = {category = 'Coaches', display = 'Coach'},
+	['caster'] = {category = 'Casters', display = 'Caster'},
+	['streamer'] = {category = 'Streamers', display = 'Streamer'},
+	['manager'] = {category = 'Managers', display = 'Manager'},
+}
 
 ---@class CallofdutyInfoboxPlayer: Person
 ---@field role table
@@ -27,63 +36,64 @@ local Center = Widgets.Center
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
----@param frame Frame
----@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.autoTeam = true
-	player.role = Role.run({role = player.args.role})
-	player.role2 = Role.run({role = player.args.role2})
+	player.args.history = TeamHistoryAuto.results{
+		convertrole = true,
+		addlpdbdata = true,
+		player = player.pagename
+	}
+	player.role = player:_getRoleData(player.args.role)
+	player.role2 = player:_getRoleData(player.args.role2)
 
-	return player:createInfobox(frame)
+	return player:createInfobox()
 end
 
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
+	local caller = self.caller
 
 	if id == 'custom' then
 		return {
 			Cell{name = 'Game Appearances', content = GameAppearances.player{player = self.caller.pagename}},
 		}
-	elseif id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			addlpdbdata = true,
-			player = self.caller.pagename
-		}
-
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {manualHistory}},
-				Center{children = {automatedHistory}},
-			}
-		end
 	elseif id == 'role' then
 		return {
-			Cell{name = 'Role(s)', content = {self.caller.role.display, self.caller.role2.display}}
+			Cell{name = 'Role', content = {
+				caller:_displayRole(caller.role),
+				caller:_displayRole(caller.role2),
+			}},
 		}
 	end
-
 	return widgets
 end
 
----@param lpdbData table
----@param args table
----@param personType string
----@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
+---@param role string?
+---@return {category: string, display: string, isplayer: boolean?}?
+function CustomPlayer:_getRoleData(role)
+	return ROLES[(role or ''):lower()]
+end
 
-	return lpdbData
+---@param roleData {category: string, display: string, isplayer: boolean?}?
+---@return string?
+function CustomPlayer:_displayRole(roleData)
+	if not roleData then return end
+
+	return Page.makeInternalLink(roleData.display, ':Category:' .. roleData.category)
+end
+
+---@param categories string[]
+---@return string[]
+function CustomPlayer:getWikiCategories(categories)
+	return Array.append(categories,
+		(self.role or {}).category,
+		(self.role2 or {}).category
+	)
 end
 
 return CustomPlayer
