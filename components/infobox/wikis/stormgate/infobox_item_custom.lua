@@ -86,7 +86,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param factionArgs table
+---@param factionArgs string
 ---@return string?
 function CustomItem._getFactionsDisplay(factionArgs)
 	local parsedFactionArgs = Array.map(Array.parseCommaSeparatedString(factionArgs), Faction.read)
@@ -96,15 +96,15 @@ function CustomItem._getFactionsDisplay(factionArgs)
 	end) then return 'any' end
 
 	local factions = Array.map(Faction.coreFactions, function(faction)
-		return Table.includes(parsedFactionArgs, faction) and faction
+		return Table.includes(parsedFactionArgs, faction) and faction or nil
 	end)
 
 	return table.concat(Array.map(factions, function(faction)
-		return Faction.Icon{faction=faction}
+		return Faction.Icon{faction = faction}
 	end), ' ')
 end
 
----@param unlockedArgs table
+---@param unlockedArgs string
 ---@return string?
 function CustomItem._getUnlockedDisplay(unlockedArgs)
 	local parsedUnlockedArgs = Array.parseCommaSeparatedString(unlockedArgs, ':')
@@ -122,7 +122,7 @@ function CustomItem._getUnlockedDisplay(unlockedArgs)
 end
 
 
----@param tagArgs table
+---@param tagArgs string
 ---@return string?
 function CustomItem._getTagsDisplay(tagArgs)
 	local tags = Array.sortBy(Array.parseCommaSeparatedString(tagArgs), function(item)
@@ -134,7 +134,6 @@ function CustomItem._getTagsDisplay(tagArgs)
 	end), ', ')
 end
 
----@param args table
 ---@return string[]
 function CustomItem:getWikiCategories()
 	return {'Gear'}
