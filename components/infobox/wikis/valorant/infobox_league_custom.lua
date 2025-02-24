@@ -52,7 +52,7 @@ function CustomLeague:customParseArguments(args)
 	self.data.mode = (args.individual or args.player_number) and '1v1' or 'team'
 
 	-- female as a temp alias to bot the old input over
-	self.data.gameChangers = Logic.readBool(args.gc or args.female)
+	self.data.gameChangers = Logic.readBool(args.gc)
 
 	local publisherTier = (args.publishertier or ''):lower()
 	self.data.publishertier = Table.includes(VALID_PUBLISHERTIERS, publisherTier) and publisherTier
