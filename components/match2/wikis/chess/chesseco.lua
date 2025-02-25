@@ -8,25 +8,25 @@
 
 local Logic = require('Module:Logic')
 
-local _ECO = mw.loadData('Module:ChessEco/Data')
+local ChessOpening = mw.loadData('Module:ChessEco/Data')
 
-local p = {}
+local ChessEcoSetup = {}
 
-function p.sanitise(eco)
+function ChessEcoSetup.sanitise(eco)
 	if Logic.isEmpty(eco) then
 		return
 	end
 	eco = mw.text.trim(eco):upper()
-	if _ECO[eco] then
+	if ChessOpening[eco] then
 		return eco
 	end
 end
 
-function p.getName(eco, withPrefix)
-	eco = p.sanitise(eco)
-	if _ECO[eco] then
-		return withPrefix and (eco .. ': ' .. _ECO[eco]) or _ECO[eco]
+function ChessEcoSetup.getName(eco, withPrefix)
+	eco = ChessEcoSetup.sanitise(eco)
+	if ChessOpening[eco] then
+		return withPrefix and (eco .. ': ' .. ChessOpening[eco]) or ChessOpening[eco]
 	end
 end
 
-return p
+return ChessEcoSetup
