@@ -17,6 +17,8 @@ return {
 	veto = 'fas fa-times',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
+	startleft = 'fas fa-chevron-left',
+	startright = 'fas fa-chevron-right',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
