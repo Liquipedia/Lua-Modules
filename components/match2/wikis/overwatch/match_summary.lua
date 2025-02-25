@@ -17,6 +17,8 @@ local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local MAX_NUM_BANS = 1
+
 local CustomMatchSummary = {}
 
 ---@param args table
