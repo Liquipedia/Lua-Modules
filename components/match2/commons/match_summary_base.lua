@@ -168,7 +168,7 @@ function Footer:addLink(link, icon, iconDark, text)
 	return self
 end
 
----@param links table<string, string|table|nil>
+---@param links table<string, string|table>
 ---@return MatchSummaryFooter
 function Footer:addLinks(links)
 	local processLink = function(linkType, link)
