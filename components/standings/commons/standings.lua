@@ -103,7 +103,7 @@ local StandingsMT = {
 local StandingsEntryMT = {
 	__index = function(entry, property)
 		if property == 'match' then
-			entry[property] = Standings.fetchMatch(entry.record)
+			entry[property] = Standings.fetchMatch(entry)
 		end
 		return rawget(entry, property)
 	end
@@ -173,9 +173,11 @@ end
 ---@return MatchGroupUtilMatch?
 function Standings.fetchMatch(entry)
 	---@diagnostic disable-next-line: invisible
-	local matchid = entry.record.matchid
+	local matchid = entry.record.extradata.matchid
+	if not matchid then
+		return
+	end
 	local bracketId = MatchGroupUtil.splitMatchId(matchid)
-
 	if not bracketId then
 		return
 	end
