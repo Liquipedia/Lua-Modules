@@ -75,7 +75,7 @@ return {
 	title = 'StarCraft II',
 	navigation = {
 		{
-			file = 'Kelazhur IEM Shenzhen 2015.jpg',
+			file = 'Serral wins blizzcon 2.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -84,7 +84,7 @@ return {
 			},
 		},
 		{
-			file = 'Kelazhur IEM Shenzhen 2015.jpg',
+			file = 'KT120213.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -93,7 +93,7 @@ return {
 			},
 		},
 		{
-			file = 'Kelazhur IEM Shenzhen 2015.jpg',
+			file = 'WCS 2014 Stage.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
