@@ -400,7 +400,7 @@ liquipedia.battleRoyale = {
 				prop: 'text',
 				text: wikitext,
 				disabletoc: true
-			} ).done( ( data ) => {
+			} ).then( ( data ) => {
 				if ( data.parse?.text?.[ '*' ] ) {
 					element.insertAdjacentHTML( 'beforeend', data.parse.text[ '*' ] );
 					if ( callback ) {
