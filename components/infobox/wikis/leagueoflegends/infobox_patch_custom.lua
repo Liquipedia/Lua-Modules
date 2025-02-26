@@ -25,8 +25,6 @@ function CustomPatch.run(frame)
 	patch.args.release = patch.args.release or patch.args.releasedate or patch.args['release date']
 	patch:setWidgetInjector(CustomInjector(patch))
 
-	patch.getChronologyData = CustomPatch.getChronologyData
-
 	return patch:createInfobox()
 end
 
