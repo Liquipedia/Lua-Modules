@@ -37,7 +37,9 @@ liquipedia.rankingTable = {
 			}
 
 			// Store initial HTML content in cache
-			this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+			if ( this.activeSelectOption.value !== null ) {
+				this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+			}
 		} );
 	},
 
