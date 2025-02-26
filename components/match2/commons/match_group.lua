@@ -91,6 +91,12 @@ function MatchGroup.MatchPage(args)
 		-- Title format is `ID bracketID matchID`
 		local titleParts = mw.text.split(title, ' ')
 
+		-- Check if bracket is from the user namespace
+		if titleParts[2] == 'User' then
+			-- Title format for matches in user namespace is `ID User username bracketID matchID`
+			-- Return bracketID and matchID
+			return table.concat(Array.sub(titleParts, 2, 4), '_'), titleParts[5]
+		end
 		-- Return bracketID and matchID
 		return titleParts[2], titleParts[3]
 	end
