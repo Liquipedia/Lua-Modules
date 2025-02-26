@@ -81,8 +81,8 @@ return {
 		lightmode = 'Marvel Rivals full lightmode.png',
 		darkmode = 'Marvel Rivals full darkmode.png',
 	},
-	metadesc = 'Comprehensive Marvel Rivals wiki with articles covering everything from heroes and maps, to strategies, ' ..
-	'to tournaments, to competitive players, and teams.',
+	metadesc = 'Comprehensive Marvel Rivals wiki with articles covering everything from heroes and maps, ' ..
+	'to strategies, to tournaments, to competitive players, and teams.',
 	title = 'The Marvel Rivals Wiki',
 	navigation = {
 		{
