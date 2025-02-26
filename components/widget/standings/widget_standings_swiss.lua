@@ -113,7 +113,16 @@ function StandingsSwissWidget:render()
 								return HtmlWidgets.Td{}
 							end
 
+							local bgClassSuffix
+							if match.finished then
+								local winner = match.winner
+								bgClassSuffix = winner == opposingOpponentIndex and 'down' or winner == 0 or 'draw' or 'up'
+							end
+
 							return HtmlWidgets.Td{
+								classes = {
+									bgClassSuffix and ('bg-' .. bgClassSuffix) or nil,
+								},
 								children = MatchOverview{
 									match = match,
 									showOpponent = opposingOpponentIndex,
