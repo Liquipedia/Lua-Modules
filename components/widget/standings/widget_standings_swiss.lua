@@ -34,7 +34,6 @@ function StandingsSwissWidget:render()
 	---@type StandingsModel
 	local standings = self.props.standings
 	local lastRound = standings.rounds[#standings.rounds]
-	local hasFutureRounds = not standings.rounds[#standings.rounds].started
 
 	return DataTable{
 		wrapperClasses = {'standings-ffa'},
@@ -69,7 +68,7 @@ function StandingsSwissWidget:render()
 			Array.map(lastRound.opponents, function(slot)
 				local positionBackground = slot.positionStatus and ('bg-' .. slot.positionStatus) or nil
 				local teamBackground
-				if not hasFutureRounds and slot.definitiveStatus then
+				if slot.definitiveStatus then
 					teamBackground = 'bg-' .. slot.definitiveStatus
 				end
 				return HtmlWidgets.Tr{
