@@ -24,6 +24,7 @@ Config.categories = {
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
+		expandKey = "liquipediatiertype",
 	},
 	{
 		name = 'liquipediatiertype',
