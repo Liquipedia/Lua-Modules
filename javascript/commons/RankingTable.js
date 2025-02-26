@@ -81,7 +81,7 @@ liquipedia.rankingTable = {
 			uselang: 'content',
 			prop: 'text',
 			text: wikiText
-		} ).done( ( data ) => {
+		} ).then( ( data ) => {
 			if ( data.parse?.text?.[ '*' ] ) {
 				this.removeToggleButtonListeners();
 				// Insert fetched HTML content
