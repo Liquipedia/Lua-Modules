@@ -59,7 +59,7 @@ local RATINGCONFIG = {
 		{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
 	},
 	aom = {
-		{text = '[[Age of Mythology Retold|Retold]]', id = 'aomr_id', game = 'aoemr'},
+		{text = '[[Age of Mythology Retold|Retold]]', id = 'aomr_id', game = 'aomr'},
 		{text = 'Elo [[Voobly]]', id = 'aom_voobly_elo'},
 		{text = 'Elo [[Age of Mythology/Extended Edition|AoM EE]]', id = 'aom_ee_elo'},
 	}
