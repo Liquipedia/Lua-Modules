@@ -39,10 +39,10 @@ function MatchOverviewWidget:render()
 			['display'] = 'flex',
 			['justify-content'] = 'space-between',
 			['flex-direction'] = 'column',
+			['align-items'] = 'center',
 		},
 		children = {
 			HtmlWidgets.Span{
-				classes = {'match-overview-opponent'},
 				children = OpponentDisplay.BlockOpponent{
 					opponent = opponent,
 					showLink = true,
@@ -51,7 +51,9 @@ function MatchOverviewWidget:render()
 				}
 			},
 			HtmlWidgets.Span{
-				classes = {'match-overview-score'},
+				css = {
+					['font-size'] = '0.8em',
+				},
 				children = match.opponents[1].score .. ' - ' .. match.opponents[2].score,
 			},
 		},
