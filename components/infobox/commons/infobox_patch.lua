@@ -51,7 +51,7 @@ function Patch:createInfobox()
 		Title{children = (self:getInformationType(args)) .. ' Information'},
 		Cell{name = 'Version', content = {args.version}},
 		Customizable{id = 'release', children = {
-				Cell{name = 'Release', content = {args.release}},
+				Cell{name = 'Release Date', content = {args.release}},
 			}
 		},
 		Customizable{id = 'custom', children = {}},
