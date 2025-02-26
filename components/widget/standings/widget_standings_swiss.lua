@@ -107,7 +107,7 @@ function StandingsSwissWidget:render()
 							end
 
 							local opposingOpponentIndex = Array.indexOf(match.opponents, function(opponent)
-								return Opponent.same(entry.opponent, slot.opponent)
+								return not Opponent.same(entry.opponent, opponent)
 							end)
 							if not entry.match.opponents[opposingOpponentIndex] then
 								return HtmlWidgets.Td{}
