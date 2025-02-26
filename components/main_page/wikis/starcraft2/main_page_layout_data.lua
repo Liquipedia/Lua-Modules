@@ -127,6 +127,10 @@ return {
 				size = 6,
 				children = {
 					{
+						mobileOrder = 1,
+						content = CONTENT.specialEvents,
+					},
+					{
 						mobileOrder = 6,
 						content = CONTENT.thisDay,
 					},
