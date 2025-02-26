@@ -41,7 +41,7 @@ function CustomInjector:parse(widgetId, widgets)
 			widgets,
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
+			Cell{name = 'Game Version', content = {Game.name{game = args.game}}, options = {makeLink = true}},
 			Cell{name = 'Day/Night Variant', content = {args.daynight}},
 			Cell{name = 'Playlists', content = {args.playlist}}
 		)
