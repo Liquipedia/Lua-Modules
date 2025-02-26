@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Patch = Lua.import('Module:Infobox/Patch')
@@ -21,7 +22,6 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
-	patch.args.version = patch.args.version or patch.args.patch
 	patch.args.release = patch.args.release or patch.args.releasedate or patch.args['release date']
 	patch:setWidgetInjector(CustomInjector(patch))
 
@@ -41,6 +41,16 @@ function CustomInjector:parse(id, widgets)
 		}
 	end
 	return widgets
+end
+
+---Adjust Lpdb data
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomPatch:addToLpdb(lpdbData, args)
+	lpdbData.information = Logic.emptyOr(args.patch, lpdbData.information)
+
+	return lpdbData
 end
 
 ---@param args table
