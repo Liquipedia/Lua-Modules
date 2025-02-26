@@ -93,8 +93,7 @@ function MatchGroup.MatchPage(args)
 
 		-- Check if bracket is from the user namespace
 		if titleParts[2] == 'User' then
-			-- Title format for matches in user namespace is `ID User username bracketID matchID`
-			-- Return bracketID and matchID
+			-- `bracketId` for user namespace matches are `User username bracketID`
 			return table.concat(Array.sub(titleParts, 2, 4), '_'), titleParts[5]
 		end
 		-- Return bracketID and matchID
