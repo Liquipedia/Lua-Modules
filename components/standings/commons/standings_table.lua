@@ -41,7 +41,7 @@ local StandingsTable = {}
 function StandingsTable.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local tableType = args.tabletype
-	if tableType ~= 'ffa' or tableType ~= 'swiss' then
+	if tableType ~= 'ffa' and tableType ~= 'swiss' then
 		error('Unknown Standing Table Type')
 	end
 	local title = args.title
