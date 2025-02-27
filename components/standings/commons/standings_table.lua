@@ -25,11 +25,14 @@ local Opponent = OpponentLibrary.Opponent
 
 local StandingsTable = {}
 
+---@alias StandingsTableTypes 'ffa'|'swiss'
+
 ---@class Scoreboard
 ---@field points number?
+---@field match {w: integer, d: integer, l: integer}
 
 ---@class StandingTableOpponentData
----@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?}[]?
+---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?, matchId: string?}[]?
 ---@field opponent standardOpponent
 ---@field startingPoints number?
 
@@ -38,7 +41,7 @@ local StandingsTable = {}
 function StandingsTable.fromTemplate(frame)
 	local args = Arguments.getArgs(frame)
 	local tableType = args.tabletype
-	if tableType ~= 'ffa' then
+	if tableType ~= 'ffa' or tableType ~= 'swiss' then
 		error('Unknown Standing Table Type')
 	end
 	local title = args.title
@@ -52,12 +55,14 @@ function StandingsTable.fromTemplate(frame)
 	local matches = parsedData.matches
 
 	if not importScoreFromMatches then
-		return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
+		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
 	end
 
-	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, StandingsParseWiki.makeScoringFunction(args))
+	local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
+
+	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
 	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	return StandingsTable.ffa(rounds, opponents, bgs, title, matches)
+	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -93,10 +98,11 @@ end
 ---@param bgs any
 ---@param title any
 ---@param matches any
+---@param tableType StandingsTableTypes
 ---@return Widget
-function StandingsTable.ffa(rounds, opponents, bgs, title, matches)
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches)
-	StandingsStorage.run(standingsTable)
+function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType)
+	StandingsStorage.run(standingsTable, {saveVars = true})
 	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
 

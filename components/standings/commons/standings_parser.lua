@@ -16,8 +16,9 @@ local StandingsParser = {}
 ---@param bgs table<integer, string>
 ---@param title string?
 ---@param matches string[]
+---@param standingsType StandingsTableTypes
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -32,7 +33,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, scoreboardMatch
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -40,6 +41,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 				end
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
+				scoreboardMatch = thisRoundsData.scoreboard.match
 			end
 			pointSum = pointSum + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
@@ -48,6 +50,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
 				points = pointSum,
+				match = scoreboardMatch,
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
@@ -83,7 +86,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 	return {
 		standingsindex = standingsindex,
 		title = title,
-		type = 'ffa', -- We only deal with ffa atm
+		type = standingsType,
 		entries = entries,
 		matches = matches,
 		roundcount = #rounds,

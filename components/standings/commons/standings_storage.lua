@@ -55,7 +55,8 @@ local DISQUALIFIED = 'dq'
 ---@field extradata table
 
 ---@param data table
-function StandingsStorage.run(data)
+---@param options? {saveVars?: boolean}
+function StandingsStorage.run(data, options)
 	if Table.isEmpty(data) then
 		return
 	end
@@ -68,7 +69,12 @@ function StandingsStorage.run(data)
 		return StandingsStorage.entry(entry, data.standingsindex)
 	end)
 
-	StandingsStorage.save(StandingsStorage.table(data), entries)
+	if StandingsStorage.shouldStoreLpdb() then
+		StandingsStorage.saveLpdb(StandingsStorage.table(data), entries)
+	end
+	if options and options.saveVars then
+		StandingsStorage.saveVars(StandingsStorage.table(data), entries)
+	end
 end
 
 ---@param data table
@@ -128,6 +134,7 @@ function StandingsStorage.entry(entry, standingsIndex)
 		roundfinished = entry.finished,
 		placerange = entry.placerange,
 		slotindex = slotIndex,
+		matchid = entry.matchid,
 	}
 
 	local lpdbEntry = {
@@ -157,23 +164,25 @@ end
 
 ---@param standingsTable table?
 ---@param standingsEntries table[]?
-function StandingsStorage.save(standingsTable, standingsEntries)
-	if StandingsStorage.shouldStoreLpdb() then
-		if standingsTable then
-			mw.ext.LiquipediaDB.lpdb_standingstable(
-				'standingsTable_' .. standingsTable.standingsindex,
-				Json.stringifySubTables(standingsTable)
-			)
-		end
-
-		Array.forEach(standingsEntries or {}, function(entry)
-			mw.ext.LiquipediaDB.lpdb_standingsentry(
-				'standing_' .. entry.standingsindex .. '_' .. entry.roundindex .. '_' .. entry.slotindex,
-				Json.stringifySubTables(entry)
-			)
-		end)
+function StandingsStorage.saveLpdb(standingsTable, standingsEntries)
+	if standingsTable then
+		mw.ext.LiquipediaDB.lpdb_standingstable(
+			'standingsTable_' .. standingsTable.standingsindex,
+			Json.stringifySubTables(standingsTable)
+		)
 	end
 
+	Array.forEach(standingsEntries or {}, function(entry)
+		mw.ext.LiquipediaDB.lpdb_standingsentry(
+			'standing_' .. entry.standingsindex .. '_' .. entry.roundindex .. '_' .. entry.slotindex,
+			Json.stringifySubTables(entry)
+		)
+	end)
+end
+
+---@param standingsTable table?
+---@param standingsEntries table[]?
+function StandingsStorage.saveVars(standingsTable, standingsEntries)
 	if standingsTable then
 		-- We have a full standings here for storage, very simple
 		-- Entries may be supplied later
@@ -238,7 +247,9 @@ function StandingsStorage.fromTemplateHeader(frame)
 	data.roundcount = tonumber(data.roundcount) or 1
 	data.finished = Logic.readBool(data.finished)
 
-	StandingsStorage.save(StandingsStorage.table(data))
+	if StandingsStorage.shouldStoreLpdb() then
+		StandingsStorage.saveLpdb(StandingsStorage.table(data))
+	end
 end
 
 ---@param frame table
@@ -322,7 +333,9 @@ function StandingsStorage.fromTemplateEntry(frame)
 
 	data.match = {w = data.win_m, d = data.tie_m, l = data.lose_m}
 	data.game = {w = data.win_g, d = data.tie_g, l = data.lose_g}
-	StandingsStorage.save(nil, {StandingsStorage.entry(data, data.standingsindex)})
+	if StandingsStorage.shouldStoreLpdb() then
+		StandingsStorage.saveLpdb(nil, {StandingsStorage.entry(data, data.standingsindex)})
+	end
 end
 
 -- Legacy input method
