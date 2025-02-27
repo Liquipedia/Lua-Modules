@@ -222,6 +222,14 @@ function Opponent.isOpponent(opponent)
 	error('Opponent.isOpponent: Not Implemented')
 end
 
+---Check if two opponents are the same opponent
+---It's still a work in progress, it's not fully implemented all cases
+---@param opponent1 standardOpponent
+---@param opponent2 standardOpponent
+function Opponent.same(opponent1, opponent2)
+	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
+end
+
 ---Coerces an arbitary table into an opponent
 ---@param opponent table
 function Opponent.coerce(opponent)

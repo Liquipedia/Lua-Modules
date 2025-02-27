@@ -49,11 +49,15 @@ local Standings = {}
 ---@field placement string
 ---@field position integer
 ---@field points number
+---@field matchWins integer
+---@field matchLosses integer
 ---@field positionStatus string?
 ---@field definitiveStatus string?
+---@field match MatchGroupUtilMatch?
 ---@field positionChangeFromPreviousRound integer
 ---@field pointsChangeFromPreviousRound number
 ---@field specialStatus 'dq'|'nc'|'' # nc = non-competing (not in the round)
+---@field private record standingstable
 
 ---Fetches a standings table from a page. Tries to read from page variables before fetching from LPDB.
 ---@param pagename string
@@ -96,6 +100,15 @@ local StandingsMT = {
 	end
 }
 
+local StandingsEntryMT = {
+	__index = function(entry, property)
+		if property == 'match' then
+			entry[property] = Standings.fetchMatch(entry)
+		end
+		return rawget(entry, property)
+	end
+}
+
 ---@param record standingstable
 ---@param entries standingsentry[]?
 ---@return StandingsModel
@@ -127,10 +140,16 @@ function Standings.entryFromRecord(record)
 		positionStatus = record.currentstatus,
 		definitiveStatus = record.definitestatus,
 		points = record.scoreboard.points,
+		matchWins = record.scoreboard.match.w,
+		matchLosses = record.scoreboard.match.l,
 		pointsChangeFromPreviousRound = record.extradata.pointschange,
 		specialStatus = record.extradata.specialstatus or '',
 		positionChangeFromPreviousRound = tonumber(record.placementchange),
+		record = record,
 	}
+
+	-- Some properties are derived from other properies and we can calculate them when accessed.
+	setmetatable(entry, StandingsEntryMT)
 
 	return entry
 end
@@ -148,6 +167,25 @@ function Standings.fetchMatches(standings)
 	return Array.filter(allMatchesFromBrackets, function(match)
 		return Table.includes(matchids, match.matchId)
 	end)
+end
+
+---@param entry StandingsEntryModel
+---@return MatchGroupUtilMatch?
+function Standings.fetchMatch(entry)
+	---@diagnostic disable-next-line: invisible
+	local matchid = entry.record.extradata.matchid
+	if not matchid then
+		return
+	end
+	local bracketId = MatchGroupUtil.splitMatchId(matchid)
+	if not bracketId then
+		return
+	end
+
+	local allMatchesFromBrackets = MatchGroupUtil.fetchMatches(bracketId)
+	return Array.filter(allMatchesFromBrackets, function(match)
+		return match.matchId == matchid
+	end)[1]
 end
 
 ---@param standings StandingsModel
