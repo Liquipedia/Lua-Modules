@@ -63,6 +63,7 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
+	lpdbData.type = 'hero'
 	lpdbData.date = args.releasedate
 	lpdbData.extradata.releasedate = args.releasedate
 	return lpdbData
