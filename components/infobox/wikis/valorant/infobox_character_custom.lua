@@ -28,7 +28,7 @@ local CustomInjector = Class.new(Injector)
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
-	character.args.informationType = 'Agent'
+	character.args.informationType = 'Agents'
 	return character:createInfobox()
 end
 
@@ -58,12 +58,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@param args table
----@return string[]
-function CustomCharacter:getWikiCategories(args)
-	return Namespace.isMain() and { 'Agents' } or {}
 end
 
 return CustomCharacter
