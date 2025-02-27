@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Abilities'},
 			Builder{
 				builder = function()
-					local abilities = self:getAllArgsForBase(args, 'ability')
+					local abilities = self.caller:getAllArgsForBase(args, 'ability')
 					return {
 						Cell{
 							name = #abilities > 1 and 'Abilities' or 'Ability',
