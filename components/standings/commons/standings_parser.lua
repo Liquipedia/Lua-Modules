@@ -29,11 +29,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 
 	local entries = Array.flatMap(opponents, function(opponentData)
 		local opponent = opponentData.opponent
-		local pointSum = opponentData.startingPoints or 0
+		local scoreboardCarry = {
+			points = opponentData.startingPoints or 0,
+			match = {w = 0, d = 0, l = 0},
+		}
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, scoreboardMatch
+			local pointsFromRound, statusInRound, tiebreakerPoints
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -41,16 +44,18 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				end
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
-				scoreboardMatch = thisRoundsData.scoreboard.match
+				scoreboardCarry.match.w = scoreboardCarry.match.w + thisRoundsData.scoreboard.match.w
+				scoreboardCarry.match.d = scoreboardCarry.match.d + thisRoundsData.scoreboard.match.d
+				scoreboardCarry.match.l = scoreboardCarry.match.l + thisRoundsData.scoreboard.match.l
 			end
-			pointSum = pointSum + (pointsFromRound or 0)
+			scoreboardCarry.points = scoreboardCarry.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
-				points = pointSum,
-				match = scoreboardMatch,
+				points = scoreboardCarry.points,
+				match = scoreboardCarry.match,
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
