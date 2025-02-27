@@ -143,7 +143,7 @@ return {
 			},
 		},
 		{
-			file = 'Team Falcons ChiYo at the 2024 Esports World Cup.jpg',
+			file = 'SparkR OWCS Major 2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
