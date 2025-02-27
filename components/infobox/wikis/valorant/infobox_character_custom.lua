@@ -64,7 +64,6 @@ end
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
 	lpdbData.date = args.releasedate
-	lpdbData.extradata.releasedate = args.releasedate
 	return lpdbData
 end
 
