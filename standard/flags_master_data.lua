@@ -1391,6 +1391,11 @@ local data = {
 		localised = 'CIS',
 		name = 'CIS',
 	},
+	['dach'] = {
+		flag = 'File:Dach_hd.png',
+		localised = '',
+		name = 'DACH',
+	},
 	['eastasia'] = {
 		flag = 'File:East asia flag hd.png',
 		localised = 'East Asian',
@@ -2175,7 +2180,6 @@ local aliases = {
 	['usgb'] = 'englishspeaking',
 	['usuk'] = 'englishspeaking',
 	['deat'] = 'germanspeaking',
-	['dach'] = 'germanspeaking',
 	['esmx'] = 'spanishspeaking',
 	['ptbr'] = 'portuguesespeaking',
 	['ruby'] = 'russianspeaking',
