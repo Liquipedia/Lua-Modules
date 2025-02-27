@@ -134,6 +134,7 @@ function Character:setLpdbData(args)
 		name = self.name,
 		image = args.image,
 		type = 'character',
+		date = args.releasedate,
 		extradata = {},
 	}
 
