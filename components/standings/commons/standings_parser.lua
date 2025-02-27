@@ -36,7 +36,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -44,6 +44,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				end
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
+				matchId = thisRoundsData.matchId
 				scoreboardCarry.match.w = scoreboardCarry.match.w + thisRoundsData.scoreboard.match.w
 				scoreboardCarry.match.d = scoreboardCarry.match.d + thisRoundsData.scoreboard.match.d
 				scoreboardCarry.match.l = scoreboardCarry.match.l + thisRoundsData.scoreboard.match.l
@@ -60,6 +61,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
 					tiebreakerpoints = tiebreakerPoints or 0,
+					matchid = matchId,
 				}
 			}
 		end)
