@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
 local StandingsParser = {}
@@ -17,8 +18,9 @@ local StandingsParser = {}
 ---@param title string?
 ---@param matches string[]
 ---@param standingsType StandingsTableTypes
+---@param tiebreakers StandingsTiebreaker[]
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType, tiebreakers)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -70,7 +72,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	Array.forEach(rounds, function(round)
 		StandingsParser.determinePlacements(Array.filter(entries, function(opponentRound)
 			return opponentRound.roundindex == round.roundNumber
-		end))
+		end), tiebreakers)
 	end)
 	---@cast entries {opponent: standardOpponent, standingindex: integer, roundindex: integer,
 	---points: number, placement: integer?, slotindex: integer}[]
@@ -107,21 +109,48 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	}
 end
 
----@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---@param tiedOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, extradata: table}[]
-function StandingsParser.determinePlacements(opponentsInRound)
-	table.sort(opponentsInRound, function(opponent1, opponent2)
-		if opponent1.points ~= opponent2.points then
-			return opponent1.points > opponent2.points
-		end
-		return opponent1.extradata.tiebreakerpoints > opponent2.extradata.tiebreakerpoints
+---@param tiebreakers StandingsTiebreaker[]
+---@param tiebreakerIndex integer
+---@return {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---placement: integer?, slotindex: integer?, extradata: table}[][]
+local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
+	local tiebreaker = tiebreakers[tiebreakerIndex]
+	if not tiebreaker then
+		return tiedOpponents
+	end
+
+	local groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
+		return tiebreaker:valueOf(opponent)
 	end)
 
-	local lastPts = math.huge
-	Array.forEach(opponentsInRound, function(opponent, slotindex)
-		opponent.slotindex = slotindex
-		opponent.placement = lastPts == opponent.points and opponentsInRound[slotindex - 1].placement or slotindex
-		lastPts = opponent.points
+	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
+		return a > b
+	end)
+
+	return Array.flatMap(groupedOpponentsInOrder, function(group)
+		if #group > 1 then
+			return resolveTieForGroup(group, tiebreakers, tiebreakerIndex + 1)
+		end
+		return { group }
+	end)
+end
+
+---@param opponentsInRound {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---placement: integer?, slotindex: integer?, extradata: table}[]
+---@param tiebreakers StandingsTiebreaker[]
+function StandingsParser.determinePlacements(opponentsInRound, tiebreakers)
+	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, tiebreakers, 1)
+
+	local slotIndex = 1
+	Array.forEach(opponentsAfterTie, function(opponentGroup)
+		local rank = slotIndex
+		Array.forEach(opponentGroup, function(opponent)
+			opponent.placement = rank
+			opponent.slotindex = slotIndex
+			slotIndex = slotIndex + 1
+		end)
 	end)
 end
 
