@@ -48,7 +48,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		} or nil,
 		casters > 0 and {
 			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
-				return '|caster'.. casterIndex ..'='
+				return '|caster' .. casterIndex .. '='
 			end), ' ')
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
