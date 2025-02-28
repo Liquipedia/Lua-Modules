@@ -57,7 +57,9 @@ local CONTENT = {
 			'[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
-		panelAttributes = 'data-switch-group-container="countdown"',
+		panelAttributes = {
+			['data-switch-group-container'] = 'countdown',
+		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
