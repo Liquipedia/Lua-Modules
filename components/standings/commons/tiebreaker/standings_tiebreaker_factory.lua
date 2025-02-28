@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Standings/Tiebreaker/Interface
+-- page=Module:Standings/Tiebreaker/Factory
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,7 +18,7 @@ function TiebreakerFactory:valueOf(name)
 	elseif name == 'points' then
 		tiebreakerClass = require('Module:Standings/Tiebreaker/Points')
 	elseif name == 'match.diff' then
-		tiebreakerClass = require('Module:Standings/Tiebreaker/MatchDiff')
+		tiebreakerClass = require('Module:Standings/Tiebreaker/Match/Diff')
 	else
 		error("Invalid tiebreaker type: " .. tostring(name))
 	end

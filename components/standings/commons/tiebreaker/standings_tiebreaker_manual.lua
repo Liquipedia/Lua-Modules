@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Standings/Table
+-- page=Module:Standings/Tiebreaker/Manual
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
