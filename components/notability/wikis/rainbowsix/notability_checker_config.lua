@@ -25,7 +25,7 @@ Config.MAX_NUMBER_OF_PARTICIPANTS = 10
 Config.MAX_NUMBER_OF_COACHES = 5
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 600
+Config.NOTABILITY_THRESHOLD_MIN = 700
 Config.NOTABILITY_THRESHOLD_NOTABLE = 700
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
