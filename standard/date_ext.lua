@@ -8,6 +8,7 @@
 
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Ordinal = require('Module:Ordinal')
 local Variables = require('Module:Variables')
 
 --[[
@@ -160,6 +161,20 @@ end
 ---@return integer # default `0`
 function DateExt.getOffsetSeconds(offsetString)
 	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. (offsetString or '')))
+end
+
+---@param props {date: string?, ordinalSiffix: boolean?}
+---@return string|integer
+function DateExt.quarterOf(props)
+	local date = DateExt.readTimestampOrNil(props.date) or os.time()
+	local month = tonumber(os.date('%m', date))
+	local quarter = math.ceil(month / 3)
+
+	if not Logic.readBool(props.ordinalSiffix) then
+		return quarter
+	end
+
+	return quarter .. Ordinal.suffix(quarter)
 end
 
 return DateExt

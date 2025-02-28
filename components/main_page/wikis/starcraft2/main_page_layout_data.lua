@@ -6,6 +6,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local DateExt = Lua.import('Module:Date/Ext')
+
+---@return string
+local getTransferSubPage = function ()
+	return DateExt.quarterOf{ordinalSiffix = true} .. ' Quarter ' .. os.date('%Y')
+end
+
 local CONTENT = {
 	theGame = {
 		heading = 'The Game',
@@ -25,7 +34,7 @@ local CONTENT = {
 			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
 			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
 			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/{{Current term}}|edit]]&#93;</div>\n' ..
+			'&#91;[[Special:EditPage/Player Transfers/' .. getTransferSubPage() .. '|edit]]&#93;</div>\n' ..
 			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
 			'[[Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
 			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]</div>\n</div>',
