@@ -30,7 +30,7 @@ function Panel:render()
 	local heading = Div{
 		classes = { 'panel-box-heading', 'wiki-color-dark', 'wiki-backgroundcolor-light', 'wiki-bordercolor-light' },
 		attributes = self.props.heading_attributes,
-		children = Array.extend(
+		children = WidgetUtil.collect(
 			self.props['box-id'] and {
 				Div{
 					classes = { 'panel-box-heading-icon' },
@@ -61,7 +61,7 @@ function Panel:render()
 	}
 
 	return Div{
-		classes = Array.extend('panel-box', 'wiki-bordercolor-light', self.props.classes),
+		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', self.props.classes),
 		attributes = Table.merge(
 			self.props['box-id'] and {
 				['data-component'] = 'panel-box',
