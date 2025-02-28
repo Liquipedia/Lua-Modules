@@ -58,9 +58,9 @@ function StandingsTable.fromTemplate(frame)
 
 	local tiebreakers = {}
 	if tableType == 'ffa' then
-		tiebreakers = {TiebreakerFactory('points'), TiebreakerFactory('manual')}
+		tiebreakers = {TiebreakerFactory.tiebreakerFromName('points'), TiebreakerFactory.tiebreakerFromName('manual')}
 	elseif tableType == 'swiss' then
-		tiebreakers = {TiebreakerFactory('match.diff')}
+		tiebreakers = {TiebreakerFactory.tiebreakerFromName('match.diff')}
 	end
 
 	if not importScoreFromMatches then

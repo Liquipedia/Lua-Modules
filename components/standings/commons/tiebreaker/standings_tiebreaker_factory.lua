@@ -10,7 +10,7 @@ local TiebreakerFactory = {}
 
 ---@param name string
 ---@return StandingsTiebreaker
-function TiebreakerFactory:valueOf(name)
+function TiebreakerFactory.tiebreakerFromName(name)
 	---@type StandingsTiebreaker?
 	local tiebreakerClass
 	if name == 'manual' then
