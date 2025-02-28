@@ -18,6 +18,8 @@ local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
+local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
+
 local Display = Lua.import('Module:Widget/Standings')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -54,15 +56,22 @@ function StandingsTable.fromTemplate(frame)
 	local bgs = parsedData.bgs
 	local matches = parsedData.matches
 
+	local tiebreakers = {}
+	if tableType == 'ffa' then
+		tiebreakers = {TiebreakerFactory('points'), TiebreakerFactory('manual')}
+	elseif tableType == 'swiss' then
+		tiebreakers = {TiebreakerFactory('match.diff')}
+	end
+
 	if not importScoreFromMatches then
-		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
+		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 	end
 
 	local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
 
 	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
 	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
+	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -99,9 +108,10 @@ end
 ---@param title any
 ---@param matches any
 ---@param tableType StandingsTableTypes
+---@param tiebreakers StandingsTiebreaker[]
 ---@return Widget
-function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType)
+function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 	StandingsStorage.run(standingsTable, {saveVars = true})
 	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end
