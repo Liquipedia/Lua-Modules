@@ -24,7 +24,6 @@ local Panel = Class.new(Widget)
 
 ---@return string
 function Panel:render()
-
 	local boxId = self.props.boxId
 
 	local heading = Div{
