@@ -68,7 +68,7 @@ function Panel:render()
 					['data-component'] = 'panel-box',
 					['data-panel-box-id'] = self.props['box-id']
 				} or {},
-				self.props.attributes
+				self.props['panel-attributes']
 			),
 			children = WidgetUtil.collect(
 				heading, body
