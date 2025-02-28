@@ -73,7 +73,7 @@ function MainPageLayout._makeCells(cells)
 				else
 					table.insert(content, tostring(PanelWidget{
 						body = frame:preprocess(item.content.body),
-						['box-id'] = item.content.boxid,
+						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
