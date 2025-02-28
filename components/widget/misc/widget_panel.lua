@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -47,7 +46,7 @@ function Panel:render()
 	}
 
 	local body = Div{
-		classes = Array.extend(
+		classes = WidgetUtil.collect(
 			self.props['box-id'] and 'panel-box-collapsible-content' or nil,
 			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
 			self.props.bodyClass
