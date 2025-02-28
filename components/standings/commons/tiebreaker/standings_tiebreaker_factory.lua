@@ -25,7 +25,7 @@ function TiebreakerFactory.tiebreakerFromName(name)
 		error("Invalid tiebreaker type: " .. tostring(name))
 	end
 
-	return tiebreakerClass()
+	return tiebreakerClass
 end
 
 return TiebreakerFactory

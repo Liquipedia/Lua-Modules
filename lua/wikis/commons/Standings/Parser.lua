@@ -124,9 +124,8 @@ local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
 	end
 
 	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		return tiebreaker:valueOf(opponent)
+		return tiebreaker(tiedOpponents):valueOf(opponent)
 	end)
-
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
 		return a > b
@@ -145,12 +144,10 @@ end
 ---@param tiebreakers StandingsTiebreaker[]
 function StandingsParser.determinePlacements(opponentsInRound, tiebreakers)
 	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, tiebreakers, 1)
-	mw.logObject(opponentsAfterTie, 'opponentsAfterTie')
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex
 		Array.forEach(opponentGroup, function(opponent)
-			mw.log('Updating opponent', opponent.opponent.name)
 			opponent.placement = rank
 			opponent.slotindex = slotIndex
 			slotIndex = slotIndex + 1
