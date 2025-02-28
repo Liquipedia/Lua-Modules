@@ -50,7 +50,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 200,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -78,7 +78,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 100,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -106,7 +106,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 60,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -134,7 +134,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 35,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -162,7 +162,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
