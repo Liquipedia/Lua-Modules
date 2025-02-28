@@ -71,13 +71,13 @@ function MainPageLayout._makeCells(cells)
 				if item.content.noPanel then
 					table.insert(content, frame:preprocess(item.content.body))
 				else
-					table.insert(content, PanelWidget{
+					table.insert(content, tostring(PanelWidget{
 						['body'] = frame:preprocess(item.content.body),
 						['box-id'] = item.content.boxid,
 						['padding'] = item.content.padding,
 						['heading'] = item.content.heading,
 						['panel-attributes'] = item.content.panelAttributes,
-					})
+					}))
 				end
 			end
 			if item.children then

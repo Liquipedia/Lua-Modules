@@ -31,7 +31,7 @@ function Panel:render()
 		classes = { 'panel-box-heading', 'wiki-color-dark', 'wiki-backgroundcolor-light', 'wiki-bordercolor-light' },
 		attributes = self.props.heading_attributes,
 		children = Array.extend(
-			self.props.boxId and {
+			self.props['box-id'] and {
 				Div{
 					classes = { 'panel-box-heading-icon' },
 					attributes = {
@@ -49,12 +49,12 @@ function Panel:render()
 
 	local body = Div{
 		classes = Array.extend(
-			self.props.boxId and 'panel-box-collapsible-content' or nil,
+			self.props['box-id'] and 'panel-box-collapsible-content' or nil,
 			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
 			self.props.bodyClass
 		),
 		css = self.props.bodyStyle,
-		attributes = self.props.boxId and {
+		attributes = self.props['box-id'] and {
 			['data-component'] = 'panel-box-content'
 		} or {},
 		children = self.props.body
@@ -64,9 +64,9 @@ function Panel:render()
 		Div{
 			classes = Array.extend('panel-box', 'wiki-bordercolor-light', self.props.classes),
 			attributes = Table.merge(
-				self.props.boxId and {
+				self.props['box-id'] and {
 					['data-component'] = 'panel-box',
-					['data-panel-box-id'] = self.props.boxId
+					['data-panel-box-id'] = self.props['box-id']
 				} or {},
 				self.props.attributes
 			),
