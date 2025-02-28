@@ -18,6 +18,7 @@ local Template = require('Module:Template')
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local PanelWidget = Lua.import('Module:Widget/Panel')
 
 local MainPageLayout = {}
 
@@ -70,12 +71,12 @@ function MainPageLayout._makeCells(cells)
 				if item.content.noPanel then
 					table.insert(content, frame:preprocess(item.content.body))
 				else
-					table.insert(content, Template.safeExpand(frame, 'panel', {
-						['body'] = frame:preprocess(item.content.body),
-						['box-id'] = item.content.boxid,
-						['padding'] = tostring(item.content.padding),
-						['heading'] = item.content.heading,
-						['panel-attributes'] = item.content.panelAttributes,
+					table.insert(content, tostring(PanelWidget{
+						body = frame:preprocess(item.content.body),
+						boxId = item.content.boxid,
+						padding = item.content.padding,
+						heading = item.content.heading,
+						panelAttributes = item.content.panelAttributes,
 					}))
 				end
 			end
