@@ -25,11 +25,13 @@ local Panel = Class.new(Widget)
 ---@return string
 function Panel:render()
 
+	local boxId = self.props.boxId
+
 	local heading = Div{
 		classes = { 'panel-box-heading', 'wiki-color-dark', 'wiki-backgroundcolor-light', 'wiki-bordercolor-light' },
 		attributes = self.props.headingAttributes,
 		children = WidgetUtil.collect(
-			self.props.boxId and {
+			boxId and {
 				Div{
 					classes = { 'panel-box-heading-icon' },
 					attributes = {
@@ -47,12 +49,12 @@ function Panel:render()
 
 	local body = Div{
 		classes = WidgetUtil.collect(
-			self.props.boxId and 'panel-box-collapsible-content' or nil,
+			boxId and 'panel-box-collapsible-content' or nil,
 			Logic.readBool(self.props.padding) and 'panel-box-body' or nil,
 			self.props.bodyClass
 		),
 		css = self.props.bodyStyle,
-		attributes = self.props.boxId and {
+		attributes = boxId and {
 			['data-component'] = 'panel-box-content'
 		} or {},
 		children = self.props.body
@@ -61,9 +63,9 @@ function Panel:render()
 	return Div{
 		classes = WidgetUtil.collect('panel-box', 'wiki-bordercolor-light', self.props.classes),
 		attributes = Table.merge(
-			self.props.boxId and {
+			boxId and {
 				['data-component'] = 'panel-box',
-				['data-panel-box-id'] = self.props.boxId
+				['data-panel-box-id'] = boxId
 			} or {},
 			self.props.panelAttributes
 		),
