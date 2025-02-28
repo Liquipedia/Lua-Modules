@@ -42,6 +42,7 @@ local CONTENT = {
 			'text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
+		panelAttributes = 'data-switch-group-container="countdown"',
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -95,11 +96,11 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::hero]]',
+				conditions = '[[type::character]]',
 			},
 		},
 		{
-			file = 'Stalk3r OWCS Finals 2024.jpeg',
+			file = 'EDward Gaming VALORANT Masters Shanghai 2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {

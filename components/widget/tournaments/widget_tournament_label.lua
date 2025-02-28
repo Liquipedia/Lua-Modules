@@ -18,13 +18,13 @@ local DateRange = Lua.import('Module:Widget/Misc/DateRange')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local TierPill = Lua.import('Module:Widget/Tournament/TierPill')
 
----@class TournamentsTickerWidget: Widget
----@operator call(table): TournamentsTickerWidget
+---@class TournamentsTickerLabelWidget: Widget
+---@operator call(table): TournamentsTickerLabelWidget
 
-local TournamentsTickerWidget = Class.new(Widget)
+local TournamentsTickerLabelWidget = Class.new(Widget)
 
 ---@return Widget?
-function TournamentsTickerWidget:render()
+function TournamentsTickerLabelWidget:render()
 	local tournament = self.props.tournament
 	if not tournament then
 		return
@@ -86,4 +86,4 @@ function TournamentsTickerWidget:render()
 	}
 end
 
-return TournamentsTickerWidget
+return TournamentsTickerLabelWidget

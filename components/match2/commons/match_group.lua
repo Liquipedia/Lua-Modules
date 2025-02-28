@@ -91,8 +91,11 @@ function MatchGroup.MatchPage(args)
 		-- Title format is `ID bracketID matchID`
 		local titleParts = mw.text.split(title, ' ')
 
-		-- Return bracketID and matchID
-		return titleParts[2], titleParts[3]
+		-- `bracketID` may contain prefixes when used in non-mainspace
+		local bracketID = table.concat(Array.sub(titleParts, 2, -2), '_')
+		local matchID = titleParts[#titleParts]
+
+		return bracketID, matchID
 	end
 
 	local bracketId, matchId = getBracketIdFromPage()

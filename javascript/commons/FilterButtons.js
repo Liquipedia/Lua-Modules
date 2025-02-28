@@ -332,7 +332,7 @@ liquipedia.filterButtons = {
 					uselang: 'content',
 					prop: 'text',
 					text: wikitext
-				} ).done( ( data ) => {
+				} ).then( ( data ) => {
 					if ( data.parse?.text?.[ '*' ] ) {
 						templateExpansion.element.innerHTML = data.parse.text[ '*' ];
 						templateExpansion.cache[ wikitext ] = data.parse.text[ '*' ];

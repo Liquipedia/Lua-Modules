@@ -75,6 +75,7 @@ function MainPageLayout._makeCells(cells)
 						['box-id'] = item.content.boxid,
 						['padding'] = tostring(item.content.padding),
 						['heading'] = item.content.heading,
+						['panel-attributes'] = item.content.panelAttributes,
 					}))
 				end
 			end

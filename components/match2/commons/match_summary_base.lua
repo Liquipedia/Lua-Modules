@@ -552,13 +552,14 @@ end
 
 ---@param games table[]
 ---@param maxNumberOfBans integer
----@return {[1]: string[], [2]: string[]}[]
+---@return {[1]: string[], [2]: string[], start: integer?}[]
 function MatchSummary.buildCharacterBanData(games, maxNumberOfBans)
 	return Array.map(games, function(game)
 		local extradata = game.extradata or {}
 		return {
 			MatchSummary.buildCharacterList(extradata, 'team1ban', maxNumberOfBans),
 			MatchSummary.buildCharacterList(extradata, 'team2ban', maxNumberOfBans),
+			start = extradata.banstart,
 		}
 	end)
 end

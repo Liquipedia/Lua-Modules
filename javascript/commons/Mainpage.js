@@ -28,7 +28,7 @@ liquipedia.mainpage = {
 				page: 'Liquipedia:This_day/' + month + '/' + day,
 				disablelimitreport: true,
 				format: 'json'
-			} ).done( ( data ) => {
+			} ).then( ( data ) => {
 				liquipedia.mainpage.useData( data, month, day );
 			} );
 		} );

@@ -5,7 +5,7 @@
 Lua Modules are an integral part of Liquipedia. They allow for more complex logic for rendering elements. The website supports adding and editing these modules straight from the browser. For more complex modules however, a more integrated developer environment has been requested by several users. To provide in this need this github repository has been constructed.
 Any modules added in this repository will, after a review process, be added to the modules and templates of the website.
 
-**Note:** Modules in this repository are only a subset off those on the website. Any 'duplicates' on the website will be overwritten by those in this repository.
+**Note:** Modules in this repository are only a subset of those on the website. Any 'duplicates' on the website will be overwritten by those in this repository.
 
 ## Contributing
 

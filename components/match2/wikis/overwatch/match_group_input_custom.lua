@@ -6,10 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
+local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
@@ -83,5 +85,20 @@ function MapFunctions.computeOpponentScore(props, autoScore)
 end
 
 
+---@param match table
+---@param game table
+---@param opponents table[]
+---@return table?
+function MapFunctions.getExtraData(match, game, opponents)
+	local banStart = tonumber(game.banstart)
+	assert(banStart == 1 or banStart == 2 or not banStart, 'Invalid "|banstart="')
+
+	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
+	return {
+		team1ban1 = getCharacterName(game.t1b1),
+		team2ban1 = getCharacterName(game.t2b1),
+		banstart = banStart,
+	}
+end
 
 return CustomMatchGroupInput

@@ -57,6 +57,7 @@ local CONTENT = {
 			'[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
+		panelAttributes = 'data-switch-group-container="countdown"',
 	},
 	tournaments = {
 		heading = 'Tournaments',
@@ -68,8 +69,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch-logo-lightmode.svg',
-		darkmode = 'Overwatch-logo-darkmode.svg',
+		lightmode = 'Overwatch 2 full lightmode.png',
+		darkmode = 'Overwatch 2 full darkmode.png',
 	},
 	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
 		'to competitive players and teams.',
