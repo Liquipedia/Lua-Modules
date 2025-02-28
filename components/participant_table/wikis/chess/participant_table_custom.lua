@@ -36,7 +36,7 @@ function CustomParticipantTable:displayEntry(entry, additionalProps)
 	additionalProps = additionalProps or {}
 
 	-- Get players' rating.
-	Array.forEach(entry.opponent.players, function (player, _)
+	Array.forEach(entry.opponent.players, function (player)
 		if Logic.isNotEmpty(player.pageName) then
 			local ratingIds = Ratings.playerIds(player.pageName)
 			local rating = Ratings.getTournament(ratingIds)
