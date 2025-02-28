@@ -47,9 +47,11 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 				matchId = thisRoundsData.matchId
-				scoreboardCarry.match.w = scoreboardCarry.match.w + thisRoundsData.scoreboard.match.w
-				scoreboardCarry.match.d = scoreboardCarry.match.d + thisRoundsData.scoreboard.match.d
-				scoreboardCarry.match.l = scoreboardCarry.match.l + thisRoundsData.scoreboard.match.l
+				if thisRoundsData.scoreboard.match then
+					scoreboardCarry.match.w = scoreboardCarry.match.w + thisRoundsData.scoreboard.match.w
+					scoreboardCarry.match.d = scoreboardCarry.match.d + thisRoundsData.scoreboard.match.d
+					scoreboardCarry.match.l = scoreboardCarry.match.l + thisRoundsData.scoreboard.match.l
+				end
 			end
 			scoreboardCarry.points = scoreboardCarry.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
@@ -121,19 +123,20 @@ local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
 		return tiedOpponents
 	end
 
-	local groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
+	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
 		return tiebreaker:valueOf(opponent)
 	end)
+
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
 		return a > b
 	end)
 
-	return Array.flatMap(groupedOpponentsInOrder, function(group)
-		if #group > 1 then
-			return resolveTieForGroup(group, tiebreakers, tiebreakerIndex + 1)
+	return Array.map(groupedOpponentsInOrder, function(group)
+		if #group == 1 then
+			return group
 		end
-		return { group }
+		return resolveTieForGroup(group, tiebreakers, tiebreakerIndex + 1)
 	end)
 end
 
@@ -142,11 +145,12 @@ end
 ---@param tiebreakers StandingsTiebreaker[]
 function StandingsParser.determinePlacements(opponentsInRound, tiebreakers)
 	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, tiebreakers, 1)
-
+	mw.logObject(opponentsAfterTie, 'opponentsAfterTie')
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex
 		Array.forEach(opponentGroup, function(opponent)
+			mw.log('Updating opponent', opponent.opponent.name)
 			opponent.placement = rank
 			opponent.slotindex = slotIndex
 			slotIndex = slotIndex + 1
