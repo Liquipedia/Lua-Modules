@@ -183,15 +183,21 @@ end
 ---@param tableType StandingsTableTypes
 ---@return StandingsTiebreaker[]
 function StandingsParseWiki.parseTiebreakers(args, tableType)
+	local tiebreakerInput = Json.parseIfString(args.tiebreakers) or {}
 	local tiebreakers = {}
-	for _, tiebreaker in ipairs(args.tiebreakers or {}) do
+	for _, tiebreaker in ipairs(tiebreakerInput) do
 		table.insert(tiebreakers, TiebreakerFactory.tiebreakerFromName(tiebreaker))
 	end
 	if #tiebreakers == 0 then
 		if tableType == 'ffa' then
-			tiebreakers = {TiebreakerFactory.tiebreakerFromName('points'), TiebreakerFactory.tiebreakerFromName('manual')}
+			tiebreakers = {
+				TiebreakerFactory.tiebreakerFromName('points'),
+				TiebreakerFactory.tiebreakerFromName('manual'),
+			}
 		elseif tableType == 'swiss' then
-			tiebreakers = {TiebreakerFactory.tiebreakerFromName('match.diff')}
+			tiebreakers = {
+				TiebreakerFactory.tiebreakerFromName('match.diff'),
+			}
 		end
 	end
 	return tiebreakers
