@@ -303,6 +303,10 @@ function SquadAuto:_selectHistoryEntries(entries)
                 mw.log("Invalid transfer history for player " .. entry.pagename)
                 mw.logObject(entry, "Invalid entry: Missing previous JOIN")
             end
+
+            --TODO: add/merge entry with currentEntry
+            --Add currentEntry to history
+            --Reset currentEntry
         end
 
         return history
