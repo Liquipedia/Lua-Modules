@@ -120,7 +120,7 @@ end
 local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
 	local tiebreaker = tiebreakers[tiebreakerIndex]
 	if not tiebreaker then
-		return tiedOpponents
+		return { tiedOpponents }
 	end
 
 	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
@@ -136,7 +136,7 @@ local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
 		if #group == 1 then
 			return group
 		end
-		return resolveTieForGroup(group, tiebreakers, tiebreakerIndex + 1)
+		return Array.flatten(resolveTieForGroup(group, tiebreakers, tiebreakerIndex + 1))
 	end)
 end
 
