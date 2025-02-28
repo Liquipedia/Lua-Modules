@@ -111,7 +111,7 @@ return {
 			},
 		},
 		{
-			file = 'Kelazhur IEM Shenzhen 2015.jpg',
+			file = 'WCSFall19 player handshake.jpg',
 			title = 'Transfers',
 			link = 'Portal:Player transfers',
 			count = {
@@ -120,7 +120,7 @@ return {
 			},
 		},
 		{
-			file = 'Kelazhur IEM Shenzhen 2015.jpg',
+			file = 'Blizzcon2019 WCS2 catsers analyzing.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
