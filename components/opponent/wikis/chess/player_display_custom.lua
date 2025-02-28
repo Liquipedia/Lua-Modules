@@ -31,49 +31,13 @@ local CustomPlayerDisplay = Table.copy(PlayerDisplay)
 ---@return Html
 function CustomPlayerDisplay.BlockPlayer(props)
 	local player = props.player
-
-	local nameNode = mw.html.create(props.dq and 's' or 'span')
-		:wikitext(
-			props.abbreviateTbd and Opponent.playerIsTbd(player) and TBD_ABBREVIATION
-			or props.showLink ~= false and player.pageName
-			and '[[' .. player.pageName .. '|' .. player.displayName .. ']]'
-			or Logic.emptyOr(player.displayName, ZERO_WIDTH_SPACE)
-		)
-	DisplayUtil.applyOverflowStyles(nameNode, props.overflow or 'ellipsis')
-
-	if props.note then
-		nameNode = mw.html.create('span'):addClass('name')
-			:node(nameNode)
-			:tag('sup'):addClass('note'):wikitext(props.note):done()
-	else
-		nameNode:addClass('name')
-	end
-
-	local flagNode
-	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
-	end
-
-	local ratingNode = mw.html.create()
+	local ratingNode
 	if Logic.isNotEmpty(player.rating) then
-		ratingNode:node(
-			mw.html.create('small'):wikitext(player.rating)
-		)
+		ratingNode = mw.html.create('small'):wikitext(player.rating)
 	end
-
-	local teamNode
-	if props.showPlayerTeam and player.team and player.team:lower() ~= 'tbd' then
-		teamNode = mw.html.create('span')
-			:wikitext('&nbsp;')
-			:node(mw.ext.TeamTemplate.teampart(player.team))
-	end
-
-	return mw.html.create('div'):addClass('block-player starcraft-block-player')
-		:addClass(props.flip and 'flipped' or nil)
-		:addClass(props.showPlayerTeam and 'has-team' or nil)
-		:node(flagNode)
-		:node(nameNode)
-		:node(teamNode)
+	local display = PlayerDisplay.BlockPlayer(props)
+	return display
+		:addClass('starcraft-block-player')
 		:node(ratingNode)
 end
 
