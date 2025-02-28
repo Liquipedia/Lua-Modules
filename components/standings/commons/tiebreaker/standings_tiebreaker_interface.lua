@@ -11,8 +11,11 @@ local Class = require('Module:Class')
 ---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, extradata: table}
 
 ---@class StandingsTiebreaker
----@field valueOf fun(self, opponent1: TiebreakerOpponent): integer
-local StandingsTiebreaker = Class.new()
+---@field state table # The state of the league
+---@field valueOf fun(self, opponent: TiebreakerOpponent): integer
+local StandingsTiebreaker = Class.new(function (self, state)
+	self.state = state
+end)
 
 ---@param opponent TiebreakerOpponent
 ---@return integer
