@@ -212,7 +212,7 @@ Config.weights = {
 -- a first placement should score more than a 10th placement.
 -- See also the EXTRA_DROP_OFF_TYPES.
 function Config.placementDropOffFunction(tier, tierType)
-	-- modnotability can be found here: https://liquipedia.net/rainbowsix/Liquipedia:Qualifier_Notability_Points
+	-- notability can be found here: https://liquipedia.net/rainbowsix/Liquipedia:Qualifier_Notability_Points
 	if tierType ~= nil and Table.includes(Config.EXTRA_DROP_OFF_TYPES, tierType:lower()) then
 		return function(score, placement) return score / (placement * placement) end
 	end
