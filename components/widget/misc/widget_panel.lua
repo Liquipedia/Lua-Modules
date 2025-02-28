@@ -60,21 +60,20 @@ function Panel:render()
 		children = self.props.body
 	}
 
-	return Fragment{children = {
-		Div{
-			classes = Array.extend('panel-box', 'wiki-bordercolor-light', self.props.classes),
-			attributes = Table.merge(
-				self.props['box-id'] and {
-					['data-component'] = 'panel-box',
-					['data-panel-box-id'] = self.props['box-id']
-				} or {},
-				self.props.panelAttributes
-			),
-			children = WidgetUtil.collect(
-				heading, body
-			)
-		},
-	}}
+	return Div{
+		classes = Array.extend('panel-box', 'wiki-bordercolor-light', self.props.classes),
+		attributes = Table.merge(
+			self.props['box-id'] and {
+				['data-component'] = 'panel-box',
+				['data-panel-box-id'] = self.props['box-id']
+			} or {},
+			self.props.panelAttributes
+		),
+		children = WidgetUtil.collect(
+			heading, body
+		)
+	}
+
 end
 
 return Panel
