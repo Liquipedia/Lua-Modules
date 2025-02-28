@@ -78,9 +78,18 @@ liquipedia.countdown = {
 		} );
 	},
 	toggleCountdowns: function ( isCountdownToggled ) {
-		liquipedia.countdown.timerObjectNodes.forEach( ( timerObjectNode ) => {
-			timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
-			timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+		// Get all countdown toggle containers, if no container exists fall back to the body
+		let containers = document.querySelectorAll( '[data-switch-group-container="countdown"]' );
+		if ( containers.length === 0 ) {
+			containers = document.querySelectorAll( 'body' );
+		}
+		containers.forEach( ( container ) => {
+			// Find countdown nodes live so we don't run into issues with injected timer nodes
+			const timerObjectNodes = container.querySelectorAll( '.timer-object' );
+			timerObjectNodes.forEach( ( timerObjectNode ) => {
+				timerObjectNode.querySelector( '.timer-object-date' ).classList.toggle( this.timerHiddenClass, isCountdownToggled );
+				timerObjectNode.querySelector( '.timer-object-countdown' ).classList.toggle( this.timerHiddenClass, !isCountdownToggled );
+			} );
 		} );
 	},
 	parseTimerObjectNodeToDateObj: function ( timerObjectNode ) {
