@@ -32,6 +32,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local showScore = Logic.nilOr(Logic.readBoolOrNil(args.score), bestof == 0)
 	local bans = Logic.readBool(args.bans)
+	local casters = tonumber(args.casters) or 0
 
 	local lines = Array.extend(
 		'{{Match|patch=',
@@ -44,6 +45,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			INDENT .. '|twitch= |youtube=',
 			(Logic.readBool(args.reddit) and INDENT .. '|reddit= |gol=' or nil),
 			INDENT .. '|mvp='
+		} or nil,
+		casters > 0 and {
+			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
+				return '|caster'.. casterIndex ..'='
+			end), ' ')
 		} or nil,
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|vodgame'.. mapIndex ..'='
