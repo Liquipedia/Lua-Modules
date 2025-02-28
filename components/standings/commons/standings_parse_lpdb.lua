@@ -16,17 +16,9 @@ local Opponent = OpponentLibraries.Opponent
 local StandingsParseLpdb = {}
 
 ---@param rounds {roundNumber: integer, matches: string[]}[]
----@param scoreMapper? fun(opponent: match2opponent): number?
+---@param scoreMapper fun(opponent: match2opponent): number|nil
 ---@return StandingTableOpponentData[]
 function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
-	if not scoreMapper then
-		scoreMapper = function(opponent)
-			if opponent.status == 'S' then
-				return tonumber(opponent.score)
-			end
-			return nil
-		end
-	end
 	local matchIds = Array.flatMap(rounds, function(round)
 		return round.matches
 	end)
@@ -80,8 +72,14 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 				return {
 					scoreboard = {
 						points = roundData.scoreboard.points,
+						match = {
+							w = roundData.scoreboard.match.w or 0,
+							l = roundData.scoreboard.match.l or 0,
+							d = roundData.scoreboard.match.d or 0,
+						},
 					},
 					specialstatus = roundData.specialstatus or 'nc',
+					matchId = roundData.matchId
 				}
 			end)
 		}
@@ -96,7 +94,9 @@ function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
 		opponent = opponentData,
 		rounds = Array.map(Array.range(1, maxRounds), function()
 			return {
-				scoreboard = {},
+				scoreboard = {
+					match = {w = 0, d = 0, l = 0},
+				},
 			}
 		end)
 	}
@@ -118,12 +118,16 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 			table.insert(opponents, standingsOpponentData)
 		end
 		assert(standingsOpponentData.rounds[roundNumber], 'Round number out of bounds')
+
 		local opponentRoundData = standingsOpponentData.rounds[roundNumber]
 		local points = scoreMapper(opponent)
 		if points then
 			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
 		end
 		opponentRoundData.specialstatus = ''
+		opponentRoundData.matchId = match.match2id
+		local matchResult = match.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
+		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end
 

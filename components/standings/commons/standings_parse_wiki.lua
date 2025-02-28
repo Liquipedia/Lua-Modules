@@ -151,16 +151,29 @@ function StandingsParseWiki.parseWikiBgs(input)
 	return statusParsed
 end
 
+---@param tabletype StandingsTableTypes
 ---@param args table
----@return (fun(opponent: match2opponent): number)|nil
-function StandingsParseWiki.makeScoringFunction(args)
-	if not args['p1'] then
-		return nil
+---@return fun(opponent: match2opponent): number|nil
+function StandingsParseWiki.makeScoringFunction(tabletype, args)
+	if tabletype == 'ffa' then
+		if not args['p1'] then
+			return function(opponent)
+				if opponent.status == 'S' then
+					return tonumber(opponent.score)
+				end
+				return nil
+			end
+		end
+		return function(opponent)
+			local scoreFromPlacement = tonumber(args['p' .. opponent.placement])
+			return scoreFromPlacement or 0
+		end
+	elseif tabletype == 'swiss' then
+		return function(opponent)
+			return opponent.placement == 1 and 1 or 0
+		end
 	end
-	return function(opponent)
-		local scoreFromPlacement = tonumber(args['p' .. opponent.placement])
-		return scoreFromPlacement or 0
-	end
+	error('Unknown table type')
 end
 
 return StandingsParseWiki

@@ -16,8 +16,9 @@ local StandingsParser = {}
 ---@param bgs table<integer, string>
 ---@param title string?
 ---@param matches string[]
+---@param standingsType StandingsTableTypes
 ---@return StandingsTableStorage
-function StandingsParser.parse(rounds, opponents, bgs, title, matches)
+function StandingsParser.parse(rounds, opponents, bgs, title, matches, standingsType)
 	-- TODO: When all legacy (of all standing type) have been converted, the wiki variable should be updated
 	-- to follow the namespace format. Eg new name could be `standings_standingsindex`
 	local lastStandingsIndex = tonumber(Variables.varDefault('standingsindex')) or -1
@@ -28,11 +29,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 
 	local entries = Array.flatMap(opponents, function(opponentData)
 		local opponent = opponentData.opponent
-		local pointSum = opponentData.startingPoints or 0
+		local scoreboardCarry = {
+			points = opponentData.startingPoints or 0,
+			match = {w = 0, d = 0, l = 0},
+		}
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -40,18 +44,24 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 				end
 				statusInRound = thisRoundsData.specialstatus
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
+				matchId = thisRoundsData.matchId
+				scoreboardCarry.match.w = scoreboardCarry.match.w + thisRoundsData.scoreboard.match.w
+				scoreboardCarry.match.d = scoreboardCarry.match.d + thisRoundsData.scoreboard.match.d
+				scoreboardCarry.match.l = scoreboardCarry.match.l + thisRoundsData.scoreboard.match.l
 			end
-			pointSum = pointSum + (pointsFromRound or 0)
+			scoreboardCarry.points = scoreboardCarry.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
-				points = pointSum,
+				points = scoreboardCarry.points,
+				match = scoreboardCarry.match,
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
 					tiebreakerpoints = tiebreakerPoints or 0,
+					matchid = matchId,
 				}
 			}
 		end)
@@ -83,7 +93,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches)
 	return {
 		standingsindex = standingsindex,
 		title = title,
-		type = 'ffa', -- We only deal with ffa atm
+		type = standingsType,
 		entries = entries,
 		matches = matches,
 		roundcount = #rounds,
