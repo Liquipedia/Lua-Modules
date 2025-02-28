@@ -18,8 +18,6 @@ local StandingsParseLpdb = Lua.import('Module:Standings/Parse/Lpdb')
 local StandingsParser = Lua.import('Module:Standings/Parser')
 local StandingsStorage = Lua.import('Module:Standings/Storage')
 
-local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
-
 local Display = Lua.import('Module:Widget/Standings')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -56,12 +54,7 @@ function StandingsTable.fromTemplate(frame)
 	local bgs = parsedData.bgs
 	local matches = parsedData.matches
 
-	local tiebreakers = {}
-	if tableType == 'ffa' then
-		tiebreakers = {TiebreakerFactory.tiebreakerFromName('points'), TiebreakerFactory.tiebreakerFromName('manual')}
-	elseif tableType == 'swiss' then
-		tiebreakers = {TiebreakerFactory.tiebreakerFromName('match.diff')}
-	end
+	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
 
 	if not importScoreFromMatches then
 		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)

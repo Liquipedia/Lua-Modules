@@ -10,10 +10,13 @@ local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
+
+local TiebreakerFactory = Lua.import('Module:Standings/Tiebreaker/Factory')
 
 local StandingsParseWiki = {}
 
@@ -174,6 +177,24 @@ function StandingsParseWiki.makeScoringFunction(tabletype, args)
 		end
 	end
 	error('Unknown table type')
+end
+
+---@param args table
+---@param tableType StandingsTableTypes
+---@return StandingsTiebreaker[]
+function StandingsParseWiki.parseTiebreakers(args, tableType)
+	local tiebreakers = {}
+	for _, tiebreaker in ipairs(args.tiebreakers or {}) do
+		table.insert(tiebreakers, TiebreakerFactory.tiebreakerFromName(tiebreaker))
+	end
+	if #tiebreakers == 0 then
+		if tableType == 'ffa' then
+			tiebreakers = {TiebreakerFactory.tiebreakerFromName('points'), TiebreakerFactory.tiebreakerFromName('manual')}
+		elseif tableType == 'swiss' then
+			tiebreakers = {TiebreakerFactory.tiebreakerFromName('match.diff')}
+		end
+	end
+	return tiebreakers
 end
 
 return StandingsParseWiki
