@@ -16,7 +16,6 @@ local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Fragment = HtmlWidgets.Fragment
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class Panel: Widget
