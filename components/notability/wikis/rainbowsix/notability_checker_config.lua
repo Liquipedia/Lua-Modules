@@ -25,7 +25,7 @@ Config.MAX_NUMBER_OF_PARTICIPANTS = 10
 Config.MAX_NUMBER_OF_COACHES = 5
 
 -- These are the notability thresholds needed by a team/player
-Config.NOTABILITY_THRESHOLD_MIN = 600
+Config.NOTABILITY_THRESHOLD_MIN = 700
 Config.NOTABILITY_THRESHOLD_NOTABLE = 700
 
 -- These are all the liquipediatiertypes which should be extra "penalised"
@@ -50,7 +50,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 200,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -78,7 +78,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 100,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -106,7 +106,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 60,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -134,7 +134,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 35,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -162,7 +162,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 15,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -212,8 +212,7 @@ Config.weights = {
 -- a first placement should score more than a 10th placement.
 -- See also the EXTRA_DROP_OFF_TYPES.
 function Config.placementDropOffFunction(tier, tierType)
-	-- R6 is currently setting 0 points for the EXTRA_DROP_OFF types
-	-- but have plans to add points for them once modnotability is added on the wiki
+	-- notability can be found here: https://liquipedia.net/rainbowsix/Liquipedia:Qualifier_Notability_Points
 	if tierType ~= nil and Table.includes(Config.EXTRA_DROP_OFF_TYPES, tierType:lower()) then
 		return function(score, placement) return score / (placement * placement) end
 	end
