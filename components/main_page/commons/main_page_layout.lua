@@ -8,7 +8,6 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Grid = require('Module:Grid')
 local Image = require('Module:Image')
 local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
