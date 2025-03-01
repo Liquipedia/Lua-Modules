@@ -55,7 +55,7 @@ function MainPageLayout.make(frame)
 							},
 							HtmlWidgets.Div{
 								classes = {'logo--dark-theme'},
-								children = { Image.display(WikiData.banner.darkmodemode, nil, {size = 200, link = ''}) }
+								children = { Image.display(WikiData.banner.darkmode, nil, {size = 200, link = ''}) }
 							}
 						},
 					},
