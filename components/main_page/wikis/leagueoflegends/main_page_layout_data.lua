@@ -7,8 +7,15 @@
 --
 
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 
+local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Fragment = HtmlWidgets.Fragment
+local Span = HtmlWidgets.Span
 
 local CONTENT = {
 	usefulArticles = {
@@ -79,11 +86,36 @@ local CONTENT = {
 	},
 	headlines = {
 		heading = 'Headlines',
-		body = '{{ExternalMediaList|subject=!|limit=4}}' ..
-			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px; font-size:15px; font-style:italic;">' ..
-			'[[Portal:News|See all Headlines]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:FormEdit/ExternalMediaLinks|Add a Headline]]</div></div>',
+		body = Fragment{
+			children = {
+				ExternalMediaList.get({ subject = '!', limit = 4 }),
+				Div{
+					css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
+					children = {
+						Div{
+							css = {
+								['white-space'] = 'nowrap',
+								display = 'inline',
+								margin = '0 10px',
+								['font-size'] = '15px',
+								['font-style'] = 'italic',
+							},
+							children = {
+								Page.makeInternalLink('See all Headlines', 'Portal:News'),
+								Span{
+									css = {
+										['font-style'] = 'normal',
+										['padding'] = '0 5px',
+									},
+									children = { '&#8226;' }
+								},
+								Page.makeInternalLink('Add a Headline', 'Special:FormEdit/ExternalMediaLinks')
+							}
+						}
+					}
+				}
+			}
+		},
 		padding = true,
 		boxid = 1511,
 	},
