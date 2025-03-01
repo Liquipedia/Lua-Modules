@@ -18,6 +18,7 @@ local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Span = HtmlWidgets.Span
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CENTER_DOT = Span{
 	css = {
@@ -32,52 +33,49 @@ local CENTER_DOT = Span{
 ---@field props table<string, any>
 local TransfersList = Class.new(Widget)
 
----@return WidgetHtml
 function TransfersList:render()
-	return Fragment {
-		children = {
-			TransferList { limit = self.props.limit or 15 }:fetch():create(),
-			Div {
-				css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
-				children = {
-					Div {
-						css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
-						children = { Link { children = 'Back to top', link = '#Top' } }
-					},
-					Div {
-						classes = { 'plainlinks', 'smalledit' },
-						css = { display = 'inline', float = 'right' },
-						children = {
-							'&#91;',
-								Link {
-								children = 'edit',
-								link = 'Special:EditPage/' .. self.props.transferPage()
-							},
-							'&#93;'
+	return WidgetUtil.collect(
+		TransferList { limit = self.props.limit or 15 }:fetch():create(),
+		Div {
+			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
+			children = {
+				Div {
+					css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
+					children = { Link { children = 'Back to top', link = '#Top' } }
+				},
+				Div {
+					classes = { 'plainlinks', 'smalledit' },
+					css = { display = 'inline', float = 'right' },
+					children = {
+						'&#91;',
+							Link {
+							children = 'edit',
+							link = 'Special:EditPage/' .. self.props.transferPage()
 						},
+						'&#93;'
 					},
-					Div {
-						css = {
-							['white-space'] = 'nowrap',
-							display = 'inline',
-							margin = '0 10px',
-							['font-size'] = '15px',
-							['font-style'] = 'italic'
-						},
-						children = {
-							Link { children = 'See more transfers', link = 'Portal:Transfers' },
-							CENTER_DOT,
-							Link { children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
-							CENTER_DOT,
-							Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
-							Logic.readBool(self.props.rumours) and CENTER_DOT or nil,
-							Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil,
-						}
+				},
+				Div {
+					css = {
+						['white-space'] = 'nowrap',
+						display = 'inline',
+						margin = '0 10px',
+						['font-size'] = '15px',
+						['font-style'] = 'italic'
 					},
-				}
+					children = {
+						Link { children = 'See more transfers', link = 'Portal:Transfers' },
+						CENTER_DOT,
+						Link { children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
+						CENTER_DOT,
+						Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
+						Logic.readBool(self.props.rumours) and CENTER_DOT or nil,
+						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil,
+					}
+				},
 			}
 		}
-	}
+	)
 end
 
 return TransfersList
