@@ -15,6 +15,8 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
+local GridContainer = Lua.import('Module:Widget/Grid/Container')
+local GridCell = Lua.import('Module:Widget/Grid/Cell')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local PanelWidget = Lua.import('Module:Widget/Panel')
@@ -65,18 +67,17 @@ function MainPageLayout.make(frame)
 				classes = {'navigation-cards'},
 				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
 			},
-			table.concat(MainPageLayout._makeCells(layout)),
+			MainPageLayout._makeCells(layout),
 		},
 	}
 end
 
 ---@param cells table[]
----@return string[]
+---@return Widget
 function MainPageLayout._makeCells(cells)
 	local frame = mw.getCurrentFrame()
 	local output = {}
 
-	table.insert(output, Grid._start_grid{})
 	for _, column in ipairs(cells) do
 		local cellContent = {}
 		for _, item in ipairs(column.children) do
@@ -86,24 +87,24 @@ function MainPageLayout._makeCells(cells)
 				if item.content.noPanel then
 					table.insert(content, type(contentBody) == 'string' and frame:preprocess(contentBody) or tostring(contentBody))
 				else
-					table.insert(content, tostring(PanelWidget{
+					table.insert(content, PanelWidget{
 						body = type(contentBody) == 'string' and frame:preprocess(contentBody) or contentBody,
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
-					}))
+					})
 				end
 			end
 			if item.children then
 				Array.extendWith(content, MainPageLayout._makeCells(item.children))
 			end
-			table.insert(cellContent, tostring(Grid._cell{table.concat(content), ['order-xs'] = item.mobileOrder}))
+			table.insert(cellContent, GridCell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
-		table.insert(output, tostring(Grid._cell{table.concat(cellContent), lg = column.size, xs = 'ignore', sm = 'ignore'}))
+		table.insert(output, GridCell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
 	end
-	table.insert(output, Grid._end_grid{})
-	return output
+
+	return GridContainer{ cellContent = output }
 end
 
 ---@param navigationData {file: string?, link: string?, count: table?, title: string?}
