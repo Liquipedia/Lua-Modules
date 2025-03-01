@@ -43,10 +43,25 @@ function MainPageLayout.make(frame)
 			NO_TABLE_OF_CONTENTS,
 			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
 			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
-			Template.expandTemplate(frame, 'Header banner', {
-				['logo-lighttheme'] = WikiData.banner.lightmode,
-				['logo-darktheme'] = WikiData.banner.darkmode,
-			}),
+			HtmlWidgets.Div{
+				classes = {'header-banner'},
+				children = {
+					HtmlWidgets.Div{
+						classes = {'header-banner__logo'},
+						children = {
+							HtmlWidgets.Div{
+								classes = {'logo--light-theme'},
+								children = { Image.display(WikiData.banner.lightmode, nil, {size = 200, link = ''}) }
+							},
+							HtmlWidgets.Div{
+								classes = {'logo--dark-theme'},
+								children = { Image.display(WikiData.banner.darkmodemode, nil, {size = 200, link = ''}) }
+							}
+						},
+					},
+					frame:preprocess('{{#searchbox:}}'),
+				}
+			},
 			HtmlWidgets.Div{
 				classes = {'navigation-cards'},
 				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
