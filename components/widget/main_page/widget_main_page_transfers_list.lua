@@ -29,7 +29,7 @@ local CENTER_DOT = Span{
 }
 
 ---@class TransfersList: Widget
----@operator call(table): Panel
+---@operator call(table): TransfersList
 ---@field props table<string, any>
 local TransfersList = Class.new(Widget)
 
