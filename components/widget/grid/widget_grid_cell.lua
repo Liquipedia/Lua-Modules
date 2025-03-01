@@ -34,7 +34,7 @@ local GRID_DIRECTIONS = {
 }
 
 ---@class GridCell: Widget
----@operator call(table): Panel
+---@operator call(table): GridCell
 ---@field props table<string, any>
 local GridCell = Class.new(Widget)
 
