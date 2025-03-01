@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -43,9 +44,8 @@ function GridCell:render()
 	local addedSpecificClass = false
 
 	local cellClasses = { 'lp-col' }
-	for _, width in ipairs( GRID_WIDTHS ) do
+	Array.forEach(GRID_WIDTHS, function (width)
 		if self.props[ width ] then
-			addedSpecificClass = true
 			local widthPrefix = ''
 			if width ~= 'xs' then
 				if self.props[ width ] == 'default' then
@@ -74,9 +74,11 @@ function GridCell:render()
 				})
 			end
 		end
-	end
+	end)
 
-	if not addedSpecificClass and not self.props.noDefault then
+	if Array.any(GRID_WIDTHS, function (width)
+		return self.props[width] ~= nil
+	end) and not self.props.noDefault then
 		Array.extendWith(cellClasses, 'lp-col-12')
 	end
 
