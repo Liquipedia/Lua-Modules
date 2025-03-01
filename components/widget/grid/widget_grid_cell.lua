@@ -44,7 +44,7 @@ function GridCell:render()
 
 	local cellClasses = { 'lp-col' }
 	for _, width in ipairs( GRID_WIDTHS ) do
-		if self.props.width then
+		if self.props[ width ] then
 			addedSpecificClass = true
 			local widthPrefix = ''
 			if width == 'xs' then
@@ -59,7 +59,7 @@ function GridCell:render()
 			elseif self.props.width == 'default' then
 				Array.extendWith(cellClasses, 'lp-d-' .. widthPrefix .. '-block', 'lp-col-' .. widthPrefix)
 			else
-				Array.extendWith(cellClasses, 'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props.width)
+				Array.extendWith(cellClasses, 'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props[ width ])
 			end
 		end
 		if self.props[ 'order-' .. width ] then
