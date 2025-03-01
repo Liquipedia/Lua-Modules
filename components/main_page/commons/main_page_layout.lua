@@ -97,7 +97,7 @@ function MainPageLayout._makeCells(cells)
 				end
 			end
 			if item.children then
-				Array.extendWith(content, MainPageLayout._makeCells(item.children))
+				Array.extendWith(content, { MainPageLayout._makeCells(item.children) })
 			end
 			table.insert(cellContent, GridCell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
