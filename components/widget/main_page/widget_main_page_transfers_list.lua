@@ -15,7 +15,6 @@ local TransferList = Lua.import('Module:TransferList')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Fragment = HtmlWidgets.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Span = HtmlWidgets.Span
 local WidgetUtil = Lua.import('Module:Widget/Util')
