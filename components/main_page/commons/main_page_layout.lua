@@ -104,7 +104,7 @@ function MainPageLayout._makeCells(cells)
 		table.insert(output, GridCell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
 	end
 
-	return GridContainer{ cellContent = output }
+	return GridContainer{ gridCells = output }
 end
 
 ---@param navigationData {file: string?, link: string?, count: table?, title: string?}
