@@ -22,7 +22,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 ---@field props table<string, any>
 local Panel = Class.new(Widget)
 
----@return string
+---@return Widget
 function Panel:render()
 	local boxId = self.props.boxId
 
