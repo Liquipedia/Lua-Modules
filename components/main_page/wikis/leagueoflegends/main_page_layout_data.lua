@@ -16,11 +16,11 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Fragment = HtmlWidgets.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Small = HtmlWidgets.Small
 local Span = HtmlWidgets.Span
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CENTER_DOT = Span{
 	css = {
@@ -54,16 +54,14 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = Fragment{
-			children = {
-				'This day in League of Legends ',
-				Small{
-					attributes = { id = 'this-day-date' },
-					css = { ['margin-left'] = '5px' },
-					children = { '(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')' }
-				}
+		heading = WidgetUtil.collect(
+			'This day in League of Legends ',
+			Small{
+				attributes = { id = 'this-day-date' },
+				css = { ['margin-left'] = '5px' },
+				children = { '(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')' }
 			}
-		},
+		),
 		body = '{{Liquipedia:This day}}',
 		padding = true,
 		boxid = 1510,
@@ -81,22 +79,20 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = Fragment{
-			children = {
-				MatchTickerContainer{},
-				Div{
-					css = {
-						['white-space'] = 'nowrap',
-						display = 'block',
-						margin = '0 10px',
-						['font-size'] = '15px',
-						['font-style'] = 'italic',
-						['text-align'] = 'center',
-					},
-					children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-				}
+		body = WidgetUtil.collect(
+			MatchTickerContainer{},
+			Div{
+				css = {
+					['white-space'] = 'nowrap',
+					display = 'block',
+					margin = '0 10px',
+					['font-size'] = '15px',
+					['font-style'] = 'italic',
+					['text-align'] = 'center',
+				},
+				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
 			}
-		},
+		),
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -118,30 +114,28 @@ local CONTENT = {
 	},
 	headlines = {
 		heading = 'Headlines',
-		body = Fragment{
-			children = {
-				ExternalMediaList.get({ subject = '!', limit = 4 }),
-				Div{
-					css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
-					children = {
-						Div{
-							css = {
-								['white-space'] = 'nowrap',
-								display = 'inline',
-								margin = '0 10px',
-								['font-size'] = '15px',
-								['font-style'] = 'italic',
-							},
-							children = {
-								Link{ children = 'See all Headlines', link = 'Portal:News' },
-								CENTER_DOT,
-								Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
-							}
+		body = WidgetUtil.collect(
+			ExternalMediaList.get({ subject = '!', limit = 4 }),
+			Div{
+				css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
+				children = {
+					Div{
+						css = {
+							['white-space'] = 'nowrap',
+							display = 'inline',
+							margin = '0 10px',
+							['font-size'] = '15px',
+							['font-style'] = 'italic',
+						},
+						children = {
+							Link{ children = 'See all Headlines', link = 'Portal:News' },
+							CENTER_DOT,
+							Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
 						}
 					}
 				}
 			}
-		},
+		),
 		padding = true,
 		boxid = 1511,
 	},
