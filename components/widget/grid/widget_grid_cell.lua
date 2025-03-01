@@ -40,8 +40,6 @@ local GridCell = Class.new(Widget)
 
 ---@return Widget
 function GridCell:render()
-	local addedSpecificClass = false
-
 	local cellClasses = { 'lp-col' }
 	Array.forEach(GRID_WIDTHS, function (width)
 		if self.props[ width ] then
