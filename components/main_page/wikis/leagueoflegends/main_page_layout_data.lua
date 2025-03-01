@@ -11,6 +11,7 @@ local Page = require('Module:Page')
 local Template = require('Module:Template')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
+local FilterButtons = Lua.import('Module:FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
@@ -99,8 +100,10 @@ local CONTENT = {
 	},
 	filterButtons = {
 		noPanel = true,
-		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
-			'{{#invoke:Lua|invoke|module=FilterButtons|fn=getFromConfig}}</div>',
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtons.getFromConfig() }
+		}
 	},
 	matches = {
 		heading = 'Matches',
