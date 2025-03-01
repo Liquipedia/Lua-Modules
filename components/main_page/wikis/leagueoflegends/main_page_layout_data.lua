@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local Template = require('Module:Template')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
@@ -17,6 +19,19 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
 local Span = HtmlWidgets.Span
+
+local CENTER_DOT = Span{
+	css = {
+		['font-style'] = 'normal',
+		['padding'] = '0 5px',
+	},
+	children = { '&#8226;' }
+}
+
+---@return string
+local function getTransferSubPage()
+	return os.date('%Y') .. '/' .. os.date('%B')
+end
 
 local CONTENT = {
 	usefulArticles = {
@@ -33,16 +48,43 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|limit=15|title=}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
-			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
-			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
-			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Transfer query]]<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
-			'<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Portal:Rumours|Rumours]]</center></div>\n</div>',
+		body = Fragment{
+			children = {
+				Template.safeExpand(mw.getCurrentFrame(), 'Transfer List', { limit = 15, title = '' }),
+				Div{
+					css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
+					children = {
+						Div{
+							css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
+							children = { Page.makeInternalLink('Back to top', '#Top') }
+						},
+						Div{
+							classes = { 'plainlinks', 'smalledit' },
+							css = { display = 'inline', float = 'right' },
+							children = { '&#91;' .. Page.makeInternalLink('edit', 'Special:EditPage/Player Transfers/' .. getTransferSubPage() ) .. '&#93;' },
+						},
+						Div{
+							css = {
+								['white-space'] = 'nowrap',
+								display = 'inline',
+								margin = '0 10px',
+								['font-size'] = '15px',
+								['font-style'] = 'italic'
+							},
+							children = {
+								Page.makeInternalLink('See more transfers', 'Portal:Transfers'),
+								CENTER_DOT,
+								Page.makeInternalLink('Transfer query', 'Special:RunQuery/Transfer_history'),
+								CENTER_DOT,
+								Page.makeInternalLink('Input Form', 'lpcommons:Special:RunQuery/Transfer'),
+								CENTER_DOT,
+								Page.makeInternalLink('Rumours', 'Portal:Rumours'),
+							}
+						},
+					}
+				}
+			}
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -116,13 +158,7 @@ local CONTENT = {
 							},
 							children = {
 								Page.makeInternalLink('See all Headlines', 'Portal:News'),
-								Span{
-									css = {
-										['font-style'] = 'normal',
-										['padding'] = '0 5px',
-									},
-									children = { '&#8226;' }
-								},
+								CENTER_DOT,
 								Page.makeInternalLink('Add a Headline', 'Special:FormEdit/ExternalMediaLinks')
 							}
 						}
