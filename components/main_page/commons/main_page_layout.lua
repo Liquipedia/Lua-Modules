@@ -82,10 +82,10 @@ function MainPageLayout._makeCells(cells)
 		for _, item in ipairs(column.children) do
 			local content = {}
 			if item.content then
+				local contentBody = item.content.body
 				if item.content.noPanel then
-					table.insert(content, frame:preprocess(item.content.body))
+					table.insert(content, type(contentBody) == 'string' and frame:preprocess(contentBody) or tostring(contentBody))
 				else
-					local contentBody = item.content.body
 					table.insert(content, tostring(PanelWidget{
 						body = type(contentBody) == 'string' and frame:preprocess(contentBody) or contentBody,
 						boxId = item.content.boxid,
