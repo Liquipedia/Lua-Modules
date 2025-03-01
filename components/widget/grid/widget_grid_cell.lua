@@ -47,12 +47,12 @@ function GridCell:render()
 		if self.props[ width ] then
 			addedSpecificClass = true
 			local widthPrefix = ''
-			if width == 'xs' then
-				addedSpecificClass = true
-			elseif self.props[ width ] == 'default' then
-				widthPrefix = width
-			else
-				widthPrefix = width .. '-'
+			if width ~= 'xs' then
+				if self.props[ width ] == 'default' then
+					widthPrefix = width
+				else
+					widthPrefix = width .. '-'
+				end
 			end
 			if self.props[ width ] == 'ignore' then
 				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'contents'})
