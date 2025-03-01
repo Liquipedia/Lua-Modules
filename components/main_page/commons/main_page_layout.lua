@@ -71,10 +71,16 @@ function MainPageLayout.make(frame)
 	}
 end
 
+---@param body string|Widget
+---@return string|Widget
+function MainPageLayout._processCellBody(body)
+	local frame = mw.getCurrentFrame()
+	return type(body) == 'string' and frame:preprocess(body) or body
+end
+
 ---@param cells table[]
 ---@return Widget
 function MainPageLayout._makeCells(cells)
-	local frame = mw.getCurrentFrame()
 	local output = {}
 
 	for _, column in ipairs(cells) do
@@ -84,10 +90,10 @@ function MainPageLayout._makeCells(cells)
 			if item.content then
 				local contentBody = item.content.body
 				if item.content.noPanel then
-					table.insert(content, type(contentBody) == 'string' and frame:preprocess(contentBody) or tostring(contentBody))
+					table.insert(content, MainPageLayout._processCellBody(contentBody))
 				else
 					table.insert(content, PanelWidget{
-						body = type(contentBody) == 'string' and frame:preprocess(contentBody) or contentBody,
+						body = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
