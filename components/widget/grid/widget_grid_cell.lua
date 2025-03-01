@@ -63,14 +63,14 @@ function GridCell:render()
 			local width_prefix = width ~= 'xs' and width .. '-' or ''
 			Array.extendWith(cellClasses, {'lp-order-' .. width_prefix .. self.props[ 'order-' .. width ]})
 		end
-		for _, direction in ipairs( GRID_DIRECTIONS ) do
+		Array.forEach(GRID_DIRECTIONS, function (direction)
 			if self.props[ 'm' .. direction .. '-' .. width ] then
 				local width_prefix = width ~= 'xs' and width .. '-' or ''
 				Array.extendWith(cellClasses, {
 					'm' .. direction .. '-' .. width_prefix .. self.props[ 'm' .. direction .. '-' .. width ]
 				})
 			end
-		end
+		end)
 	end)
 
 	if Array.all(GRID_WIDTHS, function (width)
