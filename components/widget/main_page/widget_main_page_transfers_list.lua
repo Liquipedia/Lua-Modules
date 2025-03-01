@@ -47,7 +47,14 @@ function TransfersList:render()
 					Div {
 						classes = { 'plainlinks', 'smalledit' },
 						css = { display = 'inline', float = 'right' },
-						children = { '&#91;', Link { children = 'edit', link = 'Special:EditPage/' .. self.props.transferPage() }, '&#93;' },
+						children = {
+							'&#91;',
+								Link {
+								children = 'edit',
+								link = 'Special:EditPage/' .. self.props.transferPage()
+							},
+							'&#93;'
+						},
 					},
 					Div {
 						css = {

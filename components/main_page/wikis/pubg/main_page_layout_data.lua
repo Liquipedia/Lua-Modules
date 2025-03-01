@@ -12,7 +12,6 @@ local Ordinal = require('Module:Ordinal')
 local FilterButtons = Lua.import('Module:FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
-local TransferList = Lua.import('Module:TransferList')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
