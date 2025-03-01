@@ -14,8 +14,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
-local GridContainer = Lua.import('Module:Widget/Grid/Container')
-local GridCell = Lua.import('Module:Widget/Grid/Cell')
+local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local PanelWidget = Lua.import('Module:Widget/Panel')
@@ -104,12 +103,12 @@ function MainPageLayout._makeCells(cells)
 			if item.children then
 				Array.extendWith(content, { MainPageLayout._makeCells(item.children) })
 			end
-			table.insert(cellContent, GridCell{cellContent = content, ['order-xs'] = item.mobileOrder})
+			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
-		table.insert(output, GridCell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
+		table.insert(output, GridWidgets.Cell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
 	end
 
-	return GridContainer{ gridCells = output }
+	return GridWidgets.Container{ gridCells = output }
 end
 
 ---@param navigationData {file: string?, link: string?, count: table?, title: string?}
