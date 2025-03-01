@@ -8,7 +8,6 @@
 
 local Lua = require('Module:Lua')
 local Ordinal = require('Module:Ordinal')
-local Page = require('Module:Page')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -19,6 +18,7 @@ local TransferList = Lua.import('Module:TransferList')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Small = HtmlWidgets.Small
 local Span = HtmlWidgets.Span
 
@@ -58,12 +58,12 @@ local CONTENT = {
 					children = {
 						Div{
 							css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
-							children = { Page.makeInternalLink('Back to top', '#Top') }
+							children = { Link{ children = 'Back to top', link = '#Top'} }
 						},
 						Div{
 							classes = { 'plainlinks', 'smalledit' },
 							css = { display = 'inline', float = 'right' },
-							children = { '&#91;' .. Page.makeInternalLink('edit', getTransferPage() ) .. '&#93;' },
+							children = { '&#91;', Link{ children = 'edit', link = getTransferPage() }, '&#93;' },
 						},
 						Div{
 							css = {
@@ -74,13 +74,13 @@ local CONTENT = {
 								['font-style'] = 'italic'
 							},
 							children = {
-								Page.makeInternalLink('See more transfers', 'Portal:Transfers'),
+								Link{ children = 'See more transfers', link = 'Portal:Transfers' },
 								CENTER_DOT,
-								Page.makeInternalLink('Transfer query', 'Special:RunQuery/Transfer_history'),
+								Link{ children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
 								CENTER_DOT,
-								Page.makeInternalLink('Input Form', 'lpcommons:Special:RunQuery/Transfer'),
+								Link{ children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
 								CENTER_DOT,
-								Page.makeInternalLink('Rumours', 'Portal:Rumours'),
+								Link{ children = 'Rumours', link = 'Portal:Rumours' },
 							}
 						},
 					}
@@ -129,7 +129,7 @@ local CONTENT = {
 						['font-style'] = 'italic',
 						['text-align'] = 'center',
 					},
-					children = { Page.makeInternalLink('See more matches', 'Liquipedia:Matches') }
+					children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
 				}
 			}
 		},
@@ -169,9 +169,9 @@ local CONTENT = {
 								['font-style'] = 'italic',
 							},
 							children = {
-								Page.makeInternalLink('See all Headlines', 'Portal:News'),
+								Link{ children = 'See all Headlines', link = 'Portal:News' },
 								CENTER_DOT,
-								Page.makeInternalLink('Add a Headline', 'Special:FormEdit/ExternalMediaLinks')
+								Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
 							}
 						}
 					}
