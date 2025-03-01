@@ -85,8 +85,9 @@ function MainPageLayout._makeCells(cells)
 				if item.content.noPanel then
 					table.insert(content, frame:preprocess(item.content.body))
 				else
+					local contentBody = item.content.body
 					table.insert(content, tostring(PanelWidget{
-						body = frame:preprocess(item.content.body),
+						body = type(contentBody) == 'string' and frame:preprocess(contentBody) or contentBody,
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
