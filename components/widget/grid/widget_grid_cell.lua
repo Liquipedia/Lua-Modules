@@ -49,32 +49,32 @@ function GridCell:render()
 			local widthPrefix = ''
 			if width == 'xs' then
 				addedSpecificClass = true
-			elseif self.props.width == 'default' then
+			elseif self.props[ width ] == 'default' then
 				widthPrefix = width
 			else
 				widthPrefix = width .. '-'
 			end
-			if self.props.width == 'ignore' then
-				Array.extendWith(cellClasses, 'lp-d-' .. widthPrefix .. 'contents')
+			if self.props[ width ] == 'ignore' then
+				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'contents'})
 			elseif self.props.width == 'default' then
-				Array.extendWith(cellClasses, 'lp-d-' .. widthPrefix .. '-block', 'lp-col-' .. widthPrefix)
+				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. '-block', 'lp-col-' .. widthPrefix})
 			else
-				Array.extendWith(cellClasses, 'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props[ width ])
+				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props[ width ]})
 			end
 		end
 		if self.props[ 'order-' .. width ] then
 			local width_prefix = width ~= 'xs' and width .. '-' or ''
-			Array.extendWith(cellClasses, 'lp-order-' .. width_prefix .. self.props[ 'order-' .. width ])
+			Array.extendWith(cellClasses, {'lp-order-' .. width_prefix .. self.props[ 'order-' .. width ]})
 		end
 		for _, direction in ipairs( GRID_DIRECTIONS ) do
 			if self.props[ 'm' .. direction .. '-' .. width ] then
 				local width_prefix = width ~= 'xs' and width .. '-' or ''
-				Array.extendWith(cellClasses, 'm' .. direction .. '-' .. width_prefix .. self.props[ 'm' .. direction .. '-' .. width ])
+				Array.extendWith(cellClasses, {'m' .. direction .. '-' .. width_prefix .. self.props[ 'm' .. direction .. '-' .. width ]})
 			end
 		end
 	end
 
-	if not addedSpecificClass and self.props.noDefault then
+	if not addedSpecificClass and not self.props.noDefault then
 		Array.extendWith(cellClasses, 'lp-col-12')
 	end
 
