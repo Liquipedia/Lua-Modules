@@ -73,8 +73,8 @@ function GridCell:render()
 		end
 	end)
 
-	if not Array.any(GRID_WIDTHS, function (width)
-		return self.props[width] ~= nil
+	if Array.all(GRID_WIDTHS, function (width)
+		return self.props[width] == nil
 	end) and not self.props.noDefault then
 		Array.extendWith(cellClasses, 'lp-col-12')
 	end
