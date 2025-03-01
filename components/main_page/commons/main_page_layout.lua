@@ -13,7 +13,6 @@ local Image = require('Module:Image')
 local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
