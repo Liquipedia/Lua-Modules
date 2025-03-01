@@ -6,6 +6,34 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+local Ordinal = require('Module:Ordinal')
+
+local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TransferList = Lua.import('Module:TransferList')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local Fragment = HtmlWidgets.Fragment
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Small = HtmlWidgets.Small
+local Span = HtmlWidgets.Span
+
+local CENTER_DOT = Span{
+	css = {
+		['font-style'] = 'normal',
+		['padding'] = '0 5px',
+	},
+	children = { '&#8226;' }
+}
+
+---@return string
+local function getTransferPage()
+	return 'Special:EditPage/Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
+end
+
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
@@ -21,21 +49,54 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|limit=15|title=}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
-			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
-			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
-			'[[Portal:Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:RunQuery/Transfer history|Transfer query]]' ..
-			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
-			'</center></div>\n</div>',
+		body = Fragment{
+			children = {
+				TransferList{ limit = 15 }:fetch():create(),
+				Div{
+					css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
+					children = {
+						Div{
+							css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
+							children = { Link{ children = 'Back to top', link = '#Top'} }
+						},
+						Div{
+							classes = { 'plainlinks', 'smalledit' },
+							css = { display = 'inline', float = 'right' },
+							children = { '&#91;', Link{ children = 'edit', link = getTransferPage() }, '&#93;' },
+						},
+						Div{
+							css = {
+								['white-space'] = 'nowrap',
+								display = 'inline',
+								margin = '0 10px',
+								['font-size'] = '15px',
+								['font-style'] = 'italic'
+							},
+							children = {
+								Link{ children = 'See more transfers', link = 'Portal:Transfers' },
+								CENTER_DOT,
+								Link{ children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
+								CENTER_DOT,
+								Link{ children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' }
+							}
+						},
+					}
+				}
+			}
+		},
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in PUBG <small id="this-day-date" style = "margin-left: 5px">' ..
-			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
+		heading = Fragment{
+			children = {
+				'This day in PUBG ',
+				Small{
+					attributes = { id = 'this-day-date' },
+					css = { ['margin-left'] = '5px' },
+					children = { '(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')' }
+				}
+			}
+		},
 		body = '{{Liquipedia:This day}}',
 		padding = true,
 		boxid = 1510,
@@ -46,15 +107,29 @@ local CONTENT = {
 	},
 	filterButtons = {
 		noPanel = true,
-		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
-			'{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=FilterButtons}}</div>',
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtonsWidget() }
+		}
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}'..
-			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">' ..
-			'[[Liquipedia:Upcoming and ongoing matches|See more matches]]</div>',
+		body = Fragment{
+			children = {
+				MatchTickerContainer{},
+				Div{
+					css = {
+						['white-space'] = 'nowrap',
+						display = 'block',
+						margin = '0 10px',
+						['font-size'] = '15px',
+						['font-style'] = 'italic',
+						['text-align'] = 'center',
+					},
+					children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
+				}
+			}
+		},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -63,8 +138,10 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=90|completedDays=60}}',
+		body = TournamentsTicker{
+			upcomingDays = 90,
+			completedDays = 60
+		},
 		padding = true,
 		boxid = 1508,
 	},
