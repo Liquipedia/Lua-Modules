@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
+local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -62,9 +63,22 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
-			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
+		body = Fragment{
+			children = {
+				MatchTickerContainer{},
+				Div{
+					css = {
+						['white-space'] = 'nowrap',
+						display = 'block',
+						margin = '0 10px',
+						['font-size'] = '15px',
+						['font-style'] = 'italic',
+						['text-align'] = 'center',
+					},
+					children = { Page.makeInternalLink('See more matches', 'Liquipedia:Matches') }
+				}
+			}
+		},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
