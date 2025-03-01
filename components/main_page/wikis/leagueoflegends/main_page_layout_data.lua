@@ -13,7 +13,6 @@ local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
-local TransferList = Lua.import('Module:TransferList')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -21,6 +20,7 @@ local Fragment = HtmlWidgets.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Small = HtmlWidgets.Small
 local Span = HtmlWidgets.Span
+local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
 local CENTER_DOT = Span{
 	css = {
@@ -29,11 +29,6 @@ local CENTER_DOT = Span{
 	},
 	children = { '&#8226;' }
 }
-
----@return string
-local function getTransferPage()
-	return 'Special:EditPage/Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
-end
 
 local CONTENT = {
 	usefulArticles = {
@@ -50,42 +45,11 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = Fragment{
-			children = {
-				TransferList{ limit = 15 }:fetch():create(),
-				Div{
-					css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
-					children = {
-						Div{
-							css = { display = 'inline', float = 'left', ['font-style'] = 'italic' },
-							children = { Link{ children = 'Back to top', link = '#Top'} }
-						},
-						Div{
-							classes = { 'plainlinks', 'smalledit' },
-							css = { display = 'inline', float = 'right' },
-							children = { '&#91;', Link{ children = 'edit', link = getTransferPage() }, '&#93;' },
-						},
-						Div{
-							css = {
-								['white-space'] = 'nowrap',
-								display = 'inline',
-								margin = '0 10px',
-								['font-size'] = '15px',
-								['font-style'] = 'italic'
-							},
-							children = {
-								Link{ children = 'See more transfers', link = 'Portal:Transfers' },
-								CENTER_DOT,
-								Link{ children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
-								CENTER_DOT,
-								Link{ children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
-								CENTER_DOT,
-								Link{ children = 'Rumours', link = 'Portal:Rumours' },
-							}
-						},
-					}
-				}
-			}
+		body = TransfersList {
+			rumours = true,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
+			end
 		},
 		boxid = 1509,
 	},
