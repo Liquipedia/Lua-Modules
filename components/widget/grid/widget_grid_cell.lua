@@ -69,7 +69,7 @@ function GridCell:render()
 		for _, direction in ipairs( GRID_DIRECTIONS ) do
 			if self.props[ 'm' .. direction .. '-' .. width ] then
 				local width_prefix = width ~= 'xs' and width .. '-' or ''
-				Array.extendWith(cellClasses, {'m' .. direction .. '-' .. width_prefix .. self.props[ 'm' .. direction .. '-' .. width ]})
+				Array.extendWith(cellClasses, {'m' .. direction .. '-' .. width_prefix .. self.props['m' .. direction .. '-' .. width]})
 			end
 		end
 	end
