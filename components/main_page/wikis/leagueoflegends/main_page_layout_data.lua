@@ -29,8 +29,8 @@ local CENTER_DOT = Span{
 }
 
 ---@return string
-local function getTransferSubPage()
-	return os.date('%Y') .. '/' .. os.date('%B')
+local function getTransferPage()
+	return 'Special:EditPage/Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
 end
 
 local CONTENT = {
@@ -61,7 +61,7 @@ local CONTENT = {
 						Div{
 							classes = { 'plainlinks', 'smalledit' },
 							css = { display = 'inline', float = 'right' },
-							children = { '&#91;' .. Page.makeInternalLink('edit', 'Special:EditPage/Player Transfers/' .. getTransferSubPage() ) .. '&#93;' },
+							children = { '&#91;' .. Page.makeInternalLink('edit', getTransferPage() ) .. '&#93;' },
 						},
 						Div{
 							css = {
