@@ -27,7 +27,7 @@ end
 local CENTER_DOT = Span{
 	css = {
 		['font-style'] = 'normal',
-		['padding'] = '0 5px',
+		padding = '0 5px',
 	},
 	children = { '&#8226;' }
 }
