@@ -6,6 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
 local CONTENT = {
 	usefulArticles = {
 		heading = 'Useful Articles',
@@ -62,8 +66,14 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=30|completedDays=20|modifierTypeQualifier=-2|modifierTier1=55|modifierTier2=55|modifierTier3=10}}',
+		body = TournamentsTicker{
+			upcomingDays = 30,
+			completedDays = 20,
+			modifierTypeQualifier = -2,
+			modifierTier1 = 55,
+			modifierTier2 = 55,
+			modifierTier3 = 10
+		},
 		padding = true,
 		boxid = 1508,
 	},
