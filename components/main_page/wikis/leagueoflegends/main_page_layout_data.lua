@@ -8,12 +8,12 @@
 
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local Template = require('Module:Template')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local FilterButtons = Lua.import('Module:FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+local TransferList = Lua.import('Module:TransferList')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -50,7 +50,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = Fragment{
 			children = {
-				Template.safeExpand(mw.getCurrentFrame(), 'Transfer List', { limit = 15, title = '' }),
+				TransferList{ limit = 15 }:fetch():create(),
 				Div{
 					css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
 					children = {
