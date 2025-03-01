@@ -7,6 +7,7 @@
 --
 
 local Lua = require('Module:Lua')
+local Ordinal = require('Module:Ordinal')
 local Page = require('Module:Page')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
@@ -88,8 +89,8 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in League of Legends <small id="this-day-date" style = "margin-left: 5px">' ..
-			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
+		heading = 'This day in League of Legends <small id="this-day-date" style = "margin-left: 5px">(' ..
+			os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')</small>',
 		body = '{{Liquipedia:This day}}',
 		padding = true,
 		boxid = 1510,
