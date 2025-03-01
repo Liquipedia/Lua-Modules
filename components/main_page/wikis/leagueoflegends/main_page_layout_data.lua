@@ -19,6 +19,7 @@ local TransferList = Lua.import('Module:TransferList')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Fragment = HtmlWidgets.Fragment
+local Small = HtmlWidgets.Small
 local Span = HtmlWidgets.Span
 
 local CENTER_DOT = Span{
@@ -89,8 +90,16 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in League of Legends <small id="this-day-date" style = "margin-left: 5px">(' ..
-			os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')</small>',
+		heading = Fragment{
+			children = {
+				'This day in League of Legends ',
+				Small{
+					attributes = { id = 'this-day-date' },
+					css = { ['margin-left'] = '5px' },
+					children = { '(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')' }
+				}
+			}
+		},
 		body = '{{Liquipedia:This day}}',
 		padding = true,
 		boxid = 1510,
