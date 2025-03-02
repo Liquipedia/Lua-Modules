@@ -53,7 +53,7 @@ function GridCell:render()
 			end
 			if self.props[width] == 'ignore' then
 				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'contents'})
-			elseif self.props.width == 'default' then
+			elseif self.props[width] == 'default' then
 				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. '-block', 'lp-col-' .. widthPrefix})
 			else
 				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props[width]})
