@@ -35,12 +35,7 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList {
-			rumours = false,
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
-			end
-		},
+		body = TransfersList{},
 		boxid = 1509,
 	},
 	thisDay = {
