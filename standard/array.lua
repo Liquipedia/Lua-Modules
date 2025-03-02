@@ -144,7 +144,7 @@ function Array.flatMap(elements, funct)
 	return Array.flatten(Array.map(elements, funct))
 end
 
----Determnines whether all elements in an array satisfy a predicate.
+---Determines whether all elements in an array satisfy a predicate.
 ---@generic T
 ---@param tbl T[]
 ---@param predicate fun(element: T): boolean
@@ -159,7 +159,7 @@ function Array.all(tbl, predicate)
 	return true
 end
 
----Determnines whether any elements in an array satisfies a predicate.
+---Determines whether any elements in an array satisfies a predicate.
 ---@generic T
 ---@param tbl T[]
 ---@param predicate fun(element: T): boolean
@@ -298,7 +298,7 @@ Sorts an array by transforming its elements via a function and comparing the
 transformed elements.
 
 If the transformed elements are arrays, then they will be lexically compared.
-This is useful for setting up tie-breaker criteria - put the main critera in
+This is useful for setting up tie-breaker criteria - put the main criteria in
 the first element, and subsequent tie-breakers in the remaining elements.
 
 The optional third argument specifies a custom comparator for the transformed elements.
@@ -609,7 +609,7 @@ function Array.min(array, compare)
 end
 
 --[[
-Finds the index of the element in an array satisfying a predicate. Returs 0
+Finds the index of the element in an array satisfying a predicate. Returns 0
 if no element satisfies the predicate.
 
 Example:
