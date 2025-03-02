@@ -32,6 +32,7 @@ local CENTER_DOT = Span{
 ---@field props table<string, any>
 local TransfersList = Class.new(Widget)
 TransfersList.defaultProps = {
+	limit = 15,
 	rumours = false,
 	transferPage = function ()
 		return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
@@ -40,7 +41,7 @@ TransfersList.defaultProps = {
 
 function TransfersList:render()
 	return WidgetUtil.collect(
-		TransferList { limit = self.props.limit or 15 }:fetch():create(),
+		TransferList { limit = self.props.limit }:fetch():create(),
 		Div {
 			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
 			children = {
