@@ -86,7 +86,7 @@ function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|map=|vod=}}'
 		end),
 		Array.map(Array.range(1, opponents), function(opponentIndex)
-			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getFfaOpponent(mode, bestof)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
 		end),
 		'}}'
 	)
@@ -97,7 +97,7 @@ end
 ---@param mode string
 ---@param mapCount integer
 ---@return string
-function WikiCopyPaste._getFfaOpponent(mode, mapCount)
+function WikiCopyPaste.getFfaOpponent(mode, mapCount)
 	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
 		return '|m' .. idx .. '={{MS||}}'
 	end))
