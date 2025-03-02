@@ -31,6 +31,12 @@ local CENTER_DOT = Span{
 ---@operator call(table): TransfersList
 ---@field props table<string, any>
 local TransfersList = Class.new(Widget)
+TransfersList.defaultProps = {
+	rumours = false,
+	transferPage = function ()
+		return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
+	end
+}
 
 function TransfersList:render()
 	return WidgetUtil.collect(
