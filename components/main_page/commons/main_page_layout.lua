@@ -101,7 +101,7 @@ function MainPageLayout._makeCells(cells)
 				end
 			end
 			if item.children then
-				Array.extendWith(content, MainPageLayout._makeCells(item.children))
+				Array.appendWith(content, MainPageLayout._makeCells(item.children))
 			end
 			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
