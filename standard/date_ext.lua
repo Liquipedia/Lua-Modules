@@ -163,14 +163,14 @@ function DateExt.getOffsetSeconds(offsetString)
 	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. (offsetString or '')))
 end
 
----@param props {date: string?, ordinalSiffix: boolean?}
+---@param props {date: string?, ordinalSuffix: boolean?}
 ---@return string|integer
 function DateExt.quarterOf(props)
 	local date = DateExt.readTimestampOrNil(props.date) or os.time()
 	local month = tonumber(os.date('%m', date))
 	local quarter = math.ceil(month / 3)
 
-	if not Logic.readBool(props.ordinalSiffix) then
+	if not Logic.readBool(props.ordinalSuffix) then
 		return quarter
 	end
 
