@@ -38,26 +38,32 @@ local GRID_DIRECTIONS = {
 ---@field props table<string, any>
 local GridCell = Class.new(Widget)
 
+---@param width string
+---@return string[]
+function GridCell:_getCellClasses(width)
+	local widthPrefix = ''
+	if width ~= 'xs' then
+		if self.props[width] == 'default' then
+			widthPrefix = width
+		else
+			widthPrefix = width .. '-'
+		end
+	end
+	if self.props[width] == 'ignore' then
+		return {'lp-d-' .. widthPrefix .. 'contents'}
+	elseif self.props[width] == 'default' then
+		return {'lp-d-' .. widthPrefix .. '-block', 'lp-col-' .. widthPrefix}
+	else
+		return {'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props[width]}
+	end
+end
+
 ---@return Widget
 function GridCell:render()
 	local cellClasses = { 'lp-col' }
 	Array.forEach(GRID_WIDTHS, function (width)
 		if self.props[width] then
-			local widthPrefix = ''
-			if width ~= 'xs' then
-				if self.props[width] == 'default' then
-					widthPrefix = width
-				else
-					widthPrefix = width .. '-'
-				end
-			end
-			if self.props[width] == 'ignore' then
-				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'contents'})
-			elseif self.props[width] == 'default' then
-				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. '-block', 'lp-col-' .. widthPrefix})
-			else
-				Array.extendWith(cellClasses, {'lp-d-' .. widthPrefix .. 'block', 'lp-col-' .. widthPrefix .. self.props[width]})
-			end
+			Array.extendWith(cellClasses, self:_getCellClasses(width))
 		end
 		if self.props['order-' .. width] then
 			local width_prefix = width ~= 'xs' and width .. '-' or ''
