@@ -115,7 +115,7 @@ local CONTENT = {
 	headlines = {
 		heading = 'Headlines',
 		body = WidgetUtil.collect(
-			ExternalMediaList.get({ subject = '!', limit = 4 }),
+			ExternalMediaList.get{ subject = '!', limit = 4 },
 			Div{
 				css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
 				children = {
