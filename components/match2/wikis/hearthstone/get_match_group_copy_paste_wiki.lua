@@ -36,7 +36,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 end
 
----returns the Code for a Match, depending on the input
+---returns the Code for a standard Match, depending on the input
 ---@param bestof integer
 ---@param mode string
 ---@param index integer
@@ -85,6 +85,7 @@ function WikiCopyPaste._getStandardMap(mode, opponents)
 	return table.concat(parts)
 end
 
+---returns the Code for a FFA Match, depending on the input
 ---@param bestof integer
 ---@param mode string
 ---@param index integer
