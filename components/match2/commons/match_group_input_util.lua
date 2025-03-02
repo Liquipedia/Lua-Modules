@@ -1395,10 +1395,12 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 
 	match.stream = Streams.processStreams(match)
 	match.links = MatchGroupInputUtil.getLinks(match)
-	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {
+	match.extradata = Table.merge({
+		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+	}, Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
-	}
+	})
 
 	match.games = games
 	match.opponents = opponents
@@ -1474,7 +1476,9 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 			map.winner = getWinner(map.status, winnerInput, map.opponents)
 		end
 
-		map.extradata = Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil
+		map.extradata = Table.merge({
+			mvp = MatchGroupInputUtil.readMvp(map, opponents),
+		}, Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil)
 
 		table.insert(maps, map)
 		match[key] = nil

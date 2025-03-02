@@ -30,7 +30,7 @@ liquipedia.commonsmainpage = {
 					lelimit: 20,
 					continue: '',
 					format: 'json'
-				} ).done( ( logEntries ) => {
+				} ).then( ( logEntries ) => {
 					const imageNames = [ ];
 					logEntries.query.logevents.forEach( ( title ) => {
 						imageNames.push( title.title );
@@ -42,7 +42,7 @@ liquipedia.commonsmainpage = {
 						iiprop: 'url',
 						iiurlheight: 150,
 						format: 'json'
-					} ).done( ( imageData ) => {
+					} ).then( ( imageData ) => {
 						// let imageUrls = [ ];
 						// imageUrls = imageUrls.reverse();
 						let output = '';

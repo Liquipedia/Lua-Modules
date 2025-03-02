@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local FfaStandings = Lua.import('Module:Widget/Standings/Ffa')
+local SwissStandings = Lua.import('Module:Widget/Standings/Swiss')
 
 local Standings = Lua.import('Module:Standings')
 
@@ -30,6 +31,10 @@ function StandingsWidget:render()
 
 	if standings.type == 'ffa' then
 		return FfaStandings{
+			standings = standings,
+		}
+	elseif standings.type == 'swiss' then
+		return SwissStandings{
 			standings = standings,
 		}
 	end

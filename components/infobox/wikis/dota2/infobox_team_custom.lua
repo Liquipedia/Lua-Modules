@@ -8,8 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local RoleOf = require('Module:RoleOf')
-local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Team = Lua.import('Module:Infobox/Team')
@@ -37,12 +35,6 @@ function CustomTeam.run(frame)
 	team.args.achievements = Achievements.team{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
-
-	-- Automatic org people
-	team.args.coach = RoleOf.get{role = 'Coach'}
-	team.args.director = RoleOf.get{role = 'Director'}
-	team.args.manager = RoleOf.get{role = 'Manager'}
-	team.args.captain = RoleOf.get{role = 'Captain'}
 
 	return team:createInfobox()
 end
@@ -73,8 +65,6 @@ end
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.teamid = args.teamid
-	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
-	lpdbData.manager = Variables.varDefault('managerid') or args.manager
 
 	return lpdbData
 end

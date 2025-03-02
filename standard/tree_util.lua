@@ -8,6 +8,10 @@
 
 local TreeUtil = {}
 
+---@generic V
+---@param getChildren fun(V):V[]
+---@param start V
+---@return fun():V
 function TreeUtil.dfs(getChildren, start)
 	local stack = {start}
 	return function()

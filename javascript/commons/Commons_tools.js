@@ -33,7 +33,7 @@ liquipedia.commonstools = {
 			const api = new mw.ForeignApi( '/api.php' );
 			api.get( {
 				action: 'listwikis'
-			} ).done( ( data ) => {
+			} ).then( ( data ) => {
 				liquipedia.commonstools.wikis = data.allwikis;
 				callback();
 			} );
@@ -76,7 +76,7 @@ liquipedia.commonstools = {
 			format: 'json',
 			formatversion: 2,
 			titles: title
-		} ).done( ( data ) => {
+		} ).then( ( data ) => {
 			if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
@@ -133,7 +133,7 @@ liquipedia.commonstools = {
 				format: 'json',
 				formatversion: 2,
 				titles: title
-			} ).done( ( data ) => {
+			} ).then( ( data ) => {
 				if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 					listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 				} else {
@@ -170,7 +170,7 @@ liquipedia.commonstools = {
 			format: 'json',
 			formatversion: 2,
 			titles: title
-		} ).done( ( data ) => {
+		} ).then( ( data ) => {
 			if ( !Object.prototype.hasOwnProperty.call( data, 'query' ) ) {
 				listElement.innerHTML = '<span style="color:#0000ff;">You need to put in a valid page title</span>';
 			} else {
@@ -208,7 +208,7 @@ liquipedia.commonstools = {
 					api2.get( {
 						action: 'query',
 						meta: 'tokens'
-					} ).done( ( data2 ) => {
+					} ).then( ( data2 ) => {
 						const editToken = data2.query.tokens.csrftoken;
 						if ( editToken === '+\\' ) {
 							const errorMessage = document.createElement( 'p' );
@@ -221,7 +221,7 @@ liquipedia.commonstools = {
 								title: title,
 								text: liquipedia.commonstools.checkPageTextRealSourceText,
 								token: editToken
-							} ).done( () => {
+							} ).then( () => {
 								const successMessage = document.createElement( 'p' );
 								successMessage.style.color = '#006400';
 								successMessage.innerHTML = 'Transferred!';

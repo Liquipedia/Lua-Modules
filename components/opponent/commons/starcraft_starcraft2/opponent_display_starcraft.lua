@@ -97,19 +97,13 @@ StarcraftOpponentDisplay.BracketOpponentEntry = BracketOpponentEntry
 function StarcraftOpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
-	if opponent.type == Opponent.team then
-		return OpponentDisplay.InlineTeamContainer({
-			flip = props.flip,
-			showLink = props.showLink,
-			style = props.teamStyle,
-			team = opponent.team,
-			template = opponent.template or 'tbd',
-		})
-	elseif opponent.type == 'literal' then
-		return OpponentDisplay.InlineOpponent(props)
-	else -- opponent.type == Opponent.solo Opponent.duo Opponent.trio Opponent.quad
-		return StarcraftOpponentDisplay.PlayerInlineOpponent(props)
+	if Opponent.typeIsParty((opponent or {}).type) then
+		return mw.html.create()
+			:node(StarcraftOpponentDisplay.InlinePlayers(props))
+			:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or '')
 	end
+
+	return OpponentDisplay.InlineOpponent(props)
 end
 
 ---Displays an opponent as a block element. The width of the component is

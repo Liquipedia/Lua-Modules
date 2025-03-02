@@ -13,6 +13,7 @@ return {
 	defaultGame = 'cod',
 	games = {
 		aw = {
+			order = 1,
 			abbreviation = 'AW',
 			name = 'Advanced Warfare',
 			link = 'Call of Duty: Advanced Warfare',
@@ -26,6 +27,7 @@ return {
 			},
 		},
 		bo = {
+			order = 2,
 			abbreviation = 'BO',
 			name = 'Black Ops',
 			link = 'Call of Duty: Black Ops',
@@ -39,6 +41,7 @@ return {
 			},
 		},
 		bo2 = {
+			order = 2,
 			abbreviation = 'BO2',
 			name = 'Black Ops II',
 			link = 'Call of Duty: Black Ops II',
@@ -52,6 +55,7 @@ return {
 			},
 		},
 		bo3 = {
+			order = 3,
 			abbreviation = 'BO3',
 			name = 'Black Ops III',
 			link = 'Call of Duty: Black Ops III',
@@ -65,6 +69,7 @@ return {
 			},
 		},
 		bo4 = {
+			order = 4,
 			abbreviation = 'BO4',
 			name = 'Black Ops 4',
 			link = 'Call of Duty: Black Ops 4',
@@ -78,6 +83,7 @@ return {
 			},
 		},
 		bocw = {
+			order = 5,
 			abbreviation = 'BOCW',
 			name = 'Black Ops Cold War',
 			link = 'Call of Duty: Black Ops Cold War',
@@ -91,6 +97,7 @@ return {
 			},
 		},
 		bo6 = {
+			order = 6,
 			abbreviation = 'BO6',
 			name = 'Black Ops 6',
 			link = 'Call of Duty: Black Ops 6',
@@ -104,6 +111,7 @@ return {
 			},
 		},
 		cod = {
+			order = 7,
 			abbreviation = 'COD',
 			name = 'Call of Duty',
 			link = 'Call of Duty',
@@ -117,6 +125,7 @@ return {
 			},
 		},
 		cod2 = {
+			order = 8,
 			abbreviation = 'COD2',
 			name = 'Call of Duty 2',
 			link = 'Call of Duty 2',
@@ -130,6 +139,7 @@ return {
 			},
 		},
 		cod3 = {
+			order = 9,
 			abbreviation = 'COD3',
 			name = 'Call of Duty 3',
 			link = 'Call of Duty 3',
@@ -143,6 +153,7 @@ return {
 			},
 		},
 		cod4 = {
+			order = 10,
 			abbreviation = 'COD4',
 			name = 'Call of Duty 4',
 			link = 'Call of Duty 4: Modern Warfare',
@@ -156,6 +167,7 @@ return {
 			},
 		},
 		codm = {
+			order = 11,
 			abbreviation = 'CODM',
 			name = 'Call of Duty: Mobile',
 			link = 'Call of Duty: Mobile',
@@ -169,7 +181,8 @@ return {
 			},
 		},
 		ghosts = {
-			abbreviation = 'GHOSTS',
+			order = 12,
+			abbreviation = 'Ghosts',
 			name = 'Ghosts',
 			link = 'Call of Duty: Ghosts',
 			logo = {
@@ -182,6 +195,7 @@ return {
 			},
 		},
 		iw = {
+			order = 13,
 			abbreviation = 'IW',
 			name = 'Infinite Warfare',
 			link = 'Call of Duty: Infinite Warfare',
@@ -195,6 +209,7 @@ return {
 			},
 		},
 		mw2 = {
+			order = 14,
 			abbreviation = 'MW2',
 			name = 'Modern Warfare 2',
 			link = 'Call of Duty: Modern Warfare 2',
@@ -207,20 +222,8 @@ return {
 				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
-		mw2019 = {
-			abbreviation = 'MW2019',
-			name = 'Modern Warfare (2019)',
-			link = 'Call of Duty: Modern Warfare (2019)',
-			logo = {
-				darkMode = 'Modern warfare TeamCardImage.png',
-				lightMode = 'Modern warfare TeamCardImage.png',
-			},
-			defaultTeamLogo = {
-				darkMode = 'Call of Duty Default darkmode.png',
-				lightMode = 'Call of Duty Default lightmode.png',
-			},
-		},
 		mw3 = {
+			order = 15,
 			abbreviation = 'MW3',
 			name = 'Modern Warfare 3',
 			link = 'Call of Duty: Modern Warfare 3',
@@ -233,7 +236,22 @@ return {
 				lightMode = 'Call of Duty Default lightmode.png',
 			},
 		},
+		mw2019 = {
+			order = 16,
+			abbreviation = 'MW19',
+			name = 'Modern Warfare (2019)',
+			link = 'Call of Duty: Modern Warfare (2019)',
+			logo = {
+				darkMode = 'Modern warfare TeamCardImage.png',
+				lightMode = 'Modern warfare TeamCardImage.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Call of Duty Default darkmode.png',
+				lightMode = 'Call of Duty Default lightmode.png',
+			},
+		},
 		mwii = {
+			order = 17,
 			abbreviation = 'MWII',
 			name = 'Modern Warfare II',
 			link = 'Call of Duty: Modern Warfare II',
@@ -247,6 +265,7 @@ return {
 			},
 		},
 		mwiii = {
+			order = 18,
 			abbreviation = 'MWIII',
 			name = 'Modern Warfare III',
 			link = 'Call of Duty: Modern Warfare III',
@@ -260,6 +279,7 @@ return {
 			},
 		},
 		vg = {
+			order = 19,
 			abbreviation = 'VG',
 			name = 'Vanguard',
 			link = 'Call of Duty: Vanguard',
@@ -273,6 +293,7 @@ return {
 			},
 		},
 		waw = {
+			order = 20,
 			abbreviation = 'WaW',
 			name = 'World at War',
 			link = 'Call of Duty: World at War',
@@ -286,6 +307,7 @@ return {
 			},
 		},
 		wwii = {
+			order = 21,
 			abbreviation = 'WWII',
 			name = 'WWII',
 			link = 'Call of Duty: WWII',
@@ -299,6 +321,7 @@ return {
 			},
 		},
 		wz = {
+			order = 22,
 			abbreviation = 'WZ',
 			name = 'Warzone',
 			link = 'Call of Duty: Warzone',
@@ -312,6 +335,7 @@ return {
 			},
 		},
 		wzm = {
+			order = 23,
 			abbreviation = 'WZM',
 			name = 'Warzone Mobile',
 			link = 'Call of Duty: Warzone Mobile',
@@ -325,6 +349,7 @@ return {
 			},
 		},
 		online = {
+			order = 24,
 			abbreviation = 'CODOL',
 			name = 'Call of Duty Online',
 			link = 'Call of Duty Online',

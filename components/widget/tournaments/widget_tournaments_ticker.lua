@@ -34,19 +34,18 @@ function TournamentsTickerWidget:render()
 	local upcomingDays = self.props.upcomingDays
 	local completedDays = self.props.completedDays
 
-	--- These thresholds makes very little sense, but it's converted from legacy.
-	--- Let's revisit them with product, design and community at the later date
 	local tierThresholdModifiers = {
-		[1] = 55,
-		[2] = 55,
-		[3] = 22,
-		[4] = 0,
-		[5] = 0,
+		[1] = self.props.modifierTier1,
+		[2] = self.props.modifierTier2,
+		[3] = self.props.modifierTier3,
+		[4] = self.props.modifierTier4,
+		[5] = self.props.modifierTier5,
+		[-1] = self.props.modifierTierMisc,
 	}
 
 	--- The Tier Type thresholds only affect completed tournaments.
 	local tierTypeThresholdModifiers = {
-		['qualifier'] = -2,
+		['qualifier'] = self.props.modifierTypeQualifier,
 	}
 
 	local currentTimestamp = DateExt.getCurrentTimestamp()
