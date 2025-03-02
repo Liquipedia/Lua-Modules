@@ -29,6 +29,21 @@ local INDENT = WikiCopyPaste.Indent
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	if opponents > 2 then
+		return WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	else
+		return WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
+	end
+end
+
+---returns the Code for a Match, depending on the input
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getStandardMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBool(args.score), true)
 
 	local lines = Array.extend(
@@ -39,7 +54,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode, opponents)
+			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getStandardMap(mode, opponents)
 		end),
 		'}}'
 	)
@@ -51,7 +66,7 @@ end
 ---@param mode string
 ---@param opponents integer
 ---@return string
-function WikiCopyPaste._getMap(mode, opponents)
+function WikiCopyPaste._getStandardMap(mode, opponents)
 	if mode == Opponent.team then
 		return '={{Map|o1p1=|o2p1=|o1c1=|o2c1=|winner=}}'
 	elseif mode == Opponent.literal then
@@ -68,6 +83,29 @@ function WikiCopyPaste._getMap(mode, opponents)
 	)
 
 	return table.concat(parts)
+end
+
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
+	local lines = Array.extend(
+		'{{Match|finished=',
+		INDENT .. '|p1=7.1 |p2=6 |p3=5 |p4=4 |p5=3 |p6=2 |p7=1 |p8=0',
+		INDENT .. '|twitch= |youtube=',
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|vod=}}'
+		end),
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
+		end),
+		'}}'
+	)
+
+	return table.concat(lines, '\n')
 end
 
 return WikiCopyPaste
