@@ -16,9 +16,13 @@ local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 
-local FilterButtons = {}
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
-local DROPDOWN_ARROW = '&#8203;▼&#8203;'
+local FilterButtons = {}
 
 ---@class FilterButtonCategory
 ---@field name string
@@ -38,30 +42,27 @@ local DROPDOWN_ARROW = '&#8203;▼&#8203;'
 
 ---Builds filterbuttons based on config stored in Module:FilterButtons/Config
 ---Can be used from wikicode
----@return Html
+---@return Widget
 function FilterButtons.getFromConfig()
 	return FilterButtons.get(Lua.import('Module:FilterButtons/Config').categories)
 end
 
 ---Entrypoint building a set of FilterButtons
 ---@param categories FilterButtonCategory[]
----@return Html
+---@return Widget
 function FilterButtons.get(categories)
 	Array.forEach(categories, FilterButtons._loadCategories)
 
-	local div = mw.html.create('div')
-
-	for _, category in ipairs(categories) do
-		-- Variable used to pass default values on to other modules using these.
-		assert(
-			Table.isNotEmpty(category.items), category.name .. ': List of items is required, either input or filled during load'
-		)
-		Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
-		local buttons = FilterButtons.getButtonRow(category)
-		div:node(buttons)
-	end
-
-	return div
+	return Div{
+		children = Array.map(categories, function (category)
+			-- Variable used to pass default values on to other modules using these.
+			assert(
+				Table.isNotEmpty(category.items), category.name .. ': List of items is required, either input or filled during load'
+			)
+			Variables.varDefine('filterbuttons_defaults_' .. category.name, table.concat(category.defaultItems, ','))
+			return FilterButtons.getButtonRow(category)
+		end)
+	}
 end
 
 ---@param category FilterButtonCategory
@@ -79,70 +80,78 @@ function FilterButtons._loadCategories(category)
 end
 
 ---@param category FilterButtonCategory
----@return Html
+---@param value string?
+---@param text string?
+---@return WidgetHtml
+function FilterButtons:_makeButton(category, value, text)
+	return Span{
+		classes = {
+			'filter-button',
+			Table.includes(category.defaultItems, value) and 'filter-button--active' or nil
+		},
+		attributes = { ['data-filter-on'] = value },
+		children = { text }
+	}
+end
+
+---@param category FilterButtonCategory
+---@return Widget
 function FilterButtons.getButtonRow(category)
-	local buttons = mw.html.create('div')
-		:addClass('filter-buttons')
-		:attr('data-filter', 'data-filter')
-		:attr('data-filter-effect','fade')
-		:attr('data-filter-group', 'filterbuttons-' .. category.name)
-		:attr('data-filter-default-curated', category.featuredByDefault and 'true' or nil)
-		:tag('span')
-			:addClass('filter-button')
-			:addClass('filter-button-all')
-			:attr('data-filter-on', 'all')
-			:wikitext(I18n.translate('filterbuttons-all'))
-			:done()
-
-	local makeButton = function(value, text)
-		local button = mw.html.create('span')
-			:addClass('filter-button')
-			:attr('data-filter-on', value)
-			:wikitext(text)
-		if Table.includes(category.defaultItems, value) then
-			button:addClass('filter-button--active')
-		end
-		buttons:node(button)
-	end
-
-	if category.hasFeatured then
-		makeButton('curated', I18n.translate('filterbuttons-featured'))
-	end
-
 	local transformValueToText = category.transform or FnUtil.identity
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
-	for _, value in ipairs(category.items or {}) do
-		local text = transformValueToText(value)
-		local filterValue = itemToPropertyValues(value) or value
-		makeButton(filterValue, text)
-	end
 
-	if String.isNotEmpty(category.expandKey) then
-		local dropdownButton = mw.html.create('div')
-			:addClass('filter-buttons')
-			:attr('data-filter', 'data-filter')
-			:attr('data-filter-effect','fade')
-			:attr('data-filter-group', 'tournaments-list-dropdown-' .. category.expandKey)
-			:node(mw.html.create('span')
-				:addClass('filter-button')
-				:addClass('filter-button-dropdown')
-				:attr('data-filter-on', 'dropdown-' .. category.expandKey)
-				:wikitext(DROPDOWN_ARROW))
-			:node(mw.html.create('span')
-				:addClass('filter-button')
-				:css('display','none')
-				:attr('data-filter-on', 'all'))
-
-		buttons:node(dropdownButton)
-	end
+	local buttons = Div{
+		classes = {'filter-buttons'},
+		attributes = {
+			['data-filter'] = 'data-filter',
+			['data-filter-effect'] = 'fade',
+			['data-filter-group'] = 'filterbuttons-' .. category.name,
+			['data-filter-default-curated'] = category.featuredByDefault and 'true' or nil,
+		},
+		children = WidgetUtil.collect(
+			Span{
+				classes = { 'filter-button', 'filter-button-all' },
+				attributes = { ['data-filter-on'] = 'all' },
+				children = { I18n.translate('filterbuttons-all') }
+			},
+			category.hasFeatured and FilterButtons:_makeButton(category, 'curated', I18n.translate('filterbuttons-featured')),
+			Array.map(category.items or {}, function (value)
+				local text = transformValueToText(value)
+				local filterValue = itemToPropertyValues(value) or value
+				FilterButtons:_makeButton(category, filterValue, text)
+			end),
+			String.isNotEmpty(category.expandKey) and Div{
+				classes = { 'filter-buttons' },
+				attributes = {
+					['data-filter'] = 'data-filter',
+					['data-filter-effect'] ='fade',
+					['data-filter-group'] = 'tournaments-list-dropdown-' .. category.expandKey
+				},
+				children = {
+					Span{
+						classes = { 'filter-button', 'filter-button-dropdown' },
+						attributes = { ['data-filter-on'] = 'dropdown-' .. category.expandKey },
+						children = { IconFa{iconName = 'expand'} }
+					},
+					Span{
+						classes = { 'filter-button' },
+						css = { display = 'none' },
+						attributes = { ['data-filter-on'] = 'all'}
+					}
+				}
+			} or nil
+		)
+	}
 
 	if category.expandable then
-		local section = mw.html.create('div')
-			:addClass('filter-category--hidden')
-			:attr('data-filter-group', 'tournaments-list-dropdown-' .. category.name)
-			:attr('data-filter-category', 'dropdown-' .. category.name)
-			:node(buttons)
-		return section
+		return Div{
+			classes = { 'filter-category--hidden' },
+			attributes = {
+				['data-filter-group'] = 'tournaments-list-dropdown-' .. category.name,
+				['data-filter-category'] = 'dropdown-' .. category.name
+			},
+			children = { buttons }
+		}
 	end
 
 	return buttons
