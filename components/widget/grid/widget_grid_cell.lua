@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -81,7 +82,7 @@ function GridCell:render()
 
 	if Array.all(GRID_WIDTHS, function (width)
 		return self.props[width] == nil
-	end) and not self.props.noDefault then
+	end) and not Logic.readBool(self.props.noDefault) then
 		Array.extendWith(cellClasses, 'lp-col-12')
 	end
 
