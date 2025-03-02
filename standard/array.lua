@@ -174,7 +174,7 @@ function Array.any(tbl, predicate)
 	return false
 end
 
----Finds the first element in an array satisfying a predicate. Returs nil if no element satisfies the predicate.
+---Finds the first element in an array satisfying a predicate. Returns nil if no element satisfies the predicate.
 ---@generic T
 ---@param tbl T[]
 ---@param predicate fun(element?: T, index?: integer): boolean
