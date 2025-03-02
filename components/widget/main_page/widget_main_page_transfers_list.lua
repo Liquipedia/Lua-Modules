@@ -29,7 +29,7 @@ local CENTER_DOT = Span{
 
 ---@class TransfersList: Widget
 ---@operator call(table): TransfersList
----@field props table<string, any>
+---@field props {limit: integer?, rumours: boolean?, transferPage: fun():string}
 local TransfersList = Class.new(Widget)
 TransfersList.defaultProps = {
 	limit = 15,
