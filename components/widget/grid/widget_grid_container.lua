@@ -15,7 +15,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class GridContainer: Widget
 ---@operator call(table): GridContainer
----@field props table<string, any>
+---@field props {center: boolean?, rowGap: string?, gridCells:(Widget|string|Html|nil)|(Widget|string|Html|nil)[]}
 local GridContainer = Class.new(Widget)
 
 ---@return Widget
