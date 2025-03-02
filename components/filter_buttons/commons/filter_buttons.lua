@@ -118,7 +118,7 @@ function FilterButtons.getButtonRow(category)
 			Array.map(category.items or {}, function (value)
 				local text = transformValueToText(value)
 				local filterValue = itemToPropertyValues(value) or value
-				FilterButtons:_makeButton(category, filterValue, text)
+				return FilterButtons:_makeButton(category, filterValue, text)
 			end),
 			String.isNotEmpty(category.expandKey) and Div{
 				classes = { 'filter-buttons' },
