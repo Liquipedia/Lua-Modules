@@ -12,7 +12,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 
 ---@return string
 local getTransferSubPage = function ()
-	return DateExt.quarterOf{ordinalSiffix = true} .. ' Quarter ' .. os.date('%Y')
+	return DateExt.quarterOf{ordinalSuffix = true} .. ' Quarter ' .. os.date('%Y')
 end
 
 local CONTENT = {
