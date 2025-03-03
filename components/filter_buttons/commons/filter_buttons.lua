@@ -99,6 +99,7 @@ end
 function FilterButtons.getButtonRow(category)
 	local transformValueToText = category.transform or FnUtil.identity
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
+	local makeButton = FnUtil.curry(FilterButtons._makeButton, category)
 
 	local buttons = Div{
 		classes = {'filter-buttons'},
@@ -114,11 +115,11 @@ function FilterButtons.getButtonRow(category)
 				attributes = { ['data-filter-on'] = 'all' },
 				children = { I18n.translate('filterbuttons-all') }
 			},
-			category.hasFeatured and FilterButtons._makeButton(category, 'curated', I18n.translate('filterbuttons-featured')),
+			category.hasFeatured and makeButton('curated', I18n.translate('filterbuttons-featured')),
 			Array.map(category.items or {}, function (value)
 				local text = transformValueToText(value)
 				local filterValue = itemToPropertyValues(value) or value
-				return FilterButtons._makeButton(category, filterValue, text)
+				return makeButton(filterValue, text)
 			end),
 			String.isNotEmpty(category.expandKey) and Div{
 				classes = { 'filter-buttons' },
