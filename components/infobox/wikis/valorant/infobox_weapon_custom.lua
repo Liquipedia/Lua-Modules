@@ -66,6 +66,7 @@ function CustomWeapon.run(frame)
 	args.wallpenetration = args['wall penetration']
 
 	args.disableClassLink = true
+	args.reloadspeedunit = 's'
 	weapon:setWidgetInjector(CustomInjector(weapon))
 
 	return weapon:createInfobox()
