@@ -79,7 +79,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			args.price and Cell{
 				name = 'Price',
-				separator = ' ',
+				options = { separator = ' ' },
 				content = { CREDS_ICON, args.price }
 			} or nil
 		}
@@ -100,7 +100,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			args.killaward and Cell{
 				name = 'Kill Award',
-				separator = ' ',
+				options = { separator = ' ' },
 				content = { CREDS_ICON, args.killaward }
 			} or nil
 		}
@@ -112,12 +112,12 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Fire rate',
-				separator = ' ',
+				options = { separator = ' ' },
 				content = { rateOfFire, FIRE_RATE_UNIT }
 			},
 			Cell{
 				name = 'Alternate Fire rate',
-				separator = ' ',
+				options = { separator = ' ' },
 				content = {
 					args.altrateoffire,
 					args.altrateoffire and FIRE_RATE_UNIT or nil
