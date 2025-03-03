@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -21,15 +22,14 @@ local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
 -- Battle Mode: Different Battle Mode each providing different pacing.
-local BATTLEMODE = {
+local BATTLEMODES = {
 	ab = 'Arcade',
 	rb = 'Realistic',
 	sb = 'Simulator',
 	rbm = 'Realistic with Markers',
 }
-
 -- Vehicle: Type of units played in the event.
-local VEHICLE = {
+local VEHICLES = {
 	aviation = 'Aviation',
 	ground = 'Ground',
 	naval = 'Naval',
@@ -53,18 +53,12 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		-- Process battle mode - convert to lowercase for matching
-		local battlemodeInput = string.lower(args.battlemode or '')
-		local battlemodeValue = BATTLEMODE[battlemodeInput] or 'Unknown'
-
-		-- Process vehicle type - convert to lowercase for matching
-		local vehicleInput = string.lower(args.vehicle or '')
-		local vehicleValue = VEHICLE[vehicleInput] or 'Unknown'
-
+		local battleMode = BATTLEMODES[string.lower(args.battlemode or '')] or 'Unknown'
+		local vehicle = VEHICLES[string.lower(args.vehicle or '')] or 'Unknown'
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Battle Mode', content = {battlemodeValue}},
-			Cell{name = 'Vehicle', content = {vehicleValue}}
+			Cell{name = 'Battle Mode', content = {battleMode}},
+			Cell{name = 'Vehicle', content = {vehicle}}
 		)
 	end
 
