@@ -49,6 +49,14 @@ function CustomWeapon.run(frame)
 	args.ammocap = args.capacity
 	--args['reload time'] should be botted to args.reloadspeed
 	args.reloadspeed = args['reload time']
+	-- args['fire rate'] should be botted to args.rateoffire
+	args.rateoffire = args['fire rate']
+	-- args['fire rate min'] should be botted to args.minrateoffire
+	args.minrateoffire = args['fire rate min']
+	-- args['fire rate max'] should be botted to args.maxrateoffire
+	args.maxrateoffire = args['fire rate max']
+	-- args['alternate fire rate'] should be botted to args.altrateoffire
+	args.altrateoffire = args['alternate fire rate']
 
 	weapon:setWidgetInjector(CustomInjector(weapon))
 
@@ -77,18 +85,14 @@ function CustomInjector:parse(id, widgets)
 			} or nil
 		}
 	elseif id == 'rateoffire' then
+		local rateOfFire = Logic.emptyOr(
+			args.rateoffire,
+			(args.minrateoffire or '?') .. '-' .. (args.maxrateoffire or '?')
+		)
 		return {
 			Cell{
 				name = 'Fire rate',
-				content = {
-					-- 'fire rate' should be botted to
-					-- 'rateoffire' for standardization
-					Logic.emptyOr(
-						args['fire rate'],
-						(args['fire rate min'] or '?') .. '-' .. (args['fire rate max'] or '?')
-					),
-					args['fire rate'] and ' rounds/sec' or nil
-				}
+				content = { rateOfFire .. ' rounds/sec' }
 			},
 			Cell{
 				name = 'Alternate Fire rate',
@@ -107,7 +111,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Movement speed',
-				content = { args['movement speed'] }
+				content = { args['movement speed'] .. ' m/sec' }
 			}
 		)
 	end
@@ -126,13 +130,13 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		wallpenetration = args['wall penetration'],
 		ammo = args.ammo,
 		capacity = args.capacity,
-		reload = args['reload time'],
+		reload = args.reloadspeed,
 		movementspeed = args['movement speed'],
-		firingmode = args['firing mode'],
-		firerate = args['fire rate'],
-		fireratemin = args['fire rate min'],
-		fireratemax = args['fire rate max'],
-		fireratealternate = args['alternate fire rate'],
+		firingmode = args.firemode,
+		firerate = args.rateoffire,
+		fireratemin = args.minrateoffire,
+		fireratemax = args.maxrateoffire,
+		fireratealternate = args.altrateoffire,
 	}
 	return lpdbData
 end
