@@ -69,7 +69,10 @@ function Weapon:createInfobox()
 				Cell{name = 'Kill Award', content = {args.killaward}}
 			}
 		},
-		Cell{name = 'Base Damage', content = {args.damage}},
+		Customizable{
+			id = 'damage',
+			children = { Cell{name = 'Base Damage', content = {args.damage}} }
+		},
 		Cell{name = 'Magazine Size', content = {args.magsize}},
 		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
 		Cell{name = 'Reload Speed', content = {args.reloadspeed}},

@@ -14,6 +14,7 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Span = Widgets.Span
@@ -81,6 +82,19 @@ function CustomInjector:parse(id, widgets)
 				separator = ' ',
 				content = { CREDS_ICON, args.price }
 			} or nil
+		}
+	elseif id == 'damage' then
+		return {
+			Builder{
+				builder = function()
+					return {
+						Cell{
+							name = 'Damage',
+							content = self.caller:getAllArgsForBase(args, 'damage'),
+						}
+					}
+				end
+			}
 		}
 	elseif id == 'killaward' then
 		return {
