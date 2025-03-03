@@ -149,6 +149,7 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		class = args.class,
 		price = args.price,
 		damage = args.damage,
+		damage2 = args.damage2,
 		wallpenetration = args.wallpenetration,
 		ammo = args.ammo,
 		capacity = args.capacity,
