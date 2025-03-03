@@ -45,6 +45,22 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'price' then
+		return {
+			Cell{
+				name = 'Price',
+				content = { CREDS_ICON, args.price }
+			}
+		}
+	elseif id == 'killaward' then
+		return {
+			Cell{
+				name = 'Kill Award',
+				content = { CREDS_ICON, args.killaward }
+			}
+		}
+	end
 	return widgets
 end
 
