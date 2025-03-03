@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
