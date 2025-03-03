@@ -56,8 +56,18 @@ function Weapon:createInfobox()
 			name = 'Origin',
 			content = {self:_createLocation(args.origin)},
 		},
-		Cell{name = 'Price', content = {args.price}},
-		Cell{name = 'Kill Award', content = {args.killaward}},
+		Customizable{
+			id = 'price',
+			children = {
+				Cell{name = 'Price', content = {args.price}}
+			}
+		},
+		Customizable{
+			id = 'killaward',
+			children = {
+				Cell{name = 'Kill Award', content = {args.killaward}}
+			}
+		},
 		Cell{name = 'Base Damage', content = {args.damage}},
 		Cell{name = 'Magazine Size', content = {args.magsize}},
 		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
