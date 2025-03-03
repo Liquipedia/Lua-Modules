@@ -30,6 +30,7 @@ local CREDS_ICON = Span{
 		}
 	}
 }
+local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
@@ -57,6 +58,10 @@ function CustomWeapon.run(frame)
 	args.maxrateoffire = args['fire rate max']
 	-- args['alternate fire rate'] should be botted to args.altrateoffire
 	args.altrateoffire = args['alternate fire rate']
+	-- args['movement speed'] should be botted to args.movementspeed
+	args.movementspeed = args['movement speed']
+	-- args['wall penetration'] should be botted to args.wallpenetration
+	args.wallpenetration = args['wall penetration']
 
 	weapon:setWidgetInjector(CustomInjector(weapon))
 
@@ -92,13 +97,15 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{
 				name = 'Fire rate',
-				content = { rateOfFire .. ' rounds/sec' }
+				separator = ' ',
+				content = { rateOfFire, FIRE_RATE_UNIT }
 			},
 			Cell{
 				name = 'Alternate Fire rate',
+				separator = ' ',
 				content = {
-					args['alternate fire rate'],
-					args['alternate fire rate'] and ' rounds/sec' or nil
+					args.altrateoffire,
+					args.altrateoffire and FIRE_RATE_UNIT or nil
 				}
 			}
 		}
@@ -107,11 +114,11 @@ function CustomInjector:parse(id, widgets)
 		return WidgetUtil.collect(
 			Cell{
 				name = 'Wall peneration',
-				content = { args['wall penetration'] }
+				content = { args.wallpenetration }
 			},
 			Cell{
 				name = 'Movement speed',
-				content = { args['movement speed'] .. ' m/sec' }
+				content = { args.movementspeed .. ' m/sec' }
 			}
 		)
 	end
@@ -127,11 +134,11 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		class = args.class,
 		price = args.price,
 		damage = args.damage,
-		wallpenetration = args['wall penetration'],
+		wallpenetration = args.wallpenetration,
 		ammo = args.ammo,
 		capacity = args.capacity,
 		reload = args.reloadspeed,
-		movementspeed = args['movement speed'],
+		movementspeed = args.movementspeed,
 		firingmode = args.firemode,
 		firerate = args.rateoffire,
 		fireratemin = args.minrateoffire,
