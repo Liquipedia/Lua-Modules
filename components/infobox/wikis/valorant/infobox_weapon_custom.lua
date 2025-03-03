@@ -62,17 +62,19 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'price' then
 		return {
-			Cell{
+			args.price and Cell{
 				name = 'Price',
+				separator = ' ',
 				content = { CREDS_ICON, args.price }
-			}
+			} or nil
 		}
 	elseif id == 'killaward' then
 		return {
-			Cell{
+			args.killaward and Cell{
 				name = 'Kill Award',
+				separator = ' ',
 				content = { CREDS_ICON, args.killaward }
-			}
+			} or nil
 		}
 	elseif id == 'rateoffire' then
 		return {
