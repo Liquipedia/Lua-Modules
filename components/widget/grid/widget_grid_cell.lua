@@ -68,14 +68,17 @@ function GridCell:render()
 		end
 		if self.props['order-' .. width] then
 			local width_prefix = width ~= 'xs' and width .. '-' or ''
-			Array.extendWith(cellClasses, {'lp-order-' .. width_prefix .. self.props['order-' .. width]})
+			Array.appendWith(
+				cellClasses, 'lp-order-' .. width_prefix .. self.props['order-' .. width]
+			)
 		end
 		Array.forEach(GRID_DIRECTIONS, function (direction)
 			if self.props['m' .. direction .. '-' .. width] then
 				local width_prefix = width ~= 'xs' and width .. '-' or ''
-				Array.extendWith(cellClasses, {
+				Array.appendWith(
+					cellClasses,
 					'm' .. direction .. '-' .. width_prefix .. self.props['m' .. direction .. '-' .. width]
-				})
+				)
 			end
 		end)
 	end)
@@ -83,7 +86,7 @@ function GridCell:render()
 	if Array.all(GRID_WIDTHS, function (width)
 		return self.props[width] == nil
 	end) and not Logic.readBool(self.props.noDefault) then
-		Array.extendWith(cellClasses, 'lp-col-12')
+		Array.appendWith(cellClasses, 'lp-col-12')
 	end
 
 	return Div{
