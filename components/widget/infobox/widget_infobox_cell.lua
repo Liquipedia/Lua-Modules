@@ -18,6 +18,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@field columns number?
 ---@field makeLink boolean?
 ---@field suppressColon boolean?
+---@field separator Widget|string|Html|nil
 
 ---@class CellWidget: Widget
 ---@operator call(table):CellWidget
@@ -32,6 +33,7 @@ Cell.defaultProps = {
 		columns = 2,
 		makeLink = false,
 		suppressColon = false,
+		separator = HtmlWidgets.Br,
 	}
 }
 
@@ -46,7 +48,7 @@ function Cell:render()
 	local mappedChildren = {}
 	for i, child in ipairs(self.props.children) do
 		if i > 1 then
-			table.insert(mappedChildren, '<br/>')
+			table.insert(mappedChildren, self.props.separator)
 		end
 		if options.makeLink then
 			table.insert(mappedChildren, Link{children = {child}, link = child})
