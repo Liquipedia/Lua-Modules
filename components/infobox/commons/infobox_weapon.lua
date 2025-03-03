@@ -72,7 +72,12 @@ function Weapon:createInfobox()
 		Cell{name = 'Magazine Size', content = {args.magsize}},
 		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
 		Cell{name = 'Reload Speed', content = {args.reloadspeed}},
-		Cell{name = 'Rate of Fire', content = {args.rateoffire}},
+		Customizable{
+			id = 'rateoffire',
+			children = {
+				Cell{name = 'Rate of Fire', content = {args.rateoffire}}
+			}
+		},
 		Cell{name = 'Firing Mode', content = {args.firemode}},
 		Customizable{
 			id = 'side',
