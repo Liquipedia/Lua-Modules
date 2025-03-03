@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
@@ -50,7 +51,7 @@ function Weapon:createInfobox()
 		Title{children = (args.informationType or 'Weapon') .. ' Information'},
 		Cell{
 			name = 'Class',
-			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
+			content = self:getAllArgsForBase(args, 'class', {makeLink = not Logic.readBool(args.disableClassLink)}),
 		},
 		Cell{
 			name = 'Origin',

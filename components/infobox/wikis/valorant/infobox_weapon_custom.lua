@@ -63,6 +63,7 @@ function CustomWeapon.run(frame)
 	-- args['wall penetration'] should be botted to args.wallpenetration
 	args.wallpenetration = args['wall penetration']
 
+	args.disableClassLink = true
 	weapon:setWidgetInjector(CustomInjector(weapon))
 
 	return weapon:createInfobox()
