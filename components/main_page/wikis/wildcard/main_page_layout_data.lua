@@ -80,7 +80,7 @@ return {
 		lightmode = 'Wildcard full lightmode.svg',
 		darkmode = 'Wildcard full darkmode.svg',
 	},
-	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from champions and summons, to strategies, ' ..
+	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from characters, to strategies, ' ..
 	'to tournaments, to competitive players, and teams.',
 	title = 'The Wildcard Wiki',
 	navigation = {
