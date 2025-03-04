@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -24,7 +23,9 @@ local TiebreakerBuchholz = Class.new(TiebreakerInteface)
 ---@return integer
 function TiebreakerBuchholz:valueOf(state, opponent)
 	local enemies = Array.flatMap(opponent.matches, function(match)
-		return Array.filter(match.opponents, FnUtil.curry(Opponent.same, opponent))
+		return Array.filter(match.opponents, function (opp)
+			return not Opponent.same(opp, opponent.opponent)
+		end)
 	end)
 
 	return Array.reduce(state, function(score, groupMember)
