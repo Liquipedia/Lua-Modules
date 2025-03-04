@@ -13,7 +13,6 @@ local Image = require('Module:Image')
 local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -43,10 +42,25 @@ function MainPageLayout.make(frame)
 			NO_TABLE_OF_CONTENTS,
 			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
 			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
-			Template.expandTemplate(frame, 'Header banner', {
-				['logo-lighttheme'] = WikiData.banner.lightmode,
-				['logo-darktheme'] = WikiData.banner.darkmode,
-			}),
+			HtmlWidgets.Div{
+				classes = {'header-banner'},
+				children = {
+					HtmlWidgets.Div{
+						classes = {'header-banner__logo'},
+						children = {
+							HtmlWidgets.Div{
+								classes = {'logo--light-theme'},
+								children = { Image.display(WikiData.banner.lightmode, nil, {size = 200, link = ''}) }
+							},
+							HtmlWidgets.Div{
+								classes = {'logo--dark-theme'},
+								children = { Image.display(WikiData.banner.darkmode, nil, {size = 200, link = ''}) }
+							}
+						},
+					},
+					frame:preprocess('{{#searchbox:}}'),
+				}
+			},
 			HtmlWidgets.Div{
 				classes = {'navigation-cards'},
 				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
