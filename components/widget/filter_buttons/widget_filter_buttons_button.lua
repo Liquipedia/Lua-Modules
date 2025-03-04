@@ -14,9 +14,16 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
+---@class FilterButtonParameters
+---@field buttonClasses string[]?
+---@field css table<string,string>?
+---@field active boolean?
+---@field value string?
+---@field display string|Widget|Html|nil
+
 ---@class FilterButton: Widget
 ---@operator call(table): FilterButton
----@field props {buttonClasses: string[]?, css: table<string,string>?, active: boolean?, value: string?, display: string|Widget|Html|nil}
+---@field props FilterButtonParameters
 local FilterButton = Class.new(Widget)
 
 ---@return Widget
