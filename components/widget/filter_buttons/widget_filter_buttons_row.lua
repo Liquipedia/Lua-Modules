@@ -45,11 +45,11 @@ function FilterButtonRow:render()
 			FilterButton{
 				buttonClasses = { 'filter-button-all' },
 				value = 'all',
-				text = I18n.translate('filterbuttons-all')
+				display = I18n.translate('filterbuttons-all')
 			},
 			self.props.hasFeatured and FilterButton{
 				value = 'curated',
-				text = I18n.translate('filterbuttons-featured')
+				display = I18n.translate('filterbuttons-featured')
 			},
 			self.props.buttons,
 			String.isNotEmpty(self.props.expandKey) and HtmlWidgets.Div{
@@ -63,7 +63,7 @@ function FilterButtonRow:render()
 					FilterButton{
 						buttonClasses = { 'filter-button-dropdown' },
 						value = 'dropdown-' .. self.props.expandKey,
-						children = { IconFa{iconName = 'expand'} }
+						display = { IconFa{iconName = 'expand'} }
 					},
 					FilterButton{
 						css = { display = 'none' },

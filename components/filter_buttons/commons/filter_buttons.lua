@@ -86,7 +86,7 @@ function FilterButtons._makeButton(category, value, text)
 	return FilterButton{
 		active = Table.includes(category.defaultItems, value),
 		value = value,
-		text = text
+		display = text
 	}
 end
 

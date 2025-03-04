@@ -16,7 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 ---@class FilterButton: Widget
 ---@operator call(table): FilterButton
----@field props {buttonClasses: string[]?, css: table<string,string>?, active: boolean?, value: string?, text: string?}
+---@field props {buttonClasses: string[]?, css: table<string,string>?, active: boolean?, value: string?, display: string|Widget|Html|nil}
 local FilterButton = Class.new(Widget)
 
 ---@return Widget
@@ -28,7 +28,7 @@ function FilterButton:render()
 		}, self.props.buttonClasses),
 		attributes = { ['data-filter-on'] = self.props.value },
 		css = self.props.css,
-		children = { self.props.text }
+		children = { self.props.display }
 	}
 end
 
