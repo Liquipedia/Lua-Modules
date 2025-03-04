@@ -14,21 +14,13 @@ local FilterButtons = Lua.import('Module:FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
+local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Small = HtmlWidgets.Small
-local Span = HtmlWidgets.Span
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local CENTER_DOT = Span{
-	css = {
-		['font-style'] = 'normal',
-		padding = '0 5px',
-	},
-	children = { '&#8226;' }
-}
 
 local CONTENT = {
 	usefulArticles = {
@@ -124,7 +116,7 @@ local CONTENT = {
 						},
 						children = {
 							Link{ children = 'See all Headlines', link = 'Portal:News' },
-							CENTER_DOT,
+							CenterDot(),
 							Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
 						}
 					}
