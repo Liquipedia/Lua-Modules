@@ -66,9 +66,12 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 			return
 		end
 
+		local matches = {}
+
 		return {
 			opponent = opponent,
 			rounds = Array.map(opponentData.rounds, function(roundData)
+				matches = Array.extend(matches, roundData.matchId)
 				return {
 					scoreboard = {
 						points = roundData.scoreboard.points,
@@ -79,7 +82,8 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 						},
 					},
 					specialstatus = roundData.specialstatus or 'nc',
-					matchId = roundData.matchId
+					matches = matches,
+					matchId = roundData.matchId,
 				}
 			end)
 		}
