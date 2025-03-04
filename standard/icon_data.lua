@@ -119,4 +119,8 @@ return {
 
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
+
+	-- Usage: Chess
+	chesskingoutline = 'far fa-chess-king',
+	chesskingfull = 'fas fa-chess-king',
 }
