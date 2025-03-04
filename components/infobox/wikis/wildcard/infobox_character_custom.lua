@@ -44,11 +44,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Health', content = {args.health}},
 			Cell{name = 'Damage per second', content = {args.dps}},
 			Cell{name = 'Move Speed', content = {args.movespeed}},
-			Cell{name = 'House', content = {args.house}}
-		)
-
-		Array.appendWith(
-			widgets,
+			Cell{name = 'House', content = {args.house}},
 			Title{children = 'Basic Stats'},
 			Cell{name = 'Healing', content = {args.healing}},
 			Cell{name = 'Mobility', content = {args.mobility}},
