@@ -13,20 +13,12 @@ local Lua = require('Module:Lua')
 
 local TransferList = Lua.import('Module:TransferList')
 
+local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Span = HtmlWidgets.Span
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local CENTER_DOT = Span{
-	css = {
-		['font-style'] = 'normal',
-		padding = '0 5px',
-	},
-	children = { '&#8226;' }
-}
 
 ---@class TransfersListParameters
 ---@field limit integer?
@@ -34,6 +26,7 @@ local CENTER_DOT = Span{
 ---@field transferPortal string?
 ---@field transferPage fun():string
 ---@field transferQuery boolean?
+---@field onlyNotableTransfers boolean?
 
 ---@class TransfersList: Widget
 ---@operator call(table): TransfersList
@@ -51,7 +44,10 @@ TransfersList.defaultProps = {
 
 function TransfersList:render()
 	return WidgetUtil.collect(
-		TransferList { limit = self.props.limit }:fetch():create(),
+		TransferList{
+			limit = self.props.limit,
+			onlyNotableTransfers = self.props.onlyNotableTransfers,
+		}:fetch():create(),
 		Div {
 			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
 			children = {
@@ -87,7 +83,7 @@ function TransfersList:render()
 						} or nil,
 						Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
 						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
-					), CENTER_DOT)
+					), CenterDot())
 				},
 			}
 		}

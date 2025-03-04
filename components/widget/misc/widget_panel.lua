@@ -56,7 +56,7 @@ function Panel:render()
 		attributes = boxId and {
 			['data-component'] = 'panel-box-content'
 		} or {},
-		children = self.props.body
+		children = self.props.children
 	}
 
 	return Div{
