@@ -9,6 +9,18 @@
 local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
+local Ordinal = Lua.import('Module:Ordinal')
+
+local FilterButtons = Lua.import('Module:FilterButtons')
+local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Small = HtmlWidgets.Small
+local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@return string
 local getTransferSubPage = function ()
@@ -30,19 +42,21 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = '{{Transfer List|onlyNotableTransfers=true|limit=15}}\n' ..
-			'<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
-			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
-			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/' .. getTransferSubPage() .. '|edit]]&#93;</div>\n' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
-			'[[Transfers|See more transfers]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]</div>\n</div>',
+		body = TransfersList{
+			transferQuery = false,
+			onlyNotableTransfers = true,
+		},
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in StarCraft II <small id="this-day-date" style = "margin-left: 5px">' ..
-			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
+		heading = WidgetUtil.collect(
+			'This day in StarCraft II ',
+			Small{
+				attributes = {id = 'this-day-date'},
+				css = {['margin-left'] = '5px'},
+				children = {'(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')'}
+			}
+		),
 		body = '{{Liquipedia:This day}}',
 		padding = true,
 		boxid = 1510,
@@ -54,14 +68,27 @@ local CONTENT = {
 	},
 	filterButtons = {
 		noPanel = true,
-		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
-			'{{#invoke:Lua|invoke|module=FilterButtons|fn=getFromConfig}}</div>',
+		body = Div{
+			css = {width = '100%', ['margin-bottom'] = '8px'},
+			children = {FilterButtons.getFromConfig()}
+		},
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}' ..
-			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
+		body = WidgetUtil.collect(
+			MatchTickerContainer{},
+			Div{
+				css = {
+					['white-space'] = 'nowrap',
+					display = 'block',
+					margin = '0 10px',
+					['font-size'] = '15px',
+					['font-style'] = 'italic',
+					['text-align'] = 'center',
+				},
+				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
+			}
+		),
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -70,8 +97,14 @@ local CONTENT = {
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=7|completedDays=7|modifierTypeQualifier=-2|modifierTier1=55|modifierTier2=55|modifierTier3=10}}',
+		body = TournamentsTicker{
+			upcomingDays = 7,
+			completedDays = 7,
+			modifierTypeQualifier = -2,
+			modifierTier1 = 55,
+			modifierTier2 = 55,
+			modifierTier3 = 10
+		},
 		padding = true,
 		boxid = 1508,
 	},
