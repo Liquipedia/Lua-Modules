@@ -16,7 +16,7 @@ local TiebreakerMatchDiff = Class.new(TiebreakerInteface)
 
 ---@param opponent TiebreakerOpponent
 ---@return integer
-function TiebreakerMatchDiff:valueOf(opponent)
+function TiebreakerMatchDiff:valueOf(state, opponent)
 	return opponent.match.w - opponent.match.l
 end
 

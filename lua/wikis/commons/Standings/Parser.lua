@@ -123,8 +123,13 @@ local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
 		return { tiedOpponents }
 	end
 
+	--TODO: add support for ml/h2h tiebreakers
+	if tiebreaker:getContextType() ~= 'full' then
+		error('Minileague and head2head tiebreakers not yet supported')
+	end
+
 	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		return tiebreaker(tiedOpponents):valueOf(opponent)
+		return tiebreaker:valueOf(tiedOpponents, opponent)
 	end)
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)

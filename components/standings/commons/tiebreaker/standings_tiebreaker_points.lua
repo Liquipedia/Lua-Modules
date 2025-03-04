@@ -16,7 +16,7 @@ local TiebreakerPoints = Class.new(TiebreakerInteface)
 
 ---@param opponent TiebreakerOpponent
 ---@return integer
-function TiebreakerPoints:valueOf(opponent)
+function TiebreakerPoints:valueOf(state, opponent)
 	return opponent.points
 end
 
