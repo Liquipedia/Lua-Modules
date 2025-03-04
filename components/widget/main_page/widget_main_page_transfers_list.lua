@@ -34,6 +34,7 @@ local CENTER_DOT = Span{
 ---@field transferPortal string?
 ---@field transferPage fun():string
 ---@field transferQuery boolean?
+---@field onlyNotableTransfers boolean?
 
 ---@class TransfersList: Widget
 ---@operator call(table): TransfersList
@@ -51,7 +52,10 @@ TransfersList.defaultProps = {
 
 function TransfersList:render()
 	return WidgetUtil.collect(
-		TransferList { limit = self.props.limit }:fetch():create(),
+		TransferList{
+			limit = self.props.limit,
+			onlyNotableTransfers = self.props.onlyNotableTransfers,
+		}:fetch():create(),
 		Div {
 			css = { display = 'block', ['text-align'] = 'center', padding = '0.5em' },
 			children = {
