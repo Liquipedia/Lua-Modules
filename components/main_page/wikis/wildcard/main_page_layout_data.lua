@@ -95,13 +95,13 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Characters 1.jpg ',
-			title = 'Summons',
-			link = 'Portal:Summons',
+			file = 'Wildcard Deck covers.jpg ',
+			title = 'Cards',
+			link = 'Portal:Cards',
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::summons]]',
+				conditions = '[[type::cards]]',
 			},
 		},
 		{
