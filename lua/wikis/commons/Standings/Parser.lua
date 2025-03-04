@@ -115,25 +115,25 @@ end
 
 ---@param allOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[]
----@param minileagueOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---@param tiedOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[]
 ---@param tiebreakers StandingsTiebreaker[]
 ---@param tiebreakerIndex integer
 ---@return {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[][]
-local function resolveTieForGroup(allOpponents, minileagueOpponents, tiebreakers, tiebreakerIndex)
+local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakers, tiebreakerIndex)
 	local tiebreaker = tiebreakers[tiebreakerIndex]
 	if not tiebreaker then
-		return { minileagueOpponents }
+		return { tiedOpponents }
 	end
 
-	--TODO: add support for h2h tiebreakers
+	--TODO: add support for ml & h2h tiebreakers
 	local tiebreakerContextType = tiebreaker:getContextType()
 	if tiebreakerContextType == 'headtohead' or tiebreakerContextType == 'minileague' then
 		error('Tiebreakers for head-to-head and minileague are not yet supported')
 	end
 
-	local _, groupedOpponents = Array.groupBy(minileagueOpponents, function(opponent)
+	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
 		return tiebreaker:valueOf(allOpponents, opponent)
 	end)
 
@@ -141,11 +141,11 @@ local function resolveTieForGroup(allOpponents, minileagueOpponents, tiebreakers
 		return a > b
 	end)
 
-	return Array.map(groupedOpponentsInOrder, function(group)
+	return Array.flatMap(groupedOpponentsInOrder, function(group)
 		if #group == 1 then
-			return group
+			return { group }
 		end
-		return Array.flatten(resolveTieForGroup(allOpponents, group, tiebreakers, tiebreakerIndex + 1))
+		return resolveTieForGroup(allOpponents, group, tiebreakers, tiebreakerIndex + 1)
 	end)
 end
 
