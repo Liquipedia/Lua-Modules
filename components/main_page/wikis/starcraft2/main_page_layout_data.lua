@@ -22,11 +22,6 @@ local Small = HtmlWidgets.Small
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@return string
-local getTransferSubPage = function ()
-	return DateExt.quarterOf{ordinalSuffix = true} .. ' Quarter ' .. os.date('%Y')
-end
-
 local CONTENT = {
 	theGame = {
 		heading = 'The Game',
@@ -45,6 +40,9 @@ local CONTENT = {
 		body = TransfersList{
 			transferQuery = false,
 			onlyNotableTransfers = true,
+			transferPage = function ()
+				return DateExt.quarterOf{ordinalSuffix = true} .. ' Quarter ' .. os.date('%Y')
+			end
 		},
 		boxid = 1509,
 	},
@@ -75,20 +73,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTickerContainer{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
