@@ -7,25 +7,32 @@
 --
 
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 
 local TiebreakerFactory = {}
 
----@param name string
----@return StandingsTiebreaker
-function TiebreakerFactory.tiebreakerFromName(name)
-	---@type StandingsTiebreaker?
-	local tiebreakerClass
-	if name == 'manual' then
-		tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/Manual')
-	elseif name == 'points' then
-		tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/Points')
-	elseif name == 'match.diff' then
-		tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/Match/Diff')
-	else
-		error("Invalid tiebreaker type: " .. tostring(name))
-	end
+local NAME_TO_CLASS = {
+	manual = 'Manual',
+	points = 'Points',
+	matchdiff = 'Match/Diff',
+}
 
-	return tiebreakerClass
+---@param input string
+---@return StandingsTiebreaker
+function TiebreakerFactory.tiebreakerFromName(input)
+	local name, context = unpack(String.split(input, '.'))
+	if context == nil then
+		context = 'full'
+	end
+	assert(context == 'full' or context == 'minileague' or context == 'headtohead', 'Invalid context: ' .. context)
+
+	local className = NAME_TO_CLASS[name]
+	assert(className, "Invalid tiebreaker type: " .. tostring(name))
+
+	---@type StandingsTiebreaker
+	local tiebreakerClass = Lua.import('Module:Standings/Tiebreaker/' .. className)
+
+	return tiebreakerClass(context)
 end
 
 return TiebreakerFactory

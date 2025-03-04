@@ -16,7 +16,7 @@ local TiebreakerManual = Class.new(TiebreakerInteface)
 
 ---@param opponent TiebreakerOpponent
 ---@return integer
-function TiebreakerManual:valueOf(opponent)
+function TiebreakerManual:valueOf(state, opponent)
 	return opponent.extradata.tiebreakerpoints
 end
 

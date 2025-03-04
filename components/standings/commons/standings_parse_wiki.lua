@@ -196,7 +196,8 @@ function StandingsParseWiki.parseTiebreakers(args, tableType)
 			}
 		elseif tableType == 'swiss' then
 			tiebreakers = {
-				TiebreakerFactory.tiebreakerFromName('match.diff'),
+				TiebreakerFactory.tiebreakerFromName('matchdiff'),
+				TiebreakerFactory.tiebreakerFromName('manual'),
 			}
 		end
 	end
