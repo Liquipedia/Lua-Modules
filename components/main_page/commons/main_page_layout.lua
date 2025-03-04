@@ -92,7 +92,7 @@ function MainPageLayout._makeCells(cells)
 					table.insert(content, MainPageLayout._processCellBody(contentBody))
 				else
 					table.insert(content, PanelWidget{
-						body = MainPageLayout._processCellBody(contentBody),
+						children = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
