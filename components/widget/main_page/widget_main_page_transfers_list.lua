@@ -28,16 +28,25 @@ local CENTER_DOT = Span{
 	children = { '&#8226;' }
 }
 
+---@class TransfersListParameters
+---@field limit integer?
+---@field rumours boolean?
+---@field transferPortal string?
+---@field transferPage fun():string
+---@field transferQuery boolean?
+
 ---@class TransfersList: Widget
 ---@operator call(table): TransfersList
----@field props {limit: integer?, rumours: boolean?, transferPage: fun():string}
+---@field props TransfersListParameters
 local TransfersList = Class.new(Widget)
 TransfersList.defaultProps = {
 	limit = 15,
 	rumours = false,
+	transferPortal = 'Portal:Transfers',
 	transferPage = function ()
 		return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
-	end
+	end,
+	transferQuery = true
 }
 
 function TransfersList:render()
@@ -71,8 +80,11 @@ function TransfersList:render()
 						['font-style'] = 'italic'
 					},
 					children = Array.interleave({
-						Link { children = 'See more transfers', link = 'Portal:Transfers' },
-						Link { children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
+						Link { children = 'See more transfers', link = self.props.transferPortal },
+						Logic.readBool(self.props.transferQuery) and Link {
+							children = 'Transfer query',
+							link = 'Special:RunQuery/Transfer history'
+						} or nil,
 						Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
 						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil,
 					}, CENTER_DOT)
