@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -69,15 +70,12 @@ function TransfersList:render()
 						['font-size'] = '15px',
 						['font-style'] = 'italic'
 					},
-					children = {
+					children = Array.interleave({
 						Link { children = 'See more transfers', link = 'Portal:Transfers' },
-						CENTER_DOT,
 						Link { children = 'Transfer query', link = 'Special:RunQuery/Transfer_history' },
-						CENTER_DOT,
 						Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
-						Logic.readBool(self.props.rumours) and CENTER_DOT or nil,
 						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil,
-					}
+					}, CENTER_DOT)
 				},
 			}
 		}
