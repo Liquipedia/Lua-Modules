@@ -79,15 +79,15 @@ function TransfersList:render()
 						['font-size'] = '15px',
 						['font-style'] = 'italic'
 					},
-					children = Array.interleave({
+					children = Array.interleave(WidgetUtil.collect(
 						Link { children = 'See more transfers', link = self.props.transferPortal },
 						Logic.readBool(self.props.transferQuery) and Link {
 							children = 'Transfer query',
 							link = 'Special:RunQuery/Transfer history'
 						} or nil,
 						Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
-						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil,
-					}, CENTER_DOT)
+						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
+					), CENTER_DOT)
 				},
 			}
 		}
