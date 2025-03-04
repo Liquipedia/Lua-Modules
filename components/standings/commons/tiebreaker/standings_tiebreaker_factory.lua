@@ -24,7 +24,10 @@ function TiebreakerFactory.tiebreakerFromName(input)
 	if context == nil then
 		context = 'full'
 	end
-	assert(context == 'full' or context == 'minileague' or context == 'headtohead', 'Invalid tie breaker context: ' .. context)
+	assert(
+		context == 'full' or context == 'minileague' or context == 'headtohead',
+		'Invalid tie breaker context: ' .. context
+	)
 
 	local className = NAME_TO_CLASS[name]
 	assert(className, "Invalid tiebreaker type: " .. tostring(name))
