@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:FilterButtons
+-- page=Module:Widget/FilterButtons
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -18,8 +18,11 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local FilterButton = Lua.import('Module:Widget/FilterButtons/Button')
 local FilterButtonRow = Lua.import('Module:Widget/FilterButtons/ButtonRow')
+local Widget = Lua.import('Module:Widget')
 
-local FilterButtons = {}
+---@class FilterButtons: Widget
+---@operator call(table): FilterButtons
+local FilterButtons = Class.new(Widget)
 
 ---@class FilterButtonCategory
 ---@field name string
@@ -41,13 +44,15 @@ local FilterButtons = {}
 ---Can be used from wikicode
 ---@return Widget
 function FilterButtons.getFromConfig()
-	return FilterButtons.get(Lua.import('Module:FilterButtons/Config').categories)
+	-- for compatibility on wiki pages calling this ... to be removed after wiki pages have been updated
+	return FilterButtons()
 end
 
----Entrypoint building a set of FilterButtons
----@param categories FilterButtonCategory[]
 ---@return Widget
-function FilterButtons.get(categories)
+function FilterButtons:render()
+	---@type FilterButtonCategory[]
+	local categories = self.props.categories or Lua.import('Module:FilterButtons/Config').categories
+
 	Array.forEach(categories, FilterButtons._loadCategories)
 
 	return Div{
@@ -121,4 +126,4 @@ function FilterButtons.getButtonRow(category)
 	return buttons
 end
 
-return Class.export(FilterButtons)
+return FilterButtons
