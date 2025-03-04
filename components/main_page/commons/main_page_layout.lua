@@ -70,8 +70,8 @@ function MainPageLayout.make(frame)
 	}
 end
 
----@param body string|Widget|Html|nil
----@return string|Widget|Html|nil
+---@param body (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
+---@return (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
 function MainPageLayout._processCellBody(body)
 	local frame = mw.getCurrentFrame()
 	return type(body) == 'string' and frame:preprocess(body) or body
