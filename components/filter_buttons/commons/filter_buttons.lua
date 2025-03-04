@@ -18,9 +18,8 @@ local Table = require('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Span = HtmlWidgets.Span
-local WidgetUtil = Lua.import('Module:Widget/Util')
-local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local FilterButton = Lua.import('Module:Widget/FilterButtons/Button')
+local FilterButtonRow = Lua.import('Module:Widget/FilterButtons/ButtonRow')
 
 local FilterButtons = {}
 
@@ -82,15 +81,12 @@ end
 ---@param category FilterButtonCategory
 ---@param value string?
 ---@param text string?
----@return WidgetHtml
+---@return FilterButton
 function FilterButtons._makeButton(category, value, text)
-	return Span{
-		classes = {
-			'filter-button',
-			Table.includes(category.defaultItems, value) and 'filter-button--active' or nil
-		},
-		attributes = { ['data-filter-on'] = value },
-		children = { text }
+	return FilterButton{
+		active = Table.includes(category.defaultItems, value),
+		value = value,
+		text = text
 	}
 end
 
@@ -101,47 +97,16 @@ function FilterButtons.getButtonRow(category)
 	local itemToPropertyValues = category.itemToPropertyValues or FnUtil.identity
 	local makeButton = FnUtil.curry(FilterButtons._makeButton, category)
 
-	local buttons = Div{
-		classes = {'filter-buttons'},
-		attributes = {
-			['data-filter'] = 'data-filter',
-			['data-filter-effect'] = 'fade',
-			['data-filter-group'] = 'filterbuttons-' .. category.name,
-			['data-filter-default-curated'] = category.featuredByDefault and 'true' or nil,
-		},
-		children = WidgetUtil.collect(
-			Span{
-				classes = { 'filter-button', 'filter-button-all' },
-				attributes = { ['data-filter-on'] = 'all' },
-				children = { I18n.translate('filterbuttons-all') }
-			},
-			category.hasFeatured and makeButton('curated', I18n.translate('filterbuttons-featured')),
-			Array.map(category.items or {}, function (value)
-				local text = transformValueToText(value)
-				local filterValue = itemToPropertyValues(value) or value
-				return makeButton(filterValue, text)
-			end),
-			String.isNotEmpty(category.expandKey) and Div{
-				classes = { 'filter-buttons' },
-				attributes = {
-					['data-filter'] = 'data-filter',
-					['data-filter-effect'] ='fade',
-					['data-filter-group'] = 'tournaments-list-dropdown-' .. category.expandKey
-				},
-				children = {
-					Span{
-						classes = { 'filter-button', 'filter-button-dropdown' },
-						attributes = { ['data-filter-on'] = 'dropdown-' .. category.expandKey },
-						children = { IconFa{iconName = 'expand'} }
-					},
-					Span{
-						classes = { 'filter-button' },
-						css = { display = 'none' },
-						attributes = { ['data-filter-on'] = 'all'}
-					}
-				}
-			} or nil
-		)
+	local buttons = FilterButtonRow{
+		categoryName = category.name,
+		featuredByDefault = category.featuredByDefault,
+		hasFeatured = category.hasFeatured,
+		buttons = Array.map(category.items or {}, function (value)
+			local text = transformValueToText(value)
+			local filterValue = itemToPropertyValues(value) or value
+			return makeButton(filterValue, text)
+		end),
+		expandKey = category.expandKey
 	}
 
 	if category.expandable then
