@@ -128,9 +128,9 @@ return {
 			link = 'Portal:Statistics',
 		},
 		{
-			file = 'Kelazhur IEM Shenzhen 2015.jpg',
-			title = 'ESL Pro Tour',
-			link = 'Portal:2023 EPT',
+			file = 'SC2 Commanders Banner.jpg',
+			title = 'Co-op Missions',
+			link = 'Co-op Missions',
 		},
 	},
 	layouts = {
