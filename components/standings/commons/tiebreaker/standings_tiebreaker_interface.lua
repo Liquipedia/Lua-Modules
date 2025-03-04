@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 
 ---@alias TiebreakerOpponent {opponent: standardOpponent, points: number, matches: MatchGroupUtilMatch[],
----scoreboard:{match: {w: integer, d: integer, l:integer}}, extradata: table}
+---match: {w: integer, d: integer, l:integer}, extradata: table}
 
 ---@class StandingsTiebreaker
 ---@field context 'full'|'minileague'|'headtohead'

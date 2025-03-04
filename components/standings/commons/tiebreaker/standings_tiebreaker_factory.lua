@@ -15,12 +15,13 @@ local NAME_TO_CLASS = {
 	manual = 'Manual',
 	points = 'Points',
 	matchdiff = 'Match/Diff',
+	buchholz = 'Buchholz',
 }
 
 ---@param input string
 ---@return StandingsTiebreaker
 function TiebreakerFactory.tiebreakerFromName(input)
-	local name, context = unpack(String.split(input, '.'))
+	local name, context = unpack(String.split(input, '%.'))
 	if context == nil then
 		context = 'full'
 	end

@@ -36,7 +36,7 @@ function TiebreakerBuchholz:valueOf(state, opponent)
 			return score
 		end
 
-		return score + groupMember.scoreboard.match.w - groupMember.scoreboard.match.l
+		return score + groupMember.match.w - groupMember.match.l
 	end, 0)
 end
 
