@@ -111,25 +111,28 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 	}
 end
 
----@param tiedOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---@param allOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
+---placement: integer?, slotindex: integer?, extradata: table}[]
+---@param minileagueOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, extradata: table}[]
 ---@param tiebreakers StandingsTiebreaker[]
 ---@param tiebreakerIndex integer
 ---@return {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
 ---placement: integer?, slotindex: integer?, extradata: table}[][]
-local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
+local function resolveTieForGroup(allOpponents, minileagueOpponents, tiebreakers, tiebreakerIndex)
 	local tiebreaker = tiebreakers[tiebreakerIndex]
 	if not tiebreaker then
-		return { tiedOpponents }
+		return { minileagueOpponents }
 	end
 
-	--TODO: add support for ml/h2h tiebreakers
-	if tiebreaker:getContextType() ~= 'full' then
-		error('Minileague and head2head tiebreakers not yet supported')
+	--TODO: add support for h2h tiebreakers
+	local tiebreakerContextType = tiebreaker:getContextType()
+	if tiebreakerContextType == 'headtohead' or tiebreakerContextType == 'minileague' then
+		error('Tiebreakers for head-to-head and minileague are not yet supported')
 	end
 
-	local _, groupedOpponents = Array.groupBy(tiedOpponents, function(opponent)
-		return tiebreaker:valueOf(tiedOpponents, opponent)
+	local _, groupedOpponents = Array.groupBy(minileagueOpponents, function(opponent)
+		return tiebreaker:valueOf(allOpponents, opponent)
 	end)
 
 	local groupedOpponentsInOrder = Array.extractValues(groupedOpponents, Table.iter.spairs, function(_, a, b)
@@ -140,7 +143,7 @@ local function resolveTieForGroup(tiedOpponents, tiebreakers, tiebreakerIndex)
 		if #group == 1 then
 			return group
 		end
-		return Array.flatten(resolveTieForGroup(group, tiebreakers, tiebreakerIndex + 1))
+		return Array.flatten(resolveTieForGroup(allOpponents, group, tiebreakers, tiebreakerIndex + 1))
 	end)
 end
 
@@ -148,7 +151,7 @@ end
 ---placement: integer?, slotindex: integer?, extradata: table}[]
 ---@param tiebreakers StandingsTiebreaker[]
 function StandingsParser.determinePlacements(opponentsInRound, tiebreakers)
-	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, tiebreakers, 1)
+	local opponentsAfterTie = resolveTieForGroup(opponentsInRound, opponentsInRound, tiebreakers, 1)
 	local slotIndex = 1
 	Array.forEach(opponentsAfterTie, function(opponentGroup)
 		local rank = slotIndex
