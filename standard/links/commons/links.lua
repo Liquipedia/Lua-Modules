@@ -133,7 +133,10 @@ local PREFIXES = {
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
 	fanclub = {''},
-	fide = {'https://ratings.fide.com/profile/'},
+	fide = {
+		'https://ratings.fide.com/tournament_information.phtml?event=',
+		player = 'https://ratings.fide.com/profile/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
