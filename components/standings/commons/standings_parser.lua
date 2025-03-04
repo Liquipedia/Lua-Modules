@@ -31,14 +31,14 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 
 	local entries = Array.flatMap(opponents, function(opponentData)
 		local opponent = opponentData.opponent
-		local scoreboardCarry = {
+		local carryData = {
 			points = opponentData.startingPoints or 0,
 			match = {w = 0, d = 0, l = 0},
 		}
 		local opponentRounds = opponentData.rounds
 
 		return Array.map(rounds, function(round)
-			local pointsFromRound, statusInRound, tiebreakerPoints, matchId
+			local pointsFromRound, statusInRound, tiebreakerPoints, matchId, playedMatches
 			if opponentRounds and opponentRounds[round.roundNumber] then
 				local thisRoundsData = opponentRounds[round.roundNumber]
 				if thisRoundsData.scoreboard then
@@ -48,19 +48,21 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				tiebreakerPoints = thisRoundsData.tiebreakerPoints
 				matchId = thisRoundsData.matchId
 				if thisRoundsData.scoreboard.match then
-					scoreboardCarry.match.w = scoreboardCarry.match.w + thisRoundsData.scoreboard.match.w
-					scoreboardCarry.match.d = scoreboardCarry.match.d + thisRoundsData.scoreboard.match.d
-					scoreboardCarry.match.l = scoreboardCarry.match.l + thisRoundsData.scoreboard.match.l
+					carryData.match.w = carryData.match.w + thisRoundsData.scoreboard.match.w
+					carryData.match.d = carryData.match.d + thisRoundsData.scoreboard.match.d
+					carryData.match.l = carryData.match.l + thisRoundsData.scoreboard.match.l
 				end
+				playedMatches = thisRoundsData.matches
 			end
-			scoreboardCarry.points = scoreboardCarry.points + (pointsFromRound or 0)
+			carryData.points = carryData.points + (pointsFromRound or 0)
 			---@type {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number?}
 			return {
 				opponent = opponent,
 				standingsindex = standingsindex,
 				roundindex = round.roundNumber,
-				points = scoreboardCarry.points,
-				match = scoreboardCarry.match,
+				points = carryData.points,
+				match = carryData.match,
+				matches = playedMatches,
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
