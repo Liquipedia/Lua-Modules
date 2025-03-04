@@ -63,7 +63,7 @@ function FilterButtonRow:render()
 					FilterButton{
 						buttonClasses = { 'filter-button-dropdown' },
 						value = 'dropdown-' .. self.props.expandKey,
-						display = { IconFa{iconName = 'expand'} }
+						display = IconFa{iconName = 'expand'}
 					},
 					FilterButton{
 						css = { display = 'none' },
