@@ -18,6 +18,11 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@field props {center: boolean?, rowGap: string?, gridCells:(Widget|string|Html|nil)|(Widget|string|Html|nil)[]}
 local GridContainer = Class.new(Widget)
 
+GridContainer.defaultProps = {
+	center = false,
+	rowGap = '0px'
+}
+
 ---@return Widget
 function GridContainer:render()
 	return HtmlWidgets.Div{
@@ -25,7 +30,7 @@ function GridContainer:render()
 		children = {
 			HtmlWidgets.Div{
 				classes = { Logic.readBool(self.props.center) and 'lp-row-center' or 'lp-row' },
-				css = { ['row-gap'] = self.props.rowGap or '0px' },
+				css = { ['row-gap'] = self.props.rowGap },
 				children = self.props.gridCells
 			}
 		}
