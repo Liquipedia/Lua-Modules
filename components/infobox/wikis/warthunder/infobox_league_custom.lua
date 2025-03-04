@@ -20,8 +20,8 @@ local Cell = Widgets.Cell
 local CustomLeague = Class.new(League)
 local CustomInjector = Class.new(Injector)
 
--- Battle Mode: Different Battle Mode each providing different pacing.
-local BATTLEMODES = {
+-- Game Mode: Different Battle Mode each providing different pacing.
+local MODES = {
 	ab = 'Arcade',
 	rb = 'Realistic',
 	sb = 'Simulator',
@@ -52,11 +52,11 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		local battleMode = BATTLEMODES[string.lower(args.battlemode or '')] or 'Unknown'
+		local mode = MODES[string.lower(args.mode or '')] or 'Unknown'
 		local vehicle = VEHICLES[string.lower(args.vehicle or '')] or 'Unknown'
 		Array.appendWith(
 			widgets,
-			Cell{name = 'Battle Mode', content = {battleMode}},
+			Cell{name = 'Mode', content = {mode}},
 			Cell{name = 'Vehicle', content = {vehicle}}
 		)
 	end
