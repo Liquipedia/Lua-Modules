@@ -80,7 +80,7 @@ return {
 		lightmode = 'Wildcard full lightmode.svg',
 		darkmode = 'Wildcard full darkmode.svg',
 	},
-	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from characters, to strategies, ' ..
+	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from champions, to summons, ' ..
 	'to tournaments, to competitive players, and teams.',
 	title = 'The Wildcard Wiki',
 	navigation = {
@@ -95,13 +95,13 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Deck covers.jpg ',
-			title = 'Cards',
-			link = 'Portal:Cards',
+			file = 'Wildcard Characters 1.jpg ',
+			title = 'Summons',
+			link = 'Portal:Summons',
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::cards]]',
+				conditions = '[[type::summons]]',
 			},
 		},
 		{
