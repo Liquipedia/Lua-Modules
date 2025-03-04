@@ -62,7 +62,7 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 				roundindex = round.roundNumber,
 				points = carryData.points,
 				match = carryData.match,
-				matches = playedMatches,
+				matches = playedMatches or {},
 				extradata = {
 					pointschange = pointsFromRound,
 					specialstatus = statusInRound,
@@ -114,13 +114,13 @@ function StandingsParser.parse(rounds, opponents, bgs, title, matches, standings
 end
 
 ---@param allOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, extradata: table}[]
+---placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[]
 ---@param minileagueOpponents {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, extradata: table}[]
+---placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[]
 ---@param tiebreakers StandingsTiebreaker[]
 ---@param tiebreakerIndex integer
 ---@return {opponent: standardOpponent, standingindex: integer, roundindex: integer, points: number,
----placement: integer?, slotindex: integer?, extradata: table}[][]
+---placement: integer?, slotindex: integer?, matches: MatchGroupUtilMatch[], extradata: table}[][]
 local function resolveTieForGroup(allOpponents, minileagueOpponents, tiebreakers, tiebreakerIndex)
 	local tiebreaker = tiebreakers[tiebreakerIndex]
 	if not tiebreaker then
