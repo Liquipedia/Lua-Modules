@@ -9,10 +9,8 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
-local I18n = require('Module:I18n')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 local Variables = require('Module:Variables')
 local Table = require('Module:Table')
 
