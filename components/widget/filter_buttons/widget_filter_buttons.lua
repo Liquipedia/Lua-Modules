@@ -40,14 +40,6 @@ local FilterButtons = Class.new(Widget)
 ---@field hasFeatured boolean?
 ---@field featuredByDefault boolean?
 
----Builds filterbuttons based on config stored in Module:FilterButtons/Config
----Can be used from wikicode
----@return Widget
-function FilterButtons.getFromConfig()
-	-- for compatibility on wiki pages calling this ... to be removed after wiki pages have been updated
-	return FilterButtons()
-end
-
 ---@return Widget
 function FilterButtons:render()
 	---@type FilterButtonCategory[]
