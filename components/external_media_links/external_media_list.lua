@@ -336,11 +336,11 @@ end
 ---@param date string
 ---@return string?
 function MediaList._displayTeam(subject, date)
-	local team = PlayerExt.syncTeam(subject, nil, {date = date})
+	local _, team = PlayerExt.syncTeam(subject, nil, {date = date})
 	if not team then
 		return
 	end
-	return Team.icon(nil, team)
+	return Team.icon(nil, team, date)
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
