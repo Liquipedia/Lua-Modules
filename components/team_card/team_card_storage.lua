@@ -6,14 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Json = require('Module:Json')
-local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+require('Module:Standard')
 
 local Custom = Lua.import('Module:TeamCard/Custom')
-
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
@@ -162,6 +157,5 @@ function TeamCardStorage._parseQualifier(rawQualifier)
 		return rawQualifier, nil, nil
 	end
 end
-
 
 return TeamCardStorage
