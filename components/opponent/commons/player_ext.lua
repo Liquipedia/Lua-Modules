@@ -268,12 +268,12 @@ options.savePageVar: Whether to save results to page variables. Enabled by
 default.
 options.useTimeless: Whether to use the template passed to a previous call of
 PlayerExt.syncTeam. Enabled by default.
-options.returnRaw: Whether to return the template without resolving. Disabled by default.
 ]]
 ---@param pageName string
 ---@param template string?
 ---@param options PlayerExtSyncTeamOptions
----@return string?
+---@return string? template
+---@return string? resolvedTemplate
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
 	local dateInput = Logic.emptyOr(options.date, DateExt.getContextualDateOrNow())
