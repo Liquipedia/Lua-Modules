@@ -8,13 +8,13 @@
 
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Grid = require('Module:Grid')
 local Image = require('Module:Image')
 local LpdbCounter = require('Module:LPDB entity count')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 
 local WikiData = Lua.import('Module:MainPageLayout/data')
+local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local LinkWidget = Lua.import('Module:Widget/Basic/Link')
 local PanelWidget = Lua.import('Module:Widget/Panel')
@@ -65,44 +65,50 @@ function MainPageLayout.make(frame)
 				classes = {'navigation-cards'},
 				children = Array.map(WikiData.navigation, MainPageLayout._makeNavigationCard)
 			},
-			table.concat(MainPageLayout._makeCells(layout)),
+			MainPageLayout._makeCells(layout),
 		},
 	}
 end
 
----@param cells table[]
----@return string[]
-function MainPageLayout._makeCells(cells)
+---@param body (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
+---@return (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
+function MainPageLayout._processCellBody(body)
 	local frame = mw.getCurrentFrame()
+	return type(body) == 'string' and frame:preprocess(body) or body
+end
+
+---@param cells table[]
+---@return Widget
+function MainPageLayout._makeCells(cells)
 	local output = {}
 
-	table.insert(output, Grid._start_grid{})
 	for _, column in ipairs(cells) do
 		local cellContent = {}
 		for _, item in ipairs(column.children) do
 			local content = {}
 			if item.content then
+				local contentBody = item.content.body
 				if item.content.noPanel then
-					table.insert(content, frame:preprocess(item.content.body))
+					table.insert(content, MainPageLayout._processCellBody(contentBody))
 				else
-					table.insert(content, tostring(PanelWidget{
-						body = frame:preprocess(item.content.body),
+					table.insert(content, PanelWidget{
+						children = MainPageLayout._processCellBody(contentBody),
 						boxId = item.content.boxid,
 						padding = item.content.padding,
 						heading = item.content.heading,
 						panelAttributes = item.content.panelAttributes,
-					}))
+					})
 				end
 			end
 			if item.children then
-				Array.extendWith(content, MainPageLayout._makeCells(item.children))
+				Array.appendWith(content, MainPageLayout._makeCells(item.children))
 			end
-			table.insert(cellContent, tostring(Grid._cell{table.concat(content), ['order-xs'] = item.mobileOrder}))
+			table.insert(cellContent, GridWidgets.Cell{cellContent = content, ['order-xs'] = item.mobileOrder})
 		end
-		table.insert(output, tostring(Grid._cell{table.concat(cellContent), lg = column.size, xs = 'ignore', sm = 'ignore'}))
+		table.insert(output, GridWidgets.Cell{cellContent = cellContent, lg = column.size, xs = 'ignore', sm = 'ignore'})
 	end
-	table.insert(output, Grid._end_grid{})
-	return output
+
+	return GridWidgets.Container{ gridCells = output }
 end
 
 ---@param navigationData {file: string?, link: string?, count: table?, title: string?}
