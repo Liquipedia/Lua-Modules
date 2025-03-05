@@ -99,7 +99,7 @@ function UnofficialWorldChampion:createInfobox()
 		},
 		Customizable{
 			id = 'regionaldistribution',
-			content = String.isNotEmpty(args.region1) and WidgetUtil.collect(
+			children = String.isNotEmpty(args.region1) and WidgetUtil.collect(
 				Title{children = 'Regional distribution'},
 				self:_parseRegionalDistribution()
 			) or {}
@@ -118,7 +118,10 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 
 	for regionKey, region in Table.iter.pairsByPrefix(args, 'region') do
 		Array.appendWith(widgets,
-			Cell{name = (args[regionKey .. ' no'] or '') .. ' champions', content = {region}},
+			Cell{
+				name = (args[regionKey .. ' no'] or '') .. ' champions',
+				content = {region}
+			},
 			Breakdown{children = {args[regionKey .. ' champions']}}
 		)
 	end
