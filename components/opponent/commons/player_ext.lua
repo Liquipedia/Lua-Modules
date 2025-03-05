@@ -37,7 +37,6 @@ local PlayerExt = {globalVars = globalVars}
 ---@field useTimeless boolean?
 ---@field fetchPlayer boolean?
 ---@field savePageVar boolean?
----@field returnRaw boolean?
 
 --[===[
 Splits a wiki link of a player into a pageName and displayName.
@@ -320,10 +319,10 @@ function PlayerExt.syncTeam(pageName, template, options)
 		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
 	end
 
-	if options.returnRaw then
-		return entry and entry.raw or nil
+	if not entry then
+		return nil
 	end
-	return entry and entry.template or nil
+	return entry.template, entry.raw
 end
 
 ---Same as PlayerExt.syncTeam, except it does not save the player's team to page variables.
