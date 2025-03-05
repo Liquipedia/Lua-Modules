@@ -336,7 +336,7 @@ end
 ---@param date string
 ---@return string?
 function MediaList._displayTeam(subject, date)
-	local team = PlayerExt.syncTeam(subject, nil, {date = date, returnRaw = true})
+	local _, team = PlayerExt.syncTeam(subject, nil, {date = date})
 	if not team then
 		return
 	end
