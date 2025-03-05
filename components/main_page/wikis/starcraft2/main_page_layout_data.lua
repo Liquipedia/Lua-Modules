@@ -11,13 +11,13 @@ local Lua = require('Module:Lua')
 local DateExt = Lua.import('Module:Date/Ext')
 local Ordinal = Lua.import('Module:Ordinal')
 
-local FilterButtons = Lua.import('Module:FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Small = HtmlWidgets.Small
+local FilterButtons = Lua.import('Module:Widget/FilterButtons')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -67,7 +67,7 @@ local CONTENT = {
 		noPanel = true,
 		body = Div{
 			css = {width = '100%', ['margin-bottom'] = '8px'},
-			children = {FilterButtons.getFromConfig()}
+			children = {FilterButtons()},
 		},
 	},
 	matches = {
