@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
@@ -21,6 +22,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 local Builder = Widgets.Builder
 local Breakdown = Widgets.Breakdown
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UnofficialWorldChampionInfobox: BasicInfobox
 local UnofficialWorldChampion = Class.new(BasicInfobox)
@@ -95,11 +97,32 @@ function UnofficialWorldChampion:createInfobox()
 			name = (args['most times held no'] or '?') .. ' times',
 			content = { args['most times held'] },
 		},
+		Customizable{
+			id = 'regionaldistribution',
+			content = String.isNotEmpty(args.region1) and WidgetUtil.collect(
+				Title{children = 'Regional distribution'},
+				self:_parseRegionalDistribution()
+			) or {}
+		},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
 
 	return self:build(widgets)
+end
+
+---@return Widget[]
+function UnofficialWorldChampion:_parseRegionalDistribution()
+	local args = self.args
+	local widgets = {}
+
+	for regionKey, region in Table.iter.pairsByPrefix(args, 'region') do
+		Array.appendWith(widgets,
+			Cell{name = (args[regionKey .. ' no'] or '') .. ' champions', content = {region}},
+			Breakdown{children = {args[regionKey .. ' champions']}}
+		)
+	end
+	return widgets
 end
 
 return UnofficialWorldChampion
