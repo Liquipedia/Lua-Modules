@@ -113,7 +113,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Movement speed',
-				content = { args.movementspeed .. ' m/sec' }
+				content = { args.movementspeed and (args.movementspeed .. ' m/sec') or nil }
 			}
 		)
 	end
