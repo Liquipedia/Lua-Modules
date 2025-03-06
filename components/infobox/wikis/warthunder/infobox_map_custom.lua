@@ -82,9 +82,6 @@ end
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		location = args.country,
-		tanksize = tonumber(args.tanksize),
-		airsize = tonumber(args.airsize),
-		modes = self:getAllArgsForBase(args, 'mode')
 	})
 	return lpdbData
 end
