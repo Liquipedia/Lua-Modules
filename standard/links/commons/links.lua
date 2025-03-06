@@ -78,6 +78,7 @@ local PREFIXES = {
 		player = 'https://www.chessgames.com/perl/chessplayer?pid=',
 		match = 'https://www.chessgames.com/perl/chessgame?gid=',
 	},
+	chessresults = {'https://chess-results.com/'},
 	chzzk = {'https://chzzk.naver.com/live/'},
 	civdraft = {match = 'https://aoe2cm.net/draft/'},
 	cntft = {'https://lol.qq.com/tft/#/masterDetail/'},
@@ -133,7 +134,10 @@ local PREFIXES = {
 	['faceit-hub'] = {'https://www.faceit.com/en/hub/'},
 	['faceit-org'] = {'https://www.faceit.com/en/organizers/'},
 	fanclub = {''},
-	fide = {'https://ratings.fide.com/profile/'},
+	fide = {
+		'https://ratings.fide.com/tournament_information.phtml?event=',
+		player = 'https://ratings.fide.com/profile/',
+	},
 	geoguessr = {'https://www.geoguessr.com/'},
 	gol = {match = 'https://gol.gg/game/stats/'},
 	gosugamers = {''},
@@ -322,6 +326,7 @@ local PREFIXES = {
 PREFIXES = Table.merge(PREFIXES, CustomData.prefixes or {})
 
 local SUFFIXES = {
+	chessresults = {'.aspx'},
 	cntft = {'/1'},
 	esportal = {'/event/info'},
 	facebook = {

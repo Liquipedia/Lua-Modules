@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
@@ -50,19 +51,41 @@ function Weapon:createInfobox()
 		Title{children = (args.informationType or 'Weapon') .. ' Information'},
 		Cell{
 			name = 'Class',
-			content = self:getAllArgsForBase(args, 'class', {makeLink = true}),
+			content = self:getAllArgsForBase(args, 'class', {makeLink = not Logic.readBool(args.disableClassLink)}),
 		},
 		Cell{
 			name = 'Origin',
 			content = {self:_createLocation(args.origin)},
 		},
-		Cell{name = 'Price', content = {args.price}},
-		Cell{name = 'Kill Award', content = {args.killaward}},
-		Cell{name = 'Base Damage', content = {args.damage}},
+		Customizable{
+			id = 'price',
+			children = {
+				Cell{name = 'Price', content = {args.price}}
+			}
+		},
+		Customizable{
+			id = 'killaward',
+			children = {
+				Cell{name = 'Kill Award', content = {args.killaward}}
+			}
+		},
+		Customizable{
+			id = 'damage',
+			children = { Cell{name = 'Base Damage', content = {args.damage}} }
+		},
 		Cell{name = 'Magazine Size', content = {args.magsize}},
 		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
-		Cell{name = 'Reload Speed', content = {args.reloadspeed}},
-		Cell{name = 'Rate of Fire', content = {args.rateoffire}},
+		Cell{name = 'Reload Speed', content = {
+			Logic.isNotEmpty(args.reloadspeed) and (
+				args.reloadspeed .. (args.reloadspeedunit and (' ' .. args.reloadspeedunit) or '')
+			) or nil
+		}},
+		Customizable{
+			id = 'rateoffire',
+			children = {
+				Cell{name = 'Rate of Fire', content = {args.rateoffire}}
+			}
+		},
 		Cell{name = 'Firing Mode', content = {args.firemode}},
 		Customizable{
 			id = 'side',

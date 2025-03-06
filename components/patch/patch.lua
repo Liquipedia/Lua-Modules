@@ -1,4 +1,4 @@
---
+---
 -- @Liquipedia
 -- wiki=commons
 -- page=Module:Patch

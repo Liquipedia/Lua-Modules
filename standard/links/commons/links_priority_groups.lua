@@ -25,6 +25,7 @@ return {
 		'challonge',
 		'chesscom',
 		'chessgames',
+		'chessresults',
 		'cybergamer',
 		'datdota',
 		'dotabuff',
