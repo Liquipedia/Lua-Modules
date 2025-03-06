@@ -42,7 +42,7 @@ function ThisDayContent:render()
 		},
 		showBirthdayList and HtmlWidgets.Fragment{
 			children = {
-				HtmlWidgets.Hr,
+				HtmlWidgets.Hr(),
 				Small{
 					css = { ['font-style'] = 'italic' },
 					children = {
