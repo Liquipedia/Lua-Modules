@@ -104,7 +104,7 @@ return {
 	title = 'StarCraft II',
 	navigation = {
 		{
-			file = 'Serral wins blizzcon 2.jpg',
+			file = 'TY IEM Shenzhen 2015.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -113,7 +113,7 @@ return {
 			},
 		},
 		{
-			file = 'KT120213.jpg',
+			file = 'TeamLiquidFull.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
