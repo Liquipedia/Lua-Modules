@@ -14,7 +14,6 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local Widgets = Lua.import('Module:Widget/All')
-local Builder = Widgets.Builder
 local Cell = Widgets.Cell
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Span = Widgets.Span
@@ -65,15 +64,9 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'damage' then
 		return {
-			Builder{
-				builder = function()
-					return {
-						Cell{
-							name = 'Damage',
-							content = self.caller:getAllArgsForBase(args, 'damage'),
-						}
-					}
-				end
+			Cell{
+				name = 'Damage',
+				content = self.caller:getAllArgsForBase(args, 'damage'),
 			}
 		}
 	elseif id == 'killaward' then
@@ -85,13 +78,18 @@ function CustomInjector:parse(id, widgets)
 			} or nil
 		}
 	elseif id == 'rateoffire' then
-		local rateOfFire = Logic.emptyOr(
-			args.rateoffire,
-			(args.minrateoffire or '?') .. '-' .. (args.maxrateoffire or '?')
+		local rateOfFire = args.rateoffire
+		local minRateOfFire = args.minrateoffire
+		local maxRateOfFire = args.maxrateoffire
+		local altRateOfFire = Logic.isNotEmpty(rateOfFire) and not (
+			Logic.isEmpty(minRateOfFire) and Logic.isEmpty(maxRateOfFire)
 		)
-		return {
+		if altRateOfFire then
+			rateOfFire = (minRateOfFire or '?') .. '-' .. (maxRateOfFire or '?')
+		end
+		return rateOfFire and {
 			Cell{
-				name = 'Fire rate',
+				name = 'Firerate',
 				options = { separator = ' ' },
 				content = { rateOfFire, FIRE_RATE_UNIT }
 			},
@@ -103,7 +101,7 @@ function CustomInjector:parse(id, widgets)
 					args.altrateoffire and FIRE_RATE_UNIT or nil
 				}
 			}
-		}
+		} or {}
 	end
 	if id == 'custom' then
 		return WidgetUtil.collect(
@@ -129,7 +127,6 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		class = args.class,
 		price = args.price,
 		damage = self:getAllArgsForBase(args, 'damage'),
-		damage2 = args.damage2,
 		wallpenetration = args.wallpenetration,
 		ammo = args.ammo,
 		capacity = args.capacity,
