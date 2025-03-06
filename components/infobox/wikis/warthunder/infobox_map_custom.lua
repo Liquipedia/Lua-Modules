@@ -113,6 +113,5 @@ function CustomMap:getWikiCategories(args)
 		String.isNotEmpty(args.country) and ('Maps located in ' .. args.country) or nil
 	)
 end
-end
 
 return CustomMap
