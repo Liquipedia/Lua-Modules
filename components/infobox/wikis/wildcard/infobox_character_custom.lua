@@ -14,11 +14,11 @@ local Lua = require('Module:Lua')
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class WildcardHeroInfobox: CharacterInfobox
+---@class WildcardChampionInfobox: CharacterInfobox
 local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
@@ -63,9 +63,7 @@ end
 function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.information = args.name
 	lpdbData.image = args.image
-	lpdbData.date = args.release
 	lpdbData.extradata = {
-		name = args.name,
 		house = args.house,
 		health = args.health,
 		damagepersecond = args.dps,
