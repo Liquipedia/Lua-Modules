@@ -16,17 +16,23 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Small = HtmlWidgets.Small
 
 ---@class ThisDayContent: Widget
+---@field props { month: integer?, day: integer? }
 ---@operator call(table): ThisDayContent
 local ThisDayContent = Class.new(Widget)
+ThisDayContent.defaultProps = {
+	month = tonumber(os.date('%m')),
+	day = tonumber(os.date('%d'))
+}
 
 function ThisDayContent:render()
-	local today = os.date('*t')
+	local month = self.props.month
+	local day = self.props.day
 	local frame = mw.getCurrentFrame()
 	return {
 		Div{
 			attributes = { id = 'this-day-facts' },
 			children = {
-				frame:expandTemplate{ title = 'Liquipedia:This day/' .. today.month .. '/' .. today.day }
+				frame:expandTemplate{ title = 'Liquipedia:This day/' .. month .. '/' .. day }
 			}
 		},
 		Small{
@@ -35,7 +41,7 @@ function ThisDayContent:render()
 				'Add trivia about this day ',
 				Link{
 					children = 'here',
-					link = 'Liquipedia:This_day/' .. today.month .. '/' .. today.day
+					link = 'Liquipedia:This_day/' .. month .. '/' .. day
 				}
 			}
 		}
