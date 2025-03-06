@@ -9,9 +9,11 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
 local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
@@ -37,6 +39,11 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
+
+	-- Automatic org people
+	team.args.coach = RoleOf.get{role = 'Coach'}
+	team.args.manager = RoleOf.get{role = 'Manager'}
+	team.args.captain = RoleOf.get{role = 'Captain'}
 
 	return team:createInfobox()
 end
@@ -84,6 +91,9 @@ function CustomTeam:addToLpdb(lpdbData, args)
 	if String.isNotEmpty(args.league) then
 		lpdbData.extradata.competesin = string.upper(args.league)
 	end
+
+	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
+	lpdbData.manager = Variables.varDefault('managerid') or args.manager
 
 	return lpdbData
 end
