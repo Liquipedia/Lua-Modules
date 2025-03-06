@@ -7,7 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
-local Ordinal = require('Module:Ordinal')
 
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
@@ -16,7 +15,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Small = HtmlWidgets.Small
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -39,15 +38,8 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = WidgetUtil.collect(
-			'This day in PUBG ',
-			Small{
-				attributes = { id = 'this-day-date' },
-				css = { ['margin-left'] = '5px' },
-				children = { '(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')' }
-			}
-		),
-		body = '{{Liquipedia:This day}}',
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content{ birthdayListPage = 'Birthday list' },
 		padding = true,
 		boxid = 1510,
 	},
