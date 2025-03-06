@@ -51,6 +51,7 @@ function ThisDayContent:render()
 				}
 			}
 		} or nil,
+		HtmlWidgets.Br(),
 		Small{
 			attributes = { id = 'this-day-trivialink' },
 			children = {
