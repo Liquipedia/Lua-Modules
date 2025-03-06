@@ -65,15 +65,9 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'damage' then
 		return {
-			Builder{
-				builder = function()
-					return {
-						Cell{
-							name = 'Damage',
-							content = self.caller:getAllArgsForBase(args, 'damage'),
-						}
-					}
-				end
+			Cell{
+				name = 'Damage',
+				content = self.caller:getAllArgsForBase(args, 'damage'),
 			}
 		}
 	elseif id == 'killaward' then
