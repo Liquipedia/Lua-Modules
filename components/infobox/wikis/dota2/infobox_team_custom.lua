@@ -73,8 +73,6 @@ end
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.teamid = args.teamid
-	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
-	lpdbData.manager = Variables.varDefault('managerid') or args.manager
 
 	return lpdbData
 end

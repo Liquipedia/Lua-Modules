@@ -92,9 +92,6 @@ function CustomTeam:addToLpdb(lpdbData, args)
 		lpdbData.extradata.competesin = string.upper(args.league)
 	end
 
-	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
-	lpdbData.manager = Variables.varDefault('managerid') or args.manager
-
 	return lpdbData
 end
 
