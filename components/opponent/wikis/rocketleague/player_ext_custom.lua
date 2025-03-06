@@ -60,17 +60,20 @@ end
 
 ---@param pageName string
 ---@param template string?
----@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean}
----@return string?
+---@param options PlayerExtSyncTeamOptions
+---@return string? resolvedTemplate
+---@return string? rawTemplate
 function PlayerExtCustom.syncTeam(pageName, template, options)
 	options = options or {}
 
-	template = PlayerExt.syncTeam(pageName, template, options)
-	if Logic.isNotEmpty(template) or options.fetchPlayer == false then return template end
+	local rawTemplate
+	template, rawTemplate = PlayerExt.syncTeam(pageName, template, options)
+	if Logic.isNotEmpty(template) or options.fetchPlayer == false then return template, rawTemplate end
 
 	local entry = PlayerExtCustom._fetchTeamFromPlacement(pageName, options.date) --[[@as table]]
 
 	if entry and not entry.isResolved then
+		entry.raw = entry.template
 		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
 		entry.isResolved = true
 	end
@@ -87,7 +90,10 @@ function PlayerExtCustom.syncTeam(pageName, template, options)
 		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
 	end
 
-	return entry and entry.template or nil
+	if not entry then
+		return nil
+	end
+	return entry.template, entry.raw
 end
 
 return PlayerExtCustom
