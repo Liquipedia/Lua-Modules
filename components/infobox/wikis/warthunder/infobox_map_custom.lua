@@ -104,7 +104,9 @@ end
 ---@param args table
 ---@return table
 function CustomMap:getWikiCategories(args)
-	local categories = {}
+	return Array.append(
+		String.isNotEmpty(args.country) and ('Maps located in ' .. args.country) or nil
+	)
 	if String.isNotEmpty(args.country) then
 		table.insert(categories, 'Maps located in ' .. args.country)
 	end
