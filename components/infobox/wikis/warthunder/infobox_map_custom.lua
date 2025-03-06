@@ -14,7 +14,6 @@ local Table = require('Module:Table')
 local Flags = Lua.import('Module:Flags')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
-local Flags = Lua.import('Module:Flags')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
