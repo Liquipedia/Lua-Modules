@@ -39,7 +39,7 @@ local CONTENT = {
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content(),
+		body = ThisDayWidgets.Content{ birthdayListPage = 'Birthday list' },
 		padding = true,
 		boxid = 1510,
 	},
