@@ -32,6 +32,12 @@ local PlayerExt = {globalVars = globalVars}
 ---@field fetchMatch2Player boolean?
 ---@field date string|number|osdate?
 
+---@class PlayerExtSyncTeamOptions
+---@field date string|number|osdate?
+---@field useTimeless boolean?
+---@field fetchPlayer boolean?
+---@field savePageVar boolean?
+
 --[===[
 Splits a wiki link of a player into a pageName and displayName.
 
@@ -265,8 +271,9 @@ PlayerExt.syncTeam. Enabled by default.
 ]]
 ---@param pageName string
 ---@param template string?
----@param options {date: string|number|osdate?, useTimeless: boolean, fetchPlayer: boolean, savePageVar: boolean}
----@return string?
+---@param options PlayerExtSyncTeamOptions
+---@return string? resolvedTemplate
+---@return string? rawTemplate
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
 	local dateInput = Logic.emptyOr(options.date, DateExt.getContextualDateOrNow())
@@ -276,7 +283,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 	local historyVar = playerVars:get(pageName .. '.teamHistory')
 	local history = historyVar and Json.parse(historyVar) or {}
 	local pageVarEntry = options.useTimeless ~= false and history.timeless
-		or Array.find(history, function(entry) return date < entry.leaveDate end)
+		or Array.find(history, function(entry) return entry.joinDate <= date and date < entry.leaveDate end)
 
 	local timelessEntry = template and {
 		isResolved = pageVarEntry and template == pageVarEntry.template,
@@ -296,6 +303,7 @@ function PlayerExt.syncTeam(pageName, template, options)
 		or options.fetchPlayer ~= false and PlayerExt.fetchTeamHistoryEntry(pageName, options.date)
 
 	if entry and not entry.isResolved then
+		entry.raw = entry.template
 		entry.template = entry.template and TeamTemplate.resolve(entry.template, options.date)
 		entry.isResolved = true
 	end
@@ -311,7 +319,10 @@ function PlayerExt.syncTeam(pageName, template, options)
 		playerVars:set(pageName .. '.teamHistory', Json.stringify(history))
 	end
 
-	return entry and entry.template or nil
+	if not entry then
+		return nil
+	end
+	return entry.template, entry.raw
 end
 
 ---Same as PlayerExt.syncTeam, except it does not save the player's team to page variables.

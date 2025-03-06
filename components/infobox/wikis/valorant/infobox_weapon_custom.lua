@@ -128,15 +128,15 @@ function CustomWeapon:addToLpdb(lpdbData, args)
 		price = args.price,
 		damage = self:getAllArgsForBase(args, 'damage'),
 		wallpenetration = args.wallpenetration,
-		ammo = args.ammo,
-		capacity = args.capacity,
+		magsize = args.magsize,
+		ammocap = args.ammocap,
 		reload = args.reloadspeed,
 		movementspeed = args.movementspeed,
-		firingmode = args.firemode,
-		firerate = args.rateoffire,
-		fireratemin = args.minrateoffire,
-		fireratemax = args.maxrateoffire,
-		fireratealternate = args.altrateoffire,
+		firemode = args.firemode,
+		rateoffire = args.rateoffire,
+		minrateoffire = args.minrateoffire,
+		maxrateoffire = args.maxrateoffire,
+		altrateoffire = args.altrateoffire,
 	}
 	return lpdbData
 end
