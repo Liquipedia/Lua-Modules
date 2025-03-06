@@ -9,6 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local PlacementStats = require('Module:InfoboxPlacementStats')
+local RoleOf = require('Module:RoleOf')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -26,6 +27,11 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
+
+	-- Automatic org people
+	team.args.coach = RoleOf.get{role = 'Coach'}
+	team.args.manager = RoleOf.get{role = 'Manager'}
+	team.args.captain = RoleOf.get{role = 'Captain'}
 
 	return team:createInfobox()
 end

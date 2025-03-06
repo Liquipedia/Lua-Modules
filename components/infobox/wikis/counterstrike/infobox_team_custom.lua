@@ -40,7 +40,20 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'custom' then
+	local args = self.caller.args
+
+	if id == 'staff' then
+		return {
+			Cell{name = 'Founders',	content = {args.founders}},
+			Cell{name = 'CEO', content = {args.ceo}},
+			Cell{name = 'Gaming Director', content = {args['gaming director']}},
+			widgets[4], -- Manager
+			widgets[5], -- Captain
+			Cell{name = 'In-Game Leader', content = {args.igl}},
+			widgets[1], -- Coaches
+			Cell{name = 'Analysts', content = {args.analysts}},
+		}
+	elseif id == 'custom' then
 		return {Cell {
 			name = 'Games',
 			content = Array.map(self.caller.gamesList, function (gameIdentifier)
