@@ -272,8 +272,8 @@ PlayerExt.syncTeam. Enabled by default.
 ---@param pageName string
 ---@param template string?
 ---@param options PlayerExtSyncTeamOptions
----@return string? template
 ---@return string? resolvedTemplate
+---@return string? rawTemplate
 function PlayerExt.syncTeam(pageName, template, options)
 	options = options or {}
 	local dateInput = Logic.emptyOr(options.date, DateExt.getContextualDateOrNow())
