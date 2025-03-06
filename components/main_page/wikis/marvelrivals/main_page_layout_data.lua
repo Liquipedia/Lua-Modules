@@ -87,13 +87,39 @@ return {
 	title = 'The Marvel Rivals Wiki',
 	navigation = {
 		{
-			file = 'Marvel Rivals gameasset Patches allmode.jpg',
-			title = 'Patches',
-			link = 'Portal:Patches',
+			file = 'SparkR OWCS Major 2024.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
 			count = {
 				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::patch]]',
+				table = 'player',
+			},
+		},
+		{
+			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			title = 'Tournaments',
+			link = 'Portal:Tournaments',
+			count = {
+				method = 'LPDB',
+				table = 'tournament',
 			},
 		},
 		{
@@ -107,6 +133,15 @@ return {
 			},
 		},
 		{
+			file = 'Marvel_Rivals_icon_Planet_x_Pals.png',
+			title = 'Mechanics',
+			link = 'Mechanics',
+			count = {
+				method = 'CATEGORY',
+				category = 'Mechanics',
+			},
+		},
+		{
 			file = 'Marvel_Rivals_map_Royal_Palace.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
@@ -117,48 +152,13 @@ return {
 			},
 		},
 		{
-			file = 'Marvel_Rivals_icon_Planet_x_Pals.png',
-			title = 'Mechanics',
-			link = 'Mechanics',
-			count = {
-				method = 'CATEGORY',
-				category = 'Mechanics',
-			},
-		},
-		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
-			title = 'Tournaments',
-			link = 'Portal:Tournaments',
+			file = 'Marvel Rivals gameasset Patches allmode.jpg',
+			title = 'Patches',
+			link = 'Portal:Patches',
 			count = {
 				method = 'LPDB',
-				table = 'tournament',
-			},
-		},
-		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
-			title = 'Teams',
-			link = 'Portal:Teams',
-			count = {
-				method = 'LPDB',
-				table = 'team',
-			},
-		},
-		{
-			file = 'SparkR OWCS Major 2024.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
-			count = {
-				method = 'LPDB',
-				table = 'transfer',
+				table = 'datapoint',
+				conditions = '[[type::patch]]',
 			},
 		},
 		{
