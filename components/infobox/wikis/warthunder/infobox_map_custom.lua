@@ -62,24 +62,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Game Modes', content = Logic.nilIfEmpty(modes)}
 		)
 
-	if String.isNotEmpty(args.mapimage) then
-		Array.appendWith(
-			widgets,
-			Title{children = 'Full Map'},
-			Widgets.Div{
-				classes = {'infobox-image-wrapper'},
-				children = {Widgets.Div{
-					classes = { 'infobox-image' },
-					children = {
-						Image.display(args.mapimage, args.mapimage, { size = 600, alignment = 'center' })
-					}
-				}
-			}}
-
-		)
+		return widgets
 	end
-	return widgets
-end
 
 	return widgets
 end
