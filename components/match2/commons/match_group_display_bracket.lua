@@ -819,7 +819,7 @@ of the opponent, as well as the opponent's scores.
 This is the default opponent entry component. Specific wikis may override this
 by passing in a different props.OpponentEntry in the Bracket component.
 ]]
----@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number, }
+---@param props {opponent: standardOpponent, displayType: string, forceShortName: boolean?, height: number}
 ---@return Html
 function BracketDisplay.OpponentEntry(props)
 	local opponentEntry = OpponentDisplay.BracketOpponentEntry(props.opponent, {forceShortName = props.forceShortName})

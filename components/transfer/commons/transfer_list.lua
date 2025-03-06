@@ -67,12 +67,10 @@ local DEFAULT_VALUES = {
 ---@field baseConditions ConditionTree
 ---@field conditions string
 local TransferList = Class.new(
-	---@param frame Frame
+	---@param args table
 	---@return self
-	function(self, frame)
-		local args = Arguments.getArgs(frame)
+	function(self, args)
 		self.config = self:parseArgs(args)
-
 		return self
 	end
 )
@@ -80,7 +78,8 @@ local TransferList = Class.new(
 ---@param frame Frame
 ---@return Html
 function TransferList.run(frame)
-	return TransferList(frame):fetch():create()
+	local args = Arguments.getArgs(frame)
+	return TransferList(args):fetch():create()
 end
 
 ---@param args table

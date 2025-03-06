@@ -15,13 +15,13 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local TournamentLabel = Lua.import('Module:Widget/Tournament/Label')
 local FilterConfig = Lua.import('Module:FilterButtons/Config')
 
----@class TournamentsTickerWidget: Widget
----@operator call(table): TournamentsTickerWidget
+---@class TournamentsTickerSublistWidget: Widget
+---@operator call(table): TournamentsTickerSublistWidget
 
-local TournamentsTickerWidget = Class.new(Widget)
+local TournamentsTickerSublistWidget = Class.new(Widget)
 
 ---@return Widget?
-function TournamentsTickerWidget:render()
+function TournamentsTickerSublistWidget:render()
 	if not self.props.tournaments then
 		return
 	end
@@ -70,4 +70,4 @@ function TournamentsTickerWidget:render()
 	}
 end
 
-return TournamentsTickerWidget
+return TournamentsTickerSublistWidget

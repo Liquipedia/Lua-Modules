@@ -1391,6 +1391,11 @@ local data = {
 		localised = 'CIS',
 		name = 'CIS',
 	},
+	['dach'] = {
+		flag = 'File:Dach_hd.png',
+		localised = '',
+		name = 'DACH',
+	},
 	['eastasia'] = {
 		flag = 'File:East asia flag hd.png',
 		localised = 'East Asian',
@@ -1797,6 +1802,7 @@ local twoLetter = {
 
 	--   ISO 3166-1 alpha-2 Exceptional Reservations
 	['eu'] = 'europeanunion',
+	['su'] = 'ussr',
 	['un'] = 'unitednations',
 
 	--   ISO 3166-1 alpha-2 Traditional Reservations
@@ -2060,6 +2066,9 @@ local threeLetter = {
 	['zmb'] = 'zambia',
 	['zwe'] = 'zimbabwe',
 
+	--   ISO 3166-1 alpha-2 Exceptional Reservations
+	['sun'] = 'ussr',
+
 	-- ISO 3166-2:GB
 	['eng'] = 'england',
 	['nir'] = 'northernireland',
@@ -2171,7 +2180,6 @@ local aliases = {
 	['usgb'] = 'englishspeaking',
 	['usuk'] = 'englishspeaking',
 	['deat'] = 'germanspeaking',
-	['dach'] = 'germanspeaking',
 	['esmx'] = 'spanishspeaking',
 	['ptbr'] = 'portuguesespeaking',
 	['ruby'] = 'russianspeaking',

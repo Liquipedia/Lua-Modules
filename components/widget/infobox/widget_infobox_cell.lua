@@ -17,7 +17,8 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@class CellWidgetOptions
 ---@field columns number?
 ---@field makeLink boolean?
----@field surpressColon boolean?
+---@field suppressColon boolean?
+---@field separator Widget|string|Html|nil
 
 ---@class CellWidget: Widget
 ---@operator call(table):CellWidget
@@ -31,8 +32,9 @@ Cell.defaultProps = {
 	options = {
 		columns = 2,
 		makeLink = false,
-		surpressColon = false,
-	}
+		suppressColon = false,
+		separator = '<br />',
+	},
 }
 
 ---@return Widget?
@@ -46,7 +48,7 @@ function Cell:render()
 	local mappedChildren = {}
 	for i, child in ipairs(self.props.children) do
 		if i > 1 then
-			table.insert(mappedChildren, '<br/>')
+			table.insert(mappedChildren, options.separator)
 		end
 		if options.makeLink then
 			table.insert(mappedChildren, Link{children = {child}, link = child})
@@ -64,7 +66,7 @@ function Cell:render()
 		children = {
 			HtmlWidgets.Div{
 				classes = {'infobox-cell-' .. options.columns, 'infobox-description'},
-				children = {self.props.name, not options.surpressColon and ':' or nil}
+				children = {self.props.name, not options.suppressColon and ':' or nil}
 			},
 			HtmlWidgets.Div{
 				css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3

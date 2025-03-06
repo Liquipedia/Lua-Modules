@@ -87,7 +87,7 @@ local VALVE_TIERS = {
 	['tier 1 qualifier'] = {meta = 'Valve Tier 1 qualifier', name = 'Tier 1 Qualifier', link = 'Valve Tier 1 Events'},
 	['tier 2'] = {meta = 'Valve Tier 2 event', name = 'Tier 2', link = 'Valve Tier 2 Events'},
 	['tier 2 qualifier'] = {meta = 'Valve Tier 2 qualifier', name = 'Tier 2 Qualifier', link = 'Valve Tier 2 Events'},
-	['wildcard'] = {meta = 'Valve Wildcard qualifier', name = 'Wildcard', link = 'Valve Wildcard Events'},
+	['wildcard'] = {meta = 'Valve Wildcard event', name = 'Wildcard', link = 'Valve Wildcard Events'},
 }
 
 local RESTRICTIONS = {

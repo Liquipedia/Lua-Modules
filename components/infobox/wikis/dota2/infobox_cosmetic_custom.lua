@@ -62,7 +62,7 @@ function CustomInjector:parse(id, widgets)
 		local slotText = ((args.slot == 'Persona' and '[[Persona]]') or (args.slot and String.upperCaseFirst(args.slot)))
 		Array.appendWith(widgets,
 			Cell{
-				options = {columns = args.hero and 3 or 10, surpressColon = true},
+				options = {columns = args.hero and 3 or 10, suppressColon = true},
 				name = args.hero and Template.expandTemplate(mw.getCurrentFrame(), 'Hero entry', {args.hero}) or ' ',
 				content = {
 					'<b>Rarity:</b> ' .. Template.safeExpand(mw.getCurrentFrame(), 'Raritylink', {args.rarity}),

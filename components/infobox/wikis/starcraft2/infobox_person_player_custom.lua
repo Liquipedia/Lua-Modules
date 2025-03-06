@@ -291,7 +291,7 @@ end
 
 ---@return boolean
 function CustomPlayer:_isActive()
-	return Table.includes(self.years, CURRENT_YEAR) or Table.includes(self.years, CURRENT_YEAR - 1)
+	return Table.includes(self.years or {}, CURRENT_YEAR) or Table.includes(self.years or {}, CURRENT_YEAR - 1)
 end
 
 ---@param args table

@@ -104,6 +104,26 @@ function WikiCopyPaste.getOpponent(mode, showScore)
 	return ''
 end
 
+---subfunction used to generate the code for the Opponent template in Ffa matches, depending on the type of opponent
+---@param mode string
+---@param mapCount integer
+---@return string
+function WikiCopyPaste.getFfaOpponent(mode, mapCount)
+	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
+		return '|m' .. idx .. '={{MS||}}'
+	end))
+
+	if mode == Opponent.solo then
+		return '{{SoloOpponent||flag=' .. mapScores .. '}}'
+	elseif mode == Opponent.team then
+		return '{{TeamOpponent|' .. mapScores .. '}}'
+	elseif mode == Opponent.literal then
+		return '{{Literal|}}'
+	end
+
+	return ''
+end
+
 ---function that sets the text that starts the invoke of the MatchGroup Moduiles,
 ---contains madatory stuff like bracketid, templateid and MatchGroup type (matchlist or bracket)
 ---@param template string

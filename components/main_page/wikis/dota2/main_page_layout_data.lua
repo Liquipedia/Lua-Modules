@@ -102,7 +102,7 @@ local CONTENT = {
 	filterButtons = {
 		noPanel = true,
 		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
-		'{{#invoke:Lua|invoke|module=FilterButtons|fn=getFromConfig}}</div>',
+		'{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=FilterButtons}}</div>',
 	},
 	matches = {
 		heading = 'Matches',
@@ -111,6 +111,9 @@ local CONTENT = {
 			'font-style:italic; text-align:center;">[[Liquipedia:Matches|See more matches]]</div>',
 		padding = true,
 		boxid = 1507,
+		panelAttributes = {
+			['data-switch-group-container'] = 'countdown',
+		},
 	},
 	tournaments = {
 		heading = 'Tournaments',

@@ -193,7 +193,16 @@ function RatingsList:render()
 		children = HtmlWidgets.Th {
 			attributes = { colspan = '7' },
 			children = HtmlWidgets.Div {
-				children = { 'Last updated: ' .. formattedDate, '[[File:DataProvidedSAP.svg|link=]]' }
+				children = {
+					HtmlWidgets.Div {
+						children = {
+							HtmlWidgets.B{children = 'BETA'},
+							HtmlWidgets.Span{children = 'Last updated: ' .. formattedDate}
+						},
+						classes = { 'ranking-table__top-row-text' }
+					},
+					'[[File:DataProvidedSAP.svg|link=]]',
+				}
 			},
 			classes = { 'ranking-table__top-row' },
 		}
@@ -220,6 +229,7 @@ function RatingsList:render()
 			['data-ranking-table'] = 'content',
 		},
 		children = WidgetUtil.collect(
+
 			HtmlWidgets.Table {
 				attributes = { ['data-ranking-table'] = 'table' },
 				classes = { 'ranking-table', isSmallerVersion and 'ranking-table--small' or nil },

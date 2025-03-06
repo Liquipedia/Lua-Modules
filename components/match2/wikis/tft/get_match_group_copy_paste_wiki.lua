@@ -13,9 +13,6 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-
 ---@class TftMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
@@ -80,31 +77,12 @@ function WikiCopyPaste.getFfaMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|map' .. mapIndex .. '={{Map|date=|finished=|vod=}}'
 		end),
 		Array.map(Array.range(1, opponents), function(opponentIndex)
-			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste._getFfaOpponent(mode, bestof)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getFfaOpponent(mode, bestof)
 		end),
 		'}}'
 	)
 
 	return table.concat(lines, '\n')
-end
-
----@param mode string
----@param mapCount integer
----@return string
-function WikiCopyPaste._getFfaOpponent(mode, mapCount)
-	local mapScores = table.concat(Array.map(Array.range(1, mapCount), function(idx)
-		return '|m' .. idx .. '={{MS||}}'
-	end))
-
-	if mode == Opponent.solo then
-		return '{{SoloOpponent||flag=' .. mapScores .. '}}'
-	elseif mode == Opponent.team then
-		return '{{TeamOpponent|' .. mapScores .. '}}'
-	elseif mode == Opponent.literal then
-		return '{{Literal|}}'
-	end
-
-	return ''
 end
 
 return WikiCopyPaste

@@ -37,7 +37,9 @@ liquipedia.rankingTable = {
 			}
 
 			// Store initial HTML content in cache
-			this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+			if ( this.activeSelectOption.value !== null ) {
+				this.cache[ this.activeSelectOption.value ] = this.rankingContent.innerHTML;
+			}
 		} );
 	},
 
@@ -81,7 +83,7 @@ liquipedia.rankingTable = {
 			uselang: 'content',
 			prop: 'text',
 			text: wikiText
-		} ).done( ( data ) => {
+		} ).then( ( data ) => {
 			if ( data.parse?.text?.[ '*' ] ) {
 				this.removeToggleButtonListeners();
 				// Insert fetched HTML content

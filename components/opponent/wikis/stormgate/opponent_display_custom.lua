@@ -62,12 +62,14 @@ CustomOpponentDisplay.BracketOpponentEntry.addScores = OpponentDisplay.BracketOp
 ---@field hideFaction boolean?
 
 ---@param props StormgateInlineOpponentProps
----@return Html|string|nil
+---@return Html|nil
 function CustomOpponentDisplay.InlineOpponent(props)
 	local opponent = props.opponent
 
 	if Opponent.typeIsParty((opponent or {}).type) then
-		return CustomOpponentDisplay.InlinePlayers(props)
+		return mw.html.create()
+			:node(CustomOpponentDisplay.InlinePlayers(props))
+			:node(props.note and mw.html.create('sup'):addClass('note'):wikitext(props.note) or '')
 	end
 
 	return OpponentDisplay.InlineOpponent(props)

@@ -36,6 +36,7 @@ function CustomGameSummary.getGameByMatchId(props)
 		children = {
 			MatchSummaryWidgets.GameDetails{game = game},
 			MatchSummaryWidgets.PointsDistribution{scores = scoringData},
+			MatchSummaryWidgets.Mvp(game.extradata.mvp),
 			SummaryHelper.standardGame(game)
 		}
 	}
