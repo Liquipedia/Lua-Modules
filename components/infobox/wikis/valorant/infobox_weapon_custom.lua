@@ -85,13 +85,18 @@ function CustomInjector:parse(id, widgets)
 			} or nil
 		}
 	elseif id == 'rateoffire' then
-		local rateOfFire = Logic.emptyOr(
-			args.rateoffire,
-			(args.minrateoffire or '?') .. '-' .. (args.maxrateoffire or '?')
+		local rateOfFire = args.rateoffire
+		local minRateOfFire = args.minrateoffire
+		local maxRateOfFire = args.maxrateoffire
+		local altRateOfFire = Logic.isNotEmpty(rateOfFire) and not (
+			Logic.isEmpty(minRateOfFire) and Logic.isEmpty(maxRateOfFire)
 		)
-		return {
+		if altRateOfFire then
+			rateOfFire = (minRateOfFire or '?') .. '-' .. (maxRateOfFire or '?')
+		end
+		return rateOfFire and {
 			Cell{
-				name = 'Fire rate',
+				name = 'Firerate',
 				options = { separator = ' ' },
 				content = { rateOfFire, FIRE_RATE_UNIT }
 			},
@@ -103,7 +108,7 @@ function CustomInjector:parse(id, widgets)
 					args.altrateoffire and FIRE_RATE_UNIT or nil
 				}
 			}
-		}
+		} or {}
 	end
 	if id == 'custom' then
 		return WidgetUtil.collect(
