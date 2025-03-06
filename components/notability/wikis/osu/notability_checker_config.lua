@@ -298,15 +298,15 @@ end
 -- Adjusts the score to compensate for the mode, you might
 -- want to decrease the points given for a certain mode
 function Config.adjustScoreForMode(score, mode)
-	if string.lower(mode) == "taiko" then
+	if string.lower(mode or '') == "taiko" then
         return score * 1.2
     end
 
-	if string.lower(mode) == "catch" then
+	if string.lower(mode or '') == "catch" then
         return score * 1.2
     end
 
-	if string.lower(mode) == "mania 7k" then
+	if string.lower(mode or '') == "mania 7k" then
         return score * 1.2
     end
 
