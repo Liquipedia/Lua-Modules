@@ -39,10 +39,6 @@ return {
 		name = 'Alma-Ata Time',
 		offset = {5, 0},
 	},
-	ALMT6 = {
-		name = 'Alma-Ata Time before March 1st, 2024',
-		offset = {6, 0},
-	},
 	AMT = {
 		name = 'Armenian Time',
 		offset = {4, 0},
@@ -325,4 +321,10 @@ return {
 		name = 'Central Indonesian Time',
 		offset = {8, 0},
 	},
+
+	-- UTC offsets to replace updated timezones
+	['UTC+6'] = {
+		name = 'UTC+6',
+		offset = {6, 0}
+	}
 }
