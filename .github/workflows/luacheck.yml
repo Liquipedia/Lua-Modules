@@ -33,6 +33,7 @@ jobs:
         with:
           report_paths: 'report.xml'
           check_name: 'Lint Report'
+          annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
 
   lua-unit-test:
     runs-on: ubuntu-latest
@@ -63,3 +64,4 @@ jobs:
         with:
           report_paths: 'busted.xml'
           check_name: 'Test Report'
+          annotate_only: ${{ (github.event.pull_request.head.repo.full_name != github.repository) }}
