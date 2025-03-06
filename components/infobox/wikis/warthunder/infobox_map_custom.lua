@@ -6,7 +6,6 @@
 --
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
