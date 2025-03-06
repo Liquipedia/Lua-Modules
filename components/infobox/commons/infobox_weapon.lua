@@ -76,7 +76,7 @@ function Weapon:createInfobox()
 		Cell{name = 'Magazine Size', content = {args.magsize}},
 		Cell{name = 'Ammo Capacity', content = {args.ammocap}},
 		Cell{name = 'Reload Speed', content = {
-			args.reloadspeed .. (args.reloadspeedunit and (' ' .. args.reloadspeedunit) or '')
+			Logic.isNotEmpty and (args.reloadspeed .. (args.reloadspeedunit and (' ' .. args.reloadspeedunit) or '')) or nil
 		}},
 		Customizable{
 			id = 'rateoffire',
