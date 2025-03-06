@@ -10,6 +10,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Template = require('Module:Template')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -37,7 +38,7 @@ function ThisDayContent:render()
 		Div{
 			attributes = { id = 'this-day-facts' },
 			children = {
-				frame:expandTemplate{ title = 'Liquipedia:This day/' .. month .. '/' .. day }
+				Template.safeExpand(frame, 'Liquipedia:This day/' .. month .. '/' .. day)
 			}
 		},
 		showBirthdayList and HtmlWidgets.Fragment{
