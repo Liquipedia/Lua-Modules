@@ -32,6 +32,15 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param size string
+---@return string|nil
+function CustomInjector:_getMapSize(size)
+	if String.isNotEmpty(size) then
+		return size .. 'km x ' .. size .. 'km'
+	end
+	return nil
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -43,20 +52,15 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Location', content = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. locationText}},
 		}
 	elseif id == 'custom' then
-		local hasTank = String.isNotEmpty(args.tanksize)
-		local hasAir = String.isNotEmpty(args.airsize)
 		local modes = self.caller:_getGameMode(args)
-		local hasModes = #modes > 0
 
-		if hasTank or hasAir or hasModes then
 		Array.appendWith(
 			widgets,
 			Title{children = 'Other Information'},
-			Cell{name = 'Tank area size', content = {hasTank and (args.tanksize .. 'km x ' .. args.tanksize .. 'km') or nil}},
-			Cell{name = 'Air area size', content = {hasAir and (args.airsize .. 'km x ' .. args.airsize .. 'km') or nil}},
-			Cell{name = 'Game Modes', content = hasModes and modes or nil}
+			Cell{name = 'Tank area size', content = {self:_getMapSize(args.tanksize)}},
+			Cell{name = 'Air area size', content = {self:_getMapSize(args.airsize)}},
+			Cell{name = 'Game Modes', content = Logic.nilIfEmpty(modes)}
 		)
-	end
 
 	if String.isNotEmpty(args.mapimage) then
 		Array.appendWith(
