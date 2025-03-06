@@ -13,7 +13,6 @@ local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
 local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
