@@ -41,28 +41,7 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomWeapon.run(frame)
 	local weapon = CustomWeapon(frame)
-
 	local args = weapon.args
-	--args['firing mode'] should be botted to args.firemode
-	args.firemode = args['firing mode']
-	--args.ammo should be botted to args.magsize
-	args.magsize = args.ammo
-	--args.capacity should be botted to args.ammocap
-	args.ammocap = args.capacity
-	--args['reload time'] should be botted to args.reloadspeed
-	args.reloadspeed = args['reload time']
-	-- args['fire rate'] should be botted to args.rateoffire
-	args.rateoffire = args['fire rate']
-	-- args['fire rate min'] should be botted to args.minrateoffire
-	args.minrateoffire = args['fire rate min']
-	-- args['fire rate max'] should be botted to args.maxrateoffire
-	args.maxrateoffire = args['fire rate max']
-	-- args['alternate fire rate'] should be botted to args.altrateoffire
-	args.altrateoffire = args['alternate fire rate']
-	-- args['movement speed'] should be botted to args.movementspeed
-	args.movementspeed = args['movement speed']
-	-- args['wall penetration'] should be botted to args.wallpenetration
-	args.wallpenetration = args['wall penetration']
 
 	args.disableClassLink = true
 	args.reloadspeedunit = 's'
