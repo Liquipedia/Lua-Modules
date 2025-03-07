@@ -357,7 +357,7 @@ return {
 			},
 		},
 		{
-			file = 'Rune of Arcane prev.png',
+			file = 'Dota 2 Rune Arcane preview.png',
 			title = 'Mechanics',
 			link = 'Mechanics',
 			count = {
