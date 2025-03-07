@@ -26,7 +26,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Import = Lua.import('Module:ParticipantTable/Import')
-local PlayerExt = Lua.import('Module:Player/Ext')
+local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 local TournamentStructure = Lua.import('Module:TournamentStructure')
 
 local pageVars = PageVariableNamespace('ParticipantTable')
