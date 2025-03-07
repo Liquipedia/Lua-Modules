@@ -8,6 +8,11 @@ html.theme--dark .componentsinvert {
 	filter: invert( 1 );
 }
 
+// Default text-shadow
+.txtshd {
+	text-shadow: 0.0625em 0.0625em 0.125em #000;
+}
+
 // Hero infobox-related
 .healthbar {
 	background: linear-gradient( to right, #286323, #7af03c );
@@ -63,6 +68,102 @@ html.theme--dark .componentsinvert {
 		background-color: rgba( 255, 215, 0, 0.5 );
 	}
 } // Mainly for Hero infobox tooltip. Can be expanded to other usage in the future.
+
+// Item infobox-related
+.itmtitle {
+	cursor: default;
+	font-size: 90%;
+	font-weight: bold;
+	color: #e2e2e6;
+	margin: -0.25em 0 0.125em 0;
+}
+
+.itmicon {
+	margin: 0.125em 0 0.125em 0;
+	display: flex;
+	justify-content: center;
+	width: 18.75em;
+	max-height: 5.25em;
+}
+
+.itmneg {
+	color: var( --clr-semantic-negative-base ) // #e93737
+}
+
+.itmtype {
+	&_neutral { // Neutral Items
+		&1 {
+			background-color: #808080;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+		&2 {
+			background-color: #00ff00;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+		&3 {
+			background-color: #5d3fd3;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+		&4 {
+			background-color: #bf40bf;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+		&5 {
+			background-color: #ffa500;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+	}
+	&_armor,
+	&_consumables {
+		background-color: #b9500b;
+        font-weight: bold;
+		color: #e2e2e6;
+	}
+	&_artifacts {
+		background-color: #730a54;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+	&_attributes {
+		background-color: #000000;
+		color: #FFE845;
+	}
+	&_collectible,
+	&_roshan,
+	&_tormentor {
+		background-color: #00a388;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+	&_equipment,
+	&_weapons {
+		background-color: #167C13;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+	&_magical {
+		background-color: #1a88fc;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+	&_miscellaneous,
+	&_support {
+		background-color: #257dae;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+	&_removed,
+	&_unreleased { // This includes unreleased Neutral Items.
+		background-color: #a50f79;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+}
 
 /* Infobox Cosmetic */
 .infobox-cosmetic-tradeable,
