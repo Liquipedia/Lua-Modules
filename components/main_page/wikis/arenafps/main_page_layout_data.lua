@@ -37,7 +37,6 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferQuery = false,
-			rumours = true,
 			transferPage = function ()
 				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 			end
