@@ -43,14 +43,14 @@ User may specify overrides to force/suppress reordering.
 ---@param options {country: string?, forceEasternOrder: boolean?, forceWesternOrder: boolean?}
 ---@return string, string
 function NameOrder.reorderNames(givenName, familyName, options)
-	if Array.any({
-		options.forceEasternOrder,
-		not options.forceWesternOrder,
-		NameOrder.usesEasternNameOrder(options.country)
-	}, Logic.readBool) then
+	if options.forceEasternOrder then
+		return familyName, givenName
+	elseif options.forceWesternOrder then
+		return givenName, familyName
+	elseif NameOrder.usesEasternNameOrder(options.country) then
 		return familyName, givenName
 	else
-		return givenName, familyName
+		return familyName, givenName
 	end
 end
 
