@@ -12,6 +12,7 @@ local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
+local NameOrder = require('Module:NameOrder')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -39,16 +40,6 @@ local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
 local LINK_VARIANT = 'player'
-local COUNTRIES_EASTERN_NAME_ORDER = {
-	'China',
-	'Taiwan',
-	'Hong Kong',
-	'Vietnam',
-	'South Korea',
-	'Cambodia',
-	'Macau',
-	'Singapore',
-}
 
 ---@enum PlayerStatus
 local Status = {
@@ -560,9 +551,9 @@ end
 ---@param args table
 ---@return table
 function Person:_flipNameOrder(args)
-	if not Logic.readBool(args.nonameflip) and Table.includes(COUNTRIES_EASTERN_NAME_ORDER, args.country) then
-		args.givenname, args.familyname = args.familyname, args.givenname
-	end
+	args.givenname, args.familyname = NameOrder.reorderNames(
+		args.givenname, args.familyname, {country = args.country, forceWesternOrder = args.nonameflip}
+	)
 	return args
 end
 
