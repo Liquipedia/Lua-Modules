@@ -32,25 +32,33 @@ describe('NameOrder', function()
 		it('verify', function ()
 			--Faker
 			local inputFirstName1, inputLastName1 = 'Sang-hyeok', 'Lee'
-			local outputLastName1, outputFirstName1 = NameOrder.reorderNames(inputFirstName1, inputLastName1, {country = 'South Korea'})
+			local outputLastName1, outputFirstName1 = NameOrder.reorderNames(
+				inputFirstName1, inputLastName1, {country = 'South Korea'}
+			)
 			assert.are_equal(inputFirstName1, outputFirstName1)
 			assert.are_equal(inputLastName1, outputLastName1)
 
 			--generic western name
 			local inputFirstName2, inputLastName2 = 'John', 'Doe'
-			local outputFirstName2, outputLastName2 = NameOrder.reorderNames(inputFirstName2, inputLastName2, {country = 'United Kingdom'})
+			local outputFirstName2, outputLastName2 = NameOrder.reorderNames(
+				inputFirstName2, inputLastName2, {country = 'United Kingdom'}
+			)
 			assert.are_equal(inputFirstName2, outputFirstName2)
 			assert.are_equal(inputLastName2, outputLastName2)
 
 			--Deft, with reordering suppressed
 			local inputFirstName3, inputLastName3 = 'Hyuk-kyu', 'Kim'
-			local outputFirstName3, outputLastName3 = NameOrder.reorderNames(inputFirstName3, inputLastName3, {country = 'South Korea', forceWesternOrder = true})
+			local outputFirstName3, outputLastName3 = NameOrder.reorderNames(
+				inputFirstName3, inputLastName3, {country = 'South Korea', forceWesternOrder = true}
+			)
 			assert.are_equal(inputFirstName3, outputFirstName3)
 			assert.are_equal(inputLastName3, outputLastName3)
 
 			--generic western name, with force reordering
 			local inputFirstName4, inputLastName4 = 'Jane', 'Doe'
-			local outputLastName4, outputFirstName4 = NameOrder.reorderNames(inputFirstName4, inputLastName4, {country = 'United States', forceEasternOrder = true})
+			local outputLastName4, outputFirstName4 = NameOrder.reorderNames(
+				inputFirstName4, inputLastName4, {country = 'United States', forceEasternOrder = true}
+			)
 			assert.are_equal(inputFirstName4, outputFirstName4)
 			assert.are_equal(inputLastName4, outputLastName4)
 		end)
