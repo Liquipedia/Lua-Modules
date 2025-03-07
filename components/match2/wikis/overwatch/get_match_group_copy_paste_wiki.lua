@@ -45,6 +45,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		end),
 		bestof ~= 0 and Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste._getMapCode, hasBans)) or nil,
 		Logic.readBool(args.faceit) and (INDENT .. '|faceit=') or nil,
+		Logic.readBool(args.mvp) and (INDENT .. '|mvp=') or nil,
 		INDENT .. '}}'
 	)
 
