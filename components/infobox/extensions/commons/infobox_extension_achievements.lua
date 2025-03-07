@@ -96,7 +96,7 @@ function Achievements.teamAndTeamSolo(args)
 		Achievements.display(Achievements._fetchDataForTeam(historicalPages, Opponent.solo, options), options)
 end
 
----Entry point for infobox team to fetch both team achievements and player achievements while on team as sep. icon strings
+---Entry point for infobox team to fetch both team and player achievements while on team as icon strings
 ---@param args AchievementIconsArgs?
 ---@return string? #Team Achievements icon string
 function Achievements.teamAll(args)
