@@ -170,8 +170,8 @@ If date is not specified, it falls back to now.
 ---@param props {date: string?, ordinalSuffix: boolean?}
 ---@return string|integer
 function DateExt.quarterOf(props)
-	local date = DateExt.readTimestampOrNil(props.date) or os.time()
-	local month = tonumber(os.date('%m', date))
+	local date = DateExt.parseIsoDate(props.date) or os.date('!*t')
+	local month = date.month
 	local quarter = math.ceil(month / 3)
 
 	if not Logic.readBool(props.ordinalSuffix) then
