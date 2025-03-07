@@ -32,7 +32,7 @@ function CustomMap.run(frame)
 end
 
 ---@param size string
----@return string|nil
+---@return string?
 function CustomInjector:_getMapSize(size)
 	if String.isNotEmpty(size) then
 		return size .. 'km x ' .. size .. 'km'
