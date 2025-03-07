@@ -51,21 +51,16 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Location', content = {Flags.Icon{flag = args.country, shouldLink = false} .. '&nbsp;' .. locationText}},
 		}
 	elseif id == 'custom' then
-		local modes = self.caller:_getGameMode(args)
-
-		Array.appendWith(
-			widgets,
-			Title{children = 'Other Information'},
-			Cell{name = 'Tank area size', content = {self:_getMapSize(args.tanksize)}},
-			Cell{name = 'Air area size', content = {self:_getMapSize(args.airsize)}},
-			Cell{name = 'Game Modes', content = Logic.nilIfEmpty(modes)}
-		)
-
+		return Array.append(
+				widgets,
+				Title{children = 'Other Information'},
+				Cell{name = 'Tank area size', content = {self:_getMapSize(args.tanksize)}},
+				Cell{name = 'Air area size', content = {self:_getMapSize(args.airsize)}},
+				Cell{name = 'Game Modes', content = Logic.nilIfEmpty(self.caller:_getGameMode(args))}
+			)
+		end
 		return widgets
 	end
-
-	return widgets
-end
 
 ---@param args table
 ---@return string[]
