@@ -84,9 +84,7 @@ end
 ---@param args table
 ---@return table
 function CustomMap:getWikiCategories(args)
-	return Array.append({},
-		String.isNotEmpty(args.country) and ('Maps located in ' .. args.country) or nil
-	)
+	return String.isNotEmpty(args.country) and { 'Maps located in ' .. args.country } or {}
 end
 
 return CustomMap
