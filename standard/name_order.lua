@@ -48,7 +48,7 @@ function NameOrder.reorderNames(givenName, familyName, options)
 	elseif NameOrder.usesEasternNameOrder(options.country) then
 		return familyName, givenName
 	else
-		return familyName, givenName
+		return givenName, familyName
 	end
 end
 
