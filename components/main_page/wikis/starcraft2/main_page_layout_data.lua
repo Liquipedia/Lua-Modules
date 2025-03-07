@@ -9,17 +9,15 @@
 local Lua = require('Module:Lua')
 
 local DateExt = Lua.import('Module:Date/Ext')
-local Ordinal = Lua.import('Module:Ordinal')
 
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Small = HtmlWidgets.Small
 local FilterButtons = Lua.import('Module:Widget/FilterButtons')
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	theGame = {
@@ -46,15 +44,8 @@ local CONTENT = {
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = WidgetUtil.collect(
-			'This day in StarCraft II ',
-			Small{
-				attributes = {id = 'this-day-date'},
-				css = {['margin-left'] = '5px'},
-				children = {'(' .. os.date('%B') .. ' ' .. Ordinal.toOrdinal(tonumber(os.date('%d'))) .. ')'}
-			}
-		),
-		body = '{{Liquipedia:This day}}',
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content(),
 		padding = true,
 		boxid = 1510,
 	},
