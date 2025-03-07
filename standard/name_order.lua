@@ -31,7 +31,7 @@ end
 
 --[[
 Reorders name as required by the Name Standards.
-For countries using the eastern order, (familyName, givenName) is returned whereas
+(familyName, givenName) is returned for countries using the eastern order whereas
 (givenName, familyName) is returned for countries using the western order.
 
 User may specify overrides to force/suppress reordering.
