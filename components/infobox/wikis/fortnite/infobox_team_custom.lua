@@ -46,7 +46,7 @@ function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
 
-	team.args.achievements = TeamAchievements.achievements(frame)
+	team.args.achievements = TeamAchievements.teamAll()
 
 	return team:createInfobox()
 end
