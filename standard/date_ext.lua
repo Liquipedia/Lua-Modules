@@ -163,6 +163,10 @@ function DateExt.getOffsetSeconds(offsetString)
 	return 0 - tonumber(mw.getContentLanguage():formatDate('U', '1970-01-01T00:00:00' .. (offsetString or '')))
 end
 
+--[[
+Determines which quarter the specified date is in.
+If date is not specified, it falls back to now.
+]]
 ---@param props {date: string?, ordinalSuffix: boolean?}
 ---@return string|integer
 function DateExt.quarterOf(props)
