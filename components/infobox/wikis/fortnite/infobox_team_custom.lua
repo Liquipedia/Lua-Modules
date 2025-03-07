@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- wiki=fortnite
 -- page=Module:Infobox/Team/Custom
