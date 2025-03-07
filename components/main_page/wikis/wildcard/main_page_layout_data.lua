@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -103,7 +102,8 @@ return {
 		lightmode = 'Wildcard full lightmode.svg',
 		darkmode = 'Wildcard full darkmode.svg',
 	},
-	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from champions and summons, to strategies, ' ..
+	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from '
+		.. 'champions and summons, to strategies, ' ..
 	'to tournaments, to competitive players, and teams.',
 	title = 'The Wildcard Wiki',
 	navigation = {
