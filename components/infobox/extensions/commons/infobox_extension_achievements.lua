@@ -96,6 +96,17 @@ function Achievements.teamAndTeamSolo(args)
 		Achievements.display(Achievements._fetchDataForTeam(historicalPages, Opponent.solo, options), options)
 end
 
+---Entry point for infobox team to fetch both team achievements and player achievements while on team as sep. icon strings
+---@param args AchievementIconsArgs?
+---@return string? #Team Achievements icon string
+function Achievements.teamAll(args)
+	if not Namespace.isMain() then return end
+	local historicalPages = Achievements._getTeamNames()
+	local options = Achievements._readOptions(args)
+
+	return Achievements.display(Achievements._fetchDataForTeam(historicalPages, '!' .. Opponent.literal, options), options)
+end
+
 ---Entry point for infobox team to fetch solo achievements while on team as icon strings
 ---@param args AchievementIconsArgs?
 ---@return string?
@@ -168,15 +179,34 @@ end
 ---@param options AchievementIconsOptions
 ---@return string
 function Achievements._buildTeamConditions(historicalPages, opponentType, options)
-	local lpdbKey = opponentType == Opponent.team and 'opponentname' or 'opponentplayers_p1team'
-
-	return table.concat(Array.extend(
-		options.baseConditions,
-		'[[opponenttype::' .. opponentType .. ']]',
-		'(' .. table.concat(Array.map(historicalPages, function(team)
+	local lpdbKeys = Achievements._getLpdbKeys(opponentType)
+	local teamConditions = Array.flatMap(lpdbKeys, function(lpdbKey)
+		return Array.map(historicalPages, function(team)
 			return '[[' .. lpdbKey .. '::' .. team .. ']]'
-		end), ' OR ') .. ')'
-	), ' AND ')
+		end)
+	end)
+
+	local conditions = Array.extend({},
+		'(' .. table.concat(teamConditions, ' OR ') .. ')',
+		'[[opponenttype::' .. opponentType .. ']]',
+		options.baseConditions
+	)
+
+	return table.concat(conditions, ' AND ')
+end
+
+---@param opponentType OpponentType
+---@return string[]
+function Achievements._getLpdbKeys(opponentType)
+	if opponentType == Opponent.solo then
+		return {'opponentname'}
+	end
+
+	-- default to quad opponents if we want to look up for `!Literal`
+	local partySize = Opponent.partySize(type) or Opponent.partySize(Opponent.quad)
+	return Array.map(Array.range(1, partySize), function(opponentIndex)
+		return 'opponentplayers_p' .. opponentIndex .. 'team'
+	end)
 end
 
 ---Query data for given conditions
