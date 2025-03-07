@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=starcraft2
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,21 +8,21 @@
 
 local Lua = require('Module:Lua')
 
-local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local DateExt = Lua.import('Module:Date/Ext')
+
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
+local FilterButtons = Lua.import('Module:Widget/FilterButtons')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
-	usefulArticles = {
-		heading = 'Useful Articles',
-		body = '{{Liquipedia:Useful Articles}}',
+	theGame = {
+		heading = 'The Game',
+		body = '{{Liquipedia:The Game}}',
 		padding = true,
 		boxid = 1503,
 	},
@@ -34,55 +34,51 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			transferQuery = false,
+			onlyNotableTransfers = true,
+			transferPage = function ()
+				return 'Player Transfers/' .. DateExt.quarterOf{ordinalSuffix = true} .. ' Quarter ' .. os.date('%Y')
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content{
-			birthdayListPage = 'Birthday list'
-		},
+		body = ThisDayWidgets.Content(),
 		padding = true,
 		boxid = 1510,
 	},
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1511,
 	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
-			css = { width = '100%', ['margin-bottom'] = '8px' },
-			children = { FilterButtonsWidget() }
-		}
+			css = {width = '100%', ['margin-bottom'] = '8px'},
+			children = {FilterButtons()},
+		},
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTickerContainer{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
+			['data-switch-group-container'] = "countdown"
 		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20
+			upcomingDays = 7,
+			completedDays = 7,
+			modifierTypeQualifier = -2,
+			modifierTier1 = 55,
+			modifierTier2 = 55,
+			modifierTier3 = 10
 		},
 		padding = true,
 		boxid = 1508,
@@ -91,24 +87,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'Starcraft-2-logo-lightmode.svg',
+		darkmode = 'Starcraft-2-logo-darkmode.svg',
 	},
-	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
-	title = 'Rainbow Six',
+	metadesc = 'Comprehensive StarCraft II wiki with articles covering everything from units and buildings, ' ..
+		'to strategies, to tournaments, to competitive players and teams.',
+	title = 'StarCraft II',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
-			title = 'Teams',
-			link = 'Portal:Teams',
-			count = {
-				method = 'LPDB',
-				table = 'team',
-			},
-		},
-		{
-			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			file = 'TY IEM Shenzhen 2015.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -117,7 +104,16 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'TeamLiquidFull.jpg',
+			title = 'Teams',
+			link = 'Portal:Teams',
+			count = {
+				method = 'LPDB',
+				table = 'team',
+			},
+		},
+		{
+			file = 'WCS 2014 Stage.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -126,32 +122,23 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'WCSFall19 player handshake.jpg',
 			title = 'Transfers',
-			link = 'Portal:Transfers',
+			link = 'Portal:Player transfers',
 			count = {
 				method = 'LPDB',
 				table = 'transfer',
 			},
 		},
 		{
-			file = 'Deimos Trophy of the Manchester major 2024.jpg',
-			title = 'Operators',
-			link = 'Portal:Operators',
-			count = {
-				method = 'CATEGORY',
-				category = 'Operators',
-			},
+			file = 'Blizzcon2019 WCS2 catsers analyzing.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
 		},
 		{
-			file = 'R6s map lair.png',
-			title = 'Maps',
-			link = 'Portal:Maps',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
-			},
+			file = 'SC2 Commanders Banner.jpg',
+			title = 'Co-op Missions',
+			link = 'Co-op Missions',
 		},
 	},
 	layouts = {
@@ -164,11 +151,15 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 3,
+						mobileOrder = 6,
+						content = CONTENT.thisDay,
+					},
+					{
+						mobileOrder = 4,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 8,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -207,13 +198,13 @@ return {
 							},
 						},
 					},
+				},
+			},
+			{
+				children = {
 					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
-					},
-					{
-						mobileOrder = 4,
-						content = CONTENT.usefulArticles,
+						mobileOrder = 9,
+						content = CONTENT.theGame,
 					},
 				},
 			},
