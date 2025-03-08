@@ -355,8 +355,6 @@ function Team:_setLpdbData(args, links)
 		earningsbyyear = self.yearlyEarnings or {},
 		createdate = args.created,
 		disbanddate = ReferenceCleaner.clean(args.disbanded),
-		coach = args.coaches or args.coach,
-		manager = args.manager,
 		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
 		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(

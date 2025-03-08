@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
-local Variables = require('Module:Variables')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Team = Lua.import('Module:Infobox/Team')
@@ -73,8 +72,6 @@ end
 ---@return table
 function CustomTeam:addToLpdb(lpdbData, args)
 	lpdbData.extradata.teamid = args.teamid
-	lpdbData.coach = Variables.varDefault('coachid') or args.coach or args.coaches
-	lpdbData.manager = Variables.varDefault('managerid') or args.manager
 
 	return lpdbData
 end
