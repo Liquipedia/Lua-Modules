@@ -122,7 +122,6 @@ function CustomCharacter:_getCustomCells()
 		Cell{name = 'Resource Bar', content = {args.secondarybar}},
 		Cell{name = 'Secondary Bar', content = {args.secondarybar1}},
 		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
-		Cell{name = 'Release Date', content = {args.releasedate}}
 	}
 
 	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
