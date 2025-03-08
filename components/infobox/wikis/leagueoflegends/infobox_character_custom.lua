@@ -46,6 +46,7 @@ function CustomCharacter.run(frame)
 	character:setWidgetInjector(CustomInjector(character))
 	character.args.informationType = 'Champion'
 
+	-- legacy args that need to be botted
 	local args = character.args
 	args.name = args.championname
 	args.caption = args.quote
@@ -57,13 +58,23 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	if id == 'overview' then
-		local breakDownContents = WidgetUtil.collect(
-			self:_toBreakDownCell('region', 'Region', 'RegionIcon'),
-			self:_toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
-			self:_toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
-		)
-		return { Breakdown{classes = {'infobox-center'}, children = breakDownContents} }
+	if id == 'country' then
+		return {
+			Cell{
+				name = 'Region',
+				content = { self:_toCellContent('region', 'RegionIcon') }
+			},
+		}
+	elseif id == 'role' then
+		return {
+			Cell{
+				name = 'Role',
+				content = WidgetUtil.collect(
+					self:_toCellContent('primaryrole', 'ClassIcon'),
+					self:_toCellContent('secondaryrole', 'ClassIcon')
+				)
+			}
+		}
 	elseif id == 'custom' then
 		return WidgetUtil.collect(
 			self.caller:_getPriceCell(),
@@ -75,28 +86,24 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param key string
----@param title string
 ---@param dataModule string
 ---@return Widget?
-function CustomInjector:_toBreakDownCell(key, title, dataModule)
+function CustomInjector:_toCellContent(key, dataModule)
 	local args = self.caller.args
 	if String.isEmpty(args[key]) then return end
 	local data = Lua.requireIfExists('Module:' .. dataModule, { loadData = true })
 	if Logic.isEmpty(data) then return end
 	local iconData = data[args[key]:lower()]
-	return HtmlWidgets.Fragment{
+	return Logic.isNotEmpty(iconData) and HtmlWidgets.Fragment{
 		children = {
-			HtmlWidgets.B{
-				children = { title }
-			},
-			HtmlWidgets.Br{},
 			IconImageWidget{
 				imageLight = iconData.icon,
-				size = '50px',
 				link = iconData.link
-			}
+			},
+			' ',
+			iconData.displayName
 		}
-	}
+	} or nil
 end
 
 ---@return Widget
