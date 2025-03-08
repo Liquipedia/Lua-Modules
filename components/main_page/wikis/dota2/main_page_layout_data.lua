@@ -28,42 +28,28 @@ local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintai
 			'This wiki currently covers esports and game content, containing over ' ..
 			mw.getContentLanguage():formatNum(mw.site.stats.articles) .. ' articles managed by ' ..
 			mw.site.stats.activeUsers .. ' active users.'
-local MAIN_PAGE_BUTTON = Button{
-	link = 'Main Page',
-	title = 'Click here to get to the main page',
-	variant = 'secondary',
-	children = {
-		IconFa{
-			additionalClasses = { 'wiki-color-dark' },
-			iconName = 'hub'
-		},
-		' View Main Page'
+
+---@param link string
+---@param displayName string
+---@return Widget
+local function createHubButton(link, displayName)
+	return Button{
+		link = link,
+		title = 'Click here to get to the ' .. displayName:lower(),
+		variant = 'secondary',
+		children = {
+			IconFa{
+				additionalClasses = { 'wiki-color-dark' },
+				iconName = 'hub'
+			},
+			' View ' .. displayName
+		}
 	}
-}
-local ESPORTS_HUB_BUTTON = Button{
-	link = 'Portal:Esports',
-	title = 'Click here to get to the esports hub',
-	variant = 'secondary',
-	children = {
-		IconFa{
-			additionalClasses = { 'wiki-color-dark' },
-			iconName = 'hub'
-		},
-		' View Esports Hub'
-	}
-}
-local GAME_HUB_BUTTON = Button{
-	link = 'Portal:Game',
-	title = 'Click here to get to the game hub',
-	variant = 'secondary',
-	children = {
-		IconFa{
-			additionalClasses = { 'wiki-color-dark' },
-			iconName = 'hub'
-		},
-		' View Game Hub'
-	}
-}
+end
+
+local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page')
+local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub')
+local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub')
 
 local CONTENT = {
 	aboutMain = {
