@@ -13,8 +13,10 @@ local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
+local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -24,41 +26,92 @@ local ABOUT_HEADING = 'About Liquipedia\'s Dota 2 Wiki'
 local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
 			'This wiki currently covers esports and game content, containing over ' .. mw.site.stats.articles ..
 			'articles managed by ' .. mw.site.stats.activeUsers .. ' active users.'
+local MAIN_PAGE_BUTTON = Button{
+	link = 'Main Page',
+	title = 'Click here to get to the main page',
+	variant = 'secondary',
+	children = {
+		IconFa{ iconName = 'hub' },
+		' View Main Page'
+	}
+}
+local ESPORTS_HUB_BUTTON = Button{
+	link = 'Portal:Esports',
+	title = 'Click here to get to the esports hub',
+	variant = 'secondary',
+	children = {
+		IconFa{ iconName = 'hub' },
+		' View Esports Hub'
+	}
+}
+local GAME_HUB_BUTTON = Button{
+	link = 'Portal:Game',
+	title = 'Click here to get to the game hub',
+	variant = 'secondary',
+	children = {
+		IconFa{ iconName = 'hub' },
+		' View Game Hub'
+	}
+}
 
 local CONTENT = {
 	aboutMain = {
 		heading = ABOUT_HEADING,
-		body = ABOUT_BODY ..
-			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'</div>',
+		body = WidgetUtil.collect(
+			ABOUT_BODY,
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '12px',
+					['justify-content'] = 'center',
+					['padding-top'] = '12px'
+				},
+				children = {
+					ESPORTS_HUB_BUTTON, GAME_HUB_BUTTON
+				}
+			}
+		),
 		padding = true,
 		boxid = 1500,
 	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
-		body = ABOUT_BODY ..
-			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'</div>',
+		body = WidgetUtil.collect(
+			ABOUT_BODY,
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '12px',
+					['justify-content'] = 'center',
+					['padding-top'] = '12px'
+				},
+				children = {
+					MAIN_PAGE_BUTTON, GAME_HUB_BUTTON
+				}
+			}
+		),
 		padding = true,
 		boxid = 1500,
 	},
 	aboutGame = {
 		heading = ABOUT_HEADING,
-		body = ABOUT_BODY ..
-			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'</div>',
+		body = WidgetUtil.collect(
+			ABOUT_BODY,
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '12px',
+					['justify-content'] = 'center',
+					['padding-top'] = '12px'
+				},
+				children = {
+					ESPORTS_HUB_BUTTON, ESPORTS_HUB_BUTTON
+				}
+			}
+		),
 		padding = true,
 		boxid = 1500,
 	},
