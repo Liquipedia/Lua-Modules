@@ -491,6 +491,7 @@ function MatchTable:resultFromRecord(record)
 		vs = record.match2opponents[indexes[2]],
 		winner = winner,
 		countGames = countGames,
+		countRounds = countRounds,
 		gameOpponents = Array.map(gameOpponents, Operator.property(indexes[1])),
 		gameVsOpponents = Array.map(gameOpponents, Operator.property(indexes[2]))
 	}
