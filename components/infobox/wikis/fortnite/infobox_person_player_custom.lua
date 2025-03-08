@@ -19,6 +19,8 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
+local PlayerAchievements = Lua.import('Module:Infobox/Extension/Achievements')
+
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
@@ -41,6 +43,7 @@ function CustomPlayer.run(frame)
 	player.args.autoTeam = true
 	player.role = Role.run{role = player.args.role}
 	player.role2 = Role.run{role = player.args.role2}
+	player.args.achievements = PlayerAchievements.player{}
 
 	return player:createInfobox()
 end
