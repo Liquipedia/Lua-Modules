@@ -57,7 +57,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 }
 
 body.skin-lakesideview .tournaments-list-heading {
-	background-color: var( --clr-wiki-primary-container );
+	background-color: rgb( from var( --clr-wiki-theme-primary ) r g b / 0.12 );
 	color: var( --clr-wiki-theme-primary );
 	padding: 0.5rem 0.75rem;
 	border-radius: 0.5rem;
@@ -65,6 +65,11 @@ body.skin-lakesideview .tournaments-list-heading {
 	line-height: 1.25rem;
 	margin-bottom: 0.5rem;
 	border: 0;
+}
+
+.theme--dark body.skin-lakesideview .tournaments-list-heading {
+	background-color: rgb( from #ffffff r g b / 0.12 );
+	color: #ffffff;
 }
 
 .tournaments-list-type-list {
