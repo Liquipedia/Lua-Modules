@@ -93,6 +93,7 @@ function CustomInjector:_toBreakDownCell(key, title, dataModule)
 			HtmlWidgets.Br{},
 			IconImageWidget{
 				imageLight = iconData.icon,
+				size = '50px',
 				link = iconData.link
 			}
 		}
@@ -114,20 +115,18 @@ function CustomCharacter:_getPriceCell()
 end
 
 ---@return Widget[]
-function CustomCharacter:getCustomCells()
+function CustomCharacter:_getCustomCells()
 	local args = self.args
-	local widgets = {}
-	Array.appendWith(
-		widgets,
+	local widgets = {
 		Cell{name = 'Attack Type', content = {args.attacktype}},
 		Cell{name = 'Resource Bar', content = {args.secondarybar}},
 		Cell{name = 'Secondary Bar', content = {args.secondarybar1}},
 		Cell{name = 'Secondary Attributes', content = {args.secondaryattributes1}},
 		Cell{name = 'Release Date', content = {args.releasedate}}
-	)
+	}
 
 	if Array.any({'hp', 'hplvl', 'hpreg', 'hpreglvl'}, function(key) return String.isNotEmpty(args[key]) end) then
-		table.insert(widgets, Title{children = 'Base Statistics'})
+		Array.appendWith(widgets, Title{children = 'Base Statistics'})
 	end
 
 	local function bonusPerLevel(start, bonuslvl)
