@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=leagueoflegends
--- page=Module:Infobox/Unit/Champion/Custom
+-- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,36 +9,48 @@
 local Array = require('Module:Array')
 local CharacterWinLoss = require('Module:CharacterWinLoss')
 local Class = require('Module:Class')
-local DisplayIcon = require('Module:DisplayIcon')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 
+local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
-local Unit = Lua.import('Module:Infobox/Unit')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
-local Center = Widgets.Center
-local Header = Widgets.Header
+local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Title = Widgets.Title
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class LeagueofLegendsUnitInfobox: UnitInfobox
-local CustomChampion = Class.new(Unit)
+local BLUE_ESSENCE_ICON = IconImageWidget{
+	imageLight = 'Blue Essence Icon.png',
+	link = 'Blue Essence'
+}
+local RIOT_POINTS_ICON = IconImageWidget{
+	imageLight = 'RP Points.png',
+	link = 'Riot Points'
+}
+
+---@class LeagueofLegendsChampionInfobox: CharacterInfobox
+local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
-
-local BLUE_ESSENCE_ICON = '[[File:Blue Essence Icon.png|x20px|Blue Essence|link=Blue Essence]]'
-local RIOT_POINTS_ICON = '[[File:RP Points.png|x20px|Riot Points|link=Riot Points]]'
 
 ---@param frame Frame
 ---@return Html
-function CustomChampion.run(frame)
-	local unit = CustomChampion(frame)
-	unit:setWidgetInjector(CustomInjector(unit))
-	unit.args.informationType = 'Champion'
-	return unit:createInfobox()
+function CustomCharacter.run(frame)
+	local character = CustomCharacter(frame)
+	character:setWidgetInjector(CustomInjector(character))
+	character.args.informationType = 'Champion'
+
+	local args = character.args
+	args.caption = args.quote
+
+
+	return character:createInfobox()
 end
 
 ---@param id string
@@ -46,53 +58,65 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'header' then
-		return {
-			Header{
-				name = args.championname,
-				subHeader = args.title,
-				image = args.image,
-				imageDefault = args.default,
-				imageDark = args.imagedark or args.imagedarkmode,
-				imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-			},
-		}
-	elseif id == 'caption' then
-		table.insert(widgets, Center{children = {args.quote}})
-	elseif id == 'type' then
-		local toBreakDownCell = function(key, title, dataModule)
-			if String.isEmpty(args[key]) then return end
-			return '<b>' .. title .. '</b><br>' .. DisplayIcon.run{data = 'Module:' .. dataModule, icon = args[key]}
-		end
-
-		local breakDownContents = Array.append({},
-			toBreakDownCell('region', 'Region', 'RegionIcon'),
-			toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
-			toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
+	if id == 'overview' then
+		local breakDownContents = WidgetUtil.collect(
+			self:_toBreakDownCell('region', 'Region', 'RegionIcon'),
+			self:_toBreakDownCell('primaryrole', 'Primary Role', 'ClassIcon'),
+			self:_toBreakDownCell('secondaryrole', 'Secondary Role', 'ClassIcon')
 		)
-		return {
-			Breakdown{classes = {'infobox-center'}, children = breakDownContents},
-			Cell{name = 'Real Name', content = {args.realname}},
-		}
-	elseif id == 'cost' then
-		local cost = Array.append({},
-			String.isNotEmpty(args.costbe) and (args.costbe .. ' ' .. BLUE_ESSENCE_ICON) or nil,
-			String.isNotEmpty(args.costrp ) and (args.costrp .. ' ' .. RIOT_POINTS_ICON) or nil
-		)
-		return {
-			Cell{name = 'Price', content = {table.concat(cost, '&emsp;&ensp;')}},
-		}
+		return { Breakdown{classes = {'infobox-center'}, children = breakDownContents} }
 	elseif id == 'custom' then
-		return self.caller:getCustomCells(widgets)
+		return WidgetUtil.collect(
+			self.caller:_getPriceCell(),
+			self.caller:_getCustomCells()
+		)
 	end
 
 	return widgets
 end
 
----@param widgets Widget[]
----@return Widget[]
-function CustomChampion:getCustomCells(widgets)
+---@param key string
+---@param title string
+---@param dataModule string
+---@return Widget?
+function CustomInjector:_toBreakDownCell(key, title, dataModule)
+	local args = self.caller.args
+	if String.isEmpty(args[key]) then return end
+	local data = Lua.requireIfExists('Module:' .. dataModule, { loadData = true })
+	if Logic.isEmpty(data) then return end
+	local iconData = data[args[key]:lower()]
+	return HtmlWidgets.Fragment{
+		children = {
+			HtmlWidgets.B{
+				children = { title }
+			},
+			HtmlWidgets.Br{},
+			IconImageWidget{
+				imageLight = iconData.icon,
+				link = iconData.link
+			}
+		}
+	}
+end
+
+---@return Widget
+function CustomCharacter:_getPriceCell()
 	local args = self.args
+	local costContent = WidgetUtil.collect(
+		String.isNotEmpty(args.costbe) and HtmlWidgets.Fragment{
+			children = { args.costbe, ' ', BLUE_ESSENCE_ICON }
+		} or nil,
+		String.isNotEmpty(args.costrp) and HtmlWidgets.Fragment{
+			children = { args.costrp, ' ', RIOT_POINTS_ICON }
+		} or nil
+	)
+	return Cell{ name = 'Price', content = costContent }
+end
+
+---@return Widget[]
+function CustomCharacter:getCustomCells()
+	local args = self.args
+	local widgets = {}
 	Array.appendWith(
 		widgets,
 		Cell{name = 'Attack Type', content = {args.attacktype}},
@@ -145,7 +169,7 @@ end
 
 ---@param args table
 ---@return string[]
-function CustomChampion:getWikiCategories(args)
+function CustomCharacter:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
 	return Array.appendWith({'Champions'},
 		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' Champions') or nil,
@@ -153,20 +177,17 @@ function CustomChampion:getWikiCategories(args)
 	)
 end
 
+---@param lpdbData table
 ---@param args table
-function CustomChampion:setLpdbData(args)
-	local lpdbData = {
-		type = 'hero',
-		name = args.championname or self.pagename,
-		information = args.primaryrole,
-		image = args.image,
-		date = args.releasedate,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{
-			costbe = args.costbe,
-			costrp = args.costrp,
-		}
+---@return table
+function CustomCharacter:addToLpdb(lpdbData, args)
+	lpdbData.information = args.primaryrole
+	lpdbData.extradata = {
+		region = args.region,
+		costbe = args.costbe,
+		costrp = args.costrp,
 	}
-	mw.ext.LiquipediaDB.lpdb_datapoint('hero_' .. (args.championname or self.pagename), lpdbData)
+	return lpdbData
 end
 
-return CustomChampion
+return CustomCharacter

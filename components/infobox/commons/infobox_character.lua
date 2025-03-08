@@ -47,6 +47,10 @@ function Character:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Character') .. ' Information'},
+		Customizable{
+			id = 'overview',
+			children = {}
+		},
 		Cell{name = 'Real Name', content = {args.realname}},
 		Customizable{
 			id = 'country',
