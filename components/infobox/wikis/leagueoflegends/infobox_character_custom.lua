@@ -159,7 +159,7 @@ function CustomCharacter:_getCustomCells()
 		Cell{name = 'Movement Speed', content = {args.movespeed}}
 	)
 
-	local wins, loses = CharacterWinLoss.run()
+	local wins, loses = CharacterWinLoss.run(args.name)
 	if wins + loses == 0 then return widgets end
 
 	local winPercentage = Math.round(wins * 100 / (wins + loses), 2)
