@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 
 local TransferList = Lua.import('Module:TransferList')
 
@@ -81,7 +82,10 @@ function TransfersList:render()
 							children = 'Transfer query',
 							link = 'Special:RunQuery/Transfer history'
 						} or nil,
-						Link { children = 'Input Form', link = 'lpcommons:Special:RunQuery/Transfer' },
+						Link {
+							children = 'Input Form',
+							link = (Page.exists('Form:Transfer') and '' or 'lpcommons:') .. 'Special:RunQuery/Transfer'
+						},
 						Logic.readBool(self.props.rumours) and Link { children = 'Rumours', link = 'Portal:Rumours' } or nil
 					), CenterDot())
 				},
