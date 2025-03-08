@@ -26,7 +26,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local ABOUT_HEADING = 'About Liquipedia\'s Dota 2 Wiki'
 local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
 			'This wiki currently covers esports and game content, containing over ' .. mw.site.stats.articles ..
-			'articles managed by ' .. mw.site.stats.activeUsers .. ' active users.'
+			' articles managed by ' .. mw.site.stats.activeUsers .. ' active users.'
 local MAIN_PAGE_BUTTON = Button{
 	link = 'Main Page',
 	title = 'Click here to get to the main page',
