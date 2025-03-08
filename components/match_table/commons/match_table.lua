@@ -11,11 +11,13 @@ local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -60,12 +62,14 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showVod boolean
 ---@field showStats boolean
 ---@field showOnlyGameStats boolean
+---@field showRoundStats boolean
 ---@field showOpponent boolean
 ---@field queryHistoricalAliases boolean
 ---@field showType boolean
 ---@field showYearHeaders boolean
 ---@field useTickerName boolean
 ---@field teamStyle teamStyle
+---@field linkSubPage boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -83,12 +87,21 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field result MatchTableMatchResult
 ---@field game string?
 ---@field date string
+---@field bestof number?
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
+---@field gameOpponents table[]
 ---@field vs match2opponent
+---@field gameVsOpponents table[]
 ---@field winner number
 ---@field countGames boolean
+---@field countRounds boolean
+
+---@class MatchTableStats
+---@field matches {w: number, d: number, l: number}
+---@field games {w: number, d: number, l: number}
+---@field rounds {w: number, d: number, l: number}
 
 ---@class MatchTable
 ---@operator call(table): MatchTable
@@ -96,7 +109,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field title Title
 ---@field config MatchTableConfig
 ---@field matches MatchTableMatch[]
----@field stats {matches: {w: number, d: number, l: number}, games: {w: number, d: number, l: number}}
+---@field stats MatchTableStats
 ---@field display Html
 local MatchTable = Class.new(function(self, args)
 	self.args = args or {}
@@ -148,6 +161,7 @@ function MatchTable:_readDefaultConfig()
 		showVod = Logic.readBool(args.vod),
 		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
 		showOnlyGameStats = Logic.nilOr(Logic.readBool(args.showOnlyGameStats), false),
+		showRoundStats = Logic.nilOr(Logic.readBool(args.showRoundStats), false),
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
@@ -291,7 +305,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata, bestof',
 		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
@@ -414,6 +428,7 @@ function MatchTable:matchFromRecord(record)
 		result = result,
 		game = record.game,
 		date = record.date,
+		bestof = tonumber(record.bestof) or 0,
 	}
 end
 
@@ -443,10 +458,12 @@ function MatchTable:resultFromRecord(record)
 
 	local aliases = self.config.aliases
 	local countGames = false
+	local countRounds = false
 
 	local foundInAlias = function(opponentRecord)
 		if aliases[opponentRecord.name] then
 			countGames = true
+			countRounds = self.config.showRoundStats
 			return true
 		end
 		return self.config.mode == Opponent.solo and Array.any(opponentRecord.match2players, function(player)
@@ -467,11 +484,15 @@ function MatchTable:resultFromRecord(record)
 		return
 	end
 
+	local gameOpponents = Array.map(record.match2games, Operator.property('opponents'))
 	local result = {
 		opponent = record.match2opponents[indexes[1]],
 		vs = record.match2opponents[indexes[2]],
 		winner = winner,
 		countGames = countGames,
+		countRounds = countRounds,
+		gameOpponents = Array.map(gameOpponents, Operator.property(indexes[1])),
+		gameVsOpponents = Array.map(gameOpponents, Operator.property(indexes[2]))
 	}
 
 	return result
@@ -487,6 +508,7 @@ end
 function MatchTable:statsFromMatches()
 	local totalMatches = {w = 0, d = 0, l = 0}
 	local totalGames = {w = 0, d = 0, l = 0}
+	local totalRounds = {w = 0, d = 0, l = 0}
 
 	local nonNegative = function(value)
 		return math.max(tonumber(value) or 0, 0)
@@ -511,11 +533,21 @@ function MatchTable:statsFromMatches()
 			totalGames.w = totalGames.w + nonNegative(match.result.opponent.score)
 			totalGames.l = totalGames.l + nonNegative(match.result.vs.score)
 		end
+
+		if match.result.countRounds then
+			Array.forEach(match.result.gameOpponents, function (gameOpponent)
+				totalRounds.w = totalRounds.w + nonNegative(gameOpponent.score)
+			end)
+			Array.forEach(match.result.gameVsOpponents, function (gameOpponent)
+				totalRounds.l = totalRounds.l + nonNegative(gameOpponent.score)
+			end)
+		end
 	end)
 
 	return {
 		matches = totalMatches,
 		games = totalGames,
+		rounds = totalRounds
 	}
 end
 
@@ -738,7 +770,7 @@ function MatchTable:_displayMatch(match)
 
 	return mw.html.create()
 		:node(self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil)
-		:node(self:_displayScore(match.result))
+		:node(self:_displayScore(match))
 		:node(self:_displayOpponent(match.result.vs):css('text-align', 'left'))
 end
 
@@ -769,22 +801,36 @@ function MatchTable:_displayOpponent(opponentRecord, flipped)
 		:attr('data-sort-value', opponent.name)
 end
 
----@param result MatchTableMatchResult
+---@param match MatchTableMatch
 ---@return Html
-function MatchTable:_displayScore(result)
+function MatchTable:_displayScore(match)
+	local result = match.result
+	local hasOnlyScores = Array.all({result.opponent, result.vs}, function(opponent)
+		return opponent.status == 'S' end)
+
 	---@param opponentRecord match2opponent
+	---@param gameOpponents table[]
 	---@return Html|string
-	local toScore = function(opponentRecord)
+	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
+		local score = opponentRecord.score
+		local status = opponentRecord.status
+
+		local game1Opponent = gameOpponents[1]
+		if match.bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1Opponent and hasOnlyScores then
+			score = game1Opponent.score
+			status = game1Opponent.status
+		end
+
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(opponentRecord.status == SCORE_STATUS and (opponentRecord.score or '–') or opponentRecord.status)
+			:wikitext(status == SCORE_STATUS and (score or '–') or status)
 	end
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
-		:node(toScore(result.opponent))
+		:node(toScore(result.opponent, result.gameOpponents))
 		:node(SCORE_CONCAT)
-		:node(toScore(result.vs))
+		:node(toScore(result.vs, result.gameVsOpponents))
 end
 
 ---@param match MatchTableMatch
@@ -862,7 +908,8 @@ function MatchTable:displayStats()
 
 	local stats = Array.append({},
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.matches, 'matches'),
-		displayScores(self.stats.games, 'games')
+		displayScores(self.stats.games, 'games'),
+		self.config.showOnlyGameStats and '' or displayScores(self.stats.rounds, 'rounds')
 	)
 
 	return mw.html.create('div')
