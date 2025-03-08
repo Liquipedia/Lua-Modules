@@ -8,64 +8,117 @@
 
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+local Template = require('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
+local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local ABOUT_HEADING = 'About Liquipedia\'s Dota 2 Wiki'
+local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, containing over ' ..
+			mw.getContentLanguage():formatNum(mw.site.stats.articles) .. ' articles managed by ' ..
+			mw.site.stats.activeUsers .. ' active users.'
+
+---@param link string
+---@param displayName string
+---@return Widget
+local function createHubButton(link, displayName)
+	return Button{
+		link = link,
+		title = 'Click here to get to the ' .. displayName:lower(),
+		variant = 'secondary',
+		children = {
+			IconFa{
+				additionalClasses = { 'wiki-color-dark' },
+				iconName = 'hub'
+			},
+			' View ' .. displayName
+		}
+	}
+end
+
+local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page')
+local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub')
+local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub')
+
 local CONTENT = {
 	aboutMain = {
-		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
-			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
-			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'</div>',
+		heading = ABOUT_HEADING,
+		body = WidgetUtil.collect(
+			ABOUT_BODY,
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '12px',
+					['justify-content'] = 'center',
+					['padding-top'] = '12px'
+				},
+				children = {
+					ESPORTS_HUB_BUTTON, GAME_HUB_BUTTON
+				}
+			}
+		),
 		padding = true,
 		boxid = 1500,
 	},
 	aboutEsport = {
-		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
-			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
-			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Game Hub|title=Click here to get to the game hub|internallink=Portal:Game' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'</div>',
+		heading = ABOUT_HEADING,
+		body = WidgetUtil.collect(
+			ABOUT_BODY,
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '12px',
+					['justify-content'] = 'center',
+					['padding-top'] = '12px'
+				},
+				children = {
+					MAIN_PAGE_BUTTON, GAME_HUB_BUTTON
+				}
+			}
+		),
 		padding = true,
 		boxid = 1500,
 	},
 	aboutGame = {
-		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
-			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
-			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
-			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
-			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
-			'</div>',
+		heading = ABOUT_HEADING,
+		body = WidgetUtil.collect(
+			ABOUT_BODY,
+			Div{
+				css = {
+					display = 'flex',
+					['flex-wrap'] = 'wrap',
+					gap = '12px',
+					['justify-content'] = 'center',
+					['padding-top'] = '12px'
+				},
+				children = {
+					MAIN_PAGE_BUTTON, ESPORTS_HUB_BUTTON
+				}
+			}
+		),
 		padding = true,
 		boxid = 1500,
 	},
 	heroes = {
 		heading = 'Heroes',
-		body = '<div class="heroes-panel" data-component="heroes-panel">{{HeroTable}}</div>',
+		body = Div{
+			classes = { 'heroes-panel' },
+			attributes = { ['data-component'] = 'heroes-panel' },
+			children = { Template.safeExpand(mw.getCurrentFrame(), 'HeroTable') }
+		},
 		padding = true,
 		boxid = 1501,
 	},

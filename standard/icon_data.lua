@@ -113,6 +113,9 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
+	-- Usage: Dota2 Main Page
+	hub = 'fas fa-external-link-alt',
+
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
