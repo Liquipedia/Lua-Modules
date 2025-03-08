@@ -62,6 +62,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showVod boolean
 ---@field showStats boolean
 ---@field showOnlyGameStats boolean
+---@field showRoundStats boolean
 ---@field showOpponent boolean
 ---@field queryHistoricalAliases boolean
 ---@field showType boolean
@@ -95,6 +96,12 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field gameVsOpponents table[]
 ---@field winner number
 ---@field countGames boolean
+---@field countRounds boolean
+
+---@class MatchTableStats
+---@field matches {w: number, d: number, l: number}
+---@field games {w: number, d: number, l: number}
+---@field rounds {w: number, d: number, l: number}
 
 ---@class MatchTable
 ---@operator call(table): MatchTable
@@ -102,7 +109,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field title Title
 ---@field config MatchTableConfig
 ---@field matches MatchTableMatch[]
----@field stats {matches: {w: number, d: number, l: number}, games: {w: number, d: number, l: number}}
+---@field stats MatchTableStats
 ---@field display Html
 local MatchTable = Class.new(function(self, args)
 	self.args = args or {}
@@ -154,6 +161,7 @@ function MatchTable:_readDefaultConfig()
 		showVod = Logic.readBool(args.vod),
 		showStats = Logic.nilOr(Logic.readBoolOrNil(args.stats), true),
 		showOnlyGameStats = Logic.nilOr(Logic.readBool(args.showOnlyGameStats), false),
+		showRoundStats = Logic.nilOr(Logic.readBool(args.showRoundStats), false),
 		showType = Logic.readBool(args.showType),
 		showYearHeaders = Logic.readBool(args.showYearHeaders),
 		useTickerName = Logic.readBool(args.useTickerName),
@@ -450,10 +458,12 @@ function MatchTable:resultFromRecord(record)
 
 	local aliases = self.config.aliases
 	local countGames = false
+	local countRounds = false
 
 	local foundInAlias = function(opponentRecord)
 		if aliases[opponentRecord.name] then
 			countGames = true
+			countRounds = self.config.showRoundStats
 			return true
 		end
 		return self.config.mode == Opponent.solo and Array.any(opponentRecord.match2players, function(player)
@@ -497,6 +507,7 @@ end
 function MatchTable:statsFromMatches()
 	local totalMatches = {w = 0, d = 0, l = 0}
 	local totalGames = {w = 0, d = 0, l = 0}
+	local totalRounds = {w = 0, d = 0, l = 0}
 
 	local nonNegative = function(value)
 		return math.max(tonumber(value) or 0, 0)
@@ -521,11 +532,21 @@ function MatchTable:statsFromMatches()
 			totalGames.w = totalGames.w + nonNegative(match.result.opponent.score)
 			totalGames.l = totalGames.l + nonNegative(match.result.vs.score)
 		end
+
+		if match.result.countRounds then
+			Array.forEach(match.result.gameOpponents, function (gameOpponent)
+				totalRounds.w = totalRounds.w + nonNegative(gameOpponent.score)
+			end)
+			Array.forEach(match.result.gameVsOpponents, function (gameOpponent)
+				totalRounds.l = totalRounds.l + nonNegative(gameOpponent.score)
+			end)
+		end
 	end)
 
 	return {
 		matches = totalMatches,
 		games = totalGames,
+		rounds = totalRounds
 	}
 end
 
@@ -886,7 +907,8 @@ function MatchTable:displayStats()
 
 	local stats = Array.append({},
 		self.config.showOnlyGameStats and '' or displayScores(self.stats.matches, 'matches'),
-		displayScores(self.stats.games, 'games')
+		displayScores(self.stats.games, 'games'),
+		self.config.showOnlyGameStats and '' or displayScores(self.stats.rounds, 'rounds')
 	)
 
 	return mw.html.create('div')
