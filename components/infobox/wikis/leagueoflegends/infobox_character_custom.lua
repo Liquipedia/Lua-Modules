@@ -20,7 +20,6 @@ local Injector = Lua.import('Module:Widget/Injector')
 
 local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Breakdown = Widgets.Breakdown
 local Cell = Widgets.Cell
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Title = Widgets.Title
