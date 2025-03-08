@@ -168,9 +168,9 @@ end
 ---@return string[]
 function CustomCharacter:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
-	return Array.appendWith({'Champions'},
-		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' Champions') or nil,
-		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' Champions') or nil
+	return WidgetUtil.collect(
+		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' Champion') or nil,
+		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' Champion') or nil
 	)
 end
 
