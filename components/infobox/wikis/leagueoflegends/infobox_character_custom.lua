@@ -111,10 +111,10 @@ function CustomCharacter:_getPriceCell()
 	local args = self.args
 	local costContent = WidgetUtil.collect(
 		String.isNotEmpty(args.costbe) and HtmlWidgets.Fragment{
-			children = { args.costbe, ' ', BLUE_ESSENCE_ICON }
+			children = { BLUE_ESSENCE_ICON, ' ', args.costbe }
 		} or nil,
 		String.isNotEmpty(args.costrp) and HtmlWidgets.Fragment{
-			children = { args.costrp, ' ', RIOT_POINTS_ICON }
+			children = { RIOT_POINTS_ICON, ' ', args.costrp }
 		} or nil
 	)
 	return Cell{ name = 'Price', content = costContent }
