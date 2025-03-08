@@ -32,7 +32,10 @@ local MAIN_PAGE_BUTTON = Button{
 	title = 'Click here to get to the main page',
 	variant = 'secondary',
 	children = {
-		IconFa{ iconName = 'hub' },
+		IconFa{
+			additionalClasses = { 'wiki-color-dark' },
+			iconName = 'hub'
+		},
 		' View Main Page'
 	}
 }
@@ -41,7 +44,10 @@ local ESPORTS_HUB_BUTTON = Button{
 	title = 'Click here to get to the esports hub',
 	variant = 'secondary',
 	children = {
-		IconFa{ iconName = 'hub' },
+		IconFa{
+			additionalClasses = { 'wiki-color-dark' },
+			iconName = 'hub'
+		},
 		' View Esports Hub'
 	}
 }
@@ -50,7 +56,10 @@ local GAME_HUB_BUTTON = Button{
 	title = 'Click here to get to the game hub',
 	variant = 'secondary',
 	children = {
-		IconFa{ iconName = 'hub' },
+		IconFa{
+			additionalClasses = { 'wiki-color-dark' },
+			iconName = 'hub'
+		},
 		' View Game Hub'
 	}
 }
@@ -74,7 +83,7 @@ local CONTENT = {
 			}
 		),
 		padding = true,
-		boxid = 1500,
+	boxid = 1500,
 	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
