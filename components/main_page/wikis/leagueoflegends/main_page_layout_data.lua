@@ -178,7 +178,7 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::hero]]',
+				conditions = '[[type::character]]',
 			},
 		},
 		{
