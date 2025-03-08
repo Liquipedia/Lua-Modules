@@ -20,12 +20,15 @@ local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local ABOUT_HEADING = 'About Liquipedia\'s Dota 2 Wiki'
+local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
+			'This wiki currently covers esports and game content, containing over ' .. mw.site.stats.articles ..
+			'articles managed by ' .. mw.site.stats.activeUsers .. ' active users.'
+
 local CONTENT = {
 	aboutMain = {
-		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
-			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
+		heading = ABOUT_HEADING,
+		body = ABOUT_BODY ..
 			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
 			'{{button|text=View Esports Hub|title=Click here to get to the esports hub|internallink=Portal:Esports' ..
 			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
@@ -36,10 +39,8 @@ local CONTENT = {
 		boxid = 1500,
 	},
 	aboutEsport = {
-		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
-			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
+		heading = ABOUT_HEADING,
+		body = ABOUT_BODY ..
 			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
 			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
 			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
@@ -50,10 +51,8 @@ local CONTENT = {
 		boxid = 1500,
 	},
 	aboutGame = {
-		heading = 'About Liquipedia’s Dota 2 Wiki',
-		body = 'We are the largest Dota 2 wiki that anyone can edit, maintained by fans just like you. ' ..
-			'This wiki currently covers esports and game content, containing over {{NUMBEROFARTICLES}} ' ..
-			'articles managed by {{NUMBEROFACTIVEUSERS}} active users.' ..
+		heading = ABOUT_HEADING,
+		body = ABOUT_BODY ..
 			'<div style="display:flex; flex-wrap: wrap; gap:12px; justify-content:center; padding-top: 12px;">' ..
 			'{{button|text=View Main Page|title=Click here to get to the main page|internallink=Main_Page' ..
 			'|icon=fa-external-link-alt wiki-color-dark|new=true|secondary=true}}' ..
