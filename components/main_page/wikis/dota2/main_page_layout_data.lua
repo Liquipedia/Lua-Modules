@@ -8,6 +8,7 @@
 
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
+local Template = require('Module:Template')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
@@ -117,7 +118,11 @@ local CONTENT = {
 	},
 	heroes = {
 		heading = 'Heroes',
-		body = '<div class="heroes-panel" data-component="heroes-panel">{{HeroTable}}</div>',
+		body = Div{
+			classes = { 'heroes-panel' },
+			attributes = { ['data-component'] = 'heroes-panel' },
+			children = { Template.safeExpand(mw.getCurrentFrame(), 'HeroTable') }
+		},
 		padding = true,
 		boxid = 1501,
 	},
