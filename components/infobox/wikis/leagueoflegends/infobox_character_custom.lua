@@ -44,12 +44,6 @@ function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
 	character.args.informationType = 'Champion'
-
-	-- legacy args that need to be botted
-	local args = character.args
-	args.name = args.championname
-	args.caption = args.quote
-
 	return character:createInfobox()
 end
 
