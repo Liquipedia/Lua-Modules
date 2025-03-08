@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- wiki=warthunder
 -- page=Module:Infobox/Map/Custom
