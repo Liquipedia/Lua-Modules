@@ -84,7 +84,7 @@ local CONTENT = {
 			}
 		),
 		padding = true,
-	boxid = 1500,
+		boxid = 1500,
 	},
 	aboutEsport = {
 		heading = ABOUT_HEADING,
