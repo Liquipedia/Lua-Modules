@@ -119,7 +119,7 @@ local CONTENT = {
 					['padding-top'] = '12px'
 				},
 				children = {
-					ESPORTS_HUB_BUTTON, ESPORTS_HUB_BUTTON
+					MAIN_PAGE_BUTTON, ESPORTS_HUB_BUTTON
 				}
 			}
 		),
