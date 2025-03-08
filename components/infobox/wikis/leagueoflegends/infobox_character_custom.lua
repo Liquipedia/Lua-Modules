@@ -47,8 +47,8 @@ function CustomCharacter.run(frame)
 	character.args.informationType = 'Champion'
 
 	local args = character.args
+	args.name = args.championname
 	args.caption = args.quote
-
 
 	return character:createInfobox()
 end
@@ -57,7 +57,6 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
 	if id == 'overview' then
 		local breakDownContents = WidgetUtil.collect(
 			self:_toBreakDownCell('region', 'Region', 'RegionIcon'),
