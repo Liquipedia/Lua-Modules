@@ -59,7 +59,7 @@ Returns the resolved page name of a team template that has been resolved to a
 date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
-	local raw = mw.ext.TeamTemplate.raw(resolvedTemplate)
+	local raw = TeamTemplate.getRawOrNil(resolvedTemplate)
 	return raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page) or nil
 end)
 
