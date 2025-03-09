@@ -101,7 +101,7 @@ end
 
 --[[
 Returns raw data of a historical team template.
-Keys of the returned table is of form YYYY-MM-DD and
+Keys of the returned table are of form YYYY-MM-DD and
 their corresponding values are team template names.
 ]]
 ---@param name string
