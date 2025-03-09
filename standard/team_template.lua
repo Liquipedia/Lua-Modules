@@ -45,7 +45,7 @@ end
 ---@return string?
 ---@return string?
 function TeamTemplate.getIcon(template)
-	local raw = mw.ext.TeamTemplate.raw(template)
+	local raw = TeamTemplate.getRawOrNil(template)
 	if not raw then
 		return
 	end
