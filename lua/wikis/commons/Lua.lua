@@ -221,6 +221,46 @@ function Lua.withPerfSetup(context, f)
 end
 
 --[[
+Incorporates Lua.invoke functionality into an entry point. The resulting entry
+point can be #invoked directly, without needing Lua.invoke.
+Usage:
+function JayModule.TemplateJay(frame) ... end
+JayModule.TemplateJay = Lua.wrapAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
+]]
+---@param module table
+---@param baseModuleName string
+---@param fnName string
+---@return fun(frame: Frame|table): unknown
+function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
+	assert(
+		not StringUtils.endsWith(baseModuleName, '/dev'),
+		'Lua.wrapAutoInvoke: Module name should not end in \'/dev\''
+	)
+	assert(
+		StringUtils.startsWith(baseModuleName, 'Module:'),
+		'Lua.wrapAutoInvoke: Module name must begin with \'Module:\''
+	)
+
+	local moduleFn = module[fnName]
+
+	return function(frame)
+		local dev
+		if type(frame.args) == 'table' then
+			dev = frame.args.dev
+		else
+			dev = frame.dev
+		end
+
+		local flags = {dev = Logic.readBoolOrNil(dev)}
+		return FeatureFlag.with(flags, function()
+			local variantModule = Lua.import(baseModuleName)
+			local fn = module == variantModule and moduleFn or variantModule[fnName]
+			return fn(frame)
+		end)
+	end
+end
+
+--[[
 Incorporates Lua.invoke functionality into entry points of a module. The entry
 points can then be invoked directly, without needing Lua.invoke.
 
