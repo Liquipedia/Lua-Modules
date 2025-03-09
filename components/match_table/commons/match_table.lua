@@ -45,6 +45,7 @@ local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local BO1_SCORE_CONCAT = '&nbsp;-&nbsp;'
 
 ---@alias MatchTableMode `Opponent.solo` | `Opponent.team`
 
@@ -785,6 +786,7 @@ function MatchTable:_displayScore(match)
 	local result = match.result
 	local hasOnlyScores = Array.all({result.opponent, result.vs}, function(opponent)
 		return opponent.status == 'S' end)
+	local bestof1Score = match.bestof == 1 and Info.config.match2.gameScoresIfBo1 and hasOnlyScores
 
 	---@param opponentRecord match2opponent
 	---@param gameOpponents table[]
@@ -795,7 +797,7 @@ function MatchTable:_displayScore(match)
 		local status = opponentRecord.status
 
 		local game1Opponent = gameOpponents[1]
-		if match.bestof == 1 and Info.config.match2.gameScoresIfBo1 and game1Opponent and hasOnlyScores then
+		if bestof1Score and game1Opponent then
 			score = game1Opponent.score
 			status = game1Opponent.status
 		end
@@ -807,7 +809,7 @@ function MatchTable:_displayScore(match)
 	return mw.html.create('td')
 		:addClass('match-table-score')
 		:node(toScore(result.opponent, result.gameOpponents))
-		:node(SCORE_CONCAT)
+		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
 		:node(toScore(result.vs, result.gameVsOpponents))
 end
 
