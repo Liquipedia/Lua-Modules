@@ -28,8 +28,8 @@ timezone parts.
 ---@return string?
 function TeamTemplate.resolve(template, date)
 	template = template:gsub('_', ' ')
-	local raw = mw.ext.TeamTemplate.raw(template, date)
-	return raw and raw.templatename or nil
+	local raw = TeamTemplate.getRawOrNil(template, date) or {}
+	return raw.templatename
 end
 
 ---Returns true if the specified team template exists.
