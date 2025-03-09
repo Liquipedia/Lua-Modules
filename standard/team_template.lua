@@ -119,9 +119,9 @@ An empty array is returned if the specified team template does not exist.
 function TeamTemplate.queryHistoricalNames(name)
     local resolvedName = TeamTemplate.resolve(name)
 	if resolvedName then
-		local index = TeamTemplate.queryHistorical(resolvedName) or {}
-		if Logic.isNotEmpty(index) then
-			return Array.unique(Array.extractValues(index))
+		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
+		if Logic.isNotEmpty(historical) then
+			return Array.unique(Array.extractValues(historical))
 		else
 			return { resolvedName }
 		end
