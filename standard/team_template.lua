@@ -41,7 +41,7 @@ TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
 	local raw = mw.ext.TeamTemplate.raw(resolvedTemplate)
 	return raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page)
 end)
-	
+
 --[[
 Returns raw data of a team template for a team on a given date. Throws if the
 team template does not exist.
