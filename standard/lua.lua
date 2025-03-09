@@ -145,7 +145,9 @@ function Lua.invoke(frame)
 	frame.args.module = nil
 	frame.args.fn = nil
 
+	-- luacheck: push ignore (yes we want to do this here!)
 	_G.require = Lua.import
+	-- luacheck: pop
 
 	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
