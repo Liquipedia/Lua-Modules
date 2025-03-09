@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:TeamTemplate
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 
