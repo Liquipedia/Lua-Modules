@@ -6,8 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Table = require('Module:Table')
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
@@ -29,6 +31,14 @@ function TeamTemplate.resolve(template, date)
 	template = template:gsub('_', ' ')
 	local raw = mw.ext.TeamTemplate.raw(template, date)
 	return raw and raw.templatename
+end
+
+---Returns true if the specified team template exists.
+---@param template string
+---@param date string|number?
+---@return boolean
+function TeamTemplate.exists(template, date)
+	return TeamTemplate.resolve(template, date) ~= nil
 end
 
 --- Retrieves the lightmode image and darkmode image for a given team template.
@@ -85,6 +95,38 @@ end
 function TeamTemplate.noTeamMessage(pageName, date)
 	return 'Missing template for team=' .. tostring(pageName)
 		.. (date and ' on date=' .. tostring(date) or '')
+end
+
+--[[
+Returns raw data of a historical team template.
+Keys of the returned table is of form YYYY-MM-DD and
+their corresponding values are team template names.
+]]
+---@param name string
+---@return {[string]: string}?
+function TeamTemplate.queryHistorical(name)
+	return mw.ext.TeamTemplate.raw_historical(name)
+end
+
+--[[
+Returns all historical names of the given team template.
+An empty array is returned if the specified team template does not exist.
+]]
+---@param name string
+---@return string[]
+function TeamTemplate.queryHistoricalNames(name)
+    local resolvedName = TeamTemplate.resolve(name)
+	if resolvedName then
+		local index = TeamTemplate.queryHistorical(resolvedName) or {}
+		if Logic.isNotEmpty(index) then
+			local templates = Table.mapValues(index, FnUtil.identity)
+			return Array.unique(templates)
+		else
+			return { resolvedName }
+		end
+	else
+		return {}
+	end
 end
 
 return TeamTemplate
