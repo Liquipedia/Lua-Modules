@@ -22,6 +22,9 @@ Note that team template changes only occur at midnights in the UTC timezone.
 So it is safe to pass Y-m-d date strings ('2021-11-08') without time or
 timezone parts.
 ]]
+---@param template string
+---@param date string|number?
+---@return string?
 function TeamTemplate.resolve(template, date)
 	template = template:gsub('_', ' ')
 	local raw = mw.ext.TeamTemplate.raw(template, date)
@@ -55,6 +58,9 @@ Returns raw data of a team template for a team on a given date. Throws if the
 team template does not exist.
 The team can be specified using a team page name, team template, or alias.
 ]]
+---@param team string
+---@param date string|number?
+---@return teamTemplateData
 function TeamTemplate.getRaw(team, date)
 	return TeamTemplate.getRawOrNil(team, date)
 		or error(TeamTemplate.noTeamMessage(team, date), 2)
@@ -64,11 +70,18 @@ end
 Same as TeamTemplate.getRaw, except that it returns nil if the team template
 does not exist.
 ]]
+---@param team string
+---@param date string|number?
+---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	team = team:gsub('_', ' '):lower()
 	return mw.ext.TeamTemplate.raw(team, date)
 end
 
+---Creates error message for missing team templates.
+---@param pageName string
+---@param date string|number?
+---@return string
 function TeamTemplate.noTeamMessage(pageName, date)
 	return 'Missing template for team=' .. tostring(pageName)
 		.. (date and ' on date=' .. tostring(date) or '')
