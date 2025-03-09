@@ -51,8 +51,8 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 
 	if not (Variables.varDefault('tournament_parent') or Namespace.isDocumentative(currentTitle)) then
 		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
-		local userSpacePrefix = Namespace.isUser(currentTitle) and 'User space ' or ''
-		mw.ext.TeamLiquidIntegration.add_category(userSpacePrefix .. 'Pages with missing tournament context')
+		local categoryPrefix = Namespace.isUser(currentTitle) and 'User space ' or ''
+		mw.ext.TeamLiquidIntegration.add_category(categoryPrefix .. 'Pages with missing tournament context')
 	end
 
 	if Logic.readBool(args.isLegacy) then
