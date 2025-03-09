@@ -29,7 +29,7 @@ local Namespace = {}
 ---@return boolean
 local function isInNamespace(title, namespace, includeTalk)
 	local fn = includeTalk and title.hasSubjectNamespace or title.inNamespace
-	return fn(namespace)
+	return fn(title, namespace)
 end
 
 ---Determines if a title object is in the Main namespace.
