@@ -37,12 +37,13 @@ configured default value which is only available in lua.
 ]]
 local FeatureFlag = {}
 
+---@type {[string]: boolean|string}
 local cachedFlags = {}
 
 ---Retrieves the boolean value of a feature flag. If the flag has not been
 ---previously set, this returns the configured default value of the flag.
 ---@param flag string
----@return boolean
+---@return boolean|string
 function FeatureFlag.get(flag)
 	if cachedFlags[flag] == nil then
 		cachedFlags[flag] = FeatureFlag._get(flag)
