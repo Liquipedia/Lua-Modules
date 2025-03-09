@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
-local Table = require('Module:Table')
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
@@ -120,8 +119,7 @@ function TeamTemplate.queryHistoricalNames(name)
 	if resolvedName then
 		local index = TeamTemplate.queryHistorical(resolvedName) or {}
 		if Logic.isNotEmpty(index) then
-			local templates = Table.mapValues(index, FnUtil.identity)
-			return Array.unique(templates)
+			return Array.unique(Array.extractValues(index))
 		else
 			return { resolvedName }
 		end
