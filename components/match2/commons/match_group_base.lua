@@ -9,9 +9,9 @@
 local Logic = require('Module:Logic')
 local Variables = require('Module:Variables')
 
-local NAMESPACE_USER = 'User'
-local NAMESPACE_TEMPLATE = 'Template'
-local NAMESPACE_MODULE = 'Module'
+local NS_USER = 'User'
+local NS_TEMPLATE = 'Template'
+local NS_MODULE = 'Module'
 
 local MatchGroupBase = {}
 
@@ -52,9 +52,9 @@ function MatchGroupBase.readOptions(args, matchGroupType)
 		end
 	end
 
-	if not (Variables.varDefault('tournament_parent') or currentTitle:inNamespaces(NAMESPACE_TEMPLATE, NAMESPACE_MODULE)) then
+	if not (Variables.varDefault('tournament_parent') or currentTitle:inNamespaces(NS_TEMPLATE, NS_MODULE)) then
 		table.insert(warnings, 'Missing tournament context. Ensure the page has a InfoboxLeague or a HiddenDataBox.')
-		local userSpacePrefix = currentTitle:hasSubjectNamespace(NAMESPACE_USER) and 'User space ' or ''
+		local userSpacePrefix = currentTitle:hasSubjectNamespace(NS_USER) and 'User space ' or ''
 		mw.ext.TeamLiquidIntegration.add_category(userSpacePrefix .. 'Pages with missing tournament context')
 	end
 
@@ -100,7 +100,7 @@ end
 ---@return string
 function MatchGroupBase.getBracketIdPrefix()
 	local currentTitle = mw.title.getCurrentTitle()
-	if currentTitle:hasSubjectNamespace(NAMESPACE_USER) then
+	if currentTitle:hasSubjectNamespace(NS_USER) then
 		return currentTitle.nsText .. '_' .. currentTitle.rootText .. '_'
 	elseif not currentTitle:inNamespace(0) then
 		return currentTitle.nsText .. '_'
