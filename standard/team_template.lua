@@ -30,7 +30,7 @@ timezone parts.
 function TeamTemplate.resolve(template, date)
 	template = template:gsub('_', ' ')
 	local raw = mw.ext.TeamTemplate.raw(template, date)
-	return raw and raw.templatename
+	return raw and raw.templatename or nil
 end
 
 ---Returns true if the specified team template exists.
@@ -60,7 +60,7 @@ date. Returns nil if the team does not exist, or if the page is not specified.
 ]]
 TeamTemplate.getPageName = FnUtil.memoize(function(resolvedTemplate)
 	local raw = mw.ext.TeamTemplate.raw(resolvedTemplate)
-	return raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page)
+	return raw and mw.ext.TeamLiquidIntegration.resolve_redirect(raw.page) or nil
 end)
 
 --[[
