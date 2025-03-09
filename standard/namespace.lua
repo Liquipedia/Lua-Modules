@@ -22,6 +22,16 @@ local NS_MODULE_TALK = 829
 
 local Namespace = {}
 
+---Determins whether a given title object is in a given namespace, and optionally it's talk namespace.
+---@param title Title
+---@param namespace string|number
+---@param includeTalk boolean?
+---@return boolean
+local function isInNamespace(title, namespace, includeTalk)
+	local fn = includeTalk and title.hasSubjectNamespace or title.inNamespace
+	return fn(namespace)
+end
+
 ---Determines if a title object is in the Main namespace.
 ---`NS_MODULE_TALK` is treated as Main namespace for ScribuntoUnit to work properly.
 ---Will use the title object of the page this module is invoked on if no title is provided.
@@ -29,7 +39,7 @@ local Namespace = {}
 ---@return boolean
 function Namespace.isMain(title)
 	title = title or mw.title.getCurrentTitle()
-	return title:inNamespace(NS_MAIN) or title:inNamespace(NS_MODULE_TALK)
+	return isInNamespace(title, NS_MAIN) or isInNamespace(title, NS_MODULE_TALK)
 end
 
 ---Determines if a title object is in the User namespace, also considers
@@ -40,7 +50,7 @@ end
 ---@return boolean
 function Namespace.isUser(title, excludeTalk)
 	title = title or mw.title.getCurrentTitle()
-	return excludeTalk and title:inNamespace(NS_USER) or title:hasSubjectNamespace(NS_USER)
+	return isInNamespace(title, NS_USER, not excludeTalk)
 end
 
 ---Determines if a title object is in a namespace used for documentation purposes (`NS_PROJECT`,
