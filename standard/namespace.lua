@@ -33,7 +33,7 @@ function Namespace.isMain(title)
 end
 
 ---Determines if a title object is in the User namespace, also considers
----the User Talk namespace (unless exluded using the `excludeTalk` paramater).
+---the User Talk namespace (unless excluded using the `excludeTalk` paramater).
 ---Will use the title object of the page this module is invoked on if no title is provided.
 ---@param title Title?
 ---@param excludeTalk boolean?
@@ -44,7 +44,7 @@ function Namespace.isUser(title, excludeTalk)
 end
 
 ---Determines if a title object is in a namespace used for documentation purposes (`NS_PROJECT`,
----`NS_TEMPLATE`, `NS_HELP`, and `NS_MODULE`), also considers their talk pages (unless exluded
+---`NS_TEMPLATE`, `NS_HELP`, and `NS_MODULE`), also considers their talk pages (unless excluded
 ---using the `excludeTalk` paramater). Will use the title object of the page this module is
 ---invoked on if no title is provided.
 ---@param title Title?
