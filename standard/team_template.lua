@@ -47,11 +47,12 @@ end
 ---@return string?
 function TeamTemplate.getIcon(template)
 	local raw = mw.ext.TeamTemplate.raw(template)
-	if raw then
-		local icon = Logic.emptyOr(raw.image, raw.legacyimage)
-		local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
-		return icon, iconDark
+	if not raw then
+		return
 	end
+	local icon = Logic.emptyOr(raw.image, raw.legacyimage)
+	local iconDark = Logic.emptyOr(raw.imagedark, raw.legacyimagedark)
+	return icon, iconDark
 end
 
 --[[
