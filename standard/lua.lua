@@ -223,9 +223,12 @@ end
 --[[
 Incorporates Lua.invoke functionality into an entry point. The resulting entry
 point can be #invoked directly, without needing Lua.invoke.
+
 Usage:
+
 function JayModule.TemplateJay(frame) ... end
 JayModule.TemplateJay = Lua.wrapAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
+
 ]]
 ---@param module table
 ---@param baseModuleName string
