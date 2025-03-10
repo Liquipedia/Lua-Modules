@@ -27,15 +27,17 @@ end
 
 ---@param args table
 function CustomUnofficialWorldChampion:setLpdbData(args)
-	if Namespace.isMain() and Logic.readBool(args.storeLPDB) then
-		mw.ext.LiquipediaDB.lpdb_datapoint(
-			'Unofficial World Champion',
-			Json.stringifySubTables({
-				type = 'Unofficial World Champion',
-				name = args.currentChampOpponent.template
-			})
-		)
+	if not Namespace.isMain() or not Logic.readBool(args.storeLPDB) then
+		return
 	end
+
+	mw.ext.LiquipediaDB.lpdb_datapoint(
+		'Unofficial World Champion',
+		Json.stringifySubTables({
+			type = 'Unofficial World Champion',
+			name = args.currentChampOpponent.template
+		})
+	)
 end
 
 return CustomUnofficialWorldChampion
