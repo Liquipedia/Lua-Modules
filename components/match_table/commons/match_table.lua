@@ -312,6 +312,10 @@ function MatchTable:query()
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
 
+	if self.config.limit and self.config.limit == #self.matches then
+		mw.ext.TeamLiquidIntegration.add_category('Limited match pages')
+	end
+
 	self.stats = self:statsFromMatches()
 
 	return self
