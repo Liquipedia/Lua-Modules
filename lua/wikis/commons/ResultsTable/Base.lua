@@ -15,7 +15,7 @@ local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
@@ -329,13 +329,13 @@ end
 ---@param opponent string
 ---@return string[]
 function BaseResultsTable._getOpponentTemplates(opponent)
-	local rawOpponentTemplate = Team.queryRaw(opponent) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
 		error('Missing team template for team: ' .. opponent)
 	end
 
-	local opponentTeamTemplates = Team.queryHistorical(opponentTemplate)
+	local opponentTeamTemplates = TeamTemplate.queryHistorical(opponentTemplate)
 
 	return Array.append(Array.extractValues(opponentTeamTemplates or {}), opponentTemplate)
 end
@@ -479,7 +479,7 @@ function BaseResultsTable:opponentDisplay(data, options)
 		return
 	end
 
-	local rawTeamTemplate = Team.queryRaw(teamTemplate, data.date) or {}
+	local rawTeamTemplate = TeamTemplate.getRawOrNil(teamTemplate, data.date) or {}
 
 	local teamDisplay = OpponentDisplay.BlockOpponent{
 		opponent = {template = rawTeamTemplate.templatename, type = Opponent.team},

@@ -14,7 +14,7 @@ local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Ordinal = require('Module:Ordinal')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local TeamLogoGallery = {}
 
@@ -24,7 +24,7 @@ function TeamLogoGallery.run(args)
 	args = args or {}
 	local name = (args.name or mw.title.getCurrentTitle().prefixedText):gsub('_', ' '):lower()
 
-	assert(mw.ext.TeamTemplate.teamexists(name), 'Missing team template "' .. name .. '"')
+	assert(TeamTemplate.exists(name), 'Missing team template "' .. name .. '"')
 
 	local imageData = TeamLogoGallery._getImageData(name, Logic.readBool(args.showPresentLogo))
 
@@ -35,13 +35,13 @@ end
 ---@param showPresentLogo boolean
 ---@return {imageLightMode: string, imageDarkMode: string?, caption: string}[]
 function TeamLogoGallery._getImageData(name, showPresentLogo)
-	local historicalTeamTemplates = Logic.emptyOr(Team.queryHistorical(name)) or {[DateExt.defaultDate] = name}
+	local historicalTeamTemplates = Logic.emptyOr(TeamTemplate.queryHistorical(name)) or {[DateExt.defaultDate] = name}
 
 	local imageDatas = {}
 	for startDate, teamTemplate in Table.iter.spairs(historicalTeamTemplates) do
 		table.insert(imageDatas, {
 			startDate = startDate,
-			raw = mw.ext.TeamTemplate.raw(teamTemplate)
+			raw = TeamTemplate.getRaw(teamTemplate)
 		})
 	end
 

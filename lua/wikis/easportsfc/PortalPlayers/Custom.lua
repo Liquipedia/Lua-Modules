@@ -15,6 +15,7 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local PortalPlayers = Lua.import('Module:PortalPlayers')
@@ -88,7 +89,7 @@ function CustomPortalPlayers:row(player, isPlayer)
 	row:tag('td'):node(CustomPortalPlayers._getAge(player))
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = TeamTemplate.exists(player.team) and Team.team(nil, player.team) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then

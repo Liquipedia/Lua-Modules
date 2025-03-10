@@ -15,7 +15,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -133,10 +133,10 @@ function TransferList:_getTeams(args)
 
 	local teamList = {}
 	Array.forEach(teams, function(team)
-		if not mw.ext.TeamTemplate.teamexists(team) then
+		if not TeamTemplate.exists(team) then
 			mw.log('Missing team teamplate: ' .. team)
 		end
-		Array.extendWith(teamList, Team.queryHistoricalNames(team) or {team})
+		Array.extendWith(teamList, TeamTemplate.queryHistoricalNames(team))
 	end)
 
 	return teamList

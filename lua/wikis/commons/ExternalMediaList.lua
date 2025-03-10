@@ -15,7 +15,7 @@ local PlayerExt = require('Module:Player/Ext/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local MediaList = {}
 
@@ -340,7 +340,7 @@ function MediaList._displayTeam(subject, date)
 	if not team then
 		return
 	end
-	return Team.icon(nil, team, date)
+	return TeamTemplate.getIcon(team, date)
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.

@@ -13,7 +13,7 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
@@ -161,7 +161,7 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = TeamTemplate.getPageName(args.team2)
 	end
 
 	return lpdbData
@@ -170,7 +170,7 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local teamPage = TeamTemplate.getPageName(self.args.team)
 		return
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}) ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})

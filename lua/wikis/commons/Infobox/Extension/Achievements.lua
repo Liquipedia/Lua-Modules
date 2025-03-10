@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
@@ -134,8 +134,8 @@ end
 ---@return string[]
 function Achievements._getTeamNames()
 	local pageName = mw.title.getCurrentTitle().text
-	local historicalPages = Team.queryHistoricalNames(pageName)
-	assert(historicalPages, 'No team template exists for "' .. pageName .. '"')
+	local historicalPages = TeamTemplate.queryHistoricalNames(pageName)
+	assert(Logic.isNotEmpty(historicalPages), 'No team template exists for "' .. pageName .. '"')
 
 	return Array.extend(
 		Array.map(historicalPages, function(team) return (team:gsub(' ', '_')) end),

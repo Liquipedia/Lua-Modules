@@ -14,7 +14,7 @@ local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local Tier = require('Module:Tier/Utils')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -153,9 +153,8 @@ function MatchTicker:init(args)
 		not (config.upcoming or config.ongoing)),
 		'Invalid recent, upcoming, ongoing combination')
 
-	local teamPages = args.team and Team.queryHistoricalNames(args.team)
-		or args.team and {args.team} or nil
-	if teamPages then
+	local teamPages = TeamTemplate.queryHistoricalNames(args.team)
+	if Logic.isNotEmpty(teamPages) then
 		Array.extendWith(teamPages,
 		Array.map(teamPages, function(team) return (team:gsub(' ', '_')) end),
 		Array.map(teamPages, function(team) return mw.getContentLanguage():ucfirst(team) end),
