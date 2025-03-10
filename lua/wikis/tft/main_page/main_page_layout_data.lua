@@ -153,7 +153,7 @@ return {
 			},
 		},
 		{
-			file = 'Worlds Trophy 2024.jpg',
+			file = 'TFT Macao Open 2024 Champion Belt.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
