@@ -87,7 +87,7 @@ return {
 		lightmode = 'GeoGuessr full logo allmode.svg',
 		darkmode = 'GeoGuessr full logo allmode.svg',
 	},
-	metadesc = 'Comprehensive GeoGuessr wiki with articles covering everything from formats, to strategies,' .. 
+	metadesc = 'Comprehensive GeoGuessr wiki with articles covering everything from formats, to strategies,' ..
 	'to tournaments, to competitive players and teams',
 	title = 'GeoGuessr Wiki | Liquipedia',
 	navigation = {
