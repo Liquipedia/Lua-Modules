@@ -8,11 +8,13 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -52,8 +54,8 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Current Champion'},
 		Center{
 			children = {
-				OpponentDisplay.InlineTeamContainer{
-					template = args['current champion']
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['current champion']))
 				}
 			},
 			classes = { 'infobox-size-20', 'infobox-bold' }
@@ -69,7 +71,10 @@ function UnofficialWorldChampion:createInfobox()
 							content = WidgetUtil.collect(
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
-								OpponentDisplay.InlineTeamContainer{ template = args['gained against'] }
+								OpponentDisplay.InlineOpponent{
+									opponent = Opponent.readOpponentArgs(Json.parseIfString(args['gained against'])),
+									teamStyle = 'short'
+								}
 							)
 						},
 					}
@@ -79,7 +84,11 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
-			content = { OpponentDisplay.InlineTeamContainer{ template = args['most defences'] } },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most defences']))
+				}
+			},
 		},
 		Customizable{id = 'defences', children = {
 				Builder{
@@ -95,17 +104,29 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = { OpponentDisplay.InlineTeamContainer{ template = args['longest consecutive'] } },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest consecutive']))
+				}
+			},
 		},
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
-			content = { OpponentDisplay.InlineTeamContainer{ template = args['longest total'] } },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest total']))
+				}
+			},
 		},
 		Title{children = 'Most Times Held'},
 		Cell{
 			name = (args['most times held no'] or '?') .. ' times',
-			content = { OpponentDisplay.InlineTeamContainer{ template = args['most times held'] } },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most times held']))
+				}
+			},
 		},
 		Customizable{
 			id = 'regionaldistribution',
