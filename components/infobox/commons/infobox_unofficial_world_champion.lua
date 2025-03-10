@@ -8,9 +8,14 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+
+local OpponentLibraries = require('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 
@@ -38,6 +43,10 @@ end
 function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
+	args.currentChampOpponent = Opponent.readOpponentArgs(
+		Json.parseIfString(args['current champion'])
+	)
+
 	local widgets = {
 		Header{
 			name = 'Unofficial World Champion',
@@ -47,21 +56,31 @@ function UnofficialWorldChampion:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = 'Current Champion'},
-		Center{children = { args['current champion'] }, classes = { 'infobox-size-20', 'infobox-bold' }},
+		Center{
+			children = {
+				OpponentDisplay.InlineOpponent{
+					opponent = args.currentChampOpponent
+				}
+			},
+			classes = { 'infobox-size-20', 'infobox-bold' }
+		},
 		Builder{
 			builder = function()
 				if not String.isEmpty(args['gained date']) then
-					local contentCell
-					if not (String.isEmpty(args['gained against result']) or String.isEmpty(args['gained against'])) then
-						contentCell = args['gained against result'] .. ' vs ' .. args['gained against']
-					elseif not String.isEmpty(args['gained against result']) then
-						contentCell = args['gained against result'] .. ' vs Unknown'
-					elseif not String.isEmpty(args['gained against']) then
-						contentCell = ' vs ' .. args['gained against']
-					end
 					return {
 						Title{children = 'Title Gained'},
-						Cell{name = args['gained date'], content = { contentCell }},
+						Cell{
+							name = args['gained date'],
+							options = { separator = ' ' },
+							content = WidgetUtil.collect(
+								String.nilIfEmpty(args['gained against result']),
+								'vs',
+								OpponentDisplay.InlineOpponent{
+									opponent = Opponent.readOpponentArgs(Json.parseIfString(args['gained against'])),
+									teamStyle = 'short'
+								}
+							)
+						},
 					}
 				end
 			end
@@ -69,7 +88,11 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Most Defences'},
 		Cell{
 			name = (args['most defences no'] or '?') .. ' Matches',
-			content = { args['most defences'] },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most defences']))
+				}
+			},
 		},
 		Customizable{id = 'defences', children = {
 				Builder{
@@ -85,17 +108,30 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = { args['longest consecutive'] },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest consecutive']))
+				}
+			},
 		},
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
-			content = { args['longest total'] },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest total']))
+				}
+			},
 		},
 		Title{children = 'Most Times Held'},
 		Cell{
 			name = (args['most times held no'] or '?') .. ' times',
-			content = { args['most times held'] },
+			content = {
+				OpponentDisplay.InlineOpponent{
+					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most times held']))
+				},
+				String.nilIfEmpty(args['most times held desc'])
+			},
 		},
 		Customizable{
 			id = 'regionaldistribution',
@@ -108,6 +144,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{children = {args.footnotes}},
 	}
 
+	self:setLpdbData(args)
 	return self:build(widgets)
 end
 
@@ -126,6 +163,10 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 		)
 	end
 	return widgets
+end
+
+---@param args table
+function UnofficialWorldChampion:setLpdbData(args)
 end
 
 return UnofficialWorldChampion
