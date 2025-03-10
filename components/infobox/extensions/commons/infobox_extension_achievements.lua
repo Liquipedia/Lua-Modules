@@ -23,6 +23,7 @@ local Opponent = OpponentLibrary.Opponent
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_PLAYER_LIMIT = 10
+local MAX_PARTY_SIZE = 4
 local DEFAULT_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Qualifier]]',
 	'[[liquipediatiertype::!Charity]]',
@@ -94,6 +95,17 @@ function Achievements.teamAndTeamSolo(args)
 
 	return Achievements.display(Achievements._fetchDataForTeam(historicalPages, Opponent.team, options), options),
 		Achievements.display(Achievements._fetchDataForTeam(historicalPages, Opponent.solo, options), options)
+end
+
+---Entry point for infobox team to fetch both team and player achievements while on team as icon strings
+---@param args AchievementIconsArgs?
+---@return string? #Team Achievements icon string
+function Achievements.teamAll(args)
+	if not Namespace.isMain() then return end
+	local historicalPages = Achievements._getTeamNames()
+	local options = Achievements._readOptions(args)
+
+	return Achievements.display(Achievements._fetchDataForTeam(historicalPages, '!' .. Opponent.literal, options), options)
 end
 
 ---Entry point for infobox team to fetch solo achievements while on team as icon strings
@@ -168,15 +180,32 @@ end
 ---@param options AchievementIconsOptions
 ---@return string
 function Achievements._buildTeamConditions(historicalPages, opponentType, options)
-	local lpdbKey = opponentType == Opponent.team and 'opponentname' or 'opponentplayers_p1team'
-
-	return table.concat(Array.extend(
-		options.baseConditions,
-		'[[opponenttype::' .. opponentType .. ']]',
-		'(' .. table.concat(Array.map(historicalPages, function(team)
+	local lpdbKeys = Achievements._getLpdbKeys(opponentType)
+	local teamConditions = Array.flatMap(lpdbKeys, function(lpdbKey)
+		return Array.map(historicalPages, function(team)
 			return '[[' .. lpdbKey .. '::' .. team .. ']]'
-		end), ' OR ') .. ')'
-	), ' AND ')
+		end)
+	end)
+
+	local conditions = Array.extend({},
+		'(' .. table.concat(teamConditions, ' OR ') .. ')',
+		'[[opponenttype::' .. opponentType .. ']]',
+		options.baseConditions
+	)
+
+	return table.concat(conditions, ' AND ')
+end
+
+---@param opponentType OpponentType
+---@return string[]
+function Achievements._getLpdbKeys(opponentType)
+	if opponentType == Opponent.team then
+		return {'opponentname'}
+	end
+
+	return Array.map(Array.range(1, MAX_PARTY_SIZE), function(opponentIndex)
+		return 'opponentplayers_p' .. opponentIndex .. 'team'
+	end)
 end
 
 ---Query data for given conditions

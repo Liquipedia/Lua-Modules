@@ -30,6 +30,8 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local TeamAchievements = Lua.import('Module:Infobox/Extension/Achievements')
+
 ---@class FortniteInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
 
@@ -43,6 +45,8 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
+
+	team.args.achievements = TeamAchievements.teamAll()
 
 	return team:createInfobox()
 end
