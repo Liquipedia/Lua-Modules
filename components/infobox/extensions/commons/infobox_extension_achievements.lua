@@ -198,7 +198,7 @@ end
 ---@param opponentType OpponentType
 ---@return string[]
 function Achievements._getLpdbKeys(opponentType)
-	if opponentType == Opponent.solo then
+	if opponentType == Opponent.team then
 		return {'opponentname'}
 	end
 
