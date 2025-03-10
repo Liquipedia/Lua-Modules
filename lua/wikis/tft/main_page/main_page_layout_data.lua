@@ -126,7 +126,7 @@ return {
 	title = 'Teamfight Tactics',
 	navigation = {
 		{
-			file = 'DRX Deft Worlds 2022 Champion.jpg',
+			file = 'Shiquz TFT Macao Open 2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
