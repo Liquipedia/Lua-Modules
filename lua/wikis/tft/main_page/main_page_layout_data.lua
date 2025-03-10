@@ -167,7 +167,7 @@ return {
 			link = 'Portal:Hall of Fame',
 		},
 		{
-			file = 'Gen.G Mata Worlds 2024.jpg',
+			file = 'TFT Macao Open 2024 Casters.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
