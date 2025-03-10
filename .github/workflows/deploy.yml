@@ -20,8 +20,8 @@ jobs:
         uses: tj-actions/changed-files@v42
         with:
           files: |
-            components/**/*.lua
-            standard/**/*.lua
+            lua/components/**/*.lua
+            lua/standard/**/*.lua
 
       - id: res-changed-files
         uses: tj-actions/changed-files@v42

@@ -15,7 +15,7 @@ if [[ -n "$1" ]]; then
   luaFiles=$1
   gitDeployReason="\"$(git log -1 --pretty='%h %s')\""
 else
-  luaFiles=$(find . -type f -name '*.lua')
+  luaFiles=$(find lua -type f -name '*.lua')
   gitDeployReason='Automated Weekly Re-Sync'
 fi
 

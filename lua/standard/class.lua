@@ -14,7 +14,6 @@ Class.PRIVATE_FUNCTION_SPECIFIER = '_'
 
 ---@class BaseClass
 ---@operator call:self
----@field is_a fun(self, class: BaseClass):boolean #deprecated
 ---@field init fun(self, ...)
 
 function Class.new(base, init)
@@ -56,9 +55,6 @@ function Class.new(base, init)
 		return Class.export(instance, options)
 	end
 
-	---@deprecated
-	instance.is_a = Class.instanceOf
-
 	setmetatable(instance, metatable)
 	return instance
 end
@@ -80,10 +76,8 @@ function Class.export(class, options)
 	return class
 end
 
-local Table = {}
-
 -- Duplicate Table.isNotEmpty() here to avoid circular dependencies with Table
-function Table.isNotEmpty(tbl)
+local function TableIsNotEmpty(tbl)
 	-- luacheck: push ignore (Loop can be executed at most once)
 	for _ in pairs(tbl) do
 		return true
@@ -146,7 +140,7 @@ function Class._frameToArgs(frame, options)
 		end
 	end
 
-	return (Table.isNotEmpty(namedArgs) and namedArgs or nil), indexedArgs
+	return (TableIsNotEmpty(namedArgs) and namedArgs or nil), indexedArgs
 end
 
 ---@param instance any

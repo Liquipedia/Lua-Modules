@@ -1,7 +1,7 @@
 {
 	"$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
 	"runtime.version": "Lua 5.1",
-	"runtime.plugin": "plugins/sumneko_plugin.lua",
+	"runtime.plugin": "lua/plugins/sumneko_plugin.lua",
 	"completion.autoRequire": false,
 	"diagnostics.severity": {
 		"trailing-space": "Error"
@@ -16,6 +16,6 @@
 	],
 	"workspace.ignoreDir": [
 		".vscode",
-		"3rd"
+		"lua/3rd"
 	]
 }

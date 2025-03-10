@@ -245,6 +245,61 @@ local lpdb = {}
 ---@field audio table
 ---@field chair table
 
+---@class match:LpdbBaseData
+---@field matchid unknown
+---@field staticid string
+---@field opponent1 string
+---@field opponent2 string
+---@field opponent1score string
+---@field opponent2score string
+---@field opponent1flag string
+---@field opponent2flag string
+---@field opponent1players table
+---@field opponent2players table
+---@field winner string
+---@field finished integer
+---@field mode string
+---@field type string
+---@field game string
+---@field date string
+---@field dateexact integer
+---@field stream table
+---@field lrthread string
+---@field vod string
+---@field tournament string
+---@field parent string
+---@field tickername string
+---@field shortname string
+---@field series string
+---@field icon string
+---@field liquipediatier string # to be converted to integer
+---@field liquipediatiertype string
+---@field publishertier string
+---@field status string
+---@field header string
+---@field patch string
+
+---@class game:LpdbBaseData
+---@field matchid unknown
+---@field staticid string
+---@field opponent1 string
+---@field opponent2 string
+---@field opponent1score string
+---@field opponent2score string
+---@field opponent1flag string
+---@field opponent2flag string
+---@field winner string
+---@field walkover string
+---@field resulttype string
+---@field mode string
+---@field type string
+---@field game string
+---@field date string
+---@field vod string
+---@field map string
+---@field length string
+---@field patch string
+
 ---@class match2:LpdbBaseData
 ---@field match2id string
 ---@field match2bracketid string
