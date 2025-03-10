@@ -25,8 +25,7 @@ jobs:
         with:
           base_sha: ${{ steps.forkpoint.outputs.fork_point_sha }}
           files: |
-            lua/components/**/*.lua
-            lua/standard/**/*.lua
+            lua/wikis/**/*.lua
 
       - name: Personal Lua Deploy
         if: steps.changed-files.outputs.any_changed == 'true'
