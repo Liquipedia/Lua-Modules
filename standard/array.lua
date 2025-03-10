@@ -135,7 +135,7 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
----Maps each element of an array to an array, then flattens the mapped results.
+---Maps each element of an array to separate arrays, then flattens the mapped results.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T[]|nil
