@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
-local Variables = require('Module:Variables')
 
 local RoleOf = {}
 
@@ -43,7 +42,6 @@ function RoleOf.get(args)
 			return
 		end
 
-		Variables.varDefine(args.role .. 'id', staff.link)
 		local opponent = Opponent.readOpponentArgs{
 			type = Opponent.solo,
 			name = staff.id,
