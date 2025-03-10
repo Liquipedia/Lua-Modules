@@ -162,7 +162,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds23 Skins Splash Art.jpg',
+			file = 'Chibi T1 Orianna.png',
 			title = 'Hall of Fame',
 			link = 'Portal:Hall of Fame',
 		},
