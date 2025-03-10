@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Tier = require('Module:Tier/Custom')
 
@@ -24,7 +25,7 @@ function CustomMatchTable.results(args)
 	args.gameIcons = Logic.nilOr(Logic.readBoolOrNil(args.gameIcons), true)
 	args.vod = Logic.nilOr(Logic.readBoolOrNil(args.vod), true)
 	args.showType = Logic.nilOr(Logic.readBoolOrNil(args.showType), true)
-	
+
 	local matchtable = MatchTable(args)
 	matchtable._displayTier = CustomMatchTable._displayTier
 
