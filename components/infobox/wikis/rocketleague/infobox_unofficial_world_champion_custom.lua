@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 
@@ -25,7 +26,7 @@ function CustomUnofficialWorldChampion.run(frame)
 end
 
 function CustomUnofficialWorldChampion:_setLpdbData()
-	if Namespace.isMain() then
+	if Namespace.isMain() and Logic.readBool(self.args.storeLPDB) then
 		mw.ext.LiquipediaDB.lpdb_datapoint(
 			'Unofficial World Champion',
 			Json.stringifySubTables({
