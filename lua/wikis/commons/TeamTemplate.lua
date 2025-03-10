@@ -42,10 +42,11 @@ end
 
 --- Retrieves the lightmode image and darkmode image for a given team template.
 ---@param template string
+---@param date string|number?
 ---@return string?
 ---@return string?
-function TeamTemplate.getIcon(template)
-	local raw = TeamTemplate.getRawOrNil(template)
+function TeamTemplate.getIcon(template, date)
+	local raw = TeamTemplate.getRawOrNil(template, date)
 	if not raw then
 		return
 	end
