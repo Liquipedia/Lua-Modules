@@ -1,7 +1,7 @@
---- components/widget/html/widget_html_all.lua
+---
 
 describe('HTML Widget', function()
-	local Widgets = require('components/widget/html/widget_html_all')
+	local Widgets = require('Module:Widget/Html/All')
 
 	describe('Abbr', function()
 		it('should create an abbr tag', function()
