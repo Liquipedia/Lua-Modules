@@ -135,7 +135,7 @@ return {
 			},
 		},
 		{
-			file = 'T1 Worlds 2024.jpg',
+			file = 'T1 TFT EWC 2024.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
