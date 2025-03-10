@@ -32,7 +32,7 @@ std = {
 exclude_files = {
 	".install", -- package files
 	".luarocks", -- package manager files
-	"3rd/*", -- 3rd party
+	"lua/3rd/*", -- 3rd party
 	"node_modules/*", -- to speedup run when running locally
 }
 
@@ -41,4 +41,4 @@ ignore = {
 	"212" -- unused argument
 }
 
-files["spec/*_spec.lua"].read_globals = {"GoldenTest", "SetActiveWiki", "allwikis"}
+files["lua/spec/*_spec.lua"].read_globals = {"GoldenTest", "SetActiveWiki", "allwikis"}
