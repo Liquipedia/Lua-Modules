@@ -36,6 +36,10 @@ local UnofficialWorldChampion = Class.new(BasicInfobox)
 ---@return Html
 function UnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = UnofficialWorldChampion(frame)
+	local args = unofficialWorldChampion.args
+	args.currentChampOpponent = Opponent.readOpponentArgs(
+		Json.parseIfString(args['current champion'])
+	)
 	return unofficialWorldChampion:createInfobox()
 end
 
@@ -45,7 +49,7 @@ function UnofficialWorldChampion:createInfobox()
 
 	local widgets = {
 		Header{
-			name = 'Unofficial World Champion',
+			name = 'Unofficial Wrld Champion',
 			image = args.image,
 			imageDark = args.imagedark or args.imagedarkmode,
 			size = args.imagesize,
@@ -55,7 +59,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{
 			children = {
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['current champion']))
+					opponent = args.currentChampOpponent
 				}
 			},
 			classes = { 'infobox-size-20', 'infobox-bold' }

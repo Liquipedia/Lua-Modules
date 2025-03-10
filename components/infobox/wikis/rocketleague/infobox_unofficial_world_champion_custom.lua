@@ -30,7 +30,7 @@ function CustomUnofficialWorldChampion:_setLpdbData()
 			'Unofficial World Champion',
 			Json.stringifySubTables({
 				type = 'Unofficial World Champion',
-				name = self.args['current champion']
+				name = self.args.currentChampOpponent.template
 			})
 		)
 	end
