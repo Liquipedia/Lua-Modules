@@ -144,7 +144,7 @@ return {
 			},
 		},
 		{
-			file = 'G2 Worlds 2024.jpg',
+			file = 'Scarra and BoxBox TFT Macao Open 2024.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
