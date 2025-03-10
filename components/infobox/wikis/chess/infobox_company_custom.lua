@@ -17,7 +17,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 
----@class Formula1CompanyInfobox: CompanyInfobox
+---@class ChessCompanyInfobox: CompanyInfobox
 local CustomCompany = Class.new(Company)
 local CustomInjector = Class.new(Injector)
 
@@ -40,7 +40,7 @@ function CustomInjector:parse(id, widgets)
 			{key = 'president', name = 'President'},
 			{key = 'deputypresident', name = 'Deputy President'},
 		}
-		if not Array.any(staffInfoCells, function(cellData) return args[cellData.key] end) then
+		if not Array.any(staffInfoCells, function(cellData) return Logic.isNotEmpty(args[cellData.key]) end) then
 			return widgets
 		end
 
