@@ -20,6 +20,11 @@ local CustomMatchTable = {}
 ---@param args table
 ---@return Html
 function CustomMatchTable.results(args)
+	args.showRoundStats = Logic.nilOr(Logic.readBoolOrNil(args.showRoundStats), true)
+	args.gameIcons = Logic.nilOr(Logic.readBoolOrNil(args.gameIcons), true)
+	args.vod = Logic.nilOr(Logic.readBoolOrNil(args.vod), true)
+	args.showType = Logic.nilOr(Logic.readBoolOrNil(args.showType), true)
+	
 	local matchtable = MatchTable(args)
 	matchtable._displayTier = CustomMatchTable._displayTier
 
