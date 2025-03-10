@@ -76,9 +76,7 @@ function UnofficialWorldChampion:createInfobox()
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
 								OpponentDisplay.InlineOpponent{
-									opponent = Opponent.readOpponentArgs(
-										Json.parseIfString(args['gained against']) or Opponent.tbd()
-									),
+									opponent = self:_parseOpponentArg('gained against'),
 									teamStyle = 'short'
 								}
 							)
@@ -92,9 +90,7 @@ function UnofficialWorldChampion:createInfobox()
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = {
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(
-						Json.parseIfString(args['most defences']) or Opponent.tbd()
-					)
+					opponent = self:_parseOpponentArg('most defences')
 				}
 			},
 		},
@@ -114,9 +110,7 @@ function UnofficialWorldChampion:createInfobox()
 			name = (args['longest consecutive no'] or '?') .. ' days',
 			content = WidgetUtil.collect(
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(
-						Json.parseIfString(args['longest consecutive']) or Opponent.tbd()
-					)
+					opponent = self:_parseOpponentArg('longest consecutive')
 				},
 				String.nilIfEmpty(args['longest consecutive desc'])
 			),
@@ -126,9 +120,7 @@ function UnofficialWorldChampion:createInfobox()
 			name = (args['longest total no'] or '?') .. ' days',
 			content = {
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(
-						Json.parseIfString(args['longest total']) or Opponent.tbd()
-					)
+					opponent = self:_parseOpponentArg('longest total')
 				}
 			},
 		},
@@ -136,9 +128,9 @@ function UnofficialWorldChampion:createInfobox()
 		Builder{
 			builder = function()
 				local opponents = {}
-				for _, defenseTeam in Table.iter.pairsByPrefix(args, 'most times held', {requireIndex = false}) do
+				for defenseTeamKey, _ in Table.iter.pairsByPrefix(args, 'most times held', {requireIndex = false}) do
 					Array.appendWith(opponents,
-						Opponent.readOpponentArgs(Json.parseIfString(defenseTeam) or Opponent.tbd())
+						self:_parseOpponentArg(defenseTeamKey)
 					)
 				end
 				return Cell{
@@ -165,6 +157,14 @@ function UnofficialWorldChampion:createInfobox()
 
 	self:setLpdbData(args)
 	return self:build(widgets)
+end
+
+---@param key string
+---@return standardOpponent
+function UnofficialWorldChampion:_parseOpponentArg(key)
+	return Opponent.readOpponentArgs(
+		Json.parseIfString(self.args[key]) or Opponent.tbd()
+	)
 end
 
 ---@return Widget[]
