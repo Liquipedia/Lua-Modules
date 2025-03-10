@@ -129,15 +129,24 @@ function UnofficialWorldChampion:createInfobox()
 			},
 		},
 		Title{children = 'Most Times Held'},
-		Cell{
-			name = (args['most times held no'] or '?') .. ' times',
-			content = {
-				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most times held']))
-						or Opponent.tbd()
-				},
-				String.nilIfEmpty(args['most times held desc'])
-			},
+		Builder{
+			builder = function()
+				local opponents = {}
+				for _, defenseTeam in Table.iter.pairsByPrefix(args, 'most times held', {requireIndex = false}) do
+					Array.appendWith(opponents,
+						Opponent.readOpponentArgs(Json.parseIfString(defenseTeam)) or Opponent.tbd()
+					)
+				end
+				return Cell{
+					name = (args['most times held no'] or '?') .. ' times',
+					content = WidgetUtil.collect(
+						Array.map(opponents, function (opponent)
+							return OpponentDisplay.InlineOpponent{ opponent = opponent }
+						end),
+						String.nilIfEmpty(args['most times held desc'])
+					),
+				}
+			end
 		},
 		Customizable{
 			id = 'regionaldistribution',
