@@ -59,7 +59,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{
 			children = {
 				OpponentDisplay.InlineOpponent{
-					opponent = args.currentChampOpponent
+					opponent = args.currentChampOpponent or Opponent.tbd()
 				}
 			},
 			classes = { 'infobox-size-20', 'infobox-bold' }
@@ -76,7 +76,8 @@ function UnofficialWorldChampion:createInfobox()
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
 								OpponentDisplay.InlineOpponent{
-									opponent = Opponent.readOpponentArgs(Json.parseIfString(args['gained against'])),
+									opponent = Opponent.readOpponentArgs(Json.parseIfString(args['gained against']))
+										or Opponent.tbd(),
 									teamStyle = 'short'
 								}
 							)
@@ -91,6 +92,7 @@ function UnofficialWorldChampion:createInfobox()
 			content = {
 				OpponentDisplay.InlineOpponent{
 					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most defences']))
+						or Opponent.tbd()
 				}
 			},
 		},
@@ -111,7 +113,8 @@ function UnofficialWorldChampion:createInfobox()
 			content = {
 				OpponentDisplay.InlineOpponent{
 					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest consecutive']))
-				}
+						or Opponent.tbd()
+				},
 			},
 		},
 		Title{children = 'Longest Total Time as Champion'},
@@ -120,6 +123,7 @@ function UnofficialWorldChampion:createInfobox()
 			content = {
 				OpponentDisplay.InlineOpponent{
 					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest total']))
+						or Opponent.tbd()
 				}
 			},
 		},
@@ -129,6 +133,7 @@ function UnofficialWorldChampion:createInfobox()
 			content = {
 				OpponentDisplay.InlineOpponent{
 					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most times held']))
+						or Opponent.tbd()
 				},
 				String.nilIfEmpty(args['most times held desc'])
 			},
