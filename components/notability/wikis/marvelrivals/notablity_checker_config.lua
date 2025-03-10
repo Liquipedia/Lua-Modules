@@ -255,7 +255,6 @@ function Config.placementDropOffFunction(tier, tierType)
 					return (score - 5)
 				elseif (tier == 3) then
 					return (score - 5.5)
-			
 				elseif (tier == 4 and placement == 3) then
 					return (score)
 				elseif (tier == 4 and placement <= 4) then
