@@ -110,12 +110,13 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = {
+			content = WidgetUtil.collect(
 				OpponentDisplay.InlineOpponent{
 					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest consecutive']))
 						or Opponent.tbd()
 				},
-			},
+				String.nilIfEmpty(args['longest consecutive desc'])
+			),
 		},
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
