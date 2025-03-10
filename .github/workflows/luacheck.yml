@@ -24,8 +24,8 @@ jobs:
 
       - name: Run lint
         run: |
-          luacheck ./ |
-          luacheck ./ --formatter=JUnit > report.xml
+          luacheck lua --config lua/.luacheckrc |
+          luacheck lua --config lua/.luacheckrc --formatter=JUnit > report.xml
 
       - name: Report lint
         uses: mikepenz/action-junit-report@v5
@@ -56,7 +56,7 @@ jobs:
 
       - name: Run test
         run: |
-          busted -v --run=ci --output=junit > busted.xml
+          busted -C lua -v --run=ci --output=junit > busted.xml
 
       - name: Report test
         uses: mikepenz/action-junit-report@v5
