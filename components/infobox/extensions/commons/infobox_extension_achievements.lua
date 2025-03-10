@@ -23,6 +23,7 @@ local Opponent = OpponentLibrary.Opponent
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_PLAYER_LIMIT = 10
+local MAX_PARTY_SIZE = 4
 local DEFAULT_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Qualifier]]',
 	'[[liquipediatiertype::!Charity]]',
@@ -202,9 +203,7 @@ function Achievements._getLpdbKeys(opponentType)
 		return {'opponentname'}
 	end
 
-	-- default to quad opponents if we want to look up for `!Literal`
-	local partySize = Opponent.partySize(type) or Opponent.partySize(Opponent.quad)
-	return Array.map(Array.range(1, partySize), function(opponentIndex)
+	return Array.map(Array.range(1, MAX_PARTY_SIZE), function(opponentIndex)
 		return 'opponentplayers_p' .. opponentIndex .. 'team'
 	end)
 end
