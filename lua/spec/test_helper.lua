@@ -49,49 +49,8 @@ return function(busted, helper, options)
 		table.insert(paths, '?.lua')
 		if wiki ~= '' then
 			table.insert(paths, 'wikis/'.. wiki ..'/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/faction/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/match2/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/prize_pool/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/infobox/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/opponent/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/hidden_data_box/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/squad/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/standings/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/transfer/?.lua')
-			table.insert(paths, 'wikis/'.. wiki ..'/highlight_conditions/?.lua')
 		end
 		table.insert(paths, 'wikis/commons/?.lua')
-		table.insert(paths, 'wikis/commons/faction/?.lua')
-		table.insert(paths, 'wikis/commons/faction/starcraft_starcraft2/?.lua')
-		table.insert(paths, 'wikis/commons/faction/?.lua')
-		table.insert(paths, 'wikis/commons/hidden_data_box/?.lua')
-		table.insert(paths, 'wikis/commons/highlight_conditions/?.lua')
-		table.insert(paths, 'wikis/commons/infobox/?.lua')
-		table.insert(paths, 'wikis/commons/infobox/extensions/?.lua')
-		table.insert(paths, 'wikis/commons/infobox/custom/?.lua')
-		table.insert(paths, 'wikis/commons/links/?.lua')
-		table.insert(paths, 'wikis/commons/opponent/?.lua')
-		table.insert(paths, 'wikis/commons/opponent/starcraft_starcraft2/?.lua')
-		table.insert(paths, 'wikis/commons/match2/?.lua')
-		table.insert(paths, 'wikis/commons/match2/starcraft_starcraft2/?.lua')
-		table.insert(paths, 'wikis/commons/prize_pool/?.lua')
-		table.insert(paths, 'wikis/commons/region/?.lua')
-		table.insert(paths, 'wikis/commons/tier/?.lua')
-		table.insert(paths, 'wikis/commons/squad/?.lua')
-		table.insert(paths, 'wikis/commons/standings/?.lua')
-		table.insert(paths, 'wikis/commons/team_card/?.lua')
-		table.insert(paths, 'wikis/commons/transfer/?.lua')
-		table.insert(paths, 'wikis/commons/standard/?.lua')
-		table.insert(paths, 'wikis/commons/widget/?.lua')
-		table.insert(paths, 'wikis/commons/widget/basic/?.lua')
-		table.insert(paths, 'wikis/commons/widget/contexts/?.lua')
-		table.insert(paths, 'wikis/commons/widget/html/?.lua')
-		table.insert(paths, 'wikis/commons/widget/infobox/?.lua')
-		table.insert(paths, 'wikis/commons/widget/image/?.lua')
-		table.insert(paths, 'wikis/commons/widget/match/summary/?.lua')
-		table.insert(paths, 'wikis/commons/widget/match/summary/ffa/?.lua')
-		table.insert(paths, 'wikis/commons/widget/misc/?.lua')
-		table.insert(paths, 'wikis/commons/widget/squad/?.lua')
 
 		package.path = table.concat(paths, ';')
 	end
@@ -169,11 +128,11 @@ return function(busted, helper, options)
 				newName = Plugin.luaifyModuleName(module)
 			end
 
-			if newName == 'arguments' then
+			if newName == 'Arguments' then
 				return {getArgs = function(t) return t end}
 			end
 
-			if newName == 'feature_flag_config' then
+			if newName == 'FeatureFlag/Config' then
 				return {
 					award_table = {defaultValue = false},
 					debug_import = {defaultValue = false},
@@ -187,14 +146,15 @@ return function(busted, helper, options)
 					perf_rich_reporter = {defaultValue = true},
 					random_errors = {defaultValue = false},
 					team_list = {defaultValue = false},
+					new_setting = {defaultValue = true},
 				}
 			end
 
-			if newName == 'points_data' then
+			if newName == 'Points/data' then
 				return {points = {title = 'Points'}}
 			end
 
-			if newName == 'a or an' then
+			if newName == 'A or an' then
 				return {_main = function(params)
 					-- Simplified implemenation for mocking
 					local firstChar = string.sub(params[1], 1, 1):lower()
@@ -206,7 +166,7 @@ return function(busted, helper, options)
 			end
 
 			-- TODO This should be added to git
-			if newName == 'team_template' then
+			if newName == 'TeamTemplate' then
 				return {
 					getPageName = function(s) return s end
 				}
