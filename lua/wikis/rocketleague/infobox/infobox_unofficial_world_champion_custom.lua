@@ -20,7 +20,6 @@ local CustomUnofficialWorldChampion = Class.new(UnofficialWorldChampion)
 ---@return Html
 function CustomUnofficialWorldChampion.run(frame)
 	local unofficialWorldChampion = CustomUnofficialWorldChampion(frame)
-	unofficialWorldChampion:_setLpdbData()
 	return unofficialWorldChampion:createInfobox()
 end
 
