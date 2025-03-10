@@ -13,7 +13,7 @@ local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
@@ -141,7 +141,7 @@ end
 function CustomPlayer:createBottomContent()
 	local components = {}
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local teamPage = TeamTemplate.getPageName(self.args.team)
 
 		table.insert(components,
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing matches of', {team = teamPage}))

@@ -13,7 +13,7 @@ local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -226,7 +226,7 @@ Condition Functions
 ---@param opponent string
 ---@return string[]
 function Count._getOpponentNames(opponent)
-	local opponentNames = Team.queryHistoricalNames(opponent) or {}
+	local opponentNames = TeamTemplate.queryHistoricalNames(opponent)
 	return Array.extractValues(opponentNames)
 end
 
