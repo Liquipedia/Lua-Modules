@@ -655,6 +655,14 @@ function Array.unique(elements)
 	return uniqueElements
 end
 
+--[[
+Parses a comma-separated string into an array.
+An empty string input returns an empty array.
+
+Example:
+Array.parseCommaSeparatedString('a, b, c, d')
+-- Returns {'a', 'b', 'c', 'd'}
+]]
 ---@param inputString string?
 ---@param sep string?
 ---@return string[]
