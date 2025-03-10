@@ -43,6 +43,10 @@ end
 function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
+	args.currentChampOpponent = Opponent.readOpponentArgs(
+		Json.parseIfString(args['current champion'])
+	)
+
 	local widgets = {
 		Header{
 			name = 'Unofficial World Champion',
@@ -55,7 +59,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{
 			children = {
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['current champion']))
+					opponent = args.currentChampOpponent
 				}
 			},
 			classes = { 'infobox-size-20', 'infobox-bold' }
@@ -140,6 +144,7 @@ function UnofficialWorldChampion:createInfobox()
 		Center{children = {args.footnotes}},
 	}
 
+	self:setLpdbData(args)
 	return self:build(widgets)
 end
 
@@ -158,6 +163,10 @@ function UnofficialWorldChampion:_parseRegionalDistribution()
 		)
 	end
 	return widgets
+end
+
+---@param args table
+function UnofficialWorldChampion:setLpdbData(args)
 end
 
 return UnofficialWorldChampion

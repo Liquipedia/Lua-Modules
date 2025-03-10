@@ -25,13 +25,14 @@ function CustomUnofficialWorldChampion.run(frame)
 	return unofficialWorldChampion:createInfobox()
 end
 
-function CustomUnofficialWorldChampion:_setLpdbData()
-	if Namespace.isMain() and Logic.readBool(self.args.storeLPDB) then
+---@param args table
+function CustomUnofficialWorldChampion:setLpdbData(args)
+	if Namespace.isMain() and Logic.readBool(args.storeLPDB) then
 		mw.ext.LiquipediaDB.lpdb_datapoint(
 			'Unofficial World Champion',
 			Json.stringifySubTables({
 				type = 'Unofficial World Champion',
-				name = self.args.currentChampOpponent.template
+				name = args.currentChampOpponent.template
 			})
 		)
 	end
