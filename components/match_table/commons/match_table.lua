@@ -11,11 +11,13 @@ local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
+local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
+local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -43,6 +45,7 @@ local INVALID_TIER_DISPLAY = 'Undefined'
 local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
+local BO1_SCORE_CONCAT = '&nbsp;-&nbsp;'
 
 ---@alias MatchTableMode `Opponent.solo` | `Opponent.team`
 
@@ -66,6 +69,7 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field showYearHeaders boolean
 ---@field useTickerName boolean
 ---@field teamStyle teamStyle
+---@field linkSubPage boolean
 
 ---@class MatchTableMatch
 ---@field timestamp number
@@ -83,10 +87,13 @@ local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 ---@field result MatchTableMatchResult
 ---@field game string?
 ---@field date string
+---@field bestof number?
 
 ---@class MatchTableMatchResult
 ---@field opponent match2opponent
+---@field gameOpponents table[]
 ---@field vs match2opponent
+---@field gameVsOpponents table[]
 ---@field winner number
 ---@field countGames boolean
 
@@ -291,7 +298,7 @@ function MatchTable:query()
 		conditions = self:buildConditions(),
 		order = 'date desc',
 		query = 'match2opponents, match2games, date, dateexact, icon, icondark, liquipediatier, game, type, '
-			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata',
+			.. 'liquipediatiertype, tournament, pagename, tickername, vod, winner, extradata, bestof',
 		limit = 50,
 	}, function(match)
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
@@ -414,6 +421,7 @@ function MatchTable:matchFromRecord(record)
 		result = result,
 		game = record.game,
 		date = record.date,
+		bestof = tonumber(record.bestof) or 0,
 	}
 end
 
@@ -467,11 +475,14 @@ function MatchTable:resultFromRecord(record)
 		return
 	end
 
+	local gameOpponents = Array.map(record.match2games, Operator.property('opponents'))
 	local result = {
 		opponent = record.match2opponents[indexes[1]],
 		vs = record.match2opponents[indexes[2]],
 		winner = winner,
 		countGames = countGames,
+		gameOpponents = Array.map(gameOpponents, Operator.property(indexes[1])),
+		gameVsOpponents = Array.map(gameOpponents, Operator.property(indexes[2]))
 	}
 
 	return result
@@ -738,7 +749,7 @@ function MatchTable:_displayMatch(match)
 
 	return mw.html.create()
 		:node(self.config.showOpponent and self:_displayOpponent(match.result.opponent, true) or nil)
-		:node(self:_displayScore(match.result))
+		:node(self:_displayScore(match))
 		:node(self:_displayOpponent(match.result.vs):css('text-align', 'left'))
 end
 
@@ -769,22 +780,37 @@ function MatchTable:_displayOpponent(opponentRecord, flipped)
 		:attr('data-sort-value', opponent.name)
 end
 
----@param result MatchTableMatchResult
+---@param match MatchTableMatch
 ---@return Html
-function MatchTable:_displayScore(result)
+function MatchTable:_displayScore(match)
+	local result = match.result
+	local hasOnlyScores = Array.all({result.opponent, result.vs}, function(opponent)
+		return opponent.status == 'S' end)
+	local bestof1Score = match.bestof == 1 and Info.config.match2.gameScoresIfBo1 and hasOnlyScores
+
 	---@param opponentRecord match2opponent
+	---@param gameOpponents table[]
 	---@return Html|string
-	local toScore = function(opponentRecord)
+	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
+		local score = opponentRecord.score
+		local status = opponentRecord.status
+
+		local game1Opponent = gameOpponents[1]
+		if bestof1Score and game1Opponent then
+			score = game1Opponent.score
+			status = game1Opponent.status
+		end
+
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(opponentRecord.status == SCORE_STATUS and (opponentRecord.score or '–') or opponentRecord.status)
+			:wikitext(status == SCORE_STATUS and (score or '–') or status)
 	end
 
 	return mw.html.create('td')
 		:addClass('match-table-score')
-		:node(toScore(result.opponent))
-		:node(SCORE_CONCAT)
-		:node(toScore(result.vs))
+		:node(toScore(result.opponent, result.gameOpponents))
+		:node(bestof1Score and BO1_SCORE_CONCAT or SCORE_CONCAT)
+		:node(toScore(result.vs, result.gameVsOpponents))
 end
 
 ---@param match MatchTableMatch
