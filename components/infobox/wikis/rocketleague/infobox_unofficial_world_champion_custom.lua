@@ -32,7 +32,7 @@ function CustomUnofficialWorldChampion:setLpdbData(args)
 	end
 
 	mw.ext.LiquipediaDB.lpdb_datapoint(
-		'Unofficial World Champion',
+		'unofficial_world_champion',
 		Json.stringifySubTables({
 			type = 'Unofficial World Champion',
 			name = args.currentChampOpponent.template
