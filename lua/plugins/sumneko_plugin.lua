@@ -8,11 +8,11 @@ local liquipedia = {}
 local importFunctions = {}
 importFunctions.functions = {'require', 'mw%.loadData', 'Lua%.import', 'Lua%.requireIfExists'}
 importFunctions.prefixModules = {
-	table = 'standard.',
-	math = 'standard.',
-	string = 'standard.',
-	array = 'standard.',
-	match = 'components.match2.commons.',
+	table = 'wikis.commons.standard.',
+	math = 'wikis.commons.standard.',
+	string = 'wikis.commons.standard.',
+	array = 'wikis.commons.standard.',
+	match = 'wikis.commons.match2.',
 }
 
 ---Transforms a MediaWiki module name, e.g. `Module:Array`, into a lua repository name, e.g. `array`

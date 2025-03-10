@@ -2,7 +2,6 @@
 describe('metadata generator', function()
 	SetActiveWiki('counterstrike')
 	local MetadataGenerator = require('wikis.commons.infobox.extensions.metadata_generator')
-	local Array = require('wikis.commons.standard.array')
 
 	teardown(function ()
 		SetActiveWiki('')
