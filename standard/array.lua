@@ -135,6 +135,7 @@ function Array.flatten(tbl)
 	return flattenedArray
 end
 
+---Maps each element of an array to separate arrays, then flattens the mapped results.
 ---@generic V, T
 ---@param elements V[]
 ---@param funct fun(element: V, index?: integer): T[]|nil
@@ -655,6 +656,14 @@ function Array.unique(elements)
 	return uniqueElements
 end
 
+--[[
+Parses a comma-separated string into an array.
+An empty string input returns an empty array.
+
+Example:
+Array.parseCommaSeparatedString('a, b, c, d')
+-- Returns {'a', 'b', 'c', 'd'}
+]]
 ---@param inputString string?
 ---@param sep string?
 ---@return string[]
