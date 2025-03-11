@@ -41,12 +41,23 @@
 			}
 		}
 
-		&-logo {
+		&-logo-container {
 			height: 43px;
 			display: flex;
 			gap: 0.5rem;
 			align-items: center;
+		
+			> div {
+				height: 100%;
+
+				> img {
+					height: 100%;
+					width: 100%;
+					object-fit: contain;
+				}
+			}
 		}
+
 	}
 
 	&__footer-row {

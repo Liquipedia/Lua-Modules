@@ -203,10 +203,10 @@ function RatingsList:render()
 					},
 					HtmlWidgets.Div {
 						children = {
-							HtmlWidgets.P {children = 'Data provided by '},
-							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=]]' }
+							HtmlWidgets.Span {children = 'Data provided by '},
+							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=]]'}
 						},
-						classes = { 'ranking-table__top-row-logo' }
+						classes = { 'ranking-table__top-row-logo-container' }
 					}
 				}
 			},
