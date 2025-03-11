@@ -201,7 +201,13 @@ function RatingsList:render()
 						},
 						classes = { 'ranking-table__top-row-text' }
 					},
-					'Data provided by [[File:SAP_logo.svg|link=]]',
+					HtmlWidgets.Div {
+						children = {
+							HtmlWidgets.P {children = 'Data provided by '},
+							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=]]' }
+						},
+						classes = { 'ranking-table__top-row-logo' }
+					}
 				}
 			},
 			classes = { 'ranking-table__top-row' },
