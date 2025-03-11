@@ -347,7 +347,8 @@ function MatchTable:buildDateConditions()
 	end
 
 	if timeRange.endDate ~= DateExt.maxTimestamp then
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, DateExt.formatTimestamp('c', timeRange.endDate))}
+		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt,
+			DateExt.formatTimestamp('c', timeRange.endDate + 3600 * 24))}
 	end
 
 	return conditions
