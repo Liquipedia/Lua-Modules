@@ -167,7 +167,7 @@ return {
 			link = 'Portal:Hall of Fame',
 		},
 		{
-			file = 'TFT Macao Open 2024 Casters.jpg',
+			file = 'Aesah and Mortdog TFT Vegas Open 2023.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
