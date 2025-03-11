@@ -21,12 +21,13 @@ local NAME_TO_CLASS = {
 ---@param input string
 ---@return StandingsTiebreaker
 function TiebreakerFactory.tiebreakerFromName(input)
-	local name, context = unpack(String.split(input, '%.'))
-	if context == nil then
+	local context, name = unpack(String.split(input, '%.'))
+	if name == nil then
+		name = context
 		context = 'full'
 	end
 	assert(
-		context == 'full' or context == 'minileague' or context == 'headtohead',
+		context == 'full' or context == 'ml' or context == 'h2h',
 		'Invalid tie breaker context: ' .. context
 	)
 
