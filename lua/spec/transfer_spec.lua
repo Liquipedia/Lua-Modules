@@ -1,6 +1,6 @@
 --- Triple Comment to Enable our LLS Plugin
 local Json = require('Module:Json')
-local TeamTemplateMock = require('wikis.commons.mock.mock_team_template')
+local TeamTemplateMock = require('wikis.commons.Mock.TeamTemplate')
 insulate('Transfer', function()
 	allwikis('smoke', function (args, wikiName)
 		local LpdbTransferStub = stub(mw.ext.LiquipediaDB, 'lpdb_transfer')
