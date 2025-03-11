@@ -17,12 +17,12 @@ return {
 			name = 'Mobile Legends',
 			link = 'Mobile Legends',
 			logo = {
-				darkMode = 'Mobile Legends 2023 allmode.png',
-				lightMode = 'Mobile Legends 2023 allmode.png',
+				darkMode = 'Mobile Legends 2025 allmode.png',
+				lightMode = 'Mobile Legends 2025 allmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Mobile Legends 2023 allmode.png',
-				lightMode = 'Mobile Legends 2023 allmode.png',
+				darkMode = 'Mobile Legends 2025 allmode.png',
+				lightMode = 'Mobile Legends 2025 allmode.png',
 			},
 		},
 	},
