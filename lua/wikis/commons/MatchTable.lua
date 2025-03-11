@@ -381,12 +381,10 @@ function MatchTable:buildAdditionalConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
-	local hasAdditionalConditions = false
 
 	local getOrCondition = function(lpdbKey, input)
 		if Logic.isEmpty(input) then return end
 
-		hasAdditionalConditions = true
 		local orConditions = ConditionTree(BooleanOperator.any)
 		Array.forEach(mw.text.split(input, ','), function(value)
 			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, String.trim(value))}
@@ -398,15 +396,12 @@ function MatchTable:buildAdditionalConditions()
 	getOrCondition('game', args.game)
 
 	if Logic.isNotEmpty(args.bestof) then
-		hasAdditionalConditions = true
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
 	end
 
 	if Logic.isNotEmpty(args.type) then
 		conditions:add(ConditionNode(ColumnName('type'), Comparator.eq, args.type))
 	end
-
-	if not hasAdditionalConditions then return end
 
 	return conditions
 end
