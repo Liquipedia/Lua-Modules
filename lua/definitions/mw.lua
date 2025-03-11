@@ -771,12 +771,24 @@ end
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number
 ---@return boolean
-function mw.title:inNamespaces(...) end
+function mw.title:inNamespaces(...)
+	for _, ns in ipairs(arg) do
+		if ns == 0 then
+			return true
+		end
+	end
+	return false
+end
 
 ---Whether this title's subject namespace is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.title:hasSubjectNamespace(ns) end
+function mw.title:hasSubjectNamespace(ns)
+	if ns == 0 or ns == 1 then
+		return true
+	end
+	return false
+end
 
 ---The same as mw.title.makeTitle( title.namespace, title.text .. '/' .. text ).
 ---@param text string
