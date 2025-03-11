@@ -399,6 +399,10 @@ function MatchTable:buildAdditionalConditions()
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
 	end
 
+	if Logic.isNotEmpty(args.type) then
+		conditions:add(ConditionNode(ColumnName('type'), Comparator.eq, args.type))
+	end
+
 	return conditions
 end
 
