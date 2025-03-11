@@ -129,7 +129,7 @@ local function resolveTieForGroup(allOpponents, tiedOpponents, tiebreakers, tieb
 
 	--TODO: add support for ml & h2h tiebreakers
 	local tiebreakerContextType = tiebreaker:getContextType()
-	if tiebreakerContextType == 'headtohead' or tiebreakerContextType == 'minileague' then
+	if tiebreakerContextType == 'h2h' or tiebreakerContextType == 'ml' then
 		error('Tiebreakers for head-to-head and minileague are not yet supported')
 	end
 

@@ -12,7 +12,7 @@ local Class = require('Module:Class')
 ---match: {w: integer, d: integer, l:integer}, extradata: table}
 
 ---@class StandingsTiebreaker
----@field context 'full'|'minileague'|'headtohead'
+---@field context 'full'|'ml'|'h2h'
 ---@field valueOf fun(self, state:TiebreakerOpponent[], opponent: TiebreakerOpponent): integer
 local StandingsTiebreaker = Class.new(function (self, context)
 	self.context = context
@@ -25,7 +25,7 @@ function StandingsTiebreaker:valueOf(state, opponent)
 	error('This is an Interface')
 end
 
----@return 'full'|'minileague'|'headtohead'
+---@return 'full'|'ml'|'h2h'
 function StandingsTiebreaker:getContextType()
 	return self.context
 end
