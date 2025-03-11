@@ -22,14 +22,15 @@ local NS_MODULE_TALK = 829
 
 local Namespace = {}
 
----Determins whether a given title object is in a given namespace, and optionally it's talk namespace.
+---Determins whether a given title object is in the given namespaces, and optionally their talk namespaces.
 ---@param title Title
----@param namespace string|number
+---@param namespaces (string|integer)[]
 ---@param includeTalk boolean?
 ---@return boolean
-local function isInNamespace(title, namespace, includeTalk)
-	local fn = includeTalk and title.hasSubjectNamespace or title.inNamespace
-	return fn(title, namespace)
+local function isInNamespace(title, namespaces, includeTalk)
+	return includeTalk and Array.any(namespaces, function (namespace)
+		return title:hasSubjectNamespace(namespace)
+	end) or title:inNamespaces(unpack(namespaces))
 end
 
 ---Determines if a title object is in the Main namespace.
@@ -39,7 +40,7 @@ end
 ---@return boolean
 function Namespace.isMain(title)
 	title = title or mw.title.getCurrentTitle()
-	return isInNamespace(title, NS_MAIN) or isInNamespace(title, NS_MODULE_TALK)
+	return isInNamespace(title, {NS_MAIN}) or isInNamespace(title, {NS_MODULE_TALK})
 end
 
 ---Determines if a title object is in the User namespace, also considers
@@ -50,7 +51,7 @@ end
 ---@return boolean
 function Namespace.isUser(title, excludeTalk)
 	title = title or mw.title.getCurrentTitle()
-	return isInNamespace(title, NS_USER, not excludeTalk)
+	return isInNamespace(title, {NS_USER}, not excludeTalk)
 end
 
 ---Determines if a title object is in a namespace used for documentation purposes (`NS_PROJECT`,
@@ -62,10 +63,7 @@ end
 ---@return boolean
 function Namespace.isDocumentative(title, excludeTalk)
 	title = title or mw.title.getCurrentTitle()
-	return excludeTalk and title:inNamespaces(NS_PROJECT, NS_TEMPLATE, NS_HELP, NS_MODULE)
-		or Array.any({NS_PROJECT, NS_TEMPLATE, NS_HELP, NS_MODULE}, function (namespace)
-			return title:hasSubjectNamespace(namespace)
-		end)
+	return isInNamespace(title, {NS_PROJECT, NS_TEMPLATE, NS_HELP, NS_MODULE}, not excludeTalk)
 end
 
 Namespace.getIdsByName = FnUtil.memoize(function()
