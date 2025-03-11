@@ -14,7 +14,7 @@ local Table = require('Module:Table')
 
 local NS_MAIN = 0
 local NS_USER = 2
-local NS_PROJECT = 4
+local NS_PROJECT = 4 -- "Liquipedia" namespace
 local NS_TEMPLATE = 10
 local NS_HELP = 12
 local NS_MODULE = 828
