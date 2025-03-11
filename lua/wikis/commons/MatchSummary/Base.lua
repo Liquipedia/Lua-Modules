@@ -432,7 +432,7 @@ function MatchSummary.createSubstitutesComment(match)
 			end
 
 			if Table.isNotEmpty(substitution.games) then
-				local gamesNoun = 'map' .. (#substitution.games > 1 and 's' or '')
+				local gamesNoun = 'game' .. (#substitution.games > 1 and 's' or '')
 				table.insert(subString, string.format('on %s %s', gamesNoun, mw.text.listToText(substitution.games)))
 			end
 
