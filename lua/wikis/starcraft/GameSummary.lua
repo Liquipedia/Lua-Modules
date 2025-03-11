@@ -8,6 +8,6 @@
 
 local Lua = require('Module:Lua')
 
-local StarcraftFfaGameSummary = Lua.import('Module:GameSummary/Starcraft/FFa')
+local StarcraftFfaGameSummary = Lua.import('Module:GameSummary/Starcraft')
 
 return StarcraftFfaGameSummary
