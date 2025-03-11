@@ -28,9 +28,12 @@ local Namespace = {}
 ---@param includeTalk boolean?
 ---@return boolean
 local function isInNamespace(title, namespaces, includeTalk)
-	return includeTalk and Array.any(namespaces, function (namespace)
-		return title:hasSubjectNamespace(namespace)
-	end) or title:inNamespaces(unpack(namespaces))
+	if includeTalk then
+		return Array.any(namespaces, function (namespace)
+			return title:hasSubjectNamespace(namespace)
+		end)
+	end
+	return title:inNamespaces(unpack(namespaces))
 end
 
 ---Determines if a title object is in the Main namespace.
@@ -40,7 +43,7 @@ end
 ---@return boolean
 function Namespace.isMain(title)
 	title = title or mw.title.getCurrentTitle()
-	return isInNamespace(title, {NS_MAIN}) or isInNamespace(title, {NS_MODULE_TALK})
+	return isInNamespace(title, {NS_MAIN, NS_MODULE_TALK})
 end
 
 ---Determines if a title object is in the User namespace, also considers
