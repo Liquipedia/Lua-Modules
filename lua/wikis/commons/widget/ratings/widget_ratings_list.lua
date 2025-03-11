@@ -201,7 +201,7 @@ function RatingsList:render()
 						},
 						classes = { 'ranking-table__top-row-text' }
 					},
-					'[[File:DataProvidedSAP.svg|link=]]',
+					'Data provided by [[File:SAP_logo.svg|link=]]',
 				}
 			},
 			classes = { 'ranking-table__top-row' },
