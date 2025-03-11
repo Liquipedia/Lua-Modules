@@ -321,10 +321,4 @@ return {
 		name = 'Central Indonesian Time',
 		offset = {8, 0},
 	},
-
-	-- UTC offsets to replace updated timezones
-	['UTC+6'] = {
-		name = 'UTC+6',
-		offset = {6, 0}
-	}
 }
