@@ -7,16 +7,11 @@
 --
 
 local Abbreviation = require('Module:Abbreviation')
-local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
-local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
-
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
-local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class ChessPlayerDisplay: PlayerDisplay
 local CustomPlayerDisplay = Table.copy(PlayerDisplay)
