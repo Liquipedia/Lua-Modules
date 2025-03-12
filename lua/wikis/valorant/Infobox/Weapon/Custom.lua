@@ -15,21 +15,9 @@ local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
-local Span = Widgets.Span
+local CredsIcon = Lua.import('Module:Widget/Image/Icon/Creds')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CREDS_ICON = Span{
-	css = { ['white-space'] = 'nowrap'},
-	children = {
-		IconImageWidget{
-			imageLight = 'Black_Creds_VALORANT.png',
-			imageDark = 'White_Creds_VALORANT.png',
-			link = 'Creds',
-			size = '10px'
-		}
-	}
-}
 local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox
@@ -59,7 +47,7 @@ function CustomInjector:parse(id, widgets)
 			args.price and Cell{
 				name = 'Price',
 				options = { separator = ' ' },
-				content = { CREDS_ICON, args.price }
+				content = { CredsIcon(), args.price }
 			} or nil
 		}
 	elseif id == 'damage' then
@@ -74,7 +62,7 @@ function CustomInjector:parse(id, widgets)
 			args.killaward and Cell{
 				name = 'Kill Award',
 				options = { separator = ' ' },
-				content = { CREDS_ICON, args.killaward }
+				content = { CredsIcon(), args.killaward }
 			} or nil
 		}
 	elseif id == 'rateoffire' then
