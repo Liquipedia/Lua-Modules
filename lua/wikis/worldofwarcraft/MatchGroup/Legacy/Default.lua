@@ -53,6 +53,8 @@ end
 ---@return table
 function MatchGroupLegacyDefault:handleLiterals(match1params, opp, opponentIndex)
 	opp.name = opp.name .. 'literal'
+	if Logic.isEmpty(self.args[opp.name]) then return nil end
+
 	local opponentArgs = self:readOpponent(opp)
 	opponentArgs.type = Opponent.literal
 
