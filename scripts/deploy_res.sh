@@ -47,7 +47,7 @@ for file in $files; do
   if [[ -n "$1" ]]; then
     file="./$file"
   fi
-  echo "== Checking $file =="
+  echo "::group::Checking $file"
   fileContents=$(cat "$file")
   fileName=$(basename "$file")
 
@@ -101,13 +101,14 @@ for file in $files; do
     echo "...failed to deploy"
     allDeployed=false
   fi
+  echo '::endgroup::'
 
   # Don't get rate limited
   sleep 4
 done
 
 if [ "$allDeployed" != true ]; then
-  echo "DEBUG: Some files were not deployed; resource cache version not updated!"
+  echo "::debug::Some files were not deployed; resource cache version not updated!"
   exit 1
 elif [ "$changesMade" == true ]; then
   cacheResult=$(
@@ -126,7 +127,7 @@ elif [ "$changesMade" == true ]; then
   if [[ "${cacheResult}" == "Successfully changed the message value" ]]; then
   	echo "Resource cache version updated succesfully!"
   else
-    echo "DEBUG: Resource cache version unable to be updated!"
+    echo "::debug::Resource cache version unable to be updated!"
     exit 1
   fi
 fi
