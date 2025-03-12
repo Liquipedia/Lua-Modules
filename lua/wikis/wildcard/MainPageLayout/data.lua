@@ -78,7 +78,8 @@ return {
 			link = 'Portal:Mechanics',
 			count = {
 				method = 'LPDB',
-				table = 'mechanics',
+				table = 'datapoint',
+				conditions = '[[type::mechanics]]',
 			},
 		},
 		{
@@ -87,7 +88,8 @@ return {
 			link = 'Portal:Wildcards',
 			count = {
 				method = 'LPDB',
-				table = 'wildcard',
+				table = 'datapoint',
+				conditions = '[[type::wildcard]]',
 			},
 		},
 		{
@@ -96,7 +98,8 @@ return {
 			link = 'Portal:Decks',
 			count = {
 				method = 'LPDB',
-				table = 'deck',
+				table = 'datapoint',
+				conditions = '[[type::deck]]',
 			},
 		},
 	},
