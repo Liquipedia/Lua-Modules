@@ -6,20 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
-local Lua = require('Module:Lua')
-
-local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
-local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
-
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
-local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
-local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-
 local CONTENT = {
 	updates = {
 		heading = 'Updates',
