@@ -49,6 +49,10 @@ function Character:createInfobox()
 		Title{children = (args.informationType or 'Character') .. ' Information'},
 		Cell{name = 'Real Name', content = {args.realname}},
 		Customizable{
+			id = 'birth',
+			children = {}
+		},
+		Customizable{
 			id = 'country',
 			children = {
 				Cell{
