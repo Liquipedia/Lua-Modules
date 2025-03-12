@@ -110,7 +110,7 @@ for file in $files; do
 done
 
 if [ "$allDeployed" != true ]; then
-  echo "::warning::Some files were not deployed; resource cache version not updated!"
+  echo "::error::Some files were not deployed; resource cache version not updated!"
   exit 1
 elif [ "$changesMade" == true ]; then
   cacheResult=$(
