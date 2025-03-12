@@ -11,5 +11,11 @@
 	],
 	"css.validate": false,
 	"less.validate": false,
-	"scss.validate": false
+	"scss.validate": false,
+	"workbench.editor.customLabels.patterns": {
+		"**/wikis/*/*.lua": "${dirname}: ${filename}",
+		"**/wikis/*/*/*.lua": "${dirname(-4)}: ${dirname}/${filename}",
+		"**/wikis/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname}/${filename}",
+		"**/*.lua": "${dirname}: ${filename}"
+	}
 }
