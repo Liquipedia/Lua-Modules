@@ -762,16 +762,15 @@ function mw.title:isSubpageOf(title2) end
 ---@param ns string|number
 ---@return boolean
 function mw.title:inNamespace(ns)
-	if ns == 0 then
-		return true
-	end
-	return false
+	-- Currently only supports mocking main namespace as all busted tests are written expecting it
+	return ns == 0
 end
 
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number
 ---@return boolean
 function mw.title:inNamespaces(...)
+	-- Currently only supports mocking main namespace as all busted tests are written expecting it
 	for _, ns in ipairs(arg) do
 		if ns == 0 then
 			return true
@@ -784,10 +783,8 @@ end
 ---@param ns string|number
 ---@return boolean
 function mw.title:hasSubjectNamespace(ns)
-	if ns == 0 or ns == 1 then
-		return true
-	end
-	return false
+	-- Currently only supports mocking main and talk namespace as all busted tests are written expecting it
+	return ns == 0 or ns == 1
 end
 
 ---The same as mw.title.makeTitle( title.namespace, title.text .. '/' .. text ).
