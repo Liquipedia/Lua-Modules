@@ -6,7 +6,7 @@ local Game = require('Module:Game')
 Config.categories = {
 	{
 		name = 'liquipediatier',
-		property = 'liquipediatier',
+		property = 'liquipediaTier',
 		load = function(category)
 			category.items = {}
 			for _, tier in Tier.iterate('tiers') do
