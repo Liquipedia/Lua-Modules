@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
---python pwb.py replace -lang:artifact -transcludes:"BracketMatchSummary" -regex "\|\s*g(\d)score\s*=\s*(\d+)\-(\d+)" "|g\1p1score=\2|g\1p2score=\3"
-
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
