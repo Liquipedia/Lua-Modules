@@ -90,15 +90,17 @@ for file in $files; do
   )
   result=$(echo "$rawResult" | jq ".edit.result" -r)
   newRevId=$(echo "$rawResult" | jq ".edit.newrevid" -r)
-  echo "DEBUG: ...${rawResult}"
+  echo "::debug::${rawResult}"
   if [[ "${result}" == "Success" ]]; then
     if [[ "${newRevId}" != "null" ]]; then
       changesMade=true
     fi
     echo "...${result}"
     echo '...done'
+    echo ":information_source: ${file} successfully deployed" >> $GITHUB_STEP_SUMMARY
   else
-    echo "...failed to deploy"
+    echo "::warning file=${file}::failed to deploy"
+    echo ":warning: ${file} failed to deploy" >> $GITHUB_STEP_SUMMARY
     allDeployed=false
   fi
   echo '::endgroup::'
@@ -108,7 +110,7 @@ for file in $files; do
 done
 
 if [ "$allDeployed" != true ]; then
-  echo "::debug::Some files were not deployed; resource cache version not updated!"
+  echo "::warning::Some files were not deployed; resource cache version not updated!"
   exit 1
 elif [ "$changesMade" == true ]; then
   cacheResult=$(
@@ -127,7 +129,7 @@ elif [ "$changesMade" == true ]; then
   if [[ "${cacheResult}" == "Successfully changed the message value" ]]; then
   	echo "Resource cache version updated succesfully!"
   else
-    echo "::debug::Resource cache version unable to be updated!"
+    echo "::error::Resource cache version unable to be updated!"
     exit 1
   fi
 fi

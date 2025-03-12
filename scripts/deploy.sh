@@ -109,10 +109,10 @@ for luaFile in $luaFiles; do
     if [[ "${result}" == "Success" ]]; then
       echo "...${result}"
       echo '...done'
-      echo "${luaFile} successfully deployed" >> $GITHUB_STEP_SUMMARY
+      echo ":information_source: ${luaFile} successfully deployed" >> $GITHUB_STEP_SUMMARY
     else
-      echo "...failed to deploy"
-      echo "${luaFile} failed to deploy" >> $GITHUB_STEP_SUMMARY
+      echo "::warning file=${luaFile}::failed to deploy"
+      echo ":warning: ${luaFile} failed to deploy" >> $GITHUB_STEP_SUMMARY
       allModulesDeployed=false
     fi
 
@@ -122,7 +122,7 @@ for luaFile in $luaFiles; do
   echo '::endgroup::'
 
   if [ "$allModulesDeployed" != true ]; then
-    echo "::debug::Some modules were not deployed!"
+    echo "::warning::Some modules were not deployed!"
     exit 1
   fi
 done
