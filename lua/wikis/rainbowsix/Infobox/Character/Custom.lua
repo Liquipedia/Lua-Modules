@@ -73,11 +73,11 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		return WidgetUtil.collect(
 			Cell{
-				title = 'Team',
+				name = 'Team',
 				children = self.caller:_getTeam(args)
 			},
 			Cell{
-				title = 'Operator Role',
+				name = 'Operator Role',
 				content = self.caller:getAllArgsForBase(args, 'function'),
 				options = { makeLink = true }
 			}
@@ -85,12 +85,12 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'class' then
 		return {
 			Cell{
-				title = 'Team Rainbow',
+				name = 'Team Rainbow',
 				content = self.caller:_getTeamRainbow(args),
 				options = { separator = ' ' }
 			},
 			Cell{
-				title = 'Affiliation',
+				name = 'Affiliation',
 				content = { args.affiliation }
 			}
 		}
