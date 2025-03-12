@@ -97,6 +97,9 @@ function CustomInjector:parse(id, widgets)
 			}
 		}
 	elseif id == 'release' then
+		if Logic.isEmpty(args.releasedate) then
+			return {}
+		end
 		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '[[type::patch]] AND [[date::'.. args.releasedate ..']]',
 		})[1]
