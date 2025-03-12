@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
@@ -20,6 +21,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local TEAM_ATTACK = HtmlWidgets.Fragment{
@@ -94,8 +96,24 @@ function CustomInjector:parse(id, widgets)
 				content = { args.affiliation }
 			}
 		}
-	end
-	if id == 'custom' then
+	elseif id == 'release' then
+		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
+			conditions = '[[type::patch]] AND [[date::'.. args.releasedate ..']]',
+		})[1]
+
+		return {
+			Cell{
+				name = 'Release Date',
+				content = WidgetUtil.collect(
+					args.releasedate,
+					Logic.isNotEmpty(patchData) and Link{
+						link = patchData.pagename,
+						children = patchData.name
+					} or nil
+				)
+			}
+		}
+	elseif id == 'custom' then
 		--TODO
 	end
 
