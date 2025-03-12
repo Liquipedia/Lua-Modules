@@ -1,7 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('metadata generator', function()
 	SetActiveWiki('counterstrike')
-	local MetadataGenerator = require('wikis.commons.infobox.extensions.metadata_generator')
+	local MetadataGenerator = require('wikis.commons.MetadataGenerator')
 
 	teardown(function ()
 		SetActiveWiki('')
