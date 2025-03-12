@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
-local NameAliases = Lua.requireIfExists('Module:ChampionNames', {loadData = true})
+local NameAliases = Lua.requireIfExists('Module:CharacterNames', {loadData = true})
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
