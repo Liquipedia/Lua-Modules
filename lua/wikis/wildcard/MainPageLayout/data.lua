@@ -44,8 +44,9 @@ local CONTENT = {
 		body = '{{Liquipedia:championTable}}',
 		padding = true,
 		boxid = 1501,
-
 	},
+}
+
 return {
 	banner = {
 		lightmode = 'Wildcard full lightmode.svg',
@@ -130,6 +131,7 @@ return {
 			},
 			{ -- Right
 				size = 6,
+				children = {
 					{
 						mobileOrder = 2,
 						content = CONTENT.updates,
