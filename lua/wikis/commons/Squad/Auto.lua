@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Condition = require('Module:Condition')
@@ -28,8 +29,8 @@ local Comparator = Condition.Comparator
 ---@field manualPlayers table?
 ---@field manualTimeline table?
 ---@field playersTeamHistory table<string, TeamHistoryEntry[]>
-local SquadAuto = Class.new(nil, function (self, args)
-    self.args = arg
+local SquadAuto = Class.new(nil, function (self, frame)
+    self.args = Arguments.getArgs(frame)
 end)
 
 ---@class SquadAutoTeam
@@ -44,6 +45,8 @@ end)
 ---@field flag string?
 ---@field idleavedate string?
 ---@field page string
+---@field name string?
+---@field localizedname string?
 ---@field thisTeam SquadAutoTeam
 ---@field oldTeam SquadAutoTeam?
 ---@field newTeam SquadAutoTeam?
@@ -54,6 +57,7 @@ end)
 ---@field leavedatedisplay string?
 ---@field leavedateRef table<string, string>?
 ---@field faction string?
+---@field captain boolean?
 
 ---@class SquadAutoConfig
 ---@field team string
@@ -82,29 +86,33 @@ SquadAuto.TransferType = {
 
 ---Entrypoint for the automated timelin
 ---TODO: Implement in submodule
-function SquadAuto.timeline(args)
-    args.timeline = true
-    self:parseConfig(args)
+function SquadAuto.timeline(frame)
+    -- return SquadAuto(frame):timeline()
 end
 
 ---Entrypoint for SquadAuto tables
----@param args table
-function SquadAuto.run(args)
-    local autosquad = SquadAuto(args)
-    autosquad:parseConfig(args)
+---@param frame table
+function SquadAuto.run(frame)
+    local autosquad = SquadAuto(frame)
+    autosquad:parseConfig()
     autosquad:queryTransfers()
 
-    mw.logObject(autosquad:selectEntries())
-    --return SquadCustom.runAuto(self:filterEntries(), self.config.status, self.config.type, self.config.title)
+    return autosquad:display()
+end
+
+function SquadAuto:display()
+    local entries = self:selectEntries()
+    mw.logObject(entries)
+    return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
 end
 
 ---Parses the args into a SquadAutoConfig
----@param args table
-function SquadAuto:parseConfig(args)
+function SquadAuto:parseConfig()
+    local args = self.args
     self.config = {
         team = args.team or mw.title.getCurrentTitle().text,
-        status = SquadUtils.StatusToSquadStatus[args.status:lower()],
-        type = SquadUtils.TypeToSquadType[args.type:lower()],
+        status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()],
+        type = SquadUtils.TypeToSquadType[(args.type or ''):lower()],
         title = args.title -- TODO: Switch to Former players instead of squad?
     }
     if args.timeline then
@@ -331,8 +339,8 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
         joindatedisplay = joinEntry.dateDisplay,
         joindateRef = joinEntry.references,
 
-        idleavedate = joinEntry.dateDisplay,
-        leavedate = leaveEntry.date or nil,
+        idleavedate = leaveEntry.displayname,
+        leavedate = leaveEntry.date or '',
         leavedatedisplay = leaveEntry.dateDisplay,
         leavedateRef = leaveEntry.references,
 
