@@ -5,7 +5,7 @@ local Game = require('Module:Game')
 ---@type FilterButtonCategory[]
 Config.categories = {
 	{
-		name = 'tier',
+		name = 'liquipediatier',
 		property = 'liquipediatier',
 		load = function(category)
 			category.items = {}
