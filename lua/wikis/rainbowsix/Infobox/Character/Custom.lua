@@ -109,7 +109,7 @@ function CustomInjector:parse(id, widgets)
 					Logic.isNotEmpty(patchData) and Link{
 						link = patchData.pagename,
 						children = patchData.name
-					} or nil
+					} or 'Launch'
 				)
 			}
 		}
