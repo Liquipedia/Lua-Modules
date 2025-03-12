@@ -50,7 +50,7 @@ end
 ---@param match1params match1Keys
 ---@param opp table
 ---@param opponentIndex integer
----@return table
+---@return table?
 function MatchGroupLegacyDefault:handleLiterals(match1params, opp, opponentIndex)
 	opp.name = opp.name .. 'literal'
 	if Logic.isEmpty(self.args[opp.name]) then return nil end
