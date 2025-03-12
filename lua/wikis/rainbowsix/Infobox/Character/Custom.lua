@@ -63,7 +63,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'birth' then
+	if id == 'country' then
 		local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
 			birthdate = args.birthdate,
 			birthlocation = args.birthplace,
