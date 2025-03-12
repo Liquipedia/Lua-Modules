@@ -240,7 +240,7 @@ function MatchGroupLegacy:_getMap(mapIndex)
 
 	local mapping = {}
 	Table.iter.forEachPair(self:getMap(), function (key, val)
-		val = val:gsub('%$1%$',mapIndex, 1)
+		val = val:gsub('%$1%$', mapIndex, 1)
 		mapping[key] = val
 	end)
 
@@ -338,6 +338,7 @@ end
 
 ---@param match2key string
 ---@param match1params match1Keys
+---@return table?
 function MatchGroupLegacy:getMatch(match2key, match1params)
 	local isReset = match2key == RESET_MATCH
 	local isValidReset = false
