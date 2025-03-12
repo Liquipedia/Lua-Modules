@@ -29,7 +29,7 @@ function MatchTickerContainer:render()
 	local upcomingTemplate = self.props.upcomingTemplate
 	local completedTemplate = self.props.completedTemplate
 
-	local filters = Array.map(FilterConfig.categories, Operator.property('property')) or {}
+	local filters = Array.map(FilterConfig.categories, Operator.property('name')) or {}
 	local filterText = table.concat(Array.map(filters, function(filter)
 		return 'filterbuttons-' .. string.lower(filter)
 	end), ',')
