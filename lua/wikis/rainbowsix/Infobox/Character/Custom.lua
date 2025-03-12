@@ -9,6 +9,9 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local NameAliases = Lua.requireIfExists('Module:ChampionNames', {loadData = true})
+
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
 
@@ -37,7 +40,10 @@ end
 ---@param args table
 ---@return string?
 function Character:nameDisplay(args)
-	return args.name
+	return CharacterIcon.Icon{
+		character = NameAliases[args.name:lower()],
+		size = '50px'
+	} .. ' ' .. args.name
 end
 
 return CustomCharacter
