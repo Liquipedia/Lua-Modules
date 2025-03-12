@@ -24,7 +24,7 @@ local CustomInjector = Class.new(Injector)
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
-	character.args.informationType = 'Agents'
+	character.args.informationType = 'Operator'
 	return character:createInfobox()
 end
 
