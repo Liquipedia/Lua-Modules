@@ -161,6 +161,8 @@ function CustomInjector:parse(id, widgets)
 		end
 		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '[[type::patch]] AND [[date::'.. args.releasedate ..']]',
+			query = 'name, pagename, date',
+			limit = 1
 		})[1]
 
 		return {
