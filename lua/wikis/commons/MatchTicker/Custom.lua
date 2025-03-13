@@ -51,6 +51,17 @@ end
 function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
 	args.newStyle = true
+
+	args.tiers = args['filterbuttons-liquipediatier']
+	if args.tiers == 'curated' then
+		args.tiers = nil
+		args.featuredTournamentsOnly = true
+	end
+
+	args.tiertypes = args['filterbuttons-liquipediatiertypes']
+	args.regions = args['filterbuttons-regions']
+	args.games = args['filterbuttons-games']
+
 	return MatchTicker(args):query():create():addClass('new-match-style')
 end
 
