@@ -1,0 +1,136 @@
+---
+-- @Liquipedia
+-- wiki=wildcard
+-- page=Module:MainPageLayout/data
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local CONTENT = {
+	updates = {
+		heading = 'Updates',
+		body = '<nowiki>\n</nowiki>{{Main Page Updates}}',
+		padding = true,
+		boxid = 1502,
+	},
+	usefulArticles = {
+		heading = 'Useful Articles',
+		body = '{{Liquipedia:Useful Articles}}',
+		padding = true,
+		boxid = 1503,
+	},
+	wantToHelp = {
+		heading = 'Want To Help?',
+		body = '{{Liquipedia:Want_to_help}}',
+		padding = true,
+		boxid = 1504,
+	},
+	champions = {
+		heading = 'Champions',
+		body = '{{Liquipedia:championTable}}',
+		padding = true,
+		boxid = 1501,
+	},
+}
+
+return {
+	banner = {
+		lightmode = 'Wildcard full lightmode.svg',
+		darkmode = 'Wildcard full darkmode.svg',
+	},
+	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from champions and summons, ' ..
+		'to strategies, to tournaments, to competitive players, and teams.',
+	title = 'The Wildcard Wiki',
+	navigation = {
+		{
+			file = 'Wildcard Characters 2.jpg',
+			title = 'Champions',
+			link = 'Portal:Champions',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::character]]',
+			},
+		},
+		{
+			file = 'Wildcard Characters 1.jpg ',
+			title = 'Summons',
+			link = 'Portal:Summons',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::summons]]',
+			},
+		},
+		{
+			file = 'Wildcard Lushland Arena.jpg',
+			title = 'Arenas',
+			link = 'Portal:Arenas',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::map]]',
+			},
+		},
+		{
+			file = 'Wildcard Frostburn Arena.jpg',
+			title = 'Mechanics',
+			link = 'Portal:Mechanics',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::mechanics]]',
+			},
+		},
+		{
+			file = 'Wildcards',
+			title = 'Wildcards',
+			link = 'Portal:Wildcards',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::wildcard]]',
+			},
+		},
+		{
+			file = 'Decks',
+			title = 'Decks',
+			link = 'Portal:Decks',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::deck]]',
+			},
+		},
+	},
+	layouts = {
+		main = {
+			{ -- Left
+				size = 6,
+				children = {
+					{
+						mobileOrder = 1,
+						content = CONTENT.champions,
+					},
+					{
+						mobileOrder = 4,
+						content = CONTENT.wantToHelp,
+					},
+				}
+			},
+			{ -- Right
+				size = 6,
+				children = {
+					{
+						mobileOrder = 2,
+						content = CONTENT.updates,
+					},
+					{
+						mobileOrder = 3,
+						content = CONTENT.usefulArticles,
+					},
+				},
+			},
+		},
+	},
+}
