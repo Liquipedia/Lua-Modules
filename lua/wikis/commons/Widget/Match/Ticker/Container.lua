@@ -37,7 +37,7 @@ function MatchTickerContainer:render()
 	local filterText = table.concat(Array.map(filters, filterName), ',')
 
 	local defaultFilterParams = Table.map(FilterConfig.categories, function (_, category)
-		return filterName(category.name), table.concat(category.defaultItems, ',')
+		return filterName(category.name), table.concat(category.defaultItems or {}, ',')
 	end)
 
 	local devFlag = FeatureFlag.get('dev')
