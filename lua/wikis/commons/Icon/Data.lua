@@ -116,7 +116,7 @@ return {
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
 
-	-- Usage: Rainbow6 Infobox operator
+	-- Usage: Indicate boolean info in Infobox
 	yes = 'fa fa-check',
 	no = 'fa fa-times',
 
