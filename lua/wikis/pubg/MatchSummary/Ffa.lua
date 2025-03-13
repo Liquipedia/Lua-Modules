@@ -32,7 +32,7 @@ function CustomMatchSummary.getByMatchId(props)
 			idx = 0,
 			children = WidgetUtil.collect(
 				MatchSummaryWidgets.GamesSchedule{match = match},
-				MatchSummaryWidgets.PointsDistribution{scores = scoringData},
+				-- MatchSummaryWidgets.PointsDistribution{scores = scoringData},
 				MatchSummaryWidgets.Mvp(match.extradata.mvp),
 				MatchSummaryWidgets.MatchComment{match = match},
 				SummaryHelper.standardMatch(match)
