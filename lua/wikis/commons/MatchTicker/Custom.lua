@@ -52,6 +52,13 @@ function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
 	args.newStyle = true
 
+	if args.type == 'upcoming' then
+		args.upcoming = true
+		args.ongoing = true
+	elseif args.type == 'recent' then
+		args.recent = true
+	end
+
 	args.tiers = args['filterbuttons-liquipediatier']
 	if args.tiers == 'curated' then
 		args.tiers = nil

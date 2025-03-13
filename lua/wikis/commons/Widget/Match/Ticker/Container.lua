@@ -70,7 +70,7 @@ function MatchTickerContainer:render()
 	---@param type 'upcoming' | 'recent'
 	local function callTemplate(type)
 		local config = self.defaultProps.matchTicker
-		local ticker = require(config.module)
+		local ticker = require('Module:' .. config.module)
 		return ticker[config.fn](
 			Table.merge(
 				config.args,
