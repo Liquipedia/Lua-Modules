@@ -132,8 +132,15 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Operator Role',
-				content = self.caller:getAllArgsForBase(args, 'function'),
-				options = { makeLink = true }
+				content = Array.map(
+					self.caller:getAllArgsForBase(args, 'function'),
+					function (role)
+						return Link{
+							link = ':Category:' .. role .. ' Operators',
+							children = role
+						}
+					end
+				),
 			}
 		)
 	elseif id == 'class' then
