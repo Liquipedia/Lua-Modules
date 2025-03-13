@@ -47,17 +47,10 @@ end
 
 ---Entry point for display on the main page with the new style
 ---@param frame Frame?
----@return Html
+---@return Html?
 function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
 	args.newStyle = true
-
-	if args.type == 'upcoming' then
-		args.upcoming = true
-		args.ongoing = true
-	elseif args.type == 'recent' then
-		args.recent = true
-	end
 
 	args.tiers = args['filterbuttons-liquipediatier']
 	if args.tiers == 'curated' then
@@ -69,7 +62,13 @@ function CustomMatchTicker.newMainPage(frame)
 	args.regions = args['filterbuttons-regions']
 	args.games = args['filterbuttons-games']
 
-	return MatchTicker(args):query():create():addClass('new-match-style')
+	if args.type == 'upcoming' then
+		-- Separate calls to be able to use separate limits
+		return MatchTicker(Table.merge(args, {ongoing = true})):query():create():addClass('new-match-style')
+		.. MatchTicker(Table.merge(args, {upcoming = true})):query():create():addClass('new-match-style')
+	elseif args.type == 'recent' then
+		return MatchTicker(Table.merge(args, {recent = true})):query():create():addClass('new-match-style')
+	end
 end
 
 ---Entry point for display on player pages

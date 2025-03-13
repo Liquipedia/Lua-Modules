@@ -26,9 +26,7 @@ MatchTickerContainer.defaultProps = {
 		module = 'MatchTicker/Custom',
 		fn = 'newMainPage',
 		args = {
-			upcomingLimit = 10,
-			ongoingLimit = 10,
-			recentLimit = 10,
+			limit = 10,
 		}
 	},
 }
