@@ -170,7 +170,8 @@ function CustomInjector:parse(id, widgets)
 		}
 	elseif id == 'custom' then
 		return WidgetUtil.collect(
-			self.caller:_getAdditionalInfo(args)
+			self.caller:_getAdditionalInfo(args),
+			self.caller:_getBaseStats(args)
 		)
 	end
 
