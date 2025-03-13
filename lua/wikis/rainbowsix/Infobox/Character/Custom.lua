@@ -106,6 +106,7 @@ local CustomInjector = Class.new(Injector)
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
+	character.args.name = Logic.emptyOr(character.args.name, mw.title.getCurrentTitle())
 	character.args.informationType = 'Operator'
 	return character:createInfobox()
 end
