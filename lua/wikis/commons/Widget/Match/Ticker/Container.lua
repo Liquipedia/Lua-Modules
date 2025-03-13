@@ -47,8 +47,8 @@ function MatchTickerContainer:render()
 		return String.interpolate(
 			'#invoke:Lua|invoke|module=${module}|fn=${fn}${args}',
 			{
-				module = self.props.module,
-				fn = self.props.fn,
+				module = self.defaultProps.module,
+				fn = self.defaultProps.fn,
 				args = table.concat(Array.extractValues(Table.map(
 					{limit=self.props.limit, type=type, dev=devFlag},
 					function (key, value)
@@ -61,8 +61,8 @@ function MatchTickerContainer:render()
 
 	---@param type 'upcoming' |'recent'
 	local function callTemplate(type)
-		local ticker = Lua.import('Module:' .. self.props.module)
-		return ticker[self.props.fn](
+		local ticker = Lua.import('Module:' .. self.defaultProps.module)
+		return ticker[self.defaultProps.fn](
 			Table.merge(
 				{limit=self.props.limit, type=type},
 				defaultFilterParams
