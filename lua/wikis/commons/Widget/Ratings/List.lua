@@ -204,7 +204,7 @@ function RatingsList:render()
 					HtmlWidgets.Div {
 						children = {
 							HtmlWidgets.Span {children = 'Data provided by '},
-							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=]]'}
+							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=|SAP]]'}
 						},
 						classes = { 'ranking-table__top-row-logo-container' }
 					}
