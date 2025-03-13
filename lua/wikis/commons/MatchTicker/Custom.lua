@@ -58,14 +58,15 @@ function CustomMatchTicker.newMainPage(frame)
 		args.featuredTournamentsOnly = true
 	end
 
-	args.tiertypes = args['filterbuttons-liquipediatiertypes']
-	args.regions = args['filterbuttons-regions']
-	args.games = args['filterbuttons-games']
+	args.tiertypes = args['filterbuttons-liquipediatiertype']
+	args.regions = args['filterbuttons-region']
+	args.games = args['filterbuttons-game']
 
 	if args.type == 'upcoming' then
 		-- Separate calls to be able to use separate limits
-		return MatchTicker(Table.merge(args, {ongoing = true})):query():create():addClass('new-match-style')
-		.. MatchTicker(Table.merge(args, {upcoming = true})):query():create():addClass('new-match-style')
+		return mw.html.create()
+			:node(MatchTicker(Table.merge(args, {ongoing = true})):query():create():addClass('new-match-style'))
+			:node(MatchTicker(Table.merge(args, {upcoming = true})):query():create():addClass('new-match-style'))
 	elseif args.type == 'recent' then
 		return MatchTicker(Table.merge(args, {recent = true})):query():create():addClass('new-match-style')
 	end
