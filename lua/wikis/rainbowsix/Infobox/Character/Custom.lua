@@ -400,11 +400,11 @@ function CustomCharacter:_getSpeedContent(speed)
 	local speedContent = FnUtil.curry(CustomCharacter._getStatContent, 'speed')
 	local speedEq = FnUtil.curry(Operator.eq, speed)
 	if Array.any({'1', 'slow', 'low'}, speedEq) then
-		return speedContent(1, 'Light (100 HP)')
+		return speedContent(1, 'Slow')
 	elseif Array.any({'2', 'medium'}, speedEq) then
-		return speedContent(2, 'Medium (110 HP)')
+		return speedContent(2, 'Medium')
 	elseif Array.any({'3', 'fast', 'high'}, speedEq) then
-		return speedContent(3, 'Heavy (125 HP)')
+		return speedContent(3, 'Fast')
 	end
 	return {}
 end
