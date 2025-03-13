@@ -44,6 +44,7 @@ end
 
 -- invoked by Template:MatchMaps
 ---@param frame Frame
+---@return Html|string
 function LegacyMatchList.matchMaps(frame)
 	local args = Arguments.getArgs(frame)
 
@@ -163,10 +164,10 @@ function LegacyMatchList.run(frame)
 	)
 
 	local matches = Array.mapIndexes(function(matchIndex)
-		return Json.parseIfTable(args['match' .. matchIndex])
+		return args['match' .. matchIndex]
 	end)
 
-	local matchListArgs = Table.deepCopy(matches)
+	local matchListArgs = Table.copy(matches)
 	matchListArgs.id = args.id
 	matchListArgs.isLegacy = true
 	matchListArgs.title = args.title or args[1] or 'Match List'
@@ -184,7 +185,6 @@ function LegacyMatchList.run(frame)
 		matchListArgs.noDuplicateCheck = true
 		matchListArgs.store = false
 	end
-mw.logObject(matchListArgs)
 
 	return MatchGroup.MatchList(matchListArgs)
 end
