@@ -8,11 +8,11 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FeatureFlag = require('Module:FeatureFlag')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -48,6 +48,8 @@ function MatchTickerContainer:render()
 		})
 	end, {})
 
+	local devFlag = FeatureFlag.get('dev')
+
 	---@param type 'upcoming' | 'recent'
 	local function buildTemplateExpansionString(type)
 		local config = self.defaultProps.matchTicker
@@ -58,7 +60,7 @@ function MatchTickerContainer:render()
 				module = config.module,
 				fn = config.fn,
 				args = table.concat(Array.map(
-					Table.entries(Table.merge(config.args, {type=type})),
+					Table.entries(Table.merge(config.args, {type=type, dev=devFlag})),
 					function (entry)
 						return String.interpolate('|${1}=${2}', entry)
 					end
@@ -70,7 +72,7 @@ function MatchTickerContainer:render()
 	---@param type 'upcoming' | 'recent'
 	local function callTemplate(type)
 		local config = self.defaultProps.matchTicker
-		local ticker = require('Module:' .. config.module)
+		local ticker = Lua.import('Module:' .. config.module)
 		return ticker[config.fn](
 			Table.merge(
 				config.args,
