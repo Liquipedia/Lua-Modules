@@ -12,6 +12,7 @@ local FnUtil = require('Module:FnUtil')
 local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
@@ -381,7 +382,7 @@ end
 ---@return (string|Widget)[]
 function CustomCharacter:_getArmorContent(armor)
 	local armorContent = FnUtil.curry(CustomCharacter._getStatContent, 'armor')
-	local armorEq = FnUtil.curry(FnUtil.eq, armor)
+	local armorEq = FnUtil.curry(Operator.eq, armor)
 	if Array.any({'1', 'light', 'low'}, armorEq) then
 		return armorContent(1, 'Light (100 HP)')
 	elseif Array.any({'2', 'medium'}, armorEq) then
@@ -396,7 +397,7 @@ end
 ---@return (string|Widget)[]
 function CustomCharacter:_getSpeedContent(speed)
 	local speedContent = FnUtil.curry(CustomCharacter._getStatContent, 'speed')
-	local speedEq = FnUtil.curry(FnUtil.eq, speed)
+	local speedEq = FnUtil.curry(Operator.eq, speed)
 	if Array.any({'1', 'slow', 'low'}, speedEq) then
 		return speedContent(1, 'Light (100 HP)')
 	elseif Array.any({'2', 'medium'}, speedEq) then
@@ -411,7 +412,7 @@ end
 ---@return (string|Widget)[]
 function CustomCharacter:_getDifficultyContent(difficulty)
 	local difficultyContent = FnUtil.curry(CustomCharacter._getStatContent, 'armor')
-	local difficultyEq = FnUtil.curry(FnUtil.eq, difficulty)
+	local difficultyEq = FnUtil.curry(Operator.eq, difficulty)
 	if Array.any({'1', 'easy', 'low'}, difficultyEq) then
 		return difficultyContent(1, 'Easy')
 	elseif Array.any({'2', 'normal', 'medium'}, difficultyEq) then
@@ -443,8 +444,8 @@ end
 ---@return string[]
 function CustomCharacter:getWikiCategories(args)
 	local categories = {}
-	local speedEq = FnUtil.curry(FnUtil.eq, args.speed)
-	local difficultyEq = FnUtil.curry(FnUtil.eq, args.difficulty)
+	local speedEq = FnUtil.curry(Operator.eq, args.speed)
+	local difficultyEq = FnUtil.curry(Operator.eq, args.difficulty)
 
 	Array.extendWith(categories, Array.map(self:getAllArgsForBase(args, 'function'), function (element)
 		return element .. ' Operators'

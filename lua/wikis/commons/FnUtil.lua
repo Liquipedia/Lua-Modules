@@ -84,20 +84,6 @@ end
 ---@return T
 function FnUtil.identity(x) return x end
 
---- The equality function
----@generic T
----@param x T
----@param y T
----@return boolean
-function FnUtil.eq(x, y) return x == y end
-
---- The inequality function
----@generic T
----@param x T
----@param y T
----@return boolean
-function FnUtil.ne(x, y) return x ~= y end
-
 ---Currying is a way to re-write a function with multiple arguments in such a way as it can be
 ---called as a chain of functions each with a single argument
 ---@generic T, V, R
