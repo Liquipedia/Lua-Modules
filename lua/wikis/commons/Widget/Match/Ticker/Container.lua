@@ -61,9 +61,8 @@ function MatchTickerContainer:render()
 
 	---@param type 'upcoming' |'recent'
 	local function callTemplate(type)
-		local config = self.defaultProps.matchTicker
-		local ticker = Lua.import('Module:' .. config.module)
-		return ticker[config.fn](
+		local ticker = Lua.import('Module:' .. self.defaultProps.module)
+		return ticker[self.defaultProps.fn](
 			Table.merge(
 				{limit=self.defaultProps.limit, type=type},
 				defaultFilterParams
