@@ -81,8 +81,10 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20
+			upcomingDays=21,
+			modifierTier1=42,
+			completedDays=14,
+			displayGameIcons = true
 		},
 		padding = true,
 		boxid = 1508,
