@@ -71,6 +71,7 @@ function CustomMatchSummary._createGame(game, gameIndex, date)
 			local playerCards = player.cards or {}
 			local cards = Array.map(Array.range(1, NUM_CARDS_PER_PLAYER), function(idx)
 				return playerCards[idx] or DEFAULT_CARD end)
+			---@cast cards table
 			cards.tower = playerCards.tower
 			return cards
 		end)
@@ -126,10 +127,19 @@ function CustomMatchSummary._getSubMatchOpponentsAndPlayers(match, subMatch, sub
 	subMatch.opponents = Array.map(Array.range(1, #subMatch.players), function(opponentIndex)
 		local score, status = MatchGroupInputUtil.computeOpponentScore(
 			{opponentIndex = opponentIndex},
-			FnUtil.curry(MatchGroupInputUtil.computeMatchScoreFromMapWinners, subMatch.games)
+			FnUtil.curry(CustomMatchSummary.computeSubMatchScore, subMatch.games)
 		)
 		return {score = score, status = status}
 	end)
+end
+
+---@param games {winner: integer?, opponents: {score: integer?}[]}[]
+---@param opponentIndex integer
+---@return integer
+function CustomMatchSummary.computeSubMatchScore(games, opponentIndex)
+	return Array.reduce(Array.map(games, function(game)
+		return (game.opponents[opponentIndex] or {}).score or (game.winner == opponentIndex and 1 or 0)
+	end), Operator.add)
 end
 
 ---@param subMatch table
