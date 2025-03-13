@@ -62,7 +62,7 @@ function MatchTickerContainer:render()
 				args = table.concat(Array.map(
 					Table.entries(Table.merge(config.args, {type=type, dev=devFlag})),
 					function (entry)
-						return String.interpolate('|${1}=${2}', entry)
+						return String.interpolate('|${key}=${value}', {key = entry[1], value = entry[2]})
 					end
 				), '')
 			}
