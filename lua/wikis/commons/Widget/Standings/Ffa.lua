@@ -58,19 +58,18 @@ function StandingsFfaWidget:render()
 				},
 				children = {
 					HtmlWidgets.Div{
-						css = {['position'] = 'relative'},
 						children = {
 							HtmlWidgets.Span{
-								children = standings.title
-							},
-							HtmlWidgets.Span{
-								css = {['position'] = 'absolute', ['left'] = '0', ['top'] = '-6px'},
 								children = RoundSelector{
 									rounds = activeRounds,
 									hasEnded = not hasFutureRounds,
 								}
 							},
+							HtmlWidgets.Span{
+								children = standings.title
+							},
 						},
+						classes = {'tableHeaderRow'}
 					},
 				},
 			}},
