@@ -106,7 +106,6 @@ local CustomInjector = Class.new(Injector)
 function CustomCharacter.run(frame)
 	local character = CustomCharacter(frame)
 	character:setWidgetInjector(CustomInjector(character))
-	character.args.name = Logic.emptyOr(character.args.name, mw.title.getCurrentTitle())
 	character.args.informationType = 'Operator'
 	return character:createInfobox()
 end
@@ -161,7 +160,7 @@ function CustomInjector:parse(id, widgets)
 			return {}
 		end
 		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '[[type::patch]] AND [[date::'.. args.releasedate ..']]',
+			conditions = '[[type::patch]] AND [[date::' .. args.releasedate .. ']]',
 			query = 'name, pagename, date',
 			limit = 1
 		})[1]
@@ -476,9 +475,9 @@ end
 ---@return string?
 function CustomCharacter:nameDisplay(args)
 	return CharacterIcon.Icon{
-		character = NameAliases[args.name:lower()],
+		character = NameAliases[self.name:lower()],
 		size = '50px'
-	} .. ' ' .. args.name
+	} .. ' ' .. self.name
 end
 
 return CustomCharacter
