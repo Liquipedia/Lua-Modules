@@ -8,9 +8,11 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FeatureFlag = require('Module:FeatureFlag')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
-local Template = require('Module:Template')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -20,19 +22,61 @@ local FilterConfig = Lua.import('Module:FilterButtons/Config')
 ---@operator call(table): MatchTickerContainer
 local MatchTickerContainer = Class.new(Widget)
 MatchTickerContainer.defaultProps = {
-	upcomingTemplate = 'MainPageMatches/Upcoming',
-	completedTemplate = 'MainPageMatches/Completed',
+	matchTicker = {
+		module = 'MatchTicker/Custom',
+		fn = 'newMainPage',
+		args = {
+			limit = 10,
+		}
+	},
 }
 
 ---@return Widget
 function MatchTickerContainer:render()
-	local upcomingTemplate = self.props.upcomingTemplate
-	local completedTemplate = self.props.completedTemplate
+	local function filterName(filter)
+		return 'filterbuttons-' .. filter
+	end
 
 	local filters = Array.map(FilterConfig.categories, Operator.property('name')) or {}
-	local filterText = table.concat(Array.map(filters, function(filter)
-		return 'filterbuttons-' .. filter
-	end), ',')
+	local filterText = table.concat(Array.map(filters, filterName), ',')
+
+	local defaultFilterParams = Table.map(FilterConfig.categories, function (_, category)
+		return filterName(category.name), table.concat(category.defaultItems, ',')
+	end)
+
+	local devFlag = FeatureFlag.get('dev')
+
+	---@param type 'upcoming' | 'recent'
+	local function buildTemplateExpansionString(type)
+		local config = self.defaultProps.matchTicker
+
+		return String.interpolate(
+			'#invoke:Lua|invoke|module=${module}|fn=${fn}${args}',
+			{
+				module = config.module,
+				fn = config.fn,
+				args = table.concat(Array.map(
+					Table.entries(Table.merge(config.args, {type=type, dev=devFlag})),
+					function (entry)
+						return String.interpolate('|${key}=${value}', {key = entry[1], value = entry[2]})
+					end
+				), '')
+			}
+		)
+	end
+
+	---@param type 'upcoming' | 'recent'
+	local function callTemplate(type)
+		local config = self.defaultProps.matchTicker
+		local ticker = Lua.import('Module:' .. config.module)
+		return ticker[config.fn](
+			Table.merge(
+				config.args,
+				{type = type},
+				defaultFilterParams
+			)
+		)
+	end
 
 	return HtmlWidgets.Div{
 		classes = {'toggle-area', 'toggle-area-1'},
@@ -93,18 +137,18 @@ function MatchTickerContainer:render()
 			HtmlWidgets.Div{
 				attributes = {
 					['data-toggle-area-content'] = '1',
-					['data-filter-expansion-template'] = upcomingTemplate,
+					['data-filter-expansion-template'] = buildTemplateExpansionString('upcoming'),
 					['data-filter-groups'] = filterText,
 				},
-				children = Template.safeExpand(mw.getCurrentFrame(), upcomingTemplate),
+				children = callTemplate('upcoming'),
 			},
 			HtmlWidgets.Div{
 				attributes = {
 					['data-toggle-area-content'] = '2',
-					['data-filter-expansion-template'] = completedTemplate,
+					['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
 					['data-filter-groups'] = filterText,
 				},
-				children = Template.safeExpand(mw.getCurrentFrame(), completedTemplate),
+				children = callTemplate('upcoming'),
 			},
 		},
 	}
