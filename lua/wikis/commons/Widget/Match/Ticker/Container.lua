@@ -52,7 +52,7 @@ function MatchTickerContainer:render()
 				args = table.concat(Array.extractValues(Table.map(
 					{limit=self.props.limit, type=type, dev=devFlag},
 					function (key, value)
-						return String.interpolate('|${key}=${value}', {key=key, value=value})
+						return key, String.interpolate('|${key}=${value}', {key=key, value=value})
 					end
 				)), '')
 			}
