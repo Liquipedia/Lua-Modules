@@ -30,26 +30,22 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local TEAM_ATTACK = HtmlWidgets.Fragment{
-	children = {
-		IconImageWidget{
-			imageLight = 'R6S Para Bellum atk logo.png',
-			link = '',
-			size = '14px'
-		},
-		' Attack'
+---@param teamType 'atk'|'def'
+---@param displayName 'Attack'|'Defense'
+---@return Widget
+local function createTeamDisplayWidget(teamType, displayName)
+	return HtmlWidgets.Fragment{
+		children = {
+			IconImageWidget{
+				imageLight = 'R6S Para Bellum ' .. teamType .. ' logo.png',
+				link = '',
+				size = '14px'
+			},
+			' ',
+			displayName
+		}
 	}
-}
-local TEAM_DEFENSE = HtmlWidgets.Fragment{
-	children = {
-		IconImageWidget{
-			imageLight = 'R6S Para Bellum def logo.png',
-			link = '',
-			size = '14px'
-		},
-		' Defense'
-	}
-}
+end
 
 ---@param label string
 ---@return Widget
@@ -68,8 +64,11 @@ local function createPriceLabel(label)
 		}
 	}
 end
+
 local STANDARD_EDITION_LABEL = createPriceLabel('SE')
 local SEASON_PASS_LABEL = createPriceLabel('SP')
+local TEAM_ATTACK = createTeamDisplayWidget('atk','Attack')
+local TEAM_DEFENSE = createTeamDisplayWidget('def', 'Defense')
 
 local OPERATOR_PRICES = {
 	launch = {
