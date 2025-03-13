@@ -139,7 +139,7 @@ end
 function CustomMatchSummary.computeSubMatchScore(games, opponentIndex)
 	return Array.reduce(Array.map(games, function(game)
 		return (game.opponents[opponentIndex] or {}).score or (game.winner == opponentIndex and 1 or 0)
-	end), Operator.add)
+	end), Operator.add) or 0
 end
 
 ---@param subMatch table
