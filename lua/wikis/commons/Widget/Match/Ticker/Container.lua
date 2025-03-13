@@ -22,13 +22,9 @@ local FilterConfig = Lua.import('Module:FilterButtons/Config')
 ---@operator call(table): MatchTickerContainer
 local MatchTickerContainer = Class.new(Widget)
 MatchTickerContainer.defaultProps = {
-	matchTicker = {
-		module = 'MatchTicker/Custom',
-		fn = 'newMainPage',
-		args = {
-			limit = 10,
-		}
-	},
+	limit = 10,
+	module = 'MatchTicker/Custom',
+	fn = 'newMainPage',
 }
 
 ---@return Widget
@@ -48,31 +44,27 @@ function MatchTickerContainer:render()
 
 	---@param type 'upcoming' | 'recent'
 	local function buildTemplateExpansionString(type)
-		local config = self.defaultProps.matchTicker
-
 		return String.interpolate(
 			'#invoke:Lua|invoke|module=${module}|fn=${fn}${args}',
 			{
-				module = config.module,
-				fn = config.fn,
-				args = table.concat(Array.map(
-					Table.entries(Table.merge(config.args, {type=type, dev=devFlag})),
-					function (entry)
-						return String.interpolate('|${key}=${value}', {key = entry[1], value = entry[2]})
+				module = self.defaultProps.module,
+				fn = self.defaultProps.fn,
+				args = table.concat(Array.extractValues(Table.map(
+					{limit=self.props.limit, type=type, dev=devFlag},
+					function (key, value)
+						return key, String.interpolate('|${key}=${value}', {key=key, value=value})
 					end
-				), '')
+				)), '')
 			}
 		)
 	end
 
-	---@param type 'upcoming' | 'recent'
+	---@param type 'upcoming' |'recent'
 	local function callTemplate(type)
-		local config = self.defaultProps.matchTicker
-		local ticker = Lua.import('Module:' .. config.module)
-		return ticker[config.fn](
+		local ticker = Lua.import('Module:' .. self.defaultProps.module)
+		return ticker[self.defaultProps.fn](
 			Table.merge(
-				config.args,
-				{type = type},
+				{limit=self.props.limit, type=type},
 				defaultFilterParams
 			)
 		)
@@ -148,7 +140,7 @@ function MatchTickerContainer:render()
 					['data-filter-expansion-template'] = buildTemplateExpansionString('recent'),
 					['data-filter-groups'] = filterText,
 				},
-				children = callTemplate('upcoming'),
+				children = callTemplate('recent'),
 			},
 		},
 	}
