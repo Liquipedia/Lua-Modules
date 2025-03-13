@@ -22,13 +22,13 @@ local Opponent = OpponentLibraries.Opponent
 local globalVars = PageVariableNamespace()
 local matchlistVars = PageVariableNamespace('LegacyMatchlist')
 
-local MatchMapsLegacy = {}
+local LegacyMatchList = {}
 
 local NUMBER_OF_OPPONENTS = 2
 
 -- invoked by Template:Legacy Match list start
 ---@param frame Frame
-function MatchMapsLegacy.init(frame)
+function LegacyMatchList.init(frame)
 	local args = Arguments.getArgs(frame)
 	local store = Logic.nilOr(
 		Logic.readBoolOrNil(args.store),
@@ -44,11 +44,11 @@ end
 
 -- invoked by Template:MatchMaps
 ---@param frame Frame
-function MatchMapsLegacy.matchMaps(frame)
+function LegacyMatchList.matchMaps(frame)
 	local args = Arguments.getArgs(frame)
 
 	local processedArgs = Table.copy(args)
-	MatchMapsLegacy._handleOpponents(processedArgs)
+	LegacyMatchList._handleOpponents(processedArgs)
 
 	if processedArgs.date then
 		processedArgs.dateheader = true
@@ -58,14 +58,22 @@ function MatchMapsLegacy.matchMaps(frame)
 	processedArgs.date = Logic.emptyOr(details.date, processedArgs.date)
 	processedArgs.finished = Logic.emptyOr(details.finished, processedArgs.finished)
 
-	Table.deepMergeInto(processedArgs, MatchMapsLegacy.handleMaps(processedArgs), details)
+	Table.deepMergeInto(processedArgs, LegacyMatchList.handleMaps(processedArgs), details)
 
-	Template.stashReturnValue(processedArgs, 'LegacyMatchlist')
+	processedArgs.details = nil
+
+	-- case matchlist version 1
+	if Logic.isNotEmpty(matchlistVars:get('bracketid')) then
+		Template.stashReturnValue(processedArgs, 'LegacyMatchlist')
+		return mw.html.create('div')
+	else -- case matchlist version 2
+		return Json.stringify(processedArgs)
+	end
 end
 
 ---@param processedArgs table
 ---@return table
-function MatchMapsLegacy.handleMaps(processedArgs)
+function LegacyMatchList.handleMaps(processedArgs)
 	local maps = Array.mapIndexes(function(mapIndex)
 		return Logic.nilIfEmpty{winner = Table.extract(processedArgs, 'map' .. mapIndex .. 'win')}
 	end)
@@ -76,7 +84,7 @@ function MatchMapsLegacy.handleMaps(processedArgs)
 end
 
 ---@param processedArgs table
-function MatchMapsLegacy._handleOpponents(processedArgs)
+function LegacyMatchList._handleOpponents(processedArgs)
 	for opponentIndex = 1, NUMBER_OF_OPPONENTS do
 		if processedArgs['player' .. opponentIndex] and processedArgs['player' .. opponentIndex]:lower() == 'bye' then
 			processedArgs['opponent' .. opponentIndex] = {
@@ -86,7 +94,7 @@ function MatchMapsLegacy._handleOpponents(processedArgs)
 		else
 			processedArgs['opponent' .. opponentIndex] = {
 				['type'] = Opponent.solo,
-				processedArgs['player' .. opponentIndex],
+				name = processedArgs['player' .. opponentIndex],
 				flag = processedArgs['player' .. opponentIndex .. 'flag'],
 			}
 			if processedArgs['player' .. opponentIndex] == '' then
@@ -100,7 +108,7 @@ end
 
 -- invoked by Template:Match list end
 ---@return string
-function MatchMapsLegacy.close()
+function LegacyMatchList.close()
 	local matches = Template.retrieveReturnValues('LegacyMatchlist') --[[@as table]]
 
 	for matchIndex, match in ipairs(matches) do
@@ -129,12 +137,12 @@ function MatchMapsLegacy.close()
 	-- this also stores the MatchData
 	local matchHtml = MatchGroup.MatchList(matches)
 
-	MatchMapsLegacy._resetVars()
+	LegacyMatchList._resetVars()
 
 	return matchHtml
 end
 
-function MatchMapsLegacy._resetVars()
+function LegacyMatchList._resetVars()
 	globalVars:set('match2bracketindex', (globalVars:get('match2bracketindex') or 0) + 1)
 	globalVars:set('match_number', 0)
 	globalVars:delete('matchsection')
@@ -145,4 +153,40 @@ function MatchMapsLegacy._resetVars()
 	matchlistVars:delete('width')
 end
 
-return MatchMapsLegacy
+-- handle the second version of matchlists ...
+-- invoked by Template:LegacyMatchList
+function LegacyMatchList.run(frame)
+	local args = Arguments.getArgs(frame)
+	local store = Logic.nilOr(
+		Logic.readBoolOrNil(args.store),
+		not Logic.readBool(globalVars:get('disable_LPDB_storage'))
+	)
+
+	local matches = Array.mapIndexes(function(matchIndex)
+		return Json.parseIfTable(args['match' .. matchIndex])
+	end)
+
+	local matchListArgs = Table.deepCopy(matches)
+	matchListArgs.id = args.id
+	matchListArgs.isLegacy = true
+	matchListArgs.title = args.title or args[1] or 'Match List'
+	matchListArgs.width = args.width
+
+	if Logic.nilOr(Logic.readBoolOrNil(args.hide), true) then
+		matchListArgs.collapsed = true
+		matchListArgs.attached = true
+	else
+		matchListArgs.collapsed = false
+	end
+	if store then
+		matchListArgs.store = true
+	else
+		matchListArgs.noDuplicateCheck = true
+		matchListArgs.store = false
+	end
+mw.logObject(matchListArgs)
+
+	return MatchGroup.MatchList(matchListArgs)
+end
+
+return LegacyMatchList
