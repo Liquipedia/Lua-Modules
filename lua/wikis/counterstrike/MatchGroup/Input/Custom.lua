@@ -14,6 +14,7 @@ local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
 
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
@@ -146,7 +147,7 @@ function MatchFunctions.isFeatured(match, opponents)
 	if Table.includes(FEATURED_TIERS, tonumber(match.liquipediatier)) then
 		return true
 	end
-	if Logic.isNotEmpty(match.publishertier) then
+	if HighlightConditions.tournament(match) then
 		return true
 	end
 
