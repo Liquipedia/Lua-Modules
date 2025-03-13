@@ -9,6 +9,9 @@
 local Array = require('Module:Array')
 local Condition = require('Module:Condition')
 local Lpdb = require('Module:Lpdb')
+local Lua = require('Module:Lua')
+
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -44,12 +47,12 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 		conditionsMatches:add(Condition.Node(Condition.ColumnName('match2id'), Condition.Comparator.eq, matchId))
 	end)
 
+	---@type StandingTableOpponentData[]
 	local opponents = {}
 	Lpdb.executeMassQuery(
 		'match2',
 		{
 			conditions = conditionsMatches:toString(),
-			query = 'match2opponents',
 		},
 		function(match2)
 			local roundNumbers = matchIdToRound[match2.match2id]
@@ -60,15 +63,17 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 	)
 
 	return Array.map(opponents, function(opponentData)
-		local opponent = Opponent.fromMatch2Record(opponentData.opponent)
-
-		if Opponent.isTbd(opponent) then
+		if Opponent.isTbd(opponentData.opponent) then
 			return
 		end
 
+		local matches = {}
+
 		return {
-			opponent = opponent,
+			opponent = opponentData.opponent,
 			rounds = Array.map(opponentData.rounds, function(roundData)
+				local match = roundData.match
+				matches = Array.append(matches, match)
 				return {
 					scoreboard = {
 						points = roundData.scoreboard.points,
@@ -79,14 +84,15 @@ function StandingsParseLpdb.importFromMatches(rounds, scoreMapper)
 						},
 					},
 					specialstatus = roundData.specialstatus or 'nc',
-					matchId = roundData.matchId
+					matches = matches,
+					matchId = match and match.matchId or nil,
 				}
 			end)
 		}
 	end)
 end
 
----@param opponentData match2opponent
+---@param opponentData standardOpponent
 ---@param maxRounds integer
 ---@return StandingTableOpponentData
 function StandingsParseLpdb.newOpponent(opponentData, maxRounds)
@@ -105,13 +111,14 @@ end
 ---@param roundNumber integer
 ---@param match match2
 ---@param opponents StandingTableOpponentData[]
----@param scoreMapper fun(opponent: match2opponent): number?
+---@param scoreMapper fun(opponent: standardOpponent): number?
 ---@param maxRounds integer
 function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMapper, maxRounds)
-	Array.forEach(match.match2opponents, function(opponent)
+	local match2 = MatchGroupUtil.matchFromRecord(match)
+	Array.forEach(match2.opponents, function(opponent)
 		---Find matching opponent
 		local standingsOpponentData = Array.find(opponents, function(opponentData)
-			return opponentData.opponent.name == opponent.name
+			return Opponent.same(opponentData.opponent, opponent)
 		end)
 		if not standingsOpponentData then
 			standingsOpponentData = StandingsParseLpdb.newOpponent(opponent, maxRounds)
@@ -125,8 +132,8 @@ function StandingsParseLpdb.parseMatch(roundNumber, match, opponents, scoreMappe
 			opponentRoundData.scoreboard.points = (opponentRoundData.scoreboard.points or 0) + points
 		end
 		opponentRoundData.specialstatus = ''
-		opponentRoundData.matchId = match.match2id
-		local matchResult = match.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
+		opponentRoundData.match = match2
+		local matchResult = match2.winner == 0 and 'd' or opponent.placement == 1 and 'w' or 'l'
 		opponentRoundData.scoreboard.match[matchResult] = (opponentRoundData.scoreboard.match[matchResult] or 0) + 1
 	end)
 end
