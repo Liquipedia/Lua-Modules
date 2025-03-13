@@ -362,7 +362,7 @@ function CustomCharacter:_getBaseStats(args)
 		},
 		Cell{
 			name = 'Difficulty',
-			content = self:_getArmorContent((args.difficulty or ''):lower()),
+			content = self:_getDifficultyContent((args.difficulty or ''):lower()),
 			options = { separator = ' ' }
 		}
 	)
