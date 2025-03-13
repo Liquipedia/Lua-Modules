@@ -116,6 +116,10 @@ return {
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
 
+	-- Usage: Rainbow6 Infobox operator
+	yes = 'fa fa-check',
+	no = 'fa fa-times',
+
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
