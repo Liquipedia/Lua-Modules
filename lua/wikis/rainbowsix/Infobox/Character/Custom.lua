@@ -165,13 +165,15 @@ function CustomInjector:parse(id, widgets)
 
 		return {
 			Cell{
-				name = 'Release Date',
+				name = 'Released',
 				content = WidgetUtil.collect(
-					args.releasedate,
 					Logic.isNotEmpty(patchData) and Link{
 						link = patchData.pagename,
 						children = patchData.name
-					} or 'Launch'
+					} or 'Launch',
+					HtmlWidgets.Small{
+						children = { args.releasedate }
+					}
 				)
 			}
 		}
