@@ -47,6 +47,7 @@ end
 ---@return Widget[]
 function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
+
 	if widgetId == 'custom' then
 		return Array.append(
 			widgets,
