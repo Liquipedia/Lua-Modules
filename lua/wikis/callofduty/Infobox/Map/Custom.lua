@@ -41,7 +41,7 @@ function CustomMap:_getGames(args)
 		end,
 		function(i, value) return String.isNotEmpty(value) end
 	)
-	return Array.map(games, function(game) return Game.name{game = game} 
+	return Array.map(games, function(game) return Game.name{game = game}
 	end
 	)
 end
