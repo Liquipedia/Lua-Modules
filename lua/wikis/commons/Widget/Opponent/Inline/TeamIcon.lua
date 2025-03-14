@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Image/Icon/TeamIcon
+-- page=Module:Widget/Opponent/Inline/Icon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,9 +11,9 @@ local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 local TeamTemplate = require('Module:TeamTemplate')
 
+local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Span = HtmlWidgets.Span
-local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
 ---@class TeamIconParameters
 ---@field name string?
@@ -23,7 +23,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@class TeamIcon: IconWidget
 ---@operator call(TeamIconParameters): TeamIcon
 ---@field props TeamIconParameters
-local TeamIconWidget = Class.new(WidgetIcon)
+local TeamIconWidget = Class.new(Widget)
 
 ---@return Widget
 function TeamIconWidget:render()
