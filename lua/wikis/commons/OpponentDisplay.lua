@@ -254,7 +254,6 @@ end
 ---@param props {flip: boolean?, template: string, style: teamStyle?}
 ---@return string|Widget?
 function OpponentDisplay.InlineTeamContainer(props)
-	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
 	if props.style == 'standard' or not props.style then
 		return TeamStandard{ name = props.template, flip = props.flip }
 	elseif props.style == 'short' then
