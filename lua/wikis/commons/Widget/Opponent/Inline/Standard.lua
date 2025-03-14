@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Opponent/Inline/Team
+-- page=Module:Widget/Opponent/Inline/Standard
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
