@@ -21,7 +21,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'

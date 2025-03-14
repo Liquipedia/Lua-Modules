@@ -18,7 +18,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
-local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 ---@class Formula1InfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)

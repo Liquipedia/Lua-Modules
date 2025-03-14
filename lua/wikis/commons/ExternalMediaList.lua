@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TeamTemplate = require('Module:TeamTemplate')
 
-local TeamIconWidget = Lua.import('Module:Widget/Opponent/Inline/Icon')
+local TeamIconWidget = Lua.import('Module:Widget/TeamDisplay/Inline/Icon')
 
 local MediaList = {}
 
