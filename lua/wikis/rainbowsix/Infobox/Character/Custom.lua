@@ -114,6 +114,21 @@ local ARMOR_SPEED_DATA = {
 	}
 }
 
+local DIFFICULTY_DATA = {
+	easy = {
+		value = 1,
+		display = 'Easy'
+	},
+	normal = {
+		value = 2,
+		display = 'Normal'
+	},
+	hard = {
+		value = 3,
+		display = 'Hard'
+	}
+}
+
 ---@class RainbowsixHeroInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
@@ -400,16 +415,10 @@ end
 ---@param difficulty string
 ---@return CellWidget|nil
 function CustomCharacter._generateDifficultyCell(difficulty)
-	local difficultyCell = FnUtil.curry(FnUtil.curry(CustomCharacter._generateStatCell, 'Difficulty'), 'armor')
-	local difficultyEq = FnUtil.curry(Operator.eq, difficulty)
-	if Array.any({'1', 'easy', 'low'}, difficultyEq) then
-		return difficultyCell(1, 'Easy')
-	elseif Array.any({'2', 'normal', 'medium'}, difficultyEq) then
-		return difficultyCell(2, 'Medium')
-	elseif Array.any({'3', 'hard', 'difficult'}, difficultyEq) then
-		return difficultyCell(3, 'Hard')
-	end
-	return nil
+	local difficultyData = DIFFICULTY_DATA[difficulty]
+	return Logic.isNotEmpty(difficultyData)
+		and CustomCharacter._generateStatCell('Difficulty', 'armor', difficultyData.value, difficultyData.display)
+		or nil
 end
 
 ---@param title string
@@ -454,11 +463,11 @@ function CustomCharacter:getWikiCategories(args)
 		Array.appendWith(categories, ARMOR_SPEED_DATA[speed].speedValue .. ' Speed Operators')
 	end
 
-	if Array.any({'1', 'easy', 'low'}, difficultyEq) then
+	if Array.any({'1', 'easy'}, difficultyEq) then
 		Array.appendWith(categories, '1 Difficulty Operators')
-	elseif Array.any({'2', 'normal', 'medium'}, difficultyEq) then
+	elseif Array.any({'2', 'normal'}, difficultyEq) then
 		Array.appendWith(categories, '2 Difficulty Operators')
-	elseif Array.any({'3', 'hard', 'difficult'}, difficultyEq) then
+	elseif Array.any({'3', 'hard'}, difficultyEq) then
 		Array.appendWith(categories, '3 Difficulty Operators')
 	end
 
