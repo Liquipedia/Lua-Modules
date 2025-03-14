@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Opponent/Inline/Bracket
+-- page=Module:Widget/TeamDisplay/Inline/Bracket
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -9,7 +9,7 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local TeamInlineWidget = Lua.import('Module:Widget/Opponent/Inline')
+local TeamInlineWidget = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 ---@class TeamBracket: TeamInlineWidget
 ---@operator call(TeamInlineParameters): TeamBracket

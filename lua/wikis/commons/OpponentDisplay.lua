@@ -18,9 +18,9 @@ local TypeUtil = require('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local TeamBracket = Lua.import('Module:Widget/Opponent/Inline/Bracket')
-local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Team')
-local TeamShort = Lua.import('Module:Widget/Opponent/Inline/Short')
+local TeamBracket = Lua.import('Module:Widget/TeamDisplay/Inline/Bracket')
+local TeamShort = Lua.import('Module:Widget/TeamDisplay/Inline/Short')
+local TeamStandard = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -256,7 +256,7 @@ end
 function OpponentDisplay.InlineTeamContainer(props)
 	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
 	if props.style == 'standard' or not props.style then
-		return TeamInline{ name = props.template, flip = props.flip }
+		return TeamStandard{ name = props.template, flip = props.flip }
 	elseif props.style == 'short' then
 		return TeamShort{ name = props.template, flip = props.flip }
 	elseif props.style == 'bracket' then
