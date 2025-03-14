@@ -129,7 +129,7 @@ local DIFFICULTY_DATA = {
 	}
 }
 
----@class RainbowsixHeroInfobox: CharacterInfobox
+---@class RainbowsixOperatorInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
