@@ -9,13 +9,16 @@
 local Class = require('Module:Class')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Span = HtmlWidgets.Span
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
 ---@class TeamIconParameters
----@field teamTemplate teamTemplateData
+---@field name string?
+---@field date number|string?
+---@field teamTemplate teamTemplateData?
 
 ---@class TeamIcon: IconWidget
 ---@operator call(TeamIconParameters): TeamIcon
@@ -24,7 +27,7 @@ local TeamIconWidget = Class.new(WidgetIcon)
 
 ---@return Widget
 function TeamIconWidget:render()
-	local teamTemplate = self.props.teamTemplate
+	local teamTemplate = self.props.teamTemplate or TeamTemplate.getRaw(self.props.name, self.props.date)
 	return Span{
 		attributes = { ['data-highlighting-class'] = self.props.teamTemplate.name },
 		classes = { 'team-template-team-icon' },
