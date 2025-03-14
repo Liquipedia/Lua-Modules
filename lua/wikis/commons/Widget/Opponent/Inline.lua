@@ -84,12 +84,12 @@ end
 
 ---@return string
 function TeamInlineWidget:getType()
-	error('Widget/Opponent/Inline is an abstract implementation and should not be instantiated directly')
+	error('TeamInlineWidget:getType() cannot be called directly and must be overridden.')
 end
 
 ---@return string
 function TeamInlineWidget:getDisplayName()
-	error('Widget/Opponent/Inline is an abstract implementation and should not be instantiated directly')
+	error('TeamInlineWidget:getDisplayName() cannot be called directly and must be overridden.')
 end
 
 return TeamInlineWidget
