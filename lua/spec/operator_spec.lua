@@ -1,6 +1,7 @@
 --- Triple Comment to Enable our LLS Plugin
 describe('operator', function()
 	local Array = require('Module:Array')
+	local FnUtil = require('Module:FnUtil')
 	local Operator = require('Module:Operator')
 
 	describe('math', function()
@@ -103,6 +104,44 @@ describe('operator', function()
 				},
 			}
 			assert.are_same({4, 10, 7}, Array.map(foo, Operator.method('f', 1)))
+		end)
+	end)
+
+	describe('comparison', function()
+		it('lt', function()
+			local foo = {5, 3, 2, 1}
+			assert.are_same({5, 3, 2}, Array.filter(foo, FnUtil.curry(Operator.lt, 1)), 'lt')
+			assert.are_same({}, Array.filter(foo, FnUtil.curry(Operator.lt, 5)), 'lt')
+			assert.is_true(Operator.lt(1, 5))
+			assert.is_false(Operator.lt(1, 1))
+			assert.is_false(Operator.lt(5, 1))
+		end)
+
+		it('le', function()
+			local foo = {5, 3, 2, 1}
+			assert.are_same({5, 3, 2, 1}, Array.filter(foo, FnUtil.curry(Operator.le, 1)), 'le')
+			assert.are_same({5}, Array.filter(foo, FnUtil.curry(Operator.le, 5)), 'le')
+			assert.is_true(Operator.le(1, 5))
+			assert.is_true(Operator.le(1, 1))
+			assert.is_false(Operator.le(5, 1))
+		end)
+
+		it('gt', function()
+			local foo = {5, 3, 2, 1}
+			assert.are_same({}, Array.filter(foo, FnUtil.curry(Operator.gt, 1)), 'gt')
+			assert.are_same({3, 2, 1}, Array.filter(foo, FnUtil.curry(Operator.gt, 5)), 'gt')
+			assert.is_true(Operator.gt(5, 1))
+			assert.is_false(Operator.gt(1, 1))
+			assert.is_false(Operator.gt(1, 5))
+		end)
+
+		it('ge', function()
+			local foo = {5, 3, 2, 1}
+			assert.are_same({1}, Array.filter(foo, FnUtil.curry(Operator.ge, 1)), 'ge')
+			assert.are_same({5, 3, 2, 1}, Array.filter(foo, FnUtil.curry(Operator.ge, 5)), 'ge')
+			assert.is_true(Operator.ge(5, 1))
+			assert.is_true(Operator.ge(1, 1))
+			assert.is_false(Operator.ge(1, 5))
 		end)
 	end)
 end)
