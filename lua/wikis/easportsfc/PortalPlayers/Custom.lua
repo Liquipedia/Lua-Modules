@@ -22,7 +22,7 @@ local PortalPlayers = Lua.import('Module:PortalPlayers')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Coaches, Managers, Analysts and more')
 	.. ' & ' .. Abbreviation.make('Talents', 'Commentators, Observers, Hosts and more')

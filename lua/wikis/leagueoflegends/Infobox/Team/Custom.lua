@@ -20,7 +20,7 @@ local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 local REGION_REMAPPINGS = {
 	['south america'] = 'latin america',
