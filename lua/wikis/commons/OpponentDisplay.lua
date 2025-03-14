@@ -13,11 +13,14 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+
+local TeamBracket = Lua.import('Module:Widget/TeamDisplay/Inline/Bracket')
+local TeamShort = Lua.import('Module:Widget/TeamDisplay/Inline/Short')
+local TeamStandard = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -249,34 +252,15 @@ end
 
 ---Displays a team as an inline element. The team is specified by a template.
 ---@param props {flip: boolean?, template: string, style: teamStyle?}
----@return string?
+---@return string|Widget?
 function OpponentDisplay.InlineTeamContainer(props)
-	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
 	if props.style == 'standard' or not props.style then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.team(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team', {props.template})
-		else
-			return teamExists
-				and mw.ext.TeamTemplate.team2(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team2', {props.template})
-		end
+		return TeamStandard{ name = props.template, flip = props.flip }
 	elseif props.style == 'short' then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.teamshort(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'TeamShort', {props.template})
-		else
-			return teamExists
-				and mw.ext.TeamTemplate.team2short(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team2Short', {props.template})
-		end
+		return TeamShort{ name = props.template, flip = props.flip }
 	elseif props.style == 'bracket' then
 		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.teambracket(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'TeamBracket', {props.template})
+			return TeamBracket{ name = props.template }
 		else
 			error('Flipped style=bracket is not supported')
 		end

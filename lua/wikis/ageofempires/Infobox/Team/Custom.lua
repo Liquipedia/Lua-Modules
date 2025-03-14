@@ -12,7 +12,7 @@ local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
-local TeamTemplates = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -135,13 +135,13 @@ end
 ---@return ConditionTree
 function CustomTeam:_buildTeamPlacementConditions()
 	local team = self.args.teamtemplate or self.args.name or self.pagename
-	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
+	local rawOpponentTemplate = TeamTemplate.getRawOrNil(team) or {}
 	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
 	if not opponentTemplate then
 		error('Missing team template for team: ' .. team)
 	end
 
-	local opponentTeamTemplates = TeamTemplates.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTemplates = TeamTemplate.queryHistorical(opponentTemplate) or {opponentTemplate}
 
 	local playerConditions = self:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 
