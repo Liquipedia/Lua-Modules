@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TeamTemplates = require('Module:Team')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -19,6 +18,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Standard')
 
 ---@class Formula1InfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 
 		if args.academy then
 			local academyTeams = Array.map(self.caller:getAllArgsForBase(args, 'academy'), function(team)
-				return TeamTemplates.team(nil, team)
+				return TeamInline{name = team}
 			end)
 			Array.extendWith(widgets,
 				{Title{children = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},
