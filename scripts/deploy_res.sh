@@ -90,7 +90,6 @@ for file in $files; do
   )
   result=$(echo "$rawResult" | jq ".edit.result" -r)
   newRevId=$(echo "$rawResult" | jq ".edit.newrevid" -r)
-  echo "::debug::${rawResult}"
   if [[ "${result}" == "Success" ]]; then
     if [[ "${newRevId}" != "null" ]]; then
       changesMade=true

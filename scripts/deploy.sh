@@ -105,7 +105,6 @@ for luaFile in $luaFiles; do
         | gunzip
     )
     result=$(echo "$rawResult" | jq ".edit.result" -r)
-    echo "::debug::...${rawResult}"
     if [[ "${result}" == "Success" ]]; then
       nochange=$(echo "$rawResult" | jq ".edit.nochange" -r)
       echo "...${result}"
