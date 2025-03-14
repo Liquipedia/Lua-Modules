@@ -379,65 +379,62 @@ function CustomCharacter:_getBaseStats(args)
 	return WidgetUtil.collect(
 		Title{ children = 'Base Stats' },
 		self:_getArmorAndSpeedDisplay((args.speed or ''):lower()),
-		Cell{
-			name = 'Difficulty',
-			content = self:_getDifficultyContent((args.difficulty or ''):lower()),
-			options = { separator = ' ' }
-		}
+		CustomCharacter._generateDifficultyCell((args.difficulty or ''):lower())
 	)
 end
 
 ---@param speed 'slow'|'medium'|'fast'
 ---@return CellWidget[]
 function CustomCharacter:_getArmorAndSpeedDisplay(speed)
-	local armorContent = FnUtil.curry(CustomCharacter._getStatContent, 'armor')
-	local speedContent = FnUtil.curry(CustomCharacter._getStatContent, 'speed')
 	local armorSpeedData = ARMOR_SPEED_DATA[speed]
 	return {
-		Cell{
-			name = 'Armor/Health',
-			content = armorContent(armorSpeedData.armorValue, armorSpeedData.armor)
-		},
-		Cell{
-			name = 'Speed',
-			content = speedContent(armorSpeedData.speedValue, armorSpeedData.speed)
-		},
+		CustomCharacter._generateStatCell(
+			'Armor/Health', 'armor', armorSpeedData.armorValue, armorSpeedData.armor
+		),
+		CustomCharacter._generateStatCell(
+			'Speed', 'speed', armorSpeedData.speedValue, armorSpeedData.speed
+		),
 	}
 end
 
 ---@param difficulty string
----@return (string|Widget)[]
-function CustomCharacter:_getDifficultyContent(difficulty)
-	local difficultyContent = FnUtil.curry(CustomCharacter._getStatContent, 'armor')
+---@return CellWidget|nil
+function CustomCharacter._generateDifficultyCell(difficulty)
+	local difficultyCell = FnUtil.curry(FnUtil.curry(CustomCharacter._generateStatCell, 'Difficulty'), 'armor')
 	local difficultyEq = FnUtil.curry(Operator.eq, difficulty)
 	if Array.any({'1', 'easy', 'low'}, difficultyEq) then
-		return difficultyContent(1, 'Easy')
+		return difficultyCell(1, 'Easy')
 	elseif Array.any({'2', 'normal', 'medium'}, difficultyEq) then
-		return difficultyContent(2, 'Medium')
+		return difficultyCell(2, 'Medium')
 	elseif Array.any({'3', 'hard', 'difficult'}, difficultyEq) then
-		return difficultyContent(3, 'Hard')
+		return difficultyCell(3, 'Hard')
 	end
-	return {}
+	return nil
 end
 
----@param type string
----@param value string|integer
+---@param title string
+---@param datatype string
+---@param value number|string
 ---@param display string
----@return (string|Widget)[]
-function CustomCharacter._getStatContent(type, value, display)
-	return {
-		Image.display(
-			'R6S operator-rating-' .. type .. '-' ..  value .. ' lightmode.png',
-			'R6S operator-rating-' .. type .. '-' ..  value .. ' darkmode.png',
-			{ size = '40x20px', link = '' }
-		),
-		HtmlWidgets.I{
-			css = {
-				['padding-left'] = '2px',
-				['vertical-align'] = '-1px'
-			},
-			children = { display }
-		}
+---@return CellWidget
+function CustomCharacter._generateStatCell(title, datatype, value, display)
+	return Cell{
+		name = title,
+		content = {
+			Image.display(
+				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' lightmode.png',
+				'R6S operator-rating-' .. datatype .. '-' ..  value .. ' darkmode.png',
+				{ size = '40x20px', link = '' }
+			),
+			HtmlWidgets.I{
+				css = {
+					['padding-left'] = '2px',
+					['vertical-align'] = '-1px'
+				},
+				children = { display }
+			}
+		},
+		options = { separator = ' ' }
 	}
 end
 
