@@ -12,10 +12,10 @@ local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 local TeamTemplate = require('Module:TeamTemplate')
 
+local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Span = HtmlWidgets.Span
-local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
 ---@class TeamInlineParameters
 ---@field name string?
@@ -26,7 +26,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@class TeamInline: Widget
 ---@operator call(TeamInlineParameters): TeamInline
 ---@field props TeamInlineParameters
-local TeamInline = Class.new(WidgetIcon)
+local TeamInline = Class.new(Widget)
 
 ---@return Widget
 function TeamInline:render()
