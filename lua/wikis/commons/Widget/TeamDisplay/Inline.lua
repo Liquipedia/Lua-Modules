@@ -34,6 +34,8 @@ local ICON_SIZE = '100x50px'
 ---@field teamTemplate teamTemplateData
 ---@field flip boolean
 local TeamInlineWidget = Class.new(Widget,
+	---@param self self
+	---@param input TeamInlineParameters
 	function (self, input)
 		self.teamTemplate = input.teamTemplate or TeamTemplate.getRaw(input.name, input.date)
 		self.flip = Logic.readBool(input.flip)
