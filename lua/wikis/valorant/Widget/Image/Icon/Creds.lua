@@ -13,7 +13,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 
----@class ValorantCredsIconWidget: Widget
+---@class ValorantCredsIconWidget: IconWidget
 ---@operator call(): ValorantCredsIconWidget
 local ValorantCredsIconWidget = Class.new(Widget)
 
