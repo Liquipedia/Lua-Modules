@@ -8,7 +8,6 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -16,6 +15,7 @@ local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+local TeamInline = Lua.import('Module:Widget/Opponent/Inline/Standard')
 
 ---@class ValorantInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -43,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		return {
 			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
-				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
+				args.affiliate and TeamInline{name = args.affiliate} or nil}}
 		}
 	end
 	return widgets
