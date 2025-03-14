@@ -68,10 +68,9 @@ function CustomMap:addToLpdb(lpdbData, args)
 	local games = self:_getGames(args)
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.size = args.size
-	-- Save all games
-	for i, game in ipairs(games) do
-		lpdbData.extradata["game" .. i] = game
-	end
+	Table.mergeInto(lpdbData.extradata, Table.map(self:_getGames(args), function(gameIndex, game)
+		return 'game' .. gameIndex, game
+	end))
 	lpdbData.extradata.daynight = args.daynight
 	lpdbData.extradata.playlist = args.playlist
 	return lpdbData
