@@ -387,14 +387,14 @@ end
 ---@return CellWidget[]
 function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 	local armorSpeedData = ARMOR_SPEED_DATA[speed]
-	return {
+	return Logic.isNotEmpty(armorSpeedData) and {
 		CustomCharacter._generateStatCell(
 			'Armor/Health', 'armor', armorSpeedData.armorValue, armorSpeedData.armor
 		),
 		CustomCharacter._generateStatCell(
 			'Speed', 'speed', armorSpeedData.speedValue, armorSpeedData.speed
 		),
-	}
+	} or {}
 end
 
 ---@param difficulty string
