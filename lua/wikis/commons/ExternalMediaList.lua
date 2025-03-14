@@ -235,7 +235,7 @@ end
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
-		:wikitext(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
+		:node(MediaList._displayTeam(args.subjects[1], item.date))
 		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 
 	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
@@ -337,13 +337,13 @@ end
 ---Displays the subject's team for a given External Media Link
 ---@param subject string
 ---@param date string
----@return string?
+---@return Widget?
 function MediaList._displayTeam(subject, date)
 	local _, team = PlayerExt.syncTeam(subject, nil, {date = date})
 	if not team then
 		return
 	end
-	return tostring(TeamIconWidget{ teamTemplate = TeamTemplate.getRaw(team) })
+	return TeamIconWidget{ teamTemplate = TeamTemplate.getRaw(team) }
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
