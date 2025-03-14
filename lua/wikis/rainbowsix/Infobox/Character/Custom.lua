@@ -426,7 +426,11 @@ end
 ---@return (string|Widget)[]
 function CustomCharacter._getStatContent(type, value, display)
 	return {
-		Image.display('R6S operator-rating-' .. type .. '-' ..  value .. '.png', nil, { size = '40x20px', link = '' }),
+		Image.display(
+			'R6S operator-rating-' .. type .. '-' ..  value .. ' lightmode.png',
+			'R6S operator-rating-' .. type .. '-' ..  value .. ' darkmode.png',
+			{ size = '40x20px', link = '' }
+		),
 		HtmlWidgets.I{
 			css = {
 				['padding-left'] = '2px',
