@@ -6,18 +6,67 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local NS_MAIN = 0
+local NS_USER = 2
+local NS_PROJECT = 4 -- "Liquipedia" namespace
+local NS_TEMPLATE = 10
+local NS_HELP = 12
+local NS_MODULE = 828
+local NS_MODULE_TALK = 829
+
 local Namespace = {}
 
----Determines if the page this module is invoked on is in main space
----829 (ModuleTalk) is treated as main space for ScribuntoUnit to work properly
+---Determins whether a given title object is in the given namespaces, and optionally their talk namespaces.
+---@param title Title
+---@param namespaces (string|integer)[]
+---@param includeTalk boolean?
 ---@return boolean
-function Namespace.isMain()
-	return mw.title.getCurrentTitle():inNamespace(0) or mw.title.getCurrentTitle():inNamespace(829)
+local function isInNamespace(title, namespaces, includeTalk)
+	if includeTalk then
+		return Array.any(namespaces, function (namespace)
+			return title:hasSubjectNamespace(namespace)
+		end)
+	end
+	return title:inNamespaces(unpack(namespaces))
+end
+
+---Determines if a title object is in the Main namespace.
+---`NS_MODULE_TALK` is treated as Main namespace for ScribuntoUnit to work properly.
+---Will use the title object of the page this module is invoked on if no title is provided.
+---@param title Title?
+---@return boolean
+function Namespace.isMain(title)
+	title = title or mw.title.getCurrentTitle()
+	return isInNamespace(title, {NS_MAIN, NS_MODULE_TALK})
+end
+
+---Determines if a title object is in the User namespace, also considers
+---the User Talk namespace (unless excluded using the `excludeTalk` paramater).
+---Will use the title object of the page this module is invoked on if no title is provided.
+---@param title Title?
+---@param excludeTalk boolean?
+---@return boolean
+function Namespace.isUser(title, excludeTalk)
+	title = title or mw.title.getCurrentTitle()
+	return isInNamespace(title, {NS_USER}, not excludeTalk)
+end
+
+---Determines if a title object is in a namespace used for documentation purposes (`NS_PROJECT`,
+---`NS_TEMPLATE`, `NS_HELP`, and `NS_MODULE`), also considers their talk pages (unless excluded
+---using the `excludeTalk` paramater). Will use the title object of the page this module is
+---invoked on if no title is provided.
+---@param title Title?
+---@param excludeTalk boolean?
+---@return boolean
+function Namespace.isDocumentative(title, excludeTalk)
+	title = title or mw.title.getCurrentTitle()
+	return isInNamespace(title, {NS_PROJECT, NS_TEMPLATE, NS_HELP, NS_MODULE}, not excludeTalk)
 end
 
 Namespace.getIdsByName = FnUtil.memoize(function()

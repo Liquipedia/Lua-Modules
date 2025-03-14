@@ -96,6 +96,7 @@ end
 ---@field tiers string[]?
 ---@field tierTypes string[]?
 ---@field regions string[]?
+---@field games string[]?
 ---@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
 
@@ -142,6 +143,9 @@ function MatchTicker:init(args)
 					Array.parseCommaSeparatedString(args.tiertypes), FnUtil.curry(Tier.isValid, 1)
 				), function(tiertype)
 					return select(2, Tier.toValue(1, tiertype))
+				end) or nil,
+		games = args.games and Array.map(Array.parseCommaSeparatedString(args.games), function (game)
+					return Game.toIdentifier{game=game}
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
@@ -292,6 +296,16 @@ function MatchTicker:buildQueryConditions()
 
 
 		conditions:add(tierTypeConditions)
+	end
+
+	if Table.isNotEmpty(config.games) then
+		local tierConditions = ConditionTree(BooleanOperator.any)
+
+		Array.forEach(config.games, function(game)
+			tierConditions:add { ConditionNode(ColumnName('game'), Comparator.eq, game) }
+		end)
+
+		conditions:add(tierConditions)
 	end
 
 	conditions:add(self:dateConditions())

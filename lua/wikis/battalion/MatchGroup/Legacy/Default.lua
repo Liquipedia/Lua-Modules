@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
+-- wiki=battalion
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,14 +11,18 @@ local Lua = require('Module:Lua')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
----@class AgeofEmpiresMatchGroupLegacyDefault: MatchGroupLegacy
+---@class BattalionMatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@return table
 function MatchGroupLegacyDefault:getMap()
 	return {
 		['$notEmpty$'] = 'map$1$',
-		['$parse$'] = 'map$1$'
+		map = 'map$1$',
+		winner = 'map$1$win',
+		vod = 'vodgame$1$',
+		score1 = 'map$1$score1',
+		score2 = 'map$1$score2',
 	}
 end
 

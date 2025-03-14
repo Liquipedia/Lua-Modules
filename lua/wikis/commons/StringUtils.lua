@@ -24,7 +24,7 @@ end
 
 ---@param inputstr string?
 ---@param sep string?
----@return table
+---@return string[]
 function String.split(inputstr, sep)
 	if inputstr ~= nil then
 		if sep == nil then
