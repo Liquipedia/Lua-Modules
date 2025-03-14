@@ -10,12 +10,15 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerExt = require('Module:Player/Ext/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TeamTemplate = require('Module:TeamTemplate')
+
+local TeamIconWidget = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 
 local MediaList = {}
 
@@ -340,7 +343,7 @@ function MediaList._displayTeam(subject, date)
 	if not team then
 		return
 	end
-	return TeamTemplate.getIcon(team, date)
+	return tostring(TeamIconWidget{ teamTemplate = TeamTemplate.getRaw(team) })
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
