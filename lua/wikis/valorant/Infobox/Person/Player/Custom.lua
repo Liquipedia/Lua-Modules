@@ -70,7 +70,7 @@ function CustomPlayer.run(frame)
 	player.args.history = TeamHistoryAuto.results{
 		convertrole = true,
 		addlpdbdata = true,
-		specialRoles = Logic.readBool(player.args.historySpecialRoles)
+		specialRoles = player.args.historySpecialRoles
 	}
 	player.args.autoTeam = true
 	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
