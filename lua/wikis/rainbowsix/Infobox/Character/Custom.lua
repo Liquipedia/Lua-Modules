@@ -452,8 +452,9 @@ end
 function CustomCharacter:getWikiCategories(args)
 	local categories = {}
 	local speed = (args.speed or ''):lower()
+	local difficulty = (args.difficulty or ''):lower()
 	local speedEq = FnUtil.curry(Operator.eq, speed)
-	local difficultyEq = FnUtil.curry(Operator.eq, args.difficulty)
+	local difficultyEq = FnUtil.curry(Operator.eq, difficulty)
 
 	Array.extendWith(categories, Array.map(self:getAllArgsForBase(args, 'function'), function (element)
 		return element .. ' Operators'
@@ -463,12 +464,8 @@ function CustomCharacter:getWikiCategories(args)
 		Array.appendWith(categories, ARMOR_SPEED_DATA[speed].speedValue .. ' Speed Operators')
 	end
 
-	if Array.any({'1', 'easy'}, difficultyEq) then
-		Array.appendWith(categories, '1 Difficulty Operators')
-	elseif Array.any({'2', 'normal'}, difficultyEq) then
-		Array.appendWith(categories, '2 Difficulty Operators')
-	elseif Array.any({'3', 'hard'}, difficultyEq) then
-		Array.appendWith(categories, '3 Difficulty Operators')
+	if Array.any(Array.extractKeys(DIFFICULTY_DATA), difficultyEq) then
+		Array.appendWith(categories, DIFFICULTY_DATA[difficulty].value .. ' Difficulty Operators')
 	end
 
 	return categories
