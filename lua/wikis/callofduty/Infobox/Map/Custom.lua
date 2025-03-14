@@ -69,7 +69,6 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	local games = self:_getGames(args)
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.size = args.size
 	Table.mergeInto(lpdbData.extradata, Table.map(self:_getGames(args), function(gameIndex, game)
