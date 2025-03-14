@@ -53,11 +53,7 @@ function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
 
 	if widgetId == 'custom' then
-		return Array.append(
-function CustomInjector:parse(widgetId, widgets)
-	local args = self.caller.args
-
-	if widgetId == 'custom' then
+		local games = self.caller:_getGames(args)
 		return Array.append(
 			widgets,
 			Cell{name = 'Type', content = {args.type}},
