@@ -93,6 +93,27 @@ local OPERATOR_PRICES = {
 	}
 }
 
+local ARMOR_SPEED_DATA = {
+	slow = {
+		armorValue = 3,
+		armor = 'Heavy (125 HP)',
+		speedValue = 1,
+		speed = 'Slow'
+	},
+	medium = {
+		armorValue = 2,
+		armor = 'Medium (110 HP)',
+		speedValue = 2,
+		speed = 'Medium'
+	},
+	fast = {
+		armorValue = 1,
+		armor = 'Light (100 HP)',
+		speedValue = 3,
+		speed = 'Fast'
+	}
+}
+
 ---@class RainbowsixHeroInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
 local CustomInjector = Class.new(Injector)
@@ -357,16 +378,7 @@ end
 function CustomCharacter:_getBaseStats(args)
 	return WidgetUtil.collect(
 		Title{ children = 'Base Stats' },
-		Cell{
-			name = 'Armor/Health',
-			content = self:_getArmorContent((args.armor or ''):lower()),
-			options = { separator = ' ' }
-		},
-		Cell{
-			name = 'Speed',
-			content = self:_getSpeedContent((args.speed or ''):lower()),
-			options = { separator = ' ' }
-		},
+		self:_getArmorAndSpeedDisplay((args.speed or ''):lower()),
 		Cell{
 			name = 'Difficulty',
 			content = self:_getDifficultyContent((args.difficulty or ''):lower()),
@@ -375,34 +387,22 @@ function CustomCharacter:_getBaseStats(args)
 	)
 end
 
----@param armor string
----@return (string|Widget)[]
-function CustomCharacter:_getArmorContent(armor)
+---@param speed 'slow'|'medium'|'fast'
+---@return CellWidget[]
+function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 	local armorContent = FnUtil.curry(CustomCharacter._getStatContent, 'armor')
-	local armorEq = FnUtil.curry(Operator.eq, armor)
-	if Array.any({'1', 'light', 'low'}, armorEq) then
-		return armorContent(1, 'Light (100 HP)')
-	elseif Array.any({'2', 'medium'}, armorEq) then
-		return armorContent(2, 'Medium (110 HP)')
-	elseif Array.any({'3', 'slow', 'high'}, armorEq) then
-		return armorContent(3, 'Heavy (125 HP)')
-	end
-	return {}
-end
-
----@param speed string
----@return (string|Widget)[]
-function CustomCharacter:_getSpeedContent(speed)
 	local speedContent = FnUtil.curry(CustomCharacter._getStatContent, 'speed')
-	local speedEq = FnUtil.curry(Operator.eq, speed)
-	if Array.any({'1', 'slow', 'low'}, speedEq) then
-		return speedContent(1, 'Slow')
-	elseif Array.any({'2', 'medium'}, speedEq) then
-		return speedContent(2, 'Medium')
-	elseif Array.any({'3', 'fast', 'high'}, speedEq) then
-		return speedContent(3, 'Fast')
-	end
-	return {}
+	local armorSpeedData = ARMOR_SPEED_DATA[speed]
+	return {
+		Cell{
+			title = 'Armor/Health',
+			content = armorContent(armorSpeedData.armorValue, armorSpeedData.armor)
+		},
+		Cell{
+			title = 'Speed',
+			content = speedContent(armorSpeedData.speedValue, armorSpeedData.speed)
+		},
+	}
 end
 
 ---@param difficulty string
@@ -441,19 +441,16 @@ end
 ---@return string[]
 function CustomCharacter:getWikiCategories(args)
 	local categories = {}
-	local speedEq = FnUtil.curry(Operator.eq, args.speed)
+	local speed = (args.speed or ''):lower()
+	local speedEq = FnUtil.curry(Operator.eq, speed)
 	local difficultyEq = FnUtil.curry(Operator.eq, args.difficulty)
 
 	Array.extendWith(categories, Array.map(self:getAllArgsForBase(args, 'function'), function (element)
 		return element .. ' Operators'
 	end))
 
-	if Array.any({'1', 'slow', 'low'}, speedEq) then
-		Array.appendWith(categories, '1 Speed Operators')
-	elseif Array.any({'2', 'medium'}, speedEq) then
-		Array.appendWith(categories, '2 Speed Operators')
-	elseif Array.any({'3', 'fast', 'high'}, speedEq) then
-		Array.appendWith(categories, '3 Speed Operators')
+	if Array.any(Array.extractKeys(ARMOR_SPEED_DATA), speedEq) then
+		Array.appendWith(categories, ARMOR_SPEED_DATA[speed].speedValue .. ' Speed Operators')
 	end
 
 	if Array.any({'1', 'easy', 'low'}, difficultyEq) then
