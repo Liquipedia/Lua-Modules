@@ -94,6 +94,9 @@ for file in $files; do
   if [[ "${result}" == "Success" ]]; then
     if [[ "${newRevId}" != "null" ]]; then
       changesMade=true
+      if [[ "${DEPLOY_TRIGGER}" != "push" ]]; then
+        echo "::warning file=${file}::File changed"
+      fi
     fi
     echo "...${result}"
     echo '...done'
