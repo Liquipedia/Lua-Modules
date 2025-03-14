@@ -18,7 +18,7 @@ local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 function MatchGroupLegacyDefault:getMap()
 	return {
 		['$notEmpty$'] = 'map$1$',
-		['$parse$'] = 'match$1$',
+		['$parse$'] = 'map$1$',
 	}
 end
 
