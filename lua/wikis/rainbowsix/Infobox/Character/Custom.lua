@@ -395,11 +395,11 @@ function CustomCharacter:_getArmorAndSpeedDisplay(speed)
 	local armorSpeedData = ARMOR_SPEED_DATA[speed]
 	return {
 		Cell{
-			title = 'Armor/Health',
+			name = 'Armor/Health',
 			content = armorContent(armorSpeedData.armorValue, armorSpeedData.armor)
 		},
 		Cell{
-			title = 'Speed',
+			name = 'Speed',
 			content = speedContent(armorSpeedData.speedValue, armorSpeedData.speed)
 		},
 	}
