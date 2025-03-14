@@ -107,7 +107,13 @@ for luaFile in $luaFiles; do
     result=$(echo "$rawResult" | jq ".edit.result" -r)
     echo "::debug::...${rawResult}"
     if [[ "${result}" == "Success" ]]; then
+      nochange=$(echo "$rawResult" | jq ".edit.nochange" -r)
       echo "...${result}"
+      if [[ "${nochange}" == "" ]] && [[ "${DEPLOY_TRIGGER}" == "push" ]]; then
+        echo "::notice file=${luaFile}::No change made"
+      elif [[ "${nochange}" != "" ]] && [[ "${DEPLOY_TRIGGER}" != "push" ]]; then
+        echo "::warning file=${luaFile}::File changed"
+      fi
       echo '...done'
       echo ":information_source: ${luaFile} successfully deployed" >> $GITHUB_STEP_SUMMARY
     else
