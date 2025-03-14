@@ -92,10 +92,6 @@ local OPERATOR_PRICES = {
 		credit = 600
 	}
 }
-OPERATOR_PRICES['36 months'] = OPERATOR_PRICES['36m']
-OPERATOR_PRICES['24 months'] = OPERATOR_PRICES['24m']
-OPERATOR_PRICES['12 months'] = OPERATOR_PRICES['12m']
-OPERATOR_PRICES['0 months'] = OPERATOR_PRICES['0m']
 
 ---@class RainbowsixHeroInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
@@ -192,9 +188,9 @@ end
 ---@return Widget[]
 function CustomCharacter:_getTeam(args)
 	local team = (args.team or ''):lower()
-	if team == 'attack' or team == 'atk' then
+	if team == 'attack' then
 		return { TEAM_ATTACK }
-	elseif team == 'defense' or team == 'def' then
+	elseif team == 'defense' then
 		return { TEAM_DEFENSE }
 	elseif team == 'both' then
 		return { TEAM_ATTACK, TEAM_DEFENSE }
