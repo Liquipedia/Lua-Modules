@@ -417,7 +417,7 @@ end
 function CustomCharacter._generateDifficultyCell(difficulty)
 	local difficultyData = DIFFICULTY_DATA[difficulty]
 	return Logic.isNotEmpty(difficultyData)
-		and CustomCharacter._generateStatCell('Difficulty', 'armor', difficultyData.value, difficultyData.display)
+		and CustomCharacter._generateStatCell('Difficulty', 'difficulty', difficultyData.value, difficultyData.display)
 		or nil
 end
 
