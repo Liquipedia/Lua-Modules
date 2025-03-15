@@ -60,10 +60,11 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	local characterNode = mw.html.create()
 	if player.chars then
-		Array.forEach(player.chars, function (character)
-			characterNode:node(
-				mw.html.create('span'):addClass('race'):wikitext(CustomPlayerDisplay.character(player.game, character))
-			)
+		local chars = Array.map(player.chars, function (character)
+			return mw.html.create('span'):addClass('race'):wikitext(CustomPlayerDisplay.character(player.game, character))
+		end)
+		Array.forEach(Array.interleave(chars, ' '), function (character)
+			characterNode:node(character)
 		end)
 	end
 
