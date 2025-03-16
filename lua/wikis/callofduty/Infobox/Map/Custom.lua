@@ -35,15 +35,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomMap:_getGames(args)
-	local games = Array.mapIndexes(
-		function(i)
-			return i == 1 and (args.game1 or args.game) or args['game' .. i]
-		end,
-		function(i, value) return String.isNotEmpty(value) end
-	)
-	return Array.map(games, function(game) return Game.name{game = game}
-	end
-	)
+	return Array.map(self:getAllArgsForBase(args, 'game'), function(game) return Game.name{game = game} end)
 end
 
 ---@param widgetId string
