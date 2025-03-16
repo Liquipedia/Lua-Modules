@@ -1,44 +1,54 @@
+---
+-- @Liquipedia
+-- wiki=chess
+-- page=Module:Ratings
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Array = require('Module:Array')
+local Conditions = require('Module:Condition')
+local Logic = require('Module:Logic')
+local Page = require('Module:Page')
 local Variables = require('Module:Variables')
 
-local Language = mw.language.new('en')
+local Language = mw.getContentLanguage()
 
-local p = {}
+local Ratings = {}
 
-function p.format(rating)
-	if rating then
-		local date = rating.year .. '-' .. string.format('%02d', rating.month) .. '-01'
-		return rating.elo .. ' <small>(' .. Language:formatDate('F Y', date) .. ')</small>'
+function Ratings.format(rating)
+	if not rating or not rating.year or not rating.month then
+		return
 	end
+	local date = rating.year .. '-' .. string.format('%02d', rating.month) .. '-01' --personally would use os.time for this or even better DateExt
+	return rating.elo .. ' <small>(' .. Language:formatDate('F Y', date) .. ')</small>' -- use widgets instead
 end
 
-function p.fromDatapoint(datapoint)
-	return {
+function Ratings.fromDatapoint(datapoint)--preferably give datapoint a more meaningfull name
+	local extradata = datapoint.extradata or {}
+	return Logic.nilIfEmpty{
 		elo = tonumber(datapoint.information),
-		year = datapoint.extradata.year,
-		month = datapoint.extradata.month,
+		year = extradata.year,
+		month = extradata.month,
 	}
 end
 
-function p.playerIds(pagename)
-	pagename = pagename:gsub(' ', '_')
+function Ratings.playerIds(pagename)
+	pagename = Page.pageifyLink(pagename)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
 		limit = 1,
 		query = 'extradata',
 		conditions = '[[pagename::' .. pagename .. ']]'
 	})
-	return #data == 1 and data[1].extradata.rating_ids or {}
+	return type(data[1]) == 'table' and (data[1].extradata or {}).rating_ids or {}
 end
 
-function p.getAll(ids, mode, config)
+function Ratings.getAll(ids, mode, config)
 	-- Handle ID conditions.
-	if type(ids) ~= 'table' then
-		ids = {ids}
-	elseif #ids == 0 then
-		return {}
-	end
+	ids = Array.extend({}, ids)
+	--use Module:Condition for condition building
 	local nameConditions = table.concat(
-		Array.map(ids, function (id, _) return '[[name::' .. id .. ']]' end),
+		Array.map(ids, function (id) return '[[name::' .. id .. ']]' end),
 		'OR'
 	)
 
@@ -59,33 +69,32 @@ function p.getAll(ids, mode, config)
 		query = 'information, extradata',
 		conditions = table.concat(conditions, 'AND')
 	})
-	local ratings = Array.map(data, p.fromDatapoint)
-	return ratings
+	return ratings == Array.map(data, Ratings.fromDatapoint)
 end
 
-function p.get(ids, mode, config)
+function Ratings.get(ids, mode, config)
 	config.limit = 1
-	return p.getAll(ids, mode, config)[1]
+	return Ratings.getAll(ids, mode, config)
 end
 
-function p.getRecent(ids, mode)
+function Ratings.getRecent(ids, mode)
 	local config = {order = 'date desc'}
-	return p.get(ids, mode, config)
+	return Ratings.get(ids, mode, config)
 end
 
-function p.getPeak(ids, mode)
+function Ratings.getPeak(ids, mode)
 	local config = {order = 'information desc, date asc'}
-	return p.get(ids, mode, config)
+	return Ratings.get(ids, mode, config)
 end
 
-function p.getTournament(ids)
+function Ratings.getTournament(ids)
 	local mode = Variables.varDefault('tournament_mode', '')
 	local date = Variables.varDefault('tournament_startdate', '')
 	local config = {
 		order = 'date desc',
 		conditions = {'([[date::' .. date .. ']] OR [[date::<' .. date .. ']])'}
 	}
-	return p.get(ids, mode, config)
+	return Ratings.get(ids, mode, config)
 end
 
-return p
+return Ratings
