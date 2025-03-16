@@ -277,7 +277,7 @@ function CustomCharacter:_getAdditionalInfo(args)
 			options = { separator = ' ' }
 		} or nil,
 		Logic.isNotEmpty(args.weight) and Cell{
-			name = 'Height',
+			name = 'Weight',
 			content = { args.weight, 'kg' },
 			options = { separator = ' ' }
 		} or nil,
