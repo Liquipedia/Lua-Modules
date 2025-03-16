@@ -1,5 +1,14 @@
-local Config = {}
+---
+-- @Liquipedia
+-- wiki=callofduty
+-- page=Module:FilterButtons/Config
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Tier = require('Module:Tier/Utils')
+local Config = {}
+
 local Game = require('Module:Game')
 
 Config.categories = {
