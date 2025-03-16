@@ -21,6 +21,7 @@ local Table = require('Module:Table')
 local Character = Lua.import('Module:Infobox/Character')
 local Injector = Lua.import('Module:Widget/Injector')
 
+local ClassIcon = Lua.import('Module:ClassIcon', {loadData = true})
 local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
@@ -55,13 +56,13 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'Role',
 				content = WidgetUtil.collect(
-					self:_toCellContent('primaryrole', 'ClassIcon'),
-					self:_toCellContent('secondaryrole', 'ClassIcon')
+					self:_toCellContent('primaryrole'),
+					self:_toCellContent('secondaryrole')
 				)
 			},
 			Cell{
 				name = 'Lane',
-				content = {self:_toCellContent('lane', 'ClassIcon')}
+				content = {self:_toCellContent('lane')}
 			},
 		}
 	elseif id == 'custom' then
@@ -75,14 +76,11 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param key string
----@param dataModule string
 ---@return Widget?
-function CustomInjector:_toCellContent(key, dataModule)
+function CustomInjector:_toCellContent(key)
 	local args = self.caller.args
 	if String.isEmpty(args[key]) then return end
-	local data = Lua.requireIfExists('Module:' .. dataModule, {loadData = true})
-	if Logic.isEmpty(data) then return end
-	local iconData = data[args[key]:lower()]
+	local iconData = ClassIcon[args[key]:lower()]
 	return Logic.isNotEmpty(iconData) and HtmlWidgets.Fragment{
 		children = {
 			IconImageWidget{
@@ -99,21 +97,12 @@ end
 ---@return Widget
 function CustomCharacter:_getPriceCell()
 	local args = self.args
-	local costContent = WidgetUtil.collect(
-		String.isNotEmpty(args.costbp) and HtmlWidgets.Fragment{
-			children = {CostDisplay.display('battle point', '15px', args.costbp)}
-		} or nil,
-		String.isNotEmpty(args.costdia) and HtmlWidgets.Fragment{
-			children = {CostDisplay.display('diamond', '15px', args.costdia)}
-		} or nil,
-		String.isNotEmpty(args.costlg) and HtmlWidgets.Fragment{
-			children = {CostDisplay.display('lucky gem', '15px', args.costlg)}
-		} or nil,
-		String.isNotEmpty(args.costticket) and HtmlWidgets.Fragment{
-			children = {CostDisplay.display('ticket', '15px', args.costticket)}
-		} or nil
-	)
-	return Cell{name = 'Price', content = costContent}
+	return Cell{name = 'Price', content = WidgetUtil.collect(
+		String.isNotEmpty(args.costbp) and CostDisplay.run('battle point', args.costbp) or nil,
+		String.isNotEmpty(args.costdia) and CostDisplay.run('diamond', args.costdia) or nil,
+		String.isNotEmpty(args.costlg) and CostDisplay.run('lucky gem', args.costlg) or nil,
+		String.isNotEmpty(args.costticket) and CostDisplay.run('ticket', args.costticket) or nil
+	)}
 end
 
 ---@return Widget[]
@@ -191,7 +180,7 @@ end
 ---@return string[]
 function CustomCharacter:getWikiCategories(args)
 	if not Namespace.isMain() then return {} end
-	return WidgetUtil.collect(
+	return Array.append({},
 		String.isNotEmpty(args.attacktype) and (args.attacktype .. ' Hero') or nil,
 		String.isNotEmpty(args.primaryrole) and (args.primaryrole .. ' Hero') or nil,
 		String.isNotEmpty(args.secondaryrole) and (args.secondaryrole .. ' Hero') or nil
