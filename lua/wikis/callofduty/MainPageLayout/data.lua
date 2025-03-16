@@ -53,7 +53,7 @@ local CONTENT = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
 		body = '{{Liquipedia:App}}',
-		boxid = 1507,
+		boxid = 1505,
 	},
 	filterButtons = {
 		noPanel = true,
