@@ -132,7 +132,7 @@ function CustomPrizePool.addPointsDatapoint(data, prize)
 			participantname = data.participant,
 			participantflag = data.participantflag,
 			publishertier = data.extradata.circuit_tier or Variables.varDefault('circuittier'),
-			region = Variables.varDefault('tournament_region'),
+			region = Variables.varDefault('circuitregion'),
 		})
 	})
 end
