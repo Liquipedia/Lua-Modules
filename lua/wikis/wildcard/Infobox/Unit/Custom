@@ -1,0 +1,52 @@
+---
+-- @Liquipedia
+-- wiki=wildcard
+-- page=Module:Infobox/Unit/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+local Namespace = require('Module:Namespace')
+local String = require('Module:StringUtils')
+
+local Injector = Lua.import('Module:Widget/Injector')
+local Unit = Lua.import('Module:Infobox/Unit')
+
+local Widgets = require('Module:Widget/All')
+local Cell = Widgets.Cell
+
+---@class WorldofTanksUnitInfobox: UnitInfobox
+local CustomUnit = Class.new(Unit)
+local CustomInjector = Class.new(Injector)
+
+---@param frame Frame
+---@return Html
+function CustomUnit.run(frame)
+	local unit = CustomUnit(frame)
+	unit:setWidgetInjector(CustomInjector(unit))
+	unit.args.informationType = 'Summon'
+	return unit:createInfobox()
+end
+
+---@param id string
+---@param widgets Widget[]
+---@return Widget[]
+function CustomInjector:parse(id, widgets)
+	local args = self.caller.args
+	if id == 'custom' then
+		return Array.append(widgets,
+			Cell{name = 'Pronouns', content = {args.pronouns}},
+			Cell{name = 'House', content = {args.house}},
+			Cell{name = 'Quantity', content = {args.quantity}},
+     		Cell{name = 'Health', content = {args.health}},
+			Cell{name = 'Movement Speed', content = {args.movement}},
+			Cell{name = 'Key Words', content = {args.keywords}}
+		)
+	end
+	return widgets
+end
+
+return CustomUnit
