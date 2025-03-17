@@ -331,7 +331,7 @@ end
 ---@param input string
 ---@return Widget[]|nil
 function CustomCharacter:_getPriceCells(input)
-	local lowerInput = input:lower()
+	local lowerInput = (input or ''):lower()
 	if (lowerInput == 'launch') then
 		local lang = mw.getContentLanguage()
 		return {
