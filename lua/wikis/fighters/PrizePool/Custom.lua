@@ -117,7 +117,7 @@ end
 function CustomPrizePool.addPointsDatapoint(data, prize)
 	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
 		type = 'points',
-		name = data.extradata.circuit,
+		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata.circuit),
 		information = data.participant,
 		date = data.date,
 		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
@@ -131,8 +131,8 @@ function CustomPrizePool.addPointsDatapoint(data, prize)
 			type = Variables.varDefault('tournament_type'),
 			participantname = data.participant,
 			participantflag = data.participantflag,
-			publishertier = data.extradata.circuit_tier or Variables.varDefault('tournament_region'),
-			region = Variables.varDefault('tournament_region'),
+			publishertier = data.extradata.circuit_tier or Variables.varDefault('circuittier'),
+			region = Variables.varDefault('circuitregion'),
 		})
 	})
 end
