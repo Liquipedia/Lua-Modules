@@ -138,7 +138,6 @@ function StormgateParticipantTable:readEntry(sectionArgs, key, index, config)
 		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note,
 		opponent = opponent,
-		name = Opponent.toName(opponent),
 		isQualified = Logic.nilOr(Logic.readBoolOrNil(sectionArgs[key .. 'qualified']), config.isQualified),
 	}
 end
