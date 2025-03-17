@@ -216,7 +216,7 @@ return {
 						content = CONTENT.wantToHelp,
 					},
 					{
-						mobileOrder = 7,
+						mobileOrder = 8,
 						content = CONTENT.liquipediaApp,
 					},
 				}
@@ -264,7 +264,7 @@ return {
 						content = CONTENT.headlines,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},
