@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=trackmaina
+-- wiki=trackmania
 -- page=Module:MatchGroup/Legacy/Default
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
----@class TrackmainaMatchGroupLegacyDefault: MatchGroupLegacy
+---@class TrackmaniaMatchGroupLegacyDefault: MatchGroupLegacy
 local MatchGroupLegacyDefault = Class.new(MatchGroupLegacy)
 
 ---@return table
