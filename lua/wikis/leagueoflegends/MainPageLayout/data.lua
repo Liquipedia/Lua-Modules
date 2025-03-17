@@ -38,7 +38,7 @@ local CONTENT = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
 		body = '{{Liquipedia:App}}',
-		boxid = 1513,
+		boxid = 1505,
 	},
 	transfers = {
 		heading = 'Transfers',
