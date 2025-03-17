@@ -67,7 +67,11 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{convertrole = true, addlpdbdata = true, specialRoles = true}
+	player.args.history = TeamHistoryAuto.results{
+		convertrole = true,
+		addlpdbdata = true,
+		specialRoles = player.args.historySpecialRoles
+	}
 	player.args.autoTeam = true
 	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 	player.role = player:_getRoleData(player.args.role)
