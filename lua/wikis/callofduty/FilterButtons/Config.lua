@@ -31,9 +31,7 @@ Config.categories = {
 		name = 'game',
 		property = 'game',
 		expandable = true,
-		load = function(category)
-			category.items = Game.listGames({ordered = true})
-		end,
+		items = {'bo6', 'wz', 'codm'},
 		transform = function(game)
 			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
 		end
