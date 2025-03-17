@@ -530,7 +530,7 @@ Array.reduce({2, 3, 5}, pow)
 ---@generic T, V
 ---@param array T[]
 ---@param operator fun(aggregate: V, arrayValue: T): V
----@param initialValue V
+---@param initialValue V?
 ---@return V
 ---@nodiscard
 function Array.reduce(array, operator, initialValue)
