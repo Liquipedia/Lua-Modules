@@ -34,6 +34,12 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = '{{Liquipedia:App}}',
+		boxid = 1513,
+	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{rumours = true},
@@ -231,6 +237,10 @@ return {
 						mobileOrder = 7,
 						content = CONTENT.wantToHelp,
 					},
+					{
+						mobileOrder = 8,
+						content = CONTENT.liquipediaApp,
+					},
 				}
 			},
 			{ -- Right
@@ -276,11 +286,11 @@ return {
 						content = CONTENT.headlines,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 9,
 						content = CONTENT.usefulArticles,
 					},
 					{
-						mobileOrder = 9,
+						mobileOrder = 10,
 						content = CONTENT.references,
 					},
 				},
