@@ -35,6 +35,12 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = '{{Liquipedia:App}}',
+		boxid = 1505,
+	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
@@ -208,6 +214,10 @@ return {
 					{
 						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
