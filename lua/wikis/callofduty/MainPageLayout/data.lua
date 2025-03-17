@@ -49,12 +49,6 @@ local CONTENT = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
 	},
-	liquipediaApp = {
-		heading = 'Download the Liquipedia App',
-		padding = true,
-		body = '{{Liquipedia:App}}',
-		boxid = 1505,
-	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
@@ -146,8 +140,9 @@ return {
 			title = 'Games',
 			link = 'Portal:Games',
 			count = {
-				method = 'CATEGORY',
-				category = 'Games',
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::game]]',
 			},
 		},
 		{
@@ -177,10 +172,6 @@ return {
 					{
 						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 7,
-						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
