@@ -139,8 +139,9 @@ return {
 			title = 'Operators',
 			link = 'Portal:Operators',
 			count = {
-				method = 'CATEGORY',
-				category = 'Operators',
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::character]]',
 			},
 		},
 		{
