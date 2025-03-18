@@ -121,11 +121,11 @@ function CustomInjector:parse(id, widgets)
 				local roleDisplay = CustomPlayer._displayRole(roleData)
 
 				if roleDisplay then
-					local inGameRoleKeys = {awper = true, igl = true, lurker = true, support = true, entry = true, rifler = true}
-					local contractKeys = {standard = true, loan = true, standin = true, twoway = true}
-					if inGameRoleKeys[roleData] then
+					local inGameRoleKeys = {"awper", "igl", "lurker", "support", "entry", "rifler"}
+					local contractKeys = {"standard", "loan", "standin", "twoway"}
+					if Table.includes(inGameRoleKeys, roleData) then
 						table.insert(inGameRoles, roleDisplay)
-					elseif contractKeys[roleData] then
+					elseif Table.includes(contractKeys, roleData) then
 						table.insert(contracts, roleDisplay)
 					else
 						table.insert(positions, roleDisplay)
@@ -135,12 +135,12 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
-		local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
 		local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
+		local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
 
 		local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
-		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
 		local positionsTitle = #positions > 1 and "Positions" or "Position"
+		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
 
 		local cells = {}
 
