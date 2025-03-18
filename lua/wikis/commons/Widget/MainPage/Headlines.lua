@@ -29,6 +29,7 @@ Headlines.defaultProps = {
 
 ---@return (Html|Widget)[]
 function Headlines:render()
+	assert(self.props.limit > 0, 'Invalid limit')
 	return WidgetUtil.collect(
 		ExternalMediaList.get{ subject = '!', limit = self.props.limit },
 		Div{
