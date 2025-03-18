@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=counterstrike
--- page=Module:Info
+-- page=Module:InGameRoles
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
