@@ -97,7 +97,7 @@ function CustomPlayer.run(frame)
 	if player.args.roles then
 		for role in string.gmatch(player.args.roles, "[^,]+") do
 			local roleKey = role:match("^%s*(.-)%s*$"):lower()
-			local roleData = ROLES[rolekey]
+			local roleData = ROLES[roleKey]
 			if roleData then
 				table.insert(player.roles, roleData)
 			end
