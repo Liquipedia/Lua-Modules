@@ -24,13 +24,14 @@ for luaFile in $luaFiles; do
   if [[ -n "$1" ]]; then
     luaFile="./$luaFile"
   fi
-  echo "== Checking $luaFile =="
+  echo "::group::Checking $luaFile"
   fileContents=$(cat "$luaFile")
 
   [[ $fileContents =~ $pat ]]
 
   if [[ "${BASH_REMATCH[1]}" == "" ]]; then
     echo '...skipping - no magic comment found'
+    echo "${luaFile} skipped" >> $GITHUB_STEP_SUMMARY
   else
     wiki="${BASH_REMATCH[1]}"
     page="${BASH_REMATCH[2]}${LUA_DEV_ENV_NAME}"
@@ -104,21 +105,29 @@ for luaFile in $luaFiles; do
         | gunzip
     )
     result=$(echo "$rawResult" | jq ".edit.result" -r)
-    echo "DEBUG: ...${rawResult}"
     if [[ "${result}" == "Success" ]]; then
+      nochange=$(echo "$rawResult" | jq ".edit.nochange" -r)
       echo "...${result}"
+      if [[ "${nochange}" == "" ]] && [[ "${DEPLOY_TRIGGER}" == "push" ]]; then
+        echo "::notice file=${luaFile}::No change made"
+      elif [[ "${nochange}" != "" ]] && [[ "${DEPLOY_TRIGGER}" != "push" ]]; then
+        echo "::warning file=${luaFile}::File changed"
+      fi
       echo '...done'
+      echo ":information_source: ${luaFile} successfully deployed" >> $GITHUB_STEP_SUMMARY
     else
-      echo "...failed to deploy"
+      echo "::warning file=${luaFile}::failed to deploy"
+      echo ":warning: ${luaFile} failed to deploy" >> $GITHUB_STEP_SUMMARY
       allModulesDeployed=false
     fi
 
     # Don't get rate limited
     sleep 4
   fi
+  echo '::endgroup::'
 
   if [ "$allModulesDeployed" != true ]; then
-    echo "DEBUG: Some modules were not deployed!"
+    echo "::warning::Some modules were not deployed!"
     exit 1
   fi
 done

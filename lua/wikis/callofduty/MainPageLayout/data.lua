@@ -1,20 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
+-- wiki=callofduty
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
-local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -24,7 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	usefulArticles = {
-		heading = 'The Game',
+		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = 1503,
@@ -35,25 +32,16 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
-	liquipediaApp = {
-		heading = 'Download the Liquipedia App',
-		padding = true,
-		body = '{{Liquipedia:App}}',
-		boxid = 1505,
-	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{
-			rumours = true,
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
-		},
+		body = TransfersList{rumours = true, limit = 10},
 		boxid = 1509,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content(),
+		body = ThisDayWidgets.Content{
+			birthdayListPage = 'Birthday list'
+		},
 		padding = true,
 		boxid = 1510,
 	},
@@ -66,7 +54,7 @@ local CONTENT = {
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		},
+		}
 	},
 	matches = {
 		heading = 'Matches',
@@ -94,51 +82,25 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
 			upcomingDays = 30,
-			completedDays = 30
+			completedDays = 20,
+			displayGameIcons = true
 		},
 		padding = true,
 		boxid = 1508,
-	},
-	headlines = {
-		heading = 'Headlines',
-		body = WidgetUtil.collect(
-			ExternalMediaList.get{ subject = '!', limit = 4 },
-			Div{
-				css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
-				children = {
-					Div{
-						css = {
-							['white-space'] = 'nowrap',
-							display = 'inline',
-							margin = '0 10px',
-							['font-size'] = '15px',
-							['font-style'] = 'italic',
-						},
-						children = {
-							Link{ children = 'See all Headlines', link = 'Portal:News' },
-							CenterDot(),
-							Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
-						}
-					}
-				}
-			}
-		),
-		padding = true,
-		boxid = 1511,
 	},
 }
 
 return {
 	banner = {
-		lightmode = 'Apex Legends logo lightmode.svg',
-		darkmode = 'Apex Legends logo darkmode.svg',
+		lightmode = 'COD logo lightmode.svg',
+		darkmode = 'COD logo darkmode.svg',
 	},
-	metadesc = 'Comprehensive Apex Legends wiki with articles covering everything from weapons, to strategies, '..
-		'to tournaments, to competitive players and teams.',
-	title = 'Apex Legends',
+	metadesc = 'The Call of Duty (COD) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and games.',
+	title = 'Call of Duty',
 	navigation = {
 		{
-			file = 'Fnatic at the ALGS Birmingham Championship.jpg',
+			file = 'Elevate at CODM World Championship 2024.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -147,7 +109,7 @@ return {
 			},
 		},
 		{
-			file = 'Falcons ImperialHal at the ALGS Mannheim Split 2 Playoffs.jpg',
+			file = 'Seattle Surge at EWC 2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -156,7 +118,7 @@ return {
 			},
 		},
 		{
-			file = 'ALGS Raleigh Championship Trrophy.jpg',
+			file = 'Warzone Trophy at EWC 2024.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -165,7 +127,7 @@ return {
 			},
 		},
 		{
-			file = 'PVX ShunMi at the ALGS Birmingham Championship.jpg',
+			file = 'Insight at EWC 2024.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -174,21 +136,17 @@ return {
 			},
 		},
 		{
-			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
-			title = 'Statistics',
-			link = 'Portal:Statistics',
-		},
-		{
-			file = 'Alter Banner.png',
-			title = 'Legends',
-			link = 'Legends',
+			file = 'COD Infinite Warfare Wallpaper.jpg',
+			title = 'Games',
+			link = 'Portal:Games',
 			count = {
-				method = 'CATEGORY',
-				category = 'Character',
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::game]]',
 			},
 		},
 		{
-			file = 'Kings Canyon S3.png',
+			file = 'COD Black Ops 6 Map Skyline.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -201,7 +159,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				size = 5,
 				children = {
 					{
 						mobileOrder = 1,
@@ -215,14 +173,10 @@ return {
 						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
 					},
-					{
-						mobileOrder = 8,
-						content = CONTENT.liquipediaApp,
-					},
 				}
 			},
 			{ -- Right
-				size = 6,
+				size = 7,
 				children = {
 					{
 						mobileOrder = 2,
@@ -256,15 +210,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 5,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 5,
-						content = CONTENT.headlines,
-					},
-					{
-						mobileOrder = 7,
+						mobileOrder = 4,
 						content = CONTENT.usefulArticles,
 					},
 				},
