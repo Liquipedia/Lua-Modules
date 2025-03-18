@@ -17,9 +17,22 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
+---@class PanelParameters
+---@field bodyClass string[]?
+---@field bodyStyle table<string, any>?
+---@field boxId integer?
+---@field children (Widget|string|Html|nil)|(Widget|string|Html|nil)[]
+---@field classes string[]?
+---@field heading string|Html|Widget
+---@field headingAttributes table<string, any>?
+---@field headingH2 string|Html|Widget?
+---@field headingH3 string|Html|Widget?
+---@field padding boolean?
+---@field panelAttributes table<string, any>?
+
 ---@class Panel: Widget
----@operator call(table): Panel
----@field props table<string, any>
+---@operator call(PanelParameters): Panel
+---@field props PanelParameters
 local Panel = Class.new(Widget)
 
 ---@return Widget
