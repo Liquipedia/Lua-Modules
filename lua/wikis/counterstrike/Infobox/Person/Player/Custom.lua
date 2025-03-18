@@ -92,7 +92,6 @@ function CustomPlayer.run(frame)
 
 	player.role = ROLES[(player.args.role or ''):lower()]
 	player.role2 = ROLES[(player.args.role2 or ''):lower()]
-	-- player.roles = ROLES[(player.args.roles or {}):lower()]
 	player.roles = {}
 	if player.args.roles then
 		for role in string.gmatch(player.args.roles, "[^,]+") do
@@ -135,12 +134,50 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		local role = CustomPlayer._displayRole(caller.role)
 		local role2 = CustomPlayer._displayRole(caller.role2)
-		local roles = CustomPlayer._displayRoles(caller.roles)
 
-		return {
+		local inGameRoles = {}
+		local positions = {}
+
+		if caller.roles and #caller.roles > 0 then
+			for _, roleData in ipairs(caller.roles) do
+				local roleDisplay = CustomPlayer._displayRole(roleData)
+				if roleDisplay then
+					local isInGameRole = false
+					local inGameRoleKeys = {awper = true, igl = true, lurker = true, support = true, entry = true, rifler = true}
+					for key, data in pairs(ROLES) do
+						if data == roleData and inGameRoleKeys[key] then
+							isInGameRole = true
+							break
+						end
+					end
+					if isInGameRole then
+						table.insert(inGameRoles, roleDisplay)
+					else
+						table.insert(positions, roleDisplay)
+					end
+				end
+			end
+		end
+
+		local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
+		local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
+
+		local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
+		local positionsTitle = #positions > 1 and "Positions" or "Position"
+
+		local cells = {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
-			Cell{name = 'In-game Role', content = {roles}},
 		}
+
+		if inGameRolesDisplay then
+			table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+		end
+
+		if positionsDisplay then
+			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
+		end
+
+		return cells
 	elseif id == 'region' then
 		return {}
 	end
