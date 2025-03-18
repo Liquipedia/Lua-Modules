@@ -125,7 +125,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		local role = CustomPlayer._displayRole(caller.role)
 		local role2 = CustomPlayer._displayRole(caller.role2)
-		local roles = CustomPlayer._displayRole(caller.roles)
+		local roles = CustomPlayer._displayRoles(caller.roles)
 
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
@@ -221,6 +221,29 @@ function CustomPlayer._displayRole(roleData)
 	end
 
 	return table.concat({role1Display, role2Display}, ' ')
+end
+
+---@param rolesTable CounterstrikePersonRoleData[]?
+---@return string?
+function CustomPlayer._displayRoles(rolesTable)
+	if not rolesTable or #rolesTable == 0 then
+		return nil
+	end
+
+	local displayedRoles = {}
+
+	for _, roleData in ipairs(rolesTable) do
+		local roleDisplay = CustomPlayer._displayRole(roleData)
+		if roleDisplay then
+			table.insert(displayedRoles, roleDisplay)
+		end
+	end
+
+	if #displayedRoles == 0 then
+		return nil
+	end
+
+	return table.concat(displayedRoles, ", ")
 end
 
 ---@param args table
