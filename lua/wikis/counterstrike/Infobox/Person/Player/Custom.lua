@@ -45,6 +45,12 @@ local ROLES = {
 	['manager'] = {category = 'Managers', display = 'Manager', management = true},
 	['director of esport'] = {category = 'Organizational Staff', display = 'Director of Esport', management = true},
 	['caster'] = {category = 'Casters', display = 'Caster', talent = true},
+
+	-- Contract
+	['standard'] = {category = 'Standard Contracts', display = 'Standard'},
+	['loan'] = {category = 'Players On Loan', display = 'On loan'},
+	['standin'] = {category = 'Stand-in Players', display = 'Stand-in'},
+	['twoway'] = {category = 'Two-way Contracts', display = 'Two-way'},
 }
 ROLES.awp = ROLES.awper
 ROLES.lurk = ROLES.lurker
@@ -136,6 +142,7 @@ function CustomInjector:parse(id, widgets)
 		local role2 = CustomPlayer._displayRole(caller.role2)
 
 		local inGameRoles = {}
+		local contracts = {}
 		local positions = {}
 
 		if caller.roles and #caller.roles > 0 then
@@ -144,14 +151,21 @@ function CustomInjector:parse(id, widgets)
 				if roleDisplay then
 					local isInGameRole = false
 					local inGameRoleKeys = {awper = true, igl = true, lurker = true, support = true, entry = true, rifler = true}
+					local isContract = false
+					local contractKeys = {standard = true, loan = true, standin = true, twoway = true}
 					for key, data in pairs(ROLES) do
 						if data == roleData and inGameRoleKeys[key] then
 							isInGameRole = true
+							break
+						elseif data == roleData and contractKeys[key] then
+							isContract = true
 							break
 						end
 					end
 					if isInGameRole then
 						table.insert(inGameRoles, roleDisplay)
+					elseif isContract then
+						table.insert(contracts, roleDisplay)
 					else
 						table.insert(positions, roleDisplay)
 					end
@@ -160,9 +174,11 @@ function CustomInjector:parse(id, widgets)
 		end
 
 		local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
+		local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
 		local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
 
 		local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
+		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
 		local positionsTitle = #positions > 1 and "Positions" or "Position"
 
 		local cells = {
@@ -173,6 +189,9 @@ function CustomInjector:parse(id, widgets)
 			table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
 		end
 
+		if contractsDisplay then
+			table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
+		end
 		if positionsDisplay then
 			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
 		end
