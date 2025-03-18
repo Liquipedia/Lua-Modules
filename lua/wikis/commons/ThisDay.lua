@@ -265,7 +265,7 @@ function ThisDay._displayWins(yearData)
 		local opponent
 		if placement.opponenttype then
 			opponent = Opponent.fromLpdbStruct(placement)
-		
+
 		-- legacy opponent building
 		elseif placement.mode == CONFIG.soloMode then
 			opponent = {
