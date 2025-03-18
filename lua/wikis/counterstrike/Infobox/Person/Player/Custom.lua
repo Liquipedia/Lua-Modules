@@ -92,7 +92,17 @@ function CustomPlayer.run(frame)
 
 	player.role = ROLES[(player.args.role or ''):lower()]
 	player.role2 = ROLES[(player.args.role2 or ''):lower()]
-	player.roles = ROLES[(player.args.roles or {}):lower()]
+	-- player.roles = ROLES[(player.args.roles or {}):lower()]
+	player.roles = {}
+	if player.args.roles then
+		for role in string.gmatch(player.args.roles, "[^,]+") do
+			local roleKey = role:match("^%s*(.-)%s*$"):lower()
+			local roleData = ROLES[rolekey]
+			if roleData then
+				table.insert(player.roles, roleData)
+			end
+		end
+	end
 
 	return player:createInfobox()
 end
