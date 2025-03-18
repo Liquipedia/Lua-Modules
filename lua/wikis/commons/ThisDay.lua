@@ -153,7 +153,7 @@ end
 local ThisDay = {}
 
 --- Get and display birthdays that happened on a given date (falls back to today)
----@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
+---@param args {date: string?, month: string|integer|nil, day: string|integer|nil, noTwitter: boolean?}
 ---@return string
 function ThisDay.birthday(args)
 	local birthdayData = Query.birthday(ThisDay._readDate(args))
