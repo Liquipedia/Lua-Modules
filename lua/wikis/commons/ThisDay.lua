@@ -131,7 +131,7 @@ end
 --- build conditions for multi variable
 ---@param key string
 ---@param values table
----@param booleanOperator BooleanOperator
+---@param booleanOperator lpdbBooleanOperator
 ---@return table?
 function Query._multiValueCondition(key, values, booleanOperator)
 	if Table.isEmpty(values) then
