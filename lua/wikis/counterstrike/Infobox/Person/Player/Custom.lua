@@ -91,6 +91,7 @@ function CustomPlayer.run(frame)
 
 	player.role = ROLES[(player.args.role or ''):lower()]
 	player.role2 = ROLES[(player.args.role2 or ''):lower()]
+	player.roles = ROLES[(player.args.roles or {}):lower()]
 
 	return player:createInfobox()
 end
@@ -126,6 +127,7 @@ function CustomInjector:parse(id, widgets)
 
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
+			Cell{name = 'In-game Role', content = {caller.roles}},
 		}
 	elseif id == 'region' then
 		return {}

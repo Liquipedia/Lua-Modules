@@ -274,6 +274,7 @@ Lpdb.SquadPlayer = Model('squadplayer', {
 	{name = 'nationality', fieldType = 'string', default = ''},
 	{name = 'position', fieldType = 'string', default = ''},
 	{name = 'role', fieldType = 'string', default = ''},
+	{name = 'roles', fieldType = 'struct', default = {}},
 	{name = 'type', fieldType = 'string', default = 'player'},
 	{name = 'newteam', fieldType = 'string', default = ''},
 	{name = 'teamtemplate', fieldType = 'string', default = ''},
