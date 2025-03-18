@@ -181,19 +181,20 @@ function CustomInjector:parse(id, widgets)
 		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
 		local positionsTitle = #positions > 1 and "Positions" or "Position"
 
-		local cells = {
-			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
-		}
+		local cells = {}
 
 		if inGameRolesDisplay then
 			table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+		else
+			table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}})
+		end
+
+		if positionsDisplay then
+			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
 		end
 
 		if contractsDisplay then
 			table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
-		end
-		if positionsDisplay then
-			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
 		end
 
 		return cells
