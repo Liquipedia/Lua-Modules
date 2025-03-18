@@ -21,41 +21,11 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local BANNED = mw.loadData('Module:Banned')
-local ROLES = {
-	-- Players
-	['awper'] = {category = 'AWPers', display = 'AWPer', store = 'awp'},
-	['igl'] = {category = 'In-game leaders', display = 'In-game leader', store = 'igl'},
-	['lurker'] = {category = 'Riflers', display = 'Rifler', category2 = 'Lurkers', display2 = 'lurker'},
-	['support'] = {category = 'Riflers', display = 'Rifler', category2 = 'Support players', display2 = 'support'},
-	['entry'] = {category = 'Riflers', display = 'Rifler', category2 = 'Entry fraggers', display2 = 'entry fragger'},
-	['rifler'] = {category = 'Riflers', display = 'Rifler'},
 
-	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', display = 'Analyst', coach = true},
-	['broadcast analyst'] = {category = 'Broadcast Analysts', display = 'Broadcast Analyst', talent = true},
-	['observer'] = {category = 'Observers', display = 'Observer', talent = true},
-	['host'] = {category = 'Hosts', display = 'Host', talent = true},
-	['journalist'] = {category = 'Journalists', display = 'Journalist', talent = true},
-	['expert'] = {category = 'Experts', display = 'Expert', talent = true},
-	['producer'] = {category = 'Production Staff', display = 'Producer', talent = true},
-	['director'] = {category = 'Production Staff', display = 'Director', talent = true},
-	['executive'] = {category = 'Organizational Staff', display = 'Executive', management = true},
-	['coach'] = {category = 'Coaches', display = 'Coach', coach = true},
-	['assistant coach'] = {category = 'Coaches', display = 'Assistant Coach', coach = true},
-	['manager'] = {category = 'Managers', display = 'Manager', management = true},
-	['director of esport'] = {category = 'Organizational Staff', display = 'Director of Esport', management = true},
-	['caster'] = {category = 'Casters', display = 'Caster', talent = true},
-
-	-- Contract
-	['standard'] = {category = 'Standard Contracts', display = 'Standard'},
-	['loan'] = {category = 'Players On Loan', display = 'On loan'},
-	['standin'] = {category = 'Stand-in Players', display = 'Stand-in'},
-	['twoway'] = {category = 'Two-way Contracts', display = 'Two-way'},
-}
-ROLES.awp = ROLES.awper
-ROLES.lurk = ROLES.lurker
-ROLES.entryfragger = ROLES.entry
-ROLES.rifle = ROLES.rifler
+local ContractRoles = require('Module:ContractRoles')
+local StaffRoles = require('Module:StaffRoles')
+local InGameRoles = require('Module:InGameRoles')
+local ROLES = Table.merge(ContractRoles, StaffRoles, InGameRoles)
 
 ---@class CounterstrikePersonRoleData
 ---@field category string
@@ -100,8 +70,9 @@ function CustomPlayer.run(frame)
 	player.role2 = ROLES[(player.args.role2 or ''):lower()]
 	player.roles = {}
 	if player.args.roles then
-		for role in string.gmatch(player.args.roles, "[^,]+") do
-			local roleKey = role:match("^%s*(.-)%s*$"):lower()
+		local roleKeys = Array.parseCommaSeparatedString(player.args.roles)
+		for _, roleKey in ipairs(roleKeys) do
+			local roleKey = roleKey:lower()
 			local roleData = ROLES[roleKey]
 			if roleData then
 				table.insert(player.roles, roleData)
@@ -154,10 +125,10 @@ function CustomInjector:parse(id, widgets)
 					local isContract = false
 					local contractKeys = {standard = true, loan = true, standin = true, twoway = true}
 					for key, data in pairs(ROLES) do
-						if data == roleData and inGameRoleKeys[key] then
+						if Table.includes(inGameRoleKeys) then
 							isInGameRole = true
 							break
-						elseif data == roleData and contractKeys[key] then
+						elseif Table.includes(contractKeys) then
 							isContract = true
 							break
 						end
