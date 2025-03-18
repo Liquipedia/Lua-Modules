@@ -10,13 +10,13 @@ local Lua = require('Module:Lua')
 
 local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -60,20 +60,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
