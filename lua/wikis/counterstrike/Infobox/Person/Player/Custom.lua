@@ -125,10 +125,10 @@ function CustomInjector:parse(id, widgets)
 					local isContract = false
 					local contractKeys = {standard = true, loan = true, standin = true, twoway = true}
 					for _, data in pairs(ROLES) do
-						if Table.includes(inGameRoleKeys) then
+						if data == roleData and Table.includes(inGameRoleKeys, data) then
 							isInGameRole = true
 							break
-						elseif Table.includes(contractKeys) then
+						elseif data == roleData and Table.includes(contractKeys, data) then
 							isContract = true
 							break
 						end
