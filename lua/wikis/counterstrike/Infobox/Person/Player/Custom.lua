@@ -22,9 +22,9 @@ local Cell = Widgets.Cell
 
 local BANNED = mw.loadData('Module:Banned')
 
-local ContractRoles = require('Module:ContractRoles')
-local StaffRoles = require('Module:StaffRoles')
-local InGameRoles = require('Module:InGameRoles')
+local ContractRoles = Lua.import('Module:ContractRoles')
+local StaffRoles = Lua.import('Module:StaffRoles')
+local InGameRoles = Lua.import('Module:InGameRoles')
 local ROLES = Table.merge(ContractRoles, StaffRoles, InGameRoles)
 
 ---@class CounterstrikePersonRoleData
@@ -72,8 +72,8 @@ function CustomPlayer.run(frame)
 	if player.args.roles then
 		local roleKeys = Array.parseCommaSeparatedString(player.args.roles)
 		for _, roleKey in ipairs(roleKeys) do
-			local roleKey = roleKey:lower()
-			local roleData = ROLES[roleKey]
+			local key = roleKey:lower()
+			local roleData = ROLES[key]
 			if roleData then
 				table.insert(player.roles, roleData)
 			end
@@ -124,7 +124,7 @@ function CustomInjector:parse(id, widgets)
 					local inGameRoleKeys = {awper = true, igl = true, lurker = true, support = true, entry = true, rifler = true}
 					local isContract = false
 					local contractKeys = {standard = true, loan = true, standin = true, twoway = true}
-					for key, data in pairs(ROLES) do
+					for _, data in pairs(ROLES) do
 						if Table.includes(inGameRoleKeys) then
 							isInGameRole = true
 							break
