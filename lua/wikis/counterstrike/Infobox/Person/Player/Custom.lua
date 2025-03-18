@@ -65,6 +65,7 @@ ROLES.rifle = ROLES.rifler
 ---@field gamesList string[]
 ---@field role CounterstrikePersonRoleData?
 ---@field role2 CounterstrikePersonRoleData?
+---@field roles CounterstrikePersonRoleData?
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -124,10 +125,11 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'role' then
 		local role = CustomPlayer._displayRole(caller.role)
 		local role2 = CustomPlayer._displayRole(caller.role2)
+		local roles = CustomPlayer._displayRole(caller.roles)
 
 		return {
 			Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}},
-			Cell{name = 'In-game Role', content = {caller.roles}},
+			Cell{name = 'In-game Role', content = {roles}},
 		}
 	elseif id == 'region' then
 		return {}
