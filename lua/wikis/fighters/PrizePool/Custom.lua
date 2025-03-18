@@ -85,6 +85,10 @@ function CustomLpdbInjector:adjust(lpdbData, placement, opponent)
 
 	lpdbData.extradata.matchid = opponent.additionalData.LASTVSMATCHID
 
+	if not Variables.varExists('circuit') then
+		return lpdbData
+	end
+
 	lpdbData.extradata.circuit = Variables.varDefault('circuit')
 	lpdbData.extradata.circuit_tier = Variables.varDefault('circuit_tier')
 	lpdbData.extradata.circuit2 = Variables.varDefault('circuit2')
