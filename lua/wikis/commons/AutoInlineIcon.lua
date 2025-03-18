@@ -64,6 +64,7 @@ function AutoInlineIcon._iconCreator(data)
 			imageLight = data.iconLight,
 			imageDark = data.iconDark,
 			link = data.link,
+			size = Logic.emptyOr(data.size),
 		}
 	elseif data.iconType == 'fa' then
 		local IconFa = require('Module:Widget/Image/Icon/Fontawesome')
