@@ -8,8 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local ClassIcon = require('Module:ClassIcon')
-local String = require('Module:StringUtils')
 
 local Lua = require('Module:Lua')
 
