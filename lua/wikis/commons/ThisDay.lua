@@ -11,21 +11,22 @@ local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
-
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local CONFIG = mw.loadData('Module:ThisDay/config')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
+local CONFIG = Lua.import('Module:ThisDay/config', {loadData = true})
 
 local DEFAULT_CONFIG = {
 	tiers = {1, 2},
