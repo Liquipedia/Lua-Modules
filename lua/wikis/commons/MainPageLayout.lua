@@ -112,7 +112,7 @@ function MainPageLayout._makeCells(cells)
 end
 
 ---@param navigationData {file: string?, link: string?, count: table?, title: string?}
----@return Widget
+---@return NavigationCard
 function MainPageLayout._makeNavigationCard(navigationData)
 	local count
 	if navigationData.count then
