@@ -202,6 +202,11 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
+						noPanel = true,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 2,
 						content = CONTENT.heroes,
 					},
 					{
@@ -218,16 +223,8 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 3,
 						children = {
-							{
-								children = {
-									{
-										noPanel = true,
-										content = CONTENT.specialEvents,
-									},
-								},
-							},
 							{
 								children = {
 									{
