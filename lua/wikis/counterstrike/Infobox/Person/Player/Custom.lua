@@ -119,23 +119,13 @@ function CustomInjector:parse(id, widgets)
 		if caller.roles and #caller.roles > 0 then
 			for _, roleData in ipairs(caller.roles) do
 				local roleDisplay = CustomPlayer._displayRole(roleData)
+
 				if roleDisplay then
-					local isInGameRole = false
 					local inGameRoleKeys = {awper = true, igl = true, lurker = true, support = true, entry = true, rifler = true}
-					local isContract = false
 					local contractKeys = {standard = true, loan = true, standin = true, twoway = true}
-					for _, data in pairs(ROLES) do
-						if data == roleData and Table.includes(inGameRoleKeys, data) then
-							isInGameRole = true
-							break
-						elseif data == roleData and Table.includes(contractKeys, data) then
-							isContract = true
-							break
-						end
-					end
-					if isInGameRole then
+					if inGameRoleKeys[roleData] then
 						table.insert(inGameRoles, roleDisplay)
-					elseif isContract then
+					elseif contractKeys[roleData] then
 						table.insert(contracts, roleDisplay)
 					else
 						table.insert(positions, roleDisplay)
