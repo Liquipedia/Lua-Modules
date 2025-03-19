@@ -7,29 +7,41 @@
 --
 
 local CONTENT = {
+	about = {
+		heading = 'About Wildcard',
+		body = '<nowiki>\n</nowiki>{{Main Page About}}',
+		padding = true,
+		boxid = 1502,
+	},
 	updates = {
 		heading = 'Updates',
 		body = '<nowiki>\n</nowiki>{{Main Page Updates}}',
 		padding = true,
-		boxid = 1502,
+		boxid = 1503,
 	},
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1503,
+		boxid = 1504,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = '{{Liquipedia:Want_to_help}}',
 		padding = true,
-		boxid = 1504,
+		boxid = 1505,
 	},
 	champions = {
 		heading = 'Champions',
 		body = '{{Liquipedia:championTable}}',
 		padding = true,
 		boxid = 1501,
+	},
+	wildcards = {
+		heading = 'Wildcards',
+		body = '{{Liquipedia:Wildcards}}',
+		padding = true,
+		boxid = 1506,
 	},
 }
 
@@ -41,7 +53,12 @@ return {
 	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from champions and summons, ' ..
 		'to strategies, to tournaments, to competitive players, and teams.',
 	title = 'The Wildcard Wiki',
-	navigation = {
+	navigation = 	{
+			{
+			file = 'Wildcard gameasset Wildcard Bulwark Boost.png',
+			title = 'Wildcards',
+			link = 'Portal:Wildcards',
+		},
 		{
 			file = 'Wildcard Characters 2.jpg',
 			title = 'Champions',
@@ -59,7 +76,7 @@ return {
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::summons]]',
+				conditions = '[[type::Summon]]',
 			},
 		},
 		{
@@ -76,31 +93,11 @@ return {
 			file = 'Wildcard Frostburn Arena.jpg',
 			title = 'Mechanics',
 			link = 'Portal:Mechanics',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::mechanics]]',
-			},
 		},
 		{
-			file = 'Wildcards',
-			title = 'Wildcards',
-			link = 'Portal:Wildcards',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::wildcard]]',
-			},
-		},
-		{
-			file = 'Decks',
+			file = 'Wildcard gameasset Wildcard Bulwark Boost.png',
 			title = 'Decks',
 			link = 'Portal:Decks',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::deck]]',
-			},
 		},
 	},
 	layouts = {
@@ -108,9 +105,17 @@ return {
 			{ -- Left
 				size = 6,
 				children = {
-					{
+										{
 						mobileOrder = 1,
+						content = CONTENT.about,
+					},
+					{
+						mobileOrder = 2,
 						content = CONTENT.champions,
+					},
+					{
+						mobileOrder = 3,
+						content = CONTENT.wildcards,
 					},
 					{
 						mobileOrder = 4,
@@ -122,11 +127,11 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 5,
 						content = CONTENT.updates,
 					},
 					{
-						mobileOrder = 3,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},
