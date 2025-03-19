@@ -55,12 +55,15 @@ local CONTENT = {
 		padding = true,
 		boxid = 1510,
 	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+	},
 	heroes = {
 		heading = 'Heroes',
 		body = '{{Liquipedia:HeroTable}}',
 		padding = true,
 		boxid = 1501,
-
 	},
 	filterButtons = {
 		noPanel = true,
@@ -199,6 +202,11 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
+						noPanel = true,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 2,
 						content = CONTENT.heroes,
 					},
 					{
@@ -215,7 +223,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 3,
 						children = {
 							{
 								children = {
