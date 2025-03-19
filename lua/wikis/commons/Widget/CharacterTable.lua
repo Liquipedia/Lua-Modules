@@ -39,9 +39,9 @@ function CharacterTable:render()
 		css = {
 			['text-align'] = 'center'
 		},
-		children = Array.map(characterNames, function (characterName)
+		children = Array.interleave(Array.map(characterNames, function (characterName)
 			return Entry{name = characterName, alias = self.props.alias}
-		end)
+		end), '\n')
 	}
 end
 
