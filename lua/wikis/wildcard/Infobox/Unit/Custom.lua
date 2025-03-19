@@ -9,8 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Unit = Lua.import('Module:Infobox/Unit')
@@ -43,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Rarity', content = {args.rarity}},
 			Cell{name = 'Mana Cost', content = {args.cost}},
 			Cell{name = 'Quantity', content = {args.quantity}},
-     		Cell{name = 'Health', content = {args.health}},
+     			Cell{name = 'Health', content = {args.health}},
 			Cell{name = 'Movement Speed', content = {args.movement}},
 			Cell{name = 'Key Words', content = {args.keywords}}
 		)
