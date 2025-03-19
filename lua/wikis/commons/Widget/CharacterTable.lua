@@ -31,7 +31,7 @@ function CharacterTable:render()
 	end
 	local characterNames = Array.map(mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = conditions,
-		characterNames = 'name',
+		query = 'name',
 		order = 'name asc',
 		limit = 1000,
 	}), Operator.property('name'))
