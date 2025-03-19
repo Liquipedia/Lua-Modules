@@ -41,7 +41,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Rarity', content = {args.rarity}},
 			Cell{name = 'Mana Cost', content = {args.cost}},
 			Cell{name = 'Quantity', content = {args.quantity}},
-     			Cell{name = 'Health', content = {args.health}},
+			Cell{name = 'Health', content = {args.health}},
 			Cell{name = 'Movement Speed', content = {args.movement}},
 			Cell{name = 'Key Words', content = {args.keywords}}
 		)
