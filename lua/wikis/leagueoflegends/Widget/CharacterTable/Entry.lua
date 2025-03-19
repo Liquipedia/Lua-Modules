@@ -23,13 +23,8 @@ local TYPE_BACKGROUND_CLASS = {
 	tank = 'forest-green-bg',
 }
 
----@class CharacterTableParams
----@field name string
----@field fontSize string?
----@field size string?
----@field alias string?
-
----@class LoLCharacterTableEntry:BaseCharacterTableEntry
+---@class LoLCharacterTableEntry: BaseCharacterTableEntry
+---@operator call(table): LoLCharacterTableEntry
 ---@field lpdbProperties datapoint
 ---@field name string
 ---@field props { name: string, fontSize: string?, size: string? }

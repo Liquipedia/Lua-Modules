@@ -24,7 +24,8 @@ local Td = HtmlWidgets.Td
 ---@field size string?
 ---@field alias string?
 
----@class BaseCharacterTableEntry:Widget
+---@class BaseCharacterTableEntry: Widget
+---@operator call(table): BaseCharacterTableEntry
 ---@field lpdbProperties datapoint
 ---@field name string
 ---@field props CharacterTableEntryParams

@@ -16,8 +16,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Entry = Lua.import('Module:Widget/CharacterTable/Entry')
 
----@class CharacterTable:Widget
----@operator call(table): GridContainer
+---@class CharacterTable: Widget
+---@operator call(table): CharacterTable
 ---@field props {alias: string?}
 local CharacterTable = Class.new(Widget)
 
