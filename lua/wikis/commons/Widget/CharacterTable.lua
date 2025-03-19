@@ -29,7 +29,6 @@ function CharacterTable:render()
 		order = 'name asc',
 		limit = 1000,
 	}), Operator.property('name'))
-	mw.logObject(characterNames)
 	return Div{
 		css = {
 			['text-align'] = 'center'
