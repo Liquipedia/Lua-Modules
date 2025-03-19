@@ -69,6 +69,7 @@ function BaseCharacterTableEntry:render()
 	}
 end
 
+---@return Widget
 function BaseCharacterTableEntry:_buildUpper()
 	return HtmlWidgets.Table{
 		classes = { self:getBackgroundClass() },
@@ -100,6 +101,7 @@ function BaseCharacterTableEntry:_buildUpper()
 	}
 end
 
+---@return Widget
 function BaseCharacterTableEntry:_buildLower()
 	return HtmlWidgets.Table{
 		classes = { self:getBackgroundClass() },
