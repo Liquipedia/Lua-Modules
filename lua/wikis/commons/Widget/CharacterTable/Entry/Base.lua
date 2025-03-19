@@ -39,7 +39,7 @@ local BaseCharacterTableEntry = Class.new(Widget,
 		else
 			self.name = input.name
 		end
-        assert(Logic.isNotEmpty(self.name), 'Invalid name')
+		assert(Logic.isNotEmpty(self.name), 'Invalid name')
 		local query = mw.ext.LiquipediaDB.lpdb('datapoint', {
 			conditions = '[[type::character]] AND [[name::'.. self.name ..']]',
 		})[1]
