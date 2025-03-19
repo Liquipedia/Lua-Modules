@@ -23,18 +23,18 @@ local CharacterTable = Class.new(Widget)
 
 ---@return Widget
 function CharacterTable:render()
-	local query = Array.map(mw.ext.LiquipediaDB.lpdb('datapoint', {
+	local characterNames = Array.map(mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::character]]',
-		query = 'name',
+		characterNames = 'name',
 		order = 'name asc',
 		limit = 1000,
 	}), Operator.property('name'))
-	mw.logObject(query)
+	mw.logObject(characterNames)
 	return Div{
 		css = {
 			['text-align'] = 'center'
 		},
-		children = Array.map(query, function (characterName)
+		children = Array.map(characterNames, function (characterName)
 			return Entry{name = characterName, alias = self.props.alias}
 		end)
 	}
