@@ -6,9 +6,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 
 local Condition = {}
 
@@ -98,6 +100,7 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
+	assert(Array.any(Array.extractValues(Comparator), FnUtil.curry(Logic.deepEquals, self.comparator)))
 	local conditions = Array.map(self.comparator, function(comp)
 		return String.interpolate(
 			'[[${name}${comparator}${value}]]',
