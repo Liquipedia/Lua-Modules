@@ -133,6 +133,7 @@ function Character:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
 		image = args.image,
+		imagedark = args.imagedark or args.imagedarkmode,
 		type = 'character',
 		date = args.releasedate,
 		extradata = {},
