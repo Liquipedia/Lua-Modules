@@ -69,18 +69,36 @@ function CharacterIcon.Icon(args)
 		return nil
 	end
 
-	local characterIcons = Data[args.character:lower()]
+	local iconInfo = CharacterIcon.raw(args.character, args.date)
 
-	assert(characterIcons, 'Character:"' .. args.character .. '" was not found')
-
-	local iconInfo = CharacterIcon._getCharacterIconInfo(characterIcons, args.date)
-
+	assert(iconInfo, 'Character:"' .. args.character .. '" was not found')
 	assert(iconInfo.file, 'Character:"' .. args.character .. '" has no file set')
 
 	return CharacterIcon._makeImage(iconInfo, args.size, args.class)
 		.. (Logic.readBool(args.addTextLink)
 			and ('&nbsp;' .. Page.makeInternalLink(iconInfo.display or args.character, iconInfo.link or args.character))
 			or '')
+end
+
+---@param character string?
+---@param date string?
+---@return CharacterIconInfo?
+function CharacterIcon.raw(character, date)
+	if not CharacterIcon then
+		return nil
+	end
+	if Logic.isEmpty(character) then
+		return nil
+	end
+	---@cast character -nil
+
+	local characterIcons = Data[character:lower()]
+
+	if not characterIcons then
+		return nil
+	end
+
+	return CharacterIcon._getCharacterIconInfo(characterIcons, date)
 end
 
 return Class.export(CharacterIcon)

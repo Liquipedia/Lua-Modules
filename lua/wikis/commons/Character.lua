@@ -8,6 +8,9 @@
 
 local Array = require('Module:Array')
 local Info = require('Module:Info')
+local Lua = require('Module:Lua')
+
+local CharacterIcon = Lua.import('Module:CharacterIcon')
 
 local Character = {}
 
@@ -49,13 +52,24 @@ end
 ---@param record datapoint
 ---@return StandardCharacter
 function Character.characterFromRecord(record)
+	local name = record.name
+	local icon
+	local iconData = CharacterIcon.raw(name)
+	if iconData and iconData.file then
+		icon = iconData.file
+	else
+		icon = record.extradata.icon
+	end
+
 	---@type StandardCharacter
 	local character = {
-		name = record.name,
+		name = name,
 		pageName = record.pagename,
 		releaseDate = record.date,
-		iconLight = record.extradata.icon or record.image,
-		iconDark = record.extradata.icon or record.imagedark,
+		iconLight = icon or record.image,
+		iconDark = icon or record.imagedark,
+		imageLight = record.image,
+		imageDark = record.imagedark,
 	}
 
 	return character
