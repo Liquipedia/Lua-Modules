@@ -21,11 +21,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local BANNED = mw.loadData('Module:Banned')
-
-local ContractRoles = Lua.import('Module:ContractRoles')
-local StaffRoles = Lua.import('Module:StaffRoles')
-local InGameRoles = Lua.import('Module:InGameRoles')
-local ROLES = Table.merge(ContractRoles, StaffRoles, InGameRoles)
+local ROLES = Lua.import('Modules:Roles')
 
 ---@class CounterstrikePersonRoleData
 ---@field category string
