@@ -60,6 +60,29 @@ function ConditionTree:toString()
 
 end
 
+---@enum lpdbComparator
+local Comparator = {
+	equals = '::',
+	notEquals = '::!',
+	greaterThan = '::>',
+	lessThan = '::<',
+	greaterThanOrEqualTo = '>::',
+	lessThanOrEqualTo = '<::'
+}
+Comparator.eq = Comparator.equals
+Comparator.neq = Comparator.notEquals
+Comparator.gt = Comparator.greaterThan
+Comparator.lt = Comparator.lessThan
+Comparator.ge = Comparator.greaterThanOrEqualTo
+Comparator.le = Comparator.lessThanOrEqualTo
+
+---Checks whether the supplied comparator is natively supported by LPDB.
+---@param comparator lpdbComparator
+---@return boolean
+local function isBasicComparator(comparator)
+	return not (comparator == Comparator.greaterThanOrEqualTo or comparator == Comparator.lessThanOrEqualTo)
+end
+
 ---A condition in a ConditionTree
 ---@class ConditionNode:AbstractConditionNode
 ---@operator call(...): ConditionNode
@@ -76,27 +99,25 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
+	if isBasicComparator(self.comparator) then
+		return String.interpolate(
+			'[[${name}${comparator}${value}]]',
+			{
+				name = self.name:toString(),
+				comparator = self.comparator,
+				value = self.value
+			}
+		)
+	end
 	return String.interpolate(
-		'[[${name}${comparator}${value}]]',
+		'([[${name}${comparator}${value}]] OR [[${name}::${value}]])',
 		{
 			name = self.name:toString(),
-			comparator = self.comparator,
+			comparator = string.reverse(self.comparator),
 			value = self.value
 		}
 	)
 end
-
----@enum lpdbComparator
-local Comparator = {
-	equals = '::',
-	notEquals = '::!',
-	greaterThan = '::>',
-	lessThan = '::<'
-}
-Comparator.eq = Comparator.equals
-Comparator.neq = Comparator.notEquals
-Comparator.gt = Comparator.greaterThan
-Comparator.lt = Comparator.lessThan
 
 ---@enum lpdbBooleanOperator
 local BooleanOperator = {
