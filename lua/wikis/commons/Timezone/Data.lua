@@ -37,7 +37,7 @@ return {
 	},
 	ALMT = {
 		name = 'Alma-Ata Time',
-		offset = {6, 0},
+		offset = {5, 0},
 	},
 	AMT = {
 		name = 'Armenian Time',
