@@ -127,7 +127,7 @@ function Lua.invoke(frame)
 		'Lua.invoke: Module name should not begin with \'Module:\''
 	)
 
-	local newArgs = Table.deepCopy(frame.args)
+	local newArgs = Table.copy(frame.args)
 	newArgs.module = nil
 	newArgs.fn = nil
 	frame.args = newArgs
