@@ -6,11 +6,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Game = require('Module:Game')
 local Tier = require('Module:Tier/Utils')
+
 local Config = {}
 
-local Game = require('Module:Game')
-
+---@type FilterButtonCategory[]
 Config.categories = {
 	{
 		name = 'liquipediatier',
