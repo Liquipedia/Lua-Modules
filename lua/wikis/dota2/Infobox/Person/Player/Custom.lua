@@ -16,7 +16,6 @@ local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
@@ -29,28 +28,11 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local BANNED = mw.loadData('Module:Banned')
-local ROLES = {
-	-- Players
-	['carry'] = {category = 'Carry players', variable = 'Carry', isplayer = true},
-	['mid'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
-	['solo middle'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
-	['solomiddle'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
-	['offlane'] = {category = 'Offlaners', variable = 'Offlaner', isplayer = true},
-	['offlaner'] = {category = 'Offlaners', variable = 'Offlaner', isplayer = true},
-	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
-	['captain'] = {category = 'Captains', variable = 'Captain', isplayer = true},
 
-	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', isplayer = false},
-	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
-}
+local Roles = Lua.import('Module:Roles')
+local ROLES = Roles.All
+local InGameRoles = Roles.InGameRoles
+local ContractRoles = Roles.ContractRoles
 
 local ROLES_CATEGORY = {
 	host = 'Casters',
@@ -59,9 +41,20 @@ local ROLES_CATEGORY = {
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
+---@class Dota2PersonRoleData
+---@field category string
+---@field category2 string?
+---@field display string
+---@field display2 string?
+---@field store string?
+---@field coach boolean?
+---@field talent boolean?
+---@field management boolean?
+
 ---@class Dota2InfoboxPlayer: Person
----@field role {category: string, variable: string, isplayer: boolean?}?
----@field role2 {category: string, variable: string, isplayer: boolean?}?
+---@field role Dota2PersonRoleData?
+---@field role2 Dota2PersonRoleData?
+---@field roles Dota2PersonRoleData? 
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -84,8 +77,20 @@ function CustomPlayer.run(frame)
 
 	player.args.banned = tostring(player.args.banned or '')
 
-	player.role = player:_getRoleData(player.args.role)
-	player.role2 = player:_getRoleData(player.args.role2)
+	player.role = ROLES[(player.args.role or ''):lower()]
+	player.role2 = ROLES[(player.args.role2 or ''):lower()]
+	player.roles = {}
+	if player.args.roles then
+		local roleKeys = Array.parseCommaSeparatedString(player.args.roles)
+		for _, roleKey in ipairs(roleKeys) do
+			local key = roleKey:lower()
+			local roleData = ROLES[key]
+			if roleData then
+				table.insert(player.roles, roleData)
+			end
+		end
+	end
+
 	player.basePageName = mw.title.getCurrentTitle().baseText
 
 	return player:createInfobox()
@@ -142,12 +147,62 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{children = {args.history_odl}})
 		end
 	elseif id == 'role' then
-		return {
-			Cell{name = 'Current Role', content = {
-				caller:_displayRole(caller.role),
-				caller:_displayRole(caller.role2),
-			}},
-		}
+		local role = CustomPlayer._displayRole(caller.role)
+		local role2 = CustomPlayer._displayRole(caller.role2)
+
+		local inGameRoles = {}
+		local contracts = {}
+		local positions = {}
+
+		if caller.roles and #caller.roles > 0 then
+			for _, roleData in ipairs(caller.roles) do
+				local roleDisplay = CustomPlayer._displayRole(roleData)
+
+				if roleDisplay then
+					local roleKey
+					for key, data in pairs(ROLES) do
+						if data == roleData then
+							roleKey = key
+							break
+						end
+					end
+
+					if roleKey and InGameRoles[roleKey] then
+						table.insert(inGameRoles, roleDisplay)
+					elseif roleKey and ContractRoles[roleKey] then
+						table.insert(contracts, roleDisplay)
+					else
+						table.insert(positions, roleDisplay)
+					end
+				end
+			end
+		end
+
+		local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
+		local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
+		local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
+
+		local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
+		local positionsTitle = #positions > 1 and "Positions" or "Position"
+		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
+
+		local cells = {}
+
+		if inGameRolesDisplay then
+			table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+		else
+			table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}})
+		end
+
+		if positionsDisplay then
+			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
+		end
+
+		if contractsDisplay then
+			table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
+		end
+
+		return cells
 	end
 	return widgets
 end
@@ -158,18 +213,26 @@ function CustomPlayer:_getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
----@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@param roleData Dota2PersonRoleData?
 ---@return string?
-function CustomPlayer:_displayRole(roleData)
+function CustomPlayer._displayRole(roleData)
 	if not roleData then return end
 
-	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
-end
+	---@param postFix string|integer|nil
+	---@return string?
+	local toDisplay = function(postFix)
+		postFix = postFix or ''
+		if not roleData['category' .. postFix] then return end
+		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
+	end
 
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('role', (self.role or {}).variable)
-	Variables.varDefine('role2', (self.role2 or {}).variable)
+	local role1Display = toDisplay()
+	local role2Display = toDisplay(2)
+	if role1Display and role2Display then
+		role2Display = '(' .. role2Display .. ')'
+	end
+
+	return table.concat({role1Display, role2Display}, ' ')
 end
 
 ---@param lpdbData table
@@ -183,8 +246,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 		lpdbData.extradata['hero' .. heroIndex] = HeroNames[hero:lower()]
 	end
 
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
 	lpdbData.extradata['lc_id'] = self.basePageName:lower()
 	lpdbData.extradata.team2 = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		not String.isEmpty(args.team2link) and args.team2link or args.team2 or '')
