@@ -20,6 +20,8 @@ local Character = {}
 ---@field releaseDate string?
 ---@field iconLight string?
 ---@field iconDark string?
+---@field imageLight string?
+---@field imageDark string?
 
 local function datapointType()
 	if Info.wikiName == 'dota2' then
