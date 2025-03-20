@@ -7,11 +7,11 @@
 --
 
 local inGameRoles = {
-	['awper'] = {category = 'AWPers', display = 'AWPer', store = 'awp'},
-	['igl'] = {category = 'In-game leaders', display = 'In-game leader', store = 'igl'},
-	['lurker'] = {category = 'Riflers', display = 'Rifler', category2 = 'Lurkers', display2 = 'lurker'},
-	['support'] = {category = 'Riflers', display = 'Rifler', category2 = 'Support players', display2 = 'support'},
-	['entry'] = {category = 'Riflers', display = 'Rifler', category2 = 'Entry fraggers', display2 = 'entry fragger'},
+	['awper'] = {category = 'AWPers', display = 'AWPer'},
+	['igl'] = {category = 'In-game leaders', display = 'In-game leader'},
+	['lurker'] = {category = 'Riflers', display = 'Rifler'},
+	['support'] = {category = 'Riflers', display = 'Rifler'},
+	['entry'] = {category = 'Riflers', display = 'Rifler'},
 	['rifler'] = {category = 'Riflers', display = 'Rifler'},
 }
 

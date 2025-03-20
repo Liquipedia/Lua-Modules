@@ -7,21 +7,21 @@
 --
 
 local staffRoles = {
-	['analyst'] = {category = 'Analysts', display = 'Analyst', coach = true},
-	['broadcast analyst'] = {category = 'Broadcast Analysts', display = 'Broadcast Analyst', talent = true},
-	['observer'] = {category = 'Observers', display = 'Observer', talent = true},
-	['host'] = {category = 'Hosts', display = 'Host', talent = true},
-	['journalist'] = {category = 'Journalists', display = 'Journalist', talent = true},
-	['expert'] = {category = 'Experts', display = 'Expert', talent = true},
-	['producer'] = {category = 'Production Staff', display = 'Producer', talent = true},
-	['director'] = {category = 'Production Staff', display = 'Director', talent = true},
-	['executive'] = {category = 'Organizational Staff', display = 'Executive', management = true},
-	['coach'] = {category = 'Coaches', display = 'Coach', coach = true},
-	['assistant coach'] = {category = 'Coaches', display = 'Assistant Coach', coach = true},
-	['manager'] = {category = 'Managers', display = 'Manager', management = true},
-	['director of esport'] = {category = 'Organizational Staff', display = 'Director of Esport', management = true},
-	['caster'] = {category = 'Casters', display = 'Caster', talent = true},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
+	['analyst'] = {category = 'Analysts', display = 'Analyst'},
+	['broadcast analyst'] = {category = 'Broadcast Analysts', display = 'Broadcast Analyst'},
+	['observer'] = {category = 'Observers', display = 'Observer'},
+	['host'] = {category = 'Hosts', display = 'Host'},
+	['journalist'] = {category = 'Journalists', display = 'Journalist'},
+	['expert'] = {category = 'Experts', display = 'Expert'},
+	['producer'] = {category = 'Production Staff', display = 'Producer'},
+	['director'] = {category = 'Production Staff', display = 'Director'},
+	['executive'] = {category = 'Organizational Staff', display = 'Executive'},
+	['coach'] = {category = 'Coaches', display = 'Coach'},
+	['assistant coach'] = {category = 'Coaches', display = 'Assistant Coach'},
+	['manager'] = {category = 'Managers', display = 'Manager'},
+	['director of esport'] = {category = 'Organizational Staff', display = 'Director of Esport'},
+	['caster'] = {category = 'Casters', display = 'Caster'},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer'},
 }
 
 return staffRoles
