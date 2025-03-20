@@ -16,7 +16,6 @@ local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
@@ -51,7 +50,6 @@ local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 ---@field coach boolean?
 ---@field talent boolean?
 ---@field management boolean?
----@field variable string?
 
 ---@class Dota2InfoboxPlayer: Person
 ---@field role Dota2PersonRoleData?
@@ -79,8 +77,8 @@ function CustomPlayer.run(frame)
 
 	player.args.banned = tostring(player.args.banned or '')
 
-	player.role = player:_getRoleData(player.args.role)
-	player.role2 = player:_getRoleData(player.args.role2)
+	player.role = ROLES[(player.args.role or ''):lower()]
+	player.role2 = ROLES[(player.args.role2 or ''):lower()]
 	player.roles = {}
 	if player.args.roles then
 		local roleKeys = Array.parseCommaSeparatedString(player.args.roles)
@@ -215,29 +213,26 @@ function CustomPlayer:_getRoleData(role)
 	return ROLES[(role or ''):lower()]
 end
 
----@param roleData {category: string, variable: string, isplayer: boolean?}?
+---@param roleData Dota2PersonRoleData?
 ---@return string?
-function CustomPlayer:_displayRole(roleData)
+function CustomPlayer._displayRole(roleData)
 	if not roleData then return end
 
+	---@param postFix string|integer|nil
 	---@return string?
-	local toDisplay = function()
-		return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+	local toDisplay = function(postFix)
+		postFix = postFix or ''
+		if not roleData['category' .. postFix] then return end
+		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
 	end
 
 	local role1Display = toDisplay()
-	local role2Display = toDisplay()
+	local role2Display = toDisplay(2)
 	if role1Display and role2Display then
 		role2Display = '(' .. role2Display .. ')'
 	end
 
 	return table.concat({role1Display, role2Display}, ' ')
-end
-
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('role', (self.role or {}).variable)
-	Variables.varDefine('role2', (self.role2 or {}).variable)
 end
 
 ---@param lpdbData table
@@ -251,8 +246,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 		lpdbData.extradata['hero' .. heroIndex] = HeroNames[hero:lower()]
 	end
 
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
 	lpdbData.extradata['lc_id'] = self.basePageName:lower()
 	lpdbData.extradata.team2 = mw.ext.TeamLiquidIntegration.resolve_redirect(
 		not String.isEmpty(args.team2link) and args.team2link or args.team2 or '')
