@@ -15,6 +15,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
+local Template = require('Module:Template')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -36,6 +37,7 @@ local DEFAULT_CONFIG = {
 	tierTypes = {'!Qualifier'},
 	tierTypeBooleanOperator = BooleanOperator.any,
 	soloMode = '', -- legacy!
+	showPatches = false,
 }
 
 local Config = Table.merge(DEFAULT_CONFIG, Lua.import('Module:ThisDay/config', {loadData = true}))
@@ -156,6 +158,35 @@ end
 
 
 local ThisDay = {}
+
+---@param args table
+---@return Widget
+function ThisDay.run(args)
+	local tournaments = {
+		HtmlWidgets.H3{children = 'Tournaments'},
+		ThisDay.tournament(args)
+	}
+	local birthdays = {
+		HtmlWidgets.H3{children = 'Birthdays'},
+		ThisDay.birthday(args)
+	}
+	local patches = Config.showPatches and {
+		HtmlWidgets.H3{children = 'Patches'},
+		ThisDay.patch(args)
+	} or {}
+	local month, day = ThisDay._readDate(args)
+	local triviaText = Template.safeExpand(
+		mw.getCurrentFrame(),
+		String.interpolate('Liquipedia:This day/${month}/${day}', {month = month, day = day})
+	)
+	local trivia = String.isNotEmpty(triviaText) and {
+		HtmlWidgets.H3{children = 'Trivia'},
+		triviaText
+	} or {}
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(tournaments, birthdays, patches, trivia)
+	}
+end
 
 --- Get and display birthdays that happened on a given date (falls back to today)
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil, noTwitter: boolean?}
