@@ -69,11 +69,17 @@ local Comparator = {
 	greaterThanOrEqualTo = '>::',
 	lessThanOrEqualTo = '<::'
 }
+---@diagnostic disable-next-line: inject-field
 Comparator.eq = Comparator.equals
+---@diagnostic disable-next-line: inject-field
 Comparator.neq = Comparator.notEquals
+---@diagnostic disable-next-line: inject-field
 Comparator.gt = Comparator.greaterThan
+---@diagnostic disable-next-line: inject-field
 Comparator.lt = Comparator.lessThan
+---@diagnostic disable-next-line: inject-field
 Comparator.ge = Comparator.greaterThanOrEqualTo
+---@diagnostic disable-next-line: inject-field
 Comparator.le = Comparator.lessThanOrEqualTo
 
 ---Checks whether the supplied comparator is natively supported by LPDB.
