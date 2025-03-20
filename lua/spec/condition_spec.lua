@@ -23,10 +23,6 @@ describe('LPDB Condition Builder', function()
 			local conditionNode2 = ConditionNode(
 				ColumnName('date'), Comparator.greaterThanOrEqualTo, '2020-03-02T00:00:00.000'
 			)
-			assert.are_not_equal(
-				'[[date>::2020-03-02T00:00:00.000]]',
-				conditionNode2:toString()
-			)
 			assert.are_equal(
 				'([[date::>2020-03-02T00:00:00.000]] OR [[date::2020-03-02T00:00:00.000]])',
 				conditionNode2:toString()
@@ -36,10 +32,6 @@ describe('LPDB Condition Builder', function()
 		it('test le', function ()
 			local conditionNode3 = ConditionNode(
 				ColumnName('date'), Comparator.lessThanOrEqualTo, '2020-03-02T00:00:00.000'
-			)
-			assert.are_not_equal(
-				'[[date<::2020-03-02T00:00:00.000]]',
-				conditionNode3:toString()
 			)
 			assert.are_equal(
 				'([[date::<2020-03-02T00:00:00.000]] OR [[date::2020-03-02T00:00:00.000]])',
