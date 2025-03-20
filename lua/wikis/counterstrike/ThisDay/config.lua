@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=counterstrike
+-- page=Module:ThisDay/config
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Condition = require('Module:Condition')
 local BooleanOperator = Condition.BooleanOperator
 
