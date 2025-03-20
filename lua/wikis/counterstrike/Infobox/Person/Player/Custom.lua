@@ -21,7 +21,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local BANNED = mw.loadData('Module:Banned')
-local ROLES = Lua.import('Modules:Roles')
+local ROLES = Lua.import('Module:Roles')
 
 ---@class CounterstrikePersonRoleData
 ---@field category string
