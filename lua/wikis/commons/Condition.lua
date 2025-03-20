@@ -62,12 +62,12 @@ end
 
 ---@enum lpdbComparator
 local Comparator = {
-	equals = '::',
-	notEquals = '::!',
-	greaterThan = '::>',
-	lessThan = '::<',
-	greaterThanOrEqualTo = '>::',
-	lessThanOrEqualTo = '<::'
+	equals = {'::'},
+	notEquals = {'::!'},
+	greaterThan = {'::>'},
+	lessThan = {'::<'},
+	greaterThanOrEqualTo = {'::>', '::'},
+	lessThanOrEqualTo = {'::<', '::'},
 }
 ---@diagnostic disable-next-line: inject-field
 Comparator.eq = Comparator.equals
@@ -81,13 +81,6 @@ Comparator.lt = Comparator.lessThan
 Comparator.ge = Comparator.greaterThanOrEqualTo
 ---@diagnostic disable-next-line: inject-field
 Comparator.le = Comparator.lessThanOrEqualTo
-
----Checks whether the supplied comparator is natively supported by LPDB.
----@param comparator lpdbComparator
----@return boolean
-local function isBasicComparator(comparator)
-	return not (comparator == Comparator.greaterThanOrEqualTo or comparator == Comparator.lessThanOrEqualTo)
-end
 
 ---A condition in a ConditionTree
 ---@class ConditionNode:AbstractConditionNode
@@ -105,24 +98,19 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
-	if isBasicComparator(self.comparator) then
+	local conditions = Array.map(self.comparator, function(comp)
 		return String.interpolate(
 			'[[${name}${comparator}${value}]]',
 			{
 				name = self.name:toString(),
-				comparator = self.comparator,
+				comparator = comp,
 				value = self.value
 			}
 		)
-	end
-	return String.interpolate(
-		'([[${name}${comparator}${value}]] OR [[${name}::${value}]])',
-		{
-			name = self.name:toString(),
-			comparator = string.reverse(self.comparator),
-			value = self.value
-		}
-	)
+	end)
+
+	if #conditions == 1 then return conditions[1] end
+	return '(' .. table.concat(conditions, ' OR ') .. ')'
 end
 
 ---@enum lpdbBooleanOperator
