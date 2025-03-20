@@ -299,7 +299,7 @@ end
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
 ---@return integer|string
 function ThisDay._readDate(args)
-	local date = String.isNotEmpty(args.date) and args.date or os.date('%Y-%m-%d')
+	local date = Logic.emptyOr(args.date, os.date('%Y-%m-%d'))
 	local dateArray = mw.text.split(date, '-', true)
 
 	return tonumber(args.month) or dateArray[#dateArray - 1], tonumber(args.day) or dateArray[#dateArray]
