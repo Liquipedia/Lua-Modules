@@ -121,11 +121,17 @@ function CustomInjector:parse(id, widgets)
 				local roleDisplay = CustomPlayer._displayRole(roleData)
 
 				if roleDisplay then
-					local inGameRoleKeys = {"awper", "igl", "lurker", "support", "entry", "rifler"}
-					local contractKeys = {"standard", "loan", "standin", "twoway"}
-					if Table.includes(inGameRoleKeys, roleData) then
+					local roleKey
+					for key, data in pairs(ROLES) do
+						if data == roleData then
+							roleKey = key
+							break
+						end
+					end
+
+					if roleKey and InGameRoles[roleKey] then
 						table.insert(inGameRoles, roleDisplay)
-					elseif Table.includes(contractKeys, roleData) then
+					elseif roleKey and ContractRoles[roleKey] then
 						table.insert(contracts, roleDisplay)
 					else
 						table.insert(positions, roleDisplay)
