@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
@@ -40,10 +39,7 @@ end
 
 ---@return string
 function LoLCharacterTableEntry:getBackgroundClass()
-	return Logic.emptyOr(
-		TYPE_BACKGROUND_CLASS[self.lpdbProperties.information:lower()],
-		BaseEntry.DEFAULT_BACKGROUND_CLASS
-	) --[[@as string]]
+	return TYPE_BACKGROUND_CLASS[self.lpdbProperties.information:lower()] or BaseEntry.DEFAULT_BACKGROUND_CLASS
 end
 
 return LoLCharacterTableEntry
