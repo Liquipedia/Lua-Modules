@@ -27,6 +27,10 @@ local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+
 local CONFIG = Lua.import('Module:ThisDay/config', {loadData = true})
 
 local DEFAULT_CONFIG = {
@@ -41,7 +45,7 @@ local Query = {}
 --- Queries birthday data
 ---@param month integer
 ---@param day integer
----@return table?
+---@return player[]?
 function Query.birthday(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -66,7 +70,7 @@ end
 --- Queries patch data
 ---@param month integer
 ---@param day integer
----@return table?
+---@return datapoint?
 function Query.patch(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -91,7 +95,7 @@ end
 --- Queries tournament win data
 ---@param month integer
 ---@param day integer
----@return table?
+---@return placement[]?
 function Query.tournament(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -154,23 +158,22 @@ local ThisDay = {}
 
 --- Get and display birthdays that happened on a given date (falls back to today)
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil, noTwitter: boolean?}
----@return string
+---@return string|Widget?
 function ThisDay.birthday(args)
 	local birthdayData = Query.birthday(ThisDay._readDate(args))
 
 	if not birthdayData then
 		return 'There are no birthdays today'
 	else
-		local nowArray = mw.text.split(os.date('%Y-%m-%d'), '-', true)
-		local lines = {}
-		for _, player in ipairs(birthdayData) do
-			local birthdateArray = mw.text.split(player.birthdate, '-', true)
-			local birthYear = birthdateArray[1]
-			local age = tonumber(nowArray[1]) - tonumber(birthdateArray[1])
+		local now = DateExt.parseIsoDate(os.date('%Y-%m-%d') --[[@as string]])
+		local lines = Array.map(birthdayData, function (player)
+			local birthdate = DateExt.parseIsoDate(player.birthdate)
+			local birthYear = birthdate.year
+			local age = now.year - birthYear
 			if
-				birthdateArray[2] > nowArray[2] or (
-					birthdateArray[2] == nowArray[2]
-					and birthdateArray[3] > nowArray[3]
+				birthdate.month > now.month or (
+					birthdate.month == now.month
+					and birthdate.day > now.day
 				)
 			then
 				age = age - 1
@@ -181,47 +184,65 @@ function ThisDay.birthday(args)
 				pageName = player.pagename,
 				faction = (player.extradata or {}).faction,
 			}
-			local line = '* ' .. tostring(OpponentDisplay.InlineOpponent{
-				opponent = {players = {playerData}, type = Opponent.solo}
-			}) .. ' - ' .. birthYear .. ' (age ' .. age .. ')'
+			local line = {
+				OpponentDisplay.InlineOpponent{
+					opponent = {players = {playerData}, type = Opponent.solo}
+				},
+				' - ',
+				birthYear .. ' (age ' .. age .. ')'
+			}
 
 			if String.isNotEmpty((player.links or {}).twitter) and not Logic.readBool(args.noTwitter) then
-				line = line .. ' <i class="lp-icon lp-icon-25 lp-twitter share-birthday" data-url="'
-					.. player.links.twitter .. '" data-page="' .. player.pagename
-					.. '" title="Send a message to ' .. player.id
-					.. ' about their birthday!" style="cursor:pointer;"></i>'
+				Array.appendWith(
+					line,
+					' ',
+					HtmlWidgets.I{
+						classes = {'lp-icon', 'lp-icon-25', 'lp-twitter', 'share-birthday'},
+						attributes = {
+							['data-url'] = player.links.twitter,
+							['data-page'] = player.pagename,
+							title = 'Send a message to ' .. player.id .. ' about their birthday!'
+						},
+						css = {cursor = 'pointer'}
+					}
+				)
 			end
 
-			table.insert(lines, line)
-		end
+			return line
+		end)
 
-		return table.concat(lines, '\n')
+		return ThisDay._buildListWidget(lines)
 	end
 end
 
 --- Get and display patches that happened on a given date (falls back to today)
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
----@return string
+---@return string|Widget?
 function ThisDay.patch(args)
 	local patchData = Query.patch(ThisDay._readDate(args))
 
 	if not patchData then
 		return 'There were no patches on this day'
 	else
-		local lines = {}
-
-		for _, patch in ipairs(patchData) do
+		local lines = Array.map(patchData, function (patch)
 			local patchYear = patch.date:sub(1, 4)
-			table.insert(lines, '* <b>' .. patchYear .. '</b>: [[' .. patch.pagename .. ' |' .. patch.name .. ']] released')
-		end
+			return {
+				HtmlWidgets.B{
+					children = {patchYear}
+				},
+				': ',
+				Link{link = patch.pagename, children = patch.name},
+				' released'
+			}
+		end)
 
-		return table.concat(lines, '\n')
+		return ThisDay._buildListWidget(lines)
 	end
 end
 
 --- Get and display tournament wins that happened on a given date (falls back to today)
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
----@return string
+---@return string|Widget?
 function ThisDay.tournament(args)
 	local tournamentWinData = Query.tournament(ThisDay._readDate(args))
 
@@ -233,20 +254,24 @@ function ThisDay.tournament(args)
 
 		local display = {}
 		for year, yearData in Table.iter.spairs(byYear) do
-			table.insert(display, '====' .. year .. '====')
-			table.insert(display, ThisDay._displayWins(yearData))
+			Array.appendWith(display,
+				HtmlWidgets.H4{
+					children = { year }
+				},
+				'\n',
+				ThisDay._displayWins(yearData)
+			)
 		end
-
-		return table.concat(display, '\n')
+		mw.logObject(display)
+		return HtmlWidgets.Fragment{children = display}
 	end
 end
 
 --- Display win rows of a year
----@param yearData table
----@return string
+---@param yearData placement[]
+---@return Widget?
 function ThisDay._displayWins(yearData)
-	local display = {}
-	for _, placement in ipairs(yearData) do
+	local display = Array.map(yearData, function (placement)
 		local displayName = placement.shortname
 		if String.isEmpty(displayName) then
 			displayName = placement.tournament
@@ -255,14 +280,19 @@ function ThisDay._displayWins(yearData)
 			end
 		end
 
-		local row = '* ' .. LeagueIcon.display{
-			icon = placement.icon,
-			iconDark = placement.icondark,
-			link = placement.pagename,
-			date = placement.date,
-			series = placement.series,
-			name = placement.shortname,
-		} .. ' [[' .. placement.pagename .. '|' .. displayName .. ']] won by '
+		local row = {
+			LeagueIcon.display{
+				icon = placement.icon,
+				iconDark = placement.icondark,
+				link = placement.pagename,
+				date = placement.date,
+				series = placement.series,
+				name = placement.shortname,
+			},
+			' ',
+			Link{ link = placement.pagename, children = displayName },
+			' won by '
+		}
 
 		local opponent
 		if placement.opponenttype then
@@ -289,21 +319,36 @@ function ThisDay._displayWins(yearData)
 		if not opponent then
 			mw.logObject(placement)
 		end
-		table.insert(display, row .. tostring(OpponentDisplay.InlineOpponent{opponent = opponent}))
-	end
+		return Array.append(row, OpponentDisplay.InlineOpponent{opponent = opponent})
+	end)
 
-	return table.concat(display, '\n')
+	return ThisDay._buildListWidget(display)
 end
 
 --- Read date/month/day input
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
----@return integer|string
+---@return integer
+---@return integer
 function ThisDay._readDate(args)
-	local date = Logic.emptyOr(args.date, os.date('%Y-%m-%d'))
+	local date = Logic.emptyOr(args.date, os.date('%Y-%m-%d')) --[[@as string]]
 	local dateArray = mw.text.split(date, '-', true)
 
-	return tonumber(args.month) or dateArray[#dateArray - 1], tonumber(args.day) or dateArray[#dateArray]
+	return tonumber(args.month or dateArray[#dateArray - 1]) --[[@as integer]],
+		tonumber(args.day or dateArray[#dateArray]) --[[@as integer]]
 end
 
+--- Build list widget from an array of elements
+---@param arr ((string|Html|Widget|nil)|((string|Html|Widget|nil)[]))[]
+---@return Widget?
+function ThisDay._buildListWidget(arr)
+	if Logic.isEmpty(arr) then return end
+	return HtmlWidgets.Ul{
+		children = Array.map(arr, function (element)
+			return HtmlWidgets.Li{
+				children = WidgetUtil.collect(element)
+			}
+		end)
+	}
+end
 
 return Class.export(ThisDay)
