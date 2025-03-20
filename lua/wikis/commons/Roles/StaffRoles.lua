@@ -21,6 +21,7 @@ local staffRoles = {
 	['manager'] = {category = 'Managers', display = 'Manager', management = true},
 	['director of esport'] = {category = 'Organizational Staff', display = 'Director of Esport', management = true},
 	['caster'] = {category = 'Casters', display = 'Caster', talent = true},
+	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
 
 return staffRoles

@@ -29,28 +29,11 @@ local Title = Widgets.Title
 local Center = Widgets.Center
 
 local BANNED = mw.loadData('Module:Banned')
-local ROLES = {
-	-- Players
-	['carry'] = {category = 'Carry players', variable = 'Carry', isplayer = true},
-	['mid'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
-	['solo middle'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
-	['solomiddle'] = {category = 'Solo middle players', variable = 'Solo Middle', isplayer = true},
-	['offlane'] = {category = 'Offlaners', variable = 'Offlaner', isplayer = true},
-	['offlaner'] = {category = 'Offlaners', variable = 'Offlaner', isplayer = true},
-	['support'] = {category = 'Support players', variable = 'Support', isplayer = true},
-	['captain'] = {category = 'Captains', variable = 'Captain', isplayer = true},
 
-	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', isplayer = false},
-	['expert'] = {category = 'Experts', variable = 'Expert', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['manager'] = {category = 'Managers', variable = 'Manager', isplayer = false},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
-}
+local Roles = Lua.import('Module:Roles')
+local ROLES = Roles.All
+local InGameRoles = Roles.InGameRoles
+local ContractRoles = Roles.ContractRoles
 
 local ROLES_CATEGORY = {
 	host = 'Casters',
@@ -86,6 +69,18 @@ function CustomPlayer.run(frame)
 
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
+	player.roles = {}
+	if player.args.roles then
+		local roleKeys = Array.parseCommaSeparatedString(player.args.roles)
+		for _, roleKey in ipairs(roleKeys) do
+			local key = roleKey:lower()
+			local roleData = ROLES[key]
+			if roleData then
+				table.insert(player.roles, roleData)
+			end
+		end
+	end
+
 	player.basePageName = mw.title.getCurrentTitle().baseText
 
 	return player:createInfobox()
@@ -142,12 +137,62 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{children = {args.history_odl}})
 		end
 	elseif id == 'role' then
-		return {
-			Cell{name = 'Current Role', content = {
-				caller:_displayRole(caller.role),
-				caller:_displayRole(caller.role2),
-			}},
-		}
+		local role = CustomPlayer._displayRole(caller.role)
+		local role2 = CustomPlayer._displayRole(caller.role2)
+
+		local inGameRoles = {}
+		local contracts = {}
+		local positions = {}
+
+		if caller.roles and #caller.roles > 0 then
+			for _, roleData in ipairs(caller.roles) do
+				local roleDisplay = CustomPlayer._displayRole(roleData)
+
+				if roleDisplay then
+					local roleKey
+					for key, data in pairs(ROLES) do
+						if data == roleData then
+							roleKey = key
+							break
+						end
+					end
+
+					if roleKey and InGameRoles[roleKey] then
+						table.insert(inGameRoles, roleDisplay)
+					elseif roleKey and ContractRoles[roleKey] then
+						table.insert(contracts, roleDisplay)
+					else
+						table.insert(positions, roleDisplay)
+					end
+				end
+			end
+		end
+
+		local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
+		local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
+		local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
+
+		local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
+		local positionsTitle = #positions > 1 and "Positions" or "Position"
+		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
+
+		local cells = {}
+
+		if inGameRolesDisplay then
+			table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+		else
+			table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}})
+		end
+
+		if positionsDisplay then
+			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
+		end
+
+		if contractsDisplay then
+			table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
+		end
+
+		return cells
 	end
 	return widgets
 end
