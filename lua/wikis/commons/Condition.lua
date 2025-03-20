@@ -100,7 +100,10 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
-	assert(Array.any(Array.extractValues(Comparator), FnUtil.curry(Logic.deepEquals, self.comparator)))
+	assert(
+		Array.any(Array.extractValues(Comparator), FnUtil.curry(Logic.deepEquals, self.comparator)),
+		'Invalid comparator for LPDB query condition'
+	)
 	local conditions = Array.map(self.comparator, function(comp)
 		return String.interpolate(
 			'[[${name}${comparator}${value}]]',
