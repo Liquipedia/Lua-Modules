@@ -31,14 +31,14 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CONFIG = Lua.import('Module:ThisDay/config', {loadData = true})
-
 local DEFAULT_CONFIG = {
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
 	tierTypeBooleanOperator = BooleanOperator.any,
 	soloMode = '', -- legacy!
 }
+
+local Config = Table.merge(DEFAULT_CONFIG, Lua.import('Module:ThisDay/config', {loadData = true}))
 
 local Query = {}
 
@@ -112,12 +112,13 @@ function Query.tournament(month, day)
 		}
 	conditions:add(Query._multiValueCondition(
 		'liquipediatier',
-		CONFIG.tiers or DEFAULT_CONFIG.tiers,
+		Config.tiers,
 		BooleanOperator.any
 	))
 	conditions:add(Query._multiValueCondition(
 		'liquipediatiertype',
-		CONFIG.tierTypes or DEFAULT_CONFIG.tierTypes, CONFIG.tierTypeBooleanOperator or DEFAULT_CONFIG.tierTypeBooleanOperator
+		Config.tierTypes,
+		Config.tierTypeBooleanOperator
 	))
 
 	local tournamentWinData = mw.ext.LiquipediaDB.lpdb('placement', {
@@ -299,7 +300,7 @@ function ThisDay._displayWins(yearData)
 			opponent = Opponent.fromLpdbStruct(placement)
 
 		-- legacy opponent building
-		elseif placement.mode == CONFIG.soloMode then
+		elseif placement.mode == Config.soloMode then
 			opponent = {
 				type = Opponent.solo,
 				players = {
