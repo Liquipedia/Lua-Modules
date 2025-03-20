@@ -42,9 +42,21 @@ local ROLES_CATEGORY = {
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
+---@class Dota2PersonRoleData
+---@field category string
+---@field category2 string?
+---@field display string
+---@field display2 string?
+---@field store string?
+---@field coach boolean?
+---@field talent boolean?
+---@field management boolean?
+---@field variable string?
+
 ---@class Dota2InfoboxPlayer: Person
----@field role {category: string, variable: string, isplayer: boolean?}?
----@field role2 {category: string, variable: string, isplayer: boolean?}?
+---@field role Dota2PersonRoleData?
+---@field role2 Dota2PersonRoleData?
+---@field roles Dota2PersonRoleData? 
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -208,7 +220,18 @@ end
 function CustomPlayer:_displayRole(roleData)
 	if not roleData then return end
 
-	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+	---@return string?
+	local toDisplay = function()
+		return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+	end
+
+	local role1Display = toDisplay()
+	local role2Display = toDisplay()
+	if role1Display and role2Display then
+		role2Display = '(' .. role2Display .. ')'
+	end
+
+	return table.concat({role1Display, role2Display}, ' ')
 end
 
 ---@param args table

@@ -257,29 +257,6 @@ function CustomPlayer._displayRole(roleData)
 	return table.concat({role1Display, role2Display}, ' ')
 end
 
----@param rolesTable CounterstrikePersonRoleData[]?
----@return string?
-function CustomPlayer._displayRoles(rolesTable)
-	if not rolesTable or #rolesTable == 0 then
-		return nil
-	end
-
-	local displayedRoles = {}
-
-	for _, roleData in ipairs(rolesTable) do
-		local roleDisplay = CustomPlayer._displayRole(roleData)
-		if roleDisplay then
-			table.insert(displayedRoles, roleDisplay)
-		end
-	end
-
-	if #displayedRoles == 0 then
-		return nil
-	end
-
-	return table.concat(displayedRoles, ", ")
-end
-
 ---@param args table
 ---@return {store: string, category: string}
 function CustomPlayer:getPersonType(args)
