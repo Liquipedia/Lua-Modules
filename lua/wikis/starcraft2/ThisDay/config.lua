@@ -8,6 +8,7 @@
 
 ---@type ThisDayConfig
 return {
+	hideEmptyBirthdayList = true,
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier', '!Charity'},
 	showPatches = true,
