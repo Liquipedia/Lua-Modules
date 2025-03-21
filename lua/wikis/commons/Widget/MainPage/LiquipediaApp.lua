@@ -21,7 +21,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK_CIRCLE = IconFa{
-	iconName = 'appfeature',
+	iconName = 'checkcircle',
 	color = 'forest-green-non-text',
 	additionalClasses = { 'fa-lg' },
 	additionalCss = {

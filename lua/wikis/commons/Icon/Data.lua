@@ -114,8 +114,8 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
-	-- Usage: Main Page app panel
-	appfeature = 'fas fa-check-circle',
+	-- Usage: Main Page
+	checkcircle = 'fas fa-check-circle',
 
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
