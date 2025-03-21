@@ -11,5 +11,4 @@ return {
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
 	showPatches = true,
-	showEmptyBirthdayList = true,
 }

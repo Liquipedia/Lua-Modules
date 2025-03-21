@@ -33,8 +33,8 @@ local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ThisDayConfig
+---@field hideEmptyBirthdayList boolean?
 ---@field showPatches boolean?
----@field showEmptyBirthdayList boolean?
 ---@field showEmptyPatchList boolean?
 ---@field showTrivia boolean?
 ---@field tiers integer[]
@@ -174,7 +174,8 @@ function ThisDay.birthday(args)
 	local birthdayData = Query.birthday(ThisDay._readDate(args))
 
 	if Logic.isEmpty(birthdayData) then
-		return Config.showEmptyBirthdayList and 'There are no birthdays today' or nil
+		if Config.hideEmptyBirthdayList then return end
+		return 'There are no birthdays today'
 	else
 		local now = DateExt.parseIsoDate(os.date('%Y-%m-%d') --[[@as string]])
 		local lines = Array.map(birthdayData, function (player)
