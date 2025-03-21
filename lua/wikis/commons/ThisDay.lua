@@ -281,8 +281,7 @@ function ThisDay.tournament(args)
 	if not tournamentWinData then
 		return 'No tournament ended on this date'
 	else
-		local byYear
-		_, byYear = Array.groupBy(tournamentWinData, function(placement) return placement.date:sub(1, 4) end)
+		local _, byYear = Array.groupBy(tournamentWinData, function(placement) return placement.date:sub(1, 4) end)
 
 		local display = {}
 		for year, yearData in Table.iter.spairs(byYear) do
