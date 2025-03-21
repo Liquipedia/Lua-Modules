@@ -35,7 +35,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local DEFAULT_CONFIG = {
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
-	tierTypeBooleanOperator = BooleanOperator.any,
 	soloMode = '', -- legacy!
 	showPatches = false,
 }
@@ -120,7 +119,7 @@ function Query.tournament(month, day)
 	conditions:add(Query._multiValueCondition(
 		'liquipediatiertype',
 		Config.tierTypes,
-		Config.tierTypeBooleanOperator
+		BooleanOperator.all
 	))
 
 	local tournamentWinData = mw.ext.LiquipediaDB.lpdb('placement', {
