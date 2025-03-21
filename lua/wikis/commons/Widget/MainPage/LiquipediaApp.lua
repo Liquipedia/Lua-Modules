@@ -22,7 +22,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK_CIRCLE = IconFa{
 	iconName = 'appfeature',
-	color = 'forest-gren-non-text',
+	color = 'forest-green-non-text',
 	additionalClasses = { 'fa-lg' },
 	additionalCss = {
 		['margin-left'] = '-0.1em',
