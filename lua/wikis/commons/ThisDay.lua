@@ -37,6 +37,8 @@ local DEFAULT_CONFIG = {
 	tierTypes = {'!Qualifier'},
 	soloMode = 'individual', -- legacy!
 	showPatches = false,
+	showEmptyBirthdayList = true,
+	showEmptyPatchList = true,
 }
 
 local Config = Table.merge(DEFAULT_CONFIG, Lua.requireIfExists('Module:ThisDay/config', {loadData = true}))
@@ -46,7 +48,7 @@ local Query = {}
 --- Queries birthday data
 ---@param month integer
 ---@param day integer
----@return player[]?
+---@return player[]
 function Query.birthday(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -56,22 +58,18 @@ function Query.birthday(month, day)
 			ConditionNode(ColumnName('birthdate'), Comparator.neq, DateExt.defaultDate),
 		}
 
-	local birthdayData = mw.ext.LiquipediaDB.lpdb('player', {
+	return mw.ext.LiquipediaDB.lpdb('player', {
 		limit = 5000,
 		conditions = conditions:toString(),
 		query = 'extradata, pagename, id, birthdate, nationality, links',
 		order = 'birthdate asc, id asc'
 	})
-
-	if type(birthdayData[1]) == 'table' then
-		return birthdayData
-	end
 end
 
 --- Queries patch data
 ---@param month integer
 ---@param day integer
----@return datapoint?
+---@return datapoint[]
 function Query.patch(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -81,22 +79,18 @@ function Query.patch(month, day)
 			ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
 		}
 
-	local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
+	return mw.ext.LiquipediaDB.lpdb('datapoint', {
 		limit = 5000,
 		conditions = conditions:toString(),
 		query = 'pagename, name, date',
 		order = 'date asc, name asc'
 	})
-
-	if type(patchData[1]) == 'table' then
-		return patchData
-	end
 end
 
 --- Queries tournament win data
 ---@param month integer
 ---@param day integer
----@return placement[]?
+---@return placement[]
 function Query.tournament(month, day)
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{
@@ -122,7 +116,7 @@ function Query.tournament(month, day)
 		BooleanOperator.all
 	))
 
-	local tournamentWinData = mw.ext.LiquipediaDB.lpdb('placement', {
+	return mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = 5000,
 		conditions = conditions:toString(),
 		query = 'extradata, pagename, date, icon, icondark, shortname, tournament, series, '
@@ -130,10 +124,6 @@ function Query.tournament(month, day)
 			.. ', mode, participant, participantflag, participanttemplate', --this line for legacy reasons
 		order = 'date asc, pagename asc'
 	})
-
-	if type(tournamentWinData[1]) == 'table' then
-		return tournamentWinData
-	end
 end
 
 --- build conditions for multi variable
@@ -161,17 +151,19 @@ local ThisDay = {}
 ---@param args table
 ---@return Widget
 function ThisDay.run(args)
+	local birthdaysList = ThisDay.birthday(args)
+	local patchesList = ThisDay.patch(args)
 	local tournaments = {
 		HtmlWidgets.H3{children = 'Tournaments'},
 		ThisDay.tournament(args)
 	}
-	local birthdays = {
+	local birthdays = birthdaysList and {
 		HtmlWidgets.H3{children = 'Birthdays'},
 		ThisDay.birthday(args)
 	}
-	local patches = Config.showPatches and {
+	local patches = patchesList and {
 		HtmlWidgets.H3{children = 'Patches'},
-		ThisDay.patch(args)
+		patchesList
 	} or {}
 	local month, day = ThisDay._readDate(args)
 	local triviaText = Template.safeExpand(
@@ -193,8 +185,8 @@ end
 function ThisDay.birthday(args)
 	local birthdayData = Query.birthday(ThisDay._readDate(args))
 
-	if not birthdayData then
-		return 'There are no birthdays today'
+	if Logic.isEmpty(birthdayData) then
+		return Config.showEmptyBirthdayList and 'There are no birthdays today' or nil
 	else
 		local now = DateExt.parseIsoDate(os.date('%Y-%m-%d') --[[@as string]])
 		local lines = Array.map(birthdayData, function (player)
@@ -250,10 +242,11 @@ end
 ---@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
 ---@return string|Widget?
 function ThisDay.patch(args)
+	if not Config.showPatches then return end
 	local patchData = Query.patch(ThisDay._readDate(args))
 
-	if not patchData then
-		return 'There were no patches on this day'
+	if Logic.isEmpty(patchData) then
+		return Config.showEmptyPatchList and 'There were no patches on this day' or nil
 	else
 		local lines = Array.map(patchData, function (patch)
 			local patchYear = patch.date:sub(1, 4)
@@ -277,7 +270,7 @@ end
 function ThisDay.tournament(args)
 	local tournamentWinData = Query.tournament(ThisDay._readDate(args))
 
-	if not tournamentWinData then
+	if Logic.isEmpty(tournamentWinData) then
 		return 'No tournament ended on this date'
 	else
 		local _, byYear = Array.groupBy(tournamentWinData, function(placement) return placement.date:sub(1, 4) end)
