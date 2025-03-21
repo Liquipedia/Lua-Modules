@@ -35,11 +35,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local DEFAULT_CONFIG = {
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
-	soloMode = '', -- legacy!
+	soloMode = 'individual', -- legacy!
 	showPatches = false,
 }
 
-local Config = Table.merge(DEFAULT_CONFIG, Lua.import('Module:ThisDay/config', {loadData = true}))
+local Config = Table.merge(DEFAULT_CONFIG, Lua.requireIfExists('Module:ThisDay/config', {loadData = true}))
 
 local Query = {}
 
