@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -35,7 +34,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local DEFAULT_CONFIG = {
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
-	soloMode = 'individual', -- legacy!
 	showPatches = false,
 	showEmptyBirthdayList = true,
 	showEmptyPatchList = true,
@@ -310,27 +308,7 @@ function ThisDay._displayWins(yearData)
 			' won by '
 		}
 
-		local opponent
-		if placement.opponenttype then
-			opponent = Opponent.fromLpdbStruct(placement)
-
-		-- legacy opponent building
-		elseif placement.mode == Config.soloMode then
-			opponent = {
-				type = Opponent.solo,
-				players = {
-					displayName = placement.extradata.participantname or placement.participant,
-					flag = Flags.CountryName(placement.participantflag),
-					pageName = placement.participant,
-				},
-			}
-		else
-			opponent = {
-				type = Opponent.team,
-				name = placement.participant,
-				template = placement.participanttemplate or placement.participant:lower():gsub('_', ' '),
-			}
-		end
+		local opponent = Opponent.fromLpdbStruct(placement)
 
 		if not opponent then
 			mw.logObject(placement)
