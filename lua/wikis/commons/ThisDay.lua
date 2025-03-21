@@ -39,6 +39,7 @@ local DEFAULT_CONFIG = {
 	showPatches = false,
 	showEmptyBirthdayList = true,
 	showEmptyPatchList = true,
+	showTrivia = false,
 }
 
 local Config = Table.merge(DEFAULT_CONFIG, Lua.requireIfExists('Module:ThisDay/config', {loadData = true}))
@@ -165,15 +166,7 @@ function ThisDay.run(args)
 		HtmlWidgets.H3{children = 'Patches'},
 		patchesList
 	} or {}
-	local month, day = ThisDay._readDate(args)
-	local triviaText = Template.safeExpand(
-		mw.getCurrentFrame(),
-		String.interpolate('Liquipedia:This day/${month}/${day}', {month = month, day = day})
-	)
-	local trivia = String.isNotEmpty(triviaText) and {
-		HtmlWidgets.H3{children = 'Trivia'},
-		triviaText
-	} or {}
+	local trivia = Config.showTrivia and ThisDay.trivia(args) or nil
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(tournaments, birthdays, patches, trivia)
 	}
@@ -346,6 +339,21 @@ function ThisDay._displayWins(yearData)
 	end)
 
 	return ThisDay._buildListWidget(display)
+end
+
+--- Reads trivia from subpages of 'Liquipedia:This day'
+---@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
+---@return (string|Widget)[]
+function ThisDay.trivia(args)
+	local month, day = ThisDay._readDate(args)
+	local triviaText = Template.safeExpand(
+		mw.getCurrentFrame(),
+		String.interpolate('Liquipedia:This day/${month}/${day}', {month = month, day = day})
+	)
+	return String.isNotEmpty(triviaText) and {
+		HtmlWidgets.H3{children = 'Trivia'},
+		triviaText
+	} or {}
 end
 
 --- Read date/month/day input
