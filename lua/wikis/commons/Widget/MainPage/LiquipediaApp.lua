@@ -77,7 +77,7 @@ function LiquipediaApp:render()
 							GREEN_CHECK_CIRCLE,
 							'Available in ',
 							Array.interleave(Array.map({'ru', 'br', 'fr', 'es', 'cn', 'de', 'jp'}, function (country)
-								return Flags.Icon({shouldLink = false}, country)
+								return Flags.Icon{shouldLink = false, flag = country}
 							end), ' '),
 							' and 12 more languages!'
 						},
