@@ -12,6 +12,6 @@ return {
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
 	showPatches = false,
-	showEmptyPatchList = true,
+	showEmptyPatchList = false,
 	showTrivia = false,
 }
