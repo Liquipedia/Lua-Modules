@@ -47,7 +47,8 @@ end
 function Character.getAllCharacters()
 	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = '[[type::' .. datapointType() .. ']]',
-	})[1]
+		limit = 5000,
+	})
 	return Array.map(records, Character.characterFromRecord)
 end
 
