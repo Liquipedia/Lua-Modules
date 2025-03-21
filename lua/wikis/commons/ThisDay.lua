@@ -29,6 +29,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ThisDayConfig
@@ -224,7 +225,7 @@ function ThisDay.birthday(args)
 			return line
 		end)
 
-		return ThisDay._buildListWidget(lines)
+		return UnorderedList{ children = lines }
 	end
 end
 
@@ -250,7 +251,7 @@ function ThisDay.patch(args)
 			}
 		end)
 
-		return ThisDay._buildListWidget(lines)
+		return UnorderedList{ children = lines }
 	end
 end
 
@@ -315,7 +316,7 @@ function ThisDay._displayWins(yearData)
 		return Array.append(row, OpponentDisplay.InlineOpponent{opponent = opponent})
 	end)
 
-	return ThisDay._buildListWidget(display)
+	return UnorderedList{ children = display }
 end
 
 --- Reads trivia from subpages of 'Liquipedia:This day'
@@ -343,20 +344,6 @@ function ThisDay._readDate(args)
 
 	return tonumber(args.month or dateArray[#dateArray - 1]) --[[@as integer]],
 		tonumber(args.day or dateArray[#dateArray]) --[[@as integer]]
-end
-
---- Build list widget from an array of elements
----@param arr ((string|Html|Widget|nil)|((string|Html|Widget|nil)[]))[]
----@return Widget?
-function ThisDay._buildListWidget(arr)
-	if Logic.isEmpty(arr) then return end
-	return HtmlWidgets.Ul{
-		children = Array.map(arr, function (element)
-			return HtmlWidgets.Li{
-				children = WidgetUtil.collect(element)
-			}
-		end)
-	}
 end
 
 return Class.export(ThisDay)
