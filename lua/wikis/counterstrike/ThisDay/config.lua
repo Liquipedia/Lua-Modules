@@ -7,7 +7,5 @@
 --
 
 return {
-	tiers = {1, 2},
 	tierTypes = {'!Qualifier', '!Points', '!Showmatch'},
-	soloMode = 'individual',
 }

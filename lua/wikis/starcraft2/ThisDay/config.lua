@@ -7,6 +7,5 @@
 --
 
 return {
-	tiers = {1, 2},
 	tierTypes = {'!Qualifier', '!Charity'},
 }
