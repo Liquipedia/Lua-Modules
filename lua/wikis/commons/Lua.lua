@@ -9,6 +9,7 @@
 local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local StringUtils = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Lua = {}
 
@@ -126,8 +127,10 @@ function Lua.invoke(frame)
 		'Lua.invoke: Module name should not begin with \'Module:\''
 	)
 
-	frame.args.module = nil
-	frame.args.fn = nil
+	local newArgs = Table.copy(frame.args)
+	newArgs.module = nil
+	newArgs.fn = nil
+	frame.args = newArgs
 
 	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
