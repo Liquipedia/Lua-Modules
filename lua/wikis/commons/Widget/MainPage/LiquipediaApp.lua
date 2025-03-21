@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -18,6 +17,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK_CIRCLE = IconFa{
@@ -64,7 +64,11 @@ function LiquipediaApp:render()
 			children = {
 				Div{
 					classes = { 'mobile-hide' },
-					children = {Image.display('Qr-code-app.svg', nil, { size = '132px', link = '' })}
+					children = {IconImage{
+						imageLight = 'Qr-code-app.svg',
+						size = '132px',
+						link = ''
+					}}
 				},
 				buildFontAwesomeList(
 					GREEN_CHECK_CIRCLE,
@@ -100,15 +104,17 @@ function LiquipediaApp:render()
 				clear = 'both'
 			},
 			children = {
-				Image.display('App-store.svg', nil, {
+				IconImage{
+					imageLight = 'App-store.svg',
 					link = 'https://apps.apple.com/us/app/liquipedia-esports-tracker/id1640722331',
 					size = '160px'
-				}),
+				},
 				' ',
-				Image.display('Google-play.svg', nil, {
+				IconImage{
+					imageLight = 'Google-play.svg',
 					link = 'https://play.google.com/store/apps/details?id=com.teamliquid.liquipedia.liquipedia_app',
 					size = '160px'
-				})
+				}
 			}
 		}
 	}
