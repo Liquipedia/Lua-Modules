@@ -31,16 +31,15 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local DEFAULT_CONFIG = {
-	tiers = {1, 2},
-	tierTypes = {'!Qualifier'},
-	showPatches = false,
-	showEmptyBirthdayList = true,
-	showEmptyPatchList = true,
-	showTrivia = false,
-}
+---@class ThisDayConfig
+---@field showPatches boolean?
+---@field showEmptyBirthdayList boolean?
+---@field showEmptyPatchList boolean?
+---@field showTrivia boolean?
+---@field tiers integer[]
+---@field tierTypes string[]
 
-local Config = Table.merge(DEFAULT_CONFIG, Lua.requireIfExists('Module:ThisDay/config', {loadData = true}))
+local Config = Lua.import('Module:ThisDay/config', {loadData = true})
 
 local Query = {}
 
