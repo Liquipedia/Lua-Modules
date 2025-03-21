@@ -19,6 +19,7 @@ local Icon = {}
 ---@field hover string?
 ---@field size integer|string|nil
 ---@field additionalClasses string[]?
+---@field additionalCss table<string, string|number|nil>?
 ---@field attributes table<string, string>?
 
 ---@param props IconProps
@@ -39,6 +40,7 @@ function Icon.makeIcon(props)
 			:addClass(Logic.isNotEmpty(props.additionalClasses) and table.concat(props.additionalClasses, ' ') or nil)
 			:attr('title', props.hover)
 			:css('font-size', size)
+			:css(props.additionalCss)
 			:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
 			:attr(props.attributes and props.attributes or {})
 	)
