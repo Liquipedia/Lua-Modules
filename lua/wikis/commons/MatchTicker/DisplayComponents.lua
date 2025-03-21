@@ -90,7 +90,7 @@ function Versus:create()
 		-- brackets always have an inherited header matchlists might lack them,
 		-- hence use matchIndex to generate a generic one for those cases
 		local headerRaw = self.match.match2bracketdata.inheritedheader
-			or ('Match' .. self.match.match2bracketdata.matchIndex)
+			or ('Match ' .. self.match.match2bracketdata.matchIndex)
 		upperText = DisplayHelper.expandHeader(headerRaw)[1]
 		if self.match.asGame then
 			upperText = upperText .. ' - ' .. self:gameTitle() .. self:mapTitle()
