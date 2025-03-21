@@ -8,6 +8,7 @@
 
 return {
 	tierTypes = {'!Qualifier', '!Charity'},
+	showPatches = true,
 	showEmptyBirthdayList = false,
 	showEmptyPatchList = false,
 }
