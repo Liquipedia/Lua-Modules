@@ -99,9 +99,7 @@ function Query.tournament(month, day)
 			ConditionNode(ColumnName('date'), Comparator.lt, os.date('%Y-%m-%d', os.time() - 86400)),
 			ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD'),
-			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'Definitions'),
 			ConditionTree(BooleanOperator.any)
-				:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '')}
 				:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1')}
 		}
 	conditions:add(Query._multiValueCondition(
@@ -119,8 +117,7 @@ function Query.tournament(month, day)
 		limit = 5000,
 		conditions = conditions:toString(),
 		query = 'extradata, pagename, date, icon, icondark, shortname, tournament, series, '
-			.. 'opponentname, opponenttemplate, opponentplayers, opponenttype'
-			.. ', mode, participant, participantflag, participanttemplate', --this line for legacy reasons
+			.. 'opponentname, opponenttemplate, opponentplayers, opponenttype',
 		order = 'date asc, pagename asc'
 	})
 end
