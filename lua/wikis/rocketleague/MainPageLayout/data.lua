@@ -94,7 +94,7 @@ return {
 	title = 'Rocket League',
 	navigation = {
 		{
-			file = '',
+			file = 'RLCS Worlds 2024 LAN Michal Konkol zen.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -103,7 +103,7 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'RLCS Worlds 2024 Media Day Rachel Mathews Team BDS.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -121,12 +121,12 @@ return {
 			},
 		},
 		{
-			file = '',
+			file = 'RLCS Worlds 2024 LAN Michal Konkol Bachi.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
 		{
-			file = '',
+			file = 'RLCS Copenhagen Major 2024 LAN Adela Sznajder itachi.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
