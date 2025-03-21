@@ -8,10 +8,10 @@
 
 ---@type ThisDayConfig
 return {
+	hideEmptyBirthdayList = false,
 	tiers = {1, 2},
 	tierTypes = {'!Qualifier'},
 	showPatches = false,
-	showEmptyBirthdayList = true,
 	showEmptyPatchList = true,
 	showTrivia = false,
 }
