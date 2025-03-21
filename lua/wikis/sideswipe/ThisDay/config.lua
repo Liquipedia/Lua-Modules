@@ -7,6 +7,7 @@
 --
 
 return {
-	soloMode = 'individual',
 	tiers = {1, 2, 3},
+	tierTypes = {'!Qualifier'},
+	showEmptyBirthdayList = true,
 }
