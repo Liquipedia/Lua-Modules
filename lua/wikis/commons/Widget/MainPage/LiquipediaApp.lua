@@ -34,7 +34,7 @@ local GREEN_CHECK_CIRCLE = IconFa{
 ---@operator call(table): LiquipediaApp
 local LiquipediaApp = Class.new(Widget)
 
----@param entries (string|Html|Widget|nil)[][]
+---@param entries (string|Html|Widget|nil|(string|Html|Widget|nil)[])[][]
 ---@return Widget
 local function buildDescriptionList(entries)
 	return HtmlWidgets.Dl{
