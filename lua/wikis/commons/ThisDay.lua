@@ -99,8 +99,7 @@ function Query.tournament(month, day)
 			ConditionNode(ColumnName('date'), Comparator.lt, os.date('%Y-%m-%d', os.time() - 86400)),
 			ConditionNode(ColumnName('placement'), Comparator.eq, 1),
 			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD'),
-			ConditionTree(BooleanOperator.any)
-				:add{ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1')}
+			ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1'),
 		}
 	conditions:add(Query._multiValueCondition(
 		'liquipediatier',
