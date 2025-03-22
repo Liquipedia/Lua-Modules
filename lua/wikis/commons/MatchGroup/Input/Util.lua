@@ -419,7 +419,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	local players = {}
 	local playersIndex = 0
 
-	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?}
+	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?, customId: string?}
 	local insertIntoPlayers = function(player)
 		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.pageName) then
 			return
@@ -436,6 +436,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 			displayName = player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
+			customId = player.customId
 		})
 	end
 
@@ -475,6 +476,9 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 				displayName = globalVars:get(varPrefix .. 'dn'),
 				flag = globalVars:get(varPrefix .. 'flag'),
 				faction = globalVars:get(varPrefix .. 'faction'),
+				-- To be discussed - prefixed with "custom" to make sure it's not confused with e.g. opponentXpY
+				-- Used on dota2 for ingame IDs
+				customId = globalVars:get(varPrefix .. 'id'),
 			}
 		end
 		playerIndex = playerIndex + 1
