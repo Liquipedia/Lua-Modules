@@ -235,7 +235,7 @@ end
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
-		:node(MediaList._displayTeam(args.subjects[1], item.date))
+		:node(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
 		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 
 	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
