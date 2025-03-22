@@ -98,8 +98,8 @@ function SquadUtils.anyInactive(players)
 	end)
 end
 
----@param player table
----@return table
+---@param player SquadAutoPerson
+---@return SquadPersonArgs
 function SquadUtils.convertAutoParameters(player)
 	local newPlayer = Table.copy(player)
 	local joinReference = TransferRefs.useReferences(player.joindateRef, player.joindate)
@@ -122,7 +122,30 @@ function SquadUtils.convertAutoParameters(player)
 	return newPlayer
 end
 
----@param args table
+---@class SquadPersonArgs
+---@field name string?
+---@field id string?
+---@field link string?
+---@field flag string?
+---@field position string?
+---@field role string?
+---@field captain string?
+---@field igl string?
+---@field newteam string?
+---@field newteamrole string?
+---@field newrole string?
+---@field joindate string?
+---@field leavedate string?
+---@field inactivedate string?
+---@field status string?
+---@field type string?
+---@field team string?
+---@field teamrole string?
+---@field newteamdate string?
+---@field faction string?
+---@field race string?
+
+---@param args SquadPersonArgs
 ---@return ModelRow
 function SquadUtils.readSquadPersonArgs(args)
 	local function getTeamInfo(page, property)
