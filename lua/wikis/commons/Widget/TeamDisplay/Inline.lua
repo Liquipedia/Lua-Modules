@@ -59,7 +59,7 @@ function TeamInlineWidget:render()
 				}
 			},
 			Span{
-				classes = { 'team-template-image-icon', 'team-template-lightmode' },
+				classes = { 'team-template-image-icon', 'team-template-darkmode' },
 				children = {
 					Image.display(teamTemplate.imagedark, nil, {
 						size = ICON_SIZE,
