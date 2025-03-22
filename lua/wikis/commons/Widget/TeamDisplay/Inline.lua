@@ -78,7 +78,7 @@ function TeamInlineWidget:render()
 		} or nil
 	), ' ')
 	return Span{
-		attributes = { ['data-highlighting-class'] = self.props.teamTemplate.name },
+		attributes = { ['data-highlighting-class'] = self.teamTemplate.name },
 		classes = { 'team-template-team' .. (flip and '2' or '') .. '-' .. self:getType() },
 		children = flip and Array.reverse(children) or children
 	}
