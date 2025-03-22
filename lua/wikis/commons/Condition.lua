@@ -163,10 +163,30 @@ function ColumnName:toString()
 	return self.name
 end
 
+local ConditionUtil = {}
+
+---Builds conditions for a collection of values.
+---@param column ColumnName
+---@param values (string|number)[]
+---@param booleanOperator lpdbBooleanOperator
+---@return ConditionTree?
+function ConditionUtil.multiValueCondition(column, values, booleanOperator)
+	if Array.isEmpty(values) then return end
+
+	local conditions = ConditionTree(booleanOperator)
+
+	Array.forEach(values, function (value)
+		conditions:add{ConditionNode(column, Comparator.eq, value)}
+	end)
+
+	return conditions
+end
+
 Condition.Tree = ConditionTree
 Condition.Node = ConditionNode
 Condition.Comparator = Comparator
 Condition.BooleanOperator = BooleanOperator
 Condition.ColumnName = ColumnName
+Condition.Util = ConditionUtil
 
 return Condition
