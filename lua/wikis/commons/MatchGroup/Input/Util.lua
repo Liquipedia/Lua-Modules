@@ -420,7 +420,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	local players = {}
 	local playersIndex = 0
 
-	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?}
+	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?, customId: string?}
 	local insertIntoPlayers = function(player)
 		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.pageName) then
 			return
@@ -437,6 +437,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 			displayName = player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
+			customId = player.customId
 		})
 	end
 
