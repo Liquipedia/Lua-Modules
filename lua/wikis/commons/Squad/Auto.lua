@@ -73,7 +73,7 @@ SquadAuto.TransferType = {
 	CHANGE = 'CHANGE',
 }
 
----@class TeamHistoryEntry
+---@class (exact) TeamHistoryEntry
 ---@field pagename string
 ---@field displayname string
 ---@field flag string
@@ -83,6 +83,10 @@ SquadAuto.TransferType = {
 ---@field references table<string, string>
 ---@field wholeTeam boolean
 ---@field position string
+---@field fromTeam string?
+---@field fromRole string?
+---@field toTeam string?
+---@field toRole string?
 
 ---Entrypoint for the automated timelin
 ---TODO: Implement in submodule
@@ -236,6 +240,9 @@ function SquadAuto:queryTransfers()
                 fromRole = parseRelevantRole('from', record, relevantFromTeam, isFromMain),
                 toRole = parseRelevantRole('to', record, relevantToTeam, isToMain),
 
+                fromTeam = relevantFromTeam,
+                toTeam = relevantToTeam,
+
                 -- Other
                 wholeTeam = Logic.readBool(record.wholeteam),
                 position = record.extradata.position,
@@ -306,16 +313,25 @@ function SquadAuto:_selectHistoryEntries(entries)
         local history = {}
 
         local currentEntry = nil
-        for index, entry in ipairs(entries) do
-            if not currentEntry and entry.type ~= SquadAuto.TransferType.JOIN then
-                mw.log("Invalid transfer history for player " .. entry.pagename)
-                mw.logObject(entry, "Invalid entry: Missing previous JOIN")
+
+        Array.forEach(entries, function (entry)
+            if not currentEntry then
+                if entry.type == SquadAuto.TransferType.JOIN then
+                    currentEntry = entry
+                else
+                    mw.log("Invalid transfer history for player " .. entry.pagename)
+                    mw.logObject(entry, "Invalid entry: Missing previous JOIN. Skipping")
+                end
+                return
             end
 
-            --TODO: add/merge entry with currentEntry
-            --Add currentEntry to history
-            --Reset currentEntry
-        end
+            table.insert(history, self:_mapToSquadAutoPerson(currentEntry, entry))
+            if entry.type == "CHANGE" then
+                currentEntry = entry
+            else
+                currentEntry = nil
+            end
+        end)
 
         return history
     end
@@ -346,12 +362,17 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
 
         thisTeam = {
             --TODO
+            team = joinEntry.toTeam,
+            role = joinEntry.toRole
         },
         oldTeam = {
             --TODO
+            team = joinEntry.fromTeam,
+            role = joinEntry.fromRole
         },
         newTeam = {
-            --TODO
+            team = leaveEntry.toTeam,
+            role = leaveEntry.toRole
         },
 
         faction = '' --TODO
