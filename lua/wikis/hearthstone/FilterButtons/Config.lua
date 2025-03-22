@@ -23,6 +23,21 @@ Config.categories = {
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
+		expandKey = "liquipediatiertype",
+	},
+	{
+		name = 'liquipediatiertype',
+		property = 'liquipediaTierType',
+		expandable = true,
+		load = function(category)
+			category.items = {}
+			for _, tiertype in Tier.iterate('tierTypes') do
+				table.insert(category.items, Tier.toIdentifier(tiertype.value))
+			end
+		end,
+		transform = function(tiertype)
+			return select(2, Tier.toName(1, tiertype))
+		end,
 	},
 }
 
