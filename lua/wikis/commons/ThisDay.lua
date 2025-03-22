@@ -19,6 +19,7 @@ local Template = require('Module:Template')
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
+local ConditionUtil = Condition.Util
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
@@ -101,13 +102,13 @@ function Query.tournament(month, day)
 			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD'),
 			ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1'),
 		}
-	conditions:add(Query._multiValueCondition(
-		'liquipediatier',
+	conditions:add(ConditionUtil.multiValueCondition(
+		ColumnName('liquipediatier'),
 		Config.tiers,
 		BooleanOperator.any
 	))
-	conditions:add(Query._multiValueCondition(
-		'liquipediatiertype',
+	conditions:add(ConditionUtil.multiValueCondition(
+		ColumnName('liquipediatiertype'),
 		Config.tierTypes,
 		BooleanOperator.all
 	))
@@ -120,26 +121,6 @@ function Query.tournament(month, day)
 		order = 'date asc, pagename asc'
 	})
 end
-
---- build conditions for multi variable
----@param key string
----@param values table
----@param booleanOperator lpdbBooleanOperator
----@return table?
-function Query._multiValueCondition(key, values, booleanOperator)
-	if Table.isEmpty(values) then
-		return
-	end
-
-	local conditions = ConditionTree(booleanOperator)
-
-	for _, value in pairs(values) do
-		conditions:add{ConditionNode(ColumnName(key), Comparator.eq, value)}
-	end
-
-	return conditions
-end
-
 
 local ThisDay = {}
 
