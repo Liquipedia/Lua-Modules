@@ -74,9 +74,10 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex, oppo
 		}
 	end
 
-	local ingameIDmapping = Array.reduce(opponent.players, function (aggregate, player)
-		if player.customId then
-			aggregate[player.customId] = player
+	local ingameIDmapping = Array.reduce(opponent.match2players, function (aggregate, player)
+		local id = (player.extradata or {}).customId
+		if id then
+			aggregate[id] = player
 		end
 		return aggregate
 	end, {})
