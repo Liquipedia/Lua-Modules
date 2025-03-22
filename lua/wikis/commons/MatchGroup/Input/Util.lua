@@ -476,6 +476,9 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 				displayName = globalVars:get(varPrefix .. 'dn'),
 				flag = globalVars:get(varPrefix .. 'flag'),
 				faction = globalVars:get(varPrefix .. 'faction'),
+				-- To be discussed - prefixed with "custom" to make sure it's not confused with e.g. opponentXpY
+				-- Used on dota2 for ingame IDs
+				customId = globalVars:get(varPrefix .. 'id'),
 			}
 		end
 		playerIndex = playerIndex + 1

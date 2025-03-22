@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Operator = require('Module:Operator')
+local Table = require('Module:Table')
 
 local CustomMatchGroupInputMatchPage = {}
 
@@ -59,8 +60,9 @@ end
 
 ---@param map dota2MatchDataExtended
 ---@param opponentIndex integer
+---@param opponent table
 ---@return table[]?
-function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
+function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex, opponent)
 	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
 	if not team then return end
 	if not team.players then return end
@@ -71,6 +73,14 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			image = item.image,
 		}
 	end
+
+	local ingameIDmapping = Array.reduce(opponent.players, function (aggregate, player)
+		if player.customId then
+			aggregate[player.customId] = player
+		end
+		return aggregate
+	end, {})
+
 	local function fetchLpdbPlayer(playerId)
 		if not playerId then return end
 		return mw.ext.LiquipediaDB.lpdb('player', {
@@ -79,7 +89,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		})[1]
 	end
 	local players = Array.map(team.players, function(player)
-		local playerData = fetchLpdbPlayer(player.id) or {}
+		local playerData = fetchLpdbPlayer(player.id) or ingameIDmapping[player.id] or {}
 		return {
 			player = playerData.pagename or player.name,
 			name = playerData.id,
