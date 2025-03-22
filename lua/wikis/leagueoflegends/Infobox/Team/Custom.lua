@@ -14,6 +14,7 @@ local String = require('Module:StringUtils')
 local TeamTemplate = require('Module:Team')
 local Template = require('Module:Template')
 
+local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
@@ -38,6 +39,14 @@ local CustomInjector = Class.new(Injector)
 function CustomTeam.run(frame)
 	local team = CustomTeam(frame)
 	team:setWidgetInjector(CustomInjector(team))
+
+	-- Automatically load achievements
+	team.args.achievements = Achievements.team{noTemplate = true, baseConditions = {
+		'[[liquipediatiertype::]]',
+		'[[liquipediatier::1]]',
+		'[[placement::1]]',
+		'[[publishertier::true]]'
+	}}
 
 	-- Automatic org people
 	team.args.coach = RoleOf.get{role = 'Coach'}
