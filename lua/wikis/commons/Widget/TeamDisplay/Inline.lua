@@ -70,7 +70,7 @@ function TeamInlineWidget:render()
 			}
 		}},
 		String.isNotEmpty(self:getDisplayName()) and Span{
-			classes = 'team-template-text',
+			classes = { 'team-template-text' },
 			children = {Link{
 				children = self:getDisplayName(),
 				link = teamTemplate.page
