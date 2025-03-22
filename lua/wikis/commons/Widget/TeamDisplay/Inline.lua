@@ -69,10 +69,10 @@ function TeamInlineWidget:render()
 				}
 			}
 		}},
-		String.isNotEmpty(TeamInlineWidget:getDisplayName()) and Span{
+		String.isNotEmpty(self:getDisplayName()) and Span{
 			classes = 'team-template-text',
 			children = {Link{
-				children = TeamInlineWidget:getDisplayName(),
+				children = self:getDisplayName(),
 				link = teamTemplate.page
 			}}
 		} or nil
