@@ -8,24 +8,21 @@
 
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
+local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
+local Table = require('Module:Table') ---@module 'commons.Table'
 local TemplateEngine = require('Module:TemplateEngine')
-local VodLink = require('Module:VodLink')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Display = Lua.import('Module:MatchPage/Template')
 
-local MatchPage = {}
+---@class Dota2MatchPage: BaseMatchPage
+local MatchPage = Class.new(BaseMatchPage)
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'notplayed'
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
@@ -37,42 +34,22 @@ function MatchPage.isEnabledFor(match)
 			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
 end
 
----@class Dota2MatchPageViewModelGame: MatchGroupUtilGame
----@field finished boolean
----@field winnerName string?
----@field teams table[]
-
----@class Dota2MatchPageViewModelOpponent: standardOpponent
----@field opponentIndex integer
----@field iconDisplay string
----@field shortname string
----@field page string
----@field seriesDots string[]
-
 ---@param props {match: MatchGroupUtilMatch}
----@return Html
+---@return Widget
 function MatchPage.getByMatchId(props)
-	---@class Dota2MatchPageViewModel: MatchGroupUtilMatch
-	---@field games Dota2MatchPageViewModelGame[]
-	---@field opponents Dota2MatchPageViewModelOpponent[]
-	local viewModel = props.match
-
-	viewModel.isBestOfOne = #viewModel.games == 1
-	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
-		DisplayHelper.MatchCountdownBlock(viewModel) or nil
-
-	local phase = MatchGroupUtil.computeMatchPhase(props.match)
-	viewModel.statusText = phase == 'ongoing' and 'live' or phase
-
-	local function makeItemDisplay(item)
-		if String.isEmpty(item.name) then
-			return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
-		end
-		return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
-	end
+	local matchPage = MatchPage(props.match)
 
 	-- Update the view model with game and team data
-	Array.forEach(viewModel.games, function(game)
+	matchPage:populateGames()
+
+	-- Add more opponent data field
+	matchPage:populateOpponents()
+
+	return matchPage:render()
+end
+
+function MatchPage:populateGames()
+	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = {}
@@ -83,23 +60,23 @@ function MatchPage.getByMatchId(props)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
-					items = Array.map(player.items or {}, makeItemDisplay),
-					backpackitems = Array.map(player.backpackitems or {}, makeItemDisplay),
-					neutralitem = makeItemDisplay(player.neutralitem or {}),
+					items = Array.map(player.items or {}, MatchPage.makeItemDisplay),
+					backpackitems = Array.map(player.backpackitems or {}, MatchPage.makeItemDisplay),
+					neutralitem = MatchPage.makeItemDisplay(player.neutralitem or {}),
 				})
 
-				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
-				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold)
+				newPlayer.displayDamageDone = MatchPage.abbreviateNumber(player.damagedone)
+				newPlayer.displayGold = MatchPage.abbreviateNumber(player.gold)
 
 				return newPlayer
 			end)
 
 			if game.finished then
 				-- Aggregate stats
-				team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
-				team.kills = MatchPage._sumItem(team.players, 'kills')
-				team.deaths = MatchPage._sumItem(team.players, 'deaths')
-				team.assists = MatchPage._sumItem(team.players, 'assists')
+				team.gold = MatchPage.abbreviateNumber(MatchPage.sumItem(team.players, 'gold'))
+				team.kills = MatchPage.sumItem(team.players, 'kills')
+				team.deaths = MatchPage.sumItem(team.players, 'deaths')
+				team.assists = MatchPage.sumItem(team.players, 'assists')
 
 				-- Set fields
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
@@ -114,13 +91,14 @@ function MatchPage.getByMatchId(props)
 
 			return team
 		end)
-		if game.finished and viewModel.opponents[game.winner] then
-			game.winnerName = viewModel.opponents[game.winner].name
+		if game.finished and self.opponents[game.winner] then
+			game.winnerName = self.opponents[game.winner].name
 		end
 	end)
+end
 
-	-- Add more opponent data field
-	Array.forEach(viewModel.opponents, function(opponent, index)
+function MatchPage:populateOpponents()
+	Array.forEach(self.opponents, function(opponent, index)
 		opponent.opponentIndex = index
 
 		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
@@ -133,136 +111,63 @@ function MatchPage.getByMatchId(props)
 		opponent.page = teamTemplate.page
 		opponent.name = teamTemplate.name
 
-		opponent.seriesDots = Array.map(viewModel.games, function(game)
+		opponent.seriesDots = Array.map(self.games, function(game)
 			return game.teams[index].scoreDisplay
 		end)
 	end)
-
-	viewModel.vods = Array.map(viewModel.games, function(game, gameIdx)
-		return game.vod and VodLink.display{
-			gamenum = gameIdx,
-			vod = game.vod,
-		} or ''
-	end)
-	if String.isNotEmpty(viewModel.vod) then
-		table.insert(viewModel.vods, 1, VodLink.display{
-			vod = viewModel.vod,
-		})
-	end
-
-	-- Create an object array for links
-	local function processLink(site, link)
-		return Table.mergeInto({link = link}, Links.getMatchIconData(site))
-	end
-
-	viewModel.parsedLinks = Array.flatMap(Table.entries(viewModel.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return processLink(site, sublink)
-			end)
-		end
-		return {processLink(site, link)}
-	end)
-
-	viewModel.heroIcon = function(c)
-		local character = c
-		if type(c) == 'table' then
-			character = c.character
-			---@cast character -table
-		end
-		return CharacterIcon.Icon{
-			character = character or NO_CHARACTER,
-			date = viewModel.date
-		}
-	end
-
-	local displayTitle = MatchPage.makeDisplayTitle(viewModel)
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
-
-	return MatchPage.render(viewModel)
 end
 
----@param viewModel table
+function MatchPage:getCharacterIcon(character)
+	local characterName = character
+	if type(character) == 'table' then
+		characterName = character.character
+		---@cast character -table
+	end
+	return CharacterIcon.Icon{
+		character = characterName or NO_CHARACTER,
+		date = self.matchData.date
+	}
+end
+
 ---@return string
-function MatchPage.makeDisplayTitle(viewModel)
-	if not viewModel.opponents[1].shortname and viewModel.opponents[2].shortname then
-		return table.concat({'Match in', viewModel.tickername}, ' ')
+function MatchPage:makeDisplayTitle()
+	if not self.opponents[1].shortname and self.opponents[2].shortname then
+		return table.concat({'Match in', self.matchData.tickername}, ' ')
 	end
 
-	local team1name = viewModel.opponents[1].shortname or 'TBD'
-	local team2name = viewModel.opponents[2].shortname or 'TBD'
-	local tournamentName = viewModel.tickername
+	local team1name = self.opponents[1].shortname or 'TBD'
+	local team2name = self.opponents[2].shortname or 'TBD'
+	local tournamentName = self.matchData.tickername
 	local displayTitle = team1name .. ' vs. ' .. team2name
 	if not tournamentName then
 		return displayTitle
 	end
 
-	return displayTitle .. ' @ ' .. tournamentName
+	displayTitle = displayTitle .. ' @ ' .. tournamentName
+
+	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
 end
 
----@param tbl table
----@param item string
----@return number
-function MatchPage._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
-end
-
----@param number number?
----@return string?
-function MatchPage._abbreviateNumber(number)
-	if not number then
-		return
+function MatchPage.makeItemDisplay(item)
+	if String.isEmpty(item.name) then
+		return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
 	end
-	return string.format('%.1fK', number / 1000)
+	return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
 end
 
----@param model table
----@return Html
-function MatchPage.render(model)
-	return mw.html.create('div')
-		:wikitext(MatchPage.header(model))
-		:node(MatchPage.games(model))
-		:wikitext(MatchPage.footer(model))
-end
-
----@param model table
 ---@return string
-function MatchPage.header(model)
-	return TemplateEngine():render(Display.header, model)
+function MatchPage:header()
+	return TemplateEngine():render(Display.header, self.matchData)
 end
 
----@param model table
 ---@return string
-function MatchPage.games(model)
-	local games = Array.map(Array.filter(model.games, function(game)
-		return game.status ~= NOT_PLAYED
-	end), function(game)
-		return TemplateEngine():render(Display.game, Table.merge(model, game))
-	end)
-
-	if #games < 2 then
-		return tostring(games[1])
-	end
-
-	---@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true
-	}
-
-	Array.forEach(games, function(game, idx)
-		tabs['name' .. idx] = 'Game ' .. idx
-		tabs['content' .. idx] = tostring(game)
-	end)
-
-	return tostring(Tabs.dynamic(tabs))
+function MatchPage:renderGame()
+	return TemplateEngine():render(Display.game, Table.merge(self.matchData, self.games))
 end
 
----@param model table
 ---@return string
-function MatchPage.footer(model)
-	return TemplateEngine():render(Display.footer, model)
+function MatchPage:footer()
+	return TemplateEngine():render(Display.footer, self.matchData)
 end
 
 return MatchPage

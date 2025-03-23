@@ -8,21 +8,24 @@
 
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
+local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
 local TemplateEngine = require('Module:TemplateEngine')
-local VodLink = require('Module:VodLink')
 
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local Display = Lua.import('Module:MatchPage/Template')
 
-local MatchPage = {}
+---@class LoLMatchPageGame: MatchPageGame
+---@field vetoByTeam table[]
+
+---@class LoLMatchPage: BaseMatchPage
+---@field games LoLMatchPageGame[]
+local MatchPage = Class.new(BaseMatchPage)
 
 local KEYSTONES = Table.map({
 	-- Precision
@@ -56,7 +59,7 @@ local KEYSTONES = Table.map({
 end)
 
 local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'notplayed'
+
 local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
@@ -70,27 +73,27 @@ function MatchPage.isEnabledFor(match)
 			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
 end
 
----@param props table
----@return Html
+---@param props {match: MatchGroupUtilMatch}
+---@return Widget
 function MatchPage.getByMatchId(props)
-	local viewModel = props.match
-
-	viewModel.isBestOfOne = #viewModel.games == 1
-	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
-		DisplayHelper.MatchCountdownBlock(viewModel) or nil
-
-	-- Create an object array for links
-	viewModel.parsedLinks = Array.extractValues(Table.map(viewModel.links, function(site, link)
-		return site, Table.mergeInto({link = link}, Links.getMatchIconData(site))
-	end))
+	local matchPage = MatchPage(props.match)
 
 	-- Update the view model with game and team data
-	Array.forEach(viewModel.games, function(game)
+	matchPage:populateGames()
+
+	-- Add more opponent data field
+	matchPage:populateOpponents()
+
+	return MatchPage:render()
+end
+
+function MatchPage:populateGames()
+	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
 			local team = {}
 
-			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
+			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
 			team.players = Array.map(opponent.players, function(player)
@@ -108,10 +111,10 @@ function MatchPage.getByMatchId(props)
 
 			if game.finished then
 				-- Aggregate stats
-				team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
-				team.kills = MatchPage._sumItem(team.players, 'kills')
-				team.deaths = MatchPage._sumItem(team.players, 'deaths')
-				team.assists = MatchPage._sumItem(team.players, 'assists')
+				team.gold = MatchPage.abbreviateNumber(MatchPage.sumItem(team.players, 'gold'))
+				team.kills = MatchPage.sumItem(team.players, 'kills')
+				team.deaths = MatchPage.sumItem(team.players, 'deaths')
+				team.assists = MatchPage.sumItem(team.players, 'assists')
 
 				-- Set fields
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
@@ -137,114 +140,33 @@ function MatchPage.getByMatchId(props)
 			end)
 		end)
 	end)
+end
 
-	-- Add more opponent data field
-	Array.forEach(viewModel.opponents, function(opponent, index)
-		opponent.opponentIndex = index
-
-		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
-		if not teamTemplate then
-			return
-		end
-
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
-		opponent.shortname = teamTemplate.shortname
-		opponent.page = teamTemplate.page
-		opponent.name = teamTemplate.name
-
-		opponent.seriesDots = Array.map(viewModel.games, function(game)
-			return game.teams[index].scoreDisplay
-		end)
-	end)
-
-	viewModel.vods = {
-		icons = Array.map(viewModel.games, function(game, gameIdx)
-			return game.vod and VodLink.display{
-				gamenum = gameIdx,
-				vod = game.vod,
-			} or ''
-		end)
+function MatchPage:getCharacterIcon(character)
+	local characterName = character
+	if type(character) == 'table' then
+		characterName = character.character
+		---@cast character -table
+	end
+	return CharacterIcon.Icon{
+		character = characterName or NO_CHARACTER,
+		date = self.matchData.date
 	}
-	if String.isNotEmpty(viewModel.vod) then
-		table.insert(viewModel.vods.icons, 1, VodLink.display{
-			vod = viewModel.vod,
-		})
-	end
-
-	viewModel.heroIcon = function(self)
-		local character = self
-		if type(self) == 'table' then
-			character = self.character
-			---@cast character -table
-		end
-		return CharacterIcon.Icon{
-			character = character or NO_CHARACTER,
-			date = viewModel.date
-		}
-	end
-
-	return MatchPage.render(viewModel)
 end
 
----@param tbl table
----@param item string
----@return number
-function MatchPage._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
-end
-
----@param number number
 ---@return string
-function MatchPage._abbreviateNumber(number)
-	return string.format('%.1fK', number / 1000)
+function MatchPage:header()
+	return nil
 end
 
----@param model table
----@return Html
-function MatchPage.render(model)
-	return mw.html.create('div')
-		:wikitext(MatchPage.header(model))
-		:node(MatchPage.games(model))
-		:wikitext(MatchPage.footer(model))
-end
-
----@param model table
 ---@return string
-function MatchPage.header(model)
-	return TemplateEngine():render(Display.header, model)
+function MatchPage:renderGame(game)
+	return TemplateEngine():render(Display.game, Table.merge(self.matchData, game))
 end
 
----@param model table
 ---@return string
-function MatchPage.games(model)
-	local games = Array.map(Array.filter(model.games, function(game)
-		return game.status ~= NOT_PLAYED
-	end), function(game)
-		return TemplateEngine():render(Display.game, Table.merge(model, game))
-	end)
-
-	if #games < 2 then
-		return tostring(games[1])
-	end
-
-	---@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true
-	}
-
-	Array.forEach(games, function(game, idx)
-		tabs['name' .. idx] = 'Game ' .. idx
-		tabs['content' .. idx] = tostring(game)
-	end)
-
-	return tostring(Tabs.dynamic(tabs))
-end
-
----@param model table
----@return string
-function MatchPage.footer(model)
-	return TemplateEngine():render(Display.footer, model)
+function MatchPage:footer()
+	return nil
 end
 
 return MatchPage
