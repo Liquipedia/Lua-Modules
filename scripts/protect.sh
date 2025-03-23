@@ -52,15 +52,14 @@ fetchAllWikis() {
 
 }
 
-hasNoLocalVersion() {
+checkForLocalVersion() {
   if [[ $2 == "commons" ]]; then
-    return 1
+    hasNoLocalVersion=false
+  elif [[ $luaFiles == *"lua/wikis/${2}/${1}.lua"* ]] || [[ $filesToProtect == *"lua/wikis/${2}/${1}.lua"* ]]; then
+    hasNoLocalVersion=false
+  else
+    hasNoLocalVersion=true
   fi
-
-  if [[ $luaFiles == *"lua/wikis/${2}/${1}.lua"* ]] || [[ $filesToProtect == *"lua/wikis/${2}/${1}.lua"* ]]; then
-    return 0
-  fi
-  return 1
 }
 
 protectPage() {
@@ -155,9 +154,9 @@ protectNonExistingPage() {
   fi
 }
 
-pageExists() {
-  wiki=$2
+checkIfPageExists() {
   page="Module:${1}"
+  wikiApiUrl="${WIKI_BASE_URL}/${2}/api.php"
   rawResult=$(
     curl \
       -s \
@@ -165,7 +164,6 @@ pageExists() {
       -c "$ckf" \
       --data-urlencode "titles=${page}" \
       --data-urlencode "prop=info" \
-      --data-urlencode "token=${protectToken}" \
       -H "User-Agent: ${userAgent}" \
       -H 'Accept-Encoding: gzip' \
       -X POST "${wikiApiUrl}?format=json&action=query" \
@@ -175,14 +173,15 @@ pageExists() {
   # Don't get rate limited
   sleep 4
 
-  if [[ $rawResult == *'"missing":true'* ]]; then
-    return 0
+  if [[ $rawResult == *'missing'* ]]; then
+    pageExists=false
+  else
+    pageExists=true
   fi
-  return 1
 }
 
 for fileToProtect in $filesToProtect; do
-  echo "::group::Checking $fileToProtect"
+  echo "::group::Trying to protect for $fileToProtect"
   if [[ $fileToProtect =~ $regex ]]; then
     wiki=${BASH_REMATCH[1]}
     module=${BASH_REMATCH[2]}
@@ -199,9 +198,11 @@ for fileToProtect in $filesToProtect; do
         fetchAllWikis
       fi
       for deployWiki in $allWikis; do
-        if hasNoLocalVersion $module $deployWiki; then
+        checkForLocalVersion $module $deployWiki
+        if $hasNoLocalVersion; then
           echo "...protecting ${module} against creation on ${deployWiki}"
-          if pageExists $module $deployWiki; then
+          checkIfPageExists $module $deployWiki
+          if $pageExists; then
             echo "::warning::$fileToProtect already exists on $deployWiki"
             protectErrors+=("$fileToProtect on $deployWiki")
           else
@@ -229,7 +230,7 @@ if [[ ${#protectErrors[@]} -ne 0 ]]; then
   echo "::warning::Some modules could not be protected"
   for info in $protectErrors; do
     echo "::warning protection failed:: ${info}"
-    echo ":warning protection failed:: ${info}" >> $GITHUB_STEP_SUMMARY
+    echo ":warning protection failed: ${info}" >> $GITHUB_STEP_SUMMARY
   done
 fi
 
