@@ -155,18 +155,8 @@ function MatchPage:getCharacterIcon(character)
 end
 
 ---@return string
-function MatchPage:header()
-	return nil
-end
-
----@return string
 function MatchPage:renderGame(game)
 	return TemplateEngine():render(Display.game, Table.merge(self.matchData, game))
-end
-
----@return string
-function MatchPage:footer()
-	return nil
 end
 
 return MatchPage
