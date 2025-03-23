@@ -441,9 +441,11 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
 		})
-		players[normalizedPageName].extradata = Table.merge(players[normalizedPageName].extradata or {}, {
-			customId = player.customId
-		})
+		if player.customId then
+			players[normalizedPageName].extradata = Table.merge(players[normalizedPageName].extradata or {}, {
+				customId = player.customId
+			})
+		end
 	end
 
 	---@param varPrefix string
