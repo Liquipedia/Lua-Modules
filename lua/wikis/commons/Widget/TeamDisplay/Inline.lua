@@ -51,11 +51,7 @@ function TeamInlineWidget:render()
 		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
 		return HtmlWidgets.Small{
 			classes = { 'error' },
-			children = {
-				'No team template exists for name "',
-				self.name,
-				'.'
-			}
+			children = { TeamTemplate.noTeamMessage(self.name) }
 		}
 	end
 	local flip = self.flip
