@@ -59,5 +59,4 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-          DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/protect.sh "${{ steps.lua-changed-files.outputs.added_files }} ${{ steps.lua-changed-files.outputs.renamed_files }}"
