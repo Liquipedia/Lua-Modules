@@ -85,7 +85,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Abbreviation', content = {args.abbreviation}},
 			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
-				args.affiliate and TeamInline{args.affiliate} or nil}}
+				args.affiliate and TeamInline{name = args.affiliate} or nil}}
 		}
 	end
 
