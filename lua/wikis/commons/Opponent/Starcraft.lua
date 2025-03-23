@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext')

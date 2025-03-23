@@ -16,7 +16,7 @@ local PlayerExt = require('Module:Player/Ext/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local TeamTemplate = require('Module:TeamTemplate')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
 local TeamIconWidget = Lua.import('Module:Widget/TeamDisplay/Inline/Icon')
 

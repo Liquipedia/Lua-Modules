@@ -13,7 +13,7 @@ local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
