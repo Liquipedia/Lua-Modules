@@ -54,7 +54,7 @@ function TeamInlineWidget:render()
 			children = {
 				'No team template exists for name "',
 				self.name,
-				'.'
+				'".'
 			}
 		}
 	end
