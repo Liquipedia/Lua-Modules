@@ -323,8 +323,8 @@ function BaseMatchPage:footer()
 					bodyClasses = { 'vodlink' },
 					children = Array.map(self:parseLinks(), function (parsedLink)
 						return IconImage{
-							imageLight = parsedLink.icon,
-							imageDark = parsedLink.iconDark,
+							imageLight = parsedLink.icon:sub(6),
+							imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
 							link = parsedLink.link
 						}
 					end)
