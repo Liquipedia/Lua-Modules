@@ -30,6 +30,7 @@ local ICON_SIZE = '100x50px'
 
 ---@class TeamInlineWidget: Widget
 ---@operator call(TeamInlineParameters): TeamInlineWidget
+---@field name string?
 ---@field props TeamInlineParameters
 ---@field teamTemplate teamTemplateData
 ---@field flip boolean
@@ -37,7 +38,8 @@ local TeamInlineWidget = Class.new(Widget,
 	---@param self self
 	---@param input TeamInlineParameters
 	function (self, input)
-		self.teamTemplate = input.teamTemplate or TeamTemplate.getRaw(input.name, input.date)
+		self.teamTemplate = input.teamTemplate or TeamTemplate.getRawOrNil(input.name, input.date)
+		self.name = (self.teamTemplate or {}).name or input.name
 		self.flip = Logic.readBool(input.flip)
 	end
 )
@@ -45,6 +47,17 @@ local TeamInlineWidget = Class.new(Widget,
 ---@return Widget
 function TeamInlineWidget:render()
 	local teamTemplate = self.teamTemplate
+	if not teamTemplate then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
+		return HtmlWidgets.Small{
+			classes = { 'error' },
+			children = {
+				'No team template exists for name "',
+				self.name,
+				'.'
+			}
+		}
+	end
 	local flip = self.flip
 	local children = Array.interleave(WidgetUtil.collect(
 		HtmlWidgets.Fragment{children = {
