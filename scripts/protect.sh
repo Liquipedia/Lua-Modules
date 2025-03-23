@@ -9,31 +9,16 @@ declare -A protectErrors
 
 regex="^\.?/?lua/wikis/([a-z0-9]+)/(.*)\.lua$"
 
-rawCreatedFiles=$1
-rawMovedFiles=$2
-
-if [[ -n "$rawCreatedFiles" ]] && [[ ${#rawCreatedFiles[@]} -ne 0 ]]; then
-  createdFiles=$rawCreatedFiles
-fi
-
-if [[ -n "$rawMovedFiles" ]] && [[ ${#rawMovedFiles[@]} -ne 0 ]]; then
-  movedFiles=$rawMovedFiles
-fi
-
-if [[ -n "$createdFiles" ]] && [[ -n "$movedFiles" ]]; then
-  filesToProtect=( "${createdFiles[@]}" "${movedFiles[@]}" )
-elif [[ -n "$createdFiles" ]]; then
-  filesToProtect=$createdFiles
-elif [[ -n "$movedFiles" ]]; then
-  filesToProtect=$movedFiles
+if [[ -n "$1" ]] then
+  filesToProtect=$1
 elif [[ -n ${WIKI_TO_PROTECT} ]]; then
-  filesToProtect=$(find lua -type f -name '*/wikis/*.lua')
+  filesToProtect=$(find lua/wikis -type f -name '*.lua')
 else
   echo "Nothing to protect"
   exit 0
 fi
 
-luaFiles=$(find lua -type f -name '*/wikis/*.lua')
+allLuaFiles=$(find lua -type f -name '*.lua')
 
 fetchAllWikis() {
   allWikis=$(
@@ -55,7 +40,7 @@ fetchAllWikis() {
 checkForLocalVersion() {
   if [[ $2 == "commons" ]]; then
     hasNoLocalVersion=false
-  elif [[ $luaFiles == *"lua/wikis/${2}/${1}.lua"* ]] || [[ $filesToProtect == *"lua/wikis/${2}/${1}.lua"* ]]; then
+  elif [[ $allLuaFiles == *"lua/wikis/${2}/${1}.lua"* ]] || [[ $filesToProtect == *"lua/wikis/${2}/${1}.lua"* ]]; then
     hasNoLocalVersion=false
   else
     hasNoLocalVersion=true
@@ -186,12 +171,19 @@ for fileToProtect in $filesToProtect; do
     wiki=${BASH_REMATCH[1]}
     module=${BASH_REMATCH[2]}
 
-    if [[ "commons" != $wiki ]]; then
-      # if the file is on a wiki only protect on the wiki
-      # for wiki setups only apply if $wiki matches the wiki we are setting up
-      if [[ -n ${WIKI_TO_PROTECT} ]] || [[ $wiki == ${WIKI_TO_PROTECT} ]]; then
-        protectExistingPage $module $wiki
+    if [[ -n ${WIKI_TO_PROTECT} ]]; then
+      if [[ $wiki == ${WIKI_TO_PROTECT} ]]; then
+        protectExistingPage $module ${WIKI_TO_PROTECT}
+      elif [[ $wiki == "commons" ]]; then
+        checkForLocalVersion $module ${WIKI_TO_PROTECT}
+        if $hasNoLocalVersion; then
+          protectNonExistingPage $module ${WIKI_TO_PROTECT}
+        fi
+      else
+        echo "...no protection needed"
       fi
+    elif [[ "commons" != $wiki ]]; then
+      protectExistingPage $module $wiki
     else # commons case
       protectExistingPage $module $wiki
       if [[ -z "$allWikis" ]] || [[ ${#allWikis[@]} -ne 0 ]]; then
