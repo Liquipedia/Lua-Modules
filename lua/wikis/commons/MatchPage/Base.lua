@@ -24,12 +24,15 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local AdditionalSection = Lua.import('Module:Widget/Match/MatchPage/AdditionalSection')
 local Div = HtmlWidgets.Div
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageMatch: MatchGroupUtilMatch
 ---@field parent string?
+---@field patch string?
 
 ---@class MatchPageGame: MatchGroupUtilGame
 ---@field finished boolean
@@ -306,7 +309,38 @@ end
 
 ---@return string|Html|Widget
 function BaseMatchPage:footer()
-	error('BaseMatchPage:footer() cannot be called directly and must be overridden.')
+	local vods = self:getVods()
+	return {
+		HtmlWidgets.H3{ children = 'Additional Information' },
+		Div{
+			classes = { 'match-bm-match-additional' },
+			children = WidgetUtil.collect(
+				#vods > 0 and AdditionalSection{
+					header = 'VODs',
+					children = vods
+				} or nil,
+				AdditionalSection{
+					bodyClasses = { 'vodlink' },
+					children = Array.map(self:parseLinks(), function (parsedLink)
+						return IconImage{
+							imageLight = parsedLink.icon,
+							imageDark = parsedLink.iconDark,
+							link = parsedLink.link
+						}
+					end)
+				},
+				AdditionalSection{
+					header = 'Patch',
+					children = { self:getPatchLink() }
+				}
+			)
+		}
+	}
+end
+
+function BaseMatchPage:getPatchLink()
+	if Logic.isEmpty(self.matchData.patch) then return end
+	return Link{ link = 'Patch ' .. self.matchData.patch }
 end
 
 return BaseMatchPage

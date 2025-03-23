@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table') ---@module 'commons.Table'
@@ -17,6 +18,8 @@ local TemplateEngine = require('Module:TemplateEngine')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local Display = Lua.import('Module:MatchPage/Template')
+
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class Dota2MatchPage: BaseMatchPage
 local MatchPage = Class.new(BaseMatchPage)
@@ -137,18 +140,13 @@ function MatchPage.makeItemDisplay(item)
 end
 
 ---@return string
-function MatchPage:header()
-	return TemplateEngine():render(Display.header, self.matchData)
-end
-
----@return string
 function MatchPage:renderGame()
 	return TemplateEngine():render(Display.game, Table.merge(self.matchData, self.games))
 end
 
----@return string
-function MatchPage:footer()
-	return TemplateEngine():render(Display.footer, self.matchData)
+function MatchPage:getPatchLink()
+	if Logic.isEmpty(self.matchData.patch) then return end
+	return Link{ link = 'Version ' .. self.matchData.patch }
 end
 
 return MatchPage
