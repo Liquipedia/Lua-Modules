@@ -16,7 +16,6 @@ local Table = require('Module:Table') ---@module 'commons.Table'
 local TemplateEngine = require('Module:TemplateEngine')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local Display = Lua.import('Module:MatchPage/Template')
 
 ---@class Dota2MatchPage: BaseMatchPage
