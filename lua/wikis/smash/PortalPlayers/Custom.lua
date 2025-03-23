@@ -9,7 +9,6 @@
 local Abbreviation = require('Module:Abbreviation')
 local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
-local Characters = require('Module:Characters')
 local Links = require('Module:Links')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -19,6 +18,7 @@ local TeamTemplate = require('Module:TeamTemplate')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
+local Characters = Lua.import('Module:Characters')
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
 
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Coaches, Managers, Analysts and more')
