@@ -81,14 +81,11 @@ function PlacementStats._buildConditions(opponentType, opponent, excludedTierTyp
 	if opponentType ~= Opponent.team then
 		table.insert(conditions, '[[opponentname::' .. opponent .. ']]')
 	else
-		local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
-		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-		if not opponentTemplate then
-			error('Missing team template for team: ' .. opponent)
+		if not TeamTemplate.exists(opponent) then
+			error(TeamTemplate.noTeamMessage(opponent))
 		end
 
-		local teamTemplates = TeamTemplate.queryHistorical(opponentTemplate)
-		teamTemplates = teamTemplates and Array.extractValues(teamTemplates) or {opponentTemplate}
+		local teamTemplates = TeamTemplate.queryHistoricalNames(opponent)
 		local opponentConditions = Array.map(teamTemplates, function(teamTemplate)
 			return '[[opponenttemplate::' .. teamTemplate .. ']]'
 		end)
