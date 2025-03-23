@@ -252,7 +252,7 @@ end
 
 ---Displays a team as an inline element. The team is specified by a template.
 ---@param props {flip: boolean?, template: string, style: teamStyle?}
----@return string|Widget?
+---@return Widget
 function OpponentDisplay.InlineTeamContainer(props)
 	if props.style == 'standard' or not props.style then
 		return TeamStandard{ name = props.template, flip = props.flip }
