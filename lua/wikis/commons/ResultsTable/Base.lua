@@ -329,15 +329,10 @@ end
 ---@param opponent string
 ---@return string[]
 function BaseResultsTable._getOpponentTemplates(opponent)
-	local rawOpponentTemplate = TeamTemplate.getRawOrNil(opponent) or {}
-	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-	if not opponentTemplate then
-		error('Missing team template for team: ' .. opponent)
+	if not TeamTemplate.exists(opponent) then
+		error(TeamTemplate.noTeamMessage(opponent))
 	end
-
-	local opponentTeamTemplates = TeamTemplate.queryHistorical(opponentTemplate)
-
-	return Array.append(Array.extractValues(opponentTeamTemplates or {}), opponentTemplate)
+	return TeamTemplate.queryHistoricalNames(opponent)
 end
 
 ---Builds Lpdb conditions for players on a given team
