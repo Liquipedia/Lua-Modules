@@ -84,7 +84,7 @@ function MatchPage.getByMatchId(props)
 	-- Add more opponent data field
 	matchPage:populateOpponents()
 
-	return MatchPage:render()
+	return matchPage:render()
 end
 
 function MatchPage:populateGames()
