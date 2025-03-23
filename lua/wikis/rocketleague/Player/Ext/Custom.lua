@@ -12,7 +12,7 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 

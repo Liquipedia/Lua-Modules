@@ -17,7 +17,7 @@ local Page = require('Module:Page')
 local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 local VodLink = require('Module:VodLink')
 
 local Info = Lua.import('Module:Info', {loadData = true})
