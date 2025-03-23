@@ -320,6 +320,7 @@ function BaseMatchPage:footer()
 					children = vods
 				} or nil,
 				AdditionalSection{
+					header = 'Links',
 					bodyClasses = { 'vodlink' },
 					children = Array.map(self:parseLinks(), function (parsedLink)
 						return IconImage{
