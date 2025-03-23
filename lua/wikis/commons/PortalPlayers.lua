@@ -74,17 +74,17 @@ function PortalPlayers:create()
 
 		wrapper:tag('h3')
 			:tag('span')
-			:addClass('mw-headline')
-			:attr('id', country)
-			:wikitext(flag .. NONBREAKING_SPACE .. country)
+				:addClass('mw-headline')
+				:attr('id', country)
+				:wikitext(flag .. NONBREAKING_SPACE .. country)
 
 		wrapper
-			:node(self:buildCountryTable {
+			:node(self:buildCountryTable{
 				players = playerData.players,
 				flag = flag,
 				isPlayer = true,
 			})
-			:node(self:buildCountryTable {
+			:node(self:buildCountryTable{
 				players = playerData.nonPlayers,
 				flag = flag,
 			})
@@ -97,7 +97,7 @@ end
 ---@return {[string]: {players: table[]?, nonPlayers: table[]?}}
 function PortalPlayers:_getPlayers()
 	local games = String.isNotEmpty(self.args.game) and
-		Array.map(Array.map(mw.text.split(self.args.game, ',', true), String.trim), function(game)
+		Array.map(Array.map(mw.text.split(self.args.game, ',', true), String.trim), function (game)
 			return '[[extradata_maingame::' .. game .. ']]'
 		end)
 	local gameConditions = games and ('(' .. table.concat(games, ' OR ') .. ')') or ''
@@ -135,8 +135,7 @@ function PortalPlayers:_getPlayers()
 	end
 
 	local players = mw.ext.LiquipediaDB.lpdb('player', {
-		query =
-		'pagename, id, name, team, status, type, extradata, links, nationality, localizedname, birthdate, deathdate',
+		query = 'pagename, id, name, team, status, type, extradata, links, nationality, localizedname, birthdate, deathdate',
 		order = 'id asc',
 		conditions = conditionString,
 		limit = 5000,
@@ -239,10 +238,10 @@ function PortalPlayers:header(args)
 
 	local header = mw.html.create('tr')
 		:tag('th')
-		:attr('colspan', 4)
-		:css('padding-left', '1em')
-		:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
-		:done()
+			:attr('colspan', 4)
+			:css('padding-left', '1em')
+			:wikitext(args.flag .. ' ' .. (args.isPlayer and self.playerType or NON_PLAYER_HEADER))
+			:done()
 
 	local subHeader = mw.html.create('tr')
 		:tag('th'):css('width', '175px'):wikitext(' ID'):done()
@@ -263,7 +262,7 @@ function PortalPlayers:row(player, isPlayer)
 	local row = mw.html.create('tr')
 		:addClass(PortalPlayers._getStatusBackground(player.status, (player.extradata or {}).banned))
 
-	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent { opponent = PortalPlayers.toOpponent(player) })
+	row:tag('td'):wikitext(' '):node(OpponentDisplay.BlockOpponent{opponent = PortalPlayers.toOpponent(player)})
 	row:tag('td')
 		:wikitext(' ' .. player.name)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
@@ -313,7 +312,7 @@ function PortalPlayers.toOpponent(player)
 		link = player.pagename,
 		name = player.id,
 		flag = player.nationality,
-	})) --[[@as standardOpponent]]
+	}))--[[@as standardOpponent]]
 end
 
 return PortalPlayers
