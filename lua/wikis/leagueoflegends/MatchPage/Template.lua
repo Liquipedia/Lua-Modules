@@ -8,25 +8,6 @@
 
 -- luacheck: ignore
 return {
-	header =
-		[=[
-			<div class="match-bm-lol-match-header">
-				<div class="match-bm-match-header-powered-by">Data provided by [[File:SAP_logo.svg|link=|SAP]]</div>
-				<div class="match-bm-lol-match-header-overview">
-					<div class="match-bm-lol-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{#seriesDots}} {{.}}{{/seriesDots}}</div>{{/opponents.1}}</div>
-					<div class="match-bm-lol-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}</div>
-					<div class="match-bm-lol-match-header-team">{{#opponents.2}}{{&iconDisplay}}<div class="match-bm-lol-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-lol-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div>{{#seriesDots}}{{.}} {{/seriesDots}}</div>{{/opponents.2}}</div>
-				</div>
-				<div class="match-bm-lol-match-header-tournament">[[{{parent}}|{{tournament}}]]</div>
-				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
-			</div>
-			{{#isBestOfOne}}<div class="match-bm-lol-game-overview"><div class="match-bm-lol-game-summary">
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.1.side}}[[File:Lol faction {{games.1.teams.1.side}}.png|link=|{{games.1.teams.1.side}} side]]{{/games.1.teams.1.side}}</div>
-			<div class="match-bm-lol-game-summary-center"><div class="match-bm-lol-game-summary-score-holder"><div class="match-bm-lol-game-summary-length">{{games.1.length}}</div></div></div>
-			<div class="match-bm-lol-game-summary-team">{{#games.1.teams.2.side}}[[File:Lol faction {{games.1.teams.2.side}}.png|link=|{{games.1.teams.2.side}} side]]{{/games.1.teams.2.side}}</div>
-			</div></div>{{/isBestOfOne}}
-			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b> {{#players}}[[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
-		]=],
 	footer =
 		[=[
 			<h3>Additional Information</h3>
