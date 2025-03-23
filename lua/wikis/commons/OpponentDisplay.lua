@@ -273,14 +273,9 @@ Only the default icon is supported.
 ]]
 ---@param props {flip: boolean?, style: teamStyle?, team: standardTeamProps}
 ---@return string
+---@deprecated
 function OpponentDisplay.InlineTeam(props)
-	return (OpponentDisplay.InlineTeamContainer(Table.merge(props, {
-		template = 'default',
-	}))
-		:gsub('DefaultPage', props.team.pageName)
-		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace) --[[@as string]])
-		:gsub('DefaultShort', props.team.shortName)
-		:gsub('DefaultBracket', props.team.bracketName))
+	return tostring(OpponentDisplay.InlineTeamContainer{name = props.team.pageName})
 end
 
 --[[
