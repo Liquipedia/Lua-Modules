@@ -180,7 +180,7 @@ function Count.placements(args)
 
 	elseif String.isNotEmpty(args.team) then
 		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(Count._getOpponentNames(args.team), function(templateValue)
+		Array.forEach(TeamTemplate.queryHistoricalNames(args.team), function(templateValue)
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
 				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
@@ -220,15 +220,6 @@ end
 --[[
 Condition Functions
 ]]--
-
-
----Retrieve all team templates for team argument parameter
----@param opponent string
----@return string[]
-function Count._getOpponentNames(opponent)
-	local opponentNames = TeamTemplate.queryHistoricalNames(opponent)
-	return Array.extractValues(opponentNames)
-end
 
 
 ---Returns the base query conditions based on input args
