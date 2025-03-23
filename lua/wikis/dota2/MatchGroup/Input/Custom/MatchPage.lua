@@ -77,7 +77,10 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex, oppo
 	local ingameIDmapping = Array.reduce(opponent.match2players, function (aggregate, player)
 		local id = (player.extradata or {}).customId
 		if id then
-			aggregate[id] = player
+			aggregate[id] = {
+				pagename = player.pageName,
+				id = player.displayName
+			}
 		end
 		return aggregate
 	end, {})
@@ -90,7 +93,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex, oppo
 		})[1]
 	end
 	local players = Array.map(team.players, function(player)
-		local playerData = fetchLpdbPlayer(player.id) or ingameIDmapping[player.id] or {}
+		local playerData = ingameIDmapping[player.id] or fetchLpdbPlayer(player.id) or {}
 		return {
 			player = playerData.pagename or player.name,
 			name = playerData.id,

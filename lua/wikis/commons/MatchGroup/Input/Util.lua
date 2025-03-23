@@ -272,7 +272,7 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 				team = player.team,
 				extradata = Logic.nilIfEmpty({
 					faction = player.faction,
-					customId = player.customId
+					customId = (player.extradata or {}).customId
 				})
 			}
 		end)
@@ -440,6 +440,8 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 			displayName = player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
+		})
+		players[normalizedPageName].extradata = Table.merge(players[normalizedPageName].extradata or {}, {
 			customId = player.customId
 		})
 	end
