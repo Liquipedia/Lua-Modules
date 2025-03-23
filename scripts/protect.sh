@@ -13,11 +13,11 @@ rawCreatedFiles=$1
 rawMovedFiles=$2
 
 if [[ -n "$rawCreatedFiles" ]] && [[ ${#rawCreatedFiles[@]} -ne 0 ]]; then
-  createdFiles=$1
+  createdFiles=$rawCreatedFiles
 fi
 
 if [[ -n "$rawMovedFiles" ]] && [[ ${#rawMovedFiles[@]} -ne 0 ]]; then
-  movedFiles=$2
+  movedFiles=$rawMovedFiles
 fi
 
 if [[ -n "$createdFiles" ]] && [[ -n "$movedFiles" ]]; then
@@ -36,7 +36,7 @@ fi
 luaFiles=$(find lua -type f -name '*/wikis/*.lua')
 
 fetchAllWikis() {
-  data=$(
+  allWikis=$(
     curl \
       -s \
       -b "$ckf" \
@@ -50,14 +50,17 @@ fetchAllWikis() {
   # Don't get rate limited
   sleep 4
 
-  return $data
 }
 
 hasNoLocalVersion() {
-  if [[ $luaFiles == *"lua/wikis/${2}/${1}.lua"* ]] || [[ $filesToProtect == *"lua/wikis/${2}/${1}.lua"* ]]; then
-    return false
+  if [[ $2 == "commons" ]]; then
+    return 1
   fi
-  return true
+
+  if [[ $luaFiles == *"lua/wikis/${2}/${1}.lua"* ]] || [[ $filesToProtect == *"lua/wikis/${2}/${1}.lua"* ]]; then
+    return 0
+  fi
+  return 1
 }
 
 protectPage() {
@@ -173,9 +176,9 @@ pageExists() {
   sleep 4
 
   if [[ $rawResult == *'"missing":true'* ]]; then
-    return false
+    return 0
   fi
-  return true
+  return 1
 }
 
 for fileToProtect in $filesToProtect; do
@@ -184,7 +187,7 @@ for fileToProtect in $filesToProtect; do
     wiki=${BASH_REMATCH[1]}
     module=${BASH_REMATCH[2]}
 
-    if [[ "commons" -ne $wiki ]]; then
+    if [[ "commons" != $wiki ]]; then
       # if the file is on a wiki only protect on the wiki
       # for wiki setups only apply if $wiki matches the wiki we are setting up
       if [[ -n ${WIKI_TO_PROTECT} ]] || [[ $wiki == ${WIKI_TO_PROTECT} ]]; then
@@ -192,11 +195,12 @@ for fileToProtect in $filesToProtect; do
       fi
     else # commons case
       protectExistingPage $module $wiki
-      if [[ -n $allWikis ]]; then
-        allWikis="$(fetchAllWikis)"
+      if [[ -z "$allWikis" ]] || [[ ${#allWikis[@]} -ne 0 ]]; then
+        fetchAllWikis
       fi
       for deployWiki in $allWikis; do
         if hasNoLocalVersion $module $deployWiki; then
+          echo "...protecting ${module} against creation on ${deployWiki}"
           if pageExists $module $deployWiki; then
             echo "::warning::$fileToProtect already exists on $deployWiki"
             protectErrors+=("$fileToProtect on $deployWiki")
