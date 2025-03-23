@@ -158,43 +158,50 @@ end
 function BaseMatchPage:render()
 	self:makeDisplayTitle()
 	return Div{
-		children = {
+		children = WidgetUtil.collect(
 			self:header(),
 			self:renderGames(),
 			self:footer()
-		}
+		)
 	}
 end
 
----@return string|Html|Widget
+---@return Widget[]
 function BaseMatchPage:header()
-	return Div{
-		classes = { 'match-bm-lol-match-header' },
-		children = {
-			Div{
-				classes = { 'match-bm-match-header-powered-by' },
-				children = {
-					'Data provided by ',
-					Image.display('SAP logo.svg', nil, {link = '', alt = 'SAP'})
-				}
-			},
-			Div{
-				classes = { 'match-bm-lol-match-header-overview' },
-				children = {
-					self:_makeTeamDisplay(self.opponents[1]),
-					self:_makeResultDisplay(),
+	return WidgetUtil.collect(
+		Div{
+			classes = { 'match-bm-lol-match-header' },
+			children = {
+				Div{
+					classes = { 'match-bm-match-header-powered-by' },
+					children = {
+						'Data provided by ',
+						Image.display('SAP logo.svg', nil, {link = '', alt = 'SAP'})
+					}
+				},
+				Div{
+					classes = { 'match-bm-lol-match-header-overview' },
+					children = {
+						self:_makeTeamDisplay(self.opponents[1]),
+						self:_makeResultDisplay(),
 					self:_makeTeamDisplay(self.opponents[2])
+					}
+				},
+				Div{
+					classes = { 'match-bm-lol-match-header-tournament' },
+					children = {
+						Link{ link = self.matchData.parent, children = self.matchData.tournament }
+					}
+				},
+				Div{
+					classes = { 'match-bm-lol-match-header-date' },
+					children = { self:getCountdownBlock() }
 				}
 			},
-			Div{
-				classes = { 'match-bm-lol-match-header-tournament' },
-				children = {
-					Link{ link = self.matchData.parent, children = self.matchData.tournament }
-				}
-			},
-			self:_showMvps()
-		}
-	}
+
+		},
+		self:_showMvps()
+	)
 end
 
 ---comment
