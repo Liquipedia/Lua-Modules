@@ -96,26 +96,6 @@ function MatchPage:populateGames()
 	end)
 end
 
-function MatchPage:populateOpponents()
-	Array.forEach(self.opponents, function(opponent, index)
-		opponent.opponentIndex = index
-
-		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
-		if not teamTemplate then
-			return
-		end
-
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
-		opponent.shortname = teamTemplate.shortname
-		opponent.page = teamTemplate.page
-		opponent.name = teamTemplate.name
-
-		opponent.seriesDots = Array.map(self.games, function(game)
-			return game.teams[index].scoreDisplay
-		end)
-	end)
-end
-
 function MatchPage:getCharacterIcon(character)
 	local characterName = character
 	if type(character) == 'table' then
@@ -130,12 +110,14 @@ end
 
 ---@return string
 function MatchPage:makeDisplayTitle()
-	if not self.opponents[1].shortname and self.opponents[2].shortname then
+	local team1name = self.opponents[1].teamTemplateData.shortname
+	local team2name = self.opponents[2].teamTemplateData.shortname
+	if not team1name and team2name then
 		return table.concat({'Match in', self.matchData.tickername}, ' ')
 	end
 
-	local team1name = self.opponents[1].shortname or 'TBD'
-	local team2name = self.opponents[2].shortname or 'TBD'
+	team1name = team1name or 'TBD'
+	team2name = team2name or 'TBD'
 	local tournamentName = self.matchData.tickername
 	local displayTitle = team1name .. ' vs. ' .. team2name
 	if not tournamentName then
