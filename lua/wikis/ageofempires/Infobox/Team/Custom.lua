@@ -135,20 +135,18 @@ end
 ---@return ConditionTree
 function CustomTeam:_buildTeamPlacementConditions()
 	local team = self.args.teamtemplate or self.args.name or self.pagename
-	local rawOpponentTemplate = TeamTemplate.getRawOrNil(team) or {}
-	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-	if not opponentTemplate then
-		error('Missing team template for team: ' .. team)
+	if not TeamTemplate.exists(team) then
+		error(TeamTemplate.noTeamMessage(team))
 	end
 
-	local opponentTeamTemplates = TeamTemplate.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTemplates = TeamTemplate.queryHistoricalNames(team)
 
 	local playerConditions = self:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
-	for _, teamTemplate in pairs(opponentTeamTemplates) do
+	Array.forEach(opponentTeamTemplates, function (teamTemplate)
 		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
-	end
+	end)
 
 	local conditions = ConditionTree(BooleanOperator.any):add{
 		ConditionTree(BooleanOperator.all):add{
