@@ -8,26 +8,6 @@
 
 -- luacheck: ignore
 return {
-	footer =
-		[=[
-			<h3>Additional Information</h3>
-			<div class="match-bm-match-additional">
-				{{#vods.1}}
-					<div class="match-bm-match-additional-section">
-						<div class="match-bm-match-additional-section-header">VODs</div>
-						<div class="match-bm-match-additional-section-body">{{#vods}}{{&.}}{{/vods}}</div>
-					</div>{{/vods.1}}{{#parsedLinks.1}}
-					<div class="match-bm-match-additional-section">
-						<div class="match-bm-match-additional-section-header">Socials</div>
-						<div class="match-bm-match-additional-section-body vodlink">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
-					</div>{{/parsedLinks.1}}{{#patch}}
-					<div class="match-bm-match-additional-section">
-						<div class="match-bm-match-additional-section-header">Patch</div>
-						<div class="match-bm-match-additional-section-body">[[Version {{patch}}]]</div>
-					</div>
-				{{/patch}}
-			</div>
-		]=],
 	game =
 		[=[
 			<h3>Draft</h3>
