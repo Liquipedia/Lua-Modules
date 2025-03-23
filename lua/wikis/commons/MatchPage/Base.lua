@@ -179,7 +179,7 @@ function BaseMatchPage:header()
 				}
 			},
 			Div{
-				classes = { 'match-bm-match-header-overview' },
+				classes = { 'match-bm-lol-match-header-overview' },
 				children = {
 					self:_makeTeamDisplay(self.opponents[1]),
 					self:_makeResultDisplay(),
@@ -270,7 +270,7 @@ function BaseMatchPage:renderGames()
 	local games = Array.map(Array.filter(self.matchData.games, function(game)
 		return game.status ~= BaseMatchPage.NOT_PLAYED
 	end), function(game)
-		return BaseMatchPage:renderGame(game)
+		return self:renderGame(game)
 	end)
 
 	if #games < 2 then
