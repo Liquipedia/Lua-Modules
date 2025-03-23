@@ -1057,6 +1057,7 @@ mw.ext.TeamTemplate = {}
 ---imagedark: string,
 ---legacyimage: string,
 ---legacyimagedark: string,
+---nolink: boolean?,
 ---}
 
 ---@param teamtemplate string

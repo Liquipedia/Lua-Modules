@@ -67,7 +67,7 @@ function TeamInlineWidget:render()
 					Image.display(teamTemplate.image, nil, {
 						size = ICON_SIZE,
 						alignment = 'middle',
-						link = teamTemplate.page
+						link = teamTemplate.nolink and '' or teamTemplate.page
 					})
 				}
 			},
@@ -77,17 +77,19 @@ function TeamInlineWidget:render()
 					Image.display(teamTemplate.imagedark, nil, {
 						size = ICON_SIZE,
 						alignment = 'middle',
-						link = teamTemplate.page
+						link = teamTemplate.nolink and '' or teamTemplate.page
 					})
 				}
 			}
 		}},
 		String.isNotEmpty(self:getDisplayName()) and Span{
 			classes = { 'team-template-text' },
-			children = {Link{
-				children = self:getDisplayName(),
-				link = teamTemplate.page
-			}}
+			children = {
+				teamTemplate.nolink and self:getDisplayName() or Link{
+					children = self:getDisplayName(),
+					link = teamTemplate.page
+				}
+			}
 		} or nil
 	), ' ')
 	return Span{
