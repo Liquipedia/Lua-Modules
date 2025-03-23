@@ -114,7 +114,7 @@ protectPage() {
       | gunzip \
       | jq ".query.tokens.csrftoken" -r
   )
-  rawResult=$(
+  rawProtectResult=$(
     curl \
       -s \
       -b "$ckf" \
@@ -132,13 +132,11 @@ protectPage() {
   )
   # Don't get rate limited
   sleep 4
-
-  return $rawResult
 }
 
 protectExistingPage() {
-  rawResult=$(protectPage $1 $2 "edit=allow-only-sysop|move=allow-only-sysop")
-  result=$(echo "$rawResult" | jq ".protect.protections.[].edit" -r)
+  protectPage $1 $2 "edit=allow-only-sysop|move=allow-only-sysop"
+  result=$(echo "$rawProtectResult" | jq ".protect.protections.[].edit" -r)
   if [[ $result != *"allow-only-sysop"* ]]; then
     echo "::warning::could not protect $1 on $2 against editing"
     protectErrors+=("$1 on $2")
@@ -146,8 +144,8 @@ protectExistingPage() {
 }
 
 protectNonExistingPage() {
-  rawResult=$(protectPage $1 $2 "create=allow-only-sysop")
-  result=$(echo "$rawResult" | jq ".protect.protections.[].create" -r)
+  protectPage $1 $2 "create=allow-only-sysop"
+  result=$(echo "$rawProtectResult" | jq ".protect.protections.[].create" -r)
   if [[ $result != *"allow-only-sysop"* ]]; then
     echo "::warning::could not protect $1 on $2 against creation"
     protectErrors+=("$1 on $2")
