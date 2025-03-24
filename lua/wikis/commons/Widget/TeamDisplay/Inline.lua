@@ -99,7 +99,7 @@ function TeamInlineWidget:render()
 	), ' ')
 	return Span{
 		attributes = { ['data-highlighting-class'] = self.teamTemplate.name },
-		classes = { 'team-template-team' .. (flip and '2' or '') .. '-' .. self:getType() },
+		classes = { 'team-template-team' .. (flip and '2' or '') .. '-' .. self.displayType.displayType },
 		children = flip and Array.reverse(children) or children
 	}
 end
@@ -111,6 +111,7 @@ function TeamInlineWidget:getNameComponent()
 			return TeamName{
 				additionalClasses = element[2],
 				displayName = self.teamTemplate[element[1]],
+				noLink = self.teamTemplate.nolink,
 				page = self.teamTemplate.page
 			}
 		end)

@@ -19,6 +19,7 @@ local Span = HtmlWidgets.Span
 ---@class TeamNameDisplayParameters
 ---@field additionalClasses string[]?
 ---@field displayName string?
+---@field noLink boolean?
 ---@field page string?
 
 ---@class TeamNameDisplay: Widget
@@ -34,10 +35,12 @@ function TeamNameDisplay:render()
 	return Span{
 		classes = Array.extend({ 'team-template-text' }, self.props.additionalClasses),
 		children = {
-			String.isEmpty(page) and displayName or Link{
+			self.props.noLink and displayName or self.props.noLink and displayName or Link{
 				children = displayName,
 				link = page
 			}
 		}
 	}
 end
+
+return TeamNameDisplay
