@@ -3,9 +3,9 @@
 userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
 
 declare -A loggedin
-declare -A allWikis
-declare -A regexErrors
-declare -A protectErrors
+declare -a allWikis
+declare -a regexErrors=()
+declare -a protectErrors=()
 
 regex="^\.?/?lua/wikis/([a-z0-9]+)/(.*)\.lua$"
 
@@ -48,10 +48,10 @@ checkForLocalVersion() {
 }
 
 protectPage() {
-  protectOptions=$3
-  protectionToCheck=$4
-  wiki=$2
   page="Module:${1}"
+  wiki=$2
+  protectOptions=$3
+  protectMode=$4
   echo "...wiki = $wiki"
   echo "...page = $page"
   wikiApiUrl="${WIKI_BASE_URL}/${wiki}/api.php"
@@ -121,10 +121,12 @@ protectPage() {
   # Don't get rate limited
   sleep 4
 
-  result=$(echo "$rawProtectResult" | jq ".protect.protections.[].${protectionToCheck}" -r)
+  result=$(echo "$rawProtectResult" | jq ".protect.protections.[].${protectMode}" -r)
   if [[ $result != *"allow-only-sysop"* ]]; then
-    echo "::warning::could not protect $1 on $2 against creation"
-    protectErrors+=("$1 on $2")
+    echo "::warning::could not protect $1 on $2"
+    protectErrorMsg="${protectMode}:${wiki}:${page}"
+    echo "${protectErrorMsg}"
+    protectErrors+=("${protectErrorMsg}")
   fi
 }
 
@@ -209,18 +211,22 @@ done
 
 if [[ ${#regexErrors[@]} -ne 0 ]]; then
   echo "::warning::Some regexes failed"
-  for failedRegex in $regexErrors; do
-    echo "::warning failed regex:: ${failedRegex}"
-    echo ":warning: ${failedRegex} failed regex" >> $GITHUB_STEP_SUMMARY
+  echo ":warning: Some regexes failed" >> $GITHUB_STEP_SUMMARY
+  echo "::group::Files the regex failed on"
+  for value in "${regexErrors[@]}"; do
+     echo "... ${failedRegex}"
   done
+  echo "::endgroup::"
 fi
 
 if [[ ${#protectErrors[@]} -ne 0 ]]; then
   echo "::warning::Some modules could not be protected"
-  for info in $protectErrors; do
-    echo "::warning protection failed:: ${info}"
-    echo ":warning protection failed: ${info}" >> $GITHUB_STEP_SUMMARY
+  echo ":warning: Some modules could not be protected" >> $GITHUB_STEP_SUMMARY
+  echo "::group::Failed protections"
+  for value in "${protectErrors[@]}"; do
+     echo "... ${value}"
   done
+  echo "::endgroup::"
 fi
 
 rm -f cookie_*
