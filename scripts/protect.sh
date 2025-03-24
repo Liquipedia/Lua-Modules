@@ -124,7 +124,6 @@ protectPage() {
   if [[ $result != *"allow-only-sysop"* ]]; then
     echo "::warning::could not (${protectMode}) protect $1 on $2"
     protectErrorMsg="${protectMode}:${wiki}:${page}"
-    echo "${protectErrorMsg}"
     protectErrors+=("${protectErrorMsg}")
   fi
 }
@@ -194,7 +193,8 @@ for fileToProtect in $filesToProtect; do
           checkIfPageExists $module $deployWiki
           if $pageExists; then
             echo "::warning::$fileToProtect already exists on $deployWiki"
-            protectErrors+=("$fileToProtect on $deployWiki")
+            protectErrorMsg="create:${deployWiki}:${fileToProtect}"
+            protectErrors+=("${protectErrorMsg}")
           else
             protectNonExistingPage $module $deployWiki
           fi
