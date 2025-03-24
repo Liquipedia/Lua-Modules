@@ -34,7 +34,6 @@ fetchAllWikis() {
   )
   # Don't get rate limited
   sleep 4
-
 }
 
 checkForLocalVersion() {
@@ -123,7 +122,7 @@ protectPage() {
 
   result=$(echo "$rawProtectResult" | jq ".protect.protections.[].${protectMode}" -r)
   if [[ $result != *"allow-only-sysop"* ]]; then
-    echo "::warning::could not protect $1 on $2"
+    echo "::warning::could not (${protectMode}) protect $1 on $2"
     protectErrorMsg="${protectMode}:${wiki}:${page}"
     echo "${protectErrorMsg}"
     protectErrors+=("${protectErrorMsg}")
@@ -214,7 +213,7 @@ if [[ ${#regexErrors[@]} -ne 0 ]]; then
   echo ":warning: Some regexes failed" >> $GITHUB_STEP_SUMMARY
   echo "::group::Files the regex failed on"
   for value in "${regexErrors[@]}"; do
-     echo "... ${failedRegex}"
+      echo "... ${failedRegex}"
   done
   echo "::endgroup::"
 fi
@@ -224,7 +223,7 @@ if [[ ${#protectErrors[@]} -ne 0 ]]; then
   echo ":warning: Some modules could not be protected" >> $GITHUB_STEP_SUMMARY
   echo "::group::Failed protections"
   for value in "${protectErrors[@]}"; do
-     echo "... ${value}"
+      echo "... ${value}"
   done
   echo "::endgroup::"
 fi
@@ -234,4 +233,3 @@ rm -f cookie_*
 if [[ ${#protectErrors[@]} -ne 0 ]] || [[ ${#regexErrors[@]} -ne 0 ]]; then
   exit 1
 fi
-
