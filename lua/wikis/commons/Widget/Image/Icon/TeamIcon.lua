@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 
@@ -23,6 +22,7 @@ local ICON_SIZE = '100x50px'
 ---@field page string?
 ---@field size string?
 ---@field nolink boolean?
+---@field legacy boolean?
 
 ---@class TeamIconWidget: IconWidget
 ---@operator call(TeamIconWidgetParameters): TeamIconWidget
@@ -32,11 +32,14 @@ TeamIcon.defaultProps = {
 	size = ICON_SIZE
 }
 
----@param theme 'lightmode'|'darkmode'|'allmode'
+---@param props { theme: 'lightmode'|'darkmode'|'allmode', legacy: boolean? }
 ---@return string[]
-TeamIcon._getSpanClasses = FnUtil.memoize(function(theme)
-	return { 'team-template-image-icon', 'team-template-' .. theme }
-end)
+function TeamIcon._getSpanClasses(props)
+	return {
+		'team-template-image-' .. props.legacy and 'legacy' or 'icon',
+		'team-template-' .. props.theme
+	}
+end
 
 ---@return string?
 function TeamIcon:_getPageLink()
@@ -46,10 +49,11 @@ end
 ---@return Widget|Widget[]
 function TeamIcon:render()
 	local imageLight = self.props.imageLight
-	local imageDark = self.props.imageDark
-	if self.props.imageLight == imageDark then
+	local imageDark = self.props.imageDark or self.props.imageLight
+	local allmode = imageLight == imageDark
+	if allmode then
 		return HtmlWidgets.Span{
-			classes = TeamIcon._getSpanClasses('allmode'),
+			classes = TeamIcon._getSpanClasses{theme = 'allmode', legacy = self.props.legacy},
 			children = {
 				Image.display(imageLight, nil, {
 					size = ICON_SIZE,
@@ -61,7 +65,7 @@ function TeamIcon:render()
 	end
 	return {
 		Span{
-			classes = TeamIcon._getSpanClasses('lightmode'),
+			classes = TeamIcon._getSpanClasses{theme = 'lightmode'},
 			children = {
 				Image.display(imageLight, nil, {
 					size = ICON_SIZE,
@@ -71,7 +75,7 @@ function TeamIcon:render()
 			}
 		},
 		Span{
-			classes = TeamIcon._getSpanClasses('darkmode'),
+			classes = TeamIcon._getSpanClasses{theme = 'darkmode'},
 			children = {
 				Image.display(imageDark, nil, {
 					size = ICON_SIZE,
