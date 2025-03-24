@@ -135,9 +135,7 @@ end
 ---@return ConditionTree
 function CustomTeam:_buildTeamPlacementConditions()
 	local team = self.args.teamtemplate or self.args.name or self.pagename
-	if not TeamTemplate.exists(team) then
-		error(TeamTemplate.noTeamMessage(team))
-	end
+	assert(TeamTemplate.exists(team), TeamTemplate.noTeamMessage(team))
 
 	local opponentTeamTemplates = TeamTemplate.queryHistoricalNames(team)
 
