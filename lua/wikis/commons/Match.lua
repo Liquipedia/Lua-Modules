@@ -538,6 +538,4 @@ if FeatureFlag.get('perf') then
 	Match.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'subobjectPerf'})
 end
 
-Lua.autoInvokeEntryPoints(Match, 'Module:Match', {'toEncodedJson'})
-
 return Match
