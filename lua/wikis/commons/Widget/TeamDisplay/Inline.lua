@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -18,9 +17,8 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Span = HtmlWidgets.Span
+local TeamIcon = Lua.import('Module:Widget/Image/Icon/TeamIcon')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
-local ICON_SIZE = '100x50px'
 
 ---@class TeamInlineParameters
 ---@field name string?
@@ -60,28 +58,12 @@ function TeamInlineWidget:render()
 	end
 	local flip = self.flip
 	local children = Array.interleave(WidgetUtil.collect(
-		HtmlWidgets.Fragment{children = {
-			Span{
-				classes = { 'team-template-image-icon', 'team-template-lightmode' },
-				children = {
-					Image.display(teamTemplate.image, nil, {
-						size = ICON_SIZE,
-						alignment = 'middle',
-						link = teamTemplate.nolink and '' or teamTemplate.page
-					})
-				}
-			},
-			Span{
-				classes = { 'team-template-image-icon', 'team-template-darkmode' },
-				children = {
-					Image.display(teamTemplate.imagedark, nil, {
-						size = ICON_SIZE,
-						alignment = 'middle',
-						link = teamTemplate.nolink and '' or teamTemplate.page
-					})
-				}
-			}
-		}},
+		TeamIcon{
+			imageLight = self.teamTemplate.image,
+			imageDark = self.teamTemplate.imagedark,
+			page = self.teamTemplate.page,
+			nolink = self.teamTemplate.nolink
+		},
 		String.isNotEmpty(self:getDisplayName()) and Span{
 			classes = { 'team-template-text' },
 			children = {
