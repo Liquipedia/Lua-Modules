@@ -7,9 +7,9 @@
 --
 
 local Array = require('Module:Array')
-local Data = mw.loadData('Module:TeamTemplate/data')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local SpecialTemplates = mw.loadData('Module:TeamTemplate/data')
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
@@ -89,7 +89,7 @@ does not exist.
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	team = team:gsub('_', ' '):lower()
-	return Data[team] or mw.ext.TeamTemplate.raw(team, date)
+	return SpecialTemplates[team] or mw.ext.TeamTemplate.raw(team, date)
 end
 
 ---Creates error message for missing team templates.
