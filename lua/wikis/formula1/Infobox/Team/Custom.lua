@@ -18,7 +18,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
-local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 ---@class Formula1InfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -58,7 +58,7 @@ function CustomInjector:parse(id, widgets)
 
 		if args.academy then
 			local academyTeams = Array.map(self.caller:getAllArgsForBase(args, 'academy'), function(team)
-				return TeamInline{name = team}
+				return TeamInline{name = team, displayType = 'standard' }
 			end)
 			Array.extendWith(widgets,
 				{Title{children = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},

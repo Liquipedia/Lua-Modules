@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
-local TeamIconWidget = Lua.import('Module:Widget/TeamDisplay/Inline/Icon')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local MediaList = {}
 
@@ -343,7 +343,7 @@ function MediaList._displayTeam(subject, date)
 	if not team then
 		return
 	end
-	return TeamIconWidget{ teamTemplate = TeamTemplate.getRaw(team, date) }
+	return TeamInline{ teamTemplate = TeamTemplate.getRaw(team, date), displayType = 'icon' }
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.

@@ -22,7 +22,7 @@ local PortalPlayers = Lua.import('Module:PortalPlayers')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Team Principals, Race Engineers, Strategists and more')
 	.. ' & ' .. Abbreviation.make('Owners', 'Founders, Owners, Investors and more')
@@ -89,7 +89,9 @@ function CustomPortalPlayers:row(player, isPlayer)
 	row:tag('td'):node(CustomPortalPlayers._getAge(player))
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = TeamTemplate.exists(player.team) and tostring(TeamInline{name = player.team}) or ''
+	local teamText = TeamTemplate.exists(player.team) and tostring(TeamInline{
+		name = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
