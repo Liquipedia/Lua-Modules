@@ -18,9 +18,7 @@ local TypeUtil = require('Module:TypeUtil')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
-local TeamBracket = Lua.import('Module:Widget/TeamDisplay/Inline/Bracket')
-local TeamShort = Lua.import('Module:Widget/TeamDisplay/Inline/Short')
-local TeamStandard = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -255,12 +253,12 @@ end
 ---@return Widget
 function OpponentDisplay.InlineTeamContainer(props)
 	if props.style == 'standard' or not props.style then
-		return TeamStandard{ name = props.template, flip = props.flip }
+		return TeamInline{ name = props.template, flip = props.flip, displayType = 'standard' }
 	elseif props.style == 'short' then
-		return TeamShort{ name = props.template, flip = props.flip }
+		return TeamInline{ name = props.template, flip = props.flip, displayType = 'short' }
 	elseif props.style == 'bracket' then
 		if not props.flip then
-			return TeamBracket{ name = props.template }
+			return TeamInline{ name = props.template, displayType = 'bracket' }
 		else
 			error('Flipped style=bracket is not supported')
 		end

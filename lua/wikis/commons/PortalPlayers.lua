@@ -21,7 +21,7 @@ local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline/Standard')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'
@@ -268,7 +268,9 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = TeamTemplate.exists(player.team) and tostring(TeamInline { name = player.team }) or ''
+	local teamText = TeamTemplate.exists(player.team) and tostring(TeamInline {
+		name = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
