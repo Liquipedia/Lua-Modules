@@ -8,17 +8,15 @@ on:
         required: true
 
 jobs:
-  deploy:
+  protect:
+    if: github.ref_name == github.event.repository.default_branch
     name: Protect newly set up wiki
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
 
       - name: Lua Protect
-        if: github.ref_name == github.event.repository.default_branch
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
