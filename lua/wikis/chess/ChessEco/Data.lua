@@ -1,3 +1,11 @@
+---
+-- @Liquipedia
+-- wiki=chess
+-- page=Module:ChessEco/Data
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 return {
 	['A00'] = "Uncommon Opening",
 	['A01'] = "Nimzo-Larsen Attack",
