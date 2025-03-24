@@ -43,7 +43,7 @@ function TeamIcon:_getPageLink()
 	return self.props.nolink and '' or self.props.page
 end
 
----@return Widget
+---@return Widget|Widget[]
 function TeamIcon:render()
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark
@@ -59,7 +59,7 @@ function TeamIcon:render()
 			}
 		}
 	end
-	return HtmlWidgets.Fragment{children = {
+	return {
 		Span{
 			classes = TeamIcon._getSpanClasses('lightmode'),
 			children = {
@@ -80,7 +80,7 @@ function TeamIcon:render()
 				})
 			}
 		}
-	}}
+	}
 end
 
 return TeamIcon
