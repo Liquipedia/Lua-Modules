@@ -135,7 +135,7 @@ end
 function Achievements._getTeamNames()
 	local pageName = mw.title.getCurrentTitle().text
 	local historicalPages = TeamTemplate.queryHistoricalNames(pageName)
-	assert(Logic.isNotEmpty(historicalPages), 'No team template exists for "' .. pageName .. '"')
+	assert(Logic.isNotEmpty(historicalPages), TeamTemplate.noTeamMessage(pageName))
 
 	return Array.extend(
 		Array.map(historicalPages, function(team) return (team:gsub(' ', '_')) end),

@@ -97,7 +97,7 @@ end
 ---@param date string|number?
 ---@return string
 function TeamTemplate.noTeamMessage(pageName, date)
-	return 'Missing template for team=' .. tostring(pageName)
+	return 'Missing team template for "' .. tostring(pageName) .. '"'
 		.. (date and ' on date=' .. tostring(date) or '')
 end
 
