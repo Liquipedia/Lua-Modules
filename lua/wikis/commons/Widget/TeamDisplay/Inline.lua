@@ -41,6 +41,13 @@ local TeamInlineTypes = {
 	['standard'] = {
 		displayType = 'standard',
 		displayNames = {['name'] = {}}
+	},
+	['hybrid'] = {
+		displayType = 'standard',
+		displayNames = {
+			['name'] = {'mobile-hide'},
+			['nameshort'] = {'mobile-only'}
+		}
 	}
 }
 
