@@ -24,7 +24,7 @@ function TeamLogoGallery.run(args)
 	args = args or {}
 	local name = (args.name or mw.title.getCurrentTitle().prefixedText):gsub('_', ' '):lower()
 
-	assert(TeamTemplate.exists(name), 'Missing team template "' .. name .. '"')
+	assert(TeamTemplate.exists(name), TeamTemplate.noTeamMessage(name))
 
 	local imageData = TeamLogoGallery._getImageData(name, Logic.readBool(args.showPresentLogo))
 
