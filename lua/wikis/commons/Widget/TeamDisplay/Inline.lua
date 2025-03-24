@@ -90,10 +90,11 @@ function TeamInlineWidget:render()
 	local flip = self.flip
 	local children = Array.interleave(WidgetUtil.collect(
 		TeamIcon{
-			imageLight = self.teamTemplate.image,
-			imageDark = self.teamTemplate.imagedark,
+			imageLight = Logic.emptyOr(self.teamTemplate.image, self.teamTemplate.legacyimage),
+			imageDark = Logic.emptyOr(self.teamTemplate.imagedark, self.teamTemplate.legacyimagedark),
 			page = self.teamTemplate.page,
-			nolink = self.teamTemplate.nolink
+			nolink = self.teamTemplate.nolink,
+			legacy = Logic.isNotEmpty(self.teamTemplate.legacyimage)
 		},
 		self:getNameComponent()
 	), ' ')
