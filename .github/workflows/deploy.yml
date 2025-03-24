@@ -20,8 +20,7 @@ jobs:
         uses: tj-actions/changed-files@v42
         with:
           files: |
-            components/**/*.lua
-            standard/**/*.lua
+            lua/wikis/**/*.lua
 
       - id: res-changed-files
         uses: tj-actions/changed-files@v42
@@ -39,6 +38,7 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/deploy_res.sh "${{ steps.res-changed-files.outputs.all_changed_files }}"
 
       - name: Lua Deploy
@@ -48,4 +48,5 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/deploy.sh "${{ steps.lua-changed-files.outputs.all_changed_files }}"

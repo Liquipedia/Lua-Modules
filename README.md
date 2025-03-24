@@ -21,9 +21,19 @@ Clone the repository. This requires [git](https://git-scm.com/downloads) to be i
 
 Recommended to use WSL. Then follow the Unix instructions.
 
-##### Unix
+##### Unix (Linux Ubuntu)
 
-TODO: Write
+###### Installing Lua and Luarocks
+1. Follow [these instruction](https://github.com/luarocks/luarocks/blob/main/docs/installation_instructions_for_unix.md) on installing needed development tools on your system. 
+2. Instead of downloading and unpacking the latest Lua version, download lua-5.1.tar.gz from [lua.org](https://www.lua.org/ftp/) and unpack it.
+3. Follow the instructions linked above for the rest of the process.
+4. If you have done everything correctly, you should now have Lua and Luarocks installed on your system.
+
+###### Installing busted and luacheck
+1. Run `luarocks install --lua-version=5.1 busted` to install busted (used as a testing framework).
+2. Run `luarocks install --lua-version=5.1 luacheck` to install luacheck (used for linting).
+3. Make sure installed rocks are available in your path variable. 
+4. Test if everything is correctly installed by running `busted -C lua` and `luacheck lua --config lua/.luacheckrc` from the root of this project. If all tests pass and all checks are OK, you're installation of busted and luacheck is complete.
 
 ##### Mac
 
@@ -47,6 +57,29 @@ We recommend VSCode. Highly recommend that you get the extension [Lua](https://m
 ##### Intellij
 
 Highly recommend that you get the extension [SumnekoLua](https://plugins.jetbrains.com/plugin/22315-sumnekolua).
+
+##### Neovim
+
+1. Add [lua_ls](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configuration (useful tools for lua files). Installation instruction can be found [here](https://luals.github.io/#neovim-install).
+2. Add [eslint](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#eslint) in your Neovims lsp configration (useful linting for Javascript files)
+3. Add [stylelint_lsp](https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.md#stylelint_lsp) in your Neovims lsp configuration (useful linting for css and less files). Make sure to add `less` as a filetype to get the benefits of this LSP on less files in this project. You can also enable `autoFixOnSave` or [other settings](https://github.com/bmatcuk/stylelint-lsp?tab=readme-ov-file#settings) if you want:
+
+```lua
+require('lspconfig').stylelint_lsp.setup {
+  filetypes = {
+    'css',
+    'postcss',
+    'less',
+    'scss'
+  },
+  settings = {
+    stylelintplus = {
+      autoFixOnSave = true,
+      validateOnType = true,
+    },
+  },
+}
+```
 
 ### Adding a module
 

@@ -19,6 +19,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
 
+local Info = Lua.import('Module:Info', {loadData = true})
+
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
@@ -432,7 +434,7 @@ function MatchSummary.createSubstitutesComment(match)
 			end
 
 			if Table.isNotEmpty(substitution.games) then
-				local gamesNoun = 'map' .. (#substitution.games > 1 and 's' or '')
+				local gamesNoun = Logic.emptyOr(Info.config.match2.gameNoun, 'game') .. (#substitution.games > 1 and 's' or '')
 				table.insert(subString, string.format('on %s %s', gamesNoun, mw.text.listToText(substitution.games)))
 			end
 
