@@ -55,8 +55,8 @@ Abbr/BRL
 Abbr/BRST
 Abbr/BRT
 Abbr/BST
-Abbr/BST (Bangladesh)
-Abbr/BST (British)
+Abbr/BST_(Bangladesh)
+Abbr/BST_(British)
 Abbr/BTN
 Abbr/BYN
 Abbr/BYR
@@ -98,7 +98,7 @@ Abbr/GEL
 Abbr/GET
 Abbr/GHS
 Abbr/GMT
-Abbr/Grp. S.
+Abbr/Grp._S.
 Abbr/GST
 Abbr/GTQ
 Abbr/HKD
@@ -116,7 +116,7 @@ Abbr/IRR
 Abbr/IRST
 Abbr/ISK
 Abbr/IST
-Abbr/IST (Ireland)
+Abbr/IST_(Ireland)
 Abbr/IST2
 Abbr/JOD
 Abbr/JPY
@@ -195,7 +195,7 @@ Abbr/THB
 Abbr/TJS
 Abbr/TJT
 Abbr/TMT
-Abbr/TMT (currency)
+Abbr/TMT_(currency)
 Abbr/TND
 Abbr/TON
 Abbr/TPP
@@ -254,12 +254,12 @@ SoloOpponent
 SoloPrizePool
 Stage
 Streams
-Tabs dynamic
-Tabs static
+Tabs_dynamic
+Tabs_static
 TeamOpponent
 TeamPrizePool
-Transfer List
-Transfer row
+Transfer_List
+Transfer_row
 TRef
 TrioOpponent
 TrioPrizePool
