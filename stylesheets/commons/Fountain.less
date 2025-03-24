@@ -630,7 +630,7 @@ a.cf {
 
 	&Cell {
 		background-color: #9fa1a3;
-		padding-top:5px;
+		padding-top: 5px;
 
 		.theme--dark {
 			background-color: #2c2f33;
@@ -645,9 +645,10 @@ a.cf {
 		font-weight: bold;
 		color: var( --clr-moon-base ); // #000000
 		text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-30 );
-		&Title,.theme--dark {
+		
+		&Title, .theme--dark {
 			color: #e2e2e6;
-			text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base )
+			text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base );
 		}
 	}
 
@@ -669,6 +670,7 @@ a.cf {
 		padding: 0.3125rem;
 		border: 0.0625rem solid #505050;
 		width: 100%;
+		
 		.theme--dark {
 			background: rgba( 18, 26, 33, 0.7 );
 		}
@@ -735,11 +737,11 @@ a.cf {
 		}
 
 		&:hover {
-			background-color: rgb( 9, 13, 17 );
+			background-color: rgba( 9, 13, 17, 1 );
 			transition: 0.15s;
 
 			.theme--dark {
-				background-color: rgb( 142, 185, 229 );
+				background-color: rgba( 142, 185, 229, 1 );
 			}
 		}
 	}
