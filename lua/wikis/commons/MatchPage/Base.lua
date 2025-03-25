@@ -56,8 +56,8 @@ local BaseMatchPage = Class.new(
 	---@param match MatchGroupUtilMatch
 	function (self, match)
 		self.matchData = match
-		self.games = Table.deepCopy(match.games)
-		self.opponents = Table.deepCopy(match.opponents)
+		self.games = match.games
+		self.opponents = match.opponents
 	end
 )
 
@@ -277,7 +277,7 @@ end
 
 ---@return string|Html|Widget?
 function BaseMatchPage:renderGames()
-	local games = Array.map(Array.filter(self.matchData.games, function(game)
+	local games = Array.map(Array.filter(self.games, function(game)
 		return game.status ~= BaseMatchPage.NOT_PLAYED
 	end), function(game)
 		return self:renderGame(game)
