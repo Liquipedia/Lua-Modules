@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -140,8 +141,10 @@ function MatchPage.makeItemDisplay(item)
 end
 
 ---@return string
-function MatchPage:renderGame()
-	return TemplateEngine():render(Display.game, Table.merge(self.matchData, self.games))
+function MatchPage:renderGame(game)
+	local inputTable = Table.merge(self.matchData, game)
+	inputTable.heroIcon = FnUtil.curry(self.getCharacterIcon, self)
+	return TemplateEngine():render(Display.game, inputTable)
 end
 
 function MatchPage:getPatchLink()
