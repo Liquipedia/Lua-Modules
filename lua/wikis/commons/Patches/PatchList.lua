@@ -194,7 +194,10 @@ local function buildMonthHeader(monthAnchor, monthAbbr, columnCount)
 		:attr('colspan', columnCount)
 		:addClass('gray-bg')
 		:css('text-align', 'center')
-		:wikitext('<span id="' .. monthAnchor .. '" style="position: relative; top: -250px; visibility: hidden;"></span><b>' .. monthAbbr .. '</b>')
+		:wikitext(
+		'<span id="' .. monthAnchor ..
+		'" style="position: relative; top: -250px; visibility: hidden;"></span><b>' .. monthAbbr .. '</b>'
+	)
 	return subheaderRow
 end
 
