@@ -25,8 +25,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
----@param teamType 'atk'|'def'
----@param displayName 'Attack'|'Defense'
+---@param roleType 'duelist'|'strategist'|'vanguard'
+---@param displayName 'Duelist'|'Strategist'|'Vanguard'
 ---@return Widget
 local function createRoleDisplayWidget(roleType, displayName)
 	return HtmlWidgets.Fragment{
@@ -88,16 +88,14 @@ end
 
 ---@return Widget[]
 function CustomHero:_getRole(args)
-	local role = (args.role or ''):lower()
-	if role == 'duelist' then
-		return { DUELIST }
-	elseif role == 'strategist' then
-		return { STRATEGIST }
-	elseif role == 'vanguard' then
-		return { VANGUARD }
-	else
-		return {}
-	end
+    local role = (args.role or ''):lower()
+    local roleLookup = {
+        duelist = { DUELIST },
+        strategist = { STRATEGIST },
+        vanguard = { VANGUARD }
+    }
+    
+    return roleLookup[role] or {}
 end
 
 ---@param lpdbData table
@@ -105,7 +103,6 @@ end
 function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.information = args.name
 	lpdbData.image = args.image
-	lpdbData.date = args.releasedate
 	lpdbData.extradata = {
 		role = args.role,
 		revealdate = args.revealdate,
