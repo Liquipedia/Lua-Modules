@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Match/MatchPage/Footer
+-- page=Module:Widget/Match/Page/Footer
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
