@@ -37,7 +37,7 @@ local CONTENT = {
 			rumours = true,
 			limits = 10,
 			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+				return 'Player Transfers/' .. os.date('%Y')
 			end
 		},
 		boxid = 1509,
