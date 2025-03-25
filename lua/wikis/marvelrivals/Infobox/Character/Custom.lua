@@ -94,7 +94,7 @@ function CustomHero:_getRole(args)
         strategist = { STRATEGIST },
         vanguard = { VANGUARD }
     }
-    
+
     return roleLookup[role] or {}
 end
 
