@@ -203,7 +203,7 @@ function BaseMatchPage:header()
 					children = {
 						self:_makeTeamDisplay(self.opponents[1]),
 						self:_makeResultDisplay(),
-					self:_makeTeamDisplay(self.opponents[2])
+						self:_makeTeamDisplay(self.opponents[2])
 					}
 				},
 				Div{
