@@ -7,12 +7,9 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local DateExt = require('Module:Date/Ext')
 local Condition = require('Module:Condition')
 
 local ConditionTree = Condition.Tree
@@ -290,7 +287,10 @@ function PatchList.create(frame)
 		end
 
 		-- Check if this patch is the latest overall
-		patchData.isLatest = (patchData.date == PatchList.globalLatestPatchDate and patchData.pageid == PatchList.globalLatestPatchId)
+		patchData.isLatest = (
+			patchData.date == PatchList.globalLatestPatchDate
+			and patchData.pageid == PatchList.globalLatestPatchId
+		)
 
 		-- Extract month and year for grouping
 		local monthAbbr = patchData.date and contentLanguage:formatDate('M', patchData.date) or ''
@@ -318,7 +318,9 @@ function PatchList.create(frame)
 						:css('padding', '0')
 						:css('margin', '0')
 						:css('border', 'none')
-						:wikitext('<span id="' .. monthAnchor .. '" style="position: relative; top: -250px; visibility: hidden;"></span>')
+						:wikitext(
+						'<span id="' .. monthAnchor .. '" style="position: relative; top: -250px; visibility: hidden;"></span>'
+					)
 
 					output:node(anchorRow)
 					previousMonthAnchors[monthAnchor] = true
