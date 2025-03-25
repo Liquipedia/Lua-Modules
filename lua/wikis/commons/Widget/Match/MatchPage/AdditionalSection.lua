@@ -28,7 +28,7 @@ local MatchPageAdditionalSection = Class.new(Widget)
 
 ---@return Widget?
 function MatchPageAdditionalSection:render()
-	if Logic.isEmpty(self.props.children) then return end
+	if Logic.isDeepEmpty(self.props.children) then return end
 	return Div{
 		classes = { 'match-bm-match-additional-section' },
 		children = {
