@@ -71,6 +71,7 @@ local ContractRoles = Roles.ContractRoles
 ---@class Infobox: Person
 ---@field role PersonRoleData?
 ---@field role2 PersonRoleData?
+---@field role3 PersonRoleData?
 ---@field roles PersonRoleData?
 
 ---@param frame Frame
@@ -134,6 +135,7 @@ function Person:createInfobox()
 
 	self.role = self:createRoleData(args.role or '')
 	self.role2 = self:createRoleData(args.role2 or '')
+	self.role3 = self:createRoleData(args.role3 or '')
 
 	self.roles = {}
 	if args.roles then
@@ -231,7 +233,8 @@ function Person:createInfobox()
 				else
 					local role = self:_displayRole(self.role)
 					local role2 = self:_displayRole(self.role2)
-					table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}})
+					local role3 = self:_displayRole(self.role3)
+					table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2, role3}})
 				end
 				return cells
 			end}
@@ -569,11 +572,23 @@ function Person:_displayRole(roleData)
 
 	local role1Display = toDisplay()
 	local role2Display = toDisplay(2)
-	if role1Display and role2Display then
-		role2Display = '(' .. role2Display .. ')'
+	local role3Display = toDisplay(3)
+
+	if role1Display then
+		if role2Display then
+			role2Display = '(' .. role2Display .. ')'
+			if role3Display then
+				role3Display = '(' .. role3Display .. ')'
+			end
+		end
 	end
 
-	return table.concat({role1Display, role2Display}, ' ')
+	local displays = {}
+	if role1Display then table.insert(displays, role1Display) end
+	if role2Display then table.insert(displays, role2Display) end
+	if role3Display then table.insert(displays, role3Display) end
+
+	return #displays > 0 and table.concat(displays, ' ') or nil
 end
 
 ---@param team string?
