@@ -207,7 +207,7 @@ function BaseMatchPage:header()
 	)
 end
 
----comment
+---@private
 ---@param opponent MatchPageOpponent
 ---@return Widget
 function BaseMatchPage:_makeTeamDisplay(opponent)
@@ -245,6 +245,7 @@ local RESULT_DISPLAY_TYPES = {
 	['-'] = '-'
 }
 
+---@private
 ---@param result string
 ---@return Widget
 function BaseMatchPage._makeGameResultIcon(result)
@@ -253,6 +254,7 @@ function BaseMatchPage._makeGameResultIcon(result)
 	}
 end
 
+---@private
 ---@return Widget
 function BaseMatchPage:_makeResultDisplay()
 	local phase = MatchGroupUtil.computeMatchPhase(self.matchData)
@@ -268,6 +270,7 @@ function BaseMatchPage:_makeResultDisplay()
 	}
 end
 
+---@private
 ---@return Widget?
 function BaseMatchPage:_showMvps()
 	local mvpData = self.matchData.extradata.mvp
