@@ -89,7 +89,7 @@ does not exist.
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	team = team:gsub('_', ' '):lower()
-	return Data[team] or mw.ext.TeamTemplate.raw(team, date)
+	return Data.specialTemplates[team] or mw.ext.TeamTemplate.raw(team, date)
 end
 
 ---Creates error message for missing team templates.
