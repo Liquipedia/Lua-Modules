@@ -24,9 +24,9 @@ local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local AdditionalSection = Lua.import('Module:Widget/Match/MatchPage/AdditionalSection')
+local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local Div = HtmlWidgets.Div
-local Footer = Lua.import('Module:Widget/Match/MatchPage/Footer')
+local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
