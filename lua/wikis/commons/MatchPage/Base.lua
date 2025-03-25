@@ -88,12 +88,27 @@ function BaseMatchPage:getCountdownBlock()
 	return DisplayHelper.MatchCountdownBlock(self.matchData)
 end
 
+---@private
+---@param site string
+---@param link string
+---@return {icon: string, iconDark: string?, link: string, text: string}?
+function BaseMatchPage._processLink(site, link)
+	return Table.mergeInto({link = link}, Links.getMatchIconData(site))
+end
+
 ---Creates an object array for links
+---@private
 ---@return {icon: string, iconDark: string?, link: string, text: string}[]
-function BaseMatchPage:parseLinks()
-	return Array.extractValues(Table.map(self.matchData.links, function(site, link)
-		return site, Table.mergeInto({link = link}, Links.getMatchIconData(site))
-	end))
+function BaseMatchPage:_parseLinks()
+	return Array.flatMap(Table.entries(self.matchData.links), function(linkData)
+		local site, link = unpack(linkData)
+		if type(link) == 'table' then
+			return Array.map(link, function(sublink)
+				return BaseMatchPage._processLink(site, sublink)
+			end)
+		end
+		return {BaseMatchPage._processLink(site, link)}
+	end)
 end
 
 ---@return (string|Html)[]
@@ -333,7 +348,7 @@ function BaseMatchPage:footer()
 				AdditionalSection{
 					header = 'Links',
 					bodyClasses = { 'vodlink' },
-					children = Array.map(self:parseLinks(), function (parsedLink)
+					children = Array.map(self:_parseLinks(), function (parsedLink)
 						return IconImage{
 							imageLight = parsedLink.icon:sub(6),
 							imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
