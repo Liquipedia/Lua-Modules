@@ -50,10 +50,6 @@ local CONTENT = {
 		padding = true,
 		boxid = 1510,
 	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
-	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
@@ -149,19 +145,15 @@ return {
 				size = 5,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
-					},
-					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -170,7 +162,7 @@ return {
 				size = 7,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -201,7 +193,7 @@ return {
 						},
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.usefulArticles,
 					},
 				},
