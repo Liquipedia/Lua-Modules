@@ -235,6 +235,7 @@ FlagNoLink
 GetBracketCopyPaste
 GetMatchListCopyPaste
 GetSingleMatchCopyPaste
+HDB
 HiddenDataBox
 HiddenSort
 Json
@@ -244,6 +245,7 @@ Map
 Match
 Matchlist
 MatchPage
+MatchSection
 Navbox
 Opponent
 QuadOpponent
@@ -258,8 +260,10 @@ Tabs_dynamic
 Tabs_static
 TeamOpponent
 TeamPrizePool
+TournamentVariables
 Transfer_List
 Transfer_Row
 TRef
 TrioOpponent
 TrioPrizePool
+TVar
