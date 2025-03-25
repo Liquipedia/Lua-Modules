@@ -186,7 +186,7 @@ function Person:createInfobox()
 					local positions = {}
 
 					for _, roleData in ipairs(self.roles) do
-						local roleDisplay = Person._displayRole(roleData)
+						local roleDisplay = self:_displayRole(roleData)
 
 						if roleDisplay then
 							local roleKey
@@ -229,8 +229,8 @@ function Person:createInfobox()
 
 					return cells
 				else
-					local role = Person._displayRole(self.role)
-					local role2 = Person._displayRole(self.role2)
+					local role = self:_displayRole(self.role)
+					local role2 = self:_displayRole(self.role2)
 					table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}})
 				end
 				return cells

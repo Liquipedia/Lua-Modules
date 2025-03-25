@@ -54,7 +54,7 @@ local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 ---@class Dota2InfoboxPlayer: Person
 ---@field role Dota2PersonRoleData?
 ---@field role2 Dota2PersonRoleData?
----@field roles Dota2PersonRoleData? 
+---@field roles Dota2PersonRoleData?
 ---@field basePageName string
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
