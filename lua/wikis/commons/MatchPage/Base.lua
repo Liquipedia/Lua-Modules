@@ -237,11 +237,19 @@ function BaseMatchPage:_makeTeamDisplay(opponent)
 	}
 end
 
----@param result 'winner'|'loser'|'-'
+local RESULT_DISPLAY_TYPES = {
+	['w'] = 'winner',
+	['l'] = 'loser',
+	['winner'] = 'winner',
+	['loser'] = 'loser',
+	['-'] = '-'
+}
+
+---@param result string
 ---@return Widget
 function BaseMatchPage._makeGameResultIcon(result)
 	return Div{
-		classes = { 'match-bm-lol-match-header-round-result', 'result--' .. result }
+		classes = { 'match-bm-lol-match-header-round-result', 'result--' .. RESULT_DISPLAY_TYPES[result:lower()] }
 	}
 end
 
