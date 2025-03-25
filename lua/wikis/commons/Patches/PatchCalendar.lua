@@ -89,7 +89,9 @@ function PatchCalendar.create(frame)
 	for monthNum = 1, 6 do
 		local monthAbbr = mw.getContentLanguage():formatDate('M', string.format('%04d-%02d-01', year, monthNum))
 		local anchor = monthAbbr .. '_' .. year
-		local cellContent = monthsPresent[monthNum] and '[[#' .. anchor .. '|' .. monthAbbr .. ']]' or '<s>' .. monthAbbr .. '</s>'
+		local cellContent = monthsPresent[monthNum]
+			and '[[#' .. anchor .. '|' .. monthAbbr .. ']]'
+			or '<s>' .. monthAbbr .. '</s>'
 		tr1:tag('td'):wikitext(cellContent)
 	end
 
@@ -98,7 +100,9 @@ function PatchCalendar.create(frame)
 	for monthNum = 7, 12 do
 		local monthAbbr = mw.getContentLanguage():formatDate('M', string.format('%04d-%02d-01', year, monthNum))
 		local anchor = monthAbbr .. '_' .. year
-		local cellContent = monthsPresent[monthNum] and '[[#' .. anchor .. '|' .. monthAbbr .. ']]' or '<s>' .. monthAbbr .. '</s>'
+		local cellContent = monthsPresent[monthNum]
+			and '[[#' .. anchor .. '|' .. monthAbbr .. ']]'
+			or '<s>' .. monthAbbr .. '</s>'
 		tr2:tag('td'):wikitext(cellContent)
 	end
 
