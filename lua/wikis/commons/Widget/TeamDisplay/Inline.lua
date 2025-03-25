@@ -45,8 +45,8 @@ local TeamInlineTypes = {
 	['hybrid'] = {
 		displayType = 'standard',
 		displayNames = {
-			['name'] = {'mobile-hide'},
-			['nameshort'] = {'mobile-only'}
+			['bracketname'] = {'mobile-hide'},
+			['shortname'] = {'mobile-only'}
 		}
 	}
 }
