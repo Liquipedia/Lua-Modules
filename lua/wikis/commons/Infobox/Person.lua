@@ -132,8 +132,17 @@ function Person:createInfobox()
 
 	self.age = age
 
-	self.role = ROLES[(args.role or ''):lower()]
-	self.role2 = ROLES[(args.role2 or ''):lower()]
+	local roleKey = (args.role or ''):lower()
+	local role2Key = (args.role2 or ''):lower()
+	self.role = ROLES[roleKey] or (roleKey ~= '' and {
+		display = roleKey:gsub("^%l", string.upper),
+		category = roleKey:gsub("^%l", string.upper) .. "s"
+	})
+	self.role2 = ROLES[role2Key] or (role2Key ~= '' and {
+		display = role2Key:gsub("^%l", string.upper),
+		category = role2Key:gsub("^%l", string.upper) .. "s"
+	})
+
 	self.roles = {}
 	if args.roles then
 		local roleKeys = Array.parseCommaSeparatedString(args.roles)
@@ -142,6 +151,11 @@ function Person:createInfobox()
 			local roleData = ROLES[key]
 			if roleData then
 				table.insert(self.roles, roleData)
+			else
+				table.insert(self.roles, {
+					display = roleKey:gsub("^%l", string.upper),
+					category = roleKey:gsub("^%l", string.upper) .. "s"
+				})
 			end
 		end
 	end
