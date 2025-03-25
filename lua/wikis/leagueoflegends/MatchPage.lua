@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -93,7 +94,7 @@ function MatchPage:populateGames()
 		game.teams = Array.map(game.opponents, function(opponent, teamIdx)
 			local team = {}
 
-			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
+			team.scoreDisplay = game.winner == teamIdx and 'W' or game.finished and 'L' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
 
 			team.players = Array.map(opponent.players, function(player)
@@ -156,7 +157,9 @@ end
 
 ---@return string
 function MatchPage:renderGame(game)
-	return TemplateEngine():render(Display.game, Table.merge(self.matchData, game))
+	local inputTable = Table.merge(self.matchData, game)
+	inputTable.heroIcon = FnUtil.curry(self.getCharacterIcon, self)
+	return TemplateEngine():render(Display.game, inputTable)
 end
 
 return MatchPage
