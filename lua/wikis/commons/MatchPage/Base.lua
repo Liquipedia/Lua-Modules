@@ -26,6 +26,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/MatchPage/AdditionalSection')
 local Div = HtmlWidgets.Div
+local Footer = Lua.import('Module:Widget/Match/MatchPage/Footer')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -333,35 +334,31 @@ function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
 
----@return string|Html|Widget
+---@return Widget
 function BaseMatchPage:footer()
 	local vods = self:getVods()
-	return {
-		HtmlWidgets.H3{ children = 'Additional Information' },
-		Div{
-			classes = { 'match-bm-match-additional' },
-			children = WidgetUtil.collect(
-				#vods > 0 and AdditionalSection{
-					header = 'VODs',
-					children = vods
-				} or nil,
-				AdditionalSection{
-					header = 'Links',
-					bodyClasses = { 'vodlink' },
-					children = Array.map(self:_parseLinks(), function (parsedLink)
-						return IconImage{
-							imageLight = parsedLink.icon:sub(6),
-							imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
-							link = parsedLink.link
-						}
-					end)
-				},
-				AdditionalSection{
-					header = 'Patch',
-					children = { self:getPatchLink() }
-				}
-			)
-		}
+	return Footer{
+		children = WidgetUtil.collect(
+			#vods > 0 and AdditionalSection{
+				header = 'VODs',
+				children = vods
+			} or nil,
+			AdditionalSection{
+				header = 'Links',
+				bodyClasses = { 'vodlink' },
+				children = Array.map(self:_parseLinks(), function (parsedLink)
+					return IconImage{
+						imageLight = parsedLink.icon:sub(6),
+						imageDark = (parsedLink.iconDark or parsedLink.icon):sub(6),
+						link = parsedLink.link
+					}
+				end)
+			},
+			AdditionalSection{
+				header = 'Patch',
+				children = { self:getPatchLink() }
+			}
+		)
 	}
 end
 
