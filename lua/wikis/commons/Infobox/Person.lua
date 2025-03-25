@@ -132,30 +132,16 @@ function Person:createInfobox()
 
 	self.age = age
 
-	local roleKey = (args.role or ''):lower()
-	local role2Key = (args.role2 or ''):lower()
-	self.role = ROLES[roleKey] or (roleKey ~= '' and {
-		display = roleKey:gsub("^%l", string.upper),
-		category = roleKey:gsub("^%l", string.upper) .. "s"
-	})
-	self.role2 = ROLES[role2Key] or (role2Key ~= '' and {
-		display = role2Key:gsub("^%l", string.upper),
-		category = role2Key:gsub("^%l", string.upper) .. "s"
-	})
+	self.role = self:createRoleData(args.role or '')
+	self.role2 = self:createRoleData(args.role2 or '')
 
 	self.roles = {}
 	if args.roles then
 		local roleKeys = Array.parseCommaSeparatedString(args.roles)
 		for _, roleKey in ipairs(roleKeys) do
-			local key = roleKey:lower()
-			local roleData = ROLES[key]
+			local roleData = self:createRoleData(roleKey)
 			if roleData then
 				table.insert(self.roles, roleData)
-			else
-				table.insert(self.roles, {
-					display = roleKey:gsub("^%l", string.upper),
-					category = roleKey:gsub("^%l", string.upper) .. "s"
-				})
 			end
 		end
 	end
@@ -547,6 +533,26 @@ function Person:displayLocations()
 			(location and (',&nbsp;' .. location) or '')
 	end)
 end
+
+---@param roleKey string
+---@return PersonRoleData?
+function Person:createRoleData(roleKey)
+	if String.isEmpty(roleKey) then return nil end
+
+	local key = roleKey:lower()
+	local roleData = ROLES[key]
+
+	if not roleData and key ~= '' then
+		local display = roleKey:gsub("^%l", string.upper)
+		roleData = {
+			display = display,
+			category = display .. "s"
+		}
+	end
+
+	return roleData
+end
+
 
 ---@param roleData PersonRoleData?
 ---@return string?
