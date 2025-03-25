@@ -112,7 +112,6 @@ function MatchPage:getCharacterIcon(character)
 	}
 end
 
----@return string
 function MatchPage:makeDisplayTitle()
 	local team1name = self.opponents[1].teamTemplateData.shortname
 	local team2name = self.opponents[2].teamTemplateData.shortname
