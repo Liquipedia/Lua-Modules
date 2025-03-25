@@ -29,33 +29,9 @@ local Center = Widgets.Center
 
 local BANNED = mw.loadData('Module:Banned')
 
-local Roles = Lua.import('Module:Roles')
-local ROLES = Roles.All
-local InGameRoles = Roles.InGameRoles
-local ContractRoles = Roles.ContractRoles
-
-local ROLES_CATEGORY = {
-	host = 'Casters',
-	caster = 'Casters'
-}
 local SIZE_HERO = '44x25px'
 local CONVERSION_PLAYER_ID_TO_STEAM = 61197960265728
 
----@class Dota2PersonRoleData
----@field category string
----@field category2 string?
----@field display string
----@field display2 string?
----@field store string?
----@field coach boolean?
----@field talent boolean?
----@field management boolean?
-
----@class Dota2InfoboxPlayer: Person
----@field role Dota2PersonRoleData?
----@field role2 Dota2PersonRoleData?
----@field roles Dota2PersonRoleData?
----@field basePageName string
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -76,20 +52,6 @@ function CustomPlayer.run(frame)
 	player.args.informationType = player.args.informationType or 'Player'
 
 	player.args.banned = tostring(player.args.banned or '')
-
-	player.role = ROLES[(player.args.role or ''):lower()]
-	player.role2 = ROLES[(player.args.role2 or ''):lower()]
-	player.roles = {}
-	if player.args.roles then
-		local roleKeys = Array.parseCommaSeparatedString(player.args.roles)
-		for _, roleKey in ipairs(roleKeys) do
-			local key = roleKey:lower()
-			local roleData = ROLES[key]
-			if roleData then
-				table.insert(player.roles, roleData)
-			end
-		end
-	end
 
 	player.basePageName = mw.title.getCurrentTitle().baseText
 
@@ -146,93 +108,8 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Title{children = '[[Oceania Draft League|Oceania Draft League]] History'})
 			table.insert(widgets, Center{children = {args.history_odl}})
 		end
-	elseif id == 'role' then
-		local role = CustomPlayer._displayRole(caller.role)
-		local role2 = CustomPlayer._displayRole(caller.role2)
-
-		local inGameRoles = {}
-		local contracts = {}
-		local positions = {}
-
-		if caller.roles and #caller.roles > 0 then
-			for _, roleData in ipairs(caller.roles) do
-				local roleDisplay = CustomPlayer._displayRole(roleData)
-
-				if roleDisplay then
-					local roleKey
-					for key, data in pairs(ROLES) do
-						if data == roleData then
-							roleKey = key
-							break
-						end
-					end
-
-					if roleKey and InGameRoles[roleKey] then
-						table.insert(inGameRoles, roleDisplay)
-					elseif roleKey and ContractRoles[roleKey] then
-						table.insert(contracts, roleDisplay)
-					else
-						table.insert(positions, roleDisplay)
-					end
-				end
-			end
-		end
-
-		local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
-		local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
-		local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
-
-		local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
-		local positionsTitle = #positions > 1 and "Positions" or "Position"
-		local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
-
-		local cells = {}
-
-		if inGameRolesDisplay then
-			table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
-		else
-			table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2}})
-		end
-
-		if positionsDisplay then
-			table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
-		end
-
-		if contractsDisplay then
-			table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
-		end
-
-		return cells
 	end
 	return widgets
-end
-
----@param role string?
----@return {category: string, variable: string, isplayer: boolean?}?
-function CustomPlayer:_getRoleData(role)
-	return ROLES[(role or ''):lower()]
-end
-
----@param roleData Dota2PersonRoleData?
----@return string?
-function CustomPlayer._displayRole(roleData)
-	if not roleData then return end
-
-	---@param postFix string|integer|nil
-	---@return string?
-	local toDisplay = function(postFix)
-		postFix = postFix or ''
-		if not roleData['category' .. postFix] then return end
-		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
-	end
-
-	local role1Display = toDisplay()
-	local role2Display = toDisplay(2)
-	if role1Display and role2Display then
-		role2Display = '(' .. role2Display .. ')'
-	end
-
-	return table.concat({role1Display, role2Display}, ' ')
 end
 
 ---@param lpdbData table
