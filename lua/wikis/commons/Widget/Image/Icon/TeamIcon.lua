@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
@@ -35,10 +36,10 @@ TeamIcon.defaultProps = {
 ---@param props { theme: 'lightmode'|'darkmode'|'allmode', legacy: boolean? }
 ---@return string[]
 function TeamIcon._getSpanClasses(props)
-	return {
+	return Array.append({},
 		'team-template-image-' .. props.legacy and 'legacy' or 'icon',
-		'team-template-' .. props.theme
-	}
+		props.theme ~= 'allmode' and ('team-template-' .. props.theme) or nil
+	)
 end
 
 ---@return string?
