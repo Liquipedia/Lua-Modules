@@ -106,42 +106,4 @@ function CustomPlayer:_getStatusContents(args)
 	return statusContents
 end
 
----@param categories string[]
----@return string[]
-function CustomPlayer:getWikiCategories(categories)
-	local typeCategory = self:getPersonType(self.args).category
-
-	Array.forEach(self.gamesList, function (gameIdentifier)
-			local prefix = Game.abbreviation{game = gameIdentifier} or Game.name{game = gameIdentifier}
-			table.insert(categories, prefix .. ' ' .. typeCategory .. 's')
-		end)
-
-	if Table.isEmpty(self.gamesList) then
-		table.insert(categories, 'Gameless Players')
-	end
-
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category,
-		(self.role or {}).category2,
-		(self.role2 or {}).category2
-	)
-end
-
----@param args table
----@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
-	local roleData = self.role
-	if roleData then
-		if roleData.coach then
-			return {store = 'Coach', category = 'Coache'}
-		elseif roleData.management then
-			return {store = 'Staff', category = 'Manager'}
-		elseif roleData.talent then
-			return {store = 'Talent', category = 'Talent'}
-		end
-	end
-	return {store = 'Player', category = 'Player'}
-end
-
 return CustomPlayer

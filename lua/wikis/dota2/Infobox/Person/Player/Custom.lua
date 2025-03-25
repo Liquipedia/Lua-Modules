@@ -167,26 +167,6 @@ function CustomPlayer:_getStatusContents()
 	return statusContents
 end
 
----@param categories string[]
----@return string[]
-function CustomPlayer:getWikiCategories(categories)
-	local countryRoleCategory = ROLES_CATEGORY[self.args.role] or 'Players'
-	local countryRoleCategory2 = ROLES_CATEGORY[self.args.role2]
-
-	Array.forEach(self.locations, function (country)
-		local demonym = Flags.getLocalisation(country)
-		Array.appendWith(categories,
-			demonym .. ' ' .. countryRoleCategory,
-			countryRoleCategory2 and (demonym .. ' ' .. countryRoleCategory2) or nil
-		)
-	end)
-
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
-end
-
 ---@return string[]
 function CustomPlayer:getLocations()
 	return Array.map(self:getAllArgsForBase(self.args, 'country'), function(country)

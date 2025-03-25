@@ -12,22 +12,18 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Custom')
-local Page = require('Module:Page')
 local Region = require('Module:Region')
 local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-
-local BANNED = mw.loadData('Module:Banned')
 
 local SIZE_AGENT = '20px'
 
