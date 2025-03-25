@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -25,8 +26,9 @@ local Div = HtmlWidgets.Div
 ---@field props MatchPageAdditionalSectionParameters
 local MatchPageAdditionalSection = Class.new(Widget)
 
----@return Widget
+---@return Widget?
 function MatchPageAdditionalSection:render()
+	if Logic.isEmpty(self.props.children) then return end
 	return Div{
 		classes = { 'match-bm-match-additional-section' },
 		children = {
