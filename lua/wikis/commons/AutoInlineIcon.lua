@@ -45,7 +45,7 @@ end
 ---@return fun(name: string): table
 function AutoInlineIcon._getDataRetrevalFunction(category)
 	local categoryMapper = {
-		H = AutoInlineIcon._queryHeroData,
+		H = AutoInlineIcon._queryCharacterData,
 		A = function(name)
 			error('Abilities not yet implemented.')
 		end,
@@ -98,7 +98,7 @@ end
 
 ---@param name string
 ---@return table
-function AutoInlineIcon._queryHeroData(name)
+function AutoInlineIcon._queryCharacterData(name)
 	local character = Character.getCharacterByName(name)
 	assert(character, 'Character not found.')
 
