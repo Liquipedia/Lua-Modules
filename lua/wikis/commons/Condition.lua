@@ -34,7 +34,7 @@ local ConditionTree = Class.new(_ConditionNode,
 ---@param node AbstractConditionNode|AbstractConditionNode[]|nil
 ---@return self
 function ConditionTree:add(node)
-	if Logic.isEmpty(node) then
+	if not node then
 		return self
 	elseif Class.instanceOf(node, _ConditionNode) then
 		table.insert(self._nodes, node)
