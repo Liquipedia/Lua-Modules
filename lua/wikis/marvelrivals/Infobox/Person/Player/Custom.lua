@@ -8,27 +8,26 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local CharacterIcon = require('Module:CharacterIcon')
-local CharacterNames = mw.loadData('Module:CharacterNames')
-local GameAppearances = require('Module:GetGameAppearances')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local CharacterNames = Lua.import('Module:CharacterNames')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 
 local ROLES = {
 	-- Players
-	['duelust'] = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
+	['duelist'] = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
 	['flex'] = {category = 'Flex Players', variable = 'Flex', isplayer = true},
 	['strategist'] = {category = 'Strategist Players', variable = 'Strategist', isplayer = true},
 	['vanguard'] = {category = 'Vanguard Players', variable = 'Vanguard', isplayer = true},
