@@ -60,7 +60,7 @@ describe('LPDB Condition Builder', function()
 				cond1:toString()
 			)
 			assert.are_equal(
-				'([[game::commons1]] OR [[game::commons2]])',
+				'[[game::commons1]] OR [[game::commons2]]',
 				cond2:toString()
 			)
 			assert.are_equal(
