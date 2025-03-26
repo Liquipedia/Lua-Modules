@@ -93,6 +93,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'history' then
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
+	
 	return widgets
 end
 
