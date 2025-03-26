@@ -21,7 +21,7 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local CONTENT = {
 	usefulArticles = {
 		heading = 'The Game',
-		body = '{{Liquipedia:Useful Articles}}',
+		body = '{{Liquipedia:The Game}}',
 		padding = true,
 		boxid = 1503,
 	},
