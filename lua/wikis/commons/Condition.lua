@@ -6,9 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
 
 local Condition = {}
 
@@ -32,15 +33,15 @@ local ConditionTree = Class.new(_ConditionNode,
 ---@param node AbstractConditionNode|AbstractConditionNode[]|nil
 ---@return self
 function ConditionTree:add(node)
-	if not node then
+	if Logic.isEmpty(node) then
 		return self
 	elseif Class.instanceOf(node, _ConditionNode) then
 		table.insert(self._nodes, node)
 	else
 		-- List of nodes
-		for _, value in pairs(node) do
-			table.insert(self._nodes, value)
-		end
+		Array.forEach(node, function(subNode)
+			self:add(subNode)
+		end)
 	end
 	return self
 end
@@ -51,7 +52,11 @@ function ConditionTree:toString()
 	return table.concat(Array.map(self._nodes,
 		function(node)
 			if Class.instanceOf(node, ConditionTree) then
-				return String.interpolate('(${node})', {node = node:toString()})
+				local nodeString = node:toString()
+				if Logic.isEmpty(nodeString) then return end
+				return String.interpolate('(${node})', {node = nodeString})
+			elseif Logic.isEmpty(node) then
+				return
 			end
 
 			return node:toString()
