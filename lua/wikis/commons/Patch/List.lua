@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:PatchList
+-- page=Module:Patch/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
