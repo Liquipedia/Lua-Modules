@@ -1,14 +1,13 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:PatchCalendar
+-- page=Module:Patch/Calendar
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require('Module:Arguments')
 local PatchList = require('Module:PatchList')
-local mw = require('mw')
 
 local PatchCalendar = {}
 
