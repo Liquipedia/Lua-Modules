@@ -276,13 +276,14 @@ function BaseMatchPage:_makeResultDisplay()
 	local phase = MatchGroupUtil.computeMatchPhase(self.matchData)
 	return Div{
 		classes = { 'match-bm-match-header-result' },
-		children = {
-			self:isBestOfOne() and '' or (self.opponents[1].score .. '&ndash;' .. self.opponents[2].score),
+		children = WidgetUtil.collect(
+			(self:isBestOfOne() or phase == 'upcoming') and '' or (
+				self.opponents[1].score .. '&ndash;' .. self.opponents[2].score),
 			Div{
 				classes = { 'match-bm-match-header-result-text' },
 				children = { phase == 'ongoing' and 'live' or phase }
 			}
-		}
+		)
 	}
 end
 
