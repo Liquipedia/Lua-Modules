@@ -102,7 +102,9 @@ local ConditionNode = Class.new(_ConditionNode,
 ---@return string
 function ConditionNode:toString()
 	assert(
-		Table.any(Comparator, FnUtil.curry(Operator.eq, self.comparator)),
+		Table.any(Comparator, function (_, value)
+			return self.comparator == value
+		end),
 		'Invalid comparator for LPDB query condition'
 	)
 	local conditions = Array.map(self.comparator, function(comp)
