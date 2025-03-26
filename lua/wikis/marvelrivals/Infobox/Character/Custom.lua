@@ -47,6 +47,12 @@ local DUELIST = createRoleDisplayWidget('Duelist','Duelist')
 local STRATEGIST = createRoleDisplayWidget('Strategist', 'Strategist')
 local VANGUARD = createRoleDisplayWidget('Vanguard','Vanguard')
 
+local ROLE_LOOKUP = {
+	duelist = { DUELIST },
+	strategist = { STRATEGIST },
+	vanguard = { VANGUARD },
+}
+
 ---@param frame Frame
 ---@return Html
 function CustomHero.run(frame)
@@ -89,20 +95,23 @@ end
 ---@return Widget[]
 function CustomHero:_getRole(args)
     local role = (args.role or ''):lower()
-    local roleLookup = {
-        duelist = { DUELIST },
-        strategist = { STRATEGIST },
-        vanguard = { VANGUARD }
-    }
+    local roleLookup = ROLE_LOOKUP[role]
 
-    return roleLookup[role] or {}
+	if roleLookup then
+   		return roleLookup
+	else
+		return { 'NPC' }
+	end
 end
 
 ---@param lpdbData table
 ---@param args table
 function CustomHero:addToLpdb(lpdbData, args)
-	lpdbData.information = args.name
-	lpdbData.image = args.image
+	if ROLE_LOOKUP[args.role:lower()] then
+		lpdbData.information = 'Playable Character'
+	else
+		lpdbData.information = 'Non-Playable Character'
+	end
 	lpdbData.extradata = {
 		role = args.role,
 		revealdate = args.revealdate,
