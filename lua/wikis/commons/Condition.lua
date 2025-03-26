@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Condition = {}
 
@@ -65,6 +66,28 @@ function ConditionTree:toString()
 
 end
 
+---@enum lpdbComparator
+local Comparator = {
+	equals = {'::'},
+	notEquals = {'::!'},
+	greaterThan = {'::>'},
+	lessThan = {'::<'},
+	greaterThanOrEqualTo = {'::>', '::'},
+	lessThanOrEqualTo = {'::<', '::'},
+}
+---@diagnostic disable-next-line: inject-field
+Comparator.eq = Comparator.equals
+---@diagnostic disable-next-line: inject-field
+Comparator.neq = Comparator.notEquals
+---@diagnostic disable-next-line: inject-field
+Comparator.gt = Comparator.greaterThan
+---@diagnostic disable-next-line: inject-field
+Comparator.lt = Comparator.lessThan
+---@diagnostic disable-next-line: inject-field
+Comparator.ge = Comparator.greaterThanOrEqualTo
+---@diagnostic disable-next-line: inject-field
+Comparator.le = Comparator.lessThanOrEqualTo
+
 ---A condition in a ConditionTree
 ---@class ConditionNode:AbstractConditionNode
 ---@operator call(...): ConditionNode
@@ -81,27 +104,26 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
-	return String.interpolate(
-		'[[${name}${comparator}${value}]]',
-		{
-			name = self.name:toString(),
-			comparator = self.comparator,
-			value = self.value
-		}
+	assert(
+		Table.any(Comparator, function (_, value)
+			return self.comparator == value
+		end),
+		'Invalid comparator for LPDB query condition'
 	)
-end
+	local conditions = Array.map(self.comparator, function(comp)
+		return String.interpolate(
+			'[[${name}${comparator}${value}]]',
+			{
+				name = self.name:toString(),
+				comparator = comp,
+				value = self.value
+			}
+		)
+	end)
 
----@enum lpdbComparator
-local Comparator = {
-	equals = '::',
-	notEquals = '::!',
-	greaterThan = '::>',
-	lessThan = '::<'
-}
-Comparator.eq = Comparator.equals
-Comparator.neq = Comparator.notEquals
-Comparator.gt = Comparator.greaterThan
-Comparator.lt = Comparator.lessThan
+	if #conditions == 1 then return conditions[1] end
+	return '(' .. table.concat(conditions, ' OR ') .. ')'
+end
 
 ---@enum lpdbBooleanOperator
 local BooleanOperator = {
