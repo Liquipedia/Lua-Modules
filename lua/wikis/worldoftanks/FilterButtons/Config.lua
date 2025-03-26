@@ -36,7 +36,7 @@ Config.categories = {
 			category.items = Game.listGames({ordered = true})
 		end,
 		transform = function(game)
-			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'})
+			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'}) .. '&nbsp;' .. Game.name({game = game})
 		end
 	}
 }
