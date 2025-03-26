@@ -8,15 +8,19 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Lua = require('Module:Lua')
 local Link = require('Module:Widget/Basic/Link')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
+local Center = Widgets.Center
 
 ---@class MarvelrivalsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -61,14 +65,20 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@param args table
+---@return string[]
+function CustomLeague:getWikiCategories(args)
+	local platform = self:_platformLookup(args.platform)
+
+	return {
+		platform and (platform .. ' Tournaments') or nil,
+	}
+end
+
 ---@param platform string?
 ---@return string?
 function CustomLeague:_platformLookup(platform)
-	if String.isEmpty(platform) then
-		platform = DEFAULT_PLATFORM
-	end
-	---@cast platform -nil
-
+	platform  = Logic.nilIfEmpty(platform) or DEFAULT_PLATFORM
 	return PLATFORM_ALIAS[platform:lower()]
 end
 
@@ -77,14 +87,14 @@ end
 function CustomLeague:_createPlatformCell(args)
 	local platform = self:_platformLookup(args.platform)
 
-	if String.isNotEmpty(platform) then
-		return Link{
-			link = ':Category:' .. platform .. ' Tournaments',
-			children = { platform }
-		}
-	else
+	if String.isEmpty(platform) then
 		return nil
 	end
+		
+	return Link{
+		link = ':Category:' .. platform .. ' Tournaments',
+		children = { platform } 
+	}
 end
 
 return CustomLeague
