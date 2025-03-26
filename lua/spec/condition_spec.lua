@@ -8,6 +8,38 @@ describe('LPDB Condition Builder', function()
 	local BooleanOperator = Condition.BooleanOperator
 	local ColumnName = Condition.ColumnName
 
+	describe('test ConditionNode', function ()
+		it('test basic comparator', function ()
+			local conditionNode1 = ConditionNode(
+				ColumnName('date'), Comparator.lessThan, '2020-03-02T00:00:00.000'
+			)
+			assert.are_equal(
+				'[[date::<2020-03-02T00:00:00.000]]',
+				conditionNode1:toString()
+			)
+		end)
+
+		it('test ge', function ()
+			local conditionNode2 = ConditionNode(
+				ColumnName('date'), Comparator.greaterThanOrEqualTo, '2020-03-02T00:00:00.000'
+			)
+			assert.are_equal(
+				'([[date::>2020-03-02T00:00:00.000]] OR [[date::2020-03-02T00:00:00.000]])',
+				conditionNode2:toString()
+			)
+		end)
+
+		it('test le', function ()
+			local conditionNode3 = ConditionNode(
+				ColumnName('date'), Comparator.lessThanOrEqualTo, '2020-03-02T00:00:00.000'
+			)
+			assert.are_equal(
+				'([[date::<2020-03-02T00:00:00.000]] OR [[date::2020-03-02T00:00:00.000]])',
+				conditionNode3:toString()
+			)
+		end)
+	end)
+
 	it('build condition', function()
 		local tree = ConditionTree(BooleanOperator.all):add({
 			ConditionNode(
