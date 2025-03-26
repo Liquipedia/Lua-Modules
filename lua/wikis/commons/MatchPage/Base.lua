@@ -230,7 +230,7 @@ function BaseMatchPage:_makeTeamDisplay(opponent)
 	local data = opponent.teamTemplateData
 	return Div{
 		classes = { 'match-bm-match-header-team' },
-		children = {
+		children = Logic.isEmpty(data) and {} or {
 			mw.ext.TeamTemplate.teamicon(data.templatename),
 			Div{
 				classes = { 'match-bm-match-header-team-group' },
