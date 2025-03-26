@@ -87,13 +87,11 @@ function CharacterIcon.raw(character, date)
 	if not CharacterIcon then
 		return nil
 	end
-	if Logic.isEmpty(character) then
+	if not character then
 		return nil
 	end
-	---@cast character -nil
 
 	local characterIcons = Data[character:lower()]
-
 	if not characterIcons then
 		return nil
 	end
