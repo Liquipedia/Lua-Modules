@@ -14,6 +14,7 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -21,7 +22,7 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local CONTENT = {
 	usefulArticles = {
 		heading = 'The Game',
-		body = '{{Liquipedia:The Game}}',
+		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
 		boxid = 1503,
 	},
@@ -34,6 +35,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
+			rumours = true,
 			transferPage = function ()
 				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 			end
@@ -128,9 +130,9 @@ return {
 			link = 'Portal:Statistics',
 		},
 		{
-			file = 'FF_Wukong.png',
+			file = 'Free Fire Characters Artwork.jpeg',
 			title = 'Characters',
-			link = 'Portal:Characters',
+			link = 'Portal:CharactersCharacters',
 			count = {
 				method = 'CATEGORY',
 				category = 'Characters',
@@ -146,7 +148,7 @@ return {
 			},
 		},
 		{
-			file = 'FF_Robo.png',
+			file = 'Free Fire Pets Artwork.jpeg',
 			title = 'Pets',
 			link = 'Portal:Pets',
 			count = {
@@ -155,7 +157,7 @@ return {
 			},
 		},
 		{
-			file = 'Map FF Bermuda allmode.jpeg',
+			file = 'Free Fire Maps Artwork.jpeg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
