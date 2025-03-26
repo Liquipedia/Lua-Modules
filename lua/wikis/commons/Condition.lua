@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -39,9 +40,9 @@ function ConditionTree:add(node)
 		table.insert(self._nodes, node)
 	else
 		-- List of nodes
-		for _, value in pairs(node) do
-			table.insert(self._nodes, value)
-		end
+		Array.forEach(node, function(subNode)
+			self:add(subNode)
+		end)
 	end
 	return self
 end
@@ -52,7 +53,11 @@ function ConditionTree:toString()
 	return table.concat(Array.map(self._nodes,
 		function(node)
 			if Class.instanceOf(node, ConditionTree) then
-				return String.interpolate('(${node})', {node = node:toString()})
+				local nodeString = node:toString()
+				if Logic.isEmpty(nodeString) then return end
+				return String.interpolate('(${node})', {node = nodeString})
+			elseif Logic.isEmpty(node) then
+				return
 			end
 
 			return node:toString()
