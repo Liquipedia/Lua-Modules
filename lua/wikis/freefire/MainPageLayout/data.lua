@@ -130,7 +130,7 @@ return {
 		{
 			file = 'FF_Wukong.png',
 			title = 'Characters',
-			link = 'Portal:CharactersCharacters',
+			link = 'Portal:Characters',
 			count = {
 				method = 'CATEGORY',
 				category = 'Characters',
