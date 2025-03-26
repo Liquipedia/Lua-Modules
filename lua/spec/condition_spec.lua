@@ -86,6 +86,10 @@ describe('LPDB Condition Builder', function()
 				cond2,
 				cond3,
 			}
+			local cond5 = ConditionTree(BooleanOperator.all):add{
+				ConditionTree(BooleanOperator.all):add{ConditionTree(BooleanOperator.all):add{}},
+				ConditionNode(ColumnName('game'), Comparator.eq, game1),
+			}
 
 			assert.are_equal(
 				'[[game::commons1]]',
@@ -103,6 +107,10 @@ describe('LPDB Condition Builder', function()
 				'([[game::commons1]]) AND ([[game::commons1]] OR [[game::commons2]]) AND '..
 					'(([[game::commons1]] OR [[game::commons2]]))',
 				cond4:toString()
+			)
+			assert.are_equal(
+				'[[game::commons1]]',
+				cond5:toString()
 			)
 		end)
 	end)
