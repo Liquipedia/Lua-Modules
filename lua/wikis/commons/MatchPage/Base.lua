@@ -29,6 +29,7 @@ local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageMatch: MatchGroupUtilMatch
@@ -201,9 +202,9 @@ function BaseMatchPage:header()
 				Div{
 					classes = { 'match-bm-match-header-overview' },
 					children = {
-						self:_makeTeamDisplay(self.opponents[1]),
+						TeamDisplay{ opponent = self.opponents[1] },
 						self:_makeResultDisplay(),
-						self:_makeTeamDisplay(self.opponents[2])
+						TeamDisplay{ opponent = self.opponents[2] }
 					}
 				},
 				Div{
@@ -221,53 +222,6 @@ function BaseMatchPage:header()
 		},
 		self:_showMvps()
 	)
-end
-
----@private
----@param opponent MatchPageOpponent
----@return Widget
-function BaseMatchPage:_makeTeamDisplay(opponent)
-	local data = opponent.teamTemplateData
-	return Div{
-		classes = { 'match-bm-match-header-team' },
-		children = Logic.isEmpty(data) and {} or {
-			mw.ext.TeamTemplate.teamicon(data.templatename),
-			Div{
-				classes = { 'match-bm-match-header-team-group' },
-				children = {
-					Div{
-						classes = { 'match-bm-match-header-team-long' },
-						children = { Link{ link = data.page } }
-					},
-					Div{
-						classes = { 'match-bm-match-header-team-short' },
-						children = { Link{ link = data.page, children = data.shortname } }
-					},
-					Div{
-						classes = { 'match-bm-match-header-round-results' },
-						children = Array.map(opponent.seriesDots, BaseMatchPage._makeGameResultIcon)
-					},
-				}
-			}
-		}
-	}
-end
-
-local RESULT_DISPLAY_TYPES = {
-	['w'] = 'winner',
-	['l'] = 'loser',
-	['winner'] = 'winner',
-	['loser'] = 'loser',
-	['-'] = 'notplayed'
-}
-
----@private
----@param result string
----@return Widget
-function BaseMatchPage._makeGameResultIcon(result)
-	return Div{
-		classes = { 'match-bm-match-header-round-result', 'result--' .. RESULT_DISPLAY_TYPES[result:lower()] }
-	}
 end
 
 ---@private
