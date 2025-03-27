@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -54,7 +55,7 @@ function CustomUnit:setLpdbData(args)
 	mw.ext.LiquipediaDB.lpdb_datapoint('unit_' .. self.pagename, {
 		name = args.name,
 		type = args.informationType,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json{house = args.house or '',},
+		extradata = Json.stringifySubTables{house = args.house or '',},
 	})
 end
 
