@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Links = require('Module:Links')
@@ -27,9 +26,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
+local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local TeamDisplay = Lua.import('Module:Widget/Match/Page/TeamDisplay')
+
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageMatch: MatchGroupUtilMatch
@@ -179,80 +179,18 @@ function BaseMatchPage:render()
 	self:makeDisplayTitle()
 	return Div{
 		children = WidgetUtil.collect(
-			self:header(),
+			Header {
+				countdownBlock = self:getCountdownBlock(),
+				isBestOfOne = self:isBestOfOne(),
+				mvp = self.matchData.extradata.mvp,
+				opponent1 = self.matchData.opponents[1],
+				opponent2 = self.matchData.opponents[2],
+				parent = self.matchData.parent,
+				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
+				tournamentName = self.matchData.tournament,
+			},
 			self:renderGames(),
 			self:footer()
-		)
-	}
-end
-
----@return Widget[]
-function BaseMatchPage:header()
-	return WidgetUtil.collect(
-		Div{
-			classes = { 'match-bm-match-header' },
-			children = {
-				Div{
-					classes = { 'match-bm-match-header-powered-by' },
-					children = {
-						'Data provided by ',
-						Image.display('SAP logo.svg', nil, {link = '', alt = 'SAP'})
-					}
-				},
-				Div{
-					classes = { 'match-bm-match-header-overview' },
-					children = {
-						TeamDisplay{ opponent = self.opponents[1] },
-						self:_makeResultDisplay(),
-						TeamDisplay{ opponent = self.opponents[2] }
-					}
-				},
-				Div{
-					classes = { 'match-bm-match-header-tournament' },
-					children = {
-						Link{ link = self.matchData.parent, children = self.matchData.tournament }
-					}
-				},
-				Div{
-					classes = { 'match-bm-match-header-date' },
-					children = { self:getCountdownBlock() }
-				}
-			},
-
-		},
-		self:_showMvps()
-	)
-end
-
----@private
----@return Widget
-function BaseMatchPage:_makeResultDisplay()
-	local phase = MatchGroupUtil.computeMatchPhase(self.matchData)
-	return Div{
-		classes = { 'match-bm-match-header-result' },
-		children = WidgetUtil.collect(
-			(self:isBestOfOne() or phase == 'upcoming') and '' or (
-				self.opponents[1].score .. '&ndash;' .. self.opponents[2].score),
-			Div{
-				classes = { 'match-bm-match-header-result-text' },
-				children = { phase == 'ongoing' and 'live' or phase }
-			}
-		)
-	}
-end
-
----@private
----@return Widget?
-function BaseMatchPage:_showMvps()
-	local mvpData = self.matchData.extradata.mvp
-	if Logic.isEmpty(mvpData) then return end
-	return Div{
-		classes = { 'match-bm-match-mvp' },
-		children = WidgetUtil.collect(
-			HtmlWidgets.B{ children = { 'MVP' } },
-			unpack(Array.interleave(Array.map(mvpData.players, function (player)
-				return Link{ link = player.name, children = player.displayname }
-			end), ' '))
 		)
 	}
 end
