@@ -84,7 +84,7 @@ end
 ---@param game string?
 ---@return string
 function TierCustom.adjustLink(link, game)
-	return String.isNotEmpty(game) and (Game.link{game=game} .. '/' .. link) or link
+	return String.isNotEmpty(game) and (Game.link{game = game} .. '/' .. link) or link
 end
 
 return TierCustom
