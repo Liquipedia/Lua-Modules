@@ -52,11 +52,11 @@ end
 
 ---@param args table
 function CustomUnit:setLpdbData(args)
-	mw.ext.LiquipediaDB.lpdb_datapoint('unit_' .. self.pagename, {
+	mw.ext.LiquipediaDB.lpdb_datapoint('unit_' .. self.pagename, Json.stringifySubTables({
 		name = args.name,
 		type = args.informationType,
-		extradata = Json.stringifySubTables{house = args.house or '',},
-	})
+		extradata = {house = args.house or ''},
+	}))
 end
 
 return CustomUnit
