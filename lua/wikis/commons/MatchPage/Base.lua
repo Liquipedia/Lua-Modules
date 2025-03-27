@@ -189,7 +189,7 @@ end
 function BaseMatchPage:header()
 	return WidgetUtil.collect(
 		Div{
-			classes = { 'match-bm-lol-match-header' },
+			classes = { 'match-bm-match-header' },
 			children = {
 				Div{
 					classes = { 'match-bm-match-header-powered-by' },
@@ -199,7 +199,7 @@ function BaseMatchPage:header()
 					}
 				},
 				Div{
-					classes = { 'match-bm-lol-match-header-overview' },
+					classes = { 'match-bm-match-header-overview' },
 					children = {
 						self:_makeTeamDisplay(self.opponents[1]),
 						self:_makeResultDisplay(),
@@ -207,13 +207,13 @@ function BaseMatchPage:header()
 					}
 				},
 				Div{
-					classes = { 'match-bm-lol-match-header-tournament' },
+					classes = { 'match-bm-match-header-tournament' },
 					children = {
 						Link{ link = self.matchData.parent, children = self.matchData.tournament }
 					}
 				},
 				Div{
-					classes = { 'match-bm-lol-match-header-date' },
+					classes = { 'match-bm-match-header-date' },
 					children = { self:getCountdownBlock() }
 				}
 			},
@@ -244,7 +244,7 @@ function BaseMatchPage:_makeTeamDisplay(opponent)
 						children = { Link{ link = data.page, children = data.shortname } }
 					},
 					Div{
-						classes = { 'match-bm-lol-match-header-round-results' },
+						classes = { 'match-bm-match-header-round-results' },
 						children = Array.map(opponent.seriesDots, BaseMatchPage._makeGameResultIcon)
 					},
 				}
@@ -266,7 +266,7 @@ local RESULT_DISPLAY_TYPES = {
 ---@return Widget
 function BaseMatchPage._makeGameResultIcon(result)
 	return Div{
-		classes = { 'match-bm-lol-match-header-round-result', 'result--' .. RESULT_DISPLAY_TYPES[result:lower()] }
+		classes = { 'match-bm-match-header-round-result', 'result--' .. RESULT_DISPLAY_TYPES[result:lower()] }
 	}
 end
 
@@ -293,7 +293,7 @@ function BaseMatchPage:_showMvps()
 	local mvpData = self.matchData.extradata.mvp
 	if Logic.isEmpty(mvpData) then return end
 	return Div{
-		classes = { 'match-bm-lol-match-mvp' },
+		classes = { 'match-bm-match-mvp' },
 		children = WidgetUtil.collect(
 			HtmlWidgets.B{ children = { 'MVP' } },
 			unpack(Array.interleave(Array.map(mvpData.players, function (player)
