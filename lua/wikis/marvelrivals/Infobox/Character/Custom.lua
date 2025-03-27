@@ -99,7 +99,7 @@ function CustomHero:_getRole(args)
     local roleLookup = ROLE_LOOKUP[role]
 
 	if roleLookup then
-   		return roleLookup
+		return roleLookup
 	else
 		return { 'NPC' }
 	end
