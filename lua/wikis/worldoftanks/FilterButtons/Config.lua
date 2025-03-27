@@ -1,12 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=hearthstone
+-- wiki=worldoftanks
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Game = require('Module:Game')
 local Tier = require('Module:Tier/Utils')
+
 local Config = {}
 
 ---@type FilterButtonCategory[]
@@ -20,26 +22,24 @@ Config.categories = {
 				table.insert(category.items, tier.value)
 			end
 		end,
-		defaultItems = {'1', '2', '3', '4'},
+		defaultItems = {'1', '2', '3'},
 		transform = function(tier)
 			return Tier.toName(tier)
 		end,
-		expandKey = "liquipediatiertype",
+		expandKey = "game",
 	},
 	{
-		name = 'liquipediatiertype',
-		property = 'liquipediaTierType',
+		name = 'game',
+		property = 'game',
 		expandable = true,
 		load = function(category)
-			category.items = {}
-			for _, tiertype in Tier.iterate('tierTypes') do
-				table.insert(category.items, Tier.toIdentifier(tiertype.value))
-			end
+			category.items = Game.listGames({ordered = true})
 		end,
-		transform = function(tiertype)
-			return select(2, Tier.toName(1, tiertype))
-		end,
-	},
+		transform = function(game)
+			return Game.icon({game = game, noSpan = true, noLink = true, size = '20x20px'}) ..
+				'&nbsp;' .. Game.name({game = game})
+		end
+	}
 }
 
 return Config

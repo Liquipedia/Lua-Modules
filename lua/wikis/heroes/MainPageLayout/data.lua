@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=heroes
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -32,7 +33,13 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			limits = 10,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -42,10 +49,6 @@ local CONTENT = {
 		},
 		padding = true,
 		boxid = 1510,
-	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
 	},
 	filterButtons = {
 		noPanel = true,
@@ -66,8 +69,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 30,
-			completedDays = 20
+			upcomingDays = 60,
+			completedDays = 60,
 		},
 		padding = true,
 		boxid = 1508,
@@ -76,15 +79,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'Heroes of the Storm full allmode.png',
+		darkmode = 'Heroes of the Storm full allmode.png',
 	},
-	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
-	title = 'Rainbow Six',
+	metadesc = 'The Heroes of the Storm  (HotS) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, heroes and battlegrounds.',
+	title = 'Heroes of the Storm',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			file = 'Dignitas at ESL Katowice 2016.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -93,7 +96,7 @@ return {
 			},
 		},
 		{
-			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			file = 'Katowice scHwimpi.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -102,7 +105,7 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'Hearthstone Trophy at ESL Katowice 2016.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -111,7 +114,7 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'Relics at the 2015 HWC America Championship.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -120,23 +123,17 @@ return {
 			},
 		},
 		{
-			file = 'Deimos Trophy of the Manchester major 2024.jpg',
-			title = 'Operators',
-			link = 'Portal:Operators',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
-			},
+			file = 'Artosis and Tasteless Trophy at the 2015 HWC America Championship.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
 		},
 		{
-			file = 'R6s map lair.png',
-			title = 'Maps',
-			link = 'Portal:Maps',
+			file = 'Sky-temple.jpg',
+			title = 'Battlegrounds',
+			link = 'Portal:Battlegrounds',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
+				method = 'CATEGORY',
+				category = 'Battlegrounds',
 			},
 		},
 	},
@@ -146,15 +143,15 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
+						mobileOrder = 2,
+						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 4,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -163,7 +160,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -195,10 +192,6 @@ return {
 					},
 					{
 						mobileOrder = 5,
-						content = CONTENT.thisDay,
-					},
-					{
-						mobileOrder = 4,
 						content = CONTENT.usefulArticles,
 					},
 				},

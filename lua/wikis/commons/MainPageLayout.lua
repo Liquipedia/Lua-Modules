@@ -16,7 +16,7 @@ local String = require('Module:StringUtils')
 local WikiData = Lua.import('Module:MainPageLayout/data')
 local GridWidgets = Lua.import('Module:Widget/Grid')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local LinkWidget = Lua.import('Module:Widget/Basic/Link')
+local NavigationCard = Lua.import('Module:Widget/MainPage/NavigationCard')
 local PanelWidget = Lua.import('Module:Widget/Panel')
 
 local MainPageLayout = {}
@@ -112,7 +112,7 @@ function MainPageLayout._makeCells(cells)
 end
 
 ---@param navigationData {file: string?, link: string?, count: table?, title: string?}
----@return WidgetHtml
+---@return Widget
 function MainPageLayout._makeNavigationCard(navigationData)
 	local count
 	if navigationData.count then
@@ -125,22 +125,11 @@ function MainPageLayout._makeNavigationCard(navigationData)
 		end
 	end
 
-	return HtmlWidgets.Div{
-		classes = {'navigation-card'},
-		children = {
-			HtmlWidgets.Div{
-				classes = {'navigation-card__image'},
-				children = Image.display(navigationData.file, nil, {size = 240, link = ''}),
-			},
-			HtmlWidgets.Span{
-				classes = {'navigation-card__title'},
-				children = LinkWidget{link = navigationData.link, children = navigationData.title}
-			},
-			count and HtmlWidgets.Span{
-				classes = {'navigation-card__subtitle'},
-				children = count,
-			} or nil,
-		}
+	return NavigationCard{
+		file = navigationData.file,
+		link = navigationData.link,
+		title = navigationData.title,
+		count = count
 	}
 end
 

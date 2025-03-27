@@ -483,10 +483,6 @@ function StatisticsPortal.prizepoolBreakdown(args)
 			}
 		}
 
-		if yearValue == CURRENT_YEAR then
-			conditions:add{ConditionNode(ColumnName('sortdate'), Comparator.lt, DATE)}
-		end
-
 		local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 				query = 'sum::prizepool',
 				limit = MAX_QUERY_LIMIT,

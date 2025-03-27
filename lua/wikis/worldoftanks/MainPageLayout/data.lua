@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=worldoftanks
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,7 +32,13 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			limits = 10,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y')
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -42,10 +48,6 @@ local CONTENT = {
 		},
 		padding = true,
 		boxid = 1510,
-	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
 	},
 	filterButtons = {
 		noPanel = true,
@@ -67,7 +69,8 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
 			upcomingDays = 30,
-			completedDays = 20
+			completedDays = 20,
+			displayGameIcons = true
 		},
 		padding = true,
 		boxid = 1508,
@@ -76,15 +79,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'World of Tanks full lightmode.png',
+		darkmode = 'World of Tanks full darkmode.png',
 	},
-	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
-	title = 'Rainbow Six',
+	metadesc = 'The World of Tanks (WoT) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and tanks.',
+	title = 'World of Tanks',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			file = 'Natus Vincere at the WGL 2015 Grand Finals.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -93,7 +96,7 @@ return {
 			},
 		},
 		{
-			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			file = 'HellRaisers NearYou at the WGL 2016 Grand Finals.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -102,7 +105,7 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'WGL 2016 Europe Finals Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -111,7 +114,7 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'WoT WCI 2023 Player MONSTER 3.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -120,17 +123,7 @@ return {
 			},
 		},
 		{
-			file = 'Deimos Trophy of the Manchester major 2024.jpg',
-			title = 'Operators',
-			link = 'Portal:Operators',
-			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
-			},
-		},
-		{
-			file = 'R6s map lair.png',
+			file = 'WoT Minimap Himmelsdorf v1.23 cover.png',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -139,31 +132,36 @@ return {
 				conditions = '[[type::map]]',
 			},
 		},
+		{
+			file = 'Dakillzor - WoT The Grand Finals 2015.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
 	},
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				size = 5,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
+						mobileOrder = 4,
+						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
 			},
 			{ -- Right
-				size = 6,
+				size = 7,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -194,11 +192,7 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
-						content = CONTENT.thisDay,
-					},
-					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.usefulArticles,
 					},
 				},

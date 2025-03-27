@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=freefire
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -19,8 +20,8 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
 local CONTENT = {
 	usefulArticles = {
-		heading = 'Useful Articles',
-		body = '{{Liquipedia:Useful Articles}}',
+		heading = 'The Game',
+		body = '{{Liquipedia:The Game}}',
 		padding = true,
 		boxid = 1503,
 	},
@@ -32,27 +33,29 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content{
-			birthdayListPage = 'Birthday list'
-		},
+		body = ThisDayWidgets.Content(),
 		padding = true,
 		boxid = 1510,
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
+		body = '{{Liquipedia:2025 Season}}',
 	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		}
+		},
 	},
 	matches = {
 		heading = 'Matches',
@@ -67,7 +70,7 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
 			upcomingDays = 30,
-			completedDays = 20
+			completedDays = 30
 		},
 		padding = true,
 		boxid = 1508,
@@ -76,15 +79,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'Free Fire 2022 full lightmode.png',
+		darkmode = 'Free Fire 2022 full darkmode.png',
 	},
-	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
-	title = 'Rainbow Six',
+	metadesc = 'Comprehensive Free Fire wiki with articles covering everything from weapons, to maps, '..
+		'to tournaments, to competitive players and teams.',
+	title = 'Free Fire',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			file = 'P Esports at the 2024 Esports World Cup.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -93,7 +96,7 @@ return {
 			},
 		},
 		{
-			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			file = 'RRQ Dutzz at the 2024 Esports World Cup.jpg ',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -102,7 +105,7 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'Free Fire World Series 2024 Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -111,7 +114,7 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'Proxx7 and NANDO9 at the 2024 Esports World Cup.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -120,23 +123,44 @@ return {
 			},
 		},
 		{
-			file = 'Deimos Trophy of the Manchester major 2024.jpg',
-			title = 'Operators',
-			link = 'Portal:Operators',
+			file = 'Twisted Minds Smingch at the 2024 Esports World Cup.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Free Fire Characters Artwork.jpeg',
+			title = 'Characters',
+			link = 'Portal:Characters',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
+				method = 'CATEGORY',
+				category = 'Characters',
 			},
 		},
 		{
-			file = 'R6s map lair.png',
+			file = 'FF_Knife.png',
+			title = 'Weapons',
+			link = 'Portal:Weapons',
+			count = {
+				method = 'CATEGORY',
+				category = 'Weapons',
+			},
+		},
+		{
+			file = 'Free Fire Pets Artwork.jpeg',
+			title = 'Pets',
+			link = 'Portal:Pets',
+			count = {
+				method = 'CATEGORY',
+				category = 'Pets',
+			},
+		},
+		{
+			file = 'Free Fire Maps Artwork.jpeg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
+				method = 'CATEGORY',
+				category = 'Maps',
 			},
 		},
 	},
@@ -154,7 +178,7 @@ return {
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -194,11 +218,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 5,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},

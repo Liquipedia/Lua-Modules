@@ -199,10 +199,12 @@ function ParticipantTable:readSection(args)
 	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
+		entry.sortName = entry.sortName or Opponent.toName(entry.opponent)
 		entry.opponent = entry.isResolved and entry.opponent or Opponent.resolve(entry.opponent, config.resolveDate, {
 			syncPlayer = config.syncPlayers,
 			overwritePageVars = true,
 		})
+		entry.name = entry.name or Opponent.toName(entry.opponent)
 		entry.isResolved = true
 		self:setCustomPageVariables(entry, config)
 		return entry

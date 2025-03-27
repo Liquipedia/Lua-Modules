@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
+-- wiki=callofduty
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -32,7 +33,13 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			limits = 10,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -67,7 +74,8 @@ local CONTENT = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
 			upcomingDays = 30,
-			completedDays = 20
+			completedDays = 20,
+			displayGameIcons = true
 		},
 		padding = true,
 		boxid = 1508,
@@ -76,15 +84,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Rainbow Six Siege logo lightmode.svg',
-		darkmode = 'Rainbow Six Siege logo darkmode.svg',
+		lightmode = 'COD logo lightmode.svg',
+		darkmode = 'COD logo darkmode.svg',
 	},
-	metadesc = 'The Rainbow Six (R6) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, maps, weapons, and operators.',
-	title = 'Rainbow Six',
+	metadesc = 'The Call of Duty (COD) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and games.',
+	title = 'Call of Duty',
 	navigation = {
 		{
-			file = 'W7m Champions of BLAST Major Montreal 2024.jpg',
+			file = 'Elevate at CODM World Championship 2024.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -93,7 +101,7 @@ return {
 			},
 		},
 		{
-			file = 'Shaiiko BLAST R6 Montreal Major 2024.jpeg',
+			file = 'Seattle Surge at EWC 2024.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
@@ -102,7 +110,7 @@ return {
 			},
 		},
 		{
-			file = 'Hammer Trophy of the Six Invitational 2020.jpg',
+			file = 'Warzone Trophy at EWC 2024.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -111,7 +119,7 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'Insight at EWC 2024.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -120,17 +128,17 @@ return {
 			},
 		},
 		{
-			file = 'Deimos Trophy of the Manchester major 2024.jpg',
-			title = 'Operators',
-			link = 'Portal:Operators',
+			file = 'COD Infinite Warfare Wallpaper.jpg',
+			title = 'Games',
+			link = 'Portal:Games',
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::character]]',
+				conditions = '[[type::game]]',
 			},
 		},
 		{
-			file = 'R6s map lair.png',
+			file = 'COD Black Ops 6 Map Skyline.jpg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -143,7 +151,7 @@ return {
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				size = 5,
 				children = {
 					{
 						mobileOrder = 1,
@@ -160,7 +168,7 @@ return {
 				}
 			},
 			{ -- Right
-				size = 6,
+				size = 7,
 				children = {
 					{
 						mobileOrder = 2,
