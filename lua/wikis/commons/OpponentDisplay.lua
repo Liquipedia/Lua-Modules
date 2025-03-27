@@ -266,17 +266,6 @@ function OpponentDisplay.InlineTeamContainer(props)
 end
 
 --[[
-Displays a team as an inline element. The team is specified by a team struct.
-Only the default icon is supported.
-]]
----@param props {flip: boolean?, style: teamStyle?, team: standardTeamProps}
----@return string
----@deprecated
-function OpponentDisplay.InlineTeam(props)
-	return tostring(OpponentDisplay.InlineTeamContainer{name = props.team.pageName})
-end
-
---[[
 Displays a team as a block element. The width of the component is determined by
 its layout context, and not of the team name. The team is specified by template.
 ]]
