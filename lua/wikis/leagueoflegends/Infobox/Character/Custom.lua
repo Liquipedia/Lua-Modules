@@ -174,11 +174,20 @@ function CustomCharacter:getWikiCategories(args)
 	)
 end
 
+---@param args table
+---@return string[]
+function Character:getRoles(args)
+	return {
+		args.primaryrole,
+		args.secondaryrole
+	}
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.information = args.primaryrole
+	lpdbData.information = args.primaryrole ---@TODO: Investigate if we can remove this
 	lpdbData.extradata = {
 		region = args.region,
 		costbe = args.costbe,

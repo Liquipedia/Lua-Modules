@@ -129,6 +129,12 @@ function Character:nameDisplay(args)
 end
 
 ---@param args table
+---@return string[]
+function Character:getRoles(args)
+	return self:getAllArgsForBase(args, 'role')
+end
+
+---@param args table
 function Character:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
@@ -136,7 +142,9 @@ function Character:setLpdbData(args)
 		imagedark = args.imagedark or args.imagedarkmode,
 		type = 'character',
 		date = args.releasedate,
-		extradata = {},
+		extradata = {
+			roles = self:getRoles(args),
+		},
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)

@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Info = require('Module:Info')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 
@@ -56,12 +57,10 @@ end
 ---@return StandardCharacter
 function Character.characterFromRecord(record)
 	local name = record.name
-	local icon
+	local icon = Table.extract(record.extradata, 'icon')
 	local iconData = CharacterIcon.raw(name)
 	if iconData and iconData.file then
 		icon = iconData.file
-	else
-		icon = record.extradata.icon
 	end
 
 	---@type StandardCharacter
@@ -73,6 +72,8 @@ function Character.characterFromRecord(record)
 		iconDark = icon or record.imagedark,
 		imageLight = record.image,
 		imageDark = record.imagedark,
+		roles = Table.extract(record.extradata, 'roles'),
+		gameData = record.extradata,
 	}
 
 	return character
