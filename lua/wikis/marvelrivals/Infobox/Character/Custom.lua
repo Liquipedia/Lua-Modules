@@ -58,6 +58,7 @@ local ROLE_LOOKUP = {
 function CustomHero.run(frame)
 	local character = CustomHero(frame)
 	character:setWidgetInjector(CustomInjector(character))
+	assert(character.args.gameid, 'missing "|gameid=" input')
 	character.args.informationType = 'Hero'
 
 	return character:createInfobox()
@@ -98,7 +99,7 @@ function CustomHero:_getRole(args)
     local roleLookup = ROLE_LOOKUP[role]
 
 	if roleLookup then
-		return roleLookup
+   		return roleLookup
 	else
 		return { 'NPC' }
 	end
@@ -107,11 +108,7 @@ end
 ---@param lpdbData table
 ---@param args table
 function CustomHero:addToLpdb(lpdbData, args)
-	if ROLE_LOOKUP[args.role:lower()] then
-		lpdbData.information = 'Playable Character'
-	else
-		lpdbData.information = 'Non-Playable Character'
-	end
+	lpdbData.information = 'Playable Character'
 	lpdbData.extradata = {
 		role = args.role,
 		revealdate = args.revealdate,
