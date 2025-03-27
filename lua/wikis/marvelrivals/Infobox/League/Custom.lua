@@ -12,15 +12,12 @@ local Link = require('Module:Widget/Basic/Link')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 ---@class MarvelrivalsLeagueInfobox: InfoboxLeague
 local CustomLeague = Class.new(League)
@@ -90,10 +87,10 @@ function CustomLeague:_createPlatformCell(args)
 	if String.isEmpty(platform) then
 		return nil
 	end
-		
+
 	return Link{
 		link = ':Category:' .. platform .. ' Tournaments',
-		children = { platform } 
+		children = { platform }
 	}
 end
 
