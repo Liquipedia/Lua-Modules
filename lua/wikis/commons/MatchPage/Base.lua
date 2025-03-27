@@ -145,7 +145,7 @@ function BaseMatchPage.abbreviateNumber(number)
 end
 
 function BaseMatchPage:populateGames()
-	error('BaseMatchPage.populateGames() cannot be called directly and must be overridden.')
+	error('BaseMatchPage:populateGames() cannot be called directly and must be overridden.')
 end
 
 function BaseMatchPage:populateOpponents()
@@ -167,7 +167,7 @@ function BaseMatchPage:populateOpponents()
 end
 
 function BaseMatchPage:getCharacterIcon(character)
-	error('BaseMatchPage.getCharacterIcon() cannot be called directly and must be overridden.')
+	error('BaseMatchPage:getCharacterIcon() cannot be called directly and must be overridden.')
 end
 
 function BaseMatchPage:makeDisplayTitle()
