@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local Page = require('Module:Page')
@@ -83,7 +84,7 @@ end
 ---@param game string?
 ---@return string
 function TierCustom.adjustLink(link, game)
-	return String.isNotEmpty(game) and (game .. '/' .. link) or link
+	return String.isNotEmpty(game) and (Game.link{game=game} .. '/' .. link) or link
 end
 
 return TierCustom
