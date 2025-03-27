@@ -258,7 +258,7 @@ local RESULT_DISPLAY_TYPES = {
 	['l'] = 'loser',
 	['winner'] = 'winner',
 	['loser'] = 'loser',
-	['-'] = '-'
+	['-'] = 'notplayed'
 }
 
 ---@private
