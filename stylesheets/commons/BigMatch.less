@@ -105,30 +105,6 @@ Author(s): Rathoz
 	}
 }
 
-//TODO: can be deleted when switching to .match-bm-match-header-team class
-.match-bm-lol-match-header-team {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	font-weight: bold;
-}
-
-@media ( min-width: 768px ) {
-	.match-bm-lol-match-header-team-short {
-		display: none !important;
-	}
-}
-
-@media ( max-width: 767px ) {
-	.match-bm-lol-match-header-team-long {
-		display: none !important;
-	}
-}
-
-//end of TODO
-
 .match-bm-lol-match-header-round {
 	&-results {
 		display: flex;
@@ -185,26 +161,6 @@ Author(s): Rathoz
 		font-size: 0.875rem;
 		font-weight: normal;
 		text-transform: uppercase;
-	}
-}
-
-//TODO: can be deleted when switching to .match-bm-match-header-result class
-.match-bm-lol-match-header-result {
-	padding: 16px;
-	font-weight: bold;
-	text-align: center;
-	white-space: nowrap;
-}
-
-@media ( min-width: 414px ) {
-	.match-bm-lol-match-header-result {
-		font-size: 32px;
-	}
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-match-header-result {
-		font-size: 24px;
 	}
 }
 
