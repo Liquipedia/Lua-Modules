@@ -115,7 +115,7 @@ end
 
 ---@return (string|Html)[]
 function BaseMatchPage:getVods()
-	local vods =  Array.map(self.games, function(game, gameIdx)
+	local vods = Array.map(self.games, function(game, gameIdx)
 		return game.vod and VodLink.display{
 			gamenum = gameIdx,
 			vod = game.vod,
