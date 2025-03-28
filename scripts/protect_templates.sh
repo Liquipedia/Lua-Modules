@@ -5,10 +5,10 @@
 readarray filesToProtect < "./templates/templatesToProtect"
 
 for fileToProtect in "${filesToProtect[@]}"; do
-  echo "::group::Trying to protect for $fileToProtect"
   template="Template:${fileToProtect}"
+  echo "::group::Checking ${WIKI_TO_PROTECT}:${template}"
   if [[ "commons" == ${WIKI_TO_PROTECT} ]]; then
-    protectExistingPage $template ${WIKI_TO_PROTECT}
+    protectExistingPage "${template}" ${WIKI_TO_PROTECT}
   else
     protectNonExistingPage "${template}" ${WIKI_TO_PROTECT}
   fi
