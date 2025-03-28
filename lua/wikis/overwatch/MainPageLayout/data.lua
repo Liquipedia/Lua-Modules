@@ -68,6 +68,7 @@ local CONTENT = {
 			upcomingDays = 120,
 			completedDays = 30
 		},
+		padding = true,
 		boxid = 1508,
 	},
 }
