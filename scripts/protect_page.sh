@@ -101,7 +101,7 @@ protectNonExistingPage() {
   checkIfPageExists "${page}" $wiki
   if $pageExists; then
     echo "::warning::$page already exists on $wiki"
-    protectErrors+=("create:${WIKI_TO_PROTECT}:${page}")
+    protectErrors+=("create:${wiki}:${page}")
   else
     protectPage "${page}" "${wiki}" "create"
   fi
