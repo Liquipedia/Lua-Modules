@@ -79,7 +79,7 @@ function MatchPage.getByMatchId(props)
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
 			team.side = String.nilIfEmpty(game.extradata['team' .. teamIdx ..'side'])
-			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
+			team.players = Array.map(Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty), function(player)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
