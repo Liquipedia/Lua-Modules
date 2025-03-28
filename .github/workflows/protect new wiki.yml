@@ -24,3 +24,12 @@ jobs:
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
         run: bash scripts/protect.sh
+
+      - name: Template Protect
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+        run: bash scripts/protect_templates.sh
