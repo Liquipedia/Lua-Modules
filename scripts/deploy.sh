@@ -9,7 +9,7 @@ pat='\-\-\-\
 ]*)\
 '
 
-declare -A loggedin
+. ./scripts/login_and_get_token.sh
 
 if [[ -n "$1" ]]; then
   luaFiles=$1
@@ -43,51 +43,9 @@ for luaFile in $luaFiles; do
     wikiApiUrl="${WIKI_BASE_URL}/${wiki}/api.php"
     ckf="cookie_${wiki}.ck"
 
-    if [[ ${loggedin[${wiki}]} != 1 ]]; then
-      # Login
-      echo "...logging in on \"${wiki}\""
-      loginToken=$(
-        curl \
-          -s \
-          -b "$ckf" \
-          -c "$ckf" \
-          -d "format=json&action=query&meta=tokens&type=login" \
-          -H "User-Agent: ${userAgent}" \
-          -H 'Accept-Encoding: gzip' \
-          -X POST "$wikiApiUrl" \
-          | gunzip \
-          | jq ".query.tokens.logintoken" -r
-      )
-      curl \
-        -s \
-        -b "$ckf" \
-        -c "$ckf" \
-        --data-urlencode "lgname=${WIKI_USER}" \
-        --data-urlencode "lgpassword=${WIKI_PASSWORD}" \
-        --data-urlencode "lgtoken=${loginToken}" \
-        -H "User-Agent: ${userAgent}" \
-        -H 'Accept-Encoding: gzip' \
-        -X POST "${wikiApiUrl}?format=json&action=login" \
-        | gunzip \
-        > /dev/null
-      loggedin[$wiki]=1
-      # Don't get rate limited
-      sleep 4
-    fi
+    getToken ${wiki}
 
     # Edit page
-    editToken=$(
-      curl \
-        -s \
-        -b "$ckf" \
-        -c "$ckf" \
-        -d "format=json&action=query&meta=tokens" \
-        -H "User-Agent: ${userAgent}" \
-        -H 'Accept-Encoding: gzip' \
-        -X POST "$wikiApiUrl" \
-        | gunzip \
-        | jq ".query.tokens.csrftoken" -r
-    )
     rawResult=$(
       curl \
         -s \
@@ -98,7 +56,7 @@ for luaFile in $luaFiles; do
         --data-urlencode "summary=Git: ${gitDeployReason}" \
         --data-urlencode "bot=true" \
         --data-urlencode "recreate=true" \
-        --data-urlencode "token=${editToken}" \
+        --data-urlencode "token=${token}" \
         -H "User-Agent: ${userAgent}" \
         -H 'Accept-Encoding: gzip' \
         -X POST "${wikiApiUrl}?format=json&action=edit" \
