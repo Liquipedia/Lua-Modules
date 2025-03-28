@@ -12,7 +12,7 @@ local GameLookup = require('Module:GameLookup')
 local Lua = require('Module:Lua')
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
-local TeamTemplates = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -135,20 +135,16 @@ end
 ---@return ConditionTree
 function CustomTeam:_buildTeamPlacementConditions()
 	local team = self.args.teamtemplate or self.args.name or self.pagename
-	local rawOpponentTemplate = TeamTemplates.queryRaw(team) or {}
-	local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-	if not opponentTemplate then
-		error('Missing team template for team: ' .. team)
-	end
+	assert(TeamTemplate.exists(team), TeamTemplate.noTeamMessage(team))
 
-	local opponentTeamTemplates = TeamTemplates.queryHistorical(opponentTemplate) or {opponentTemplate}
+	local opponentTeamTemplates = TeamTemplate.queryHistoricalNames(team)
 
 	local playerConditions = self:_buildPlayersOnTeamOpponentConditions(opponentTeamTemplates)
 
 	local opponentConditions = ConditionTree(BooleanOperator.any)
-	for _, teamTemplate in pairs(opponentTeamTemplates) do
+	Array.forEach(opponentTeamTemplates, function (teamTemplate)
 		opponentConditions:add{ConditionNode(ColumnName('opponenttemplate'), Comparator.eq, teamTemplate)}
-	end
+	end)
 
 	local conditions = ConditionTree(BooleanOperator.any):add{
 		ConditionTree(BooleanOperator.all):add{

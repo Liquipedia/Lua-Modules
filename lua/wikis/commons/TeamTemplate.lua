@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local Data = mw.loadData('Module:TeamTemplate/data')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 
@@ -42,10 +43,11 @@ end
 
 --- Retrieves the lightmode image and darkmode image for a given team template.
 ---@param template string
+---@param date string|number?
 ---@return string?
 ---@return string?
-function TeamTemplate.getIcon(template)
-	local raw = TeamTemplate.getRawOrNil(template)
+function TeamTemplate.getIcon(template, date)
+	local raw = TeamTemplate.getRawOrNil(template, date)
 	if not raw then
 		return
 	end
@@ -87,7 +89,7 @@ does not exist.
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	team = team:gsub('_', ' '):lower()
-	return mw.ext.TeamTemplate.raw(team, date)
+	return Data.specialTemplates[team] or mw.ext.TeamTemplate.raw(team, date)
 end
 
 ---Creates error message for missing team templates.
@@ -95,7 +97,7 @@ end
 ---@param date string|number?
 ---@return string
 function TeamTemplate.noTeamMessage(pageName, date)
-	return 'Missing template for team=' .. tostring(pageName)
+	return 'Missing team template for "' .. tostring(pageName) .. '"'
 		.. (date and ' on date=' .. tostring(date) or '')
 end
 
@@ -117,17 +119,16 @@ An empty array is returned if the specified team template does not exist.
 ---@param name string
 ---@return string[]
 function TeamTemplate.queryHistoricalNames(name)
-    local resolvedName = TeamTemplate.resolve(name)
-	if resolvedName then
-		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
-		if Logic.isNotEmpty(historical) then
-			return Array.unique(Array.extractValues(historical))
-		else
-			return { resolvedName }
-		end
-	else
+	if not TeamTemplate.exists(name) then
 		return {}
 	end
+	local rawTemplate = TeamTemplate.getRaw(name)
+	if Logic.isEmpty(rawTemplate.historicaltemplate) then
+		return { rawTemplate.templatename }
+	end
+	local historical = TeamTemplate.queryHistorical(rawTemplate.historicaltemplate)
+	---@cast historical -nil
+	return Array.unique(Array.extractValues(historical))
 end
 
 return TeamTemplate

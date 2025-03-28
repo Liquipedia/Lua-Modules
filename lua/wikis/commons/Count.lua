@@ -13,7 +13,7 @@ local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -180,7 +180,7 @@ function Count.placements(args)
 
 	elseif String.isNotEmpty(args.team) then
 		local opponentConditions = ConditionTree(BooleanOperator.any)
-		Array.forEach(Count._getOpponentNames(args.team), function(templateValue)
+		Array.forEach(TeamTemplate.queryHistoricalNames(args.team), function(templateValue)
 			opponentConditions:add{
 				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue),
 				ConditionNode(ColumnName('opponentname'), Comparator.eq, templateValue:gsub(' ', '_'))
@@ -220,15 +220,6 @@ end
 --[[
 Condition Functions
 ]]--
-
-
----Retrieve all team templates for team argument parameter
----@param opponent string
----@return string[]
-function Count._getOpponentNames(opponent)
-	local opponentNames = Team.queryHistoricalNames(opponent) or {}
-	return Array.extractValues(opponentNames)
-end
 
 
 ---Returns the base query conditions based on input args
