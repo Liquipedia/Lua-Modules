@@ -13,6 +13,7 @@ local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local PageLink = require('Module:Page')
 local String = require('Module:StringUtils')
+local Tier = require('Module:Tier/Custom')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -31,6 +32,8 @@ local CustomInjector = Class.new(Injector)
 function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
+
+	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
 
 	return league:createInfobox()
 end
@@ -103,6 +106,22 @@ function CustomLeague:_createNoWrappingSpan(content)
 	return mw.html.create('span')
 		:css('white-space', 'nowrap')
 		:node(content)
+end
+
+---@param args table
+---@return string?
+function CustomLeague:createLiquipediaTierDisplay(args)
+	local tierDisplay = Tier.display(
+		args.liquipediatier,
+		args.liquipediatiertype,
+		{link = true, game = Game.name{game = args.game}}
+	)
+
+	if String.isEmpty(tierDisplay) then
+		return
+	end
+
+	return tierDisplay .. self:appendLiquipediatierDisplay(args)
 end
 
 return CustomLeague
