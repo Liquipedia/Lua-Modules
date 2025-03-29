@@ -100,4 +100,3 @@ function ThisDayQuery.tournament(month, day)
 end
 
 return ThisDayQuery
-
