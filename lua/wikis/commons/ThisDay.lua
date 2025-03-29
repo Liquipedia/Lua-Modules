@@ -37,6 +37,11 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local Config = Lua.import('Module:ThisDay/config', {loadData = true})
 
+---@class ThisDayParameters
+---@field date string?
+---@field month string|integer|nil
+---@field day string|integer|nil
+
 local ThisDay = {}
 
 ---@param args table
@@ -62,8 +67,11 @@ function ThisDay.run(args)
 	}
 end
 
+---@class ThisDayBirthdayParameters: ThisDayParameters
+---@field noTwitter boolean?
+
 --- Get and display birthdays that happened on a given date (falls back to today)
----@param args {date: string?, month: string|integer|nil, day: string|integer|nil, noTwitter: boolean?}
+---@param args ThisDayBirthdayParameters
 ---@return string|Widget?
 function ThisDay.birthday(args)
 	local birthdayData = ThisDayQuery.birthday(ThisDay._readDate(args))
@@ -123,7 +131,7 @@ function ThisDay.birthday(args)
 end
 
 --- Get and display patches that happened on a given date (falls back to today)
----@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
+---@param args ThisDayParameters
 ---@return string|Widget?
 function ThisDay.patch(args)
 	if not Config.showPatches then return end
@@ -148,7 +156,7 @@ function ThisDay.patch(args)
 end
 
 --- Get and display tournament wins that happened on a given date (falls back to today)
----@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
+---@param args ThisDayParameters
 ---@return string|Widget?
 function ThisDay.tournament(args)
 	local tournamentWinData = ThisDayQuery.tournament(ThisDay._readDate(args))
@@ -211,7 +219,7 @@ function ThisDay._displayWins(yearData)
 end
 
 --- Reads trivia from subpages of 'Liquipedia:This day'
----@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
+---@param args ThisDayParameters
 ---@return (string|Widget)[]
 function ThisDay.trivia(args)
 	local month, day = ThisDay._readDate(args)
@@ -226,7 +234,7 @@ function ThisDay.trivia(args)
 end
 
 --- Read date/month/day input
----@param args {date: string?, month: string|integer|nil, day: string|integer|nil}
+---@param args ThisDayParameters
 ---@return integer
 ---@return integer
 function ThisDay._readDate(args)
