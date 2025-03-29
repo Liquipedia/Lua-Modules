@@ -33,8 +33,6 @@ function CustomLeague.run(frame)
 	local league = CustomLeague(frame)
 	league:setWidgetInjector(CustomInjector(league))
 
-	league.args.liquipediatier = Tier.toNumber(league.args.liquipediatier)
-
 	return league:createInfobox()
 end
 
