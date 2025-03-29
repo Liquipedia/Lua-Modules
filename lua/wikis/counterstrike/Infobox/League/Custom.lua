@@ -387,7 +387,7 @@ function CustomLeague:_createValveTierCell()
 	if self.valveTier then
 		local tierLink = '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
 		local torInfo = (self.data.endDate >= VALVE_TOR_START_DATE) and Icon.makeIcon({
-				iconName = 'matchpopup',
+				iconName = 'info',
 				hover = 'Click for further details',
 				pageLink = '#Valve Operational Requirements',
 				attributes = {style = 'color: var(--clr-on-background);'}
