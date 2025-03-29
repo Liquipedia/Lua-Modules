@@ -48,7 +48,7 @@ function Icon.makeIcon(props)
 	if Logic.isNotEmpty(props.pageLink) then
 		return '[[' .. props.pageLink .. '|' .. iconString .. ']]'
 	elseif Logic.isNotEmpty(props.externalLink) then
-		return '[' .. props.pageLink .. ' ' .. iconString .. ']'
+		return '[' .. props.externalLink .. ' ' .. iconString .. ']'
 	else
 		return iconString
 	end
