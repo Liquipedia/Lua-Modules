@@ -20,6 +20,7 @@ local Variables = require('Module:Variables')
 local Currency = Lua.import('Module:Currency')
 local Game = Lua.import('Module:Game')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local Icon = Lua.import('Module:Icon')
 local InfoboxPrizePool = Lua.import('Module:Infobox/Extensions/PrizePool')
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
@@ -85,10 +86,14 @@ local VALVE_TIERS = {
 	['rmr event'] = {meta = 'Regional Major Rankings event', name = 'RMR Event', link = 'Regional Major Rankings'},
 	['tier 1'] = {meta = 'Valve Tier 1 event', name = 'Tier 1', link = 'Valve Tier 1 Events'},
 	['tier 1 qualifier'] = {meta = 'Valve Tier 1 qualifier', name = 'Tier 1 Qualifier', link = 'Valve Tier 1 Events'},
+	['tier 1 wildcard'] = {meta = 'Valve Tier 1 Wildcard event', name = 'Tier 1 Wildcard', link = 'Valve Wildcard Events'},
 	['tier 2'] = {meta = 'Valve Tier 2 event', name = 'Tier 2', link = 'Valve Tier 2 Events'},
 	['tier 2 qualifier'] = {meta = 'Valve Tier 2 qualifier', name = 'Tier 2 Qualifier', link = 'Valve Tier 2 Events'},
+	['tier 2 wildcard'] = {meta = 'Valve Tier 2 Wildcard event', name = 'Tier 2 Wildcard', link = 'Valve Wildcard Events'},
 	['wildcard'] = {meta = 'Valve Wildcard event', name = 'Wildcard', link = 'Valve Wildcard Events'},
 }
+
+local VALVE_TOR_START_DATE = '2025-01-01'
 
 local RESTRICTIONS = {
 	female = {
@@ -380,7 +385,14 @@ end
 ---@return string?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
-		return '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
+		local tierLink = '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
+		local torInfo = (self.data.endDate >= VALVE_TOR_START_DATE) and Icon.makeIcon({
+				iconName = 'matchpopup',
+				hover = 'Click for further details',
+				pageLink = '#Valve Operational Requirements',
+				attributes = {style = 'color: var(--clr-on-background);'}
+			}) or ''
+		return tierLink .. (Logic.isNotEmpty(torInfo) and ('&ensp;' .. torInfo) or '')
 	end
 end
 
