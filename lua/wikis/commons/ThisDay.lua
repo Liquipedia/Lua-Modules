@@ -71,55 +71,55 @@ function ThisDay.birthday(args)
 	if Logic.isEmpty(birthdayData) then
 		if Config.hideEmptyBirthdayList then return end
 		return 'There are no birthdays today'
-	else
-		local now = DateExt.parseIsoDate(os.date('%Y-%m-%d') --[[@as string]])
-		local lines = Array.map(birthdayData, function (player)
-			local birthdate = DateExt.parseIsoDate(player.birthdate)
-			local birthYear = birthdate.year
-			local age = now.year - birthYear
-			if
-				birthdate.month > now.month or (
-					birthdate.month == now.month
-					and birthdate.day > now.day
-				)
-			then
-				age = age - 1
-			end
-			local playerData = {
-				displayName = player.id,
-				flag = player.nationality,
-				pageName = player.pagename,
-				faction = (player.extradata or {}).faction,
-			}
-			local line = {
-				OpponentDisplay.InlineOpponent{
-					opponent = {players = {playerData}, type = Opponent.solo}
-				},
-				' - ',
-				birthYear .. ' (age ' .. age .. ')'
-			}
-
-			if String.isNotEmpty((player.links or {}).twitter) and not Logic.readBool(args.noTwitter) then
-				Array.appendWith(
-					line,
-					' ',
-					HtmlWidgets.I{
-						classes = {'lp-icon', 'lp-icon-25', 'lp-twitter', 'share-birthday'},
-						attributes = {
-							['data-url'] = player.links.twitter,
-							['data-page'] = player.pagename,
-							title = 'Send a message to ' .. player.id .. ' about their birthday!'
-						},
-						css = {cursor = 'pointer'}
-					}
-				)
-			end
-
-			return line
-		end)
-
-		return UnorderedList{ children = lines }
 	end
+
+	local now = DateExt.parseIsoDate(os.date('%Y-%m-%d') --[[@as string]])
+	local lines = Array.map(birthdayData, function (player)
+		local birthdate = DateExt.parseIsoDate(player.birthdate)
+		local birthYear = birthdate.year
+		local age = now.year - birthYear
+		if
+			birthdate.month > now.month or (
+				birthdate.month == now.month
+				and birthdate.day > now.day
+			)
+		then
+			age = age - 1
+		end
+		local playerData = {
+			displayName = player.id,
+			flag = player.nationality,
+			pageName = player.pagename,
+			faction = (player.extradata or {}).faction,
+		}
+		local line = {
+			OpponentDisplay.InlineOpponent{
+				opponent = {players = {playerData}, type = Opponent.solo}
+			},
+			' - ',
+			birthYear .. ' (age ' .. age .. ')'
+		}
+
+		if String.isNotEmpty((player.links or {}).twitter) and not Logic.readBool(args.noTwitter) then
+			Array.appendWith(
+				line,
+				' ',
+				HtmlWidgets.I{
+					classes = {'lp-icon', 'lp-icon-25', 'lp-twitter', 'share-birthday'},
+					attributes = {
+						['data-url'] = player.links.twitter,
+						['data-page'] = player.pagename,
+						title = 'Send a message to ' .. player.id .. ' about their birthday!'
+					},
+					css = {cursor = 'pointer'}
+				}
+			)
+		end
+
+		return line
+	end)
+
+	return UnorderedList{ children = lines }
 end
 
 --- Get and display patches that happened on a given date (falls back to today)
@@ -131,21 +131,20 @@ function ThisDay.patch(args)
 
 	if Logic.isEmpty(patchData) then
 		return Config.showEmptyPatchList and 'There were no patches on this day' or nil
-	else
-		local lines = Array.map(patchData, function (patch)
-			local patchYear = patch.date:sub(1, 4)
-			return {
-				HtmlWidgets.B{
-					children = {patchYear}
-				},
-				': ',
-				Link{link = patch.pagename, children = patch.name},
-				' released'
-			}
-		end)
-
-		return UnorderedList{ children = lines }
 	end
+	local lines = Array.map(patchData, function (patch)
+		local patchYear = patch.date:sub(1, 4)
+		return {
+			HtmlWidgets.B{
+				children = {patchYear}
+			},
+			': ',
+			Link{link = patch.pagename, children = patch.name},
+			' released'
+		}
+	end)
+
+	return UnorderedList{ children = lines }
 end
 
 --- Get and display tournament wins that happened on a given date (falls back to today)
@@ -156,22 +155,21 @@ function ThisDay.tournament(args)
 
 	if Logic.isEmpty(tournamentWinData) then
 		return 'No tournament ended on this date'
-	else
-		local _, byYear = Array.groupBy(tournamentWinData, function(placement) return placement.date:sub(1, 4) end)
-
-		local display = {}
-		for year, yearData in Table.iter.spairs(byYear) do
-			Array.appendWith(display,
-				HtmlWidgets.H4{
-					children = { year }
-				},
-				'\n',
-				ThisDay._displayWins(yearData)
-			)
-		end
-		mw.logObject(display)
-		return HtmlWidgets.Fragment{children = display}
 	end
+	local _, byYear = Array.groupBy(tournamentWinData, function(placement) return placement.date:sub(1, 4) end)
+
+	local display = {}
+	for year, yearData in Table.iter.spairs(byYear) do
+		Array.appendWith(display,
+			HtmlWidgets.H4{
+				children = { year }
+			},
+			'\n',
+			ThisDay._displayWins(yearData)
+		)
+	end
+	mw.logObject(display)
+	return HtmlWidgets.Fragment{children = display}
 end
 
 --- Display win rows of a year
