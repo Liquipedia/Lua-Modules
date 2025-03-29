@@ -313,7 +313,7 @@ function TransferRef._getTextAndLink(reference, options)
 		link = 'https://docs.google.com/spreadsheets/d/1Y7k5kQ2AegbuyiGwEPsa62e883FYVtHqr6UVut9RC4o/pubhtml#'
 		local appendedText = 'LoL Esports League-Recognized Contract Database'
 		return 'Transfer was not formally announced, but was revealed by changes in the ' ..
-			(linkInsideText and '[' .. link .. '|' .. appendedText .. ']].' or appendedText),
+			(linkInsideText and Page.makeExternalLink(appendedText, link) .. '.' or appendedText),
 			not linkInsideText and link or nil
 	end
 end
