@@ -16,6 +16,7 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Template = require('Module:Template')
 
+local AgeCalculation = Lua.import('Module:AgeCalculation')
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
@@ -81,19 +82,8 @@ function ThisDay.birthday(args)
 		return 'There are no birthdays today'
 	end
 
-	local now = DateExt.parseIsoDate(os.date('%Y-%m-%d') --[[@as string]])
 	local lines = Array.map(birthdayData, function (player)
-		local birthdate = DateExt.parseIsoDate(player.birthdate)
-		local birthYear = birthdate.year
-		local age = now.year - birthYear
-		if
-			birthdate.month > now.month or (
-				birthdate.month == now.month
-				and birthdate.day > now.day
-			)
-		then
-			age = age - 1
-		end
+		local playerAge = AgeCalculation.raw{birthdate = player.birthdate}
 		local playerData = {
 			displayName = player.id,
 			flag = player.nationality,
@@ -105,7 +95,7 @@ function ThisDay.birthday(args)
 				opponent = {players = {playerData}, type = Opponent.solo}
 			},
 			' - ',
-			birthYear .. ' (age ' .. age .. ')'
+			playerAge.birthDate.year .. ' (age ' .. playerAge:calculate() .. ')'
 		}
 
 		if String.isNotEmpty((player.links or {}).twitter) and not Logic.readBool(args.noTwitter) then
