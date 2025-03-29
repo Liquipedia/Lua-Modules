@@ -319,7 +319,7 @@ function TransferRef._getTextAndLink(reference, options)
 		link = contractDatabaseRef.link
 		local displayText = contractDatabaseRef.display
 		return 'Transfer was not formally announced, but was revealed by changes in the ' ..
-			(linkInsideText and Page.makeExternalLink(displayText, link) .. '.' or displayText),
+			(linkInsideText and Page.makeExternalLink(displayText, link) or displayText) .. '.',
 			not linkInsideText and link or nil
 	end
 end
