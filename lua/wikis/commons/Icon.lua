@@ -18,6 +18,8 @@ local Icon = {}
 ---@field screenReaderHidden boolean?
 ---@field hover string?
 ---@field size integer|string|nil
+---@field pageLink string?
+---@field externalLink string?
 ---@field additionalClasses string[]?
 ---@field attributes table<string, string>?
 
@@ -33,7 +35,7 @@ function Icon.makeIcon(props)
 	if Logic.isNumeric(size) then
 		size = size .. 'px'
 	end
-	return tostring(mw.html.create('i')
+	local iconString = tostring(mw.html.create('i')
 			:addClass(icon)
 			:addClass(props.color)
 			:addClass(Logic.isNotEmpty(props.additionalClasses) and table.concat(props.additionalClasses, ' ') or nil)
@@ -42,6 +44,14 @@ function Icon.makeIcon(props)
 			:attr('aria-hidden', props.screenReaderHidden and 'true' or nil)
 			:attr(props.attributes and props.attributes or {})
 	)
+
+	if Logic.isNotEmpty(props.pageLink) then
+		return '[[' .. props.pageLink .. '|' .. iconString .. ']]'
+	elseif Logic.isNotEmpty(props.externalLink) then
+		return '[' .. props.externalLink .. ' ' .. iconString .. ']'
+	else
+		return iconString
+	end
 end
 
 return Class.export(Icon)
