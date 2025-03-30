@@ -76,40 +76,22 @@ end
 ---@param MapParser LeagueOfLegendsMapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
-	local maps = {}
-	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local map = MapParser.getMap(mapInput)
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
+	---@type MapParserInterface
+	local mapParserWrapper = {
+		calculateMapScore = function(map)
+			return MapFunctions.calculateMapScore(map.winner, map.finished)
+		end,
+		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
+		getMap = MapParser.getMap,
+		getLength = MapParser.getLength,
+		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
+	}
+	local maps = MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParserWrapper)
 
-		local dateToUse = map.date or match.date
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
-
-		map.length = MapParser.getLength(map)
+	-- Legacy VOD params
+	Array.forEach(maps, function (map, mapIndex)
 		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
-		map.extradata = MapFunctions.getExtraData(MapParser, map, #opponents)
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map.winner, map.finished))
-			local players = MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
-	end
+	end)
 
 	return maps
 end
@@ -134,10 +116,11 @@ function MatchFunctions.getExtraData(match, games, opponents)
 end
 
 ---@param MapParser LeagueOfLegendsMapParserInterface
+---@param match table
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(MapParser, map, opponentCount)
+function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
@@ -145,7 +128,7 @@ function MapFunctions.getExtraData(MapParser, map, opponentCount)
 		return 'team' .. opponentIndex .. key
 	end
 
-	for opponentIndex = 1, opponentCount do
+	for opponentIndex = 1, #opponents do
 		local opponentData = {
 			objectives = MapParser.getObjectives(map, opponentIndex),
 			side = MapParser.getSide(map, opponentIndex),
