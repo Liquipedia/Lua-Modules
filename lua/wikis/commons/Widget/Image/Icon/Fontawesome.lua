@@ -80,10 +80,17 @@ function FontawesomeIcon:_makeGenericIcon()
 
 	local iconClasses
 	if Logic.isNotEmpty(props.faSize) then
-		iconClasses = String.interpolate(CLASS_TEMPLATE_SIZED, {style = props.faStyle, icon = props.faName, size = props.faSize})
+		iconClasses = String.interpolate(CLASS_TEMPLATE_SIZED, {
+				style = props.faStyle,
+				icon = props.faName,
+				size = props.faSize
+			})
 	else
-		iconClasses = String.interpolate(CLASS_TEMPLATE, {style = props.faStyle, icon = props.faName})
-	end		
+		iconClasses = String.interpolate(CLASS_TEMPLATE, {
+				style = props.faStyle,
+				icon = props.faName
+			})
+	end
 
 	return I{
 		classes = {
