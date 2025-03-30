@@ -20,6 +20,7 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field iconName string?
 ---@field faName string?
 ---@field faStyle string?
+---@field faSize string?
 ---@field color string?
 ---@field screenReaderHidden boolean?
 ---@field hover string?
