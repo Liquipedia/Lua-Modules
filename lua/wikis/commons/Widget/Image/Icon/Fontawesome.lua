@@ -27,7 +27,8 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field props IconFontawesomeProps
 local FontawesomeIcon = Class.new(WidgetIcon)
 FontawesomeIcon.defaultProps = {
-	faStyle = 'fas'
+	faStyle = 'fas',
+	faSize = ''
 }
 
 local CLASS_TEMPLATE = '${style} fa-${icon}'
@@ -59,7 +60,8 @@ local VALID_SIZES = {
 function FontawesomeIcon:_makeGenericIcon()
 	local props = self.props
 
-	assert(Table.includes(VALID_STYLES, props.faStyle), props.faStyle .. ' is not a valid Font Awesome icon style!')
+	assert(Table.includes(VALID_STYLES, props.faStyle),
+		props.faStyle .. ' is not a valid Font Awesome icon style!')
 
 	assert(Logic.isEmpty(props.faSize) or Table.includes(VALID_SIZES, props.faSize),
 		props.faSize .. ' is not a valid Font Awesome icon size!')
