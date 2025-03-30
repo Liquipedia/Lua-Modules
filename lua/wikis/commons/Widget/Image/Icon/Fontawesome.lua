@@ -31,9 +31,11 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@operator call(IconProps): IconFontawesomeWidget
 ---@field props IconFontawesomeProps
 local FontawesomeIcon = Class.new(WidgetIcon)
+FontawesomeIcon.defaultProps = {
+	faStyle = 'fas'
+}
 
 local CLASS_TEMPLATE = '${style} fa-${icon}'
-local DEFAULT_STYLE = 'fas'
 local VALID_STYLES = {
 	'fas',
 	'far',
@@ -46,9 +48,8 @@ local VALID_STYLES = {
 function FontawesomeIcon:_makeGenericIcon()
 	local props = self.props
 
-	local style = Logic.emptyOr(props.faStyle, DEFAULT_STYLE)
-	if not Table.includes(VALID_STYLES, style) then
-		error(style .. ' is not a valid Font Awesome style!')
+	if not Table.includes(VALID_STYLES, props.faStyle) then
+		error(props.faStyle .. ' is not a valid Font Awesome style!')
 	end
 
 	local size = props.size
@@ -58,7 +59,7 @@ function FontawesomeIcon:_makeGenericIcon()
 
 	return I{
 		classes = {
-			String.interpolate(CLASS_TEMPLATE, {style = style, icon = props.faName}),
+			String.interpolate(CLASS_TEMPLATE, {style = props.faStyle, icon = props.faName}),
 			props.additionalClasses,
 			props.color,
 		},
