@@ -78,7 +78,7 @@ function FontawesomeIcon:_makeGenericIcon()
 	if Logic.isNotEmpty(props.faSize) then
 		Array.appendWith(iconClasses, String.interpolate(CLASS_TEMPLATE_SIZE, {
 			size = props.faSize
-		})
+		}))
 	end
 
 	return I{
