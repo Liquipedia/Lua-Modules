@@ -24,7 +24,7 @@ local Tr = HtmlWidgets.Tr
 
 ---@class PatchCalendar
 ---@operator call(table): PatchCalendar
----@field config {game: string?, startDate: integer?, endDate: integer?, year: integer?}
+---@field config {game: string?, startDate: integer?, endDate: integer?, year: integer?, limit: integer?}
 ---@field displayYear integer
 ---@field patches datapoint[]
 local PatchCalendar = Class.new(function(self, args)
@@ -38,6 +38,7 @@ local PatchCalendar = Class.new(function(self, args)
 		startDate = startDate,
 		endDate = DateExt.readTimestamp(args.edate),
 		year = (not startDate) and year or nil,
+		limit = tonumber(args.limit),
 	}
 end)
 
@@ -79,7 +80,7 @@ function PatchCalendar:build()
 
 		if self.monthsPresent[month] then
 			return Td{children = {Link{
-				link = monthShort .. '_' .. self.displayYear,
+				link = '#' .. monthShort .. '_' .. self.displayYear,
 				children = {monthShort},
 			}}}
 		end
@@ -90,11 +91,10 @@ function PatchCalendar:build()
 		tableCss = {['text-align'] = 'center', ['font-size'] = '110%'},
 		children = {
 			Tr{children = {Th{attributes = {colspan = 6}, children = {self.displayYear}}}},
-			Tr{children = Array.map(Array.rang(1, 6), buildMonthCell)},
-			Tr{children = Array.map(Array.rang(7, 12), buildMonthCell)},
+			Tr{children = Array.map(Array.range(1, 6), buildMonthCell)},
+			Tr{children = Array.map(Array.range(7, 12), buildMonthCell)},
 		}
 	}
 end
 
 return PatchCalendar
-

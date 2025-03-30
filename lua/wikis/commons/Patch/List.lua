@@ -7,344 +7,243 @@
 --
 
 local Arguments = require('Module:Arguments')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Condition = require('Module:Condition')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
-local ConditionTree = Condition.Tree
-local ConditionNode = Condition.Node
-local Comparator = Condition.Comparator
-local BooleanOperator = Condition.BooleanOperator
-local ColumnName = Condition.ColumnName
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local PatchFetch = Lua.import('Module:Patch/Fetch')
+local TableFormatter = Lua.import('Module:Format/Table')
 
-local PatchList = {}
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local B = HtmlWidgets.B
+local Fragment = HtmlWidgets.Fragment
+local Li = HtmlWidgets.Li
+local Span = HtmlWidgets.Span
+local Td = HtmlWidgets.Td
+local Th = HtmlWidgets.Th
+local Tr = HtmlWidgets.Tr
+local Ul = HtmlWidgets.Ul
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
--- Track the most recent patch across all tables
-PatchList.globalLatestPatchDate = nil
-PatchList.globalLatestPatchId = nil
-
--- Predefined column structure (moved outside of function to avoid recreation)
-local baseColumns = {
-	-- Patch name column with link and optional latest marker
+local COLUMNS = {
 	{
-		title = '<span class="fas fa-file-alt"></span> Patch',
-		style = 'width: 280px;',
-		func = function(patch)
-			local name = String.nilIfEmpty(patch.name) or patch.pagename:gsub('_', ' '):gsub('^Patch/', '')
-			local link = '[[' .. patch.pagename .. '|' .. name .. ']]'
-			if patch.isLatest then
-				link = link .. ' (latest)'
-			end
-			return link
+		header = {
+			IconFontawesome{iconName = 'patch'},
+			' Patch',
+		},
+		width = '280px',
+		row = function(patch, isLatestPatch)
+			local name = Logic.nilIfEmpty(patch.name) or patch.pagename:gsub('_', ' '):gsub('^Patch/', '')
+			return {
+				Link{
+					link = patch.pagename,
+					children = {name},
+				},
+				isLatestPatch and ' (latest)' or nil,
+			}
 		end
 	},
-	-- Release date column formatted for readability
 	{
-		title = '<span class="gray-text fas fa-calendar-alt"></span> Release Date',
-		style = 'width: 180px;',
-		func = function(patch)
-			return patch.date and mw.getContentLanguage():formatDate('F j, Y', patch.date) or nil
+		hide = function(config)
+			return not config.showVersion
+		end,
+		header = {'Version'},
+		width = '280px',
+		row = function(patch, isLatestPatch)
+			if Logic.isEmpty(patch.extradata.version) then return {} end
+			local rawVersion = patch.extradata.version:gsub('%(', '|'):gsub('%)', '|')
+			local versions = Array.parseCommaSeparatedString(rawVersion, '|')
+			return {
+				B{children = {versions[1] or ''}},
+				versions[2] and ' (' or nil,
+				versions[2],
+				versions[2] and ')' or nil,
+			}
 		end
 	},
-	-- Highlights column displaying key patch features
 	{
-		title = '<span class="gold-text fas fa-star"></span> Release Highlights',
-		style = 'width: 490px;',
-		func = function(patch)
-			local highlights = patch.highlights or {}
-			if type(highlights) ~= 'table' then
-				highlights = {}
-			end
-			return table.concat(PatchList._makeList(highlights))
+		header = {
+			IconFontawesome{iconName = 'calendar', colorClass = 'gray-text'},
+			' Release Date',
+		},
+		width = '180px',
+		row = function(patch, isLatestPatch)
+			return {
+				DateExt.formatTimestamp('F j, Y', patch.timestamp)
+			}
+		end
+	},
+	{
+		header = {
+			IconFontawesome{iconName = 'highlights', colorClass = 'gold-text'},
+			' Release Highlights',
+		},
+		width = '490px',
+		row = function(patch, isLatestPatch)
+			local highlights = Json.parseIfTable(patch.extradata.highlights) or patch.extradata.highlights
+			if Logic.isEmpty(highlights) or type(highlights) ~= 'table' then return end
+			return {
+				Ul{children = Array.map(highlights, function(highlight)
+					return Li{children = highlight}
+				end)}
+			}
 		end
 	},
 }
 
--- Version column definition (used conditionally)
-local versionColumn = {
-	title = 'Version',
-	style = 'width: 280px;',
-	func = function(patch)
-		if patch.version then
-			local versionText
-			local versions = mw.text.split(patch.version:gsub('%(', '|'):gsub('%)', '|'), '|', true)
-			versionText = versions[1] and ('<b>' .. mw.text.trim(versions[1]) .. '</b>') or ''
-			if versions[2] then
-				versionText = versionText .. ' (' .. versions[2] .. ')'
-			end
-			return versionText
-		end
-	end
-}
+---@class PatchList
+---@operator call(table): PatchList
+---@field fetchConfig {game: string?, startDate: integer?, endDate: integer?, year: integer?, limit: integer?}
+---@field displayConfig {collapsed: boolean, showMonthHeaders: boolean, showVersion: boolean, yearInAnchorText: boolean}
+---@field latestPatchDate integer
+---@field latestPatchId integer
+---@field patches datapoint[]
+---@field currentAnchor string?
+local PatchList = Class.new(function(self, args)
+	self.fetchConfig = {
+		game = args.game,
+		startDate = DateExt.readTimestamp(args.sdate),
+		endDate = DateExt.readTimestamp(args.edate),
+		year = tonumber(args.year),
+		limit = tonumber(args.limit),
+	}
+	self.displayConfig = {
+		collapsed = Logic.readBool(args.collapsed),
+		showMonthHeaders = not Logic.readBool(args.noheadermonth),
+		showVersion = Logic.readBool(args.showVersion),
+		yearInAnchorText = Logic.isEmpty(self.fetchConfig.year),
+	}
+	-- fetch the latest patch
+	local latestPatch = (PatchFetch.run{limit = 1, game = args.game} or {})[1]
+	self.latestPatchDate = DateExt.readTimestamp(latestPatch.date)
+	self.latestPatchId = tonumber(latestPatch.pageid)
+end)
 
--- Date format validation pattern (compile once)
-local datePattern = '^%d%d%d%d%-%d%d%-%d%d$'
-
---- Fetches patch data from the Liquipedia database based on provided arguments
---- @param args table Parameters controlling the query, such as game, date range, and limit
---- @return table Array of patch data retrieved from the database
-function PatchList.getPatches(args)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
-			ConditionNode(ColumnName('type'), Comparator.eq, 'patch')
-		}
-
-	if args.game then
-		conditions:add{
-			ConditionNode(ColumnName('extradata_game'), Comparator.eq, args.game)
-		}
-	end
-
-	local startDate = args.sdate
-	local endDate = args.edate
-
-	-- Basic date validation (expects YYYY-MM-DD format)
-	if startDate and not startDate:match(datePattern) then
-		error("Invalid start date format: " .. startDate .. ". Use YYYY-MM-DD.")
-	end
-	if endDate and not endDate:match(datePattern) then
-		error("Invalid end date format: " .. endDate .. ". Use YYYY-MM-DD.")
-	end
-
-	-- Year-based filtering using date ranges
-	if args.year then
-		local year = tonumber(args.year)
-		if year then
-			startDate = string.format("%04d-01-01", year)
-			endDate = string.format("%04d-12-31", year)
-		end
-	end
-
-	-- Date range conditions using Boolean operators
-	if startDate then
-		conditions:add{
-			ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('date'), Comparator.gt, startDate),
-				ConditionNode(ColumnName('date'), Comparator.eq, startDate)
-			}
-		}
-	end
-	if endDate then
-		conditions:add{
-			ConditionTree(BooleanOperator.any):add{
-				ConditionNode(ColumnName('date'), Comparator.lt, endDate),
-				ConditionNode(ColumnName('date'), Comparator.eq, endDate)
-			}
-		}
-	end
-
-	return mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = conditions:toString(),
-		order = 'date desc, pageid desc',
-		limit = math.min(tonumber(args.limit) or 100, 5000)
-	})
-end
-
---- Formats an array of highlights into a wiki-compatible list
---- @param arr table Array of highlight strings
---- @return table Array of formatted list items
-function PatchList._makeList(arr)
-	local result = {}
-	for _, value in ipairs(arr) do
-		if String.isNotEmpty(value) then
-			table.insert(result, '\n* ' .. value .. '\n')
-		end
-	end
-	return result
-end
-
---- Builds the table header based on the columns table
---- @param columns table The list of columns to include in the header
---- @return string The constructed header row HTML
-local function buildHeader(columns)
-	local header = mw.html.create('tr')
-	for _, column in ipairs(columns) do
-		header:tag('th')
-			:cssText(column.style)
-			:css('font-size', '16px')
-			:wikitext(column.title)
-	end
-	return header
-end
-
---- Builds a row for a single patch
---- @param patch table The patch data
---- @param columns table The list of columns to display
---- @return string The constructed row HTML
-local function buildRow(patch, columns)
-	local row = mw.html.create('tr')
-	for _, column in ipairs(columns) do
-		row:tag('td')
-			:cssText(column.style)
-			:css('font-size', '14px')
-			:wikitext(column.func(patch))
-	end
-	return row
-end
-
---- Builds a month header row
---- @param monthAnchor string The anchor for the month
---- @param monthAbbr string The abbreviated month name
---- @param columnCount integer The number of columns in the table
---- @return string The constructed month header row HTML
-local function buildMonthHeader(monthAnchor, monthAbbr, columnCount)
-	local subheaderRow = mw.html.create('tr')
-	subheaderRow:tag('td')
-		:attr('colspan', columnCount)
-		:addClass('gray-bg')
-		:css('text-align', 'center')
-		:wikitext(
-		'<span id="' .. monthAnchor ..
-		'" style="position: relative; top: -250px; visibility: hidden;"></span><b>' .. monthAbbr .. '</b>'
-	)
-	return subheaderRow
-end
-
---- Finds the latest patch across all tables
-function PatchList.findLatestPatch()
-	local latestPatches = PatchList.getPatches({limit = 1})
-	if #latestPatches > 0 then
-		local latestPatch = latestPatches[1]
-		PatchList.globalLatestPatchDate = latestPatch.date
-		PatchList.globalLatestPatchId = latestPatch.pageid
-	end
-end
-
---- Creates and returns the patch table display
---- Entry point for the module
---- @param frame table The MediaWiki frame object providing arguments
---- @return string HTML string representing the patch table
-function PatchList.create(frame)
+---@param frame Frame
+---@return Widget
+function PatchList.run(frame)
 	local args = Arguments.getArgs(frame)
+	return PatchList(args):fetch():build()
+end
 
-	-- Configure table classes for collapsibility
-	local tableClasses = 'wikitable mw-collapsible'
-	if Logic.readBool(args.collapsed) then
-		tableClasses = tableClasses .. ' mw-collapsed'
-	end
+---@return self
+function PatchList:fetch()
+	local patches = PatchFetch.run(self.fetchConfig)
+	assert(type(patches[1]) == 'table',
+		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig, {asText = true}))
+	-- make sure extradata is not nil
+	self.patches = Array.map(patches, function(patch)
+		patch.extradata = patch.extradata or {}
+		patch.timestamp = DateExt.readTimestamp(patch.date)
+		return patch
+	end)
 
-	-- Copy columns to avoid modifying the original
-	local columns = {}
-	for i, col in ipairs(baseColumns) do
-		columns[i] = col
-	end
+	return self
+end
 
-	-- Add optional version column if requested
-	if Logic.readBool(args.showVersion) then
-		table.insert(columns, 2, versionColumn)
-	end
-
-	-- Initialize the latest patch tracking if not already done
-	if not PatchList.globalLatestPatchDate then
-		PatchList.findLatestPatch()
-	end
-
-	-- Retrieve patch data from database
-	local patches = PatchList.getPatches(args)
-	if #patches == 0 then
-		local filterInfo = ""
-		if args.game then filterInfo = filterInfo .. " game='" .. args.game .. "'" end
-		if args.sdate then filterInfo = filterInfo .. " sdate='" .. args.sdate .. "'" end
-		if args.edate then filterInfo = filterInfo .. " edate='" .. args.edate .. "'" end
-		return "No patches found for the given criteria:" .. (filterInfo ~= "" and filterInfo or " none specified") .. "."
-	end
-
-	-- Initialize responsive table container
-	local wrapper = mw.html.create('div')
-		:addClass('table-responsive')
-
-	-- Build table structure with styling
-	local output = wrapper:tag('table')
-		:addClass(tableClasses)
-
-	-- Add table header
-	output:node(buildHeader(columns))
-
-	local currentMonth = nil
-	-- Check if month headers should be displayed
-	local showMonthHeaders = not Logic.readBool(args.noheadermonth)
-	local previousMonthAnchors = {}
-
-	-- Prepare content formatter (outside the loop)
-	local contentLanguage = mw.getContentLanguage()
-
-	-- Populate table with patch data and month headers
-	for _, patchData in ipairs(patches) do
-		-- Extract extradata once
-		local extradata = patchData.extradata or {}
-		patchData.extradata = nil
-
-		-- Process extradata more efficiently
-		for k, v in pairs(extradata) do
-			if type(v) == 'string' and (v:find('{') or v:find('%[')) then
-				local parsed = Json.parseIfTable(v)
-				if parsed then
-					patchData[k] = parsed
-				else
-					patchData[k] = v
-				end
-			else
-				patchData[k] = v
-			end
-		end
-
-		-- Check if this patch is the latest overall
-		patchData.isLatest = (
-			patchData.date == PatchList.globalLatestPatchDate
-			and patchData.pageid == PatchList.globalLatestPatchId
+---@return Widget
+function PatchList:build()
+	return DataTable{
+		classes = {'collapsible', self.displayConfig.collapsed and 'collapsed' or nil},
+		children = WidgetUtil.collect(
+			self:_buildHeader(),
+			Array.map(self.patches, FnUtil.curry(self._buildRow, self)),
+			self:_footer()
 		)
+	}
+end
 
-		-- Extract month and year for grouping
-		local monthAbbr = patchData.date and contentLanguage:formatDate('M', patchData.date) or ''
-		local year = patchData.date and contentLanguage:formatDate('Y', patchData.date) or ''
-		local monthAnchor = monthAbbr .. '_' .. year
+---@return Widget
+function PatchList:_buildHeader()
+	return Tr{children = Array.map(COLUMNS, function(column)
+		if column.hide and column.hide(self.displayConfig) then return end
+		return Th{
+			css = {['font-size'] = '1rem', width = column.width},
+			children = column.header,
+		}
+	end)}
+end
 
-		-- Insert month header or hidden anchor when month changes
-		if monthAbbr ~= currentMonth then
-			if showMonthHeaders then
-				-- Insert visible month header with anchor
-				output:node(buildMonthHeader(monthAnchor, monthAbbr, #columns))
-			else
-				-- Check if we've already added this anchor (to avoid duplicates)
-				if not previousMonthAnchors[monthAnchor] then
-					-- Insert hidden anchor only (no visible header)
-					local anchorRow = mw.html.create('tr')
-						:css('height', '0')
-						:css('padding', '0')
-						:css('margin', '0')
-						:css('border', 'none')
+---@return Widget
+function PatchList:_footer()
+	return Tr{children = Td{
+		css = {['font-weight'] = 'bold', ['text-align'] = 'center'},
+		attributes = {colspan = self:_numberOfColumns()},
+		children = {Link{
+			link = '#top',
+			children = {'Back to the Top'},
+		}},
+	}}
+end
 
-					anchorRow:tag('td')
-						:attr('colspan', #columns)
-						:css('height', '0')
-						:css('padding', '0')
-						:css('margin', '0')
-						:css('border', 'none')
-						:wikitext(
-						'<span id="' .. monthAnchor .. '" style="position: relative; top: -250px; visibility: hidden;"></span>'
-					)
+---@param patch datapoint
+---@return Widget
+function PatchList:_buildRow(patch)
+	local isLatestPatch = patch.timestamp == self.latestPatchDate and patch.pageid == self.latestPatchId
+	return Fragment{children = WidgetUtil.collect(
+		self:_monthHeaderRow(patch),
+		Tr{children = Array.map(COLUMNS, function(column)
+			return Td{
+				css = {['font-size'] = '0.875rem'},
+				children = column.row(patch, isLatestPatch)
+			}
+		end)}
+	)}
+end
 
-					output:node(anchorRow)
-					previousMonthAnchors[monthAnchor] = true
-				end
-			end
-			currentMonth = monthAbbr
-		end
+---@return integer
+function PatchList:_numberOfColumns()
+	return Array.reduce(COLUMNS, function(currentSum, column)
+		if column.hide and column.hide(self.displayConfig) then return currentSum end
+		return currentSum + 1
+	end, 0)
+end
 
-		-- Add patch data row
-		output:node(buildRow(patchData, columns))
+---@param patch datapoint
+---@return Widget?
+function PatchList:_monthHeaderRow(patch)
+	local month = DateExt.formatTimestamp('M', patch.timestamp)
+	local year = DateExt.formatTimestamp('Y', patch.timestamp)
+	local anchor = month .. '_' .. year
+	if anchor == self.currentAnchor then return end
+	self.currentAnchor = anchor
+
+	if self.displayConfig.showMonthHeaders then
+		return Tr{children = {Td{
+			attributes = {colspan = self:_numberOfColumns()},
+			classes = {'gray-bg'},
+			css = {['text-align'] = 'center'},
+			children = {
+				Span{
+					attributes = {id = anchor},
+					css = {position = 'relative', top = '-250px', visibility = 'hidden'},
+				},
+				B{children = {
+					month,
+					self.displayConfig.yearInAnchorText and (' ' .. year) or nil,
+				}}
+			},
+		}}}
 	end
 
-	-- Append footer with back-to-top link
-	output:tag('tr')
-		:tag('td')
-			:attr('colspan', #columns)
-			:css('text-align', 'center')
-			:wikitext("'''[[#top|Back to the Top]]'''")
-
-	-- Return the completed table as a string
-	return tostring(wrapper)
+	return Tr{
+		css = {height = 0, padding = 0, margin = 0, border = 'none'},
+		children = {Td{
+			attributes = {colspan = self:_numberOfColumns()},
+			css = {height = 0, padding = 0, margin = 0, border = 'none'},
+			children = {Span{
+				attributes = {id = anchor},
+				css = {position = 'relative', top = '-250px', visibility = 'hidden'}
+			}},
+		}},
+	}
 end
 
 return PatchList
