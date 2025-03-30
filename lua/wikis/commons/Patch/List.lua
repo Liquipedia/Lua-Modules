@@ -198,7 +198,7 @@ function PatchList:_numberOfColumns()
 	return Array.reduce(COLUMNS, function(currentSum, column)
 		if (not column.show) or (not column.show(self.displayConfig)) then return currentSum end
 		return currentSum + 1
-	end)
+	end, 0)
 end
 
 ---@param patch datapoint
