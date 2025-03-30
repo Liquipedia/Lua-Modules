@@ -7,105 +7,94 @@
 --
 
 local Arguments = require('Module:Arguments')
-local PatchList = require('Module:PatchList')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
-local PatchCalendar = {}
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local PatchFetch = Lua.import('Module:Patch/Fetch')
 
+local DataTable = Lua.import('Module:Widget/Basic/DataTable')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local S = HtmlWidgets.S
+local Td = HtmlWidgets.Td
+local Th = HtmlWidgets.Th
+local Tr = HtmlWidgets.Tr
+
+---@class PatchCalendar
+---@operator call(table): PatchCalendar
+---@field config {game: string?, startDate: integer?, endDate: integer?, year: integer?}
+---@field displayYear integer
+---@field patches datapoint[]
+local PatchCalendar = Class.new(function(self, args)
+	local startDate = DateExt.readTimestamp(args.sdate)
+	local year = startDate and tonumber(DateExt.formatTimestamp('Y', startDate))
+		or tonumber(args.year) or os.date('%Y')
+
+	self.displayYear = year
+	self.config = {
+		game = args.game,
+		startDate = startDate,
+		endDate = DateExt.readTimestamp(args.edate),
+		year = (not startDate) and year or nil,
+	}
+end)
+
+---@param frame unknown
+---@return Widget
 function PatchCalendar.create(frame)
 	local args = Arguments.getArgs(frame)
-	local year = tonumber(args.year) or tonumber(mw.getContentLanguage():formatDate('Y'))
-	local sdate = args.sdate
-	local edate = args.edate
+	return PatchCalendar(args):fetch():build()
+end
 
-	-- Create parameters table to pass to PatchList.getPatches
-	local params = {}
+---@return self
+function PatchCalendar:fetch()
+	self.patches = PatchFetch.run(self.config)
+	self.monthsPresent = {}
+	Array.forEach(self.patches, function(patch)
+		local patchTimeStamp = DateExt.readTimestamp(patch.date)
+		-- can never be nil due to lpdb data having a valid date string
+		---@cast patchTimeStamp -nil
+		local month = tonumber(DateExt.formatTimestamp('n', patchTimeStamp))
+		---@cast month -nil
+		self.monthsPresent[month] = true
+	end)
 
-	-- If sdate/edate are provided, use them for filtering
-	if sdate then
-		params.sdate = sdate
-		-- Extract year from sdate if available (for header)
-		if sdate:match('^%d%d%d%d%-%d%d%-%d%d$') then
-			year = tonumber(sdate:sub(1, 4)) or year
+	return self
+end
+
+---@return Widget
+function PatchCalendar:build()
+	---@param month integer
+	---@return Widget
+	local buildMonthCell = function(month)
+		local timeStamp = DateExt.readTimestamp{
+			year = self.displayYear,
+			month = month,
+			day = 1,
+		}
+		---@cast timeStamp -nil
+		local monthShort = DateExt.formatTimestamp('M', timeStamp)
+
+		if self.monthsPresent[month] then
+			return Td{children = {Link{
+				link = monthShort .. '_' .. self.displayYear,
+				children = {monthShort},
+			}}}
 		end
-	else
-		-- Use year parameter if sdate isn't provided
-		params.year = tostring(year)
+		return Td{children = {S{children = {monthShort}}}}
 	end
 
-	-- Add edate parameter if it exists
-	if edate then
-		params.edate = edate
-	end
-
-	-- Add game parameter if it exists
-	if args.game then
-		params.game = args.game
-	end
-
-	-- Fetch patches for the specified criteria
-	local patches = PatchList.getPatches(params)
-
-	-- Filter patches based on year displayed
-	local filteredPatches = {}
-	for _, patch in ipairs(patches) do
-		if patch.date then
-			local patchYear = tonumber(mw.getContentLanguage():formatDate('Y', patch.date))
-			if patchYear == year then
-				table.insert(filteredPatches, patch)
-			end
-		end
-	end
-
-	-- Track which months have patches (using filtered patches)
-	local monthsPresent = {}
-	for _, patch in ipairs(filteredPatches) do
-		if patch.date then
-			local month = tonumber(mw.getContentLanguage():formatDate('n', patch.date))
-			if month then
-				monthsPresent[month] = true
-			end
-		end
-	end
-
-	-- Create a responsive wrapper for the table
-	local wrapper = mw.html.create('div')
-		:addClass('table-responsive')
-
-	-- Build the calendar table
-	local tbl = wrapper:tag('table')
-		:addClass('wikitable')
-		:attr('style', 'text-align:center; font-size:110%;')
-
-	-- Year header row
-	tbl:tag('tr')
-		:addClass('gray-bg')
-		:tag('td')
-		:attr('colspan', 6)
-		:wikitext("'''" .. year .. "'''")
-
-	-- First row (January - June)
-	local tr1 = tbl:tag('tr')
-	for monthNum = 1, 6 do
-		local monthAbbr = mw.getContentLanguage():formatDate('M', string.format('%04d-%02d-01', year, monthNum))
-		local anchor = monthAbbr .. '_' .. year
-		local cellContent = monthsPresent[monthNum]
-			and '[[#' .. anchor .. '|' .. monthAbbr .. ']]'
-			or '<s>' .. monthAbbr .. '</s>'
-		tr1:tag('td'):wikitext(cellContent)
-	end
-
-	-- Second row (July - December)
-	local tr2 = tbl:tag('tr')
-	for monthNum = 7, 12 do
-		local monthAbbr = mw.getContentLanguage():formatDate('M', string.format('%04d-%02d-01', year, monthNum))
-		local anchor = monthAbbr .. '_' .. year
-		local cellContent = monthsPresent[monthNum]
-			and '[[#' .. anchor .. '|' .. monthAbbr .. ']]'
-			or '<s>' .. monthAbbr .. '</s>'
-		tr2:tag('td'):wikitext(cellContent)
-	end
-
-	return tostring(wrapper)
+	return DataTable{
+		tableCss = {['text-align'] = 'center', ['font-size'] = '110%'},
+		children = {
+			Tr{children = {Th{attributes = {colspan = 6}, children = {self.displayYear}}}},
+			Tr{children = Array.map(Array.rang(1, 6), buildMonthCell)},
+			Tr{children = Array.map(Array.rang(7, 12), buildMonthCell)},
+		}
+	}
 end
 
 return PatchCalendar
+
