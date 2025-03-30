@@ -65,13 +65,10 @@ local VALID_SIZES = {
 function FontawesomeIcon:_makeGenericIcon()
 	local props = self.props
 
-	if not Table.includes(VALID_STYLES, props.faStyle) then
-		error(props.faStyle .. ' is not a valid Font Awesome icon style!')
-	end
+	assert(Table.includes(VALID_STYLES, props.faStyle), props.faStyle .. ' is not a valid Font Awesome icon style!')
 
-	if not (Logic.isEmpty(props.faSize) or Table.includes(VALID_SIZES, props.faSize)) then
-		error(props.faSize .. ' is not a valid Font Awesome icon size!')
-	end
+	assert(Logic.isEmpty(props.faSize) or Table.includes(VALID_SIZES, props.faSize),
+		props.faSize .. ' is not a valid Font Awesome icon size!')
 
 	local size = props.size
 	if Logic.isNumeric(size) then
