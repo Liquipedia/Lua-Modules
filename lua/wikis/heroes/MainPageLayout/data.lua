@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
+-- wiki=heroes
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -32,18 +33,21 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			limits = 10,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content(),
+		body = ThisDayWidgets.Content{
+			birthdayListPage = 'Birthday list'
+		},
 		padding = true,
-		boxid = 1510,
-	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
 		boxid = 1510,
 	},
 	filterButtons = {
@@ -65,8 +69,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 120,
-			completedDays = 30
+			upcomingDays = 60,
+			completedDays = 60,
 		},
 		padding = true,
 		boxid = 1508,
@@ -75,24 +79,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'Heroes of the Storm full allmode.png',
+		darkmode = 'Heroes of the Storm full allmode.png',
 	},
-	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
-		'to competitive players and teams.',
-	title = 'Overwatch',
+	metadesc = 'The Heroes of the Storm  (HotS) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, heroes and battlegrounds.',
+	title = 'Heroes of the Storm',
 	navigation = {
 		{
-			file = 'Team Falcons ChiYo at the 2024 Esports World Cup.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'Dignitas at ESL Katowice 2016.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -101,16 +96,16 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
+			file = 'Katowice scHwimpi.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
 			count = {
 				method = 'LPDB',
-				table = 'transfer',
+				table = 'player',
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'Hearthstone Trophy at ESL Katowice 2016.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -119,23 +114,26 @@ return {
 			},
 		},
 		{
-			file = 'Overwatch Heroes NavCard image.jpg',
-			title = 'Heroes',
-			link = 'Portal:Heroes',
+			file = 'Relics at the 2015 HWC America Championship.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
 			count = {
 				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
+				table = 'transfer',
 			},
 		},
 		{
-			file = 'Kings row map.jpg',
-			title = 'Maps',
-			link = 'Portal:Maps',
+			file = 'Artosis and Tasteless Trophy at the 2015 HWC America Championship.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Sky-temple.jpg',
+			title = 'Battlegrounds',
+			link = 'Portal:Battlegrounds',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
+				method = 'CATEGORY',
+				category = 'Battlegrounds',
 			},
 		},
 	},
@@ -145,15 +143,15 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
+						mobileOrder = 2,
+						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 4,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -162,7 +160,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -193,15 +191,7 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
-						content = CONTENT.thisDay,
-					},
-				},
-			},
-			{
-				children = {
-					{
-						mobileOrder = 7,
+						mobileOrder = 5,
 						content = CONTENT.usefulArticles,
 					},
 				},

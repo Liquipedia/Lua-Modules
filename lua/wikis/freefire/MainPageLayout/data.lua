@@ -1,11 +1,12 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
+-- wiki=freefire
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -19,8 +20,8 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
 local CONTENT = {
 	usefulArticles = {
-		heading = 'Useful Articles',
-		body = '{{Liquipedia:Useful Articles}}',
+		heading = 'The Game',
+		body = '{{Liquipedia:The Game}}',
 		padding = true,
 		boxid = 1503,
 	},
@@ -32,7 +33,11 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -43,15 +48,14 @@ local CONTENT = {
 	},
 	specialEvents = {
 		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
-		boxid = 1510,
+		body = '{{Liquipedia:2025 Season}}',
 	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		}
+		},
 	},
 	matches = {
 		heading = 'Matches',
@@ -65,7 +69,7 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 120,
+			upcomingDays = 30,
 			completedDays = 30
 		},
 		padding = true,
@@ -75,24 +79,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'Free Fire 2022 full lightmode.png',
+		darkmode = 'Free Fire 2022 full darkmode.png',
 	},
-	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
-		'to competitive players and teams.',
-	title = 'Overwatch',
+	metadesc = 'Comprehensive Free Fire wiki with articles covering everything from weapons, to maps, '..
+		'to tournaments, to competitive players and teams.',
+	title = 'Free Fire',
 	navigation = {
 		{
-			file = 'Team Falcons ChiYo at the 2024 Esports World Cup.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'P Esports at the 2024 Esports World Cup.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -101,16 +96,16 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
+			file = 'RRQ Dutzz at the 2024 Esports World Cup.jpg ',
+			title = 'Players',
+			link = 'Portal:Players',
 			count = {
 				method = 'LPDB',
-				table = 'transfer',
+				table = 'player',
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'Free Fire World Series 2024 Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -119,23 +114,53 @@ return {
 			},
 		},
 		{
-			file = 'Overwatch Heroes NavCard image.jpg',
-			title = 'Heroes',
-			link = 'Portal:Heroes',
+			file = 'Proxx7 and NANDO9 at the 2024 Esports World Cup.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
 			count = {
 				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
+				table = 'transfer',
 			},
 		},
 		{
-			file = 'Kings row map.jpg',
+			file = 'Twisted Minds Smingch at the 2024 Esports World Cup.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Free Fire Characters Artwork.jpeg',
+			title = 'Characters',
+			link = 'Portal:Characters',
+			count = {
+				method = 'CATEGORY',
+				category = 'Characters',
+			},
+		},
+		{
+			file = 'FF_Knife.png',
+			title = 'Weapons',
+			link = 'Portal:Weapons',
+			count = {
+				method = 'CATEGORY',
+				category = 'Weapons',
+			},
+		},
+		{
+			file = 'Free Fire Pets Artwork.jpeg',
+			title = 'Pets',
+			link = 'Portal:Pets',
+			count = {
+				method = 'CATEGORY',
+				category = 'Pets',
+			},
+		},
+		{
+			file = 'Free Fire Maps Artwork.jpeg',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
+				method = 'CATEGORY',
+				category = 'Maps',
 			},
 		},
 	},
@@ -149,11 +174,11 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -193,15 +218,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
-				},
-			},
-			{
-				children = {
 					{
-						mobileOrder = 7,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},

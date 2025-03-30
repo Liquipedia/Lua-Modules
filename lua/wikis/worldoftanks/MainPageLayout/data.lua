@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
+-- wiki=worldoftanks
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,18 +32,21 @@ local CONTENT = {
 	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			limits = 10,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y')
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
 		heading = ThisDayWidgets.Title(),
-		body = ThisDayWidgets.Content(),
+		body = ThisDayWidgets.Content{
+			birthdayListPage = 'Birthday list'
+		},
 		padding = true,
-		boxid = 1510,
-	},
-	specialEvents = {
-		noPanel = true,
-		body = '{{Liquipedia:Special Event}}',
 		boxid = 1510,
 	},
 	filterButtons = {
@@ -65,8 +68,9 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 120,
-			completedDays = 30
+			upcomingDays = 30,
+			completedDays = 20,
+			displayGameIcons = true
 		},
 		padding = true,
 		boxid = 1508,
@@ -75,24 +79,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'World of Tanks full lightmode.png',
+		darkmode = 'World of Tanks full darkmode.png',
 	},
-	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
-		'to competitive players and teams.',
-	title = 'Overwatch',
+	metadesc = 'The World of Tanks (WoT) esports wiki covering everything from players, teams and transfers, ' ..
+		'to tournaments and results, maps and tanks.',
+	title = 'World of Tanks',
 	navigation = {
 		{
-			file = 'Team Falcons ChiYo at the 2024 Esports World Cup.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'Natus Vincere at the WGL 2015 Grand Finals.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -101,16 +96,16 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
+			file = 'HellRaisers NearYou at the WGL 2016 Grand Finals.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
 			count = {
 				method = 'LPDB',
-				table = 'transfer',
+				table = 'player',
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'WGL 2016 Europe Finals Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -119,17 +114,16 @@ return {
 			},
 		},
 		{
-			file = 'Overwatch Heroes NavCard image.jpg',
-			title = 'Heroes',
-			link = 'Portal:Heroes',
+			file = 'WoT WCI 2023 Player MONSTER 3.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
 			count = {
 				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::character]]',
+				table = 'transfer',
 			},
 		},
 		{
-			file = 'Kings row map.jpg',
+			file = 'WoT Minimap Himmelsdorf v1.23 cover.png',
 			title = 'Maps',
 			link = 'Portal:Maps',
 			count = {
@@ -138,31 +132,36 @@ return {
 				conditions = '[[type::map]]',
 			},
 		},
+		{
+			file = 'Dakillzor - WoT The Grand Finals 2015.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
 	},
 	layouts = {
 		main = {
 			{ -- Left
-				size = 6,
+				size = 5,
 				children = {
 					{
-						mobileOrder = 1,
-						content = CONTENT.specialEvents,
+						mobileOrder = 4,
+						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 2,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
 			},
 			{ -- Right
-				size = 6,
+				size = 7,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 1,
 						children = {
 							{
 								children = {
@@ -193,15 +192,7 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
-						content = CONTENT.thisDay,
-					},
-				},
-			},
-			{
-				children = {
-					{
-						mobileOrder = 7,
+						mobileOrder = 3,
 						content = CONTENT.usefulArticles,
 					},
 				},
