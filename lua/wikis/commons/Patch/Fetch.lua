@@ -8,8 +8,8 @@
 
 local Lua = require('Module:Lua')
 
+local Array = require('Module:Array')
 local Lpdb = Lua.import('Module:Lpdb')
-
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -24,14 +24,13 @@ local PatchFetch = {}
 ---@param config {game: string?, startDate: integer?, endDate: integer?, year: integer?, limit: integer?}
 ---@return datapoint[]
 function PatchFetch.run(config)
-	local conditions = ConditionTree(BooleanOperator.all):add{
+	local conditions = ConditionTree(BooleanOperator.all):add(Array.append(
 		ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
 		config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil,
 		config.year and ConditionNode(ColumnName('date_year'), Comparator.eq, config.year) or nil,
 		config.startDate and ConditionNode(ColumnName('date'), Comparator.ge, config.startDate) or nil,
-		config.endDate and ConditionNode(ColumnName('date'), Comparator.le, config.endDate) or nil,
-	}
-
+		config.endDate and ConditionNode(ColumnName('date'), Comparator.le, config.endDate) or nil
+	))
 	local patches = {}
 	Lpdb.executeMassQuery('datapoint', {
 		conditions = conditions:toString(),

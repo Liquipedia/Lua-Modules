@@ -119,7 +119,7 @@ local PatchList = Class.new(function(self, args)
 		yearInAnchorText = Logic.isEmpty(self.fetchConfig.year),
 	}
 	-- fetch the latest patch
-	local latestPatch = (PatchFetch.run{limit = 1} or {})[1]
+	local latestPatch = (PatchFetch.run{limit = 1, game = args.game} or {})[1]
 	self.latestPatchDate = DateExt.readTimestamp(latestPatch.date)
 	self.latestPatchId = tonumber(latestPatch.pageid)
 end)
@@ -135,7 +135,7 @@ end
 function PatchList:fetch()
 	local patches = PatchFetch.run(self.fetchConfig)
 	assert(type(patches[1]) == 'table',
-		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig))
+		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig, {asText = true}))
 	-- make sure extradata is not nil
 	self.patches = Array.map(patches, function(patch)
 		patch.extradata = patch.extradata or {}
