@@ -185,7 +185,8 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
-				content = {self.caller:_createValveTierCell()},
+				content = self.caller:_createValveTierCell(),
+				separator = '&ensp;',
 				classes = {'valvepremier-highlighted'}
 			}
 		)
@@ -380,26 +381,23 @@ function CustomLeague:_createEslProTierCell(eslProTier)
 	end
 end
 
----@return string?
+---@return Widget[]?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
 		local showInfoIcon = self.data.endDate >= VALVE_TOR_START_DATE
-		return HtmlWidgets.Fragment{
-			children = {
-				Link{
-					children = {self.valveTier.name},
-					link = self.valveTier.link
-				},
-				showInfoIcon and '&ensp;' or nil,
-				showInfoIcon and Link{
-					children = {IconFontawesome{
-						faName = 'info-circle',
-						hover = 'Click for further details',
-					}},
-					link = '#Valve Operational Requirements'
-				} or nil,
-			}
-		}
+		return WidgetUtil.collect(
+			Link{
+				children = {self.valveTier.name},
+				link = self.valveTier.link
+			},
+			showInfoIcon and Link{
+				children = {IconFontawesome{
+					faName = 'info-circle',
+					hover = 'Click for further details',
+				}},
+				link = '#Valve Operational Requirements'
+			} or nil,
+		)
 	end
 end
 
