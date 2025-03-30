@@ -134,7 +134,8 @@ end
 ---@return self
 function PatchList:fetch()
 	local patches = PatchFetch.run(self.fetchConfig)
-	assert(type(patches[1]) == 'table', 'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig))
+	assert(type(patches[1]) == 'table',
+		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig))
 	-- make sure extradata is not nil
 	self.patches = Array.map(patches, function(patch)
 		patch.extradata = patch.extradata or {}
