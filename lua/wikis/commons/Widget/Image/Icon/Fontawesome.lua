@@ -13,7 +13,8 @@ local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
-local I = Lua.import('Module:Widget/Html/All').I
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local I = HtmlWidgets.I
 local Icon = Lua.import('Module:Icon')
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
