@@ -30,7 +30,7 @@ FontawesomeIcon.defaultProps = {
 }
 
 local CLASS_TEMPLATE = '${style} fa-${icon}'
-local CLASS_TEMPLATE_SIZED = CLASS_TEMPLATE .. ' fa-${size}'
+local CLASS_TEMPLATE_SIZE = 'fa-${size}'
 local VALID_STYLES = {
 	'fas',
 	'far',
@@ -68,18 +68,16 @@ function FontawesomeIcon:_makeGenericIcon()
 		size = size .. 'px'
 	end
 
-	local iconClasses
+	local iconClasses = {
+		String.interpolate(CLASS_TEMPLATE, {
+			style = props.faStyle,
+			icon = props.faName,
+		})
+	}
 	if Logic.isNotEmpty(props.faSize) then
-		iconClasses = String.interpolate(CLASS_TEMPLATE_SIZED, {
-				style = props.faStyle,
-				icon = props.faName,
-				size = props.faSize
-			})
-	else
-		iconClasses = String.interpolate(CLASS_TEMPLATE, {
-				style = props.faStyle,
-				icon = props.faName
-			})
+		Array.appendWith(iconClasses, String.interpolate(CLASS_TEMPLATE_SIZE, {
+			size = props.faSize
+		})
 	end
 
 	return I{
