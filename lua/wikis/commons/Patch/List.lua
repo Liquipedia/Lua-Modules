@@ -51,8 +51,8 @@ local COLUMNS = {
 		end
 	},
 	{
-		show = function(config)
-			return config.showVersion
+		hide = function(config)
+			return not config.showVersion
 		end,
 		header = {'Version'},
 		width = '280px',
@@ -160,7 +160,7 @@ end
 ---@return Widget
 function PatchList:_buildHeader()
 	return Tr{children = Array.map(COLUMNS, function(column)
-		if (not column.show) or (not column.show(self.displayConfig)) then return end
+		if column.hide and column.hide(self.displayConfig) then return end
 		return Th{
 			css = {['font-size'] = '1rem', width = column.width},
 			children = column.header,
@@ -196,7 +196,7 @@ end
 ---@return integer
 function PatchList:_numberOfColumns()
 	return Array.reduce(COLUMNS, function(currentSum, column)
-		if (not column.show) or (not column.show(self.displayConfig)) then return currentSum end
+		if column.hide and column.hide(self.displayConfig) then return currentSum end
 		return currentSum + 1
 	end, 0)
 end
