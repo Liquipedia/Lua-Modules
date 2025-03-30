@@ -89,9 +89,11 @@ local COLUMNS = {
 		row = function(patch, isLatestPatch)
 			local highlights = Json.parseIfTable(patch.extradata.highlights) or patch.extradata.highlights
 			if Logic.isEmpty(highlights) or type(highlights) ~= 'table' then return end
-			return {Ul{children = Array.map(highlights, function(highlight)
-				return Li{children = highlight}
-			end)}}
+			return {
+				Ul{children = Array.map(highlights, function(highlight)
+					return Li{children = highlight}
+				end)}
+			}
 		end
 	},
 }
@@ -185,13 +187,15 @@ end
 ---@return Widget
 function PatchList:_buildRow(patch)
 	local isLatestPatch = patch.timestamp == self.latestPatchDate and patch.pageid == self.latestPatchId
-	return Fragment{children = WidgetUtil.collect(
+	return Fragment{children = {
 		self:_monthHeaderRow(patch),
-		Tr{children = Array.map(COLUMNS, function(column)Td{children = {
-			css = {['font-size'] = '0.875rem'},
-			children = column.row(patch, isLatestPatch)
-		}}end)}
-	)}
+		Tr{children = Array.map(COLUMNS, function(column)
+			return Td{
+				css = {['font-size'] = '0.875rem'},
+				children = column.row(patch, isLatestPatch)
+			}
+		end)}
+	}}
 end
 
 ---@return integer
@@ -223,7 +227,7 @@ function PatchList:_monthHeaderRow(patch)
 				},
 				B{children = {
 					month,
-					self.displayConfig.yearInAnchorText and (' (' .. year .. ')') or nil,
+					self.displayConfig.yearInAnchorText and (' ' .. year) or nil,
 				}}
 			},
 		}}}
