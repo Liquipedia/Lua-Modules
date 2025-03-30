@@ -187,7 +187,7 @@ end
 ---@return Widget
 function PatchList:_buildRow(patch)
 	local isLatestPatch = patch.timestamp == self.latestPatchDate and patch.pageid == self.latestPatchId
-	return Fragment{children = {
+	return Fragment{children = WidgetUtil.collect(
 		self:_monthHeaderRow(patch),
 		Tr{children = Array.map(COLUMNS, function(column)
 			return Td{
@@ -195,7 +195,7 @@ function PatchList:_buildRow(patch)
 				children = column.row(patch, isLatestPatch)
 			}
 		end)}
-	}}
+	)}
 end
 
 ---@return integer
