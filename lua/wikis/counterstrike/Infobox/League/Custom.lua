@@ -31,6 +31,9 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class CounterstrikeLeagueInfobox: InfoboxLeague
 ---@field gameData table
@@ -175,16 +178,12 @@ function CustomInjector:parse(id, widgets)
 			table.insert(widgets, Center{children = {table.concat(maps, '&nbsp;• ')}})
 		end
 	elseif id == 'liquipediatier' then
-		table.insert(
-			widgets,
+		Array.appendWith(widgets,
 			Cell{
 				name = '[[File:ESL 2019 icon.png|20x20px|link=|ESL|alt=ESL]] Pro Tour Tier',
 				content = {self.caller:_createEslProTierCell(args.eslprotier)},
 				classes = {'infobox-icon-small'}
-			}
-		)
-		table.insert(
-			widgets,
+			},
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
 				content = {self.caller:_createValveTierCell()},
@@ -385,14 +384,23 @@ end
 ---@return string?
 function CustomLeague:_createValveTierCell()
 	if self.valveTier then
-		local tierLink = '[[' .. self.valveTier.link .. '|' .. self.valveTier.name .. ']]'
-		local torInfo = (self.data.endDate >= VALVE_TOR_START_DATE) and Icon.makeIcon({
-				iconName = 'matchpopup',
-				hover = 'Click for further details',
-				pageLink = '#Valve Operational Requirements',
-				attributes = {style = 'color: var(--clr-on-background);'}
-			}) or ''
-		return tierLink .. (Logic.isNotEmpty(torInfo) and ('&ensp;' .. torInfo) or '')
+		local showInfoIcon = self.data.endDate >= VALVE_TOR_START_DATE
+		return HtmlWidgets.Fragment{
+			children = {
+				Link{
+					children = {self.valveTier.name},
+					link = self.valveTier.link
+				},
+				showInfoIcon and '&ensp;' or nil,
+				showInfoIcon and Link{
+					children = {IconFontawesome{
+						faName = 'info-circle',
+						hover = 'Click for further details',
+					}},
+					link = '#Valve Operational Requirements'
+				} or nil,
+			}
+		}
 	end
 end
 
