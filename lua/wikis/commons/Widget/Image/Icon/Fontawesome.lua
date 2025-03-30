@@ -16,17 +16,10 @@ local I = Lua.import('Module:Widget/Html/All').I
 local Icon = Lua.import('Module:Icon')
 local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 
----@class IconFontawesomeProps
----@field iconName string?
+---@class IconFontawesomeProps: IconProps
 ---@field faName string?
 ---@field faStyle string?
 ---@field faSize string?
----@field color string?
----@field screenReaderHidden boolean?
----@field hover string?
----@field size integer|string|nil
----@field additionalClasses string[]?
----@field attributes table<string, string>?
 
 ---@class IconFontawesomeWidget: IconWidget
 ---@operator call(IconProps): IconFontawesomeWidget
