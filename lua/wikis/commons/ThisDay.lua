@@ -128,7 +128,8 @@ function ThisDay.patch(args)
 	local patchData = ThisDayQuery.patch(ThisDay._readDate(args))
 
 	if Logic.isEmpty(patchData) then
-		return Config.showEmptyPatchList and 'There were no patches on this day' or nil
+		if Config.showEmptyPatchList then return 'There were no patches on this day' end
+		return
 	end
 	local lines = Array.map(patchData, function (patch)
 		local patchYear = patch.date:sub(1, 4)
