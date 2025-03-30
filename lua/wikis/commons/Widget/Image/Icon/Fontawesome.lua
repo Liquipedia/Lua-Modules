@@ -9,7 +9,6 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
@@ -46,13 +45,20 @@ local VALID_STYLES = {
 ---@return WidgetHtml
 function FontawesomeIcon:_makeGenericIcon()
 	local props = self.props
+
+	local style = Logic.emptyOr(props.faStyle, DEFAULT_STYLE)
+	if not Table.includes(VALID_STYLES, style) then
+		error(style .. ' is not a valid Font Awesome style!')
+	end
+
 	local size = props.size
 	if Logic.isNumeric(size) then
 		size = size .. 'px'
 	end
+
 	return I{
 		classes = {
-			String.interpolate(CLASS_TEMPLATE, {style = Logic.emptyOr(props.faStyle, DEFAULT_STYLE), icon = props.faName}),
+			String.interpolate(CLASS_TEMPLATE, {style = style, icon = props.faName}),
 			props.additionalClasses,
 			props.color,
 		},
