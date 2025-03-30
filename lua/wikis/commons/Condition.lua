@@ -176,7 +176,7 @@ end
 
 local ConditionUtil = {}
 
----Builds conditions for a collection of values.
+---Builds "all of" or "any of" condition from the given collection of values.
 ---@param column ColumnName
 ---@param values (string|number)[]
 ---@param booleanOperator lpdbBooleanOperator
