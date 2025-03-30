@@ -80,7 +80,7 @@ function PatchCalendar:build()
 
 		if self.monthsPresent[month] then
 			return Td{children = {Link{
-				link = monthShort .. '_' .. self.displayYear,
+				link = '#' .. monthShort .. '_' .. self.displayYear,
 				children = {monthShort},
 			}}}
 		end
@@ -91,8 +91,8 @@ function PatchCalendar:build()
 		tableCss = {['text-align'] = 'center', ['font-size'] = '110%'},
 		children = {
 			Tr{children = {Th{attributes = {colspan = 6}, children = {self.displayYear}}}},
-			Tr{children = Array.map(Array.rang(1, 6), buildMonthCell)},
-			Tr{children = Array.map(Array.rang(7, 12), buildMonthCell)},
+			Tr{children = Array.map(Array.range(1, 6), buildMonthCell)},
+			Tr{children = Array.map(Array.range(7, 12), buildMonthCell)},
 		}
 	}
 end
