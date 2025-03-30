@@ -42,7 +42,7 @@ function NavigationCard:render()
 			},
 			count and HtmlWidgets.Span{
 				classes = {'navigation-card__subtitle'},
-				children = count,
+				children = mw.getContentLanguage():formatNum(count),
 			} or nil
 		)
 	}
