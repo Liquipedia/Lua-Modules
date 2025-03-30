@@ -140,6 +140,7 @@ function PatchList:fetch()
 	self.patches = Array.map(patches, function(patch)
 		patch.extradata = patch.extradata or {}
 		patch.timestamp = DateExt.readTimestamp(patch.date)
+		return patch
 	end)
 
 	return self
