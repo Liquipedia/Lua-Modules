@@ -186,8 +186,8 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = Template.safeExpand(mw.getCurrentFrame(), 'Valve/infobox') .. ' Tier',
 				content = self.caller:_createValveTierCell(),
-				separator = '&ensp;',
-				classes = {'valvepremier-highlighted'}
+				classes = {'valvepremier-highlighted'},
+				options = {separator = '&ensp;'}
 			}
 		)
 	elseif id == 'gamesettings' then
