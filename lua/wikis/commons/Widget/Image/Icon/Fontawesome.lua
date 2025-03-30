@@ -83,11 +83,11 @@ function FontawesomeIcon:_makeGenericIcon()
 	end
 
 	return I{
-		classes = {
+		classes = Array.extendWith(
 			iconClasses,
 			props.additionalClasses,
-			props.color,
-		},
+			props.color
+		),
 		attributes = Table.merge(
 			props.attributes,
 			{
