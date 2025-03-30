@@ -397,7 +397,7 @@ function CustomLeague:_createValveTierCell()
 					hover = 'Click for further details',
 				}},
 				link = '#Valve Operational Requirements'
-			} or nil,
+			} or nil
 		)
 	end
 end
