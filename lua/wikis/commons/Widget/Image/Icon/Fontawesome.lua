@@ -36,6 +36,7 @@ FontawesomeIcon.defaultProps = {
 }
 
 local CLASS_TEMPLATE = '${style} fa-${icon}'
+local CLASS_TEMPLATE_SIZED = CLASS_TEMPLATE .. ' fa-${size}'
 local VALID_STYLES = {
 	'fas',
 	'far',
@@ -43,13 +44,32 @@ local VALID_STYLES = {
 	'fad',
 	'fab'
 }
+local VALID_SIZES = {
+	'xs',
+	'sm',
+	'lg',
+	'1x',
+	'2x',
+	'3x',
+	'4x',
+	'5x',
+	'6x',
+	'7x',
+	'8x',
+	'9x',
+	'10x'
+}
 
 ---@return WidgetHtml
 function FontawesomeIcon:_makeGenericIcon()
 	local props = self.props
 
 	if not Table.includes(VALID_STYLES, props.faStyle) then
-		error(props.faStyle .. ' is not a valid Font Awesome style!')
+		error(props.faStyle .. ' is not a valid Font Awesome icon style!')
+	end
+
+	if not (Logic.isEmpty(props.faSize) or Table.includes(VALID_SIZES, props.faSize)) then
+		error(props.faSize .. ' is not a valid Font Awesome icon size!')
 	end
 
 	local size = props.size
@@ -57,9 +77,16 @@ function FontawesomeIcon:_makeGenericIcon()
 		size = size .. 'px'
 	end
 
+	local iconClasses
+	if Logic.isNotEmpty(props.faSize) then
+		iconClasses = String.interpolate(CLASS_TEMPLATE_SIZED, {style = props.faStyle, icon = props.faName, size = props.faSize})
+	else
+		iconClasses = String.interpolate(CLASS_TEMPLATE, {style = props.faStyle, icon = props.faName})
+	end		
+
 	return I{
 		classes = {
-			String.interpolate(CLASS_TEMPLATE, {style = props.faStyle, icon = props.faName}),
+			iconClasses,
 			props.additionalClasses,
 			props.color,
 		},
