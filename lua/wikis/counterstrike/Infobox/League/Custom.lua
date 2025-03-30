@@ -33,6 +33,7 @@ local Center = Widgets.Center
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class CounterstrikeLeagueInfobox: InfoboxLeague
 ---@field gameData table
