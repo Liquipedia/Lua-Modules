@@ -176,7 +176,7 @@ function ConditionUtil.multiValueCondition(column, values, booleanOperator)
 	local conditions = ConditionTree(booleanOperator)
 
 	Array.forEach(values, function (value)
-		conditions:add{ConditionNode(column, Comparator.eq, value)}
+		conditions:add(ConditionNode(column, Comparator.eq, value))
 	end)
 
 	return conditions
