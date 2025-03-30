@@ -98,9 +98,10 @@ end
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
 --- The time of day is truncated in the UTC timezone. The time of day and timezone are discarded.
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
----@return string|number
+---@return string
 function DateExt.toYmdInUtc(dateOrTimestamp)
-	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
+	-- Return value is cast as string because format 'Y-m-d' should not be interpreted as a number
+	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '') --[[@as string]]
 end
 
 ---@param dateString string|integer|osdate|osdateparam
