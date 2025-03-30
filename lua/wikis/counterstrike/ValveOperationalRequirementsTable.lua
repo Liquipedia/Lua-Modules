@@ -37,9 +37,10 @@ local DITTO_VALUE = '&#12291;'
 local HORIZONTAL_LINE = '<hr/>'
 
 local VALID_ADDITIONAL_INFO_TYPES = {'announcement', 'amendment'}
+local VALVE_GITHUB_URL = 'https://github.com/ValveSoftware/counter-strike'
 local VRS_GITHUB_URL_TEMPLATE = '${year}/${filePrefix}_${year}_${month}_${day}.md'
-local VRS_GITHUB_URL_BASE = 'https://github.com/ValveSoftware/counter-strike_regional_standings/tree/main/invitation/'
-local TOR_GITHUB_URL = 'https://github.com/ValveSoftware/counter-strike_rules_and_regs/blob/${commit}/tournament-operation-requirements.md'
+local VRS_GITHUB_URL_BASE = VALVE_GITHUB_URL .. '_regional_standings/tree/main/invitation/'
+local TOR_GITHUB_URL = VALVE_GITHUB_URL .. '_rules_and_regs/blob/${commit}/tournament-operation-requirements.md'
 local VRS_REGIONS = {
 	global = {
 		name = 'global',
@@ -89,8 +90,10 @@ local VRS_REGIONS = {
 function ValveOperationalRequirementsTable.make(frame)
 	local args = Arguments.getArgs(frame)
 	local data = ValveOperationalRequirementsTable._getData(args)
-	local additionalInfoValues = Array.map(data.additionalInfo, ValveOperationalRequirementsTable._makeAdditionalInfoDisplay)
-	local additionalInfoRefs = Array.map(data.additionalInfo, ValveOperationalRequirementsTable._makeAdditionalInfoRef)
+	local additionalInfoValues = Array.map(data.additionalInfo,
+		ValveOperationalRequirementsTable._makeAdditionalInfoDisplay)
+	local additionalInfoRefs = Array.map(data.additionalInfo,
+		ValveOperationalRequirementsTable._makeAdditionalInfoRef)
 	local vrsDisplay = ValveOperationalRequirementsTable._makeVrsDisplay(data.vrsData)
 
 	local rows = {
@@ -126,7 +129,10 @@ function ValveOperationalRequirementsTable.make(frame)
 			linkType = 'github'
 		}),
 		ValveOperationalRequirementsTable._makeTableRow({
-			title = WidgetsHtml.Fragment{children = {'Applicable ', Abbr{children = 'TOR', title = 'Tournament Operating Requirements'}}},
+			title = WidgetsHtml.Fragment{children = {
+				'Applicable ',
+				Abbr{children = 'TOR', title = 'Tournament Operating Requirements'}
+			}},
 			contents = ValveOperationalRequirementsTable._makeTorDisplay(data.torVersion.commit),
 			link = data.torVersion.link,
 			linkType = 'github'
