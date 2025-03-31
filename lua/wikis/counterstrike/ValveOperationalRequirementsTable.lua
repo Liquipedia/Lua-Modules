@@ -192,16 +192,16 @@ end
 ---@param date string?
 ---@return string
 function ValveOperationalRequirementsTable._makeVrsLink(filePrefix, date)
-	if Logic.isNotEmpty(date) then
-		local dateParams = DateExt.parseIsoDate(date) --[[@as osdateparam]]
-		return VRS_GITHUB_URL_BASE .. String.interpolate(VRS_GITHUB_URL_TEMPLATE, {
-			filePrefix = filePrefix,
-			year = dateParams.year,
-			month = string.format("%02d", dateParams.month),
-			day = string.format("%02d", dateParams.day)
-		})
+	if Logic.isEmpty(date) then
+		return VRS_GITHUB_URL_BASE
 	end
-	return VRS_GITHUB_URL_BASE
+	local dateParams = DateExt.parseIsoDate(date) --[[@as osdateparam]]
+	return VRS_GITHUB_URL_BASE .. String.interpolate(VRS_GITHUB_URL_TEMPLATE, {
+		filePrefix = filePrefix,
+		year = dateParams.year,
+		month = string.format("%02d", dateParams.month),
+		day = string.format("%02d", dateParams.day)
+	})
 end
 
 ---@param link string?
@@ -354,23 +354,24 @@ end
 ---@param data ValveOperationalRequirementsData
 function ValveOperationalRequirementsTable._storeLpdbData(data)
 	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
-		local tournamentParent = Variables.varDefault('tournament_parent')
-		local tournamentName = Variables.varDefault('tournament_name')
-		if Logic.isEmpty(tournamentParent) then
-			local title = mw.title.getCurrentTitle()
-			tournamentParent = title.text:gsub(' ', '_')
-			tournamentName = title.text
-		end
-		local dataPoint = Lpdb.DataPoint:new{
-			objectname = 'vor_' .. tournamentParent,
-			type = 'vor_data',
-			name = 'Valve Operational Requirements for ' .. tournamentName,
-			information = data.tier,
-			date = Variables.varDefault('tournament_enddate'),
-			extradata = data
-		}
-		dataPoint:save()
+		return
 	end
+	local tournamentParent = Variables.varDefault('tournament_parent')
+	local tournamentName = Variables.varDefault('tournament_name')
+	if Logic.isEmpty(tournamentParent) then
+		local title = mw.title.getCurrentTitle()
+		tournamentParent = title.text:gsub(' ', '_')
+		tournamentName = title.text
+	end
+	local dataPoint = Lpdb.DataPoint:new{
+		objectname = 'vor_' .. tournamentParent,
+		type = 'vor_data',
+		name = 'Valve Operational Requirements for ' .. tournamentName,
+		information = data.tier,
+		date = Variables.varDefault('tournament_enddate'),
+		extradata = data
+	}
+	dataPoint:save()
 end
 
 return ValveOperationalRequirementsTable
