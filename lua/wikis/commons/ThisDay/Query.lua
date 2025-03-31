@@ -79,15 +79,13 @@ function ThisDayQuery.tournament(month, day)
 			ConditionNode(ColumnName('opponentname'), Comparator.neq, 'TBD'),
 			ConditionNode(ColumnName('prizepoolindex'), Comparator.eq, '1'),
 		}
-	conditions:add(ConditionUtil.multiValueCondition(
+	conditions:add(ConditionUtil.anyOf(
 		ColumnName('liquipediatier'),
-		Config.tiers,
-		BooleanOperator.any
+		Config.tiers
 	))
-	conditions:add(ConditionUtil.multiValueCondition(
+	conditions:add(ConditionUtil.allOf(
 		ColumnName('liquipediatiertype'),
-		Config.tierTypes,
-		BooleanOperator.all
+		Config.tierTypes
 	))
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
