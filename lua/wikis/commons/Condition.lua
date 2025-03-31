@@ -199,7 +199,7 @@ function ConditionUtil._multiValueCondition(column, booleanOperator, comparator,
 	if Array.isEmpty(values) then return end
 
 	return ConditionTree(booleanOperator)
-		:add(Array.map(values, function(value)
+		:add(Array.map(Array.unique(values), function(value)
 			return ConditionNode(column, comparator, value)
 		end))
 end
