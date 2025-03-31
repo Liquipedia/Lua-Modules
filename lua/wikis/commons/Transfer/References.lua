@@ -314,7 +314,7 @@ function TransferRef._getTextAndLink(reference, options)
 			return 'Liquipedia has gained this information from a trusted inside source.'
 	elseif refType == CONTRACT_TYPE then
 		local contractDatabaseRef = (Info.config.transfers or {}).contractDatabaseRef
-		assert(contractDatabaseRef, 'Contract database type is not available')
+		assert(contractDatabaseRef, 'Contract database type is not available on this wiki')
 		link = contractDatabaseRef.link
 		local displayText = contractDatabaseRef.display
 		return 'Transfer was not formally announced, but was revealed by changes in the ' ..
