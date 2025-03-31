@@ -14,7 +14,7 @@ local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 local Tier = require('Module:Tier/Utils')
 
 local OpponentLibrary = require('Module:OpponentLibraries')

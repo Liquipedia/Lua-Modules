@@ -14,7 +14,7 @@ local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Ordinal = require('Module:Ordinal')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 
 local TeamLogoGallery = {}
 

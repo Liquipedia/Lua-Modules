@@ -15,7 +15,7 @@ local Logic = require('Module:Logic')
 local PageVariableNamespace = require('Module:PageVariableNamespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})

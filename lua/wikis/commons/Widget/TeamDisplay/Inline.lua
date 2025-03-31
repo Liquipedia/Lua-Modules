@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table') ---@module 'commons.Table'
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')

@@ -14,7 +14,7 @@ local Lpdb = require('Module:Lpdb')
 local MathUtils = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent

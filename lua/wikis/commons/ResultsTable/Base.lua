@@ -15,7 +15,7 @@ local Logic = require('Module:Logic')
 local Namespace = require('Module:Namespace')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 local Tier = require('Module:Tier/Custom')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
