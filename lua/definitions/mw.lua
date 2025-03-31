@@ -337,7 +337,7 @@ end
 ---@param format string
 ---@param timestamp string|osdateparam?
 ---@param localTime boolean?
----@return number|string
+---@return string
 function mw.language:formatDate(format, timestamp, localTime)
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
