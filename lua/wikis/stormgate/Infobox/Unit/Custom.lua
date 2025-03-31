@@ -194,7 +194,7 @@ function CustomUnit:subHeaderDisplay(args)
 end
 
 ---@param data string[]
----@return string[]?
+---@return string[]
 function CustomUnit:_parseSubfactionData(data)
 	local parsedElements = Array.map(data, function(dataElement)
 		return Array.parseCommaSeparatedString(dataElement, ':')

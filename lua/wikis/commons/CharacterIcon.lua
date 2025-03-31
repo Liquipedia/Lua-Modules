@@ -33,7 +33,7 @@ local CharacterIcon = {}
 
 ---@param icons CharacterIconInfo[]
 ---@param date string?
----@return CharacterIconInfo
+---@return CharacterIconInfo?
 function CharacterIcon._getCharacterIconInfo(icons, date)
 	date = date or DateExt.getContextualDateOrNow()
 	local timeStamp = DateExt.readTimestamp(date)
@@ -73,7 +73,7 @@ function CharacterIcon.Icon(args)
 
 	assert(characterIcons, 'Character:"' .. args.character .. '" was not found')
 
-	local iconInfo = CharacterIcon._getCharacterIconInfo(characterIcons, args.date)
+	local iconInfo = CharacterIcon._getCharacterIconInfo(characterIcons, args.date) or {}
 
 	assert(iconInfo.file, 'Character:"' .. args.character .. '" has no file set')
 

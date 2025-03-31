@@ -185,8 +185,8 @@ function CustomSkill:_castersDisplay()
 	end)
 end
 
----@param data table
----@return table?
+---@param data string[]
+---@return string[]
 function CustomSkill:_parseSubfactionData(data)
 	local parsedElements = Array.map(data, function(dataElement)
 		return Array.parseCommaSeparatedString(dataElement, ':')

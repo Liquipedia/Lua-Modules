@@ -21,13 +21,13 @@ local TierCustom = Table.copy(Tier)
 
 --- Parses queryData to be processable for other Tier functions
 ---@param queryData table
----@return string?, string?, {game: string?}
+---@return string?, string?, table
 function TierCustom.parseFromQueryData(queryData)
 	return queryData.liquipediatier, queryData.liquipediatiertype, {game = queryData.game}
 end
 
 --- Builds the display for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@param options table?
 ---@return string?

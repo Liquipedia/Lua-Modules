@@ -259,7 +259,7 @@ function MatchTable:getOpponentAliases(mode, opponent)
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
-		local pagifiedName = Page.pageifyLink(name)
+		local pagifiedName = Page.pageifyLink(name) --[[@as string]]
 		local pagifiedNameWithSpaces = pagifiedName:gsub('_', ' ')
 		aliases[name] = true
 		aliases[nameWithSpaces] = true
@@ -709,6 +709,7 @@ function MatchTable:_displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
+	---@cast tier -nil
 	options.link = true
 	options.onlyTierTypeIfBoth = true
 

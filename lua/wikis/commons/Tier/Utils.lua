@@ -63,7 +63,7 @@ end
 --- Converts input to (storage) values for a given (tier, tierType) tuple
 ---@param tier string|integer
 ---@param tierType string?
----@return integer?, string|integer|nil
+---@return integer?, string?
 function Tier.toValue(tier, tierType)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 

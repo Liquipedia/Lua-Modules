@@ -528,6 +528,7 @@ end
 ---@return Html
 function BaseTournamentsListing:displayTier(tournamentData)
 	local tier, tierType, options = Tier.parseFromQueryData(tournamentData)
+	---@cast tier -nil
 	options.link = true
 	if self.config.onlyTierTypeIfBoth then
 		options.onlyTierTypeIfBoth = true

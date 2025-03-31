@@ -26,7 +26,7 @@ local MODE_ADJUSTS = {
 
 --- Parses queryData to be processable for other Tier functions
 ---@param queryData table
----@return string?, string?, {mode: string?}
+---@return string?, string?, table
 function TierCustom.parseFromQueryData(queryData)
 	return queryData.liquipediatier, queryData.liquipediatiertype, {mode = queryData.mode}
 end

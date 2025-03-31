@@ -194,7 +194,7 @@ end
 ---Validates the provided tier, tierType pair
 ---@param tier string|number|nil
 ---@param tierType string?
----@return string|number|nil, string?, string[]
+---@return integer?, string?, string[]
 function HiddenDataBox.validateTier(tier, tierType)
 	local warnings = {}
 
@@ -202,7 +202,7 @@ function HiddenDataBox.validateTier(tier, tierType)
 		return nil, nil, warnings
 	end
 
-	local tierValue, tierTypeValue = Tier.toValue(tier, tierType)
+	local tierValue, tierTypeValue = Tier.toValue(tier --[[@as string|integer]], tierType)
 
 	if tier and not tierValue then
 		table.insert(warnings, String.interpolate(INVALID_TIER_WARNING, {tierString = tier, tierMode = 'Tier'}))
