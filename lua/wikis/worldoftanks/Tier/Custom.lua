@@ -22,7 +22,7 @@ local TierCustom = Table.copy(Tier)
 
 --- Parses queryData to be processable for other Tier functions
 ---@param queryData table
----@return string?, string?, table
+---@return string?, string?, {game: string?}
 function TierCustom.parseFromQueryData(queryData)
 	return queryData.liquipediatier, queryData.liquipediatiertype, {game = queryData.game}
 end
