@@ -38,7 +38,7 @@ return {
 			gameScoresIfBo1 = true,
 		},
 		transfers = {
-			contractDatabaseRef = {
+			contractDatabase = {
 				-- luacheck: push ignore
 				link = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRmmWiBmMMD43m5VtZq54nKlmj0ZtythsA1qCpegwx-iRptx2HEsG0T3cQlG1r2AIiKxBWnaurJZQ9Q/pubhtml',
 				-- luacheck: pop

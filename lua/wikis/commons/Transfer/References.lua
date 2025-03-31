@@ -313,10 +313,10 @@ function TransferRef._getTextAndLink(reference, options)
 	elseif refType == INSIDE_TYPE then
 			return 'Liquipedia has gained this information from a trusted inside source.'
 	elseif refType == CONTRACT_TYPE then
-		local contractDatabaseRef = (Info.config.transfers or {}).contractDatabaseRef
-		assert(contractDatabaseRef, 'Contract database type is not available on this wiki')
-		link = contractDatabaseRef.link
-		local displayText = contractDatabaseRef.display
+		local contractDatabase = (Info.config.transfers or {}).contractDatabase
+		assert(contractDatabase, 'Contract database type is not available on this wiki')
+		link = contractDatabase.link
+		local displayText = contractDatabase.display
 		return 'Transfer was not formally announced, but was revealed by changes in the ' ..
 			(linkInsideText and Page.makeExternalLink(displayText, link) or displayText) .. '.',
 			not linkInsideText and link or nil
