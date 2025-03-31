@@ -166,7 +166,7 @@ end
 ---@param args table
 ---@return string?
 function CustomUnit:subHeaderDisplay(args)
-	local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+	local subfactionData = Array.parseCommaSeparatedString(args.subfaction) or {}
 
 	if Table.includes(subfactionData, '1v1') then
 		return tostring(mw.html.create('span')
@@ -193,8 +193,8 @@ function CustomUnit:subHeaderDisplay(args)
 	)
 end
 
----@param data table
----@return table?
+---@param data string[]
+---@return string[]?
 function CustomUnit:_parseSubfactionData(data)
 	local parsedElements = Array.map(data, function(dataElement)
 		return Array.parseCommaSeparatedString(dataElement, ':')

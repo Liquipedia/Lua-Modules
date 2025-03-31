@@ -166,7 +166,7 @@ function CustomSkill:_castersDisplay()
 		end
 
 		if casterUnit.type == 'Hero' then
-			local heroSubfactionData = Array.parseCommaSeparatedString(extraData.subfaction[1] or {}, ':')
+			local heroSubfactionData = Array.parseCommaSeparatedString((extraData.subfaction or {})[1], ':')
 			return GAME_MODE_ICON[heroSubfactionData[1]] and Page.makeInternalLink({},
 				Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(heroSubfactionData[1])], size = '100%'}
 				.. ' ' .. casterUnit.name, caster)
