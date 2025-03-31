@@ -204,10 +204,9 @@ Tier.legacyShortNumbers = FnUtil.memoize(function()
 	end)
 end)
 
---- Legacy: Converts legacy tier input to its numeric value. DEPRECATED!!!
+--- Converts legacy tier input to its numeric value.
 ---@param tier string|integer|nil
 ---@return integer?
----@deprecated
 function Tier.toNumber(tier)
 	return tonumber(tier)
 		or Tier.legacyNumbers()[string.lower(tier or ''):gsub(' ', '')]
