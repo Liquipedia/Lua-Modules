@@ -82,7 +82,7 @@ end)
 --- The format string is the same used by mw.language.formatDate and {{#time}}.
 ---@param format string
 ---@param timestamp string|integer
----@return string|number
+---@return string
 function DateExt.formatTimestamp(format, timestamp)
 	return mw.getContentLanguage():formatDate(format, '@' .. timestamp)
 end

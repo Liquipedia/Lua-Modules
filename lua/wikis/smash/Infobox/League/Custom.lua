@@ -435,7 +435,7 @@ function CustomLeague:_formatDate(date)
 
 		-- All parts known
 	else
-		return tostring(mw.getContentLanguage():formatDate('F j, Y', date))
+		return mw.getContentLanguage():formatDate('F j, Y', date)
 	end
 end
 
