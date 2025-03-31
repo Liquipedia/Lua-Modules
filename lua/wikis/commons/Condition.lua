@@ -165,21 +165,43 @@ end
 
 local ConditionUtil = {}
 
----Builds "all of" or "any of" condition from the given collection of values.
+---Builds "matches any of" condition from the given collection of values.
 ---@param column ColumnName
 ---@param values (string|number)[]
----@param booleanOperator lpdbBooleanOperator
 ---@return ConditionTree?
-function ConditionUtil.multiValueCondition(column, values, booleanOperator)
+function ConditionUtil.anyOf(column, values)
+	return ConditionUtil._multiValueCondition(column, BooleanOperator.any, Comparator.equals, values)
+end
+
+---Builds "matches all of" condition from the given collection of values.
+---@param column ColumnName
+---@param values (string|number)[]
+---@return ConditionTree?
+function ConditionUtil.allOf(column, values)
+	return ConditionUtil._multiValueCondition(column, BooleanOperator.all, Comparator.equals, values)
+end
+
+---Builds "matches none of" condition from the given collection of values.
+---@param column ColumnName
+---@param values (string|number)[]
+---@return ConditionTree?
+function ConditionUtil.noneOf(column, values)
+	return ConditionUtil._multiValueCondition(column, BooleanOperator.all, Comparator.notEquals, values)
+end
+
+---@package
+---@param column ColumnName
+---@param booleanOperator lpdbBooleanOperator
+---@param comparator lpdbComparator
+---@param values (string|number)[]
+---@return ConditionTree?
+function ConditionUtil._multiValueCondition(column, booleanOperator, comparator, values)
 	if Array.isEmpty(values) then return end
 
-	local conditions = ConditionTree(booleanOperator)
-
-	Array.forEach(values, function (value)
-		conditions:add(ConditionNode(column, Comparator.eq, value))
-	end)
-
-	return conditions
+	return ConditionTree(booleanOperator)
+		:add(Array.map(values, function(value)
+			return ConditionNode(column, comparator, value)
+		end))
 end
 
 Condition.Tree = ConditionTree
