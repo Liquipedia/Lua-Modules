@@ -196,8 +196,9 @@ Config.weights = {
 function Config.placementDropOffFunction(tier, tierType)
 	return function(score, placement)
 		if tierType == Config.TIER_TYPE_QUALIFIER or
-		   tierType == Config.TIER_TYPE_SHOW_MATCH or
-		   tierType == Config.TIER_TYPE_MISC then
+			tierType == Config.TIER_TYPE_SHOW_MATCH or
+			tierType == Config.TIER_TYPE_MISC then
+
 			return score
 		end
 
