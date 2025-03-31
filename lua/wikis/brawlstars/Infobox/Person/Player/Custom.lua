@@ -13,7 +13,7 @@ local Page = require('Module:Page')
 local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 

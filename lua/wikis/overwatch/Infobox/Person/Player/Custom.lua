@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 

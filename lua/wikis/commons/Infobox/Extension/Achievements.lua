@@ -14,7 +14,7 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 
 local CustomDefaultOptions = Lua.requireIfExists('Module:Infobox/Extension/Achievements/Custom') or {}
 
