@@ -93,7 +93,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 
 	---preprocess legacy stuff
 	for _, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		mapInput.publisherid = mapInput.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
+		mapInput.matchid = mapInput.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
 		mapInput.vod = mapInput.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 	end
 
@@ -119,11 +119,11 @@ function MatchFunctions.getLinks(match, games)
 	links.datdota = {}
 
 	Array.forEach(
-		Array.filter(games, function(map) return map.publisherid ~= nil end),
+		Array.filter(games, function(map) return map.matchid ~= nil end),
 		function(map, mapIndex)
-			links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.publisherid
-			links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
-			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
+			links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.matchid
+			links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.matchid
+			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.matchid
 		end
 	)
 
@@ -172,7 +172,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {
-		publisherid = tonumber(map.publisherid),
+		publisherid = map.matchid,
 	}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
