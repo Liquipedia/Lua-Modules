@@ -77,6 +77,7 @@ end)
 ---@param name string?
 ---@return integer?
 function Namespace.idFromName(name)
+	name = (name or ''):gsub('_', ' ')
 	return Namespace.getIdsByName()[name]
 end
 
