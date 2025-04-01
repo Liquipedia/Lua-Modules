@@ -178,7 +178,7 @@ end
 function TournamentStructure.getMatchGroupFilter(matchGroupId)
 	local namespaceName = matchGroupId:match('^(%w+)_')
 	local clauses = Array.extend(
-		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName) .. ']]') or nil,
+		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName:gsub('_', ' ')) .. ']]') or nil,
 		'[[match2bracketid::' .. matchGroupId .. ']]'
 	)
 	return table.concat(clauses, ' AND ')
@@ -191,7 +191,7 @@ end
 function TournamentStructure.getPageNameFilter(matchGroupType, pageName)
 	local namespaceName, basePageName, stageName = TournamentStructure._splitPageName(pageName)
 	local clauses = Array.extend(
-		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName) .. ']]') or nil,
+		namespaceName and ('[[namespace::' .. Namespace.idFromName(namespaceName:gsub('_', ' ')) .. ']]') or nil,
 		('[[pagename::' .. basePageName:gsub('%s', '_') .. ']]'),
 		stageName and (matchGroupType == 'bracket') and ('[[match2bracketdata_sectionheader::' .. stageName .. ']]') or nil,
 		stageName and (matchGroupType == 'standingstable') and ('[[extradata_stagename::' .. stageName .. ']]') or nil
