@@ -25,7 +25,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field displayNames table<string, string[]>
 
 ---@type table<teamStyle, InlineType>
-local TeamInlineTypes = {
+local TEAM_INLINE_TYPES = {
 	['bracket'] = {
 		displayType = 'bracket',
 		displayNames = {['bracketname'] = {}}
