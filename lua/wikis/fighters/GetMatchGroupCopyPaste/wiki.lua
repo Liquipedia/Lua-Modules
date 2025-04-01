@@ -38,9 +38,8 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.vod) and INDENT .. '|twitch=|vod=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
-		end), 
-		Logic.readBool(args.details) and 
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		end),
+		Logic.readBool(args.details) and Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
 		end) or nil,
 		'}}'
