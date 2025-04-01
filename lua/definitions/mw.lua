@@ -519,16 +519,16 @@ function mw.message:isBlank() end
 ---@return boolean
 function mw.message:isDisabled() end
 
----@alias namespaceInfo {id: number, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
+---@alias namespaceInfo {id: integer, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
 ---@class Site
 ---@field currentVersion string
 ---@field scriptPath string
 ---@field server string
 ---@field siteName string
----@field namespaces table<number|string, namespaceInfo>
----@field contentNamespaces table<number|string, namespaceInfo>
----@field subjectNamespaces table<number|string, namespaceInfo>
----@field talkNamespaces table<number|string, namespaceInfo>
+---@field namespaces table<integer, namespaceInfo>
+---@field contentNamespaces table<integer, namespaceInfo>
+---@field subjectNamespaces table<integer, namespaceInfo>
+---@field talkNamespaces table<integer, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
 mw.site = {server = 'https://liquipedia.net/wiki/'}
 
