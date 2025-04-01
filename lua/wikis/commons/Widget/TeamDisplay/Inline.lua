@@ -69,11 +69,11 @@ local TeamInlineWidget = Class.new(Widget,
 	---@param self self
 	---@param input TeamInlineParameters
 	function (self, input)
-		assert(TeamInlineTypes[input.displayType], 'Invalid display type')
+		assert(TEAM_INLINE_TYPES[input.displayType], 'Invalid display type')
 		self.teamTemplate = input.teamTemplate or TeamTemplate.getRawOrNil(input.name, input.date)
 		self.name = (self.teamTemplate or {}).name or input.name
 		self.flip = Logic.readBool(input.flip)
-		self.displayType = TeamInlineTypes[input.displayType]
+		self.displayType = TEAM_INLINE_TYPES[input.displayType]
 	end
 )
 
