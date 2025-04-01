@@ -6,8 +6,7 @@ interface WarningBoxProps {
 export default function WarningBox({ text }: WarningBoxProps) {
 	return (
 		<div
-			className="show-when-logged-in navigation-not-searchable ambox-wrapper ambox
-				wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red"
+			className="show-when-logged-in navigation-not-searchable ambox-wrapper ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red"
 		>
 			<table>
 				<tr>

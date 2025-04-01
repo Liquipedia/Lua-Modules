@@ -1,14 +1,14 @@
 local Lua = require('Module:Lua')
 local WidgetFactory = Lua.import('Module:Widget/Factory')
 local ____exports = {}
-local ____Image = Lua.import("Module:Image")
+local ____Image = Lua.import("Module:Widget/Image")
 local Image = ____Image.default
 function ____exports.default(____bindingPattern0)
     local text
     text = ____bindingPattern0.text
     return WidgetFactory.createElement(
         "div",
-        {className = "show-when-logged-in navigation-not-searchable ambox-wrapper ambox\n\t\t\t\twiki-bordercolor-dark wiki-backgroundcolor-light ambox-red"},
+        {className = "show-when-logged-in navigation-not-searchable ambox-wrapper ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red"},
         WidgetFactory.createElement(
             "table",
             nil,
