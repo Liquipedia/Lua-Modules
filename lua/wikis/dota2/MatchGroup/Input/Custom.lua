@@ -172,7 +172,7 @@ end
 ---@return table
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {
-		publisherid = map.matchid,
+		publisherid = tonumber(map.matchid),
 	}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
