@@ -18,5 +18,6 @@
 		"**/wikis/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname}/${filename}",
 		"**/wikis/*/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname(-6)}/${dirname}/${filename}",
 		"**/*.lua": "${dirname}: ${filename}"
-	}
+	},
+	"eslint.workingDirectories": [ "./lua", "./javascript" ],
 }
