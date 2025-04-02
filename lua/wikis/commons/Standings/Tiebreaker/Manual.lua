@@ -14,6 +14,7 @@ local TiebreakerInteface = Lua.import('Module:Standings/Tiebreaker/Interface')
 ---@class TiebreakerManual : StandingsTiebreaker
 local TiebreakerManual = Class.new(TiebreakerInteface)
 
+---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerManual:valueOf(state, opponent)
