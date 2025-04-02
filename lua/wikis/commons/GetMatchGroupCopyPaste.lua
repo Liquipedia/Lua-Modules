@@ -245,7 +245,7 @@ function CopyPaste.matchPage(frame, args)
 	local display = WikiSpecific.getMatchCode(bestof, mode, 1, opponents, args)
 
 	-- Manually change 'Match' to 'MatchPage'
-	display = display:gsub('Match2?', 'MatchPage')
+	display = display:gsub('Match2?', 'MatchPage', 1)
 
 	return CopyPaste._generateCopyPaste(display)
 end
