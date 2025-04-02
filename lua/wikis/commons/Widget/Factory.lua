@@ -37,15 +37,17 @@ end
 ---@param ... (Widget|Html|string|number)
 ---@return Widget
 function WidgetFactory.createElement(widget, props, ...)
+	props = props or {}
 	local widgetClass = widget
 	if type(widget) == 'string' then
 		widget = (widget:gsub("^%l", string.upper))
+		props.new = true
 		widgetClass = HtmlWidgets[widget]
 	end
 
 	assert(widgetClass, 'Widget not found')
 
-	return widgetClass(Table.merge(props or {}, {children = WidgetUtil.collect(...)}))
+	return widgetClass(Table.merge(props, {children = WidgetUtil.collect(...)}))
 end
 
 return Class.export(WidgetFactory)
