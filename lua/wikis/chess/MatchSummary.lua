@@ -15,18 +15,23 @@ local DateExt = Lua.import('Module:Date/Ext')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:ChessEco')
 local FnUtil = Lua.import('Module:FnUtil')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
-local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local Collapsible = Lua.import('Module:Widget/Match/Summary/Collapsible')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Span = HtmlWidgets.Span
+local Tr = HtmlWidgets.Tr
+local Th = HtmlWidgets.Th
+local Td = HtmlWidgets.Td
+local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local KING_ICON_SIZE = '150%'
+local KING_ICON_SIZE = '120%'
 local KING_ICONS = {
 	white = Icon.makeIcon{
 		iconName = 'chesskingoutline',
@@ -53,7 +58,7 @@ local KING_ICONS = {
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
 		:css('overflow', 'auto')
-		:css('max-height', '50vh')
+		:css('max-height', '70vh')
 end
 
 ---@param match table
@@ -66,7 +71,8 @@ function CustomMatchSummary.createBody(match, createGame)
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		--need the match available in map display instead of just the date so we can access the links
 		Array.map(match.games, FnUtil.curry(createGame, match)),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		CustomMatchSummary._linksTable(match)
 	)}
 end
 
@@ -92,9 +98,9 @@ function CustomMatchSummary.createGame(match, game, gameIndex)
 				css = {
 					['text-align'] = 'center',
 					['align-content'] = 'center',
-					['min-height'] = '42px',
+					['min-height'] = '1.5rem',
 					['font-size'] = '85%',
-					['line-height'] = '12px',
+					['line-height'] = '0.75rem',
 					['max-width'] = '200px'
 				},
 				children = CustomMatchSummary._getCenterContent(match, game, gameIndex),
@@ -116,18 +122,6 @@ end
 ---@param gameIndex integer
 ---@return Widget
 function CustomMatchSummary._getCenterContent(match, game, gameIndex)
-	---@type table<string, string|table|nil>
-	local links = Table.mapValues(match.links, function(link)
-		if type(link) ~= 'table' then return nil end
-		return Table.extract(link, gameIndex)
-	end)
-
-	local vod = Table.extract(game, 'vod')
-
-	local linksFooter = MatchSummary.Footer()
-	MatchSummary.addVodsToFooter({vod = vod, games = {}}, linksFooter)
-	linksFooter:addLinks(links)
-
 	return Div{
 		children = {
 			Span{
@@ -141,11 +135,6 @@ function CustomMatchSummary._getCenterContent(match, game, gameIndex)
 				classes = {'brkts-popup-spaced'},
 				css = {['font-size'] = '85%'},
 				children = {Eco.getName(game.extradata.eco, true)},
-			},
-			Span{
-				classes = {'brkts-popup-spaced', 'vodlink'},
-				css = {['padding-top'] = '1px'},
-				children = Array.map(linksFooter.elements, tostring),
 			},
 		},
 	}
@@ -162,7 +151,7 @@ function CustomMatchSummary._getSideIcon(gameOpponent)
 end
 
 ---@param game MatchGroupUtilGame
----@return Widget
+---@return Widget?
 function CustomMatchSummary._getHeader(game)
 	return String.isNotEmpty(game.header) and {
 		Div{
@@ -175,6 +164,43 @@ function CustomMatchSummary._getHeader(game)
 		},
 		MatchSummaryWidgets.Break{}
 	} or nil
+end
+
+---@param match any
+---@return Widget?
+function CustomMatchSummary._linksTable(match)
+	local rows = Array.map(match.games, function(game, gameIndex)
+		local links = Table.mapValues(match.links, function(link)
+			if type(link) ~= 'table' then return nil end
+			return Table.extract(link, gameIndex)
+		end)
+		local vod = Table.extract(game, 'vod')
+		if not vod and Logic.isDeepEmpty(links) then return end
+
+		local linksFooter = MatchSummary.Footer()
+		MatchSummary.addVodsToFooter({vod = vod, games = {}}, linksFooter)
+		linksFooter:addLinks(links)
+
+		return Tr{children = {
+			Td{children = {'Game ', gameIndex}},
+			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.map(linksFooter.elements, tostring)}
+		}}
+
+		--[[
+			Span{
+						css = {['padding-top'] = '1px'},
+					}
+		]]
+	end)
+
+	return Collapsible{
+		tableClasses = {'wikitable-striped'},
+		header = Tr{children = {
+			Th{css = {width = '20%'}},
+			Th{css = {width = '80%'}, children = {'Additional Links'}},
+		}},
+		children = rows,
+	}
 end
 
 return CustomMatchSummary
