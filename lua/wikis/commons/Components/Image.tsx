@@ -7,7 +7,14 @@ interface ImageProps {
 	className?: string;
 }
 
-export default function Image({ src, alt = '', width, height, link = '', className = '' }: ImageProps) {
+export default function Image({
+	src,
+	alt = '',
+	width,
+	height,
+	link = '',
+	className = '',
+}: ImageProps) {
 	const generateResizing = () => {
 		if (height !== undefined && width !== undefined) {
 			return `|${width}x${height}px`;
@@ -22,4 +29,4 @@ export default function Image({ src, alt = '', width, height, link = '', classNa
 	const size = generateResizing();
 	const wikiCode = `[[File:${src}${size}|link=${link}|alt=${alt}|class=${className}]]`;
 	return wikiCode;
-};
+}
