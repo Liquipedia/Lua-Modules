@@ -6,7 +6,7 @@ export default function WarningBox({ text }: { text: string | number }) {
 			<table>
 				<tr>
 					<td className='ambox-image'>
-						{<Image src='Emblem-important.svg' alt='Important' width='40' />}
+						<Image src='Emblem-important.svg' alt='Important' width='40' />
 					</td>
 					<td className='ambox-text'>{text}</td>
 				</tr>
