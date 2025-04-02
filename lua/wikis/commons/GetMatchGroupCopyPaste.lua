@@ -228,6 +228,26 @@ function CopyPaste.singleMatch(frame, args)
 	return CopyPaste._generateCopyPaste(display)
 end
 
+---@param frame Frame
+---@param args table
+---@return Html
+function CopyPaste.matchPage(frame, args)
+	if not args then
+		args = Arguments.getArgs(frame)
+	end
+
+	local bestof = tonumber(args.bestof) or 3
+	local opponents = tonumber(args.opponents) or 2
+	local mode = WikiSpecific.getMode(args.mode)
+
+	local display = WikiSpecific.getMatchCode(bestof, mode, 1, opponents, args)
+
+	-- Manually change 'Match' to 'MatchPage'
+	display = display:gsub('()',{[8]='Page'})
+
+	return CopyPaste._generateCopyPaste(display)
+end
+
 ---@param display string
 ---@return Html
 function CopyPaste._generateCopyPaste(display)
