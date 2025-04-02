@@ -185,12 +185,6 @@ function CustomMatchSummary._linksTable(match)
 			Td{children = {'Game ', gameIndex}},
 			Td{classes = {'brkts-popup-spaced', 'vodlink'}, children = Array.map(linksFooter.elements, tostring)}
 		}}
-
-		--[[
-			Span{
-						css = {['padding-top'] = '1px'},
-					}
-		]]
 	end)
 
 	return Collapsible{
