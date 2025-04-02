@@ -21,6 +21,7 @@ local INDENT = ''
 --returns the Code for a Match, depending on the input
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil, bestof == 0)
+	local generateMatchPage = Logic.readBool(args.generateMatchPage)
 
 	local lines = Array.extend(
 		'{{Match',
@@ -37,11 +38,11 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|vodgame'.. mapIndex ..'='
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		generateMatchPage and {} or Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|matchid'.. mapIndex ..'='
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return WikiCopyPaste._getMapCode(mapIndex, args)
+			return WikiCopyPaste._getMapCode(mapIndex, Logic.readBool(args.bans), generateMatchPage)
 		end),
 		'}}'
 	)
@@ -50,13 +51,13 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 ---@param mapIndex integer
----@param args table
+---@param bans boolean
+---@param generateMatchPage boolean
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, args)
-	if Logic.readBool(args.generateMatchPage) then
+function WikiCopyPaste._getMapCode(mapIndex, bans, generateMatchPage)
+	if Logic.readBool(generateMatchPage) then
 		return INDENT .. '|map' .. mapIndex .. '={{ApiMap|matchid=|reversed=}}'
 	end
-	local bans = Logic.readBool(args.bans)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|team1side=',
