@@ -63,5 +63,8 @@ jobs:
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
-        run: bash scripts/deploy.sh "${{ steps.lua-changed-files.outputs.all_changed_files }}"
-        # TODO: Add complied TSTL files to the deploy
+        run: |
+          changed_files="${{ steps.lua-changed-files.outputs.all_changed_files }}"
+          transpiled_files=$(echo "${{ steps.tstl-changed-files.outputs.all_changed_files }}" | sed 's/\.ts\|\.tsx/\.lua/g')
+          bash scripts/deploy.sh "$changed_files $transpiled_files"
+
