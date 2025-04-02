@@ -23,13 +23,8 @@
 		"noImplicitGlobalVariables": true,
 		"noImplicitSelf": true,
 		"noHeader": true,
-		// TODO: Change to require or require-minimal
-		// Issue 1: Deployment
-		// Issue 2: Plugin and luaLibImport conflict
-		"luaLibImport": "inline",
-		// TODO: Change to true
-		// Issue: Wait until luaLibImport is require/require-minimal to avoid inlining too much
-		"sourceMapTraceback": false,
+		"luaLibImport": "require-minimal",
+		"sourceMapTraceback": true,
 		"luaPlugins": [
 			{ "name": "./lua/plugins/tstl.ts" },
 		],
