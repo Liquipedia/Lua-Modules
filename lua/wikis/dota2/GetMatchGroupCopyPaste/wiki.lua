@@ -42,7 +42,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|matchid'.. mapIndex ..'='
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return WikiCopyPaste._getMapCode(mapIndex, bans)
+			return WikiCopyPaste._getMapCode(mapIndex, args)
 		end),
 		'}}'
 	)
@@ -51,9 +51,13 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 ---@param mapIndex integer
----@param bans boolean
+---@param args table
 ---@return string
-function WikiCopyPaste._getMapCode(mapIndex, bans)
+function WikiCopyPaste._getMapCode(mapIndex, args)
+	if Logic.readBool(args.generateMatchPage) then
+		return INDENT .. '|map' .. mapIndex .. '={{ApiMap|matchid=|reversed=}}'
+	end
+	local bans = Logic.readBool(args.bans)
 	return table.concat(Array.extend(
 		INDENT .. '|map' .. mapIndex .. '={{Map',
 		INDENT .. INDENT .. '|team1side=',

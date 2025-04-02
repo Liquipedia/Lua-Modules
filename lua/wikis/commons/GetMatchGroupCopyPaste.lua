@@ -236,6 +236,8 @@ function CopyPaste.matchPage(frame, args)
 		args = Arguments.getArgs(frame)
 	end
 
+	args.generateMatchPage = true
+
 	local bestof = tonumber(args.bestof) or 3
 	local opponents = tonumber(args.opponents) or 2
 	local mode = WikiSpecific.getMode(args.mode)
