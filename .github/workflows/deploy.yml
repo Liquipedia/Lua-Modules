@@ -16,11 +16,21 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: Install node modules
+        run: npm install
+
       - id: lua-changed-files
         uses: tj-actions/changed-files@v42
         with:
           files: |
             lua/wikis/**/*.lua
+
+      - id: tstl-changed-files
+        uses: tj-actions/changed-files@v42
+        with:
+          files: |
+            lua/wikis/**/*.tsx
+            lua/wikis/**/*.ts
 
       - id: res-changed-files
         uses: tj-actions/changed-files@v42
@@ -41,8 +51,12 @@ jobs:
           DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/deploy_res.sh "${{ steps.res-changed-files.outputs.all_changed_files }}"
 
+      - name: TSTL Transpile
+        if: steps.tstl-changed-files.outputs.any_changed == 'true'
+        run: npm run  scripts/deploy.sh "${{ steps.tstl-changed-files.outputs.all_changed_files }}"
+
       - name: Lua Deploy
-        if: steps.lua-changed-files.outputs.any_changed == 'true'
+        if: steps.lua-changed-files.outputs.any_changed == 'true' || steps.tstl-changed-files.outputs.any_changed == 'true'
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
@@ -50,3 +64,4 @@ jobs:
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/deploy.sh "${{ steps.lua-changed-files.outputs.all_changed_files }}"
+        # TODO: Add complied TSTL files to the deploy

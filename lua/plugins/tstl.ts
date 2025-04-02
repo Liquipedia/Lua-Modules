@@ -35,7 +35,6 @@ const plugin: tstl.Plugin = {
 		emitHost: tstl.EmitHost,
 		result: tstl.ProcessedFile[]
 	) {
-		// Add a comment to the start of all created Lua files
 		for ( const file of result ) {
 			file.code = "local Lua = require('Module:Lua')\n" +
 				"local WidgetFactory = Lua.import('Module:Widget/Factory')\n" +

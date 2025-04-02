@@ -1,9 +1,6 @@
 import Image from '@commons/Widget/Image';
-interface WarningBoxProps {
-	text: string | number;
-}
 
-export default function WarningBox({ text }: WarningBoxProps) {
+export default function WarningBox({ text }: { text: string | number }) {
 	return (
 		<div
 			className="show-when-logged-in navigation-not-searchable ambox-wrapper ambox wiki-bordercolor-dark wiki-backgroundcolor-light ambox-red"
