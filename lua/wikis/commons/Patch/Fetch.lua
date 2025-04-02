@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 
-local Array = require('Module:Array')
 local Lpdb = Lua.import('Module:Lpdb')
 
 local Condition = Lua.import('Module:Condition')
