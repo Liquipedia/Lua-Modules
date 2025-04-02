@@ -139,11 +139,11 @@ function PatchList:fetch()
 	assert(type(patches[1]) == 'table',
 		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig, {asText = true}))
 	-- make sure extradata is not nil
-	self.patches = Array.map(patches, function(patch)
+	Array.forEach(patches, function(patch)
 		patch.extradata = patch.extradata or {}
 		patch.timestamp = DateExt.readTimestamp(patch.date)
-		return patch
 	end)
+	self.patches = patches
 
 	return self
 end
