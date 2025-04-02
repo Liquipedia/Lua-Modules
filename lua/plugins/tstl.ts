@@ -2,6 +2,9 @@ import { SourceNode } from 'source-map';
 import ts from 'typescript';
 import * as tstl from 'typescript-to-lua';
 
+const LUA_FOLDER = '/lua/wikis/'
+const LUA_IMPORTS = `local Lua = require('Module:Lua')\nlocal WidgetFactory = Lua.import('Module:Widget/Factory')\n`
+
 class CustomPrinter extends tstl.LuaPrinter {
 	printCallExpression( expression: tstl.CallExpression ): SourceNode {
 		if ( expression.expression.kind === tstl.SyntaxKind.Identifier &&
@@ -36,9 +39,19 @@ const plugin: tstl.Plugin = {
 		result: tstl.ProcessedFile[]
 	) {
 		for ( const file of result ) {
-			file.code = "local Lua = require('Module:Lua')\n" +
-				"local WidgetFactory = Lua.import('Module:Widget/Factory')\n" +
-				file.code;
+			const relativePath = file.fileName.substring(file.fileName.indexOf(LUA_FOLDER) + LUA_FOLDER.length);
+			const [wiki, ...moduleParts] = relativePath.split('/');
+			const moduleName = moduleParts.join('/').replace('.tsx', '').replace('.ts', '');
+
+			const LUA_MAGIC = `---
+-- @Liquipedia
+-- wiki=${wiki}
+-- page=Module:${moduleName}
+--
+-- Source can be found at https://github.com/Liquipedia/Lua-Modules/blob/main/${LUA_FOLDER}${relativePath}
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--`
+			file.code = `${LUA_MAGIC}\n${LUA_IMPORTS}\n${file.code}`;
 		}
 	}
 };
