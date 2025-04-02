@@ -21,7 +21,6 @@ local INDENT = ''
 --returns the Code for a Match, depending on the input
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local showScore = Logic.nilOr(Logic.readBoolOrNil, bestof == 0)
-	local bans = Logic.readBool(args.bans)
 
 	local lines = Array.extend(
 		'{{Match',
