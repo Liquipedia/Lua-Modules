@@ -823,14 +823,14 @@ function MatchTable:_displayScore(match)
 		local score = opponentRecord.score
 		local status = opponentRecord.status
 
+		local opponent = opponentRecord
 		local game1Opponent = gameOpponents[1]
 		if bestof1Score and game1Opponent then
-			score = game1Opponent.score
-			status = game1Opponent.status
+			opponent = game1Opponent
 		end
 
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (score or '–') or status)
+			:wikitext(status == SCORE_STATUS and (OpponentDisplay.InlineScore(opponent) or '–') or status)
 	end
 
 	return mw.html.create('td')
