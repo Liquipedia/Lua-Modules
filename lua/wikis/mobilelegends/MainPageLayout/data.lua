@@ -101,8 +101,8 @@ return {
 		lightmode = 'Mobile Legends 2025 full lightmode.svg',
 		darkmode = 'Mobile Legends 2025 full darkmode.svg',
 	},
-	metadesc = 'The Mobile Legends: Bang Bang (MLBB) esports wiki covering everything from players, teams and transfers, ' ..
-		'to tournaments and results, heroes, equipment, and patches.',
+	metadesc = 'The Mobile Legends: Bang Bang (MLBB) esports wiki covering everything from players, teams & transfers, ' ..
+		'to tournaments and results, heroes, equipment, & patches.',
 	title = 'Mobile Legends',
 	navigation = {
 		{
