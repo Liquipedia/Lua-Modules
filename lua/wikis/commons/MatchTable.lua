@@ -820,17 +820,17 @@ function MatchTable:_displayScore(match)
 	---@return Html|string
 	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		local score = opponentRecord.score
+		local score = OpponentDisplay.InlineScore(opponentRecord.score)
 		local status = opponentRecord.status
 
-		local opponent = opponentRecord
 		local game1Opponent = gameOpponents[1]
 		if bestof1Score and game1Opponent then
-			opponent = game1Opponent
+			score = game1Opponent.score
+			status = game1Opponent.status
 		end
 
 		return mw.html.create(tonumber(opponentRecord.placement) == 1 and 'b' or nil)
-			:wikitext(status == SCORE_STATUS and (OpponentDisplay.InlineScore(opponent) or '–') or status)
+			:wikitext(status == SCORE_STATUS and (score or '–') or status)
 	end
 
 	return mw.html.create('td')
