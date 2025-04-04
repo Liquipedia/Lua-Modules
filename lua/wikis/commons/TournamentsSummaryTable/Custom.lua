@@ -7,5 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
+local TournamentsSummaryTable = Lua.import('Module:TournamentsSummaryTable')
 
-return Lua.import('Module:TournamentsSummaryTable')
+return TournamentsSummaryTable

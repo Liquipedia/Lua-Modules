@@ -432,6 +432,7 @@ end
 ---@return string?, string?
 function BaseResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
+	---@cast tier -nil
 	options.link = true
 	options.onlyTierTypeIfBoth = true
 

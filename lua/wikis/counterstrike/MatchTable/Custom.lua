@@ -38,6 +38,7 @@ function CustomMatchTable:_displayTier(match)
 	if not self.config.showTier then return end
 
 	local tier, tierType, options = Tier.parseFromQueryData(match)
+	---@cast tier -nil
 	options.link = true
 	options.onlyDisplayPrioritized = true
 

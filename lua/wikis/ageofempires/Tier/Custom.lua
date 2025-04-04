@@ -27,7 +27,7 @@ function TierCustom.parseFromQueryData(queryData)
 end
 
 --- Builds the display for a given (tier, tierType) tuple
----@param tier integer
+---@param tier string|integer
 ---@param tierType string?
 ---@param options table?
 ---@return string?

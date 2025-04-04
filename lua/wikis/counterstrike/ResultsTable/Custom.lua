@@ -43,10 +43,11 @@ end
 
 ---CS tier display overwrite for results, achievements and awards tables
 ---@param placement table
----@return string
+---@return string?
 ---@return string
 function CustomResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
+	---@cast tier -nil
 	options.link = true
 	options.onlyTierTypeIfBoth = false
 	options.onlyDisplayPrioritized = true

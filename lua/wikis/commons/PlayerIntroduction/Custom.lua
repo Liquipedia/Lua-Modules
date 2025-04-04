@@ -7,5 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction')
 
-return Lua.import('Module:PlayerIntroduction')
+return PlayerIntroduction

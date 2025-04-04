@@ -306,8 +306,8 @@ function CustomBuilding:setLpdbData(args)
 	})
 end
 
----@param data table
----@return table?
+---@param data string[]
+---@return string[]
 function CustomBuilding:_parseSubfactionData(data)
 	local parsedElements = Array.map(data, function(dataElement)
 		return Array.parseCommaSeparatedString(dataElement, ':')
@@ -321,6 +321,7 @@ function CustomBuilding:_parseSubfactionData(data)
 end
 
 ---@param inputString string?
+---@param sep string?
 ---@return string[]
 function CustomBuilding:_csvToPageList(inputString, sep)
 	return Array.map(Array.parseCommaSeparatedString(inputString, sep), function(value)
@@ -329,6 +330,7 @@ function CustomBuilding:_csvToPageList(inputString, sep)
 end
 
 ---@param input string?
+---@param sep string?
 ---@return string
 function CustomBuilding:_displayCsvAsPageCsv(input, sep)
 	return table.concat(self:_csvToPageList(input, sep), ', ')

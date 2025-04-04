@@ -7,5 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
+local TierUtils = Lua.import('Module:Tier/Utils')
 
-return Lua.import('Module:Tier/Utils')
+return TierUtils

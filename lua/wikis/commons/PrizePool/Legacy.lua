@@ -43,6 +43,7 @@ LegacyPrizePool.BASE_CURRENCY = 'USD'
 ---@return Html
 function LegacyPrizePool.run(dependency)
 	local args = Template.retrieveReturnValues('LegacyPrizePool')
+	---@type table
 	local header = Array.sub(args, 1, 1)[1]
 	local slots = Array.sub(args, 2)
 

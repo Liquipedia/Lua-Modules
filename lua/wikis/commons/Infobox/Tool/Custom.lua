@@ -7,5 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
+local InfoboxTool = Lua.import('Module:Infobox/Tool')
 
-return Lua.import('Module:Infobox/Tool')
+return InfoboxTool
