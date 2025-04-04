@@ -1381,7 +1381,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		or MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
