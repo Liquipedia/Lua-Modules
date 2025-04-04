@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Standings/Tiebreaker/Points
+-- page=Module:Standings/Tiebreaker/Match/Score
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,14 +11,16 @@ local Lua = require('Module:Lua')
 
 local TiebreakerInteface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
----@class TiebreakerPoints : StandingsTiebreaker
-local TiebreakerPoints = Class.new(TiebreakerInteface)
+local HUGE_NUMBER = 1000000
+
+---@class TiebreakerMatchScore : StandingsTiebreaker
+local TiebreakerMatchScore = Class.new(TiebreakerInteface)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
-function TiebreakerPoints:valueOf(state, opponent)
-	return opponent.points
+function TiebreakerMatchScore:valueOf(state, opponent)
+	return (opponent.match.w * HUGE_NUMBER) - opponent.match.l
 end
 
-return TiebreakerPoints
+return TiebreakerMatchScore
