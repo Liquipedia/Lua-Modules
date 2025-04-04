@@ -608,9 +608,12 @@ end
 
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
+---@param opponents MGIParsedOpponent[]?
 ---@return string? #Match Status
-function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	elseif opponents and not MatchGroupInputUtil.hasScore(opponents) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	end
 end
@@ -832,10 +835,6 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	-- If special status has been applied to a team
 	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return true
-	end
-
-	if not MatchGroupInputUtil.hasScore(opponents) then
-		return false
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
@@ -1157,7 +1156,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
