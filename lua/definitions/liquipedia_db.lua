@@ -85,6 +85,7 @@ local lpdb = {}
 ---@field nationality string
 ---@field position string
 ---@field role string
+---@field roles table
 ---@field type 'player'|'staff'
 ---@field newteam string
 ---@field teamtemplate string
@@ -233,6 +234,7 @@ local lpdb = {}
 ---@field toteamtemplate string
 ---@field role1 string
 ---@field role2 string
+---@field roles table
 ---@field reference table
 ---@field date string
 ---@field wholeteam integer

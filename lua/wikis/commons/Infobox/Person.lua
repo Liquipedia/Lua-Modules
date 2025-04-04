@@ -59,6 +59,20 @@ local STATUS_TRANSLATE = {
 }
 
 local BANNED = 'banned' -- Temporary until conversion
+local Roles = Lua.import('Module:Roles')
+local ROLES = Roles.All
+local InGameRoles = Roles.InGameRoles
+local ContractRoles = Roles.ContractRoles
+
+---@class PersonRoleData
+---@field category string
+---@field display string
+
+---@class Infobox: Person
+---@field role PersonRoleData?
+---@field role2 PersonRoleData?
+---@field role3 PersonRoleData?
+---@field roles PersonRoleData?
 
 ---@param frame Frame
 ---@return Html
@@ -119,6 +133,21 @@ function Person:createInfobox()
 
 	self.age = age
 
+	self.role = self:createRoleData(args.role or '')
+	self.role2 = self:createRoleData(args.role2 or '')
+	self.role3 = self:createRoleData(args.role3 or '')
+
+	self.roles = {}
+	if args.roles then
+		local roleKeys = Array.parseCommaSeparatedString(args.roles)
+		for _, roleKey in ipairs(roleKeys) do
+			local roleData = self:createRoleData(roleKey)
+			if roleData then
+				table.insert(self.roles, roleData)
+			end
+		end
+	end
+
 	local widgets = {
 		Header{
 			name = self:nameDisplay(args),
@@ -150,9 +179,66 @@ function Person:createInfobox()
 			}
 		},
 		Customizable{id = 'role', children = {
-			Cell{name = 'Role', content = {args.role}}
-			}
-		},
+			Builder{builder = function()
+				local cells = {}
+
+				if self.roles and #self.roles > 0 then
+					local inGameRoles = {}
+					local contracts = {}
+					local positions = {}
+
+					for _, roleData in ipairs(self.roles) do
+						local roleDisplay = self:_displayRole(roleData)
+
+						if roleDisplay then
+							local roleKey
+							for key, data in pairs(ROLES) do
+								if data == roleData then
+									roleKey = key
+									break
+								end
+							end
+
+							if roleKey and InGameRoles[roleKey] then
+								table.insert(inGameRoles, roleDisplay)
+							elseif roleKey and ContractRoles[roleKey] then
+								table.insert(contracts, roleDisplay)
+							else
+								table.insert(positions, roleDisplay)
+							end
+						end
+					end
+
+					local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
+					local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
+					local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
+
+					local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
+					local positionsTitle = #positions > 1 and "Positions" or "Position"
+					local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
+
+					if inGameRolesDisplay then
+						table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+					end
+
+					if positionsDisplay then
+						table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
+					end
+
+					if contractsDisplay then
+						table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
+					end
+
+					return cells
+				else
+					local role = self:_displayRole(self.role)
+					local role2 = self:_displayRole(self.role2)
+					local role3 = self:_displayRole(self.role3)
+					table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2, role3}})
+				end
+				return cells
+			end}
+		}},
 		Customizable{id = 'teams', children = {
 			Builder{builder = function()
 				local teams = Array.mapIndexes(function (integerIndex)
@@ -449,6 +535,60 @@ function Person:displayLocations()
 			Page.makeInternalLink(country, ':Category:' .. country) ..
 			(location and (',&nbsp;' .. location) or '')
 	end)
+end
+
+---@param roleKey string
+---@return PersonRoleData?
+function Person:createRoleData(roleKey)
+	if String.isEmpty(roleKey) then return nil end
+
+	local key = roleKey:lower()
+	local roleData = ROLES[key]
+
+	if not roleData and key ~= '' then
+		local display = roleKey:gsub("^%l", string.upper)
+		roleData = {
+			display = display,
+			category = display .. "s"
+		}
+	end
+
+	return roleData
+end
+
+
+---@param roleData PersonRoleData?
+---@return string?
+function Person:_displayRole(roleData)
+	if not roleData then return end
+
+	---@param postFix string|integer|nil
+	---@return string?
+	local toDisplay = function(postFix)
+		postFix = postFix or ''
+		if not roleData['category' .. postFix] then return end
+		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
+	end
+
+	local role1Display = toDisplay()
+	local role2Display = toDisplay(2)
+	local role3Display = toDisplay(3)
+
+	if role1Display then
+		if role2Display then
+			role2Display = '(' .. role2Display .. ')'
+			if role3Display then
+				role3Display = '(' .. role3Display .. ')'
+			end
+		end
+	end
+
+	local displays = {}
+	if role1Display then table.insert(displays, role1Display) end
+	if role2Display then table.insert(displays, role2Display) end
+	if role3Display then table.insert(displays, role3Display) end
+
+	return #displays > 0 and table.concat(displays, ' ') or nil
 end
 
 ---@param team string?
