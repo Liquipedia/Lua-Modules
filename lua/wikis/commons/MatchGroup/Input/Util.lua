@@ -834,10 +834,6 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 		return true
 	end
 
-	if not MatchGroupInputUtil.hasScore(opponents) then
-		return false
-	end
-
 	-- If enough time has passed since match started, it should be marked as finished
 	local function recordLiveLongEnough(record)
 		if not record.timestamp or record.timestamp == DateExt.defaultTimestamp then
