@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local DateExt = require('Module:Date/Ext')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -51,7 +52,7 @@ end
 function AwardsTable:buildRow(placement)
 	local row = mw.html.create('tr')
 		:addClass(self:rowHighlight(placement))
-		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
+		:tag('td'):wikitext(DateExt.toYmdInUtc(placement.date)):done()
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)
 
