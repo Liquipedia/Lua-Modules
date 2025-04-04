@@ -61,6 +61,18 @@ local NOT_PLAYED_INPUTS = {
 	'cancelled',
 }
 
+---@enum MatchFinishedStatus
+MatchGroupInputUtil.MATCH_FINISHED_STATUS = {
+	MANUAL_INPUT_FINISHED = 'manualinputfinished',
+	MANUAL_INPUT_NOT_FINISHED = 'manualinputnotfinished',
+	IS_NOT_PLAYED = 'notplayed',
+	HAS_WINNER = 'haswinner',
+	HAS_SPECIAL_STATUS = 'hasSpecialStatus', -- TODO: Do we want to remove this one?
+	ASSUMED_FINISH_TIME = 'liveLongEnough',
+	BESTOF_REACHED = 'bestofreached',
+	ASSUMED_NOT_FINISHED = 'assumedNotFinished',
+}
+
 MatchGroupInputUtil.DEFAULT_ALLOWED_VETOES = {
 	'decider',
 	'pick',
@@ -606,11 +618,10 @@ function MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput)
 		or (type(finishedInput) == 'string' and MatchGroupInputUtil.isNotPlayedInput(finishedInput))
 end
 
----@param winnerInput integer|string|nil
----@param finishedInput string?
+---@param finishedStatus MatchFinishedStatus
 ---@return string? #Match Status
-function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+function MatchGroupInputUtil.getMatchStatus(finishedStatus)
+	if finishedStatus == MatchGroupInputUtil.MATCH_FINISHED_STATUS.IS_NOT_PLAYED then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	end
 end
@@ -810,32 +821,41 @@ function MatchGroupInputUtil.placementFromWinner(status, winner, opponentIndex)
 	return 2
 end
 
+---@param matchFinishedStatus MatchFinishedStatus
+---@return boolean
+function MatchGroupInputUtil.matchIsFinished(matchFinishedStatus)
+	if matchFinishedStatus == MatchGroupInputUtil.MATCH_FINISHED_STATUS.MANUAL_INPUT_NOT_FINISHED or
+		matchFinishedStatus == MatchGroupInputUtil.MATCH_FINISHED_STATUS.ASSUMED_NOT_FINISHED then
+
+		return false
+	end
+	return true
+end
+
 ---@param match table
 ---@param maps table[]
 ---@param opponents {score: integer?}[]
----@return boolean
-function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
+---@return MatchFinishedStatus
+function MatchGroupInputUtil.getMatchFinishedStatus(match, maps, opponents)
 	if MatchGroupInputUtil.isNotPlayed(match.winner, match.finished) then
-		return true
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.IS_NOT_PLAYED
 	end
 
 	local finished = Logic.readBoolOrNil(match.finished)
-	if finished ~= nil then
-		return finished
+	if finished == true then
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.MANUAL_INPUT_FINISHED
+	elseif finished == false then
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.MANUAL_INPUT_NOT_FINISHED
 	end
 
 	-- If a winner has been set
 	if Logic.isNotEmpty(match.winner) then
-		return true
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.HAS_WINNER
 	end
 
 	-- If special status has been applied to a team
 	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
-		return true
-	end
-
-	if not MatchGroupInputUtil.hasScore(opponents) then
-		return false
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.HAS_SPECIAL_STATUS
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
@@ -847,16 +867,18 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 		return NOW > (record.timestamp + longLiveTime)
 	end
 	if (#maps > 0 and Array.all(maps, recordLiveLongEnough)) or (#maps == 0 and recordLiveLongEnough(match)) then
-		return true
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.ASSUMED_FINISH_TIME
 	end
 
 	local bestof = match.bestof
 	if not bestof then
-		return false
+		return MatchGroupInputUtil.MATCH_FINISHED_STATUS.ASSUMED_NOT_FINISHED
 	end
 	-- TODO: Investigate if bestof = 0 needs to be handled
 
-	return MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
+	local isBestOfReached = MatchGroupInputUtil.majorityHasBeenWon(bestof, opponents)
+	return isBestOfReached and MatchGroupInputUtil.MATCH_FINISHED_STATUS.BESTOF_REACHED
+		or MatchGroupInputUtil.MATCH_FINISHED_STATUS.ASSUMED_NOT_FINISHED
 end
 
 ---@param map {winner: string|nil, finished: string?, bestof: integer?}
@@ -1154,10 +1176,14 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 		}, autoScoreFunction)
 	end)
 
-	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
+	local finishedStatus = MatchGroupInputUtil.getMatchFinishedStatus(match, games, opponents)
+	match.finished = MatchGroupInputUtil.matchIsFinished(finishedStatus)
+
+	if finishedStatus ~= MatchGroupInputUtil.MATCH_FINISHED_STATUS.ASSUMED_NOT_FINISHED then
+		match.status = MatchGroupInputUtil.getMatchStatus(finishedStatus)
+	end
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
@@ -1379,11 +1405,16 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	end)
 
 	match.finished = Parser.matchIsFinished and Parser.matchIsFinished(match, opponents)
-		or MatchGroupInputUtil.matchIsFinished(match, games, opponents)
+		or MatchGroupInputUtil.getMatchFinishedStatus(match, games, opponents)
+
+	local finishedStatus = MatchGroupInputUtil.getMatchFinishedStatus(match, games, opponents)
+	match.finished = MatchGroupInputUtil.matchIsFinished(finishedStatus)
+
+	if finishedStatus ~= MatchGroupInputUtil.MATCH_FINISHED_STATUS.ASSUMED_NOT_FINISHED then
+		match.status = MatchGroupInputUtil.getMatchStatus(finishedStatus)
+	end
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = placementOfOpponents[opponentIndex]
