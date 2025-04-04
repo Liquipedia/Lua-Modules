@@ -1,11 +1,12 @@
 import { SourceNode } from 'source-map';
 import ts from 'typescript';
+import * as path from 'path';
 import * as tstl from 'typescript-to-lua';
 
 const WIKIS_DIR = '/lua/wikis/';
 const LUA_IMPORTS = `local Lua = require('Module:Lua')\nlocal WidgetFactory = Lua.import('Module:Widget/Factory')\n`;
 const LUALIB_BUNDLE = 'lualib_bundle';
-const LUALIB_BUNDLE_WIKI = `Module:TSTL/LuaLibBundle`;
+const LUALIB_BUNDLE_WIKI = `TSTL/LuaLibBundle`;
 
 class CustomPrinter extends tstl.LuaPrinter {
 	printCallExpression(expression: tstl.CallExpression): SourceNode {
@@ -76,8 +77,10 @@ const plugin: tstl.Plugin = {
 					`Lua.import("${LUALIB_BUNDLE_WIKI}")`
 				);
 			} else {
-				// TODO: Move to a dir that is deployed
-				console.log(file.outputPath);
+				// Defaults to the root directory, but we want to put it in the lua folder
+				const outputDir = path.dirname(file.outputPath);
+				const outputFileName = path.basename(file.outputPath);
+				file.outputPath = path.join(outputDir, WIKIS_DIR, outputFileName);
 			}
 		}
 	},
