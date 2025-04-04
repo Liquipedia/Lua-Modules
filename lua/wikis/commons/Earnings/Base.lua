@@ -14,7 +14,7 @@ local Lpdb = require('Module:Lpdb')
 local MathUtils = require('Module:MathUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
@@ -108,9 +108,9 @@ function Earnings.calculateForTeam(args)
 	local queryTeams = {}
 	if Logic.readBool(args.queryHistorical) then
 		for _, team in pairs(teams) do
-			local historicalNames = Team.queryHistoricalNames(team)
+			local historicalNames = TeamTemplate.queryHistoricalNames(team)
 
-			if not historicalNames then
+			if Logic.isEmpty(historicalNames) then
 				return 0
 			end
 

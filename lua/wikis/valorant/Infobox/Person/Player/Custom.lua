@@ -16,7 +16,7 @@ local Page = require('Module:Page')
 local Region = require('Module:Region')
 local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
@@ -188,7 +188,7 @@ end
 ---@return string?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+		local teamPage = TeamTemplate.getPageName(self.args.team)
 		return
 			tostring(MatchTicker.player{recentLimit = 3}) ..
 			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
