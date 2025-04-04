@@ -613,7 +613,7 @@ end
 function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
-	elseif opponents and not MatchGroupInputUtil.hasScore(opponents) then
+	elseif opponents and not winnerInput and not MatchGroupInputUtil.hasScore(opponents) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	end
 end
