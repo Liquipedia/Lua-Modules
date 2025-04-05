@@ -2,7 +2,7 @@
 
 userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
 
-declare -A loggedin
+. ./scripts/login_and_get_token.sh
 
 if [[ -n "$1" ]]; then
   files=$1
@@ -14,32 +14,6 @@ fi
 
 wikiApiUrl="${WIKI_BASE_URL}/commons/api.php"
 ckf="cookie_commons.ck"
-# Login
-echo "...logging in on commons"
-loginToken=$(
-  curl \
-    -s \
-    -b "$ckf" \
-    -c "$ckf" \
-    -d "format=json&action=query&meta=tokens&type=login" \
-    -H "User-Agent: ${userAgent}" \
-    -H 'Accept-Encoding: gzip' \
-    -X POST "$wikiApiUrl" \
-    | gunzip \
-    | jq ".query.tokens.logintoken" -r
-)
-curl \
-  -s \
-  -b "$ckf" \
-  -c "$ckf" \
-  --data-urlencode "lgname=${WIKI_USER}" \
-  --data-urlencode "lgpassword=${WIKI_PASSWORD}" \
-  --data-urlencode "lgtoken=${loginToken}" \
-  -H "User-Agent: ${userAgent}" \
-  -H 'Accept-Encoding: gzip' \
-  -X POST "${wikiApiUrl}?format=json&action=login" \
-  | gunzip \
-  > /dev/null
 
 allDeployed=true
 changesMade=false
@@ -60,18 +34,7 @@ for file in $files; do
   echo "...page = $page"
 
   # Edit page
-  editToken=$(
-    curl \
-      -s \
-      -b "$ckf" \
-      -c "$ckf" \
-      -d "format=json&action=query&meta=tokens" \
-      -H "User-Agent: ${userAgent}" \
-      -H 'Accept-Encoding: gzip' \
-      -X POST "$wikiApiUrl" \
-      | gunzip \
-      | jq ".query.tokens.csrftoken" -r
-  )
+  getToken "commons"
   rawResult=$(
     curl \
       -s \
@@ -82,7 +45,7 @@ for file in $files; do
       --data-urlencode "summary=Git: ${gitDeployReason}" \
       --data-urlencode "bot=true" \
       --data-urlencode "recreate=true" \
-      --data-urlencode "token=${editToken}" \
+      --data-urlencode "token=${token}" \
       -H "User-Agent: ${userAgent}" \
       -H 'Accept-Encoding: gzip' \
       -X POST "${wikiApiUrl}?format=json&action=edit" \
