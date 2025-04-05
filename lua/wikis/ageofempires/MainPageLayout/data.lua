@@ -9,15 +9,13 @@
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	usefulArticles = {
@@ -58,20 +56,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -81,9 +66,9 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays=21,
-			modifierTier1=42,
-			completedDays=14,
+			upcomingDays = 21,
+			modifierTier1 = 42,
+			completedDays = 14,
 			displayGameIcons = true
 		},
 		padding = true,
@@ -97,18 +82,18 @@ return {
 		darkmode = 'Age of Empires logo allmode.png',
 	},
 	metadesc = 'The Age of Empires esports wiki covering everything from tournaments, maps,' ..
-        ' to competitive players, teams and transfers.',
+		' to competitive players, teams and transfers.',
 	title = 'Age of Empires',
 	navigation = {
-        {
-            file = 'Hera Dreamhack Hannover 2022.jpg',
-            title = 'Players',
-            link = 'Portal:Players',
-            count = {
-                method = 'LPDB',
-                table = 'player',
-            },
-        },
+		{
+			file = 'Hera Dreamhack Hannover 2022.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
+			count = {
+				method = 'LPDB',
+				table = 'player',
+			},
+		},
 		{
 			file = 'GamerLegion Team 2025.jpg',
 			title = 'Teams',
@@ -165,7 +150,7 @@ return {
 						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
-                    {
+					{
 						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
@@ -211,15 +196,15 @@ return {
 					},
 				},
 			},
-            {
-                size = 12,
-                children = {
-                    {
-                        mobileOrder = 5,
-                        content = CONTENT.usefulArticles,
-                    }
-                },
-            }
+			{
+				size = 12,
+				children = {
+					{
+						mobileOrder = 5,
+						content = CONTENT.usefulArticles,
+					}
+				},
+			}
 		},
 	},
 }
