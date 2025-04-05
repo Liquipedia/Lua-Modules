@@ -9,8 +9,8 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local ResultsTable = Lua.import('Module:ResultsTable', {requireDevIfEnabled = true})
-local AwardsTable = Lua.import('Module:ResultsTable/Award', {requireDevIfEnabled = true})
+local ResultsTable = Lua.import('Module:ResultsTable')
+local AwardsTable = Lua.import('Module:ResultsTable/Award')
 
 local CustomResultsTable = {}
 
