@@ -85,6 +85,7 @@ function Patch:createInfobox()
 
 	if Namespace.isMain() and not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		self:categories(self:getInformationType(args))
+		self:categories(unpack(self:getWikiCategories(args)))
 		self:setLpdbData(args)
 	end
 
@@ -125,6 +126,14 @@ end
 ---@return string
 function Patch:getInformationType(args)
 	return args.informationType or 'Patch'
+end
+
+--- Allows for overriding this functionality
+---@protected
+---@param args table
+---@return string[]
+function Patch:getWikiCategories(args)
+	return {}
 end
 
 --- Allows for overriding this functionality
