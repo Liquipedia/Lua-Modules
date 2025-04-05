@@ -33,7 +33,7 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPatch.run(frame)
 	local patch = CustomPatch(frame)
-	patch.gameIdentifier = Game.toIdentifier{game = patch.args.game, useDefault = true}
+	patch.gameIdentifier = Game.toIdentifier{game = patch.args.game, useDefault = false}
 	patch.wiki = patch.gameIdentifier or 'csgo'
 	patch.gameData = Game.raw{game = patch.gameIdentifier, useDefault = false}
 	patch:setWidgetInjector(CustomInjector(patch))
