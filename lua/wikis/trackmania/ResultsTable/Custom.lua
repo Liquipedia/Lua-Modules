@@ -16,7 +16,7 @@ local CustomResultsTable = {}
 
 -- Template entry point for results and achievements tables
 function CustomResultsTable.results(args)
-	args.hideresult = true	
+	args.hideresult = true
 	return ResultsTable(args):create():build()
 end
 
