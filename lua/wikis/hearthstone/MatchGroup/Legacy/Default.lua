@@ -63,12 +63,6 @@ function MatchGroupLegacyDefault:getMap()
 	}
 end
 
----@param isReset boolean
----@param match table
-function MatchGroupLegacyDefault:handleFinished(isReset, match)
-	match.finished = Logic.readBool(match.finished) or Logic.isNotEmpty(match.win)
-end
-
 ---@param isReset boolean?
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
@@ -76,6 +70,7 @@ function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
 end
 
 ---@param frame Frame
+---@return string
 function MatchGroupLegacyDefault.run(frame)
 	return MatchGroupLegacyDefault(frame):build()
 end
