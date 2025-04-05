@@ -351,7 +351,7 @@ local byFactionAoE4 = {
 
 local byFactionAoM = {
 	chinese = {
-		icon = 'File:Chinese AoM icon.png',
+		icon = 'File:Chinese AoM R icon.png',
 	},
 	greeks = {
 		icon = 'File:Greek AoM R icon.png',
@@ -366,7 +366,7 @@ local byFactionAoM = {
 		icon = 'File:Norse AoM R icon.png',
 	},
 	fuxi = {
-		icon = 'File:Fu Xi AoM icon.png',
+		icon = 'File:Fuxi AoM R icon.png',
 	},
 	freyr = {
 		icon = 'File:Freyr AoM R icon.png',
@@ -387,7 +387,7 @@ local byFactionAoM = {
 		icon = 'File:Loki AoM R icon.png',
 	},
 	nuwa = {
-		icon = 'File:Nu Wa AoM icon.png',
+		icon = 'File:Nuwa AoM R icon.png',
 	},
 	odin = {
 		icon = 'File:Odin AoM R icon.png',
@@ -405,7 +405,7 @@ local byFactionAoM = {
 		icon = 'File:Set AoM R icon.png',
 	},
 	shennong = {
-		icon = 'File:Shennong AoM icon.png',
+		icon = 'File:Shennong AoM R icon.png',
 	},
 	thor = {
 		icon = 'File:Thor AoM R icon.png',
