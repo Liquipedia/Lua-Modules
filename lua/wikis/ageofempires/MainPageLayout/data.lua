@@ -81,9 +81,8 @@ local CONTENT = {
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays=21,
-			modifierTier1=42,
-			completedDays=14,
+			upcomingDays = 30,
+			completedDays = 20,
 			displayGameIcons = true
 		},
 		padding = true,
@@ -93,8 +92,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Age of Empires default allmode.png',
-		darkmode = 'Age of Empires default allmode.png',
+		lightmode = 'Age of Empires logo allmode.png',
+		darkmode = 'Age of Empires logo allmode.png',
 	},
 	metadesc = 'The Age of Empires esports wiki covering everything from tournaments, maps,' ..
         ' to competitive players, teams and transfers.',
@@ -110,7 +109,7 @@ return {
             },
         },
 		{
-			file = 'Aussie Drongo RBWL 2022.jpg',
+			file = 'GamerLegion Team 2025.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -119,7 +118,7 @@ return {
 			},
 		},
 		{
-			file = 'Artosis Nili Dave Dreamhack Hannover 2022.jpg',
+			file = 'Stage at The Garrison.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -128,7 +127,7 @@ return {
 			},
 		},
 		{
-			file = 'Villese RBWL.jpg',
+			file = 'Yo vs ACCM at The Garrison.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -137,12 +136,17 @@ return {
 			},
 		},
 		{
-			file = 'Aussie Drongo RBWL 2022.jpg',
-			title = 'Recent Results',
-			link = 'Recent Results',
+			file = 'Age of Empires 2 DE The Mountain Royals key art.jpg',
+			title = 'Civilizations',
+			link = 'Portal:Civilizations',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::civ]]'
+			}
 		},
 		{
-			file = 'Age of Empires 2 DE The Mountain Royals key art.jpg',
+			file = 'JorDan at The Garrison.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
