@@ -13,8 +13,6 @@ local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
-
 ---@class TarkovArenaInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -23,7 +21,6 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
-	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto.results{convertrole = true}
 
