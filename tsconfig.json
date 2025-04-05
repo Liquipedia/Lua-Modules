@@ -1,0 +1,35 @@
+{
+	"$schema": "https://raw.githubusercontent.com/TypeScriptToLua/TypeScriptToLua/master/tsconfig-schema.json",
+	"compilerOptions": {
+		"target": "ESNext",
+		"lib": ["ESNext"],
+		"jsx": "react",
+		"jsxFactory": "WidgetFactory.createElement",
+		"jsxFragmentFactory": "WidgetFactory.Fragment",
+		"types": ["@typescript-to-lua/language-extensions"],
+		"moduleResolution": "Node",
+		"strict": true,
+		"noImplicitAny": true,
+		"noImplicitThis" : true,
+		"baseUrl": "lua/wikis",
+		"paths": {
+			"@commons/*": ["commons/*"],
+		}
+	},
+	"include": ["lua/wikis"],
+	"exclude": ["lua/plugins"],
+	"tstl": {
+		"luaTarget": "5.1",
+		"noImplicitGlobalVariables": true,
+		"noImplicitSelf": true,
+		"noHeader": true,
+		"luaLibImport": "require-minimal",
+		"sourceMapTraceback": true,
+		"luaPlugins": [
+			{ "name": "./lua/plugins/tstl.ts" },
+		],
+		"noResolvePaths": [
+			"Module:Lua"
+		]
+	}
+}

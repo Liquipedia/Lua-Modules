@@ -4,12 +4,18 @@ module.exports = function( grunt ) {
 	grunt.loadNpmTasks( 'grunt-stylelint' );
 
 	grunt.initConfig( {
+		/**
+		 * @TODO: Add support for javascript subdirectory again
+		 * Upsteam eslint config does not support eslint v9 yet
+		 * Tracking ticket https://github.com/wikimedia/eslint-config-wikimedia/issues/563
+		**/
 		eslint: {
 			options: {
-				fix: grunt.option( 'fix' )
+				fix: grunt.option( 'fix' ),
+				overrideConfigFile: 'eslint.config.mjs',
 			},
-			all: [
-				'javascript/**/*.{js,json,vue}'
+			src: [
+				'lua/wikis/**/*.{ts,tsx}'
 			]
 		},
 		stylelint: {
@@ -23,5 +29,5 @@ module.exports = function( grunt ) {
 	} );
 
 	grunt.registerTask( 'main', [ 'eslint', 'stylelint' ] );
-	grunt.registerTask( 'default', 'test' );
+	grunt.registerTask( 'default', 'main' );
 };

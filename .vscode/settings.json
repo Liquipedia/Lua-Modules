@@ -18,5 +18,18 @@
 		"**/wikis/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname}/${filename}",
 		"**/wikis/*/*/*/*/*.lua": "${dirname(-4)}: ${dirname(-5)}/${dirname(-6)}/${dirname}/${filename}",
 		"**/*.lua": "${dirname}: ${filename}"
-	}
+	},
+	"eslint.workingDirectories": [ "./lua", "./javascript" ],
+	"eslint.lintTask.enable": true,
+	"[typescript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true,
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"editor.formatOnSave": true,
+	},
+	"[less]": {
+		"editor.defaultFormatter": "stylelint.vscode-stylelint"
+	},
 }
