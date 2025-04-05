@@ -56,7 +56,9 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = MatchTicker{},
+		body = MatchTicker{
+			matchesPortal = 'Liquipedia:Upcoming_and_ongoing_matches'
+		},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
