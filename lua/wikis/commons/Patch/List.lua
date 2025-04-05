@@ -57,8 +57,10 @@ local COLUMNS = {
 		header = {'Version'},
 		width = '280px',
 		row = function(patch, isLatestPatch)
-			if Logic.isEmpty(patch.extradata.version) then return {} end
-			local rawVersion = patch.extradata.version:gsub('%(', '|'):gsub('%)', '|')
+			-- the later and the nilIfEmpty wrapper can be kicked once all wikis switched to standardized infobox patch
+			local versionStorage = Logic.nilIfEmpty(patch.information) or patch.extradata.version
+			if Logic.isEmpty(versionStorage) then return {} end
+			local rawVersion = versionStorage:gsub('%(', '|'):gsub('%)', '|')
 			local versions = Array.parseCommaSeparatedString(rawVersion, '|')
 			return {
 				B{children = {versions[1] or ''}},
