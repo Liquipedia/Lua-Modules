@@ -88,7 +88,7 @@ return {
 	title = 'Age of Empires',
 	navigation = {
 		{
-			file = 'Hera Dreamhack Hannover 2022.jpg',
+			file = 'Baltune at The Garrison.jpg',
 			title = 'Players',
 			link = 'Portal:Players',
 			count = {
