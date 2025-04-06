@@ -40,7 +40,11 @@ end
 
 ---@param timezone string?
 ---@return string?
+---@overload fun(timezone: table): string?
 function Timezone.getTimezoneString(timezone)
+	if type(timezone) == 'table' then
+		timezone = timezone[1]
+	end
 	local timezoneData = Timezone.getTimezoneData(timezone)
 	if not timezoneData then
 		return

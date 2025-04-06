@@ -645,7 +645,11 @@ end
 ---@param variant string?
 ---@param fallbackToBase boolean? #defaults to true
 ---@return string
+---@overload fun(platform: table): string
 function Links.makeFullLink(platform, id, variant, fallbackToBase)
+	if type(platform) == 'table' then
+		platform, id, variant, fallbackToBase = platform[1], platform[2], platform[3], platform[4]
+	end
 	if id == nil or id == '' then
 		return ''
 	end
