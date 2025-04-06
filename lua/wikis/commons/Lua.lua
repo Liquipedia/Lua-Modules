@@ -128,7 +128,7 @@ function Lua.invoke(frame)
 
 	-- idealy would remove frame.args.module and frame.args.fn
 	-- but due to how frame.args behaves this is not possible without having negative impact on the performance
-	-- todo: solve this issue once Class.export has been removed everywhere
+	-- or causing other issues
 
 	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
