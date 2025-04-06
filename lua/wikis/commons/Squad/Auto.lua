@@ -65,6 +65,7 @@ end)
 ---@field type SquadType
 ---@field title string?
 ---@field teams string[]?
+---@field roles {excluded: string[], included: string[]}
 
 ---@enum TransferType
 SquadAuto.TransferType = {
@@ -87,6 +88,31 @@ SquadAuto.TransferType = {
 ---@field fromRole string?
 ---@field toTeam string?
 ---@field toRole string?
+---@field faction string?
+
+local DEFAULT_INCLUDED_ROLES = {
+    [SquadUtils.SquadType.PLAYER] = {
+        '',
+        'Loan',
+        'Substitute',
+        'Trial',
+        'Stand-in',
+        'Uncontracted'
+    },
+    [SquadUtils.SquadType.STAFF] = {},
+}
+
+local DEFAULT_EXCLUDED_ROLES = {
+    [SquadUtils.SquadType.PLAYER] = {},
+    [SquadUtils.SquadType.STAFF] = {
+        '',
+        'Loan',
+        'Substitute',
+        'Trial',
+        'Stand-in',
+        'Uncontracted'
+    },
+}
 
 ---Entrypoint for the automated timelin
 ---TODO: Implement in submodule
@@ -113,11 +139,16 @@ end
 ---Parses the args into a SquadAutoConfig
 function SquadAuto:parseConfig()
     local args = self.args
+    local type = SquadUtils.TypeToSquadType[(args.type or ''):lower()]
     self.config = {
         team = args.team or mw.title.getCurrentTitle().text,
         status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()],
-        type = SquadUtils.TypeToSquadType[(args.type or ''):lower()],
-        title = args.title -- TODO: Switch to Former players instead of squad?
+        type = type,
+        title = args.title, -- TODO: Switch to Former players instead of squad?
+        roles = {
+            included = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.roles)) or DEFAULT_INCLUDED_ROLES[type],
+            excluded = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.not_roles)) or DEFAULT_EXCLUDED_ROLES[type],
+        }
     }
     if args.timeline then
         self.manualTimeline = self:readManualTimeline()
@@ -134,6 +165,14 @@ function SquadAuto:parseConfig()
     if self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
         error("SquadStatus 'FORMER_INACTIVE' is not supported by SquadAuto.")
     end
+
+    if self.config.status == SquadUtils.SquadStatus.INACTIVE then
+        table.insert(self.config.roles.included, 'Inactive')
+    else
+        table.insert(self.config.roles.excluded, 'Inactive')
+    end
+
+    mw.logObject(self.config)
 end
 
 function SquadAuto:readManualPlayers()
@@ -246,6 +285,7 @@ function SquadAuto:queryTransfers()
                 -- Other
                 wholeTeam = Logic.readBool(record.wholeteam),
                 position = record.extradata.position,
+                faction = record.extradata.faction
             }
 
             -- TODO: Skip this transfer if there is no relevant change
@@ -282,16 +322,40 @@ end
 ---comment
 ---@return table
 function SquadAuto:selectEntries()
-    return Array.flatMap(
-        Array.extractValues(self.playersTeamHistory),
-        FnUtil.curry(self._selectHistoryEntries, self)
+    return Array.filter(
+        Array.flatMap(
+            Array.extractValues(self.playersTeamHistory),
+            FnUtil.curry(self._selectHistoryEntries, self)
+        ),
+        ---@param entry SquadAutoPerson
+        function(entry)
+            local result = (
+                Logic.isEmpty(self.config.roles.included)
+                or Array.any(
+                    self.config.roles.included,
+                    FnUtil.curry(Operator.eq, entry.thisTeam.role)
+                )
+            ) and (
+                Logic.isEmpty(self.config.roles.excluded)
+                or Array.all(
+                    self.config.roles.excluded,
+                    FnUtil.curry(Operator.neq, entry.thisTeam.role)
+                )
+            )
+
+            if not result then
+                mw.logObject(entry, "Not included")
+            end
+
+            return result
+        end
     )
 end
 
 ---Returns a function that maps a set of transfers to a list of 
 ---SquadAutoPersons.
----Behavior depends on the current config:
----If the status is (in)active, then at most one entry will be returned
+---Behavior depends on therent config:
+---If the status is (inive, then at most one entry will be returned
 ---If the status is former(_inactive), there might be multiple entries returned
 ---If the type does not match, no entries are returned
 ---@param entries TeamHistoryEntry[]
@@ -321,6 +385,7 @@ function SquadAuto:_selectHistoryEntries(entries)
                 else
                     mw.log("Invalid transfer history for player " .. entry.pagename)
                     mw.logObject(entry, "Invalid entry: Missing previous JOIN. Skipping")
+                    mw.ext.TeamLiquidIntegration.add_category('SquadAuto with invalid player history')
                 end
                 return
             end
@@ -363,19 +428,22 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
         thisTeam = {
             --TODO
             team = joinEntry.toTeam,
-            role = joinEntry.toRole
+            role = joinEntry.toRole,
+            position = joinEntry.position
         },
         oldTeam = {
             --TODO
             team = joinEntry.fromTeam,
-            role = joinEntry.fromRole
+            role = joinEntry.fromRole,
         },
         newTeam = {
             team = leaveEntry.toTeam,
-            role = leaveEntry.toRole
+            role = leaveEntry.toRole,
         },
 
-        faction = '' --TODO
+        -- From legacy: Prefer leaveEntry faction information
+        faction = leaveEntry.faction or joinEntry.faction,
+        race = leaveEntry.faction or joinEntry.faction
     }
 
     if leaveEntry and not entry.newTeam then
