@@ -343,7 +343,7 @@ function MediaList._displayTeam(subject, date)
 	if not team then
 		return
 	end
-	return TeamInline{ teamTemplate = TeamTemplate.getRaw(team, date), displayType = 'icon' }
+	return TeamInline{ name = team, date = date, displayType = 'icon' }
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
