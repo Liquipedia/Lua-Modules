@@ -82,6 +82,7 @@ local VRS_REGIONS = {
 ---@class ValveOperationalRequirementsDataVrsData
 ---@field standings string?
 ---@field filtering string?
+---@field startingRank integer?
 ---@field date string?
 ---@field link string?
 ---@field ref string?
@@ -193,8 +194,11 @@ function ValveOperationalRequirementsTable._makeVrsDisplay(vrsData)
 		return
 	end
 	local displayString = vrsRegion.displayName
+	if Logic.isNotEmpty(vrsData.startingRank) and vrsData.startingRank ~= 1 then
+		displayString = displayString .. ' <i>(Starting at #' .. vrsData.startingRank .. ')</i>'
+	end
 	if Logic.isNotEmpty(vrsData.filtering) then
-		displayString = displayString .. '<br/>' .. '<i>(Filtered: ' .. vrsData.filtering .. ')'
+		displayString = displayString .. '<br/>' .. '<i>(Filtered: ' .. vrsData.filtering .. ')</i>'
 	end
 	return displayString
 end
@@ -346,6 +350,7 @@ function ValveOperationalRequirementsTable._getData(args)
 		vrsData = {
 			standings = vrsRegionData.name,
 			filtering = Logic.emptyOr(args.vrsFilter),
+			startingRank = tonumber(Logic.emptyOr(args.vrsStartingRank, 1)),
 			date = vrsDate,
 			link = ValveOperationalRequirementsTable._makeVrsLink(vrsRegionData.githubFilePrefix, vrsDate),
 			ref = Logic.emptyOr(args.vrsRef)
