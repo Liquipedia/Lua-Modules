@@ -370,7 +370,7 @@ end
 
 ---@param data ValveOperationalRequirementsData
 function ValveOperationalRequirementsTable._storeLpdbData(data)
-	if not Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
+	if Logic.readBool(Variables.varDefault('disable_LPDB_storage')) then
 		return
 	end
 	local tournamentParent = Variables.varDefault('tournament_parent')
