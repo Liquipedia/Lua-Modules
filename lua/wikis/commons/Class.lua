@@ -135,6 +135,9 @@ function Class._frameToArgs(frame, options)
 	for key, value in pairs(args) do
 		if type(key) == 'number' then
 			indexedArgs[key] = value
+		elseif key == 'module' or key == 'fn' then
+			-- Do not pass reserved arguments
+			-- Used by Lua.invoke
 		else
 			namedArgs[key] = value
 		end

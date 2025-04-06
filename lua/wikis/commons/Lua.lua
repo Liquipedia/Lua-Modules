@@ -127,11 +127,6 @@ function Lua.invoke(frame)
 		'Lua.invoke: Module name should not begin with \'Module:\''
 	)
 
-	local newArgs = Table.copy(frame.args)
-	newArgs.module = nil
-	newArgs.fn = nil
-	frame.args = newArgs
-
 	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
 		while currentFrame do
