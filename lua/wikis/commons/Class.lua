@@ -138,7 +138,7 @@ function Class._frameToArgs(frame, options)
 		elseif key == 'module' or key == 'fn' or key == 'dev' then
 			-- Do not pass reserved arguments
 			-- Used by Lua.invoke
-			-- luacheck: ignore empty block (Loop can be executed at most once)
+			-- luacheck: ignore 542 (Empty if block)
 		else
 			namedArgs[key] = value
 		end
