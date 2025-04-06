@@ -9,10 +9,10 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local TiebreakerInteface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
 ---@class TiebreakerMatchWinRate : StandingsTiebreaker
-local TiebreakerMatchWinRate = Class.new(TiebreakerInteface)
+local TiebreakerMatchWinRate = Class.new(TiebreakerInterface)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
