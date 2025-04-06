@@ -26,6 +26,7 @@ local DataTable = Widgets.DataTable
 local Div = WidgetsHtml.Div
 local Span = WidgetsHtml.Span
 local Abbr = WidgetsHtml.Abbr
+local Hr = WidgetsHtml.Hr
 local Tr = WidgetsHtml.Tr
 local Th = WidgetsHtml.Th
 local Td = WidgetsHtml.Td
@@ -34,7 +35,6 @@ local ValveOperationalRequirementsTable = {}
 
 local DEFAULT_VALUE = '&mdash;'
 local DITTO_VALUE = '&#12291;'
-local HORIZONTAL_LINE = '<hr/>'
 
 local VALID_ADDITIONAL_INFO_TYPES = {'announcement', 'amendment'}
 local VALVE_GITHUB_URL = 'https://github.com/ValveSoftware/counter-strike'
@@ -106,8 +106,8 @@ function ValveOperationalRequirementsTable.make(frame)
 		Tr{
 			children = {
 				Th{children = {'Additional Information'}},
-				Td{children = {Logic.emptyOr(table.concat(additionalInfoValues, HORIZONTAL_LINE), DEFAULT_VALUE)}},
-				Td{children = {table.concat(additionalInfoRefs, HORIZONTAL_LINE)}},
+				Td{children = Logic.emptyOr(Array.interleave(additionalInfoValues, Hr{}), {DEFAULT_VALUE})},
+				Td{children = Array.interleave(additionalInfoRefs, Hr{})},
 			}
 		},
 		ValveOperationalRequirementsTable._makeTableRow({
