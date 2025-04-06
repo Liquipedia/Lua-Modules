@@ -431,7 +431,7 @@ function CustomLeague:_formatDate(date)
 
 		-- Month and year are known
 	elseif dateParts[3] == UNKNOWN_DATE_PART then
-		return tostring(mw.getContentLanguage():formatDate('F Y', dateParts[1] .. '-' .. dateParts[2] .. '-01'))
+		return mw.getContentLanguage():formatDate('F Y', dateParts[1] .. '-' .. dateParts[2] .. '-01')
 
 		-- All parts known
 	else
