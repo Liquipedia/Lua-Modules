@@ -9,7 +9,6 @@
 local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local StringUtils = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local Lua = {}
 
