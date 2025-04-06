@@ -69,6 +69,7 @@ local VRS_REGIONS = {
 ---@field additionalInfo ValveOperationalRequirementsDataAdditionalInfo[]
 ---@field inviteDate {date: string?, ref: string?}
 ---@field vrsData ValveOperationalRequirementsDataVrsData
+---@field seedingData ValveOperationalRequirementsDataVrsData
 ---@field torVersion {commit: string?, link: string?}
 ---@field exceptions {html: string?, link: string?}
 ---@field tier string?
@@ -95,6 +96,7 @@ function ValveOperationalRequirementsTable.make(frame)
 	local additionalInfoRefs = Array.map(data.additionalInfo,
 		ValveOperationalRequirementsTable._makeAdditionalInfoRef)
 	local vrsDisplay = ValveOperationalRequirementsTable._makeVrsDisplay(data.vrsData)
+	local explicitSeedingDate = data.vrsData.date ~= data.seedingData.date
 
 	local rows = {
 		ValveOperationalRequirementsTable._makeTableRow({
@@ -123,7 +125,7 @@ function ValveOperationalRequirementsTable.make(frame)
 			linkType = 'ref'
 		}),
 		ValveOperationalRequirementsTable._makeTableRow({
-			title = 'Applicable VRS',
+			title = explicitSeedingDate and 'Invitational VRS' or 'Applicable VRS',
 			contents = data.vrsData.date,
 			link = data.vrsData.link,
 			linkType = 'github'
@@ -150,6 +152,15 @@ function ValveOperationalRequirementsTable.make(frame)
 			}
 		}
 	}
+
+	if explicitSeedingDate then
+		table.insert(rows, 6, ValveOperationalRequirementsTable._makeTableRow({
+			title = 'Seeding VRS',
+			contents = data.seedingData.date,
+			link = data.seedingData.link,
+			linkType = 'github'
+		}))
+	end
 
 	ValveOperationalRequirementsTable._storeLpdbData(data)
 
@@ -320,7 +331,7 @@ end
 function ValveOperationalRequirementsTable._getData(args)
 	local vrsRegionData = VRS_REGIONS[args.vrsRegion] or {}
 	local vrsDate = Logic.isNotEmpty(args.vrsDate) and DateExt.toYmdInUtc(args.vrsDate) or nil
-	local vrsLink = ValveOperationalRequirementsTable._makeVrsLink(vrsRegionData.githubFilePrefix, vrsDate)
+	local seedingDate = Logic.isNotEmpty(args.seedingDate) and DateExt.toYmdInUtc(args.seedingDate) or vrsDate
 	local inviteDate = Logic.isNotEmpty(args.inviteDate) and DateExt.toYmdInUtc(args.inviteDate) or nil
 	return {
 		announcement = {
@@ -336,8 +347,14 @@ function ValveOperationalRequirementsTable._getData(args)
 			standings = vrsRegionData.name,
 			filtering = Logic.emptyOr(args.vrsFilter),
 			date = vrsDate,
-			link = vrsLink,
+			link = ValveOperationalRequirementsTable._makeVrsLink(vrsRegionData.githubFilePrefix, vrsDate),
 			ref = Logic.emptyOr(args.vrsRef)
+		},
+		seedingData = {
+			standings = VRS_REGIONS.global.name,
+			date = seedingDate,
+			link = ValveOperationalRequirementsTable._makeVrsLink(VRS_REGIONS.global.githubFilePrefix, seedingDate),
+			ref = Logic.emptyOr(args.seedingRef)
 		},
 		torVersion = {
 			commit = Logic.emptyOr(args.torVersion, 'latest'),
