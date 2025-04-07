@@ -14,9 +14,9 @@ local Lua = require('Module:Lua')
 local Links = require('Module:Links')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
-local Table = require('Module:Table') ---@module 'commons.Table'
+local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local TeamTemplate = require('Module:TeamTemplate') ---@module 'commons.TeamTemplate'
+local TeamTemplate = require('Module:TeamTemplate')
 local VodLink = require('Module:VodLink')
 
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
@@ -84,6 +84,7 @@ function BaseMatchPage:isBestOfOne()
 	return #self.matchData.games == 1
 end
 
+---@protected
 ---@return Html?
 function BaseMatchPage:getCountdownBlock()
 	if self.matchData.timestamp == DateExt.defaultTimestamp then return end
@@ -113,6 +114,7 @@ function BaseMatchPage:_parseLinks()
 	end)
 end
 
+---@protected
 ---@return (string|Html)[]
 function BaseMatchPage:getVods()
 	local vods = Array.map(self.games, function(game, gameIdx)
@@ -145,10 +147,12 @@ function BaseMatchPage.abbreviateNumber(number)
 	return string.format('%.1fK', number / 1000)
 end
 
+---@protected
 function BaseMatchPage:populateGames()
 	error('BaseMatchPage:populateGames() cannot be called directly and must be overridden.')
 end
 
+---@protected
 function BaseMatchPage:populateOpponents()
 	Array.forEach(self.opponents, function(opponent, index)
 		opponent.opponentIndex = index
@@ -167,10 +171,12 @@ function BaseMatchPage:populateOpponents()
 	end)
 end
 
+---@protected
 function BaseMatchPage:getCharacterIcon(character)
 	error('BaseMatchPage:getCharacterIcon() cannot be called directly and must be overridden.')
 end
 
+---@protected
 function BaseMatchPage:makeDisplayTitle()
 end
 
@@ -195,6 +201,7 @@ function BaseMatchPage:render()
 	}
 end
 
+---@protected
 ---@return string|Html|Widget?
 function BaseMatchPage:renderGames()
 	local games = Array.map(Array.filter(self.games, function(game)
@@ -221,12 +228,14 @@ function BaseMatchPage:renderGames()
 	return Tabs.dynamic(tabs)
 end
 
+---@protected
 ---@param game MatchGroupUtilGame
 ---@return string|Html|Widget
 function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
 
+---@protected
 ---@return Widget
 function BaseMatchPage:footer()
 	local vods = self:getVods()
@@ -255,6 +264,7 @@ function BaseMatchPage:footer()
 	}
 end
 
+---@protected
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }
