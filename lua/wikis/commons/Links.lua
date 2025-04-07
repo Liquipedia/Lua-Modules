@@ -648,7 +648,10 @@ end
 ---@overload fun(platform: table): string
 function Links.makeFullLink(platform, id, variant, fallbackToBase)
 	if type(platform) == 'table' then
-		platform, id, variant, fallbackToBase = platform[1], platform[2], platform[3], platform[4]
+		id = platform.id or platform[2]
+		variant = platform.variant or platform[3]
+		fallbackToBase = platform.fallbackToBase or platform[4]
+		platform = platform.platform or platform[1]
 	end
 	if id == nil or id == '' then
 		return ''

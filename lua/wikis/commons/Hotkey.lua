@@ -32,7 +32,7 @@ local SEPERATORS = {
 ---@overload fun(hotkey: table): string
 function Hotkeys.hotkey(hotkey)
 	if type(hotkey) == 'table' then
-		hotkey = hotkey[1]
+		hotkey = hotkey.hotkey or hotkey[1]
 	end
 	return tostring(mw.html.create('span'):addClass('hotkey-key'):wikitext(hotkey or ''))
 end
@@ -45,7 +45,9 @@ end
 ---@overload fun(hotkey1: table): string
 function Hotkeys.hotkey2(hotkey1, hotkey2, seperator)
 	if type(hotkey1) == 'table' then
-		hotkey1, hotkey2, seperator = hotkey1[1], hotkey1[2], hotkey1[3]
+		hotkey2 = hotkey1.hotkey2 or hotkey1[2]
+		seperator = hotkey1.seperator or hotkey1[3]
+		hotkey1 = hotkey1.hotkey or hotkey1[1]
 	end
 	hotkey1 = Hotkeys.hotkey(hotkey1)
 	hotkey2 = Hotkeys.hotkey(hotkey2)

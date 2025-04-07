@@ -196,8 +196,8 @@ end
 ---@overload fun(placement: table): string
 function Placement.get(placement, customText)
 	if type(placement) == 'table' then
-		customText = placement[2]
-		placement = placement[1]
+		customText = placement.customText or placement[2]
+		placement = placement.placement or placement[1]
 	end
 	local raw = Placement.raw(placement)
 	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..

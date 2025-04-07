@@ -43,7 +43,7 @@ end
 ---@overload fun(timezone: table): string?
 function Timezone.getTimezoneString(timezone)
 	if type(timezone) == 'table' then
-		timezone = timezone[1]
+		timezone = timezone.timezone or timezone[1]
 	end
 	local timezoneData = Timezone.getTimezoneData(timezone)
 	if not timezoneData then

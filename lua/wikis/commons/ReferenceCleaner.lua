@@ -15,7 +15,7 @@ local ReferenceCleaner = {}
 ---@overload fun(dateWithRef: table): string
 function ReferenceCleaner.clean(dateWithRef)
 	if type(dateWithRef) == 'table' then
-		dateWithRef = dateWithRef[1]
+		dateWithRef = dateWithRef.input or dateWithRef[1]
 	end
 	if dateWithRef == nil then
 		return ''
