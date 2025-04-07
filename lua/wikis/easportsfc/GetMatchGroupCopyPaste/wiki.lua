@@ -21,22 +21,6 @@ local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local INDENT = WikiCopyPaste.Indent
 
---allowed opponent types on the wiki
-local MODES = {
-	solo = Opponent.solo,
-	team = Opponent.team,
-}
-
---default opponent type (used if the entered mode is not found in the above table)
-local DEFAULT_MODE = Opponent.solo
-
---returns the cleaned opponent type
----@param mode string?
----@return string
-function WikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DEFAULT_MODE
-end
-
 --returns the Code for a Match, depending on the input
 ---@param bestof integer
 ---@param mode string
