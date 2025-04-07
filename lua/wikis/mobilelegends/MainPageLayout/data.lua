@@ -1,21 +1,24 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
+-- wiki=mobilelegends
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	usefulArticles = {
@@ -30,9 +33,20 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = '{{Liquipedia:App}}',
+		boxid = 1505,
+	},
 	transfers = {
 		heading = 'Transfers',
-		body = TransfersList{rumours = true},
+		body = TransfersList{
+			rumours = true,
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
@@ -44,29 +58,38 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1510,
 	},
 	filterButtons = {
 		noPanel = true,
 		body = Div{
 			css = { width = '100%', ['margin-bottom'] = '8px' },
 			children = { FilterButtonsWidget() }
-		}
+		},
 	},
 	matches = {
 		heading = 'Matches',
-		body = MatchTicker{},
+		body = WidgetUtil.collect(
+			MatchTickerContainer{},
+			Div{
+				css = {
+					['white-space'] = 'nowrap',
+					display = 'block',
+					margin = '0 10px',
+					['font-size'] = '15px',
+					['font-style'] = 'italic',
+					['text-align'] = 'center',
+				},
+				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
+			}
+		),
 		padding = true,
 		boxid = 1507,
-		panelAttributes = {
-			['data-switch-group-container'] = 'countdown',
-		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
 		body = TournamentsTicker{
-			upcomingDays = 120,
-			completedDays = 30
+			upcomingDays = 60,
+			completedDays = 45
 		},
 		padding = true,
 		boxid = 1508,
@@ -75,24 +98,15 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'Mobile Legends 2025 full lightmode.svg',
+		darkmode = 'Mobile Legends 2025 full darkmode.svg',
 	},
-	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
-		'to competitive players and teams.',
-	title = 'Overwatch',
+	metadesc = 'The Mobile Legends: Bang Bang (MLBB) esports wiki covering everything from players, teams & transfers, ' ..
+		'to tournaments and results, heroes, equipment, & patches.',
+	title = 'Mobile Legends',
 	navigation = {
 		{
-			file = 'Team Falcons ChiYo at the 2024 Esports World Cup.jpg',
-			title = 'Players',
-			link = 'Portal:Players',
-			count = {
-				method = 'LPDB',
-				table = 'player',
-			},
-		},
-		{
-			file = 'Crazy Raccoon 2024 Esports World Cup Champions.jpg',
+			file = 'RRQ Hoshi at M6 Knockout Stage.jpg',
 			title = 'Teams',
 			link = 'Portal:Teams',
 			count = {
@@ -101,16 +115,16 @@ return {
 			},
 		},
 		{
-			file = 'NTMR Infekted at OWCS 2024 Finals.jpg',
-			title = 'Transfers',
-			link = 'Portal:Transfers',
+			file = 'TLID Aran at M6 Knockout Stage.jpg',
+			title = 'Players',
+			link = 'Portal:Players',
 			count = {
 				method = 'LPDB',
-				table = 'transfer',
+				table = 'player',
 			},
 		},
 		{
-			file = 'OWCS Stockholm 2024 Trophy.jpg',
+			file = 'M6 World Championship Trophy.jpg',
 			title = 'Tournaments',
 			link = 'Portal:Tournaments',
 			count = {
@@ -119,7 +133,26 @@ return {
 			},
 		},
 		{
-			file = 'Overwatch Heroes NavCard image.jpg',
+			file = 'RRQ at M6 World Championship.jpg',
+			title = 'Transfers',
+			link = 'Portal:Transfers',
+			count = {
+				method = 'LPDB',
+				table = 'transfer',
+			},
+		},
+		{
+			file = 'BG Shadow at M5.jpg',
+			title = 'Rumours',
+			link = 'Portal:Rumours',
+		},
+		{
+			file = 'NPFL Zarate at M6 Knockout Stage.jpg',
+			title = 'Statistics',
+			link = 'Portal:Statistics',
+		},
+		{
+			file = 'Layla Energy Gunner Revamp.png',
 			title = 'Heroes',
 			link = 'Portal:Heroes',
 			count = {
@@ -129,13 +162,23 @@ return {
 			},
 		},
 		{
-			file = 'Kings row map.jpg',
-			title = 'Maps',
-			link = 'Portal:Maps',
+			file = 'Item Immortality ML.png',
+			title = 'Equipment',
+			link = 'Portal:Equipment',
 			count = {
 				method = 'LPDB',
 				table = 'datapoint',
-				conditions = '[[type::map]]',
+				conditions = '[[type::item]]',
+			},
+		},
+		{
+			file = 'Layla Energy Gunner Revamp.png',
+			title = 'Patches',
+			link = 'Portal:Patches',
+			count = {
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::patch]]',
 			},
 		},
 	},
@@ -149,12 +192,16 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
+					},
+					{
+						mobileOrder = 7,
+						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
@@ -193,15 +240,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.thisDay,
 					},
-				},
-			},
-			{
-				children = {
 					{
-						mobileOrder = 7,
+						mobileOrder = 4,
 						content = CONTENT.usefulArticles,
 					},
 				},

@@ -34,14 +34,14 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = Array.extend(
 		'{{Match|bestof=' .. bestof,
-		INDENT .. '|date=',
-		INDENT .. '|twitch=|vod=',
+		Logic.readBool(args.date) and INDENT .. '|date=' or nil,
+		Logic.readBool(args.vod) and INDENT .. '|twitch=|vod=' or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
-		Array.map(Array.range(1, bestof), function(mapIndex)
+		Logic.readBool(args.details) and Array.map(Array.range(1, bestof), function(mapIndex)
 			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(mode)
-		end),
+		end) or nil,
 		'}}'
 	)
 

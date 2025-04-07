@@ -820,7 +820,7 @@ function MatchTable:_displayScore(match)
 	---@return Html|string
 	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		local score = opponentRecord.score
+		local score = OpponentDisplay.InlineScore(opponentRecord)
 		local status = opponentRecord.status
 
 		local game1Opponent = gameOpponents[1]

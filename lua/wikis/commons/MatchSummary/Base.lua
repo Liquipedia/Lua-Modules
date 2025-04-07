@@ -399,7 +399,7 @@ function MatchSummary.addVodsToFooter(match, footer)
 	return footer
 end
 
----Creates a match footer with vods if vods are set
+---Creates comments that describe substitute player(s) of the match.
 ---@param match table
 ---@return string?
 function MatchSummary.createSubstitutesComment(match)
