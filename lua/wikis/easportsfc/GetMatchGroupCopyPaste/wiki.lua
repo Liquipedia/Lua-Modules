@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=fifa
+-- wiki=easportsfc
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
