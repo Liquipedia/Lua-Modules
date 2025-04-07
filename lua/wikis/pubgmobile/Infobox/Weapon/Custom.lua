@@ -20,7 +20,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
 
----@class PubgmobilWeaponInfobox: WeaponInfobox
+---@class PubgmobileWeaponInfobox: WeaponInfobox
 local CustomWeapon = Class.new(Weapon)
 local CustomInjector = Class.new(Injector)
 
