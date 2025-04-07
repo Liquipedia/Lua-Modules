@@ -7,92 +7,81 @@
 --
 
 local Array = require('Module:Array')
-local Table = require('Module:Table')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 
---[[
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
-WikiSpecific Code for MatchList and Bracket Code Generators
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
-]]--
+---@class EaSportsFcMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local INDENT = WikiCopyPaste.Indent
 
 --allowed opponent types on the wiki
 local MODES = {
-	['solo'] = 'solo',
-	['team'] = 'team',
+	solo = Opponent.solo,
+	team = Opponent.team,
 }
 
 --default opponent type (used if the entered mode is not found in the above table)
-local DefaultMode = 'solo'
+local DEFAULT_MODE = Opponent.solo
 
 --returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
-	return MODES[string.lower(mode or '')] or DefaultMode
+---@param mode string?
+---@return string
+function WikiCopyPaste.getMode(mode)
+	return MODES[string.lower(mode or '')] or DEFAULT_MODE
 end
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local indent = '    '
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	local showScore = Logic.nilOr(Logic.readBool(args.score), true)
+	local hasSubmatches = Logic.readBool(args.hasSubmatches)
 
-	if bestof == 0 and args.score ~= 'false' then
-		args.score = 'true'
-	end
-
-	local score = args.score == 'true' and '|score=' or nil
 	local lines = Array.extend(
 		'{{Match|finished=',
-		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-		args.hasSubmatches == 'true' and indent .. '|hasSubmatches=1' or nil,
-		args.needsWinner == 'true' and indent .. '|winner=' or nil,
-		args.hasDate == 'true' and {indent .. '|date=', indent .. '|youtube=|twitch='} or {}
+		bestof ~= 0 and (INDENT .. '|bestof=' .. bestof) or nil,
+		hasSubmatches and INDENT .. '|hasSubmatches=1' or nil,
+		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
+		Logic.readBool(args.hasDate) and {INDENT .. '|date=', INDENT .. '|youtube=|twitch='} or {},
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
+		end),
+		Array.map(Array.range(1, bestof), function(mapIndex)
+			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(hasSubmatches)
+		end) or nil,
+		'}}'
 	)
-
-	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score))
-	end
-
-	if bestof ~= 0 then
-		for i = 1, bestof do
-			Array.appendWith(lines,
-				indent .. '|map' .. i .. '={{Map|winner=',
-				indent .. indent .. '|score1= |score2='
-			)
-			if args.hasSubmatches == 'false' then
-				Array.appendWith(lines,
-					indent .. indent .. '|penalty='
-				)
-			end
-			if args.hasSubmatches == 'true' then
-				Array.appendWith(lines,
-					indent .. indent .. '|penaltyScore1= |penaltyScore2=',
-					indent .. indent .. '|t1p1= |t1p2= |t2p1= |t2p2='
-				)
-			end
-			Array.appendWith(lines,
-				indent .. '}}'
-			)
-		end
-	end
-
-	table.insert(lines, '}}')
-
 	return table.concat(lines, '\n')
 end
 
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
-	local out
-
-	if mode == 'solo' then
-		out = '{{SoloOpponent||flag=' .. (score or '') .. '}}'
-	elseif mode == 'team' then
-		out = '{{TeamOpponent|' .. (score or '') .. '}}'
-	elseif mode == 'literal' then
-		out = '{{Literal|}}'
-	end
-
-	return out
+--subfunction used to generate code for the Map template, depending on the type of opponent
+---@private
+---@param hasSubmatches boolean
+---@return string
+function WikiCopyPaste._getMap(hasSubmatches)
+	local lines = Array.extend(
+		'={{Map',
+		INDENT .. INDENT .. '|score1= |score2=',
+		hasSubmatches and {
+			INDENT .. INDENT .. '|penaltyScore1= |penaltyScore2=',
+			INDENT .. INDENT .. '|t1p1= |t1p2= |t2p1= |t2p2='
+		} or {
+			INDENT .. INDENT .. '|penalty='
+		},
+		INDENT .. '}}'
+	)
+	return table.concat(lines, '\n')
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
