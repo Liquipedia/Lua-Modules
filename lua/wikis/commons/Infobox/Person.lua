@@ -61,7 +61,7 @@ local STATUS_TRANSLATE = {
 local BANNED = 'banned' -- Temporary until conversion
 local Roles = Lua.import('Module:Roles')
 local ROLES = Roles.All
-local InGameRoles = Roles.InGameRoles
+local InGameRoles = Roles.InGameRoles or {}
 local ContractRoles = Roles.ContractRoles
 
 ---@class PersonRoleData
@@ -199,7 +199,7 @@ function Person:createInfobox()
 								end
 							end
 
-							if roleKey and InGameRoles[roleKey] then
+							if roleKey and InGameRoles and #InGameRoles > 0 and InGameRoles[roleKey] then
 								table.insert(inGameRoles, roleDisplay)
 							elseif roleKey and ContractRoles[roleKey] then
 								table.insert(contracts, roleDisplay)
