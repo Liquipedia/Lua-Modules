@@ -172,7 +172,7 @@ return {
 			},
 		},
 		{
-			file = 'Layla Energy Gunner Revamp.png',
+			file = 'Estes Moon Elf King Skin.jpg',
 			title = 'Patches',
 			link = 'Portal:Patches',
 			count = {
