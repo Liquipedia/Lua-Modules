@@ -85,8 +85,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Osu simple allmode.png',
-		darkmode = 'Osu simple allmode.png',
+		lightmode = 'Osu! full colour allmode.png',
+		darkmode = 'Osu! full colour allmode.png',
 	},
 	metadesc = 'Comprehensive OSU! wiki with articles covering everything from tournaments, ' ..
 		'to competitive players and teams.',
