@@ -14,7 +14,6 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Eco = Lua.import('Module:ChessEco')
-local FnUtil = Lua.import('Module:FnUtil')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
@@ -70,17 +69,16 @@ function CustomMatchSummary.createBody(match, createGame)
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		--need the match available in map display instead of just the date so we can access the links
-		Array.map(match.games, FnUtil.curry(createGame, match)),
+		Array.map(match.games, createGame),
 		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		CustomMatchSummary._linksTable(match)
 	)}
 end
 
----@param match MatchGroupUtilMatch
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return MatchSummaryRow
-function CustomMatchSummary.createGame(match, game, gameIndex)
+function CustomMatchSummary.createGame(game, gameIndex)
 	return MatchSummaryWidgets.Row{
 		classes = {'brkts-popup-body-game'},
 		css = {padding = '4px'},
@@ -103,7 +101,7 @@ function CustomMatchSummary.createGame(match, game, gameIndex)
 					['line-height'] = '0.75rem',
 					['max-width'] = '200px'
 				},
-				children = CustomMatchSummary._getCenterContent(match, game, gameIndex),
+				children = CustomMatchSummary._getCenterContent(game, gameIndex),
 			},
 
 			-- Player 2
@@ -117,11 +115,10 @@ function CustomMatchSummary.createGame(match, game, gameIndex)
 	}
 end
 
----@param match MatchGroupUtilMatch
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
 ---@return Widget
-function CustomMatchSummary._getCenterContent(match, game, gameIndex)
+function CustomMatchSummary._getCenterContent(game, gameIndex)
 	return Div{
 		children = {
 			Span{
