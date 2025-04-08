@@ -61,8 +61,6 @@ local STATUS_TRANSLATE = {
 local BANNED = 'banned' -- Temporary until conversion
 local Roles = Lua.import('Module:Roles')
 local ROLES = Roles.All
-local InGameRoles = Roles.InGameRoles or {}
-local ContractRoles = Roles.ContractRoles
 
 ---@class PersonRoleData
 ---@field category string
@@ -187,6 +185,9 @@ function Person:createInfobox()
 					local contracts = {}
 					local positions = {}
 
+					local OriginalInGameRoles = Roles.InGameRoles
+					local OriginalContractRoles = Roles.ContractRoles
+
 					for _, roleData in ipairs(self.roles) do
 						local roleDisplay = self:_displayRole(roleData)
 
@@ -199,12 +200,15 @@ function Person:createInfobox()
 								end
 							end
 
-							if roleKey and InGameRoles and type(InGameRoles) == 'table' and InGameRoles[roleKey] then
-								table.insert(inGameRoles, roleDisplay)
-							elseif roleKey and ContractRoles and type(ContractRoles) == 'table' and ContractRoles[roleKey] then
-								table.insert(contracts, roleDisplay)
-							else
-								table.insert(positions, roleDisplay)
+							if roleKey then
+
+								if OriginalInGameRoles and OriginalInGameRoles[roleKey] then
+									table.insert(inGameRoles, roleDisplay)
+								elseif OriginalContractRoles and OriginalContractRoles[roleKey] then
+									table.insert(contracts, roleDisplay)
+								else
+									table.insert(positions, roleDisplay)
+								end
 							end
 						end
 					end
