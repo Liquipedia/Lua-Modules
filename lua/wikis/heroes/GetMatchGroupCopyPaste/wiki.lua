@@ -55,8 +55,8 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	return table.concat(lines, '\n')
 end
 
----@param bestof any
----@param vetoRounds any
+---@param bestof integer
+---@param vetoRounds integer
 ---@return string[]
 function WikiCopyPaste._getVeto(bestof, vetoRounds)
 	local preFilledVetoTypes = string.rep('ban,', vetoRounds)
