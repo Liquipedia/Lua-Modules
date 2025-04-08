@@ -54,11 +54,11 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	for i = 1, opponents do
 		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score))
 	end
-	
+
 	if veto and bestof > 0 then
 		local preFilledVetoTypes = string.rep('ban,', vetoBanRounds)
 			.. string.rep('pick,', bestof - 1) .. 'pick'
-		
+
 		Array.appendWith(lines,
 			indent .. '|mapveto={{MapVeto',
 			indent .. indent .. '|format=By turns',
