@@ -63,7 +63,6 @@ return {
 			short = '?',
 		},
 	},
-
 	tierTypes = {
 		qualifier = {
 			value = 'Qualifier',
