@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
 
 ---@type {specialTemplates: table<string, teamTemplateData>}
 local Data = Lua.import('Module:TeamTemplate/data', {loadData = true})
@@ -91,8 +92,27 @@ does not exist.
 ---@param date string|number?
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
-	team = team:gsub('_', ' '):lower()
-	return Data.specialTemplates[team] or mw.ext.TeamTemplate.raw(team, date)
+	local teamName = team:lower()
+	if Data.specialTemplates[teamName] then
+		return Data.specialTemplates[teamName]
+	end
+	--TODO: cleanup underscore handling when extension starts handling it
+	if mw.ext.TeamTemplate.teamexists(teamName) then
+		return mw.ext.TeamTemplate.raw(teamName, date)
+	elseif mw.ext.TeamTemplate.teamexists(String.trim(teamName)) then
+		mw.log('Trimmed needed on team name: '.. teamName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with trimmed team templates')
+		return mw.ext.TeamTemplte.raw(String.trim(teamName), date)
+	elseif mw.ext.TeamTemplat.teamexists(teamName:gsub('_', ' ')) then
+		mw.log('Underscore in team name: '.. teamName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+		return mw.ext.TeamTemplate.raw((teamName:gsub('_', ' ')), date)
+	elseif mw.ext.TeamTemplate.teamexists(teamName:gsub(' ', '_')) then
+		mw.log('Underscore in team name: '.. teamName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+		return mw.ext.TeamTemplate.raw((teamName:gsub(' ', '_')), date)
+	end
+	return nil
 end
 
 ---Creates error message for missing team templates.
