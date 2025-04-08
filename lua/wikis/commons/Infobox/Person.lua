@@ -199,9 +199,9 @@ function Person:createInfobox()
 								end
 							end
 
-							if roleKey and InGameRoles and #InGameRoles > 0 and InGameRoles[roleKey] then
+							if roleKey and InGameRoles and type(InGameRoles) == 'table' and InGameRoles[roleKey] then
 								table.insert(inGameRoles, roleDisplay)
-							elseif roleKey and ContractRoles[roleKey] then
+							elseif roleKey and ContractRoles and type(ContractRoles) == 'table' and ContractRoles[roleKey] then
 								table.insert(contracts, roleDisplay)
 							else
 								table.insert(positions, roleDisplay)
