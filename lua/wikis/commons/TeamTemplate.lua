@@ -7,9 +7,12 @@
 --
 
 local Array = require('Module:Array')
-local Data = mw.loadData('Module:TeamTemplate/data')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+
+---@type {specialTemplates: table<string, teamTemplateData>}
+local Data = Lua.import('Module:TeamTemplate/data', {loadData = true})
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
