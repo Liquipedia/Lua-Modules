@@ -37,7 +37,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. opponent
 		end),
-		bestof ~= 0 and Array.map(Array.range(1, bestof), WikiCopyPaste._map) or nil,
+		Array.map(Array.range(1, bestof), WikiCopyPaste._map),
 		INDENT .. '}}'
 	)
 
