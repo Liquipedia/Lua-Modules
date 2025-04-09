@@ -34,6 +34,7 @@ function CustomMatchSummary.getByMatchId(props)
 				MatchSummaryWidgets.GamesSchedule{match = match},
 				MatchSummaryWidgets.PointsDistribution{scores = scoringData},
 				MatchSummaryWidgets.Mvp(match.extradata.mvp),
+				MatchSummaryWidgets.Casters(match.extradata.casters),
 				MatchSummaryWidgets.MatchComment{match = match},
 				SummaryHelper.standardMatch(match)
 			)

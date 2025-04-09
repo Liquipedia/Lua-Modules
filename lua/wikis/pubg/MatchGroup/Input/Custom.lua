@@ -66,6 +66,7 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -101,6 +102,15 @@ function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 			return map.opponents[opponentIndex].score or 0
 		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
+end
+
+---@param match table
+---@param map table
+---@param opponents table[]
+function FfaMapFunctions.getExtraData(match, map, opponents)
+	return {
+		casters = MatchGroupInputUtil.readCasters(map, {noSort = true})
+	}
 end
 
 return CustomMatchGroupInput
