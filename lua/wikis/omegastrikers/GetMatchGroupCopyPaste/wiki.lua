@@ -61,7 +61,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function (mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(opponents, args.pickBan, args.mapBestof)
+			return INDENT .. '|map' .. mapIndex .. '=' .. WikiCopyPaste._getMap(opponents, args.pickBan, args.mapBestof)
 		end),
 		'}}'
 	)
@@ -76,7 +76,7 @@ end
 ---@return string
 function WikiCopyPaste._getMap(opponents, pickBan, mapBestOf)
 	local map = Array.extend(
-		'={{Map',
+		'{{Map',
 		INDENT .. INDENT .. '|map=',
 		INDENT .. INDENT .. '|score1=|score2=',
 		Array.flatMap(_CONVERT_PICK_BAN_ENTRY[pickBan or ''] or {}, function (element)
