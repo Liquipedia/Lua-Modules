@@ -319,11 +319,17 @@ local byFactionAoE4 = {
 	holyromanempire = {
 		icon = 'File:HRE AoE4 Icon.png',
 	},
+	houseoflancaster = {
+		icon = 'File:House of Lancaster AoE4 Icon.png',
+	},
 	japanese = {
 		icon = 'File:Japanese AoE4 Icon.png',
 	},
 	jeannedarc = {
 		icon = 'File:Jeanne d\'Arc AoE4 Icon.png',
+	},
+	knightstemplar = {
+		icon = 'File:Knights Templar AoE4 Icon.png',
 	},
 	malians = {
 		icon = 'File:Malians AoE4 Icon.png',
