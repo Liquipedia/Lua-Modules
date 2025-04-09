@@ -22,6 +22,8 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 ---@class SplatoonMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
+local INDENT = WikiCopyPaste.Indent
+
 local VETOES = {
 	[0] = '',
 	'ban,ban,ban,ban,decider',
@@ -38,7 +40,6 @@ local VETOES = {
 --returns the Code for a Match, depending on the input
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapVeto = Logic.readBool(args.mapVeto)
-	local indent = '  '
 
 	if bestof == 0 and Logic.nilOr(Logic.readBool(args.score), true) then
 		args.score = true
@@ -47,50 +48,50 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	local lines = Array.extend(
 		'{{Match',
-		Logic.readBool(args.needsWinner) and indent .. '|winner=' or nil
+		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, displayScore))
+		table.insert(lines, INDENT .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, displayScore))
 	end
 
 	if Logic.readBool(args.hasDate) then
 		Array.appendWith(lines,
-			indent .. '|date=',
-			indent .. '|twitch= |youtube=',
-			indent .. '|mvp='
+			INDENT .. '|date=',
+			INDENT .. '|twitch= |youtube=',
+			INDENT .. '|mvp='
 		)
 	end
 
 	for i = 1, bestof do
-		Array.appendWith(lines, indent .. '|vodgame'.. i ..'=')
+		Array.appendWith(lines, INDENT .. '|vodgame'.. i ..'=')
 	end
 
 	if mapVeto and VETOES[bestof] then
-		table.insert(lines, indent .. '|mapveto={{MapVeto')
-		table.insert(lines, indent .. indent .. '|firstpick=')
-		table.insert(lines, indent .. indent .. '|types=' .. VETOES[bestof])
-		table.insert(lines, indent .. indent .. '|t1map1=|t2map1=')
-		table.insert(lines, indent .. indent .. '|t1map2=|t2map2=')
-		table.insert(lines, indent .. indent .. '|t1map3=|t2map3=')
-		table.insert(lines, indent .. indent .. '|decider=')
-		table.insert(lines, indent .. '}}')
+		table.insert(lines, INDENT .. '|mapveto={{MapVeto')
+		table.insert(lines, INDENT .. INDENT .. '|firstpick=')
+		table.insert(lines, INDENT .. INDENT .. '|types=' .. VETOES[bestof])
+		table.insert(lines, INDENT .. INDENT .. '|t1map1=|t2map1=')
+		table.insert(lines, INDENT .. INDENT .. '|t1map2=|t2map2=')
+		table.insert(lines, INDENT .. INDENT .. '|t1map3=|t2map3=')
+		table.insert(lines, INDENT .. INDENT .. '|decider=')
+		table.insert(lines, INDENT .. '}}')
 	end
 
 	for i = 1, bestof do
 		Array.appendWith(lines,
-			indent .. '|map' .. i .. '={{Map',
-			indent .. indent .. '|map=|maptype=',
-			indent .. indent .. '|t1w1= |t1w2= |t1w3= |t1w4='
+			INDENT .. '|map' .. i .. '={{Map',
+			INDENT .. INDENT .. '|map=|maptype=',
+			INDENT .. INDENT .. '|t1w1= |t1w2= |t1w3= |t1w4='
 		)
 
 		Array.appendWith(lines,
-			indent .. indent .. '|t2w1= |t2w2= |t2w3= |t2w4='
+			INDENT .. INDENT .. '|t2w1= |t2w2= |t2w3= |t2w4='
 		)
 
 		Array.appendWith(lines,
-			indent .. indent .. '|score1=|score2=|winner=',
-			indent .. '}}'
+			INDENT .. INDENT .. '|score1=|score2=|winner=',
+			INDENT .. '}}'
 		)
 	end
 
