@@ -111,7 +111,7 @@ return {
 			},
 		},
 		{
-			file = 'Rainbow Six BLAST Montreal 2024 phase2 (4).jpg',
+			file = 'SadShibaCOE2023_3.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
