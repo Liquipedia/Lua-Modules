@@ -13,12 +13,6 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
---[[
-
-WikiSpecific Code for MatchList and Bracket Code Generators
-
-]]--
-
 ---@class SplatoonMatch2CopyPaste: Match2CopyPasteBase
 local WikiCopyPaste = Class.new(BaseCopyPaste)
 
