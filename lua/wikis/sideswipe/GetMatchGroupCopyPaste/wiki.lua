@@ -55,6 +55,12 @@ end)
 
 --returns the Code for a Match, depending on the input
 --for more customization please change stuff here^^
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local out = tostring(mw.message.new('BracketConfigMatchTemplate'))
 	if out == '⧼BracketConfigMatchTemplate⧽' then

@@ -38,6 +38,12 @@ local VETOES = {
 }
 
 --returns the Code for a Match, depending on the input
+---@param bestof integer
+---@param mode string
+---@param index integer
+---@param opponents integer
+---@param args table
+---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapVeto = Logic.readBool(args.mapVeto)
 
