@@ -39,7 +39,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
 		end),
 		Array.map(Array.range(1, bestof), function(mapIndex)
-			return INDENT .. '|map' .. mapIndex .. WikiCopyPaste._getMap(hasSubmatches)
+			return INDENT .. '|map' .. mapIndex .. '=' .. WikiCopyPaste._getMap(hasSubmatches)
 		end) or nil,
 		'}}'
 	)
@@ -52,7 +52,7 @@ end
 ---@return string
 function WikiCopyPaste._getMap(hasSubmatches)
 	local lines = Array.extend(
-		'={{Map',
+		'{{Map',
 		INDENT .. INDENT .. '|score1= |score2=',
 		hasSubmatches and {
 			INDENT .. INDENT .. '|penaltyScore1= |penaltyScore2=',
