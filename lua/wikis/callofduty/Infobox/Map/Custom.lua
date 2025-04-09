@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
@@ -30,6 +31,12 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param args table
+---@return string[]
+function CustomMap:_getGames(args)
+	return Array.map(self:getAllArgsForBase(args, 'game'), function(game) return Game.name{game = game} end)
+end
+
 ---@param widgetId string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -37,16 +44,16 @@ function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
 
 	if widgetId == 'custom' then
+		local games = self.caller:_getGames(args)
 		return Array.append(
 			widgets,
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Game Version', content = {Game.name{game = args.game}}, options = {makeLink = true}},
+			Cell{name = #games > 1 and 'Game Versions' or 'Game Version', content = games, options = {makeLink = true}},
 			Cell{name = 'Day/Night Variant', content = {args.daynight}},
 			Cell{name = 'Playlists', content = {args.playlist}}
 		)
 	end
-
 	return widgets
 end
 
@@ -56,7 +63,9 @@ end
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.size = args.size
-	lpdbData.extradata.game = Game.name{game = args.game}
+	Table.mergeInto(lpdbData.extradata, Table.map(self:_getGames(args), function(gameIndex, game)
+		return 'game' .. gameIndex, game
+	end))
 	lpdbData.extradata.daynight = args.daynight
 	lpdbData.extradata.playlist = args.playlist
 	return lpdbData

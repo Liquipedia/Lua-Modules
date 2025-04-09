@@ -519,16 +519,16 @@ function mw.message:isBlank() end
 ---@return boolean
 function mw.message:isDisabled() end
 
----@alias namespaceInfo {id: number, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
+---@alias namespaceInfo {id: integer, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
 ---@class Site
 ---@field currentVersion string
 ---@field scriptPath string
 ---@field server string
 ---@field siteName string
----@field namespaces table<number|string, namespaceInfo>
----@field contentNamespaces table<number|string, namespaceInfo>
----@field subjectNamespaces table<number|string, namespaceInfo>
----@field talkNamespaces table<number|string, namespaceInfo>
+---@field namespaces table<integer, namespaceInfo>
+---@field contentNamespaces table<integer, namespaceInfo>
+---@field subjectNamespaces table<integer, namespaceInfo>
+---@field talkNamespaces table<integer, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
 mw.site = {server = 'https://liquipedia.net/wiki/'}
 
@@ -762,21 +762,30 @@ function mw.title:isSubpageOf(title2) end
 ---@param ns string|number
 ---@return boolean
 function mw.title:inNamespace(ns)
-	if ns == 0 then
-		return true
-	end
-	return false
+	-- Currently only supports mocking main namespace as all busted tests are written expecting it
+	return ns == 0
 end
 
 ---Whether this title is in any of the given namespaces.
 ---@param ... string|number
 ---@return boolean
-function mw.title:inNamespaces(...) end
+function mw.title:inNamespaces(...)
+	-- Currently only supports mocking main namespace as all busted tests are written expecting it
+	for _, ns in ipairs(arg) do
+		if ns == 0 then
+			return true
+		end
+	end
+	return false
+end
 
 ---Whether this title's subject namespace is in the given namespace.
 ---@param ns string|number
 ---@return boolean
-function mw.title:hasSubjectNamespace(ns) end
+function mw.title:hasSubjectNamespace(ns)
+	-- Currently only supports mocking main and talk namespace as all busted tests are written expecting it
+	return ns == 0 or ns == 1
+end
 
 ---The same as mw.title.makeTitle( title.namespace, title.text .. '/' .. text ).
 ---@param text string

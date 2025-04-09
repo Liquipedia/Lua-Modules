@@ -46,6 +46,7 @@ local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local BO1_SCORE_CONCAT = '&nbsp;-&nbsp;'
+local SECONDS_ONE_DAY = 3600 * 24
 
 ---@alias MatchTableMode `Opponent.solo` | `Opponent.team`
 
@@ -347,7 +348,8 @@ function MatchTable:buildDateConditions()
 	end
 
 	if timeRange.endDate ~= DateExt.maxTimestamp then
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, DateExt.formatTimestamp('c', timeRange.endDate))}
+		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt,
+			DateExt.formatTimestamp('c', timeRange.endDate + SECONDS_ONE_DAY))}
 	end
 
 	return conditions
@@ -818,7 +820,7 @@ function MatchTable:_displayScore(match)
 	---@return Html|string
 	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		local score = opponentRecord.score
+		local score = OpponentDisplay.InlineScore(opponentRecord)
 		local status = opponentRecord.status
 
 		local game1Opponent = gameOpponents[1]

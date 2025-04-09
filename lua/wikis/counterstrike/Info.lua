@@ -124,6 +124,7 @@ local infoData = {
 			scoreWidth = 26,
 			matchWidth = 200,
 			gameScoresIfBo1 = true,
+			gameNoun = 'map',
 		},
 	},
 }

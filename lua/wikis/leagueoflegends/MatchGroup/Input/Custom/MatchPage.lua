@@ -42,6 +42,8 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	sortPlayersOnRole(map.team1)
 	sortPlayersOnRole(map.team2)
 
+	-- Manually import vod from input
+	map.vod = mapInput.vod
 	return map
 end
 

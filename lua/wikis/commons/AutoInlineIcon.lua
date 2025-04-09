@@ -13,7 +13,7 @@ local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData
 
 local AutoInlineIcon = {}
 
----@param options table
+---@param options {onlyicon: boolean?}
 ---@param category string
 ---@param lookup string
 ---@param extraInfo string?
@@ -64,6 +64,7 @@ function AutoInlineIcon._iconCreator(data)
 			imageLight = data.iconLight,
 			imageDark = data.iconDark,
 			link = data.link,
+			size = Logic.emptyOr(data.size),
 		}
 	elseif data.iconType == 'fa' then
 		local IconFa = require('Module:Widget/Image/Icon/Fontawesome')

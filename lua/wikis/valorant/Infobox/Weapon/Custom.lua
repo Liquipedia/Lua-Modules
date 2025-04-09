@@ -10,26 +10,15 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
+local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local Injector = Lua.import('Module:Widget/Injector')
 local Weapon = Lua.import('Module:Infobox/Weapon')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
-local Span = Widgets.Span
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local CREDS_ICON = Span{
-	css = { ['white-space'] = 'nowrap'},
-	children = {
-		IconImageWidget{
-			imageLight = 'Black_Creds_VALORANT.png',
-			imageDark = 'White_Creds_VALORANT.png',
-			link = 'Creds',
-			size = '10px'
-		}
-	}
-}
+local CREDS_ICON = AutoInlineIcon.display({ onlyicon = true }, 'M', 'creds')
 local FIRE_RATE_UNIT = 'rounds/sec'
 
 ---@class ValorantWeaponInfobox: WeaponInfobox

@@ -30,6 +30,7 @@ function RocketLeagueMatchGroupLegacyDefault:getMap()
 end
 
 ---@param frame Frame
+---@return string
 function RocketLeagueMatchGroupLegacyDefault.run(frame)
 	return RocketLeagueMatchGroupLegacyDefault(frame):build()
 end
