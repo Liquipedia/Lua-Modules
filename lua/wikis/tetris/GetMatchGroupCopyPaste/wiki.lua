@@ -7,15 +7,15 @@
 --
 
 local Array = require('Module:Array')
-local Table = require('Module:Table')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
 
---[[
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
-WikiSpecific Code for MatchList and Bracket Code Generators
+---@class TetrisMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
-]]--
-
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+local INDENT = WikiCopyPaste.Indent
 
 --allowed opponent types on the wiki
 local MODES = {
@@ -27,13 +27,12 @@ local MODES = {
 local DefaultMode = 'solo'
 
 --returns the cleaned opponent type
-function wikiCopyPaste.getMode(mode)
+function WikiCopyPaste.getMode(mode)
 	return MODES[string.lower(mode or '')] or DefaultMode
 end
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
-	local indent = '    '
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 
 	if bestof == 0 and args.score ~= 'false' then
 		args.score = 'true'
@@ -42,13 +41,13 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local score = args.score == 'true' and '|score=' or nil
 	local lines = Array.extend(
 		'{{Match',
-		index == 1 and (indent .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
-		args.needsWinner == 'true' and indent .. '|winner=' or nil,
-		args.hasDate == 'true' and {indent .. '|date=', indent .. '|youtube=|twitch='} or {}
+		index == 1 and (INDENT .. '|bestof=' .. (bestof ~= 0 and bestof or '')) or nil,
+		args.needsWinner == 'true' and INDENT .. '|winner=' or nil,
+		args.hasDate == 'true' and {INDENT .. '|date=', INDENT .. '|youtube=|twitch='} or {}
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, score))
+		table.insert(lines, INDENT .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, score))
 	end
 
 	if bestof ~= 0 then
@@ -63,7 +62,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, score)
+function WikiCopyPaste._getOpponent(mode, score)
 	local out
 
 	if mode == 'solo' then
@@ -77,4 +76,4 @@ function wikiCopyPaste._getOpponent(mode, score)
 	return out
 end
 
-return wikiCopyPaste
+return WikiCopyPaste

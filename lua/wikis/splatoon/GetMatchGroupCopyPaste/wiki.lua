@@ -7,8 +7,11 @@
 --
 
 local Array = require('Module:Array')
+local Class = require('Module:Class')
 local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
 --[[
 
@@ -16,7 +19,8 @@ WikiSpecific Code for MatchList and Bracket Code Generators
 
 ]]--
 
-local wikiCopyPaste = Table.copy(require('Module:GetMatchGroupCopyPaste/wiki/Base'))
+---@class SplatoonMatch2CopyPaste: Match2CopyPasteBase
+local WikiCopyPaste = Class.new(BaseCopyPaste)
 
 local VETOES = {
 	[0] = '',
@@ -32,7 +36,7 @@ local VETOES = {
 }
 
 --returns the Code for a Match, depending on the input
-function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapVeto = Logic.readBool(args.mapVeto)
 	local indent = '  '
 
@@ -47,7 +51,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	)
 
 	for i = 1, opponents do
-		table.insert(lines, indent .. '|opponent' .. i .. '=' .. wikiCopyPaste._getOpponent(mode, displayScore))
+		table.insert(lines, indent .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, displayScore))
 	end
 
 	if Logic.readBool(args.hasDate) then
@@ -96,7 +100,7 @@ function wikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 --subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function wikiCopyPaste._getOpponent(mode, displayScore)
+function WikiCopyPaste._getOpponent(mode, displayScore)
 	local scoreText = displayScore and '|score=' or ''
 
 	if mode == 'solo' then
@@ -108,4 +112,4 @@ function wikiCopyPaste._getOpponent(mode, displayScore)
 	end
 end
 
-return wikiCopyPaste
+return WikiCopyPaste
