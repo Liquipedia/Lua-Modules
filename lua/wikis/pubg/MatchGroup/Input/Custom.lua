@@ -23,6 +23,7 @@ local MatchFunctions = {
 }
 local MapFunctions = {}
 
+---@class PubgFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,
@@ -102,6 +103,19 @@ function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 			return map.opponents[opponentIndex].score or 0
 		end), Operator.add, 0) + (opponents[opponentIndex].extradata.startingpoints or 0)
 	end
+end
+
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@param settings table
+---@return table
+function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
+	return {
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		placementinfo = settings.placementInfo,
+		settings = settings.settings
+	}
 end
 
 ---@param match table
