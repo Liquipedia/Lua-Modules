@@ -124,7 +124,7 @@ return {
 			},
 		},
 		{
-			file = 'Age of Empires 2 DE The Mountain Royals key art.jpg',
+			file = 'Age of Empires 2 Mountain Royals Key Art.jpg',
 			title = 'Civilizations',
 			link = 'Portal:Civilizations',
 			count = {
