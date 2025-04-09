@@ -13,7 +13,7 @@ local Lua = require('Module:Lua')
 
 local BaseCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
 
-local _CONVERT_PICK_BAN_ENTRY = {
+local CONVERT_PICK_BAN_ENTRY = {
 	none = {},
 	pick = {'pick'},
 	ban = {'ban'},
@@ -23,12 +23,12 @@ local _CONVERT_PICK_BAN_ENTRY = {
 	['ban + player'] = {'player', 'ban'},
 	all = {'player', 'pick', 'ban'},
 }
-local _PARAM_TO_SHORT = {
+local PARAM_TO_SHORT = {
 	pick = 'c',
 	ban = 'b',
 	player = 'p',
 }
-local _LIMIT_OF_PARAM = {
+local LIMIT_OF_PARAM = {
 	pick = 3,
 	ban = 1,
 	player = 3,
