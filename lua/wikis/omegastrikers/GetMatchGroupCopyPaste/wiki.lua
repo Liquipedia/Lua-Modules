@@ -79,7 +79,7 @@ function WikiCopyPaste._getMap(opponents, pickBan, mapBestOf)
 		'{{Map',
 		INDENT .. INDENT .. '|map=',
 		INDENT .. INDENT .. '|score1=|score2=',
-		Array.flatMap(_CONVERT_PICK_BAN_ENTRY[pickBan or ''] or {}, function (element)
+		Array.flatMap(CONVERT_PICK_BAN_ENTRY[pickBan or ''] or {}, function (element)
 			return WikiCopyPaste._pickBanParams(element, opponents)
 		end),
 		mapBestOf and (INDENT .. INDENT .. '|bestof=' .. mapBestOf) or nil,
@@ -94,8 +94,8 @@ end
 ---@param numberOfOpponents integer
 ---@return string[]
 function WikiCopyPaste._pickBanParams(key, numberOfOpponents)
-	local shortKey = _PARAM_TO_SHORT[key]
-	local limit = _LIMIT_OF_PARAM[key]
+	local shortKey = PARAM_TO_SHORT[key]
+	local limit = LIMIT_OF_PARAM[key]
 	local display = Array.map(Array.range(1, numberOfOpponents), function (opponentIndex)
 		return INDENT .. INDENT .. table.concat(Array.map(Array.range(1, limit), function (keyIndex)
 			return '|t' .. opponentIndex .. shortKey .. keyIndex .. '='
