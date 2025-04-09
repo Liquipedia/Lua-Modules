@@ -18,7 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 ---@operator call(table):HighlightsWidget
 local Highlights = Class.new(Widget)
 
----@return string?
+---@return Widget?
 function Highlights:render()
 	if Table.isEmpty(self.props.children) then
 		return nil
