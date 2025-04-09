@@ -43,6 +43,18 @@ local CONTENT = {
 		padding = true,
 		boxid = 1506,
 	},
+		houses = {
+		heading = 'Houses',
+		body = '{{Liquipedia:Houses}}',
+		padding = true,
+		boxid = 1508,
+	},
+		summons = {
+		heading = 'Summons',
+		body = '{{SummonIconTable}}',
+		padding = true,
+		boxid = 1507,
+	},
 }
 
 return {
@@ -55,7 +67,7 @@ return {
 	title = 'The Wildcard Wiki',
 	navigation = 	{
 			{
-			file = 'Wildcard gameasset Wildcard Bulwark Boost.png',
+			file = 'Wildcard gameasset wildcards pill.png',
 			title = 'Wildcards',
 			link = 'Portal:Wildcards',
 		},
@@ -115,10 +127,10 @@ return {
 					},
 					{
 						mobileOrder = 3,
-						content = CONTENT.wildcards,
+						content = CONTENT.summons,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 5,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -127,11 +139,19 @@ return {
 				size = 6,
 				children = {
 					{
+						mobileOrder = 4,
+						content = CONTENT.wildcards,
+					},
+										{
 						mobileOrder = 5,
-						content = CONTENT.updates,
+						content = CONTENT.houses,
 					},
 					{
 						mobileOrder = 6,
+						content = CONTENT.updates,
+					},
+					{
+						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},
