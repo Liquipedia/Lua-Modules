@@ -46,77 +46,46 @@ local VETOES = {
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mapVeto = Logic.readBool(args.mapVeto)
-
-	if bestof == 0 and Logic.nilOr(Logic.readBool(args.score), true) then
-		args.score = true
-	end
-	local displayScore = Logic.readBool(args.score)
+	local displayScore = Logic.nilOr(Logic.readBool(args.score), true)
 
 	local lines = Array.extend(
 		'{{Match',
-		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil
-	)
-
-	for i = 1, opponents do
-		table.insert(lines, INDENT .. '|opponent' .. i .. '=' .. WikiCopyPaste._getOpponent(mode, displayScore))
-	end
-
-	if Logic.readBool(args.hasDate) then
-		Array.appendWith(lines,
+		Logic.readBool(args.needsWinner) and INDENT .. '|winner=' or nil,
+		Array.map(Array.range(1, opponents), function(opponentIndex)
+			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, displayScore)
+		end),
+		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch= |youtube=',
 			INDENT .. '|mvp='
-		)
-	end
-
-	for i = 1, bestof do
-		Array.appendWith(lines, INDENT .. '|vodgame'.. i ..'=')
-	end
-
-	if mapVeto and VETOES[bestof] then
-		table.insert(lines, INDENT .. '|mapveto={{MapVeto')
-		table.insert(lines, INDENT .. INDENT .. '|firstpick=')
-		table.insert(lines, INDENT .. INDENT .. '|types=' .. VETOES[bestof])
-		table.insert(lines, INDENT .. INDENT .. '|t1map1=|t2map1=')
-		table.insert(lines, INDENT .. INDENT .. '|t1map2=|t2map2=')
-		table.insert(lines, INDENT .. INDENT .. '|t1map3=|t2map3=')
-		table.insert(lines, INDENT .. INDENT .. '|decider=')
-		table.insert(lines, INDENT .. '}}')
-	end
-
-	for i = 1, bestof do
-		Array.appendWith(lines,
-			INDENT .. '|map' .. i .. '={{Map',
-			INDENT .. INDENT .. '|map=|maptype=',
-			INDENT .. INDENT .. '|t1w1= |t1w2= |t1w3= |t1w4='
-		)
-
-		Array.appendWith(lines,
-			INDENT .. INDENT .. '|t2w1= |t2w2= |t2w3= |t2w4='
-		)
-
-		Array.appendWith(lines,
-			INDENT .. INDENT .. '|score1=|score2=|winner=',
+		} or nil,
+		Array.map(Array.range(1, bestof), function (i)
+			return INDENT .. '|vodgame'.. i ..'='
+		end),
+		(mapVeto and VETOES[bestof]) and {
+			INDENT .. '|mapveto={{MapVeto',
+			INDENT .. INDENT .. '|firstpick=',
+			INDENT .. INDENT .. '|types=' .. VETOES[bestof],
+			INDENT .. INDENT .. '|t1map1=|t2map1=',
+			INDENT .. INDENT .. '|t1map2=|t2map2=',
+			INDENT .. INDENT .. '|t1map3=|t2map3=',
+			INDENT .. INDENT .. '|decider=',
 			INDENT .. '}}'
-		)
-	end
-
-	table.insert(lines, '}}')
+		} or nil,
+		Array.flatMap(Array.range(1, bestof), function (i)
+			return {
+				INDENT .. '|map' .. i .. '={{Map',
+				INDENT .. INDENT .. '|map=|maptype=',
+				INDENT .. INDENT .. '|t1w1= |t1w2= |t1w3= |t1w4=',
+				INDENT .. INDENT .. '|t2w1= |t2w2= |t2w3= |t2w4=',
+				INDENT .. INDENT .. '|score1=|score2=|winner=',
+				INDENT .. '}}'
+			}
+		end),
+		'}}'
+	)
 
 	return table.concat(lines, '\n')
-end
-
---subfunction used to generate the code for the Opponent template, depending on the type of opponent
-function WikiCopyPaste._getOpponent(mode, displayScore)
-	local scoreText = displayScore and '|score=' or ''
-
-	if mode == 'solo' then
-		return '{{SoloOpponent||flag=' .. scoreText .. '}}'
-	elseif mode == 'team' then
-		return '{{TeamOpponent|' .. scoreText .. '}}'
-	elseif mode == 'literal' then
-		return '{{Literal|}}'
-	end
 end
 
 return WikiCopyPaste
