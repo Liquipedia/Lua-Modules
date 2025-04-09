@@ -128,9 +128,7 @@ return {
 			title = 'Civilizations',
 			link = 'Portal:Civilizations',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::civ]]'
+				value = 124
 			}
 		},
 		{
