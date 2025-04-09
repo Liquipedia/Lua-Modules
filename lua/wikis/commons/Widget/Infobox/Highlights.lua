@@ -27,7 +27,9 @@ function Highlights:render()
 		return HtmlWidgets.Li{children = {child}}
 	end)
 	return HtmlWidgets.Div{
-		children = {HtmlWidgets.Ul{children = listItems}},
+		children = HtmlWidgets.Div{
+			children = {HtmlWidgets.Ul{children = listItems}},
+		}
 	}
 end
 
