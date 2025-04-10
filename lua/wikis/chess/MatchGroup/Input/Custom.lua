@@ -10,7 +10,7 @@ local Array = require('Module:Array')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
-local Eco = Lua.import('Module:ChessEco')
+local Eco = Lua.import('Module:ChessOpenings')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
 local CustomMatchGroupInput = {}
