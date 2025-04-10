@@ -40,7 +40,7 @@ function StarcraftMatchSummaryFfa.getByMatchId(props)
 			idx = 0,
 			children = WidgetUtil.collect(
 				MatchSummaryWidgets.GamesSchedule{match = match},
-				MatchSummaryWidgets.MatchComment{match = match},
+				MatchSummaryWidgets.MatchInformation(match),
 				BaseMatchSummary.standardMatch(match, Parser)
 			)
 		}

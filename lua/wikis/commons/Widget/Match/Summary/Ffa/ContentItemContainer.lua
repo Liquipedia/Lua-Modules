@@ -14,8 +14,21 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
+---@class MatchSummaryFfaContentItem
+---@field icon Widget?
+---@field title string?
+---@field content (string|Html|Widget)?
+
+---@class MatchSummaryFfaContentItemContainerParameters
+---@field collapsed boolean?
+---@field collapsible boolean?
+---@field contentClass string?
+---@field title string?
+---@field items MatchSummaryFfaContentItem[]
+
 ---@class MatchSummaryFfaContentItemContainer: Widget
 ---@operator call(table): MatchSummaryFfaContentItemContainer
+---@field props MatchSummaryFfaContentItemContainerParameters
 local MatchSummaryFfaContentItem = Class.new(Widget)
 MatchSummaryFfaContentItem.defaultProps = {
 	collapsible = false,
