@@ -43,13 +43,13 @@ local CONTENT = {
 		padding = true,
 		boxid = 1506,
 	},
-		houses = {
+	houses = {
 		heading = 'Houses',
 		body = '{{Liquipedia:Houses}}',
 		padding = true,
 		boxid = 1508,
 	},
-		summons = {
+	summons = {
 		heading = 'Summons',
 		body = '{{SummonIconTable}}',
 		padding = true,
@@ -65,14 +65,14 @@ return {
 	metadesc = 'Comprehensive Wildcard wiki with articles covering everything from champions and summons, ' ..
 		'to strategies, to tournaments, to competitive players, and teams.',
 	title = 'The Wildcard Wiki',
-	navigation = 	{
-			{
+	navigation = {
+		{
 			file = 'Wildcard gameasset wildcards pill.png',
 			title = 'Wildcards',
 			link = 'Portal:Wildcards',
 		},
 		{
-			file = 'Wildcard Characters 2.jpg',
+			file = 'Wildcard Champions Lineup.webp',
 			title = 'Champions',
 			link = 'Portal:Champions',
 			count = {
@@ -82,7 +82,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Characters 1.jpg ',
+			file = 'Wildcard Characters 1.jpg',
 			title = 'Summons',
 			link = 'Portal:Summons',
 			count = {
@@ -96,9 +96,8 @@ return {
 			title = 'Arenas',
 			link = 'Portal:Arenas',
 			count = {
-				method = 'LPDB',
-				table = 'datapoint',
-				conditions = '[[type::map]]',
+				method = 'CATEGORY',
+				category = 'Arenas',
 			},
 		},
 		{
@@ -117,7 +116,7 @@ return {
 			{ -- Left
 				size = 6,
 				children = {
-										{
+					{
 						mobileOrder = 1,
 						content = CONTENT.about,
 					},
@@ -142,7 +141,7 @@ return {
 						mobileOrder = 4,
 						content = CONTENT.wildcards,
 					},
-										{
+					{
 						mobileOrder = 5,
 						content = CONTENT.houses,
 					},
