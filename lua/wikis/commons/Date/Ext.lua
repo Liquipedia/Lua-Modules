@@ -100,8 +100,7 @@ end
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
 ---@return string
 function DateExt.toYmdInUtc(dateOrTimestamp)
-	-- Return value is cast as string because format 'Y-m-d' should not be interpreted as a number
-	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '') --[[@as string]]
+	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end
 
 ---@param dateString string|integer|osdate|osdateparam
