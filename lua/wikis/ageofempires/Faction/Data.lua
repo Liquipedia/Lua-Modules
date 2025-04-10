@@ -233,11 +233,11 @@ local factionPropsAoE2 = {
 		name = 'Huns',
 		faction = 'huns',
 	},
-	incas = {
+	inca = {
 		index = 24,
-		name = 'Incas',
+		name = 'Inca',
 		pageName = 'Incas' .. AOE2_SUFFIX,
-		faction = 'incas',
+		faction = 'inca',
 	},
 	indians = {
 		index = 25,
@@ -297,10 +297,10 @@ local factionPropsAoE2 = {
 		pageName = 'Malians' .. AOE2_SUFFIX,
 		faction = 'malians',
 	},
-	mayans = {
+	maya = {
 		index = 36,
-		name = 'Mayans',
-		faction = 'mayans',
+		name = 'Maya',
+		faction = 'maya',
 	},
 	mongols = {
 		index = 37,
@@ -895,7 +895,7 @@ return {
 			gur = 'gurjaras',
 			hin = 'hindustanis',
 			hun = 'huns',
-			inc = 'incas',
+			inc = 'inca',
 			ind = 'indians',
 			ita = 'italians',
 			jap = 'japanese',
@@ -909,7 +909,7 @@ return {
 			mly = 'malay',
 			mal = 'malians',
 			mli = 'malians',
-			may = 'mayans',
+			may = 'maya',
 			mon = 'mongols',
 			per = 'persians',
 			pol = 'poles',
