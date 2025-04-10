@@ -180,7 +180,7 @@ end
 function BaseMatchPage:makeDisplayTitle()
 	local team1name = self.opponents[1].teamTemplateData.shortname
 	local team2name = self.opponents[2].teamTemplateData.shortname
-	if not team1name and team2name then
+	if not team1name and not team2name then
 		return table.concat({'Match in', self.matchData.tickername}, ' ')
 	end
 
