@@ -194,7 +194,7 @@ end
 ---Validates the provided tier, tierType pair
 ---@param tier string|number|nil
 ---@param tierType string?
----@return string|number|nil, string?, string[]
+---@return integer?, string?, string[]
 function HiddenDataBox.validateTier(tier, tierType)
 	local warnings = {}
 
