@@ -10,7 +10,6 @@ local Widgets = {}
 
 local Lua = require('Module:Lua')
 
-Widgets.Casters = Lua.import('Module:Widget/Match/Summary/Ffa/Casters')
 Widgets.ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 Widgets.CountdownIcon = Lua.import('Module:Widget/Match/Summary/Ffa/CountdownIcon')
 Widgets.GameCountdown = Lua.import('Module:Widget/Match/Summary/Ffa/GameCountdown')
