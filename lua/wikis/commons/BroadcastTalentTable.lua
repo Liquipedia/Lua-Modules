@@ -342,7 +342,6 @@ end
 ---@return string?, string
 function BroadcastTalentTable:_tierDisplay(tournament)
 	local tier, tierType, options = Tier.parseFromQueryData(tournament)
-	---@cast tier -nil
 	assert(Tier.isValid(tier, tierType), 'Broadcaster event with unset or invalid tier/tiertype: ' .. tournament.pagename)
 
 	options.link = true

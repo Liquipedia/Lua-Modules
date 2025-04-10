@@ -47,7 +47,6 @@ end
 ---@return string
 function CustomResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
-	---@cast tier -nil
 	options.link = true
 	options.onlyTierTypeIfBoth = false
 	options.onlyDisplayPrioritized = true
