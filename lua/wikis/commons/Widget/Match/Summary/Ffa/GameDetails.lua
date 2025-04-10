@@ -58,7 +58,11 @@ function MatchSummaryFfaGameDetails:render()
 			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
 		} or nil,
 		Logic.isNotEmpty(casters) and {
-			icon = IconWidget{iconName = 'casters', additionalClasses = {'fa-fw'}},
+			icon = IconWidget{
+				iconName = 'casters',
+				additionalClasses = {'fa-fw'},
+				hover = 'Caster' .. (#casters > 1 and 's' or '')
+			},
 			content = HtmlWidgets.Span{children = Array.interleave(casters, ', ')},
 		} or nil,
 		game.comment and {
