@@ -167,6 +167,10 @@ return {
 						mobileOrder = 8,
 						content = CONTENT.wantToHelp,
 					},
+					{
+						mobileOrder = 9,
+						content = CONTENT.liquipediaApp,
+					},
 				}
 			},
 			{ -- Right
