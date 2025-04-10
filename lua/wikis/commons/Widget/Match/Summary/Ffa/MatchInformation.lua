@@ -101,7 +101,7 @@ function MatchSummaryFfaMatchInformation:_getCasterItem()
 
 	if #casters == 0 then return end
 	return {
-		icon = IconWidget{iconName = 'casters', size = '0.875rem'},
+		icon = IconWidget{iconName = 'casters', size = '0.875rem', hover = 'Caster' .. (#casters > 1 and 's' or '')},
 		content = HtmlWidgets.Span{children = Array.interleave(casters, ', ')}
 	}
 end
