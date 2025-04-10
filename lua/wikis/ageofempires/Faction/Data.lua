@@ -393,12 +393,12 @@ local factionPropsAoE2 = {
 		faction = 'wei',
 	},
 	wu = {
-		index = 55,
+		index = 54,
 		name = 'Wu',
 		faction = 'wu',
 	},
 	unknown = {
-		index = 56,
+		index = 55,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
