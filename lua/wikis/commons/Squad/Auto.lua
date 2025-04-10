@@ -114,7 +114,7 @@ local DEFAULT_EXCLUDED_ROLES = {
     },
 }
 
----Entrypoint for the automated timelin
+---Entrypoint for the automated timeline
 ---TODO: Implement in submodule
 function SquadAuto.timeline(frame)
     -- return SquadAuto(frame):timeline()
@@ -175,7 +175,48 @@ function SquadAuto:parseConfig()
     mw.logObject(self.config)
 end
 
+---@return SquadAutoPerson[]
 function SquadAuto:readManualPlayers()
+    ---@type SquadAutoPerson[]
+    local players = {}
+
+    -- TODO: Readd limit to roles?
+    Array.forEach(self.args, function (entry)
+        local player = Json.parseIfString(entry)
+        if Logic.isNotEmpty(player) then
+            table.insert(players, {
+                page = player.link or player.id,
+                id = player.id,
+                captain = Logic.readBoolOrNil(player.captain),
+                name = player.name,
+                localizedname = player.localizedname,
+                thisTeam = {
+                    team = self.config.team,
+                    role = player.role,
+                    position = player.position
+                },
+                newTeam = {
+                    team = player.newteam,
+                    role = player.newteamrole,
+                    player.newteamdate
+                },
+                flag = player.flag,
+                oldTeam = {
+                    team = player.oldteam
+                },
+                joindate = (player.joindate or ''):gsub('%?%?','01'),
+                joindatedisplay = player.joindate,
+                joindateRef = {},
+                leavedate = (player.leavedate or ''):gsub('%?%?','01'),
+                leavedatedisplay = player.leavedate,
+                leavedateRef = {},
+                faction = player.faction or player.race,
+                race = player.faction or player.race,
+            })
+        end
+    end)
+
+    return players
 end
 
 function SquadAuto:readManualTimeline()
@@ -426,13 +467,11 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
         leavedateRef = leaveEntry.references,
 
         thisTeam = {
-            --TODO
             team = joinEntry.toTeam,
             role = joinEntry.toRole,
             position = joinEntry.position
         },
         oldTeam = {
-            --TODO
             team = joinEntry.fromTeam,
             role = joinEntry.fromRole,
         },
