@@ -30,6 +30,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local bans = Logic.readBool(args.bans)
 	local veto = Logic.readBool(args.veto)
 	local vetoBanRounds = tonumber(args.vetoBanRounds) or 0
+	local casters = tonumber(args.casters) or 0
 
 	local lines = Array.extend(
 		'{{Match',
@@ -38,9 +39,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch=',
-			INDENT .. '|caster1=',
-			INDENT .. '|caster2=',
 			INDENT .. '|comment='
+		} or nil,
+		casters > 0 and {
+			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
+				return '|caster' .. casterIndex .. '='
+			end), ' ')
 		} or nil,
 		Array.map(Array.range(1, opponents), function(opponentIndex)
 			return INDENT .. '|opponent' .. opponentIndex .. '=' .. WikiCopyPaste.getOpponent(mode, showScore)
