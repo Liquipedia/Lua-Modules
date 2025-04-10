@@ -108,7 +108,6 @@ end
 ---@param lpdbData table
 ---@param args table
 function CustomHero:addToLpdb(lpdbData, args)
-	lpdbData.information = args.name
 	lpdbData.extradata = {
 		role = args.role,
 		revealdate = args.revealdate,
