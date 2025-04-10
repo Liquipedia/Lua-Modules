@@ -178,6 +178,23 @@ end
 
 ---@protected
 function BaseMatchPage:makeDisplayTitle()
+	local team1name = self.opponents[1].teamTemplateData.shortname
+	local team2name = self.opponents[2].teamTemplateData.shortname
+	if not team1name and team2name then
+		return table.concat({'Match in', self.matchData.tickername}, ' ')
+	end
+
+	team1name = team1name or 'TBD'
+	team2name = team2name or 'TBD'
+	local tournamentName = self.matchData.tickername
+	local displayTitle = team1name .. ' vs. ' .. team2name
+	if not tournamentName then
+		return displayTitle
+	end
+
+	displayTitle = displayTitle .. ' @ ' .. tournamentName
+
+	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '|noreplace}}'})
 end
 
 ---@return Widget
