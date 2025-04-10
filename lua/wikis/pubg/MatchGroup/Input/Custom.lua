@@ -105,26 +105,4 @@ function FfaMatchFunctions.calculateMatchScore(opponents, maps)
 	end
 end
 
----@param match table
----@param games table[]
----@param opponents table[]
----@param settings table
----@return table
-function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-		placementinfo = settings.placementInfo,
-		settings = settings.settings
-	}
-end
-
----@param match table
----@param map table
----@param opponents table[]
-function FfaMapFunctions.getExtraData(match, map, opponents)
-	return {
-		casters = MatchGroupInputUtil.readCasters(map, {noSort = true})
-	}
-end
-
 return CustomMatchGroupInput
