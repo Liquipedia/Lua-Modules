@@ -59,6 +59,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	return table.concat(lines, '\n')
 end
 
+---@private
 ---@param bestof integer
 ---@param vetoRounds integer
 ---@return string[]
@@ -78,6 +79,7 @@ function WikiCopyPaste._getVeto(bestof, vetoRounds)
 	)
 end
 
+---@private
 ---@param showBans boolean
 ---@return string
 function WikiCopyPaste._getMap(showBans)
