@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
 -- wiki=chess
--- page=Module:ChessEco
+-- page=Module:ChessOpenings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Logic = require('Module:Logic')
 
-local ChessOpening = mw.loadData('Module:ChessEco/Data')
+local ChessOpening = mw.loadData('Module:ChessOpenings/Data')
 
-local ChessEcoSetup = {}
+local ChessOpeningsSetup = {}
 
-function ChessEcoSetup.sanitise(eco)
+function ChessOpeningsSetup.sanitise(eco)
 	if Logic.isEmpty(eco) then
 		return
 	end
@@ -22,11 +22,11 @@ function ChessEcoSetup.sanitise(eco)
 	end
 end
 
-function ChessEcoSetup.getName(eco, withPrefix)
-	eco = ChessEcoSetup.sanitise(eco)
+function ChessOpeningsSetup.getName(eco, withPrefix)
+	eco = ChessOpeningsSetup.sanitise(eco)
 	if ChessOpening[eco] then
 		return withPrefix and (eco .. ': ' .. ChessOpening[eco]) or ChessOpening[eco]
 	end
 end
 
-return ChessEcoSetup
+return ChessOpeningsSetup
