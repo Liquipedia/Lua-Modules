@@ -236,7 +236,6 @@ local factionPropsAoE2 = {
 	inca = {
 		index = 24,
 		name = 'Inca',
-		pageName = 'Incas' .. AOE2_SUFFIX,
 		faction = 'inca',
 	},
 	indians = {
