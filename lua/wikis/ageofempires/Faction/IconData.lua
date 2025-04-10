@@ -146,6 +146,12 @@ local byFactionAoE2 = {
 	japanese = {
 		icon = 'File:Japanese AoE2 icon.png'
 	},
+	jurchens = {
+		icon = 'File:Jurchens AoE2 icon.png'
+	},
+	khitans = {
+		icon = 'File:Khitans AoE2 icon.png'
+	},
 	khmer = {
 		icon = 'File:Khmer AoE2 icon.png'
 	},
@@ -185,6 +191,9 @@ local byFactionAoE2 = {
 	saracens = {
 		icon = 'File:Saracens AoE2 icon.png'
 	},
+	shu = {
+		icon = 'File:Shu AoE2 icon.png'
+	},
 	sicilians = {
 		icon = 'File:Sicilians AoE2 icon.png'
 	},
@@ -212,7 +221,12 @@ local byFactionAoE2 = {
 	vikings = {
 		icon = 'File:Vikings AoE2 icon.png'
 	},
-
+	wei = {
+		icon = 'File:Wei AoE2 icon.png'
+	},
+	wu = {
+		icon = 'File:Wu AoE2 icon.png'
+	},
 	unknown = {
 		icon = 'File:Char head filler.png'
 	},
