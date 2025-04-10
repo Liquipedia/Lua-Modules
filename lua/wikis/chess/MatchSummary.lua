@@ -166,6 +166,10 @@ end
 ---@param match any
 ---@return Widget?
 function CustomMatchSummary._linksTable(match)
+	if Logic.isDeepEmpty(match.links) then
+		return
+	end
+
 	local rows = Array.map(match.games, function(game, gameIndex)
 		local links = Table.mapValues(match.links, function(link)
 			if type(link) ~= 'table' then return nil end
