@@ -12,6 +12,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 
@@ -27,6 +28,7 @@ local function createHtmlTag(tag, specialMapping)
 		css = {},
 		attributes = {},
 		tag = tag,
+		new = false,
 	}
 
 	---@return Html
@@ -34,11 +36,30 @@ local function createHtmlTag(tag, specialMapping)
 		if specialMapping then
 			specialMapping(self)
 		end
+		local isNewStyle = self.props.new
 		local htmlNode = mw.html.create(self.props.tag)
 
-		htmlNode:addClass(String.nilIfEmpty(table.concat(self.props.classes, ' ')))
-		htmlNode:css(self.props.css)
-		htmlNode:attr(self.props.attributes)
+		if isNewStyle then
+			local newAttributes = Table.copy(self.props)
+			newAttributes.new = nil
+			newAttributes.tag = nil
+			newAttributes.classes = nil
+			newAttributes.css = nil
+			newAttributes.attributes = nil
+			newAttributes.children = nil
+			newAttributes = Table.map(newAttributes, function(key, value)
+				if key == 'className' then
+					return 'class', value
+				else
+					return key:lower(), value
+				end
+			end)
+			htmlNode:attr(newAttributes)
+		else
+			htmlNode:addClass(String.nilIfEmpty(table.concat(self.props.classes, ' ')))
+			htmlNode:css(self.props.css)
+			htmlNode:attr(self.props.attributes)
+		end
 
 		Array.forEach(self.props.children, function(child)
 			if Class.instanceOf(child, Widget) then

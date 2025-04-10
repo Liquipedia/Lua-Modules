@@ -17,22 +17,40 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install node modules
+        run: npm install
+
       - uses: younited/detect-branch-changes-action@v0.2.0
         id: forkpoint
 
-      - id: changed-files
+      - id: lua-changed-files
         uses: tj-actions/changed-files@v45
         with:
           base_sha: ${{ steps.forkpoint.outputs.fork_point_sha }}
           files: |
             lua/wikis/**/*.lua
 
+      - id: tstl-changed-files
+        uses: tj-actions/changed-files@v45
+        with:
+          base_sha: ${{ steps.forkpoint.outputs.fork_point_sha }}
+          files: |
+            lua/wikis/**/*.tsx
+            lua/wikis/**/*.ts
+
+      - name: TSTL Transpile
+        if: steps.tstl-changed-files.outputs.any_changed == 'true'
+        run: npx tstl
+
       - name: Personal Lua Deploy
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.lua-changed-files.outputs.any_changed == 'true'
         env:
           WIKI_USER: ${{ secrets.LP_BOTUSER }}
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
           LUA_DEV_ENV_NAME: "/dev/${{ github.event.inputs.luadevenv }}"
-        run: bash scripts/deploy.sh "${{ steps.changed-files.outputs.all_changed_files }}"
+        run: |
+          changed_files="${{ steps.lua-changed-files.outputs.all_changed_files }}"
+          transpiled_files=$(echo "${{ steps.tstl-changed-files.outputs.all_changed_files }}" | sed 's/\.ts\|\.tsx/\.lua/g')
+          bash scripts/deploy.sh "$changed_files $transpiled_files"
