@@ -143,11 +143,6 @@ return {
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
-		{
-			file = 'Team_Spirit_win_The_International_2023.jpg',
-			title = 'Help',
-			link = 'Help:Contents',
-		},
 	},
 	layouts = {
 		main = {
