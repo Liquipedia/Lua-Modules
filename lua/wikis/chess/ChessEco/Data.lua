@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=chess
--- page=Module:ChessEco/Data
+-- page=Module:ChessOpenings/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
