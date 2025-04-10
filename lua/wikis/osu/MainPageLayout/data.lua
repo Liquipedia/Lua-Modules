@@ -1,3 +1,4 @@
+---
 -- @Liquipedia
 -- wiki=osu
 -- page=Module:MainPageLayout/data
