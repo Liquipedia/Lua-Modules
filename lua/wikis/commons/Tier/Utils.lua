@@ -112,7 +112,7 @@ end
 
 --- Parses queryData to be processable for other Tier functions
 --- overwritable on a per wiki basis if additional data needs to be passed
----@param queryData table
+---@param queryData {liquipediatier: string, liquipediatiertype: string}
 ---@return string, string?, table
 function Tier.parseFromQueryData(queryData)
 	local tierType = queryData.liquipediatiertype
