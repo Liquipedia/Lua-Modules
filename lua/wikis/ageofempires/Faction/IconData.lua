@@ -134,7 +134,7 @@ local byFactionAoE2 = {
 	huns = {
 		icon = 'File:Huns AoE2 icon.png'
 	},
-	incas = {
+	inca = {
 		icon = 'File:Incas AoE2 icon.png'
 	},
 	indians = {
@@ -170,7 +170,7 @@ local byFactionAoE2 = {
 	malians = {
 		icon = 'File:Malians AoE2 icon.png'
 	},
-	mayans = {
+	maya = {
 		icon = 'File:Mayans AoE2 icon.png'
 	},
 	mongols = {
