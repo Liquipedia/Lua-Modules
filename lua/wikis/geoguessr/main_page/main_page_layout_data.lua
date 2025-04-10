@@ -20,6 +20,12 @@ local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
+	usefulArticles = {
+		heading = 'Useful Articles',
+		body = '{{Liquipedia:Useful Articles}}',
+		padding = true,
+		boxid = 1503,
+	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = '{{Liquipedia:Want_to_help}}',
