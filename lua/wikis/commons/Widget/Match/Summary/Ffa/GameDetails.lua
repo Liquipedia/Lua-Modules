@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
@@ -30,7 +31,7 @@ function MatchSummaryFfaGameDetails:render()
 	local game = self.props.game
 	assert(game, 'No game provided')
 
-	local casters = Array.map(game.extradata.casters, function(caster)
+	local casters = Array.map(game.extradata.casters or {}, function(caster)
 		if not caster.name then
 			return nil
 		end
@@ -56,7 +57,7 @@ function MatchSummaryFfaGameDetails:render()
 			icon = IconWidget{iconName = 'map'},
 			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
 		} or nil,
-		casters and {
+		Logic.isNotEmpty(casters) and {
 			icon = IconWidget{iconName = 'casters'},
 			content = HtmlWidgets.Span{children = Array.interleave(casters, ', ')},
 		} or nil,
