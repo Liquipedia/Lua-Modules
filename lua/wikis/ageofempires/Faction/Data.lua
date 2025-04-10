@@ -266,7 +266,7 @@ local factionPropsAoE2 = {
 		name = 'Khitans',
 		faction = 'khitans',
 	},
-	koreans = {
+	khmer = {
 		index = 30,
 		name = 'Khmer',
 		faction = 'khmer',
