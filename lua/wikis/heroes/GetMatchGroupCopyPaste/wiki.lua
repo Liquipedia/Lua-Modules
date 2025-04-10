@@ -39,7 +39,6 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		Logic.readBool(args.hasDate) and {
 			INDENT .. '|date=',
 			INDENT .. '|twitch=',
-			INDENT .. '|comment='
 		} or nil,
 		casters > 0 and {
 			INDENT .. table.concat(Array.map(Array.range(1, casters), function(casterIndex)
