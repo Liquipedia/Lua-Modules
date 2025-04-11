@@ -8,19 +8,28 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local I18n = require('Module:I18n')
-local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
+local PlayerDisplay = require('Module:Player/Display')
+local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
 
-local Opponent = Lua.import('Module:Opponent')
+local Info = Lua.import('Module:Info', {loadData = true})
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
 local UTC = Timezone.getTimezoneString('UTC')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 -- Whether to allow highlighting an opponent via mouseover
 ---@param opponent standardOpponent
@@ -116,6 +125,78 @@ function DisplayHelper.MatchCountdownBlock(match)
 		-- Workaround for .brkts-popup-body-element > * selector
 		:css('display', 'block')
 		:node(require('Module:Countdown')._create(stream))
+end
+
+---Creates comments that describe substitute player(s) of the match.
+---@param match table
+---@return string[]
+function DisplayHelper.createSubstitutesComment(match)
+	local comment = {}
+	Array.forEach(match.opponents, function(opponent)
+		local substitutions = (opponent.extradata or {}).substitutions
+		if Logic.isEmpty(substitutions) then
+			return
+		end
+
+		Array.forEach(substitutions, function(substitution)
+			if Logic.isEmpty(substitution.substitute) then
+				return
+			end
+
+			local subString = {}
+			table.insert(subString, string.format('%s stands in',
+				tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
+			))
+
+			if Logic.isNotEmpty(substitution.player) then
+				table.insert(subString, string.format('for %s',
+					tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
+				))
+			end
+
+			if opponent.type == Opponent.team then
+				local team = require('Module:Team').queryRaw(opponent.template)
+				if team then
+					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
+				end
+			end
+
+			if Table.isNotEmpty(substitution.games) then
+				local gamesNoun = Logic.emptyOr(Info.config.match2.gameNoun, 'game') .. (#substitution.games > 1 and 's' or '')
+				table.insert(subString, string.format('on %s %s', gamesNoun, mw.text.listToText(substitution.games)))
+			end
+
+			if String.isNotEmpty(substitution.reason) then
+				table.insert(subString, string.format('due to %s', substitution.reason))
+			end
+
+			table.insert(comment, table.concat(subString, ' ') .. '.')
+		end)
+	end)
+
+	return comment
+end
+
+---Creates display components for caster(s).
+---@param casters {name: string?, displayName: string?, flag: string?}[]
+---@return (string|Widget|nil)[]
+function DisplayHelper.createCastersDisplay(casters)
+	return Array.map(casters, function(caster)
+		if not caster.name then
+			return nil
+		end
+
+		local casterLink = Link{children = caster.displayName, link = caster.name}
+		if not caster.flag then
+			return casterLink
+		end
+
+		return HtmlWidgets.Fragment{children = {
+			Flags.Icon(caster.flag),
+			NONBREAKING_SPACE,
+			casterLink,
+		}}
+	end)
 end
 
 ---Displays the map name and link, and the status of the match if it had an unusual status.

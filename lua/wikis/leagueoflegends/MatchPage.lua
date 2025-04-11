@@ -11,6 +11,7 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
+local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -20,6 +21,10 @@ local TemplateEngine = require('Module:TemplateEngine')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local Display = Lua.import('Module:MatchPage/Template')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
+local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
 ---@field vetoByTeam table[]
@@ -160,6 +165,20 @@ function MatchPage:renderGame(game)
 	local inputTable = Table.merge(self.matchData, game)
 	inputTable.heroIcon = FnUtil.curry(self.getCharacterIcon, self)
 	return TemplateEngine():render(Display.game, inputTable)
+end
+
+---@return MatchPageComment[]
+function MatchPage:addComments()
+	local casters = Json.parseIfString(self.matchData.extradata.casters)
+	if Logic.isEmpty(casters) then return {} end
+	return {
+		Comment{
+			children = WidgetUtil.collect(
+				#casters > 1 and 'Casters: ' or 'Caster: ',
+				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
+			)
+		}
+	}
 end
 
 return MatchPage

@@ -24,6 +24,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
+local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
@@ -259,6 +260,7 @@ end
 function BaseMatchPage:footer()
 	local vods = self:getVods()
 	return Footer{
+		comments = self:_getComments(),
 		children = WidgetUtil.collect(
 			#vods > 0 and AdditionalSection{
 				header = 'VODs',
@@ -281,6 +283,25 @@ function BaseMatchPage:footer()
 			}
 		)
 	}
+end
+
+---@private
+---@return MatchPageComment[]
+function BaseMatchPage:_getComments()
+	local substituteComments = DisplayHelper.createSubstitutesComment(self.matchData)
+	return WidgetUtil.collect(
+		self.matchData.comment and Comment{children = self.matchData.comment} or nil,
+		Logic.isNotEmpty(substituteComments) and Comment{
+			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
+		} or nil,
+		self:addComments()
+	)
+end
+
+---@protected
+---@return MatchPageComment[]
+function BaseMatchPage:addComments()
+	return {}
 end
 
 ---@protected

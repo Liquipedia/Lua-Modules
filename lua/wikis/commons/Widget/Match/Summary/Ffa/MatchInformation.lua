@@ -8,9 +8,10 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -82,22 +83,7 @@ function MatchSummaryFfaMatchInformation:_getCasterItem()
 	local rawCasters = self.props.extradata.casters
 	if Logic.isEmpty(rawCasters) then return end
 
-	local casters = Array.map(rawCasters, function(caster)
-		if not caster.name then
-			return nil
-		end
-
-		local casterLink = Link{children = caster.displayName, link = caster.name}
-		if not caster.flag then
-			return casterLink
-		end
-
-		return HtmlWidgets.Fragment{children = {
-			Flags.Icon(caster.flag),
-			'&nbsp;',
-			casterLink,
-		}}
-	end)
+	local casters = DisplayHelper.createCastersDisplay(rawCasters)
 
 	if #casters == 0 then return end
 	return {
