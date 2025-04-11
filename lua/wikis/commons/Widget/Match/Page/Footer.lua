@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -15,6 +16,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
 ---@class MatchPageFooterParameters
+---@field comments MatchPageComment[]?
 ---@field children (string|Html|Widget|nil)|(string|Html|Widget|nil)[]
 
 ---@class MatchPageFooter: Widget
@@ -24,13 +26,17 @@ local MatchPageFooter = Class.new(Widget)
 
 ---@return Widget[]
 function MatchPageFooter:render()
-	return {
+	return WidgetUtil.collect(
 		HtmlWidgets.H3{ children = 'Additional Information' },
+		Logic.isNotEmpty(self.props.comments) and Div{
+			classes = { 'match-bm-lol-match-additional' },
+			children = self.props.comments
+		} or nil,
 		Div{
 			classes = { 'match-bm-match-additional' },
 			children = WidgetUtil.collect(self.props.children)
 		}
-	}
+	)
 end
 
 return MatchPageFooter
