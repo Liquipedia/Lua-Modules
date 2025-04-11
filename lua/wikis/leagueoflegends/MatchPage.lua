@@ -390,15 +390,15 @@ function MatchPage:_renderTeamStats(game)
 			classes = {'match-bm-team-stats'},
 			children = {
 				Div{
-					classes = {'match-bm-lol-h2h-header'},
+					classes = {'match-bm-lol-team-stats-header'},
 					children = {
 						Div{
-							classes = {'match-bm-lol-h2h-header-team'},
+							classes = {'match-bm-lol-team-stats-header-team'},
 							children = self.opponents[1].iconDisplay
 						},
 						Div{classes = {'match-bm-team-stats-list-cell'}},
 						Div{
-							classes = {'match-bm-lol-h2h-header-team'},
+							classes = {'match-bm-lol-team-stats-header-team'},
 							children = self.opponents[2].iconDisplay
 						}
 					}
