@@ -187,12 +187,10 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.information = args.primaryrole ---@TODO: Investigate if we can remove this
-	lpdbData.extradata = {
-		region = args.region,
-		costbe = args.costbe,
-		costrp = args.costrp,
-	}
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.costbe = args.costbe
+	lpdbData.extradata.costrp = args.costrp
+
 	return lpdbData
 end
 

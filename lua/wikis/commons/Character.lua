@@ -23,6 +23,8 @@ local Character = {}
 ---@field iconDark string?
 ---@field imageLight string?
 ---@field imageDark string?
+---@field roles string[]
+---@field gameData table
 
 local function datapointType()
 	if Info.wikiName == 'dota2' then
@@ -63,6 +65,8 @@ function Character.characterFromRecord(record)
 		icon = iconData.file
 	end
 
+	local extradata = record.extradata or {}
+
 	---@type StandardCharacter
 	local character = {
 		name = name,
@@ -72,8 +76,8 @@ function Character.characterFromRecord(record)
 		iconDark = icon or record.imagedark,
 		imageLight = record.image,
 		imageDark = record.imagedark,
-		roles = Table.extract(record.extradata, 'roles'),
-		gameData = record.extradata,
+		roles = Table.extract(extradata, 'roles') or {},
+		gameData = extradata,
 	}
 
 	return character
