@@ -28,6 +28,7 @@ local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -110,7 +111,6 @@ function MatchPage:populateGames()
 			team.players = Array.map(opponent.players, function(player)
 				if Logic.isDeepEmpty(player) then return end
 				return Table.mergeInto(player, {
-					roleIcon = player.role .. ' ' .. team.side,
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
 					end),
@@ -177,7 +177,7 @@ function MatchPage:renderGame(game)
 			self:_renderGameOverview(game),
 			self:_renderGamePicksAndBans(game),
 			self:_renderTeamStats(game),
-			TemplateEngine():render(Display.game, inputTable)
+			self:_renderPlayersPerformance(game)
 		)
 	}
 end
@@ -450,6 +450,189 @@ function MatchPage:_renderTeamStats(game)
 							team1Value = game.teams[1].objectives.dragons,
 							team2Value = game.teams[2].objectives.dragons
 						}
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget[]
+function MatchPage:_renderPlayersPerformance(game)
+	return {
+		HtmlWidgets.H3{children = 'Player Performance'},
+		Div{
+			classes = {'match-bm-players-wrapper'},
+			children = {
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderTeamPerformance(game, teamIndex)
+	return Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			Div{
+				classes = {'match-bm-lol-players-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Array.map(game.teams[teamIndex].players, function (player)
+				return self:_renderPlayerPerformance(game, teamIndex, player)
+			end)
+		)
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@param player table
+---@return Widget
+function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	return Div{
+		classes = {'match-bm-lol-players-player'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-players-player-details'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-character'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-players-player-avatar'},
+								children = {
+									Div{
+										classes = {'match-bm-lol-players-player-icon'},
+										children = self:getCharacterIcon(player)
+									},
+									Div{
+										classes = {'match-bm-lol-players-player-role'},
+										children = IconImage{
+											imageLight = 'Lol role ' .. player.role .. ' '
+												.. game.teams[teamIndex].side .. '.png',
+											link = '',
+											caption = player.role
+										}
+									}
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-players-player-name'},
+								children = {
+									Link{link = player.player},
+									HtmlWidgets.I{children = player.character}
+								}
+							}
+						}
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-loadout'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
+								children = {
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-rs'},
+										children = {
+											IconImage{
+												imageLight = 'Rune ' .. player.runeKeystone .. '.png',
+												link = '',
+												size = '24px'
+											},
+											IconImage{
+												imageLight = 'Rune ' .. player.runes.secondary.tree .. '.png',
+												link = '',
+												size = '24px'
+											},
+										}
+									},
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-rs'},
+										children = Array.map(player.spells, function (spell)
+											return IconImage{
+												imageLight = 'Summoner spell ' .. spell .. '.png',
+												link = '',
+												size = '24px'
+											}
+										end)
+									}
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-players-player-loadout-items'},
+								children = {
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-item'},
+										children = Array.map(Array.range(1, 3), function (itemIndex)
+											return IconImage{
+												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
+												link = player.items[itemIndex],
+												size = '24px'
+											}
+										end)
+									},
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-item'},
+										children = Array.map(Array.range(4, 6), function (itemIndex)
+											return IconImage{
+												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
+												link = player.items[itemIndex],
+												size = '24px'
+											}
+										end)
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-lol-players-player-stats'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon kda.png',
+								caption = 'KDA',
+								link = ''
+							},
+							Array.interleave({
+								player.kills, player.deaths, player.assists
+							}, '/')
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon cs.png',
+								caption = 'CS',
+								link = ''
+							},
+							player.creepscore
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon dmg.png',
+								caption = 'KDA',
+								link = ''
+							},
+							player.damagedone
+						)
 					}
 				}
 			}
