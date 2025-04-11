@@ -1,10 +1,20 @@
----
 -- @Liquipedia
 -- wiki=chess
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
+local Lua = require('Module:Lua')
+
+local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
+local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
+local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
 
 local CONTENT = {
 	usefulArticles = {
@@ -20,23 +30,17 @@ local CONTENT = {
 		boxid = 1504,
 	},
 	transfers = {
-		heading = 'Signings',
-		body = '{{Transfer List|limit=15|title=}}\n<div style{{=}}"display:block; text-align:center; padding:0.5em;">\n' ..
-			'<div style{{=}}"display:inline; float:left; font-style:italic;">\'\'[[#Top|Back to top]]\'\'</div>\n' ..
-			'<div style{{=}}"display:inline; float:right;" class="plainlinks smalledit">' ..
-			'&#91;[[Special:EditPage/Player Transfers/{{CURRENTYEAR}}/{{CURRENTMONTHNAME}}|edit]]&#93;</div>\n' ..
-			'<div style{{=}}"white-space:nowrap; display:inline; margin:0 10px font-size:15px; font-style:italic;">' ..
-			'[[Portal:Transfers|See more signings]]<span style="font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[Special:RunQuery/Transfer history|Transfer query]]' ..
-			'<span style{{=}}"font-style:normal; padding:0 5px;">&#8226;</span>' ..
-			'[[lpcommons:Special:RunQuery/Transfer|Input Form]]' ..
-			'</center></div>\n</div>',
+		heading = 'Transfers',
+		body = TransfersList{
+			transferPage = function ()
+				return 'Player Transfers/' .. os.date('%Y')
+			end
+		},
 		boxid = 1509,
 	},
 	thisDay = {
-		heading = 'This day in Chess <small id="this-day-date" style = "margin-left: 5px">' ..
-			'({{#time:F}} {{Ordinal|{{#time:j}}}})</small>',
-		body = '{{Liquipedia:This day}}',
+		heading = ThisDayWidgets.Title(),
+		body = ThisDayWidgets.Content(),
 		padding = true,
 		boxid = 1510,
 	},
@@ -46,23 +50,26 @@ local CONTENT = {
 	},
 	filterButtons = {
 		noPanel = true,
-		body = '<div style{{=}}"width:100%;margin-bottom:8px;">' ..
-			'{{#invoke:Lua|invoke|module=FilterButtons|fn=getFromConfig}}</div>',
+		body = Div{
+			css = { width = '100%', ['margin-bottom'] = '8px' },
+			children = { FilterButtonsWidget() }
+		}
 	},
 	matches = {
 		heading = 'Matches',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Match/Ticker/Container}}'..
-			'<div style{{=}}"white-space:nowrap; display: block; margin:0 10px; ' ..
-			'font-size:15px; font-style:italic; text-align:center;">' ..
-			'[[Liquipedia:Upcoming and ongoing matches|See more matches]]</div>',
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
-		panelAttributes = 'data-switch-group-container="countdown"',
+		panelAttributes = {
+			['data-switch-group-container'] = 'countdown',
+		},
 	},
 	tournaments = {
 		heading = 'Tournaments',
-		body = '{{#invoke:Lua|invoke|module=Widget/Factory|fn=fromTemplate|widget=Tournaments/Ticker' ..
-			'|upcomingDays=90|completedDays=60}}',
+		body = TournamentsTicker{
+			upcomingDays = 60,
+			completedDays = 30
+		},
 		padding = true,
 		boxid = 1508,
 	},
@@ -117,10 +124,6 @@ return {
 			file = 'Norway Chess 2023 score sheet.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
-			count = {
-				method = 'CATEGORY',
-				category = 'Statistics',
-			},
 		},
 	},
 	layouts = {
@@ -130,18 +133,14 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
-						content = CONTENT.aboutEsport,
-					},
-					{
-						mobileOrder = 2,
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 7,
+						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -150,7 +149,7 @@ return {
 				size = 7,
 				children = {
 					{
-						mobileOrder = 3,
+						mobileOrder = 2,
 						children = {
 							{
 								children = {
@@ -186,10 +185,10 @@ return {
 					},
 				},
 			},
-			{
+			{ -- Bottom
 				children = {
 					{
-						mobileOrder = 6,
+						mobileOrder = 5,
 						content = CONTENT.usefulArticles,
 					},
 				},
