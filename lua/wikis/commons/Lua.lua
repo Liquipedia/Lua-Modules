@@ -9,7 +9,6 @@
 local FeatureFlag = require('Module:FeatureFlag')
 local Logic = require('Module:Logic')
 local StringUtils = require('Module:StringUtils')
-local Table = require('Module:Table')
 
 local Lua = {}
 
@@ -127,10 +126,9 @@ function Lua.invoke(frame)
 		'Lua.invoke: Module name should not begin with \'Module:\''
 	)
 
-	local newArgs = Table.copy(frame.args)
-	newArgs.module = nil
-	newArgs.fn = nil
-	frame.args = newArgs
+	-- idealy would remove frame.args.module and frame.args.fn
+	-- but due to how frame.args behaves this is not possible without having negative impact on the performance
+	-- or causing other issues
 
 	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
