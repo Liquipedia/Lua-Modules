@@ -2,7 +2,7 @@
 Template(s): Match Page
 Author(s): Rathoz
 *******************************************************************************/
-.match-bm-lol-match-header {
+.match-bm-match-header {
 	display: flex;
 	flex-direction: column;
 	border: 1px solid #bbbbbb;
@@ -12,7 +12,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-header-overview {
+.match-bm-match-header-overview {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -105,31 +105,7 @@ Author(s): Rathoz
 	}
 }
 
-//TODO: can be deleted when switching to .match-bm-match-header-team class
-.match-bm-lol-match-header-team {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	font-weight: bold;
-}
-
-@media ( min-width: 768px ) {
-	.match-bm-lol-match-header-team-short {
-		display: none !important;
-	}
-}
-
-@media ( max-width: 767px ) {
-	.match-bm-lol-match-header-team-long {
-		display: none !important;
-	}
-}
-
-//end of TODO
-
-.match-bm-lol-match-header-round {
+.match-bm-match-header-round {
 	&-results {
 		display: flex;
 		gap: 0.25rem;
@@ -137,8 +113,8 @@ Author(s): Rathoz
 
 	&-result {
 		color: #ffffff;
-		height: 1.5rem;
-		width: 1.5rem;
+		height: 1.25rem;
+		width: 1.25rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -146,6 +122,11 @@ Author(s): Rathoz
 		text-transform: uppercase;
 		font-size: 0.875rem;
 		margin-top: 0.75rem;
+
+		@media ( min-width: 768px ) {
+			height: 1.5rem;
+			width: 1.5rem;
+		}
 
 		&.result--winner {
 			background-color: var( --clr-semantic-positive-40, #27a527 );
@@ -160,6 +141,14 @@ Author(s): Rathoz
 
 			&::before {
 				content: "L";
+			}
+		}
+
+		&.result--notplayed {
+			background-color: var( --clr-secondary-25, #404040 );
+
+			&::before {
+				content: "-";
 			}
 		}
 	}
@@ -183,26 +172,6 @@ Author(s): Rathoz
 	}
 }
 
-//TODO: can be deleted when switching to .match-bm-match-header-result class
-.match-bm-lol-match-header-result {
-	padding: 16px;
-	font-weight: bold;
-	text-align: center;
-	white-space: nowrap;
-}
-
-@media ( min-width: 414px ) {
-	.match-bm-lol-match-header-result {
-		font-size: 32px;
-	}
-}
-
-@media ( max-width: 413px ) {
-	.match-bm-lol-match-header-result {
-		font-size: 24px;
-	}
-}
-
 .match-bm-match-header-powered-by {
 	display: flex;
 	align-items: center;
@@ -210,8 +179,7 @@ Author(s): Rathoz
 	padding: 1rem;
 	background: #f5f5f5;
 	border-bottom: 1px solid #bbbbbb;
-	font-size: 1rem;
-	font-weight: bold;
+	font-weight: normal;
 
 	@media ( min-width: 768px ) {
 		justify-content: flex-end;
@@ -235,7 +203,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-header-tournament {
+.match-bm-match-header-tournament {
 	display: flex;
 	justify-content: center;
 	padding: 8px;
@@ -248,7 +216,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-header-date {
+.match-bm-match-header-date {
 	display: flex;
 	justify-content: center;
 	padding: 4px;
@@ -261,7 +229,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-mvp {
+.match-bm-match-mvp {
 	display: flex;
 	justify-content: center;
 	padding: 8px;
@@ -536,7 +504,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 		font-size: 15px;
 	}
 
-	@media ( max-width: 413px ) {
+	@media ( max-width: 435px ) {
 		font-size: 12px;
 	}
 
@@ -564,7 +532,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
-@media ( max-width: 413px ) {
+@media ( max-width: 435px ) {
 	.match-bm-lol-players-wrapper {
 		font-size: 12px;
 	}
@@ -951,7 +919,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	position: relative;
 }
 
-@media ( max-width: 413px ) {
+@media ( max-width: 435px ) {
 	.match-bm-lol-players-player-avatar,
 	.match-bm-lol-players-player-icon > a > img {
 		width: 32px;
@@ -1015,7 +983,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	font-weight: bold;
 }
 
-@media ( max-width: 413px ) {
+@media ( max-width: 435px ) {
 	.match-bm-lol-players-player-loadout img {
 		width: 16px;
 		height: 16px;
@@ -1179,7 +1147,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
-@media ( max-width: 413px ) {
+@media ( max-width: 435px ) {
 	.match-bm-lol-game-summary-faction {
 		width: 16px;
 		height: 16px;
@@ -1215,7 +1183,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
-@media ( max-width: 413px ) {
+@media ( max-width: 435px ) {
 	.match-bm-lol-game-summary-score {
 		font-size: 15px;
 	}
@@ -1228,9 +1196,34 @@ ul.match-bm-lol-game-veto-overview-pick {
 .match-bm-match-additional {
 	display: flex;
 	gap: 1rem;
+	flex-wrap: wrap;
 
 	@media ( max-width: 767px ) {
 		flex-direction: column;
+	}
+
+	&-comments {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex: 3 0 100%;
+		flex-direction: column;
+		padding: 4px;
+		gap: 4px;
+		border: 1px solid #bbbbbb;
+		background: #f5f5f5;
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-secondary-25 );
+		}
+
+		> div {
+			display: block;
+			text-align: center;
+			vertical-align: middle;
+			white-space: normal;
+		}
 	}
 
 	&-section {
@@ -1263,22 +1256,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 			padding: 1rem 0.5rem;
 			justify-content: center;
 		}
-	}
-}
-
-.match-bm-lol-match-additional-list {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 4px;
-	gap: 4px;
-	border: 1px solid #bbbbbb;
-	background: #f5f5f5;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
 	}
 }
 
