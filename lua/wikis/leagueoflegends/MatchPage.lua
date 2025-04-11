@@ -462,7 +462,7 @@ function MatchPage:_renderPlayersPerformance(game)
 	return {
 		HtmlWidgets.H3{children = 'Player Performance'},
 		Div{
-			classes = {'match-bm-players-wrapper'},
+			classes = {'match-bm-lol-players-wrapper'},
 			children = {
 				self:_renderTeamPerformance(game, 1),
 				self:_renderTeamPerformance(game, 2)
@@ -477,7 +477,7 @@ end
 ---@return Widget
 function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
-		classes = {'match-bm-players-team'},
+		classes = {'match-bm-lol-players-team'},
 		children = WidgetUtil.collect(
 			Div{
 				classes = {'match-bm-lol-players-team-header'},
