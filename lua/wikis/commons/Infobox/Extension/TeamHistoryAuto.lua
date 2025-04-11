@@ -16,7 +16,6 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
-local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 
@@ -97,10 +96,7 @@ function TeamHistoryAuto._getTeamLinkAndText(transfer)
 	end
 	local leaveDateCleaned = TeamHistoryAuto._adjustDate(transfer.leaveDate)
 	local teamData = mw.ext.TeamTemplate.raw(transfer.team, leaveDateCleaned) or {}
-	local shortenedTeamName = teamData.name
-	if string.len(shortenedTeamName) <= 17 then
 
-	end
 	return teamData.page, Link{
 		link = teamData.page,
 		children = {TeamHistoryAuto._shortenTeamName(teamData)}
@@ -126,7 +122,7 @@ end
 ---@param date string?
 ---@return string?
 function TeamHistoryAuto._adjustDate(date)
-	if type(date) ~= 'string' or String.isEmpty(date) then
+	if type(date) ~= 'string' or Logic.isEmpty(date) then
 		return date
 	end
 
@@ -274,7 +270,7 @@ function TeamHistoryAuto:_processTransfer(transfer)
 	local transferDate = DateExt.toYmdInUtc(transfer.date)
 	local transferList = self.transferList
 
-	if String.isNotEmpty(extraData.toteamsec) then
+	if Logic.isNotEmpty(extraData.toteamsec) then
 		-- transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
 		if (extraData.toteamsec ~= transfer.fromteam or extraData.role2sec ~= transfer.role1) and
 			(extraData.toteamsec ~= extraData.fromteamsec or extraData.role2sec ~= extraData.role1sec) then
