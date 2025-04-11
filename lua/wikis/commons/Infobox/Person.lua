@@ -21,6 +21,7 @@ local AgeCalculation = Lua.import('Module:AgeCalculation')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
@@ -34,6 +35,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
+local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 
 ---@class PersonRoleData
 ---@field category string?
@@ -174,18 +176,7 @@ function Person:createInfobox()
 				end
 			},
 		}},
-		Customizable{id = 'history', children = {
-			Builder{
-				builder = function()
-					if String.isNotEmpty(args.history) then
-						return {
-							Title{children = 'History'},
-							Center{children = {args.history}}
-						}
-					end
-				end
-			},
-		}},
+		Customizable{id = 'history', children = TeamHistoryWidget{player = self.pagename, manualInput = args.history}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
 	}
@@ -229,7 +220,8 @@ function Person:_parseArgs()
 
 	-- ENRICH TEAM
 	local function enrichTeam()
-		if Logic.readBool(args.autoTeam) then
+		local useAutoTeam = Logic.nilOr(Logic.readBoolOrNil(args.autoTeam), (Info.config.infoboxPlayer or {}).autoTeam)
+		if useAutoTeam then
 			local team, team2 = PlayerIntroduction.playerTeamAuto{player = self.pagename}
 			args.team = Logic.emptyOr(args.team, team)
 			args.team2 = Logic.emptyOr(args.team2, team2)
