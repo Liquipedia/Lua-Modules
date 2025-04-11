@@ -15,7 +15,7 @@ local Widget = Lua.import('Module:Widget')
 ---@operator call(table): IconWidget
 local Icon = Class.new(Widget)
 
----@return (string|Widget)?
+---@return (string|Widget)|(string|Widget)[]?
 function Icon:render()
 	error('Widget/Image/Icon is an interface and should not be instantiated directly')
 end
