@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
