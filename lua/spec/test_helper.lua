@@ -165,13 +165,6 @@ return function(busted, helper, options)
 				end}
 			end
 
-			-- TODO This should be added to git
-			if newName == 'TeamTemplate' then
-				return {
-					getPageName = function(s) return s end
-				}
-			end
-
 			if fileExists(newName) then
 				return require_original(newName)
 			end
@@ -186,7 +179,7 @@ return function(busted, helper, options)
 			local mocked_import = {}
 			setmetatable(mocked_import, {
 				__index = function(t, k)
-					print('Warning!', 'called', module, '.', k, 'but', module, 'was unable to be imported')
+					error(('Called ' .. module .. '.' .. k .. ' but ' .. module .. ' was unable to be imported'))
 				end
 			})
 
