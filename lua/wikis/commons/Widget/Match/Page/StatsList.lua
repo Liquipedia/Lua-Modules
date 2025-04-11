@@ -47,7 +47,7 @@ end
 function MatchPageStatsList:_renderStat(data)
 	local finished = self.props.finished
 	return Div{
-		classes = 'match-bm-team-stats-list-row',
+		classes = {'match-bm-team-stats-list-row'},
 		children = WidgetUtil.collect(
 			finished and Div{
 				classes = {'match-bm-team-stats-list-cell'},
