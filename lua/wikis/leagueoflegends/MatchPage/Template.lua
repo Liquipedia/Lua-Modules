@@ -10,41 +10,6 @@
 return {
 	game =
 		[=[
-			<h3>Picks and Bans</h3>
-			<div class="match-bm-lol-game-veto collapsed general-collapsible">
-				<div class="match-bm-lol-game-veto-overview">
-					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
-						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#teams.1.picks}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{teams.1.side}}"></div></li>{{/teams.1.picks}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#teams.1.bans}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/teams.1.bans}}</ul>
-						</div>
-					</div>
-					<div class="match-bm-lol-game-veto-overview-team"><div class="match-bm-lol-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
-						<div class="match-bm-lol-game-veto-overview-team-veto">
-							<ul class="match-bm-lol-game-veto-overview-pick" aria-labelledby="picks">{{#teams.2.picks}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}<div class="match-bm-lol-game-veto-pick-bar-{{teams.2.side}}"></div></li>{{/teams.2.picks}}</ul>
-							<ul class="match-bm-lol-game-veto-overview-ban" aria-labelledby="bans">{{#teams.2.bans}}<li class="match-bm-lol-game-veto-overview-item">{{&heroIcon}}</li>{{/teams.2.bans}}</ul>
-						</div>
-					</div>
-				</div>
-				<div class="match-bm-lol-game-veto-order-toggle ppt-toggle-expand">
-					<div class="general-collapsible-expand-button"><div>Show Order &nbsp;<i class="fa fa-chevron-down"></i></div></div>
-					<div class="general-collapsible-collapse-button"><div>Hide Order &nbsp;<i class="fa fa-chevron-up"></i></div></div>
-				</div>
-				<div class="match-bm-lol-game-veto-order-list ppt-hide-on-collapse">
-					<div class="match-bm-lol-game-veto-order-team">
-						<div class="match-bm-lol-game-veto-order-team-header">{{&opponents.1.iconDisplay}}</div>
-						<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-							{{#vetoByTeam.1}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.1.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/vetoByTeam.1}}
-						</div></div>
-					</div>
-					<div class="match-bm-lol-game-veto-order-team">
-						<div class="match-bm-lol-game-veto-order-team-header">{{&opponents.2.iconDisplay}}</div>
-						<div class="match-bm-lol-game-veto-order-team-choices"><div class="match-bm-lol-game-veto-order-team-choice-group">
-							{{#vetoByTeam.2}}{{#isNewGroup}}</div><div class="match-bm-lol-game-veto-order-team-choice-group">{{/isNewGroup}}<div class="match-bm-lol-game-veto-order-team-choice {{#isBan}}match-bm-lol-game-veto-order-ban{{/isBan}}" aria-labelledby="round {{vetoNumber}} {{#isBan}}ban{{/isBan}}{{^isBan}}pick{{/isBan}}"><div class="match-bm-lol-game-veto-order-step {{^isBan}}match-bm-lol-game-veto-order-step-{{teams.2.side}}{{/isBan}}">{{vetoNumber}}</div>{{&heroIcon}}</div>{{/vetoByTeam.2}}
-						</div></div>
-					</div>
-				</div>
-			</div>
 			<h3>Head-to-Head</h3>
 			<div class="match-bm-lol-h2h">
 				<div class="match-bm-lol-h2h-header">

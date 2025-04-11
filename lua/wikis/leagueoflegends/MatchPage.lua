@@ -26,11 +26,12 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
----@field vetoByTeam table[]
+---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
@@ -137,16 +138,18 @@ function MatchPage:populateGames()
 			return team
 		end)
 
-		local _
-		_, game.vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
+		local _, vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
+		game.vetoGroups = {}
 
-		Array.forEach(game.vetoByTeam, function(team)
+		Array.forEach(vetoByTeam, function(team, teamIndex)
+			local groupIndex = 1
 			local lastType = 'ban'
 			Array.forEach(team, function(veto)
-				veto.isBan = veto.type == 'ban'
-				veto.isNewGroup = lastType ~= veto.type
+				if lastType ~= veto.type then groupIndex = groupIndex + 1 end
+				veto.groupIndex = groupIndex
 				lastType = veto.type
 			end)
+			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
 		end)
 	end)
 end
@@ -171,6 +174,7 @@ function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
+			self:_renderGamePicksAndBans(game),
 			TemplateEngine():render(Display.game, inputTable)
 		)
 	}
@@ -234,6 +238,141 @@ function MatchPage:_renderGameOverview(game)
 						children = self.opponents[2].iconDisplay
 					},
 				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget[]?
+function MatchPage:_renderGamePicksAndBans(game)
+	return {
+		HtmlWidgets.H3{children = 'Picks and Bans'},
+		Div{
+			classes = {'match-bm-lol-game-veto', 'collapsed', 'general-collapsible'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-game-veto-overview'},
+					children = Array.map({1, 2}, function (teamIndex)
+						return self:_renderGameTeamVetoOverview(game, teamIndex)
+					end)
+				},
+				Div{
+					classes = {'match-bm-lol-game-veto-order-toggle', 'ppt-toggle-expand'},
+					children = {
+						Div{
+							classes = {'general-collapsible-expand-button'},
+							children = Div{children = {
+								'Show Order &nbsp;',
+								IconFa{iconName = 'expand'}
+							}}
+						},
+						Div{
+							classes = {'general-collapsible-collapse-button'},
+							children = Div{children = {
+								'Hide Order &nbsp;',
+								IconFa{iconName = 'collapse'}
+							}}
+						}
+					}
+				},
+				Div{
+					classes = {'match-bm-lol-game-veto-order-list', 'ppt-hide-on-collapse'},
+					children = {
+						self:_renderGameTeamVetoOrder(game, 1),
+						self:_renderGameTeamVetoOrder(game, 2),
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderGameTeamVetoOverview(game, teamIndex)
+	return Div{
+		classes = {'match-bm-lol-game-veto-overview-team'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-veto-overview-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Div{
+				classes = {'match-bm-lol-game-veto-overview-team-veto'},
+				children = {
+					HtmlWidgets.Ul{
+						classes = {'match-bm-lol-game-veto-overview-pick'},
+						attributes = {['aria-labelledby'] = 'picks'},
+						children = Array.map(game.teams[teamIndex].picks, function (pick)
+							return HtmlWidgets.Li{
+								classes = {'match-bm-lol-game-veto-overview-item'},
+								children = {
+									self:getCharacterIcon(pick),
+									Div{classes = {'match-bm-lol-game-veto-pick-bar-' .. game.teams[teamIndex].side}}
+								}
+							}
+						end)
+					},
+					HtmlWidgets.Ul{
+						classes = {'match-bm-lol-game-veto-overview-ban'},
+						attributes = {['aria-labelledby'] = 'bans'},
+						children = Array.map(game.teams[teamIndex].bans, function (ban)
+							return HtmlWidgets.Li{
+								classes = {'match-bm-lol-game-veto-overview-item'},
+								children = {self:getCharacterIcon(ban)}
+							}
+						end)
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderGameTeamVetoOrder(game, teamIndex)
+	return Div{
+		classes = {'match-bm-lol-game-veto-order-team'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-veto-order-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Div{
+				classes = {'match-bm-lol-game-veto-order-team-choices'},
+				children = Array.map(game.vetoGroups[teamIndex], function (vetoGroup)
+					return Div{
+						classes = {'match-bm-lol-game-veto-order-team-choice-group'},
+						children = Array.map(vetoGroup, function (veto)
+							return Div{
+								classes = Array.extend(
+									'match-bm-lol-game-veto-order-team-choice',
+									veto.type == 'ban' and 'match-bm-lol-game-veto-order-ban' or nil
+								),
+								attributes = {['aria-labelledby'] = 'round ' .. veto.vetoNumber .. ' ' .. veto.type},
+								children = {
+									Div{
+										classes = Array.extend(
+											'match-bm-lol-game-veto-order-step',
+											veto.type == 'pick' and (
+												'match-bm-lol-game-veto-order-step-' .. game.teams[teamIndex].side
+											) or nil
+										),
+										children = {veto.vetoNumber}
+									},
+									self:getCharacterIcon(veto)
+								}
+							}
+						end)
+					}
+				end)
 			}
 		}
 	}
