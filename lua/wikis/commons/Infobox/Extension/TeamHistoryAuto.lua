@@ -11,7 +11,6 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
@@ -29,7 +28,13 @@ local Td = HtmlWidgets.Td
 local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local LANG = mw.language.getContentLanguage()
+local Condition = require('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local SPECIAL_ROLES = {'Retired', 'Retirement', 'Military'}
 local SPECIAL_ROLES_LOWER = Array.map(SPECIAL_ROLES, string.lower)
 local LOAN = 'Loan'
@@ -55,11 +60,6 @@ local TeamHistoryAuto = Class.new(function(self, args)
 		iconModule = configFromInfo.iconModule and Lua.import(configFromInfo.iconModule),
 	}
 end)
-
----@return self
-function TeamHistoryAuto:fetch()
-
-end
 
 ---@return self
 function TeamHistoryAuto:store()
@@ -141,14 +141,14 @@ function TeamHistoryAuto:build()
 
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
-		children = Array.map(self.transferList, FnUtil.curry(TeamHistoryAuto._row, self))
+		children = Array.map(self.transferList, FnUtil.curry(self._row, self))
 	}
 end
 
 ---@param transfer table
 ---@return Widget
 function TeamHistoryAuto:_row(transfer)
-	local teamLink, teamText = TeamHistoryAuto._getTeamLinkAndText(transfer)
+	local _, teamText = TeamHistoryAuto._getTeamLinkAndText(transfer)
 
 	local role = transfer.role
 	if ROLE_CONVERT and role then
@@ -213,50 +213,45 @@ function TeamHistoryAuto._buildLeaveDateDisplay(transfer)
 	end
 end
 
+---@return transfer[]
+function TeamHistoryAuto:_query()
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
+		ConditionNode(ColumnName('player'), Comparator.eq, self.config.player),
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('toteam'), Comparator.neq, ''),
+			Array.map(SPECIAL_ROLES, function(role)
+				return ConditionNode(ColumnName('role2'), Comparator.eq, role)
+			end),
+			Array.map(SPECIAL_ROLES, function(role)
+				return ConditionNode(ColumnName('role2'), Comparator.eq, role:lower())
+			end),
+		},
+	}
 
-
-
-
-
-
-
-
-
----[[ OLD STUFF ]]
-
-
-function TeamHistoryAuto._buildTransferList()
-	local roleConditions = _config.specialRoles and (' OR ' .. table.concat(Array.map(SPECIAL_ROLES, function(role)
-		return '[[role2::' .. role .. ']] OR [[role2::' .. role:lower() .. ']]'
-	end), ' OR ')) or ''
-
-	local transferData = mw.ext.LiquipediaDB.lpdb('transfer', {
-		conditions = '[[player::' .. _config.player .. ']] AND ([[toteam::>]]' .. roleConditions .. ') AND [[date::>' .. DateExt.defaultDate .. ']]',
+	return mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = conditions:toString(),
 		order = 'date asc',
 		limit = 5000,
 		query = 'pagename, fromteam, toteam, role1, role2, date, extradata'
-	}) --[[@as transfer[]?]]
+	})
+end
 
-	local transferList = {}
+---@return self
+function TeamHistoryAuto:fetch()
+	self.transferList = {}
+	Array.forEach(self:_query(), FnUtil.curry(self._processTransfer, self))
 
-	-- Process transfer (team, role, join date)
-	for _, transfer in ipairs(transferData or {}) do
-		-- need it like this; can not insert directly, else we get errors in some edge cases
-		local transferEntry = TeamHistoryAuto._processTransfer(transfer, transferList)
+	if ROLE_CLEAN then
+		Array.forEach(self.transferList, function(transfer)
+			transfer.role = ROLE_CLEAN[(transfer.role or ''):lower()]
+		end)
 	end
 
-	-- release transferData to free up memory
-	transferData = nil
-
-	for _, transfer in pairs(transferList) do
-		if _config.roleClean then
-			transfer.role = _config.roleClean[(transfer.role or ''):lower()]
-		end
-		TeamHistoryAuto._completeTransfer(transfer)
-	end
+	self.transferList = Array.map(self.transferList, TeamHistoryAuto._completeTransfer)
 
 	-- Sort table by joinDate/leaveDate
-	table.sort(transferList, function(transfer1, transfer2)
+	table.sort(self.transferList, function(transfer1, transfer2)
 		if transfer1.joinDate == transfer2.joinDate then
 			if transfer1.role == LOAN and transfer2.role ~= LOAN then
 				return false
@@ -270,12 +265,14 @@ function TeamHistoryAuto._buildTransferList()
 		return transfer1.joinDate < transfer2.joinDate
 	end)
 
-	return transferList
+	return self
 end
 
-function TeamHistoryAuto._processTransfer(transfer, transferList)
+---@param transfer transfer
+function TeamHistoryAuto:_processTransfer(transfer)
 	local extraData = transfer.extradata
-	local transferDate = LANG:formatDate('Y-m-d', transfer.date)
+	local transferDate = DateExt.toYmdInUtc(transfer.date)
+	local transferList = self.transferList
 
 	if String.isNotEmpty(extraData.toteamsec) then
 		-- transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
@@ -314,6 +311,8 @@ function TeamHistoryAuto._processTransfer(transfer, transferList)
 	end
 end
 
+---@param transfer table
+---@return table
 function TeamHistoryAuto._completeTransfer(transfer)
 	local leaveTransfers = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = TeamHistoryAuto._buildConditions(transfer),
@@ -321,53 +320,69 @@ function TeamHistoryAuto._completeTransfer(transfer)
 		query = 'toteam, role2, date, extradata'
 	})
 
-	for _, leaveTransfer in ipairs(leaveTransfers) do
+	local hasLeaveDate = function(leaveTransfer)
 		local extraData = leaveTransfer.extradata
 
-		if
-			(leaveTransfer.toteam ~= transfer.team or leaveTransfer.role2 ~= (transfer.role or '') or extraData.icon2 ~= transfer.position)
-			and (extraData.toteamsec ~= transfer.team or extraData.role2sec ~= (transfer.role or '')) then
+		return (
+			extraData.toteamsec ~= transfer.team or
+			extraData.role2sec ~= (transfer.role or '')
+		) and (
+			leaveTransfer.toteam ~= transfer.team or
+			leaveTransfer.role2 ~= (transfer.role or '') or
+			extraData.icon2 ~= transfer.position
+		)
+	end
 
-			transfer.leaveDate = LANG:formatDate('Y-m-d', leaveTransfer.date)
-			transfer.leaveDateDisplay = extraData.displaydate or transfer.leaveDate
+	for _, leaveTransfer in ipairs(leaveTransfers) do
+		if hasLeaveDate(leaveTransfer) then
+			transfer.leaveDate = DateExt.toYmdInUtc(leaveTransfer.date)
+			transfer.leaveDateDisplay = leaveTransfer.extradata.dispaydate or transfer.leaveDate
 
-			break
+			return transfer
 		end
 	end
+
+	return transfer
 end
 
+---@param transfer table
+---@return string
 function TeamHistoryAuto._buildConditions(transfer)
-	local historicalNames = Team.queryHistoricalNames(transfer.team)
-
-	local conditions = {
-		'[[player::' .. _config.player .. ']]',
-		'([[date::>' .. transfer.joinDate .. ']] OR [[date::' .. transfer.joinDate .. ']])'
+	local conditions = ConditionTree(BooleanOperator.all):add{
+		ConditionNode(ColumnName('date'), Comparator.ge, transfer.joinDate),
+		ConditionNode(ColumnName('player'), Comparator.eq, transfer.player),
 	}
 
-	if historicalNames then
-		local fromCondition = Array.map(historicalNames, function(team) return '[[fromteam::' .. team .. ']]' end)
-		fromCondition = '(' .. table.concat(fromCondition, ' OR ') .. ')'
-		if transfer.role then
-			fromCondition = fromCondition .. ' AND [[role1::' .. transfer.role .. ']]'
-		elseif not _config.roleClean then
-			fromCondition = fromCondition .. ' AND [[role1::]]'
+	local historicalNames = Team.queryHistoricalNames(transfer.team)
+
+	local buildFromConditions = function(teamField, roleField)
+		local fromConditions = ConditionTree(BooleanOperator.any):add(Array.map(historicalNames, function(team)
+			return ConditionNode(ColumnName(teamField), Comparator.eq, team)
+		end))
+
+		if ROLE_CLEAN and not transfer.role then
+			return fromConditions
 		end
 
-		local fromConditionSecondary = Array.map(historicalNames, function(team) return '[[extradata_fromteamsec::' .. team .. ']]' end)
-		fromConditionSecondary = '(' .. table.concat(fromConditionSecondary, ' OR ') .. ')'
-		if transfer.role then
-			fromConditionSecondary = fromConditionSecondary .. ' AND [[extradata_role1sec::' .. transfer.role .. ']]'
-		elseif not _config.roleClean then
-			fromConditionSecondary = fromConditionSecondary .. ' AND [[extradata_role1sec::]]'
-		end
-
-		table.insert(conditions, '(' .. fromCondition .. ' OR ' .. fromConditionSecondary .. ')')
-	elseif Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
-		table.insert(conditions, '[[role1::' .. transfer.role .. ']] OR [[role1::' .. transfer.role:lower() .. ']]')
+		return ConditionTree(BooleanOperator.all):add{
+			fromConditions,
+			ConditionNode(ColumnName(roleField), Comparator.eq, transfer.role or ''),
+		}
 	end
 
-	return table.concat(conditions, ' AND ')
-end
+	if Logic.isNotEmpty(historicalNames) then
+		conditions:add(ConditionTree(BooleanOperator.any):add{
+			buildFromConditions('fromteam', 'role1'),
+			buildFromConditions('extradata_fromteamsec', 'extradata_role1sec'),
+		})
+	elseif Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+		conditions:add(ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role),
+			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role:lower()),
+		})
+	end
 
+	return conditions:toString()
+end
 
 return TeamHistoryAuto
