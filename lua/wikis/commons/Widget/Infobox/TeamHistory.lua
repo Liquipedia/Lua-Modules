@@ -19,7 +19,7 @@ local Widgets = require('Module:Widget/All')
 local Big = HtmlWidgets.Big
 local Div = HtmlWidgets.Div
 
----@alias automatedHistoryMode 'ifEmpty'|'cleanup'|true|false?
+---@alias automatedHistoryMode 'ifEmpty'|'cleanup'|'both'|true|false?
 
 ---@class TeamHistoryWidget: Widget
 ---@operator call(table): TitleWidget
@@ -59,8 +59,15 @@ function TeamHistory:_getHistory()
 		iconModule = config.iconModule, -- string?
 	}
 
-	if Logic.isEmpty(self.props.manualInput) or automatedHistoryMode ~= 'cleanup' then
+	if Logic.isEmpty(self.props.manualInput) or (automatedHistoryMode ~= 'cleanup' and automatedHistoryMode ~= 'both') then
 		return automatedHistory
+	end
+
+	if automatedHistoryMode == 'both' then
+		return Div{children = {
+			self.props.manualInput,
+			automatedHistory,
+		}}
 	end
 
 	return Div{children = {
