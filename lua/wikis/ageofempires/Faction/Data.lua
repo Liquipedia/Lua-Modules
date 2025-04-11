@@ -895,6 +895,7 @@ return {
 			hin = 'hindustanis',
 			hun = 'huns',
 			inc = 'inca',
+			incas = 'inca'
 			ind = 'indians',
 			ita = 'italians',
 			jap = 'japanese',
@@ -909,6 +910,7 @@ return {
 			mal = 'malians',
 			mli = 'malians',
 			may = 'maya',
+			mayans = 'maya',
 			mon = 'mongols',
 			per = 'persians',
 			pol = 'poles',
