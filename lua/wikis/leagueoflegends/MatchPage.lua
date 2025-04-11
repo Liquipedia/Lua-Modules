@@ -17,17 +17,21 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TemplateEngine = require('Module:TemplateEngine')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local Display = Lua.import('Module:MatchPage/Template')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local Link = Lua.import('Module:Widget/Basic/Link')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
----@field vetoByTeam table[]
+---@field vetoGroups {type: 'ban'|'pick', team: integer, character: string, vetoNumber: integer}[][]
 
 ---@class LoLMatchPage: BaseMatchPage
 ---@field games LoLMatchPageGame[]
@@ -105,7 +109,6 @@ function MatchPage:populateGames()
 			team.players = Array.map(opponent.players, function(player)
 				if Logic.isDeepEmpty(player) then return end
 				return Table.mergeInto(player, {
-					roleIcon = player.role .. ' ' .. team.side,
 					items = Array.map(Array.range(1, ITEMS_TO_SHOW), function(idx)
 						return player.items[idx] or DEFAULT_ITEM
 					end),
@@ -134,16 +137,18 @@ function MatchPage:populateGames()
 			return team
 		end)
 
-		local _
-		_, game.vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
+		local _, vetoByTeam = Array.groupBy(game.extradata.vetophase or {}, Operator.property('team'))
+		game.vetoGroups = {}
 
-		Array.forEach(game.vetoByTeam, function(team)
+		Array.forEach(vetoByTeam, function(team, teamIndex)
+			local groupIndex = 1
 			local lastType = 'ban'
 			Array.forEach(team, function(veto)
-				veto.isBan = veto.type == 'ban'
-				veto.isNewGroup = lastType ~= veto.type
+				if lastType ~= veto.type then groupIndex = groupIndex + 1 end
+				veto.groupIndex = groupIndex
 				lastType = veto.type
 			end)
+			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
 		end)
 	end)
 end
@@ -160,11 +165,488 @@ function MatchPage:getCharacterIcon(character)
 	}
 end
 
----@return string
+---@param game LoLMatchPageGame
+---@return Widget
 function MatchPage:renderGame(game)
 	local inputTable = Table.merge(self.matchData, game)
 	inputTable.heroIcon = FnUtil.curry(self.getCharacterIcon, self)
-	return TemplateEngine():render(Display.game, inputTable)
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderGameOverview(game),
+			self:_renderGamePicksAndBans(game),
+			self:_renderTeamStats(game),
+			self:_renderPlayersPerformance(game)
+		)
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget?
+function MatchPage:_renderGameOverview(game)
+	if self:isBestOfOne() then return end
+	return Div{
+		classes = {'match-bm-lol-game-overview'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-summary'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-game-summary-team'},
+						children = self.opponents[1].iconDisplay
+					},
+					Div{
+						classes = {'match-bm-lol-game-summary-center'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-game-summary-faction'},
+								children = game.teams[1].side and IconImage{
+									imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
+									link = '',
+									caption = game.teams[1].side .. ' side'
+								} or nil
+							},
+							Div{
+								classes = {'match-bm-lol-game-summary-score-holder'},
+								children = game.finished and {
+									Div{
+										classes = {'match-bm-lol-game-summary-score'},
+										children = {
+											game.teams[1].scoreDisplay,
+											'&ndash;',
+											game.teams[2].scoreDisplay
+										}
+									},
+									Div{
+										classes = {'match-bm-lol-game-summary-length'},
+										children = game.length
+									}
+								} or nil
+							},
+							Div{
+								classes = {'match-bm-lol-game-summary-faction'},
+								children = game.teams[2].side and IconImage{
+									imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
+									link = '',
+									caption = game.teams[2].side .. ' side'
+								} or nil
+							}
+						}
+					},
+					Div{
+						classes = {'match-bm-lol-game-summary-team'},
+						children = self.opponents[2].iconDisplay
+					},
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget[]?
+function MatchPage:_renderGamePicksAndBans(game)
+	return {
+		HtmlWidgets.H3{children = 'Picks and Bans'},
+		Div{
+			classes = {'match-bm-lol-game-veto', 'collapsed', 'general-collapsible'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-game-veto-overview'},
+					children = Array.map({1, 2}, function (teamIndex)
+						return self:_renderGameTeamVetoOverview(game, teamIndex)
+					end)
+				},
+				Div{
+					classes = {'match-bm-lol-game-veto-order-toggle', 'ppt-toggle-expand'},
+					children = {
+						Div{
+							classes = {'general-collapsible-expand-button'},
+							children = Div{children = {
+								'Show Order &nbsp;',
+								IconFa{iconName = 'expand'}
+							}}
+						},
+						Div{
+							classes = {'general-collapsible-collapse-button'},
+							children = Div{children = {
+								'Hide Order &nbsp;',
+								IconFa{iconName = 'collapse'}
+							}}
+						}
+					}
+				},
+				Div{
+					classes = {'match-bm-lol-game-veto-order-list', 'ppt-hide-on-collapse'},
+					children = {
+						self:_renderGameTeamVetoOrder(game, 1),
+						self:_renderGameTeamVetoOrder(game, 2),
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderGameTeamVetoOverview(game, teamIndex)
+	return Div{
+		classes = {'match-bm-lol-game-veto-overview-team'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-veto-overview-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Div{
+				classes = {'match-bm-lol-game-veto-overview-team-veto'},
+				children = {
+					HtmlWidgets.Ul{
+						classes = {'match-bm-lol-game-veto-overview-pick'},
+						attributes = {['aria-labelledby'] = 'picks'},
+						children = Array.map(game.teams[teamIndex].picks, function (pick)
+							return HtmlWidgets.Li{
+								classes = {'match-bm-lol-game-veto-overview-item'},
+								children = {
+									self:getCharacterIcon(pick),
+									Div{classes = {'match-bm-lol-game-veto-pick-bar-' .. game.teams[teamIndex].side}}
+								}
+							}
+						end)
+					},
+					HtmlWidgets.Ul{
+						classes = {'match-bm-lol-game-veto-overview-ban'},
+						attributes = {['aria-labelledby'] = 'bans'},
+						children = Array.map(game.teams[teamIndex].bans, function (ban)
+							return HtmlWidgets.Li{
+								classes = {'match-bm-lol-game-veto-overview-item'},
+								children = {self:getCharacterIcon(ban)}
+							}
+						end)
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderGameTeamVetoOrder(game, teamIndex)
+	return Div{
+		classes = {'match-bm-lol-game-veto-order-team'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-veto-order-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Div{
+				classes = {'match-bm-lol-game-veto-order-team-choices'},
+				children = Array.map(game.vetoGroups[teamIndex], function (vetoGroup)
+					return Div{
+						classes = {'match-bm-lol-game-veto-order-team-choice-group'},
+						children = Array.map(vetoGroup, function (veto)
+							return Div{
+								classes = Array.extend(
+									'match-bm-lol-game-veto-order-team-choice',
+									veto.type == 'ban' and 'match-bm-lol-game-veto-order-ban' or nil
+								),
+								attributes = {['aria-labelledby'] = 'round ' .. veto.vetoNumber .. ' ' .. veto.type},
+								children = {
+									Div{
+										classes = Array.extend(
+											'match-bm-lol-game-veto-order-step',
+											veto.type == 'pick' and (
+												'match-bm-lol-game-veto-order-step-' .. game.teams[teamIndex].side
+											) or nil
+										),
+										children = {veto.vetoNumber}
+									},
+									self:getCharacterIcon(veto)
+								}
+							}
+						end)
+					}
+				end)
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-team-stats-header'},
+					children = {
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[1].iconDisplay
+						},
+						Div{classes = {'match-bm-team-stats-list-cell'}},
+						Div{
+							classes = {'match-bm-lol-team-stats-header-team'},
+							children = self.opponents[2].iconDisplay
+						}
+					}
+				},
+				StatsList{
+					finished = game.finished,
+					data = {
+						{
+							icon = IconImage{imageLight = 'Lol stat icon kda.png', link = ''},
+							name = 'KDA',
+							team1Value = Array.interleave({
+								game.teams[1].kills,
+								game.teams[1].deaths,
+								game.teams[1].assists
+							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'}),
+							team2Value = Array.interleave({
+								game.teams[2].kills,
+								game.teams[2].deaths,
+								game.teams[2].assists
+							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'})
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon gold.png', link = ''},
+							name = 'Gold',
+							team1Value = game.teams[1].gold,
+							team2Value = game.teams[2].gold
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
+							name = 'Towers',
+							team1Value = game.teams[1].objectives.towers,
+							team2Value = game.teams[2].objectives.towers
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
+							name = 'Inhibitors',
+							team1Value = game.teams[1].objectives.inhibitors,
+							team2Value = game.teams[2].objectives.inhibitors
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+							name = 'Barons',
+							team1Value = game.teams[1].objectives.barons,
+							team2Value = game.teams[2].objectives.barons
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+							name = 'Dragons',
+							team1Value = game.teams[1].objectives.dragons,
+							team2Value = game.teams[2].objectives.dragons
+						}
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget[]
+function MatchPage:_renderPlayersPerformance(game)
+	return {
+		HtmlWidgets.H3{children = 'Player Performance'},
+		Div{
+			classes = {'match-bm-lol-players-wrapper'},
+			children = {
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderTeamPerformance(game, teamIndex)
+	return Div{
+		classes = {'match-bm-lol-players-team'},
+		children = WidgetUtil.collect(
+			Div{
+				classes = {'match-bm-lol-players-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Array.map(game.teams[teamIndex].players, function (player)
+				return self:_renderPlayerPerformance(game, teamIndex, player)
+			end)
+		)
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@param teamIndex integer
+---@param player table
+---@return Widget
+function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	return Div{
+		classes = {'match-bm-lol-players-player'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-players-player-details'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-character'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-players-player-avatar'},
+								children = {
+									Div{
+										classes = {'match-bm-lol-players-player-icon'},
+										children = self:getCharacterIcon(player)
+									},
+									Div{
+										classes = {'match-bm-lol-players-player-role'},
+										children = IconImage{
+											imageLight = 'Lol role ' .. player.role .. ' '
+												.. game.teams[teamIndex].side .. '.png',
+											link = '',
+											caption = player.role
+										}
+									}
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-players-player-name'},
+								children = {
+									Link{link = player.player},
+									HtmlWidgets.I{children = player.character}
+								}
+							}
+						}
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-loadout'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
+								children = {
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-rs'},
+										children = {
+											IconImage{
+												imageLight = 'Rune ' .. player.runeKeystone .. '.png',
+												link = '',
+												size = '24px'
+											},
+											IconImage{
+												imageLight = 'Rune ' .. player.runes.secondary.tree .. '.png',
+												link = '',
+												size = '24px'
+											},
+										}
+									},
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-rs'},
+										children = Array.map(player.spells, function (spell)
+											return IconImage{
+												imageLight = 'Summoner spell ' .. spell .. '.png',
+												link = '',
+												size = '24px'
+											}
+										end)
+									}
+								}
+							},
+							Div{
+								classes = {'match-bm-lol-players-player-loadout-items'},
+								children = {
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-item'},
+										children = Array.map(Array.range(1, 3), function (itemIndex)
+											return IconImage{
+												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
+												link = player.items[itemIndex],
+												size = '24px'
+											}
+										end)
+									},
+									Div{
+										classes = {'match-bm-lol-players-player-loadout-item'},
+										children = Array.map(Array.range(4, 6), function (itemIndex)
+											return IconImage{
+												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
+												link = player.items[itemIndex],
+												size = '24px'
+											}
+										end)
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-lol-players-player-stats'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon kda.png',
+								caption = 'KDA',
+								link = ''
+							},
+							Array.interleave({
+								player.kills, player.deaths, player.assists
+							}, '/')
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon cs.png',
+								caption = 'CS',
+								link = ''
+							},
+							player.creepscore
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon gold.png',
+								caption = 'Gold',
+								link = ''
+							},
+							MatchPage.abbreviateNumber(player.gold)
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
+								imageLight = 'Lol stat icon dmg.png',
+								caption = 'KDA',
+								link = ''
+							},
+							player.damagedone
+						)
+					}
+				}
+			}
+		}
+	}
 end
 
 ---@return MatchPageComment[]
