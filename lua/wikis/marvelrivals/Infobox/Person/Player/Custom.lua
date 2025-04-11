@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=marvel rivals
+-- wiki=marvelrivals
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -24,6 +24,7 @@ local Player = Lua.import('Module:Infobox/Person')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Cell = Widgets.Cell
 
 local ROLES = {
@@ -107,7 +108,10 @@ end
 function CustomPlayer:_displayRole(roleData)
 	if not roleData then return end
 
-	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
+	return Link{
+		link = ':Category:' .. roleData.category,
+		children = roleData.variable
+	}
 end
 
 ---@param args table
