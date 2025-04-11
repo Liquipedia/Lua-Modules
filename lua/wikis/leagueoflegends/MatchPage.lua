@@ -28,6 +28,7 @@ local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
@@ -175,6 +176,7 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
 			self:_renderGamePicksAndBans(game),
+			self:_renderTeamStats(game),
 			TemplateEngine():render(Display.game, inputTable)
 		)
 	}
@@ -373,6 +375,83 @@ function MatchPage:_renderGameTeamVetoOrder(game, teamIndex)
 						end)
 					}
 				end)
+			}
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-lol-h2h-header'},
+					children = {
+						Div{
+							classes = {'match-bm-lol-h2h-header-team'},
+							children = self.opponents[1].iconDisplay
+						},
+						Div{classes = {'match-bm-team-stats-list-cell'}},
+						Div{
+							classes = {'match-bm-lol-h2h-header-team'},
+							children = self.opponents[2].iconDisplay
+						}
+					}
+				},
+				StatsList{
+					finished = game.finished,
+					data = {
+						{
+							icon = IconImage{imageLight = 'Lol stat icon kda.png', link = ''},
+							name = 'KDA',
+							team1Value = Array.interleave({
+								game.teams[1].kills,
+								game.teams[1].deaths,
+								game.teams[1].assists
+							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'}),
+							team2Value = Array.interleave({
+								game.teams[2].kills,
+								game.teams[2].deaths,
+								game.teams[2].assists
+							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'})
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon gold.png', link = ''},
+							name = 'Gold',
+							team1Value = game.teams[1].gold,
+							team2Value = game.teams[2].gold
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon tower.png', link = ''},
+							name = 'Towers',
+							team1Value = game.teams[1].objectives.towers,
+							team2Value = game.teams[2].objectives.towers
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon inhibitor.png', link = ''},
+							name = 'Inhibitors',
+							team1Value = game.teams[1].objectives.inhibitors,
+							team2Value = game.teams[2].objectives.inhibitors
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon baron.png', link = ''},
+							name = 'Barons',
+							team1Value = game.teams[1].objectives.barons,
+							team2Value = game.teams[2].objectives.barons
+						},
+						{
+							icon = IconImage{imageLight = 'Lol stat icon dragon.png', link = ''},
+							name = 'Dragons',
+							team1Value = game.teams[1].objectives.dragons,
+							team2Value = game.teams[2].objectives.dragons
+						}
+					}
+				}
 			}
 		}
 	}
