@@ -9,7 +9,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:lua')
 local String = require('Module:StringUtils')
 local Page = require('Module:Page')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -17,9 +16,34 @@ local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
+local ROLES = {
+	-- Players
+	support = {category = 'Support players', variable = 'Support'},
+	rusher = {category = 'Rusher', variable = 'Rusher'},
+	sniper = {category = 'Snipers', variable = 'Snipers'},
+	granader = {category = 'Granader', variable = 'Granader'},
+	igl = {category = 'In-game leaders', variable = 'In-game leader'},
+	captain = {category = 'Captain', variable = 'Captain'},
+
+	--Staff and Talents
+	analyst = {category = 'Analysts', variable = 'Analyst', staff = true},
+	coach = {category = 'Coaches', variable = 'Coach', staff = true},
+	['assistant coach'] = {category = 'Assistant Coach ', variable = 'Assistant Coach', staff = true},
+	manager = {category = 'Managers', variable = 'Manager', staff = true},
+	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
+	host = {category = 'Hosts', variable = 'Host', talent = true},
+	journalist = {category = 'Journalists', variable = 'Journalist', talent = true},
+	caster = {category = 'Casters', variable = 'Caster', talent = true},
+	commentator = {category = 'Commentators', variable = 'Commentator', talent = true},
+	producer = {category = 'Producers', variable = 'Producer', talent = true},
+	streamer = {category = 'Streamers', variable = 'Streamer', talent = true},
+	interviewer = {category = 'Interviewers', variable = 'Interviewer', talent = true},
+}
+
+---@class FreefireInfoboxPlayer: Person
+---@field role {category: string, variable: string, talent: boolean?, staff: boolean?}?
+---@field role2 {category: string, variable: string, talent: boolean?, staff: boolean?}?
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -39,21 +63,7 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			player = caller.pagename
-		}
-
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {manualHistory}},
-				Center{children = {automatedHistory}},
-			}
-		end
-	elseif id == 'status' then
+	if id == 'status' then
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},

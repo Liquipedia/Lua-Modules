@@ -12,15 +12,12 @@ local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local SIZE_HERO = '25x25px'
 
@@ -62,21 +59,6 @@ function CustomInjector:parse(id, widgets)
 			name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
 			content = {table.concat(heroIcons, '&nbsp;')},
 		})
-	elseif id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			iconModule = 'Module:PositionIcon/data',
-			player = caller.pagename
-		}
-
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {manualHistory}},
-				Center{children = {automatedHistory}},
-			}
-		end
 	elseif id == 'region' then return {}
 	end
 	return widgets

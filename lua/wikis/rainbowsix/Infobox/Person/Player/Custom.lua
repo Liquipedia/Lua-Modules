@@ -15,7 +15,6 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -46,7 +45,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{addlpdbdata = true, specialRoles = true}
 	-- Automatic achievements
 	player.args.achievements = Achievements.player{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS

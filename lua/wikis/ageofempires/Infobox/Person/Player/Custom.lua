@@ -19,7 +19,6 @@ local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -76,28 +75,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	local args = player.args
-
-	local automatedHistory = TeamHistoryAuto.results{player = player.pagename, convertrole = true, addlpdbdata = true}
-	if String.isEmpty(args.history) then
-		player.args.history = automatedHistory
-	else
-		args.history = tostring(mw.html.create('div')
-			:tag('div')
-				:tag('big')
-					:addClass("show-when-logged-in")
-					:addClass("navigation-not-searchable")
-					:wikitext("Automated History")
-					:done()
-				:wikitext(automatedHistory)
-				:done()
-			:tag('div')
-				:addClass("show-when-logged-in")
-				:addClass("navigation-not-searchable")
-				:tag('big'):wikitext("Manual History"):done()
-				:wikitext(args.history)
-				:done()
-			)
-	end
 
 	-- Automatic achievements
 	args.achievements = Achievements.player{player = player.pagename, noTemplate = true}

@@ -27,7 +27,6 @@ local YearsActive = require('Module:YearsActive')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local CustomPerson = Lua.import('Module:Infobox/Person/Custom')
 local Opponent = Lua.import('Module:Opponent/Starcraft')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 
 local Condition = require('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -77,14 +76,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
-
-	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
-		player = player.pagename,
-		convertrole = true,
-		addlpdbdata = Logic.emptyOr(player.args.addlpdbdata, true),
-		cleanRoles = 'Module:TeamHistoryAuto/cleanRole',
-		specialRoles = true,
-	}
 
 	if player.shouldQueryData then
 		player:_getMatchupData(player.pagename)

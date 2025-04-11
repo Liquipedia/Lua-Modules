@@ -11,7 +11,6 @@ local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -30,12 +29,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.history = String.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
-		hiderole = true,
-		iconModule = 'Module:PositionIcon/data',
-		addlpdbdata = true,
-	}
 
 	return player:createInfobox()
 end
