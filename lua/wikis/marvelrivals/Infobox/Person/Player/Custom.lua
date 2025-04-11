@@ -10,10 +10,12 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+local Region = require('Module:Region')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Team = require('Module:Team')
-local Variables = require('Module:Variables')
 local Template = require('Module:Template')
+local Variables = require('Module:Variables')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
@@ -89,6 +91,7 @@ function CustomInjector:parse(id, widgets)
 				caller:_displayRole(caller.role2),
 			}},
 		}
+	end
 
 	return widgets
 end
@@ -131,19 +134,17 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.extradata.role2 = (self.role2 or {}).variable
 
 	-- store signature heroes with standardized name
-	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
-		lpdbData.extradata['signatureHero' .. heroIndex] = CharacterNames[hero:lower()]
-		if heroIndex == MAX_NUMBER_OF_SIGNATURE_HEROES then
-			break
-		end
-	end
+	Table.mergeInto(lpdbData.extradata, Table.map(
+		Array.sub(self:getAllArgsForBase(args, 'hero'), 1, MAX_NUMBER_OF_SIGNATURE_HEROES),
+		function(index, hero) return 'signatureHero' .. index, CharacterNames[hero:lower()]
+	end))
 
 	lpdbData.type = self:_isPlayerOrStaff()
 
-	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
+	lpdbData.region = Region.name({region = args.region, country = args.country})
 
 	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = mw.ext.TeamTemplate.raw(args.team2).page
+		lpdbData.extradata.team2 = args.team2
 	end
 
 	return lpdbData
@@ -167,14 +168,9 @@ end
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		local team2Page = String.isNotEmpty(self.args.team2) and Team.page(mw.getCurrentFrame(), self.args.team2) or nil
 		return
 			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Upcoming and ongoing tournaments of',
-				{team = teamPage}, {team2 = team2Page}
-			)
+			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 	end
 end
 
