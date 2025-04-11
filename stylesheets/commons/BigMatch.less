@@ -1061,36 +1061,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
-.match-bm-lol-h2h {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	font-weight: bold;
-}
-
-.match-bm-lol-h2h-header {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	background: #eaecf0;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-.match-bm-lol-h2h-header-team {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 16px;
-	flex: 1;
-}
-
 .match-bm-lol-game-overview {
 	border: 1px solid #bbbbbb;
 
@@ -1362,5 +1332,28 @@ ul.match-bm-lol-game-veto-overview-pick {
 				filter: invert( 1 );
 			}
 		}
+	}
+}
+
+.match-bm-lol-team-stats-header {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	background: #eaecf0;
+	border: 1px solid #bbbbbb;
+	align-self: stretch;
+
+	&-team{
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		padding: 16px;
+		flex: 1;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
 	}
 }
