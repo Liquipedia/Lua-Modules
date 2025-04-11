@@ -26,7 +26,7 @@ local MatchPageComment = Class.new(Widget)
 function MatchPageComment:render()
 	return {
 		Div{
-			classes = { 'match-bm-lol-match-additional-list' },
+			classes = { 'match-bm-match-additional-comment' },
 			children = WidgetUtil.collect(self.props.children)
 		}
 	}

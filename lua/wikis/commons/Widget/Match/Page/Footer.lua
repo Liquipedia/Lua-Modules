@@ -28,13 +28,15 @@ local MatchPageFooter = Class.new(Widget)
 function MatchPageFooter:render()
 	return WidgetUtil.collect(
 		HtmlWidgets.H3{ children = 'Additional Information' },
-		Logic.isNotEmpty(self.props.comments) and Div{
-			classes = { 'match-bm-lol-match-additional' },
-			children = self.props.comments
-		} or nil,
 		Div{
 			classes = { 'match-bm-match-additional' },
-			children = WidgetUtil.collect(self.props.children)
+			children = WidgetUtil.collect(
+				Logic.isNotEmpty(self.props.comments) and Div{
+					classes = {'match-bm-match-additional-comments'},
+					children = self.props.comments
+				} or nil,
+				self.props.children
+			)
 		}
 	)
 end
