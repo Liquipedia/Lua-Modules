@@ -41,11 +41,12 @@ end
 
 function TeamHistory:_getHistory()
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
+	local manualInput = self.props.manualInput
 
 	---@type automatedHistoryMode
 	local automatedHistoryMode = config.mode
-	if not automatedHistoryMode or (Logic.isNotEmpty(self.props.manualInput) and automatedHistoryMode == 'ifEmpty') then
-		return self.props.manualInput
+	if not automatedHistoryMode or (Logic.isNotEmpty(manualInput) and automatedHistoryMode == 'ifEmpty') then
+		return manualInput
 	end
 
 	--- can improve further once THA module is added to git (and cleaned up)...
@@ -59,13 +60,13 @@ function TeamHistory:_getHistory()
 		iconModule = config.iconModule, -- string?
 	}
 
-	if Logic.isEmpty(self.props.manualInput) or (automatedHistoryMode ~= 'cleanup' and automatedHistoryMode ~= 'both') then
+	if Logic.isEmpty(manualInput) or (automatedHistoryMode ~= 'cleanup' and automatedHistoryMode ~= 'both') then
 		return automatedHistory
 	end
 
 	if automatedHistoryMode == 'both' then
 		return Div{children = {
-			self.props.manualInput,
+			manualInput,
 			automatedHistory,
 		}}
 	end
@@ -83,7 +84,7 @@ function TeamHistory:_getHistory()
 			Big{
 				children = {'Manual History'},
 			},
-			self.props.manualInput,
+			manualInput,
 		}},
 	}}
 end
