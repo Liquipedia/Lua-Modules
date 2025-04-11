@@ -23,7 +23,10 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local Display = Lua.import('Module:MatchPage/Template')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local Div = HtmlWidgets.Div
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
@@ -160,11 +163,80 @@ function MatchPage:getCharacterIcon(character)
 	}
 end
 
----@return string
+---@param game LoLMatchPageGame
+---@return Widget
 function MatchPage:renderGame(game)
 	local inputTable = Table.merge(self.matchData, game)
 	inputTable.heroIcon = FnUtil.curry(self.getCharacterIcon, self)
-	return TemplateEngine():render(Display.game, inputTable)
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderGameOverview(game),
+			TemplateEngine():render(Display.game, inputTable)
+		)
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
+---@return Widget?
+function MatchPage:_renderGameOverview(game)
+	if self:isBestOfOne() then return end
+	return Div{
+		classes = {'match-bm-lol-game-overview'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-summary'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-game-summary-team'},
+						children = self.opponents[1].iconDisplay
+					},
+					Div{
+						classes = {'match-bm-lol-game-summary-center'},
+						children = {
+							Div{
+								classes = {'match-bm-lol-game-summary-faction'},
+								children = game.teams[1].side and IconImage{
+									imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
+									link = '',
+									caption = game.teams[1].side .. ' side'
+								} or nil
+							},
+							Div{
+								classes = {'match-bm-lol-game-summary-score-holder'},
+								children = game.finished and {
+									Div{
+										classes = {'match-bm-lol-game-summary-score'},
+										children = {
+											game.teams[1].scoreDisplay,
+											'&ndash;',
+											game.teams[2].scoreDisplay
+										}
+									},
+									Div{
+										classes = {'match-bm-lol-game-summary-length'},
+										children = game.length
+									}
+								} or nil
+							},
+							Div{
+								classes = {'match-bm-lol-game-summary-faction'},
+								children = game.teams[2].side and IconImage{
+									imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
+									link = '',
+									caption = game.teams[2].side .. ' side'
+								} or nil
+							}
+						}
+					},
+					Div{
+						classes = {'match-bm-lol-game-summary-team'},
+						children = self.opponents[2].iconDisplay
+					},
+				}
+			}
+		}
+	}
 end
 
 ---@return MatchPageComment[]

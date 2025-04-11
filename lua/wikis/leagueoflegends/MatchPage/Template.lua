@@ -10,17 +10,6 @@
 return {
 	game =
 		[=[
-			{{^isBestOfOne}}<div class="match-bm-lol-game-overview">
-				<div class="match-bm-lol-game-summary">
-					<div class="match-bm-lol-game-summary-team">{{&opponents.1.iconDisplay}}</div>
-					<div class="match-bm-lol-game-summary-center">
-						<div class="match-bm-lol-game-summary-faction">{{#teams.1.side}}[[File:Lol faction {{teams.1.side}}.png|link=|{{teams.1.side}} side]]{{/teams.1.side}}</div>
-						<div class="match-bm-lol-game-summary-score-holder">{{#finished}}<div class="match-bm-lol-game-summary-score">{{teams.1.scoreDisplay}}&ndash;{{teams.2.scoreDisplay}}</div><div class="match-bm-lol-game-summary-length">{{length}}</div>{{/finished}}</div>
-						<div class="match-bm-lol-game-summary-faction">{{#teams.2.side}}[[File:Lol faction {{teams.2.side}}.png|link=|{{teams.2.side}} side]]{{/teams.2.side}}</div>
-					</div>
-					<div class="match-bm-lol-game-summary-team">{{&opponents.2.iconDisplay}}</div>
-				</div>
-			</div>{{/isBestOfOne}}
 			<h3>Picks and Bans</h3>
 			<div class="match-bm-lol-game-veto collapsed general-collapsible">
 				<div class="match-bm-lol-game-veto-overview">
