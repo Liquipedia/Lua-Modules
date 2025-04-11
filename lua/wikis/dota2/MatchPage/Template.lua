@@ -8,40 +8,6 @@
 
 -- luacheck: ignore
 return {
-	header =
-		[=[
-			<div class="match-bm-lol-match-header">
-				<div class="match-bm-match-header-powered-by">Data provided by [[File:SAP_logo.svg|link=|SAP]]</div>
-				<div class="match-bm-lol-match-header-overview">
-					<div class="match-bm-match-header-team">{{#opponents.1}}{{&iconDisplay}}<div class="match-bm-match-header-team-group"><div class="match-bm-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div class="match-bm-lol-match-header-round-results">{{#seriesDots}}<div class="match-bm-lol-match-header-round-result result--{{.}}"></div>{{/seriesDots}}</div>{{/opponents.1}}</div></div>
-					<div class="match-bm-match-header-result">{{#isBestOfOne}}{{#games.1.apiInfo}}{{team1.scoreDisplay}}&ndash;{{team2.scoreDisplay}}{{/games.1.apiInfo}}{{/isBestOfOne}}{{^isBestOfOne}}{{opponents.1.score}}&ndash;{{opponents.2.score}}{{/isBestOfOne}}<div class="match-bm-match-header-result-text">{{statusText}}</div></div>
-					<div class="match-bm-match-header-team">{{#opponents.2}}{{&iconDisplay}}<div class="match-bm-match-header-team-group"><div class="match-bm-match-header-team-long">{{#page}}[[{{page}}|{{name}}]]{{/page}}</div><div class="match-bm-match-header-team-short">[[{{page}}|{{shortname}}]]</div><div class="match-bm-lol-match-header-round-results">{{#seriesDots}}<div class="match-bm-lol-match-header-round-result result--{{.}}"></div>{{/seriesDots}}</div>{{/opponents.2}}</div></div>
-				</div>
-				<div class="match-bm-lol-match-header-tournament">[[{{parent}}|{{tournament}}]]</div>
-				<div class="match-bm-lol-match-header-date">{{&dateCountdown}}</div>
-			</div>
-			{{#extradata.mvp}}<div class="match-bm-lol-match-mvp"><b>MVP</b>{{#players}} [[{{name}}|{{displayname}}]]{{/players}}</div>{{/extradata.mvp}}
-		]=],
-	footer =
-		[=[
-			<h3>Additional Information</h3>
-			<div class="match-bm-match-additional">
-				{{#vods.1}}
-					<div class="match-bm-match-additional-section">
-						<div class="match-bm-match-additional-section-header">VODs</div>
-						<div class="match-bm-match-additional-section-body">{{#vods}}{{&.}}{{/vods}}</div>
-					</div>{{/vods.1}}{{#parsedLinks.1}}
-					<div class="match-bm-match-additional-section">
-						<div class="match-bm-match-additional-section-header">Socials</div>
-						<div class="match-bm-match-additional-section-body vodlink">{{#parsedLinks}}[[{{icon}}|link={{link}}|15px|{{text}}]]{{/parsedLinks}}</div>
-					</div>{{/parsedLinks.1}}{{#patch}}
-					<div class="match-bm-match-additional-section">
-						<div class="match-bm-match-additional-section-header">Patch</div>
-						<div class="match-bm-match-additional-section-body">[[Version {{patch}}]]</div>
-					</div>
-				{{/patch}}
-			</div>
-		]=],
 	game =
 		[=[
 			<h3>Draft</h3>

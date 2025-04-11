@@ -6,9 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
+
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -27,6 +31,8 @@ function MatchSummaryFfaGameDetails:render()
 	local game = self.props.game
 	assert(game, 'No game provided')
 
+	local casters = DisplayHelper.createCastersDisplay(game.extradata.casters)
+
 	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = WidgetUtil.collect(
 		{
 			icon = CountdownIcon{game = game},
@@ -35,6 +41,14 @@ function MatchSummaryFfaGameDetails:render()
 		game.map and {
 			icon = IconWidget{iconName = 'map'},
 			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+		} or nil,
+		Logic.isNotEmpty(casters) and {
+			icon = IconWidget{
+				iconName = 'casters',
+				additionalClasses = {'fa-fw'},
+				hover = 'Caster' .. (#casters > 1 and 's' or '')
+			},
+			content = HtmlWidgets.Span{children = Array.interleave(casters, ', ')},
 		} or nil,
 		game.comment and {
 			icon = IconWidget{iconName = 'comment'},
