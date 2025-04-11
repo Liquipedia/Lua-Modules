@@ -89,9 +89,9 @@ return {
 		lightmode = 'Osu! full colour allmode.png',
 		darkmode = 'Osu! full colour allmode.png',
 	},
-	metadesc = 'Comprehensive OSU! wiki with articles covering everything from tournaments, ' ..
+	metadesc = 'Comprehensive osu! wiki with articles covering everything from tournaments, ' ..
 		'to competitive players and teams.',
-	title = 'OSU!',
+	title = 'osu!',
 	navigation = {
 		{
 			file = 'FlyingTunaCOE2023.jpg',
