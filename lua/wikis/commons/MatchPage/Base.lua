@@ -178,14 +178,16 @@ end
 
 ---@protected
 function BaseMatchPage:makeDisplayTitle()
-	local team1name = self.opponents[1].teamTemplateData.shortname
-	local team2name = self.opponents[2].teamTemplateData.shortname
-	if not team1name and not team2name then
+	local team1data = (self.opponents[1] or {}).teamTemplateData
+	local team2data = (self.opponents[2] or {}).teamTemplateData
+
+	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
 		return table.concat({'Match in', self.matchData.tickername}, ' ')
 	end
 
-	team1name = team1name or 'TBD'
-	team2name = team2name or 'TBD'
+	local team1name = (team1data or {}).shortname or 'TBD'
+	local team2name = (team2data or {}).shortname or 'TBD'
+
 	local tournamentName = self.matchData.tickername
 	local displayTitle = team1name .. ' vs. ' .. team2name
 	if not tournamentName then

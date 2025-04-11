@@ -46,7 +46,7 @@ end
 function MatchPageTeamDisplay:render()
 	local opponent = self.props.opponent
 	local data = self.props.opponent.teamTemplateData
-	if Logic.isEmpty(data) then return end
+	if Logic.isEmpty(data) then return Div{classes = { 'match-bm-match-header-team' }} end
 	return Div{
 		classes = { 'match-bm-match-header-team' },
 		children = {
