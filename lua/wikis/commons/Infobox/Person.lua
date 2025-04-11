@@ -22,6 +22,7 @@ local AgeCalculation = Lua.import('Module:AgeCalculation')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Earnings = Lua.import('Module:Earnings')
 local Flags = Lua.import('Module:Flags')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
@@ -33,6 +34,7 @@ local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
+local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
@@ -82,8 +84,9 @@ function Person:createInfobox()
 
 	assert(String.isNotEmpty(args.id), 'You need to specify an "id"')
 
-	if Logic.readBool(args.autoTeam) then
-		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
+	local useAutoTeam = Logic.nilOr(Logic.readBoolOrNil(args.autoTeam), (Info.config.infoboxPlayer or {}).autoTeam)
+	if useAutoTeam then
+		local team, team2 = PlayerIntroduction.playerTeamAuto{player = self.pagename}
 		args.team = Logic.emptyOr(args.team, team)
 		args.team2 = Logic.emptyOr(args.team2, team2)
 	end
@@ -202,17 +205,10 @@ function Person:createInfobox()
 				end
 			},
 		}},
-		Customizable{id = 'history', children = {
-			Builder{
-				builder = function()
-					if String.isNotEmpty(args.history) then
-						return {
-							Title{children = 'History'},
-							Center{children = {args.history}}
-						}
-					end
-				end
-			},
+		Customizable{id = 'history', children = TeamHistoryWidget{
+			player = self.pagename,
+			manualInput = args.history,
+			specialRoles = args.historySpecialRoles, -- for 9 val pages ...
 		}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},

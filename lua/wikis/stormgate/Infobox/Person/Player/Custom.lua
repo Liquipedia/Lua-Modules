@@ -12,7 +12,6 @@ local Class = require('Module:Class')
 local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
 local Set = require('Module:Set')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
@@ -57,11 +56,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.history = TeamHistoryAuto.results{
-		player = player.pagename,
-		addlpdbdata = player:shouldStoreData(player.args),
-	}
 
 	return player:createInfobox()
 end
