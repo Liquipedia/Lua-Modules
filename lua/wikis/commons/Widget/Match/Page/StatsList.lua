@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Widget/Match/Page/TeamStatsList
+-- page=Module:Widget/Match/Page/StatsList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
