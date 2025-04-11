@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
+-- wiki=marvel rivals
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,31 +16,30 @@ local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
-local CharacterNames = Lua.import('Module:CharacterNames')
+local CharacterNames = Lua.import('Module:HeroNames')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local Center = Widgets.Center
 
 local ROLES = {
 	-- Players
-	['duelist'] = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
-	['flex'] = {category = 'Flex Players', variable = 'Flex', isplayer = true},
-	['strategist'] = {category = 'Strategist Players', variable = 'Strategist', isplayer = true},
-	['vanguard'] = {category = 'Vanguard Players', variable = 'Vanguard', isplayer = true},
+	duelust = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
+	flex = {category = 'Flex Players', variable = 'Flex', isplayer = true},
+	strategist = {category = 'Strategist Players', variable = 'Strategist', isplayer = true},
+	vanguard = {category = 'Vanguard Players', variable = 'Vanguard', isplayer = true},
 
 	-- Staff and Talents
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', isplayer = false},
-	['observer'] = {category = 'Observers', variable = 'Observer', isplayer = false},
-	['host'] = {category = 'Hosts', variable = 'Host', isplayer = false},
-	['coach'] = {category = 'Coaches', variable = 'Coach', isplayer = false},
-	['caster'] = {category = 'Casters', variable = 'Caster', isplayer = false},
-	['talent'] = {category = 'Talents', variable = 'Talent', isplayer = false},
-	['producer'] = {category = 'Producers', variable = 'Producer', isplayer = false},
-	['streamer'] = {category = 'Streamers', variable = 'Streamer', isplayer = false},
+	analyst = {category = 'Analysts', variable = 'Analyst', isplayer = false},
+	observer = {category = 'Observers', variable = 'Observer', isplayer = false},
+	host = {category = 'Hosts', variable = 'Host', isplayer = false},
+	coach = {category = 'Coaches', variable = 'Coach', isplayer = false},
+	caster = {category = 'Casters', variable = 'Caster', isplayer = false},
+	talent = {category = 'Talents', variable = 'Talent', isplayer = false},
+	producer = {category = 'Producers', variable = 'Producer', isplayer = false},
+	streamer = {category = 'Streamers', variable = 'Streamer', isplayer = false},
 }
 
 local SIZE_HERO = '25x25px'
@@ -90,10 +89,7 @@ function CustomInjector:parse(id, widgets)
 				caller:_displayRole(caller.role2),
 			}},
 		}
-	elseif id == 'history' then
-		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
-	end
-	
+
 	return widgets
 end
 
