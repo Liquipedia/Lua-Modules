@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
+local TeamHistoryAuto = Lua.import('Module:Infobox/Extension/TeamHistoryAuto')
 local Widget = Lua.import('Module:Widget')
 local Widgets = require('Module:Widget/All')
 
@@ -39,6 +39,7 @@ function TeamHistory:render()
 	}
 end
 
+---@return Widget?
 function TeamHistory:_getHistory()
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
 	local manualInput = self.props.manualInput
@@ -49,16 +50,10 @@ function TeamHistory:_getHistory()
 		return manualInput
 	end
 
-	--- can improve further once THA module is added to git (and cleaned up)...
-	local automatedHistory = TeamHistoryAuto.results{
-		player = self.props.player, -- string?
-		hiderole = config.hideRole, --bool
-		addlpdbdata = config.store, --bool
-		specialRoles = config.specialRoles, --bool
-		convertrole = config.convertRole, --bool
-		cleanRoles = config.cleanRoles, -- string?
-		iconModule = config.iconModule, -- string?
-	}
+	local automatedHistory = TeamHistoryAuto{
+		player = self.props.player,
+		specialRoles = self.props.specialRoles,
+	}:fetch():store():build()
 
 	if Logic.isEmpty(manualInput) or (automatedHistoryMode ~= 'cleanup' and automatedHistoryMode ~= 'both') then
 		return automatedHistory
