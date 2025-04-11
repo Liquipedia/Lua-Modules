@@ -13,10 +13,10 @@ local Lua = require('Module:Lua')
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
-local TiebreakerInteface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
 ---@class TiebreakerBuchholz : StandingsTiebreaker
-local TiebreakerBuchholz = Class.new(TiebreakerInteface)
+local TiebreakerBuchholz = Class.new(TiebreakerInterface)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent

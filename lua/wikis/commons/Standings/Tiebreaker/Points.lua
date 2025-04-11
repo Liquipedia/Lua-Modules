@@ -9,11 +9,12 @@
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local TiebreakerInteface = Lua.import('Module:Standings/Tiebreaker/Interface')
+local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
 ---@class TiebreakerPoints : StandingsTiebreaker
-local TiebreakerPoints = Class.new(TiebreakerInteface)
+local TiebreakerPoints = Class.new(TiebreakerInterface)
 
+---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
 function TiebreakerPoints:valueOf(state, opponent)

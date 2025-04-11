@@ -1,7 +1,7 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Standings/Tiebreaker/Match/Diff
+-- page=Module:Standings/Tiebreaker/Match/Count
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
@@ -11,14 +11,14 @@ local Lua = require('Module:Lua')
 
 local TiebreakerInterface = Lua.import('Module:Standings/Tiebreaker/Interface')
 
----@class TiebreakerMatchDiff : StandingsTiebreaker
-local TiebreakerMatchDiff = Class.new(TiebreakerInterface)
+---@class TiebreakerMatchCount : StandingsTiebreaker
+local TiebreakerMatchCount = Class.new(TiebreakerInterface)
 
 ---@param state TiebreakerOpponent[]
 ---@param opponent TiebreakerOpponent
 ---@return integer
-function TiebreakerMatchDiff:valueOf(state, opponent)
-	return opponent.match.w - opponent.match.l
+function TiebreakerMatchCount:valueOf(state, opponent)
+	return opponent.match.w + opponent.match.l + opponent.match.d
 end
 
-return TiebreakerMatchDiff
+return TiebreakerMatchCount
