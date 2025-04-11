@@ -286,8 +286,12 @@ end
 ---@private
 ---@return MatchPageComment[]
 function BaseMatchPage:_getComments()
+	local substituteComments = DisplayHelper.createSubstitutesComment(self.matchData)
 	return WidgetUtil.collect(
 		self.matchData.comment and Comment{children = self.matchData.comment} or nil,
+		Logic.isNotEmpty(substituteComments) and Comment{
+			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
+		} or nil,
 		self:addComments()
 	)
 end
