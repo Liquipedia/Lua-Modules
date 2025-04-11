@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=chess
+-- wiki=osu
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
