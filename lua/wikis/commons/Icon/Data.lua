@@ -15,6 +15,7 @@ return {
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
+	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
 	startleft = 'fas fa-chevron-left',
@@ -131,4 +132,8 @@ return {
 	patch = 'fas fa-file-alt',
 	calendar = 'fas fa-calendar-alt',
 	highlights = 'fas fa-star',
+
+	-- Usage: Chess
+	chesskingoutline = 'far fa-chess-king',
+	chesskingfull = 'fas fa-chess-king',
 }

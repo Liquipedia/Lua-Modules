@@ -337,7 +337,7 @@ end
 ---@param format string
 ---@param timestamp string|osdateparam?
 ---@param localTime boolean?
----@return number|string
+---@return string
 function mw.language:formatDate(format, timestamp, localTime)
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
@@ -361,10 +361,10 @@ function mw.language:formatDate(format, timestamp, localTime)
 
 	if format == 'U' then
 		if not timestamp then
-			return os.time(os.date("!*t") --[[@as osdateparam]])
+			return tostring(os.time(os.date("!*t") --[[@as osdateparam]]))
 		end
 		if type(timestamp) ~= 'string' then
-			return os.time(timestamp)
+			return tostring(os.time(timestamp))
 		end
 		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
 		local offset = 0
@@ -379,7 +379,7 @@ function mw.language:formatDate(format, timestamp, localTime)
 
 		local ts = os.time(makeOsdateParam(year, month, day, hour, minute, second)) - offset
 
-		return ts + localTimezoneOffset(ts)
+		return tostring(ts + localTimezoneOffset(ts))
 	elseif format == 'c' then
 		local outFormat = '%Y-%m-%dT%H:%M:%S'
 		if not timestamp then
@@ -519,16 +519,16 @@ function mw.message:isBlank() end
 ---@return boolean
 function mw.message:isDisabled() end
 
----@alias namespaceInfo {id: number, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
+---@alias namespaceInfo {id: integer, name: string, canonicalName: string, displayName: string, hasSubpages: boolean, hasGenderDistinction: boolean, isCapitalized: boolean, isContent: boolean, isIncludable: boolean, isMovable:boolean, isSubject: boolean, isTalk: boolean, defaultContentModel: string, aliases: string[], subject: namespaceInfo, talk: namespaceInfo, associated: namespaceInfo}
 ---@class Site
 ---@field currentVersion string
 ---@field scriptPath string
 ---@field server string
 ---@field siteName string
----@field namespaces table<number|string, namespaceInfo>
----@field contentNamespaces table<number|string, namespaceInfo>
----@field subjectNamespaces table<number|string, namespaceInfo>
----@field talkNamespaces table<number|string, namespaceInfo>
+---@field namespaces table<integer, namespaceInfo>
+---@field contentNamespaces table<integer, namespaceInfo>
+---@field subjectNamespaces table<integer, namespaceInfo>
+---@field talkNamespaces table<integer, namespaceInfo>
 ---@field stats {pages: number, articles: number, files: number, edits: number, users: number, activeUsers: number, admins: number, pagesInCategory: fun(category: string, which: 'all'|'subcats'|'files'|'pages'|'*'):integer}
 mw.site = {server = 'https://liquipedia.net/wiki/'}
 

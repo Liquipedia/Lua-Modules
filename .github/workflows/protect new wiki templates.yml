@@ -1,0 +1,26 @@
+name: Protect newly set up wiki
+
+on:
+  workflow_dispatch:
+    inputs:
+      wiki:
+        description: 'Wiki to set up'
+        required: true
+
+jobs:
+  protect:
+    if: github.ref_name == github.event.repository.default_branch
+    name: Protect modules on newly set up wiki
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Template Protect
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+        run: bash scripts/protect_templates.sh

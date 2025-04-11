@@ -11,7 +11,6 @@ local FnUtil = require('Module:FnUtil')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Variables = require('Module:Variables')
@@ -82,45 +81,23 @@ end
 ---@param MapParser Dota2MapParserInterface
 ---@return table[]
 function MatchFunctions.extractMaps(match, opponents, MapParser)
-	local maps = {}
-	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
-		local map = MapParser.getMap(mapInput)
-		local finishedInput = map.finished --[[@as string?]]
-		local winnerInput = map.winner --[[@as string?]]
+	---@type MapParserInterface
+	local mapParserWrapper = {
+		calculateMapScore = MapFunctions.calculateMapScore,
+		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
+		getMap = MapParser.getMap,
+		getMapName = MapFunctions.getMapName,
+		getLength = MapParser.getLength,
+		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
+	}
 
-		local dateToUse = map.date or match.date
-		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
-
-		map.map = MapFunctions.getMapName(map)
-		map.length = MapParser.getLength(map)
-		map.vod = map.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
-		map.publisherid = map.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
-		map.extradata = MapFunctions.getExtraData(MapParser, map, #opponents)
-
-		map.finished = MatchGroupInputUtil.mapIsFinished(map)
-		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
-			local score, status = MatchGroupInputUtil.computeOpponentScore({
-				walkover = map.walkover,
-				winner = map.winner,
-				opponentIndex = opponentIndex,
-				score = map['score' .. opponentIndex],
-			}, MapFunctions.calculateMapScore(map.winner, map.finished))
-			local players = MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponentIndex)
-			return {score = score, status = status, players = players}
-
-		end)
-
-		map.scores = Array.map(map.opponents, Operator.property('score'))
-		if map.finished then
-			map.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
-			map.winner = MatchGroupInputUtil.getWinner(map.status, winnerInput, map.opponents)
-		end
-
-		table.insert(maps, map)
-		match[key] = nil
+	---preprocess legacy stuff
+	for _, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		mapInput.matchid = mapInput.matchid or String.nilIfEmpty(match['matchid' .. mapIndex])
+		mapInput.vod = mapInput.vod or String.nilIfEmpty(match['vodgame' .. mapIndex])
 	end
 
-	return maps
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParserWrapper)
 end
 
 ---@param maps table[]
@@ -142,11 +119,11 @@ function MatchFunctions.getLinks(match, games)
 	links.datdota = {}
 
 	Array.forEach(
-		Array.filter(games, function(map) return map.publisherid ~= nil end),
+		Array.filter(games, function(map) return map.matchid ~= nil end),
 		function(map, mapIndex)
-			links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.publisherid
-			links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.publisherid
-			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.publisherid
+			links.stratz[mapIndex] = 'https://stratz.com/match/' .. map.matchid
+			links.dotabuff[mapIndex] = 'https://www.dotabuff.com/matches/' .. map.matchid
+			links.datdota[mapIndex] = 'https://www.datdota.com/matches/' .. map.matchid
 		end
 	)
 
@@ -189,12 +166,13 @@ function MapFunctions.getMapName(map)
 end
 
 ---@param MapParser Dota2MapParserInterface
+---@param match table
 ---@param map table
----@param opponentCount integer
+---@param opponents table[]
 ---@return table
-function MapFunctions.getExtraData(MapParser, map, opponentCount)
+function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	local extraData = {
-		publisherid = tonumber(map.publisherid),
+		publisherid = tonumber(map.matchid),
 	}
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, HeroNames)
 
@@ -202,7 +180,7 @@ function MapFunctions.getExtraData(MapParser, map, opponentCount)
 		return 'team' .. opponentIndex .. key
 	end
 
-	for opponentIndex = 1, opponentCount do
+	for opponentIndex = 1, #opponents do
 		local opponentData = {
 			objectives = MapParser.getObjectives(map, opponentIndex),
 			side = MapParser.getSide(map, opponentIndex),
@@ -253,14 +231,13 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 	)
 end
 
----@param winnerInput string|integer|nil
----@param finished boolean
+---@param map table
 ---@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(winnerInput, finished)
-	local winner = tonumber(winnerInput)
+function MapFunctions.calculateMapScore(map)
+	local winner = tonumber(map.winner)
 	return function(opponentIndex)
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
-		if not winner and not finished then
+		if not winner and not map.finished then
 			return
 		end
 		return winner == opponentIndex and 1 or 0
