@@ -21,6 +21,7 @@ local TemplateEngine = require('Module:TemplateEngine')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local Display = Lua.import('Module:MatchPage/Template')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -174,7 +175,7 @@ function MatchPage:addComments()
 		Comment{
 			children = WidgetUtil.collect(
 				#casters > 1 and 'Casters: ' or 'Caster: ',
-				Array.interleave(casters, ', ')
+				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
 			)
 		}
 	}
