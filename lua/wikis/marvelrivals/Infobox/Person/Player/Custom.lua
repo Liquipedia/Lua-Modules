@@ -9,12 +9,12 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Page = require('Module:Page')
 local Region = require('Module:Region')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:HeroNames')
@@ -109,14 +109,8 @@ function CustomPlayer:_displayRole(roleData)
 
 	return Link{
 		link = ':Category:' .. roleData.category,
-		children = roleData.variable
+		children = {roleData.variable}
 	}
-end
-
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('role', (self.role or {}).variable)
-	Variables.varDefine('role2', (self.role2 or {}).variable)
 end
 
 ---@param categories string[]
@@ -144,21 +138,17 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 
 	lpdbData.type = self:_isPlayerOrStaff()
 
-	lpdbData.region = Region.name({region = args.region, country = args.country})
+	lpdbData.region = Region.name{region = args.region, country = args.country}
 
-	if String.isNotEmpty(args.team2) then
-		lpdbData.extradata.team2 = args.team2
-	end
+	lpdbData.extradata.team2 = String.nilIfEmpty(args.team2)
 
 	return lpdbData
 end
 
 ---@return string
 function CustomPlayer:_isPlayerOrStaff()
-	local roleData
-	if String.isNotEmpty(self.args.role) then
-		roleData = ROLES[self.args.role:lower()]
-	end
+	local roleData = ROLES[(self.args.role or ''):lower()]
+
 	-- If the role is missing, assume it is a player
 	if roleData and roleData.isplayer == false then
 		return 'staff'
@@ -169,7 +159,7 @@ end
 
 ---@return string?
 function CustomPlayer:createBottomContent()
-	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
+	if String.isNotEmpty(self.args.team) and self:shouldStoreData(self.args) then
 		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
 		return
 			tostring(MatchTicker.player{recentLimit = 3}) ..
