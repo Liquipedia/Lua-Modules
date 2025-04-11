@@ -579,7 +579,7 @@ local factionPropsAoE4 = {
 	knightstemplar = {
 		index = 12,
 		name = 'Knights Templar',
-		pageName = 'Knights Templar' .. AOE4_SUFFIX,
+		pageName = 'Knights Templar',
 		faction = 'knightstemplar',
 	},
 	malians = {
