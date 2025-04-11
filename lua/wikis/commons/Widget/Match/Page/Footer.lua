@@ -24,21 +24,24 @@ local Div = HtmlWidgets.Div
 ---@field props MatchPageFooterParameters
 local MatchPageFooter = Class.new(Widget)
 
----@return Widget[]
+---@return Widget[]?
 function MatchPageFooter:render()
-	return WidgetUtil.collect(
+	local comments = self.props.comments
+	local children = self.props.children
+	if Logic.isEmpty(comments) and Logic.isEmpty(children) then return end
+	return {
 		HtmlWidgets.H3{ children = 'Additional Information' },
 		Div{
 			classes = { 'match-bm-match-additional' },
 			children = WidgetUtil.collect(
-				Logic.isNotEmpty(self.props.comments) and Div{
+				Logic.isNotEmpty(comments) and Div{
 					classes = {'match-bm-match-additional-comments'},
-					children = self.props.comments
+					children = comments
 				} or nil,
-				self.props.children
+				children
 			)
 		}
-	)
+	}
 end
 
 return MatchPageFooter
