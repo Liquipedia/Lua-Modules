@@ -895,7 +895,7 @@ return {
 			hin = 'hindustanis',
 			hun = 'huns',
 			inc = 'inca',
-			incas = 'inca'
+			incas = 'inca',
 			ind = 'indians',
 			ita = 'italians',
 			jap = 'japanese',
