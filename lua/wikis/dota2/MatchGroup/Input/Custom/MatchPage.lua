@@ -14,8 +14,9 @@ local CustomMatchGroupInputMatchPage = {}
 
 ---@class dota2MatchDataExtended: dota2MatchData
 ---@field matchid integer
+---@field vod string?
 
----@param mapInput {matchid: string?, reversed: string?}
+---@param mapInput {matchid: string?, reversed: string?, vod: string?}
 ---@return dota2MatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
@@ -30,6 +31,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	assert(map and type(map) == 'table', mapInput.matchid .. ' could not be retrieved.')
 	---@cast map dota2MatchDataExtended
 	map.matchid = matchId
+	map.vod = mapInput.vod
 
 	return map
 end

@@ -214,7 +214,7 @@ function DisplayHelper.DefaultMatchSummaryContainer(props)
 end
 
 ---@param props table
----@return Html
+---@return Widget
 function DisplayHelper.DefaultFfaMatchSummaryContainer(props)
 	local MatchSummaryModule = Lua.import('Module:MatchSummary/Ffa')
 

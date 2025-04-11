@@ -40,8 +40,7 @@ function WarcraftMatchSummaryFfa.getByMatchId(props)
 			idx = 0,
 			children = WidgetUtil.collect(
 				MatchSummaryWidgets.GamesSchedule{match = match},
-				MatchSummaryWidgets.Mvp(match.extradata.mvp),
-				MatchSummaryWidgets.MatchComment{match = match},
+				MatchSummaryWidgets.MatchInformation(match),
 				BaseMatchSummary.standardMatch(match, Parser)
 			)
 		}

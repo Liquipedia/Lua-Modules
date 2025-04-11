@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
@@ -40,7 +41,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y')
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 			end
 		},
 		boxid = 1509,

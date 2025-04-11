@@ -608,9 +608,14 @@ end
 
 ---@param winnerInput integer|string|nil
 ---@param finishedInput string?
+---@param opponents MGIParsedOpponent[]?
 ---@return string? #Match Status
-function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+function MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 	if MatchGroupInputUtil.isNotPlayed(winnerInput, finishedInput) then
+		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
+	elseif winnerInput or (not opponents) or MatchGroupInputUtil.hasSpecialStatus(opponents) then
+		return
+	elseif not MatchGroupInputUtil.hasScore(opponents) then
 		return MatchGroupInputUtil.MATCH_STATUS.NOT_PLAYED
 	end
 end
@@ -832,10 +837,6 @@ function MatchGroupInputUtil.matchIsFinished(match, maps, opponents)
 	-- If special status has been applied to a team
 	if MatchGroupInputUtil.hasSpecialStatus(opponents) then
 		return true
-	end
-
-	if not MatchGroupInputUtil.hasScore(opponents) then
-		return false
 	end
 
 	-- If enough time has passed since match started, it should be marked as finished
@@ -1157,7 +1158,7 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	match.finished = MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished)
+		match.status = MatchGroupInputUtil.getMatchStatus(matchInput.winner, matchInput.finished, opponents)
 		match.winner = MatchGroupInputUtil.getWinner(match.status, matchInput.winner, opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
 			opponent.placement = MatchGroupInputUtil.placementFromWinner(match.status, match.winner, opponentIndex)
@@ -1180,6 +1181,8 @@ end
 ---@class MapParserInterface
 ---@field calculateMapScore? fun(map: table): fun(opponentIndex: integer): integer?
 ---@field getExtraData? fun(match: table, game: table, opponents: table[]): table?
+---@field getLength? fun(map: table): string
+---@field getMap? fun(mapInput: table): table
 ---@field getMapName? fun(game: table, mapIndex: integer, match: table): string?, string?
 ---@field getMapMode? fun(match: table, game: table, opponents: table[]): string?
 ---@field getPlayersOfMapOpponent? fun(game: table, opponent:table, opponentIndex: integer): table[]
@@ -1197,6 +1200,8 @@ end
 --- The Parser injection may optionally have the following functions:
 --- - calculateMapScore(map): fun(opponentIndex): integer?
 --- - getExtraData(match, map, opponents): table?
+--- - getLength(map: table): string
+--- - getMap(mapInput: table): table
 --- - getMapName(map, mapIndex, match): string?, string?
 --- - getMapMode(match, map, opponents): string?
 --- - getPlayersOfMapOpponent(map, opponent, opponentIndex): table[]?
@@ -1217,7 +1222,8 @@ end
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
-	for key, map, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
+		local map = Parser.getMap and Parser.getMap(mapInput) or mapInput
 		if Parser.BREAK_ON_EMPTY and Logic.isDeepEmpty(map) then
 			break
 		end
@@ -1246,6 +1252,10 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 
 		if Parser.getGame then
 			map.game = Parser.getGame(match, map)
+		end
+
+		if Parser.getLength then
+			map.length = Parser.getLength(map)
 		end
 
 		map.opponents = Array.map(opponents, function(opponent, opponentIndex)
@@ -1373,7 +1383,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 		or MatchGroupInputUtil.matchIsFinished(match, games, opponents)
 
 	if match.finished then
-		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput)
+		match.status = MatchGroupInputUtil.getMatchStatus(winnerInput, finishedInput, opponents)
 
 		local placementOfOpponents = MatchGroupInputUtil.calculatePlacementOfOpponents(opponents)
 		Array.forEach(opponents, function(opponent, opponentIndex)
@@ -1397,6 +1407,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = Table.merge({
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true})
 	}, Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
@@ -1478,6 +1489,7 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 
 		map.extradata = Table.merge({
 			mvp = MatchGroupInputUtil.readMvp(map, opponents),
+			casters = MatchGroupInputUtil.readCasters(map, {noSort = true})
 		}, Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil)
 
 		table.insert(maps, map)

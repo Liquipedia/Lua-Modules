@@ -36,7 +36,7 @@ function Tier.toIdentifier(input)
 end
 
 --- Retrieves the raw data for a given (tier, tierType) tuple
----@param tier string|integer
+---@param tier string|integer?
 ---@param tierType string?
 ---@return table?, table?
 function Tier.raw(tier, tierType)
@@ -61,9 +61,9 @@ function Tier.isValid(tier, tierType)
 end
 
 --- Converts input to (storage) values for a given (tier, tierType) tuple
----@param tier string|integer
+---@param tier string|integer?
 ---@param tierType string?
----@return integer?, string|integer|nil
+---@return integer?, string?
 function Tier.toValue(tier, tierType)
 	local tierData, tierTypeData = Tier.raw(tier, tierType)
 
@@ -112,8 +112,8 @@ end
 
 --- Parses queryData to be processable for other Tier functions
 --- overwritable on a per wiki basis if additional data needs to be passed
----@param queryData table
----@return string?, string?, table
+---@param queryData {liquipediatier: string, liquipediatiertype: string}
+---@return string, string?, table
 function Tier.parseFromQueryData(queryData)
 	local tierType = queryData.liquipediatiertype
 	tierType = tierType ~= DEFAULT_TIER_TYPE and tierType or nil
