@@ -627,6 +627,17 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						classes = {'match-bm-lol-players-player-stat'},
 						children = WidgetUtil.collect(
 							IconImage{
+								imageLight = 'Lol stat icon gold.png',
+								caption = 'Gold',
+								link = ''
+							},
+							MatchPage.abbreviateNumber(player.gold)
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-stat'},
+						children = WidgetUtil.collect(
+							IconImage{
 								imageLight = 'Lol stat icon dmg.png',
 								caption = 'KDA',
 								link = ''
