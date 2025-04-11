@@ -31,7 +31,7 @@ function MatchSummaryFfaGameDetails:render()
 	local game = self.props.game
 	assert(game, 'No game provided')
 
-	local casters = DisplayHelper.createCastersDisplay(game.extradata.casters)
+	local casters = game.extradata.casters and DisplayHelper.createCastersDisplay(game.extradata.casters) or nil
 
 	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = WidgetUtil.collect(
 		{
