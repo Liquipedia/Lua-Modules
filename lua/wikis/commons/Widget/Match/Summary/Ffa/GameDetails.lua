@@ -13,8 +13,9 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+
 local Widget = Lua.import('Module:Widget')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local ContentItemContainer = Lua.import('Module:Widget/Match/Summary/Ffa/ContentItemContainer')
 local IconWidget = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -31,22 +32,7 @@ function MatchSummaryFfaGameDetails:render()
 	local game = self.props.game
 	assert(game, 'No game provided')
 
-	local casters = Array.map(game.extradata.casters or {}, function(caster)
-		if not caster.name then
-			return nil
-		end
-
-		local casterLink = Link{children = caster.displayName, link = caster.name}
-		if not caster.flag then
-			return casterLink
-		end
-
-		return HtmlWidgets.Fragment{children = {
-			Flags.Icon(caster.flag),
-			'&nbsp;',
-			casterLink,
-		}}
-	end)
+	local casters = DisplayHelper.createCastersDisplay(game.extradata.casters)
 
 	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = WidgetUtil.collect(
 		{

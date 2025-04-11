@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Date = require('Module:Date/Ext')
+local Flags = require('Module:Flags')
 local FnUtil = require('Module:FnUtil')
 local I18n = require('Module:I18n')
 local Logic = require('Module:Logic')
@@ -26,6 +27,9 @@ local Opponent = OpponentLibraries.Opponent
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
 local UTC = Timezone.getTimezoneString('UTC')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 -- Whether to allow highlighting an opponent via mouseover
 ---@param opponent standardOpponent
@@ -171,6 +175,28 @@ function DisplayHelper.createSubstitutesComment(match)
 	end)
 
 	return comment
+end
+
+---Creates display components for caster(s).
+---@param casters {name: string?, displayName: string?, flag: string?}[]
+---@return (string|Widget|nil)[]
+function DisplayHelper.createCastersDisplay(casters)
+	return Array.map(casters, function(caster)
+		if not caster.name then
+			return nil
+		end
+
+		local casterLink = Link{children = caster.displayName, link = caster.name}
+		if not caster.flag then
+			return casterLink
+		end
+
+		return HtmlWidgets.Fragment{children = {
+			Flags.Icon(caster.flag),
+			NONBREAKING_SPACE,
+			casterLink,
+		}}
+	end)
 end
 
 ---Displays the map name and link, and the status of the match if it had an unusual status.
