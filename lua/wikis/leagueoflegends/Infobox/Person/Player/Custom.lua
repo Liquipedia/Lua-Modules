@@ -36,7 +36,6 @@ function CustomPlayer.run(frame)
 		iconModule = 'Module:PositionIcon/data',
 		addlpdbdata = true,
 	}
-	player.args.autoTeam = true
 
 	return player:createInfobox()
 end

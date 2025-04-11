@@ -78,8 +78,6 @@ function CustomPlayer.run(frame)
 
 	player.shouldQueryData = player:shouldStoreData(player.args)
 
-	player.args.autoTeam = Logic.emptyOr(player.args.autoTeam, true)
-
 	player.args.history = Logic.nilIfEmpty(player.args.history) or TeamHistoryAuto.results{
 		player = player.pagename,
 		convertrole = true,

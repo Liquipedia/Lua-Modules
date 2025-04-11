@@ -20,7 +20,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 
 	player.args.history = TeamHistoryAuto.results{convertrole = true}
-	player.args.autoTeam = true
 	return player:createInfobox()
 end
 

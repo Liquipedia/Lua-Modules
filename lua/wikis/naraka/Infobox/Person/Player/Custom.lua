@@ -35,7 +35,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.history = TeamHistoryAuto.results{addlpdbdata = true}
-	player.args.autoTeam = true
 
 	return player:createInfobox()
 end

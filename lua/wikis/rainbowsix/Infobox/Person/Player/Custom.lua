@@ -54,8 +54,6 @@ function CustomPlayer.run(frame)
 
 	player.args.banned = tostring(player.args.banned or '')
 
-	player.args.autoTeam = true
-
 	return player:createInfobox()
 end
 

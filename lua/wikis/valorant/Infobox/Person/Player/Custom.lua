@@ -41,7 +41,6 @@ function CustomPlayer.run(frame)
 		addlpdbdata = true,
 		specialRoles = player.args.historySpecialRoles
 	}
-	player.args.autoTeam = true
 	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 
 	return player:createInfobox()

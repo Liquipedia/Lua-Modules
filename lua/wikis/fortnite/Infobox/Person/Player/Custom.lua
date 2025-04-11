@@ -35,7 +35,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.autoTeam = true
 	player.args.achievements = PlayerAchievements.player{}
 
 	return player:createInfobox()

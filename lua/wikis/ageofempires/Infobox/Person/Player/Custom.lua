@@ -77,8 +77,6 @@ function CustomPlayer.run(frame)
 
 	local args = player.args
 
-	args.autoTeam = true
-
 	local automatedHistory = TeamHistoryAuto.results{player = player.pagename, convertrole = true, addlpdbdata = true}
 	if String.isEmpty(args.history) then
 		player.args.history = automatedHistory
