@@ -9,7 +9,11 @@
 local CONTENT = {
 	about = {
 		heading = 'About Wildcard',
-		body = '<nowiki>\n</nowiki>{{Main Page About}}',
+		body = '<b>Wildcard</b> is a third-person, 2v2 Collectible Card Action Game (CCAG) that ' ..
+		'seamlessly blends fast-paced arena combat with strategic deck-building. As a champion, you battle ' ..
+		'in real-time, summoning powerful creature-companions from your deck to fight alongside you. Master ' ..
+		'dynamic abilities, outplay opponents with skillful action mechanics, and harness the power of your ' ..
+		'summons in a thrilling fusion of collectible card strategy and third-person action combat.',
 		padding = true,
 		boxid = 1502,
 	},
