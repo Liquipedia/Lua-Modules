@@ -23,6 +23,7 @@ local MatchFunctions = {
 }
 local MapFunctions = {}
 
+---@class PubgFfaMatchParser: FfaMatchParserInterface
 local FfaMatchFunctions = {
 	OPPONENT_CONFIG = {
 		resolveRedirect = true,

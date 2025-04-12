@@ -337,7 +337,7 @@ end
 ---@param format string
 ---@param timestamp string|osdateparam?
 ---@param localTime boolean?
----@return number|string
+---@return string
 function mw.language:formatDate(format, timestamp, localTime)
 	local function localTimezoneOffset(ts)
 		local utcDt = os.date("!*t", ts)
@@ -361,10 +361,10 @@ function mw.language:formatDate(format, timestamp, localTime)
 
 	if format == 'U' then
 		if not timestamp then
-			return os.time(os.date("!*t") --[[@as osdateparam]])
+			return tostring(os.time(os.date("!*t") --[[@as osdateparam]]))
 		end
 		if type(timestamp) ~= 'string' then
-			return os.time(timestamp)
+			return tostring(os.time(timestamp))
 		end
 		local tzHour, tzMinutes = timestamp:match('([%-%+]%d?%d):(%d%d)$')
 		local offset = 0
@@ -379,7 +379,7 @@ function mw.language:formatDate(format, timestamp, localTime)
 
 		local ts = os.time(makeOsdateParam(year, month, day, hour, minute, second)) - offset
 
-		return ts + localTimezoneOffset(ts)
+		return tostring(ts + localTimezoneOffset(ts))
 	elseif format == 'c' then
 		local outFormat = '%Y-%m-%dT%H:%M:%S'
 		if not timestamp then
