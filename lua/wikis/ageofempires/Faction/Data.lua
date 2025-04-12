@@ -987,6 +987,7 @@ return {
 			egy = 'egyptians',
 			fre = 'freyr',
 			fux = 'fuxi',
+			['fu xi'] = 'fuxi',
 			gai = 'gaia',
 			gre = 'greeks',
 			had = 'hades',
