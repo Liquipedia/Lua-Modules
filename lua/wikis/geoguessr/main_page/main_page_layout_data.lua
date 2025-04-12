@@ -32,12 +32,6 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
-	liquipediaApp = {
-		heading = 'Download the Liquipedia App',
-		padding = true,
-		body = '{{Liquipedia:App}}',
-		boxid = 1505,
-	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
@@ -99,7 +93,7 @@ return {
 		lightmode = 'GeoGuessr full logo allmode.svg',
 		darkmode = 'GeoGuessr full logo allmode.svg',
 	},
-	metadesc = 'Comprehensive GeoGuessr wiki with articles covering everything from formats, to strategies,' ..
+	metadesc = 'Comprehensive GeoGuessr wiki with articles covering everything from formats, to strategies,' .. 
 	'to tournaments, to competitive players and teams',
 	title = 'GeoGuessr Wiki | Liquipedia',
 	navigation = {
@@ -166,10 +160,6 @@ return {
 					{
 						mobileOrder = 8,
 						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 9,
-						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
