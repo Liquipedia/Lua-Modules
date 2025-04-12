@@ -15,6 +15,7 @@ return {
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
+	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
 	startleft = 'fas fa-chevron-left',
@@ -116,10 +117,18 @@ return {
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
 
+	-- Usage: Indicate boolean info in Infobox
+	yes = 'fa fa-check',
+	no = 'fa fa-times',
+
 	-- Usage: Stormgate
 	coop = 'fas fa-dungeon',
 	mayhem = 'fab fa-fort-awesome',
 
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
+
+	-- Usage: Chess
+	chesskingoutline = 'far fa-chess-king',
+	chesskingfull = 'fas fa-chess-king',
 }

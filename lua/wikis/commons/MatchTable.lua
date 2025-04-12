@@ -259,7 +259,7 @@ function MatchTable:getOpponentAliases(mode, opponent)
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
-		local pagifiedName = Page.pageifyLink(name)
+		local pagifiedName = Page.pageifyLink(name) --[[@as string]]
 		local pagifiedNameWithSpaces = pagifiedName:gsub('_', ' ')
 		aliases[name] = true
 		aliases[nameWithSpaces] = true
@@ -313,7 +313,7 @@ function MatchTable:query()
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
 
-	if self.config.limit and self.config.limit == #self.matches then
+	if self.config.limit and self.config.limit == #self.matches and not self.config.linkSubPage then
 		mw.ext.TeamLiquidIntegration.add_category('Limited match pages')
 	end
 
@@ -820,7 +820,7 @@ function MatchTable:_displayScore(match)
 	---@return Html|string
 	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		local score = opponentRecord.score
+		local score = OpponentDisplay.InlineScore(opponentRecord)
 		local status = opponentRecord.status
 
 		local game1Opponent = gameOpponents[1]

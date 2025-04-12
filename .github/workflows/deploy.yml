@@ -38,6 +38,7 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/deploy_res.sh "${{ steps.res-changed-files.outputs.all_changed_files }}"
 
       - name: Lua Deploy
@@ -47,4 +48,14 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          DEPLOY_TRIGGER: ${{ github.event_name }}
         run: bash scripts/deploy.sh "${{ steps.lua-changed-files.outputs.all_changed_files }}"
+
+      - name: Lua Protect
+        if: steps.lua-changed-files.outputs.added_files_count != 0 || steps.lua-changed-files.outputs.renamed_files_count != 0
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+        run: bash scripts/protect.sh "${{ steps.lua-changed-files.outputs.added_files }} ${{ steps.lua-changed-files.outputs.renamed_files }}"

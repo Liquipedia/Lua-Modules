@@ -206,7 +206,7 @@ Array.groupBy({2, 3, 5, 7, 11, 13}, function(x) return x % 4 end)
 ---@param tbl T[]
 ---@param funct fun(xValue: T): K?
 ---@return T[][]
----@return table<K, T[]>
+---@return {[K]: T[]}
 ---@nodiscard
 function Array.groupBy(tbl, funct)
 	local groupsByKey = {}
@@ -531,7 +531,7 @@ Array.reduce({2, 3, 5}, pow)
 ---@param array T[]
 ---@param operator fun(aggregate: V, arrayValue: T): V
 ---@param initialValue V?
----@return V?
+---@return V
 ---@nodiscard
 function Array.reduce(array, operator, initialValue)
 	local aggregate

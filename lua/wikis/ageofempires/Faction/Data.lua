@@ -649,7 +649,7 @@ local factionPropsAoM = {
 	},
 	fuxi = {
 		index = 7,
-		name = 'Fu Xi',
+		name = 'Fuxi',
 		faction = 'fuxi',
 	},
 	gaia = {
@@ -680,7 +680,7 @@ local factionPropsAoM = {
 	},
 	nuwa = {
 		index = 13,
-		name = 'Nü Wa',
+		name = 'Nüwa',
 		faction = 'nuwa',
 	},
 	odin = {

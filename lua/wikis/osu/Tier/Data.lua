@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=callofduty
+-- wiki=osu
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -63,24 +63,7 @@ return {
 			short = '?',
 		},
 	},
-
 	tierTypes = {
-		monthly = {
-			value = 'Monthly',
-			sort = 'A6',
-			name = 'Monthly',
-			short = 'Mon.',
-			link = 'Monthly Tournaments',
-			category = 'Monthly Tournaments',
-		},
-		weekly = {
-			value = 'Weekly',
-			sort = 'A7',
-			name = 'Weekly',
-			short = 'Week.',
-			link = 'Weekly Tournaments',
-			category = 'Weekly Tournaments',
-		},
 		qualifier = {
 			value = 'Qualifier',
 			sort = 'A8',

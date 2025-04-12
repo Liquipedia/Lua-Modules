@@ -114,6 +114,7 @@ function HorizontallistDisplay.Bracket(props)
 			:node(matchNode)
 end
 
+---@param bracketId string
 ---@param bracket [string, MatchGroupUtilBracketBracketData][]
 ---@return integer
 function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)
