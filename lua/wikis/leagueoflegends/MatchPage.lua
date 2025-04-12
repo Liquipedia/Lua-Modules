@@ -74,6 +74,16 @@ local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
+local KDA_ICON = IconImage{
+	imageLight = 'Lol stat icon kda.png',
+	link = ''
+}
+local GOLD_ICON = IconImage{
+	imageLight = 'Lol stat icon gold.png',
+	caption = 'Gold',
+	link = ''
+}
+
 local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
 
 ---@param match table
@@ -405,7 +415,7 @@ function MatchPage:_renderTeamStats(game)
 					finished = game.finished,
 					data = {
 						{
-							icon = IconImage{imageLight = 'Lol stat icon kda.png', link = ''},
+							icon = KDA_ICON,
 							name = 'KDA',
 							team1Value = Array.interleave({
 								game.teams[1].kills,
@@ -419,7 +429,7 @@ function MatchPage:_renderTeamStats(game)
 							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'})
 						},
 						{
-							icon = IconImage{imageLight = 'Lol stat icon gold.png', link = ''},
+							icon = GOLD_ICON,
 							name = 'Gold',
 							team1Value = game.teams[1].gold,
 							team2Value = game.teams[2].gold
@@ -600,11 +610,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					Div{
 						classes = {'match-bm-lol-players-player-stat'},
 						children = WidgetUtil.collect(
-							IconImage{
-								imageLight = 'Lol stat icon kda.png',
-								caption = 'KDA',
-								link = ''
-							},
+							KDA_ICON,
 							Array.interleave({
 								player.kills, player.deaths, player.assists
 							}, '/')
@@ -624,11 +630,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					Div{
 						classes = {'match-bm-lol-players-player-stat'},
 						children = WidgetUtil.collect(
-							IconImage{
-								imageLight = 'Lol stat icon gold.png',
-								caption = 'Gold',
-								link = ''
-							},
+							GOLD_ICON,
 							MatchPage.abbreviateNumber(player.gold)
 						)
 					},
