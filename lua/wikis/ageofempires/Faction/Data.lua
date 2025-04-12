@@ -579,7 +579,6 @@ local factionPropsAoE4 = {
 	knightstemplar = {
 		index = 12,
 		name = 'Knights Templar',
-		pageName = 'Knights Templar',
 		faction = 'knightstemplar',
 	},
 	malians = {
