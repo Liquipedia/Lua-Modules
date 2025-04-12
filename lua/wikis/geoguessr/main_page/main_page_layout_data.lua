@@ -154,11 +154,11 @@ return {
 						content = CONTENT.specialEvents,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
 					{
-						mobileOrder = 8,
+						mobileOrder = 6,
 						content = CONTENT.wantToHelp,
 					},
 				}
@@ -198,15 +198,11 @@ return {
 						},
 					},
 					{
-						mobileOrder = 6,
+						mobileOrder = 4,
 						content = CONTENT.thisDay,
 					},
 					{
 						mobileOrder = 5,
-						content = CONTENT.updates,
-					},
-					{
-						mobileOrder = 7,
 						content = CONTENT.usefulArticles,
 					},
 				},
