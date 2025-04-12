@@ -15,7 +15,7 @@ local CONTENT = {
 	},
 	updates = {
 		heading = 'Updates',
-		body = '<nowiki>\n</nowiki>{{Main Page Updates}}',
+		body = '{{Main Page Updates}}',
 		padding = true,
 		boxid = 1503,
 	},
