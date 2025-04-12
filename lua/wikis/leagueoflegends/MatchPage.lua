@@ -637,7 +637,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						children = WidgetUtil.collect(
 							IconImage{
 								imageLight = 'Lol stat icon dmg.png',
-								caption = 'KDA',
+								caption = 'Damage',
 								link = ''
 							},
 							player.damagedone
