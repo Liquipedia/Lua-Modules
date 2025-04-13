@@ -402,9 +402,9 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					Div{
 						classes = {'match-bm-players-player-loadout-rs-wrap'},
 						children = Array.map({
-							MatchPage.makeItemDisplay(player.neutralItem or {}),
-							player.shard and '[[File:Dota2_Aghanim\'s_Shard_symbol_allmode.png|64px|Aghanim\'s Shard|link=]]' or nil,
-							player.scepter and '[[File:Dota2_Aghanim\'s_Scepter_symbol_allmode.png|64px|Aghanim\'s Scepter|link=]]' or nil
+							MatchPage.makeItemDisplay(player.neutralitem or {}),
+							player.shard and '[[File:Dota2_Aghanim\'s_Shard_symbol_allmode.png|64px|Aghanim\'s Shard|link=]]' or '',
+							player.scepter and '[[File:Dota2_Aghanim\'s_Scepter_symbol_allmode.png|64px|Aghanim\'s Scepter|link=]]' or ''
 						}, function (specialItem)
 							return Div{
 								classes = {'match-bm-players-player-loadout-rs'},
