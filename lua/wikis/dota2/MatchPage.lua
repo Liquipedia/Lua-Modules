@@ -26,6 +26,10 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
 local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -34,6 +38,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchPage = Class.new(BaseMatchPage)
 
 local NO_CHARACTER = 'default'
+local KDA_ICON = '<i class="fas fa-skull-crossbones"></i>'
+local GOLD_ICON = '<i class="fas fa-coins"></i>'
+local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
@@ -102,9 +109,6 @@ function MatchPage:populateGames()
 
 			return team
 		end)
-		if game.finished and self.opponents[game.winner] then
-			game.winnerName = self.opponents[game.winner].name
-		end
 	end)
 end
 
@@ -135,6 +139,7 @@ function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderDraft(game),
+			self:_renderTeamStats(game),
 			TemplateEngine():render(Display.game, inputTable)
 		)
 	}
@@ -191,6 +196,112 @@ function MatchPage:_renderTeamVeto(game, opponent, index)
 						end)
 					}
 				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-team-stats-header'},
+					children = WidgetUtil.collect(
+						HtmlWidgets.H4{
+							classes = {'match-bm-team-stats-header-title'},
+							children = game.finished
+								and self.opponents[game.winner].name .. ' Victory'
+								or 'No winner determined yet'
+						},
+						game.length and Div{children = game.length} or nil
+					)
+				},
+				Div{
+					classes = {'match-bm-team-stats-container'},
+					children = {
+						self:_renderStatsTeamDisplay(game, 1),
+						StatsList{
+							finished = game.finished,
+							data = {
+								{
+									icon = KDA_ICON,
+									name = 'KDA',
+									team1Value = Array.interleave({
+										game.teams[1].kills,
+										game.teams[1].deaths,
+										game.teams[1].assists
+									}, SPAN_SLASH),
+									team2Value = Array.interleave({
+										game.teams[2].kills,
+										game.teams[2].deaths,
+										game.teams[2].assists
+									}, SPAN_SLASH)
+								},
+								{
+									icon = GOLD_ICON,
+									name = 'Gold',
+									team1Value = game.teams[1].gold,
+									team2Value = game.teams[2].gold
+								},
+								{
+									icon = '<i class="fas fa-chess-rook"></i>',
+									name = 'Towers',
+									team1Value = game.teams[1].objectives.towers,
+									team2Value = game.teams[2].objectives.towers
+								},
+								{
+									icon = '<i class="fas fa-warehouse"></i>',
+									name = 'Barracks',
+									team1Value = game.teams[1].objectives.barracks,
+									team2Value = game.teams[2].objectives.barracks
+								},
+								{
+									icon = HtmlWidgets.Span{
+										classes = {'liquipedia-custom-icon', 'liquipedia-custom-icon-roshan'}
+									},
+									name = 'Roshans',
+									team1Value = game.teams[1].objectives.roshans,
+									team2Value = game.teams[2].objectives.roshans
+								}
+							}
+						},
+						self:_renderStatsTeamDisplay(game, 2)
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
+	local team = game.teams[teamIndex]
+	return Div{
+		classes = {'match-bm-team-stats-team'},
+		children = {
+			Div{
+				classes = {'match-bm-team-stats-team-logo'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Div{
+				classes = {'match-bm-team-stats-team-side'},
+				children = team.side
+			},
+			Div{
+				classes = {
+					'match-bm-team-stats-team-state',
+					'state--' .. team.scoreDisplay
+				},
+				children = team.scoreDisplay
 			}
 		}
 	}

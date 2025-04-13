@@ -39,7 +39,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageGame: MatchGroupUtilGame
 ---@field finished boolean
----@field winnerName string?
 ---@field teams table[]
 ---@field scoreDisplay string
 
