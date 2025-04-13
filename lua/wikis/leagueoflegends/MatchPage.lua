@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -177,8 +176,6 @@ end
 ---@param game LoLMatchPageGame
 ---@return Widget
 function MatchPage:renderGame(game)
-	local inputTable = Table.merge(self.matchData, game)
-	inputTable.heroIcon = FnUtil.curry(self.getCharacterIcon, self)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
