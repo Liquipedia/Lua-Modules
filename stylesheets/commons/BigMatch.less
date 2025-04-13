@@ -871,12 +871,20 @@ ul.match-bm-lol-game-veto-overview-pick {
 			&-icon {
 				border-radius: 0.25rem 0.25rem 0 0;
 				width: 3.75rem;
-				height: 2.5rem;
+				height: 3.75rem;
 				overflow: hidden;
+
+				.wiki-dota2 & {
+					height: 2.5rem;
+				}
 
 				@media ( min-width: 834px ) {
 					width: 4.5rem;
-					height: 3rem;
+					height: 4.5rem;
+					
+					.wiki-dota2 & {
+						height: 3rem;
+					}
 				}
 			}
 
