@@ -601,15 +601,30 @@ ul.match-bm-lol-game-veto-overview-pick {
 		border-radius: 0.25rem;
 		background-color: var( --on-background );
 		overflow: hidden;
-		padding: 0.25rem;
 		display: flex;
 
-		&.role--radiant {
-			background-color: var( --clr-atlantis-40 );
+		.wiki-dota2 & {
+			padding: 0.25rem;
+
+			&.role--radiant {
+				background-color: var( --clr-atlantis-40 );
+			}
+	
+			&.role--dire {
+				background-color: var( --clr-california-40 );
+			}
 		}
 
-		&.role--dire {
-			background-color: var( --clr-california-40 );
+		.wiki-leagueoflegends & {
+			padding: 0.1rem;
+
+			&.role--blue {
+				background-color: #0d71bf;
+			}
+	
+			&.role--red {
+				background-color: #b81414;
+			}
 		}
 
 		> img {
@@ -918,15 +933,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 		border-color: var( --clr-secondary-25 );
 	}
 
-	&-character {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		gap: 8px;
-		position: relative;
-		flex: 1;
-	}
-
 	&-details {
 		display: flex;
 		flex-direction: row;
@@ -935,72 +941,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 		gap: 16px;
 		align-self: stretch;
 		flex: 2 0 50%;
-	}
-
-	&-role {
-		@media ( max-width: 435px ) {
-			padding: 1px;
-		}
-
-		@media ( min-width: 414px ) {
-			padding: 2px;
-		}
-
-		> img {
-			display: flex;
-			flex-direction: row;
-			align-items: flex-start;
-			gap: 10px;
-			position: absolute;
-			border-radius: 2px;
-
-			@media ( max-width: 435px ) {
-				width: 14px;
-				height: 14px;
-				left: 20px;
-				top: 22px;
-			}
-
-			@media ( min-width: 414px ) {
-				width: 20px;
-				height: 20px;
-				left: 30px;
-				top: 32px;
-			}
-		}
-	}
-
-	@media ( max-width: 435px ) {
-		&-avatar,
-		&-icon > a > img {
-			width: 32px;
-			height: 32px;
-		}
-	}
-
-	@media ( min-width: 414px ) {
-		&-avatar,
-		&-icon > a > img {
-			width: 48px;
-			height: 48px;
-		}
-	}
-
-	&-icon > a > img {
-		position: absolute;
-		left: 0;
-		top: 0;
-		border-radius: 40px;
-	}
-
-	&-name {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-
-		> a {
-			font-weight: bold;
-		}
 	}
 
 	&-loadout {

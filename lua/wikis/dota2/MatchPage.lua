@@ -26,6 +26,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -348,37 +349,17 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
 		classes = {'match-bm-players-player'},
 		children = {
-			Div{
-				classes = {'match-bm-players-player-character'},
-				children = {
-					Div{
-						classes = {'match-bm-players-player-avatar'},
-						children = {
-							Div{
-								classes = {'match-bm-players-player-icon'},
-								children = self:getCharacterIcon(player)
-							},
-							Div{
-								classes = {
-									'match-bm-players-player-role',
-									'role--' .. game.teams[teamIndex].side
-								},
-								children = IconImage{
-									imageLight = 'Dota2 ' .. player.facet .. ' facet icon darkmode.png',
-									caption = player.facet,
-									link = ''
-								}
-							}
-						}
-					},
-					Div{
-						classes = {'match-bm-players-player-name'},
-						children = {
-							Link{link = player.link, children = player.displayName},
-							HtmlWidgets.I{children = player.character}
-						}
-					}
-				}
+			PlayerDisplay{
+				characterIcon = self:getCharacterIcon(player),
+				characterName = player.character,
+				side = game.teams[teamIndex].side,
+				roleIcon = IconImage{
+					imageLight = 'Dota2 ' .. player.facet .. ' facet icon darkmode.png',
+					caption = player.facet,
+					link = ''
+				},
+				playerName = player.displayName,
+				playerLink = player.link
 			},
 			Div{
 				classes = {'match-bm-players-player-loadout'},

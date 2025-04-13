@@ -28,6 +28,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -507,35 +508,16 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 			Div{
 				classes = {'match-bm-lol-players-player-details'},
 				children = {
-					Div{
-						classes = {'match-bm-lol-players-player-character'},
-						children = {
-							Div{
-								classes = {'match-bm-lol-players-player-avatar'},
-								children = {
-									Div{
-										classes = {'match-bm-lol-players-player-icon'},
-										children = self:getCharacterIcon(player)
-									},
-									Div{
-										classes = {'match-bm-lol-players-player-role'},
-										children = IconImage{
-											imageLight = 'Lol role ' .. player.role .. ' '
-												.. game.teams[teamIndex].side .. '.png',
-											link = '',
-											caption = player.role
-										}
-									}
-								}
-							},
-							Div{
-								classes = {'match-bm-lol-players-player-name'},
-								children = {
-									Link{link = player.player},
-									HtmlWidgets.I{children = player.character}
-								}
-							}
-						}
+					PlayerDisplay{
+						characterIcon = self:getCharacterIcon(player),
+						characterName = player.character,
+						side = game.teams[teamIndex].side,
+						roleIcon = IconImage{
+							imageLight = 'Lol role ' .. player.role .. ' icon darkmode.svg',
+							caption = mw.getContentLanguage():ucfirst(player.role),
+							link = ''
+						},
+						playerName = player.player
 					},
 					Div{
 						classes = {'match-bm-lol-players-player-loadout'},
