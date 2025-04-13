@@ -10,51 +10,6 @@
 return {
 	game =
 		[=[
-			<h3>Draft</h3>
-			<div class="match-bm-game-veto-wrapper">
-				<div class="match-bm-lol-game-veto-overview-team">
-					<div class="match-bm-game-veto-overview-team-header">{{&opponents.1.iconDisplay}}</div>
-					<div class="match-bm-game-veto-overview-team-veto">
-						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--{{teams.1.side}}" aria-labelledby="picks">
-							{{#teams.1.picks}}
-							<div class="match-bm-game-veto-overview-team-veto-row-item">
-								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
-								<div class="match-bm-game-veto-overview-team-veto-row-item-text">#{{vetoNumber}}</div>
-							</div>
-							{{/teams.1.picks}}
-						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
-							{{#teams.1.bans}}
-							<div class="match-bm-game-veto-overview-team-veto-row-item">
-								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
-								<div class="match-bm-game-veto-overview-team-veto-row-item-text">#{{vetoNumber}}</div>
-							</div>
-							{{/teams.1.bans}}
-						</div>
-					</div>
-				</div>
-				<div class="match-bm-lol-game-veto-overview-team">
-					<div class="match-bm-game-veto-overview-team-header">{{&opponents.2.iconDisplay}}</div>
-					<div class="match-bm-game-veto-overview-team-veto">
-						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--{{teams.2.side}}" aria-labelledby="picks">
-							{{#teams.2.picks}}
-							<div class="match-bm-game-veto-overview-team-veto-row-item">
-								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
-								<div class="match-bm-game-veto-overview-team-veto-row-item-text">#{{vetoNumber}}</div>
-							</div>
-							{{/teams.2.picks}}
-						</div>
-						<div class="match-bm-game-veto-overview-team-veto-row match-bm-game-veto-overview-team-veto-row--ban" aria-labelledby="bans">
-							{{#teams.2.bans}}
-							<div class="match-bm-game-veto-overview-team-veto-row-item">
-								<div class="match-bm-game-veto-overview-team-veto-row-item-icon">{{&heroIcon}}</div>
-								<div class="match-bm-game-veto-overview-team-veto-row-item-text">#{{vetoNumber}}</div>
-							</div>
-							{{/teams.2.bans}}
-						</div>
-					</div>
-				</div>
-			</div>
 			<h3>Team Stats</h3>
 			<div class="match-bm-team-stats">
 				<div class="match-bm-team-stats-header">
