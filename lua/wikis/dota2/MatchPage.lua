@@ -16,10 +16,8 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table') ---@module 'commons.Table'
-local TemplateEngine = require('Module:TemplateEngine')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local Display = Lua.import('Module:MatchPage/Template')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
