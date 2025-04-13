@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
