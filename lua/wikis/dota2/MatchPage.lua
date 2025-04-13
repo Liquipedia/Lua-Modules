@@ -78,13 +78,7 @@ function MatchPage:populateGames()
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
-					items = Array.map(player.items or {}, MatchPage.makeItemDisplay),
-					backpackitems = Array.map(player.backpackitems or {}, MatchPage.makeItemDisplay),
-					neutralitem = MatchPage.makeItemDisplay(player.neutralitem or {}),
 				})
-
-				newPlayer.displayDamageDone = MatchPage.abbreviateNumber(player.damagedone)
-				newPlayer.displayGold = MatchPage.abbreviateNumber(player.gold)
 
 				return newPlayer
 			end)
@@ -140,7 +134,7 @@ function MatchPage:renderGame(game)
 		children = WidgetUtil.collect(
 			self:_renderDraft(game),
 			self:_renderTeamStats(game),
-			TemplateEngine():render(Display.game, inputTable)
+			self:_renderPlayersPerformance(game)
 		)
 	}
 end
@@ -302,6 +296,148 @@ function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
 					'state--' .. team.scoreDisplay
 				},
 				children = team.scoreDisplay
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderPlayersPerformance(game)
+	return {
+		HtmlWidgets.H3{children = 'Player Performance'},
+		Div{
+			classes = {'match-bm-players-wrapper'},
+			children = {
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderTeamPerformance(game, teamIndex)
+	return Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			Div{
+				classes = {'match-bm-lol-players-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Array.map(game.teams[teamIndex].players, function (player)
+				return self:_renderPlayerPerformance(game, teamIndex, player)
+			end)
+		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@param player table
+---@return Widget
+function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	return Div{
+		classes = {'match-bm-players-player'},
+		children = {
+			Div{
+				classes = {'match-bm-players-player-character'},
+				children = {
+					Div{
+						classes = {'match-bm-players-player-avatar'},
+						children = {
+							Div{
+								classes = {'match-bm-players-player-icon'},
+								children = self:getCharacterIcon(player)
+							},
+							Div{
+								classes = {
+									'match-bm-players-player-role',
+									'role--' .. game.teams[teamIndex].side
+								},
+								children = IconImage{
+									imageLight = 'Dota2 ' .. player.facet .. ' facet icon darkmode.png',
+									caption = player.facet,
+									link = ''
+								}
+							}
+						}
+					},
+					Div{
+						classes = {'match-bm-players-player-name'},
+						children = {
+							Link{link = player.link, children = player.displayName},
+							HtmlWidgets.I{children = player.character}
+						}
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-players-player-loadout'},
+				children = {
+					Div{
+						classes = {'match-bm-players-player-loadout-items'},
+						children = WidgetUtil.collect(
+							Array.map(player.items or {}, function (item)
+								return Div{
+									classes = {'match-bm-players-player-loadout-item'},
+									children = MatchPage.makeItemDisplay(item)
+								}
+							end),
+							Array.map(player.backpackitems or {}, function (backpackitem)
+								return Div{
+									classes = {'match-bm-players-player-loadout-item', 'item--backpack'},
+									children = MatchPage.makeItemDisplay(backpackitem)
+								}
+							end)
+						)
+					},
+					Div{
+						classes = {'match-bm-players-player-loadout-rs-wrap'},
+						children = Array.map({
+							MatchPage.makeItemDisplay(player.neutralItem or {}),
+							player.shard and '[[File:Dota2_Aghanim\'s_Shard_symbol_allmode.png|64px|Aghanim\'s Shard|link=]]' or nil,
+							player.scepter and '[[File:Dota2_Aghanim\'s_Scepter_symbol_allmode.png|64px|Aghanim\'s Scepter|link=]]' or nil
+						}, function (specialItem)
+							return Div{
+								classes = {'match-bm-players-player-loadout-rs'},
+								children = specialItem
+							}
+						end)
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-players-player-stats'},
+				children = {
+					PlayerStat{
+						title = {KDA_ICON, 'KDA'},
+						data = Array.interleave({
+							player.kills, player.deaths, player.assists
+						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {'<i class="fas fa-sword"></i>', 'DMG'},
+						data = MatchPage.abbreviateNumber(player.damagedone)
+					},
+					PlayerStat{
+						title = {'<i class="fas fa-swords"></i>', 'LH/DN'},
+						data = {player.lasthits, SPAN_SLASH, player.denies}
+					},
+					PlayerStat{
+						title = {'<i class="fas fa-coin"></i>', 'NET'},
+						data = MatchPage.abbreviateNumber(player.gold)
+					},
+					PlayerStat{
+						title = {GOLD_ICON, 'GPM'},
+						data = player.gpm
+					}
+				}
 			}
 		}
 	}
