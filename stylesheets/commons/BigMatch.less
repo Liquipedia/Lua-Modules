@@ -771,14 +771,34 @@ ul.match-bm-lol-game-veto-overview-pick {
 			align-items: center;
 			font-size: 0.875rem;
 
+			.wiki-leagueoflegends & {
+				@media ( max-width: 413px ) {
+					font-size: 0.6875rem;
+				}
+			}
+
 			i {
 				margin-right: 0.5rem;
+			}
+
+			img {
+				margin-right: 0.5rem;
+
+				.theme--dark & {
+					filter: invert( 1 );
+				}
 			}
 		}
 
 		&-data {
 			font-weight: bold;
 			font-size: 0.9375rem;
+
+			.wiki-leagueoflegends & {
+				@media ( max-width: 413px ) {
+					font-size: 0.75rem;
+				}
+			}
 
 			.slash {
 				margin: 0 0.125rem;

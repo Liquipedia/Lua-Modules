@@ -27,6 +27,7 @@ local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -83,6 +84,7 @@ local GOLD_ICON = IconImage{
 	caption = 'Gold',
 	link = ''
 }
+local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
 
@@ -421,12 +423,12 @@ function MatchPage:_renderTeamStats(game)
 								game.teams[1].kills,
 								game.teams[1].deaths,
 								game.teams[1].assists
-							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'}),
+							}, SPAN_SLASH),
 							team2Value = Array.interleave({
 								game.teams[2].kills,
 								game.teams[2].deaths,
 								game.teams[2].assists
-							}, HtmlWidgets.Span{classes = {'slash'}, children = '/'})
+							}, SPAN_SLASH)
 						},
 						{
 							icon = GOLD_ICON,
@@ -607,43 +609,37 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 			Div{
 				classes = {'match-bm-lol-players-player-stats'},
 				children = {
-					Div{
-						classes = {'match-bm-lol-players-player-stat'},
-						children = WidgetUtil.collect(
-							KDA_ICON,
-							Array.interleave({
-								player.kills, player.deaths, player.assists
-							}, '/')
-						)
+					PlayerStat{
+						title = {KDA_ICON, 'KDA'},
+						data = Array.interleave({
+							player.kills, player.deaths, player.assists
+						}, SPAN_SLASH)
 					},
-					Div{
-						classes = {'match-bm-lol-players-player-stat'},
-						children = WidgetUtil.collect(
+					PlayerStat{
+						title = {
 							IconImage{
 								imageLight = 'Lol stat icon cs.png',
 								caption = 'CS',
 								link = ''
 							},
-							player.creepscore
-						)
+							'CS'
+						},
+						data = player.creepscore
 					},
-					Div{
-						classes = {'match-bm-lol-players-player-stat'},
-						children = WidgetUtil.collect(
-							GOLD_ICON,
-							MatchPage.abbreviateNumber(player.gold)
-						)
+					PlayerStat{
+						title = {GOLD_ICON, 'Gold'},
+						data = MatchPage.abbreviateNumber(player.gold)
 					},
-					Div{
-						classes = {'match-bm-lol-players-player-stat'},
-						children = WidgetUtil.collect(
+					PlayerStat{
+						title = {
 							IconImage{
 								imageLight = 'Lol stat icon dmg.png',
 								caption = 'Damage',
 								link = ''
 							},
-							player.damagedone
-						)
+							'Damage'
+						},
+						data = player.damagedone
 					}
 				}
 			}
