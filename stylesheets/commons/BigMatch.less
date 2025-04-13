@@ -535,7 +535,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 	@media ( max-width: 435px ) {
 		font-size: 12px;
 	}
-	
+
 	@media ( min-width: 414px ) {
 		font-size: 15px;
 	}
@@ -905,8 +905,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 .match-bm-lol-players-player {
 	box-sizing: border-box;
 	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
+	flex-flow: row wrap;
 	align-items: center;
 	padding: 16px;
 	gap: 16px;
@@ -942,11 +941,11 @@ ul.match-bm-lol-game-veto-overview-pick {
 		@media ( max-width: 435px ) {
 			padding: 1px;
 		}
-	
+
 		@media ( min-width: 414px ) {
 			padding: 2px;
 		}
-	
+
 		> img {
 			display: flex;
 			flex-direction: row;
@@ -954,14 +953,14 @@ ul.match-bm-lol-game-veto-overview-pick {
 			gap: 10px;
 			position: absolute;
 			border-radius: 2px;
-	
+
 			@media ( max-width: 435px ) {
 				width: 14px;
 				height: 14px;
 				left: 20px;
 				top: 22px;
 			}
-	
+
 			@media ( min-width: 414px ) {
 				width: 20px;
 				height: 20px;
@@ -978,7 +977,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 			height: 32px;
 		}
 	}
-	
+
 	@media ( min-width: 414px ) {
 		&-avatar,
 		&-icon > a > img {
@@ -986,7 +985,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 			height: 48px;
 		}
 	}
-	
+
 	&-icon > a > img {
 		position: absolute;
 		left: 0;
@@ -998,53 +997,53 @@ ul.match-bm-lol-game-veto-overview-pick {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
-	
+
 		> a {
 			font-weight: bold;
 		}
 	}
 
 	&-loadout {
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		gap: 16px;
+
 		@media ( max-width: 435px ) {
 			img {
 				width: 16px;
 				height: 16px;
 			}
 		}
-		
+
 		@media ( min-width: 414px ) {
 			img {
 				width: 24px;
 				height: 24px;
 			}
 		}
-	
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		gap: 16px;
-	
+
 		&-rs {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2px;
+
 			&-wrap {
 				display: flex;
 				flex-direction: row;
 				align-items: flex-start;
 				gap: 4px;
 			}
-		
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: 2px;
 		}
-	
+
 		&-items {
 			display: flex;
 			flex-direction: column;
 			align-items: flex-start;
 			gap: 2px;
 		}
-	
+
 		&-item {
 			display: flex;
 			flex-direction: row;
@@ -1062,7 +1061,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 		align-self: stretch;
 		flex: 2 0 50%;
 	}
-	
+
 	&-stat {
 		display: flex;
 		flex-direction: row;
@@ -1070,7 +1069,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 		flex: 1;
 		gap: 4px;
 		width: auto;
-	
+
 		.theme--dark & > img {
 			filter: invert( 1 );
 		}
