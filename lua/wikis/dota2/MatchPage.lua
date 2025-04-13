@@ -36,9 +36,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchPage = Class.new(BaseMatchPage)
 
 local NO_CHARACTER = 'default'
+local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
-local KDA_ICON = '<i class="fas fa-skull-crossbones"></i>'
-local GOLD_ICON = '<i class="fas fa-coins"></i>'
+local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local AVAILABLE_FOR_TIERS = {1}
@@ -435,19 +435,19 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						}, SPAN_SLASH)
 					},
 					PlayerStat{
-						title = {'<i class="fas fa-sword"></i>', 'DMG'},
+						title = {IconFa{iconName = 'damage'}, 'DMG'},
 						data = MatchPage.abbreviateNumber(player.damagedone)
 					},
 					PlayerStat{
-						title = {'<i class="fas fa-swords"></i>', 'LH/DN'},
+						title = {IconFa{iconName = 'dota2_lhdn'}, 'LH/DN'},
 						data = {player.lasthits, SPAN_SLASH, player.denies}
 					},
 					PlayerStat{
-						title = {'<i class="fas fa-coin"></i>', 'NET'},
+						title = {GOLD_ICON, 'NET'},
 						data = MatchPage.abbreviateNumber(player.gold)
 					},
 					PlayerStat{
-						title = {GOLD_ICON, 'GPM'},
+						title = {IconFa{iconName = 'dota2_gpm'}, 'GPM'},
 						data = player.gpm
 					}
 				}

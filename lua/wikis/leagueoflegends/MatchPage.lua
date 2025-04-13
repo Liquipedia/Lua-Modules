@@ -75,15 +75,8 @@ local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
-local KDA_ICON = IconImage{
-	imageLight = 'Lol stat icon kda.png',
-	link = ''
-}
-local GOLD_ICON = IconImage{
-	imageLight = 'Lol stat icon gold.png',
-	caption = 'Gold',
-	link = ''
-}
+local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
+local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
@@ -632,11 +625,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					},
 					PlayerStat{
 						title = {
-							IconImage{
-								imageLight = 'Lol stat icon dmg.png',
-								caption = 'Damage',
-								link = ''
-							},
+							IconFa{iconName = 'damage', additionalClasses = {'fa-flip-both'}},
 							'Damage'
 						},
 						data = player.damagedone
