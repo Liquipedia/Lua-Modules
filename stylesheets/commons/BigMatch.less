@@ -908,160 +908,163 @@ ul.match-bm-lol-game-veto-overview-pick {
 		background-color: var( --clr-secondary-7 );
 		border-color: var( --clr-secondary-25 );
 	}
-}
 
-.match-bm-lol-players-player-details {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: flex-start;
-	gap: 16px;
-	align-self: stretch;
-}
-
-.match-bm-lol-players-player-character {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 8px;
-	position: relative;
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-players-player-avatar,
-	.match-bm-lol-players-player-icon > a > img {
-		width: 32px;
-		height: 32px;
+	&-details {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 16px;
+		align-self: stretch;
 	}
 
-	.match-bm-lol-players-player-role {
-		padding: 1px;
+	&-character {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 8px;
+		position: relative;
 	}
 
-	.match-bm-lol-players-player-role > img {
-		width: 14px;
-		height: 14px;
-		left: 20px;
-		top: 22px;
+	&-role {
+		@media ( max-width: 435px ) {
+			padding: 1px;
+		}
+	
+		@media ( min-width: 414px ) {
+			padding: 2px;
+		}
+	
+		> img {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 10px;
+			position: absolute;
+			border-radius: 2px;
+	
+			@media ( max-width: 435px ) {
+				width: 14px;
+				height: 14px;
+				left: 20px;
+				top: 22px;
+			}
+	
+			@media ( min-width: 414px ) {
+				width: 20px;
+				height: 20px;
+				left: 30px;
+				top: 32px;
+			}
+		}
+	}
+
+	@media ( max-width: 435px ) {
+		&-avatar,
+		&-icon > a > img {
+			width: 32px;
+			height: 32px;
+		}
+	}
+	
+	@media ( min-width: 414px ) {
+		&-avatar,
+		&-icon > a > img {
+			width: 48px;
+			height: 48px;
+		}
+	}
+	
+	&-icon > a > img {
+		position: absolute;
+		left: 0;
+		top: 0;
+		border-radius: 40px;
+	}
+
+	&-name {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+	
+		> a {
+			font-weight: bold;
+		}
+	}
+
+	&-loadout {
+		@media ( max-width: 435px ) {
+			img {
+				width: 16px;
+				height: 16px;
+			}
+		}
+		
+		@media ( min-width: 414px ) {
+			img {
+				width: 24px;
+				height: 24px;
+			}
+		}
+	
+		display: flex;
+		flex-direction: row;
+		align-items: flex-start;
+		gap: 16px;
+	
+		&-rs {
+			&-wrap {
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+				gap: 4px;
+			}
+		
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2px;
+		}
+	
+		&-items {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2px;
+		}
+	
+		&-item {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 2px;
+		}
+	}
+
+	&-stats {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+		gap: 16px;
+		align-self: stretch;
+	}
+	
+	&-stat {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		flex: 1;
+		gap: 4px;
+		width: auto;
+	
+		.theme--dark & > img {
+			filter: invert( 1 );
+		}
 	}
 }
 
-@media ( min-width: 414px ) {
-	.match-bm-lol-players-player-avatar,
-	.match-bm-lol-players-player-icon > a > img {
-		width: 48px;
-		height: 48px;
-	}
-
-	.match-bm-lol-players-player-role {
-		padding: 2px;
-	}
-
-	.match-bm-lol-players-player-role > img {
-		width: 20px;
-		height: 20px;
-		left: 30px;
-		top: 32px;
-	}
-}
-
-.match-bm-lol-players-player-role > img {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 10px;
-	position: absolute;
-	border-radius: 2px;
-}
-
-.match-bm-lol-players-player-icon > a > img {
-	position: absolute;
-	left: 0;
-	top: 0;
-	border-radius: 40px;
-}
-
-.match-bm-lol-players-player-name {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-.match-bm-lol-players-player-name > a {
-	font-weight: bold;
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-players-player-loadout img {
-		width: 16px;
-		height: 16px;
-	}
-}
-
-@media ( min-width: 414px ) {
-	.match-bm-lol-players-player-loadout img {
-		width: 24px;
-		height: 24px;
-	}
-}
-
-.match-bm-lol-players-player-loadout {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 16px;
-}
-
-.match-bm-lol-players-player-loadout-rs-wrap {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 4px;
-}
-
-.match-bm-lol-players-player-loadout-rs {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-.match-bm-lol-players-player-loadout-items {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-.match-bm-lol-players-player-loadout-item {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-.match-bm-lol-players-player-stats {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
-	align-items: center;
-	gap: 16px;
-	align-self: stretch;
-}
-
-.match-bm-lol-players-player-stat {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	flex: 1;
-	gap: 4px;
-	width: auto;
-
-	.theme--dark & > img {
-		filter: invert( 1 );
-	}
-}
-
+.match-bm-lol-players-player
 .match-bm-lol-game-overview {
 	border: 1px solid #bbbbbb;
 
