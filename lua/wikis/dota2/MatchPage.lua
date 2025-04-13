@@ -36,6 +36,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MatchPage = Class.new(BaseMatchPage)
 
 local NO_CHARACTER = 'default'
+local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = '<i class="fas fa-skull-crossbones"></i>'
 local GOLD_ICON = '<i class="fas fa-coins"></i>'
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
@@ -121,7 +122,7 @@ end
 function MatchPage.makeItemDisplay(item)
 	return IconImage{
 		imageLight = Logic.emptyOr(item.image, 'EmptyIcon itemicon dota2 gameasset.png'),
-		size = '64px',
+		size = ITEM_IMAGE_SIZE,
 		caption = Logic.emptyOr(item.name, 'Empty'),
 		link = ''
 	}
@@ -405,13 +406,13 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 							MatchPage.makeItemDisplay(player.neutralitem or {}),
 							player.shard and IconImage{
 								imageLight = 'Dota2_Aghanim\'s_Shard_symbol_allmode.png',
-								size = '64px',
+								size = ITEM_IMAGE_SIZE,
 								caption = 'Aghanim\'s Shard',
 								link = ''
 							} or '',
 							player.scepter and IconImage{
 								imageLight = 'Dota2_Aghanim\'s_Scepter_symbol_allmode.png',
-								size = '64px',
+								size = ITEM_IMAGE_SIZE,
 								caption = 'Aghanim\'s Scepter',
 								link = ''
 							} or ''
