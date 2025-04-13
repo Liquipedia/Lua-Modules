@@ -125,6 +125,8 @@ return {
 	dota2_gpm = 'fas fa-coin',
 	dota2_kda = 'fas fa-skull-crossbones',
 	dota2_lhdn = 'fas fa-swords',
+	dota2_tower = 'fas fa-chess-rook',
+	dota2_barrack = 'fas fa-warehouse',
 
 	-- Usage: LeagueOfLegends Match Pages
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',

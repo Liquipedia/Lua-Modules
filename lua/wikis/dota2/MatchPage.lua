@@ -248,13 +248,13 @@ function MatchPage:_renderTeamStats(game)
 									team2Value = game.teams[2].gold
 								},
 								{
-									icon = '<i class="fas fa-chess-rook"></i>',
+									icon = IconFa{iconName = 'dota2_tower'},
 									name = 'Towers',
 									team1Value = game.teams[1].objectives.towers,
 									team2Value = game.teams[2].objectives.towers
 								},
 								{
-									icon = '<i class="fas fa-warehouse"></i>',
+									icon = IconFa{iconName = 'dota2_barrack'},
 									name = 'Barracks',
 									team1Value = game.teams[1].objectives.barracks,
 									team2Value = game.teams[2].objectives.barracks
