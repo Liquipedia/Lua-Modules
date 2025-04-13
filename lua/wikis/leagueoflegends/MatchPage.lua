@@ -29,6 +29,8 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
+local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
+local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class LoLMatchPageGame: MatchPageGame
@@ -134,7 +136,9 @@ function MatchPage:populateGames()
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
 			end
 
-			team.picks = Array.map(team.players, Operator.property('character'))
+			team.picks = Array.filter(game.extradata.vetophase or {}, function(veto)
+				return veto.type == 'pick' and veto.team == teamIdx
+			end)
 			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx
 			end)
@@ -178,7 +182,7 @@ function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
 			self:_renderGameOverview(game),
-			self:_renderGamePicksAndBans(game),
+			self:_renderDraft(game),
 			self:_renderTeamStats(game),
 			self:_renderPlayersPerformance(game)
 		)
@@ -242,6 +246,62 @@ function MatchPage:_renderGameOverview(game)
 						classes = {'match-bm-lol-game-summary-team'},
 						children = self.opponents[2].iconDisplay
 					},
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderDraft(game)
+	return {
+		HtmlWidgets.H3{children = 'Draft'},
+		Div{
+			classes = {'match-bm-game-veto-wrapper'},
+			children = Array.map(self.opponents, function (opponent, opponentIndex)
+				return self:_renderTeamVeto(game, opponent, opponentIndex)
+			end)
+		}
+	}
+end
+
+---@private
+---@param opponent MatchPageOpponent
+---@param index integer
+---@return Widget
+function MatchPage:_renderTeamVeto(game, opponent, index)
+	local team = game.teams[index]
+	return Div{
+		classes = {'match-bm-lol-game-veto-overview-team'},
+		children = {
+			Div{
+				classes = {'match-bm-game-veto-overview-team-header'},
+				children = opponent.iconDisplay
+			},
+			Div{
+				classes = {'match-bm-game-veto-overview-team-veto'},
+				children = {
+					VetoRow{
+						vetoType = 'pick',
+						side = team.side,
+						vetoItems = Array.map(team.picks, function (pick)
+							return VetoItem{
+								characterIcon = self:getCharacterIcon(pick),
+								vetoNumber = pick.vetoNumber
+							}
+						end)
+					},
+					VetoRow{
+						vetoType = 'ban',
+						vetoItems = Array.map(team.bans, function (ban)
+							return VetoItem{
+								characterIcon = self:getCharacterIcon(ban),
+								vetoNumber = ban.vetoNumber
+							}
+						end)
+					}
 				}
 			}
 		}
