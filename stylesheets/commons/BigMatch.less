@@ -642,8 +642,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 			flex: 1 0 auto;
 		}
 
-		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
-			order: 1;
+		.wiki-dota2 & {
+			@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+				order: 1;
+			}
 		}
 	}
 
@@ -859,7 +861,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 	&-row {
 		display: flex;
-		gap: 0.125rem;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
@@ -904,6 +905,8 @@ ul.match-bm-lol-game-veto-overview-pick {
 		}
 
 		.wiki-dota2 & {
+			gap: 0.125rem;
+
 			&--radiant {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
 					background-color: #7eac20;
@@ -918,6 +921,8 @@ ul.match-bm-lol-game-veto-overview-pick {
 		}
 
 		.wiki-leagueoflegends & {
+			gap: 0.5rem;
+
 			&--blue {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
 					background-color: #0d71bf;
