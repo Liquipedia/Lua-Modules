@@ -119,12 +119,14 @@ function MatchPage:getCharacterIcon(character)
 end
 
 ---@param item {name: string?, image: string?}
----@return string
+---@return Widget
 function MatchPage.makeItemDisplay(item)
-	if String.isEmpty(item.name) then
-		return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
-	end
-	return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
+	return IconImage{
+		imageLight = Logic.emptyOr(item.image, 'EmptyIcon itemicon dota2 gameasset.png'),
+		size = '64px',
+		caption = Logic.emptyOr(item.name, 'Empty'),
+		link = ''
+	}
 end
 
 ---@param game MatchPageGame
