@@ -35,7 +35,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class Dota2MatchPage: BaseMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
-local NO_CHARACTER = 'default'
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
@@ -105,18 +104,6 @@ function MatchPage:populateGames()
 	end)
 end
 
-function MatchPage:getCharacterIcon(character)
-	local characterName = character
-	if type(character) == 'table' then
-		characterName = character.character
-		---@cast character -table
-	end
-	return CharacterIcon.Icon{
-		character = characterName or NO_CHARACTER,
-		date = self.matchData.date
-	}
-end
-
 ---@param item {name: string?, image: string?}
 ---@return Widget
 function MatchPage.makeItemDisplay(item)
@@ -176,7 +163,7 @@ function MatchPage:_renderTeamVeto(game, opponent, index)
 						side = team.side,
 						vetoItems = Array.map(team.picks, function (pick)
 							return VetoItem{
-								characterIcon = self:getCharacterIcon(pick),
+								characterIcon = self:getCharacterIcon(pick.character),
 								vetoNumber = pick.vetoNumber
 							}
 						end)
@@ -185,7 +172,7 @@ function MatchPage:_renderTeamVeto(game, opponent, index)
 						vetoType = 'ban',
 						vetoItems = Array.map(team.bans, function (ban)
 							return VetoItem{
-								characterIcon = self:getCharacterIcon(ban),
+								characterIcon = self:getCharacterIcon(ban.character),
 								vetoNumber = ban.vetoNumber
 							}
 						end)
@@ -347,7 +334,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 		classes = {'match-bm-players-player'},
 		children = {
 			PlayerDisplay{
-				characterIcon = self:getCharacterIcon(player),
+				characterIcon = self:getCharacterIcon(player.character),
 				characterName = player.character,
 				side = game.teams[teamIndex].side,
 				roleIcon = IconImage{

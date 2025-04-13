@@ -70,8 +70,6 @@ local KEYSTONES = Table.map({
 	return value, true
 end)
 
-local NO_CHARACTER = 'default'
-
 local DEFAULT_ITEM = 'EmptyIcon'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
@@ -159,18 +157,6 @@ function MatchPage:populateGames()
 			_, game.vetoGroups[teamIndex] = Array.groupBy(team, Operator.property('groupIndex'))
 		end)
 	end)
-end
-
-function MatchPage:getCharacterIcon(character)
-	local characterName = character
-	if type(character) == 'table' then
-		characterName = character.character
-		---@cast character -table
-	end
-	return CharacterIcon.Icon{
-		character = characterName or NO_CHARACTER,
-		date = self.matchData.date
-	}
 end
 
 ---@param game LoLMatchPageGame
@@ -285,7 +271,7 @@ function MatchPage:_renderTeamVeto(game, opponent, index)
 						side = team.side,
 						vetoItems = Array.map(team.picks, function (pick)
 							return VetoItem{
-								characterIcon = self:getCharacterIcon(pick),
+								characterIcon = self:getCharacterIcon(pick.character),
 								vetoNumber = pick.vetoNumber
 							}
 						end)
@@ -294,7 +280,7 @@ function MatchPage:_renderTeamVeto(game, opponent, index)
 						vetoType = 'ban',
 						vetoItems = Array.map(team.bans, function (ban)
 							return VetoItem{
-								characterIcon = self:getCharacterIcon(ban),
+								characterIcon = self:getCharacterIcon(ban.character),
 								vetoNumber = ban.vetoNumber
 							}
 						end)
@@ -430,7 +416,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				classes = {'match-bm-lol-players-player-details'},
 				children = {
 					PlayerDisplay{
-						characterIcon = self:getCharacterIcon(player),
+						characterIcon = self:getCharacterIcon(player.character),
 						characterName = player.character,
 						side = game.teams[teamIndex].side,
 						roleIcon = IconImage{
