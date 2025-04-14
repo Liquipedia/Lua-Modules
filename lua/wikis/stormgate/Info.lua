@@ -36,6 +36,13 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+				checkForSpecialRoles = true,
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 	opponentLibrary = 'Opponent/Custom',

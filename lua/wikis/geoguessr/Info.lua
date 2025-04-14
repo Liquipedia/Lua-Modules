@@ -37,6 +37,12 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
+
 	},
 	defaultRoundPrecision = 0,
 }
