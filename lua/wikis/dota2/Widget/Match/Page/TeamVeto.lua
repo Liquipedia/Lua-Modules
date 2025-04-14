@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- wiki=commons
+-- wiki=dota2
 -- page=Module:Widget/Match/Page/TeamVeto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -13,13 +13,13 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
----@class MatchPageTeamVetoParameters
+---@class Dota2MatchPageTeamVetoParameters
 ---@field teamIcon (string|Html|Widget|nil)
 ---@field vetoRows MatchPageVetoRow[]
 
----@class MatchPageTeamVeto: Widget
----@operator call(MatchPageTeamVetoParameters): MatchPageTeamVeto
----@field props MatchPageTeamVetoParameters
+---@class Dota2MatchPageTeamVeto: Widget
+---@operator call(Dota2MatchPageTeamVetoParameters): Dota2MatchPageTeamVeto
+---@field props Dota2MatchPageTeamVetoParameters
 local MatchPageTeamVeto = Class.new(Widget)
 
 ---@return Widget
