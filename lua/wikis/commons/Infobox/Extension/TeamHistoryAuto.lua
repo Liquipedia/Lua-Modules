@@ -18,13 +18,16 @@ local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
+local TransferRef = Lua.import('Module:Transfer/References')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Abbr = HtmlWidgets.Abbr
+local Fragment = HtmlWidgets.Fragment
 local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
 local Td = HtmlWidgets.Td
+local Th = HtmlWidgets.Th
 local Tr = HtmlWidgets.Tr
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -44,7 +47,7 @@ local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {load
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, showRole: boolean, store: boolean,
+---@field config {player: string, showRole: boolean, store: boolean?, hasHeaderAndRefs: boolean?,
 ---specialRoles: string[], iconModule: table?, specialRolesLowercased: string[]}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
@@ -65,6 +68,7 @@ local TeamHistoryAuto = Class.new(function(self, args)
 		iconModule = configFromInfo.iconModule and Lua.import(configFromInfo.iconModule),
 		specialRoles = specialRoles,
 		specialRolesLowercased = Array.map(specialRoles, string.lower),
+		hasHeaderAndRefs = configFromInfo.hasHeaderAndRefs,
 	}
 end)
 
@@ -146,8 +150,49 @@ function TeamHistoryAuto:build()
 
 	return Tbl{
 		css = {width = '100%', ['text-align'] = 'left'},
-		children = Array.map(self.transferList, FnUtil.curry(self._row, self))
+		children = WidgetUtil.collect(
+			self.config.hasHeaderAndRefs and self:_header() or nil,
+			Array.map(self.transferList, FnUtil.curry(self._row, self))
+		)
 	}
+end
+
+---@return Widget
+function TeamHistoryAuto:_header()
+	local makeQueryFormLink = function()
+		local linkParts = {
+			tostring(mw.uri.fullUrl('Special:RunQuery/Transfer_history')),
+			'?pfRunQueryFormName=Transfer+history&',
+			mw.uri.buildQueryString{['Transfer_query[players]'] = self.config.player},
+			'&wpRunQuery=Run+query'
+		}
+		return Link{
+			link = table.concat(linkParts),
+			children = {'q'},
+		}
+	end
+
+	return Tr{children = {
+		Th{children = {'Join'}},
+		Th{
+			css = {['padding-left'] = '5px'},
+			children = {'Leave'},
+		},
+		Th{
+			css = {['padding-left'] = '5px'},
+			children = {
+				'Team',
+				Span{
+					css = {float = 'right', ['font-size'] = '90%', ['font-weight'] = '500'},
+					children = {
+						mw.text.nowiki('['),
+						makeQueryFormLink(),
+						mw.text.nowiki(']'),
+					},
+				},
+			},
+		},
+	}}
 end
 
 ---@param transfer table
@@ -190,23 +235,70 @@ function TeamHistoryAuto:_row(transfer)
 
 	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
 
+	if not self.config.hasHeaderAndRefs then
+		return Tr{children = {
+			Td{
+				classes = {'th-mono'},
+				css = {float = 'left', width = '50%', ['font-style'] = 'italic'},
+				children = {
+					transfer.joinDateDisplay,
+					leaveateDisplay and ' &#8212; ' or nil,
+					leaveateDisplay,
+				},
+			},
+			Td{
+				css = {float = 'right', width = '50%'},
+				children = WidgetUtil.collect(
+					positionIcon,
+					teamDisplay
+				),
+			},
+		}}
+	end
+
 	return Tr{children = {
 		Td{
 			classes = {'th-mono'},
-			css = {float = 'left', width = '50%', ['font-style'] = 'italic'},
+			css = {['white-space'] = 'nowrap', ['vertical-align'] = 'top'},
 			children = {
 				transfer.joinDateDisplay,
-				leaveateDisplay and ' &#8212; ' or nil,
-				leaveateDisplay,
+				TeamHistoryAuto._displayRef(transfer.reference.join, transfer.joinDateDisplay)
 			},
 		},
 		Td{
-			css = {float = 'right', width = '50%'},
+			classes = {'th-mono'},
+			css = {['white-space'] = 'nowrap', ['vertical-align'] = 'top', ['padding-left'] = '5px'},
+			children = {
+				leaveateDisplay,
+				TeamHistoryAuto._displayRef(transfer.reference.leave, transfer.leaveDateDisplay)
+			},
+		},
+		Td{
+			css = {['padding-left'] = '5px'},
 			children = WidgetUtil.collect(
-				positionIcon,
+				positionIcon and (positionIcon .. '&nbsp;') or nil,
 				teamDisplay
 			),
 		},
+	}}
+end
+
+---@param references table[]
+---@param date string
+---@return Widget?
+function TeamHistoryAuto._displayRef(references, date)
+	local refs = Array.map(TransferRef.fromStorageData(references), function(reference)
+		return reference.link and TransferRef.useReference(reference, date) or nil
+	end)
+
+	if Logic.isEmpty(refs) then return end
+
+	return Fragment{children = {
+		Span{
+			css = {['font-size'] = '50%'},
+			children = {'&thinsp;'},
+		},
+		refs
 	}}
 end
 
@@ -245,7 +337,7 @@ function TeamHistoryAuto:_query()
 		conditions = conditions:toString(),
 		order = 'date asc',
 		limit = 5000,
-		query = 'pagename, fromteam, toteam, role1, role2, date, extradata'
+		query = 'pagename, fromteam, toteam, role1, role2, date, extradata, reference'
 	})
 end
 
@@ -297,6 +389,7 @@ function TeamHistoryAuto:_processTransfer(transfer)
 				position = extraData.icon2,
 				joinDate = transferDate,
 				joinDateDisplay = extraData.displaydate or transferDate,
+				reference = { join = transfer.reference, leave = '' },
 			})
 		end
 
@@ -309,6 +402,7 @@ function TeamHistoryAuto:_processTransfer(transfer)
 				position = extraData.icon2,
 				joinDate = transferDate,
 				joinDateDisplay = extraData.displaydate or transferDate,
+				reference = { join = transfer.reference, leave = '' },
 			})
 		end
 	elseif transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec then
@@ -319,6 +413,7 @@ function TeamHistoryAuto:_processTransfer(transfer)
 			position = extraData.icon2,
 			joinDate = transferDate,
 			joinDateDisplay = extraData.displaydate or transferDate,
+			reference = { join = transfer.reference, leave = '' },
 		})
 	end
 end
@@ -329,7 +424,7 @@ function TeamHistoryAuto:_completeTransfer(transfer)
 	local leaveTransfers = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = self:_buildConditions(transfer),
 		order = 'date asc',
-		query = 'toteam, role2, date, extradata'
+		query = 'toteam, role2, date, extradata, reference'
 	})
 
 	local hasLeaveDate = function(leaveTransfer)
@@ -349,6 +444,7 @@ function TeamHistoryAuto:_completeTransfer(transfer)
 		if hasLeaveDate(leaveTransfer) then
 			transfer.leaveDate = DateExt.toYmdInUtc(leaveTransfer.date)
 			transfer.leaveDateDisplay = leaveTransfer.extradata.dispaydate or transfer.leaveDate
+			transfer.reference.leave = leaveTransfer.reference
 
 			return transfer
 		end
