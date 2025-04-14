@@ -21,6 +21,7 @@ local Team = Lua.import('Module:Team')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Abbr = HtmlWidgets.Abbr
 local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
 local Td = HtmlWidgets.Td
@@ -38,8 +39,8 @@ local SPECIAL_ROLES = {'Retired', 'Retirement', 'Military'}
 local SPECIAL_ROLES_LOWER = Array.map(SPECIAL_ROLES, string.lower)
 local LOAN = 'Loan'
 local ONE_DAY = 86400
+local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
 
-local ROLE_CONVERT = Lua.requireIfExists('Module:TeamHistoryAuto/role', {loadData = true})
 local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
 
 ---@class TeamHistoryAuto
@@ -146,10 +147,13 @@ end
 function TeamHistoryAuto:_row(transfer)
 	local _, teamText = TeamHistoryAuto._getTeamLinkAndText(transfer)
 
+	---@type Widget|string?
 	local role = transfer.role
-	if ROLE_CONVERT and role then
-		local splitRole = mw.text.split(role, ' ')
-		role = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()] or transfer.role
+	if role and self.config.showRole then
+		local splitRole = mw.text.split(role --[[@as string]], ' ')
+		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()]
+		if roleData.empty then role = nil end
+		role = roleData and Abbr(roleData) or transfer.role
 	end
 	if role == LOAN then
 		teamText = '&#8250;&nbsp;' .. teamText
