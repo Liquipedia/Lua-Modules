@@ -47,7 +47,7 @@ local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {load
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, showRole: boolean, store: boolean?, hasHeaderAndRefs: boolean?,
+---@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?,
 ---specialRoles: string[], iconModule: table?, specialRolesLowercased: string[]}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
@@ -64,7 +64,6 @@ local TeamHistoryAuto = Class.new(function(self, args)
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
 		showRole = Logic.nilOr(configFromInfo.showRole, true),
-		store = configFromInfo.store,
 		iconModule = configFromInfo.iconModule and Lua.import(configFromInfo.iconModule),
 		specialRoles = specialRoles,
 		specialRolesLowercased = Array.map(specialRoles, string.lower),
@@ -74,8 +73,6 @@ end)
 
 ---@return self
 function TeamHistoryAuto:store()
-	if not self.config.store then return self end
-
 	Array.forEach(self.transferList, function(transfer, transferIndex)
 		local teamLink = self:_getTeamLinkAndText(transfer)
 		if not teamLink and not transfer.role then return end
