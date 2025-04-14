@@ -19,7 +19,9 @@ local Widgets = require('Module:Widget/All')
 local Big = HtmlWidgets.Big
 local Div = HtmlWidgets.Div
 
----@alias automatedHistoryMode 'ifEmpty'|'cleanup'|'both'|true|false?
+local DEFAULT_MODE = 'manual'
+
+---@alias automatedHistoryMode 'manualPrio'|'cleanup'|'merge'|'automatic'|'manual'?
 
 ---@class TeamHistoryWidget: Widget
 ---@operator call(table): TitleWidget
@@ -39,14 +41,15 @@ function TeamHistory:render()
 	}
 end
 
----@return Widget?
+---@return Widget|string?
 function TeamHistory:_getHistory()
 	local config = (Info.config.infoboxPlayer or {}).automatedHistory or {}
+	---@type string?
 	local manualInput = self.props.manualInput
 
 	---@type automatedHistoryMode
-	local automatedHistoryMode = config.mode
-	if not automatedHistoryMode or (Logic.isNotEmpty(manualInput) and automatedHistoryMode == 'ifEmpty') then
+	local mode = config.mode or DEFAULT_MODE
+	if mode == DEFAULT_MODE or (Logic.isNotEmpty(manualInput) and mode == 'manualPrio') then
 		return manualInput
 	end
 
@@ -55,11 +58,11 @@ function TeamHistory:_getHistory()
 		specialRoles = self.props.specialRoles,
 	}:fetch():store():build()
 
-	if Logic.isEmpty(manualInput) or (automatedHistoryMode ~= 'cleanup' and automatedHistoryMode ~= 'both') then
+	if Logic.isEmpty(manualInput) or (mode ~= 'cleanup' and mode ~= 'merge') then
 		return automatedHistory
 	end
 
-	if automatedHistoryMode == 'both' then
+	if mode == 'merge' then
 		return Div{children = {
 			manualInput,
 			automatedHistory,
