@@ -251,214 +251,129 @@ Author(s): Rathoz
 	}
 }
 
-/* >= ??px icons in 1→2 columns */
-@media ( min-width: 646px ) {
-	.match-bm-lol-game-veto-overview {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		padding: 0;
-		align-self: stretch;
-	}
-}
-
-@media ( max-width: 645px ) {
-	.match-bm-lol-game-veto-overview {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		padding: 0;
-		align-self: stretch;
-	}
-}
-
 .match-bm-lol-game-veto {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-}
 
-.match-bm-lol-game-veto img {
-	width: 24px;
-	height: 24px;
-}
-
-.match-bm-lol-game-veto-overview-team {
-	display: flex;
-	flex-direction: column;
-	border: 1px solid #bbbbbb;
-	width: 100%;
-
-	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-.match-bm-game-veto-overview-team-header,
-.match-bm-lol-game-veto-overview-team-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 8px;
-	background: #f5f5f5;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-	}
-}
-
-.match-bm-lol-game-veto-overview-team-veto {
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	justify-content: center;
-	padding: 8px;
-	gap: 8px;
-	border-top: 1px solid #bbbbbb;
-
-	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
-	}
-
-	.match-bm-game-veto-overview-team-veto-row {
-		flex-wrap: nowrap;
-	}
-}
-
-.match-bm-lol-game-veto-overview-ban,
-.match-bm-lol-game-veto-overview-pick {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-ul.match-bm-lol-game-veto-overview-ban,
-ul.match-bm-lol-game-veto-overview-pick {
-	margin: 0;
-}
-
-.match-bm-lol-game-veto-overview-ban,
-.match-bm-lol-game-veto-order-ban {
-	opacity: 0.5;
-}
-
-.match-bm-lol-game-veto-overview-item {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-.match-bm-lol-game-veto-pick-bar-blue,
-.match-bm-lol-game-veto-pick-bar-red {
-	width: 24px;
-	height: 4px;
-}
-
-.match-bm-lol-game-veto-pick-bar-blue {
-	background: #0d71bf;
-}
-
-.match-bm-lol-game-veto-pick-bar-red {
-	background: #b81414;
-}
-
-.match-bm-lol-game-veto-order-toggle {
-	padding: 4px;
-	background: #f5f5f5;
-	border: 1px solid #bbbbbb;
-	width: 100%;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-/* >= 768px reflow picks/bans order */
-@media ( max-width: 767px ) {
-	@media ( min-width: 646px ) {
-		/* Header not needed when both in 2 col mode */
-		.match-bm-lol-game-veto-order-team-header {
-			display: none !important;
-		}
-	}
-
-	.match-bm-lol-game-veto-order-team-choices {
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 8px;
-		gap: 8px;
-		border: 1px solid #bbbbbb;
-		width: 100%;
-		color: #ffffff;
-
-		.theme--dark & {
-			border-color: var( --clr-secondary-25 );
-		}
-	}
-
-	.match-bm-lol-game-veto-order-team-choice-group {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
-	.match-bm-lol-game-veto-order-list {
+	&-overview {
 		display: flex;
 		flex-direction: row;
-		align-items: flex-start;
-		align-self: stretch;
-	}
-
-	.match-bm-lol-game-veto-order-team {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-self: stretch;
-		width: 100%;
-	}
-}
-
-@media ( min-width: 768px ) {
-	.match-bm-lol-game-veto-order-team-choices {
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		padding: 8px;
-		gap: 8px;
-		border: 1px solid #bbbbbb;
-		width: 100%;
-		color: #ffffff;
-
-		.theme--dark & {
-			border-color: var( --clr-secondary-25 );
-		}
-	}
-
-	.match-bm-lol-game-veto-order-team-choice-group {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-	}
-
-	.match-bm-lol-game-veto-order-list {
-		display: flex;
-		flex-direction: column;
 		align-items: flex-start;
 		padding: 0;
 		align-self: stretch;
+
+		@media ( max-width: 645px ) {
+			/* >= ??px icons in 1→2 columns */
+			flex-direction: column;
+		}
+
+		&-team {
+			display: flex;
+			flex-direction: column;
+			border: 1px solid #bbbbbb;
+			width: 100%;
+		
+			.theme--dark & {
+				border-color: var( --clr-secondary-25 );
+			}
+
+			&-veto {
+				display: flex;
+				flex-direction: row;
+				flex-wrap: wrap;
+				justify-content: center;
+				padding: 8px;
+				gap: 8px;
+				border-top: 1px solid #bbbbbb;
+			
+				.theme--dark & {
+					border-color: var( --clr-secondary-25 );
+				}
+			
+				.match-bm-game-veto-overview-team-veto-row {
+					flex-wrap: nowrap;
+				}
+			}
+		}
 	}
 
-	.match-bm-lol-game-veto-order-team {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		width: 100%;
+	&-order {
+		&-toggle {
+			padding: 4px;
+			background: #f5f5f5;
+			border: 1px solid #bbbbbb;
+			width: 100%;
+		
+			.theme--dark & {
+				background-color: var( --clr-secondary-16 );
+				border-color: var( --clr-secondary-25 );
+			}
+		}
+
+		&-list {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			align-self: stretch;
+
+			@media ( min-width: 768px ) {
+				flex-direction: column;
+				padding: 0;
+			}
+		}
+
+		&-team {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			width: 100%;
+
+			&-choices {
+				box-sizing: border-box;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				padding: 8px;
+				gap: 8px;
+				border: 1px solid #bbbbbb;
+				width: 100%;
+				color: #ffffff;
+
+				.theme--dark & {
+					border-color: var( --clr-secondary-25 );
+				}
+			}
+
+			&-header {
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				padding: 8px;
+				background: #f5f5f5;
+				border: 1px solid #bbbbbb;
+			
+				.theme--dark & {
+					background-color: var( --clr-secondary-16 );
+					border-color: var( --clr-secondary-25 );
+				}
+
+				@media ( max-width: 767px ) and ( min-width: 646px ) {
+					/* Header not needed when both in 2 col mode */
+					display: none !important;
+				}
+			}
+
+			@media ( max-width: 767px ) {
+				flex-direction: column;
+				align-self: stretch;
+
+				&-choices {
+					flex-direction: column;
+				}
+			}
+		}
 	}
 }
 
@@ -475,37 +390,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
 	}
-}
-
-.match-bm-lol-game-veto-order-team-choice {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	line-height: 1;
-}
-
-.match-bm-lol-game-veto-order-step {
-	width: 24px;
-	height: 24px;
-	background: #202122;
-	color: #ffffff;
-	justify-content: center;
-	align-items: center;
-	display: flex;
-	font-weight: bold;
-	font-size: 12px;
-
-	.theme--dark & :not( .match-bm-lol-game-veto-order-step-blue ):not( .match-bm-lol-game-veto-order-step-red ) {
-		background-color: var( --clr-secondary-39 );
-	}
-}
-
-.match-bm-lol-game-veto-order-step-blue {
-	background: #0d71bf;
-}
-
-.match-bm-lol-game-veto-order-step-red {
-	background: #b81414;
 }
 
 .match-bm-game-veto-wrapper,
@@ -850,10 +734,23 @@ ul.match-bm-lol-game-veto-overview-pick {
 }
 
 .match-bm-game-veto-overview-team-header {
-	border-bottom: 0.0625rem solid #bbbbbb;
-
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px;
+	background: #f5f5f5;
+	
 	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
+		background-color: var( --clr-secondary-16 );
+	}
+
+	.wiki-dota2 & {
+		border-bottom: 0.0625rem solid #bbbbbb;
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+		}
 	}
 }
 

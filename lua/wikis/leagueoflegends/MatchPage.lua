@@ -291,7 +291,7 @@ function MatchPage:_renderGameTeamVetoOverview(game, teamIndex)
 		classes = {'match-bm-lol-game-veto-overview-team'},
 		children = {
 			Div{
-				classes = {'match-bm-lol-game-veto-overview-team-header'},
+				classes = {'match-bm-game-veto-overview-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
 			Div{
