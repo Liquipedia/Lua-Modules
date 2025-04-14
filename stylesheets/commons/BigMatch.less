@@ -545,6 +545,22 @@ ul.match-bm-lol-game-veto-overview-pick {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
+
+	&-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		padding: 8px;
+		background: #eaecf0;
+		border: 1px solid #bbbbbb;
+		align-self: stretch;
+	
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-secondary-25 );
+		}
+	}
 }
 
 .match-bm-lol-players-team {
@@ -552,22 +568,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 	flex-direction: column;
 	align-items: flex-start;
 	width: 100%;
-}
-
-.match-bm-lol-players-team-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 8px;
-	background: #eaecf0;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
-	}
 }
 
 .match-bm-players-player {

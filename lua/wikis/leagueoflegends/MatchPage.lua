@@ -392,7 +392,7 @@ function MatchPage:_renderTeamPerformance(game, teamIndex)
 		classes = {'match-bm-lol-players-team'},
 		children = WidgetUtil.collect(
 			Div{
-				classes = {'match-bm-lol-players-team-header'},
+				classes = {'match-bm-players-team-header'},
 				children = self.opponents[teamIndex].iconDisplay
 			},
 			Array.map(game.teams[teamIndex].players, function (player)
