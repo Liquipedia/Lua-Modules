@@ -111,7 +111,6 @@ return {
 		infoboxPlayer = {
 			automatedHistory = {
 				mode = 'cleanup',
-				store = true,
 			},
 			autoTeam = true,
 		},

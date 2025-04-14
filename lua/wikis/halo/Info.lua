@@ -115,5 +115,8 @@ return {
 			matchWidth = 180,
 			sortCasters = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 	},
 }

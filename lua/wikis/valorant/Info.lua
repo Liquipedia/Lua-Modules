@@ -45,5 +45,8 @@ return {
 				display = 'VALORANT Champions Tour Global Contract Database'
 			},
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 	},
 }

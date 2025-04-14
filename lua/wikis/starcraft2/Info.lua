@@ -62,6 +62,9 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
