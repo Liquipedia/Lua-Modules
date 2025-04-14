@@ -177,13 +177,8 @@ end
 ---@param character string?
 ---@return string?
 function BaseMatchPage:getCharacterIcon(character)
-	local characterName = character
-	if type(character) == 'table' then
-		characterName = character.character
-		---@cast character -table
-	end
 	return CharacterIcon.Icon{
-		character = characterName or BaseMatchPage.NO_CHARACTER,
+		character = character or BaseMatchPage.NO_CHARACTER,
 		date = self.matchData.date
 	}
 end
