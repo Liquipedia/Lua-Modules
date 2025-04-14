@@ -129,7 +129,7 @@ function MatchPage:populateGames()
 				team.assists = MatchPage.sumItem(team.players, 'assists')
 
 				-- Set fields
-				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
+				team.objectives = game.extradata['team' .. teamIdx .. 'objectives'] or {}
 			end
 
 			team.picks = Array.map(team.players, Operator.property('character'))
@@ -334,7 +334,7 @@ function MatchPage:_renderGameTeamVetoOrder(game, teamIndex)
 			},
 			Div{
 				classes = {'match-bm-lol-game-veto-order-team-choices'},
-				children = Array.map(teamVetoGroups, function (vetoGroup)
+				children = Array.map(teamVetoGroups or {}, function (vetoGroup)
 					return VetoRow{
 						vetoType = vetoGroup[1].type,
 						side = game.teams[teamIndex].side,
