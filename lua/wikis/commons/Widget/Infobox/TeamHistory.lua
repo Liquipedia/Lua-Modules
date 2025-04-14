@@ -21,7 +21,7 @@ local Div = HtmlWidgets.Div
 
 local DEFAULT_MODE = 'manual'
 
----@alias automatedHistoryMode 'manualPrio'|'cleanup'|'merge'|'automatic'|'manual'?
+---@alias automatedHistoryMode 'manualPrio'|'cleanup'|'merge'|'automatic'|'manual'
 
 ---@class TeamHistoryWidget: Widget
 ---@operator call(table): TitleWidget

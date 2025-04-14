@@ -58,11 +58,12 @@ local ONE_DAY = 86400
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
 
 local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
+local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
 ---@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?,
----specialRoles: string[], iconModule: table?, specialRolesLowercased: string[]}
+---specialRoles: string[], showPositionIcon: boolean?, specialRolesLowercased: string[]}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
 	-- specialRoles is a stringified bool to support manual input on 9 val pages ...
@@ -78,7 +79,7 @@ local TeamHistoryAuto = Class.new(function(self, args)
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
 		showRole = Logic.nilOr(configFromInfo.showRole, true),
-		iconModule = configFromInfo.iconModule and Lua.import(configFromInfo.iconModule),
+		showPositionIcon = configFromInfo.showPositionIcon,
 		specialRoles = specialRoles,
 		specialRolesLowercased = Array.map(specialRoles, string.lower),
 		hasHeaderAndRefs = configFromInfo.hasHeaderAndRefs,
@@ -240,9 +241,9 @@ function TeamHistoryAuto:_row(transfer)
 	end
 
 	local positionIcon
-	if self.config.iconModule then
+	if self.config.showPositionIcon then
 		local position = (transfer.position or ''):lower()
-		positionIcon = (self.config.iconModule[position] or self.config.iconModule['']) .. '&nbsp;'
+		positionIcon = (POSITION_ICON_DATA[position] or POSITION_ICON_DATA['']) .. '&nbsp;'
 	end
 
 	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
