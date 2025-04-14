@@ -471,7 +471,7 @@ end
 function TeamHistoryAuto:_buildConditions(transfer)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.ge, transfer.joinDate),
-		ConditionNode(ColumnName('player'), Comparator.eq, transfer.player),
+		ConditionNode(ColumnName('player'), Comparator.eq, self.config.player),
 	}
 
 	local historicalNames = Team.queryHistoricalNames(transfer.team)
