@@ -15,7 +15,7 @@ local Div = HtmlWidgets.Div
 
 ---@class MatchPageVetoItemParameters
 ---@field characterIcon (string|Html|Widget|nil)
----@field vetoNumber integer
+---@field vetoNumber integer?
 
 ---@class MatchPageVetoItem: Widget
 ---@operator call(MatchPageVetoItemParameters): MatchPageVetoItem
@@ -24,6 +24,7 @@ local MatchPageVetoItem = Class.new(Widget)
 
 ---@return Widget
 function MatchPageVetoItem:render()
+	local vetoNumber = self.props.vetoNumber
 	return Div{
 		classes = {'match-bm-game-veto-overview-team-veto-row-item'},
 		children = {
@@ -33,7 +34,7 @@ function MatchPageVetoItem:render()
 			},
 			Div{
 				classes = {'match-bm-game-veto-overview-team-veto-row-item-text'},
-				children = {'#', self.props.vetoNumber}
+				children = vetoNumber and {'#', vetoNumber} or ''
 			}
 		}
 	}

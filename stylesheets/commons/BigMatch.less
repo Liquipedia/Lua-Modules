@@ -311,6 +311,7 @@ Author(s): Rathoz
 .match-bm-lol-game-veto-overview-team-veto {
 	display: flex;
 	flex-direction: row;
+	flex-wrap: wrap;
 	justify-content: center;
 	padding: 8px;
 	gap: 8px;
@@ -318,6 +319,10 @@ Author(s): Rathoz
 
 	.theme--dark & {
 		border-color: var( --clr-secondary-25 );
+	}
+
+	.match-bm-game-veto-overview-team-veto-row {
+		flex-wrap: nowrap;
 	}
 }
 
@@ -389,6 +394,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 		gap: 8px;
 		border: 1px solid #bbbbbb;
 		width: 100%;
+		color: #ffffff;
 
 		.theme--dark & {
 			border-color: var( --clr-secondary-25 );
@@ -427,6 +433,7 @@ ul.match-bm-lol-game-veto-overview-pick {
 		gap: 8px;
 		border: 1px solid #bbbbbb;
 		width: 100%;
+		color: #ffffff;
 
 		.theme--dark & {
 			border-color: var( --clr-secondary-25 );
@@ -922,12 +929,14 @@ ul.match-bm-lol-game-veto-overview-pick {
 			&--blue {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
 					background-color: #0d71bf;
+					min-height: 0.25rem;
 				}
 			}
 
 			&--red {
 				.match-bm-game-veto-overview-team-veto-row-item-text {
 					background-color: #b81414;
+					min-height: 0.25rem;
 				}
 			}
 		}
