@@ -39,7 +39,20 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local DEFAULT_SPECIAL_ROLES = {'Retired', 'Retirement', 'Military'}
+local SPECIAL_ROLES = {
+	'Retired',
+	'Retirement',
+	'Military',
+	'Banned',
+	'Producer',
+	'Caster',
+	'Admin',
+	'Observer',
+	'Host',
+	'Talent',
+	'League Operator',
+	'Inactive'
+}
 local LOAN = 'Loan'
 local ONE_DAY = 86400
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
@@ -61,7 +74,7 @@ local TeamHistoryAuto = Class.new(function(self, args)
 		configFromInfo.checkForSpecialRoles,
 		false
 	)
-	local specialRoles = checkForSpecialRoles and (configFromInfo.specialRoles or DEFAULT_SPECIAL_ROLES) or {}
+	local specialRoles = checkForSpecialRoles and SPECIAL_ROLES or {}
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
 		showRole = Logic.nilOr(configFromInfo.showRole, true),
