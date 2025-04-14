@@ -27,6 +27,7 @@ local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
+local TeamVeto = Lua.import('Module:Widget/Match/Page/TeamVeto')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
 local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -243,49 +244,32 @@ function MatchPage:_renderDraft(game)
 		Div{
 			classes = {'match-bm-game-veto-wrapper'},
 			children = Array.map(self.opponents, function (opponent, opponentIndex)
-				return self:_renderTeamVeto(game, opponent, opponentIndex)
-			end)
-		}
-	}
-end
-
----@private
----@param opponent MatchPageOpponent
----@param index integer
----@return Widget
-function MatchPage:_renderTeamVeto(game, opponent, index)
-	local team = game.teams[index]
-	return Div{
-		classes = {'match-bm-lol-game-veto-overview-team'},
-		children = {
-			Div{
-				classes = {'match-bm-game-veto-overview-team-header'},
-				children = opponent.iconDisplay
-			},
-			Div{
-				classes = {'match-bm-game-veto-overview-team-veto'},
-				children = {
-					VetoRow{
-						vetoType = 'pick',
-						side = team.side,
-						vetoItems = Array.map(team.picks, function (pick)
-							return VetoItem{
-								characterIcon = self:getCharacterIcon(pick.character),
-								vetoNumber = pick.vetoNumber
-							}
-						end)
-					},
-					VetoRow{
-						vetoType = 'ban',
-						vetoItems = Array.map(team.bans, function (ban)
-							return VetoItem{
-								characterIcon = self:getCharacterIcon(ban.character),
-								vetoNumber = ban.vetoNumber
-							}
-						end)
+				local team = game.teams[opponentIndex]
+				return TeamVeto{
+					teamIcon = opponent.iconDisplay,
+					vetoRows = {
+						VetoRow{
+							vetoType = 'pick',
+							side = team.side,
+							vetoItems = Array.map(team.picks, function (pick)
+								return VetoItem{
+									characterIcon = self:getCharacterIcon(pick.character),
+									vetoNumber = pick.vetoNumber
+								}
+							end)
+						},
+						VetoRow{
+							vetoType = 'ban',
+							vetoItems = Array.map(team.bans, function (ban)
+								return VetoItem{
+									characterIcon = self:getCharacterIcon(ban.character),
+									vetoNumber = ban.vetoNumber
+								}
+							end)
+						}
 					}
 				}
-			}
+			end)
 		}
 	}
 end
