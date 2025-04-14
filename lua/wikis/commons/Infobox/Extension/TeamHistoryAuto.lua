@@ -16,6 +16,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local TransferRef = Lua.import('Module:Transfer/References')
@@ -73,6 +74,7 @@ end)
 
 ---@return self
 function TeamHistoryAuto:store()
+	if not Namespace.isMain() then return self end
 	Array.forEach(self.transferList, function(transfer, transferIndex)
 		local teamLink = self:_getTeamLinkAndText(transfer)
 		if not teamLink and not transfer.role then return end
