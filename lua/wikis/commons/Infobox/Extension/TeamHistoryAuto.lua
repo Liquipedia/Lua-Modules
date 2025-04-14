@@ -35,8 +35,7 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local SPECIAL_ROLES = {'Retired', 'Retirement', 'Military'}
-local SPECIAL_ROLES_LOWER = Array.map(SPECIAL_ROLES, string.lower)
+local DEFAULT_SPECIAL_ROLES = {'Retired', 'Retirement', 'Military'}
 local LOAN = 'Loan'
 local ONE_DAY = 86400
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
@@ -45,19 +44,23 @@ local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {load
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, showRole: boolean, store: boolean, specialRoles: boolean, iconModule: table?}
+---@field config {player: string, showRole: boolean, store: boolean,
+---specialRoles: string[], iconModule: table?, specialRolesLowercased: string[]}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
 	-- specialRoles is a stringified bool to support manual input on 9 val pages ...
 	---@type {player: string?, specialRoles: string?}
 	args = args or {}
 	local configFromInfo = (Info.config.infoboxPlayer or {}).automatedHistory or {}
+	local checkForSpecialRoles = Logic.nilOr(Logic.readBoolOrNil(args.specialRoles), configFromInfo.checkForSpecialRoles, false)
+	local specialRoles = checkForSpecialRoles and (configFromInfo.specialRoles or DEFAULT_SPECIAL_ROLES) or {}
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
 		showRole = Logic.nilOr(configFromInfo.showRole, true),
 		store = configFromInfo.store,
-		specialRoles = Logic.nilOr(Logic.readBoolOrNil(args.specialRoles), configFromInfo.specialRoles, false),
 		iconModule = configFromInfo.iconModule and Lua.import(configFromInfo.iconModule),
+		specialRoles = specialRoles,
+		specialRolesLowercased = Array.map(specialRoles, string.lower),
 	}
 end)
 
@@ -66,7 +69,7 @@ function TeamHistoryAuto:store()
 	if not self.config.store then return self end
 
 	Array.forEach(self.transferList, function(transfer, transferIndex)
-		local teamLink = TeamHistoryAuto._getTeamLinkAndText(transfer)
+		local teamLink = self:_getTeamLinkAndText(transfer)
 		if not teamLink and not transfer.role then return end
 
 		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'..transferIndex, {
@@ -89,8 +92,8 @@ end
 ---@param transfer table
 ---@return string?
 ---@return Widget
-function TeamHistoryAuto._getTeamLinkAndText(transfer)
-	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+function TeamHistoryAuto:_getTeamLinkAndText(transfer)
+	if Logic.isEmpty(transfer.team) and Table.includes(self.config.specialRolesLowercased, (transfer.role or ''):lower()) then
 		return nil, HtmlWidgets.B{children = {transfer.role}}
 	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
@@ -145,7 +148,7 @@ end
 ---@param transfer table
 ---@return Widget
 function TeamHistoryAuto:_row(transfer)
-	local _, teamText = TeamHistoryAuto._getTeamLinkAndText(transfer)
+	local _, teamText = self:_getTeamLinkAndText(transfer)
 
 	---@type Widget|string?
 	local role = transfer.role
@@ -177,7 +180,7 @@ function TeamHistoryAuto:_row(transfer)
 		positionIcon = (self.config.iconModule[position] or self.config.iconModule['']) .. '&nbsp;'
 	end
 
-	local leaveateDisplay = TeamHistoryAuto._buildLeaveDateDisplay(transfer)
+	local leaveateDisplay = self:_buildLeaveDateDisplay(transfer)
 
 	return Tr{children = {
 		Td{
@@ -201,11 +204,11 @@ end
 
 ---@param transfer table
 ---@return string|Widget?
-function TeamHistoryAuto._buildLeaveDateDisplay(transfer)
+function TeamHistoryAuto:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
 	local lowerCasedRole = (transfer.role or ''):lower()
-	if lowerCasedRole == 'military' or not Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+	if lowerCasedRole == 'military' or not Table.includes(self.config.specialRolesLowercased, (transfer.role or ''):lower()) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
@@ -220,10 +223,10 @@ function TeamHistoryAuto:_query()
 		ConditionNode(ColumnName('player'), Comparator.eq, self.config.player),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('toteam'), Comparator.neq, ''),
-			Array.map(SPECIAL_ROLES, function(role)
+			Array.map(self.config.specialRoles, function(role)
 				return ConditionNode(ColumnName('role2'), Comparator.eq, role)
 			end),
-			Array.map(SPECIAL_ROLES, function(role)
+			Array.map(self.config.specialRoles, function(role)
 				return ConditionNode(ColumnName('role2'), Comparator.eq, role:lower())
 			end),
 		},
@@ -248,7 +251,7 @@ function TeamHistoryAuto:fetch()
 		end)
 	end
 
-	self.transferList = Array.map(self.transferList, TeamHistoryAuto._completeTransfer)
+	self.transferList = Array.map(self.transferList, FnUtil.curry(TeamHistoryAuto._completeTransfer, self))
 
 	-- Sort table by joinDate/leaveDate
 	table.sort(self.transferList, function(transfer1, transfer2)
@@ -313,9 +316,9 @@ end
 
 ---@param transfer table
 ---@return table
-function TeamHistoryAuto._completeTransfer(transfer)
+function TeamHistoryAuto:_completeTransfer(transfer)
 	local leaveTransfers = mw.ext.LiquipediaDB.lpdb('transfer', {
-		conditions = TeamHistoryAuto._buildConditions(transfer),
+		conditions = self:_buildConditions(transfer),
 		order = 'date asc',
 		query = 'toteam, role2, date, extradata'
 	})
@@ -347,7 +350,7 @@ end
 
 ---@param transfer table
 ---@return string
-function TeamHistoryAuto._buildConditions(transfer)
+function TeamHistoryAuto:_buildConditions(transfer)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.ge, transfer.joinDate),
 		ConditionNode(ColumnName('player'), Comparator.eq, transfer.player),
@@ -375,7 +378,7 @@ function TeamHistoryAuto._buildConditions(transfer)
 			buildFromConditions('fromteam', 'role1'),
 			buildFromConditions('extradata_fromteamsec', 'extradata_role1sec'),
 		})
-	elseif Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+	elseif Table.includes(self.config.specialRolesLowercased, (transfer.role or ''):lower()) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role),
 			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role:lower()),
