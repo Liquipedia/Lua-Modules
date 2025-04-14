@@ -52,7 +52,11 @@ local TeamHistoryAuto = Class.new(function(self, args)
 	---@type {player: string?, specialRoles: string?}
 	args = args or {}
 	local configFromInfo = (Info.config.infoboxPlayer or {}).automatedHistory or {}
-	local checkForSpecialRoles = Logic.nilOr(Logic.readBoolOrNil(args.specialRoles), configFromInfo.checkForSpecialRoles, false)
+	local checkForSpecialRoles = Logic.nilOr(
+		Logic.readBoolOrNil(args.specialRoles),
+		configFromInfo.checkForSpecialRoles,
+		false
+	)
 	local specialRoles = checkForSpecialRoles and (configFromInfo.specialRoles or DEFAULT_SPECIAL_ROLES) or {}
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
@@ -93,7 +97,8 @@ end
 ---@return string?
 ---@return Widget
 function TeamHistoryAuto:_getTeamLinkAndText(transfer)
-	if Logic.isEmpty(transfer.team) and Table.includes(self.config.specialRolesLowercased, (transfer.role or ''):lower()) then
+	local specialRolesLowercased = self.config.specialRolesLowercased
+	if Logic.isEmpty(transfer.team) and Table.includes(specialRolesLowercased, (transfer.role or ''):lower()) then
 		return nil, HtmlWidgets.B{children = {transfer.role}}
 	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
@@ -155,8 +160,11 @@ function TeamHistoryAuto:_row(transfer)
 	if role and self.config.showRole then
 		local splitRole = mw.text.split(role --[[@as string]], ' ')
 		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()]
-		if roleData.empty then role = nil end
-		role = roleData and Abbr(roleData) or transfer.role
+		if roleData.empty then
+			role = nil
+		else
+			role = roleData and Abbr(roleData) or transfer.role
+		end
 	end
 	if role == LOAN then
 		teamText = '&#8250;&nbsp;' .. teamText
@@ -208,7 +216,8 @@ function TeamHistoryAuto:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
 	local lowerCasedRole = (transfer.role or ''):lower()
-	if lowerCasedRole == 'military' or not Table.includes(self.config.specialRolesLowercased, (transfer.role or ''):lower()) then
+	local specialRolesLowercased = self.config.specialRolesLowercased
+	if lowerCasedRole == 'military' or not Table.includes(specialRolesLowercased, (transfer.role or ''):lower()) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
