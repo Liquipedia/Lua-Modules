@@ -220,6 +220,19 @@ return {
 				lightMode = 'Bloody Roar Extreme logo.png',
 			},
 		},
+		cotw = {
+			abbreviation = 'CotW',
+			name = 'Fatal Fury: City of the Wolves',
+			link = 'Fatal Fury: City of the Wolves',
+			logo = {
+				darkMode = 'Fatal Fury City of the Wolves allmode.png',
+				lightMode = 'Fatal Fury City of the Wolves allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Fatal Fury City of the Wolves allmode.png',
+				lightMode = 'Fatal Fury City of the Wolves allmode.png',
+			},
+		},
 		cvs = {
 			abbreviation = 'CVS',
 			name = 'Capcom vs SNK',
