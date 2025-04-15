@@ -22,5 +22,5 @@ jobs:
           WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
           WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
           WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
-          WIKI_TO_PROTECT: ${{ github.event.inputs.template }}
+          TEMPLATE_TO_PROTECT: ${{ github.event.inputs.template }}
         run: bash scripts/protect_new_template.sh
