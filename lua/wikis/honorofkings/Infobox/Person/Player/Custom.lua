@@ -22,9 +22,6 @@ local Cell = Widgets.Cell
 
 local SIZE_HERO = '25x25px'
 
----@class HonorofkingsInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -35,9 +32,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.autoTeam = true
-
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
@@ -66,10 +60,6 @@ function CustomInjector:parse(id, widgets)
 			name = #heroIcons > 1 and 'Signature Heroes' or 'Signature Hero',
 			content = {table.concat(heroIcons, '&nbsp;')}
 		})
-	elseif id == 'role' then
-		return {
-			Cell{name = caller.role2.display and 'Roles' or 'Role', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 
 	return widgets
@@ -77,13 +67,8 @@ end
 
 ---@param lpdbData table
 ---@param args table
----@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
-
+function CustomPlayer:adjustLPDB(lpdbData, args)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]
