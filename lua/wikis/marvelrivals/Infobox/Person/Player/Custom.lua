@@ -27,7 +27,7 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	duelust = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
+	duelist = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
 	flex = {category = 'Flex Players', variable = 'Flex', isplayer = true},
 	strategist = {category = 'Strategist Players', variable = 'Strategist', isplayer = true},
 	vanguard = {category = 'Vanguard Players', variable = 'Vanguard', isplayer = true},
