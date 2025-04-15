@@ -73,12 +73,8 @@ end
 
 ---@param lpdbData table
 ---@param args table
----@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-
+function CustomPlayer:adjustLPDB(lpdbData, args)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = CharacterNames[hero:lower()]
@@ -86,8 +82,6 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 			break
 		end
 	end
-
-	lpdbData.type = self:_isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 

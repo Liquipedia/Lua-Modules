@@ -68,19 +68,13 @@ end
 
 ---@param lpdbData table
 ---@param args table
----@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-	lpdbData.extradata.role3 = (self.role3 or {}).variable
-
+function CustomPlayer:adjustLPDB(lpdbData, args)
 	lpdbData.extradata.signatureChampion1 = args.champion1 or args.champion
 	lpdbData.extradata.signatureChampion2 = args.champion2
 	lpdbData.extradata.signatureChampion3 = args.champion3
 	lpdbData.extradata.signatureChampion4 = args.champion4
 	lpdbData.extradata.signatureChampion5 = args.champion5
-	lpdbData.type = self:_isPlayerOrStaff()
 
 	lpdbData.region = Template.safeExpand(mw.getCurrentFrame(), 'Player region', {args.country})
 
