@@ -15,4 +15,4 @@ local CustomActiveYears = Lua.import('Module:YearsActive/Base')
 CustomActiveYears.defaultNumberOfStoredPlayersPerPlacement = 10
 CustomActiveYears.additionalConditions = ''
 
-return Class.export(CustomActiveYears)
+return CustomActiveYears

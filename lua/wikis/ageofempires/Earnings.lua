@@ -16,4 +16,4 @@ CustomEarnings.defaultNumberOfStoredPlayersPerMatch = 15
 -- Use placement field individualprizemoney in case of player earnings
 CustomEarnings.divisionFactorPlayer = nil
 
-return Class.export(CustomEarnings)
+return CustomEarnings

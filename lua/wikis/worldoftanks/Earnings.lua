@@ -13,4 +13,4 @@ local CustomEarnings = Lua.import('Module:Earnings/Base')
 
 CustomEarnings.defaultNumberOfStoredPlayersPerMatch = 21
 
-return Class.export(CustomEarnings)
+return CustomEarnings

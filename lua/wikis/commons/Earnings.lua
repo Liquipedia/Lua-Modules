@@ -15,4 +15,4 @@ local CustomEarnings = Lua.import('Module:Earnings/Base')
 -- e.g. divisionFactor if there are other modes
 -- or if the default mode is different
 
-return Class.export(CustomEarnings)
+return CustomEarnings

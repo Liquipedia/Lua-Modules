@@ -14,4 +14,4 @@ local MvpTable = Lua.import('Module:MvpTable')
 -- overwrite functions in this module on your custom wiki
 -- e.g. `MvpTable.processData`
 
-return Class.export(MvpTable)
+return MvpTable
