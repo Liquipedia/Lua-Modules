@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local CustomActiveYears = Lua.import('Module:YearsActive/Base')
