@@ -90,6 +90,8 @@ function MatchPage:populateGames()
 
 				-- Set fields
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
+			else
+				team.objectives = {}
 			end
 
 			team.picks = Array.filter(game.extradata.vetophase or {}, function(veto)
