@@ -61,4 +61,4 @@ function Variables.varExists(name)
 	return Variables.varDefault(name) ~= nil
 end
 
-return Class.export(Variables, {removeBlanks = false})
+return Variables
