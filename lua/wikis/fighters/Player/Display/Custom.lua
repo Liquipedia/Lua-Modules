@@ -55,7 +55,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
 	local characterNode = mw.html.create()
@@ -103,7 +103,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local faction = player.chars

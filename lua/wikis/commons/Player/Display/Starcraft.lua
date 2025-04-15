@@ -63,7 +63,7 @@ function StarcraftPlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
 	local factionNode
@@ -186,7 +186,7 @@ function StarcraftPlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local faction = props.showFaction ~= false and player.faction ~= Faction.defaultFaction
