@@ -42,7 +42,7 @@ function MatchPagePlayerDisplay:render()
 					Div{
 						classes = {
 							'match-bm-players-player-role',
-							'role--' .. self.props.side
+							'role--' .. (self.props.side or '')
 						},
 						children = self.props.roleIcon
 					}
