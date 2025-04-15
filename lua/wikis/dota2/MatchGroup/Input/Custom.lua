@@ -67,7 +67,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
 ---@param MapParser Dota2MapParserInterface
