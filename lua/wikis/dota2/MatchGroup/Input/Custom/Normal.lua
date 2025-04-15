@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
+
 ---@class Dota2NormalMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputNormal = {}
 
@@ -46,24 +48,20 @@ end
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
-	local picks = {}
 	local teamPrefix = 't' .. opponentIndex
-	for playerIndex = 1, MAX_NUM_PICKS do
-		table.insert(picks, map[teamPrefix .. 'h' .. playerIndex])
-	end
-	return picks
+	return Array.map(Array.range(1, MAX_NUM_PICKS), function (playerIndex)
+		return map[teamPrefix .. 'h' .. playerIndex]
+	end)
 end
 
 ---@param map table
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
-	local bans = {}
 	local teamPrefix = 't' .. opponentIndex
-	for playerIndex = 1, MAX_NUM_BANS do
-		table.insert(bans, map[teamPrefix .. 'b' .. playerIndex])
-	end
-	return bans
+	return Array.map(Array.range(1, MAX_NUM_BANS), function (banIndex)
+		return map[teamPrefix .. 'b' .. banIndex]
+	end)
 end
 
 ---@param map table
