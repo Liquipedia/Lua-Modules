@@ -60,13 +60,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-end
-
----@param MapParser LeagueOfLegendsMapParserInterface
----@param match table
----@return table
-function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
