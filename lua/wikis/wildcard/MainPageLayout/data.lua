@@ -45,19 +45,19 @@ local CONTENT = {
 		heading = 'Wildcards',
 		body = '{{Liquipedia:Wildcards}}',
 		padding = true,
-		boxid = 1511,
+		boxid = 1513,
 	},
 	houses = {
 		heading = 'Houses',
 		body = '{{Liquipedia:Houses}}',
 		padding = true,
-		boxid = 1512,
+		boxid = 1514,
 	},
 	summons = {
 		heading = 'Summons',
 		body = '{{SummonIconTable}}',
 		padding = true,
-		boxid = 1513,
+		boxid = 1515,
 	},
 }
 
