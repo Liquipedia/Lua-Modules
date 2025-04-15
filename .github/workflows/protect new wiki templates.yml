@@ -1,4 +1,4 @@
-name: Protect newly set up wiki
+name: Protect newly set up wiki (templates)
 
 on:
   workflow_dispatch:
