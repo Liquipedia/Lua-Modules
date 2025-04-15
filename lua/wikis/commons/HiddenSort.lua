@@ -19,4 +19,4 @@ function HiddenSort.run(sortText)
 		:wikitext(sortText)
 end
 
-return Class.export(HiddenSort)
+return HiddenSort
