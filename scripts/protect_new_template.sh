@@ -29,7 +29,6 @@ for wiki in $allWikis; do
   else
     protectExistingPage ${TEMPLATE_TO_PROTECT} $wiki
   fi
-  protectNonExistingPage ${TEMPLATE_TO_PROTECT} $wiki
   echo '::endgroup::'
 done
 
