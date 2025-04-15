@@ -16,9 +16,13 @@ local AutoInlineIcon = {}
 ---@param options {onlyicon: boolean?}
 ---@param category string
 ---@param lookup string
----@param extraInfo string?
 ---@return Widget
-function AutoInlineIcon.display(options, category, lookup, extraInfo)
+---@overload fun(options: table): Widget
+function AutoInlineIcon.display(options, category, lookup)
+	if not category then
+		category = options.category or options[1]
+		lookup = options.lookup or options[2]
+	end
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
