@@ -80,9 +80,10 @@ end
 -- Wrap the given function with an argument parses so that both wikicode and lua
 -- arguments are accepted
 --
----@param f function
+---@generic F:function
+---@param f F
 ---@param options table?
----@return function
+---@return F
 function Class._wrapFunction(f, options)
 	options = options or {}
 	local alwaysRewriteArgs = options.trim
