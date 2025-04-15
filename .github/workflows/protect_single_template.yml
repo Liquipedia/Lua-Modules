@@ -1,0 +1,26 @@
+name: Protect template on all wikis
+
+on:
+  workflow_dispatch:
+    inputs:
+      wiki:
+        description: 'Template to protect (prefix with Template: and use underscores!)'
+        required: true
+
+jobs:
+  protect:
+    if: github.ref_name == github.event.repository.default_branch
+    name: Protect new template on all wikis
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: New template Protect
+        env:
+          WIKI_USER: ${{ secrets.LP_BOTUSER }}
+          WIKI_PASSWORD: ${{ secrets.LP_BOTPASSWORD }}
+          WIKI_UA_EMAIL: ${{ secrets.LP_UA_EMAIL }}
+          WIKI_BASE_URL: ${{ secrets.LP_BASE_URL }}
+          WIKI_TO_PROTECT: ${{ github.event.inputs.wiki }}
+        run: bash scripts/protect.sh
