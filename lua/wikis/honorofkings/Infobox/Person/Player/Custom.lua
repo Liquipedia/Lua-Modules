@@ -11,7 +11,6 @@ local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
 local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
