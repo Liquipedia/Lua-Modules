@@ -6,19 +6,27 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@class Dota2NormalMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputNormal = {}
 
 local MAX_NUM_PICKS = 5
 local MAX_NUM_BANS = 7
 
+---@param mapInput table
+---@return table
 function CustomMatchGroupInputNormal.getMap(mapInput)
 	return mapInput
 end
 
+---@param map table
+---@return string?
 function CustomMatchGroupInputNormal.getLength(map)
 	return map.length
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string?
 function CustomMatchGroupInputNormal.getSide(map, opponentIndex)
 	local side = map['team' .. opponentIndex .. 'side']
 	if not side then
@@ -27,10 +35,16 @@ function CustomMatchGroupInputNormal.getSide(map, opponentIndex)
 	return string.lower(side)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table[]?
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	return
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
 	local picks = {}
 	local teamPrefix = 't' .. opponentIndex
@@ -40,6 +54,9 @@ function CustomMatchGroupInputNormal.getHeroPicks(map, opponentIndex)
 	return picks
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
 	local bans = {}
 	local teamPrefix = 't' .. opponentIndex
@@ -49,10 +66,15 @@ function CustomMatchGroupInputNormal.getHeroBans(map, opponentIndex)
 	return bans
 end
 
+---@param map table
+---@return table[]?
 function CustomMatchGroupInputNormal.getVetoPhase(map)
 	return
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table?
 function CustomMatchGroupInputNormal.getObjectives(map, opponentIndex)
 	return
 end

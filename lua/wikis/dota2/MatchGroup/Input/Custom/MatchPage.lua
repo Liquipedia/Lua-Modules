@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 local Operator = require('Module:Operator')
 
+---@class Dota2MatchPageMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class dota2MatchDataExtended: dota2MatchData
@@ -129,7 +130,7 @@ function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 end
 
 ---@param map dota2MatchDataExtended
----@return {character: string?, team: integer, type: 'pick'|'ban', vetoNumber: integer}[]|nil
+---@return {character: string?, team: integer, type: 'pick'|'ban', vetoNumber: integer}[]?
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.heroVeto then return end
 
