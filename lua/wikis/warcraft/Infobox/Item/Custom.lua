@@ -121,7 +121,10 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Stock Start Delay', content = {args.stockstart and (
 				Abbreviation.make{text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}
 			) or nil}},
-			Cell{name = Abbreviation.make{text = 'Stock Repl. Interval', title = 'Stock Replenish Interval'}, content = {args.stockreplenish}}
+			Cell{
+				name = Abbreviation.make{text = 'Stock Repl. Interval',title = 'Stock Replenish Interval'},
+				content = {args.stockreplenish}
+			}
 		)
 	elseif id == 'ability' then
 		return Array.append(widgets,
