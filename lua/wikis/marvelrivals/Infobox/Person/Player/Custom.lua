@@ -27,7 +27,7 @@ local Cell = Widgets.Cell
 
 local ROLES = {
 	-- Players
-	duelist = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
+	duelust = {category = 'Duelist Players', variable = 'Duelist', isplayer = true},
 	flex = {category = 'Flex Players', variable = 'Flex', isplayer = true},
 	strategist = {category = 'Strategist Players', variable = 'Strategist', isplayer = true},
 	vanguard = {category = 'Vanguard Players', variable = 'Vanguard', isplayer = true},
@@ -158,12 +158,10 @@ end
 
 ---@return string?
 function CustomPlayer:createBottomContent()
-	if String.isNotEmpty(self.args.team) and self:shouldStoreData(self.args) then
-		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		return
-			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
-	end
+	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then return end
+	local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
+	return tostring(MatchTicker.player{recentLimit = 3}) ..
+		Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
 end
 
 return CustomPlayer
