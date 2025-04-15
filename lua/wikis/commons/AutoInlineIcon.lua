@@ -13,16 +13,12 @@ local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData
 
 local AutoInlineIcon = {}
 
----@param options {onlyicon: boolean?}
----@param category string
----@param lookup string
+---@param options {onlyicon: boolean?, category: string, lookup: string}
 ---@return Widget
 ---@overload fun(options: table): Widget
-function AutoInlineIcon.display(options, category, lookup)
-	if not category then
-		category = options.category or options[1]
-		lookup = options.lookup or options[2]
-	end
+function AutoInlineIcon.display(options)
+	local category = options.category
+	local lookup = options.lookup
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
