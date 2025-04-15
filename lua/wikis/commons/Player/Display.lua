@@ -116,10 +116,10 @@ function PlayerDisplay.InlinePlayer(props)
 end
 
 -- Note: require('Module:Flags').Icon automatically includes a span with class="flag"
----@param args {name: string?}
+---@param args {flag: string?}
 ---@return string
 function PlayerDisplay.Flag(args)
-	return Flags.Icon({flag = args.name, shouldLink = false})
+	return Flags.Icon({flag = args.flag, shouldLink = false})
 end
 
 return Class.export(PlayerDisplay)
