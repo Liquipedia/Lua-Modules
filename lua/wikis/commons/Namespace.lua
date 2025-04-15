@@ -100,4 +100,4 @@ function Namespace.prefixFromId(id)
 	return name
 end
 
-return Class.export(Namespace, {frameOnly = true})
+return Namespace
