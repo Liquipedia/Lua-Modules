@@ -52,4 +52,4 @@ function NameOrder.reorderNames(givenName, familyName, options)
 	end
 end
 
-return Class.export(NameOrder)
+return NameOrder
