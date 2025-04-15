@@ -24,6 +24,11 @@ echo "protecting ${TEMPLATE_TO_PROTECT}"
 
 for wiki in $allWikis; do
   echo "::group::Checking $wiki"
+  if [[ $wiki == "commons" ]]; then
+    protectNonExistingPage ${TEMPLATE_TO_PROTECT} $wiki
+  else
+    protectExistingPage ${TEMPLATE_TO_PROTECT} $wiki
+  fi
   protectNonExistingPage ${TEMPLATE_TO_PROTECT} $wiki
   echo '::endgroup::'
 done
