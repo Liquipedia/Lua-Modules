@@ -21,19 +21,19 @@ local CONTENT = {
 		heading = 'Updates',
 		body = '{{Main Page Updates}}',
 		padding = true,
-		boxid = 1503,
+		boxid = 1502,
 	},
 	usefulArticles = {
 		heading = 'Useful Articles',
 		body = '{{Liquipedia:Useful Articles}}',
 		padding = true,
-		boxid = 1504,
+		boxid = 1503,
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
 		body = '{{Liquipedia:Want_to_help}}',
 		padding = true,
-		boxid = 1505,
+		boxid = 1504,
 	},
 	champions = {
 		heading = 'Champions',
@@ -45,19 +45,19 @@ local CONTENT = {
 		heading = 'Wildcards',
 		body = '{{Liquipedia:Wildcards}}',
 		padding = true,
-		boxid = 1506,
+		boxid = 1511,
 	},
 	houses = {
 		heading = 'Houses',
 		body = '{{Liquipedia:Houses}}',
 		padding = true,
-		boxid = 1508,
+		boxid = 1512,
 	},
 	summons = {
 		heading = 'Summons',
 		body = '{{SummonIconTable}}',
 		padding = true,
-		boxid = 1507,
+		boxid = 1513,
 	},
 }
 
