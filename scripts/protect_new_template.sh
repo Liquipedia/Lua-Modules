@@ -6,7 +6,7 @@ userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
 
 declare -a allWikis
 
-$templateToProtect=$1
+$templateToProtect=${TEMPLATE_TO_PROTECT}
 
 allWikis=$(
   curl \
