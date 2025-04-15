@@ -6,8 +6,6 @@ userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
 
 declare -a allWikis
 
-$templateToProtect=${TEMPLATE_TO_PROTECT}
-
 allWikis=$(
   curl \
     -s \
@@ -22,9 +20,11 @@ allWikis=$(
 # Don't get rate limited
 sleep 4
 
+echo "protecting ${TEMPLATE_TO_PROTECT}"
+
 for wiki in $allWikis; do
   echo "::group::Checking $wiki"
-  protectNonExistingPage $templateToProtect $wiki
+  protectNonExistingPage ${TEMPLATE_TO_PROTECT} $wiki
   echo '::endgroup::'
 done
 
