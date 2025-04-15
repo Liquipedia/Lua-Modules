@@ -40,4 +40,4 @@ function WarningBox.displayAll(arr)
 	return wrapper
 end
 
-return Class.export(WarningBox)
+return WarningBox
