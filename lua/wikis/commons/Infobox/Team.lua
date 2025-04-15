@@ -125,10 +125,10 @@ function Team:createInfobox()
 			id = 'earnings',
 			children = {
 				Cell{
-					name = not Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make(
-						'Approx. Total Winnings',
-						'Includes individual player winnings&#10;while representing this team'
-					) or 'Approx. Total Winnings',
+					name = not Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make{
+						text = 'Approx. Total Winnings',
+						title = 'Includes individual player winnings&#10;while representing this team',
+					} or 'Approx. Total Winnings',
 					content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
 				}
 			}

@@ -18,7 +18,7 @@ local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 local StarcraftPlayerExt = Lua.import('Module:Player/Ext/Starcraft')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
 
 ---Display components for players used in the starcraft and starcraft2 wikis.
 ---@class StarcraftPlayerDisplay: PlayerDisplay

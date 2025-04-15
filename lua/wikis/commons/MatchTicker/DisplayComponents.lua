@@ -123,7 +123,7 @@ end
 function Versus:bestof()
 	local bestof = tonumber(self.match.bestof) or 0
 	if bestof > 0 then
-		return Abbreviation.make('Bo' .. bestof, 'Best of ' .. bestof)
+		return Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof}
 	end
 end
 

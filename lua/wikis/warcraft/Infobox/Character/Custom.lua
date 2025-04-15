@@ -86,7 +86,8 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Base Stats'},
 			Cell{name = '[[Movement Speed]]', content = {args.basespeed}},
 			Cell{name = '[[Sight Range]]', content = {args.sightrange or (
-				Abbreviation.make(args.daysight or 1800, 'Day') .. ' / ' .. Abbreviation.make(args.nightsight or 800, 'Night')
+				Abbreviation.make{text = args.daysight or 1800, title = 'Day'} .. ' / ' ..
+				Abbreviation.make{text = args.nightsight or 800, title = 'Night'}
 			)}},
 			Cell{name = '[[Attack Range]]', content = {args.attackrange}},
 			Cell{name = 'Missile Speed', content = {args.missilespeed}},
@@ -150,7 +151,7 @@ function CustomCharacter:_getArmorAttribute()
 		- 2 + (tonumber(self.args.basearmor) or 0)
 
 	return ATTRIBUTE_ICONS.armor
-		.. '<br>' .. Abbreviation.make(Math.round(armorValue, 0), armorValue)
+		.. '<br>' .. Abbreviation.make{text = Math.round(armorValue, 0), title = armorValue}
 end
 
 ---@return string
@@ -197,7 +198,7 @@ function CustomCharacter:_calculateArmor(gainFactor, abbreviate)
 		- 2 + (tonumber(self.args.basearmor) or 0)
 
 	if abbreviate then
-		return Abbreviation.make(Math.round(armor, 0), armor)
+		return Abbreviation.make{text = Math.round(armor, 0), title = armor}
 	end
 
 	return armor

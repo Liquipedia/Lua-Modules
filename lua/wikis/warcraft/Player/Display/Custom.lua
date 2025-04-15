@@ -15,7 +15,7 @@ local Lua = require('Module:Lua')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
 local ZERO_WIDTH_SPACE = '&#8203;'
 
 local CustomPlayerDisplay = {}

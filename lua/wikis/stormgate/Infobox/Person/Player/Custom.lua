@@ -82,12 +82,12 @@ function CustomInjector:parse(id, widgets)
 				content = {currentYearEarnings > 0 and ('$' .. mw.getContentLanguage():formatNum(currentYearEarnings)) or nil}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active', 'Years active as a player'),
+				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
 				content = {YearsActive.display({player = caller.pagename})
 			}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
+				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
 				content = {caller:_getActiveCasterYears()}
 			},
 		}

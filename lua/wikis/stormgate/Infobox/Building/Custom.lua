@@ -160,8 +160,8 @@ function CustomBuilding:subHeaderDisplay(args)
 	if Table.includes(subfactionData, '1v1') then
 		return tostring(mw.html.create('span')
 			:css('font-size', '90%')
-			:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
-				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+			:wikitext(Abbreviation.make{text = 'Standard', title = 'This is part of Head to Head 1v1. '
+				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'})
 		)
 	end
 
@@ -188,7 +188,7 @@ function CustomBuilding:_energyDisplay()
 	return table.concat({
 		ICON_ENERGY .. ' ' .. energy,
 		'/' .. (maxEnergy == 0 and '?' or maxEnergy),
-		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make('+ varies', self.args.energy_desc),
+		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make{text = '+ varies', title = self.args.energy_desc},
 	})
 end
 
