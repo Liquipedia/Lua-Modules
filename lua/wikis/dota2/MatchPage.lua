@@ -90,6 +90,8 @@ function MatchPage:populateGames()
 
 				-- Set fields
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
+			else
+				team.objectives = {}
 			end
 
 			team.picks = Array.filter(game.extradata.vetophase or {}, function(veto)
@@ -388,7 +390,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'dota2_lhdn'}, 'LH/DN'},
-						data = {player.lasthits, SPAN_SLASH, player.denies}
+						data = Array.interleave({player.lasthits, player.denies}, SPAN_SLASH)
 					},
 					PlayerStat{
 						title = {GOLD_ICON, 'NET'},

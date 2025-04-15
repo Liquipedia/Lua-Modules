@@ -130,6 +130,8 @@ function MatchPage:populateGames()
 
 				-- Set fields
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives'] or {}
+			else
+				team.objectives = {}
 			end
 
 			team.picks = Array.map(team.players, Operator.property('character'))
