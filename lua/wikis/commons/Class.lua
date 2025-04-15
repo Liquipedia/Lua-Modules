@@ -80,7 +80,7 @@ end
 -- Wrap the given function with an argument parses so that both wikicode and lua
 -- arguments are accepted
 --
----@generic F:function
+---@generic F:fun(props: table)
 ---@param f F
 ---@param options table?
 ---@return F
