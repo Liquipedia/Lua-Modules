@@ -66,4 +66,4 @@ function MatchPageDisplay.Match(props)
 	}, require('Module:Error/Display').ErrorList)
 end
 
-return Class.export(MatchPageDisplay)
+return MatchPageDisplay

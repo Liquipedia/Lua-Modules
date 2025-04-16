@@ -62,4 +62,4 @@ function CustomBracketDisplay._addHeads(opponentEntry, opponent)
 	opponentEntry.root:node(charactersNode)
 end
 
-return Class.export(CustomBracketDisplay)
+return CustomBracketDisplay

@@ -241,4 +241,4 @@ function MatchlistDisplay.Score(props)
 		:node(contentNode)
 end
 
-return Class.export(MatchlistDisplay)
+return MatchlistDisplay

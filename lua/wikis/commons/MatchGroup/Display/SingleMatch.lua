@@ -77,4 +77,4 @@ function SingleMatchDisplay.Match(props)
 	}, require('Module:Error/Display').ErrorList)
 end
 
-return Class.export(SingleMatchDisplay)
+return SingleMatchDisplay

@@ -241,4 +241,4 @@ function HorizontallistDisplay.Match(props)
 	return matchNode
 end
 
-return Class.export(HorizontallistDisplay)
+return HorizontallistDisplay

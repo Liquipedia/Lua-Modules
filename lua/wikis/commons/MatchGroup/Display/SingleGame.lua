@@ -72,4 +72,4 @@ function SingleGameDisplay.Game(props)
 	}, require('Module:Error/Display').ErrorList)
 end
 
-return Class.export(SingleGameDisplay)
+return SingleGameDisplay

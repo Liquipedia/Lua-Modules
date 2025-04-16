@@ -37,4 +37,4 @@ function CustomBracketDisplay.OpponentEntry(props)
 	return opponentEntry.root
 end
 
-return Class.export(CustomBracketDisplay)
+return CustomBracketDisplay
