@@ -48,7 +48,6 @@ return {
 			automatedHistory = {
 				mode = 'manualPrio',
 				showRole = false,
-				showPositionIcon = true,
 			},
 		},
 	},

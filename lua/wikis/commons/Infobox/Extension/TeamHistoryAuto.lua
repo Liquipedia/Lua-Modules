@@ -63,7 +63,7 @@ local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {load
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?, showPositionIcon: boolean?}
+---@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
 	---@type {player: string?}
@@ -72,7 +72,6 @@ local TeamHistoryAuto = Class.new(function(self, args)
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
 		showRole = Logic.nilOr(configFromInfo.showRole, true),
-		showPositionIcon = configFromInfo.showPositionIcon,
 		hasHeaderAndRefs = configFromInfo.hasHeaderAndRefs,
 	}
 end)
@@ -231,7 +230,7 @@ function TeamHistoryAuto:_row(transfer)
 	end
 
 	local positionIcon
-	if self.config.showPositionIcon then
+	if POSITION_ICON_DATA then
 		local position = (transfer.position or ''):lower()
 		positionIcon = (POSITION_ICON_DATA[position] or POSITION_ICON_DATA['']) .. '&nbsp;'
 	end
