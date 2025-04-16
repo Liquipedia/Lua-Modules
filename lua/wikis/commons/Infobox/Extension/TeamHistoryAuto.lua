@@ -117,7 +117,7 @@ function TeamHistoryAuto:_getTeamLinkAndText(transfer)
 	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
 	end
-	local leaveDateCleaned = TeamHistoryAuto._adjustDate(transfr.leaveDate)
+	local leaveDateCleaned = TeamHistoryAuto._adjustDate(transfer.leaveDate)
 	local teamData = mw.ext.TeamTemplate.raw(transfer.team, leaveDateCleaned) or {}
 
 	return teamData.page, Link{
