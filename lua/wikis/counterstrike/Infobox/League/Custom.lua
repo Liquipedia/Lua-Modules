@@ -261,17 +261,17 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_icon_darkmode', self.data.iconDark)
 
 	if String.isNotEmpty(args.date) and args.date:lower() ~= DATE_TBA then
-		Variables.varDefine('date', ReferenceCleaner.clean(args.date))
+		Variables.varDefine('date', ReferenceCleaner.clean{input = args.date})
 	end
 
 	if String.isNotEmpty(args.sdate) and args.sdate:lower() ~= DATE_TBA then
-		Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean(args.sdate or args.date))
+		Variables.varDefine('sdate', ReferenceCleaner.clean{input = args.sdate})
+		Variables.varDefine('tournament_sdate', ReferenceCleaner.clean{input = args.sdate or args.date})
 	end
 
 	if String.isNotEmpty(args.edate) and args.edate:lower() ~= DATE_TBA then
-		local cleandDate = ReferenceCleaner.clean(args.edate or args.date)
-		Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+		local cleandDate = ReferenceCleaner.clean{input = args.edate or args.date}
+		Variables.varDefine('edate', ReferenceCleaner.clean{input = args.edate})
 		Variables.varDefine('tournament_date', cleandDate)
 		Variables.varDefine('tournament_edate', cleandDate)
 	end

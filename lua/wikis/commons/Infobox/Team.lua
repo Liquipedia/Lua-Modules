@@ -210,7 +210,7 @@ end
 ---@return string|number|nil # storage date
 ---@return string[] # display elements
 function Team:processCreateDates()
-	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean(self.args.created)) or Date.maxTimestamp
+	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean{input = self.args.created}) or Date.maxTimestamp
 
 	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
 		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
@@ -221,7 +221,7 @@ function Team:processCreateDates()
 
 		local icon
 		local game, date = unpack(splitInput)
-		local cleanDate = ReferenceCleaner.clean(date)
+		local cleanDate = ReferenceCleaner.clean{input = date}
 
 		if game:lower() == 'org' then
 			icon = Image.display(self:_getTeamIcon(cleanDate))
@@ -354,7 +354,7 @@ function Team:_setLpdbData(args, links)
 		earnings = self.totalEarnings,
 		earningsbyyear = self.yearlyEarnings or {},
 		createdate = args.created,
-		disbanddate = ReferenceCleaner.clean(args.disbanded),
+		disbanddate = ReferenceCleaner.clean{input = args.disbanded},
 		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
 		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(

@@ -107,9 +107,9 @@ function Company:createInfobox()
 		locations = Locale.formatLocations(args),
 		headquarterslocation = args.headquarters,
 		parentcompany = args.parent,
-		foundeddate = ReferenceCleaner.clean(args.foundeddate),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate),
-		numberofemployees = ReferenceCleaner.cleanNumber(args.employees),
+		foundeddate = ReferenceCleaner.clean{input = args.foundeddate},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate},
+		numberofemployees = ReferenceCleaner.cleanNumber{input = args.employees},
 		links = mw.ext.LiquipediaDB.lpdb_create_json({
 			discord = Links.makeFullLink{platform = 'discord', id = args.discord},
 			facebook = Links.makeFullLink{platform = 'facebook', id = args.facebook},
