@@ -208,7 +208,7 @@ function CustomBuilding:_armorDisplay()
 	end
 	display = display .. ' ' .. (self.args.armor or 0)
 	if self.args.armor_upgrades then
-		display = display.. ' (' .. (tonumber(self.args.armor) + tonumber(self.args.armor_upgrades)) .. ')'
+		display = display.. ' (' .. (tonumber(self.args.armor or 0) + tonumber(self.args.armor_upgrades)) .. ')'
 	end
 	return display
 end
