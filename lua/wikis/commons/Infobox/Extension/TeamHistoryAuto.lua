@@ -15,6 +15,7 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Info = Lua.import('Module:Info', {loadData = true})
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
@@ -55,7 +56,6 @@ local SPECIAL_ROLES = {
 }
 local SPECIAL_ROLES_LOWER = Array.map(SPECIAL_ROLES, string.lower)
 local LOAN = 'Loan'
-local ONE_DAY = 86400
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
 
 local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
@@ -79,21 +79,21 @@ end)
 function TeamHistoryAuto:store()
 	if not Namespace.isMain() then return self end
 	Array.forEach(self.transferList, function(transfer, transferIndex)
-		self:_checkForMissingLeaveDate(transfer, transferIndex)
+		TeamHistoryAuto._checkForMissingLeaveDate(transfer, transferIndex, #self.transferList)
 		local teamLink = self:_getTeamLinkAndText(transfer)
 		if not teamLink and not transfer.role then return end
 
-		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'..transferIndex, {
+		mw.ext.LiquipediaDB.lpdb_datapoint('Team_'..transferIndex, Json.stringifySubTables{
 			type = 'teamhistory',
 			name = self.config.player,
 			information = teamLink,
-			extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+			extradata = {
 				joindate = transfer.joinDate,
 				leavedate = transfer.leaveDate or '2999-01-01',
 				teamcount = transferIndex,
 				role = transfer.role,
 				auto = 1,
-			})
+			},
 		})
 	end)
 
@@ -102,8 +102,9 @@ end
 
 ---@param transfer table
 ---@param transferIndex integer
-function TeamHistoryAuto:_checkForMissingLeaveDate(transfer, transferIndex)
-	if transferIndex == #self.transferList or transfer.leaveDate then return end
+---@param numberOfRows integer
+function TeamHistoryAuto._checkForMissingLeaveDate(transfer, transferIndex, numberOfRows)
+	if transferIndex == numberOfRows or transfer.leaveDate then return end
 	mw.ext.TeamLiquidIntegration.add_category('Players with potential incomplete transfer history')
 end
 
@@ -121,13 +122,13 @@ function TeamHistoryAuto:_getTeamLinkAndText(transfer)
 
 	return teamData.page, Link{
 		link = teamData.page,
-		children = {TeamHistoryAuto._shortenTeamName(teamData)}
+		children = {TeamHistoryAuto._getTeamDisplayName(teamData)}
 	}
 end
 
 ---@param teamData {name: string, bracketname: string, shortname: string}
 ---@return string
-function TeamHistoryAuto._shortenTeamName(teamData)
+function TeamHistoryAuto._getTeamDisplayName(teamData)
 	if string.len(teamData.name) <= 17 then
 		return teamData.name
 	elseif string.len(teamData.bracketname) <= 17 then
@@ -141,13 +142,14 @@ end
 ---@param date string?
 ---@return string?
 function TeamHistoryAuto._adjustDate(date)
-	if type(date) ~= 'string' or Logic.isEmpty(date) then
+	if Logic.isEmpty(date) then
 		return date
 	end
+	---@cast date -nil
 
-	local year, month, day = date:match('(%d+)-(%d+)-(%d+)')
-	local timeStamp = os.time{day = day, month = month, year = year}
-	return os.date('%Y-%m-%d', timeStamp - ONE_DAY) --[[@as string]]
+	local dateStruct = DateExt.parseIsoDate(date)
+	dateStruct.day = dateStruct.day - 1
+	return os.date('%Y-%m-%d', os.time(dateStruct)) --[[@as string]]
 end
 
 ---@return Widget?
