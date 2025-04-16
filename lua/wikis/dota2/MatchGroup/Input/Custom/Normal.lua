@@ -72,7 +72,7 @@ end
 
 ---@param map table
 ---@param opponentIndex integer
----@return table?
+---@return table<string, integer>?
 function CustomMatchGroupInputNormal.getObjectives(map, opponentIndex)
 	return
 end
