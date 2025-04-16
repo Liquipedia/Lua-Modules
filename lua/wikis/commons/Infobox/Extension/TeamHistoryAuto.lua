@@ -80,6 +80,7 @@ end)
 function TeamHistoryAuto:store()
 	if not Namespace.isMain() then return self end
 	Array.forEach(self.transferList, function(transfer, transferIndex)
+		self:_checkForMissingLeaveDate(transfer, transferIndex)
 		local teamLink = self:_getTeamLinkAndText(transfer)
 		if not teamLink and not transfer.role then return end
 
@@ -101,6 +102,13 @@ function TeamHistoryAuto:store()
 end
 
 ---@param transfer table
+---@param transferIndex integer
+function TeamHistoryAuto:_checkForMissingLeaveDate(transfer, transferIndex)
+	if transferIndex == #self.transferList or transfer.leaveDate then return end
+	mw.ext.TeamLiquidIntegration.add_category('Players with potential incomplete transfer history')
+end
+
+---@param transfer table
 ---@return string?
 ---@return Widget
 function TeamHistoryAuto:_getTeamLinkAndText(transfer)
@@ -109,7 +117,7 @@ function TeamHistoryAuto:_getTeamLinkAndText(transfer)
 	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
 	end
-	local leaveDateCleaned = TeamHistoryAuto._adjustDate(transfer.leaveDate)
+	local leaveDateCleaned = TeamHistoryAuto._adjustDate(transfr.leaveDate)
 	local teamData = mw.ext.TeamTemplate.raw(transfer.team, leaveDateCleaned) or {}
 
 	return teamData.page, Link{
