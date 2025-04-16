@@ -279,7 +279,7 @@ end
 ---@param shouldDisplay boolean?
 ---@return Html
 function CustomMatchSummary._iconDisplay(icon, shouldDisplay)
-	return mw.html.create('iv')
+	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(shouldDisplay and icon or NO_CHECK)
 end
