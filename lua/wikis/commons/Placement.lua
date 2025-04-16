@@ -204,4 +204,4 @@ function Placement.get(placement, customText)
 		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (customText or raw.display) .. '</b>'
 end
 
-return Class.export(Placement)
+return Class.export(Placement, {onlyExport = {'getBgClass', 'get', 'RangeLabel'}})
