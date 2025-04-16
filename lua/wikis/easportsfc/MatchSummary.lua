@@ -125,7 +125,7 @@ function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 	return Abbreviation.make{
 		text = '(' .. (scores[opponentIndex] or 0) .. ')',
 		title = 'Penalty shoot-out',
-	}--[[@as string]]
+	}
 end
 
 ---@param players table[]
