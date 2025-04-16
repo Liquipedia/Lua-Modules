@@ -54,7 +54,6 @@ local SPECIAL_ROLES = {
 	'League Operator',
 	'Inactive'
 }
-local SPECIAL_ROLES_LOWER = Array.map(SPECIAL_ROLES, string.lower)
 local LOAN = 'Loan'
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
 
@@ -112,7 +111,7 @@ end
 ---@return string?
 ---@return Widget
 function TeamHistoryAuto:_getTeamLinkAndText(transfer)
-	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES, transfer.role) then
 		return nil, HtmlWidgets.B{children = {transfer.role}}
 	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
@@ -316,7 +315,7 @@ function TeamHistoryAuto:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
 	local lowerCasedRole = (transfer.role or ''):lower()
-	if lowerCasedRole == 'military' or not Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+	if lowerCasedRole == 'military' or not Table.includes(SPECIAL_ROLES, transfer.role) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
@@ -333,9 +332,6 @@ function TeamHistoryAuto:_query()
 			ConditionNode(ColumnName('toteam'), Comparator.neq, ''),
 			Array.map(SPECIAL_ROLES, function(role)
 				return ConditionNode(ColumnName('role2'), Comparator.eq, role)
-			end),
-			Array.map(SPECIAL_ROLES, function(role)
-				return ConditionNode(ColumnName('role2'), Comparator.eq, role:lower())
 			end),
 		},
 	}
@@ -490,7 +486,7 @@ function TeamHistoryAuto:_buildConditions(transfer)
 			buildFromConditions('fromteam', 'role1'),
 			buildFromConditions('extradata_fromteamsec', 'extradata_role1sec'),
 		})
-	elseif Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
+	elseif Table.includes(SPECIAL_ROLES, transfer.role) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role),
 			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role:lower()),
