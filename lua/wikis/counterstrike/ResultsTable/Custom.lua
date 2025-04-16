@@ -58,4 +58,4 @@ function CustomResultsTable:tierDisplay(placement)
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {onlyExport = {'results', 'awards'}})

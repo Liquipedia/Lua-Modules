@@ -28,4 +28,4 @@ function CustomResultsTable.awards(args)
 	return AwardsTable(args):create():build()
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {onlyExport = {'results', 'awards'}})

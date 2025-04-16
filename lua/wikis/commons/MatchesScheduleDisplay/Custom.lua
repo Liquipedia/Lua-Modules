@@ -17,4 +17,4 @@ function CustomMatchesTable.run(args)
 	return MatchesTable(args):create()
 end
 
-return Class.export(CustomMatchesTable)
+return Class.export(CustomMatchesTable, {onlyExport = {'run'}})

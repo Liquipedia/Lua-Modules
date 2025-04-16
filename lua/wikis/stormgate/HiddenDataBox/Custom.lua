@@ -22,4 +22,4 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {onlyExport = {'run'}})
