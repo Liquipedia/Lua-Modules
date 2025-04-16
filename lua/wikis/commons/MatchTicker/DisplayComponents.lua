@@ -44,6 +44,7 @@ local WINNER_TO_BG_CLASS = {
 }
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
+local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---Display class for the header of a match ticker
 ---@class MatchTickerHeader
@@ -308,9 +309,9 @@ function Details:countdown(matchPageIcon)
 	if Logic.readBool(match.dateexact) then
 		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
 		dateString = DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or (Timezone.getTimezoneString('UTC')))
+				.. (Timezone.getTimezoneString{timezone = match.extradata.timezoneid} or UTC)
 	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. (Timezone.getTimezoneString('UTC'))
+		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. UTC
 	end
 
 	local countdownArgs = Table.merge(match.stream or {}, {
