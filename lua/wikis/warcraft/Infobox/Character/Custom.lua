@@ -94,7 +94,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Attack Duration', content = {args.attackduration}},
 			Cell{name = 'Base Attack Time', content = {args.attacktime}},
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
-			Cell{name = 'Hotkey', content = {Hotkeys.hotkey(args.hotkey)}},
+			Cell{name = 'Hotkey', content = {Hotkeys.hotkey{hotkey = args.hotkey}}},
 			args.icon and Title{children = 'Icon'} or nil,
 			Center{children = {self.caller:_displayIcon()}},
 			Title{children = 'Level Changes'},

@@ -116,7 +116,7 @@ function CustomInjector:parse(id, widgets)
 				gold = SELL_FACTOR * (tonumber(args.gold) or 0),
 				lumber = SELL_FACTOR * (tonumber(args.lumber) or 0)
 			}}},
-			Cell{name = 'Purchase Hotkey', content = {args.hotkey and Hotkey.hotkey(args.hotkey) or nil}},
+			Cell{name = 'Purchase Hotkey', content = {args.hotkey and Hotkey.hotkey{hotkey = args.hotkey} or nil}},
 			Cell{name = 'Stock Max', content = {args.stock}},
 			Cell{name = 'Stock Start Delay', content = {args.stockstart and (
 				Abbreviation.make{text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}
