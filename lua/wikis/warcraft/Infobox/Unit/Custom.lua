@@ -145,7 +145,7 @@ end
 ---@return string
 function CustomUnit:_defenseDisplay()
 	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
-	if tonumber(self.args.hitpoint_bonus or 0) > 0 then
+	if (tonumber(self.args.hitpoint_bonus) or 0) > 0 then
 		return display .. ' (' .. (tonumber(self.args.hp) + tonumber(self.args.hitpoint_bonus)) .. ')'
 	end
 	return display
