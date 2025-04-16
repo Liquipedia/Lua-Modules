@@ -109,7 +109,7 @@ end
 function DisplayHelper.MatchCountdownBlock(match)
 	local dateString
 	if match.dateIsExact == true then
-		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
 		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
 				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or UTC)
 	else

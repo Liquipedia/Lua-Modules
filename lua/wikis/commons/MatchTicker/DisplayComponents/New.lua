@@ -158,7 +158,7 @@ function Details:countdown()
 
 	local dateString
 	if Logic.readBool(match.dateexact) then
-		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
 		dateString = DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
 				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or (Timezone.getTimezoneString('UTC')))
 	else

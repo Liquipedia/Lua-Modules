@@ -22,14 +22,14 @@ describe('timezone', function()
 		it('check', function()
 			assert.are_equal(
 				5 * 60 * 60 + 30 * 60,
-				Timezone.getOffset('IST')
+				Timezone.getOffset{timezone = 'IST'}
 			)
 			assert.are_equal(
 				2 * 60 * 60,
-				Timezone.getOffset('CEST')
+				Timezone.getOffset{timezone = 'CEST'}
 			)
 			assert.is_nil(
-				Timezone.getOffset('DUMMY')
+				Timezone.getOffset{timezone = 'DUMMY'}
 			)
 		end)
 	end)
