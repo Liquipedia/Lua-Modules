@@ -134,7 +134,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 function CustomUnit._bounty(args)
-	if not args.bountybasethen then return end
+	if not args.bountybase then return end
 	local baseBounty = tonumber(args.bountybase) or 0
 	local bountyDice = tonumber(args.bountydice) or 1
 	local bountySides = tonumber(args.bountysides) or 1
@@ -145,17 +145,21 @@ end
 ---@return string
 function CustomUnit:_defenseDisplay()
 	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
-	if tonumber(self.args.hitpoint_bonus) > 0 then
-		return display .. ' (' .. self.args.hp + self.args.hitpoint_bonus .. ')'
+	if tonumber(self.args.hitpoint_bonus or 0) > 0 then
+		return display .. ' (' .. (tonumber(self.args.hp) + tonumber(self.args.hitpoint_bonus)) .. ')'
 	end
 	return display
 end
 
 ---@return string
 function CustomUnit:_armorDisplay()
-	local display = ArmorIcon.run(self.args.armortype) .. ' ' .. (self.args.armor or 0)
+	local display = ArmorIcon.run(self.args.armortype)
+	if self.args.armortype2 then
+		display = display .. ' / ' .. ArmorIcon.run(self.args.armortype2)
+	end
+	display = display .. ' ' .. (self.args.armor or 0)
 	if self.args.armor_upgrades then
-		display = display.. ' (' .. (self.args.armor + self.args.armor_upgrades) .. ')'
+		display = display.. ' (' .. (tonumber(self.args.armor or 0) + tonumber(self.args.armor_upgrades)) .. ')'
 	end
 	return display
 end
