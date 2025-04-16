@@ -63,7 +63,7 @@ local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {load
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?}
+---@field config {player: string, hasHeaderAndRefs: boolean?}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
 	---@type {player: string?}
@@ -71,7 +71,6 @@ local TeamHistoryAuto = Class.new(function(self, args)
 	local configFromInfo = (Info.config.infoboxPlayer or {}).automatedHistory or {}
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
-		showRole = Logic.nilOr(configFromInfo.showRole, true),
 		hasHeaderAndRefs = configFromInfo.hasHeaderAndRefs,
 	}
 end)
@@ -212,7 +211,7 @@ function TeamHistoryAuto:_row(transfer)
 
 	---@type Widget|string?
 	local role = transfer.role
-	if role and self.config.showRole then
+	if role then
 		local splitRole = mw.text.split(role --[[@as string]], ' ')
 		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()]
 		if roleData.empty then
@@ -226,7 +225,7 @@ function TeamHistoryAuto:_row(transfer)
 	end
 	---@type string|Widget
 	local teamDisplay = teamText
-	if role and self.config.showRole then
+	if role then
 		teamDisplay = Span{
 			css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
 			children = {
