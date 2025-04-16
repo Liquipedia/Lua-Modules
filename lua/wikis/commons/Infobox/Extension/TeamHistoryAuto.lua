@@ -314,8 +314,7 @@ end
 function TeamHistoryAuto:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
-	local lowerCasedRole = (transfer.role or ''):lower()
-	if lowerCasedRole == 'military' or not Table.includes(SPECIAL_ROLES, transfer.role) then
+	if not Table.includes(SPECIAL_ROLES, transfer.role) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
