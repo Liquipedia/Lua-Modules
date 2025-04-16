@@ -66,7 +66,6 @@ return {
 			autoTeam = true,
 			automatedHistory = {
 				mode = 'manualPrio',
-				checkForSpecialRoles = true,
 			},
 		},
 	},

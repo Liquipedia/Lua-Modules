@@ -53,10 +53,7 @@ function TeamHistory:_getHistory()
 		return manualInput
 	end
 
-	local automatedHistory = TeamHistoryAuto{
-		player = self.props.player,
-		specialRoles = self.props.specialRoles,
-	}:fetch():store():build()
+	local automatedHistory = TeamHistoryAuto{player = self.props.player}:fetch():store():build()
 
 	if Logic.isEmpty(manualInput) or (mode ~= 'cleanup' and mode ~= 'merge') then
 		return automatedHistory

@@ -53,6 +53,7 @@ local SPECIAL_ROLES = {
 	'League Operator',
 	'Inactive'
 }
+local SPECIAL_ROLES_LOWER = Array.map(SPECIAL_ROLES, string.lower)
 local LOAN = 'Loan'
 local ONE_DAY = 86400
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
@@ -62,26 +63,16 @@ local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {load
 
 ---@class TeamHistoryAuto
 ---@operator call(table?): TeamHistoryAuto
----@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?,
----specialRoles: string[], showPositionIcon: boolean?, specialRolesLowercased: string[]}
+---@field config {player: string, showRole: boolean, hasHeaderAndRefs: boolean?, showPositionIcon: boolean?}
 ---@field transferList table[]
 local TeamHistoryAuto = Class.new(function(self, args)
-	-- specialRoles is a stringified bool to support manual input on 9 val pages ...
-	---@type {player: string?, specialRoles: string?}
+	---@type {player: string?}
 	args = args or {}
 	local configFromInfo = (Info.config.infoboxPlayer or {}).automatedHistory or {}
-	local checkForSpecialRoles = Logic.nilOr(
-		Logic.readBoolOrNil(args.specialRoles),
-		configFromInfo.checkForSpecialRoles,
-		false
-	)
-	local specialRoles = checkForSpecialRoles and SPECIAL_ROLES or {}
 	self.config = {
 		player = (args.player or mw.title.getCurrentTitle().subpageText):gsub('^%l', string.upper),
 		showRole = Logic.nilOr(configFromInfo.showRole, true),
 		showPositionIcon = configFromInfo.showPositionIcon,
-		specialRoles = specialRoles,
-		specialRolesLowercased = Array.map(specialRoles, string.lower),
 		hasHeaderAndRefs = configFromInfo.hasHeaderAndRefs,
 	}
 end)
@@ -114,8 +105,7 @@ end
 ---@return string?
 ---@return Widget
 function TeamHistoryAuto:_getTeamLinkAndText(transfer)
-	local specialRolesLowercased = self.config.specialRolesLowercased
-	if Logic.isEmpty(transfer.team) and Table.includes(specialRolesLowercased, (transfer.role or ''):lower()) then
+	if Logic.isEmpty(transfer.team) and Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
 		return nil, HtmlWidgets.B{children = {transfer.role}}
 	elseif not mw.ext.TeamTemplate.teamexists(transfer.team) then
 		return transfer.team, Link{link = transfer.team}
@@ -321,8 +311,7 @@ function TeamHistoryAuto:_buildLeaveDateDisplay(transfer)
 	if transfer.leaveDateDisplay then return transfer.leaveDateDisplay end
 
 	local lowerCasedRole = (transfer.role or ''):lower()
-	local specialRolesLowercased = self.config.specialRolesLowercased
-	if lowerCasedRole == 'military' or not Table.includes(specialRolesLowercased, (transfer.role or ''):lower()) then
+	if lowerCasedRole == 'military' or not Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
 		return Span{
 			css = {['font-weight'] = 'bold'},
 			children = {'Present'}
@@ -337,10 +326,10 @@ function TeamHistoryAuto:_query()
 		ConditionNode(ColumnName('player'), Comparator.eq, self.config.player),
 		ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('toteam'), Comparator.neq, ''),
-			Array.map(self.config.specialRoles, function(role)
+			Array.map(SPECIAL_ROLES, function(role)
 				return ConditionNode(ColumnName('role2'), Comparator.eq, role)
 			end),
-			Array.map(self.config.specialRoles, function(role)
+			Array.map(SPECIAL_ROLES, function(role)
 				return ConditionNode(ColumnName('role2'), Comparator.eq, role:lower())
 			end),
 		},
@@ -496,7 +485,7 @@ function TeamHistoryAuto:_buildConditions(transfer)
 			buildFromConditions('fromteam', 'role1'),
 			buildFromConditions('extradata_fromteamsec', 'extradata_role1sec'),
 		})
-	elseif Table.includes(self.config.specialRolesLowercased, (transfer.role or ''):lower()) then
+	elseif Table.includes(SPECIAL_ROLES_LOWER, (transfer.role or ''):lower()) then
 		conditions:add(ConditionTree(BooleanOperator.any):add{
 			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role),
 			ConditionNode(ColumnName('role1'), Comparator.eq, transfer.role:lower()),

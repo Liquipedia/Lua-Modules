@@ -179,7 +179,6 @@ function Person:createInfobox()
 		Customizable{id = 'history', children = TeamHistoryWidget{
 			player = self.pagename,
 			manualInput = args.history,
-			specialRoles = args.historySpecialRoles, -- for 9 val pages ...
 		}},
 		Center{children = {args.footnotes}},
 		Customizable{id = 'customcontent', children = {}},
