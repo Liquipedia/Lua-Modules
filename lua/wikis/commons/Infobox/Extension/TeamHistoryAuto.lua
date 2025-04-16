@@ -128,16 +128,13 @@ end
 ---@param teamData {name: string, bracketname: string, shortname: string}
 ---@return string
 function TeamHistoryAuto._shortenTeamName(teamData)
-	local teamName = teamData.name
-	if string.len(teamName) <= 17 then
-		return teamName
+	if string.len(teamData.name) <= 17 then
+		return teamData.name
+	elseif string.len(teamData.bracketname) <= 17 then
+		return teamData.bracketname
+	else
+		return teamData.shortname or teamData.name
 	end
-
-	teamName = teamData.bracketname or teamData.name
-	if string.len(teamName) <= 17 then
-		return teamName
-	end
-	return teamData.shortname or teamData.name
 end
 
 -- earlier date for fromteam to account for rebrands
