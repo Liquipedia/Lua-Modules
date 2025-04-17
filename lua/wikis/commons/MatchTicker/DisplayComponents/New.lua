@@ -13,6 +13,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
+local Game = require('Module:Game')
 local Info = require('Module:Info')
 local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
@@ -104,6 +105,7 @@ end
 ---@field root Html
 ---@field hideTournament boolean
 ---@field onlyHighlightOnValue string?
+---@field displayGameIcon boolean
 ---@field match table
 local Details = Class.new(
 	function(self, args)
@@ -111,6 +113,7 @@ local Details = Class.new(
 		self.root = mw.html.create('div'):addClass('match-details')
 		self.hideTournament = args.hideTournament
 		self.onlyHighlightOnValue = args.onlyHighlightOnValue
+		self.displayGameIcon = args.displayGameIcons
 		self.match = args.match
 	end
 )
@@ -141,6 +144,8 @@ function Details:create()
 			:attr('title', 'Add Match Page')
 			:wikitext('+ Add details')
 		), link))
+	elseif self.displayGameIcon then
+		matchBottomBar:node(Game.icon{game=self.match.game})
 	end
 
 	return self.root
