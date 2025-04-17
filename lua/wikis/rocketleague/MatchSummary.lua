@@ -112,10 +112,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 			:node('<br>')
 			:node(mw.html.create('span')
 				:wikitext('(')
-				:node(Abbreviation.make(
-					'Bo' .. bestof,
-					'Best of ' .. bestof
-				))
+				:node(Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof})
 				:wikitext(')')
 			)
 	end
@@ -270,10 +267,7 @@ function CustomMatchSummary._goalDisaplay(goalesValue, side)
 
 	local goalsDisplay = mw.html.create('div')
 		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
-		:node(Abbreviation.make(
-			goalesValue,
-			'Team ' .. side .. ' Goaltimes')
-		)
+		:node(Abbreviation.make{text = goalesValue, title = 'Team ' .. side .. ' Goaltimes'})
 
 	return mw.html.create('div')
 			:css('max-width', '50%')

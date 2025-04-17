@@ -85,10 +85,10 @@ function CustomInjector:parse(id, widgets)
 
 		return {
 			Cell{
-				name = Abbreviation.make(
-					'Epic Creator Code',
-					'Support-A-Creator Code used when purchasing Rocket League or Epic Games Store products'
-				),
+				name = Abbreviation.make{
+					text = 'Epic Creator Code',
+					title = 'Support-A-Creator Code used when purchasing Rocket League or Epic Games Store products',
+				},
 				content = {args.creatorcode}
 			},
 			Cell{name = 'Starting Game', content = {gameDisplay}},

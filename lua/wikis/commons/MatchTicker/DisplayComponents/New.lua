@@ -32,6 +32,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
 local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
+local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---Display class for matches shown within a match ticker
 ---@class NewMatchTickerScoreBoard
@@ -158,11 +159,11 @@ function Details:countdown()
 
 	local dateString
 	if Logic.readBool(match.dateexact) then
-		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		local timestamp = DateExt.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
 		dateString = DateExt.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or (Timezone.getTimezoneString('UTC')))
+				.. (Timezone.getTimezoneString{timezone = match.extradata.timezoneid} or UTC)
 	else
-		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. (Timezone.getTimezoneString('UTC'))
+		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date) .. UTC
 	end
 
 	local countdownArgs = {

@@ -833,7 +833,7 @@ function League:_cleanDate(date)
 	if self:_isUnknownDate(date) then
 		return nil
 	end
-	return ReferenceCleaner.clean(date)
+	return ReferenceCleaner.clean{input = date}
 end
 
 ---@param date string?

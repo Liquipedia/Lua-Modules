@@ -331,9 +331,9 @@ end
 function CustomSkill._hotkeys(hotkey1, hotkey2)
 	if String.isEmpty(hotkey1) then return end
 	if String.isEmpty(hotkey2) then
-		return Hotkeys.hotkey(hotkey1)
+		return Hotkeys.hotkey{hotkey = hotkey1}
 	end
-	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+	return Hotkeys.hotkey2{hotkey1 = hotkey1, hotkey2 = hotkey2, seperator = 'plus'}
 end
 
 ---@param key string

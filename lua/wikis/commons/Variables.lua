@@ -6,8 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-
 local Variables = {}
 
 ---Stores a wiki-variable and returns the empty string
@@ -61,4 +59,4 @@ function Variables.varExists(name)
 	return Variables.varDefault(name) ~= nil
 end
 
-return Class.export(Variables, {removeBlanks = false})
+return Variables

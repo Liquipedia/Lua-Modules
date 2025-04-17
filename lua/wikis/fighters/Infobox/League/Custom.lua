@@ -129,10 +129,7 @@ function CustomLeague:displayPrizePool(args, endDate)
 		string.upper(Variables.varDefault('tournament_currency', localCurrency) or ''))
 
 	if args.prizepoolassumed then
-		display = Abbreviation.make(
-			display,
-			'This prize is assumed, and has not been confirmed'
-		)
+		display = Abbreviation.make{text = display, title = 'This prize is assumed, and has not been confirmed'}
 	end
 
 	return display

@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 
@@ -72,4 +71,4 @@ function SingleGameDisplay.Game(props)
 	}, require('Module:Error/Display').ErrorList)
 end
 
-return Class.export(SingleGameDisplay)
+return SingleGameDisplay

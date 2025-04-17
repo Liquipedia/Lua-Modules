@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local FnUtil = require('Module:FnUtil')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -100,4 +99,4 @@ function Namespace.prefixFromId(id)
 	return name
 end
 
-return Class.export(Namespace, {frameOnly = true})
+return Namespace

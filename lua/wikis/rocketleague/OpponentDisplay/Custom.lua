@@ -87,4 +87,4 @@ function CustomOpponentDisplay.InlineScoreSpecial(props)
 	return tostring(props.score)
 end
 
-return Class.export(CustomOpponentDisplay)
+return CustomOpponentDisplay

@@ -470,4 +470,4 @@ function OpponentDisplay.BracketScore(props)
 		)
 end
 
-return Class.export(OpponentDisplay)
+return OpponentDisplay
