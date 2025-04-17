@@ -211,7 +211,7 @@ function TeamHistoryAuto:_row(transfer)
 	local role = transfer.role
 	if role then
 		local splitRole = mw.text.split(role --[[@as string]], ' ')
-		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()]
+		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()] or {}
 		if roleData.empty then
 			role = nil
 		else
