@@ -15,7 +15,7 @@ local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local PatchFetch = Lua.import('Module:Patch/Fetch')
+local Patch = Lua.import('Module:Patch')
 local TableFormatter = Lua.import('Module:Format/Table')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
@@ -40,10 +40,10 @@ local COLUMNS = {
 		},
 		width = '280px',
 		row = function(patch, isLatestPatch)
-			local name = Logic.nilIfEmpty(patch.name) or patch.pagename:gsub('_', ' '):gsub('^Patch/', '')
+			local name = Logic.nilIfEmpty(patch.displayName) or patch.pageName:gsub('_', ' '):gsub('^Patch/', '')
 			return {
 				Link{
-					link = patch.pagename,
+					link = patch.pageName,
 					children = {name},
 				},
 				isLatestPatch and ' (latest)' or nil,
@@ -58,7 +58,7 @@ local COLUMNS = {
 		width = '280px',
 		row = function(patch, isLatestPatch)
 			-- the later and the nilIfEmpty wrapper can be kicked once all wikis switched to standardized infobox patch
-			local versionStorage = Logic.nilIfEmpty(patch.information) or patch.extradata.version
+			local versionStorage = patch.version
 			if Logic.isEmpty(versionStorage) then return {} end
 			local rawVersion = versionStorage:gsub('%(', '|'):gsub('%)', '|')
 			local versions = Array.parseCommaSeparatedString(rawVersion, '|')
@@ -78,7 +78,7 @@ local COLUMNS = {
 		width = '180px',
 		row = function(patch, isLatestPatch)
 			return {
-				DateExt.formatTimestamp('F j, Y', patch.timestamp)
+				DateExt.formatTimestamp('F j, Y', patch.releaseDate.timestamp)
 			}
 		end
 	},
@@ -89,10 +89,9 @@ local COLUMNS = {
 		},
 		width = '490px',
 		row = function(patch, isLatestPatch)
-			local highlights = Json.parseIfTable(patch.extradata.highlights) or patch.extradata.highlights
-			if Logic.isEmpty(highlights) or type(highlights) ~= 'table' then return end
+			if Logic.isEmpty(patch.highlights) then return end
 			return {
-				Ul{children = Array.map(highlights, function(highlight)
+				Ul{children = Array.map(patch.highlights, function(highlight)
 					return Li{children = highlight}
 				end)}
 			}
@@ -105,7 +104,7 @@ local COLUMNS = {
 ---@field fetchConfig {game: string?, startDate: integer?, endDate: integer?, year: integer?, limit: integer?}
 ---@field displayConfig {collapsed: boolean, showMonthHeaders: boolean, showVersion: boolean, yearInAnchorText: boolean}
 ---@field latestPatchDate integer
----@field latestPatchId integer
+---@field latestPatchPage string
 ---@field patches datapoint[]
 ---@field currentAnchor string?
 local PatchList = Class.new(function(self, args)
@@ -123,9 +122,9 @@ local PatchList = Class.new(function(self, args)
 		yearInAnchorText = Logic.isEmpty(self.fetchConfig.year),
 	}
 	-- fetch the latest patch
-	local latestPatch = (PatchFetch.run{limit = 1, game = args.game} or {})[1]
-	self.latestPatchDate = DateExt.readTimestamp(latestPatch.date)
-	self.latestPatchId = tonumber(latestPatch.pageid)
+	local latestPatch = (Patch.getByGameYearStartDateEndDate{limit = 1, game = args.game} or {})[1]
+	self.latestPatchDate = latestPatch.releaseDate.timestamp
+	self.latestPatchPage = latestPatch.pageName
 end)
 
 ---@param frame Frame
@@ -137,15 +136,9 @@ end
 
 ---@return self
 function PatchList:fetch()
-	local patches = PatchFetch.run(self.fetchConfig)
-	assert(type(patches[1]) == 'table',
+	self.patches = Patch.getByGameYearStartDateEndDate(self.fetchConfig)
+	assert(type(self.patches[1]) == 'table',
 		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig, {asText = true}))
-	-- make sure extradata is not nil
-	Array.forEach(patches, function(patch)
-		patch.extradata = patch.extradata or {}
-		patch.timestamp = DateExt.readTimestamp(patch.date)
-	end)
-	self.patches = patches
 
 	return self
 end
@@ -188,7 +181,7 @@ end
 ---@param patch datapoint
 ---@return Widget
 function PatchList:_buildRow(patch)
-	local isLatestPatch = patch.timestamp == self.latestPatchDate and patch.pageid == self.latestPatchId
+	local isLatestPatch = patch.releaseDate.timestamp == self.latestPatchDate and patch.pageName == self.latestPatchPage
 	return Fragment{children = WidgetUtil.collect(
 		self:_monthHeaderRow(patch),
 		Tr{children = Array.map(COLUMNS, function(column)
@@ -211,8 +204,8 @@ end
 ---@param patch datapoint
 ---@return Widget?
 function PatchList:_monthHeaderRow(patch)
-	local month = DateExt.formatTimestamp('M', patch.timestamp)
-	local year = DateExt.formatTimestamp('Y', patch.timestamp)
+	local month = DateExt.formatTimestamp('M', patch.releaseDate.timestamp)
+	local year = DateExt.formatTimestamp('Y', patch.releaseDate.timestamp)
 	local anchor = month .. '_' .. year
 	if anchor == self.currentAnchor then return end
 	self.currentAnchor = anchor

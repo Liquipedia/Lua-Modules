@@ -12,7 +12,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
-local PatchFetch = Lua.import('Module:Patch/Fetch')
+local Patch = Lua.import('Module:Patch')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -51,10 +51,10 @@ end
 
 ---@return self
 function PatchCalendar:fetch()
-	self.patches = PatchFetch.run(self.config)
+	self.patches = Patch.getByGameYearStartDateEndDate(self.config)
 	self.monthsPresent = {}
 	Array.forEach(self.patches, function(patch)
-		local patchTimeStamp = DateExt.readTimestamp(patch.date)
+		local patchTimeStamp = patch.releaseDate.timestamp
 		-- can never be nil due to lpdb data having a valid date string
 		---@cast patchTimeStamp -nil
 		local month = tonumber(DateExt.formatTimestamp('n', patchTimeStamp))
