@@ -15,7 +15,6 @@ local AutoInlineIcon = {}
 
 ---@param options {onlyicon: boolean?, category: string, lookup: string}
 ---@return Widget
----@overload fun(options: table): Widget
 function AutoInlineIcon.display(options)
 	local category = options.category
 	local lookup = options.lookup
