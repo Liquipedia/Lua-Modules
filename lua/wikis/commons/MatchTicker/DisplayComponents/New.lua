@@ -145,7 +145,7 @@ function Details:create()
 			:wikitext('+ Add details')
 		), link))
 	elseif self.displayGameIcons then
-		matchBottomBar:node(Game.icon{game=self.match.game})
+		matchBottomBar:node(Game.icon{game=self.match.game, noLink=true, size='50'})
 	end
 
 	return self.root
