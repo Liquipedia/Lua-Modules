@@ -134,13 +134,21 @@ function MatchPage:populateGames()
 				team.objectives = {}
 			end
 
-			team.picks = Array.map(team.players, Operator.property('character'))
-			team.pickOrder = Array.filter(game.extradata.vetophase or {}, function(veto)
-				return veto.type == 'pick' and veto.team == teamIdx
-			end)
+			team.picks = {}
+
+			for _, pick in Table.iter.pairsByPrefix(game.extradata, 'team' .. teamIdx .. 'champion') do
+				table.insert(team.picks, pick)
+			end
+
 			team.bans = Array.filter(game.extradata.vetophase or {}, function(veto)
 				return veto.type == 'ban' and veto.team == teamIdx
 			end)
+
+			if Logic.isEmpty(team.bans) then
+				for _, ban in Table.iter.pairsByPrefix(game.extradata, 'team' .. teamIdx .. 'ban') do
+					table.insert(team.bans, {character = ban})
+				end
+			end
 
 			return team
 		end)
