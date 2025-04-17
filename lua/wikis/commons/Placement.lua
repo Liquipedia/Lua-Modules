@@ -182,10 +182,10 @@ end
 
 ---Takes string place value and returns prize pool color class.
 ---May return `nil` if no color is registered.
----@param placement string|number
+---@param args {placement: string|number}
 ---@return string?
-function Placement.getBgClass(placement)
-	return prizepoolClasses[placement]
+function Placement.getBgClass(args)
+	return prizepoolClasses[args.placement]
 end
 
 ---Produces wikicode table code for a placement for use in wikitables.

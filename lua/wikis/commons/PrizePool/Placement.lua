@@ -331,11 +331,11 @@ end
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
-			return PlacementInfo.getBgClass(statusName:lower())
+			return PlacementInfo.getBgClass{placement = statusName:lower()}
 		end
 	end
 
-	return PlacementInfo.getBgClass(self.placeStart)
+	return PlacementInfo.getBgClass{placement = self.placeStart}
 end
 
 ---@return string?
