@@ -233,11 +233,11 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		children = WidgetUtil.collect(
 			header,
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = {
+			MatchSummaryWidgets.GameCenter{children = WidgetUtil.collect(
 				DisplayHelper.Map(game),
 				Logic.readBool(extradata.ot) and ' - OT' or nil,
 				Logic.isNotEmpty(extradata.otlength) and ' (' .. extradata.otlength .. ')' or nil
-			}},
+			)},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			CustomMatchSummary._timeoutDisplay(extradata.timeout),
 			MatchSummaryWidgets.GameComment{children = comments}
