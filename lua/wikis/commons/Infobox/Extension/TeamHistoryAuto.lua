@@ -208,11 +208,11 @@ function TeamHistoryAuto:_row(transfer)
 	local _, teamText = self:_getTeamLinkAndText(transfer)
 
 	---@type Widget|string?
-	local role = transfer.role
+	local role = Logic.nilIfEmpty(transfer.role)
 	if role then
 		local splitRole = mw.text.split(role --[[@as string]], ' ')
-		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()] or {}
-		if roleData.empty then
+		local roleData = ROLE_CONVERT[transfer.role:lower()] or ROLE_CONVERT[splitRole[#splitRole]:lower()]
+		if (roleData or {}).empty then
 			role = nil
 		else
 			role = roleData and Abbr(roleData) or transfer.role
@@ -228,7 +228,7 @@ function TeamHistoryAuto:_row(transfer)
 			css = {['padding-left'] = '3px', ['font-style'] = 'italic'},
 			children = {
 				'(',
-				role
+				role,
 				')',
 			}
 		}
