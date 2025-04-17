@@ -190,18 +190,12 @@ end
 
 ---Produces wikicode table code for a placement for use in wikitables.
 ---Can optionally take a `customText` input for custom display text.
----@param placement string
----@param customText string?
+---@param args {placement: string, customText: string?}
 ---@return string
----@overload fun(placement: table): string
-function Placement.get(placement, customText)
-	if type(placement) == 'table' then
-		customText = placement.customText or placement[2]
-		placement = placement.placement or placement[1]
-	end
-	local raw = Placement.raw(placement)
+function Placement.get(args)
+	local raw = Placement.raw(args.placement)
 	return 'class="text-center ' .. (raw.backgroundClass or '') .. '" data-sort-value="' .. raw.sort .. '"' ..
-		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (customText or raw.display) .. '</b>'
+		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b>'
 end
 
 return Class.export(Placement)
