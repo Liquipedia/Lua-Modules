@@ -195,7 +195,7 @@ function CustomBuildingUnit.parseAttackInput(args, attackIndex)
 		coolDown = Abbreviation.make{
 			text = coolDown,
 			title = 'Attack animation: ' .. (damagePoint / backSwingPoint),
-		} --[[@as string]]
+		}
 	end
 
 	local attackSpeedBonus = tonumber(args.attackspeed_bonus) or 0
