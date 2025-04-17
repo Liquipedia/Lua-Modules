@@ -17,11 +17,18 @@ local Widget = Lua.import('Module:Widget')
 local Widgets = require('Module:Widget/All')
 
 local Big = HtmlWidgets.Big
+local Br = HtmlWidgets.Br
 local Div = HtmlWidgets.Div
+local Small = HtmlWidgets.Small
 
 local DEFAULT_MODE = 'manual'
 
----@alias automatedHistoryMode 'manualPrio'|'cleanup'|'merge'|'automatic'|'manual'
+---@alias automatedHistoryMode
+---|'manual' # always use manual input, never call THA
+---|'automatic' # always use THA and ignore manual input
+---|'manualPrio' # use manual input if present and THA else
+---|'merge' # display both manual input and THA
+---|'cleanup' # display THA and for logged in users manual input if present too
 
 ---@class TeamHistoryWidget: Widget
 ---@operator call(table): TitleWidget
@@ -74,13 +81,19 @@ function TeamHistory:_getHistory()
 			},
 			automatedHistory,
 		}},
-		Div{children = {
+		Div{
 			classes = {'show-when-logged-in', 'navigation-not-searchable'},
-			Big{
-				children = {'Manual History'},
+			children = {
+				Big{
+					children = {'Manual History'},
+				},
+				Br{},
+				Small{
+					children = {'The below shown manual input only shows when logged in.'},
+				},
+				manualInput,
 			},
-			manualInput,
-		}},
+		},
 	}}
 end
 
