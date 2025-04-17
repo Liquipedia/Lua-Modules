@@ -290,10 +290,11 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.extradata.type = 'hero'
-	lpdbData.extradata.name = self.pagename
-	lpdbData.extradata.image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil
-	lpdbData.extradata.information = Faction.toName(Faction.read(args.race)) or 'Neutral'
+	lpdbData.type = 'hero'
+	lpdbData.name = self.pagename
+	lpdbData.image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil
+	lpdbData.information = Faction.toName(Faction.read(args.race)) or 'Neutral'
+
 	lpdbData.extradata['primary attribute'] = ATTRIBUTES[args.mainattribute]
 	lpdbData.extradata.baseint = args.baseint
 	lpdbData.extradata.intgain = args.intgain

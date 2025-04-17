@@ -46,11 +46,12 @@ end
 local DUELIST = createRoleDisplayWidget('Duelist', 'Duelist')
 local STRATEGIST = createRoleDisplayWidget('Strategist', 'Strategist')
 local VANGUARD = createRoleDisplayWidget('Vanguard', 'Vanguard')
+local DEFAULT_ROLE = 'NPC'
 
 local ROLE_LOOKUP = {
-	duelist = { DUELIST },
-	strategist = { STRATEGIST },
-	vanguard = { VANGUARD },
+	duelist = DUELIST,
+	strategist = STRATEGIST,
+	vanguard = VANGUARD,
 }
 
 ---@param frame Frame
@@ -73,7 +74,7 @@ function CustomInjector:parse(id, widgets)
 		return WidgetUtil.collect(
 			Cell{
 				name = 'Role',
-				children = self.caller:_getRole(args)
+				children = self.caller:_getRole(args) or DEFAULT_ROLE
 			}
 		)
 	elseif id == 'custom' then
@@ -93,25 +94,26 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return Widget[]
-function CustomHero:_getRole(args)
-    local role = (args.role or ''):lower()
-    local roleLookup = ROLE_LOOKUP[role]
-
-	if roleLookup then
-		return roleLookup
-	else
-		return { 'NPC' }
+---@param roleInput string?
+---@return Widget?
+function CustomHero:_getRole(roleInput)
+	if type(roleInput) ~= 'string' then
+		return nil
 	end
+    return ROLE_LOOKUP[roleInput:lower()]
+end
+
+---@param args table
+---@return string[]
+function CustomHero:getRoles(args)
+	return {
+		self:_getRole(args.role),
+	}
 end
 
 ---@param lpdbData table
 ---@param args table
 function CustomHero:addToLpdb(lpdbData, args)
-	lpdbData.information = args.name
-	lpdbData.image = args.image
-	lpdbData.date = args.released
-
 	lpdbData.extradata.health = args.health
 	lpdbData.extradata.movespeed = args.movespeed
 	lpdbData.extradata.dificulty = args.difficulty
