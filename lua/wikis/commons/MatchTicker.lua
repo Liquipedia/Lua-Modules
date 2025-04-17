@@ -97,6 +97,7 @@ end
 ---@field games string[]?
 ---@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
+---@field displayGameIcons boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -146,6 +147,7 @@ function MatchTicker:init(args)
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
+		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -168,6 +170,10 @@ function MatchTicker:init(args)
 		Table.isEmpty(config.tournaments)))
 
 	config.hideTournament = Logic.readBool(args.hideTournament or Table.isNotEmpty(config.tournaments))
+
+	if config.displayGameIcons then
+		table.insert(config.queryColumns, 'game')
+	end
 
 	local wrapperClasses = type(args.wrapperClasses) == 'table' and args.wrapperClasses
 		or args.wrapperClasses == NONE and {}
