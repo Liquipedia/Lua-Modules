@@ -8,8 +8,11 @@
 local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local InlineIconAndText = require('Module:Widget/Misc/InlineIconAndText')
+
+local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
+
+local Character  = Lua.import('Module:Character')
 
 local AutoInlineIcon = {}
 
@@ -46,7 +49,7 @@ end
 ---@return fun(name: string): table
 function AutoInlineIcon._getDataRetrevalFunction(category)
 	local categoryMapper = {
-		H = AutoInlineIcon._queryHeroData,
+		H = AutoInlineIcon._queryCharacterData,
 		A = function(name)
 			error('Abilities not yet implemented.')
 		end,
@@ -99,18 +102,16 @@ end
 
 ---@param name string
 ---@return table
-function AutoInlineIcon._queryHeroData(name)
-	local data = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::character]] AND [[name::'.. name ..']]',
-	})[1]
-	assert(data, 'Hero not found.')
+function AutoInlineIcon._queryCharacterData(name)
+	local character = Character.getCharacterByName(name)
+	assert(character, 'Character not found.')
 
 	return {
 		iconType = 'image',
-		link = data.pagename,
-		text = data.name,
-		iconLight = data.extradata.icon or data.image,
-		iconDark = data.extradata.icon or data.imagedark,
+		link = character.pageName,
+		text = character.name,
+		iconLight = character.iconLight,
+		iconDark = character.iconDark,
 	}
 end
 
