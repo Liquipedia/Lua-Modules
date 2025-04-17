@@ -42,8 +42,8 @@ local getModuleName = function(name, options)
 	if options.requireDevIfEnabled == false then
 		return name
 	end
-	if StringUtils.endsWith(name, '/dev') then
-		error('Lua.import: Module name should not end in \'/dev\'')
+	if StringUtils.endsWith(name, '/dev') or StringUtils.contains(name, '/dev/') then
+		error('Lua.import: Direct import of dev modules is not allowed')
 	end
 	local devFlag = FeatureFlag.get('dev')
 	if not devFlag then
