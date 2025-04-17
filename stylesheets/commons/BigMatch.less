@@ -2,7 +2,7 @@
 Template(s): Match Page
 Author(s): Rathoz
 *******************************************************************************/
-.match-bm-lol-match-header {
+.match-bm-match-header {
 	display: flex;
 	flex-direction: column;
 	border: 1px solid #bbbbbb;
@@ -12,7 +12,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-header-overview {
+.match-bm-match-header-overview {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -73,6 +73,14 @@ Author(s): Rathoz
 		justify-content: center;
 	}
 
+	[ data-darkreader-scheme="dark" ] &,
+	.theme--dark & {
+		.team-template-image-icon.darkmode,
+		.team-template-image-icon.team-template-darkmode {
+			display: flex !important;
+		}
+	}
+
 	.team-template-image-icon {
 		display: flex;
 		align-items: center;
@@ -105,31 +113,7 @@ Author(s): Rathoz
 	}
 }
 
-//TODO: can be deleted when switching to .match-bm-match-header-team class
-.match-bm-lol-match-header-team {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	font-weight: bold;
-}
-
-@media ( min-width: 768px ) {
-	.match-bm-lol-match-header-team-short {
-		display: none !important;
-	}
-}
-
-@media ( max-width: 767px ) {
-	.match-bm-lol-match-header-team-long {
-		display: none !important;
-	}
-}
-
-//end of TODO
-
-.match-bm-lol-match-header-round {
+.match-bm-match-header-round {
 	&-results {
 		display: flex;
 		gap: 0.25rem;
@@ -137,8 +121,8 @@ Author(s): Rathoz
 
 	&-result {
 		color: #ffffff;
-		height: 1.5rem;
-		width: 1.5rem;
+		height: 1.25rem;
+		width: 1.25rem;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -146,6 +130,11 @@ Author(s): Rathoz
 		text-transform: uppercase;
 		font-size: 0.875rem;
 		margin-top: 0.75rem;
+
+		@media ( min-width: 768px ) {
+			height: 1.5rem;
+			width: 1.5rem;
+		}
 
 		&.result--winner {
 			background-color: var( --clr-semantic-positive-40, #27a527 );
@@ -160,6 +149,14 @@ Author(s): Rathoz
 
 			&::before {
 				content: "L";
+			}
+		}
+
+		&.result--notplayed {
+			background-color: var( --clr-secondary-25, #404040 );
+
+			&::before {
+				content: "-";
 			}
 		}
 	}
@@ -180,26 +177,6 @@ Author(s): Rathoz
 		font-size: 0.875rem;
 		font-weight: normal;
 		text-transform: uppercase;
-	}
-}
-
-//TODO: can be deleted when switching to .match-bm-match-header-result class
-.match-bm-lol-match-header-result {
-	padding: 16px;
-	font-weight: bold;
-	text-align: center;
-	white-space: nowrap;
-}
-
-@media ( min-width: 414px ) {
-	.match-bm-lol-match-header-result {
-		font-size: 32px;
-	}
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-match-header-result {
-		font-size: 24px;
 	}
 }
 
@@ -234,7 +211,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-header-tournament {
+.match-bm-match-header-tournament {
 	display: flex;
 	justify-content: center;
 	padding: 8px;
@@ -247,7 +224,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-header-date {
+.match-bm-match-header-date {
 	display: flex;
 	justify-content: center;
 	padding: 4px;
@@ -260,7 +237,7 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-match-mvp {
+.match-bm-match-mvp {
 	display: flex;
 	justify-content: center;
 	padding: 8px;
@@ -274,207 +251,124 @@ Author(s): Rathoz
 	}
 }
 
-/* >= ??px icons in 1→2 columns */
-@media ( min-width: 646px ) {
-	.match-bm-lol-game-veto-overview {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-		padding: 0;
-		align-self: stretch;
-	}
-}
-
-@media ( max-width: 645px ) {
-	.match-bm-lol-game-veto-overview {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		padding: 0;
-		align-self: stretch;
-	}
-}
-
 .match-bm-lol-game-veto {
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
-}
 
-.match-bm-lol-game-veto img {
-	width: 24px;
-	height: 24px;
-}
-
-.match-bm-lol-game-veto-overview-team {
-	display: flex;
-	flex-direction: column;
-	border: 1px solid #bbbbbb;
-	width: 100%;
-
-	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-.match-bm-game-veto-overview-team-header,
-.match-bm-lol-game-veto-overview-team-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 8px;
-	background: #f5f5f5;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-	}
-}
-
-.match-bm-lol-game-veto-overview-team-veto {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	padding: 8px;
-	gap: 8px;
-	border-top: 1px solid #bbbbbb;
-
-	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-.match-bm-lol-game-veto-overview-ban,
-.match-bm-lol-game-veto-overview-pick {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-ul.match-bm-lol-game-veto-overview-ban,
-ul.match-bm-lol-game-veto-overview-pick {
-	margin: 0;
-}
-
-.match-bm-lol-game-veto-overview-ban,
-.match-bm-lol-game-veto-order-ban {
-	opacity: 0.5;
-}
-
-.match-bm-lol-game-veto-overview-item {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-.match-bm-lol-game-veto-pick-bar-blue,
-.match-bm-lol-game-veto-pick-bar-red {
-	width: 24px;
-	height: 4px;
-}
-
-.match-bm-lol-game-veto-pick-bar-blue {
-	background: #0d71bf;
-}
-
-.match-bm-lol-game-veto-pick-bar-red {
-	background: #b81414;
-}
-
-.match-bm-lol-game-veto-order-toggle {
-	padding: 4px;
-	background: #f5f5f5;
-	border: 1px solid #bbbbbb;
-	width: 100%;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-/* >= 768px reflow picks/bans order */
-@media ( max-width: 767px ) {
-	@media ( min-width: 646px ) {
-		/* Header not needed when both in 2 col mode */
-		.match-bm-lol-game-veto-order-team-header {
-			display: none !important;
-		}
-	}
-
-	.match-bm-lol-game-veto-order-team-choices {
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		padding: 8px;
-		gap: 8px;
-		border: 1px solid #bbbbbb;
-		width: 100%;
-
-		.theme--dark & {
-			border-color: var( --clr-secondary-25 );
-		}
-	}
-
-	.match-bm-lol-game-veto-order-team-choice-group {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-	}
-
-	.match-bm-lol-game-veto-order-list {
+	&-overview {
 		display: flex;
 		flex-direction: row;
-		align-items: flex-start;
-		align-self: stretch;
-	}
-
-	.match-bm-lol-game-veto-order-team {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-self: stretch;
-		width: 100%;
-	}
-}
-
-@media ( min-width: 768px ) {
-	.match-bm-lol-game-veto-order-team-choices {
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		padding: 8px;
-		gap: 8px;
-		border: 1px solid #bbbbbb;
-		width: 100%;
-
-		.theme--dark & {
-			border-color: var( --clr-secondary-25 );
-		}
-	}
-
-	.match-bm-lol-game-veto-order-team-choice-group {
-		display: flex;
-		flex-direction: row;
-		align-items: flex-start;
-	}
-
-	.match-bm-lol-game-veto-order-list {
-		display: flex;
-		flex-direction: column;
 		align-items: flex-start;
 		padding: 0;
 		align-self: stretch;
+
+		@media ( max-width: 645px ) {
+			/* >= ??px icons in 1→2 columns */
+			flex-direction: column;
+		}
+
+		&-team {
+			display: flex;
+			flex-direction: column;
+			border: 1px solid #bbbbbb;
+			width: 100%;
+
+			.theme--dark & {
+				border-color: var( --clr-secondary-25 );
+			}
+
+			&-veto {
+				display: flex;
+				flex-flow: row wrap;
+				justify-content: center;
+				padding: 8px;
+				gap: 8px;
+				border-top: 1px solid #bbbbbb;
+
+				.theme--dark & {
+					border-color: var( --clr-secondary-25 );
+				}
+			}
+		}
 	}
 
-	.match-bm-lol-game-veto-order-team {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		width: 100%;
+	&-order {
+		&-toggle {
+			padding: 4px;
+			background: #f5f5f5;
+			border: 1px solid #bbbbbb;
+			width: 100%;
+
+			.theme--dark & {
+				background-color: var( --clr-secondary-16 );
+				border-color: var( --clr-secondary-25 );
+			}
+		}
+
+		&-list {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			align-self: stretch;
+
+			@media ( min-width: 768px ) {
+				flex-direction: column;
+				padding: 0;
+			}
+		}
+
+		&-team {
+			display: flex;
+			flex-direction: row;
+			justify-content: center;
+			width: 100%;
+
+			&-choices {
+				box-sizing: border-box;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				padding: 8px;
+				gap: 8px;
+				border: 1px solid #bbbbbb;
+				width: 100%;
+				color: #ffffff;
+
+				.theme--dark & {
+					border-color: var( --clr-secondary-25 );
+				}
+			}
+
+			&-header {
+				display: flex;
+				flex-direction: row;
+				justify-content: center;
+				align-items: center;
+				padding: 8px;
+				background: #f5f5f5;
+				border: 1px solid #bbbbbb;
+
+				.theme--dark & {
+					background-color: var( --clr-secondary-16 );
+					border-color: var( --clr-secondary-25 );
+				}
+
+				@media ( max-width: 767px ) and ( min-width: 646px ) {
+					/* Header not needed when both in 2 col mode */
+					display: none !important;
+				}
+			}
+
+			@media ( max-width: 767px ) {
+				flex-direction: column;
+				align-self: stretch;
+
+				&-choices {
+					flex-direction: column;
+				}
+			}
+		}
 	}
 }
 
@@ -491,37 +385,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
 	}
-}
-
-.match-bm-lol-game-veto-order-team-choice {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	line-height: 1;
-}
-
-.match-bm-lol-game-veto-order-step {
-	width: 24px;
-	height: 24px;
-	background: #202122;
-	color: #ffffff;
-	justify-content: center;
-	align-items: center;
-	display: flex;
-	font-weight: bold;
-	font-size: 12px;
-
-	.theme--dark & :not( .match-bm-lol-game-veto-order-step-blue ):not( .match-bm-lol-game-veto-order-step-red ) {
-		background-color: var( --clr-secondary-39 );
-	}
-}
-
-.match-bm-lol-game-veto-order-step-blue {
-	background: #0d71bf;
-}
-
-.match-bm-lol-game-veto-order-step-red {
-	background: #b81414;
 }
 
 .match-bm-game-veto-wrapper,
@@ -544,33 +407,22 @@ ul.match-bm-lol-game-veto-overview-pick {
 	}
 }
 
-/* >= 834 2 column player layout */
-@media ( max-width: 833px ) {
-	.match-bm-lol-players-wrapper {
-		display: flex;
-		flex-direction: column;
-		align-items: flex-start;
-		gap: 16px;
-	}
-}
+.match-bm-lol-players-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 16px;
 
-@media ( min-width: 834px ) {
-	.match-bm-lol-players-wrapper {
-		display: flex;
+	/* >= 834 2 column player layout */
+	@media ( min-width: 834px ) {
 		flex-direction: row;
-		align-items: flex-start;
-		gap: 16px;
 	}
-}
 
-@media ( max-width: 435px ) {
-	.match-bm-lol-players-wrapper {
+	@media ( max-width: 435px ) {
 		font-size: 12px;
 	}
-}
 
-@media ( min-width: 414px ) {
-	.match-bm-lol-players-wrapper {
+	@media ( min-width: 414px ) {
 		font-size: 15px;
 	}
 }
@@ -579,6 +431,22 @@ ul.match-bm-lol-game-veto-overview-pick {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
+
+	&-header {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		padding: 8px;
+		background: #eaecf0;
+		border: 1px solid #bbbbbb;
+		align-self: stretch;
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-secondary-25 );
+		}
+	}
 }
 
 .match-bm-lol-players-team {
@@ -586,22 +454,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 	flex-direction: column;
 	align-items: flex-start;
 	width: 100%;
-}
-
-.match-bm-lol-players-team-header {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 8px;
-	background: #eaecf0;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
-	}
 }
 
 .match-bm-players-player {
@@ -635,15 +487,30 @@ ul.match-bm-lol-game-veto-overview-pick {
 		border-radius: 0.25rem;
 		background-color: var( --on-background );
 		overflow: hidden;
-		padding: 0.25rem;
 		display: flex;
 
-		&.role--radiant {
-			background-color: var( --clr-atlantis-40 );
+		.wiki-dota2 & {
+			padding: 0.25rem;
+
+			&.role--radiant {
+				background-color: var( --clr-atlantis-40 );
+			}
+
+			&.role--dire {
+				background-color: var( --clr-california-40 );
+			}
 		}
 
-		&.role--dire {
-			background-color: var( --clr-california-40 );
+		.wiki-leagueoflegends & {
+			padding: 0.1rem;
+
+			&.role--blue {
+				background-color: #0d71bf;
+			}
+
+			&.role--red {
+				background-color: #b81414;
+			}
 		}
 
 		> img {
@@ -661,8 +528,10 @@ ul.match-bm-lol-game-veto-overview-pick {
 			flex: 1 0 auto;
 		}
 
-		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
-			order: 1;
+		.wiki-dota2 & {
+			@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+				order: 1;
+			}
 		}
 	}
 
@@ -805,14 +674,34 @@ ul.match-bm-lol-game-veto-overview-pick {
 			align-items: center;
 			font-size: 0.875rem;
 
+			.wiki-leagueoflegends & {
+				@media ( max-width: 413px ) {
+					font-size: 0.6875rem;
+				}
+			}
+
 			i {
 				margin-right: 0.5rem;
+			}
+
+			img {
+				margin-right: 0.5rem;
+
+				.theme--dark & {
+					filter: invert( 1 );
+				}
 			}
 		}
 
 		&-data {
 			font-weight: bold;
 			font-size: 0.9375rem;
+
+			.wiki-leagueoflegends & {
+				@media ( max-width: 413px ) {
+					font-size: 0.75rem;
+				}
+			}
 
 			.slash {
 				margin: 0 0.125rem;
@@ -840,10 +729,23 @@ ul.match-bm-lol-game-veto-overview-pick {
 }
 
 .match-bm-game-veto-overview-team-header {
-	border-bottom: 0.0625rem solid #bbbbbb;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	padding: 8px;
+	background: #f5f5f5;
 
 	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
+		background-color: var( --clr-secondary-16 );
+	}
+
+	.wiki-dota2 & {
+		border-bottom: 0.0625rem solid #bbbbbb;
+
+		.theme--dark & {
+			border-color: var( --clr-secondary-25 );
+		}
 	}
 }
 
@@ -858,7 +760,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 	&-row {
 		display: flex;
-		gap: 0.125rem;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: center;
@@ -869,13 +770,17 @@ ul.match-bm-lol-game-veto-overview-pick {
 
 			&-icon {
 				border-radius: 0.25rem 0.25rem 0 0;
-				width: 3.75rem;
-				height: 2.5rem;
+				max-width: 3.75rem;
+				aspect-ratio: 1 / 1;
+				object-fit: cover;
 				overflow: hidden;
 
+				.wiki-dota2 & {
+					aspect-ratio: 1.5 / 1;
+				}
+
 				@media ( min-width: 834px ) {
-					width: 4.5rem;
-					height: 3rem;
+					max-width: 4.5rem;
 				}
 			}
 
@@ -894,15 +799,38 @@ ul.match-bm-lol-game-veto-overview-pick {
 			}
 		}
 
-		&--radiant {
-			.match-bm-game-veto-overview-team-veto-row-item-text {
-				background-color: #7eac20;
+		.wiki-dota2 & {
+			gap: 0.125rem;
+
+			&--radiant {
+				.match-bm-game-veto-overview-team-veto-row-item-text {
+					background-color: #7eac20;
+				}
+			}
+
+			&--dire {
+				.match-bm-game-veto-overview-team-veto-row-item-text {
+					background-color: #cc6500;
+				}
 			}
 		}
 
-		&--dire {
-			.match-bm-game-veto-overview-team-veto-row-item-text {
-				background-color: #cc6500;
+		.wiki-leagueoflegends & {
+			flex-wrap: nowrap;
+			gap: 0.5rem;
+
+			&--blue {
+				.match-bm-game-veto-overview-team-veto-row-item-text {
+					background-color: #0d71bf;
+					min-height: 0.25rem;
+				}
+			}
+
+			&--red {
+				.match-bm-game-veto-overview-team-veto-row-item-text {
+					background-color: #b81414;
+					min-height: 0.25rem;
+				}
 			}
 		}
 
@@ -919,8 +847,8 @@ ul.match-bm-lol-game-veto-overview-pick {
 .match-bm-lol-players-player {
 	box-sizing: border-box;
 	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
+	flex-flow: row wrap;
+	align-items: center;
 	padding: 16px;
 	gap: 16px;
 	background: #ffffff;
@@ -931,216 +859,87 @@ ul.match-bm-lol-game-veto-overview-pick {
 		background-color: var( --clr-secondary-7 );
 		border-color: var( --clr-secondary-25 );
 	}
-}
 
-.match-bm-lol-players-player-details {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	align-items: flex-start;
-	gap: 16px;
-	align-self: stretch;
-}
-
-.match-bm-lol-players-player-character {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 8px;
-	position: relative;
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-players-player-avatar,
-	.match-bm-lol-players-player-icon > a > img {
-		width: 32px;
-		height: 32px;
+	&-details {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+		gap: 16px;
+		align-self: stretch;
+		flex: 2 0 50%;
 	}
 
-	.match-bm-lol-players-player-role {
-		padding: 1px;
+	&-loadout {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 16px;
+
+		@media ( max-width: 435px ) {
+			img {
+				width: 16px;
+				height: 16px;
+			}
+		}
+
+		@media ( min-width: 414px ) {
+			img {
+				width: 24px;
+				height: 24px;
+			}
+		}
+
+		&-rs {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2px;
+
+			&-wrap {
+				display: flex;
+				flex-direction: row;
+				align-items: flex-start;
+				gap: 4px;
+			}
+		}
+
+		&-items {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 2px;
+		}
+
+		&-item {
+			display: flex;
+			flex-direction: row;
+			align-items: flex-start;
+			gap: 2px;
+		}
 	}
 
-	.match-bm-lol-players-player-role > img {
-		width: 14px;
-		height: 14px;
-		left: 20px;
-		top: 22px;
-	}
-}
-
-@media ( min-width: 414px ) {
-	.match-bm-lol-players-player-avatar,
-	.match-bm-lol-players-player-icon > a > img {
-		width: 48px;
-		height: 48px;
+	&-stats {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-around;
+		align-items: center;
+		gap: 16px;
+		align-self: stretch;
+		flex: 2 0 50%;
 	}
 
-	.match-bm-lol-players-player-role {
-		padding: 2px;
-	}
+	&-stat {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		flex: 1;
+		gap: 4px;
+		width: auto;
 
-	.match-bm-lol-players-player-role > img {
-		width: 20px;
-		height: 20px;
-		left: 30px;
-		top: 32px;
-	}
-}
-
-.match-bm-lol-players-player-role > img {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 10px;
-	position: absolute;
-	border-radius: 2px;
-}
-
-.match-bm-lol-players-player-icon > a > img {
-	position: absolute;
-	left: 0;
-	top: 0;
-	border-radius: 40px;
-}
-
-.match-bm-lol-players-player-name {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-}
-
-.match-bm-lol-players-player-name > a {
-	font-weight: bold;
-}
-
-@media ( max-width: 435px ) {
-	.match-bm-lol-players-player-loadout img {
-		width: 16px;
-		height: 16px;
-	}
-}
-
-@media ( min-width: 414px ) {
-	.match-bm-lol-players-player-loadout img {
-		width: 24px;
-		height: 24px;
-	}
-}
-
-.match-bm-lol-players-player-loadout {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 16px;
-}
-
-.match-bm-lol-players-player-loadout-rs-wrap {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 4px;
-}
-
-.match-bm-lol-players-player-loadout-rs {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-.match-bm-lol-players-player-loadout-items {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-.match-bm-lol-players-player-loadout-item {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	gap: 2px;
-}
-
-.match-bm-lol-players-player-stats {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	gap: 16px;
-	align-self: stretch;
-}
-
-.match-bm-lol-players-player-stat {
-	display: flex;
-	flex-direction: row;
-	justify-content: flex-start;
-	gap: 4px;
-	width: 88px;
-
-	.theme--dark & > img {
-		filter: invert( 1 );
-	}
-}
-
-.match-bm-lol-h2h {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	font-weight: bold;
-}
-
-.match-bm-lol-h2h-header {
-	display: flex;
-	flex-direction: row;
-	align-items: flex-start;
-	background: #eaecf0;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-.match-bm-lol-h2h-header-team {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 16px;
-	width: 100%;
-}
-
-.match-bm-lol-h2h-section {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		border-color: var( --clr-secondary-25 );
-	}
-}
-
-.match-bm-lol-h2h-stat {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-evenly;
-	align-items: center;
-	text-align: center;
-	padding: 8px;
-	align-self: stretch;
-}
-
-.match-bm-lol-h2h-stat-title {
-	width: 80px;
-
-	.theme--dark & > img {
-		filter: invert( 1 );
+		.theme--dark & > img {
+			filter: invert( 1 );
+		}
 	}
 }
 
@@ -1227,9 +1026,34 @@ ul.match-bm-lol-game-veto-overview-pick {
 .match-bm-match-additional {
 	display: flex;
 	gap: 1rem;
+	flex-wrap: wrap;
 
 	@media ( max-width: 767px ) {
 		flex-direction: column;
+	}
+
+	&-comments {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		flex: 3 0 100%;
+		flex-direction: column;
+		padding: 4px;
+		gap: 4px;
+		border: 1px solid #bbbbbb;
+		background: #f5f5f5;
+
+		.theme--dark & {
+			background-color: var( --clr-secondary-16 );
+			border-color: var( --clr-secondary-25 );
+		}
+
+		> div {
+			display: block;
+			text-align: center;
+			vertical-align: middle;
+			white-space: normal;
+		}
 	}
 
 	&-section {
@@ -1262,22 +1086,6 @@ ul.match-bm-lol-game-veto-overview-pick {
 			padding: 1rem 0.5rem;
 			justify-content: center;
 		}
-	}
-}
-
-.match-bm-lol-match-additional-list {
-	display: flex;
-	flex-direction: row;
-	justify-content: center;
-	align-items: center;
-	padding: 4px;
-	gap: 4px;
-	border: 1px solid #bbbbbb;
-	background: #f5f5f5;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-16 );
-		border-color: var( --clr-secondary-25 );
 	}
 }
 
@@ -1401,6 +1209,33 @@ ul.match-bm-lol-game-veto-overview-pick {
 			.slash {
 				opacity: 0.4;
 			}
+
+			.theme--dark & > img {
+				filter: invert( 1 );
+			}
 		}
+	}
+}
+
+.match-bm-lol-team-stats-header {
+	display: flex;
+	flex-direction: row;
+	align-items: flex-start;
+	background: #eaecf0;
+	border: 1px solid #bbbbbb;
+	align-self: stretch;
+
+	&-team {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		padding: 16px;
+		flex: 1;
+	}
+
+	.theme--dark & {
+		background-color: var( --clr-secondary-16 );
+		border-color: var( --clr-secondary-25 );
 	}
 }

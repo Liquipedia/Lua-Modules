@@ -275,6 +275,4 @@ if FeatureFlag.get('perf') then
 	MatchGroup.perfConfig = Table.getByPathOrNil(MatchGroupConfig, {'perf'})
 end
 
-Lua.autoInvokeEntryPoints(MatchGroup, 'Module:MatchGroup')
-
 return MatchGroup

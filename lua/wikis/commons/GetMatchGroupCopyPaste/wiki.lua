@@ -7,4 +7,6 @@
 --
 
 local Lua = require('Module:Lua')
-return Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+local BaseGetMatchGroupCopyPaste = Lua.import('Module:GetMatchGroupCopyPaste/wiki/Base')
+
+return BaseGetMatchGroupCopyPaste

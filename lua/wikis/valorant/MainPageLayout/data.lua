@@ -31,6 +31,13 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
+	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = '{{Liquipedia:App}}',
+		boxid = 1505,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -145,7 +152,7 @@ return {
 					},
 					{
 						mobileOrder = 7,
-						content = CONTENT.wantToHelp,
+						content = CONTENT.liquipediaApp,
 					},
 				}
 			},

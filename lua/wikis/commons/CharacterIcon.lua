@@ -33,7 +33,7 @@ local CharacterIcon = {}
 
 ---@param icons CharacterIconInfo[]
 ---@param date string?
----@return CharacterIconInfo
+---@return CharacterIconInfo?
 function CharacterIcon._getCharacterIconInfo(icons, date)
 	date = date or DateExt.getContextualDateOrNow()
 	local timeStamp = DateExt.readTimestamp(date)
