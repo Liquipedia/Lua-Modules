@@ -17,9 +17,9 @@ local WidgetIcon = Lua.import('Module:Widget/Image/Icon')
 ---@field props IconProps
 local FontawesomeIcon = Class.new(WidgetIcon)
 
----@return string?
+---@return Html?
 function FontawesomeIcon:render()
-	return Icon.makeIcon(self.props)
+	return Icon.makeIconHtml(self.props)
 end
 
 return FontawesomeIcon
