@@ -84,7 +84,7 @@ end
 function CustomLeague:_createPlatformCell(args)
 	local platform = self:_platformLookup(args.platform)
 
-	if String.isEmpty(platform) then
+	if not platform then
 		return nil
 	end
 
