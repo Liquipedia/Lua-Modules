@@ -12,7 +12,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:Matches Player')
+local MatchTicker = require('Module:MatchesTicker/Custom')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
@@ -219,7 +219,7 @@ end
 
 ---@return string?
 function CustomPlayer:createBottomContent()
-	return MatchTicker.get{args = {self.pagename}}
+	return MatchTicker.participant{player = self.pagename}
 end
 
 ---@param id string

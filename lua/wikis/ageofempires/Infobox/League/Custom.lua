@@ -15,7 +15,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
-local MatchTicker = require('Module:Matches Tournament')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -117,15 +117,16 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Html?
 function CustomLeague:createBottomContent()
 	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
 
 	if self.data.endDate and yesterday <= self.data.endDate then
-		return MatchTicker.get{args={
-			parent = self.pagename,
+		---@diagnostic disable-next-line: missing-fields
+		return MatchTicker.tournament{args={
+			tournament = self.pagename,
 			limit = tonumber(self.args.matchtickerlimit) or 7,
-			noInfoboxWrapper = true
+			infoboxWrapperClass = false
 		}}
 	end
 end
