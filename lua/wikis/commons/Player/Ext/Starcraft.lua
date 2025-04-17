@@ -43,7 +43,7 @@ StarcraftPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 			or nil
 
 		return {
-			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
+			flag = String.nilIfEmpty(Flags.CountryName{flag = record.nationality}),
 			faction = Faction.read(record.extradata.faction),
 			factionHistory = factionHistory,
 		}
@@ -74,7 +74,7 @@ end
 ---@return string?
 function StarcraftPlayerExt.fetchPlayerFlag(resolvedPageName)
 	local lpdbPlayer = StarcraftPlayerExt.fetchPlayer(resolvedPageName)
-	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName(lpdbPlayer.flag))
+	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName{flag = lpdbPlayer.flag})
 end
 
 ---Asks LPDB for the historical factions of a player using the player faction data point.
@@ -131,7 +131,7 @@ StarcraftPlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
 	end
 
 	return {
-		flag = String.nilIfEmpty(Flags.CountryName(majority(flags))),
+		flag = String.nilIfEmpty(Flags.CountryName{flag = majority(flags)}),
 		faction = majority(factions),
 	}
 end)
@@ -175,7 +175,7 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 	PlayerExt.populatePageName(player)
 
 	player.flag = player.flag
-		or String.nilIfEmpty(Flags.CountryName(globalVars:get(player.displayName .. '_flag')))
+		or String.nilIfEmpty(Flags.CountryName{flag = globalVars:get(player.displayName .. '_flag')})
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerFlag(player.pageName)
 		or match2Player() and match2Player().flag
 
@@ -230,7 +230,7 @@ function StarcraftPlayerExt.TemplateStorePlayerLink(frame)
 	StarcraftPlayerExt.saveToPageVars({
 		displayName = displayName,
 		pageName = args.link or pageName or displayName,
-		flag = String.nilIfEmpty(Flags.CountryName(args.flag)),
+		flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag}),
 		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
 	}, {overwritePageVars = true})
 end

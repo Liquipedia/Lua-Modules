@@ -86,7 +86,7 @@ end
 ---@return string
 function Scene:createNameDisplay(args)
 	local name = args.name
-	local country = Flags.CountryName(args.country or args.scene)
+	local country = Flags.CountryName{flag = args.country or args.scene}
 	if not name then
 		local localised, errorText = Flags.getLocalisation(country)
 		local flag = Flags.Icon({flag = country, shouldLink = true})

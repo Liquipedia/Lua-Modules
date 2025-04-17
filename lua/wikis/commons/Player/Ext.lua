@@ -75,7 +75,7 @@ PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		return String.nilIfEmpty(Flags.CountryName(record.nationality))
+		return String.nilIfEmpty(Flags.CountryName{flag = record.nationality})
 	end
 end)
 
@@ -106,7 +106,7 @@ PlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
 	end
 
 	return {
-		flag = String.nilIfEmpty(Flags.CountryName(majority(flags))),
+		flag = String.nilIfEmpty(Flags.CountryName{flag = majority(flags)}),
 	}
 end)
 
@@ -186,7 +186,7 @@ function PlayerExt.syncPlayer(player, options)
 	PlayerExt.populatePageName(player)
 
 	player.flag = player.flag
-		or String.nilIfEmpty(Flags.CountryName(globalVars:get(player.displayName .. '_flag')))
+		or String.nilIfEmpty(Flags.CountryName{flag = globalVars:get(player.displayName .. '_flag')})
 		or options.fetchPlayer ~= false and PlayerExt.fetchPlayerFlag(player.pageName)
 		or match2Player() and match2Player().flag
 

@@ -224,7 +224,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			return {
 				faction = faction,
 				player = link,
-				flag = Flags.CountryName(playerIdData.flag),
+				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				random = Logic.readBool(mapInput[prefix .. 'random']),
 				heroes = MapFunctions.readHeroes(

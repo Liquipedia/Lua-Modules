@@ -140,7 +140,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = name,
-		nationality = Flags.CountryName(args.flag),
+		nationality = Flags.CountryName{flag = args.flag},
 
 		position = String.nilIfEmpty(args.position),
 		role = (String.nilIfEmpty(args.role) and mw.getContentLanguage():ucfirst(args.role))

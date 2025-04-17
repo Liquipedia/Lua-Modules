@@ -301,7 +301,7 @@ end
 ---@return string[]
 function CustomPlayer:getLocations()
 	return Array.map(self:getAllArgsForBase(self.args, 'country'), function(country)
-		return Flags.CountryName(country)
+		return Flags.CountryName{flag = country}
 	end)
 end
 
