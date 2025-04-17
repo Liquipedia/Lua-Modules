@@ -97,6 +97,7 @@ end
 ---@field games string[]?
 ---@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
+---@field displayGameIcons boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker

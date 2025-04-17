@@ -105,7 +105,7 @@ end
 ---@field root Html
 ---@field hideTournament boolean
 ---@field onlyHighlightOnValue string?
----@field displayGameIcon boolean
+---@field displayGameIcons boolean
 ---@field match table
 local Details = Class.new(
 	function(self, args)
@@ -113,7 +113,7 @@ local Details = Class.new(
 		self.root = mw.html.create('div'):addClass('match-details')
 		self.hideTournament = args.hideTournament
 		self.onlyHighlightOnValue = args.onlyHighlightOnValue
-		self.displayGameIcon = args.displayGameIcons
+		self.displayGameIcons = args.displayGameIcons
 		self.match = args.match
 	end
 )
@@ -144,7 +144,7 @@ function Details:create()
 			:attr('title', 'Add Match Page')
 			:wikitext('+ Add details')
 		), link))
-	elseif self.displayGameIcon then
+	elseif self.displayGameIcons then
 		matchBottomBar:node(Game.icon{game=self.match.game})
 	end
 
@@ -280,7 +280,8 @@ function Match:detailsRow()
 	return Details{
 		match = self.match,
 		hideTournament = self.config.hideTournament,
-		onlyHighlightOnValue = self.config.onlyHighlightOnValue
+		onlyHighlightOnValue = self.config.onlyHighlightOnValue,
+		displayGameIcons = self.config.displayGameIcons
 	}:create()
 end
 
