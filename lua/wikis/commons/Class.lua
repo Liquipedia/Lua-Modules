@@ -85,30 +85,9 @@ end
 ---@param options table?
 ---@return F
 function Class._wrapFunction(f, options)
-	options = options or {}
-	local alwaysRewriteArgs = options.trim
-		or options.removeBlanks
-		or options.valueFunc ~= nil
-
-	return function(...)
-		-- We cannot call getArgs with a spread operator when these are just lua
-		-- args, so we need to wrap it
-		local input = {...}
-
-		local frame = input[1]
-		local shouldRewriteArgs = alwaysRewriteArgs
-			or (
-				#input == 1
-					and type(frame) == 'table'
-					and type(frame.args) == 'table'
-			)
-
-		if shouldRewriteArgs then
-			local args = Arguments.getArgs(frame, options)
-			return f(args)
-		else
-			return f(...)
-		end
+	return function(frameOrArgs)
+		local args = Arguments.getArgs(frameOrArgs, options or {})
+		return f(args)
 	end
 end
 
