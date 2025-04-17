@@ -27,7 +27,7 @@ MatchTicker.defaultProps = {
 ---@return Widget[]
 function MatchTicker:render()
 	return WidgetUtil.collect(
-		MatchTickerContainer{self.props.displayGameIcons},
+		MatchTickerContainer{displayGameIcons = self.props.displayGameIcons},
 		HtmlWidgets.Div{
 			css = {
 				['white-space'] = 'nowrap',
