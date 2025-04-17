@@ -139,14 +139,8 @@ end
 -- Converts a country name, flag code, or alias to a standardized country name
 ---@param args {flag: string?}?
 ---@return string
----@overload fun(args: string?)
 function Flags.CountryName(args)
-	local flagName
-	if type(args) == 'string' then --legacy (overload case) needed for conversion
-		flagName = args
-	else
-		flagName = (args or {}).flag
-	end
+	local flagName = (args or {}).flag
 
 	if String.isEmpty(flagName) then
 		return ''
@@ -177,17 +171,11 @@ default is alpha2
 ]]--
 ---@param args {flag: string?, format: 'alpha3'|'alpha2'?}?
 ---@return string
----@overload fun(args: string?, format: string?): string
-function Flags.CountryCode(args, format)
-	local flagName
-	if type(args) == 'string' then --legacy (overload case) needed for conversion
-		flagName = args
-	else
-		args = args or {}
-		flagName = args.flag
-		format = args.format
+function Flags.CountryCode(args)
+	args = args or {}
+	local flagName = args.flag
+	local format = args.format
 
-	end
 	if String.isEmpty(flagName) then
 		return ''
 	end

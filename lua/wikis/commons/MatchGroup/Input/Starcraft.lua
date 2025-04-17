@@ -296,7 +296,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			return {
 				faction = faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
 				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
-				flag = Flags.CountryName(playerIdData.flag),
+				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				isarchon = isArchon,
 			}

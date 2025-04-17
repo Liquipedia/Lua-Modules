@@ -55,7 +55,7 @@ function Region._raw(args)
 
 	--determine region from country if region is empty
 	if String.isEmpty(regionInput) then
-		local country = Flag.CountryName(args.country) or ''
+		local country = Flag.CountryName{flag = args.country} or ''
 		regionInput = COUNTRY_TO_REGION_DATA[string.lower(country)]
 		if String.isEmpty(regionInput) then
 			return {}

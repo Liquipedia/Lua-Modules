@@ -323,7 +323,7 @@ function Team:getStandardLocationValue(location)
 		return
 	end
 
-	local locationToStore = Flags.CountryName(location)
+	local locationToStore = Flags.CountryName{flag = location}
 
 	if String.isEmpty(locationToStore) then
 		table.insert(

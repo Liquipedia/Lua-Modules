@@ -416,7 +416,7 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 		return Region.display{region = region}
 	end
 
-	return String.nilIfEmpty(display .. (city or Flags.CountryName(country)))
+	return String.nilIfEmpty(display .. (city or Flags.CountryName{flag = country}))
 end
 
 ---@param startDate string
