@@ -7,8 +7,14 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
+local String = require('Module:StringUtils')
+
+---@type {specialTemplates: table<string, teamTemplateData>}
+local Data = Lua.import('Module:TeamTemplate/data', {loadData = true})
 
 --[[
 A thin wrapper around mw.ext.TeamTemplate that memoizes extension calls
@@ -27,9 +33,7 @@ timezone parts.
 ---@param date string|number?
 ---@return string?
 function TeamTemplate.resolve(template, date)
-	template = template:gsub('_', ' ')
-	local raw = TeamTemplate.getRawOrNil(template, date) or {}
-	return raw.templatename
+	return (TeamTemplate.getRawOrNil(template, date) or {}).templatename
 end
 
 ---Returns true if the specified team template exists.
@@ -42,10 +46,11 @@ end
 
 --- Retrieves the lightmode image and darkmode image for a given team template.
 ---@param template string
+---@param date string|number?
 ---@return string?
 ---@return string?
-function TeamTemplate.getIcon(template)
-	local raw = TeamTemplate.getRawOrNil(template)
+function TeamTemplate.getIcon(template, date)
+	local raw = TeamTemplate.getRawOrNil(template, date)
 	if not raw then
 		return
 	end
@@ -86,8 +91,28 @@ does not exist.
 ---@param date string|number?
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
-	team = team:gsub('_', ' '):lower()
-	return mw.ext.TeamTemplate.raw(team, date)
+	local teamName = team:lower()
+	if Data.specialTemplates[teamName] then
+		return Data.specialTemplates[teamName]
+	end
+	date = date or DateExt.getContextualDateOrNow()
+	--TODO: cleanup underscore handling when extension starts handling it
+	if mw.ext.TeamTemplate.teamexists(teamName) then
+		return mw.ext.TeamTemplate.raw(teamName, date)
+	elseif mw.ext.TeamTemplate.teamexists(String.trim(teamName)) then
+		mw.log('Trimmed needed on team name: '.. teamName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with trimmed team templates')
+		return mw.ext.TeamTemplte.raw(String.trim(teamName), date)
+	elseif mw.ext.TeamTemplat.teamexists(teamName:gsub('_', ' ')) then
+		mw.log('Underscore in team name: '.. teamName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+		return mw.ext.TeamTemplate.raw((teamName:gsub('_', ' ')), date)
+	elseif mw.ext.TeamTemplate.teamexists(teamName:gsub(' ', '_')) then
+		mw.log('Underscore in team name: '.. teamName)
+		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+		return mw.ext.TeamTemplate.raw((teamName:gsub(' ', '_')), date)
+	end
+	return nil
 end
 
 ---Creates error message for missing team templates.
@@ -95,7 +120,7 @@ end
 ---@param date string|number?
 ---@return string
 function TeamTemplate.noTeamMessage(pageName, date)
-	return 'Missing template for team=' .. tostring(pageName)
+	return 'Missing team template for "' .. tostring(pageName) .. '"'
 		.. (date and ' on date=' .. tostring(date) or '')
 end
 
@@ -117,17 +142,16 @@ An empty array is returned if the specified team template does not exist.
 ---@param name string
 ---@return string[]
 function TeamTemplate.queryHistoricalNames(name)
-    local resolvedName = TeamTemplate.resolve(name)
-	if resolvedName then
-		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
-		if Logic.isNotEmpty(historical) then
-			return Array.unique(Array.extractValues(historical))
-		else
-			return { resolvedName }
-		end
-	else
+	if not TeamTemplate.exists(name) then
 		return {}
 	end
+	local rawTemplate = TeamTemplate.getRaw(name)
+	if Logic.isEmpty(rawTemplate.historicaltemplate) then
+		return { rawTemplate.templatename }
+	end
+	local historical = TeamTemplate.queryHistorical(rawTemplate.historicaltemplate)
+	---@cast historical -nil
+	return Array.unique(Array.extractValues(historical))
 end
 
 return TeamTemplate

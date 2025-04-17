@@ -12,13 +12,16 @@ local Class = require('Module:Class')
 local Flags = require('Module:Flags')
 local Logic = require('Module:Logic')
 local Links = require('Module:Links')
+local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'
@@ -67,7 +70,7 @@ function PortalPlayers:create()
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
 	for country, playerData in Table.iter.spairs(self:_getPlayers()) do
-		local flag = Flags.Icon({flag = country, shouldLink = true})
+		local flag = Flags.Icon({ flag = country, shouldLink = true })
 
 		wrapper:tag('h3')
 			:tag('span')
@@ -105,7 +108,7 @@ function PortalPlayers:_getPlayers()
 	if self.queryOnlyByRegion then
 		conditions = regionConditions
 	else
-		conditions = Array.map(countries, function (country)
+		conditions = Array.map(countries, function(country)
 			return '[[nationality::' .. country .. ']]'
 		end) or {}
 	end
@@ -124,7 +127,7 @@ function PortalPlayers:_getPlayers()
 	end
 
 	if String.isNotEmpty(self.args.status) then
-		conditionString = addConidition(conditionString, '[[status::'.. self.args.status .. ']]')
+		conditionString = addConidition(conditionString, '[[status::' .. self.args.status .. ']]')
 	end
 
 	if String.isNotEmpty(self.args.additionalConditions) then
@@ -148,7 +151,7 @@ end
 ---@return string[], string[]
 function PortalPlayers._getCountries(regionsInput, countriesInput, gameConditions)
 	local regionConditions = String.isNotEmpty(regionsInput) and
-		Array.map(Array.map(mw.text.split(regionsInput --[[@as string]], ',', true), String.trim), function (region)
+		Array.map(Array.map(mw.text.split(regionsInput --[[@as string]], ',', true), String.trim), function(region)
 			return '[[region::' .. region .. ']]'
 		end) or {}
 
@@ -265,7 +268,9 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = TeamTemplate.exists(player.team) and tostring(TeamInline {
+		name = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
