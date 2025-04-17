@@ -14,7 +14,6 @@ local Lua = require('Module:Lua')
 local Region = require('Module:Region')
 local Role = require('Module:Role')
 local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -35,8 +34,6 @@ local CustomInjector = Class.new(Injector)
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.args.history = TeamHistoryAuto.results{convertrole = true}
 
 	player.role = Role.run{role = player.args.role}
 	player.role2 = Role.run{role = player.args.role2}

@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -20,8 +19,6 @@ local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
 
 local ROLES = {
 	-- Staff and Talents
@@ -50,7 +47,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.autoTeam = true
 	player.role = player:_getRoleData(player.args.role)
 	player.role2 = player:_getRoleData(player.args.role2)
 
@@ -64,21 +60,7 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args = caller.args
 
-	if id == 'history' then
-		local manualHistory = args.history
-		local automatedHistory = TeamHistoryAuto.results{
-			convertrole = true,
-			player = caller.pagename
-		}
-
-		if String.isNotEmpty(manualHistory) or automatedHistory then
-			return {
-				Title{children = 'History'},
-				Center{children = {manualHistory}},
-				Center{children = {automatedHistory}},
-			}
-		end
-	elseif id == 'status' then
+	if id == 'status' then
 		return {
 			Cell{name = 'Status', content = CustomPlayer._getStatusContents(args)},
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
