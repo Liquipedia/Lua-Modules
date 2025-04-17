@@ -25,7 +25,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local CustomHero = Class.new(Character)
 local CustomInjector = Class.new(Injector)
 
----@param roleType 'duelist'|'strategist'|'vanguard'
+---@param roleType 'Duelist'|'Strategist'|'Vanguard'
 ---@param displayName 'Duelist'|'Strategist'|'Vanguard'
 ---@return Widget
 local function createRoleDisplayWidget(roleType, displayName)
@@ -43,9 +43,9 @@ local function createRoleDisplayWidget(roleType, displayName)
 	}
 end
 
-local DUELIST = createRoleDisplayWidget('Duelist','Duelist')
+local DUELIST = createRoleDisplayWidget('Duelist', 'Duelist')
 local STRATEGIST = createRoleDisplayWidget('Strategist', 'Strategist')
-local VANGUARD = createRoleDisplayWidget('Vanguard','Vanguard')
+local VANGUARD = createRoleDisplayWidget('Vanguard', 'Vanguard')
 
 local ROLE_LOOKUP = {
 	duelist = { DUELIST },
@@ -115,7 +115,7 @@ function CustomHero:addToLpdb(lpdbData, args)
 	lpdbData.extradata.health = args.health
 	lpdbData.extradata.movespeed = args.movespeed
 	lpdbData.extradata.dificulty = args.difficulty
-  lpdbData.extradata.role = args.role
+	lpdbData.extradata.role = args.role
 	lpdbData.extradata.revealdate = args.revealdate
 	lpdbData.extradata.gameid = args.gameid
 
