@@ -53,9 +53,9 @@ function TournamentsTickerLabelWidget:render()
 						children  = {
 							Game.icon{
 								game = tournament.game,
-								noLink=true,
-								size='50px',
-								spanClass='icon-small'
+								noLink = true,
+								noSpan = true,
+								size = '50px',
 							}
 						}
 					} or '',
