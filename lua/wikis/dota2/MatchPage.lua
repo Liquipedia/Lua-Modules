@@ -138,30 +138,76 @@ function MatchPage:_renderDraft(game)
 		Div{
 			classes = {'match-bm-game-veto-wrapper'},
 			children = Array.map(self.opponents, function (opponent, opponentIndex)
-				local team = game.teams[opponentIndex]
 				return TeamVeto{
 					teamIcon = opponent.iconDisplay,
-					vetoRows = {
-						VetoRow{
-							vetoType = 'pick',
-							side = team.side,
-							vetoItems = Array.map(team.picks, function (pick)
-								return VetoItem{
-									characterIcon = self:getCharacterIcon(pick.character),
-									vetoNumber = pick.vetoNumber
-								}
-							end)
-						},
-						VetoRow{
-							vetoType = 'ban',
-							vetoItems = Array.map(team.bans, function (ban)
-								return VetoItem{
-									characterIcon = self:getCharacterIcon(ban.character),
-									vetoNumber = ban.vetoNumber
-								}
-							end)
-						}
+					vetoRows = self:_generateVetoRows(game, opponentIndex)
+				}
+			end)
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param opponentIndex integer
+---@return MatchPageVetoRow[]
+function MatchPage:_generateVetoRows(game, opponentIndex)
+	local team = game.teams[opponentIndex]
+	local picks = team.picks or {}
+	local bans = team.bans or {}
+	if Logic.isNotEmpty(picks) and Logic.isNotEmpty(bans) then
+		-- Load data from Dota2DB
+		return {
+			VetoRow{
+				vetoType = 'pick',
+				side = team.side,
+				vetoItems = Array.map(picks, function (pick)
+					return VetoItem{
+						characterIcon = self:getCharacterIcon(pick.character),
+						vetoNumber = pick.vetoNumber
 					}
+				end)
+			},
+			VetoRow{
+				vetoType = 'ban',
+				vetoItems = Array.map(bans, function (ban)
+					return VetoItem{
+						characterIcon = self:getCharacterIcon(ban.character),
+						vetoNumber = ban.vetoNumber
+					}
+				end)
+			}
+		}
+	end
+
+	-- Load data from manual input
+	local extradata = game.extradata or {}
+
+	for _, pick in Table.iter.pairsByPrefix(extradata, 'team' .. opponentIndex .. 'hero') do
+		table.insert(picks, pick)
+	end
+
+	for _, ban in Table.iter.pairsByPrefix(extradata, 'team' .. opponentIndex .. 'ban') do
+		table.insert(bans, ban)
+	end
+
+	return {
+		VetoRow{
+			vetoType = 'pick',
+			side = extradata['team' .. opponentIndex .. 'side'],
+			vetoItems = Array.map(picks, function (pick)
+				return VetoItem{
+					characterIcon = self:getCharacterIcon(pick),
+					vetoNumber = pick.vetoNumber
+				}
+			end)
+		},
+		VetoRow{
+			vetoType = 'ban',
+			vetoItems = Array.map(bans, function (ban)
+				return VetoItem{
+					characterIcon = self:getCharacterIcon(ban),
+					vetoNumber = ban.vetoNumber
 				}
 			end)
 		}
