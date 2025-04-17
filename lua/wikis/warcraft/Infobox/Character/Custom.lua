@@ -290,29 +290,27 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	return {
-		type = 'hero',
-		name = self.pagename,
-		image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil,
-		information = Faction.toName(Faction.read(args.race)) or 'Neutral',
-		extradata = {
-			['primary attribute'] = ATTRIBUTES[args.mainattribute],
-			baseint = args.baseint,
-			intgain = args.intgain,
-			baseagi = args.baseagi,
-			agigain = args.agigain,
-			basestr = args.basestr,
-			strgain = args.strgain,
-			basehp = args.basehp or 100,
-			basearmor = args.basearmor or 0,
-			numdice = args.numdice,
-			sidesdie = args.sidesdie,
-			basecd = args.basecd,
-			race = Faction.read(args.race),
-			dps = self:_calculateDps(args),
-			ehp = self:_calculateEhp(args),
-		}
-	}
+	lpdbData.extradata.type = 'hero'
+	lpdbData.extradata.name = self.pagename
+	lpdbData.extradata.image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil
+	lpdbData.extradata.information = Faction.toName(Faction.read(args.race)) or 'Neutral'
+	lpdbData.extradata['primary attribute'] = ATTRIBUTES[args.mainattribute]
+	lpdbData.extradata.baseint = args.baseint
+	lpdbData.extradata.intgain = args.intgain
+	lpdbData.extradata.baseagi = args.baseagi
+	lpdbData.extradata.agigain = args.agigain
+	lpdbData.extradata.basestr = args.basestr
+	lpdbData.extradata.strgain = args.strgain
+	lpdbData.extradata.basehp = args.basehp or 100
+	lpdbData.extradata.basearmor = args.basearmor or 0
+	lpdbData.extradata.numdice = args.numdice
+	lpdbData.extradata.sidesdie = args.sidesdie
+	lpdbData.extradata.basecd = args.basecd
+	lpdbData.extradata.race = Faction.read(args.race)
+	lpdbData.extradata.dps = self:_calculateDps(args)
+	lpdbData.extradata.ehp = self:_calculateEhp(args)
+
+	return lpdbData
 end
 
 ---@param args table
