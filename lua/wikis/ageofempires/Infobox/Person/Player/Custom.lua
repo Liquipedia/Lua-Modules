@@ -12,7 +12,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:MatchesTicker/Custom')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
@@ -217,7 +217,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Html?
 function CustomPlayer:createBottomContent()
 	return MatchTicker.participant{player = self.pagename}
 end
