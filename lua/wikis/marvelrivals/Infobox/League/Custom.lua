@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Link = require('Module:Widget/Basic/Link')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local League = Lua.import('Module:Infobox/League')
