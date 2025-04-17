@@ -70,15 +70,6 @@ function Lua.requireIfExists(name, options)
 	end
 end
 
----Loads (mw.loadData) a data module if it exists by its name.
----@deprecated use `Lua.requireIfExists` with `loadData` option instead
----@param name string
----@return unknown?
-function Lua.loadDataIfExists(name)
-	mw.ext.TeamLiquidIntegration.add_category('Pages using deprecated Lua.loadDataIfExists function')
-	return Lua.requireIfExists(name, {loadData = true})
-end
-
 ---Imports a module by its name.
 ---By default it will include the /dev module if in dev mode activated. This can be turned off by setting
 --- the requireDevIfEnabled option to false.
