@@ -64,14 +64,25 @@ end
 ---@param options ?table
 ---@return T
 function Class.export(class, options)
-	for name, f in pairs(class) do
+	options = options or {}
+
+	local checkFunction = function(functionName)
+		local f = class[functionName]
 		-- We only want to export functions, and only functions which are public (no underscore)
-		if (
-			type(f) == 'function' and
-				(not string.find(name, Class.PRIVATE_FUNCTION_SPECIFIER))
-		) then
-			class[name] = Class._wrapFunction(class[name], options)
+		if type(f) ~= 'function' or string.find(functionName, Class.PRIVATE_FUNCTION_SPECIFIER) then
+			return
 		end
+		class[functionName] = Class._wrapFunction(f, options)
+	end
+
+	if type(options.onlyExport) == 'table' and #options.onlyExport > 0 then
+		for _, functionName in ipairs(options.onlyExport) do
+			checkFunction(functionName)
+		end
+		return class
+	end
+	for name in pairs(class) do
+		checkFunction(name)
 	end
 	return class
 end

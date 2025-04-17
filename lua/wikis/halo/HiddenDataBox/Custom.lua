@@ -40,4 +40,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_parent_page', Variables.varDefault('tournament_parent'))
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {onlyExport = {'run'}})
