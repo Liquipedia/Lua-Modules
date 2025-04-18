@@ -8,8 +8,10 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -45,8 +47,18 @@ end
 ---@return Widget?
 function MatchPageTeamDisplay:render()
 	local opponent = self.props.opponent
+	if Opponent.isEmpty(opponent) then
+		return Div{classes = { 'match-bm-match-header-team' }}
+	elseif opponent.type == Opponent.literal then
+		return Div{
+			classes = { 'match-bm-match-header-team' },
+			children = Div{
+				classes = {'match-bm-match-header-team-literal'},
+				children = opponent.name
+			}
+		}
+	end
 	local data = self.props.opponent.teamTemplateData
-	if Logic.isEmpty(data) then return Div{classes = { 'match-bm-match-header-team' }} end
 	return Div{
 		classes = { 'match-bm-match-header-team' },
 		children = {
