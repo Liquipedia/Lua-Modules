@@ -46,39 +46,41 @@ end
 
 ---@return Widget?
 function MatchPageTeamDisplay:render()
+	return Div{
+		classes = { 'match-bm-match-header-team' },
+		children = self:_buildChildren()
+	}
+end
+
+---@private
+---@return Widget|(string|Widget)[]?
+function MatchPageTeamDisplay:_buildChildren()
 	local opponent = self.props.opponent
-	if Opponent.isEmpty(opponent) then
-		return Div{classes = { 'match-bm-match-header-team' }}
+	if Opponent.isEmpty(opponent) then return
 	elseif opponent.type == Opponent.literal then
 		return Div{
-			classes = { 'match-bm-match-header-team' },
-			children = Div{
-				classes = {'match-bm-match-header-team-literal'},
-				children = opponent.name
-			}
+			classes = {'match-bm-match-header-team-literal'},
+			children = opponent.name
 		}
 	end
 	local data = self.props.opponent.teamTemplateData
-	return Div{
-		classes = { 'match-bm-match-header-team' },
-		children = {
-			mw.ext.TeamTemplate.teamicon(data.templatename),
-			Div{
-				classes = { 'match-bm-match-header-team-group' },
-				children = {
-					Div{
-						classes = { 'match-bm-match-header-team-long' },
-						children = { Link{ link = data.page, children = data.name } }
-					},
-					Div{
-						classes = { 'match-bm-match-header-team-short' },
-						children = { Link{ link = data.page, children = data.shortname } }
-					},
-					Div{
-						classes = { 'match-bm-match-header-round-results' },
-						children = Array.map(opponent.seriesDots, MatchPageTeamDisplay._makeGameResultIcon)
-					},
-				}
+	return {
+		mw.ext.TeamTemplate.teamicon(data.templatename),
+		Div{
+			classes = { 'match-bm-match-header-team-group' },
+			children = {
+				Div{
+					classes = { 'match-bm-match-header-team-long' },
+					children = { Link{ link = data.page, children = data.name } }
+				},
+				Div{
+					classes = { 'match-bm-match-header-team-short' },
+					children = { Link{ link = data.page, children = data.shortname } }
+				},
+				Div{
+					classes = { 'match-bm-match-header-round-results' },
+					children = Array.map(opponent.seriesDots, MatchPageTeamDisplay._makeGameResultIcon)
+				},
 			}
 		}
 	}
