@@ -63,7 +63,7 @@ function MatchPageTeamDisplay:_buildChildren()
 			children = opponent.name
 		}
 	end
-	local data = self.props.opponent.teamTemplateData
+	local data = self.props.opponent.teamTemplateData or {}
 	return {
 		mw.ext.TeamTemplate.teamicon(data.templatename),
 		Div{
