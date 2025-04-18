@@ -98,10 +98,10 @@ end
 function CustomCharacter:_getPriceCell()
 	local args = self.args
 	return Cell{name = 'Price', content = WidgetUtil.collect(
-		String.isNotEmpty(args.costbp) and CostDisplay.run('battle point', args.costbp) or nil,
-		String.isNotEmpty(args.costdia) and CostDisplay.run('diamond', args.costdia) or nil,
-		String.isNotEmpty(args.costlg) and CostDisplay.run('lucky gem', args.costlg) or nil,
-		String.isNotEmpty(args.costticket) and CostDisplay.run('ticket', args.costticket) or nil
+		CostDisplay.run('battle point', args.costbp),
+		CostDisplay.run('diamond', args.costdia),
+		CostDisplay.run('lucky gem', args.costlg),
+		CostDisplay.run('ticket', args.costticket)
 	)}
 end
 
@@ -111,7 +111,7 @@ function CustomCharacter:_getCustomCells()
 	local widgets = {}
 	Array.appendWith(
 		widgets,
-		Cell{name = 'Specialty', content = self:_getCharacterSpecialties()},
+		Cell{name = 'Specialty', content = self:getAllArgsForBase(args, 'specialty')},
 		Cell{name = 'Attack Type', content = {args.attacktype}},
 		Cell{name = 'Resource Bar', content = {args.resourcebar}},
 		Cell{name = 'Voice Actor(s)', content = self:_getVoiceActors()}
@@ -150,16 +150,6 @@ function CustomCharacter:_getCustomCells()
 		Title{children = 'Esports Statistics'},
 		Cell{name = 'Win Rate', content = {wins .. 'W : ' .. loses .. 'L (' .. winPercentage .. '%)'}}
 	)
-end
-
----@return string[]
-function CustomCharacter:_getCharacterSpecialties()
-	local args = self.args
-	local specialties = {}
-	for _, specialty in Table.iter.pairsByPrefix(args, 'specialty', {requireIndex = false}) do
-		table.insert(specialties, specialty)
-	end
-	return specialties
 end
 
 ---@return string[]
