@@ -71,7 +71,9 @@ function TransfersList:render()
 				Div {
 					css = {
 						['white-space'] = 'nowrap',
-						display = 'inline',
+						display = 'inline flex',
+						['flex-wrap'] = 'wrap',
+						['justify-content'] = 'center',
 						margin = '0 10px',
 						['font-size'] = '15px',
 						['font-style'] = 'italic'
