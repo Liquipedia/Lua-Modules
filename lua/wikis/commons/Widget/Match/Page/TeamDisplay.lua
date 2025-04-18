@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -63,7 +64,8 @@ function MatchPageTeamDisplay:_buildChildren()
 			children = opponent.name
 		}
 	end
-	local data = self.props.opponent.teamTemplateData or {}
+	local data = self.props.opponent.teamTemplateData
+	assert(data, TeamTemplate.noTeamMessage(opponent.template))
 	return {
 		mw.ext.TeamTemplate.teamicon(data.templatename),
 		Div{
