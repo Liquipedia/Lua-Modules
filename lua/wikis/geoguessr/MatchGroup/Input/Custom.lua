@@ -33,6 +33,16 @@ function MatchFunctions.extractMaps(match, opponents)
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
 end
 
+---@param match table
+---@param games table[]
+---@param opponents table[]
+---@return table
+function MatchFunctions.getExtraData(match, games, opponents)
+	return {
+		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+	}
+end
+
 ---@param games table[]
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
