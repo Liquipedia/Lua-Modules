@@ -7,12 +7,10 @@
 --
 
 local Array = require('Module:Array')
-local AgentNames = require('Module:AgentNames')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
 local MatchFunctions = {
@@ -20,7 +18,6 @@ local MatchFunctions = {
 		disregardTransferDates = true,
 	}
 }
-local MapFunctions = {}
 
 MatchFunctions.DEFAULT_MODE = 'team'
 
@@ -28,7 +25,25 @@ MatchFunctions.DEFAULT_MODE = 'team'
 ---@param options table?
 ---@return table
 function CustomMatchGroupInput.processMatch(match, options)
-	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions)
+	options = options or {}
+
+	if not options.isMatchPage then
+		-- See if this match has a standalone match (match page), if so use the data from there
+		local standaloneMatchId = MatchGroupUtil.getStandaloneId(match.bracketid, match.matchid)
+		local standaloneMatch = standaloneMatchId and MatchGroupInputUtil.fetchStandaloneMatch(standaloneMatchId) or nil
+		if standaloneMatch then
+			return MatchGroupInputUtil.mergeStandaloneIntoMatch(match, standaloneMatch)
+		end
+	end
+
+	local MapParser
+	if options.isMatchPage then
+		MapParser = Lua.import('Module:MatchGroup/Input/Custom/MatchPage')
+	else
+		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
+	end
+
+	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
 --
@@ -37,9 +52,10 @@ end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
+---@param MapParser MapParserInterface
 ---@return table[]
-function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+function MatchFunctions.extractMaps(match, opponents, MapParser)
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapParser)
 end
 
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
@@ -49,7 +65,7 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@param games table[]
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, MapFunctions.keepMap)
+	return Array.filter(games, function (game) return game.map ~= nil end)
 end
 
 ---@param maps table[]
@@ -72,81 +88,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	}
 end
 
---
--- map related functions
---
--- Check if a map should be discarded due to being redundant
----@param map table
----@return boolean
-function MapFunctions.keepMap(map)
-	return map.map ~= nil
-end
 
----@param match table
----@param map table
----@param opponents table[]
----@return table<string, any>
-function MapFunctions.getExtraData(match, map, opponents)
-	---@type table<string, any>
-	local extraData = {
-		t1firstside = map.t1firstside,
-		t1halfs = {atk = map.t1atk, def = map.t1def, otatk = map.t1otatk, otdef = map.t1otdef},
-		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
-	}
-
-	for opponentIdx, opponent in ipairs(map.opponents) do
-		for playerIdx, player in pairs(opponent.players) do
-			extraData['t' .. opponentIdx .. 'p' .. playerIdx] = player.player
-			extraData['t' .. opponentIdx .. 'p' .. playerIdx .. 'agent'] = player.agent
-		end
-	end
-
-	return extraData
-end
-
----@param map table
----@param opponent table
----@param opponentIndex integer
----@return table[]
-function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
-	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
-
-	local players = Array.mapIndexes(function(playerIndex)
-		return map['t' .. opponentIndex .. 'p' .. playerIndex]
-	end)
-	return MatchGroupInputUtil.parseMapPlayers(
-		opponent.match2players,
-		players,
-		function(playerIndex)
-			local data = Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
-			return data and {name = data.player} or nil
-		end,
-		function(playerIndex, playerIdData, playerInputData)
-			local stats = Json.parseIfString(map['t'.. opponentIndex .. 'p' .. playerIndex]) or {}
-			return {
-				kills = stats.kills,
-				deaths = stats.deaths,
-				assists = stats.assists,
-				acs = stats.acs,
-				player = playerIdData.name or playerInputData.name,
-				agent = getCharacterName(stats.agent),
-			}
-		end
-	)
-end
-
----@param map table
----@return fun(opponentIndex: integer): integer?
-function MapFunctions.calculateMapScore(map)
-	return function(opponentIndex)
-		if not map['t'.. opponentIndex ..'atk'] and not map['t'.. opponentIndex ..'def'] then
-			return
-		end
-		return (tonumber(map['t'.. opponentIndex ..'atk']) or 0)
-			+ (tonumber(map['t'.. opponentIndex ..'def']) or 0)
-			+ (tonumber(map['t'.. opponentIndex ..'otatk']) or 0)
-			+ (tonumber(map['t'.. opponentIndex ..'otdef']) or 0)
-	end
-end
 
 return CustomMatchGroupInput
