@@ -17,6 +17,7 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 ---@class ValorantDBGameExtended: ValorantDBGame
 ---@field date string?
 ---@field reversed boolean?
+---@field winner integer?
 ---@field vod string?
 
 ---@class ValorantMatchPageMapParser: MapParserInterface
@@ -40,8 +41,14 @@ function MapFunctions.getMap(mapInput)
 
 	---@cast map ValorantDBGameExtended
 
-	map.date = map.matchInfo.gameStartTime
+	map.date = mw.getCurrentFrame():preprocess(map.matchInfo.gameStartTime)
 	map.reversed = Logic.readBool(mapInput.reversed)
+	if Logic.readBool(map.teams[0].won) then
+		map.winner = map.reversed and 2 or 1
+	else
+		map.winner = map.reversed and 1 or 2
+	end
+
 	-- Manually import vod from input
 	map.vod = mapInput.vod
 
@@ -49,33 +56,36 @@ function MapFunctions.getMap(mapInput)
 end
 
 ---@param opponentIndex 1|2
----@param reversed boolean
----@return 1|2
-function MapFunctions._processOpponentIndex(opponentIndex, reversed)
-	if not reversed then
-		return opponentIndex
+---@param options {reversed: boolean?, zeroBased: boolean?}
+---@return integer
+function MapFunctions._processOpponentIndex(opponentIndex, options)
+	local processedIndex = opponentIndex
+	if options.reversed then
+		processedIndex = opponentIndex == 1 and 2 or 1
 	end
-	return opponentIndex == 1 and 2 or 1
+	return options.zeroBased and processedIndex - 1 or processedIndex
 end
 
 ---@param match table
 ---@param map ValorantDBGameExtended
 ---@param opponents table[]
----@return table<string, any>
+---@return table<string, any>?
 function MapFunctions.getExtraData(match, map, opponents)
+	if not map.matchInfo then return end
 	local extraData = {
 		t1firstside = MapFunctions._parseT1FirstSide(map.matchInfo.o1t1firstside, map.reversed),
 		t1halfs = MapFunctions._parseTeamHalfs(map, 1),
 		t2halfs = MapFunctions._parseTeamHalfs(map, 2),
 	}
 
-	Array.forEach(map.players, function (_, teamIndex)
-		local processedIndex = MapFunctions._processOpponentIndex(teamIndex, map.reversed)
+	Array.forEach(Array.range(1, 2), function (teamIndex)
+		local processedIndex = MapFunctions._processOpponentIndex(teamIndex, {reversed = map.reversed, zeroBased = true})
 		Array.forEach(
-			map.players[processedIndex],
-			function (player, playerIndex)
-				extraData['t' .. processedIndex .. 'p' .. playerIndex] = player.riot_id
-				extraData['t' .. processedIndex .. 'p' .. playerIndex .. 'agent'] = player.agent
+			Array.range(0, 4),
+			function (playerIndex)
+				local player = map.players[processedIndex][playerIndex]
+				extraData['t' .. processedIndex + 1 .. 'p' .. playerIndex + 1] = player.riot_id
+				extraData['t' .. processedIndex + 1 .. 'p' .. playerIndex + 1 .. 'agent'] = player.agent
 			end
 		)
 	end)
@@ -83,10 +93,10 @@ function MapFunctions.getExtraData(match, map, opponents)
 	return extraData
 end
 ---@param map ValorantDBGameExtended
----@pram opponentIndex integer
+---@param opponentIndex integer
 ---@return {atk: integer, def: integer, otatk: integer?, otdef: integer?}?
 function MapFunctions._parseTeamHalfs(map, opponentIndex)
-	local parsedIndex = MapFunctions._processOpponentIndex(opponentIndex, map.reversed)
+	local parsedIndex = MapFunctions._processOpponentIndex(opponentIndex, {reversed = map.reversed, zeroBased = true})
 	if not map.teams then return end
 	local teamId = map.teams[parsedIndex].teamId
 	local teamWins = map.matchInfo[teamId] --[[@as ValorantDBTeamScore]]
@@ -118,12 +128,12 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
 	if not map.players then return end
-	local players = map.players[MapFunctions._processOpponentIndex(opponentIndex, map.reversed)]
+	local players = map.players[MapFunctions._processOpponentIndex(opponentIndex, {reversed = map.reversed, zeroBased = true})]
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
 		function(playerIndex)
-			return {link = players[playerIndex].riot_id}
+			return {name = players[playerIndex].riot_id}
 		end,
 		function(playerIndex, playerIdData, playerInputData)
 			local stats = players[playerIndex]
@@ -143,7 +153,7 @@ end
 ---@return fun(opponentIndex: integer): integer?
 function MapFunctions.calculateMapScore(map)
 	return function(opponentIndex)
-		local parsedIndex = MapFunctions._processOpponentIndex(opponentIndex, map.reversed)
+		local parsedIndex = MapFunctions._processOpponentIndex(opponentIndex, {reversed = map.reversed, zeroBased = true})
 		if not map.teams then return end
 		return map.teams[parsedIndex].roundsWon
 	end
