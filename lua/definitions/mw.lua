@@ -979,6 +979,71 @@ mw.ext.Dota2Ranking = {}
 ---@return Dota2RankingRecord[]
 function mw.ext.Dota2Ranking.get(startDate, endDate) end
 
+mw.ext.valorantdb = {}
+
+---@alias ValorantDBRegion 'AP'|'EU'|'BR'|'KR'|'LATAM'|'NA'|'ESPORTS'
+
+---@alias ValorantDBSide 'atk'|'def'
+
+---@alias ValorantDBTeamID 'Blue'|'Red'
+
+---@class ValorantDBPlayer
+---@field riot_id string
+---@field team ValorantDBTeamID
+---@field agent string
+---@field agent-id string
+---@field kills integer
+---@field deaths integer
+---@field assists integer
+---@field acs number
+
+---@class ValorantDBPlayerDetail
+---@field bank integer
+---@field kills integer
+---@field score integer
+---@field buy integer
+
+---@class ValorantDBRound
+---@field round_no integer
+---@field playerDetails table<string, ValorantDBPlayerDetail>
+---@field win_by string
+---@field t1_buy integer
+---@field t2_buy integer
+---@field t1_bank integer
+---@field t2_bank integer
+---@field round_winner ValorantDBSide
+---@field t1_kills integer
+---@field t2_kills integer
+
+---@class ValorantDBTeamScore
+---@field teamatkotwins integer
+---@field teamatkwins integer
+---@field teamdefotwins integer
+---@field teamdefwins integer
+
+---@class ValorantDBMatchInfo
+---@field o1t1firstside ValorantDBSide
+---@field gameVersion string
+---@field mapId string
+---@field gameLengthMillis string
+---@field t1firstside ValorantDBSide
+---@field team1 ValorantDBTeamID
+---@field team2 ValorantDBTeamID
+---@field Blue ValorantDBTeamScore
+---@field Red ValorantDBTeamScore
+---@field gameStartTime string
+
+---@class ValorantDBGame
+---@field players ValorantDBPlayer[][]
+---@field roundDetails ValorantDBRound[]
+---@field teams {won: integer, roundsWon: integer, teamId: ValorantDBTeamID}[]
+---@field matchInfo ValorantDBMatchInfo
+
+---@param matchId string
+---@param region ValorantDBRegion
+---@return ValorantDBGame?
+function mw.ext.valorantdb.getDetails(matchId, region) end
+
 mw.ext.VariablesLua = {}
 ---@alias wikiVariableKey string|number
 ---@alias wikiVariableValue string|number|nil
