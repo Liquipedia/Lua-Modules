@@ -7,10 +7,13 @@
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchPage = Lua.import('Module:MatchPage')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -21,6 +24,24 @@ local CustomMatchSummary = {}
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
+end
+
+---@param match table
+---@param createGame fun(date: string, game: table, gameIndex: integer): Widget
+---@return Widget
+function CustomMatchSummary.createBody(match, createGame)
+	local matchId = match.extradata.originalmatchid or match.matchId
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+	local showMatchPage = MatchPage.isEnabledFor(match)
+
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
+		Array.map(match.games, FnUtil.curry(createGame, match.date)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+	)}
 end
 
 ---@param date string
