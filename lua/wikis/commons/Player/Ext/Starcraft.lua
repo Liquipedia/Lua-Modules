@@ -142,7 +142,6 @@ function StarcraftPlayerExt.syncPlayer(player, options)
 	player.faction = player.faction
 		or globalVars:get(player.displayName .. '_faction')
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerFaction(player.pageName, options.date)
-		or match2Player() and match2Player().faction
 		or Faction.defaultFaction
 
 	if options.savePageVar ~= false then
