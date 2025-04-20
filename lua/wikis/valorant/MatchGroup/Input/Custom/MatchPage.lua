@@ -166,10 +166,12 @@ function MapFunctions.getPatch(map)
 	return map.matchInfo.gameVersion
 end
 
----@param map ValorantDBGameExtended
+---@param map {map: string?}|ValorantDBGameExtended
 ---@return string?
 function MapFunctions.getMapName(map)
-	if not map.matchInfo then return end
+	if not map.matchInfo then
+		return map.map
+	end
 	return map.matchInfo.mapId
 end
 
