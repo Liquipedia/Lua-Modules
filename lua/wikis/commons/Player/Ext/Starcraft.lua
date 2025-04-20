@@ -103,39 +103,6 @@ function StarcraftPlayerExt.fetchFactionHistory(resolvedPageName)
 	return factionHistory
 end
 
----Asks LPDB for the flag and faction of a player using an arbitary sample of match2player records.
----
----For specific uses only.
----@param resolvedPageName string
----@return {flag: string?, faction: string}
-StarcraftPlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
-	local conditions = {
-		'[[name::' .. resolvedPageName .. ']]',
-	}
-	local records = mw.ext.LiquipediaDB.lpdb('match2player', {
-		conditions = table.concat(conditions, ' and '),
-		limit = 30,
-		query = 'flag, extradata',
-	})
-	local flags = Array.map(records, function(record) return record.flag end)
-	local factions = Array.map(records, function(record) return Faction.read(record.extradata.faction) end)
-
-	local function majority(xs)
-		local groups = Array.groupBy(xs, FnUtil.identity)
-		local largest = Array.maxBy(groups, function(group) return #group end)
-		if largest and 0.5 < #largest / #records then
-			return largest[1]
-		else
-			return nil
-		end
-	end
-
-	return {
-		flag = String.nilIfEmpty(Flags.CountryName{flag = majority(flags)}),
-		faction = majority(factions),
-	}
-end)
-
 --[[
 Fills in the flag, faction, and pageName of a player if they are missing. Uses
 data previously stored in page variables, and failing that, queries LPDB. The
@@ -156,7 +123,6 @@ so it does not need to be resolved again.
 options.date: Needed if the player used a different faction in the past. Defaults
 to the tournament end date or now.
 options.fetchPlayer: Whether to use the LPDB player record. Enabled by default.
-options.fetchMatch2Player: Whether to use the player's recent matches. Disabled by default.
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
 
@@ -166,18 +132,12 @@ options.savePageVar: Whether to save results to page variables. Enabled by defau
 function StarcraftPlayerExt.syncPlayer(player, options)
 	options = options or {}
 
-	local function match2Player()
-		return options.fetchMatch2Player
-			and StarcraftPlayerExt.fetchMatch2Player(player.pageName)
-			or nil
-	end
-
 	PlayerExt.populatePageName(player)
 
 	player.flag = player.flag
 		or String.nilIfEmpty(Flags.CountryName{flag = globalVars:get(player.displayName .. '_flag')})
 		or options.fetchPlayer ~= false and StarcraftPlayerExt.fetchPlayerFlag(player.pageName)
-		or match2Player() and match2Player().flag
+		or nil
 
 	player.faction = player.faction
 		or globalVars:get(player.displayName .. '_faction')
