@@ -7,11 +7,24 @@
 --
 
 return {
-	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015
+	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; mobile from 2022
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six',
 	defaultGame = 'siege',
 	games = {
+		mobile = {
+			abbreviation = 'R6M',
+			name = 'Tom Clancy\'s Rainbow Six Mobile',
+			link = 'Rainbow Six Siege',
+			logo = {
+				darkMode = 'Rainbow_Six_Mobile_darkmode.png',
+				lightMode = 'Rainbow_Six_Mobile_lightmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Rainbow_Six_Mobile_darkmode.png',
+				lightMode = 'Rainbow_Six_Mobile_lightmode.png',
+			},
+		},
 		siege = {
 			abbreviation = 'R6S',
 			name = 'Tom Clancy\'s Rainbow Six Siege',
