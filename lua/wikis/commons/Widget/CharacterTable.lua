@@ -9,14 +9,14 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+local Operator = require('Module:Operator')
 
 local Character = Lua.import('Module:Character')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Entry = Lua.import('Module:Widget/CharacterTable/Entry')
+local Entry = Lua.import('Module:Widget/CharacterTable/Entry/Custom')
 
 ---@class CharacterTable: Widget
 ---@operator call(table): CharacterTable
@@ -26,10 +26,8 @@ local CharacterTable = Class.new(Widget)
 ---@return Widget
 function CharacterTable:render()
 	local extraConditions = self.props.extraConditions
-	if String.isNotEmpty(extraConditions) then
-		conditions = conditions .. ' AND (' .. extraConditions .. ')'
-	end
-	local characters = Character.getAllCharacters()
+	local characters = Character.getAllCharacters{extraConditions}
+	Array.sortInPlaceBy(characters, Operator.property('name'))
 	return Div{
 		css = {
 			['text-align'] = 'center'
