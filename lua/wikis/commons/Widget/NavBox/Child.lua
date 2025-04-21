@@ -119,7 +119,7 @@ function NavBoxChild:_toRow(child, childIndex)
 				css = {width = '1%'},
 			} or nil,
 			Td{
-				classes = {'navbox-list', 'navbox-odd', 'hlist-group'},
+				classes = {'navbox-list', 'hlist-group'},
 				css = {padding = 0, width = '100%'},
 				children = {child.child},
 			},
