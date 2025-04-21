@@ -26,17 +26,20 @@
  * ```html
  * <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
  * <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * <span data-filter-group="group1" data-filter-categories="cat1,cat2">cat1 and cat2</span>
  * ```
  *
  * - `data-filter-group` (encouraged): group identifier for which the button group can interact with the item.
  *     Note: See data-filter-group in Filter buttons above as to why it is encouraged to always provide.
- * - `data-filter-category` (required): identifier for 'data-filter-on'
+ * - `data-filter-category` (required†): single identifier for 'data-filter-on'
+ * - `data-filter-categories` (required†): comma-separated list of identifiers for 'data-filter-on'
+ *
+ * † either one of these are required, but not both, though both can be used and will be appended together.
  *
  * #### Replacement by template with filter options
  * ```html
  * <div data-filter-expansion-template="TemplateName" data-filter-groups="group1,group2">Default content</div>
  * ```
- *
  * - `data-filter-expansion-template` (required): The template to expand with the current filter options.
  *   Expanded template will replace default content.
  * - `data-filter-groups` (required): Identify which filter groups the template will receive current parameters from.
@@ -57,6 +60,26 @@
  *   <span data-filter-hideable-group-fallback>DEFAULT CONTENT</span>
  * </div>
  * ```
+ *
+ * #### Filterable items counters
+ * Filterable items can be counted and the value updated in a seprate counter location.
+ *
+ * Counting can be done using a hidable group where only top-level hidable items will be counted.
+ * ```html
+ * <span data-filter-counter="counter1">0</span>
+ * <div data-filter-hideable-group data-filter-effect="fade" data-filter-count="counter1">
+ *   <span data-filter-group="group1" data-filter-category="cat1">cat1</span>
+ *   <span data-filter-group="group1" data-filter-category="cat2">cat2</span>
+ * </div>
+ * ```
+ * Counting can also be done on a per-item level where any item is tied to a counter.
+ * ```html
+ * <span data-filter-counter="counter2">0</span>
+ * <div>
+ *   <span data-filter-group="group1" data-filter-category="cat1" data-filter-count="counter2">cat1</span>
+ *   <span data-filter-group="group1" data-filter-category="cat2" data-filter-count="counter2">cat2</span>
+ * </div>
+ * ```
  */
 
 liquipedia.filterButtons = {
@@ -68,6 +91,7 @@ liquipedia.filterButtons = {
 	filterGroups: {},
 	templateExpansions: [],
 	hideableGroups: [],
+	filterCounters: {},
 
 	init: function() {
 		const filterButtonGroups = Array.from( document.querySelectorAll( '.filter-buttons[data-filter]' ) );
@@ -135,14 +159,32 @@ liquipedia.filterButtons = {
 	},
 
 	generateFilterableObjects: function() {
-		Array.from( document.querySelectorAll( '[data-filter-category]' ) ).forEach(
+		Array.from( document.querySelectorAll( '[data-filter-counter]' ) ).forEach(
+			/** @param {HTMLElement} filterCounter */
+			( filterCounter ) => {
+				const counterName = filterCounter.dataset.filterCounter;
+				const countableElements = document.querySelectorAll( '[data-filter-count="' + counterName + '"]' );
+				this.filterCounters[ counterName ] = {
+					element: filterCounter,
+					name: counterName,
+					count: countableElements.length
+				};
+			}
+		);
+
+		Array.from( document.querySelectorAll( '[data-filter-category], [data-filter-categories]' ) ).forEach(
 			/** @param {HTMLElement} filterableItem */
 			( filterableItem ) => {
 				const filterGroup = this.filterGroups[ filterableItem.dataset.filterGroup ?? this.fallbackFilterGroup ];
+				const filterCategories = filterableItem.dataset.filterCategories?.split( ',' ) ?? [];
+				if ( filterableItem.dataset.filterCategory ) {
+					filterCategories.push( filterableItem.dataset.filterCategory );
+				}
 				filterGroup.filterableItems.push( {
 					element: filterableItem,
-					value: filterableItem.dataset.filterCategory,
+					categories: filterCategories,
 					curated: filterableItem.dataset.curated !== undefined,
+					counter: filterableItem.dataset.filterCount,
 					hidden: false
 				} );
 			}
@@ -166,8 +208,10 @@ liquipedia.filterButtons = {
 			/** @param {HTMLElement} hideableGroup */
 			( hideableGroup ) => ( {
 				element: hideableGroup,
+				hiddenClass: hideableGroup.dataset.filterHiddenClass ?? 'filter-category--hidden-group',
 				effectClass: 'filter-effect-' + ( hideableGroup.dataset.filterEffect ?? this.fallbackFilterEffect ),
-				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' )
+				fallbackItem: hideableGroup.querySelector( ':scope > [data-filter-hideable-group-fallback]' ),
+				counter: hideableGroup.dataset.filterCount
 			} )
 		);
 	},
@@ -237,12 +281,19 @@ liquipedia.filterButtons = {
 			}
 
 			filterGroup.filterableItems.forEach( ( filterableItem ) => {
+				const initialHidden = filterableItem.hidden;
 				if ( filterGroup.curated ) {
 					filterableItem.hidden = !filterableItem.curated;
-				} else if ( filterableItem.value in filterGroup.filterStates ) {
-					filterableItem.hidden = !filterGroup.filterStates[ filterableItem.value ];
 				} else {
-					filterableItem.hidden = false;
+					filterableItem.hidden = !filterableItem.categories.every( ( category ) => {
+						return filterGroup.filterStates[ category ];
+					} );
+				}
+				if ( initialHidden !== filterableItem.hidden && filterableItem.counter ) {
+					const existingCount = this.filterCounters[ filterableItem.counter ].count;
+					let newCount = existingCount + ( filterableItem.hidden ? -1 : 1 );
+					newCount = newCount < 0 ? 0 : newCount;
+					this.filterCounters[ filterableItem.counter ].count = newCount;
 				}
 			} );
 		} );
@@ -277,14 +328,26 @@ liquipedia.filterButtons = {
 		this.hideableGroups.forEach( ( hideableGroup ) => {
 			const groupElement = hideableGroup.element;
 			const filterableItems = this.getTopLevelFilterableItems( groupElement );
+			const initialHidden = groupElement.classList.contains( hideableGroup.hiddenClass );
 			if ( !filterableItems.some( this.isFilterableVisible, this ) ) {
 				groupElement.classList.remove( hideableGroup.effectClass );
-				groupElement.classList.add( 'filter-category--hidden-group' );
+				groupElement.classList.add( hideableGroup.hiddenClass );
 				hideableGroup.fallbackItem?.classList.add( hideableGroup.effectClass );
 			} else {
-				groupElement.classList.replace( 'filter-category--hidden-group', hideableGroup.effectClass );
+				groupElement.classList.replace( hideableGroup.hiddenClass, hideableGroup.effectClass );
 				hideableGroup.fallbackItem?.classList.remove( hideableGroup.effectClass );
 			}
+			const newHidden = groupElement.classList.contains( hideableGroup.hiddenClass );
+			if ( initialHidden !== newHidden && hideableGroup.counter ) {
+				const existingCount = this.filterCounters[ hideableGroup.counter ].count;
+				let newCount = existingCount + ( newHidden ? -1 : 1 );
+				newCount = newCount < 0 ? 0 : newCount;
+				this.filterCounters[ hideableGroup.counter ].count = newCount;
+			}
+		} );
+
+		Object.values( this.filterCounters ).forEach( ( filterCounter ) => {
+			filterCounter.element.innerHTML = filterCounter.count;
 		} );
 
 		this.templateExpansions.forEach( ( templateExpansion ) => {
@@ -376,7 +439,10 @@ liquipedia.filterButtons = {
 	getTopLevelFilterableItems: function ( element ) {
 		return Array.from(
 			element.querySelectorAll(
-				':scope [data-filter-category]:not(:scope [data-filter-category] [data-filter-category])'
+				':scope [data-filter-category]:not(:scope [data-filter-category] [data-filter-category])' +
+					':not(:scope [data-filter-categories] [data-filter-categories]),' +
+				':scope [data-filter-categories]:not(:scope [data-filter-category] [data-filter-category])' +
+					':not(:scope [data-filter-categories] [data-filter-categories])'
 			)
 		);
 	},
