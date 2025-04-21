@@ -168,7 +168,10 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local participant = participantList[playerIndex]
 			return participant and {name = participant.player} or nil
 		end,
-		function(playerIndex)
+		function(playerIndex, playerIdData, playerInputData)
+			local participant = participantList[playerIndex]
+			participant.player = playerIdData.name or playerInputData.link or playerInputData.name
+			participant.displayName = playerIdData.displayname or playerInputData.name
 			local participant = participantList[playerIndex]
 			participant.character = getCharacterName(participant.character)
 			return participant
