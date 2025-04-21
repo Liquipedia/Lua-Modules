@@ -285,9 +285,9 @@ liquipedia.filterButtons = {
 				if ( filterGroup.curated ) {
 					filterableItem.hidden = !filterableItem.curated;
 				} else {
-					filterableItem.hidden = !filterableItem.categories.every( ( category ) => {
-						return filterGroup.filterStates[ category ];
-					} );
+					filterableItem.hidden = !filterableItem.categories.every(
+						( category ) => filterGroup.filterStates[ category ]
+					);
 				}
 				if ( initialHidden !== filterableItem.hidden && filterableItem.counter ) {
 					const existingCount = this.filterCounters[ filterableItem.counter ].count;
