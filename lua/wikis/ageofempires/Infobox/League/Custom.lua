@@ -122,13 +122,13 @@ function CustomLeague:createBottomContent()
 	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
 
 	if self.data.endDate and yesterday <= self.data.endDate then
-		---@diagnostic disable-next-line: missing-fields
-		return MatchTicker.tournament{
+		local matchtickerArgs = {
 			tournament = self.pagename,
 			limit = tonumber(self.args.matchtickerlimit) or 7,
 			infoboxWrapperClass = 'false',
 			infoboxClass = true
 		}
+		return MatchTicker.tournament(matchtickerArgs)
 	end
 end
 
