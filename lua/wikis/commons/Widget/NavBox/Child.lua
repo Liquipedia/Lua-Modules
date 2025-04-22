@@ -95,11 +95,13 @@ function NavBoxChild:render()
 	}
 end
 
----@param childPropsString string?
+---@param childProps table|string?
 ---@return {name: string?, child: Widget}?
-function NavBoxChild._getChild(childPropsString)
-	if not childPropsString then return end
-	local childProps = Json.parseIfTable(childPropsString)
+function NavBoxChild._getChild(childProps)
+	if Logic.isEmpty(childProps) then return end
+	if type(childProps) ~= 'table' then
+		childProps = Json.parseIfTable(childProps)
+	end
 	assert(Logic.isNotEmpty(childProps), EMPTY_CHILD_ERROR)
 	---@cast childProps -nil
 
