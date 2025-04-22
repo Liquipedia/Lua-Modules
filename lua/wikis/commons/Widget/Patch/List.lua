@@ -1,22 +1,23 @@
 ---
 -- @Liquipedia
 -- wiki=commons
--- page=Module:Patch/List
+-- page=Module:Widget/Patch/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
+local Arguments = Lua.import('Module:Arguments')
 local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
 local Patch = Lua.import('Module:Patch')
 local TableFormatter = Lua.import('Module:Format/Table')
 
+local Widget = Lua.import('Module:Widget')
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
 local IconFontawesome = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -98,67 +99,62 @@ local COLUMNS = {
 	},
 }
 
----@class PatchList
----@operator call(table): PatchList
----@field fetchConfig {game: string?, startDate: integer?, endDate: integer?, year: integer?, limit: integer?}
----@field displayConfig {collapsed: boolean, showMonthHeaders: boolean, showVersion: boolean, yearInAnchorText: boolean}
+---@class PatchList: Widget
+---@field config {collapsed: boolean, showMonthHeaders: boolean, showVersion: boolean, yearInAnchorText: boolean}
 ---@field latestPatchDate integer
 ---@field latestPatchPage string
----@field patches datapoint[]
----@field currentAnchor string?
-local PatchList = Class.new(function(self, args)
-	self.fetchConfig = {
-		game = args.game,
-		startDate = DateExt.readTimestamp(args.sdate),
-		endDate = DateExt.readTimestamp(args.edate),
-		year = tonumber(args.year),
-		limit = tonumber(args.limit),
-	}
-	self.displayConfig = {
-		collapsed = Logic.readBool(args.collapsed),
-		showMonthHeaders = not Logic.readBool(args.noheadermonth),
-		showVersion = Logic.readBool(args.showVersion),
-		yearInAnchorText = Logic.isEmpty(self.fetchConfig.year),
+---@operator call(table):PatchList
+local PatchList = Class.new(Widget, function(self, props)
+	self.config = {
+		collapsed = Logic.readBool(props.collapsed),
+		showMonthHeaders = not Logic.readBool(props.noheadermonth),
+		showVersion = Logic.readBool(props.showVersion),
+		yearInAnchorText = not tonumber(props.year),
 	}
 	-- fetch the latest patch
-	local latestPatch = Patch.getLatestPatch{game = args.game}
-	assert(latestPatch, 'No patch found for |game="' .. args.game .. '"')
+	local latestPatch = Patch.getLatestPatch{game = props.game}
+	assert(latestPatch, 'No patch found for |game="' .. props.game .. '"')
 	self.latestPatchDate = latestPatch.releaseDate.timestamp
 	self.latestPatchPage = latestPatch.pageName
 end)
 
----@param frame Frame
----@return Widget
-function PatchList.run(frame)
-	local args = Arguments.getArgs(frame)
-	return PatchList(args):fetch():build()
-end
+---@return Widget?
+function PatchList:render()
+	local patches = self:_fetch()
 
----@return self
-function PatchList:fetch()
-	self.patches = Patch.getByGameYearStartDateEndDate(self.fetchConfig)
-	assert(type(self.patches[1]) == 'table',
-		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(self.fetchConfig, {asText = true}))
-
-	return self
-end
-
----@return Widget
-function PatchList:build()
 	return DataTable{
-		classes = {'collapsible', self.displayConfig.collapsed and 'collapsed' or nil},
+		classes = {'collapsible', self.config.collapsed and 'collapsed' or nil},
 		children = WidgetUtil.collect(
 			self:_buildHeader(),
-			Array.map(self.patches, FnUtil.curry(self._buildRow, self)),
+			Array.map(patches, FnUtil.curry(self._buildRow, self)),
 			self:_footer()
 		)
 	}
 end
 
+---@return StandardPatch[]
+function PatchList:_fetch()
+	local props = self.props
+
+	local fetchConfig = {
+		game = props.game,
+		startDate = DateExt.readTimestamp(props.sdate),
+		endDate = DateExt.readTimestamp(props.edate),
+		year = tonumber(props.year),
+		limit = tonumber(props.limit),
+	}
+
+	local patches = Patch.getByGameYearStartDateEndDate(fetchConfig)
+	assert(type(patches[1]) == 'table',
+		'No patches found for the given criteria: ' .. TableFormatter.toLuaCode(fetchConfig, {asText = true}))
+
+	return patches
+end
+
 ---@return Widget
 function PatchList:_buildHeader()
 	return Tr{children = Array.map(COLUMNS, function(column)
-		if column.hide and column.hide(self.displayConfig) then return end
+		if column.hide and column.hide(self.config) then return end
 		return Th{
 			css = {['font-size'] = '1rem', width = column.width},
 			children = column.header,
@@ -196,7 +192,7 @@ end
 ---@return integer
 function PatchList:_numberOfColumns()
 	return Array.reduce(COLUMNS, function(currentSum, column)
-		if column.hide and column.hide(self.displayConfig) then return currentSum end
+		if column.hide and column.hide(self.config) then return currentSum end
 		return currentSum + 1
 	end, 0)
 end
@@ -210,7 +206,7 @@ function PatchList:_monthHeaderRow(patch)
 	if anchor == self.currentAnchor then return end
 	self.currentAnchor = anchor
 
-	if self.displayConfig.showMonthHeaders then
+	if self.config.showMonthHeaders then
 		return Tr{children = {Td{
 			attributes = {colspan = self:_numberOfColumns()},
 			classes = {'gray-bg'},
@@ -222,7 +218,7 @@ function PatchList:_monthHeaderRow(patch)
 				},
 				B{children = {
 					month,
-					self.displayConfig.yearInAnchorText and (' ' .. year) or nil,
+					self.config.yearInAnchorText and (' ' .. year) or nil,
 				}}
 			},
 		}}}
