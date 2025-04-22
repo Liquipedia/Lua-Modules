@@ -48,6 +48,7 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 180,
+			sortCasters = true,
 		},
 	},
 	defaultRoundPrecision = 0,
