@@ -42,7 +42,7 @@ function NavBox:render()
 			'navbox',
 			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
 		),
-	children = {NavBoxChild(Table.merge(props, {isFirst = true}))}
+		children = {NavBoxChild(Table.merge(props, {isFirst = true}))}
 	}
 end
 
