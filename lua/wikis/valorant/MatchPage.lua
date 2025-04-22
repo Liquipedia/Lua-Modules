@@ -71,25 +71,8 @@ function MatchPage:populateGames()
 end
 
 ---@return Widget
-function MatchPage:render()
-	self:makeDisplayTitle()
-	return Div{
-		children = WidgetUtil.collect(
-			Header {
-				countdownBlock = self:getCountdownBlock(),
-				isBestOfOne = self:isBestOfOne(),
-				mvp = self.matchData.extradata.mvp,
-				opponent1 = self.matchData.opponents[1],
-				opponent2 = self.matchData.opponents[2],
-				parent = self.matchData.parent,
-				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
-				tournamentName = self.matchData.tournament,
-			},
-			MapVeto(MatchSummary.preProcessMapVeto(self.matchData.extradata.mapveto, {game = self.matchData.game})),
-			self:renderGames(),
-			self:footer()
-		)
-	}
+function MatchPage:addHeaderComponents()
+	return MapVeto(MatchSummary.preProcessMapVeto(self.matchData.extradata.mapveto, {game = self.matchData.game}))
 end
 
 ---@param game MatchPageGame

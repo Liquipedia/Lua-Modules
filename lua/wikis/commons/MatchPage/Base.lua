@@ -221,10 +221,16 @@ function BaseMatchPage:render()
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
 				tournamentName = self.matchData.tournament,
 			},
+			self:addHeaderComponents(),
 			self:renderGames(),
 			self:footer()
 		)
 	}
+end
+
+---@protected
+---@return Widget|Widget[]?
+function BaseMatchPage:addHeaderComponents()
 end
 
 ---@protected
