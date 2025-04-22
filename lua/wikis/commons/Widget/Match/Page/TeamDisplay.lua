@@ -56,7 +56,7 @@ function MatchPageTeamDisplay:render()
 				children = {
 					Div{
 						classes = { 'match-bm-match-header-team-long' },
-						children = { Link{ link = data.page } }
+						children = { Link{ link = data.page, children = data.name } }
 					},
 					Div{
 						classes = { 'match-bm-match-header-team-short' },
