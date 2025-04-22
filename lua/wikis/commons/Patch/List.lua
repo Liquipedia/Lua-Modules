@@ -121,7 +121,8 @@ local PatchList = Class.new(function(self, args)
 		yearInAnchorText = Logic.isEmpty(self.fetchConfig.year),
 	}
 	-- fetch the latest patch
-	local latestPatch = (Patch.getByGameYearStartDateEndDate{limit = 1, game = args.game} or {})[1]
+	local latestPatch = Patch.getLatestPatch{game = args.game}
+	assert(latestPatch, 'No patch found for |game="' .. args.game .. '"')
 	self.latestPatchDate = latestPatch.releaseDate.timestamp
 	self.latestPatchPage = latestPatch.pageName
 end)

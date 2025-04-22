@@ -70,6 +70,26 @@ function Patch.getByGameYearStartDateEndDate(config)
 	return Array.map(records, Patch.patchFromRecord)
 end
 
+---@param config {game: string?}
+---@return StandardPatch?
+function Patch.getLatestPatch(config)
+	local conditions = ConditionTree(BooleanOperator.all):add(Array.append(
+		ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
+		config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil
+	))
+
+	local record = mw.ext.LiquipediaDB.lpdb('datapoint', {
+		conditions = conditions:toString(),
+		order = 'date desc, pagename desc',
+		limit = 1,
+	})[1]
+	if type(record) ~= 'table' then
+		return nil
+	end
+
+	return Patch.patchFromRecord(record)
+end
+
 ---@param record datapoint
 ---@return StandardPatch
 function Patch.patchFromRecord(record)
