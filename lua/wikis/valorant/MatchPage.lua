@@ -17,13 +17,11 @@ local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
-local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local MapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local WidgetUtil = Lua.import('Module:Widget/Util')
