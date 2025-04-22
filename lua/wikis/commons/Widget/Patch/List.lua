@@ -180,6 +180,7 @@ function PatchList:_buildRow(patch)
 	return Fragment{children = WidgetUtil.collect(
 		self:_monthHeaderRow(patch),
 		Tr{children = Array.map(COLUMNS, function(column)
+			if column.hide and column.hide(self.config) then return end
 			return Td{
 				css = {['font-size'] = '0.875rem'},
 				children = column.row(patch, isLatestPatch)

@@ -54,7 +54,7 @@ end
 ---@return StandardPatch[]
 function Patch.getByGameYearStartDateEndDate(config)
 	local conditions = ConditionTree(BooleanOperator.all):add(Array.append(
-		ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
+		{ConditionNode(ColumnName('type'), Comparator.eq, 'patch')},
 		config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil,
 		config.year and ConditionNode(ColumnName('date_year'), Comparator.eq, config.year) or nil,
 		config.startDate and ConditionNode(ColumnName('date'), Comparator.ge, config.startDate) or nil,
@@ -73,10 +73,10 @@ end
 ---@param config {game: string?}
 ---@return StandardPatch?
 function Patch.getLatestPatch(config)
-	local conditions = ConditionTree(BooleanOperator.all):add(Array.append(
+	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
 		config.game and ConditionNode(ColumnName('extradata_game'), Comparator.eq, config.game) or nil
-	))
+	}
 
 	local record = mw.ext.LiquipediaDB.lpdb('datapoint', {
 		conditions = conditions:toString(),
