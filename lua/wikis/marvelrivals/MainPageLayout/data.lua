@@ -6,18 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	updates = {
@@ -42,7 +41,7 @@ local CONTENT = {
 		heading = 'Transfers',
 		body = TransfersList{
 			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y')
+				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 			end
 		},
 		boxid = 1509,
@@ -55,12 +54,16 @@ local CONTENT = {
 		padding = true,
 		boxid = 1510,
 	},
+	specialEvents = {
+		noPanel = true,
+		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
+	},
 	heroes = {
 		heading = 'Heroes',
 		body = '{{Liquipedia:HeroTable}}',
 		padding = true,
 		boxid = 1501,
-
 	},
 	filterButtons = {
 		noPanel = true,
@@ -71,20 +74,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -199,6 +189,11 @@ return {
 				children = {
 					{
 						mobileOrder = 1,
+						noPanel = true,
+						content = CONTENT.specialEvents,
+					},
+					{
+						mobileOrder = 2,
 						content = CONTENT.heroes,
 					},
 					{
@@ -215,7 +210,7 @@ return {
 				size = 6,
 				children = {
 					{
-						mobileOrder = 2,
+						mobileOrder = 3,
 						children = {
 							{
 								children = {

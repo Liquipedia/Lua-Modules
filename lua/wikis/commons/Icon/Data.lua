@@ -15,6 +15,7 @@ return {
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
+	casters = 'fas fa-microphone-alt',
 	comment = 'far fa-comment',
 	mvp = 'fas fa-medal',
 	startleft = 'fas fa-chevron-left',
@@ -116,6 +117,20 @@ return {
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
 
+	-- Usage: Match Pages
+	damage = 'fas fa-sword',
+	gold = 'fas fa-coins',
+
+	-- Usage: Dota2 Match Pages
+	dota2_gpm = 'fas fa-coin',
+	dota2_kda = 'fas fa-skull-crossbones',
+	dota2_lhdn = 'fas fa-swords',
+	dota2_tower = 'fas fa-chess-rook',
+	dota2_barrack = 'fas fa-warehouse',
+
+	-- Usage: LeagueOfLegends Match Pages
+	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
+
 	-- Usage: Indicate boolean info in Infobox
 	yes = 'fa fa-check',
 	no = 'fa fa-times',
@@ -126,4 +141,8 @@ return {
 
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
+
+	-- Usage: Chess
+	chesskingoutline = 'far fa-chess-king',
+	chesskingfull = 'fas fa-chess-king',
 }

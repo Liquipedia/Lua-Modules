@@ -408,7 +408,7 @@ function Person:getStandardNationalityValue(nationality)
 		return nil
 	end
 
-	local nationalityToStore = Flags.CountryName(nationality)
+	local nationalityToStore = Flags.CountryName{flag = nationality}
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
@@ -527,7 +527,7 @@ function Person:getLocations()
 	end
 
 	return Array.map(locations, function(country)
-		return Flags.CountryName(country)
+		return Flags.CountryName{flag = country}
 	end)
 end
 

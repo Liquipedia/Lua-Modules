@@ -7,25 +7,38 @@
 --
 
 local Array = require('Module:Array')
-local CharacterIcon = require('Module:CharacterIcon')
+local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local Json = require('Module:Json')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Links = require('Module:Links')
-local Operator = require('Module:Operator')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Tabs = require('Module:Tabs')
-local TemplateEngine = require('Module:TemplateEngine')
-local VodLink = require('Module:VodLink')
 
+local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-local Display = Lua.import('Module:MatchPage/Template')
 
-local MatchPage = {}
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Comment = Lua.import('Module:Widget/Match/Page/Comment')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
+local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
+local TeamVeto = Lua.import('Module:Widget/Match/Page/TeamVeto')
+local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
+local VetoRow = Lua.import('Module:Widget/Match/Page/VetoRow')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local NO_CHARACTER = 'default'
-local NOT_PLAYED = 'notplayed'
+---@class Dota2MatchPage: BaseMatchPage
+local MatchPage = Class.new(BaseMatchPage)
+
+local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
+local ITEM_IMAGE_SIZE = '64px'
+local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
+local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
@@ -37,42 +50,22 @@ function MatchPage.isEnabledFor(match)
 			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
 end
 
----@class Dota2MatchPageViewModelGame: MatchGroupUtilGame
----@field finished boolean
----@field winnerName string?
----@field teams table[]
-
----@class Dota2MatchPageViewModelOpponent: standardOpponent
----@field opponentIndex integer
----@field iconDisplay string
----@field shortname string
----@field page string
----@field seriesDots string[]
-
 ---@param props {match: MatchGroupUtilMatch}
----@return Html
+---@return Widget
 function MatchPage.getByMatchId(props)
-	---@class Dota2MatchPageViewModel: MatchGroupUtilMatch
-	---@field games Dota2MatchPageViewModelGame[]
-	---@field opponents Dota2MatchPageViewModelOpponent[]
-	local viewModel = props.match
-
-	viewModel.isBestOfOne = #viewModel.games == 1
-	viewModel.dateCountdown = viewModel.timestamp ~= DateExt.defaultTimestamp and
-		DisplayHelper.MatchCountdownBlock(viewModel) or nil
-
-	local phase = MatchGroupUtil.computeMatchPhase(props.match)
-	viewModel.statusText = phase == 'ongoing' and 'live' or phase
-
-	local function makeItemDisplay(item)
-		if String.isEmpty(item.name) then
-			return '[[File:EmptyIcon itemicon dota2 gameasset.png|64px|Empty|link=]]'
-		end
-		return '[[File:'.. item.image ..'|64px|'.. item.name ..'|link=]]'
-	end
+	local matchPage = MatchPage(props.match)
 
 	-- Update the view model with game and team data
-	Array.forEach(viewModel.games, function(game)
+	matchPage:populateGames()
+
+	-- Add more opponent data field
+	matchPage:populateOpponents()
+
+	return matchPage:render()
+end
+
+function MatchPage:populateGames()
+	Array.forEach(self.games, function(game)
 		game.finished = game.winner ~= nil and game.winner ~= -1
 		game.teams = Array.map(Array.range(1, 2), function(teamIdx)
 			local team = {}
@@ -83,26 +76,22 @@ function MatchPage.getByMatchId(props)
 				local newPlayer = Table.mergeInto(player, {
 					displayName = player.name or player.player,
 					link = player.player,
-					items = Array.map(player.items or {}, makeItemDisplay),
-					backpackitems = Array.map(player.backpackitems or {}, makeItemDisplay),
-					neutralitem = makeItemDisplay(player.neutralitem or {}),
 				})
-
-				newPlayer.displayDamageDone = MatchPage._abbreviateNumber(player.damagedone)
-				newPlayer.displayGold = MatchPage._abbreviateNumber(player.gold)
 
 				return newPlayer
 			end)
 
 			if game.finished then
 				-- Aggregate stats
-				team.gold = MatchPage._abbreviateNumber(MatchPage._sumItem(team.players, 'gold'))
-				team.kills = MatchPage._sumItem(team.players, 'kills')
-				team.deaths = MatchPage._sumItem(team.players, 'deaths')
-				team.assists = MatchPage._sumItem(team.players, 'assists')
+				team.gold = MatchPage.abbreviateNumber(MatchPage.sumItem(team.players, 'gold'))
+				team.kills = MatchPage.sumItem(team.players, 'kills')
+				team.deaths = MatchPage.sumItem(team.players, 'deaths')
+				team.assists = MatchPage.sumItem(team.players, 'assists')
 
 				-- Set fields
 				team.objectives = game.extradata['team' .. teamIdx .. 'objectives']
+			else
+				team.objectives = {}
 			end
 
 			team.picks = Array.filter(game.extradata.vetophase or {}, function(veto)
@@ -114,155 +103,326 @@ function MatchPage.getByMatchId(props)
 
 			return team
 		end)
-		if game.finished and viewModel.opponents[game.winner] then
-			game.winnerName = viewModel.opponents[game.winner].name
-		end
 	end)
-
-	-- Add more opponent data field
-	Array.forEach(viewModel.opponents, function(opponent, index)
-		opponent.opponentIndex = index
-
-		local teamTemplate = opponent.template and mw.ext.TeamTemplate.raw(opponent.template)
-		if not teamTemplate then
-			return
-		end
-
-		opponent.iconDisplay = mw.ext.TeamTemplate.teamicon(opponent.template)
-		opponent.shortname = teamTemplate.shortname
-		opponent.page = teamTemplate.page
-		opponent.name = teamTemplate.name
-
-		opponent.seriesDots = Array.map(viewModel.games, function(game)
-			return game.teams[index].scoreDisplay
-		end)
-	end)
-
-	viewModel.vods = Array.map(viewModel.games, function(game, gameIdx)
-		return game.vod and VodLink.display{
-			gamenum = gameIdx,
-			vod = game.vod,
-		} or ''
-	end)
-	if String.isNotEmpty(viewModel.vod) then
-		table.insert(viewModel.vods, 1, VodLink.display{
-			vod = viewModel.vod,
-		})
-	end
-
-	-- Create an object array for links
-	local function processLink(site, link)
-		return Table.mergeInto({link = link}, Links.getMatchIconData(site))
-	end
-
-	viewModel.parsedLinks = Array.flatMap(Table.entries(viewModel.links), function(linkData)
-		local site, link = unpack(linkData)
-		if type(link) == 'table' then
-			return Array.map(link, function(sublink)
-				return processLink(site, sublink)
-			end)
-		end
-		return {processLink(site, link)}
-	end)
-
-	viewModel.heroIcon = function(c)
-		local character = c
-		if type(c) == 'table' then
-			character = c.character
-			---@cast character -table
-		end
-		return CharacterIcon.Icon{
-			character = character or NO_CHARACTER,
-			date = viewModel.date
-		}
-	end
-
-	local displayTitle = MatchPage.makeDisplayTitle(viewModel)
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '}}'})
-
-	return MatchPage.render(viewModel)
 end
 
----@param viewModel table
----@return string
-function MatchPage.makeDisplayTitle(viewModel)
-	if not viewModel.opponents[1].shortname and viewModel.opponents[2].shortname then
-		return table.concat({'Match in', viewModel.tickername}, ' ')
-	end
-
-	local team1name = viewModel.opponents[1].shortname or 'TBD'
-	local team2name = viewModel.opponents[2].shortname or 'TBD'
-	local tournamentName = viewModel.tickername
-	local displayTitle = team1name .. ' vs. ' .. team2name
-	if not tournamentName then
-		return displayTitle
-	end
-
-	return displayTitle .. ' @ ' .. tournamentName
-end
-
----@param tbl table
----@param item string
----@return number
-function MatchPage._sumItem(tbl, item)
-	return Array.reduce(Array.map(tbl, Operator.property(item)), Operator.add, 0)
-end
-
----@param number number?
----@return string?
-function MatchPage._abbreviateNumber(number)
-	if not number then
-		return
-	end
-	return string.format('%.1fK', number / 1000)
-end
-
----@param model table
----@return Html
-function MatchPage.render(model)
-	return mw.html.create('div')
-		:wikitext(MatchPage.header(model))
-		:node(MatchPage.games(model))
-		:wikitext(MatchPage.footer(model))
-end
-
----@param model table
----@return string
-function MatchPage.header(model)
-	return TemplateEngine():render(Display.header, model)
-end
-
----@param model table
----@return string
-function MatchPage.games(model)
-	local games = Array.map(Array.filter(model.games, function(game)
-		return game.status ~= NOT_PLAYED
-	end), function(game)
-		return TemplateEngine():render(Display.game, Table.merge(model, game))
-	end)
-
-	if #games < 2 then
-		return tostring(games[1])
-	end
-
-	---@type table<string, any>
-	local tabs = {
-		This = 1,
-		['hide-showall'] = true
+---@param item {name: string?, image: string?}
+---@return Widget
+function MatchPage.makeItemDisplay(item)
+	return IconImage{
+		imageLight = Logic.emptyOr(item.image, 'EmptyIcon itemicon dota2 gameasset.png'),
+		size = ITEM_IMAGE_SIZE,
+		caption = Logic.emptyOr(item.name, 'Empty'),
+		link = ''
 	}
-
-	Array.forEach(games, function(game, idx)
-		tabs['name' .. idx] = 'Game ' .. idx
-		tabs['content' .. idx] = tostring(game)
-	end)
-
-	return tostring(Tabs.dynamic(tabs))
 end
 
----@param model table
----@return string
-function MatchPage.footer(model)
-	return TemplateEngine():render(Display.footer, model)
+---@param game MatchPageGame
+---@return Widget
+function MatchPage:renderGame(game)
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderDraft(game),
+			self:_renderTeamStats(game),
+			self:_renderPlayersPerformance(game)
+		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderDraft(game)
+	return {
+		HtmlWidgets.H3{children = 'Draft'},
+		Div{
+			classes = {'match-bm-game-veto-wrapper'},
+			children = Array.map(self.opponents, function (opponent, opponentIndex)
+				local team = game.teams[opponentIndex]
+				return TeamVeto{
+					teamIcon = opponent.iconDisplay,
+					vetoRows = {
+						VetoRow{
+							vetoType = 'pick',
+							side = team.side,
+							vetoItems = Array.map(team.picks, function (pick)
+								return VetoItem{
+									characterIcon = self:getCharacterIcon(pick.character),
+									vetoNumber = pick.vetoNumber
+								}
+							end)
+						},
+						VetoRow{
+							vetoType = 'ban',
+							vetoItems = Array.map(team.bans, function (ban)
+								return VetoItem{
+									characterIcon = self:getCharacterIcon(ban.character),
+									vetoNumber = ban.vetoNumber
+								}
+							end)
+						}
+					}
+				}
+			end)
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderTeamStats(game)
+	return {
+		HtmlWidgets.H3{children = 'Team Stats'},
+		Div{
+			classes = {'match-bm-team-stats'},
+			children = {
+				Div{
+					classes = {'match-bm-team-stats-header'},
+					children = WidgetUtil.collect(
+						HtmlWidgets.H4{
+							classes = {'match-bm-team-stats-header-title'},
+							children = game.finished
+								and self.opponents[game.winner].name .. ' Victory'
+								or 'No winner determined yet'
+						},
+						game.length and Div{children = game.length} or nil
+					)
+				},
+				Div{
+					classes = {'match-bm-team-stats-container'},
+					children = {
+						self:_renderStatsTeamDisplay(game, 1),
+						StatsList{
+							finished = game.finished,
+							data = {
+								{
+									icon = KDA_ICON,
+									name = 'KDA',
+									team1Value = Array.interleave({
+										game.teams[1].kills,
+										game.teams[1].deaths,
+										game.teams[1].assists
+									}, SPAN_SLASH),
+									team2Value = Array.interleave({
+										game.teams[2].kills,
+										game.teams[2].deaths,
+										game.teams[2].assists
+									}, SPAN_SLASH)
+								},
+								{
+									icon = GOLD_ICON,
+									name = 'Gold',
+									team1Value = game.teams[1].gold,
+									team2Value = game.teams[2].gold
+								},
+								{
+									icon = IconFa{iconName = 'dota2_tower'},
+									name = 'Towers',
+									team1Value = game.teams[1].objectives.towers,
+									team2Value = game.teams[2].objectives.towers
+								},
+								{
+									icon = IconFa{iconName = 'dota2_barrack'},
+									name = 'Barracks',
+									team1Value = game.teams[1].objectives.barracks,
+									team2Value = game.teams[2].objectives.barracks
+								},
+								{
+									icon = HtmlWidgets.Span{
+										classes = {'liquipedia-custom-icon', 'liquipedia-custom-icon-roshan'}
+									},
+									name = 'Roshans',
+									team1Value = game.teams[1].objectives.roshans,
+									team2Value = game.teams[2].objectives.roshans
+								}
+							}
+						},
+						self:_renderStatsTeamDisplay(game, 2)
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderStatsTeamDisplay(game, teamIndex)
+	local team = game.teams[teamIndex]
+	return Div{
+		classes = {'match-bm-team-stats-team'},
+		children = {
+			Div{
+				classes = {'match-bm-team-stats-team-logo'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Div{
+				classes = {'match-bm-team-stats-team-side'},
+				children = team.side
+			},
+			Div{
+				classes = {
+					'match-bm-team-stats-team-state',
+					'state--' .. team.scoreDisplay
+				},
+				children = team.scoreDisplay
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderPlayersPerformance(game)
+	return {
+		HtmlWidgets.H3{children = 'Player Performance'},
+		Div{
+			classes = {'match-bm-players-wrapper'},
+			children = {
+				self:_renderTeamPerformance(game, 1),
+				self:_renderTeamPerformance(game, 2)
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderTeamPerformance(game, teamIndex)
+	return Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			Div{
+				classes = {'match-bm-players-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Array.map(game.teams[teamIndex].players, function (player)
+				return self:_renderPlayerPerformance(game, teamIndex, player)
+			end)
+		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@param player table
+---@return Widget
+function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	return Div{
+		classes = {'match-bm-players-player'},
+		children = {
+			PlayerDisplay{
+				characterIcon = self:getCharacterIcon(player.character),
+				characterName = player.character,
+				side = game.teams[teamIndex].side,
+				roleIcon = IconImage{
+					imageLight = 'Dota2 ' .. player.facet .. ' facet icon darkmode.png',
+					caption = player.facet,
+					link = ''
+				},
+				playerName = player.displayName,
+				playerLink = player.link
+			},
+			Div{
+				classes = {'match-bm-players-player-loadout'},
+				children = {
+					Div{
+						classes = {'match-bm-players-player-loadout-items'},
+						children = WidgetUtil.collect(
+							Array.map(player.items or {}, function (item)
+								return Div{
+									classes = {'match-bm-players-player-loadout-item'},
+									children = MatchPage.makeItemDisplay(item)
+								}
+							end),
+							Array.map(player.backpackitems or {}, function (backpackitem)
+								return Div{
+									classes = {'match-bm-players-player-loadout-item', 'item--backpack'},
+									children = MatchPage.makeItemDisplay(backpackitem)
+								}
+							end)
+						)
+					},
+					Div{
+						classes = {'match-bm-players-player-loadout-rs-wrap'},
+						children = Array.map({
+							MatchPage.makeItemDisplay(player.neutralitem or {}),
+							player.shard and IconImage{
+								imageLight = 'Dota2_Aghanim\'s_Shard_symbol_allmode.png',
+								size = ITEM_IMAGE_SIZE,
+								caption = 'Aghanim\'s Shard',
+								link = ''
+							} or '',
+							player.scepter and IconImage{
+								imageLight = 'Dota2_Aghanim\'s_Scepter_symbol_allmode.png',
+								size = ITEM_IMAGE_SIZE,
+								caption = 'Aghanim\'s Scepter',
+								link = ''
+							} or ''
+						}, function (specialItem)
+							return Div{
+								classes = {'match-bm-players-player-loadout-rs'},
+								children = specialItem
+							}
+						end)
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-players-player-stats'},
+				children = {
+					PlayerStat{
+						title = {KDA_ICON, 'KDA'},
+						data = Array.interleave({
+							player.kills, player.deaths, player.assists
+						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'damage'}, 'DMG'},
+						data = MatchPage.abbreviateNumber(player.damagedone)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'dota2_lhdn'}, 'LH/DN'},
+						data = Array.interleave({player.lasthits, player.denies}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {GOLD_ICON, 'NET'},
+						data = MatchPage.abbreviateNumber(player.gold)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'dota2_gpm'}, 'GPM'},
+						data = player.gpm
+					}
+				}
+			}
+		}
+	}
+end
+
+function MatchPage:getPatchLink()
+	if Logic.isEmpty(self.matchData.patch) then return end
+	return Link{ link = 'Version ' .. self.matchData.patch }
+end
+
+---@return MatchPageComment[]
+function MatchPage:addComments()
+	local casters = Json.parseIfString(self.matchData.extradata.casters)
+	if Logic.isEmpty(casters) then return {} end
+	return {
+		Comment{
+			children = WidgetUtil.collect(
+				#casters > 1 and 'Casters: ' or 'Caster: ',
+				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
+			)
+		}
+	}
 end
 
 return MatchPage

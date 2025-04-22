@@ -9,15 +9,13 @@
 local Lua = require('Module:Lua')
 
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	usefulArticles = {
@@ -46,7 +44,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1510,
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -57,20 +55,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -83,14 +68,15 @@ local CONTENT = {
 			upcomingDays = 120,
 			completedDays = 30
 		},
+		padding = true,
 		boxid = 1508,
 	},
 }
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'Overwatch 2 wordmark lightmode.png',
+		darkmode = 'Overwatch 2 wordmark darkmode.png',
 	},
 	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
 		'to competitive players and teams.',

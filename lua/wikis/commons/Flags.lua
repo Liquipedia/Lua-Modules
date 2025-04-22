@@ -137,9 +137,11 @@ function Flags.languageIcon(args, langName)
 end
 
 -- Converts a country name, flag code, or alias to a standardized country name
----@param flagName string?
+---@param args {flag: string?}?
 ---@return string
-function Flags.CountryName(flagName)
+function Flags.CountryName(args)
+	local flagName = (args or {}).flag
+
 	if String.isEmpty(flagName) then
 		return ''
 	end
@@ -167,10 +169,13 @@ alpha3 - returns the lowercase ISO 3166-1 alpha-3 flag code
 
 default is alpha2
 ]]--
----@param flagName string?
----@param format 'alpha3'|'alpha2'|nil
+---@param args {flag: string?, format: 'alpha3'|'alpha2'?}?
 ---@return string
-function Flags.CountryCode(flagName, format)
+function Flags.CountryCode(args)
+	args = args or {}
+	local flagName = args.flag
+	local format = args.format
+
 	if String.isEmpty(flagName) then
 		return ''
 	end

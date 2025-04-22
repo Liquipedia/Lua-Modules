@@ -12,7 +12,11 @@ local ReferenceCleaner = {}
 
 ---@param dateWithRef string?
 ---@return string
+---@overload fun(dateWithRef: table): string
 function ReferenceCleaner.clean(dateWithRef)
+	if type(dateWithRef) == 'table' then
+		dateWithRef = dateWithRef.input or dateWithRef[1]
+	end
 	if dateWithRef == nil then
 		return ''
 	end
@@ -31,7 +35,11 @@ end
 
 ---@param numberWithRef string?
 ---@return string
+---@overload fun(dateWithRef: table): string
 function ReferenceCleaner.cleanNumber(numberWithRef)
+	if type(numberWithRef) == 'table' then
+		numberWithRef = numberWithRef[1]
+	end
 	if numberWithRef == nil then
 		return ''
 	end
