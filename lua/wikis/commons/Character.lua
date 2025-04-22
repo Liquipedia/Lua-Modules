@@ -39,7 +39,7 @@ function Character.getCharacterByName(name)
 	return Character.getAllCharacters{'[[name::'.. name ..']]'}[1]
 end
 
----@param additionalConditions string[]?
+---@param additionalConditions string|string[]?
 ---@return StandardCharacter[]
 function Character.getAllCharacters(additionalConditions)
 	local conditions = Array.extend(
