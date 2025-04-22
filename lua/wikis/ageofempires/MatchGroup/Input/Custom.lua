@@ -174,16 +174,6 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
----@param games table[]
----@param opponents table[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
-end
-
----@param match table
 ---@param opponents table[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)

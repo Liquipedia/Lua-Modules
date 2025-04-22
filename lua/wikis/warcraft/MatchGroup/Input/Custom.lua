@@ -171,9 +171,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
+	local extradata = {}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
 		extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
