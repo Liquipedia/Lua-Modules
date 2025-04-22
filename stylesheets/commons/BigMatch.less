@@ -251,6 +251,39 @@ Author(s): Rathoz
 	}
 }
 
+.match-bm-match-mapveto {
+	padding: 4px;
+	background: #f5f5f5;
+	border: 1px solid #bbbbbb;
+	border-top: none;
+	width: 100%;
+
+	.theme--dark & {
+		background-color: var(--clr-secondary-16);
+		border-color: var(--clr-secondary-25);
+	}
+
+	tr:first-child {
+		background-color: transparent;
+		border-top: none;
+	}
+
+	&.brkts-popup-mapveto {
+		.brkts-popup-mapveto-vetoround {
+			background-color: var(--clr-surface);
+
+			.theme--dark & {
+				background-color: var(--table-background-color);
+			}
+		}
+
+		td,
+		th {
+			font-size: 0.8125rem;
+		}
+	}
+}
+
 .match-bm-lol-game-veto {
 	display: flex;
 	flex-direction: column;

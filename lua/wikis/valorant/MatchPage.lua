@@ -17,11 +17,15 @@ local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
+local MatchSummary = Lua.import('Module:MatchSummary/Base')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
+local Header = Lua.import('Module:Widget/Match/Page/Header')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local MapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchPage: BaseMatchPage
@@ -64,6 +68,28 @@ function MatchPage:populateGames()
 			return team
 		end)
 	end)
+end
+
+---@return Widget
+function MatchPage:render()
+	self:makeDisplayTitle()
+	return Div{
+		children = WidgetUtil.collect(
+			Header {
+				countdownBlock = self:getCountdownBlock(),
+				isBestOfOne = self:isBestOfOne(),
+				mvp = self.matchData.extradata.mvp,
+				opponent1 = self.matchData.opponents[1],
+				opponent2 = self.matchData.opponents[2],
+				parent = self.matchData.parent,
+				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
+				tournamentName = self.matchData.tournament,
+			},
+			MapVeto(MatchSummary.preProcessMapVeto(self.matchData.extradata.mapveto, {game = self.matchData.game})),
+			self:renderGames(),
+			self:footer()
+		)
+	}
 end
 
 ---@param game MatchPageGame
