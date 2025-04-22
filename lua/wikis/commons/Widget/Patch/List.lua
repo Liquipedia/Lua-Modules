@@ -200,7 +200,7 @@ end
 ---@return Widget?
 function PatchList:_monthHeaderRow(patch)
 	local month = DateExt.formatTimestamp('M', patch.releaseDate.timestamp)
-	local year = DateExt.formatTimestamp('Y', patch.releaseDate.timestamp)
+	local year = patch.releaseDate.year
 	local anchor = month .. '_' .. year
 	if anchor == self.currentAnchor then return end
 	self.currentAnchor = anchor
