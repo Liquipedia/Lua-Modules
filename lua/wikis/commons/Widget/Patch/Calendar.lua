@@ -63,20 +63,20 @@ end
 
 ---@return StandardPatch[]
 function PatchCalendar:_fetch()
-	local args = self.props
-	local startDate = DateExt.readTimestamp(args.sdate)
+	local props = self.props
+	local startDate = DateExt.readTimestamp(props.sdate)
 	local year = startDate and tonumber(DateExt.formatTimestamp('Y', startDate))
-		or tonumber(args.year) or tonumber(os.date('%Y'))
+		or tonumber(props.year) or tonumber(os.date('%Y'))
 	---@cast year -nil
 
 	self.displayYear = year
 
 	return Patch.getByGameYearStartDateEndDate{
-		game = args.game,
+		game = props.game,
 		startDate = startDate,
-		endDate = DateExt.readTimestamp(args.edate),
+		endDate = DateExt.readTimestamp(props.edate),
 		year = (not startDate) and year or nil,
-		limit = tonumber(args.limit),
+		limit = tonumber(props.limit),
 	}
 end
 
