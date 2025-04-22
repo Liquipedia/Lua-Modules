@@ -128,7 +128,9 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, AgentNames)
 
 	if not map.players then return end
-	local players = map.players[MapFunctions._processOpponentIndex(opponentIndex, {reversed = map.reversed, zeroBased = true})]
+	local players = map.players[MapFunctions._processOpponentIndex(
+		opponentIndex, {reversed = map.reversed, zeroBased = true}
+	)]
 	return MatchGroupInputUtil.parseMapPlayers(
 		opponent.match2players,
 		players,
