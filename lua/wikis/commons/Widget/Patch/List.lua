@@ -112,7 +112,7 @@ local PatchList = Class.new(Widget, function(self, props)
 	}
 	-- fetch the latest patch
 	local latestPatch = Patch.getLatestPatch{game = props.game}
-	assert(latestPatch, 'No patch found for |game="' .. props.game .. '"')
+	assert(latestPatch, 'No patch found for |game="' .. (props.game or '') .. '"')
 	self.latestPatchDate = latestPatch.releaseDate.timestamp
 	self.latestPatchPage = latestPatch.pageName
 end)
