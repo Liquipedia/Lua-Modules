@@ -16,7 +16,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Opponent = Lua.import('Module:Opponent')
 
 local TBD = 'TBD'
-local TBD_ABBREVIATION = Abbreviation.make(TBD, 'To be determined (or to be decided)')
+local TBD_ABBREVIATION = Abbreviation.make{text = TBD, title = 'To be determined (or to be decided)'}
 
 --Display components for players.
 ---@class PlayerDisplay
@@ -64,7 +64,7 @@ function PlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
 	local teamNode
@@ -90,7 +90,7 @@ function PlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local nameAndLink = props.showLink ~= false and player.pageName
@@ -116,10 +116,10 @@ function PlayerDisplay.InlinePlayer(props)
 end
 
 -- Note: require('Module:Flags').Icon automatically includes a span with class="flag"
----@param name string?
+---@param args {flag: string?}
 ---@return string
-function PlayerDisplay.Flag(name)
-	return Flags.Icon({flag = name, shouldLink = false})
+function PlayerDisplay.Flag(args)
+	return Flags.Icon({flag = args.flag, shouldLink = false})
 end
 
 return Class.export(PlayerDisplay)

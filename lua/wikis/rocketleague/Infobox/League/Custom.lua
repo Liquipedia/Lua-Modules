@@ -121,9 +121,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_organizer', self:_concatArgs(args, 'organizer'))
 	Variables.varDefine('tournament_sponsors', self:_concatArgs(args, 'sponsor'))
 	Variables.varDefine('tournament_rlcs_premier', self.data.rlcsPremier)
-	Variables.varDefine('date', ReferenceCleaner.clean(args.date))
-	Variables.varDefine('sdate', ReferenceCleaner.clean(args.sdate))
-	Variables.varDefine('edate', ReferenceCleaner.clean(args.edate))
+	Variables.varDefine('date', ReferenceCleaner.clean{input = args.date})
+	Variables.varDefine('sdate', ReferenceCleaner.clean{input = args.sdate})
+	Variables.varDefine('edate', ReferenceCleaner.clean{input = args.edate})
 
 	-- Legacy tier vars
 	Variables.varDefine('tournament_lptier', args.liquipediatier)

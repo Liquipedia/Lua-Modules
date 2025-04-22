@@ -207,9 +207,9 @@ function Series:_setLpdbData(args, links)
 		liquipediatier = tier,
 		liquipediatiertype = tierType,
 		publishertier = args.publishertier,
-		launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
-		defunctfate = ReferenceCleaner.clean(args.defunctfate),
+		launcheddate = ReferenceCleaner.clean{input = args.launcheddate or args.sdate or args.inaugurated},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate or args.edate},
+		defunctfate = ReferenceCleaner.clean{input = args.defunctfate},
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
 			organizer1 = args.organizer or args.organizer1,
 			organizer2 = args.organizer2,
