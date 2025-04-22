@@ -108,9 +108,9 @@ function MatchPage:_renderGameOverview(game)
 									Div{
 										classes = {'match-bm-lol-game-summary-score'},
 										children = {
-											game.teams[1].scoreDisplay,
+											game.scores[1],
 											'&ndash;',
-											game.teams[2].scoreDisplay
+											game.scores[2]
 										}
 									},
 									Div{
