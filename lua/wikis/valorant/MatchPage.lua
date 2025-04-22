@@ -66,7 +66,7 @@ function MatchPage:populateGames()
 	end)
 end
 
----@param game LoLMatchPageGame
+---@param game MatchPageGame
 ---@return Widget
 function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
@@ -77,7 +77,7 @@ function MatchPage:renderGame(game)
 end
 
 ---@private
----@param game LoLMatchPageGame
+---@param game MatchPageGame
 ---@return Widget?
 function MatchPage:_renderGameOverview(game)
 	if self:isBestOfOne() then return end
