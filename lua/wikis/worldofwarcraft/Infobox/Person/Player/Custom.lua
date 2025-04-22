@@ -12,9 +12,6 @@ local Lua = require('Module:Lua')
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
-local Cell = Widgets.Cell
-
 ---@class WorldofwarcraftInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
@@ -32,8 +29,6 @@ end
 ---@param widgets Widget[]
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
-	local args = self.caller.args
-
 	if id == 'region' then return {} end
 	return widgets
 end
