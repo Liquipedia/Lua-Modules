@@ -86,8 +86,6 @@ function PatchCalendar._getMonthsPresent(patches)
 	local monthsPresent = {}
 	Array.forEach(patches, function(patch)
 		local patchTimeStamp = patch.releaseDate.timestamp
-		-- can never be nil due to lpdb data having a valid date string
-		---@cast patchTimeStamp -nil
 		local month = tonumber(DateExt.formatTimestamp('n', patchTimeStamp))
 		---@cast month -nil
 		monthsPresent[month] = true
