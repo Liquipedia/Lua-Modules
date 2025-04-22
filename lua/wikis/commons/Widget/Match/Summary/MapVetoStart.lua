@@ -12,9 +12,10 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
-local ARROW_LEFT = '[[File:Arrow sans left.svg|15x15px|link=|Left team starts]]'
-local ARROW_RIGHT = '[[File:Arrow sans right.svg|15x15px|link=|Right team starts]]'
+local ARROW_LEFT = IconFa{iconName = 'startleft', size = '110%'}
+local ARROW_RIGHT = IconFa{iconName = 'startright', size = '110%'}
 
 ---@class MatchSummaryMapVetoStart: Widget
 ---@operator call(table): MatchSummaryMapVetoStart
