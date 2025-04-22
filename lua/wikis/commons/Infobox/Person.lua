@@ -209,6 +209,8 @@ function Person:createInfobox()
 								else
 									table.insert(positions, roleDisplay)
 								end
+							else
+								table.insert(positions, roleDisplay)
 							end
 						end
 					end
