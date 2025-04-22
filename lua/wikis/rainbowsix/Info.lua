@@ -15,14 +15,14 @@ return {
 		mobile = {
 			abbreviation = 'R6M',
 			name = 'Tom Clancy\'s Rainbow Six Mobile',
-			link = 'Rainbow Six Siege',
+			link = 'Rainbow Six Mobile',
 			logo = {
-				darkMode = 'Rainbow_Six_Mobile_darkmode.png',
-				lightMode = 'Rainbow_Six_Mobile_lightmode.png',
+				darkMode = 'Rainbow Six Mobile darkmode.png',
+				lightMode = 'Rainbow Six Mobile lightmode.png',
 			},
 			defaultTeamLogo = {
-				darkMode = 'Rainbow_Six_Mobile_darkmode.png',
-				lightMode = 'Rainbow_Six_Mobile_lightmode.png',
+				darkMode = 'Rainbow Six Mobile darkmode.png',
+				lightMode = 'Rainbow Six Mobile lightmode.png',
 			},
 		},
 		siege = {
