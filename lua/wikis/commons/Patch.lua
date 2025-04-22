@@ -11,7 +11,6 @@ local Lua = require('Module:Lua')
 local Array = require('Module:Array')
 local DateExt = require('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
-local Json = Lua.import('Module:Json')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -102,7 +101,7 @@ function Patch.patchFromRecord(record)
 		pageName = record.pagename,
 		releaseDate = releaseDate,
 		version = record.information or (record.extradata or {}).version,
-		highlights = Json.parseIfTable(record.extradata.highlights) or {},
+		highlights = record.extradata.highlights or {},
 	}
 
 	return patch
