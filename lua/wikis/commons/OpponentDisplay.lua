@@ -16,6 +16,7 @@ local Table = require('Module:Table')
 local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
 
 local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
@@ -272,17 +273,21 @@ its layout context, and not of the team name. The team is specified by template.
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
 ---@return Html
 function OpponentDisplay.BlockTeamContainer(props)
-	-- only import here to avoid dependency loop (OpponentDisplay <-> MatchGroup/Util)
-	local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	local team = MatchGroupUtil.fetchTeam(props.template)
-	if not team then
+	local rawTeam = TeamTemplate.getRawOrNil(props.template)
+
+	if not rawTeam then
 		return mw.html.create('div'):addClass('error')
-			:wikitext('No team template exists for name ' .. props.template)
+			:wikitext(TeamTemplate.noTeamMessage(props.template))
 	end
 
 	return OpponentDisplay.BlockTeam(Table.merge(props, {
 		icon = mw.ext.TeamTemplate.teamicon(props.template),
-		team = team,
+		team = {
+			bracketName = rawTeam.bracketname,
+			displayName = rawTeam.name,
+			pageName = rawTeam.page,
+			shortName = rawTeam.shortname,
+		},
 	}))
 end
 

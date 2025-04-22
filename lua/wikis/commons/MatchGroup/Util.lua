@@ -22,7 +22,6 @@ local Variables = require('Module:Variables')
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local TBD_DISPLAY = '<abbr title="To Be Decided">TBD</abbr>'
 local NOW = os.time()
 
 local nilIfEmpty = String.nilIfEmpty
@@ -822,32 +821,6 @@ function MatchGroupUtil.mergeBracketResetMatch(match, bracketResetMatch)
 	end
 
 	return mergedMatch
-end
-
----Fetches information about a team via mw.ext.TeamTemplate.
----@param template string
----@return table?
-function MatchGroupUtil.fetchTeam(template)
-	--exception for TBD opponents
-	if string.lower(template) == 'tbd' then
-		return {
-			bracketName = TBD_DISPLAY,
-			displayName = TBD_DISPLAY,
-			pageName = 'TBD',
-			shortName = TBD_DISPLAY,
-		}
-	end
-	local rawTeam = mw.ext.TeamTemplate.raw(template)
-	if not rawTeam then
-		return nil
-	end
-
-	return {
-		bracketName = rawTeam.bracketname,
-		displayName = rawTeam.name,
-		pageName = rawTeam.page,
-		shortName = rawTeam.shortname,
-	}
 end
 
 ---Parse extradata as a JSON string if read from page variables. Otherwise create a copy if fetched from lpdb.
