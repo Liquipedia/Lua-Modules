@@ -32,6 +32,7 @@ local staffRoles = {
 	['interpreter'] = {category = 'Production Staff', display = 'Interpreter'},
 	['talent'] = {category = 'Talents', display = 'Talent'},
 	['admin'] = {category = 'Admins', display = 'Admin'},
+	['commentator'] = {category = 'Casters', display = 'Caster'},
 }
 
 return staffRoles
