@@ -142,9 +142,7 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	---@type table<string, string|table|nil>
-	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
+	local extradata = {}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
 		extradata[prefix] = mapVeto and mw.ext.TeamLiquidIntegration.resolve_redirect(mapVeto) or nil

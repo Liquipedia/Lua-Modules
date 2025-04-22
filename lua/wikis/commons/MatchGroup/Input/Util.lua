@@ -21,6 +21,7 @@ local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
 -- can not use /Custom here to avoid dependency loop on sc(2)
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -504,7 +505,7 @@ end
 
 ---reads the caster input of a match
 ---@param match table
----@param options {noSort: boolean?}?
+---@param options {sortCasters: boolean?}?
 ---@return table[]?
 function MatchGroupInputUtil.readCasters(match, options)
 	options = options or {}
@@ -517,7 +518,7 @@ function MatchGroupInputUtil.readCasters(match, options)
 		))
 	end
 
-	if not options.noSort then
+	if options.sortCasters then
 		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 	end
 
@@ -1170,7 +1171,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	match.extradata = Table.merge(
+		{casters = MatchGroupInputUtil.readCasters(match, {sortCasters = Info.config.match2.sortCasters})},
+		Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	)
 
 	match.games = games
 	match.opponents = opponents

@@ -86,7 +86,6 @@ end
 function CustomMatchGroupInput.getExtraData(match, maps)
 	local hasSubmatches = CustomMatchGroupInput.getScoreType(match, maps) == 'mapWins'
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		hassubmatches = tostring(hasSubmatches),
 	}
 end
