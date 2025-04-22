@@ -274,20 +274,20 @@ function TransferRef.createReferenceIconDisplay(reference)
 			color = 'wiki-color-dark',
 		}, link)
 	elseif refType == TOURNAMENT_TYPE or refType == TOURNAMENT_LEAVE_TYPE then
-		return Page.makeInternalLink(Abbreviation.make(
-			Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
-			text
-		), link)
+		return Page.makeInternalLink(Abbreviation.make{
+			text = Icon.makeIcon{iconName = 'link', color = 'wiki-color-dark'},
+			title = text,
+		}, link)
 	elseif refType == INSIDE_TYPE then
-		return Abbreviation.make(
-			Icon.makeIcon{iconName = 'insidesource', color = 'wiki-color-dark'},
-			text
-		)
+		return Abbreviation.make{
+			text = Icon.makeIcon{iconName = 'insidesource', color = 'wiki-color-dark'},
+			title = text,
+		}
 	elseif refType == CONTRACT_TYPE then
-		return Page.makeExternalLink(Abbreviation.make(
-			Icon.makeIcon{iconName = 'transferdatabase', color = 'wiki-color-dark'},
-			text
-		), link)
+		return Page.makeExternalLink(Abbreviation.make{
+			text = Icon.makeIcon{iconName = 'transferdatabase', color = 'wiki-color-dark'},
+			title = text,
+		}, link)
 	end
 
 	return nil

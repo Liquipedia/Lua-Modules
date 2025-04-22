@@ -150,7 +150,6 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'false',
 	}
 

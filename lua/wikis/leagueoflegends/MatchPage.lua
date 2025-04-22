@@ -486,7 +486,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 							caption = mw.getContentLanguage():ucfirst(player.role),
 							link = ''
 						},
-						playerName = player.player
+						playerLink = player.player,
+						playerName = player.displayName or player.player
 					},
 					Div{
 						classes = {'match-bm-lol-players-player-loadout'},

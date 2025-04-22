@@ -36,6 +36,7 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 190,
+			sortCasters = true,
 		},
 	},
 	defaultRoundPrecision = 0,

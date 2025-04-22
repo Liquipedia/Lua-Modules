@@ -145,7 +145,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
-		casters = MatchGroupInputUtil.readCasters(match),
 		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponents[1]),
 		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponents[2]),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
