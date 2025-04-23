@@ -312,7 +312,7 @@ function Series:_createLocation(country, city)
 		return ''
 	end
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
+	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 end
 
 ---@param id string?

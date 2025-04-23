@@ -303,7 +303,7 @@ function Team:_createLocation(location)
 		self:categories(demonym .. ' Teams')
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) ..
+	return Flags.Icon{flag = location, shouldLink = true} ..
 			'&nbsp;' ..
 			(locationDisplay or '')
 end

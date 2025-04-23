@@ -67,7 +67,7 @@ function PortalPlayers:create()
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
 	for country, playerData in Table.iter.spairs(self:_getPlayers()) do
-		local flag = Flags.Icon({flag = country, shouldLink = true})
+		local flag = Flags.Icon{flag = country, shouldLink = true}
 
 		wrapper:tag('h3')
 			:tag('span')
