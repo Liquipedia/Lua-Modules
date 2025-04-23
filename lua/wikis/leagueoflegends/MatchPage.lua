@@ -70,6 +70,7 @@ local KEYSTONES = Table.map({
 end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
+local LOADOUT_ICON_SIZE = '24px'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
@@ -477,7 +478,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 		return IconImage{
 			imageLight = 'Lol item ' .. itemName .. '.png',
 			link = itemName ~= DEFAULT_ITEM and itemName or '',
-			size = '24px'
+			size = LOADOUT_ICON_SIZE
 		}
 	end
 
@@ -511,12 +512,12 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 											IconImage{
 												imageLight = 'Rune ' .. player.runeKeystone .. '.png',
 												link = '',
-												size = '24px'
+												size = LOADOUT_ICON_SIZE
 											},
 											IconImage{
 												imageLight = 'Rune ' .. player.runes.secondary.tree .. '.png',
 												link = '',
-												size = '24px'
+												size = LOADOUT_ICON_SIZE
 											},
 										}
 									},
@@ -526,7 +527,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 											return IconImage{
 												imageLight = 'Summoner spell ' .. spell .. '.png',
 												link = '',
-												size = '24px'
+												size = LOADOUT_ICON_SIZE
 											}
 										end)
 									}
