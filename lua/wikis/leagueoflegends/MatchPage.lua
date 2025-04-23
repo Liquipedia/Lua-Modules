@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -472,15 +473,36 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
-	---@param itemName string
+	---@param prefix string
+	---@param name string
+	---@param noLink boolean?
 	---@return Widget
-	local generateItemImage = function (itemName)
+	local generateLoadoutImage = function (prefix, name, noLink)
 		return IconImage{
-			imageLight = 'Lol item ' .. itemName .. '.png',
-			link = itemName ~= DEFAULT_ITEM and itemName or '',
-			size = LOADOUT_ICON_SIZE
+			imageLight = prefix .. ' ' .. name .. '.png',
+			caption = name,
+			link = Logic.readBool(noLink) and '' or name,
+			size = LOADOUT_ICON_SIZE,
 		}
 	end
+
+	---@param runeName string
+	---@return Widget
+	local generateRuneImage = FnUtil.memoize(function (runeName)
+		return generateLoadoutImage('Rune', runeName, true)
+	end)
+
+	---@param spellName string
+	---@return Widget
+	local generateSpellImage = FnUtil.memoize(function (spellName)
+		return generateLoadoutImage('Summoner spell', spellName)
+	end)
+
+	---@param itemName string
+	---@return Widget
+	local generateItemImage = FnUtil.memoize(function (itemName)
+		return generateLoadoutImage('Lol item', itemName, itemName == DEFAULT_ITEM)
+	end)
 
 	return Div{
 		classes = {'match-bm-lol-players-player'},
@@ -508,28 +530,14 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 								children = {
 									Div{
 										classes = {'match-bm-lol-players-player-loadout-rs'},
-										children = {
-											IconImage{
-												imageLight = 'Rune ' .. player.runeKeystone .. '.png',
-												link = '',
-												size = LOADOUT_ICON_SIZE
-											},
-											IconImage{
-												imageLight = 'Rune ' .. player.runes.secondary.tree .. '.png',
-												link = '',
-												size = LOADOUT_ICON_SIZE
-											},
-										}
+										children = Array.map(
+											{player.runeKeystone, player.runes.secondary.tree},
+											generateRuneImage
+										)
 									},
 									Div{
 										classes = {'match-bm-lol-players-player-loadout-rs'},
-										children = Array.map(player.spells, function (spell)
-											return IconImage{
-												imageLight = 'Summoner spell ' .. spell .. '.png',
-												link = '',
-												size = LOADOUT_ICON_SIZE
-											}
-										end)
+										children = Array.map(player.spells, generateSpellImage)
 									}
 								}
 							},
