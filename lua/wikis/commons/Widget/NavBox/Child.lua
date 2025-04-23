@@ -14,7 +14,6 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
-local Variables = Lua.import('Module:Variables')
 
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -68,23 +67,8 @@ function NavBoxChild:render()
 		+ 1 -- middle Row is always shown
 		+ ((props.image or props.imagedark) and 1 or 0)
 
-	-- intentionally only check against boolean true so it can not be inputted from wiki code
-	local isFirst = props.isFirst == true
-
-	-- as a first step collapse at the top and uncollapse at the bottom
-	-- as heuristic assume we are at the bottom if an infobox or HDB is above
-	local shouldCollapse = isFirst and not (
-			Variables.varDefault('has_infobox') -- any page with an infobox
-			or Variables.varDefault('tournament_parent') -- any Page with a HDB
-		)
-
 	return Tbl{
-		classes = WidgetUtil.collect(
-			'nowraplinks',
-			'navbox-inner',
-			isFirst and 'collapsible' or nil,
-			shouldCollapse and 'collapsed' or nil
-		),
+		classes = {'nowraplinks', 'navbox-inner'},
 		children = WidgetUtil.collect(
 			props.title and Tr{children = {Th{
 				attributes = {colspan = colSpan},
