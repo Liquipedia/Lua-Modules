@@ -25,6 +25,8 @@ local VodLink = require('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Title = Lua.import('Module:Widget/Tournament/Title')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -232,24 +234,15 @@ function Details:tournament()
 		match.parent:gsub('_', ' ')
 	)
 
-	return mw.html.create('div')
-		:addClass('match-tournament')
-		:node(
-			self.displayGameIcons
-			and Game.icon{game=self.match.game, noLink=true, size='50px', spanClass='icon-small'}
-			or nil
-		)
-		:node(mw.html.create('div')
-			:addClass('tournament-icon')
-			:node(mw.html.create('div')
-				:wikitext(icon)
-			)
-		)
-		:node(mw.html.create('div')
-			:addClass('tournament-text')
-			:wikitext(Page.makeInternalLink({}, displayName, match.pagename))
-		)
-
+	return HtmlWidgets.Div{
+		classes = {'match-tournament'},
+		children = {
+			Title{
+				tournament = match,
+				displayGameIcon = self.displayGameIcons
+			}
+		}
+	}
 end
 
 ---Display class for matches shown within a match ticker
