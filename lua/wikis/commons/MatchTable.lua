@@ -22,7 +22,7 @@ local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Timezone = require('Module:Timezone')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local Tier = require('Module:Tier/Custom')
 local VodLink = require('Module:VodLink')
 
@@ -253,7 +253,7 @@ function MatchTable:getOpponentAliases(mode, opponent)
 
 	local aliases = {}
 	--for teams also query pagenames from team template
-	local opponentNames = self.config.queryHistoricalAliases and Team.queryHistoricalNames(opponent.template) or
+	local opponentNames = self.config.queryHistoricalAliases and TeamTemplate.queryHistoricalNames(opponent.template) or
 		{opponent.template}
 
 	Array.forEach(opponentNames, function(name)

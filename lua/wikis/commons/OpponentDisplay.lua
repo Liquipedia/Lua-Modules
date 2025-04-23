@@ -13,11 +13,13 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Math = require('Module:MathUtil')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 local TypeUtil = require('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 local PlayerDisplay = Lua.import('Module:Player/Display/Custom')
+
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local zeroWidthSpace = '&#8203;'
 
@@ -249,54 +251,19 @@ end
 
 ---Displays a team as an inline element. The team is specified by a template.
 ---@param props {flip: boolean?, template: string, style: teamStyle?}
----@return string?
+---@return Widget?
 function OpponentDisplay.InlineTeamContainer(props)
-	local teamExists = mw.ext.TeamTemplate.teamexists(props.template)
 	if props.style == 'standard' or not props.style then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.team(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team', {props.template})
-		else
-			return teamExists
-				and mw.ext.TeamTemplate.team2(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team2', {props.template})
-		end
+		return TeamInline{ name = props.template, flip = props.flip, displayType = 'standard' }
 	elseif props.style == 'short' then
-		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.teamshort(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'TeamShort', {props.template})
-		else
-			return teamExists
-				and mw.ext.TeamTemplate.team2short(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'Team2Short', {props.template})
-		end
+		return TeamInline{ name = props.template, flip = props.flip, displayType = 'short' }
 	elseif props.style == 'bracket' then
 		if not props.flip then
-			return teamExists
-				and mw.ext.TeamTemplate.teambracket(props.template)
-				or Template.safeExpand(mw.getCurrentFrame(), 'TeamBracket', {props.template})
+			return TeamInline{ name = props.template, displayType = 'bracket' }
 		else
 			error('Flipped style=bracket is not supported')
 		end
 	end
-end
-
---[[
-Displays a team as an inline element. The team is specified by a team struct.
-Only the default icon is supported.
-]]
----@param props {flip: boolean?, style: teamStyle?, team: standardTeamProps}
----@return string
-function OpponentDisplay.InlineTeam(props)
-	return (OpponentDisplay.InlineTeamContainer(Table.merge(props, {
-		template = 'default',
-	}))
-		:gsub('DefaultPage', props.team.pageName)
-		:gsub('DefaultName', Logic.emptyOr(props.team.displayName, zeroWidthSpace) --[[@as string]])
-		:gsub('DefaultShort', props.team.shortName)
-		:gsub('DefaultBracket', props.team.bracketName))
 end
 
 --[[
@@ -306,17 +273,22 @@ its layout context, and not of the team name. The team is specified by template.
 ---@param props {flip: boolean?, overflow: OverflowModes?, showLink: boolean?, style: teamStyle?, template: string}
 ---@return Html
 function OpponentDisplay.BlockTeamContainer(props)
-	-- only import here to avoid dependency loop (OpponentDisplay <-> MatchGroup/Util)
-	local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
-	local team = MatchGroupUtil.fetchTeam(props.template)
-	if not team then
+	local rawTeam = TeamTemplate.getRawOrNil(props.template)
+
+	if not rawTeam then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
 		return mw.html.create('div'):addClass('error')
-			:wikitext('No team template exists for name ' .. props.template)
+			:wikitext(TeamTemplate.noTeamMessage(props.template))
 	end
 
 	return OpponentDisplay.BlockTeam(Table.merge(props, {
 		icon = mw.ext.TeamTemplate.teamicon(props.template),
-		team = team,
+		team = {
+			bracketName = rawTeam.bracketname,
+			displayName = rawTeam.name,
+			pageName = rawTeam.page,
+			shortName = rawTeam.shortname,
+		},
 	}))
 end
 

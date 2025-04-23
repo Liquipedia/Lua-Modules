@@ -13,12 +13,13 @@ local Links = require('Module:Links')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local Characters = require('Module:Characters')
+local Characters = Lua.import('Module:Characters')
+local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
 
 local NON_PLAYER_HEADER = Abbreviation.make{text = 'Staff', title = 'Coaches, Managers, Analysts and more'}
 	.. ' & ' .. Abbreviation.make{text = 'Talents', title = 'Commentators, Observers, Hosts and more'}
@@ -88,7 +89,9 @@ function CustomPortalPlayers:row(player, isPlayer)
 	row:tag('td'):node(CustomPortalPlayers._getMainCharIcons(player))
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = TeamTemplate.exists(player.team) and tostring(TeamInline{
+		name = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then

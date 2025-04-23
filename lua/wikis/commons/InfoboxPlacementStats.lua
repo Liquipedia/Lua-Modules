@@ -10,7 +10,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Medals = require('Module:Medals')
-local Team = require('Module:Team')
+local TeamTemplate = require('Module:TeamTemplate')
 local Tier = require('Module:Tier/Custom')
 
 local OpponentLibrary = require('Module:OpponentLibraries')
@@ -81,14 +81,11 @@ function PlacementStats._buildConditions(opponentType, opponent, excludedTierTyp
 	if opponentType ~= Opponent.team then
 		table.insert(conditions, '[[opponentname::' .. opponent .. ']]')
 	else
-		local rawOpponentTemplate = Team.queryRaw(opponent) or {}
-		local opponentTemplate = rawOpponentTemplate.historicaltemplate or rawOpponentTemplate.templatename
-		if not opponentTemplate then
-			error('Missing team template for team: ' .. opponent)
+		if not TeamTemplate.exists(opponent) then
+			error(TeamTemplate.noTeamMessage(opponent))
 		end
 
-		local teamTemplates = Team.queryHistorical(opponentTemplate)
-		teamTemplates = teamTemplates and Array.extractValues(teamTemplates) or {opponentTemplate}
+		local teamTemplates = TeamTemplate.queryHistoricalNames(opponent)
 		local opponentConditions = Array.map(teamTemplates, function(teamTemplate)
 			return '[[opponenttemplate::' .. teamTemplate .. ']]'
 		end)
