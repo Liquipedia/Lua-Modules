@@ -471,6 +471,16 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	---@param itemName string
+	---@return Widget
+	local generateItemImage = function (itemName)
+		return IconImage{
+			imageLight = 'Lol item ' .. itemName .. '.png',
+			link = itemName ~= DEFAULT_ITEM and itemName or '',
+			size = '24px'
+		}
+	end
+
 	return Div{
 		classes = {'match-bm-lol-players-player'},
 		children = {
@@ -527,23 +537,11 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 								children = {
 									Div{
 										classes = {'match-bm-lol-players-player-loadout-item'},
-										children = Array.map(Array.range(1, 3), function (itemIndex)
-											return IconImage{
-												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
-												link = player.items[itemIndex],
-												size = '24px'
-											}
-										end)
+										children = Array.map(Array.sub(player.items, 1, 3), generateItemImage)
 									},
 									Div{
 										classes = {'match-bm-lol-players-player-loadout-item'},
-										children = Array.map(Array.range(4, 6), function (itemIndex)
-											return IconImage{
-												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
-												link = player.items[itemIndex],
-												size = '24px'
-											}
-										end)
+										children = Array.map(Array.sub(player.items, 4, 6), generateItemImage)
 									}
 								}
 							}
