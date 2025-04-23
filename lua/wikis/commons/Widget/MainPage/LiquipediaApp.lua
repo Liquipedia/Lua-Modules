@@ -45,7 +45,7 @@ local function buildFontAwesomeList(icon, entries, listCss)
 						classes = {'fa-li'},
 						children = icon
 					},
-					entry
+					unpack(entry)
 				)
 			}
 		end)
