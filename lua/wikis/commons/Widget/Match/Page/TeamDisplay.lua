@@ -8,8 +8,11 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local TeamTemplate = require('Module:TeamTemplate')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -44,29 +47,42 @@ end
 
 ---@return Widget?
 function MatchPageTeamDisplay:render()
-	local opponent = self.props.opponent
-	local data = self.props.opponent.teamTemplateData
-	if Logic.isEmpty(data) then return Div{classes = { 'match-bm-match-header-team' }} end
 	return Div{
 		classes = { 'match-bm-match-header-team' },
-		children = {
-			mw.ext.TeamTemplate.teamicon(data.templatename),
-			Div{
-				classes = { 'match-bm-match-header-team-group' },
-				children = {
-					Div{
-						classes = { 'match-bm-match-header-team-long' },
-						children = { Link{ link = data.page } }
-					},
-					Div{
-						classes = { 'match-bm-match-header-team-short' },
-						children = { Link{ link = data.page, children = data.shortname } }
-					},
-					Div{
-						classes = { 'match-bm-match-header-round-results' },
-						children = Array.map(opponent.seriesDots, MatchPageTeamDisplay._makeGameResultIcon)
-					},
-				}
+		children = self:_buildChildren()
+	}
+end
+
+---@private
+---@return Widget|(string|Widget)[]?
+function MatchPageTeamDisplay:_buildChildren()
+	local opponent = self.props.opponent
+	if Opponent.isEmpty(opponent) then return
+	elseif opponent.type == Opponent.literal then
+		return Div{
+			classes = {'match-bm-match-header-team-literal'},
+			children = opponent.name
+		}
+	end
+	local data = self.props.opponent.teamTemplateData
+	assert(data, TeamTemplate.noTeamMessage(opponent.template))
+	return {
+		mw.ext.TeamTemplate.teamicon(data.templatename),
+		Div{
+			classes = { 'match-bm-match-header-team-group' },
+			children = {
+				Div{
+					classes = { 'match-bm-match-header-team-long' },
+					children = { Link{ link = data.page, children = data.name } }
+				},
+				Div{
+					classes = { 'match-bm-match-header-team-short' },
+					children = { Link{ link = data.page, children = data.shortname } }
+				},
+				Div{
+					classes = { 'match-bm-match-header-round-results' },
+					children = Array.map(opponent.seriesDots, MatchPageTeamDisplay._makeGameResultIcon)
+				},
 			}
 		}
 	}

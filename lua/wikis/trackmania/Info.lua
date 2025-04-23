@@ -151,6 +151,7 @@ return {
 		},
 		match2 = {
 			status = 1,
+			sortCasters = true,
 		},
 	},
 	opponentLibrary = 'Opponent',

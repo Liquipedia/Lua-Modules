@@ -150,7 +150,6 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'false',
 	}
 
@@ -528,7 +527,7 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		casters = MatchGroupInputUtil.readCasters(match),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

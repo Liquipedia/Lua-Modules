@@ -147,9 +147,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_sponsors', args.sponsors)
 
 
-	local dateclean = ReferenceCleaner.clean(args.date)
-	local edateclean = ReferenceCleaner.clean(args.edate)
-	local sdateclean = ReferenceCleaner.clean(args.sdate)
+	local dateclean = ReferenceCleaner.clean{input = args.date}
+	local edateclean = ReferenceCleaner.clean{input = args.edate}
+	local sdateclean = ReferenceCleaner.clean{input = args.sdate}
 	local date = (not String.isEmpty(args.date)) and dateclean
 					or edateclean
 	local startdate = (not String.isEmpty(args.sdate)) and sdateclean
