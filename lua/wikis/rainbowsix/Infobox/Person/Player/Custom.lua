@@ -59,6 +59,7 @@ ROLES.entryfragger = ROLES.entry
 ROLES['assistant coach'] = ROLES.coach
 
 local GAMES = {
+	r6m = '[[Rainbow Six Siege Mobile|Mobile]]',
 	r6s = '[[Rainbow Six Siege|Siege]]',
 	vegas2 = '[[Rainbow Six Vegas 2|Vegas 2]]',
 }
