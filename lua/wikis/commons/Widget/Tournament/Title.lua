@@ -35,7 +35,7 @@ function TournamentsTickerTitleWidget:render()
                 spanClass = 'icon-small',
                 size = '50px',
             } or '',
-            HtmlWidgets.Div{
+            HtmlWidgets.Span{
                 classes = {'tournament-icon'},
                 children = {
                     LeagueIcon.display{
@@ -48,7 +48,7 @@ function TournamentsTickerTitleWidget:render()
                     }
                 }
             },
-            HtmlWidgets.Div{
+            HtmlWidgets.Span{
                 classes = {'tournament-name'},
                 children = {
                     Link{

@@ -221,7 +221,15 @@ function Details:tournament()
 		classes = {'match-tournament'},
 		children = {
 			Title{
-				tournament = match,
+				tournament = {
+					pageName = match.pagename,
+					displayName = match.tournament,
+					tickerName = match.tickername,
+					icon = match.icon,
+					iconDark = match.icondark,
+					series = match.series,
+					game = match.game,
+				},
 				displayGameIcon = self.displayGameIcons
 			}
 		}
