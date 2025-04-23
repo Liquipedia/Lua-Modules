@@ -535,15 +535,13 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage._buildPlayerLoadout(player)
-	---@param prefix string
-	---@param name string
-	---@param noLink boolean?
+	---@param props {prefix: string, name: string, caption: string?, noLink: boolean?}
 	---@return Widget
-	local generateLoadoutImage = function (prefix, name, noLink)
+	local generateLoadoutImage = function (props)
 		return IconImage{
-			imageLight = prefix .. ' ' .. name .. '.png',
-			caption = name,
-			link = Logic.readBool(noLink) and '' or name,
+			imageLight = props.prefix .. ' ' .. props.name .. '.png',
+			caption = props.caption or props.name,
+			link = Logic.readBool(props.noLink) and '' or props.name,
 			size = LOADOUT_ICON_SIZE,
 		}
 	end
@@ -551,19 +549,25 @@ function MatchPage._buildPlayerLoadout(player)
 	---@param runeName string
 	---@return Widget
 	local generateRuneImage = FnUtil.memoize(function (runeName)
-		return generateLoadoutImage('Rune', runeName, true)
+		return generateLoadoutImage{prefix = 'Rune', name = runeName, noLink = true}
 	end)
 
 	---@param spellName string
 	---@return Widget
 	local generateSpellImage = FnUtil.memoize(function (spellName)
-		return generateLoadoutImage('Summoner spell', spellName)
+		return generateLoadoutImage{prefix = 'Summoner spell', name = spellName}
 	end)
 
 	---@param itemName string
 	---@return Widget
 	local generateItemImage = FnUtil.memoize(function (itemName)
-		return generateLoadoutImage('Lol item', itemName, itemName == DEFAULT_ITEM)
+		local isDefaultItem = itemName == DEFAULT_ITEM
+		return generateLoadoutImage{
+			prefix = 'Lol item',
+			name = itemName,
+			caption = isDefaultItem and 'Empty' or itemName,
+			noLink = isDefaultItem
+		}
 	end)
 
 	return Div{
