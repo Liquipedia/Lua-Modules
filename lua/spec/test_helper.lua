@@ -197,6 +197,7 @@ return function(busted, helper, options)
 		stub(require('Module:Lua'), 'moduleExists', function(file)
 			return attemptImport(file) ~= nil
 		end)
+		stub(require('Module:Lua'), 'import', require)
 	end
 
 	busted.subscribe({'suite', 'start'}, setupForTesting)
