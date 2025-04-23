@@ -532,44 +532,48 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 end
 
 ---@private
+---@param props {prefix: string, name: string, caption: string?, noLink: boolean?}
+---@return Widget
+function MatchPage._generateLoadoutImage(props)
+	return IconImage{
+		imageLight = props.prefix .. ' ' .. props.name .. '.png',
+		caption = props.caption or props.name,
+		link = Logic.readBool(props.noLink) and '' or props.name,
+		size = LOADOUT_ICON_SIZE,
+	}
+end
+
+---@private
+---@param runeName string
+---@return Widget
+MatchPage._generateRuneImage = FnUtil.memoize(function (runeName)
+	return MatchPage._generateLoadoutImage{prefix = 'Rune', name = runeName, noLink = true}
+end)
+
+---@private
+---@param spellName string
+---@return Widget
+MatchPage._generateSpellImage = FnUtil.memoize(function (spellName)
+	return MatchPage._generateLoadoutImage{prefix = 'Summoner spell', name = spellName}
+end)
+
+---@private
+---@param itemName string
+---@return Widget
+MatchPage._generateItemImage = FnUtil.memoize(function (itemName)
+	local isDefaultItem = itemName == DEFAULT_ITEM
+	return MatchPage._generateLoadoutImage{
+		prefix = 'Lol item',
+		name = itemName,
+		caption = isDefaultItem and 'Empty' or itemName,
+		noLink = isDefaultItem
+	}
+end)
+
+---@private
 ---@param player table
 ---@return Widget
 function MatchPage._buildPlayerLoadout(player)
-	---@param props {prefix: string, name: string, caption: string?, noLink: boolean?}
-	---@return Widget
-	local generateLoadoutImage = function (props)
-		return IconImage{
-			imageLight = props.prefix .. ' ' .. props.name .. '.png',
-			caption = props.caption or props.name,
-			link = Logic.readBool(props.noLink) and '' or props.name,
-			size = LOADOUT_ICON_SIZE,
-		}
-	end
-
-	---@param runeName string
-	---@return Widget
-	local generateRuneImage = FnUtil.memoize(function (runeName)
-		return generateLoadoutImage{prefix = 'Rune', name = runeName, noLink = true}
-	end)
-
-	---@param spellName string
-	---@return Widget
-	local generateSpellImage = FnUtil.memoize(function (spellName)
-		return generateLoadoutImage{prefix = 'Summoner spell', name = spellName}
-	end)
-
-	---@param itemName string
-	---@return Widget
-	local generateItemImage = FnUtil.memoize(function (itemName)
-		local isDefaultItem = itemName == DEFAULT_ITEM
-		return generateLoadoutImage{
-			prefix = 'Lol item',
-			name = itemName,
-			caption = isDefaultItem and 'Empty' or itemName,
-			noLink = isDefaultItem
-		}
-	end)
-
 	return Div{
 		classes = {'match-bm-lol-players-player-loadout'},
 		children = {
@@ -580,12 +584,12 @@ function MatchPage._buildPlayerLoadout(player)
 						classes = {'match-bm-lol-players-player-loadout-rs'},
 						children = Array.map(
 							{player.runeKeystone, player.runes.secondary.tree},
-							generateRuneImage
+							MatchPage._generateRuneImage
 						)
 					},
 					Div{
 						classes = {'match-bm-lol-players-player-loadout-rs'},
-						children = Array.map(player.spells, generateSpellImage)
+						children = Array.map(player.spells, MatchPage._generateSpellImage)
 					}
 				}
 			},
@@ -594,11 +598,11 @@ function MatchPage._buildPlayerLoadout(player)
 				children = {
 					Div{
 						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 1, 3), generateItemImage)
+						children = Array.map(Array.sub(player.items, 1, 3), MatchPage._generateItemImage)
 					},
 					Div{
 						classes = {'match-bm-lol-players-player-loadout-item'},
-						children = Array.map(Array.sub(player.items, 4, 6), generateItemImage)
+						children = Array.map(Array.sub(player.items, 4, 6), MatchPage._generateItemImage)
 					}
 				}
 			}
