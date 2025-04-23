@@ -119,7 +119,7 @@ end
 ---@param args {flag: string?}
 ---@return string
 function PlayerDisplay.Flag(args)
-	return Flags.Icon({flag = args.flag, shouldLink = false})
+	return Flags.Icon{flag = args.flag, shouldLink = false}
 end
 
 return Class.export(PlayerDisplay)

@@ -293,7 +293,7 @@ end
 ---@return string[]
 function CustomPlayer:displayLocations()
 	return Array.map(self.locations, function(country)
-		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+		return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' ..
 			Page.makeInternalLink(country, ':Category:' .. country)
 	end)
 end

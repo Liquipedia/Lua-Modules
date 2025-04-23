@@ -7,18 +7,9 @@ describe('flags', function()
 			local nlOutput = '<span class=\"flag\">[[File:nl_hd.png|36x24px|Netherlands|link=]]</span>'
 			local nlOutputLink = '<span class=\"flag\">[[File:nl_hd.png|36x24px|Netherlands|link=Category:Netherlands]]</span>'
 
-			assert.are_equal(nlOutput, Flags.Icon('nl'))
-			assert.are_equal(nlOutput, Flags.Icon('nld'))
-			assert.are_equal(nlOutput, Flags.Icon('holland'))
-			assert.are_equal(nlOutput, Flags.Icon({}, 'nl'))
-			assert.are_equal(nlOutput, Flags.Icon({}, 'nld'))
-			assert.are_equal(nlOutput, Flags.Icon({}, 'holland'))
-			assert.are_equal(nlOutputLink, Flags.Icon({shouldLink = true}, 'nl'))
-			assert.are_equal(nlOutputLink, Flags.Icon({shouldLink = true}, 'nld'))
-			assert.are_equal(nlOutputLink, Flags.Icon({shouldLink = true}, 'holland'))
-			assert.are_equal(nlOutput, Flags.Icon({shouldLink = false}, 'nl'))
-			assert.are_equal(nlOutput, Flags.Icon({shouldLink = false}, 'nld'))
-			assert.are_equal(nlOutput, Flags.Icon({shouldLink = false}, 'holland'))
+			assert.are_equal(nlOutput, Flags.Icon{flag = 'nl'})
+			assert.are_equal(nlOutput, Flags.Icon{flag = 'nld'})
+			assert.are_equal(nlOutput, Flags.Icon{flag = 'holland'})
 			assert.are_equal(nlOutputLink, Flags.Icon{shouldLink = true, flag = 'nl'})
 			assert.are_equal(nlOutputLink, Flags.Icon{shouldLink = true, flag = 'nld'})
 			assert.are_equal(nlOutputLink, Flags.Icon{shouldLink = true, flag = 'holland'})
@@ -47,9 +38,9 @@ describe('flags', function()
 	describe('language icon', function()
 		it('check', function()
 			assert.are_equal('<span class=\"flag\">[[File:UsGb hd.png|36x24px|English Speaking|link=]]</span>',
-				Flags.languageIcon('en'))
+				Flags.languageIcon{language = 'en'})
 			assert.are_equal('<span class=\"flag\">[[File:nl_hd.png|36x24px|Netherlands|link=]]</span>',
-				Flags.languageIcon('nl'))
+				Flags.languageIcon{language = 'nl'})
 		end)
 	end)
 
