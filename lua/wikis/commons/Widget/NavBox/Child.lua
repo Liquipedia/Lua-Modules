@@ -45,7 +45,9 @@ function NavBoxChild:render()
 
 	assert(props[1] or props.child1, EMPTY_CHILD_ERROR)
 	if not props.child1 then
-		return NavBoxList(props)
+		return NavBoxList{children = Array.mapIndexes(function(index)
+			return self.props[index]
+		end)}
 	end
 
 	local children = Array.mapIndexes(function(rowIndex)

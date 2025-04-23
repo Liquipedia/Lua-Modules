@@ -23,13 +23,11 @@ local NavBoxList = Class.new(Widget)
 
 ---@return Widget
 function NavBoxList:render()
-	local elements = Array.mapIndexes(function(index)
-		if not self.props[index] then return end
+	local elements = Array.map(self.props.children, function(child)
 		return Li{
-			children = {self.props[index]}
+			children = child
 		}
 	end)
-
 
 	return Div{
 		classes = {'hlist'},
