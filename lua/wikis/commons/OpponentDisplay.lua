@@ -276,6 +276,7 @@ function OpponentDisplay.BlockTeamContainer(props)
 	local rawTeam = TeamTemplate.getRawOrNil(props.template)
 
 	if not rawTeam then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with missing team templates')
 		return mw.html.create('div'):addClass('error')
 			:wikitext(TeamTemplate.noTeamMessage(props.template))
 	end
