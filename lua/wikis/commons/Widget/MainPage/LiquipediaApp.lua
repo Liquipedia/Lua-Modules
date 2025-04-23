@@ -24,23 +24,29 @@ local GREEN_CHECK_CIRCLE = IconFa{
 	iconName = 'checkcircle',
 	color = 'forest-green-non-text',
 	size = 'lg',
-	additionalCss = {
-		['margin-left'] = '-0.1em',
-		['margin-right'] = '0.3em'
-	}
 }
 
 ---@class LiquipediaApp: Widget
 ---@operator call(table): LiquipediaApp
 local LiquipediaApp = Class.new(Widget)
 
+---@param icon string|Html|Widget
 ---@param entries (string|Html|Widget|nil|(string|Html|Widget|nil)[])[][]
+---@param listCss table<string, string?>?
 ---@return Widget
-local function buildDescriptionList(entries)
-	return HtmlWidgets.Dl{
+local function buildFontAwesomeList(icon, entries, listCss)
+	return HtmlWidgets.Ul{
+		classes = {'fa-ul'},
+		css = listCss,
 		children = Array.map(entries, function (entry)
-			return HtmlWidgets.Dd{
-				children = WidgetUtil.collect(unpack(entry))
+			return HtmlWidgets.Li{
+				children = WidgetUtil.collect(
+					HtmlWidgets.Span{
+						classes = {'fa-li'},
+						children = icon
+					},
+					entry
+				)
 			}
 		end)
 	}
@@ -60,33 +66,29 @@ function LiquipediaApp:render()
 					classes = { 'mobile-hide' },
 					children = {Image.display('Qr-code-app.svg', nil, { size = '132px', link = '' })}
 				},
-				Div{
-					css = { ['line-height'] = '2.2em' },
-					children = buildDescriptionList{
+				buildFontAwesomeList(
+					GREEN_CHECK_CIRCLE,
+					{
 						{
-							GREEN_CHECK_CIRCLE,
 							'Follow your favorite ',
 							Info.name,
 							' players and teams!'
 						},
+						{'Get notifications and never miss a match again.'},
 						{
-							GREEN_CHECK_CIRCLE,
-							'Get notifications and never miss a match again.'
-						},
-						{
-							GREEN_CHECK_CIRCLE,
 							'Available in ',
 							Array.interleave(Array.map({'ru', 'br', 'fr', 'es', 'cn', 'de', 'jp'}, function (country)
 								return Flags.Icon{shouldLink = false, flag = country}
 							end), ' '),
 							' and 12 more languages!'
 						},
-						{
-							GREEN_CHECK_CIRCLE,
-							'Spoiler-free version.'
-						}
+						{'Spoiler-free version.'},
+					},
+					{
+						margin = '0 0 0 2.5rem',
+						['line-height'] = '2.2em'
 					}
-				}
+				)
 			}
 		},
 		Div{
