@@ -31,7 +31,6 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 
 ---@class NavBoxChild: Widget
 ---@operator call(table): NavBoxChild
----@field props table
 local NavBoxChild = Class.new(Widget)
 NavBoxChild.defaultProps = {
 	imagesize = '30px',

@@ -19,7 +19,6 @@ local Li = HtmlWidgets.Li
 
 ---@class NavBoxList: Widget
 ---@operator call(table): NavBoxList
----@field props table
 local NavBoxList = Class.new(Widget)
 
 ---@return Widget
