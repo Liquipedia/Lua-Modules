@@ -81,7 +81,7 @@ function Lua.import(name, options)
 	options = options or {}
 	local importFunction = options.loadData and mw.loadData or require
 	local moduleName = getModuleName(name, options)
-	assert(Lua.moduleExists(moduleName), 'Module:' .. moduleName .. ' doesn\'t exist')
+	assert(Lua.moduleExists(moduleName), '"' .. moduleName .. '" doesn\'t exist')
 	return importFunction(moduleName)
 end
 
