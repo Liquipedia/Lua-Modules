@@ -532,13 +532,13 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 end
 
 ---@private
----@param props {prefix: string, name: string, caption: string?, noLink: boolean?}
+---@param props {prefix: string, name: string, caption: string?}
 ---@return Widget
 function MatchPage._generateLoadoutImage(props)
 	return IconImage{
 		imageLight = props.prefix .. ' ' .. props.name .. '.png',
 		caption = props.caption or props.name,
-		link = Logic.readBool(props.noLink) and '' or props.name,
+		link = '',
 		size = LOADOUT_ICON_SIZE,
 	}
 end
@@ -547,7 +547,7 @@ end
 ---@param runeName string
 ---@return Widget
 MatchPage._generateRuneImage = FnUtil.memoize(function (runeName)
-	return MatchPage._generateLoadoutImage{prefix = 'Rune', name = runeName, noLink = true}
+	return MatchPage._generateLoadoutImage{prefix = 'Rune', name = runeName}
 end)
 
 ---@private
@@ -566,7 +566,6 @@ MatchPage._generateItemImage = FnUtil.memoize(function (itemName)
 		prefix = 'Lol item',
 		name = itemName,
 		caption = isDefaultItem and 'Empty' or itemName,
-		noLink = isDefaultItem
 	}
 end)
 
