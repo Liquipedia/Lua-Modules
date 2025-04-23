@@ -9,7 +9,6 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
-local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
