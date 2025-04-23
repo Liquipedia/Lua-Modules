@@ -52,6 +52,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'match2bracketdata',
 	'match2games',
+	'game',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
@@ -170,10 +171,6 @@ function MatchTicker:init(args)
 		Table.isEmpty(config.tournaments)))
 
 	config.hideTournament = Logic.readBool(args.hideTournament or Table.isNotEmpty(config.tournaments))
-
-	if config.displayGameIcons then
-		table.insert(config.queryColumns, 'game')
-	end
 
 	local wrapperClasses = type(args.wrapperClasses) == 'table' and args.wrapperClasses
 		or args.wrapperClasses == NONE and {}
