@@ -21,7 +21,6 @@ local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
 
 ---@class NavBox: Widget
 ---@operator call(table): NavBox
----@field props table
 local NavBox = Class.new(Widget)
 
 ---@return Widget
