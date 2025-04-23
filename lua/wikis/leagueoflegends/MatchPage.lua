@@ -473,37 +473,6 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
-	---@param prefix string
-	---@param name string
-	---@param noLink boolean?
-	---@return Widget
-	local generateLoadoutImage = function (prefix, name, noLink)
-		return IconImage{
-			imageLight = prefix .. ' ' .. name .. '.png',
-			caption = name,
-			link = Logic.readBool(noLink) and '' or name,
-			size = LOADOUT_ICON_SIZE,
-		}
-	end
-
-	---@param runeName string
-	---@return Widget
-	local generateRuneImage = FnUtil.memoize(function (runeName)
-		return generateLoadoutImage('Rune', runeName, true)
-	end)
-
-	---@param spellName string
-	---@return Widget
-	local generateSpellImage = FnUtil.memoize(function (spellName)
-		return generateLoadoutImage('Summoner spell', spellName)
-	end)
-
-	---@param itemName string
-	---@return Widget
-	local generateItemImage = FnUtil.memoize(function (itemName)
-		return generateLoadoutImage('Lol item', itemName, itemName == DEFAULT_ITEM)
-	end)
-
 	return Div{
 		classes = {'match-bm-lol-players-player'},
 		children = {
@@ -522,40 +491,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						playerLink = player.player,
 						playerName = player.displayName or player.player
 					},
-					Div{
-						classes = {'match-bm-lol-players-player-loadout'},
-						children = {
-							Div{
-								classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
-								children = {
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-rs'},
-										children = Array.map(
-											{player.runeKeystone, player.runes.secondary.tree},
-											generateRuneImage
-										)
-									},
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-rs'},
-										children = Array.map(player.spells, generateSpellImage)
-									}
-								}
-							},
-							Div{
-								classes = {'match-bm-lol-players-player-loadout-items'},
-								children = {
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-item'},
-										children = Array.map(Array.sub(player.items, 1, 3), generateItemImage)
-									},
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-item'},
-										children = Array.map(Array.sub(player.items, 4, 6), generateItemImage)
-									}
-								}
-							}
-						}
-					}
+					MatchPage._buildPlayerLoadout(player)
 				}
 			},
 			Div{
@@ -588,6 +524,77 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 							'Damage'
 						},
 						data = player.damagedone
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param player table
+---@return Widget
+function MatchPage._buildPlayerLoadout(player)
+	---@param prefix string
+	---@param name string
+	---@param noLink boolean?
+	---@return Widget
+	local generateLoadoutImage = function (prefix, name, noLink)
+		return IconImage{
+			imageLight = prefix .. ' ' .. name .. '.png',
+			caption = name,
+			link = Logic.readBool(noLink) and '' or name,
+			size = LOADOUT_ICON_SIZE,
+		}
+	end
+
+	---@param runeName string
+	---@return Widget
+	local generateRuneImage = FnUtil.memoize(function (runeName)
+		return generateLoadoutImage('Rune', runeName, true)
+	end)
+
+	---@param spellName string
+	---@return Widget
+	local generateSpellImage = FnUtil.memoize(function (spellName)
+		return generateLoadoutImage('Summoner spell', spellName)
+	end)
+
+	---@param itemName string
+	---@return Widget
+	local generateItemImage = FnUtil.memoize(function (itemName)
+		return generateLoadoutImage('Lol item', itemName, itemName == DEFAULT_ITEM)
+	end)
+
+	return Div{
+		classes = {'match-bm-lol-players-player-loadout'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-rs'},
+						children = Array.map(
+							{player.runeKeystone, player.runes.secondary.tree},
+							generateRuneImage
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-rs'},
+						children = Array.map(player.spells, generateSpellImage)
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-lol-players-player-loadout-items'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-item'},
+						children = Array.map(Array.sub(player.items, 1, 3), generateItemImage)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-item'},
+						children = Array.map(Array.sub(player.items, 4, 6), generateItemImage)
 					}
 				}
 			}
