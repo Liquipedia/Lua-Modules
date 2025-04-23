@@ -36,9 +36,9 @@ function NavBox:render()
 	-- as a first step collapse at the top and uncollapse at the bottom
 	-- as heuristic assume we are at the bottom if an infobox or HDB is above
 	local shouldCollapse = not (
-			Variables.varDefault('has_infobox') -- any page with an infobox
-			or Variables.varDefault('tournament_parent') -- any Page with a HDB
-		)
+		Variables.varDefault('has_infobox') -- any page with an infobox
+		or Variables.varDefault('tournament_parent') -- any Page with a HDB
+	)
 
 	-- have to extract so the child doesn't add the header too ...
 	local title = Table.extract(self.props, 'title')

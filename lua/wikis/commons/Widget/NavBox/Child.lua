@@ -54,7 +54,9 @@ function NavBoxChild:render()
 	end)
 
 	if props[1] then
-		table.insert(children, {name = props.name, child = NavBoxList(props)})
+		table.insert(children, {name = props.name, child = NavBoxList{children = Array.mapIndexes(function(index)
+			return self.props[index]
+		end)}})
 	end
 
 	self.rowSpan = #children
