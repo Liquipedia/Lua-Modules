@@ -13,9 +13,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
 local Info = require('Module:Info')
-local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Timezone = require('Module:Timezone')
@@ -34,7 +32,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
-local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---Display class for matches shown within a match ticker
@@ -219,20 +216,6 @@ function Details:tournament()
 	end
 
 	local match = self.match
-
-	local icon = LeagueIcon.display{
-		icon = Logic.emptyOr(match.icon, TOURNAMENT_DEFAULT_ICON),
-		iconDark = match.icondark,
-		link = match.pagename,
-		name = match.tournament,
-		options = {noTemplate = true},
-	}
-
-	local displayName = Logic.emptyOr(
-		match.tickername,
-		match.tournament,
-		match.parent:gsub('_', ' ')
-	)
 
 	return HtmlWidgets.Div{
 		classes = {'match-tournament'},
