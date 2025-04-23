@@ -15,7 +15,7 @@ function allwikis(name, funcToRun, wikiArgs) error('SOMETHING WENT WRONG') end
 function GoldenTest(testname, actual) error('SOMETHING WENT WRONG') end
 
 return function(busted, helper, options)
-	-- Copy from standard/lua.lua
+	-- Copy from lua/wikis/commons/lua.lua
 	local function fileExists(name)
 		if package.loaded[name] then
 			return true
