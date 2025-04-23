@@ -251,4 +251,4 @@ function Flags.isValidFlagInput(flagInput)
 	return String.isNotEmpty(Flags._convertToKey(flagInput))
 end
 
-return Class.export(Flags, {onlyExport = {'Icon', 'CountryCode', 'CountryName', 'localisationTemplate'}})
+return Class.export(Flags, {onlyExport = {'Icon', 'CountryCode', 'CountryName', 'localisationTemplate', 'languageIcon'}})
