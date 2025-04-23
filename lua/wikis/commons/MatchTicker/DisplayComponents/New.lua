@@ -235,7 +235,7 @@ function Details:tournament()
 	return mw.html.create('div')
 		:addClass('match-tournament')
 		:node(
-			self.displayGameIcons 
+			self.displayGameIcons
 			and Game.icon{game=self.match.game, noLink=true, size='50px', spanClass='icon-small'}
 			or nil
 		)
