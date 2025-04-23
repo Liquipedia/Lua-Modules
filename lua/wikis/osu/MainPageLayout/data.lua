@@ -13,7 +13,6 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
@@ -30,12 +29,6 @@ local CONTENT = {
 		body = '{{Liquipedia:Want_to_help}}',
 		padding = true,
 		boxid = 1504,
-	},
-	liquipediaApp = {
-		heading = 'Download the Liquipedia App',
-		padding = true,
-		body = LiquipediaApp{},
-		boxid = 1505,
 	},
 	transfers = {
 		heading = 'Transfers',
@@ -158,10 +151,6 @@ return {
 					{
 						mobileOrder = 8,
 						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 9,
-						content = CONTENT.liquipediaApp,
 					},
 				}
 			},
