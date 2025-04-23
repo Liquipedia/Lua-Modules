@@ -7,8 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Game = require('Module:Game')
-local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
