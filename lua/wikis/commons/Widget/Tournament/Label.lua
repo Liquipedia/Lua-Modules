@@ -39,6 +39,9 @@ function TournamentsTickerLabelWidget:render()
 			TierPill{tournament = tournament},
 			HtmlWidgets.Span{
 				classes = {'tournaments-list-name'},
+				css = {
+					['padding-left'] = self.props.displayGameIcon and '50px' or '25px',
+				},
 				children = {
 					Title{
 						tournament = tournament,
