@@ -27,36 +27,36 @@ function TournamentsTickerTitleWidget:render()
 		return
 	end
 	return HtmlWidgets.Fragment{
-        children = {
-            self.props.displayGameIcon and Game.icon{
-                game = tournament.game,
-                noLink = true,
-                spanClass = 'tournament-game-icon icon-small',
-                size = '50px',
-            } or '',
-            HtmlWidgets.Span{
-                classes = {'tournament-icon'},
-                children = {
-                    LeagueIcon.display{
-                        icon = tournament.icon,
-                        iconDark = tournament.iconDark,
-                        series = tournament.series,
-                        abbreviation = tournament.abbreviation,
-                        link = tournament.pageName,
-                        options = {noTemplate = true},
-                    }
-                }
-            },
-            HtmlWidgets.Span{
-                classes = {'tournament-name'},
-                children = {
-                    Link{
-                        link = tournament.pageName,
-                        children = tournament.displayName,
-                    },
-                }
-            }
-        },
+		children = {
+			self.props.displayGameIcon and Game.icon{
+				game = tournament.game,
+				noLink = true,
+				spanClass = 'tournament-game-icon icon-small',
+				size = '50px',
+			} or '',
+			HtmlWidgets.Span{
+				classes = {'tournament-icon'},
+				children = {
+					LeagueIcon.display{
+						icon = tournament.icon,
+						iconDark = tournament.iconDark,
+						series = tournament.series,
+						abbreviation = tournament.abbreviation,
+						link = tournament.pageName,
+						options = {noTemplate = true},
+					}
+				}
+			},
+			HtmlWidgets.Span{
+				classes = {'tournament-name'},
+				children = {
+					Link{
+						link = tournament.pageName,
+						children = tournament.displayName,
+					},
+				}
+			}
+		},
 	}
 end
 
