@@ -32,7 +32,7 @@ function TournamentsTickerTitleWidget:render()
             self.props.displayGameIcon and Game.icon{
                 game = tournament.game,
                 noLink = true,
-                spanClass = 'icon-small',
+                spanClass = 'tournament-game-icon icon-small',
                 size = '50px',
             } or '',
             HtmlWidgets.Span{
