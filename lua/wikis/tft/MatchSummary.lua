@@ -26,10 +26,6 @@ end
 ---@param gameIndex integer
 ---@return Widget?
 function CustomMatchSummary.createGame(date, game, gameIndex)
-	if not game.map then
-		return
-	end
-
 	local function makeTeamSection(opponentIndex)
 		return {
 			MatchSummaryWidgets.GameWinLossIndicator{winner = game.winner, opponentIndex = opponentIndex},
