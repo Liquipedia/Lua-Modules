@@ -436,7 +436,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamtyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
+---@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(
