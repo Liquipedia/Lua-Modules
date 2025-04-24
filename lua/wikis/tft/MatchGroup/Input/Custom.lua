@@ -70,9 +70,7 @@ end
 ---@param games table[]
 ---@return table[]
 function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, function(map)
-		return map.map ~= nil
-	end)
+	return Array.filter(games, Logic.isNotEmpty)
 end
 
 ---@param map table
