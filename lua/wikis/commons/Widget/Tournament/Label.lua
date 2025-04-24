@@ -19,7 +19,6 @@ local Title = Lua.import('Module:Widget/Tournament/Title')
 
 ---@class TournamentsTickerLabelWidget: Widget
 ---@operator call(table): TournamentsTickerLabelWidget
-
 local TournamentsTickerLabelWidget = Class.new(Widget)
 
 ---@return Widget?

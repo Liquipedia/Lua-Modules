@@ -16,9 +16,8 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class TournamentsTickerLabelWidget: Widget
----@operator call(table): TournamentsTickerLabelWidget
-
+---@class TournamentsTickerTitleWidget: Widget
+---@operator call(table): TournamentsTickerTitleWidget
 local TournamentsTickerTitleWidget = Class.new(Widget)
 
 ---@return Widget?
