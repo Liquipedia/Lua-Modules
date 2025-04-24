@@ -42,7 +42,6 @@ function CustomMatchSummary.createBody(match)
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
 	)}
 end
