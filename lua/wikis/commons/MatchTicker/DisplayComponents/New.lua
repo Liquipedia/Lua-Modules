@@ -209,7 +209,7 @@ function Details:streamsOrVods()
 	return vods
 end
 
----@return Html?
+---@return Widget?
 function Details:tournament()
 	if self.hideTournament then
 		return
@@ -223,7 +223,11 @@ function Details:tournament()
 			Title{
 				tournament = {
 					pageName = match.pagename,
-					displayName = match.tournament,
+					displayName = Logic.emptyOr(
+						match.tickername,
+						match.tournament,
+						match.parent:gsub('_', ' ')
+					),
 					tickerName = match.tickername,
 					icon = match.icon,
 					iconDark = match.icondark,
