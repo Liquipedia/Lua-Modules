@@ -609,18 +609,4 @@ function MatchPage._buildPlayerLoadout(player)
 	}
 end
 
----@return MatchPageComment[]
-function MatchPage:addComments()
-	local casters = Json.parseIfString(self.matchData.extradata.casters)
-	if Logic.isEmpty(casters) then return {} end
-	return {
-		Comment{
-			children = WidgetUtil.collect(
-				#casters > 1 and 'Casters: ' or 'Caster: ',
-				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
-			)
-		}
-	}
-end
-
 return MatchPage
