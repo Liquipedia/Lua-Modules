@@ -14,7 +14,6 @@ local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
 local Info = require('Module:Info')
-local LeagueIcon = require('Module:LeagueIcon')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Timezone = require('Module:Timezone')
@@ -24,6 +23,8 @@ local VodLink = require('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Title = Lua.import('Module:Widget/Tournament/Title')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -31,7 +32,6 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local HIGHLIGHT_CLASS = 'tournament-highlighted-bg'
-local TOURNAMENT_DEFAULT_ICON = 'Generic_Tournament_icon.png'
 local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 ---Display class for matches shown within a match ticker
@@ -105,6 +105,7 @@ end
 ---@field root Html
 ---@field hideTournament boolean
 ---@field onlyHighlightOnValue string?
+---@field displayGameIcons boolean
 ---@field match table
 local Details = Class.new(
 	function(self, args)
@@ -112,6 +113,7 @@ local Details = Class.new(
 		self.root = mw.html.create('div'):addClass('match-details')
 		self.hideTournament = args.hideTournament
 		self.onlyHighlightOnValue = args.onlyHighlightOnValue
+		self.displayGameIcons = args.displayGameIcons
 		self.match = args.match
 	end
 )
@@ -207,7 +209,7 @@ function Details:streamsOrVods()
 	return vods
 end
 
----@return Html?
+---@return Widget?
 function Details:tournament()
 	if self.hideTournament then
 		return
@@ -215,33 +217,27 @@ function Details:tournament()
 
 	local match = self.match
 
-	local icon = LeagueIcon.display{
-		icon = Logic.emptyOr(match.icon, TOURNAMENT_DEFAULT_ICON),
-		iconDark = match.icondark,
-		link = match.pagename,
-		name = match.tournament,
-		options = {noTemplate = true},
+	return HtmlWidgets.Div{
+		classes = {'match-tournament'},
+		children = {
+			Title{
+				tournament = {
+					pageName = match.pagename,
+					displayName = Logic.emptyOr(
+						match.tickername,
+						match.tournament,
+						match.parent:gsub('_', ' ')
+					),
+					tickerName = match.tickername,
+					icon = match.icon,
+					iconDark = match.icondark,
+					series = match.series,
+					game = match.game,
+				},
+				displayGameIcon = self.displayGameIcons
+			}
+		}
 	}
-
-	local displayName = Logic.emptyOr(
-		match.tickername,
-		match.tournament,
-		match.parent:gsub('_', ' ')
-	)
-
-	return mw.html.create('div')
-		:addClass('match-tournament')
-		:node(mw.html.create('div')
-			:addClass('tournament-icon')
-			:node(mw.html.create('div')
-				:wikitext(icon)
-			)
-		)
-		:node(mw.html.create('div')
-			:addClass('tournament-text')
-			:wikitext(Page.makeInternalLink({}, displayName, match.pagename))
-		)
-
 end
 
 ---Display class for matches shown within a match ticker
@@ -276,7 +272,8 @@ function Match:detailsRow()
 	return Details{
 		match = self.match,
 		hideTournament = self.config.hideTournament,
-		onlyHighlightOnValue = self.config.onlyHighlightOnValue
+		onlyHighlightOnValue = self.config.onlyHighlightOnValue,
+		displayGameIcons = self.config.displayGameIcons
 	}:create()
 end
 

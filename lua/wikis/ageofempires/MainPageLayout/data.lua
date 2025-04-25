@@ -58,6 +58,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{
+			displayGameIcons = true,
 			matchesPortal = 'Liquipedia:Upcoming_and_ongoing_matches'
 		},
 		padding = true,
