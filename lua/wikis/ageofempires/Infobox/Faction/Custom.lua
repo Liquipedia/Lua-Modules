@@ -51,7 +51,7 @@ function CustomInjector:parse(id, widgets)
             } or nil
         }
     elseif id == 'custom' then
-        Array.extendWith(widgets,
+        Array.appendWithWith(widgets,
             Cell{
                 name = Page.makeInternalLink('Architectural Style', 'Architectures (building styles)'),
                 content = {args.architecture}

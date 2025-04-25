@@ -43,7 +43,7 @@ function FactionInfobox:createInfobox()
 			imageDefault = args.default,
 			imageDark = args.imagedark or args.imagedarkmode,
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
-			size = args.imagesize or '100px',
+			size = args.imagesize or 100,
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Faction') .. ' Information'},
