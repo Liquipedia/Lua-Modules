@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
@@ -16,7 +17,6 @@ local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Icon = require('Module:Widget/Image/Icon/Image')
 
 ---@class CustomFactionInfobox: FactionInfobox
 local CustomFactionInfobox = Class.new(FactionInfobox)
@@ -45,13 +45,12 @@ function CustomInjector:parse(id, widgets)
             args.introduced and Cell{
                 name = 'First introduced',
                 content = {
-                    caller._makeIntroducedIcon(args.introduced),
-                    Page.makeInternalLink(args.introduced)
+                    caller._makeIntroducedIcon(args.introduced) .. Page.makeInternalLink(args.introduced)
                 }
             } or nil
         }
     elseif id == 'custom' then
-        Array.appendWithWith(widgets,
+        Array.appendWith(widgets,
             Cell{
                 name = Page.makeInternalLink('Architectural Style', 'Architectures (building styles)'),
                 content = {args.architecture}
@@ -84,10 +83,8 @@ function CustomInjector:parse(id, widgets)
             args.tech1 and Cell{
                 name = 'Unique technologies',
                 content = {
-                    caller._makeAgeIcon('Castle'),
-                    Page.makeInternalLink(args.tech1),
-                    caller._makeAgeIcon('Imperial'),
-                    Page.makeInternalLink(args.tech2),
+                    caller._makeAgeIcon('Castle') .. Page.makeInternalLink(args.tech1),
+                    caller._makeAgeIcon('Imperial') .. Page.makeInternalLink(args.tech2),
                 }
             }
         )
@@ -97,23 +94,29 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param introduced string?
----@return Widget
+---@return string
 function CustomFactionInfobox._makeIntroducedIcon(introduced)
-    return Icon{
-        image = 'Aoe2 ' .. introduced .. 'Icon.png',
-        size = '18px',
-        link = introduced
-    }
+    return Image.display(
+        'Aoe2 ' .. introduced .. 'Icon.png',
+        nil,
+        {
+            size = '18',
+            link = introduced
+        }
+    ) or ''
 end
 
 ---@param age string?
----@return Widget
+---@return string
 function CustomFactionInfobox._makeAgeIcon(age)
-    return Icon{
-        image = age .. ' Age AoE2 logo.png',
-        size = '18px',
-        link = age .. ' Age'
-    }
+    return Image.display(
+        age .. ' Age AoE2 logo.png',
+        nil,
+        {
+            size = '18',
+            link = age .. ' Age'
+        }
+    ) or ''
 end
 
 return CustomFactionInfobox
