@@ -16,9 +16,7 @@ local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
-local Title = Widgets.Title
-local Center = Widgets.Center
-local Icon = require('Module:Widgets/Image/Icon/Image')
+local Icon = require('Module:Widget/Image/Icon/Image')
 
 ---@class CustomFactionInfobox: FactionInfobox
 local CustomFactionInfobox = Class.new(FactionInfobox)
