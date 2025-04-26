@@ -65,7 +65,7 @@ function CustomInjector:parse(id, widgets)
 						}
 					}
 				}
-			} or nil
+			} or Fragment{}
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
@@ -123,8 +123,8 @@ end
 ---@param introduced string?
 ---@return Widget?
 function CustomFactionInfobox:_makeIntroducedIcon(introduced)
-	if self.game ~= 'Ae of Empires II' then
-		return
+	if self.game ~= 'Age of Empires II' then
+		return Fragment{}
 	end
 	return Image{
 		imageLight = 'Aoe2 ' .. introduced .. ' Icon.png',
@@ -137,7 +137,7 @@ end
 ---@return Widget?
 function CustomFactionInfobox:_makeAgeIcon(age)
 	if self.game ~= 'Age of Empires II' then
-		return
+		return Fragment{}
 	end
 	return Image{
 		imageLight = age .. ' Age AoE2 logo.png',
