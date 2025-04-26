@@ -129,4 +129,21 @@ function CustomFactionInfobox:_makeAgeIcon(age)
     ) or ''
 end
 
+---@param lpdbData table
+---@param args table
+---@return table
+function CustomFactionInfobox:addToLpdb(lpdbData, args)
+    lpdbData.extradata.game = self.game
+    return lpdbData
+end
+
+---@param args table
+---@return string[]
+function CustomFactionInfobox:getWikiCategories(args)
+	return {
+        'Civilization',
+        self.game and ('Civilization ' .. (self.game)) or nil
+    }
+end
+
 return CustomFactionInfobox
