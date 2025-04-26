@@ -9,7 +9,6 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Game = require('Module:Game')
-local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 
@@ -18,6 +17,8 @@ local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+local Image = require('Module:Widget/Image/Icon/Image')
+local WidgetUtil = require('Module:Widget/Util')
 
 ---@class CustomFactionInfobox: FactionInfobox
 ---@field game string
@@ -56,14 +57,17 @@ function CustomInjector:parse(id, widgets)
             args.introduced and Cell{
                 name = 'First introduced',
                 content = {
-                    caller:_makeIntroducedIcon(args.introduced) .. Page.makeInternalLink(args.introduced)
+                    WidgetUtil.collect(
+                        caller:_makeIntroducedIcon(args.introduced),
+                        Page.makeInternalLink(args.introduced)
+                    )
                 }
             } or nil
         }
     elseif id == 'custom' then
         Array.appendWith(widgets,
             Cell{
-                name = Page.makeInternalLink('Architectural Style', 'Architectures (building styles)'),
+                name = Page.makeInternalLnk('Architectural Style', 'Architectures (building styles)'),
                 content = {args.architecture}
             },
             Cell{name = 'Continent', content = {args.continent}},
@@ -93,8 +97,14 @@ function CustomInjector:parse(id, widgets)
             args.tech1 and Cell{
                 name = 'Unique technologies',
                 content = {
-                    caller:_makeAgeIcon('Castle') .. Page.makeInternalLink(args.tech1),
-                    caller:_makeAgeIcon('Imperial') .. Page.makeInternalLink(args.tech2),
+                    WidgetUtil.collect(
+                        caller:_makeAgeIcon('Castle'),
+                        Page.makeInternalLink(args.tech1)
+                    ),
+                    WidgetUtil.collect(
+                        caller:_makeAgeIcon('Imperial'),
+                        Page.makeInternalLink(args.tech2)
+                    )
                 }
             }
         )
@@ -104,35 +114,29 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param introduced string?
----@return string
+---@return Widget?
 function CustomFactionInfobox:_makeIntroducedIcon(introduced)
-    if self.game ~= 'Age of Empires II' then
-        return ''
+    if self.game ~= 'Ae of Empires II' then
+        return
     end
-    return Image.display(
-        'Aoe2 ' .. introduced .. ' Icon.png',
-        nil,
-        {
-            size = '18',
-            link = introduced
-        }
-    ) or ''
+    return Image{
+        imageLight = 'Aoe2 ' .. introduced .. ' Icon.png',
+        size = '18',
+        link = introduced
+    }
 end
 
 ---@param age string?
----@return string
+---@return Widget?
 function CustomFactionInfobox:_makeAgeIcon(age)
     if self.game ~= 'Age of Empires II' then
-        return ''
+        return
     end
-    return Image.display(
-        age .. ' Age AoE2 logo.png',
-        nil,
-        {
-            size = '18',
-            link = age .. ' Age'
-        }
-    ) or ''
+    return Image{
+        imageLight = age .. ' Age AoE2 logo.png',
+        size = '18',
+        link = age .. ' Age'
+    }
 end
 
 ---@param lpdbData table

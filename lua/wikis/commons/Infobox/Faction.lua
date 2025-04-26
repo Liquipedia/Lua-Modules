@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Flags = require('Module:Flags')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
@@ -24,13 +23,6 @@ local Customizable = Widgets.Customizable
 ---@class FactionInfobox: BasicInfobox
 local FactionInfobox = Class.new(BasicInfobox)
 
----@param frame Frame
----@return Html
-function FactionInfobox.run(frame)
-	local faction = FactionInfobox(frame)
-	return faction:createInfobox()
-end
-
 ---@return string
 function FactionInfobox:createInfobox()
 	local args = self.args
@@ -45,19 +37,19 @@ function FactionInfobox:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize or 100,
 		},
-		Center{children = {args.caption}},
-		Title{children = (args.informationType or 'Faction') .. ' Information'},
+		Center{content = {args.caption}},
+		Title{content = (args.informationType or 'Faction') .. ' Information'},
 		Customizable{
 			id = 'release',
-			children = {
+			content = {
 				Cell{
 					name = 'Release Date',
 					content = {args.releasedate}
 				},
 			}
 		},
-		Customizable{id = 'custom', children = {}},
-        Center{children = {args.footnotes}},
+		Customizable{id = 'custom', content = {}},
+        Center{content = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
@@ -67,17 +59,6 @@ function FactionInfobox:createInfobox()
 	end
 
 	return self:build(widgets)
-end
-
----@param location string?
----@return string
-function FactionInfobox:_createLocation(location)
-	if location == nil then
-		return ''
-	end
-
-	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
-		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
 ---@param args table
