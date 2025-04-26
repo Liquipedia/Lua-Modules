@@ -49,7 +49,7 @@ function FactionInfobox:createInfobox()
 			}
 		},
 		Customizable{id = 'custom', content = {}},
-        Center{content = {args.footnotes}},
+		Center{content = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
