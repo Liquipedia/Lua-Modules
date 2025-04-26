@@ -16,9 +16,10 @@ local Injector = Lua.import('Module:Widget/Injector')
 local FactionInfobox = Lua.import('Module:Infobox/Faction')
 
 local Widgets = require('Module:Widget/All')
+local WidgetsHtml = require('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local Fragment = WidgetsHtml.Fragment
 local Image = require('Module:Widget/Image/Icon/Image')
-local WidgetUtil = require('Module:Widget/Util')
 
 ---@class CustomFactionInfobox: FactionInfobox
 ---@field game string
@@ -57,17 +58,17 @@ function CustomInjector:parse(id, widgets)
 			args.introduced and Cell{
 				name = 'First introduced',
 				content = {
-					WidgetUtil.collect(
+					Fragment{
 						caller:_makeIntroducedIcon(args.introduced),
 						Page.makeInternalLink(args.introduced)
-					)
+					}
 				}
 			} or nil
 		}
 	elseif id == 'custom' then
 		Array.appendWith(widgets,
 			Cell{
-				name = Page.makeInternalLnk('Architectural Style', 'Architectures (building styles)'),
+				name = Page.makeInternalLink('Architectural Style', 'Architectures (building styles)'),
 				content = {args.architecture}
 			},
 			Cell{name = 'Continent', content = {args.continent}},
@@ -97,14 +98,14 @@ function CustomInjector:parse(id, widgets)
 			args.tech1 and Cell{
 				name = 'Unique technologies',
 				content = {
-					WidgetUtil.collect(
+					Fragment{
 						caller:_makeAgeIcon('Castle'),
 						Page.makeInternalLink(args.tech1)
-					),
-					WidgetUtil.collect(
+					},
+					Fragment{
 						caller:_makeAgeIcon('Imperial'),
 						Page.makeInternalLink(args.tech2)
-					)
+					}
 				}
 			}
 		)
