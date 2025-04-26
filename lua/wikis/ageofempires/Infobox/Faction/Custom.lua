@@ -21,13 +21,13 @@ local Cell = Widgets.Cell
 local Fragment = WidgetsHtml.Fragment
 local Image = require('Module:Widget/Image/Icon/Image')
 
----@class CustomFactionInfobox: FactionInfobox
+---@class AoECustomFactionInfobox: FactionInfobox
 ---@field game string
 local CustomFactionInfobox = Class.new(FactionInfobox)
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
----@return Html
+---@return string
 function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 
@@ -49,7 +49,7 @@ function CustomFactionInfobox.run(frame)
 end
 
 function CustomInjector:parse(id, widgets)
-	---@type CustomFactionInfobox
+	---@type AoECustomFactionInfobox
 	local caller = self.caller
 	local args = caller.args
 
