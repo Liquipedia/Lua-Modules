@@ -178,6 +178,47 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
+---@return Widget[]
+function MatchPage:_buildGameResultSummary(game)
+	return {
+		Div{
+			classes = {'match-bm-lol-game-summary-faction'},
+			children = game.teams[1].side and IconImage{
+				imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
+				link = '',
+				caption = game.teams[1].side .. ' side'
+			} or nil
+		},
+		Div{
+			classes = {'match-bm-lol-game-summary-score-holder'},
+			children = game.finished and {
+				Div{
+					classes = {'match-bm-lol-game-summary-score'},
+					children = {
+						game.teams[1].scoreDisplay,
+						'&ndash;',
+						game.teams[2].scoreDisplay
+					}
+				},
+				Div{
+					classes = {'match-bm-lol-game-summary-length'},
+					children = game.length
+				}
+			} or nil
+		},
+		Div{
+			classes = {'match-bm-lol-game-summary-faction'},
+			children = game.teams[2].side and IconImage{
+				imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
+				link = '',
+				caption = game.teams[2].side .. ' side'
+			} or nil
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
 ---@return Widget?
 function MatchPage:_renderGameOverview(game)
 	if self:isBestOfOne() then return end
@@ -193,41 +234,7 @@ function MatchPage:_renderGameOverview(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-center'},
-						children = {
-							Div{
-								classes = {'match-bm-lol-game-summary-faction'},
-								children = game.teams[1].side and IconImage{
-									imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
-									link = '',
-									caption = game.teams[1].side .. ' side'
-								} or nil
-							},
-							Div{
-								classes = {'match-bm-lol-game-summary-score-holder'},
-								children = game.finished and {
-									Div{
-										classes = {'match-bm-lol-game-summary-score'},
-										children = {
-											game.teams[1].scoreDisplay,
-											'&ndash;',
-											game.teams[2].scoreDisplay
-										}
-									},
-									Div{
-										classes = {'match-bm-lol-game-summary-length'},
-										children = game.length
-									}
-								} or nil
-							},
-							Div{
-								classes = {'match-bm-lol-game-summary-faction'},
-								children = game.teams[2].side and IconImage{
-									imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
-									link = '',
-									caption = game.teams[2].side .. ' side'
-								} or nil
-							}
-						}
+						children = self:_buildGameResultSummary(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
@@ -373,41 +380,7 @@ function MatchPage:_renderTeamStats(game)
 						},
 						Div{
 							classes = {'match-bm-team-stats-list-cell'},
-							children = self:isBestOfOne() and {
-								Div{
-									classes = {'match-bm-lol-game-summary-faction'},
-									children = game.teams[1].side and IconImage{
-										imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
-										link = '',
-										caption = game.teams[1].side .. ' side'
-									} or nil
-								},
-								Div{
-									classes = {'match-bm-lol-game-summary-score-holder'},
-									children = game.finished and {
-										Div{
-											classes = {'match-bm-lol-game-summary-score'},
-											children = {
-												game.teams[1].scoreDisplay,
-												'&ndash;',
-												game.teams[2].scoreDisplay
-											}
-										},
-										Div{
-											classes = {'match-bm-lol-game-summary-length'},
-											children = game.length
-										}
-									} or nil
-								},
-								Div{
-									classes = {'match-bm-lol-game-summary-faction'},
-									children = game.teams[2].side and IconImage{
-										imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
-										link = '',
-										caption = game.teams[2].side .. ' side'
-									} or nil
-								}
-							} or nil
+							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or nil
 						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
