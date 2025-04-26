@@ -57,10 +57,12 @@ function CustomInjector:parse(id, widgets)
 		return {
 			args.introduced and Cell{
 				name = 'First introduced',
-				content = {
+				children = {
 					Fragment{
-						caller:_makeIntroducedIcon(args.introduced),
-						Page.makeInternalLink(args.introduced)
+						children = {
+							caller:_makeIntroducedIcon(args.introduced),
+							Page.makeInternalLink(args.introduced)
+						}
 					}
 				}
 			} or nil
@@ -69,12 +71,12 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{
 				name = Page.makeInternalLink('Architectural Style', 'Architectures (building styles)'),
-				content = {args.architecture}
+				children = {args.architecture}
 			},
-			Cell{name = 'Continent', content = {args.continent}},
+			Cell{name = 'Continent', children = {args.continent}},
 			Cell{
 				name = Page.makeInternalLink('Ingame classification', 'Civilizations classification'),
-				content = Array.map(
+				children = Array.map(
 					caller:getAllArgsForBase(args, 'type'),
 					function (t)
 						return t .. ' civilization'
@@ -83,28 +85,32 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Unique buildings',
-				content = Array.map(
+				children = Array.map(
 					caller:getAllArgsForBase(args, 'building'),
 					Page.makeInternalLink
 				)
 			},
 			Cell{
 				name = 'Unique units',
-				content = Array.map(
+				children = Array.map(
 					caller:getAllArgsForBase(args, 'unit'),
 					Page.makeInternalLink
 				)
 			},
 			args.tech1 and Cell{
 				name = 'Unique technologies',
-				content = {
+				children = {
 					Fragment{
-						caller:_makeAgeIcon('Castle'),
-						Page.makeInternalLink(args.tech1)
+						children = {
+							caller:_makeAgeIcon('Castle'),
+							Page.makeInternalLink(args.tech1)
+						}
 					},
 					Fragment{
-						caller:_makeAgeIcon('Imperial'),
-						Page.makeInternalLink(args.tech2)
+						children = {
+							caller:_makeAgeIcon('Imperial'),
+							Page.makeInternalLink(args.tech2)
+						}
 					}
 				}
 			}

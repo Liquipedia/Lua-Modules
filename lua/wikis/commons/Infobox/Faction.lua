@@ -37,19 +37,19 @@ function FactionInfobox:createInfobox()
 			imageDefaultDark = args.defaultdark or args.defaultdarkmode,
 			size = args.imagesize or 100,
 		},
-		Center{content = {args.caption}},
-		Title{content = (args.informationType or 'Faction') .. ' Information'},
+		Center{children = {args.caption}},
+		Title{children = (args.informationType or 'Faction') .. ' Information'},
 		Customizable{
 			id = 'release',
-			content = {
+			children = {
 				Cell{
 					name = 'Release Date',
-					content = {args.releasedate}
+					children = {args.releasedate}
 				},
 			}
 		},
-		Customizable{id = 'custom', content = {}},
-		Center{content = {args.footnotes}},
+		Customizable{id = 'custom', children = {}},
+		Center{children = {args.footnotes}},
 	}
 
 	if Namespace.isMain() then
