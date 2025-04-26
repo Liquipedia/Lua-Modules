@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Game = require('Module:Game')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
@@ -19,6 +20,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class CustomFactionInfobox: FactionInfobox
+---@field game string
 local CustomFactionInfobox = Class.new(FactionInfobox)
 local CustomInjector = Class.new(Injector)
 
@@ -29,6 +31,8 @@ function CustomFactionInfobox.run(frame)
 
     infobox.args.informationType = 'Civilization'
     infobox.args.lpdbType = 'civ'
+
+    infobox.game = Game.toIdentifier{game = infobox.args.game}
 
     infobox:setWidgetInjector(CustomInjector(infobox))
 
@@ -45,7 +49,7 @@ function CustomInjector:parse(id, widgets)
             args.introduced and Cell{
                 name = 'First introduced',
                 content = {
-                    caller._makeIntroducedIcon(args.introduced) .. Page.makeInternalLink(args.introduced)
+                    caller:_makeIntroducedIcon(args.introduced) .. Page.makeInternalLink(args.introduced)
                 }
             } or nil
         }
@@ -83,8 +87,8 @@ function CustomInjector:parse(id, widgets)
             args.tech1 and Cell{
                 name = 'Unique technologies',
                 content = {
-                    caller._makeAgeIcon('Castle') .. Page.makeInternalLink(args.tech1),
-                    caller._makeAgeIcon('Imperial') .. Page.makeInternalLink(args.tech2),
+                    caller:_makeAgeIcon('Castle') .. Page.makeInternalLink(args.tech1),
+                    caller:_makeAgeIcon('Imperial') .. Page.makeInternalLink(args.tech2),
                 }
             }
         )
@@ -95,9 +99,12 @@ end
 
 ---@param introduced string?
 ---@return string
-function CustomFactionInfobox._makeIntroducedIcon(introduced)
+function CustomFactionInfobox:_makeIntroducedIcon(introduced)
+    if self.game ~= 'Age of Empires II' then
+        return ''
+    end
     return Image.display(
-        'Aoe2 ' .. introduced .. 'Icon.png',
+        'Aoe2 ' .. introduced .. ' Icon.png',
         nil,
         {
             size = '18',
@@ -108,7 +115,10 @@ end
 
 ---@param age string?
 ---@return string
-function CustomFactionInfobox._makeAgeIcon(age)
+function CustomFactionInfobox:_makeAgeIcon(age)
+    if self.game ~= 'Age of Empires II' then
+        return ''
+    end
     return Image.display(
         age .. ' Age AoE2 logo.png',
         nil,
