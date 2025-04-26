@@ -32,7 +32,14 @@ function CustomFactionInfobox.run(frame)
     infobox.args.informationType = 'Civilization'
     infobox.args.lpdbType = 'civ'
 
-    infobox.game = Game.toIdentifier{game = infobox.args.game}
+    local subpageText = mw.title.getCurrentTitle().subpageText
+    infobox.game = Game.toIdentifier{
+        game = infobox.args.game or subpageText
+    }
+
+    if infobox.game == subpageText then
+        infobox.name = mw.title.getCurrentTitle().baseText
+    end
 
     infobox:setWidgetInjector(CustomInjector(infobox))
 
@@ -144,6 +151,12 @@ function CustomFactionInfobox:getWikiCategories(args)
         'Civilization',
         self.game and ('Civilization ' .. (self.game)) or nil
     }
+end
+
+---@param args table
+---@return string?
+function CustomFactionInfobox:nameDisplay(args)
+	return Game.icon{game = self.game} .. args.name
 end
 
 return CustomFactionInfobox
