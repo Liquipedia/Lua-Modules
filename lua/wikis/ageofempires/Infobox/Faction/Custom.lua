@@ -67,7 +67,6 @@ function CustomInjector:parse(id, widgets)
                 content = {args.architecture}
             },
             Cell{name = 'Continent', content = {args.continent}},
-            --TODO: Game?
             Cell{
                 name = Page.makeInternalLink('Ingame classification', 'Civilizations classification'),
                 content = Array.map(
