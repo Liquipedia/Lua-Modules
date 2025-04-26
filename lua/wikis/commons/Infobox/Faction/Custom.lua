@@ -7,7 +7,6 @@
 --
 
 local Class = require('Module:Class')
-local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 
 local FactionInfobox = Lua.import('Module:Infobox/Faction')
