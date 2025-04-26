@@ -371,7 +371,44 @@ function MatchPage:_renderTeamStats(game)
 							classes = {'match-bm-lol-team-stats-header-team'},
 							children = self.opponents[1].iconDisplay
 						},
-						Div{classes = {'match-bm-team-stats-list-cell'}},
+						Div{
+							classes = {'match-bm-team-stats-list-cell'},
+							children = self:isBestOfOne() and {
+								Div{
+									classes = {'match-bm-lol-game-summary-faction'},
+									children = game.teams[1].side and IconImage{
+										imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
+										link = '',
+										caption = game.teams[1].side .. ' side'
+									} or nil
+								},
+								Div{
+									classes = {'match-bm-lol-game-summary-score-holder'},
+									children = game.finished and {
+										Div{
+											classes = {'match-bm-lol-game-summary-score'},
+											children = {
+												game.teams[1].scoreDisplay,
+												'&ndash;',
+												game.teams[2].scoreDisplay
+											}
+										},
+										Div{
+											classes = {'match-bm-lol-game-summary-length'},
+											children = game.length
+										}
+									} or nil
+								},
+								Div{
+									classes = {'match-bm-lol-game-summary-faction'},
+									children = game.teams[2].side and IconImage{
+										imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
+										link = '',
+										caption = game.teams[2].side .. ' side'
+									} or nil
+								}
+							} or nil
+						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
 							children = self.opponents[2].iconDisplay
