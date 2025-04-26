@@ -156,7 +156,7 @@ end
 ---@param args table
 ---@return string?
 function CustomFactionInfobox:nameDisplay(args)
-	return Game.icon{game = self.game} .. args.name
+	return Game.icon{game = self.game, size = '32px'} .. '&nbsp;' .. self.name
 end
 
 return CustomFactionInfobox
