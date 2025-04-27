@@ -249,7 +249,7 @@ local factionPropsAoE2 = {
 	italians = {
 		index = 26,
 		name = 'Italians',
-		pageNname = 'Italians' .. AOE2_SUFFIX,
+		pageName = 'Italians' .. AOE2_SUFFIX,
 		faction = 'italians',
 	},
 	japanese = {
