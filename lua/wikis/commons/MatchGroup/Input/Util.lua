@@ -272,7 +272,7 @@ function MatchGroupInputUtil.mergeRecordWithOpponent(record, opponent, substitut
 				team = player.team,
 				extradata = Logic.nilIfEmpty({
 					faction = player.faction,
-					customId = (player.extradata or {}).customId
+					publisherId = (player.extradata or {}).publisherId
 				})
 			}
 		end)
@@ -423,7 +423,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 	local players = {}
 	local playersIndex = 0
 
-	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?, customId: string?}
+	---@param player {pageName: string, displayName: string?, flag: string?, faction: string?, publisherId: string?}
 	local insertIntoPlayers = function(player)
 		if type(player) ~= 'table' or Logic.isEmpty(player) or Logic.isEmpty(player.pageName) then
 			return
@@ -441,9 +441,9 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
 		})
-		if player.customId then
+		if player.publisherId then
 			players[normalizedPageName].extradata = Table.merge(players[normalizedPageName].extradata or {}, {
-				customId = player.customId
+				publisherId = player.publisherId
 			})
 		end
 	end
@@ -484,9 +484,8 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 				displayName = globalVars:get(varPrefix .. 'dn'),
 				flag = globalVars:get(varPrefix .. 'flag'),
 				faction = globalVars:get(varPrefix .. 'faction'),
-				-- To be discussed - prefixed with "custom" to make sure it's not confused with e.g. opponentXpY
 				-- Used on dota2 for ingame IDs
-				customId = globalVars:get(varPrefix .. 'id'),
+				publisherId = globalVars:get(varPrefix .. 'id'),
 			}
 		end
 		playerIndex = playerIndex + 1
