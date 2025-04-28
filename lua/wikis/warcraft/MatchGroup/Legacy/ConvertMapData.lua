@@ -212,4 +212,4 @@ function ConvertMapData._readSubmatchPlayers(args, players, opponentPlayers, pre
 	table.insert(players[opponentIndex], Table.copy(opponentPlayers[opponentIndex][name2] or {}))
 end
 
-return Class.export(ConvertMapData)
+return Class.export(ConvertMapData, {onlyExport = {'solo', 'team', 'teamMulti'}})

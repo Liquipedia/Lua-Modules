@@ -48,4 +48,4 @@ function TeamRanking.run(args)
 end
 
 
-return Class.export(TeamRanking)
+return Class.export(TeamRanking, {onlyExport = {'run'}})
