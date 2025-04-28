@@ -1487,4 +1487,15 @@ function StatisticsPortal._addArrays(arrays)
 	end)
 end
 
-return Class.export(StatisticsPortal)
+return Class.export(StatisticsPortal, {onlyExport = {
+	'gameEarningsChart',
+	'modeEarningsChart',
+	'topEarningsChart',
+	'coverageStatistics',
+	'coverageMatchTable',
+	'coverageTournamentTable',
+	'prizepoolBreakdown',
+	'pieChartBreakdown',
+	'earningsTable',
+	'playerAgeTable',
+}})

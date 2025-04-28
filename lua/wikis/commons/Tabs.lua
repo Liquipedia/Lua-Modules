@@ -248,4 +248,4 @@ function Tabs._getDisplayNameFromLink(link)
 	return linkParts[#linkParts]
 end
 
-return Class.export(Tabs)
+return Class.export(Tabs, {onlyExport = {'static', 'dynamic'}})

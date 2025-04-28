@@ -312,4 +312,13 @@ function Count._tierConditions(args, lpdbConditions)
 end
 
 
-return Class.export(Count)
+return Class.export(Count, {onlyExport = {
+	'match2',
+	'match2game',
+	'match2gamesData',
+	'games',
+	'matches',
+	'tournaments',
+	'tournamentsByTier',
+	'placements',
+}})

@@ -110,4 +110,4 @@ function AutoInlineIcon._queryCharacterData(name)
 	}
 end
 
-return Class.export(AutoInlineIcon)
+return Class.export(AutoInlineIcon, {onlyExport = {'display'}})

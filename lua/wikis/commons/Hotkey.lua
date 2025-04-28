@@ -48,4 +48,4 @@ function Hotkeys.hotkey2(args)
 	return '<b>' .. hotkey1 .. seperator .. hotkey2 .. '</b>'
 end
 
-return Class.export(Hotkeys, {frameOnly = true})
+return Class.export(Hotkeys, {frameOnly = true, onlyExport = {'hotkey', 'hotkey2'}})
