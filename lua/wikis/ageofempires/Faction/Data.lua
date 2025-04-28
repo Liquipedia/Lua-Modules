@@ -174,6 +174,7 @@ local factionPropsAoE2 = {
 	byzantines = {
 		index = 12,
 		name = 'Byzantines',
+		pageName = 'Byzantines'  .. AOE2_SUFFIX,
 		faction = 'byzantines',
 	},
 	celts = {
@@ -201,6 +202,7 @@ local factionPropsAoE2 = {
 	ethiopians = {
 		index = 17,
 		name = 'Ethiopians',
+		pageName = 'Ethiopians' .. AOE2_SUFFIX,
 		faction = 'ethiopians',
 	},
 	franks = {
@@ -247,6 +249,7 @@ local factionPropsAoE2 = {
 	italians = {
 		index = 26,
 		name = 'Italians',
+		pageName = 'Italians' .. AOE2_SUFFIX,
 		faction = 'italians',
 	},
 	japanese = {
@@ -436,6 +439,7 @@ local factionPropsAoE3 = {
 	french = {
 		index = 6,
 		name = 'French',
+		pageName = 'French' .. AOE3_SUFFIX,
 		faction = 'french',
 	},
 	germans = {
