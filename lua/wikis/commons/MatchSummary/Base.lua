@@ -28,7 +28,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
+local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class MatchSummaryHeader
 ---@operator call: MatchSummaryHeader

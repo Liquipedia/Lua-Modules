@@ -46,6 +46,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -57,6 +58,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{
+			displayGameIcons = true,
 			matchesPortal = 'Liquipedia:Upcoming_and_ongoing_matches'
 		},
 		padding = true,

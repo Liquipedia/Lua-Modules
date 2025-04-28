@@ -68,7 +68,7 @@ return {
 			value = '-1',
 			sort = 'A8',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Miscellaneous Events',
 			category = 'Miscellaneous Events',
 		},

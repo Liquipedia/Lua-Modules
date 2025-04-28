@@ -87,20 +87,14 @@ function Class.export(class, options)
 	return class
 end
 
--- Duplicate Table.isNotEmpty() here to avoid circular dependencies with Table
-local function TableIsNotEmpty(tbl)
-	-- luacheck: push ignore (Loop can be executed at most once)
-	for _ in pairs(tbl) do
-		return true
-	end
-	-- luacheck: pop
-	return false
-end
-
 ---
 -- Wrap the given function with an argument parses so that both wikicode and lua
 -- arguments are accepted
 --
+---@generic F:fun(props: table)
+---@param f F
+---@param options table?
+---@return F
 function Class._wrapFunction(f, options)
 	options = options or {}
 	local alwaysRewriteArgs = options.trim
@@ -121,38 +115,12 @@ function Class._wrapFunction(f, options)
 			)
 
 		if shouldRewriteArgs then
-			local namedArgs, indexedArgs = Class._frameToArgs(frame, options)
-			if namedArgs then
-				return f(namedArgs, unpack(indexedArgs))
-			else
-				return f(unpack(indexedArgs))
-			end
+			local args = Arguments.getArgs(frame, options)
+			return f(args)
 		else
 			return f(...)
 		end
 	end
-end
-
---[[
-Translates a frame object into arguments expected by a lua function.
-]]
-function Class._frameToArgs(frame, options)
-	local args = Arguments.getArgs(frame, options)
-
-	-- getArgs adds a metatable to the table. This breaks unpack. So we remove it.
-	-- We also add all named params to a special table, since unpack removes them.
-	local indexedArgs = {}
-	local namedArgs = {}
-	for key, value in pairs(args) do
-		if type(key) == 'number' then
-			indexedArgs[key] = value
-		-- remove args that are needed for the Lua.invoke wrapper
-		elseif key ~= 'module' and key ~= 'fn' and key ~= 'dev' and key ~= 'frameOnly' then
-			namedArgs[key] = value
-		end
-	end
-
-	return (TableIsNotEmpty(namedArgs) and namedArgs or nil), indexedArgs
 end
 
 ---@param instance any

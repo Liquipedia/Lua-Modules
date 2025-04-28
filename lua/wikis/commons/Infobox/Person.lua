@@ -318,7 +318,7 @@ function Person:getStandardNationalityValue(nationality)
 		return nil
 	end
 
-	local nationalityToStore = Flags.CountryName(nationality)
+	local nationalityToStore = Flags.CountryName{flag = nationality}
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
@@ -437,7 +437,7 @@ function Person:getLocations()
 	end
 
 	return Array.map(locations, function(country)
-		return Flags.CountryName(country)
+		return Flags.CountryName{flag = country}
 	end)
 end
 
@@ -445,7 +445,7 @@ end
 function Person:displayLocations()
 	return Array.map(self.locations, function(country, locationIndex)
 		local location = self.args['location' .. locationIndex]
-		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+		return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' ..
 			Page.makeInternalLink(country, ':Category:' .. country) ..
 			(location and (',&nbsp;' .. location) or '')
 	end)

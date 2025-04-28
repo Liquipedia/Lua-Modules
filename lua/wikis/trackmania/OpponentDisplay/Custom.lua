@@ -76,4 +76,4 @@ function OpponentDisplayCustom.InlineScore(opponent, scoreIndex)
 	return score
 end
 
-return Class.export(OpponentDisplayCustom)
+return OpponentDisplayCustom

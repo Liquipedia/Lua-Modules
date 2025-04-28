@@ -426,7 +426,8 @@ function StatisticsPortal._coverageTournamentTableHeader(args)
 
 	if String.isNotEmpty(args.showOther) then
 		headerRow:tag('th')
-			:wikitext(Abbreviation.make('Other', 'Includes otherwise unlisted tournaments (e.g. with tiertypes, misc.)'))
+			:wikitext(Abbreviation.make{text = 'Other',
+				title = 'Includes otherwise unlisted tournaments (e.g. with tiertypes, misc.)'})
 	end
 
 	headerRow:tag('th')

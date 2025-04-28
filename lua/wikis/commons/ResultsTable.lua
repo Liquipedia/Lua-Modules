@@ -38,7 +38,7 @@ function ResultsTable:buildHeader()
 	end
 
 	if self.config.displayGameIcons then
-		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
+		header:tag('th'):node(Abbreviation.make{text = 'G.', title = 'Game'})
 	end
 
 	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament')

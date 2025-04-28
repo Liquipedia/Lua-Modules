@@ -101,7 +101,7 @@ return {
 			link = 'Portal:Arenas',
 			count = {
 				method = 'CATEGORY',
-				category = 'Arenas',
+				category = 'Maps',
 			},
 		},
 		{

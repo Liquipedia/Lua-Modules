@@ -97,7 +97,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then
 		Array.appendWith(widgets,
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (' .. Abbreviation.make('Org', 'Organisation') .. ')', content = {args.years_active_org}},
+			Cell{
+				name = 'Years Active (' .. Abbreviation.make{text = 'Org', title = 'Organisation'} .. ')',
+				content = {args.years_active_org}
+			},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
 		)

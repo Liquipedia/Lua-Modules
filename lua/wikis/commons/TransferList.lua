@@ -363,7 +363,7 @@ function TransferList:_buildHeader()
 		:tag('div'):addClass('divCell Empty')
 			:tag('span')
 				:addClass('mobile-hide')
-				:wikitext(Abbreviation.make('Ref', 'Reference'))
+				:wikitext(Abbreviation.make{text = 'Ref', title = 'Reference'})
 		:allDone()
 end
 

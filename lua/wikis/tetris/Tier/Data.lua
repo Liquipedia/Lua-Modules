@@ -44,7 +44,7 @@ return {
 			value = '-1',
 			sort = 'C1',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Miscellaneous Tournaments',
 			category = 'Misc Tournaments',
 		},
