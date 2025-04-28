@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Variables = require('Module:Variables')
@@ -21,7 +20,9 @@ local MatchFunctions = {
 local FfaMatchFunctions = {
 	DEFAULT_MODE = 'solos',
 }
-local MapFunctions = {}
+local MapFunctions = {
+	BREAK_ON_EMPTY = true
+}
 local FfaMapFunctions = {}
 
 local DEFAULT_BESTOF = 3
@@ -66,12 +67,6 @@ function MatchFunctions.getBestOf(bestofInput)
 	local bestof = tonumber(bestofInput) or tonumber(Variables.varDefault('match_bestof')) or DEFAULT_BESTOF
 	Variables.varDefine('match_bestof', bestof)
 	return bestof
-end
-
----@param games table[]
----@return table[]
-function MatchFunctions.removeUnsetMaps(games)
-	return Array.filter(games, Logic.isNotEmpty)
 end
 
 ---@param map table
