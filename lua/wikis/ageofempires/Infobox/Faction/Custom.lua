@@ -32,7 +32,6 @@ function CustomFactionInfobox.run(frame)
 	local infobox = CustomFactionInfobox(frame)
 
 	infobox.args.informationType = 'Civilization'
-	infobox.args.lpdbType = 'civ'
 
 	local subpageText = mw.title.getCurrentTitle().subpageText
 	infobox.game = Game.toIdentifier{

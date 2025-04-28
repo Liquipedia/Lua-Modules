@@ -85,7 +85,7 @@ function FactionInfobox:setLpdbData(args)
 		name = self.name,
 		image = args.image,
 		imagedark = args.imagedark or args.imagedarkmode,
-		type = args.lpdbType or 'faction',
+		type = 'faction',
 		date = args.releasedate,
 		extradata = {},
 	}
