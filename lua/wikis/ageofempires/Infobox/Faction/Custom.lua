@@ -84,10 +84,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Unique buildings',
-				children = Array.map(
-					caller:getAllArgsForBase(args, 'building'),
-					Page.makeInternalLink
-				)
+				children = getAllArgsForBase(args, 'building', {makeLink = true})
 			},
 			Cell{
 				name = 'Unique units',
