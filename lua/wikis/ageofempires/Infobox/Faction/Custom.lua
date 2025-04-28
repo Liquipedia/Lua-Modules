@@ -91,10 +91,7 @@ function CustomInjector:parse(id, widgets)
 			},
 			Cell{
 				name = 'Unique units',
-				children = Array.map(
-					caller:getAllArgsForBase(args, 'unit'),
-					Page.makeInternalLink
-				)
+				children = caller:getAllArgsForBase(args, 'unit', {makeLink = true})
 			},
 			args.tech1 and Cell{
 				name = 'Unique technologies',
@@ -120,7 +117,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@param introduced string?
----@return Widget?
+---@return Widget
 function CustomFactionInfobox:_makeIntroducedIcon(introduced)
 	if self.game ~= 'Age of Empires II' then
 		return Fragment{}
@@ -133,7 +130,7 @@ function CustomFactionInfobox:_makeIntroducedIcon(introduced)
 end
 
 ---@param age string?
----@return Widget?
+---@return Widget
 function CustomFactionInfobox:_makeAgeIcon(age)
 	if self.game ~= 'Age of Empires II' then
 		return Fragment{}
@@ -157,8 +154,7 @@ end
 ---@return string[]
 function CustomFactionInfobox:getWikiCategories(args)
 	return {
-		'Civilization',
-		self.game and ('Civilization ' .. (self.game)) or nil
+		self.game and ('Civilization (' .. self.game .. ')') or nil
 	}
 end
 
