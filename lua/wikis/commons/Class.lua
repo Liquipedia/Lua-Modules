@@ -8,6 +8,22 @@
 
 local Arguments = require('Module:Arguments')
 
+---@class ArgumentsOptions
+---@field translate table?
+---@field backtranslate table?
+---@field wrappers string[]?
+---@field frameOnly boolean?
+---@field parentOnly boolean?
+---@field parentFirst boolean?
+---@field valueFunc ?fun(key: string, val: string):string
+---@field removeBlanks boolean?
+---@field trim boolean?
+---@field readOnly boolean?
+---@field noOverwrite boolean?
+
+---@class ClassExportOptions: ArgumentsOptions
+---@field onlyExport string[]
+
 local Class = {}
 
 Class.PRIVATE_FUNCTION_SPECIFIER = '_'
@@ -61,9 +77,10 @@ end
 
 ---@generic T:table
 ---@param class T
----@param options ?table
+---@param options ClassExportOptions
 ---@return T
 function Class.export(class, options)
+	--- nil check needed for non-git usage
 	options = options or {}
 
 	local checkFunction = function(functionName)
@@ -75,6 +92,7 @@ function Class.export(class, options)
 		class[functionName] = Class._wrapFunction(f, options)
 	end
 
+	--- need to catch missing `onlyExport` option for non-git usages
 	if type(options.onlyExport) == 'table' and #options.onlyExport > 0 then
 		for _, functionName in ipairs(options.onlyExport) do
 			checkFunction(functionName)
