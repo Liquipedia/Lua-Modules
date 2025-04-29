@@ -9,7 +9,6 @@
 local ActiveYears = require('Module:YearsActive')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Role = require('Module:Role')
 local Region = require('Module:Region')
 local Math = require('Module:MathUtil')
 local String = require('Module:StringUtils')
