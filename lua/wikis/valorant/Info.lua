@@ -36,6 +36,7 @@ return {
 			status = 2,
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
+			matchPage = true,
 		},
 		transfers = {
 			contractDatabase = {
