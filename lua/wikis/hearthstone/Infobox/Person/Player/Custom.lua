@@ -26,8 +26,6 @@ local Center = Widgets.Center
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 ---@class HearthstoneInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -38,8 +36,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.autoTeam = true
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
@@ -80,10 +76,6 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 	elseif id == 'region' then return {}
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role(s)', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 	return widgets
 end
@@ -93,9 +85,6 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-
 	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData
