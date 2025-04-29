@@ -120,18 +120,16 @@ return {
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
 
-	-- Usage: Match Pages
+	-- Usage: Match Stats
 	damage = 'fas fa-sword',
 	gold = 'fas fa-coins',
 
-	-- Usage: Dota2 Match Pages
 	dota2_gpm = 'fas fa-coin',
 	dota2_kda = 'fas fa-skull-crossbones',
 	dota2_lhdn = 'fas fa-swords',
 	dota2_tower = 'fas fa-chess-rook',
 	dota2_barrack = 'fas fa-warehouse',
 
-	-- Usage: LeagueOfLegends Match Pages
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
 
 	-- Usage: Indicate boolean info in Infobox
