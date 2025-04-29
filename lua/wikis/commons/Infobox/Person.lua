@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local FnUtil = require('Module:FnUtil')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -36,6 +37,15 @@ local Customizable = Widgets.Customizable
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
+
+---@class PersonRoleData
+---@field category string
+---@field display string
+---@field role PersonRoleData?
+---@field role2 PersonRoleData?
+---@field role3 PersonRoleData?
+---@field roles PersonRoleData?
+
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -61,16 +71,6 @@ local STATUS_TRANSLATE = {
 local BANNED = 'banned' -- Temporary until conversion
 local Roles = Lua.import('Module:Roles')
 local ROLES = Roles.All
-
----@class PersonRoleData
----@field category string
----@field display string
-
----@class Infobox: Person
----@field role PersonRoleData?
----@field role2 PersonRoleData?
----@field role3 PersonRoleData?
----@field roles PersonRoleData?
 
 ---@param frame Frame
 ---@return Html
@@ -137,7 +137,7 @@ function Person:createInfobox()
 
 	self.roles = {}
 	if args.roles then
-		local roleKeys = Array.parseCommaSeparatedString(args.roles)
+		local roleKeys = Array.map(Array.parseCommaSeparatedString(args.roles), FnUtil.curry(Person.createRoleData, self))
 		for _, roleKey in ipairs(roleKeys) do
 			local roleData = self:createRoleData(roleKey)
 			if roleData then
@@ -212,27 +212,18 @@ function Person:createInfobox()
 					end
 				end)
 
-				local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
-				local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
-				local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
-
-				local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
-				local positionsTitle = #positions > 1 and "Positions" or "Position"
-				local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
-
-				if inGameRolesDisplay then
-					table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+				---@param rolesArray string[]
+				---@param title string
+				---@return Widget
+				local makeRoleCell = function(rolesArray, title)
+					return Cell{name = title .. (#rolesArray > 0 and 's' or ''), children = rolesArray, separator = ', '}
 				end
 
-				if positionsDisplay then
-					table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
-				end
-
-				if contractsDisplay then
-					table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
-				end
-
-				return cells
+				return Array.append(cells,
+					makeRoleCell(inGameRoles, 'In-game Role'),
+					makeRoleCell(positions, 'Position'),
+					makeRoleCell(contracts, 'Contract')
+				)
 			end}
 		}},
 		Customizable{id = 'teams', children = {
@@ -361,7 +352,11 @@ function Person:_setLpdbData(args, links, status, personType)
 		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
-		type = personType,
+		type = self:_isPlayerOrStaff(),
+		role = self.role or {},
+		role2 = self.role2 or {},
+		role3 = self.role3 or {},
+		roles = self.roles or {},
 		earnings = self.totalEarnings,
 		earningsbyyear = {},
 		links = Links.makeFullLinksForTableItems(links, LINK_VARIANT),
@@ -433,46 +428,26 @@ end
 ---@param personType string
 ---@return table
 function Person:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = self.role or {}
-	lpdbData.extradata.role2 = self.role2 or {}
-	lpdbData.extradata.role3 = self.role3 or {}
-	lpdbData.extradata.roles = self.roles or {}
-
-	lpdbData.type = self:isPlayerOrStaff()
 	return lpdbData
 end
 
 ---@return string
-function Person:isPlayerOrStaff()
+function Person:_isPlayerOrStaff()
 	local inGameRoles = Roles.InGameRoles
 
-	if self.roles and #self.roles > 0 then
-		for _, roleData in ipairs(self.roles) do
-			for roleKey, data in pairs(ROLES) do
-				if data == roleData then
-					if inGameRoles and inGameRoles[roleKey] then
-						return 'player'
-					end
-				end
-			end
-		end
-		return 'staff'
-	end
+	local roles = Logic.nilIfEmpty(self.roles) or {self.role, self.role2, self.role3}
 
-	local roles = {self.role, self.role2, self.role3}
-	for _, roleData in ipairs(roles) do
-		if roleData then
-			for roleKey, data in pairs(ROLES) do
-				if data == roleData then
-					if inGameRoles and inGameRoles[roleKey] then
-						return 'player'
-					end
-				end
-			end
-		end
-	end
+	if Logic.isEmpty(roles) then return 'player' end
 
-	return 'staff'
+	local isPlayer = Array.any(roles, function(roleData)
+		Table.any(ROLES, function(roleKey, data)
+			if data == roleData and inGameRoles and inGameRoles[roleKey] then
+				return true
+			end
+		end)
+	end)
+
+	return isPlayer and 'player' or 'staff'
 end
 
 --- Allows for overriding this functionality
@@ -581,7 +556,7 @@ function Person:createRoleData(roleKey)
 	local roleData = ROLES[key]
 
 	if not roleData and key ~= '' then
-		local display = roleKey:gsub("^%l", string.upper)
+		local display = String.upperCaseFirst(roleKey)
 		roleData = {
 			display = display,
 			category = display .. "s"
