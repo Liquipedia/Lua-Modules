@@ -180,68 +180,58 @@ function Person:createInfobox()
 			Builder{builder = function()
 				local cells = {}
 
-				if self.roles and #self.roles > 0 then
-					local inGameRoles = {}
-					local contracts = {}
-					local positions = {}
-
-					local OriginalInGameRoles = Roles.InGameRoles
-					local OriginalContractRoles = Roles.ContractRoles
-
-					for _, roleData in ipairs(self.roles) do
-						local roleDisplay = self:_displayRole(roleData)
-
-						if roleDisplay then
-							local roleKey
-							for key, data in pairs(ROLES) do
-								if data == roleData then
-									roleKey = key
-									break
-								end
-							end
-
-							if roleKey then
-
-								if OriginalInGameRoles and OriginalInGameRoles[roleKey] then
-									table.insert(inGameRoles, roleDisplay)
-								elseif OriginalContractRoles and OriginalContractRoles[roleKey] then
-									table.insert(contracts, roleDisplay)
-								else
-									table.insert(positions, roleDisplay)
-								end
-							else
-								table.insert(positions, roleDisplay)
-							end
-						end
-					end
-
-					local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
-					local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
-					local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
-
-					local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
-					local positionsTitle = #positions > 1 and "Positions" or "Position"
-					local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
-
-					if inGameRolesDisplay then
-						table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
-					end
-
-					if positionsDisplay then
-						table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
-					end
-
-					if contractsDisplay then
-						table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
-					end
-
-					return cells
-				else
+				if not self.roles or #self.roles == 0 then
 					local role = self:_displayRole(self.role)
 					local role2 = self:_displayRole(self.role2)
 					local role3 = self:_displayRole(self.role3)
 					table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2, role3}})
+
+					return cells
 				end
+
+				local inGameRoles = {}
+				local contracts = {}
+				local positions = {}
+
+				local OriginalInGameRoles = Roles.InGameRoles
+				local OriginalContractRoles = Roles.ContractRoles
+
+				Array.forEach(self.roles, function(roleData)
+					local roleDisplay = self:_displayRole(roleData)
+
+					if not roleDisplay then
+						return
+					end
+
+					if OriginalInGameRoles and Table.includes(OriginalInGameRoles, roleData) then
+						table.insert(inGameRoles, roleDisplay)
+					elseif OriginalContractRoles and Table.includes(OriginalContractRoles, roleData) then
+						table.insert(contracts, roleDisplay)
+					else
+						table.insert(positions, roleDisplay)
+					end
+				end)
+
+				local inGameRolesDisplay = #inGameRoles > 0 and table.concat(inGameRoles, ", ") or nil
+				local positionsDisplay = #positions > 0 and table.concat(positions, ", ") or nil
+				local contractsDisplay = #contracts > 0 and table.concat(contracts, ", ") or nil
+
+				local inGameRolesTitle = #inGameRoles > 1 and "In-game Roles" or "In-game Role"
+				local positionsTitle = #positions > 1 and "Positions" or "Position"
+				local contractsTitle = #contracts > 1 and "Contracts" or "Contract"
+
+				if inGameRolesDisplay then
+					table.insert(cells, Cell{name = inGameRolesTitle, content = {inGameRolesDisplay}})
+				end
+
+				if positionsDisplay then
+					table.insert(cells, Cell{name = positionsTitle, content = {positionsDisplay}})
+				end
+
+				if contractsDisplay then
+					table.insert(cells, Cell{name = contractsTitle, content = {contractsDisplay}})
+				end
+
 				return cells
 			end}
 		}},
@@ -443,7 +433,46 @@ end
 ---@param personType string
 ---@return table
 function Person:adjustLPDB(lpdbData, args, personType)
+	lpdbData.extradata.role = self.role or {}
+	lpdbData.extradata.role2 = self.role2 or {}
+	lpdbData.extradata.role3 = self.role3 or {}
+	lpdbData.extradata.roles = self.roles or {}
+
+	lpdbData.type = self:isPlayerOrStaff()
 	return lpdbData
+end
+
+---@return string
+function Person:isPlayerOrStaff()
+	local inGameRoles = Roles.InGameRoles
+
+	if self.roles and #self.roles > 0 then
+		for _, roleData in ipairs(self.roles) do
+			for roleKey, data in pairs(ROLES) do
+				if data == roleData then
+					if inGameRoles and inGameRoles[roleKey] then
+						return 'player'
+					end
+				end
+			end
+		end
+		return 'staff'
+	end
+
+	local roles = {self.role, self.role2, self.role3}
+	for _, roleData in ipairs(roles) do
+		if roleData then
+			for roleKey, data in pairs(ROLES) do
+				if data == roleData then
+					if inGameRoles and inGameRoles[roleKey] then
+						return 'player'
+					end
+				end
+			end
+		end
+	end
+
+	return 'staff'
 end
 
 --- Allows for overriding this functionality
