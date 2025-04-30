@@ -166,6 +166,9 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				deaths = participant.deaths,
 				assists = participant.assists,
 				acs = participant.acs,
+				adr = participant.adr,
+				kast = participant.kast,
+				hs = participant.hs,
 				player = playerIdData.name or playerInputData.name,
 				agent = getCharacterName(participant.agent),
 			}
