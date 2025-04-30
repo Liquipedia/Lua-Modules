@@ -126,7 +126,7 @@ function StatisticsPortal.topEarningsChart(args)
 
 	local yearSeriesData = Array.map(Array.range(config.startYear, tonumber(args.year) or CURRENT_YEAR), function(year)
 		return Array.map(Array.reverse(topEarningsList), function(teamData)
-			return teamData.extradata['earningsin' .. year] or 0
+			return teamData.earningsbyyear[year] or 0
 		end)
 	end)
 
@@ -689,8 +689,8 @@ function StatisticsPortal.earningsTable(args)
 	args.minimumEarnings = tonumber(args.minimumEarnings) or MINIMUM_EARNINGS
 
 	local earningsFunction = function (a)
-		if String.isNotEmpty(args.year) and a.extradata then
-			return tonumber(a.extradata['earningsin'..args.year]) or 0
+		if String.isNotEmpty(args.year) then
+			return a.earningsbyyear[tonumber(args.year)] or 0
 		else
 			return tonumber(a.earnings) or 0
 		end
@@ -814,7 +814,7 @@ Section: Query Functions
 ---@return table
 function StatisticsPortal._getPlayers(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('player', {
-		query = 'pagename, id, nationality, earnings, extradata, birthdate, team',
+		query = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear',
 		conditions = addConditions or '',
 		order = addOrder,
 		limit = limit or MAX_QUERY_LIMIT,
@@ -830,7 +830,7 @@ end
 ---@return table
 function StatisticsPortal._getTeams(limit, addConditions, addOrder)
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
-		query = 'pagename, name, template, earnings, extradata',
+		query = 'pagename, name, template, earnings, earningsbyyear',
 		conditions = addConditions or '',
 		order = addOrder,
 		limit = limit or MAX_QUERY_LIMIT,
@@ -847,9 +847,9 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 	local opponentType = config.opponentType == Opponent.team and 'team' or 'player'
 	local queryFields
 	if opponentType == Opponent.team then
-		queryFields = 'pagename, name, template, earnings, extradata'
+		queryFields = 'pagename, name, template, earnings, earningsbyyear'
 	else
-		queryFields = 'pagename, id, nationality, earnings, extradata, birthdate, team'
+		queryFields = 'pagename, id, nationality, earnings, birthdate, team, earningsbyyear'
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all)
@@ -870,8 +870,8 @@ function StatisticsPortal._getOpponentEarningsData(args, config)
 	Lpdb.executeMassQuery(opponentType, queryParameters, processData)
 
 	local earningsFunction = function (a)
-		if String.isNotEmpty(args.year) and a.extradata then
-			return tonumber(a.extradata['earningsin'..args.year]) or 0
+		if String.isNotEmpty(args.year) then
+			return a.earningsbyyear[tonumber(args.year)] or 0
 		else
 			return tonumber(a.earnings) or 0
 		end
