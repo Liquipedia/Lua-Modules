@@ -348,10 +348,10 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = self.region.region,
 		team = teamLink or team,
-		type = personType,
 		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
+		type = personType,
 		earnings = self.totalEarnings,
 		earningsbyyear = {},
 		links = Links.makeFullLinksForTableItems(links, LINK_VARIANT),
@@ -359,6 +359,7 @@ function Person:_setLpdbData(args, links, status, personType)
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
+			type = self:_isPlayerOrStaff(),
 			role = self.role,
 			role2 = self.role2,
 			role3 = self.role3,
@@ -557,7 +558,7 @@ function Person:_createRoleData(roleKey)
 	local display = String.upperCaseFirst(roleKey)
 	return {
 		display = display,
-		category = display .. "s"
+		category = display .. 's'
 	}
 end
 
