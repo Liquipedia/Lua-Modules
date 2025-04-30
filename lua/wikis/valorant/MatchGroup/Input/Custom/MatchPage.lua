@@ -11,7 +11,7 @@ local Array = require('Module:Array')
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchDataExtended: valorantMatchData
----@field matchid integer
+---@field matchid string
 ---@field vod string?
 
 ---@param mapInput {matchid: string?, reversed: string?, vod: string?, region: string?}
@@ -21,11 +21,10 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	if not mapInput or not mapInput.matchid then
 		return mapInput
 	end
-	local matchId = tonumber(mapInput.matchid)
-	assert(matchId, 'Numeric matchid expected, got ' .. mapInput.matchid)
+	assert(mapInput.matchid, 'Numeric matchid expected, got ' .. mapInput.matchid)
 	assert(mapInput.region, 'Region is required ')
 
-	--local map = mw.ext.valorantdb.getDetails(matchId, mapInput.region, Logic.readBool(mapInput.reversed))
+	--local map = mw.ext.valorantdb.getDetails(mapInput.matchid, mapInput.region, Logic.readBool(mapInput.reversed))
 	local map = CustomMatchGroupInputMatchPage.getMockData()
 
 	assert(map and type(map) == 'table' and map.matchInfo, mapInput.matchid .. ' could not be retrieved.')
@@ -59,7 +58,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	end
 
 	---@cast map valorantMatchDataExtended
-	map.matchid = matchId
+	map.matchid = mapInput.matchid
 	map.vod = mapInput.vod
 
 	return map
