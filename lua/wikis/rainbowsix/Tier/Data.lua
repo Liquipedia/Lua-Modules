@@ -107,15 +107,15 @@ return {
 		},
 		points = {
 			value = 'Points',
-			sort = 'B1',
+			sort = 'B3',
 			name = 'Points',
-			short = 'Points',
+			short = 'Pts.',
 			link = 'Point Rankings',
 			category = 'Point Rankings',
 		},
 		award = {
 			value = 'Awards',
-			sort = 'B2',
+			sort = 'B4',
 			name = 'Awards',
 			short = 'Awards',
 			link = 'Award Shows',
