@@ -37,7 +37,7 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
-local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
+local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local AVAILABLE_FOR_TIERS = {1}

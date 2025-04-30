@@ -123,9 +123,12 @@ return {
 	-- Usage: Match Stats
 	damage = 'fas fa-sword',
 	gold = 'fas fa-coins',
+	kda = 'fas fa-skull-crossbones',
+	asc = 'far fa-abacus',
+	kast = 'fas fa-hands-helping',
+	headshot = 'fal fa-head-side',
 
 	dota2_gpm = 'fas fa-coin',
-	dota2_kda = 'fas fa-skull-crossbones',
 	dota2_lhdn = 'fas fa-swords',
 	dota2_tower = 'fas fa-chess-rook',
 	dota2_barrack = 'fas fa-warehouse',

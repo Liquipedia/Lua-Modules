@@ -139,17 +139,17 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				classes = {'match-bm-players-player-stats'},
 				children = {
 					PlayerStat{
-						title = {IconFa{iconName = 'XXX'}, 'ACS'},
+						title = {IconFa{iconName = 'asc'}, 'ACS'},
 						data = player.asc
 					},
 					PlayerStat{
-						title = {IconFa{iconName = 'dota2_kda'}, 'KDA'},
+						title = {IconFa{iconName = 'kda'}, 'KDA'},
 						data = Array.interleave({
 							player.kills, player.deaths, player.assists
 						}, SPAN_SLASH)
 					},
 					PlayerStat{
-						title = {IconFa{iconName = 'XXX'}, 'KAST'},
+						title = {IconFa{iconName = 'kast'}, 'KAST'},
 						data = player.kast and (player.kast .. '%') or nil
 					},
 					PlayerStat{
@@ -157,7 +157,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						data = player.asc
 					},
 					PlayerStat{
-						title = {IconFa{iconName = 'XXX'}, 'HS%'},
+						title = {IconFa{iconName = 'headshot'}, 'HS%'},
 						data = player.hs and (player.hs .. '%') or nil
 					}
 				}
