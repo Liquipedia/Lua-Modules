@@ -77,7 +77,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		calculateMapScore = FnUtil.curry(MapFunctions.calculateMapScore, MapParser),
 		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
 		getMap = MapParser.getMap,
-		getMapName = function() return '' end,
+		getMapName = MapParser.getMapName,
 		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
 	}
 
