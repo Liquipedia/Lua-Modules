@@ -83,7 +83,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			player = playerData.pagename or player.riot_id,
 			name = playerData.id or player.riot_id,
 			agent = player.agent,
-			acs = player.level,
+			acs = player.acs,
 			adr = nil,
 			kast = nil,
 			hs = nil,
