@@ -113,5 +113,13 @@ return {
 			link = 'Point Rankings',
 			category = 'Point Rankings',
 		},
+		award = {
+			value = 'Awards',
+			sort = 'B2',
+			name = 'Awards',
+			short = 'Awards',
+			link = 'Award Shows',
+			category = 'Award Shows',
+		},
 	},
 }
