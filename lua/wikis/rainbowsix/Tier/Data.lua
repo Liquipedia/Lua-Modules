@@ -89,14 +89,6 @@ return {
 			link = 'Qualifier Tournaments',
 			category = 'Qualifier Tournaments',
 		},
-		misc = {
-			value = 'Misc',
-			sort = 'A9',
-			name = 'Misc',
-			short = 'Misc',
-			link = 'Miscellaneous Tournaments',
-			category = 'Miscellaneous Tournaments',
-		},
 		showmatch = {
 			value = 'Showmatch',
 			sort = 'B1',
