@@ -13,6 +13,7 @@ local CustomMatchGroupInputMatchPage = {}
 ---@class valorantMatchDataExtended: valorantMatchData
 ---@field matchid string
 ---@field vod string?
+---@field finished boolean
 
 ---@param mapInput {matchid: string?, reversed: string?, vod: string?, region: string?}
 ---@return dota2MatchDataExtended|table
@@ -60,6 +61,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	---@cast map valorantMatchDataExtended
 	map.matchid = mapInput.matchid
 	map.vod = mapInput.vod
+	map.finished = true
 
 	return map
 end
@@ -115,7 +117,7 @@ function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIn
 	if not sideData then
 		return nil
 	end
-	return sideData[side .. 'wins']
+	return sideData['team' .. side .. 'wins']
 end
 
 function CustomMatchGroupInputMatchPage.getMockData()

@@ -55,7 +55,7 @@ function CustomMatchGroupInput.processMatch(match, options)
 	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 end
 
----@param MapParser Dota2MapParserInterface
+---@param MapParser ValorantMapParserInterface
 ---@param match table
 ---@return table
 function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
@@ -68,9 +68,19 @@ end
 
 ---@param match table
 ---@param opponents MGIParsedOpponent[]
+---@param MapParser ValorantMapParserInterface
 ---@return table[]
-function MatchFunctions.extractMaps(match, opponents)
-	return MatchGroupInputUtil.standardProcessMaps(match, opponents, MapFunctions)
+function MatchFunctions.extractMaps(match, opponents, MapParser)
+	---@type MapParserInterface
+	local mapParser = {
+		calculateMapScore = FnUtil.curry(MapFunctions.calculateMapScore, MapParser),
+		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
+		getMap = MapParser.getMap,
+		getMapName = function() return '' end,
+		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
+	}
+
+	return MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParser)
 end
 
 -- These maps however shouldn't be stored

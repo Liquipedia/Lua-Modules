@@ -130,7 +130,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 		classes = {'match-bm-players-player'},
 		children = {
 			PlayerDisplay{
-				characterIcon = self:getCharacterIcon(player.character),
+				characterIcon = self:getCharacterIcon(player.agent),
 				characterName = player.character,
 				playerName = player.displayName,
 				playerLink = player.link
