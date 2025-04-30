@@ -139,8 +139,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				classes = {'match-bm-players-player-stats'},
 				children = {
 					PlayerStat{
-						title = {IconFa{iconName = 'asc'}, 'ACS'},
-						data = player.asc
+						title = {IconFa{iconName = 'acs'}, 'ACS'},
+						data = player.acs
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kda'}, 'KDA'},
@@ -154,7 +154,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.asc
+						data = player.adr
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'headshot'}, 'HS%'},

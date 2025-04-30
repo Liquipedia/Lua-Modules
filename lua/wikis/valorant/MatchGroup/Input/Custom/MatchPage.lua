@@ -83,7 +83,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			player = playerData.pagename or player.riot_id,
 			name = playerData.id or player.riot_id,
 			agent = player.agent,
-			asc = player.level,
+			acs = player.level,
 			adr = nil,
 			kast = nil,
 			hs = nil,
@@ -93,7 +93,7 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 		}
 	end)
 	return Array.sortBy(players, function(player)
-		return player.asc or player.kills or player.player
+		return player.acs or player.kills or player.player
 	end)
 end
 

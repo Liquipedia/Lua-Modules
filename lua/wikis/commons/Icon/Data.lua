@@ -124,7 +124,7 @@ return {
 	damage = 'fas fa-sword',
 	gold = 'fas fa-coins',
 	kda = 'fas fa-skull-crossbones',
-	asc = 'far fa-abacus',
+	acs = 'far fa-abacus',
 	kast = 'fas fa-hands-helping',
 	headshot = 'fal fa-head-side',
 
