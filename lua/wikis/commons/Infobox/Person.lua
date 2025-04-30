@@ -35,17 +35,16 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
+---@class PersonRoleData
+---@field category string?
+---@field display string?
+
 ---@class Person: BasicInfobox
 ---@field locations string[]
-
----@class PersonRoleData
----@field category string
----@field display string
 ---@field role PersonRoleData?
 ---@field role2 PersonRoleData?
 ---@field role3 PersonRoleData?
 ---@field roles PersonRoleData?
-
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -131,19 +130,19 @@ function Person:createInfobox()
 
 	self.age = age
 
-	self.role = self:createRoleData(args.role or '')
-	self.role2 = self:createRoleData(args.role2 or '')
-	self.role3 = self:createRoleData(args.role3 or '')
+	self.role = self:_createRoleData(args.role or '')
+	self.role2 = self:_createRoleData(args.role2 or '')
+	self.role3 = self:_createRoleData(args.role3 or '')
 
 	self.roles = {}
 	if args.roles then
-		local roleKeys = Array.map(Array.parseCommaSeparatedString(args.roles), FnUtil.curry(Person.createRoleData, self))
-		for _, roleKey in ipairs(roleKeys) do
-			local roleData = self:createRoleData(roleKey)
-			if roleData then
-				table.insert(self.roles, roleData)
-			end
-		end
+		Array.extendWith(
+			self.roles,
+			Array.map(
+				Array.parseCommaSeparatedString(args.roles),
+				FnUtil.curry(Person._createRoleData, self)
+			)
+		)
 	end
 
 	local widgets = {
@@ -349,14 +348,10 @@ function Person:_setLpdbData(args, links, status, personType)
 		image = args.image,
 		region = self.region.region,
 		team = teamLink or team,
+		type = personType,
 		teampagename = mw.ext.TeamLiquidIntegration.resolve_redirect(teamLink or team or ''):gsub(' ', '_'),
 		teamtemplate = teamTemplate,
 		status = status,
-		type = self:_isPlayerOrStaff(),
-		role = self.role or {},
-		role2 = self.role2 or {},
-		role3 = self.role3 or {},
-		roles = self.roles or {},
 		earnings = self.totalEarnings,
 		earningsbyyear = {},
 		links = Links.makeFullLinksForTableItems(links, LINK_VARIANT),
@@ -364,11 +359,15 @@ function Person:_setLpdbData(args, links, status, personType)
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
+			role = self.role,
+			role2 = self.role2,
+			role3 = self.role3,
+			roles = self.roles,
 		},
 	}
 
 	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
-		lpdbData.extradata['earningsin' .. year] = earningsOfYear
+		lpdbData.extradata['earningsin' .. year] = {value = earningsOfYear}
 		lpdbData.earningsbyyear[year] = earningsOfYear
 	end
 
@@ -376,7 +375,7 @@ function Person:_setLpdbData(args, links, status, personType)
 	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
 		if teamIndex > 1 then
 			otherTeam = args[teamKey .. 'link'] or otherTeam
-			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
+			lpdbData.extradata[teamKey] = {value = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename}
 		end
 	end
 
@@ -440,10 +439,8 @@ function Person:_isPlayerOrStaff()
 	if Logic.isEmpty(roles) then return 'player' end
 
 	local isPlayer = Array.any(roles, function(roleData)
-		Table.any(ROLES, function(roleKey, data)
-			if data == roleData and inGameRoles and inGameRoles[roleKey] then
-				return true
-			end
+		return Table.any(ROLES, function(roleKey, data)
+			return data == roleData and inGameRoles and inGameRoles[roleKey]
 		end)
 	end)
 
@@ -549,23 +546,20 @@ end
 
 ---@param roleKey string
 ---@return PersonRoleData?
-function Person:createRoleData(roleKey)
+function Person:_createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
 
 	local key = roleKey:lower()
 	local roleData = ROLES[key]
 
-	if not roleData and key ~= '' then
-		local display = String.upperCaseFirst(roleKey)
-		roleData = {
-			display = display,
-			category = display .. "s"
-		}
-	end
+	if roleData then return roleData end
 
-	return roleData
+	local display = String.upperCaseFirst(roleKey)
+	return {
+		display = display,
+		category = display .. "s"
+	}
 end
-
 
 ---@param roleData PersonRoleData?
 ---@return string?
@@ -580,25 +574,17 @@ function Person:_displayRole(roleData)
 		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
 	end
 
-	local role1Display = toDisplay()
-	local role2Display = toDisplay(2)
-	local role3Display = toDisplay(3)
+	local displays = Array.append({},
+		toDisplay(),
+		toDisplay(2),
+		toDisplay(3)
+	)
 
-	if role1Display then
-		if role2Display then
-			role2Display = '(' .. role2Display .. ')'
-			if role3Display then
-				role3Display = '(' .. role3Display .. ')'
-			end
-		end
-	end
+	local formattedDisplays = Array.map(displays, function(display, index)
+		return index == 1 and display or ('(' .. display .. ')')
+	end)
 
-	local displays = {}
-	if role1Display then table.insert(displays, role1Display) end
-	if role2Display then table.insert(displays, role2Display) end
-	if role3Display then table.insert(displays, role3Display) end
-
-	return #displays > 0 and table.concat(displays, ' ') or nil
+	return #formattedDisplays > 0 and table.concat(formattedDisplays, ' ') or nil
 end
 
 ---@param team string?
