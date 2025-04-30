@@ -29,6 +29,7 @@ local MapFunctions = {}
 ---@field getFirstSide fun(map: table, opponentIndex: integer): string?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getScoreFromRounds fun(map: table, side: 'atk'|'def'|'otatk'|'otdef', opponentIndex: integer): integer?
+---@field getMapName fun(map: table): string?
 
 ---@param match table
 ---@param options table?

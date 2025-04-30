@@ -120,6 +120,12 @@ function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIn
 	return sideData['team' .. side .. 'wins']
 end
 
+---@param map table
+---@return string?
+function CustomMatchGroupInputMatchPage.getMapName(map)
+	return map.matchInfo.mapId
+end
+
 function CustomMatchGroupInputMatchPage.getMockData()
 	return {
 		["matchInfo"] = {
