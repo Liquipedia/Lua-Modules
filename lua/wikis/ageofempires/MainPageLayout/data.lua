@@ -130,8 +130,10 @@ return {
 			title = 'Civilizations',
 			link = 'Portal:Civilizations',
 			count = {
-				value = 124
-			}
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::faction]]'
+			},
 		},
 		{
 			file = 'JorDan at The Garrison.jpg',
