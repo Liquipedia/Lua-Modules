@@ -158,7 +158,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	end
 
 	Array.forEach(games, function(_, subGroupIndex)
-		extradata['subGroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
+		extradata['subgroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
 	end)
 
 	return extradata
