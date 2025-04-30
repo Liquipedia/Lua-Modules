@@ -201,7 +201,7 @@ function MatchFunctions.currentEarnings(name)
 	if not data then
 		return 0
 	end
- 
+
 	return data.earningsbyyear[tonumber(CURRENT_YEAR)] or 0
 end
 
