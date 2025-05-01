@@ -476,8 +476,20 @@ Author(s): Rathoz
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 		display: grid;
-		grid-template-columns: 9.375rem auto 9.5rem;
 		grid-gap: 1rem;
+		grid-template-columns: 9.375rem auto 9.5rem; // set as default
+	}
+
+	&.match-bm-players-player--col-2 {
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			grid-template-columns: 9.375rem 1fr;
+		}
+	}
+
+	&.match-bm-players-player--col-3 {
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			grid-template-columns: 9.375rem 1fr 9.5rem;
+		}
 	}
 
 	.theme--dark & {
@@ -719,7 +731,7 @@ Author(s): Rathoz
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: repeat(5, minmax(0, 1fr)); // set as default
 		grid-template-rows: 1fr 1fr;
 
 		@media ( max-width: 1199px ), ( min-width: 1320px ) {
@@ -730,6 +742,16 @@ Author(s): Rathoz
 		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 			order: 2;
 			margin-top: unset;
+		}
+
+		// if player parent is 2 columns,
+		.match-bm-players-player--col-2 & {
+			grid-template-columns: repeat(5, minmax(0, 1fr));
+		}
+
+		// if player parent is 3 columns,
+		.match-bm-players-player--col-3 & {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
 		}
 	}
 }
