@@ -136,7 +136,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				playerLink = player.link
 			},
 			Div{
-				classes = {'match-bm-players-player-stats'},
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},

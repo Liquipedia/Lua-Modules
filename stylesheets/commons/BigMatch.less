@@ -476,8 +476,8 @@ Author(s): Rathoz
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 		display: grid;
-		grid-gap: 1rem;
 		grid-template-columns: 9.375rem auto 9.5rem; // set as default
+		grid-gap: 1rem;
 	}
 
 	&.match-bm-players-player--col-2 {
@@ -488,7 +488,7 @@ Author(s): Rathoz
 
 	&.match-bm-players-player--col-3 {
 		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
-			grid-template-columns: 9.375rem 1fr 9.5rem;
+			grid-template-columns: 9.375rem auto 9.5rem;
 		}
 	}
 
@@ -731,7 +731,7 @@ Author(s): Rathoz
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: repeat(5, minmax(0, 1fr)); // set as default
+		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); // set as default
 		grid-template-rows: 1fr 1fr;
 
 		@media ( max-width: 1199px ), ( min-width: 1320px ) {
@@ -744,14 +744,15 @@ Author(s): Rathoz
 			margin-top: unset;
 		}
 
-		// if player parent is 2 columns,
-		.match-bm-players-player--col-2 & {
-			grid-template-columns: repeat(5, minmax(0, 1fr));
-		}
+		&.match-bm-players-player-stats--col-5 {
+			grid-template-columns: repeat( 5, minmax( 0, 1fr ) );
+			grid-template-rows: 1fr;
+			align-items: center;
 
-		// if player parent is 3 columns,
-		.match-bm-players-player--col-3 & {
-			grid-template-columns: repeat(3, minmax(0, 1fr));
+			@media ( max-width: 1023px ) {
+				grid-template-columns: repeat( 3, minmax( 0, 1fr ) );
+				grid-template-rows: 1fr 1fr;
+			}
 		}
 	}
 }
@@ -1028,6 +1029,7 @@ Author(s): Rathoz
 }
 
 .match-bm-lol-game-summary-length {
+	font-weight: normal;
 	line-height: 100%;
 }
 
@@ -1248,7 +1250,7 @@ Author(s): Rathoz
 .match-bm-lol-team-stats-header {
 	display: flex;
 	flex-direction: row;
-	align-items: flex-start;
+	align-items: center;
 	background: #eaecf0;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;
