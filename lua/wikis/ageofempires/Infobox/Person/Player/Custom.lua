@@ -56,7 +56,7 @@ local RATINGCONFIG = {
 		{text = 'Supremacy', id = 'aoe3_elo'},
 	},
 	aoe4 = {
-		{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
+		{text = 'MMR', id = 'aoe4net_id', game = 'aoe4'},
 	},
 	aom = {
 		{text = '[[Age of Mythology/Retold|Retold]]', id = 'aomr_id', game = 'aomr'},
