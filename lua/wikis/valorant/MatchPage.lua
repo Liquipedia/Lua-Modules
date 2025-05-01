@@ -127,7 +127,7 @@ end
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
-		classes = {'match-bm-players-player'},
+		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
 			PlayerDisplay{
 				characterIcon = self:getCharacterIcon(player.agent),
