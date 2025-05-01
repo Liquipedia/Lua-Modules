@@ -363,10 +363,6 @@ function Team:_setLpdbData(args, links)
 		extradata = {}
 	}
 
-	for year, earningsOfYear in pairs(self.yearlyEarnings or {}) do
-		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-	end
-
 	lpdbData = self:addToLpdb(lpdbData, args)
 
 	mw.ext.LiquipediaDB.lpdb_team('team_' .. self.name, Json.stringifySubTables(lpdbData))
