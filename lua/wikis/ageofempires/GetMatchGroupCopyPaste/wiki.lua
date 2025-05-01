@@ -37,7 +37,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		INDENT .. '|date=',
 		INDENT .. '|bestof=' .. bestof,
 		INDENT .. '|twitch=|vod=',
-		INDENT .. '|mapdraft=|civdraft=',
+		not isFFA and (INDENT .. '|mapdraft=|civdraft=') or nil,
 		isFFA and Logic.readBool(args.hasPointsMapping)
 			and (INDENT .. WikiCopyPaste._getPointsMapping(opponents)) or nil,
 		Logic.readBool(args.casters) and (INDENT .. '|caster1= |caster2=') or nil,
