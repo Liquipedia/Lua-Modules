@@ -57,7 +57,6 @@ local SPECIAL_ROLES = {
 local LOAN = 'Loan'
 local ROLE_CONVERT = Lua.import('Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData', {loadData = true})
 
-local ROLE_CLEAN = Lua.requireIfExists('Module:TeamHistoryAuto/cleanRole', {loadData = true})
 local POSITION_ICON_DATA = Lua.requireIfExists('Module:PositionIcon/data', {loadData = true})
 
 ---@class TeamHistoryAuto
