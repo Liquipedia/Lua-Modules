@@ -413,26 +413,6 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-players-wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 16px;
-
-	/* >= 834 2 column player layout */
-	@media ( min-width: 834px ) {
-		flex-direction: row;
-	}
-
-	@media ( max-width: 435px ) {
-		font-size: 12px;
-	}
-
-	@media ( min-width: 414px ) {
-		font-size: 15px;
-	}
-}
-
 .match-bm-players-team {
 	display: flex;
 	flex-direction: column;
@@ -455,13 +435,6 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-players-team {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	width: 100%;
-}
-
 .match-bm-players-player {
 	display: flex;
 	padding: 1rem;
@@ -478,6 +451,12 @@ Author(s): Rathoz
 		display: grid;
 		grid-template-columns: 9.375rem auto 9.5rem; // set as default
 		grid-gap: 1rem;
+	}
+
+	&.match-bm-players-player--col-1 {
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 
 	&.match-bm-players-player--col-2 {
@@ -744,6 +723,12 @@ Author(s): Rathoz
 			margin-top: unset;
 		}
 
+		&.match-bm-players-player-stats--col-4 {
+			grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
+			grid-template-rows: 1fr;
+			align-items: center;
+		}
+
 		&.match-bm-players-player-stats--col-5 {
 			grid-template-columns: repeat( 5, minmax( 0, 1fr ) );
 			grid-template-rows: 1fr;
@@ -874,21 +859,6 @@ Author(s): Rathoz
 }
 
 .match-bm-lol-players-player {
-	box-sizing: border-box;
-	display: flex;
-	flex-flow: row wrap;
-	align-items: center;
-	padding: 16px;
-	gap: 16px;
-	background: #ffffff;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-7 );
-		border-color: var( --clr-secondary-25 );
-	}
-
 	&-details {
 		display: flex;
 		flex-direction: row;
@@ -945,29 +915,6 @@ Author(s): Rathoz
 			flex-direction: row;
 			align-items: flex-start;
 			gap: 2px;
-		}
-	}
-
-	&-stats {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-		align-items: center;
-		gap: 16px;
-		align-self: stretch;
-		flex: 2 0 50%;
-	}
-
-	&-stat {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		flex: 1;
-		gap: 4px;
-		width: auto;
-
-		.theme--dark & > img {
-			filter: invert( 1 );
 		}
 	}
 }
