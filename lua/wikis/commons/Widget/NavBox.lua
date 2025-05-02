@@ -14,11 +14,13 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
-local Widget = Lua.import('Module:Widget')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
+local EditButton = Lua.import('Module:Widget/NavBox/EditButton')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local B = HtmlWidgets.B
 local Div = HtmlWidgets.Div
+local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
 
@@ -42,6 +44,7 @@ function NavBox:render()
 
 	-- have to extract so the child doesn't add the header too ...
 	local title = Table.extract(self.props, 'title')
+	assert(title, 'Missing "|title="')
 
 	return Div{
 		attributes = {
@@ -57,7 +60,7 @@ function NavBox:render()
 			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
 		),
 		children = {
-			NavBox._title(title),
+			NavBox._title(title, self.props.template),
 			Div{
 				children = NavBoxChild(props),
 				classes = {'should-collapse'},
@@ -67,14 +70,16 @@ function NavBox:render()
 end
 
 ---@param titleText string
+---@param templateLink string?
 ---@return Widget
-function NavBox._title(titleText)
+function NavBox._title(titleText, templateLink)
 	return Div{
 		classes = {'navbox-title'},
-		children = {
+		children = WidgetUtil.collect(
+			EditButton{templateLink = templateLink},
 			B{children = {titleText}},
-			CollapsibleToggle{css = {float = 'right'}},
-		}
+			CollapsibleToggle{css = {float = 'right'}}
+		)
 	}
 end
 
