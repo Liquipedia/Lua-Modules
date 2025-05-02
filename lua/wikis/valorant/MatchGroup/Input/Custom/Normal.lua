@@ -33,4 +33,8 @@ function CustomMatchGroupInputNormal.getScoreFromRounds(map, side, opponentIndex
 	return tonumber(map['t'.. opponentIndex .. side ])
 end
 
+function CustomMatchGroupInputNormal.getRounds(map)
+	return nil
+end
+
 return CustomMatchGroupInputNormal

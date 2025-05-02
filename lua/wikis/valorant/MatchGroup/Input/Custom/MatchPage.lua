@@ -126,6 +126,26 @@ function CustomMatchGroupInputMatchPage.getMapName(map)
 	return map.matchInfo.mapId
 end
 
+---@param map table
+---@return ValorantRoundData[]?
+function CustomMatchGroupInputMatchPage.getRounds(map)
+	local t1start = map.matchInfo.t1firstside
+	return Array.map(map.roundDetails, function(round)
+		local roundNumber = round.round_no
+		-- TODO This is stupid, doesn't handle OT, but it works until the API is fixed
+		local t1side = round <= 12 and t1start or (t1start == 'atk' and 'def' or 'atk')
+		local t2side = round <= 12 and (t1start == 'atk' and 'def' or 'atk') or t1start
+		---@type ValorantRoundData
+		return {
+			roundNumber = roundNumber,
+			t1side = t1side,
+			t2side = t2side,
+			winningSide = round.round_winner,
+			winBy = round.win_by,
+		}
+	end)
+end
+
 function CustomMatchGroupInputMatchPage.getMockData()
 	return {
 		["matchInfo"] = {
