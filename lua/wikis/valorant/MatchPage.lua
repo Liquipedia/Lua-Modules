@@ -27,6 +27,7 @@ local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchPage: BaseMatchPage
+---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local AVAILABLE_FOR_TIERS = {1}
