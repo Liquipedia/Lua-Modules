@@ -71,12 +71,12 @@ return {
 	title = 'The Wildcard Wiki',
 	navigation = {
 		{
-			file = 'Wildcard gameasset wildcards pill.png',
+			file = 'Wildcard header Wildcards.png',
 			title = 'Wildcards',
 			link = 'Portal:Wildcards',
 		},
 		{
-			file = 'Wildcard Champions Lineup.webp',
+			file = 'Wildcard header Champions.png',
 			title = 'Champions',
 			link = 'Portal:Champions',
 			count = {
@@ -86,7 +86,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Characters 1.jpg',
+			file = 'Wildcard header Summons.png',
 			title = 'Summons',
 			link = 'Portal:Summons',
 			count = {
@@ -96,7 +96,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Lushland Arena.jpg',
+			file = 'Wildcard header Arenas.png',
 			title = 'Arenas',
 			link = 'Portal:Arenas',
 			count = {
@@ -105,12 +105,12 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard Frostburn Arena.jpg',
+			file = 'Wildcard header Mechanics.png',
 			title = 'Mechanics',
 			link = 'Portal:Mechanics',
 		},
 		{
-			file = 'Wildcard gameasset Wildcard Bulwark Boost.png',
+			file = 'Wildcard header Decks.png',
 			title = 'Decks',
 			link = 'Portal:Decks',
 		},
