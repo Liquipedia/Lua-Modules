@@ -69,18 +69,27 @@ function NavBoxChild:render()
 		+ 1 -- middle Row is always shown
 		+ ((props.image or props.imagedark) and 1 or 0)
 
+	local shouldCollapse = Logic.readBool(props.collapsed)
+
 	return Tbl{
-		classes = {'nowraplinks', 'navbox-inner'},
+		classes = {
+			'nowraplinks',
+			'navbox-inner',
+			shouldCollapse and 'collapsible' or nil,
+			shouldCollapse and 'collapsed' or nil,
+		},
 		children = WidgetUtil.collect(
-			props.title and Tr{children = {Th{
+			(props.title or shouldCollapse) and Tr{children = {Th{
 				attributes = {colspan = colSpan},
 				classes = {'navbox-title'},
-				children = {props.title},
+				children = {props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'},
 			}}} or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
 	}
 end
+
+--Click on the "Show" link on the right to see the full list
 
 ---@param childProps table|string?
 ---@return {name: string?, child: Widget}?
