@@ -111,12 +111,13 @@ function NavBoxChild:_toRow(child, childIndex)
 	return Tr{
 		children = WidgetUtil.collect(
 			self:_makeImage(childIndex, true),
-			self.anyHasName and Th{
+			child.name and Th{
 				classes = {'navbox-group'},
 				children = {child.name or ''},
 				css = {width = '1%'},
 			} or nil,
 			Td{
+				attributes = {colspan = self.anyHasName and (not child.name) and 2 or nil},
 				classes = {'navbox-list', 'hlist-group'},
 				css = {padding = 0, width = '100%'},
 				children = {child.child},
