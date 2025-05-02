@@ -285,4 +285,16 @@ Lpdb.SquadPlayer = Model('squadplayer', {
 	{name = 'extradata', fieldType = 'struct', default = {}},
 })
 
+---@class DataPoint:Model
+Lpdb.DataPoint = Model('datapoint', {
+	{name = 'objectname', fieldType = 'string'},
+	{name = 'type', fieldType = 'string', default = ''},
+	{name = 'name', fieldType = 'string', default = ''},
+	{name = 'information', fieldType = 'string', default = ''},
+	{name = 'image', fieldType = 'string', default = ''},
+	{name = 'imagedark', fieldType = 'string', default = ''},
+	{name = 'date', fieldType = 'string', default = 0},
+	{name = 'extradata', fieldType = 'struct', default = {}},
+})
+
 return Lpdb
