@@ -36,9 +36,10 @@ function MatchPageMapVeto:render()
 	end
 
 	return Div{
+		classes = {'navigation-cards'},
 		children = Array.map(self.props.vetoRounds, function(vetoRound)
 			return NavigationCard{
-				file = 'Map' .. vetoRound.name .. '.png',
+				file = vetoRound.name .. ' Map.png',
 				link = vetoRound.link,
 				title = formatTitle(vetoRound),
 			}
