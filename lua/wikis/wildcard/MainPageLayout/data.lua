@@ -71,12 +71,12 @@ return {
 	title = 'The Wildcard Wiki',
 	navigation = {
 		{
-			file = 'Wildcard header Wildcards.png',
+			file = 'Wildcard header Wildcards.webp',
 			title = 'Wildcards',
 			link = 'Portal:Wildcards',
 		},
 		{
-			file = 'Wildcard header Champions.png',
+			file = 'Wildcard header Champions.webp',
 			title = 'Champions',
 			link = 'Portal:Champions',
 			count = {
@@ -86,7 +86,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard header Summons.png',
+			file = 'Wildcard header Summons.webp',
 			title = 'Summons',
 			link = 'Portal:Summons',
 			count = {
@@ -96,7 +96,7 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard header Arenas.png',
+			file = 'Wildcard header Arenas.webp',
 			title = 'Arenas',
 			link = 'Portal:Arenas',
 			count = {
@@ -105,12 +105,12 @@ return {
 			},
 		},
 		{
-			file = 'Wildcard header Mechanics.png',
+			file = 'Wildcard header Mechanics.webp',
 			title = 'Mechanics',
 			link = 'Portal:Mechanics',
 		},
 		{
-			file = 'Wildcard header Decks.png',
+			file = 'Wildcard header Decks.webp',
 			title = 'Decks',
 			link = 'Portal:Decks',
 		},
