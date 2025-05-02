@@ -1218,3 +1218,49 @@ Author(s): Rathoz
 		border-color: var( --clr-secondary-25 );
 	}
 }
+
+.match-bm-map-veto {
+	&-cards {
+		display: flex;
+		gap: 1rem;
+	}
+
+	&-card {
+		flex: 1 0 0;
+		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+		border-radius: 0.5rem;
+		font-size: 0.875rem;
+		padding-bottom: 0.5rem;
+		min-width: 0;
+		position: relative;
+
+		&-image {
+			height: ~"max( 5rem, 5vw )";
+			overflow: hidden;
+			border-radius: 0.5rem 0.5rem 0 0;
+			display: flex;
+			position: relative;
+
+			img {
+				display: flex;
+				object-fit: cover;
+				width: 100%;
+				height: 100%;
+				transition: transform 0.2s linear;
+			}
+		}
+
+		&-title {
+			padding: 0.5rem;
+			text-align: center;
+		}
+
+		&-map-name {
+			font-weight: bold;
+		}
+
+		.match-bm-map-veto-card--ban &-map-action {
+			background-color: red;
+		}
+	}
+}
