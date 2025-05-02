@@ -14,6 +14,7 @@ local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
+local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
 local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
 local EditButton = Lua.import('Module:Widget/NavBox/EditButton')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -46,26 +47,20 @@ function NavBox:render()
 	local title = Table.extract(self.props, 'title')
 	assert(title, 'Missing "|title="')
 
-	return Div{
+	return Collapsible{
 		attributes = {
 			['aria-labelledby'] = title:gsub(' ', '_'),
 			role = 'navigation',
 			['data-nosnippet'] = 0,
 		},
-		classes = Array.append({},
+		classes = {
 			'navigation-not-searchable',
 			'navbox',
-			'general-collapsible',
-			shouldCollapse and 'collapsed' or nil,
 			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
-		),
-		children = {
-			NavBox._title(title, self.props.template),
-			Div{
-				children = NavBoxChild(props),
-				classes = {'should-collapse'},
-			},
-		}
+		},
+		shouldCollapse = shouldCollapse,
+		titleWidget = NavBox._title(title, self.props.template),
+		children = {NavBoxChild(props)},
 	}
 end
 
