@@ -302,9 +302,10 @@ function BaseMatchPage:renderMapVeto(match)
 		}
 	end)
 
-	return MatchPageMapVeto{
-		vetoRounds = mapVetoRounds,
-	}
+	return HtmlWidgets.Fragment{children = {
+		HtmlWidgets.H3{children = 'Map Veto'},
+		MatchPageMapVeto{vetoRounds = mapVetoRounds},
+	}}
 end
 
 ---@protected
