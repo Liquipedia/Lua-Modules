@@ -495,7 +495,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				}
 			},
 			Div{
-				classes = {'match-bm-lol-players-player-stats'},
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
