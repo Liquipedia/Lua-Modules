@@ -92,9 +92,9 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 			assists = player.assists,
 		}
 	end)
-	return Array.sortBy(players, function(player)
+	return Array.reverse(Array.sortBy(players, function(player)
 		return player.acs or player.kills or player.player
-	end)
+	end))
 end
 
 ---@param map table

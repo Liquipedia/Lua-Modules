@@ -12,6 +12,7 @@ local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -140,7 +141,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.acs
+						data = MathUtil.round(player.acs)
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kda'}, 'KDA'},
