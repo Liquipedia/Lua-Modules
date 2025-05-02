@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
@@ -24,6 +25,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
+local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
 local Header = Lua.import('Module:Widget/Match/Page/Header')
@@ -38,7 +40,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageGame: MatchGroupUtilGame
 ---@field finished boolean
----@field winnerName string?
 ---@field teams table[]
 ---@field scoreDisplay string
 
@@ -64,6 +65,7 @@ local BaseMatchPage = Class.new(
 )
 
 BaseMatchPage.NOT_PLAYED = 'notplayed'
+BaseMatchPage.NO_CHARACTER = 'default'
 
 ---@param match table
 ---@return boolean
@@ -172,20 +174,27 @@ function BaseMatchPage:populateOpponents()
 end
 
 ---@protected
+---@param character string?
+---@return string?
 function BaseMatchPage:getCharacterIcon(character)
-	error('BaseMatchPage:getCharacterIcon() cannot be called directly and must be overridden.')
+	return CharacterIcon.Icon{
+		character = character or BaseMatchPage.NO_CHARACTER,
+		date = self.matchData.date
+	}
 end
 
 ---@protected
 function BaseMatchPage:makeDisplayTitle()
-	local team1name = self.opponents[1].teamTemplateData.shortname
-	local team2name = self.opponents[2].teamTemplateData.shortname
-	if not team1name and not team2name then
+	local team1data = (self.opponents[1] or {}).teamTemplateData
+	local team2data = (self.opponents[2] or {}).teamTemplateData
+
+	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
 		return table.concat({'Match in', self.matchData.tickername}, ' ')
 	end
 
-	team1name = team1name or 'TBD'
-	team2name = team2name or 'TBD'
+	local team1name = (team1data or {}).shortname or 'TBD'
+	local team2name = (team2data or {}).shortname or 'TBD'
+
 	local tournamentName = self.matchData.tickername
 	local displayTitle = team1name .. ' vs. ' .. team2name
 	if not tournamentName then
@@ -257,6 +266,7 @@ end
 function BaseMatchPage:footer()
 	local vods = self:getVods()
 	return Footer{
+		comments = self:_getComments(),
 		children = WidgetUtil.collect(
 			#vods > 0 and AdditionalSection{
 				header = 'VODs',
@@ -279,6 +289,25 @@ function BaseMatchPage:footer()
 			}
 		)
 	}
+end
+
+---@private
+---@return MatchPageComment[]
+function BaseMatchPage:_getComments()
+	local substituteComments = DisplayHelper.createSubstitutesComment(self.matchData)
+	return WidgetUtil.collect(
+		self.matchData.comment and Comment{children = self.matchData.comment} or nil,
+		Logic.isNotEmpty(substituteComments) and Comment{
+			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
+		} or nil,
+		self:addComments()
+	)
+end
+
+---@protected
+---@return MatchPageComment[]
+function BaseMatchPage:addComments()
+	return {}
 end
 
 ---@protected

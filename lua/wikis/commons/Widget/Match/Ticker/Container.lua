@@ -40,6 +40,11 @@ function MatchTickerContainer:render()
 		return filterName(category.name), table.concat(category.defaultItems or {}, ',')
 	end)
 
+	local matchTickerArgs = {
+		limit = self.props.limit,
+		displayGameIcons = self.props.displayGameIcons
+	}
+
 	local devFlag = FeatureFlag.get('dev')
 
 	---@param type 'upcoming' | 'recent'
@@ -50,9 +55,9 @@ function MatchTickerContainer:render()
 				module = self.defaultProps.module,
 				fn = self.defaultProps.fn,
 				args = table.concat(Array.extractValues(Table.map(
-					{limit=self.props.limit, type=type, dev=devFlag},
+					Table.merge(matchTickerArgs, {type=type, dev=devFlag}),
 					function (key, value)
-						return key, String.interpolate('|${key}=${value}', {key=key, value=value})
+						return key, String.interpolate('|${key}=${value}', {key = key, value = tostring(value)})
 					end
 				)), '')
 			}
@@ -64,7 +69,8 @@ function MatchTickerContainer:render()
 		local ticker = Lua.import('Module:' .. self.defaultProps.module)
 		return ticker[self.defaultProps.fn](
 			Table.merge(
-				{limit=self.props.limit, type=type},
+				{type=type},
+				matchTickerArgs,
 				defaultFilterParams
 			)
 		)

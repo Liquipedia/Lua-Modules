@@ -18,7 +18,7 @@ local CURRENT_PAGE = mw.title.getCurrentTitle().text
 local CustomMatchTicker = {}
 
 ---Entry point for display on tournament pages
----@param frame Frame
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.tournament(frame)
 	local args = Arguments.getArgs(frame)
@@ -38,7 +38,7 @@ function CustomMatchTicker.tournament(frame)
 end
 
 ---Entry point for display on the main page
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.mainPage(frame)
 	local args = Arguments.getArgs(frame)
@@ -46,7 +46,7 @@ function CustomMatchTicker.mainPage(frame)
 end
 
 ---Entry point for display on the main page with the new style
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html?
 function CustomMatchTicker.newMainPage(frame)
 	local args = Arguments.getArgs(frame)
@@ -73,7 +73,7 @@ function CustomMatchTicker.newMainPage(frame)
 end
 
 ---Entry point for display on player pages
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.player(frame)
 	local args = Arguments.getArgs(frame)
@@ -84,7 +84,7 @@ function CustomMatchTicker.player(frame)
 end
 
 ---Entry point for display on team pages
----@param frame Frame?
+---@param frame Frame|table|nil
 ---@return Html
 function CustomMatchTicker.team(frame)
 	local args = Arguments.getArgs(frame)

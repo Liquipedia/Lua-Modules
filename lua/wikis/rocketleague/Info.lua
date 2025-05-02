@@ -48,6 +48,7 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 150,
+			sortCasters = true,
 		},
 		transfers = {
 			showTeamName = true,

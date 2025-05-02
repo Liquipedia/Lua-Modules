@@ -23,7 +23,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
-local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
+local FP = Abbreviation.make{text = 'First Pick', title = 'First Pick for Heroes on this map'}
 
 ---@param args table
 ---@return Html

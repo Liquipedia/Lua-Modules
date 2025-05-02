@@ -74,7 +74,7 @@ function MatchesTable:init(args)
 		onlyShowExactDates = Logic.readBool(args.dateexact),
 		shortenRoundNames = Logic.readBool(args.shortedroundnames),
 		pages = Array.map(Array.extractValues(
-				Table.filterByKey(args, function(key) return key:find('^tournament%d-$') end)
+				Table.filterByKey(args, function(key) return string.find(key, '^tournament%d-$') ~= nil end)
 			), function(page) return (page:gsub(' ', '_')) end),
 	}
 
@@ -379,7 +379,7 @@ end
 ---@param value string|number
 ---@return string
 function MatchesTable._bestof(value)
-	return Abbreviation.make('Bo' .. value, 'Best of ' .. value) --[[@as string]]
+	return Abbreviation.make{text = 'Bo' .. value, title = 'Best of ' .. value} --[[@as string]]
 end
 
 return MatchesTable

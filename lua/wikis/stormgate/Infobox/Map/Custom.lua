@@ -37,8 +37,8 @@ local CAMPS = {
 --currently the ingame icons are still temporary
 --use placeholders until ingame icons are final and we get them
 local RESOURCE_ICONS = {
-	luminite = Abbreviation.make('Lum', 'Luminite'),
-	therium = Abbreviation.make('The', 'Therium'),
+	luminite = Abbreviation.make{text = 'Lum', title = 'Luminite'},
+	therium = Abbreviation.make{text = 'The', title = 'Therium'},
 }
 local LADDER_HISTORY = {
 	{key = '1v1history', name = '1v1 Ladder'},

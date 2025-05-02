@@ -174,16 +174,6 @@ function MatchFunctions.calculateMatchScore(maps)
 end
 
 ---@param match table
----@param games table[]
----@param opponents table[]
----@return table
-function MatchFunctions.getExtraData(match, games, opponents)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
-end
-
----@param match table
 ---@param opponents table[]
 ---@return string?
 function MatchFunctions.getHeadToHeadLink(match, opponents)
@@ -240,8 +230,14 @@ function MapFunctions.getPlayersOfMapOpponent(map, opponent, opponentIndex)
 	local players
 	if opponent.type == Opponent.team then
 		players = Array.parseCommaSeparatedString(map['players' .. opponentIndex])
-	else
+	elseif opponent.type == Opponent.solo then
 		players = Array.map(opponent.match2players, Operator.property('name'))
+	else
+		-- Party of 2 or more players
+		players = Logic.emptyOr(
+			Array.parseCommaSeparatedString(map['players' .. opponentIndex]),
+			Array.map(opponent.match2players, Operator.property('name'))
+		) or {}
 	end
 	local civs = Array.parseCommaSeparatedString(map['civs' .. opponentIndex])
 

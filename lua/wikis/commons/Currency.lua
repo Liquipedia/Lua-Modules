@@ -115,7 +115,7 @@ function Currency.display(currencyCode, prizeValue, options)
 	end
 	if options.displayCurrencyCode then
 		local currencyCodeDisplay = not options.useHtmlStyling and currencyData.code
-			or Abbreviation.make(currencyData.code, currencyData.name)
+			or Abbreviation.make{text = currencyData.code, title = currencyData.name}
 		prizeDisplay = prizeDisplay .. (String.isNotEmpty(prizeDisplay) and spaceString or '') .. currencyCodeDisplay
 	end
 

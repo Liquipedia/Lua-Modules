@@ -62,7 +62,7 @@ function LegacyMatchList.processMatch(input)
 	local args = Json.parseStringified(input)
 	if Logic.isDeepEmpty(args) then return end
 
-	local details = Table.extract(args, 'details')
+	local details = Table.extract(args, 'details') or {}
 	-- remap matchX --> mapX
 	details = Table.map(details, function(key, value)
 		local mapIndex = key:match('^match(%d+)')

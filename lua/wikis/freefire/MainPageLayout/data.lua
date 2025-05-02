@@ -49,6 +49,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:2025 Season}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,

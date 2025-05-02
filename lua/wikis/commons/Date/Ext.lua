@@ -82,7 +82,7 @@ end)
 --- The format string is the same used by mw.language.formatDate and {{#time}}.
 ---@param format string
 ---@param timestamp string|integer
----@return string|number
+---@return string
 function DateExt.formatTimestamp(format, timestamp)
 	return mw.getContentLanguage():formatDate(format, '@' .. timestamp)
 end
@@ -98,7 +98,7 @@ end
 --- Truncates the time of day in a date string or timestamp, and returns the date formatted as yyyy-mm-dd.
 --- The time of day is truncated in the UTC timezone. The time of day and timezone are discarded.
 ---@param dateOrTimestamp string|integer|osdate|osdateparam
----@return string|number
+---@return string
 function DateExt.toYmdInUtc(dateOrTimestamp)
 	return DateExt.formatTimestamp('Y-m-d', DateExt.readTimestamp(dateOrTimestamp) or '')
 end

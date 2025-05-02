@@ -16,9 +16,9 @@ describe('placement', function()
 
 	describe('bg class', function()
 		it('check', function()
-			assert.is_nil(Placement.getBgClass('DummyDummy'))
-			assert.are_equal('background-color-first-place', Placement.getBgClass(1))
-			assert.are_equal('bg-dq', Placement.getBgClass('dq'))
+			assert.is_nil(Placement.getBgClass{placement = 'DummyDummy'})
+			assert.are_equal('background-color-first-place', Placement.getBgClass{placement = 1})
+			assert.are_equal('bg-dq', Placement.getBgClass{placement = 'dq'})
 		end)
 	end)
 
@@ -27,16 +27,16 @@ describe('placement', function()
 			local DASH = NON_BREAKING_SPACE .. '-' .. NON_BREAKING_SPACE
 			assert.are_equal(
 				'class="text-center placement-1" data-sort-value="1"|<b class="placement-text">1st</b>',
-				Placement.get('1')
+				Placement.get{placement = '1'}
 			)
 			assert.are_equal(
 				'class="text-center placement-3" data-sort-value="3-4"|<b class="placement-text">3rd' ..
 				DASH .. '4th</b>',
-				Placement.get('3-4')
+				Placement.get{placement = '3-4'}
 			)
 			assert.are_equal(
 				'class="text-center placement-dnp" data-sort-value="1032"|<b>hi</b>',
-				Placement.get('dnp', 'hi')
+				Placement.get{placement = 'dnp', customText = 'hi'}
 			)
 		end)
 	end)

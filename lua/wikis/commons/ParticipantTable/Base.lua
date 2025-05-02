@@ -294,10 +294,14 @@ function ParticipantTable:store()
 
 		if section.config.noStorage or Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
-		if placements[lpdbData.opponentname] then
+		local pageNameWithUnderscores = (lpdbData.opponentname or ''):gsub(' ', '_')
+		local pageNameWithSpaces = (lpdbData.opponentname or ''):gsub('_', ' ')
+		local placement = placements[pageNameWithUnderscores] or placements[pageNameWithSpaces]
+
+		if placement then
 			lpdbData = Table.deepMerge(
 				lpdbData,
-				placements[lpdbData.opponentname]
+				placement
 			)
 		else
 			lpdbData = Table.merge(

@@ -9,7 +9,6 @@
 local WarningBox = {}
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 
 ---@param text string|number
 ---@return Html
@@ -40,4 +39,4 @@ function WarningBox.displayAll(arr)
 	return wrapper
 end
 
-return Class.export(WarningBox)
+return WarningBox

@@ -111,7 +111,7 @@ function TournamentsListingConditions.base(args)
 		input = args.country,
 		lpdbKey = 'locations_country',
 		maxNumber = tonumber(args.numberOfCountries) or 2,
-		normalize = Flags.CountryCode,
+		normalize = function(flag) return Flags.CountryCode{flag = flag} end,
 	})
 
 	TournamentsListingConditions._addConditionsFromCsv(conditions, {

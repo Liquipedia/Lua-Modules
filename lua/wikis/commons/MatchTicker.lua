@@ -52,6 +52,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'match2bracketdata',
 	'match2games',
+	'game',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
@@ -97,6 +98,7 @@ end
 ---@field games string[]?
 ---@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
+---@field displayGameIcons boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -146,6 +148,7 @@ function MatchTicker:init(args)
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
+		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set

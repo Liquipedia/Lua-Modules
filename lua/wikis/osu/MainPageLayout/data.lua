@@ -30,12 +30,6 @@ local CONTENT = {
 		padding = true,
 		boxid = 1504,
 	},
-	liquipediaApp = {
-		heading = 'Download the Liquipedia App',
-		padding = true,
-		body = '{{Liquipedia:App}}',
-		boxid = 1505,
-	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
@@ -56,6 +50,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -89,9 +84,9 @@ return {
 		lightmode = 'Osu! full colour allmode.png',
 		darkmode = 'Osu! full colour allmode.png',
 	},
-	metadesc = 'Comprehensive OSU! wiki with articles covering everything from tournaments, ' ..
+	metadesc = 'Comprehensive osu! wiki with articles covering everything from tournaments, ' ..
 		'to competitive players and teams.',
-	title = 'OSU!',
+	title = 'osu!',
 	navigation = {
 		{
 			file = 'FlyingTunaCOE2023.jpg',
@@ -156,10 +151,6 @@ return {
 					{
 						mobileOrder = 8,
 						content = CONTENT.wantToHelp,
-					},
-					{
-						mobileOrder = 9,
-						content = CONTENT.liquipediaApp,
 					},
 				}
 			},

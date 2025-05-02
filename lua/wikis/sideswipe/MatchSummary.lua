@@ -80,10 +80,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 			:node('<br>')
 			:node(mw.html.create('span')
 				:wikitext('(')
-				:node(Abbreviation.make(
-					'Bo' .. bestof,
-					'Best of ' .. bestof
-				))
+				:node(Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof})
 				:wikitext(')')
 			)
 	end

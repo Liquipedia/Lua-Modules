@@ -192,15 +192,20 @@ function CustomBuildingUnit.parseAttackInput(args, attackIndex)
 	local coolDownValue = tonumber(args['cooldown' .. postFix]) or 0
 	local coolDown = tostring(coolDownValue)
 	if backSwingPoint > 0 then
-		coolDown = Abbreviation.make(coolDown, 'Attack animation: ' .. (damagePoint / backSwingPoint)) --[[@as string]]
+		coolDown = Abbreviation.make{
+			text = coolDown,
+			title = 'Attack animation: ' .. (damagePoint / backSwingPoint),
+		}
 	end
 
 	local attackSpeedBonus = tonumber(args.attackspeed_bonus) or 0
 	if attackSpeedBonus > 0 then
 		local attackSpeedBonusPlus1 = 1 + attackSpeedBonus
 		local animation = (damagePoint / attackSpeedBonusPlus1) .. '/' .. (backSwingPoint / attackSpeedBonusPlus1)
-		coolDown = coolDown .. ' (' .. Abbreviation.make(coolDownValue / attackSpeedBonusPlus1,
-			'Attack animation: ' .. animation) .. ')'
+		coolDown = coolDown .. ' (' .. Abbreviation.make{
+			text = coolDownValue / attackSpeedBonusPlus1,
+			title = 'Attack animation: ' .. animation
+		} .. ')'
 	end
 
 	local data = {
@@ -342,8 +347,8 @@ function CustomBuildingUnit.mercenaryStats(args)
 	return {
 		Title{children = 'Mercenary Stats'},
 		Cell{name = 'Stock Maximum', content = {args.stock}},
-		Cell{name = 'Stock Start Delay', content = {
-			Abbreviation.make(args.stockstart .. 's', 'First available at ' .. GameClock.run(args.stockstart))}},
+		Cell{name = 'Stock Start Delay', content = {Abbreviation.make{
+			text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}}},
 		Cell{name = 'Replenish Interval', content = {args.stockreplenish}},
 		Cell{name = 'Tileset', content = {args.merctileset, args.merctileset2, args.merctileset3}},
 	}

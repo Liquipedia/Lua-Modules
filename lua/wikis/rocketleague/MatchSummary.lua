@@ -112,10 +112,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 			:node('<br>')
 			:node(mw.html.create('span')
 				:wikitext('(')
-				:node(Abbreviation.make(
-					'Bo' .. bestof,
-					'Best of ' .. bestof
-				))
+				:node(Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof})
 				:wikitext(')')
 			)
 	end
@@ -233,11 +230,11 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		children = WidgetUtil.collect(
 			header,
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = {
+			MatchSummaryWidgets.GameCenter{children = WidgetUtil.collect(
 				DisplayHelper.Map(game),
 				Logic.readBool(extradata.ot) and ' - OT' or nil,
 				Logic.isNotEmpty(extradata.otlength) and ' (' .. extradata.otlength .. ')' or nil
-			}},
+			)},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			CustomMatchSummary._timeoutDisplay(extradata.timeout),
 			MatchSummaryWidgets.GameComment{children = comments}
@@ -270,10 +267,7 @@ function CustomMatchSummary._goalDisaplay(goalesValue, side)
 
 	local goalsDisplay = mw.html.create('div')
 		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
-		:node(Abbreviation.make(
-			goalesValue,
-			'Team ' .. side .. ' Goaltimes')
-		)
+		:node(Abbreviation.make{text = goalesValue, title = 'Team ' .. side .. ' Goaltimes'})
 
 	return mw.html.create('div')
 			:css('max-width', '50%')

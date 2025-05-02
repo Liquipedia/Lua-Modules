@@ -150,7 +150,6 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'false',
 	}
 
@@ -159,7 +158,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	end
 
 	Array.forEach(games, function(_, subGroupIndex)
-		extradata['subGroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
+		extradata['subgroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
 	end)
 
 	return extradata
@@ -296,7 +295,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			return {
 				faction = faction or (playerIdData.extradata or {}).faction or Faction.defaultFaction,
 				player = playerIdData.name or playerInputData.link or playerInputData.name:gsub(' ', '_'),
-				flag = Flags.CountryName(playerIdData.flag),
+				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				isarchon = isArchon,
 			}
@@ -528,7 +527,7 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		casters = MatchGroupInputUtil.readCasters(match),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

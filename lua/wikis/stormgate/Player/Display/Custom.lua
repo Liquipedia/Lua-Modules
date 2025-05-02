@@ -16,7 +16,7 @@ local Table = require('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
 local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class StormgatePlayerDisplay: PlayerDisplay
@@ -54,7 +54,7 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
 	local factionNode
@@ -85,7 +85,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local faction = not props.hideFaction and player.faction ~= Faction.defaultFaction

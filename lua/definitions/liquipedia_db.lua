@@ -76,7 +76,7 @@ local lpdb = {}
 ---@field links table
 ---@field status string
 ---@field earnings integer
----@field earningsbyyear table
+---@field earningsbyyear table<integer, number>
 
 ---@class squadplayer:LpdbBaseData
 ---@field id string

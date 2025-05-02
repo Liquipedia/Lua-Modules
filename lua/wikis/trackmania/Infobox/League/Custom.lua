@@ -99,7 +99,7 @@ function CustomLeague:customParseArguments(args)
 		(String.isNotEmpty(args.team_number) and 'team' or nil),
 		DEFAULT_MODE
 	)
-	self.data.publishertier = Array.any(self:getAllArgsForBase(args, 'organizer'),
+	self.data.publishertier = self.data.publishertier or Array.any(self:getAllArgsForBase(args, 'organizer'),
 		function(organizer)
 			return organizer:find('Nadeo', 1, true) or organizer:find('Ubisoft', 1, true)
 		end)

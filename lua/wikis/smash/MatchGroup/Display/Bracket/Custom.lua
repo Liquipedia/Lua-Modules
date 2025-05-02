@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Characters = require('Module:Characters')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -62,4 +61,4 @@ function CustomBracketDisplay._addHeads(opponentEntry, opponent)
 	opponentEntry.root:node(charactersNode)
 end
 
-return Class.export(CustomBracketDisplay)
+return CustomBracketDisplay

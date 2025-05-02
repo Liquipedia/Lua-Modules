@@ -547,7 +547,7 @@ function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
 	if Logic.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, nil, Abbreviation.make{text = 'Grp S.', title = 'Group Stage'}
 	end
 
 	local score = ''

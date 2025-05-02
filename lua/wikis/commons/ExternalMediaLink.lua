@@ -137,7 +137,7 @@ function ExternalMediaLink._display(args)
 	end
 
 	if args.language and args.language ~= DEFAULT_LANGUAGE then
-		display:wikitext(Flags.Icon({flag = args.language, shouldLink = false}) .. NON_BREAKING_SPACE)
+		display:wikitext(Flags.Icon{flag = args.language, shouldLink = false} .. NON_BREAKING_SPACE)
 	end
 
 	if args.title then
@@ -206,7 +206,7 @@ end
 ---@return string
 function ExternalMediaLink._displayTranslation(args)
 	local translation = NON_BREAKING_SPACE .. '(trans. '
-		.. Flags.Icon({flag = args.translation, shouldLink = false})
+		.. Flags.Icon{flag = args.translation, shouldLink = false}
 
 	if String.isEmpty(args.translator) then
 		return translation .. ')'

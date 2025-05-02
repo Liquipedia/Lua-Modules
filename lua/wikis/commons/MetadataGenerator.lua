@@ -53,7 +53,7 @@ function MetadataGenerator.tournament(args)
 	if args.publisherdescription then
 		publisher = Variables.varDefault(args.publisherdescription, '')
 	end
-	local date, tense = MetadataGenerator.getDate(args.sdate or args.date, args.edate or args.date)
+	local date, tense = MetadataGenerator._getDate(args.sdate or args.date, args.edate or args.date)
 
 	local teams = args.team_number
 	local players = args.player_number
@@ -136,7 +136,7 @@ function MetadataGenerator.tournament(args)
 	return output
 end
 
-function MetadataGenerator.getDate(startDate, endDate)
+function MetadataGenerator._getDate(startDate, endDate)
 	if not startDate or not endDate then
 		return
 	end
@@ -163,9 +163,9 @@ function MetadataGenerator.getDate(startDate, endDate)
 		return
 	end
 
-	local relativeTime = MetadataGenerator.getTimeRelativity(currentTimestamp, startTime, endTime)
+	local relativeTime = MetadataGenerator._getTimeRelativity(currentTimestamp, startTime, endTime)
 
-	local sFormat, eFormat = MetadataGenerator.getDateFormat(startTime, endTime)
+	local sFormat, eFormat = MetadataGenerator._getDateFormat(startTime, endTime)
 
 	local prefix
 	if startTime.timestamp == endTime.timestamp and endTime.dayExact then
@@ -196,7 +196,7 @@ function MetadataGenerator.getDate(startDate, endDate)
 	return displayDate, relativeTime
 end
 
-function MetadataGenerator.getTimeRelativity(timeNow, startTime, endTime)
+function MetadataGenerator._getTimeRelativity(timeNow, startTime, endTime)
 	if timeNow < startTime.timestamp then
 		return TIME_FUTURE
 	elseif timeNow < endTime.timestamp then
@@ -206,7 +206,7 @@ function MetadataGenerator.getTimeRelativity(timeNow, startTime, endTime)
 	end
 end
 
-function MetadataGenerator.getDateFormat(startTime, endTime)
+function MetadataGenerator._getDateFormat(startTime, endTime)
 	local formatStart, formatEnd
 	if startTime.dayExact and startTime.year == endTime.year then
 		formatStart = '%b %d'
