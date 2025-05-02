@@ -24,6 +24,7 @@ local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchPage: BaseMatchPage
@@ -80,8 +81,32 @@ end
 function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
+			self:_renderRoundsOverview(game),
 			self:_renderPerformance(game)
 		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget
+function MatchPage:_renderRoundsOverview(game)
+	return RoundsOverview{
+		rounds = game.extradata.rounds,
+		iconRender = function(winningSide, winBy)
+			local color = winningSide == 'atk' and '#FE4554' or '#42FED0'
+			local iconName
+			if winBy == 'elimination' then
+				iconName = 'skull'
+			elseif winBy == 'explosion' then
+				iconName = 'explosion'
+			elseif winBy == 'defuse' then
+				iconName = 'wrench'
+			else
+				iconName = 'hourglass-end'
+			end
+			return color .. iconName
+		end,
 	}
 end
 

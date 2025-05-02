@@ -137,7 +137,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 		local t2side = round <= 12 and (t1start == 'atk' and 'def' or 'atk') or t1start
 		---@type ValorantRoundData
 		return {
-			roundNumber = roundNumber,
+			round = roundNumber,
 			t1side = t1side,
 			t2side = t2side,
 			winningSide = round.round_winner,
