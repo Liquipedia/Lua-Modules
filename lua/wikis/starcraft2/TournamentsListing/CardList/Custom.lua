@@ -72,4 +72,4 @@ function CustomTournamentsListing.byYear(args)
 	return display
 end
 
-return Class.export(CustomTournamentsListing, {onlyExport = {'run', 'byYear'}})
+return Class.export(CustomTournamentsListing, {exports = {'run', 'byYear'}})

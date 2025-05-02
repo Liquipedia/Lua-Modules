@@ -363,4 +363,4 @@ function MediaList._formLink(show)
 		)
 end
 
-return Class.export(MediaList, {onlyExport = {'get'}})
+return Class.export(MediaList, {exports = {'get'}})

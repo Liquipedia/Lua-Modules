@@ -106,4 +106,4 @@ function Locale.formatLocations(args)
 end
 
 
-return Class.export(Locale, {frameOnly = true, onlyExport = {'formatLocation', 'formatLocations'}})
+return Class.export(Locale, {frameOnly = true, exports = {'formatLocation', 'formatLocations'}})

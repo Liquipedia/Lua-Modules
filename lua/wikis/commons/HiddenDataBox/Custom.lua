@@ -27,4 +27,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	--add your wiki specific vars here
 end
 
-return Class.export(CustomHiddenDataBox, {onlyExport = {'run'}})
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

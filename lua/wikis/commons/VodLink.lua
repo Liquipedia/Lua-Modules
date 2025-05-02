@@ -51,4 +51,4 @@ function VodLink.display(args)
 		:wikitext('[[File:' .. fileName .. '|32px|link=' .. link .. ']]')
 end
 
-return Class.export(VodLink, {frameOnly = true, onlyExport = {'display'}})
+return Class.export(VodLink, {frameOnly = true, exports = {'display'}})

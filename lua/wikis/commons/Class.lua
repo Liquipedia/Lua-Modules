@@ -22,7 +22,7 @@ local Arguments = require('Module:Arguments')
 ---@field noOverwrite boolean?
 
 ---@class ClassExportOptions: ArgumentsOptions
----@field onlyExport string[]
+---@field exports string[]
 
 local Class = {}
 
@@ -92,9 +92,9 @@ function Class.export(class, options)
 		class[functionName] = Class._wrapFunction(f, options)
 	end
 
-	--- need to catch missing `onlyExport` option for non-git usages
-	if type(options.onlyExport) == 'table' and #options.onlyExport > 0 then
-		for _, functionName in ipairs(options.onlyExport) do
+	--- need to catch missing `exports` option for non-git usages
+	if type(options.exports) == 'table' and #options.exports > 0 then
+		for _, functionName in ipairs(options.exports) do
 			checkFunction(functionName)
 		end
 		return class

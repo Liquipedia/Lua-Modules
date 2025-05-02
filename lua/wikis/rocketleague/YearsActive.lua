@@ -90,4 +90,4 @@ function CustomActiveYears._getYearsBroadcast(conditions)
 	return years:toArray()
 end
 
-return Class.export(CustomActiveYears, {onlyExport = {'get', 'getTalent', 'display'}})
+return Class.export(CustomActiveYears, {exports = {'get', 'getTalent', 'display'}})

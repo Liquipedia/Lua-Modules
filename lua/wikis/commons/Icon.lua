@@ -51,5 +51,5 @@ function Icon.makeIcon(props)
 	return tostring(iconHtml)
 end
 
-return Class.export(Icon, {onlyExport = {'makeIcon'}}
+return Class.export(Icon, {exports = {'makeIcon'}}
 )

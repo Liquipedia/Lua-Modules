@@ -226,4 +226,4 @@ function Faction.bgClass(faction, options)
 	return factionProps and factionProps.bgClass or nil
 end
 
-return Class.export(Faction, {onlyExport = {'Icon'}})
+return Class.export(Faction, {exports = {'Icon'}})

@@ -183,4 +183,4 @@ function PrizePoolCurrency._errorMessage(message)
 		:wikitext(category))
 end
 
-return Class.export(PrizePoolCurrency, {onlyExport = {'display'}})
+return Class.export(PrizePoolCurrency, {exports = {'display'}})

@@ -48,4 +48,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	BasicHiddenDataBox.checkAndAssign('tournament_patch', args.patch, queryResult.patch)
 end
 
-return Class.export(CustomHiddenDataBox, {onlyExport = {'run'}})
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

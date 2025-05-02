@@ -128,4 +128,4 @@ function CustomEarnings._determineValue(placement)
 	return tonumber(placement.prizemoney) or 0
 end
 
-return Class.export(CustomEarnings, {onlyExport = {'calculateForPlayer', 'calculateForTeam'}})
+return Class.export(CustomEarnings, {exports = {'calculateForPlayer', 'calculateForTeam'}})

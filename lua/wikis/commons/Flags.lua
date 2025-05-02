@@ -239,7 +239,7 @@ function Flags.isValidFlagInput(flagInput)
 	return String.isNotEmpty(Flags._convertToKey(flagInput))
 end
 
-return Class.export(Flags, {onlyExport = {
+return Class.export(Flags, {exports = {
 	'Icon',
 	'CountryCode',
 	'CountryName',

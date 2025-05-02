@@ -68,4 +68,4 @@ function CustomResultsTable:processVsData(placement)
 	return '', ''
 end
 
-return Class.export(CustomResultsTable, {onlyExport = {'results', 'awards'}})
+return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})

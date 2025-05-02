@@ -33,4 +33,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_icon_dark', Variables.varDefault('tournament_icondark'))
 end
 
-return Class.export(CustomHiddenDataBox, {onlyExport = {'run'}})
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

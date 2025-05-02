@@ -1487,7 +1487,7 @@ function StatisticsPortal._addArrays(arrays)
 	end)
 end
 
-return Class.export(StatisticsPortal, {onlyExport = {
+return Class.export(StatisticsPortal, {exports = {
 	'gameEarningsChart',
 	'modeEarningsChart',
 	'topEarningsChart',

@@ -374,4 +374,4 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 	return ''
 end
 
-return Class.export(TournamentsSummaryTable, {onlyExport = {'run'}})
+return Class.export(TournamentsSummaryTable, {exports = {'run'}})

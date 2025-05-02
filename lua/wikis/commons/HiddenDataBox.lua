@@ -215,4 +215,4 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
-return Class.export(HiddenDataBox, {onlyExport = {'run'}})
+return Class.export(HiddenDataBox, {exports = {'run'}})

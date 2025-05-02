@@ -19,4 +19,4 @@ function CustomGameTable.results(args)
 	return GameTable(args):readConfig():query():build()
 end
 
-return Class.export(CustomGameTable, {onlyExport = {'results'}})
+return Class.export(CustomGameTable, {exports = {'results'}})

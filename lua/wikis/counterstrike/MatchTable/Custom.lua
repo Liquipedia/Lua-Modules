@@ -52,4 +52,4 @@ function CustomMatchTable:_displayTier(match)
 		:wikitext(Tier.display(tier, tierType, options))
 end
 
-return Class.export(CustomMatchTable, {onlyExport = {'results'}})
+return Class.export(CustomMatchTable, {exports = {'results'}})

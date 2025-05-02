@@ -68,4 +68,4 @@ function LegacyBracketMatchSummary.convert(args)
 	return Json.stringify(args)
 end
 
-return Class.export(LegacyBracketMatchSummary, {onlyExport = {'convert'}})
+return Class.export(LegacyBracketMatchSummary, {exports = {'convert'}})

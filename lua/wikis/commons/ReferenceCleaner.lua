@@ -47,4 +47,4 @@ function ReferenceCleaner.cleanNumber(args)
 	return ''
 end
 
-return Class.export(ReferenceCleaner, {frameOnly = true, onlyExport = {'clean', 'cleanNumber'}})
+return Class.export(ReferenceCleaner, {frameOnly = true, exports = {'clean', 'cleanNumber'}})

@@ -272,4 +272,4 @@ function NotabilityChecker._calculateDateLoss(date)
 	return math.floor(differenceSeconds / SECONDS_IN_YEAR) + 1
 end
 
-return Class.export(NotabilityChecker, {onlyExport = {'run'}})
+return Class.export(NotabilityChecker, {exports = {'run'}})

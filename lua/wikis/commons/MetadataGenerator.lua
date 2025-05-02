@@ -229,4 +229,4 @@ function MetadataGenerator._getDateFormat(startTime, endTime)
 	return formatStart, formatEnd
 end
 
-return Class.export(MetadataGenerator, {onlyExport = {'tournament'}})
+return Class.export(MetadataGenerator, {exports = {'tournament'}})

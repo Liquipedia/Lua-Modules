@@ -208,4 +208,4 @@ function PlacementStats._buildBottom(placementData)
 		:tag('th'):wikitext(placementData.totals.all):done()
 end
 
-return Class.export(PlacementStats, {frameOnly = true, onlyExport = {'run'}})
+return Class.export(PlacementStats, {frameOnly = true, exports = {'run'}})

@@ -81,4 +81,4 @@ function CustomHiddenDataBox.cleanPrizePool(value)
 	end
 end
 
-return Class.export(CustomHiddenDataBox, {onlyExport = {'run'}})
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})
