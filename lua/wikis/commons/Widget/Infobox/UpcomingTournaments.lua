@@ -20,6 +20,9 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local Opponent = OpponentLibraries.Opponent
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -29,8 +32,12 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UpcomingTournaments: Widget
 ---@operator call(table): UpcomingTournaments
----@field props {name: string}
+---@field props {name: string, type: OpponentType}
 local UpcomingTournaments = Class.new(Widget)
+UpcomingTournaments.defaultProps = {
+	name = mw.title.getCurrentTitle().text,
+	type = Opponent.team
+}
 
 ---@return Widget
 function UpcomingTournaments:render()
@@ -49,6 +56,7 @@ end
 function UpcomingTournaments:_getTournaments()
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name))
+		:add(ConditionNode(ColumnName('opponenttype'), Comparator.eq, self.props.type))
 		:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - 86400))
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
 
