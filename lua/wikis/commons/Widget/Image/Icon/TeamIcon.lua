@@ -36,7 +36,7 @@ TeamIcon.defaultProps = {
 ---@param props { theme: 'lightmode'|'darkmode'|'allmode', legacy: boolean? }
 ---@return string[]
 function TeamIcon._getSpanClasses(props)
-	return Array.append({},
+	return Array.extend(
 		'team-template-image-' .. props.legacy and 'legacy' or 'icon',
 		props.theme ~= 'allmode' and ('team-template-' .. props.theme) or nil
 	)
