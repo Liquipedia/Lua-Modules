@@ -36,7 +36,7 @@ return {
 			value = '-1',
 			sort = 'A5',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 		},
 		[''] = {
 			value = nil,

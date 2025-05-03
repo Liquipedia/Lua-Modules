@@ -52,7 +52,7 @@ return {
 			value = '-1',
 			sort = 'A6',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Misc Tournaments',
 			category = 'Misc Tournaments',
 		},

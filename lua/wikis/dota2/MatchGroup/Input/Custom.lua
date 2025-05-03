@@ -152,7 +152,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -182,7 +181,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 
 	for opponentIndex = 1, #opponents do
 		local opponentData = {
-			objectives = MapParser.getObjectives(map, opponentIndex),
+			objectives = MapParser.getObjectives(map, opponentIndex) or {},
 			side = MapParser.getSide(map, opponentIndex),
 		}
 		opponentData = Table.merge(opponentData,

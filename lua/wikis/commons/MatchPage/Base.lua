@@ -7,6 +7,7 @@
 --
 
 local Array = require('Module:Array')
+local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
@@ -39,7 +40,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class MatchPageGame: MatchGroupUtilGame
 ---@field finished boolean
----@field winnerName string?
 ---@field teams table[]
 ---@field scoreDisplay string
 
@@ -65,6 +65,7 @@ local BaseMatchPage = Class.new(
 )
 
 BaseMatchPage.NOT_PLAYED = 'notplayed'
+BaseMatchPage.NO_CHARACTER = 'default'
 
 ---@param match table
 ---@return boolean
@@ -173,8 +174,13 @@ function BaseMatchPage:populateOpponents()
 end
 
 ---@protected
+---@param character string?
+---@return string?
 function BaseMatchPage:getCharacterIcon(character)
-	error('BaseMatchPage:getCharacterIcon() cannot be called directly and must be overridden.')
+	return CharacterIcon.Icon{
+		character = character or BaseMatchPage.NO_CHARACTER,
+		date = self.matchData.date
+	}
 end
 
 ---@protected

@@ -34,6 +34,28 @@ function Lua.moduleExists(name)
 	end
 end
 
+---@param name string
+---@param options {requireDevIfEnabled: boolean?}?
+---@return any
+local getModuleName = function(name, options)
+	options = options or {}
+	if options.requireDevIfEnabled == false then
+		return name
+	end
+	if StringUtils.endsWith(name, '/dev') or StringUtils.contains(name, '/dev/') then
+		error('Lua.import: Direct import of dev modules is not allowed')
+	end
+	local devFlag = FeatureFlag.get('dev')
+	if not devFlag then
+		return name
+	end
+	local devName = name .. '/dev' .. (type(devFlag) == 'string' and ('/' .. devFlag) or '')
+	if require('Module:Namespace').isMain() then
+		mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
+	end
+	return Lua.moduleExists(devName) and devName or name
+end
+
 ---Imports a module if it exists by its name.
 ---
 ---By default it will include the /dev module if in dev mode activated. This can be turned off by setting
@@ -42,18 +64,10 @@ end
 ---@param options {requireDevIfEnabled: boolean, loadData: boolean?}?
 ---@return unknown?
 function Lua.requireIfExists(name, options)
-	if Lua.moduleExists(name) then
+	local moduleName = getModuleName(name, options)
+	if Lua.moduleExists(moduleName) then
 		return Lua.import(name, options)
 	end
-end
-
----Loads (mw.loadData) a data module if it exists by its name.
----@deprecated use `Lua.requireIfExists` with `loadData` option instead
----@param name string
----@return unknown?
-function Lua.loadDataIfExists(name)
-	mw.ext.TeamLiquidIntegration.add_category('Pages using deprecated Lua.loadDataIfExists function')
-	return Lua.requireIfExists(name, {loadData = true})
 end
 
 ---Imports a module by its name.
@@ -66,27 +80,8 @@ end
 function Lua.import(name, options)
 	options = options or {}
 	local importFunction = options.loadData and mw.loadData or require
-	if options.requireDevIfEnabled ~= false then
-		if StringUtils.endsWith(name, '/dev') then
-			error('Lua.import: Module name should not end in \'/dev\'')
-		end
-
-		local devFlag = FeatureFlag.get('dev')
-		if not devFlag then
-			return importFunction(name)
-		end
-		local devName = name .. '/dev' .. (type(devFlag) == 'string' and ('/' .. devFlag) or '')
-		if require('Module:Namespace').isMain() then
-			mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
-		end
-		if Lua.moduleExists(devName) then
-			return importFunction(devName)
-		else
-			return importFunction(name)
-		end
-	else
-		return importFunction(name)
-	end
+	local moduleName = getModuleName(name, options)
+	return importFunction(moduleName)
 end
 
 --[[

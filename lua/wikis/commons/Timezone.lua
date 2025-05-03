@@ -38,10 +38,11 @@ function Timezone.getTimezoneData(timezone)
 	return timezoneData
 end
 
----@param timezone string?
+---@param args {timezone: string?}
 ---@return string?
-function Timezone.getTimezoneString(timezone)
-	local timezoneData = Timezone.getTimezoneData(timezone)
+---@overload fun(timezone: table): string?
+function Timezone.getTimezoneString(args)
+	local timezoneData = Timezone.getTimezoneData(args.timezone)
 	if not timezoneData then
 		return
 	end
@@ -60,10 +61,10 @@ function Timezone.getTimezoneString(timezone)
 	})
 end
 
----@param timezone string?
+---@param args {timezone: string?}
 ---@return integer?
-function Timezone.getOffset(timezone)
-	local timezoneData = Timezone.getTimezoneData(timezone)
+function Timezone.getOffset(args)
+	local timezoneData = Timezone.getTimezoneData(args.timezone)
 	if not timezoneData then
 		return
 	end

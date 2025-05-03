@@ -69,7 +69,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 		mapveto = MatchGroupInputUtil.getMapVeto(match, ALLOWED_VETOES),
-		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
 

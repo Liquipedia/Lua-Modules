@@ -23,7 +23,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.dns)
 		end,
 		display = function ()
-			return Abbreviation.make('DNS', 'Did not start')
+			return Abbreviation.make{text = 'DNS', title = 'Did not start'}
 		end,
 		lpdb = 'DNS',
 	},
@@ -32,7 +32,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.dnpq)
 		end,
 		display = function ()
-			return Abbreviation.make('DNPQ', 'Did not pre-qualify')
+			return Abbreviation.make{text = 'DNPQ', title = 'Did not pre-qualify'}
 		end,
 		lpdb = 'DNPQ',
 	},
@@ -41,7 +41,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.dnq)
 		end,
 		display = function ()
-			return Abbreviation.make('DNQ', 'Did not qualify')
+			return Abbreviation.make{text = 'DNQ', title = 'Did not qualify'}
 		end,
 		lpdb = 'DNQ',
 	},
@@ -50,7 +50,7 @@ PrizePoolPlacement.specialStatuses = Table.merge(PrizePoolPlacement.specialStatu
 			return Logic.readBool(args.nc)
 		end,
 		display = function ()
-			return Abbreviation.make('NC', 'Not classified')
+			return Abbreviation.make{text = 'NC', title = 'Not classified'}
 		end,
 		lpdb = 'NC',
 	},

@@ -29,6 +29,8 @@ function DataTable:render()
 			Table{
 				children = self.props.children,
 				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes)),
+				css = self.props.tableCss,
+				attributes = self.props.tableAttributes,
 			},
 		},
 		classes = WidgetUtil.collect('table-responsive', unpack(self.props.wrapperClasses)),

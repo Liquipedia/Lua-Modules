@@ -44,7 +44,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1510,
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -75,8 +75,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'Overwatch 2 wordmark lightmode.png',
+		darkmode = 'Overwatch 2 wordmark darkmode.png',
 	},
 	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
 		'to competitive players and teams.',
