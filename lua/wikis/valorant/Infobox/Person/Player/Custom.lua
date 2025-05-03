@@ -18,7 +18,6 @@ local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')

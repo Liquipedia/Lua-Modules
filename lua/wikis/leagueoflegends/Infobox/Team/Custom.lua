@@ -12,7 +12,6 @@ local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
 local TeamTemplate = require('Module:Team')
-local Template = require('Module:Template')
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
