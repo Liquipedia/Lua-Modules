@@ -37,7 +37,7 @@ function UpcomingTournamentsRow:render()
 	if status == 'cancelled' or status == 'delayed' then return end
 
 	return HtmlWidgets.Table{
-		classes = {'wikitable wikitable-striped', 'infobox_matches_content'},
+		classes = {'wikitable', 'wikitable-striped', 'infobox_matches_content'},
 		children = HtmlWidgets.Tbody{
 			children = {
 				Tr{
