@@ -61,7 +61,7 @@ function UpcomingTournaments:_getTournaments()
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
 
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
-		conditons = conditions:toString(),
+		conditions = conditions:toString(),
 		limit = 1000,
 		order = 'startdate asc',
 		query = 'tournament, date, startdate, pagename, icon, icondark, publishertier, extradata'
