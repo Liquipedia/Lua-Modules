@@ -14,6 +14,7 @@ local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -41,7 +42,10 @@ function UpcomingTournamentsRow:render()
 			children = {
 				Tr{
 					children = Td{
-						classes = Array.extend('versus'),
+						classes = Array.extend(
+							'versus',
+							Logic.isNotEmpty(data.publishertier) and 'tournament-highlighted-bg' or nil
+						),
 						css = {['text-align'] = 'center'},
 						children = {
 							LeagueIcon.display{
