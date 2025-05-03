@@ -35,7 +35,7 @@ function TeamNameDisplay:render()
 	return Span{
 		classes = Array.extend({ 'team-template-text' }, self.props.additionalClasses),
 		children = {
-			self.props.noLink and displayName or self.props.noLink and displayName or Link{
+			self.props.noLink and displayName or Link{
 				children = displayName,
 				link = page
 			}
