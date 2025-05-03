@@ -95,7 +95,7 @@ function TeamInlineWidget:render()
 			page = self.teamTemplate.page,
 			legacy = Logic.isNotEmpty(self.teamTemplate.legacyimage)
 		},
-		self:getNameComponent()
+		self:_getNameComponent()
 	), ' ')
 	return Span{
 		attributes = { ['data-highlighting-class'] = self.teamTemplate.name },
@@ -104,8 +104,9 @@ function TeamInlineWidget:render()
 	}
 end
 
+---@private
 ---@return Widget
-function TeamInlineWidget:getNameComponent()
+function TeamInlineWidget:_getNameComponent()
 	return HtmlWidgets.Fragment{
 		children = Array.map(Table.entries(self.displayType.displayNames), function (element)
 			return TeamName{
