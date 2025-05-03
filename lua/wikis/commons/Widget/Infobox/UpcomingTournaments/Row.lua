@@ -44,7 +44,7 @@ function UpcomingTournamentsRow:render()
 					children = Td{
 						classes = Array.extend(
 							'versus',
-							Logic.isNotEmpty(data.publishertier) and 'tournament-highlighted-bg' or nil
+							self:isHighlighted() and 'tournament-highlighted-bg' or nil
 						),
 						css = {['text-align'] = 'center'},
 						children = {
@@ -92,6 +92,12 @@ function UpcomingTournamentsRow:render()
 			}
 		}
 	}
+end
+
+---@protected
+---@return boolean
+function UpcomingTournamentsRow:isHighlighted()
+	return Logic.isNotEmpty(self.props.data.publishertier)
 end
 
 ---@private
