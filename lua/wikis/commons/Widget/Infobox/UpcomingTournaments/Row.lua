@@ -38,53 +38,51 @@ function UpcomingTournamentsRow:render()
 
 	return HtmlWidgets.Table{
 		classes = {'wikitable', 'wikitable-striped', 'infobox_matches_content'},
-		children = HtmlWidgets.Tbody{
-			children = {
-				Tr{
-					children = Td{
-						classes = Array.extend(
-							'versus',
-							self:isHighlighted() and 'tournament-highlighted-bg' or nil
-						),
-						css = {['text-align'] = 'center'},
-						children = {
-							LeagueIcon.display{
-								icon = data.icon,
-								iconDark = data.icondark,
-								link = data.pagename
-							},
-							' ',
-							Link{
-								link = data.pagename,
-								children = data.tournament
-							}
+		children = {
+			Tr{
+				children = Td{
+					classes = Array.extend(
+						'versus',
+						self:isHighlighted() and 'tournament-highlighted-bg' or nil
+					),
+					css = {['text-align'] = 'center'},
+					children = {
+						LeagueIcon.display{
+							icon = data.icon,
+							iconDark = data.icondark,
+							link = data.pagename
+						},
+						' ',
+						Link{
+							link = data.pagename,
+							children = data.tournament
 						}
 					}
-				},
-				Tr{
-					children = Td{
-						classes = {'match-filler'},
-						children = {
-							self:_getCountdown(),
-							Div{
+				}
+			},
+			Tr{
+				children = Td{
+					classes = {'match-filler'},
+					children = {
+						self:_getCountdown(),
+						Div{
+							css = {
+								width = '100px',
+								float = 'right',
+								['white-space'] = 'nowrap'
+							},
+							children = Div{
 								css = {
-									width = '100px',
-									float = 'right',
-									['white-space'] = 'nowrap'
+									overflow = 'hidden',
+									['text-overflow'] = 'ellipsis',
+									['max-width'] = '170px',
+									['vertical-align'] = 'middle',
+									['white-space'] = 'nowrap',
+									['font-size'] = '11px',
+									height = '16px',
+									['margin-top'] = '3px'
 								},
-								children = Div{
-									css = {
-										overflow = 'hidden',
-										['text-overflow'] = 'ellipsis',
-										['max-width'] = '170px',
-										['vertical-align'] = 'middle',
-										['white-space'] = 'nowrap',
-										['font-size'] = '11px',
-										height = '16px',
-										['margin-top'] = '3px'
-									},
-									children = self:_getTournamentSpan()
-								}
+								children = self:_getTournamentSpan()
 							}
 						}
 					}
