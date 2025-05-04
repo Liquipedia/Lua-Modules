@@ -27,7 +27,7 @@ local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Header = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Header')
-local Row = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Row/Custom')
+local Row = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Row')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UpcomingTournaments: Widget
