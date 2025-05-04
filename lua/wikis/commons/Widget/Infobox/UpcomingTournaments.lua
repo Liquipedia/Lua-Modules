@@ -33,7 +33,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@class UpcomingTournamentsParameters
 ---@field name string
 ---@field type OpponentType
----@field onlyHighlightOnValue string?
+---@field options table?
 
 ---@class UpcomingTournaments: Widget
 ---@operator call(UpcomingTournamentsParameters): UpcomingTournaments
@@ -85,7 +85,7 @@ function UpcomingTournaments:_getTournaments()
 		}
 	end
 	return Array.map(placements, function (placement)
-		return Row{data = placement, onlyHighlightOnValue = self.props.onlyHighlightOnValue}
+		return Row{data = placement, options = self.props.options}
 	end)
 end
 

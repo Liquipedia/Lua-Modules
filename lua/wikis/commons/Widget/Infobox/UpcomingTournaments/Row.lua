@@ -27,6 +27,7 @@ local Td = HtmlWidgets.Td
 ---@class UpcomingTournamentsRowParameters
 ---@field data placement
 ---@field onlyHighlightOnValue string?
+---@field options table?
 
 ---@class UpcomingTournamentsRow: Widget
 ---@operator call(UpcomingTournamentsRowParameters): UpcomingTournamentsRow
@@ -90,7 +91,7 @@ end
 ---@private
 ---@return boolean
 function UpcomingTournamentsRow:_isHighlighted()
-	return HighlightConditions.tournament(self.props.data, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
+	return HighlightConditions.tournament(self.props.data, self.props.options)
 end
 
 ---@private
