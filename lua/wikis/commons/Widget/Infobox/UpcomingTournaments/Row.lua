@@ -113,7 +113,7 @@ function UpcomingTournamentsRow:_getCountdown()
 		children = ongoing and Span{
 			classes = {'timer-object-countdown-live'},
 			children = 'ONGOING!'
-		} or Countdown._create{timestamp = startDateTimestamp, rawcountdown = true, text = 'ONGOING!'}
+		} or Countdown._create{timestamp = startDateTimestamp, rawcountdown = true}
 	}
 end
 
