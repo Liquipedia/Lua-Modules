@@ -76,16 +76,7 @@ function UpcomingTournamentsRow:render()
 								['white-space'] = 'nowrap'
 							},
 							children = Div{
-								css = {
-									overflow = 'hidden',
-									['text-overflow'] = 'ellipsis',
-									['max-width'] = '170px',
-									['vertical-align'] = 'middle',
-									['white-space'] = 'nowrap',
-									['font-size'] = '11px',
-									height = '16px',
-									['margin-top'] = '3px'
-								},
+								classes = {'tournament-span'},
 								children = self:_getTournamentSpan()
 							}
 						}
