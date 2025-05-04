@@ -96,8 +96,8 @@ return {
 		},
 		{
 			file = 'GeoGuessr Format Image.png',
-			title = 'Formats',
-			link = 'Portal:Formats',
+			title = 'Game Modes',
+			link = 'Portal:Modes',
 		},
 		{
 			file = 'Jake Lyons at GeoGuessr World Cup 2024.jpg',
