@@ -196,7 +196,7 @@ function CustomPlayer:createBottomContent()
 		return HtmlWidgets.Fragment{
 			children = {
 				MatchTicker.player{recentLimit = 3},
-				UpcomingTournaments{name = teamPage}
+				UpcomingTournaments{name = teamPage, onlyHighlightOnValue = 'highlighted'}
 			}
 		}
 	end
