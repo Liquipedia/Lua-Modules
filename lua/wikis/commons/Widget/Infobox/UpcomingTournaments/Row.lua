@@ -13,8 +13,8 @@ local Class = Lua.import('Module:Class')
 local Countdown = Lua.import('Module:Countdown')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
+local HighlightConditions = Lua.import('Module:HighlightConditions')
 local LeagueIcon = Lua.import('Module:LeagueIcon')
-local Logic = Lua.import('Module:Logic')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
@@ -26,7 +26,7 @@ local Td = HtmlWidgets.Td
 
 ---@class UpcomingTournamentsRow: Widget
 ---@operator call(table): UpcomingTournamentsRow
----@field props {data: placement}
+---@field props {data: placement, onlyHighlightOnValue: string?}
 local UpcomingTournamentsRow = Class.new(Widget)
 
 ---@return Widget?
@@ -43,7 +43,7 @@ function UpcomingTournamentsRow:render()
 				children = Td{
 					classes = Array.extend(
 						'versus',
-						self:isHighlighted() and 'tournament-highlighted-bg' or nil
+						self:_isHighlighted() and 'tournament-highlighted-bg' or nil
 					),
 					css = {['text-align'] = 'center'},
 					children = {
@@ -92,10 +92,10 @@ function UpcomingTournamentsRow:render()
 	}
 end
 
----@protected
+---@private
 ---@return boolean
-function UpcomingTournamentsRow:isHighlighted()
-	return Logic.isNotEmpty(self.props.data.publishertier)
+function UpcomingTournamentsRow:_isHighlighted()
+	return HighlightConditions.tournament(self.props.data, {onlyHighlightOnValue = self.props.onlyHighlightOnValue})
 end
 
 ---@private
