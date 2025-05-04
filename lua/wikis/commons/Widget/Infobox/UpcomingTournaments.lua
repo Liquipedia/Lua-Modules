@@ -67,7 +67,6 @@ function UpcomingTournaments:_getTournaments()
 
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions:toString(),
-		limit = 1000,
 		order = 'startdate asc',
 		query = 'tournament, date, startdate, pagename, icon, icondark, publishertier, extradata'
 	})
