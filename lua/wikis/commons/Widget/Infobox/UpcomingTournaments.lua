@@ -30,9 +30,14 @@ local Header = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Header')
 local Row = Lua.import('Module:Widget/Infobox/UpcomingTournaments/Row')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+---@class UpcomingTournamentsParameters
+---@field name string
+---@field type OpponentType
+---@field onlyHighlightOnValue string?
+
 ---@class UpcomingTournaments: Widget
----@operator call(table): UpcomingTournaments
----@field props {name: string, type: OpponentType, onlyHighlightOnValue: string?}
+---@operator call(UpcomingTournamentsParameters): UpcomingTournaments
+---@field props UpcomingTournamentsParameters
 local UpcomingTournaments = Class.new(Widget)
 UpcomingTournaments.defaultProps = {
 	name = mw.title.getCurrentTitle().text,

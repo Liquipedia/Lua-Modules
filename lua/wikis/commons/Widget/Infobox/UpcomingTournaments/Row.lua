@@ -24,9 +24,13 @@ local Span = HtmlWidgets.Span
 local Tr = HtmlWidgets.Tr
 local Td = HtmlWidgets.Td
 
+---@class UpcomingTournamentsRowParameters
+---@field data placement
+---@field onlyHighlightOnValue string?
+
 ---@class UpcomingTournamentsRow: Widget
----@operator call(table): UpcomingTournamentsRow
----@field props {data: placement, onlyHighlightOnValue: string?}
+---@operator call(UpcomingTournamentsRowParameters): UpcomingTournamentsRow
+---@field props UpcomingTournamentsRowParameters
 local UpcomingTournamentsRow = Class.new(Widget)
 
 ---@return Widget?
