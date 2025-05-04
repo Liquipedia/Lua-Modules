@@ -53,11 +53,12 @@ function TeamIcon:render()
 	local imageDark = self.props.imageDark or self.props.imageLight
 	local size = self.props.size
 	local allmode = imageLight == imageDark
-	if allmode then
-		return HtmlWidgets.Span{
-			classes = TeamIcon._getSpanClasses{theme = 'allmode', legacy = self.props.legacy},
+
+	local buildSpan = function(image, theme)
+		return Span{
+			classes = TeamIcon._getSpanClasses{theme = theme, legacy = self.props.legacy},
 			children = {
-				Image.display(imageLight, nil, {
+				Image.display(image, nil, {
 					size = size,
 					alignment = 'middle',
 					link = self:_getPageLink()
@@ -65,27 +66,13 @@ function TeamIcon:render()
 			}
 		}
 	end
+
+	if allmode then
+		return buildSpan(imageLight, 'allmode')
+	end
 	return {
-		Span{
-			classes = TeamIcon._getSpanClasses{theme = 'lightmode'},
-			children = {
-				Image.display(imageLight, nil, {
-					size = size,
-					alignment = 'middle',
-					link = self:_getPageLink()
-				})
-			}
-		},
-		Span{
-			classes = TeamIcon._getSpanClasses{theme = 'darkmode'},
-			children = {
-				Image.display(imageDark, nil, {
-					size = size,
-					alignment = 'middle',
-					link = self:_getPageLink()
-				})
-			}
-		}
+		buildSpan(imageLight, 'lightmode'),
+		buildSpan(imageDark, 'darkmode')
 	}
 end
 
