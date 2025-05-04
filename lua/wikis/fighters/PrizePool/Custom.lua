@@ -11,6 +11,7 @@ local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lpdb = require('Module:Lpdb')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -121,11 +122,14 @@ end
 ---@param prize string|number|boolean?
 function CustomPrizePool.addPointsDatapoint(data, prize)
 	local opponentData = Opponent.fromLpdbStruct(data)
+	if opponentData.type ~= Opponent.solo then return
+	elseif Logic.isEmpty(prize) then return end
+	local player = opponentData.players[1]
 	local pointsDataPoint = Lpdb.DataPoint:new{
-		objectname = 'Points_' .. opponentData.name,
+		objectname = 'Points_' .. player.pageName,
 		type = 'points',
 		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata.circuit),
-		information = opponentData.name,
+		information = player.pageName,
 		date = data.date,
 		extradata = {
 			points = prize,
@@ -133,11 +137,11 @@ function CustomPrizePool.addPointsDatapoint(data, prize)
 			tournament = Variables.varDefault('tournament_link'),
 			parent = Variables.varDefault('tournament_parent'),
 			shortname = Variables.varDefault('tournament_name'),
-			participant = opponentData.players[1].pageName,
+			participant = player.pageName,
 			game = Variables.varDefault('tournament_game'),
 			type = Variables.varDefault('tournament_type'),
-			participantname = opponentData.players[1].displayName,
-			participantflag = opponentData.players[1].flag,
+			participantname = player.displayName,
+			participantflag = player.flag,
 			publishertier = data.extradata.circuit_tier or Variables.varDefault('circuittier'),
 			region = Variables.varDefault('circuitregion'),
 		}
