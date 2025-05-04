@@ -33,15 +33,28 @@ TeamIcon.defaultProps = {
 	size = ICON_SIZE
 }
 
----@param props { theme: 'lightmode'|'darkmode'|'allmode', legacy: boolean? }
----@return string[]
-function TeamIcon._getSpanClasses(props)
-	return Array.extend(
-		'team-template-image-' .. props.legacy and 'legacy' or 'icon',
-		props.theme ~= 'allmode' and ('team-template-' .. props.theme) or nil
-	)
+---@private
+---@param image string
+---@param theme 'lightmode'|'darkmode'|'allmode'
+---@return Widget
+function TeamIcon:_buildSpan(image, theme)
+	local size = self.props.size
+	return Span{
+		classes = Array.extend(
+			'team-template-image-' .. self.props.legacy and 'legacy' or 'icon',
+			theme ~= 'allmode' and ('team-template-' .. theme) or nil
+		),
+		children = {
+			Image.display(image, nil, {
+				size = size,
+				alignment = 'middle',
+				link = self:_getPageLink()
+			})
+		}
+	}
 end
 
+---@private
 ---@return string?
 function TeamIcon:_getPageLink()
 	return self.props.noLink and '' or self.props.page
@@ -51,28 +64,14 @@ end
 function TeamIcon:render()
 	local imageLight = self.props.imageLight
 	local imageDark = self.props.imageDark or self.props.imageLight
-	local size = self.props.size
 	local allmode = imageLight == imageDark
 
-	local buildSpan = function(image, theme)
-		return Span{
-			classes = TeamIcon._getSpanClasses{theme = theme, legacy = self.props.legacy},
-			children = {
-				Image.display(image, nil, {
-					size = size,
-					alignment = 'middle',
-					link = self:_getPageLink()
-				})
-			}
-		}
-	end
-
 	if allmode then
-		return buildSpan(imageLight, 'allmode')
+		return self:_buildSpan(imageLight, 'allmode')
 	end
 	return {
-		buildSpan(imageLight, 'lightmode'),
-		buildSpan(imageDark, 'darkmode')
+		self:_buildSpan(imageLight, 'lightmode'),
+		self:_buildSpan(imageDark, 'darkmode')
 	}
 end
 
