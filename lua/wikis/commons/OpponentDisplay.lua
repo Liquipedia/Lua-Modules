@@ -252,17 +252,10 @@ end
 ---@param props {flip: boolean?, template: string, style: teamStyle?}
 ---@return Widget?
 function OpponentDisplay.InlineTeamContainer(props)
-	if props.style == 'standard' or not props.style then
-		return TeamInline{ name = props.template, flip = props.flip, displayType = 'standard' }
-	elseif props.style == 'short' then
-		return TeamInline{ name = props.template, flip = props.flip, displayType = 'short' }
-	elseif props.style == 'bracket' then
-		if not props.flip then
-			return TeamInline{ name = props.template, displayType = 'bracket' }
-		else
-			error('Flipped style=bracket is not supported')
-		end
-	end
+	local style = props.style or 'standard'
+	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
+	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
+	return TeamInline{name = props.template, flip = props.flip, displayType = style}
 end
 
 --[[
