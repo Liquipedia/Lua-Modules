@@ -22,7 +22,7 @@ local ICON_SIZE = '100x50px'
 ---@field imageDark string?
 ---@field page string?
 ---@field size string?
----@field nolink boolean?
+---@field noLink boolean?
 ---@field legacy boolean?
 
 ---@class TeamIconWidget: IconWidget
@@ -44,7 +44,7 @@ end
 
 ---@return string?
 function TeamIcon:_getPageLink()
-	return self.props.nolink and '' or self.props.page
+	return self.props.noLink and '' or self.props.page
 end
 
 ---@return Widget|Widget[]
