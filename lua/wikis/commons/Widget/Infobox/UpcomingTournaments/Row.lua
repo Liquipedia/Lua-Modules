@@ -26,7 +26,6 @@ local Td = HtmlWidgets.Td
 
 ---@class UpcomingTournamentsRowParameters
 ---@field data placement
----@field onlyHighlightOnValue string?
 ---@field options table?
 
 ---@class UpcomingTournamentsRow: Widget
