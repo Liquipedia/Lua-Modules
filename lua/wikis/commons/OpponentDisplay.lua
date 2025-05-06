@@ -249,13 +249,13 @@ function OpponentDisplay.BlockPlayers(props)
 end
 
 ---Displays a team as an inline element. The team is specified by a template.
----@param props {flip: boolean?, template: string, style: teamStyle?}
+---@param props {flip: boolean?, template: string, date: number|string?, style: teamStyle?}
 ---@return Widget?
 function OpponentDisplay.InlineTeamContainer(props)
 	local style = props.style or 'standard'
 	TypeUtil.assertValue(style, OpponentDisplay.types.TeamStyle)
 	assert(style ~= 'bracket' or not props.flip, 'Flipped style=bracket is not supported')
-	return TeamInline{name = props.template, flip = props.flip, displayType = style}
+	return TeamInline{name = props.template, date = props.date, flip = props.flip, displayType = style}
 end
 
 --[[
