@@ -343,7 +343,7 @@ function MediaList._displayTeam(subject, date)
 	if not team then
 		return
 	end
-	return OpponentDisplay.InlineTeamContainer{template = team, date = date, displayType = 'icon'}
+	return OpponentDisplay.InlineTeamContainer{template = team, date = date, style = 'icon'}
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
