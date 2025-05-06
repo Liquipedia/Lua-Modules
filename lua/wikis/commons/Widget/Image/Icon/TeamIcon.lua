@@ -41,7 +41,7 @@ function TeamIcon:_buildSpan(image, theme)
 	local size = self.props.size
 	return Span{
 		classes = Array.extend(
-			'team-template-image-' .. self.props.legacy and 'legacy' or 'icon',
+			'team-template-image-' .. (self.props.legacy and 'legacy' or 'icon'),
 			theme ~= 'allmode' and ('team-template-' .. theme) or nil
 		),
 		children = {
