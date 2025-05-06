@@ -449,7 +449,7 @@ Author(s): Rathoz
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 		display: grid;
-		grid-template-columns: 9.375rem auto 9.5rem; // set as default
+		grid-template-columns: 9.375rem auto 9.5rem; /* set as default */
 		grid-gap: 1rem;
 	}
 
@@ -712,7 +712,7 @@ Author(s): Rathoz
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); // set as default
+		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); /* set as default */
 		grid-template-rows: 1fr 1fr;
 
 		@media ( max-width: 1199px ), ( min-width: 1320px ) {
@@ -1257,10 +1257,6 @@ Author(s): Rathoz
 
 		&-map-name {
 			font-weight: bold;
-		}
-
-		.match-bm-map-veto-card--ban &-map-action {
-			background-color: red;
 		}
 	}
 }

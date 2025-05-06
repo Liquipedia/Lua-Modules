@@ -13,8 +13,10 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 
 ---@class MatchPageMapVetoParameters
 ---@field vetoRounds {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}[]
@@ -30,28 +32,33 @@ function MatchPageMapVeto:render()
 		local teamDisplay = function()
 			return tostring(OpponentDisplay.BlockOpponent({opponent = vetoRound.by, teamStyle = 'hybrid'}))
 		end
+		local actionType
+		local byText
+
 		if vetoRound.type == 'pick' then
-			return teamDisplay() .. ' Pick'
+			actionType = 'Pick'
+			byText = teamDisplay()
 		elseif vetoRound.type == 'ban' then
-			return teamDisplay() .. ' Ban'
+			actionType = 'Ban'
+			byText = teamDisplay()
 		elseif vetoRound.type == 'decider' then
+			actionType = 'Decider'
 			actionType = 'Decider'
 		elseif vetoRound.type == 'defaultban' then
 			actionType = 'Default Ban'
+			actionType = 'Default Ban'
 		elseif vetoRound.type == 'protect' then
-			return teamDisplay() .. 'Protect'
+			actionType = 'Protect'
+			byText = teamDisplay()
 		end
 
-		return HtmlWidgets.Div{
-			classes = {'match-bm-map-veto-card-map-info'},
-			children = {
-				HtmlWidgets.Span{
-					classes = {'match-bm-map-veto-card-map-action'},
-					children = actionType
-				},
-				byText
-			}
-		}
+		return WidgetUtil.collect(
+			HtmlWidgets.Span{
+				classes = {'match-bm-map-veto-card-map-action'},
+				children = actionType
+			},
+			byText
+		)
 	end
 
 	return HtmlWidgets.Div{
@@ -71,7 +78,10 @@ function MatchPageMapVeto:render()
 								classes = {'match-bm-map-veto-card-map-name'},
 								children = vetoRound.name
 							},
-							formatTitle(vetoRound)
+							HtmlWidgets.Div{
+								classes = {'match-bm-map-veto-card-map-info'},
+								children = formatTitle(vetoRound)
+							},
 						}
 					}
 				}
