@@ -13,6 +13,8 @@ local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 ---@class MatchPageMapVetoParameters
 ---@field vetoRounds {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}[]
@@ -25,17 +27,23 @@ local MatchPageMapVeto = Class.new(Widget)
 ---@return Widget
 function MatchPageMapVeto:render()
 	local formatTitle = function(vetoRound)
+		local teamDisplay = OpponentDisplay.BlockOpponent({opponent = vetoRound.by, teamStyle = 'hybrid'})
 		local actionType
 		local byText = ''
 
 		if vetoRound.type == 'pick' then
 			actionType = 'Pick'
-			byText = ' ' .. vetoRound.by.name
+			byText = teamDisplay
 		elseif vetoRound.type == 'ban' then
 			actionType = 'Ban'
-			byText = ' ' .. vetoRound.by.name
+			byText = teamDisplay
 		elseif vetoRound.type == 'decider' then
 			actionType = 'Decider'
+		elseif vetoRound.type == 'defaultban' then
+			actionType = 'Default Ban'
+		elseif vetoRound.type == 'protect' then
+			actionType = 'Protect'
+			byText = teamDisplay
 		end
 
 		return HtmlWidgets.Div{
