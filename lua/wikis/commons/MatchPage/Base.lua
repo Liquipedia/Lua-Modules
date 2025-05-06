@@ -247,7 +247,12 @@ function BaseMatchPage:renderGames()
 	}
 
 	Array.forEach(games, function(game, idx)
-		tabs['name' .. idx] = 'Game ' .. idx
+		local mapName = self.games[idx].map
+		if Logic.isNotEmpty(mapName) then
+			tabs['name' .. idx] = 'Game ' .. idx .. ': ' .. mapName
+		else
+			tabs['name' .. idx] = 'Game ' .. idx
+		end
 		tabs['content' .. idx] = game
 	end)
 

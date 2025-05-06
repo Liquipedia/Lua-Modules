@@ -12,6 +12,7 @@ local DateExt = require('Module:Date/Ext')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
@@ -20,6 +21,10 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Div = HtmlWidgets.Div
+local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
+local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchPage: BaseMatchPage
@@ -27,6 +32,7 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1746050400 -- May 1st 2025 midnight
+local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 ---@param match table
 ---@return boolean
@@ -73,7 +79,92 @@ end
 ---@param game MatchPageGame
 ---@return Widget
 function MatchPage:renderGame(game)
-	return HtmlWidgets.Fragment{}
+	return HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			self:_renderPerformance(game)
+		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget[]
+function MatchPage:_renderPerformance(game)
+	return {
+		HtmlWidgets.H3{children = 'Player Performance'},
+		Div{
+			classes = {'match-bm-players-wrapper'},
+			children = {
+				self:_renderPerformanceForTeam(game, 1),
+				self:_renderPerformanceForTeam(game, 2)
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@return Widget
+function MatchPage:_renderPerformanceForTeam(game, teamIndex)
+	return Div{
+		classes = {'match-bm-players-team'},
+		children = WidgetUtil.collect(
+			Div{
+				classes = {'match-bm-players-team-header'},
+				children = self.opponents[teamIndex].iconDisplay
+			},
+			Array.map(game.teams[teamIndex].players, function (player)
+				return self:_renderPlayerPerformance(game, teamIndex, player)
+			end)
+		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param teamIndex integer
+---@param player table
+---@return Widget
+function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	return Div{
+		classes = {'match-bm-players-player match-bm-players-player--col-2'},
+		children = {
+			PlayerDisplay{
+				characterIcon = self:getCharacterIcon(player.agent),
+				characterName = player.character,
+				playerName = player.displayName,
+				playerLink = player.link
+			},
+			Div{
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},
+				children = {
+					PlayerStat{
+						title = {IconFa{iconName = 'acs'}, 'ACS'},
+						data = MathUtil.round(player.acs)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'kda'}, 'KDA'},
+						data = Array.interleave({
+							player.kills, player.deaths, player.assists
+						}, SPAN_SLASH)
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'kast'}, 'KAST'},
+						data = player.kast and (player.kast .. '%') or nil
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'damage'}, 'ADR'},
+						data = player.adr
+					},
+					PlayerStat{
+						title = {IconFa{iconName = 'headshot'}, 'HS%'},
+						data = player.hs and (player.hs .. '%') or nil
+					}
+				}
+			}
+		}
+	}
 end
 
 function MatchPage:getPatchLink()
