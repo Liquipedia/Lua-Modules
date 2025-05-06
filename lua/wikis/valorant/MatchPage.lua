@@ -94,7 +94,6 @@ function MatchPage:_renderRoundsOverview(game)
 	return RoundsOverview{
 		rounds = game.extradata.rounds,
 		iconRender = function(winningSide, winBy)
-			local color = winningSide == 'atk' and '#FE4554' or '#42FED0'
 			local iconName
 			if winBy == 'elimination' then
 				iconName = 'skull'
@@ -105,7 +104,22 @@ function MatchPage:_renderRoundsOverview(game)
 			else
 				iconName = 'hourglass-end'
 			end
-			return color .. iconName
+			return Div{
+				classes = {'match-bm-rounds-overview-round-outcome-icon'},
+				css = {
+					['background-color'] = winningSide == 'atk' and '#FE4554' or '#000000',
+					color = 'white',
+					['border-radius'] = '4px',
+					height = '28px',
+					width = '28px',
+					['text-align'] = 'center',
+					['font-size'] = '20px',
+					display = 'flex',
+					['align-items'] = 'center',
+					['justify-content'] = 'center',
+				},
+				children = '<i class="fas fa-' .. iconName .. '"></i>'
+			}
 		end,
 	}
 end

@@ -25,26 +25,35 @@ function MatchPageRoundsOverview:render()
 		return
 	end
 	assert(self.props.iconRender, 'MatchPageRoundsOverview: iconRender prop is required')
-	return HtmlWidgets.Fragment{
+	local function makeIcon(round, side)
+		if round.winningSide == side then
+			return self.props.iconRender(side, round.winBy)
+		end
+		return '&nbsp;'
+	end
+
+	return HtmlWidgets.Div{
 		classes = {'match-bm-rounds-overview'},
-		children = {
+		css = {
+			display = 'flex',
+			gap = '4px',
+		},
+		children = WidgetUtil.collect(
 			Div{
 				classes = {'match-bm-rounds-overview-teams'},
-				children = {'', 'team1', 'team2'}
+				children = {Div{children = '&nbsp;'}, Div{children = 'T1'}, Div{children = 'T2'}}
 			},
-			Div{
-				children = Array.map(self.props.rounds, function(round)
-					return Div{
-						classes = {'match-bm-rounds-overview-round'},
-						children = WidgetUtil.collect(
-							round.round,
-							round.winningSide == round.team1side and self.props.iconRender(round.winningSide, round.winBy) or '',
-							round.winningSide == round.team2side and self.props.iconRender(round.winningSide, round.winBy) or ''
-						)
-					}
-				end)
-			}
-		}
+			Array.map(self.props.rounds, function(round)
+				return Div{
+					classes = {'match-bm-rounds-overview-round'},
+					children = WidgetUtil.collect(
+						Div{classes = {'match-bm-rounds-overview-round-title'}, css = {['text-align'] = 'center'}, children = round.round},
+						Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t1side)},
+						Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t2side)}
+					)
+				}
+			end)
+		)
 	}
 
 end
