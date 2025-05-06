@@ -40,7 +40,7 @@ local Transfer = {}
 
 ---@param config {player: string, specialRoles: string[]?}
 ---@return TransferSpan[]
-function Transfer.transferSpan(config)
+function Transfer.getTeamHistoryForPerson(config)
 	local conditions = ConditionTree(BooleanOperator.all):add{
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
 		ConditionNode(ColumnName('player'), Comparator.eq, config.player),

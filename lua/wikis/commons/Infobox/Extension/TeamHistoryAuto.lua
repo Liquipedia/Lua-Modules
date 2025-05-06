@@ -344,7 +344,7 @@ end
 
 ---@return self
 function TeamHistoryAuto:fetch()
-	self.transferList = TransferModel.transferSpan{player = self.config.player, specialRoles = SPECIAL_ROLES}
+	self.transferList = TransferModel.getTeamHistoryForPerson{player = self.config.player, specialRoles = SPECIAL_ROLES}
 	return self
 end
 
