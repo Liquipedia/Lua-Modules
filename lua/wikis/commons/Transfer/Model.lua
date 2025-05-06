@@ -59,7 +59,10 @@ function Transfer.getTeamHistoryForPerson(config)
 		query = 'pagename, fromteam, toteam, role1, role2, date, extradata, reference'
 	})
 
-	local transferList = Array.map(records, Transfer._processTransfer)
+	local transferList = {}
+	Array.forEach(records, function(record)
+		Array.appendWith(transferList, unpack(Transfer._processTransfer(record)))
+	end)
 
 	if ROLE_CLEAN then
 		Array.forEach(transferList, function(transfer)
@@ -88,7 +91,7 @@ function Transfer.getTeamHistoryForPerson(config)
 end
 
 ---@param transfer transfer
----@return TransferSpan?
+---@return TransferSpan[]
 function Transfer._processTransfer(transfer)
 	local extraData = transfer.extradata
 	local transferDate = DateExt.toYmdInUtc(transfer.date)
@@ -97,48 +100,49 @@ function Transfer._processTransfer(transfer)
 		-- transfer does not include multiple teams that were joined
 		if transfer.toteam == extraData.fromteamsec and transfer.role2 == extraData.role1sec then
 			-- the joined team & role was already set before (as 2nd team + role)
-			return
+			return {}
 		end
 		-- classic transfer
-		return {
+		return {{
 			team = transfer.toteam,
 			role = transfer.role2,
 			position = extraData.icon2,
 			joinDate = transferDate,
 			joinDateDisplay = extraData.displaydate or transferDate,
 			reference = {join = transfer.reference},
-		}
+		}}
 	end
 
 	-- case: transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
-
+	local transfers = {}
 
 	if (extraData.toteamsec ~= transfer.fromteam or extraData.role2sec ~= transfer.role1) and
 		(extraData.toteamsec ~= extraData.fromteamsec or extraData.role2sec ~= extraData.role1sec) then
 		-- secondary transfer
-		return {
+		table.insert(transfers, {
 			team = extraData.toteamsec,
 			role = extraData.role2sec,
 			position = extraData.icon2,
 			joinDate = transferDate,
 			joinDateDisplay = extraData.displaydate or transferDate,
 			reference = {join = transfer.reference},
-		}
+		})
 	end
 
 	if (transfer.toteam ~= transfer.fromteam or transfer.role2 ~= transfer.role1) and
 		(transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec) then
 		-- primary transfer
-		return {
+		table.insert(transfers, {
 			team = transfer.toteam,
 			role = transfer.role2,
 			position = extraData.icon2,
 			joinDate = transferDate,
 			joinDateDisplay = extraData.displaydate or transferDate,
 			reference = {join = transfer.reference},
-		}
+		})
 	end
 
+	return transfers
 end
 
 ---@param config {player: string, specialRoles: string[]?}
