@@ -1218,3 +1218,50 @@ Author(s): Rathoz
 		border-color: var( --clr-secondary-25 );
 	}
 }
+
+.match-bm-rounds-overview {
+	display: flex;
+	gap: 0.25rem;
+	line-height: 2rem;
+
+	@media ( max-width: 767px ) {
+		/* TODO */
+	}
+
+	&-round {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+
+		:nth-child(13 of &), :nth-child(25 of &) {
+			margin-left: 4rem;
+		}
+
+		&-outcome-icon {
+			color: #FFFFFF;
+			border-radius: 0.25rem;
+			height: 1.75rem;
+			width: 1.75rem;
+			text-align: center;
+			font-size: 1.25rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&-attack {
+				.wiki-valorant {
+					color: #FFFFFF;
+					background-color: #B20110;
+				}
+			}
+
+			&-defence {
+				.wiki-valorant {
+					color: #FFFFFF;
+					background-color: #01654C;
+				}
+			}
+		}
+	}
+}

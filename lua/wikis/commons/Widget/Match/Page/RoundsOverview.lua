@@ -15,6 +15,9 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 ---@class MatchPageRoundsOverview: Widget
 ---@operator call(table): MatchPageRoundsOverview
 local MatchPageRoundsOverview = Class.new(Widget)
@@ -34,21 +37,20 @@ function MatchPageRoundsOverview:render()
 
 	return HtmlWidgets.Div{
 		classes = {'match-bm-rounds-overview'},
-		css = {
-			display = 'flex',
-			gap = '0.25rem',
-			['line-height'] = '2rem',
-		},
 		children = WidgetUtil.collect(
 			Div{
 				classes = {'match-bm-rounds-overview-teams'},
-				children = {Div{children = '&nbsp;'}, Div{children = 'T1'}, Div{children = 'T2'}}
+				children = {
+					Div{children = '&nbsp;'},
+					Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'}},
+					Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'}},
+				},
 			},
 			Array.map(self.props.rounds, function(round)
 				return Div{
 					classes = {'match-bm-rounds-overview-round'},
 					children = WidgetUtil.collect(
-						Div{classes = {'match-bm-rounds-overview-round-title'}, css = {['text-align'] = 'center'}, children = round.round},
+						Div{classes = {'match-bm-rounds-overview-round-title'}, children = round.round},
 						Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t1side)},
 						Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t2side)}
 					)

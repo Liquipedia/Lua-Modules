@@ -93,6 +93,8 @@ end
 function MatchPage:_renderRoundsOverview(game)
 	return RoundsOverview{
 		rounds = game.extradata.rounds,
+		opponent1 = self.matchData.opponents[1],
+		opponent2 = self.matchData.opponents[2],
 		iconRender = function(winningSide, winBy)
 			local iconName
 			if winBy == 'elimination' then
@@ -105,19 +107,9 @@ function MatchPage:_renderRoundsOverview(game)
 				iconName = 'hourglass-end'
 			end
 			return Div{
-				classes = {'match-bm-rounds-overview-round-outcome-icon'},
-				css = {
-					['background-color'] = winningSide == 'atk' and '#B20110' or '#01654C',
-					color = 'white',
-					['border-radius'] = '0.25rem',
-					height = '1.75rem',
-					width = '1.75rem',
-					['text-align'] = 'center',
-					['font-size'] = '1.25rem',
-					display = 'flex',
-					['align-items'] = 'center',
-					['justify-content'] = 'center',
-				},
+				classes = {
+					'match-bm-rounds-overview-round-outcome-icon',
+					'match-bm-rounds-overview-round-outcome-icon--' .. winningSide},
 				children = '<i class="fas fa-' .. iconName .. '"></i>'
 			}
 		end,
