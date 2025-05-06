@@ -36,7 +36,8 @@ function MatchPageRoundsOverview:render()
 		classes = {'match-bm-rounds-overview'},
 		css = {
 			display = 'flex',
-			gap = '4px',
+			gap = '0.25rem',
+			['line-height'] = '2rem',
 		},
 		children = WidgetUtil.collect(
 			Div{
