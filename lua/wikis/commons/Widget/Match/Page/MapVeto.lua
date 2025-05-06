@@ -27,23 +27,19 @@ local MatchPageMapVeto = Class.new(Widget)
 ---@return Widget
 function MatchPageMapVeto:render()
 	local formatTitle = function(vetoRound)
-		local teamDisplay = OpponentDisplay.BlockOpponent({opponent = vetoRound.by, teamStyle = 'hybrid'})
-		local actionType
-		local byText = ''
-
+		local teamDisplay = function()
+			return tostring(OpponentDisplay.BlockOpponent({opponent = vetoRound.by, teamStyle = 'hybrid'}))
+		end
 		if vetoRound.type == 'pick' then
-			actionType = 'Pick'
-			byText = teamDisplay
+			return teamDisplay() .. ' Pick'
 		elseif vetoRound.type == 'ban' then
-			actionType = 'Ban'
-			byText = teamDisplay
+			return teamDisplay() .. ' Ban'
 		elseif vetoRound.type == 'decider' then
 			actionType = 'Decider'
 		elseif vetoRound.type == 'defaultban' then
 			actionType = 'Default Ban'
 		elseif vetoRound.type == 'protect' then
-			actionType = 'Protect'
-			byText = teamDisplay
+			return teamDisplay() .. 'Protect'
 		end
 
 		return HtmlWidgets.Div{
