@@ -1225,7 +1225,8 @@ Author(s): Rathoz
 		gap: 1rem;
 
 		@media ( max-width: 767px ) {
-			flex-direction: column;
+			flex-wrap: wrap;
+			justify-content: center;
 		}
 	}
 
@@ -1237,6 +1238,10 @@ Author(s): Rathoz
 		padding-bottom: 0.5rem;
 		min-width: 0;
 		position: relative;
+
+		@media ( max-width: 767px ) {
+			flex: 0 0 calc(50% - 0.5rem); /* half of the screen minus half the gap */
+		}
 
 		&--ban &-image {
 			opacity: 0.5;
@@ -1265,6 +1270,11 @@ Author(s): Rathoz
 
 		&-map-name {
 			font-weight: bold;
+		}
+
+		&-map-info {
+			display: flex;
+			flex-direction: column;
 		}
 
 		&--ban &-map-action {
