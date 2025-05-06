@@ -17,7 +17,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 
-local TeamInline = Lua.import('Module:Widget/TeamDisplay/Inline')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MediaList = {}
 
@@ -342,7 +343,7 @@ function MediaList._displayTeam(subject, date)
 	if not team then
 		return
 	end
-	return TeamInline{name = team, date = date, displayType = 'icon'}
+	return OpponentDisplay.InlineTeamContainer{template = team, date = date, displayType = 'icon'}
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
