@@ -98,7 +98,7 @@ function MatchPage:_renderRoundsOverview(game)
 			if winBy == 'elimination' then
 				iconName = 'skull'
 			elseif winBy == 'explosion' then
-				iconName = 'explosion'
+				iconName = 'fire-alt'
 			elseif winBy == 'defuse' then
 				iconName = 'wrench'
 			else
@@ -107,7 +107,7 @@ function MatchPage:_renderRoundsOverview(game)
 			return Div{
 				classes = {'match-bm-rounds-overview-round-outcome-icon'},
 				css = {
-					['background-color'] = winningSide == 'atk' and '#FE4554' or '#000000',
+					['background-color'] = winningSide == 'atk' and '#B20110' or '#01654C',
 					color = 'white',
 					['border-radius'] = '4px',
 					height = '28px',
