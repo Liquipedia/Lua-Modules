@@ -1223,6 +1223,9 @@ Author(s): Rathoz
 	&-cards {
 		display: flex;
 		gap: 1rem;
+		@media ( max-width: 767px ) {
+			flex-direction: column;
+		}
 	}
 
 	&-card {
@@ -1233,6 +1236,10 @@ Author(s): Rathoz
 		padding-bottom: 0.5rem;
 		min-width: 0;
 		position: relative;
+
+		&--ban &-image {
+			opacity: 0.5;
+		}
 
 		&-image {
 			height: ~"max( 5rem, 5vw )";
@@ -1256,6 +1263,21 @@ Author(s): Rathoz
 		}
 
 		&-map-name {
+			font-weight: bold;
+		}
+
+		&--ban &-map-action {
+			color: var( --clr-semantic-negative-40 );
+			font-weight: bold;
+		}
+
+		&--pick &-map-action {
+			color: var( --clr-semantic-positive-40 );
+			font-weight: bold;
+		}
+
+		&--decider &-map-action {
+			color: var( --clr-semantic-positive-40 );
 			font-weight: bold;
 		}
 	}

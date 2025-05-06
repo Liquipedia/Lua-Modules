@@ -30,7 +30,7 @@ local MatchPageMapVeto = Class.new(Widget)
 function MatchPageMapVeto:render()
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
-			return tostring(OpponentDisplay.BlockOpponent({opponent = vetoRound.by, teamStyle = 'hybrid'}))
+			return tostring(OpponentDisplay.InlineOpponent({opponent = vetoRound.by, teamStyle = 'standard'}))
 		end
 		local actionType
 		local byText
