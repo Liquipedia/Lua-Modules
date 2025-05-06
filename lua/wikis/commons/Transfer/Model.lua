@@ -93,34 +93,12 @@ function Transfer._processTransfer(transfer)
 	local extraData = transfer.extradata
 	local transferDate = DateExt.toYmdInUtc(transfer.date)
 
-	if Logic.isNotEmpty(extraData.toteamsec) then
-		-- transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
-		if (extraData.toteamsec ~= transfer.fromteam or extraData.role2sec ~= transfer.role1) and
-			(extraData.toteamsec ~= extraData.fromteamsec or extraData.role2sec ~= extraData.role1sec) then
-			-- secondary transfer
-			return {
-				team = extraData.toteamsec,
-				role = extraData.role2sec,
-				position = extraData.icon2,
-				joinDate = transferDate,
-				joinDateDisplay = extraData.displaydate or transferDate,
-				reference = {join = transfer.reference},
-			}
+	if Logic.isEmpty(extraData.toteamsec) then
+		-- transfer does not include multiple teams that were joined
+		if transfer.toteam == extraData.fromteamsec and transfer.role2 == extraData.role1sec then
+			-- the joined team & role was already set before (as 2nd team + role)
+			return
 		end
-
-		if (transfer.toteam ~= transfer.fromteam or transfer.role2 ~= transfer.role1) and
-			(transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec) then
-			-- primary transfer
-			return {
-				team = transfer.toteam,
-				role = transfer.role2,
-				position = extraData.icon2,
-				joinDate = transferDate,
-				joinDateDisplay = extraData.displaydate or transferDate,
-				reference = {join = transfer.reference},
-			}
-		end
-	elseif transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec then
 		-- classic transfer
 		return {
 			team = transfer.toteam,
@@ -131,6 +109,36 @@ function Transfer._processTransfer(transfer)
 			reference = {join = transfer.reference},
 		}
 	end
+
+	-- case: transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
+
+
+	if (extraData.toteamsec ~= transfer.fromteam or extraData.role2sec ~= transfer.role1) and
+		(extraData.toteamsec ~= extraData.fromteamsec or extraData.role2sec ~= extraData.role1sec) then
+		-- secondary transfer
+		return {
+			team = extraData.toteamsec,
+			role = extraData.role2sec,
+			position = extraData.icon2,
+			joinDate = transferDate,
+			joinDateDisplay = extraData.displaydate or transferDate,
+			reference = {join = transfer.reference},
+		}
+	end
+
+	if (transfer.toteam ~= transfer.fromteam or transfer.role2 ~= transfer.role1) and
+		(transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec) then
+		-- primary transfer
+		return {
+			team = transfer.toteam,
+			role = transfer.role2,
+			position = extraData.icon2,
+			joinDate = transferDate,
+			joinDateDisplay = extraData.displaydate or transferDate,
+			reference = {join = transfer.reference},
+		}
+	end
+
 end
 
 ---@param config {player: string, specialRoles: string[]?}
