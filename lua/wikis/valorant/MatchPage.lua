@@ -18,7 +18,6 @@ local Table = require('Module:Table')
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local Link = Lua.import('Module:Widget/Basic/Link')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
