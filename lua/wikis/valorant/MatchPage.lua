@@ -167,11 +167,6 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	}
 end
 
-function MatchPage:getPatchLink()
-	if Logic.isEmpty(self.matchData.patch) then return end
-	return Link{ link = 'Patch ' .. self.matchData.patch }
-end
-
 ---@return MatchPageComment[]
 function MatchPage:addComments()
 	local casters = Json.parseIfString(self.matchData.extradata.casters)
