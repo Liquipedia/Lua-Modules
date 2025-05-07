@@ -55,6 +55,10 @@ return {
 	upcomingandongoing = 'far fa-clock',
 	concluded = 'fas fa-check',
 	transfers = 'fas fa-handshake-alt',
+	createaccount = 'fas fa-user-plus',
+	login = 'fas fa-sign-in-alt',
+	discord = 'fab fa-discord',
+	helparticles = 'far fa-life-ring',
 
 	-- Usage: To indicate different transfer type with icon difference not just background colour
 	transferbetween = 'fas fa-arrow-alt-right',
