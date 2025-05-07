@@ -270,17 +270,17 @@ end
 
 ---@protected
 ---@param match MatchPageMatch
----@return Widget?
+---@return Widget[]
 function BaseMatchPage:renderMapVeto(match)
 	if not match.extradata or not match.extradata.mapveto then
-		return
+		return {}
 	end
 
 	local mapVetoes = match.extradata.mapveto
 	local firstVeto = tonumber(mapVetoes[1].vetostart)
 
 	if not firstVeto or not (firstVeto == 1 or firstVeto == 2) then
-		return
+		return {}
 	end
 
 	local secondVeto = firstVeto == 1 and 2 or 1
@@ -302,10 +302,10 @@ function BaseMatchPage:renderMapVeto(match)
 		}
 	end)
 
-	return HtmlWidgets.Fragment{children = {
+	return {
 		HtmlWidgets.H3{children = 'Map Veto'},
 		MatchPageMapVeto{vetoRounds = mapVetoRounds},
-	}}
+	}
 end
 
 ---@protected

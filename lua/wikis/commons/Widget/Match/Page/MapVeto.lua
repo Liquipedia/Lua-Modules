@@ -17,6 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+
 ---@class MatchPageMapVetoParameters
 ---@field vetoRounds {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}[]
 
@@ -29,7 +30,7 @@ local MatchPageMapVeto = Class.new(Widget)
 function MatchPageMapVeto:render()
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
-			return OpponentDisplay.InlineOpponent({opponent = vetoRound.by, teamStyle = 'standard'})
+			return OpponentDisplay.InlineOpponent{opponent = vetoRound.by, teamStyle = 'standard'}
 		end
 		local actionType
 		local byText
