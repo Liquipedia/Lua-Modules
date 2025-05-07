@@ -35,27 +35,40 @@ function MatchPageRoundsOverview:render()
 		return '&nbsp;'
 	end
 
+	local numTeamContainers = math.ceil(#self.props.rounds / 6)
+	local teamContainers = {}
+
+	for _ = 1, numTeamContainers do
+		WidgetUtil.collect(teamContainers, Div{
+			classes = {'match-bm-rounds-overview-teams'},
+			children = {
+				Div{children = '&nbsp;'},
+				Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'}},
+				Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'}},
+			},
+		})
+	end
+
 	return HtmlWidgets.Div{
 		classes = {'match-bm-rounds-overview'},
 		children = WidgetUtil.collect(
 			Div{
-				classes = {'match-bm-rounds-overview-teams'},
-				children = {
-					Div{children = '&nbsp;'},
-					Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'}},
-					Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'}},
-				},
+				classes = {'match-bm-rounds-overview-teams-container'},
+				children = teamContainers,
 			},
-			Array.map(self.props.rounds, function(round)
-				return Div{
-					classes = {'match-bm-rounds-overview-round'},
-					children = WidgetUtil.collect(
-						Div{classes = {'match-bm-rounds-overview-round-title'}, children = round.round},
-						Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t1side)},
-						Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t2side)}
-					)
-				}
-			end)
+			Div{
+				classes = {'match-bm-rounds-overview-round-container'},
+				children = Array.map(self.props.rounds, function(round)
+					return Div{
+						classes = {'match-bm-rounds-overview-round'},
+						children = WidgetUtil.collect(
+								Div{classes = {'match-bm-rounds-overview-round-title'}, children = round.round},
+								Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t1side)},
+								Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t2side)}
+						)
+					}
+				end)
+			}
 		)
 	}
 

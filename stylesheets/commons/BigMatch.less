@@ -1220,15 +1220,47 @@ Author(s): Rathoz
 }
 
 .match-bm-rounds-overview {
+	@cell-height: 1.75rem;
 	display: flex;
 	gap: 0.25rem;
-	line-height: 2rem;
 	overflow-y: auto;
 
 	&-teams {
 		overflow: hidden;
 		min-width: 3rem;
 		text-wrap: nowrap;
+
+		@media ( min-width: 768px ) {
+			&:not( :first-child ) {
+				display: none;
+			}
+		}
+
+		> * {
+			height: @cell-height;
+		}
+
+		> *:nth-child( 3n+4 ) {
+			margin-top: 1rem;
+		}
+
+		.team-template-text {
+			@media ( max-width: 767px ) {
+				display: none;
+			}
+		}
+	}
+
+	&-round-container {
+		display: flex;
+		gap: 0.5rem;
+
+		@media ( max-width: 767px ) {
+			display: grid;
+			grid-template-columns: repeat( 6, minmax( 0, 1fr ) );
+			flex-grow: 1;
+			gap: unset;
+		}
 	}
 
 	&-round {
@@ -1236,10 +1268,28 @@ Author(s): Rathoz
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
+		height: calc( @cell-height * 3 );
+		margin-bottom: 1rem;
+
+		@media ( max-width: 767px ) {
+			margin-bottom: 1rem;
+		}
 
 		:nth-child( 13 of & ),
 		:nth-child( 25 of & ) {
-			margin-left: 4rem;
+			@media ( min-width: 768px ) {
+				margin-left: 4rem;
+			}
+		}
+
+		&-title {
+			height: @cell-height;
+			display: flex;
+			align-items: center;
+		}
+
+		&-outcome {
+			height: @cell-height;
 		}
 
 		&-outcome-icon {
@@ -1247,7 +1297,7 @@ Author(s): Rathoz
 			height: 1.75rem;
 			width: 1.75rem;
 			text-align: center;
-			font-size: 1.25rem;
+			font-size: 1rem;
 			display: flex;
 			align-items: center;
 			justify-content: center;
