@@ -353,7 +353,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		status = status,
 		type = personType,
 		earnings = self.totalEarnings,
-		earningsbyyear = {},
+		earningsbyyear = self.earningsPerYear or {},
 		links = Links.makeFullLinksForTableItems(links, LINK_VARIANT),
 		extradata = {
 			firstname = args.givenname,
@@ -367,16 +367,11 @@ function Person:_setLpdbData(args, links, status, personType)
 		},
 	}
 
-	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
-		lpdbData.extradata['earningsin' .. year] = {value = earningsOfYear}
-		lpdbData.earningsbyyear[year] = earningsOfYear
-	end
-
 	-- Store additional team-templates in extradata
 	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
 		if teamIndex > 1 then
 			otherTeam = args[teamKey .. 'link'] or otherTeam
-			lpdbData.extradata[teamKey] = {value = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename}
+			lpdbData.extradata[teamKey] = (mw.ext.TeamTemplate.raw(otherTeam) or {}).templatename
 		end
 	end
 
