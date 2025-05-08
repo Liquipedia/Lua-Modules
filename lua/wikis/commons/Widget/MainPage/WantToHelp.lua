@@ -107,7 +107,6 @@ function WantToHelp:render()
 						'&utm_campaign=Want+to+Help+' .. mw.uri.encode(mw.site.siteName) .. '&utm_id=Want+to+Help',
 					linktype = 'external',
 					title = 'Click here to create an account',
-					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'createacount'},
 						' Create Account'
