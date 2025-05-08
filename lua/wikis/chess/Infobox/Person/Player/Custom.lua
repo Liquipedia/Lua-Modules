@@ -8,10 +8,8 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 local Variables = require('Module:Variables')
 
