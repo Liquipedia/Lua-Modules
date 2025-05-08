@@ -11,6 +11,7 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
+local Variables = Lua.import('Module:Variables')
 local WantToHelpList = Lua.import('Module:WantToHelpList')
 
 local Info = Lua.import('Module:Info', {loadData = true})
@@ -20,6 +21,7 @@ local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK_CIRCLE = IconFa{
@@ -108,7 +110,7 @@ function WantToHelp:render()
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'createacount'},
-						'Create Account'
+						' Create Account'
 					}
 				}),
 				showWhenLoggedOut(Button{
@@ -117,7 +119,7 @@ function WantToHelp:render()
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'login'},
-						'Log In'
+						' Log In'
 					}
 				}),
 				Button{
@@ -127,7 +129,7 @@ function WantToHelp:render()
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'discord'},
-						'Join Our Discord'
+						' Join Our Discord'
 					}
 				},
 				Page.exists('Help:Contents') and Button{
@@ -136,7 +138,7 @@ function WantToHelp:render()
 					variant = 'secondary',
 					children = {
 						IconFa{iconName = 'helparticles'},
-						'Help Articles'
+						' Help Articles'
 					}
 				} or nil
 			)
@@ -150,7 +152,16 @@ function WantToHelp:render()
 				['margin-top'] = '1em'
 			},
 			children = WantToHelpList.get{}
-		}
+		},
+		HtmlWidgets.Br{},
+		'In total there are ',
+		Link{
+			link = 'Liquipedia:Want to help/All',
+			children = {
+				Variables.varDefault('total_number_of_todos', 0), ' pages'
+			}
+		},
+		' listed needing help.'
 	}
 end
 
