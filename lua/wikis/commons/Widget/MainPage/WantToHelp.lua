@@ -151,15 +151,13 @@ function WantToHelp:render()
 				['line-height'] = '2em',
 				['margin-top'] = '1em'
 			},
-			children = WantToHelpList.get{}
+			children = {'\n', WantToHelpList.get{}}
 		},
 		HtmlWidgets.Br{},
 		'In total there are ',
 		Link{
 			link = 'Liquipedia:Want to help/All',
-			children = {
-				Variables.varDefault('total_number_of_todos', 0), ' pages'
-			}
+			children = Variables.varDefault('total_number_of_todos', 0) .. ' pages'
 		},
 		' listed needing help.'
 	}
