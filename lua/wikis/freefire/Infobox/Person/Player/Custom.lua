@@ -11,7 +11,6 @@ local Lua = require('Module:lua')
 local String = require('Module:StringUtils')
 local Page = require('Module:Page')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Variables = require('Module:Variables')
 local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
