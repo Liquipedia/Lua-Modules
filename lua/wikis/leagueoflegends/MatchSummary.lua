@@ -39,14 +39,13 @@ function CustomMatchSummary.createBody(match)
 	local matchId = match.extradata.originalmatchid or match.matchId
 
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-	local showMatchPage = MatchPage.isEnabledFor(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
-		showMatchPage and MatchSummaryWidgets.MatchPageLink{
+		MatchSummaryWidgets.MatchPageLink{
 			matchId = matchId,
 			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
-		} or nil,
+		},
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
