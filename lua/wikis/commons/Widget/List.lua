@@ -17,7 +17,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ListWidget: Widget
 ---@operator call(table): ListWidget
----@field children (string|Widget|Html|nil)|(string|Widget|Html|nil)[]
+---@field props {children: ((string|Widget|Html|nil)|(string|Widget|Html|nil)[])[]}
 local ListWidget = Class.new(Widget)
 
 ---@return Widget?
@@ -33,6 +33,7 @@ function ListWidget:render()
 	}
 end
 
+---@protected
 ---@return WidgetHtml
 function ListWidget:getType()
 	error('ListWidget:getType() cannot be called directly and must be overridden.')
