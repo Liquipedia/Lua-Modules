@@ -374,6 +374,12 @@ return {
 			matchWidthMobile = 100,
 			matchWidth = 190,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }
