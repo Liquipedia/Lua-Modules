@@ -70,6 +70,7 @@ function Logic.isNotEmpty(val)
 	end
 end
 
+---Returns nil if argument is empty; otherwise returns the argument itself.
 ---@generic V
 ---@param val V?
 ---@return V?
