@@ -93,12 +93,17 @@ SquadAuto.TransferType = {
 
 local DEFAULT_INCLUDED_ROLES = {
     [SquadUtils.SquadType.PLAYER] = {
-        '',
-        'Loan',
-        'Substitute',
-        'Trial',
-        'Stand-in',
-        'Uncontracted'
+        [SquadUtils.SquadStatus.ACTIVE] = {
+            '',
+            'Loan',
+            'Substitute',
+            'Trial',
+            'Stand-in',
+            'Uncontracted'
+        },
+        [SquadUtils.SquadStatus.INACTIVE] = {
+            'Inactive'
+        }
     },
     [SquadUtils.SquadType.STAFF] = {},
 }
@@ -111,7 +116,8 @@ local DEFAULT_EXCLUDED_ROLES = {
         'Substitute',
         'Trial',
         'Stand-in',
-        'Uncontracted'
+        'Uncontracted',
+        'Inactive'
     },
 }
 
@@ -132,21 +138,24 @@ end
 function SquadAuto:parseConfig()
     local args = self.args
     local type = SquadUtils.TypeToSquadType[(args.type or ''):lower()]
+    local status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()]
     self.config = {
         team = args.team or mw.title.getCurrentTitle().text,
-        status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()],
         type = type,
+        status = status,
         title = args.title,
         roles = {
-            included = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.roles)) or DEFAULT_INCLUDED_ROLES[type],
-            excluded = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.not_roles)) or DEFAULT_EXCLUDED_ROLES[type],
+            included = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.roles))
+                or DEFAULT_INCLUDED_ROLES[type][status],
+            excluded = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.not_roles))
+                or DEFAULT_EXCLUDED_ROLES[type],
         }
     }
 
     self.manualPlayers = self:readManualPlayers()
 
     -- Override default 'Former Squad' title
-    if self.config.status == SquadUtils.SquadStatus.FORMER
+    if status == SquadUtils.SquadStatus.FORMER
             and type == SquadUtils.SquadType.PLAYER
             and not self.config.title then
         self.config.title = 'Former Players'
@@ -451,7 +460,7 @@ function SquadAuto:selectEntries()
     )
 end
 
----Returns a function that maps a set of transfers to a list of 
+---Returns a function that maps a set of transfers to a list of
 ---SquadAutoPersons.
 ---Behavior depends on therent config:
 ---If the status is (inive, then at most one entry will be returned
