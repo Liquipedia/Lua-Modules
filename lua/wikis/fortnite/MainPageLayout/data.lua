@@ -32,9 +32,7 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
-			end
+			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' .. os.date('%B')
 		},
 		boxid = 1509,
 	},

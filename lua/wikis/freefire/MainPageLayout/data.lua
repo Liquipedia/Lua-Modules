@@ -34,9 +34,8 @@ local CONTENT = {
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
+			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/'
+				.. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
 	},
