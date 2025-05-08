@@ -40,16 +40,6 @@ local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
-local AVAILABLE_FOR_TIERS = {1}
-local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
-
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
 function MatchPage.getByMatchId(props)
