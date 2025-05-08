@@ -203,14 +203,6 @@ function CustomInjector:parse(id, widgets)
 			name = 'Years Active',
 			content = args.years_active and mw.text.split(args.years_active, ',') or {}
 		})
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Roles', content =
-				Array.map(args.roleList, function(role)
-					return Page.makeInternalLink(role, ':Category:' .. role .. 's')
-				end)
-			}
-		}
 	elseif id == 'region' then
 		return {}
 	end
@@ -262,9 +254,6 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.region = Region.name{country = args.country}
 
-	lpdbData.extradata.role = args.roleList[1]
-	lpdbData.extradata.role2 = args.roleList[2]
-	lpdbData.extradata.roles = mw.text.listToText(args.roleList)
 	lpdbData.extradata.isplayer = CustomPlayer._getRoleType(args.roleList).player
 	lpdbData.extradata.game = mw.text.listToText(Array.map(args.gameList, Operator.property('name')))
 	Array.forEach(args.gameList,
