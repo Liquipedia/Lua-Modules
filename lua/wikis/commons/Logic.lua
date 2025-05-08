@@ -130,7 +130,7 @@ function Logic.nilThrows(val)
 	return val
 end
 
----Trys to execute a function.
+---Tries to execute a function.
 ---If it fails executes a catch function
 ---@param try function
 ---@param catch function
