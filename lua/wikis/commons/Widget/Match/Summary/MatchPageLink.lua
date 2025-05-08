@@ -26,6 +26,7 @@ function MatchSummaryMatchPageLink:render()
 	end
 
 	return MatchSummaryRow{children = Center{
+		css = {display = 'block'},
 		children = {
 			MatchPageButton{
 				matchId = self.props.matchId,

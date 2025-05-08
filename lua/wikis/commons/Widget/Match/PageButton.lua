@@ -45,7 +45,8 @@ function MatchPageButton:render()
 	return Button{
 		classes = { 'btn--add-match-details', 'show-when-logged-in' },
 		title = 'Add Match Page',
-		variant = 'secondary',
+		variant = 'ghost',
+		size = 'sm',
 		link = link,
 		children = {
 			'+ Add details',
