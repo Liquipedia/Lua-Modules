@@ -108,7 +108,7 @@ function WantToHelp:render()
 					linktype = 'external',
 					title = 'Click here to create an account',
 					children = {
-						IconFa{iconName = 'createacount'},
+						IconFa{iconName = 'createaccount'},
 						' Create Account'
 					}
 				}),
