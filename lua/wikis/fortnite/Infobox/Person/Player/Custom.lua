@@ -28,9 +28,6 @@ local Center = Widgets.Center
 
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
----@class FortniteInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -41,8 +38,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.autoTeam = true
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
 	player.args.achievements = PlayerAchievements.player{}
 
 	return player:createInfobox()
@@ -91,10 +86,6 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 	elseif id == 'region' then return {}
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role(s)', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 	return widgets
 end
@@ -104,10 +95,6 @@ end
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
-
 	lpdbData.region = String.nilIfEmpty(Region.name({region = args.region, country = args.country}))
 
 	return lpdbData

@@ -26,6 +26,7 @@ local staffRoles = {
 	['caster'] = {category = 'Casters', display = 'Caster'},
 	['streamer'] = {category = 'Streamers', display = 'Streamer'},
 	['content creator'] = {category = 'Content Creators', display = 'Content Creator'},
+	['creator'] = {category = 'Content Creator', display = 'Content Creator'},
 	['stats producer'] = {category = 'Production Staff', display = 'Stats Producer'},
 	['interviewer'] = {category = 'Interviewers', display = 'Interviewer'},
 	['translator'] = {category = 'Production Staff', display = 'Translator'},
@@ -33,6 +34,7 @@ local staffRoles = {
 	['talent'] = {category = 'Talents', display = 'Talent'},
 	['admin'] = {category = 'Admins', display = 'Admin'},
 	['commentator'] = {category = 'Casters', display = 'Caster'},
+	['organizer'] = {category = 'Tournament Organizer', display = 'Tournament Organizer'},
 }
 
 return staffRoles
