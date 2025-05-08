@@ -27,7 +27,9 @@ function MatchPageButton:render()
 	if not matchId then
 		return nil
 	end
-	local link = 'Match:ID ' .. self.props.matchId
+
+	local link = 'Match:ID ' .. matchId
+
 	if self.props.hasMatchPage then
 		return Button{
 			classes = { 'btn--match-details' },
@@ -42,6 +44,7 @@ function MatchPageButton:render()
 			}
 		}
 	end
+
 	return Button{
 		classes = { 'btn--add-match-details', 'show-when-logged-in' },
 		title = 'Add Match Page',
