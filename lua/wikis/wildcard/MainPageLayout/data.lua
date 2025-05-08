@@ -42,8 +42,8 @@ local CONTENT = {
 		boxid = 1501,
 	},
 	wildcards = {
-		heading = 'Wildcards',
-		body = '{{Liquipedia:Wildcards}}',
+		heading = 'Wild Cards',
+		body = '{{Liquipedia:Wild Cards}}',
 		padding = true,
 		boxid = 1513,
 	},
@@ -72,8 +72,8 @@ return {
 	navigation = {
 		{
 			file = 'Wildcard header Wildcards.webp',
-			title = 'Wildcards',
-			link = 'Portal:Wildcards',
+			title = 'Wild Cards',
+			link = 'Portal:Wild Cards',
 		},
 		{
 			file = 'Wildcard header Champions.webp',
