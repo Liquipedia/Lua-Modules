@@ -119,8 +119,9 @@ function Logic.readBoolOrNil(val)
 end
 
 ---Throws an error if the supplied value is nil
----@param val any?
----@return any
+---@generic T
+---@param val T?
+---@return T
 function Logic.nilThrows(val)
 	if val == nil then
 		error('Unexpected nil', 2)
