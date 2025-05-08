@@ -6,17 +6,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info')
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Div = HtmlWidgets.Div
 
 ---@class MatchPageButton: Widget
 ---@operator call(table): MatchPageButton
