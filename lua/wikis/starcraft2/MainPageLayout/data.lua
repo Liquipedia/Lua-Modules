@@ -37,9 +37,7 @@ local CONTENT = {
 		body = TransfersList{
 			transferQuery = false,
 			onlyNotableTransfers = true,
-			transferPage = function ()
-				return 'Player Transfers/' .. DateExt.quarterOf{ordinalSuffix = true} .. ' Quarter ' .. os.date('%Y')
-			end
+			transferPage = 'Player Transfers/' .. DateExt.quarterOf{ordinalSuffix = true} .. ' Quarter ' .. os.date('%Y')
 		},
 		boxid = 1509,
 	},
