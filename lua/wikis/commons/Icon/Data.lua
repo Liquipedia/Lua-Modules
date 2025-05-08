@@ -114,6 +114,9 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
+	-- Usage: Main Page
+	checkcircle = 'fas fa-check-circle',
+
 	-- Usage: Dota2 Main Page
 	hub = 'fas fa-external-link-alt',
 
@@ -141,6 +144,11 @@ return {
 
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
+
+	-- Usage: PatchList
+	patch = 'fas fa-file-alt',
+	calendar = 'fas fa-calendar-alt',
+	highlights = 'fas fa-star',
 
 	-- Usage: Chess
 	chesskingoutline = 'far fa-chess-king',

@@ -322,11 +322,11 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				characterIcon = self:getCharacterIcon(player.character),
 				characterName = player.character,
 				side = game.teams[teamIndex].side,
-				roleIcon = IconImage{
+				roleIcon = player.facet and IconImage{
 					imageLight = 'Dota2 ' .. player.facet .. ' facet icon darkmode.png',
 					caption = player.facet,
 					link = ''
-				},
+				} or nil,
 				playerName = player.displayName,
 				playerLink = player.link
 			},

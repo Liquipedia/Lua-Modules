@@ -40,6 +40,7 @@ Author(s): Rathoz
 		.match-bm-match-header-team-group {
 			@media ( min-width: 768px ) {
 				align-items: flex-end;
+				text-align: end;
 			}
 		}
 	}
@@ -65,6 +66,11 @@ Author(s): Rathoz
 		@media ( min-width: 768px ) {
 			display: none !important;
 		}
+	}
+
+	&-literal {
+		font-style: italic;
+		font-weight: normal;
 	}
 
 	.team-template-team-icon {
@@ -1000,6 +1006,7 @@ Author(s): Rathoz
 }
 
 .match-bm-lol-game-summary-length {
+	font-weight: normal;
 	line-height: 100%;
 }
 
@@ -1220,7 +1227,7 @@ Author(s): Rathoz
 .match-bm-lol-team-stats-header {
 	display: flex;
 	flex-direction: row;
-	align-items: flex-start;
+	align-items: center;
 	background: #eaecf0;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;

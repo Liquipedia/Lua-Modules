@@ -46,7 +46,6 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -58,6 +57,7 @@ local CONTENT = {
 	matches = {
 		heading = 'Matches',
 		body = MatchTicker{
+			displayGameIcons = true,
 			matchesPortal = 'Liquipedia:Upcoming_and_ongoing_matches'
 		},
 		padding = true,
@@ -129,8 +129,10 @@ return {
 			title = 'Civilizations',
 			link = 'Portal:Civilizations',
 			count = {
-				value = 124
-			}
+				method = 'LPDB',
+				table = 'datapoint',
+				conditions = '[[type::faction]]'
+			},
 		},
 		{
 			file = 'JorDan at The Garrison.jpg',

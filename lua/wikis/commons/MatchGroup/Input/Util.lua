@@ -1411,7 +1411,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = Table.merge({
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true})
+		casters = MatchGroupInputUtil.readCasters(match)
 	}, Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
@@ -1432,6 +1432,7 @@ end
 ---@field readMapOpponent? fun(map: table, matchOpponent: table, opponentIndex: integer): table
 ---@field getMapWinner? fun(status: string?, winnerInput: integer|string?, mapOpponents: table[]): integer?
 ---@field mapIsFinished? fun(match: table, map: table): boolean
+---@field getGame? fun(match: table, map:table): string?
 
 --- The standard way to process a ffa map input.
 ---
@@ -1463,6 +1464,10 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 			map.patch = Parser.getPatch(map)
 		end
 
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
+		end
+
 		local dateToUse = map.date or match.date
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
@@ -1492,8 +1497,9 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		end
 
 		map.extradata = Table.merge({
+			displayname = map.mapDisplayName,
 			mvp = MatchGroupInputUtil.readMvp(map, opponents),
-			casters = MatchGroupInputUtil.readCasters(map, {noSort = true})
+			casters = MatchGroupInputUtil.readCasters(map)
 		}, Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil)
 
 		table.insert(maps, map)

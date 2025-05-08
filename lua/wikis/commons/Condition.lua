@@ -18,6 +18,18 @@ local Condition = {}
 ---@class AbstractConditionNode:BaseClass
 local _ConditionNode = Class.new()
 
+---Returns the string representation of this condition node.
+function _ConditionNode:__tostring()
+	return self:toString()
+end
+
+---Returns the string representation of this condition node.
+---@protected
+---@return string
+function _ConditionNode:toString()
+	error('_ConditionNode:toString() cannot be called directly and must be overridden.')
+end
+
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.
 ---@class ConditionTree:AbstractConditionNode

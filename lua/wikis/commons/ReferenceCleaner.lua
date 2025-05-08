@@ -10,13 +10,10 @@ local Class = require('Module:Class')
 
 local ReferenceCleaner = {}
 
----@param dateWithRef string?
+---@param args {input: string?}
 ---@return string
----@overload fun(dateWithRef: table): string
-function ReferenceCleaner.clean(dateWithRef)
-	if type(dateWithRef) == 'table' then
-		dateWithRef = dateWithRef.input or dateWithRef[1]
-	end
+function ReferenceCleaner.clean(args)
+	local dateWithRef = args.input
 	if dateWithRef == nil then
 		return ''
 	end
@@ -33,13 +30,11 @@ function ReferenceCleaner.clean(dateWithRef)
 	return ''
 end
 
----@param numberWithRef string?
+---@param args {input: string?}
 ---@return string
 ---@overload fun(dateWithRef: table): string
-function ReferenceCleaner.cleanNumber(numberWithRef)
-	if type(numberWithRef) == 'table' then
-		numberWithRef = numberWithRef[1]
-	end
+function ReferenceCleaner.cleanNumber(args)
+	local numberWithRef = args.input
 	if numberWithRef == nil then
 		return ''
 	end

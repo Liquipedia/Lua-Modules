@@ -62,7 +62,7 @@ function BroadcasterCard.create(frame)
 	if args.title then
 		title = args.title
 	elseif position == TBD then
-		title = Abbreviation.make(TBD, 'To Be Determined')
+		title = Abbreviation.make{text = TBD, title = 'To Be Determined'}
 	else
 		-- Create a title from the position.
 		local positions = Array.map(
@@ -115,7 +115,7 @@ function BroadcasterCard.create(frame)
 	end
 
 	if Table.isEmpty(casters) then
-		return outputList .. '\n**' .. Abbreviation.make('TBA', 'To Be Announced')
+		return outputList .. '\n**' .. Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
 	end
 
 	table.sort(casters, function(a, b) return a.sort < b.sort or (a.sort == b.sort and a.id:lower() < b.id:lower()) end)

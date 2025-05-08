@@ -9,6 +9,7 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -70,6 +71,7 @@ local KEYSTONES = Table.map({
 end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
+local LOADOUT_ICON_SIZE = '24px'
 local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
@@ -176,6 +178,47 @@ end
 
 ---@private
 ---@param game LoLMatchPageGame
+---@return Widget[]
+function MatchPage:_buildGameResultSummary(game)
+	return {
+		Div{
+			classes = {'match-bm-lol-game-summary-faction'},
+			children = game.teams[1].side and IconImage{
+				imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
+				link = '',
+				caption = game.teams[1].side .. ' side'
+			} or nil
+		},
+		Div{
+			classes = {'match-bm-lol-game-summary-score-holder'},
+			children = game.finished and {
+				Div{
+					classes = {'match-bm-lol-game-summary-score'},
+					children = {
+						game.teams[1].scoreDisplay,
+						'&ndash;',
+						game.teams[2].scoreDisplay
+					}
+				},
+				Div{
+					classes = {'match-bm-lol-game-summary-length'},
+					children = game.length
+				}
+			} or nil
+		},
+		Div{
+			classes = {'match-bm-lol-game-summary-faction'},
+			children = game.teams[2].side and IconImage{
+				imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
+				link = '',
+				caption = game.teams[2].side .. ' side'
+			} or nil
+		}
+	}
+end
+
+---@private
+---@param game LoLMatchPageGame
 ---@return Widget?
 function MatchPage:_renderGameOverview(game)
 	if self:isBestOfOne() then return end
@@ -191,41 +234,7 @@ function MatchPage:_renderGameOverview(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-center'},
-						children = {
-							Div{
-								classes = {'match-bm-lol-game-summary-faction'},
-								children = game.teams[1].side and IconImage{
-									imageLight = 'Lol faction ' .. game.teams[1].side .. '.png',
-									link = '',
-									caption = game.teams[1].side .. ' side'
-								} or nil
-							},
-							Div{
-								classes = {'match-bm-lol-game-summary-score-holder'},
-								children = game.finished and {
-									Div{
-										classes = {'match-bm-lol-game-summary-score'},
-										children = {
-											game.teams[1].scoreDisplay,
-											'&ndash;',
-											game.teams[2].scoreDisplay
-										}
-									},
-									Div{
-										classes = {'match-bm-lol-game-summary-length'},
-										children = game.length
-									}
-								} or nil
-							},
-							Div{
-								classes = {'match-bm-lol-game-summary-faction'},
-								children = game.teams[2].side and IconImage{
-									imageLight = 'Lol faction ' .. game.teams[2].side .. '.png',
-									link = '',
-									caption = game.teams[2].side .. ' side'
-								} or nil
-							}
-						}
+						children = self:_buildGameResultSummary(game)
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
@@ -369,7 +378,10 @@ function MatchPage:_renderTeamStats(game)
 							classes = {'match-bm-lol-team-stats-header-team'},
 							children = self.opponents[1].iconDisplay
 						},
-						Div{classes = {'match-bm-team-stats-list-cell'}},
+						Div{
+							classes = {'match-bm-team-stats-list-cell'},
+							children = self:isBestOfOne() and self:_buildGameResultSummary(game) or nil
+						},
 						Div{
 							classes = {'match-bm-lol-team-stats-header-team'},
 							children = self.opponents[2].iconDisplay
@@ -489,66 +501,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						playerLink = player.player,
 						playerName = player.displayName or player.player
 					},
-					Div{
-						classes = {'match-bm-lol-players-player-loadout'},
-						children = {
-							Div{
-								classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
-								children = {
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-rs'},
-										children = {
-											IconImage{
-												imageLight = 'Rune ' .. player.runeKeystone .. '.png',
-												link = '',
-												size = '24px'
-											},
-											IconImage{
-												imageLight = 'Rune ' .. player.runes.secondary.tree .. '.png',
-												link = '',
-												size = '24px'
-											},
-										}
-									},
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-rs'},
-										children = Array.map(player.spells, function (spell)
-											return IconImage{
-												imageLight = 'Summoner spell ' .. spell .. '.png',
-												link = '',
-												size = '24px'
-											}
-										end)
-									}
-								}
-							},
-							Div{
-								classes = {'match-bm-lol-players-player-loadout-items'},
-								children = {
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-item'},
-										children = Array.map(Array.range(1, 3), function (itemIndex)
-											return IconImage{
-												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
-												link = player.items[itemIndex],
-												size = '24px'
-											}
-										end)
-									},
-									Div{
-										classes = {'match-bm-lol-players-player-loadout-item'},
-										children = Array.map(Array.range(4, 6), function (itemIndex)
-											return IconImage{
-												imageLight = 'Lol item ' .. player.items[itemIndex] .. '.png',
-												link = player.items[itemIndex],
-												size = '24px'
-											}
-										end)
-									}
-								}
-							}
-						}
-					}
+					MatchPage._buildPlayerLoadout(player)
 				}
 			},
 			Div{
@@ -581,6 +534,84 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 							'Damage'
 						},
 						data = player.damagedone
+					}
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param props {prefix: string, name: string, caption: string?}
+---@return Widget
+function MatchPage._generateLoadoutImage(props)
+	return IconImage{
+		imageLight = props.prefix .. ' ' .. props.name .. '.png',
+		caption = props.caption or props.name,
+		link = '',
+		size = LOADOUT_ICON_SIZE,
+	}
+end
+
+---@private
+---@param runeName string
+---@return Widget
+MatchPage._generateRuneImage = FnUtil.memoize(function (runeName)
+	return MatchPage._generateLoadoutImage{prefix = 'Rune', name = runeName}
+end)
+
+---@private
+---@param spellName string
+---@return Widget
+MatchPage._generateSpellImage = FnUtil.memoize(function (spellName)
+	return MatchPage._generateLoadoutImage{prefix = 'Summoner spell', name = spellName}
+end)
+
+---@private
+---@param itemName string
+---@return Widget
+MatchPage._generateItemImage = FnUtil.memoize(function (itemName)
+	local isDefaultItem = itemName == DEFAULT_ITEM
+	return MatchPage._generateLoadoutImage{
+		prefix = 'Lol item',
+		name = itemName,
+		caption = isDefaultItem and 'Empty' or itemName,
+	}
+end)
+
+---@private
+---@param player table
+---@return Widget
+function MatchPage._buildPlayerLoadout(player)
+	return Div{
+		classes = {'match-bm-lol-players-player-loadout'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-players-player-loadout-rs-wrap'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-rs'},
+						children = Array.map(
+							{player.runeKeystone, player.runes.secondary.tree},
+							MatchPage._generateRuneImage
+						)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-rs'},
+						children = Array.map(player.spells, MatchPage._generateSpellImage)
+					}
+				}
+			},
+			Div{
+				classes = {'match-bm-lol-players-player-loadout-items'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-item'},
+						children = Array.map(Array.sub(player.items, 1, 3), MatchPage._generateItemImage)
+					},
+					Div{
+						classes = {'match-bm-lol-players-player-loadout-item'},
+						children = Array.map(Array.sub(player.items, 4, 6), MatchPage._generateItemImage)
 					}
 				}
 			}
