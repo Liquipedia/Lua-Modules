@@ -1,0 +1,61 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Widget/Match/PageButton
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local Info = Lua.import('Module:Info')
+local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Button = Lua.import('Module:Widget/Basic/Button')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Div = HtmlWidgets.Div
+
+---@class MatchPageButton: Widget
+---@operator call(table): MatchPageButton
+local MatchPageButton = Class.new(Widget)
+
+---@return Widget?
+function MatchPageButton:render()
+	if not Info.config.match2.matchPage then
+		return nil
+	end
+	local matchId = self.props.matchId
+	if not matchId then
+		return nil
+	end
+	local link = 'Match:ID ' .. self.props.matchId
+	if self.props.hasMatchPage then
+		return Button{
+			classes = { 'btn--match-details' },
+			title = 'View Match Page',
+			variant = 'ghost',
+			link = link,
+			children = {
+				Icon{
+					name = 'matchpagelink',
+				},
+				'  ',
+				'Details',
+			}
+		}
+	end
+	return Button{
+		classes = { 'btn--add-match-details', 'show-when-logged-in' },
+		title = 'Add Match Page',
+		variant = 'secondary',
+		link = link,
+		children = {
+			'+ Add details',
+		}
+	}
+end
+
+return MatchPageButton

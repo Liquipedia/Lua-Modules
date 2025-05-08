@@ -12,6 +12,7 @@ return {
 	loss = 'fas fa-times',
 
 	-- Usage: Other Match detail pop up icons
+	matchpagelink = 'fas fa-external-link', -- Should we really use external for this?
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
@@ -114,11 +115,11 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
-	-- Usage: Main Page
+	-- Usage: Lists
 	checkcircle = 'fas fa-check-circle',
 
 	-- Usage: Dota2 Main Page
-	hub = 'fas fa-external-link-alt',
+	hub = 'fas fa-external-link-alt',  -- Should we really use external for this?
 
 	-- Usage: Match Pages
 	damage = 'fas fa-sword',

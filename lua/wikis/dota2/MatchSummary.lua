@@ -32,7 +32,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	-- Original Match Id must be used to match page links if it exists.
+	-- Original Match Id must be used link to match page if it exists.
 	-- It can be different from the matchId when shortened brackets are used.
 	local matchId = match.extradata.originalmatchid or match.matchId
 
@@ -42,7 +42,10 @@ function CustomMatchSummary.createBody(match)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
+		showMatchPage and MatchSummaryWidgets.MatchPageLink{
+			matchId = matchId,
+			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
+		} or nil,
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
