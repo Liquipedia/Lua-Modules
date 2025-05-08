@@ -14,8 +14,9 @@ local FnUtil = require('Module:FnUtil')
 local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
-local Table = require('Module:Table')
 local Operator = require('Module:Operator')
+local Table = require('Module:Table')
+local Tabs = require('Module:Tabs')
 
 local SquadUtils = require('Module:Squad/Utils')
 local SquadCustom = require('Module:Squad/Custom')
@@ -54,7 +55,7 @@ end)
 ---@field joindatedisplay string?
 ---@field joindateRef table<string, string>?
 ---@field leavedate string?
----@field leavedatedisplay string?
+---@field leavedatedisplay string
 ---@field leavedateRef table<string, string>?
 ---@field faction string?
 ---@field captain boolean?
@@ -114,12 +115,6 @@ local DEFAULT_EXCLUDED_ROLES = {
     },
 }
 
----Entrypoint for the automated timeline
----TODO: Implement in submodule
-function SquadAuto.timeline(frame)
-    -- return SquadAuto(frame):timeline()
-end
-
 ---Entrypoint for SquadAuto tables
 ---@param frame table
 function SquadAuto.run(frame)
@@ -127,13 +122,10 @@ function SquadAuto.run(frame)
     autosquad:parseConfig()
     autosquad:queryTransfers()
 
-    return autosquad:display()
-end
+    local entries = autosquad:selectEntries()
+    Array.forEach(entries, SquadAuto.enrichEntry)
 
-function SquadAuto:display()
-    local entries = self:selectEntries()
-    mw.logObject(entries)
-    return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
+    return autosquad:display(entries)
 end
 
 ---Parses the args into a SquadAutoConfig
@@ -144,16 +136,20 @@ function SquadAuto:parseConfig()
         team = args.team or mw.title.getCurrentTitle().text,
         status = SquadUtils.StatusToSquadStatus[(args.status or ''):lower()],
         type = type,
-        title = args.title, -- TODO: Switch to Former players instead of squad?
+        title = args.title,
         roles = {
             included = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.roles)) or DEFAULT_INCLUDED_ROLES[type],
             excluded = Logic.nilIfEmpty(Array.parseCommaSeparatedString(args.not_roles)) or DEFAULT_EXCLUDED_ROLES[type],
         }
     }
-    if args.timeline then
-        self.manualTimeline = self:readManualTimeline()
-    else
-        self.manualPlayers = self:readManualPlayers()
+
+    self.manualPlayers = self:readManualPlayers()
+
+    -- Override default 'Former Squad' title
+    if self.config.status == SquadUtils.SquadStatus.FORMER
+            and type == SquadUtils.SquadType.PLAYER
+            and not self.config.title then
+        self.config.title = 'Former Players'
     end
 
     local historicalTemplates = mw.ext.TeamTemplate.raw_historical(self.config.team)
@@ -171,8 +167,71 @@ function SquadAuto:parseConfig()
     else
         table.insert(self.config.roles.excluded, 'Inactive')
     end
+end
 
-    mw.logObject(self.config)
+---@param entries SquadAutoPerson[]
+---@return Widget|Html|string?
+function SquadAuto:display(entries)
+    if Logic.isEmpty(entries) then
+        return
+    end
+
+    if self.config.status == SquadUtils.SquadStatus.FORMER then
+        return self:displayTabs(entries)
+    end
+
+    entries = SquadAuto._sortEntries(entries)
+
+    return SquadCustom.runAuto(entries, self.config.status, self.config.type, self.config.title)
+end
+
+---@param entries SquadAutoPerson[]
+---@return Html|string?
+function SquadAuto:displayTabs(entries)
+    local _, groupedEntries = Array.groupBy(
+        entries,
+        ---@param entry SquadAutoPerson
+        function (entry)
+            return entry.leavedate:match('(%d%d%d%d)')
+        end
+    )
+
+    ---@type table<string, any>
+	local tabs = {
+		This = Table.size(groupedEntries),
+        removeEmptyTabs = true
+	}
+
+    local idx = 1
+	for year, group in Table.iter.spairs(groupedEntries) do
+		tabs['name' .. idx] = year
+        tabs['content' .. idx] = tostring(SquadCustom.runAuto(
+            SquadAuto._sortEntries(group),
+            self.config.status,
+            self.config.type,
+            self.config.title
+        ))
+        idx = idx + 1
+	end
+
+    return Tabs.dynamic(tabs)
+end
+
+---@param entry SquadAutoPerson
+function SquadAuto.enrichEntry(entry)
+    local personInfo = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = '[[pagename::' .. string.gsub(entry.page, ' ', '_') .. ']]',
+		limit = 1,
+		query = 'pagename, nationality, id, name, localizedname, extradata'
+	})[1]
+
+	if personInfo then
+        entry.id = personInfo.id
+        entry.flag = personInfo.nationality
+        entry.name = personInfo.name
+        entry.localizedname = personInfo.localizedname
+    end
+    --TODO: Captain from pagevars?
 end
 
 ---@return SquadAutoPerson[]
@@ -180,12 +239,13 @@ function SquadAuto:readManualPlayers()
     ---@type SquadAutoPerson[]
     local players = {}
 
-    -- TODO: Readd limit to roles?
+    -- TODO: Handle manual 'enrichments' for adding names
+    -- TODO: Readd limitations to specific roles?
     Array.forEach(self.args, function (entry)
         local player = Json.parseIfString(entry)
         if Logic.isNotEmpty(player) then
             table.insert(players, {
-                page = player.link or player.id,
+                page = player.link or player.id or player.name,
                 id = player.id,
                 captain = Logic.readBoolOrNil(player.captain),
                 name = player.name,
@@ -217,9 +277,6 @@ function SquadAuto:readManualPlayers()
     end)
 
     return players
-end
-
-function SquadAuto:readManualTimeline()
 end
 
 function SquadAuto:queryTransfers()
@@ -334,7 +391,6 @@ function SquadAuto:queryTransfers()
             table.insert(self.playersTeamHistory[record.player], entry)
         end
     )
-
 end
 
 ---Builds the conditions to fetch all transfers related
@@ -360,13 +416,15 @@ function SquadAuto:buildConditions()
     return conditions:toString()
 end
 
----comment
----@return table
+---@return SquadAutoPerson[]
 function SquadAuto:selectEntries()
     return Array.filter(
-        Array.flatMap(
-            Array.extractValues(self.playersTeamHistory),
-            FnUtil.curry(self._selectHistoryEntries, self)
+        Array.extend(
+            Array.flatMap(
+                Array.extractValues(self.playersTeamHistory),
+                FnUtil.curry(self._selectHistoryEntries, self)
+            ),
+            self.manualPlayers
         ),
         ---@param entry SquadAutoPerson
         function(entry)
@@ -462,8 +520,8 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
         joindateRef = joinEntry.references,
 
         idleavedate = leaveEntry.displayname,
-        leavedate = leaveEntry.date or '',
-        leavedatedisplay = leaveEntry.dateDisplay,
+        leavedate = leaveEntry.date,
+        leavedatedisplay = leaveEntry.dateDisplay or '',
         leavedateRef = leaveEntry.references,
 
         thisTeam = {
@@ -492,5 +550,15 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
     return entry
 end
 
+---Sorts a list of SquadAutoPersons
+-- Active entries (no leavedate) sorted by joindate,
+-- Former entries sorted by leavedate
+---@param entries SquadAutoPerson[]
+---@return unknown[]
+function SquadAuto._sortEntries(entries)
+    return Array.sortBy(entries, function (element)
+        return {element.leavedate or element.joindate, element.id}
+    end)
+end
 
 return SquadAuto
