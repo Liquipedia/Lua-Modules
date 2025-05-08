@@ -12,6 +12,8 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 local MatchSummaryRow = Lua.import('Module:Widget/Match/Summary/Row')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Center = HtmlWidgets.Center
 
 ---@class MatchSummaryMatchPageLink: Widget
 ---@operator call(table): MatchSummaryMatchPageLink
@@ -23,14 +25,14 @@ function MatchSummaryMatchPageLink:render()
 		return
 	end
 
-	return MatchSummaryRow{
+	return MatchSummaryRow{children = Center{
 		children = {
 			MatchPageButton{
 				matchId = self.props.matchId,
 				hasMatchPage = self.props.hasMatchPage,
 			},
 		}
-	}
+	}}
 end
 
 return MatchSummaryMatchPageLink

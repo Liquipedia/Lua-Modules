@@ -32,12 +32,11 @@ function MatchPageButton:render()
 		return Button{
 			classes = { 'btn--match-details' },
 			title = 'View Match Page',
-			variant = 'ghost',
+			variant = 'secondary',
+			size = 'sm',
 			link = link,
 			children = {
-				Icon{
-					name = 'matchpagelink',
-				},
+				Icon{iconName = 'matchpagelink'},
 				'  ',
 				'Details',
 			}
