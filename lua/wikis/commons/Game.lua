@@ -249,4 +249,12 @@ function Game.isDefaultTeamLogo(options)
 	return Table.includes(defaultLogos, logo)
 end
 
-return Class.export(Game)
+return Class.export(Game, {exports = {
+	'toIdentifier',
+	'abbreviation',
+	'name',
+	'link',
+	'icon',
+	'text',
+	'isDefaultTeamLogo',
+}})

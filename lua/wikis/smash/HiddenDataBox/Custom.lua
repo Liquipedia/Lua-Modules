@@ -88,4 +88,4 @@ function CustomHiddenDataBox._determineMatchSection(page)
 	end
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})
