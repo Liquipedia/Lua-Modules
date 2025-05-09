@@ -36,20 +36,18 @@ end
 ---@param name string
 ---@return StandardCharacter?
 function Character.getCharacterByName(name)
-	local record = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::' .. datapointType() .. ']] AND [[name::'.. name ..']]',
-		limit = 1,
-	})[1]
-	if not record then
-		return nil
-	end
-	return Character.characterFromRecord(record)
+	return Character.getAllCharacters{'[[name::'.. name ..']]'}[1]
 end
 
+---@param additionalConditions string|string[]?
 ---@return StandardCharacter[]
-function Character.getAllCharacters()
+function Character.getAllCharacters(additionalConditions)
+	local conditions = Array.extend(
+		'[[type::' .. datapointType() .. ']]',
+		additionalConditions
+	)
 	local records = mw.ext.LiquipediaDB.lpdb('datapoint', {
-		conditions = '[[type::' .. datapointType() .. ']]',
+		conditions = table.concat(conditions, ' AND '),
 		limit = 5000,
 	})
 	return Array.map(records, Character.characterFromRecord)

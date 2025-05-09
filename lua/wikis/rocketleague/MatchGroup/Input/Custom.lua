@@ -195,15 +195,14 @@ function MatchFunctions.currentEarnings(name)
 	end
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		conditions = '[[name::' .. name .. ']]',
-		query = 'extradata'
+		query = 'earningsbyyear'
 	})[1]
 
 	if not data then
 		return 0
 	end
 
-	local currentEarnings = (data.extradata or {})['earningsin' .. CURRENT_YEAR]
-	return tonumber(currentEarnings) or 0
+	return data.earningsbyyear[tonumber(CURRENT_YEAR)] or 0
 end
 
 --
