@@ -45,8 +45,7 @@ function CustomMatchSummary.createBody(match)
 		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)}
 end
 

@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -18,10 +17,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
@@ -615,20 +612,6 @@ function MatchPage._buildPlayerLoadout(player)
 					}
 				}
 			}
-		}
-	}
-end
-
----@return MatchPageComment[]
-function MatchPage:addComments()
-	local casters = Json.parseIfString(self.matchData.extradata.casters)
-	if Logic.isEmpty(casters) then return {} end
-	return {
-		Comment{
-			children = WidgetUtil.collect(
-				#casters > 1 and 'Casters: ' or 'Caster: ',
-				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
-			)
 		}
 	}
 end

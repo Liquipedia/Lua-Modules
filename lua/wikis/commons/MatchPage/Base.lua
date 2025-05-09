@@ -300,8 +300,22 @@ function BaseMatchPage:_getComments()
 		Logic.isNotEmpty(substituteComments) and Comment{
 			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
 		} or nil,
+		self:_getCasterComment(),
 		self:addComments()
 	)
+end
+
+---@private
+---@return MatchPageComment?
+function BaseMatchPage:_getCasterComment()
+	local casters = self.matchData.extradata.casters
+	if Logic.isEmpty(casters) then return end
+	return Comment{
+		children = WidgetUtil.collect(
+			#casters > 1 and 'Casters: ' or 'Caster: ',
+			Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
+		)
+	}
 end
 
 ---@protected
