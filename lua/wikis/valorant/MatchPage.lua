@@ -9,16 +9,12 @@
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
-local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -70,14 +66,7 @@ function MatchPage:populateGames()
 			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = Array.map(game.opponents[teamIdx].players or {}, function(player)
-				local newPlayer = Table.mergeInto(player, {
-					displayName = player.name or player.player,
-					link = player.player,
-				})
-
-				return newPlayer
-			end)
+			team.players = game.opponents[teamIdx].players or {}
 
 			return team
 		end)
@@ -166,8 +155,8 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 			PlayerDisplay{
 				characterIcon = self:getCharacterIcon(player.agent),
 				characterName = player.character,
-				playerName = player.displayName,
-				playerLink = player.link
+				playerName = player.displayName or player.player,
+				playerLink = player.player,
 			},
 			Div{
 				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-5'},

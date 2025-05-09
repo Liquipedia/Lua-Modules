@@ -58,13 +58,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-end
-
----@param MapParser ValorantMapParserInterface
----@param match table
----@return table
-function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
@@ -186,7 +179,9 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 				adr = participant.adr,
 				kast = participant.kast,
 				hs = participant.hs,
-				player = playerIdData.name or playerInputData.name,
+				player = playerIdData.name or playerInputData.link or playerInputData.name,
+				displayName = playerIdData.displayname or playerInputData.name,
+
 				agent = getCharacterName(participant.agent),
 			}
 		end
