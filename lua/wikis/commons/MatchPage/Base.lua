@@ -221,6 +221,7 @@ function BaseMatchPage:render()
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
 				tournamentName = self.matchData.tournament,
+				poweredBy = self.getPoweredBy(),
 			},
 			self:renderMapVeto(self.matchData),
 			self:renderGames(),
@@ -375,6 +376,11 @@ end
 function BaseMatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Patch ' .. self.matchData.patch }
+end
+
+---@protected
+function BaseMatchPage.getPoweredBy()
+	return nil
 end
 
 return BaseMatchPage

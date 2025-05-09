@@ -616,4 +616,8 @@ function MatchPage._buildPlayerLoadout(player)
 	}
 end
 
+function MatchPage.getPoweredBy()
+	return 'SAP logo.svg'
+end
+
 return MatchPage

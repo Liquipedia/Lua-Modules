@@ -408,4 +408,8 @@ function MatchPage:getPatchLink()
 	return Link{ link = 'Version ' .. self.matchData.patch }
 end
 
+function MatchPage.getPoweredBy()
+	return 'SAP logo.svg'
+end
+
 return MatchPage
