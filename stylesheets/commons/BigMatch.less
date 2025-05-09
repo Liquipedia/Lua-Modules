@@ -1297,14 +1297,25 @@ Author(s): Rathoz
 
 .match-bm-rounds-overview {
 	@cell-height: 1.75rem;
+	@cell-radius: 0.25rem;
 	display: flex;
 	gap: 0.25rem;
 	overflow-y: auto;
+	margin-top: 1rem;
+
+	&-teams-container {
+		display: grid;
+		grid-template-columns: 3.75rem;
+		gap: 0.25rem;
+	}
 
 	&-teams {
 		overflow: hidden;
 		min-width: 3rem;
 		text-wrap: nowrap;
+		gap: 0.125rem;
+		display: flex;
+		flex-direction: column;
 
 		> * {
 			height: @cell-height;
@@ -1321,21 +1332,17 @@ Author(s): Rathoz
 		}
 
 		.team-template-text {
-			@media ( max-width: 767px ) {
-				display: none;
-			}
+			display: none;
 		}
 	}
 
 	&-round-container {
 		display: flex;
-		gap: 0.5rem;
+		gap: 0.25rem;
 
 		@media ( max-width: 767px ) {
 			display: grid;
-			grid-template-columns: repeat( 6, minmax( 0, 1fr ) );
-			flex-grow: 1;
-			gap: unset;
+			grid-template-columns: repeat( 12, 1fr );
 		}
 	}
 
@@ -1344,8 +1351,7 @@ Author(s): Rathoz
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		height: calc( @cell-height * 3 );
-		margin-bottom: 1rem;
+		gap: 0.125rem;
 
 		:nth-child( 13 of & ),
 		:nth-child( 25 of & ) {
@@ -1362,12 +1368,22 @@ Author(s): Rathoz
 
 		&-outcome {
 			height: @cell-height;
+			width: @cell-height;
+			border-radius: @cell-radius;
+
+			.theme--light & {
+				background-color: var( --clr-moon-90 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-moon-20 );
+			}
 		}
 
 		&-outcome-icon {
-			border-radius: 0.25rem;
-			height: 1.75rem;
-			width: 1.75rem;
+			border-radius: @cell-radius;
+			height: @cell-height;
+			width: @cell-height;
 			text-align: center;
 			font-size: 1rem;
 			display: flex;

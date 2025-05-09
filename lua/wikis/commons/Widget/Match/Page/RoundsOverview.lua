@@ -29,7 +29,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field props MatchPageRoundsOverviewProps
 local MatchPageRoundsOverview = Class.new(Widget)
 
-local ROUNDS_PER_ROW_MOBILE = 6
+local ROUNDS_PER_ROW_MOBILE = 12
 
 ---@return Widget?
 function MatchPageRoundsOverview:render()
