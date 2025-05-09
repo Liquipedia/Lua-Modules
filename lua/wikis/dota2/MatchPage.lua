@@ -34,7 +34,7 @@ local MatchPage = Class.new(BaseMatchPage)
 
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
-local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
+local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local AVAILABLE_FOR_TIERS = {1}
@@ -313,7 +313,7 @@ end
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
-		classes = {'match-bm-players-player'},
+		classes = {'match-bm-players-player match-bm-players-player--col-3'},
 		children = {
 			PlayerDisplay{
 				characterIcon = self:getCharacterIcon(player.character),
@@ -406,6 +406,10 @@ end
 function MatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Version ' .. self.matchData.patch }
+end
+
+function MatchPage.getPoweredBy()
+	return 'SAP logo.svg'
 end
 
 return MatchPage
