@@ -6,6 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
 local CONTENT = {
 	about = {
 		heading = 'About Wildcard',
@@ -31,7 +35,7 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
