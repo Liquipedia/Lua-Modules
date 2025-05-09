@@ -44,6 +44,8 @@ function Button:render()
 		table.insert(cssClasses, 'btn-primary')
 	elseif self.props.variant == 'secondary' then
 		table.insert(cssClasses, 'btn-secondary')
+	elseif self.props.variant == 'ghost' then
+		table.insert(cssClasses, 'btn-ghost')
 	end
 
 	if self.props.size == 'sm' then
