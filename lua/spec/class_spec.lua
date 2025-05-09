@@ -32,21 +32,35 @@ describe('class', function()
 		return 4
 	end
 
-	describe('base', function()
+	describe('class operations', function()
 		it('base class', function ()
 			local a1 = Animal()
 			assert.equal('Animal', a1:type())
 			assert.error(function() return a1:numLegs() end)
 			assert.error(function() return a1:size() end)
 		end)
-	end)
 
-	describe('subclass', function()
-		it('base class', function ()
+		it('subclass', function ()
 			local c1 = Cat(5)
 			assert.equal('Cat', c1:type())
 			assert.equal(4, c1:numLegs())
 			assert.equal(5, c1:size())
+		end)
+	end)
+
+	describe('instanceOf', function()
+		it('with same class', function ()
+			local c1 = Cat(5)
+
+			assert.is_true(Class.instanceOf(c1, Cat))
+		end)
+
+		it('in same hierarchy', function ()
+			local c1 = Cat(5)
+			assert.is_true(Class.instanceOf(c1, Animal))
+
+			local a1 = Animal()
+			assert.is_false(Class.instanceOf(a1, Cat))
 		end)
 	end)
 end)
