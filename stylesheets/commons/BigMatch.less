@@ -1230,18 +1230,18 @@ Author(s): Rathoz
 		min-width: 3rem;
 		text-wrap: nowrap;
 
-		@media ( min-width: 768px ) {
-			&:not( :first-child ) {
-				display: none;
-			}
-		}
-
 		> * {
 			height: @cell-height;
 		}
 
 		> *:nth-child( 3n+4 ) {
 			margin-top: 1rem;
+		}
+
+		@media ( min-width: 768px ) {
+			&:not( :first-child ) {
+				display: none;
+			}
 		}
 
 		.team-template-text {
