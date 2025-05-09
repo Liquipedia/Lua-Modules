@@ -1240,7 +1240,7 @@ Author(s): Rathoz
 		position: relative;
 
 		@media ( max-width: 767px ) {
-			flex: 0 0 calc(50% - 0.5rem);
+			flex: 0 0 calc( 50% - 0.5rem );
 		}
 
 		&--ban &-image {
@@ -1296,7 +1296,6 @@ Author(s): Rathoz
 
 .match-bm-rounds-overview {
 	@cell-height: 1.75rem;
-
 	display: flex;
 	gap: 0.25rem;
 	overflow-y: auto;
@@ -1313,9 +1312,9 @@ Author(s): Rathoz
 		> *:nth-child( 3n+4 ) {
 			margin-top: 1rem;
 		}
-		
+
 		@media ( min-width: 768px ) {
-			&:not(:first-child) {
+			&:not( :first-child ) {
 				display: none;
 			}
 		}
@@ -1330,7 +1329,7 @@ Author(s): Rathoz
 	&-round-container {
 		display: flex;
 		gap: 0.5rem;
-		
+
 		@media ( max-width: 767px ) {
 			display: grid;
 			grid-template-columns: repeat( 6, minmax( 0, 1fr ) );
