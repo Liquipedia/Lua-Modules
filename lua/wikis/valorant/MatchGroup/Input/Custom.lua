@@ -24,8 +24,9 @@ local MatchFunctions = {
 }
 local MapFunctions = {}
 
+---@alias ValorantSides 'atk'|'def'
 ---@alias ValorantRoundData{round: integer, winBy:string,
----team1side: 'atk'|'def', team2side: 'atk'|'def', winningSide: 'atk'|'def'}
+---t1side: ValorantSides, t2side: ValorantSides, winningSide: ValorantSides}
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table

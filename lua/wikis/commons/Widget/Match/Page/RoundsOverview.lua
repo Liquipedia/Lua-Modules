@@ -18,9 +18,18 @@ local Div = HtmlWidgets.Div
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
+---@class MatchPageRoundsOverviewProps
+---@field rounds ValorantRoundData[]
+---@field iconRender fun(side: string, winBy: string): string
+---@field opponent1 standardOpponent
+---@field opponent2 standardOpponent
+
 ---@class MatchPageRoundsOverview: Widget
----@operator call(table): MatchPageRoundsOverview
+---@operator call(MatchPageRoundsOverviewProps): MatchPageRoundsOverview
+---@field props MatchPageRoundsOverviewProps
 local MatchPageRoundsOverview = Class.new(Widget)
+
+local ROUNDS_PER_ROW_MOBILE = 6
 
 ---@return Widget?
 function MatchPageRoundsOverview:render()
@@ -35,19 +44,17 @@ function MatchPageRoundsOverview:render()
 		return '&nbsp;'
 	end
 
-	local numTeamContainers = math.ceil(#self.props.rounds / 6)
-	local teamContainers = {}
-
-	for _ = 1, numTeamContainers do
-		WidgetUtil.collect(teamContainers, Div{
+	local numTeamContainers = math.ceil(#self.props.rounds / ROUNDS_PER_ROW_MOBILE)
+	local teamContainers = Array.map(Array.range(1, numTeamContainers), function()
+		return Div{
 			classes = {'match-bm-rounds-overview-teams'},
 			children = {
 				Div{children = '&nbsp;'},
 				Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'}},
 				Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'}},
 			},
-		})
-	end
+		}
+	end)
 
 	return HtmlWidgets.Div{
 		classes = {'match-bm-rounds-overview'},
@@ -71,7 +78,6 @@ function MatchPageRoundsOverview:render()
 			}
 		)
 	}
-
 end
 
 return MatchPageRoundsOverview
