@@ -20,7 +20,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 ---@class MatchPageRoundsOverviewProps
 ---@field rounds ValorantRoundData[]
----@field iconRender fun(side: string, winBy: string): string
+---@field iconRender fun(side: string, winBy: string): string?
 ---@field opponent1 standardOpponent
 ---@field opponent2 standardOpponent
 
@@ -69,9 +69,9 @@ function MatchPageRoundsOverview:render()
 					return Div{
 						classes = {'match-bm-rounds-overview-round'},
 						children = WidgetUtil.collect(
-								Div{classes = {'match-bm-rounds-overview-round-title'}, children = round.round},
-								Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t1side)},
-								Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t2side)}
+							Div{classes = {'match-bm-rounds-overview-round-title'}, children = round.round},
+							Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t1side)},
+							Div{classes = {'match-bm-rounds-overview-round-outcome'}, children = makeIcon(round, round.t2side)}
 						)
 					}
 				end)

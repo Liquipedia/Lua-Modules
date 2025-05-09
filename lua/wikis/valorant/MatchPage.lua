@@ -34,6 +34,13 @@ local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1746050400 -- May 1st 2025 midnight
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
+local RESULT_TYPE_TO_ICON = {
+	['elimination'] = 'elimination',
+	['explosion'] = 'explotion_valorant',
+	['defuse'] = 'defuse',
+	['time'] = 'outoftime'
+}
+
 ---@param match table
 ---@return boolean
 function MatchPage.isEnabledFor(match)
@@ -96,21 +103,16 @@ function MatchPage:_renderRoundsOverview(game)
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
 		iconRender = function(winningSide, winBy)
-			local iconName
-			if winBy == 'elimination' then
-				iconName = 'skull'
-			elseif winBy == 'explosion' then
-				iconName = 'fire-alt'
-			elseif winBy == 'defuse' then
-				iconName = 'wrench'
-			else
-				iconName = 'hourglass-end'
+			local iconName = RESULT_TYPE_TO_ICON[winBy]
+			if not iconName then
+				return nil
 			end
-			return Div{
-				classes = {
+			return IconFa{
+				iconName = iconName,
+				additionalClasses = {
 					'match-bm-rounds-overview-round-outcome-icon',
-					'match-bm-rounds-overview-round-outcome-icon--' .. winningSide},
-				children = '<i class="fas fa-' .. iconName .. '"></i>'
+					'match-bm-rounds-overview-round-outcome-icon--' .. winningSide
+				}
 			}
 		end,
 	}
