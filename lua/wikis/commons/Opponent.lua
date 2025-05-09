@@ -6,16 +6,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
 
+local Array = Lua.import('Module:Array')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local BYE = 'bye'
 
@@ -226,6 +227,7 @@ end
 ---It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
+---@return boolean
 function Opponent.same(opponent1, opponent2)
 	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
 end
@@ -350,10 +352,11 @@ Returns nil if the team template does not exist.
 ---@return string
 function Opponent.toName(opponent)
 	if opponent.type == Opponent.team then
-		return TeamTemplate.getPageName(opponent.template)
+		local pageName = TeamTemplate.getPageName(opponent.template)
+		return Page.applyUnderScoresIfEnforced(pageName)
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
-			return player.pageName or player.displayName
+			return Page.applyUnderScoresIfEnforced(player.pageName or player.displayName)
 		end)
 		table.sort(pageNames)
 		return table.concat(pageNames, ' / ')
@@ -388,7 +391,7 @@ function Opponent.readOpponentArgs(args)
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
 			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
-			pageName = args.link or args.p1link,
+			pageName = Page.applyUnderScoresIfEnforced(args.link or args.p1link),
 			team = args.team or args.p1team,
 		}
 		return {type = Opponent.solo, players = {player}}
@@ -399,7 +402,7 @@ function Opponent.readOpponentArgs(args)
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
 				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
-				pageName = args['p' .. playerIndex .. 'link'],
+				pageName = Page.applyUnderScoresIfEnforced(args['p' .. playerIndex .. 'link']),
 				team = playerTeam,
 			}
 		end)
@@ -461,7 +464,7 @@ function Opponent.toLpdbStruct(opponent)
 		for playerIndex, player in ipairs(opponent.players) do
 			local prefix = 'p' .. playerIndex
 
-			players[prefix] = player.pageName
+			players[prefix] = Page.applyUnderScoresIfEnforced(player.pageName)
 			players[prefix .. 'dn'] = player.displayName
 			players[prefix .. 'flag'] = player.flag
 			players[prefix .. 'team'] = player.team and
