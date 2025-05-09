@@ -164,7 +164,7 @@ function WantToHelp:render()
 				}
 			end
 			return text
-		end}
+		end},
 		' listed needing help.'
 	}
 end
