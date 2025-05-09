@@ -449,7 +449,7 @@ Author(s): Rathoz
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 		display: grid;
-		grid-template-columns: 9.375rem auto 9.5rem; // set as default
+		grid-template-columns: 9.375rem auto 9.5rem; /* set as default */
 		grid-gap: 1rem;
 	}
 
@@ -712,7 +712,7 @@ Author(s): Rathoz
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); // set as default
+		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); /* set as default */
 		grid-template-rows: 1fr 1fr;
 
 		@media ( max-width: 1199px ), ( min-width: 1320px ) {
@@ -1219,8 +1219,84 @@ Author(s): Rathoz
 	}
 }
 
+.match-bm-map-veto {
+	&-cards {
+		display: flex;
+		gap: 1rem;
+
+		@media ( max-width: 767px ) {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+	}
+
+	&-card {
+		flex: 1 0 0;
+		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+		border-radius: 0.5rem;
+		font-size: 0.875rem;
+		padding-bottom: 0.5rem;
+		min-width: 0;
+		position: relative;
+
+		@media ( max-width: 767px ) {
+			flex: 0 0 calc(50% - 0.5rem);
+		}
+
+		&--ban &-image {
+			opacity: 0.5;
+		}
+
+		&-image {
+			height: ~"max( 5rem, 5vw )";
+			overflow: hidden;
+			border-radius: 0.5rem 0.5rem 0 0;
+			display: flex;
+			position: relative;
+
+			img {
+				display: flex;
+				object-fit: cover;
+				width: 100%;
+				height: 100%;
+				transition: transform 0.2s linear;
+			}
+		}
+
+		&-title {
+			padding: 0.5rem;
+			text-align: center;
+		}
+
+		&-map-name {
+			font-weight: bold;
+		}
+
+		&-map-info {
+			display: flex;
+			flex-direction: column;
+		}
+
+		&--ban &-map-action {
+			color: var( --clr-semantic-negative-40 );
+			font-weight: bold;
+		}
+
+		&--pick &-map-action {
+			color: var( --clr-semantic-positive-40 );
+			font-weight: bold;
+		}
+
+		&--decider &-map-action {
+			color: var( --clr-semantic-positive-40 );
+			font-weight: bold;
+		}
+	}
+}
+
 .match-bm-rounds-overview {
 	@cell-height: 1.75rem;
+
 	display: flex;
 	gap: 0.25rem;
 	overflow-y: auto;
@@ -1237,9 +1313,9 @@ Author(s): Rathoz
 		> *:nth-child( 3n+4 ) {
 			margin-top: 1rem;
 		}
-
+		
 		@media ( min-width: 768px ) {
-			&:not( :first-child ) {
+			&:not(:first-child) {
 				display: none;
 			}
 		}
@@ -1254,7 +1330,7 @@ Author(s): Rathoz
 	&-round-container {
 		display: flex;
 		gap: 0.5rem;
-
+		
 		@media ( max-width: 767px ) {
 			display: grid;
 			grid-template-columns: repeat( 6, minmax( 0, 1fr ) );

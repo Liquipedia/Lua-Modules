@@ -25,6 +25,7 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local AdditionalSection = Lua.import('Module:Widget/Match/Page/AdditionalSection')
+local MatchPageMapVeto = Lua.import('Module:Widget/Match/Page/MapVeto')
 local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local Footer = Lua.import('Module:Widget/Match/Page/Footer')
@@ -50,7 +51,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field seriesDots string[]
 
 ---@class BaseMatchPage
----@operator call(MatchPageMatch): self
+---@operator call(MatchPageMatch): BaseMatchPage
 ---@field matchData MatchPageMatch
 ---@field games MatchPageGame[]
 ---@field opponents MatchPageOpponent[]
@@ -221,6 +222,7 @@ function BaseMatchPage:render()
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
 				tournamentName = self.matchData.tournament,
 			},
+			self:renderMapVeto(self.matchData),
 			self:renderGames(),
 			self:footer()
 		)
@@ -264,6 +266,46 @@ end
 ---@return string|Html|Widget
 function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
+end
+
+---@protected
+---@param match MatchPageMatch
+---@return Widget[]
+function BaseMatchPage:renderMapVeto(match)
+	if not match.extradata or not match.extradata.mapveto then
+		return {}
+	end
+
+	local mapVetoes = match.extradata.mapveto
+	local firstVeto = tonumber(mapVetoes[1].vetostart)
+
+	if not firstVeto or not (firstVeto == 1 or firstVeto == 2) then
+		return {}
+	end
+
+	local secondVeto = firstVeto == 1 and 2 or 1
+
+	local opponent1 = match.opponents[firstVeto]
+	local opponent2 = match.opponents[secondVeto]
+
+	local mapVetoRounds = Array.flatMap(mapVetoes, function(vetoRound, vetoRoundIdx)
+		local vetoRoundFirst = vetoRoundIdx * 2 - 1
+		local vetoRoundSecond = vetoRoundIdx * 2
+		if vetoRound.type == 'decider' then
+			return {{name = vetoRound.decider, link = vetoRound.decider, type = vetoRound.type, round = vetoRoundFirst}}
+		end
+		local firstMap = vetoRound['team' .. firstVeto]
+		local secondMap = vetoRound['team' .. secondVeto]
+		return {
+			{name = firstMap, link = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
+			{name = secondMap, link = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
+		}
+	end)
+
+	return {
+		HtmlWidgets.H3{children = 'Map Veto'},
+		MatchPageMapVeto{vetoRounds = mapVetoRounds},
+	}
 end
 
 ---@protected

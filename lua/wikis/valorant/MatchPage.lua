@@ -28,6 +28,7 @@ local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchPage: BaseMatchPage
+---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
 local AVAILABLE_FOR_TIERS = {1}
