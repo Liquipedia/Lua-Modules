@@ -37,7 +37,7 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local RESULT_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
-	['explosion'] = 'explotion_valorant',
+	['explosion'] = 'explosion_valorant',
 	['defuse'] = 'defuse',
 	['time'] = 'outoftime'
 }

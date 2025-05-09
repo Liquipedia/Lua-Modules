@@ -21,7 +21,7 @@ return {
 	startleft = 'fas fa-chevron-left',
 	startright = 'fas fa-chevron-right',
 	elimination = 'fas fa-skull',
-	explotion_valorant = 'fas fa-fire-alt',
+	explosion_valorant = 'fas fa-fire-alt',
 	defuse = 'fas fa-wrench',
 	outoftime = 'fas fa-hourglass',
 
