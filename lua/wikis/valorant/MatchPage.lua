@@ -22,6 +22,7 @@ local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local WidgetUtil = Lua.import('Module:Widget/Util')
+local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -37,6 +38,11 @@ local RESULT_TYPE_TO_ICON = {
 	['defuse'] = 'defuse',
 	['time'] = 'outoftime'
 }
+
+---@return boolean
+function MatchPage:isBestOfOne()
+	return #self.games == 1
+end
 
 ---@param match table
 ---@return boolean
@@ -78,9 +84,113 @@ end
 function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
+			self:_renderGameOverview(game),
 			self:_renderRoundsOverview(game),
 			self:_renderPerformance(game)
 		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget?
+function MatchPage:_renderGameOverview(game)
+	if self:isBestOfOne() then return end
+
+	-- Hardcoded values for testing
+	local team1Score = 13
+	local team2Score = 7
+
+	local team1FirstHalf = 11
+	local team1SecondHalf = 2
+	local team2FirstHalf = 1
+	local team2SecondHalf = 6
+
+	--local team1Score = game.extradata.team1score or 0
+	--local team2Score = game.extradata.team2score or 0
+	--
+	--local team1FirstHalf = game.extradata.team1firsthalf or 0
+	--local team1SecondHalf = game.extradata.team1secondhalf or 0
+	--local team2FirstHalf = game.extradata.team2firsthalf or 0
+	--local team2SecondHalf = game.extradata.team2secondhalf or 0
+
+	return Div{
+		classes = {'match-bm-lol-game-overview'},
+		children = {
+			Div{
+				classes = {'match-bm-lol-game-summary'},
+				children = {
+					Div{
+						classes = {'match-bm-lol-game-summary-team'},
+						children = {
+							self.opponents[1].iconDisplay,
+							Div{
+								classes = {'match-bm-lol-game-summary-team-halves'},
+								children = {team1FirstHalf .. ' / ' .. team1SecondHalf}
+							}
+						}
+					},
+					Div{
+						classes = {'match-bm-lol-game-summary-center'},
+						children = self:_buildGameResultSummary(game, team1Score, team2Score,
+								team1FirstHalf, team1SecondHalf, team2FirstHalf, team2SecondHalf)
+					},
+					Div{
+						classes = {'match-bm-lol-game-summary-team'},
+						children = {
+							self.opponents[2].iconDisplay,
+							Div{
+								classes = {'match-bm-lol-game-summary-team-halves'},
+								children = {team2FirstHalf .. ' / ' .. team2SecondHalf}
+							}
+						}
+					},
+				}
+			}
+		}
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@param team1Score number
+---@param team2Score number
+---@return Widget[]
+function MatchPage:_buildGameResultSummary(game, team1Score, team2Score)
+	return {
+		Div{
+			classes = {'match-bm-lol-game-summary-faction'},
+			children = game.extradata.team1side and IconImage{
+				imageLight = 'Valorant side ' .. game.extradata.team1side .. '.png',
+				link = '',
+				caption = game.extradata.team1side .. ' side'
+			} or nil
+		},
+		Div{
+			classes = {'match-bm-lol-game-summary-score-holder'},
+			children = game.finished and {
+				Div{
+					classes = {'match-bm-lol-game-summary-score'},
+					children = {
+						team1Score,
+						'&ndash;',
+						team2Score
+					}
+				},
+				Div{
+					classes = {'match-bm-lol-game-summary-length'},
+					children = game.length
+				}
+			} or nil
+		},
+		Div{
+			classes = {'match-bm-lol-game-summary-faction'},
+			children = game.extradata.team2side and IconImage{
+				imageLight = 'Valorant side ' .. game.extradata.team2side .. '.png',
+				link = '',
+				caption = game.extradata.team2side .. ' side'
+			} or nil
+		}
 	}
 end
 
