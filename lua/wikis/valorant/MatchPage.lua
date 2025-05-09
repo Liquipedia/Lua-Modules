@@ -24,6 +24,7 @@ local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ValorantMatchPage: BaseMatchPage
@@ -33,6 +34,13 @@ local MatchPage = Class.new(BaseMatchPage)
 local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1746050400 -- May 1st 2025 midnight
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
+
+local RESULT_TYPE_TO_ICON = {
+	['elimination'] = 'elimination',
+	['explosion'] = 'explosion_valorant',
+	['defuse'] = 'defuse',
+	['time'] = 'outoftime'
+}
 
 ---@param match table
 ---@return boolean
@@ -81,8 +89,33 @@ end
 function MatchPage:renderGame(game)
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
+			self:_renderRoundsOverview(game),
 			self:_renderPerformance(game)
 		)
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget
+function MatchPage:_renderRoundsOverview(game)
+	return RoundsOverview{
+		rounds = game.extradata.rounds,
+		opponent1 = self.matchData.opponents[1],
+		opponent2 = self.matchData.opponents[2],
+		iconRender = function(winningSide, winBy)
+			local iconName = RESULT_TYPE_TO_ICON[winBy]
+			if not iconName then
+				return nil
+			end
+			return IconFa{
+				iconName = iconName,
+				additionalClasses = {
+					'match-bm-rounds-overview-round-outcome-icon',
+					'match-bm-rounds-overview-round-outcome-icon--' .. winningSide
+				}
+			}
+		end,
 	}
 end
 

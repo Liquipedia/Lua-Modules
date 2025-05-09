@@ -24,12 +24,17 @@ local MatchFunctions = {
 }
 local MapFunctions = {}
 
+---@alias ValorantSides 'atk'|'def'
+---@alias ValorantRoundData{round: integer, winBy:string,
+---t1side: ValorantSides, t2side: ValorantSides, winningSide: ValorantSides}
+
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
 ---@field getFirstSide fun(map: table, opponentIndex: integer): string?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getScoreFromRounds fun(map: table, side: 'atk'|'def'|'otatk'|'otdef', opponentIndex: integer): integer?
 ---@field getMapName fun(map: table): string?
+---@field getRounds fun(map: table): ValorantRoundData[]?
 
 ---@param match table
 ---@param options table?
@@ -142,6 +147,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 			otatk = MapParser.getScoreFromRounds(map, 'otatk', 2),
 			otdef = MapParser.getScoreFromRounds(map, 'otdef', 2),
 		},
+		rounds = MapParser.getRounds(map),
 	}
 
 	for opponentIdx, opponent in ipairs(map.opponents) do

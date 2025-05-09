@@ -126,6 +126,46 @@ function CustomMatchGroupInputMatchPage.getMapName(map)
 	return map.matchInfo.mapId
 end
 
+---@param map table
+---@return ValorantRoundData[]?
+function CustomMatchGroupInputMatchPage.getRounds(map)
+	local function otherSide(side)
+		if side == 'atk' then
+			return 'def'
+		end
+		return 'atk'
+	end
+	local t1start = map.matchInfo.t1firstside
+	local t1startot = map.matchInfo.o1t1firstside
+	local nextOvertimeSide = t1startot
+	return Array.map(map.roundDetails, function(round)
+		local roundNumber = round.round_no
+		-- TODO This is stupid, doesn't handle OT, but it works until the API is fixed
+		local t1side, t2side
+		if roundNumber <= 12 then
+			t1side = t1start
+			t2side = otherSide(t1start)
+		elseif roundNumber <= 24 then
+			t1side = otherSide(t1start)
+			t2side = t1start
+		else
+			-- In overtime they switch sides every round
+			t1side = nextOvertimeSide
+			t2side = otherSide(nextOvertimeSide)
+			nextOvertimeSide = otherSide(nextOvertimeSide)
+		end
+
+		---@type ValorantRoundData
+		return {
+			round = roundNumber,
+			t1side = t1side,
+			t2side = t2side,
+			winningSide = round.round_winner,
+			winBy = round.win_by,
+		}
+	end)
+end
+
 function CustomMatchGroupInputMatchPage.getMockData()
 	return {
 		["matchInfo"] = {
