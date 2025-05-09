@@ -134,7 +134,7 @@ return {
 	kda = 'fas fa-skull-crossbones',
 	acs = 'far fa-abacus',
 	kast = 'fas fa-hands-helping',
-	headshot = 'fal fa-head-side',
+	headshot = 'far fa-crosshairs',
 
 	dota2_gpm = 'fas fa-coin',
 	dota2_lhdn = 'fas fa-swords',
