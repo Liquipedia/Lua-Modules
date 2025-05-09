@@ -14,9 +14,7 @@ local Lua = require('Module:Lua')
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
-
+local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class MatchPageMapVetoParameters
 ---@field vetoRounds {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}[]
@@ -30,7 +28,7 @@ local MatchPageMapVeto = Class.new(Widget)
 function MatchPageMapVeto:render()
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
-			return OpponentDisplay.InlineOpponent{opponent = vetoRound.by, teamStyle = 'icon'}
+			return mw.ext.TeamTemplate.teamicon(vetoRound.by.template)
 		end
 		local actionType
 		local byText
@@ -67,14 +65,19 @@ function MatchPageMapVeto:render()
 				children = {
 					HtmlWidgets.Div{
 						classes = {'match-bm-map-veto-card-image'},
-						children = Image.display(vetoRound.name .. ' Map.png', nil, {size = 240, link = ''}),
+						children = Image.display(vetoRound.name .. ' Map.png', nil, {size = 240, link = 'vetoRound.name'}),
 					},
 					HtmlWidgets.Div{
 						classes = {'match-bm-map-veto-card-title'},
 						children = {
-							HtmlWidgets.Div{
-								classes = {'match-bm-map-veto-card-map-name'},
-								children = vetoRound.name
+							Link{
+								link = vetoRound.name,
+								children = {
+									HtmlWidgets.Div{
+										classes = {'match-bm-map-veto-card-map-name'},
+										children = vetoRound.name
+									},
+								}
 							},
 							HtmlWidgets.Div{
 								classes = {'match-bm-map-veto-card-map-info'},
