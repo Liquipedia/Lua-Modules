@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
@@ -25,14 +24,14 @@ local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
 local TITLES = {
-	{code = "gm", name = "Grandmaster"},
-	{code = "im", name = "International Master"},
-	{code = "wgm", name = "Woman Grandmaster"},
-	{code = "fm", name = "FIDE Master"},
-	{code = "wim", name = "Woman International Master"},
-	{code = "cm", name = "Candidate Master"},
-	{code = "wfm", name = "Woman FIDE Master"},
-	{code = "wcm", name = "Woman Candidate Master"},
+	{code = 'gm', name = 'Grandmaster'},
+	{code = 'im', name = 'International Master'},
+	{code = 'wgm', name = 'Woman Grandmaster'},
+	{code = 'fm', name = 'FIDE Master'},
+	{code = 'wim', name = 'Woman International Master'},
+	{code = 'cm', name = 'Candidate Master'},
+	{code = 'wfm', name = 'Woman FIDE Master'},
+	{code = 'wcm', name = 'Woman Candidate Master'},
 }
 
 ---@param frame Frame
@@ -52,7 +51,7 @@ function CustomPlayer.run(frame)
 	-- Title.
 	player.args.title = Array.find(
 		TITLES,
-		function (title, _)
+		function (title)
 			return Logic.isNotEmpty(player.args['title_' .. title.code])
 		end
 	)
@@ -86,11 +85,6 @@ function CustomInjector:parse(id, widgets)
 	end
 
 	return widgets
-end
-
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('player_title', args.title and args.title.name or 'Player')
 end
 
 return CustomPlayer
