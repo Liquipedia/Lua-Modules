@@ -30,7 +30,7 @@ local MatchPageMapVeto = Class.new(Widget)
 function MatchPageMapVeto:render()
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
-			return OpponentDisplay.InlineOpponent{opponent = vetoRound.by, teamStyle = 'standard'}
+			return OpponentDisplay.InlineOpponent{opponent = vetoRound.by, teamStyle = 'icon'}
 		end
 		local actionType
 		local byText
@@ -51,11 +51,11 @@ function MatchPageMapVeto:render()
 		end
 
 		return WidgetUtil.collect(
+			byText,
 			HtmlWidgets.Span{
 				classes = {'match-bm-map-veto-card-map-action'},
 				children = actionType
-			},
-			byText
+			}
 		)
 	end
 
