@@ -17,7 +17,7 @@ describe('class', function()
 	end
 
 	local Cat = Class.new(Animal, function (self, size)
-		self.size = size
+		self._size = size
 	end)
 
 	function Cat:type()
@@ -25,7 +25,7 @@ describe('class', function()
 	end
 
 	function Cat:size()
-		return self.size
+		return self._size
 	end
 
 	function Cat:numLegs()
