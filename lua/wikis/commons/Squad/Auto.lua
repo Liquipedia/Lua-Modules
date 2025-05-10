@@ -577,7 +577,8 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
     -- Special case: Person went inactive.
     -- Set thisTeam.role to inactive and remove newTeam.role,
     -- otherwise Squad doesn't display the entries
-    if leaveEntry.toRole == "Inactive" then
+    if self.config.status == SquadUtils.SquadStatus.INACTIVE
+            and leaveEntry.toRole == "Inactive" then
         entry.thisTeam.role = entry.newTeam.role
         entry.newTeam.role = ""
     end
