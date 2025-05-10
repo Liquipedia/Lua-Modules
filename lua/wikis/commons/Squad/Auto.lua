@@ -368,6 +368,13 @@ function SquadAuto:queryTransfers()
             local relevantToTeam, isToMain = parseRelevantTeam('to', record)
             local transferType = getTransferType(relevantFromTeam, relevantToTeam)
 
+            -- For leave transfers: Pass on new team for display as next team
+            if transferType == "LEAVE" and Logic.isEmpty(relevantToTeam) then
+                relevantToTeam = isFromMain
+                    and Logic.nilIfEmpty(record.toteamtemplate)
+                    or record.extradata.toteamsectemplate
+            end
+
             ---@type TeamHistoryEntry
             local entry = {
                 type = transferType,
@@ -450,10 +457,6 @@ function SquadAuto:selectEntries()
                     FnUtil.curry(Operator.neq, entry.thisTeam.role)
                 )
             )
-
-            if not result then
-                mw.logObject(entry, "Not included")
-            end
 
             return result
         end
@@ -547,16 +550,47 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
             role = leaveEntry.toRole,
         },
 
-        -- From legacy: Prefer leaveEntry faction information
+        -- From legacy: Prefer faction information from leaveEntry
         faction = leaveEntry.faction or joinEntry.faction,
         race = leaveEntry.faction or joinEntry.faction
     }
 
-    if leaveEntry and not entry.newTeam then
-        --TODO: Fetch next team for person
+    -- On leave: Fetch the next team a person joined
+    if Logic.isNotEmpty(leaveEntry) and Logic.isEmpty(entry.newTeam.team) then
+        local newTeam, newRole = SquadAuto._fetchNextTeam(joinEntry.pagename, leaveEntry.date)
+        if newTeam then
+            entry.newTeam.team = newTeam
+            entry.newTeam.role = newRole
+        end
     end
 
     return entry
+end
+
+---Fetches the next team a person joined after a given date
+---@param pagename string
+---@param date string
+---@return string?
+---@return string?
+function SquadAuto._fetchNextTeam(pagename, date)
+    local conditions = Condition.Tree(BooleanOperator.all)
+        :add{
+            Condition.Node(Condition.ColumnName('player'), Comparator.eq, string.gsub(pagename, ' ', '_')),
+            Condition.Tree(BooleanOperator.any):add{
+                Condition.Node(Condition.ColumnName('date'), Comparator.gt, date),
+            }
+        }
+
+    local transfer = mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = conditions:toString(),
+		limit = 1,
+        order = 'date asc, objectname desc',
+		query = 'toteamtemplate, role2'
+	})[1] or {}
+
+    -- TODO: Check if fetched transfer is in fact a join transfer (empty fromTeam)?
+
+    return transfer.toteamtemplate, transfer.role2
 end
 
 ---Sorts a list of SquadAutoPersons

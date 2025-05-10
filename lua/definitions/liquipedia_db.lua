@@ -63,7 +63,7 @@ local lpdb = {}
 ---@field alternativeid string
 ---@field name string
 ---@field localizedname string
----@field iamge string
+---@field image string
 ---@field type string
 ---@field nationality string
 ---@field nationality2 string
