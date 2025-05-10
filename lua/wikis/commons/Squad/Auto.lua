@@ -369,7 +369,7 @@ function SquadAuto:queryTransfers()
             local transferType = getTransferType(relevantFromTeam, relevantToTeam)
 
             -- For leave transfers: Pass on new team for display as next team
-            if transferType == "LEAVE" and Logic.isEmpty(relevantToTeam) then
+            if transferType == SquadAuto.TransferType.LEAVE and Logic.isEmpty(relevantToTeam) then
                 relevantToTeam = isFromMain
                     and Logic.nilIfEmpty(record.toteamtemplate)
                     or record.extradata.toteamsectemplate
@@ -402,8 +402,13 @@ function SquadAuto:queryTransfers()
                 faction = record.extradata.faction
             }
 
-            -- TODO: Skip this transfer if there is no relevant change
-            -- E.g. this is grabbed a secondary team, but only main team changed
+            -- Skip this transfer if there is no relevant change, i.e. the role in this team didn't change
+            -- E.g. this is grabbed by secondary team, but only main team changed
+            if relevantFromTeam == relevantToTeam
+                    and entry.fromRole == entry.toRole then
+                return
+            end
+
             table.insert(self.playersTeamHistory[record.player], entry)
         end
     )
@@ -463,24 +468,29 @@ function SquadAuto:selectEntries()
     )
 end
 
----Returns a function that maps a set of transfers to a list of
----SquadAutoPersons.
----Behavior depends on therent config:
----If the status is (inive, then at most one entry will be returned
+---Returns a function that maps a set of transfers to a list of SquadAutoPersons.
+---Behavior depends on the current config:
+---If the status is (in)active, then at most one entry will be returned
 ---If the status is former(_inactive), there might be multiple entries returned
 ---If the type does not match, no entries are returned
 ---@param entries TeamHistoryEntry[]
 ---@return SquadAutoPerson[]
 function SquadAuto:_selectHistoryEntries(entries)
     -- Select entries to match status
-    if self.config.status == SquadUtils.SquadStatus.ACTIVE
-            or self.config.status == SquadUtils.SquadStatus.INACTIVE then
+    if self.config.status == SquadUtils.SquadStatus.ACTIVE then
         -- Only most recent transfer is relevant
         local last = entries[#entries]
         if last.type == SquadAuto.TransferType.CHANGE
                 or last.type == SquadAuto.TransferType.JOIN then
-            -- When the last transfer is a leave transfer, the person wouldn't be (in)active
+            -- When the last transfer is a leave transfer, the person wouldn't be active
             return {self:_mapToSquadAutoPerson(last)}
+        end
+    end
+
+    if self.config.status == SquadUtils.SquadStatus.INACTIVE then
+        local last, secondToLast = entries[#entries], entries[#entries - 1]
+        if secondToLast and last.type == SquadAuto.TransferType.CHANGE then
+            return {self:_mapToSquadAutoPerson(secondToLast, last)}
         end
     end
 
@@ -562,6 +572,14 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
             entry.newTeam.team = newTeam
             entry.newTeam.role = newRole
         end
+    end
+
+    -- Special case: Person went inactive.
+    -- Set thisTeam.role to inactive and remove newTeam.role,
+    -- otherwise Squad doesn't display the entries
+    if leaveEntry.toRole == "Inactive" then
+        entry.thisTeam.role = entry.newTeam.role
+        entry.newTeam.role = ""
     end
 
     return entry
