@@ -9,9 +9,11 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -192,7 +194,7 @@ function MvpTable._row(item, args)
 				displayName = item.displayName,
 				flag = item.flag,
 				pageName = item.name,
-				team = item.team and (item.team:gsub('_', ' '):lower()) or nil,
+				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
 			}}},
 			showLink = true,
 			overflow = 'ellipsis',
