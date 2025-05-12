@@ -29,6 +29,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	local map = CustomMatchGroupInputMatchPage.getMockData()
 
 	assert(map and type(map) == 'table' and map.matchInfo, mapInput.matchid .. ' could not be retrieved.')
+
 	-- Let's shift the array to start from 1
 	if map.players and type(map.players) == 'table' and map.players[0] then
 		local newTeams = {}
@@ -124,6 +125,12 @@ end
 ---@return string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
 	return map.matchInfo.mapId
+end
+
+---@param map table
+---@return string?
+function CustomMatchGroupInputMatchPage.getLength(map)
+	return map.matchInfo.gameLengthMillis -- It's called millis but is in MM:SS format
 end
 
 ---@param map table

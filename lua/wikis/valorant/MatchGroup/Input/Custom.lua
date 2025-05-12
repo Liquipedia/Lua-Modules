@@ -34,6 +34,7 @@ local MapFunctions = {}
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getScoreFromRounds fun(map: table, side: 'atk'|'def'|'otatk'|'otdef', opponentIndex: integer): integer?
 ---@field getMapName fun(map: table): string?
+---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
 
 ---@param match table
@@ -76,6 +77,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		getExtraData = FnUtil.curry(MapFunctions.getExtraData, MapParser),
 		getMap = MapParser.getMap,
 		getMapName = MapParser.getMapName,
+		getLength = MapParser.getLength,
 		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
 	}
 

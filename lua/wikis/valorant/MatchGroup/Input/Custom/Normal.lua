@@ -19,6 +19,10 @@ function CustomMatchGroupInputNormal.getMapName(mapInput)
 	return mapInput.map
 end
 
+function CustomMatchGroupInputNormal.getLength(mapInput)
+	return mapInput.length
+end
+
 function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	return Array.mapIndexes(function(playerIndex)
 		return Json.parseIfString(map['t' .. opponentIndex .. 'p' .. playerIndex])
