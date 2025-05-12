@@ -70,6 +70,7 @@ function Logic.isNotEmpty(val)
 	end
 end
 
+---Returns nil if argument is empty; otherwise returns the argument itself.
 ---@generic V
 ---@param val V?
 ---@return V?
@@ -119,8 +120,9 @@ function Logic.readBoolOrNil(val)
 end
 
 ---Throws an error if the supplied value is nil
----@param val any?
----@return any
+---@generic T
+---@param val T?
+---@return T
 function Logic.nilThrows(val)
 	if val == nil then
 		error('Unexpected nil', 2)
@@ -128,7 +130,7 @@ function Logic.nilThrows(val)
 	return val
 end
 
----Trys to execute a function.
+---Tries to execute a function.
 ---If it fails executes a catch function
 ---@param try function
 ---@param catch function
