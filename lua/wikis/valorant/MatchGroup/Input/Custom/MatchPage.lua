@@ -100,9 +100,14 @@ end
 
 ---@param map table
 ---@param opponentIndex integer
+---@param phase 'normal'|'ot'
 ---@return 'atk'|'def'|nil
-function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex)
-	return map.matchInfo['t' .. opponentIndex .. 'firstside']
+function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, phase)
+	if phase == 'normal' then
+		return map.matchInfo['t' .. opponentIndex .. 'firstside']
+	else
+		return map.matchInfo['o1t' .. opponentIndex .. 'firstside']
+	end
 end
 
 ---@param map table

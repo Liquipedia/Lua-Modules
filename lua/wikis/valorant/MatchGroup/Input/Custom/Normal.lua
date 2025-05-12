@@ -29,8 +29,16 @@ function CustomMatchGroupInputNormal.getParticipants(map, opponentIndex)
 	end)
 end
 
-function CustomMatchGroupInputNormal.getFirstSide(map, opponentIndex)
-	return map['t' .. opponentIndex .. 'firstside']
+---@param map table
+---@param opponentIndex integer
+---@param phase 'normal'|'ot'
+---@return 'atk'|'def'|nil
+function CustomMatchGroupInputNormal.getFirstSide(map, opponentIndex, phase)
+	if phase == 'normal' then
+		return map['t' .. opponentIndex .. 'firstside']
+	else
+		return map['t' .. opponentIndex .. 'firstsideot']
+	end
 end
 
 function CustomMatchGroupInputNormal.getScoreFromRounds(map, side, opponentIndex)

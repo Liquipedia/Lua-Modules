@@ -30,7 +30,7 @@ local MapFunctions = {}
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
----@field getFirstSide fun(map: table, opponentIndex: integer): string?
+---@field getFirstSide fun(map: table, opponentIndex: integer, phase: 'normal'|'ot'): string?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getScoreFromRounds fun(map: table, side: 'atk'|'def'|'otatk'|'otdef', opponentIndex: integer): integer?
 ---@field getMapName fun(map: table): string?
@@ -129,7 +129,8 @@ end
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
 	---@type table<string, any>
 	local extraData = {
-		t1firstside = MapParser.getFirstSide(map, 1),
+		t1firstside = MapParser.getFirstSide(map, 1, 'normal'),
+		t1firstsideot = MapParser.getFirstSide(map, 1, 'ot'),
 		t1halfs = {
 			atk = MapParser.getScoreFromRounds(map, 'atk', 1),
 			def = MapParser.getScoreFromRounds(map, 'def', 1),

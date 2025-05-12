@@ -22,7 +22,7 @@ local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
+local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
@@ -32,17 +32,12 @@ local AVAILABLE_FOR_TIERS = {1}
 local MATCH_PAGE_START_TIME = 1746050400 -- May 1st 2025 midnight
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
-local RESULT_TYPE_TO_ICON = {
+local WIN_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
 	['explosion'] = 'explosion_valorant',
 	['defuse'] = 'defuse',
 	['time'] = 'outoftime'
 }
-
----@return boolean
-function MatchPage:isBestOfOne()
-	return #self.games == 1
-end
 
 ---@param match table
 ---@return boolean
@@ -97,22 +92,30 @@ end
 function MatchPage:_renderGameOverview(game)
 	if self:isBestOfOne() then return end
 
-	-- Hardcoded values for testing
-	local team1Score = 13
-	local team2Score = 7
+	local otherSide = function(side)
+		return side == 'atk' and 'def' or 'atk'
+	end
 
-	local team1FirstHalf = 11
-	local team1SecondHalf = 2
-	local team2FirstHalf = 1
-	local team2SecondHalf = 6
+	local team1Halfs = game.extradata.t1halfs or {}
+	local team2Halfs = game.extradata.t2halfs or {}
+	local team1FirstHalf = game.extradata.t1firstside
+	local team1OtFirstHalf = game.extradata.t1firstsideot
 
-	--local team1Score = game.extradata.team1score or 0
-	--local team2Score = game.extradata.team2score or 0
-	--
-	--local team1FirstHalf = game.extradata.team1firsthalf or 0
-	--local team1SecondHalf = game.extradata.team1secondhalf or 0
-	--local team2FirstHalf = game.extradata.team2firsthalf or 0
-	--local team2SecondHalf = game.extradata.team2secondhalf or 0
+	local hasOvertime = team1OtFirstHalf ~= nil
+
+	local team1 = {
+		team1Halfs[team1FirstHalf],
+		team1Halfs[otherSide(team1FirstHalf)],
+		hasOvertime and team1Halfs['ot' .. team1OtFirstHalf] or nil,
+		hasOvertime and team1Halfs['ot' .. otherSide(team1OtFirstHalf)] or nil,
+	}
+
+	local team2 = {
+		team2Halfs[otherSide(team1FirstHalf)],
+		team2Halfs[team1FirstHalf],
+		hasOvertime and team2Halfs['ot' .. otherSide(team1OtFirstHalf)] or nil,
+		hasOvertime and team2Halfs['ot' .. team1OtFirstHalf] or nil,
+	}
 
 	return Div{
 		classes = {'match-bm-lol-game-overview'},
@@ -126,14 +129,26 @@ function MatchPage:_renderGameOverview(game)
 							self.opponents[1].iconDisplay,
 							Div{
 								classes = {'match-bm-lol-game-summary-team-halves'},
-								children = {team1FirstHalf .. ' / ' .. team1SecondHalf}
+								children = Array.interleave(team1, SPAN_SLASH)
 							}
 						}
 					},
 					Div{
-						classes = {'match-bm-lol-game-summary-center'},
-						children = self:_buildGameResultSummary(game, team1Score, team2Score,
-								team1FirstHalf, team1SecondHalf, team2FirstHalf, team2SecondHalf)
+						classes = {'match-bm-lol-game-summary-score-holder'},
+						children = game.finished and {
+							Div{
+								classes = {'match-bm-lol-game-summary-score'},
+								children = {
+									DisplayHelper.MapScore(game.opponents[1], game.status),
+									'&#8209;', -- Non-breaking hyphen
+									DisplayHelper.MapScore(game.opponents[2], game.status)
+							}
+							},
+							Div{
+								classes = {'match-bm-lol-game-summary-length'},
+								children = game.length
+							}
+						} or nil
 					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
@@ -141,55 +156,12 @@ function MatchPage:_renderGameOverview(game)
 							self.opponents[2].iconDisplay,
 							Div{
 								classes = {'match-bm-lol-game-summary-team-halves'},
-								children = {team2FirstHalf .. ' / ' .. team2SecondHalf}
+								children = Array.interleave(team2, SPAN_SLASH)
 							}
 						}
 					},
 				}
 			}
-		}
-	}
-end
-
----@private
----@param game MatchPageGame
----@param team1Score number
----@param team2Score number
----@return Widget[]
-function MatchPage:_buildGameResultSummary(game, team1Score, team2Score)
-	return {
-		Div{
-			classes = {'match-bm-lol-game-summary-faction'},
-			children = game.extradata.team1side and IconImage{
-				imageLight = 'Valorant side ' .. game.extradata.team1side .. '.png',
-				link = '',
-				caption = game.extradata.team1side .. ' side'
-			} or nil
-		},
-		Div{
-			classes = {'match-bm-lol-game-summary-score-holder'},
-			children = game.finished and {
-				Div{
-					classes = {'match-bm-lol-game-summary-score'},
-					children = {
-						team1Score,
-						'&ndash;',
-						team2Score
-					}
-				},
-				Div{
-					classes = {'match-bm-lol-game-summary-length'},
-					children = game.length
-				}
-			} or nil
-		},
-		Div{
-			classes = {'match-bm-lol-game-summary-faction'},
-			children = game.extradata.team2side and IconImage{
-				imageLight = 'Valorant side ' .. game.extradata.team2side .. '.png',
-				link = '',
-				caption = game.extradata.team2side .. ' side'
-			} or nil
 		}
 	}
 end
@@ -203,7 +175,7 @@ function MatchPage:_renderRoundsOverview(game)
 		opponent1 = self.matchData.opponents[1],
 		opponent2 = self.matchData.opponents[2],
 		iconRender = function(winningSide, winBy)
-			local iconName = RESULT_TYPE_TO_ICON[winBy]
+			local iconName = WIN_TYPE_TO_ICON[winBy]
 			if not iconName then
 				return nil
 			end
