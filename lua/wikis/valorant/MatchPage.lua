@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
@@ -28,8 +27,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 ---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
 
-local AVAILABLE_FOR_TIERS = {1}
-local MATCH_PAGE_START_TIME = 1746050400 -- May 1st 2025 midnight
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local WIN_TYPE_TO_ICON = {
@@ -38,13 +35,6 @@ local WIN_TYPE_TO_ICON = {
 	['defuse'] = 'defuse',
 	['time'] = 'outoftime'
 }
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
