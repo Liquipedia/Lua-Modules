@@ -1303,6 +1303,9 @@ span.slash {
 	}
 }
 
+@valorant-atk: #b20110;
+@valorant-def: #01654c;
+
 .match-bm-rounds-overview {
 	@cell-height: 1.75rem;
 	@cell-radius: 0.25rem;
@@ -1313,13 +1316,13 @@ span.slash {
 
 	&-teams-container {
 		display: grid;
-		grid-template-columns: 3.75rem;
+		grid-template-columns: 5rem;
 		gap: 0.25rem;
 	}
 
 	&-teams {
 		overflow: hidden;
-		min-width: 3rem;
+		min-width: 5rem;
 		text-wrap: nowrap;
 		gap: 0.125rem;
 		display: flex;
@@ -1341,6 +1344,33 @@ span.slash {
 
 		.team-template-text {
 			display: none;
+		}
+
+		&-team {
+			display: flex;
+		}
+
+		&-score {
+			text-align: center;
+			width: 2rem;
+			height: 1.75rem;
+			font-weight: bolder;
+
+			@media ( min-width: 768px ) {
+				display: none;
+			}
+
+			&--atk {
+				.wiki-valorant & {
+					color: @valorant-atk;
+				}
+			}
+
+			&--def {
+				.wiki-valorant & {
+					color: @valorant-def;
+				}
+			}
 		}
 	}
 
@@ -1401,14 +1431,14 @@ span.slash {
 			&--atk {
 				.wiki-valorant & {
 					color: #ffffff;
-					background-color: #b20110;
+					background-color: @valorant-atk;
 				}
 			}
 
 			&--def {
 				.wiki-valorant & {
 					color: #ffffff;
-					background-color: #01654c;
+					background-color: @valorant-def;
 				}
 			}
 		}
@@ -1418,18 +1448,22 @@ span.slash {
 .match-bm-game-summary-team-halves {
 	display: flex;
 
+	@media ( max-width: 767px ) {
+		display: none;
+	}
+
 	&-half {
 		font-weight: bold;
 
 		&--atk {
 			.wiki-valorant & {
-				color: #b20110;
+				color: @valorant-atk;
 			}
 		}
 
 		&--def {
 			.wiki-valorant & {
-				color: #01654c;
+				color: @valorant-def;
 			}
 		}
 	}

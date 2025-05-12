@@ -29,7 +29,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 ---@field props MatchPageRoundsOverviewProps
 local MatchPageRoundsOverview = Class.new(Widget)
 
-local ROUNDS_PER_ROW_MOBILE = 12
+local ROUNDS_BEFORE_SPLIT = 12
 
 ---@return Widget?
 function MatchPageRoundsOverview:render()
@@ -44,14 +44,57 @@ function MatchPageRoundsOverview:render()
 		return '&nbsp;'
 	end
 
-	local numTeamContainers = math.ceil(#self.props.rounds / ROUNDS_PER_ROW_MOBILE)
-	local teamContainers = Array.map(Array.range(1, numTeamContainers), function()
+	local numTeamContainers = math.ceil(#self.props.rounds / ROUNDS_BEFORE_SPLIT)
+
+	local scoreForContainer = function(container, team)
+		local start = (container - 1) * ROUNDS_BEFORE_SPLIT + 1
+		local endIdx = math.min(container * ROUNDS_BEFORE_SPLIT, #self.props.rounds)
+
+		return Array.reduce(
+			Array.sub(self.props.rounds, start, endIdx),
+			function(acc, round)
+				if round.winningSide == round['t' .. team .. 'side'] then
+					return acc + 1
+				end
+				return acc
+			end,
+			0
+		)
+	end
+
+	local sideInContainer = function(container, team)
+		local start = (container - 1) * ROUNDS_BEFORE_SPLIT + 1
+
+		local round = self.props.rounds[start]
+		if not round then return '' end
+		return round['t' .. team .. 'side']
+	end
+
+	local teamContainers = Array.map(Array.range(1, numTeamContainers), function(container)
 		return Div{
 			classes = {'match-bm-rounds-overview-teams'},
 			children = {
 				Div{children = '&nbsp;'},
-				Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'}},
-				Div{children = OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'}},
+				Div{
+					classes = {'match-bm-rounds-overview-teams-team'},
+					children = {
+						OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'},
+						Div{
+							classes = {'match-bm-rounds-overview-teams-score', 'match-bm-rounds-overview-teams-score--'.. sideInContainer(container, 1)},
+							children = scoreForContainer(container, 1)
+						},
+					}
+				},
+				Div{
+					classes = {'match-bm-rounds-overview-teams-team'},
+					children = {
+						OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'},
+						Div{
+							classes = {'match-bm-rounds-overview-teams-score', 'match-bm-rounds-overview-teams-score--'.. sideInContainer(container, 2)},
+							children = scoreForContainer(container, 2)
+						},
+					}
+				},
 			},
 		}
 	end)

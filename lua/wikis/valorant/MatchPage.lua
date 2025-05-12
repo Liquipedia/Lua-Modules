@@ -88,60 +88,50 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget?
-function MatchPage:_renderGameOverview(game)
-	if self:isBestOfOne() then return end
+---@param teamIndex 1|2
+---@return {score: number, side: string}[]
+local function getTeamHalvesDetails(game, teamIndex)
+	if not teamIndex or not game.extradata then
+		return {}
+	end
 
 	local otherSide = function(side)
 		return side == 'atk' and 'def' or 'atk'
 	end
 
-	local team1FirstHalf = game.extradata.t1firstside
-	local team1OtFirstHalf = game.extradata.t1firstsideot
+	local startNormal, otherNormal = game.extradata.t1firstside, otherSide(game.extradata.t1firstside)
+	local startOvertime, otherOvertime = game.extradata.t1firstsideot, otherSide(game.extradata.t1firstsideot)
 
-	local hasStart = team1FirstHalf ~= nil
-	local hasOvertime = team1OtFirstHalf ~= nil
-
-	---@param teamIndex 1|2
-	---@return {score: number, side: string}[]
-	local makeTeamDetails = function(teamIndex)
-		local details = {}
-
-		local teamHalf = game.extradata['t' .. teamIndex .. 'halfs']
-		if Table.isEmpty(teamHalf) or not hasStart then
-			return details
-		end
-
-		local firstHalf, startOvertime = team1FirstHalf, team1OtFirstHalf
-		if teamIndex == 2 then
-			firstHalf, startOvertime = otherSide(firstHalf), otherSide(startOvertime)
-		end
-
-		table.insert(details, teamHalf[firstHalf])
-		table.insert(details, teamHalf[otherSide(firstHalf)])
-
-		if not hasOvertime then
-			return details
-		end
-
-		table.insert(details, teamHalf['ot' .. startOvertime])
-		table.insert(details, teamHalf['ot' .. otherSide(startOvertime)])
-
-		return details
+	if not startNormal or not startOvertime then
+		return {}
 	end
 
-	local team1 = makeTeamDetails(1)
-	local team2 = makeTeamDetails(2)
-
-	local function makeTeamHalfScoreDisplay(half)
-		return Div{
-			classes = {
-				'match-bm-game-summary-team-halves-half',
-				'match-bm-game-summary-team-halves-half--' .. half.side
-			},
-			children = half.score
-		}
+	if teamIndex == 2 then
+		startNormal, otherNormal, startOvertime, otherOvertime = otherNormal, startNormal, otherOvertime, startOvertime
 	end
+
+	local teamHalf = game.extradata['t' .. teamIndex .. 'halfs']
+	if Table.isEmpty(teamHalf) then
+		return {}
+	end
+
+	---@type {score: number, side: string}[]
+	return {
+		{side = startNormal, score = teamHalf[startNormal]},
+		{side = otherNormal, score = teamHalf[otherNormal]},
+		startOvertime and {side = startOvertime, score = teamHalf['ot' .. startOvertime]} or nil,
+		startOvertime and {side = otherOvertime, score = teamHalf['ot' .. otherOvertime]} or nil
+	}
+end
+
+---@private
+---@param game MatchPageGame
+---@return Widget?
+function MatchPage:_renderGameOverview(game)
+	if self:isBestOfOne() then return end
+
+	local team1 = getTeamHalvesDetails(game, 1)
+	local team2 = getTeamHalvesDetails(game, 2)
 
 	local function makeTeamHalvesDisplay(halves)
 		return Div{
@@ -149,7 +139,13 @@ function MatchPage:_renderGameOverview(game)
 				'match-bm-game-summary-team-halves',
 			},
 			children = Array.interleave(Array.map(halves, function(half)
-				return makeTeamHalfScoreDisplay(half)
+				return Div{
+					classes = {
+						'match-bm-game-summary-team-halves-half',
+						'match-bm-game-summary-team-halves-half--' .. half.side
+					},
+					children = half.score
+				}
 			end), SPAN_SLASH)
 		}
 	end
@@ -163,8 +159,8 @@ function MatchPage:_renderGameOverview(game)
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
+							makeTeamHalvesDisplay(team1),
 							self.opponents[1].iconDisplay,
-							makeTeamHalvesDisplay(team1)
 						}
 					},
 					Div{
@@ -188,7 +184,7 @@ function MatchPage:_renderGameOverview(game)
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
 							self.opponents[2].iconDisplay,
-							makeTeamHalvesDisplay(team2)
+							makeTeamHalvesDisplay(team2),
 						}
 					},
 				}

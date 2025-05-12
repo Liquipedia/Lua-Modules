@@ -197,7 +197,7 @@ function MapFunctions.calculateMapScore(MapParser, map)
 	return function(opponentIndex)
 		local attackScore = MapParser.getScoreFromRounds(map, 'atk', opponentIndex)
 		local defenseScore = MapParser.getScoreFromRounds(map, 'def', opponentIndex)
-		if not attackScore and not defenseScore then
+		if not attackScore or not defenseScore then
 			return
 		end
 		return (attackScore or 0)
