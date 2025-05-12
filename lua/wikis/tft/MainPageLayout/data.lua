@@ -8,18 +8,16 @@
 
 local Lua = require('Module:Lua')
 
-local ExternalMediaList = Lua.import('Module:ExternalMediaList')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
-local CenterDot = Lua.import('Module:Widget/MainPage/CenterDot')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
+local Headlines = Lua.import('Module:Widget/MainPage/Headlines')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	theGame = {
@@ -30,7 +28,7 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
@@ -48,6 +46,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -58,20 +57,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -89,28 +75,7 @@ local CONTENT = {
 	},
 	headlines = {
 		heading = 'Headlines',
-		body = WidgetUtil.collect(
-			ExternalMediaList.get{ subject = '!', limit = 4 },
-			Div{
-				css = { display = 'block', ['text-align'] = 'center', padding = '0.5em', },
-				children = {
-					Div{
-						css = {
-							['white-space'] = 'nowrap',
-							display = 'inline',
-							margin = '0 10px',
-							['font-size'] = '15px',
-							['font-style'] = 'italic',
-						},
-						children = {
-							Link{ children = 'See all Headlines', link = 'Portal:News' },
-							CenterDot(),
-							Link{ children = 'Add a Headline', link = 'Special:FormEdit/ExternalMediaLinks' }
-						}
-					}
-				}
-			}
-		),
+		body = Headlines{},
 		padding = true,
 		boxid = 1511,
 	},

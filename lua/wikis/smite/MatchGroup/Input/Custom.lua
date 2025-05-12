@@ -69,14 +69,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	end
 end
 
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
-end
-
 --
 -- map related functions
 --

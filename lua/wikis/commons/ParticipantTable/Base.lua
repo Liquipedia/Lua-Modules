@@ -62,6 +62,8 @@ local prizePoolVars = PageVariableNamespace('PrizePool')
 ---@field note string?
 ---@field dq boolean
 ---@field inputIndex integer?
+---@field isResolved boolean?
+---@field sortName string
 
 ---@class ParticipantTable
 ---@operator call(Frame): ParticipantTable
@@ -170,12 +172,21 @@ function ParticipantTable:readSection(args)
 	local tbds = {}
 	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
+		entry.sortName = Opponent.toName(entry.opponent)
 
 		if entry.opponent and Opponent.isTbd(entry.opponent) then
+			entry.name = Opponent.toName(entry.opponent)
 			table.insert(tbds, entry)
 			--needed so index is increased
 			return entry
 		end
+
+		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {
+			syncPlayer = config.syncPlayers,
+			overwritePageVars = true,
+		})
+		entry.isResolved = true
+		entry.name = Opponent.toName(entry.opponent)
 
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
@@ -188,16 +199,19 @@ function ParticipantTable:readSection(args)
 	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
-		entry.opponent = Opponent.resolve(entry.opponent, config.resolveDate, {
+		entry.sortName = entry.sortName or Opponent.toName(entry.opponent)
+		entry.opponent = entry.isResolved and entry.opponent or Opponent.resolve(entry.opponent, config.resolveDate, {
 			syncPlayer = config.syncPlayers,
 			overwritePageVars = true,
 		})
+		entry.name = entry.name or Opponent.toName(entry.opponent)
+		entry.isResolved = true
 		self:setCustomPageVariables(entry, config)
 		return entry
 	end)
 
 	Array.sortInPlaceBy(section.entries, function(entry)
-		return config.sortOpponents and entry.name:lower() or entry.inputIndex or -1
+		return config.sortOpponents and entry.sortName:lower() or entry.inputIndex or -1
 	end)
 
 	Array.extendWith(section.entries, tbds)
@@ -249,7 +263,6 @@ function ParticipantTable:readEntry(sectionArgs, key, index, config)
 		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note,
 		opponent = opponent,
-		name = Opponent.toName(opponent),
 		inputIndex = index,
 	}
 end
@@ -281,10 +294,14 @@ function ParticipantTable:store()
 
 		if section.config.noStorage or Opponent.isTbd(entry.opponent) or Opponent.isEmpty(entry.opponent) then return end
 
-		if placements[lpdbData.opponentname] then
+		local pageNameWithUnderscores = (lpdbData.opponentname or ''):gsub(' ', '_')
+		local pageNameWithSpaces = (lpdbData.opponentname or ''):gsub('_', ' ')
+		local placement = placements[pageNameWithUnderscores] or placements[pageNameWithSpaces]
+
+		if placement then
 			lpdbData = Table.deepMerge(
 				lpdbData,
-				placements[lpdbData.opponentname]
+				placement
 			)
 		else
 			lpdbData = Table.merge(

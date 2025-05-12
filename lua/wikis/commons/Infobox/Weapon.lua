@@ -146,7 +146,7 @@ function Weapon:_createLocation(location)
 		return ''
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 

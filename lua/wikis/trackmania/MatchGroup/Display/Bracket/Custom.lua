@@ -6,7 +6,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -37,4 +36,4 @@ function CustomBracketDisplay.OpponentEntry(props)
 	return opponentEntry.root
 end
 
-return Class.export(CustomBracketDisplay)
+return CustomBracketDisplay

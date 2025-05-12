@@ -8,15 +8,14 @@
 
 local Lua = require('Module:Lua')
 
-local MatchTickerContainer = Lua.import('Module:Widget/Match/Ticker/Container')
 local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
-local Link = Lua.import('Module:Widget/Basic/Link')
+local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
+local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local FilterButtonsWidget = Lua.import('Module:Widget/FilterButtons')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local CONTENT = {
 	theGame = {
@@ -33,6 +32,13 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
+		boxid = 1516,
+	},
+	liquipediaApp = {
+		heading = 'Download the Liquipedia App',
+		padding = true,
+		body = LiquipediaApp{},
+		boxid = 1505,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -43,20 +49,7 @@ local CONTENT = {
 	},
 	matches = {
 		heading = 'Matches',
-		body = WidgetUtil.collect(
-			MatchTickerContainer{},
-			Div{
-				css = {
-					['white-space'] = 'nowrap',
-					display = 'block',
-					margin = '0 10px',
-					['font-size'] = '15px',
-					['font-style'] = 'italic',
-					['text-align'] = 'center',
-				},
-				children = { Link{ children = 'See more matches', link = 'Liquipedia:Matches'} }
-			}
-		),
+		body = MatchTicker{},
 		padding = true,
 		boxid = 1507,
 		panelAttributes = {
@@ -160,7 +153,7 @@ return {
 					},
 					{
 						mobileOrder = 7,
-						content = CONTENT.wantToHelp,
+						content = CONTENT.liquipediaApp,
 					},
 				}
 			},

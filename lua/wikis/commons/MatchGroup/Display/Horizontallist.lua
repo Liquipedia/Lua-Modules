@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
@@ -114,6 +113,7 @@ function HorizontallistDisplay.Bracket(props)
 			:node(matchNode)
 end
 
+---@param bracketId string
 ---@param bracket [string, MatchGroupUtilBracketBracketData][]
 ---@return integer
 function HorizontallistDisplay.findMatchClosestInTime(bracketId, bracket)
@@ -240,4 +240,4 @@ function HorizontallistDisplay.Match(props)
 	return matchNode
 end
 
-return Class.export(HorizontallistDisplay)
+return HorizontallistDisplay

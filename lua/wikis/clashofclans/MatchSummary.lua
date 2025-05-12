@@ -63,7 +63,7 @@ function CustomMatchSummary._percentage(game, opponentIndex)
 	return mw.html.create('div')
 		:css('font-size', '80%')
 		:css('width', '48px')
-		:wikitext(Abbreviation.make('(' .. percentage .. '%)', 'Average Damage Percentage'))
+		:wikitext(Abbreviation.make{text = '(' .. percentage .. '%)', title = 'Average Damage Percentage'})
 end
 
 function CustomMatchSummary._time(game, opponentIndex)
@@ -74,7 +74,7 @@ function CustomMatchSummary._time(game, opponentIndex)
 	return mw.html.create('div')
 		:css('font-size', '80%')
 		:css('width', '40px')
-		:wikitext(Abbreviation.make('(' .. os.date('%M:%S', time) .. ')', 'Total Time'))
+		:wikitext(Abbreviation.make{text = '(' .. os.date('%M:%S', time) .. ')', title = 'Total Time'})
 end
 
 ---@param date string

@@ -6,15 +6,29 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local String = require('Module:StringUtils')
 local Array = require('Module:Array')
+local Class = require('Module:Class')
+local Logic = require('Module:Logic')
+local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Condition = {}
 
 -- Abstract class, node of the conditions tree
 ---@class AbstractConditionNode:BaseClass
 local _ConditionNode = Class.new()
+
+---Returns the string representation of this condition node.
+function _ConditionNode:__tostring()
+	return self:toString()
+end
+
+---Returns the string representation of this condition node.
+---@protected
+---@return string
+function _ConditionNode:toString()
+	error('_ConditionNode:toString() cannot be called directly and must be overridden.')
+end
 
 ---A tree of conditions, specifying the conditions for an LPDB request.
 ---Can be used recursively, as in, a tree of trees.
@@ -38,9 +52,9 @@ function ConditionTree:add(node)
 		table.insert(self._nodes, node)
 	else
 		-- List of nodes
-		for _, value in pairs(node) do
-			table.insert(self._nodes, value)
-		end
+		Array.forEach(node, function(subNode)
+			self:add(subNode)
+		end)
 	end
 	return self
 end
@@ -51,7 +65,11 @@ function ConditionTree:toString()
 	return table.concat(Array.map(self._nodes,
 		function(node)
 			if Class.instanceOf(node, ConditionTree) then
-				return String.interpolate('(${node})', {node = node:toString()})
+				local nodeString = node:toString()
+				if Logic.isEmpty(nodeString) then return end
+				return String.interpolate('(${node})', {node = nodeString})
+			elseif Logic.isEmpty(node) then
+				return
 			end
 
 			return node:toString()
@@ -59,6 +77,28 @@ function ConditionTree:toString()
 	), String.interpolate(' ${booleanOperator} ', {booleanOperator = self.booleanOperator}))
 
 end
+
+---@enum lpdbComparator
+local Comparator = {
+	equals = {'::'},
+	notEquals = {'::!'},
+	greaterThan = {'::>'},
+	lessThan = {'::<'},
+	greaterThanOrEqualTo = {'::>', '::'},
+	lessThanOrEqualTo = {'::<', '::'},
+}
+---@diagnostic disable-next-line: inject-field
+Comparator.eq = Comparator.equals
+---@diagnostic disable-next-line: inject-field
+Comparator.neq = Comparator.notEquals
+---@diagnostic disable-next-line: inject-field
+Comparator.gt = Comparator.greaterThan
+---@diagnostic disable-next-line: inject-field
+Comparator.lt = Comparator.lessThan
+---@diagnostic disable-next-line: inject-field
+Comparator.ge = Comparator.greaterThanOrEqualTo
+---@diagnostic disable-next-line: inject-field
+Comparator.le = Comparator.lessThanOrEqualTo
 
 ---A condition in a ConditionTree
 ---@class ConditionNode:AbstractConditionNode
@@ -76,27 +116,26 @@ local ConditionNode = Class.new(_ConditionNode,
 
 ---@return string
 function ConditionNode:toString()
-	return String.interpolate(
-		'[[${name}${comparator}${value}]]',
-		{
-			name = self.name:toString(),
-			comparator = self.comparator,
-			value = self.value
-		}
+	assert(
+		Table.any(Comparator, function (_, value)
+			return self.comparator == value
+		end),
+		'Invalid comparator for LPDB query condition'
 	)
-end
+	local conditions = Array.map(self.comparator, function(comp)
+		return String.interpolate(
+			'[[${name}${comparator}${value}]]',
+			{
+				name = self.name:toString(),
+				comparator = comp,
+				value = self.value
+			}
+		)
+	end)
 
----@enum lpdbComparator
-local Comparator = {
-	equals = '::',
-	notEquals = '::!',
-	greaterThan = '::>',
-	lessThan = '::<'
-}
-Comparator.eq = Comparator.equals
-Comparator.neq = Comparator.notEquals
-Comparator.gt = Comparator.greaterThan
-Comparator.lt = Comparator.lessThan
+	if #conditions == 1 then return conditions[1] end
+	return '(' .. table.concat(conditions, ' OR ') .. ')'
+end
 
 ---@enum lpdbBooleanOperator
 local BooleanOperator = {

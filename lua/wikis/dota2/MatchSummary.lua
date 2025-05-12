@@ -21,6 +21,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
+local STATUS_NOT_PLAYED = 'notplayed'
 
 ---@param args table
 ---@return Html
@@ -44,15 +45,17 @@ function CustomMatchSummary.createBody(match)
 		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow
+---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game, gameIndex)
+	if game.status == STATUS_NOT_PLAYED then
+		return
+	end
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data

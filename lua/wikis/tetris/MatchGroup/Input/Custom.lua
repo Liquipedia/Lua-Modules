@@ -65,14 +65,6 @@ function CustomMatchGroupInput.getBestOf(bestofInput)
 end
 
 ---@param match table
----@return table
-function CustomMatchGroupInput.getExtraData(match)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
-end
-
----@param match table
 ---@return boolean
 function CustomMatchGroupInput._hasTeamOpponent(match)
 	return match.opponent1.type == Opponent.team or match.opponent2.type == Opponent.team

@@ -18,7 +18,7 @@ local Table = require('Module:Table')
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
 
-local TBD_ABBREVIATION = Abbreviation.make('TBD', 'To be determined (or to be decided)')
+local TBD_ABBREVIATION = Abbreviation.make{text = 'TBD', title = 'To be determined (or to be decided)'}
 local ZERO_WIDTH_SPACE = '&#8203;'
 
 ---@class FightersPlayerDisplay: PlayerDisplay
@@ -55,15 +55,16 @@ function CustomPlayerDisplay.BlockPlayer(props)
 
 	local flagNode
 	if props.showFlag ~= false and player.flag then
-		flagNode = PlayerDisplay.Flag(player.flag)
+		flagNode = PlayerDisplay.Flag{flag = player.flag}
 	end
 
 	local characterNode = mw.html.create()
 	if player.chars then
-		Array.forEach(player.chars, function (character)
-			characterNode:node(
-				mw.html.create('span'):addClass('race'):wikitext(CustomPlayerDisplay.character(player.game, character))
-			)
+		local chars = Array.map(player.chars, function (character)
+			return mw.html.create('span'):addClass('race'):wikitext(CustomPlayerDisplay.character(player.game, character))
+		end)
+		Array.forEach(Array.interleave(chars, ' '), function (character)
+			characterNode:node(character)
 		end)
 	end
 
@@ -102,7 +103,7 @@ function CustomPlayerDisplay.InlinePlayer(props)
 	local player = props.player
 
 	local flag = props.showFlag ~= false and player.flag
-		and PlayerDisplay.Flag(player.flag)
+		and PlayerDisplay.Flag{flag = player.flag}
 		or nil
 
 	local faction = player.chars

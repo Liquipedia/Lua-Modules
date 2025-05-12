@@ -19,6 +19,8 @@ local REGION_TO_SUPERREGION = {
 	['MENA'] = 'EMEA',
 	['Arab States'] = 'EMEA',
 	['CIS'] = 'EMEA',
+	['Levant'] = 'EMEA',
+	['Africa'] = 'EMEA',
 	['Korea'] = 'Pacific',
 	['China'] = 'CN',
 	['North America'] = 'Americas',
@@ -31,8 +33,11 @@ local REGION_TO_SUPERREGION = {
 	['Oceania'] = 'Pacific',
 	['Japan'] = 'Pacific',
 	['Vietnam'] = 'Pacific',
+	['East Asia'] = 'Pacific',
 	['South Asia'] = 'Pacific',
 	['Southeast Asia'] = 'Pacific',
+	['Asia'] = 'Pacific',
+	['India'] = 'Pacific',
 	['Other'] = 'Other',
 }
 

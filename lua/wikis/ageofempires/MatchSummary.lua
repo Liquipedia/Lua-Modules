@@ -55,8 +55,7 @@ function CustomMatchSummary.createBody(match)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		games,
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+		games
 	)}
 end
 

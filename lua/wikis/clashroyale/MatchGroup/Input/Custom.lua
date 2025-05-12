@@ -92,6 +92,11 @@ end
 function MapFunctions.calculateMapScore(map)
 	local winner = tonumber(map.winner)
 	return function(opponentIndex)
+		-- to be able to legacy convert old brackets/matchlists need to add manual score input per map ...
+		if Logic.isNumeric(map['score' .. opponentIndex]) then
+			return tonumber(map['score' .. opponentIndex])
+		end
+
 		-- TODO Better to check if map has started, rather than finished, for a more correct handling
 		if not winner then
 			return

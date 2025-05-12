@@ -123,7 +123,6 @@ function CustomParticipantTable:readEntry(sectionArgs, key, index, config)
 		dq = Logic.readBool(opponentArgs.dq),
 		note = opponentArgs.note,
 		opponent = opponent,
-		name = Opponent.toName(opponent),
 	}
 end
 

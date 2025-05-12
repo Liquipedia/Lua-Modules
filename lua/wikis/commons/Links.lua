@@ -52,7 +52,7 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
-	bluesky = {'https://bsky.app/profile'},
+	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
 	breakingpoint = {match = 'https://www.breakingpoint.gg/match/'},
@@ -640,12 +640,13 @@ function Links.transform(links)
 	return transformedLinks
 end
 
----@param platform string
----@param id string?
----@param variant string?
----@param fallbackToBase boolean? #defaults to true
+---@param args {platform: string, id: string?, variant: string?, fallbackToBase: boolean?}
 ---@return string
-function Links.makeFullLink(platform, id, variant, fallbackToBase)
+function Links.makeFullLink(args)
+	local id = args.id
+	local variant = args.variant
+	local fallbackToBase = args.fallbackToBase
+	local platform = args.platform
 	if id == nil or id == '' then
 		return ''
 	end
@@ -678,7 +679,12 @@ end
 ---@return {[string]: string}
 function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 	return Table.map(links, function(key, item)
-		return key, Links.makeFullLink(Links.removeAppendedNumber(key), item, variant, fallbackToBase)
+		return key, Links.makeFullLink{
+			platform = Links.removeAppendedNumber(key),
+			id = item,
+			variant = variant,
+			fallbackToBase = fallbackToBase,
+		}
 	end)
 end
 

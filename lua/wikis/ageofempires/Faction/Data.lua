@@ -174,6 +174,7 @@ local factionPropsAoE2 = {
 	byzantines = {
 		index = 12,
 		name = 'Byzantines',
+		pageName = 'Byzantines'  .. AOE2_SUFFIX,
 		faction = 'byzantines',
 	},
 	celts = {
@@ -201,6 +202,7 @@ local factionPropsAoE2 = {
 	ethiopians = {
 		index = 17,
 		name = 'Ethiopians',
+		pageName = 'Ethiopians' .. AOE2_SUFFIX,
 		faction = 'ethiopians',
 	},
 	franks = {
@@ -233,11 +235,10 @@ local factionPropsAoE2 = {
 		name = 'Huns',
 		faction = 'huns',
 	},
-	incas = {
+	inca = {
 		index = 24,
-		name = 'Incas',
-		pageName = 'Incas' .. AOE2_SUFFIX,
-		faction = 'incas',
+		name = 'Inca',
+		faction = 'inca',
 	},
 	indians = {
 		index = 25,
@@ -248,6 +249,7 @@ local factionPropsAoE2 = {
 	italians = {
 		index = 26,
 		name = 'Italians',
+		pageName = 'Italians' .. AOE2_SUFFIX,
 		faction = 'italians',
 	},
 	japanese = {
@@ -256,126 +258,150 @@ local factionPropsAoE2 = {
 		pageName = 'Japanese' .. AOE2_SUFFIX,
 		faction = 'japanese',
 	},
-	khmer = {
+	jurchens = {
 		index = 28,
+		name = 'Jurchens',
+		faction = 'jurchens',
+	},
+	khitans = {
+		index = 29,
+		name = 'Khitans',
+		faction = 'khitans',
+	},
+	khmer = {
+		index = 30,
 		name = 'Khmer',
 		faction = 'khmer',
 	},
 	koreans = {
-		index = 29,
+		index = 31,
 		name = 'Koreans',
 		faction = 'koreans',
 	},
 	lithuanians = {
-		index = 30,
+		index = 32,
 		name = 'Lithuanians',
 		faction = 'lithuanians',
 	},
 	magyars = {
-		index = 31,
+		index = 33,
 		name = 'Magyars',
 		faction = 'magyars',
 	},
 	malay = {
-		index = 32,
+		index = 34,
 		name = 'Malay',
 		faction = 'malay',
 	},
 	malians = {
-		index = 33,
+		index = 35,
 		name = 'Malians',
 		pageName = 'Malians' .. AOE2_SUFFIX,
 		faction = 'malians',
 	},
-	mayans = {
-		index = 34,
-		name = 'Mayans',
-		faction = 'mayans',
+	maya = {
+		index = 36,
+		name = 'Maya',
+		faction = 'maya',
 	},
 	mongols = {
-		index = 35,
+		index = 37,
 		name = 'Mongols',
 		pageName = 'Mongols' .. AOE2_SUFFIX,
 		faction = 'mongols',
 	},
 	persians = {
-		index = 36,
+		index = 38,
 		name = 'Persians',
 		pageName = 'Persians' .. AOE2_SUFFIX,
 		faction = 'persians',
 	},
 	poles = {
-		index = 37,
+		index = 39,
 		name = 'Poles',
 		faction = 'poles',
 	},
 	portuguese = {
-		index = 38,
+		index = 40,
 		name = 'Portuguese',
 		pageName = 'Portuguese' .. AOE2_SUFFIX,
 		faction = 'portuguese',
 	},
 	romans = {
-		index = 39,
+		index = 41,
 		name = 'Romans',
 		pageName = 'Romans' .. AOE2_SUFFIX,
 		faction = 'romans',
 	},
 	saracens = {
-		index = 40,
+		index = 42,
 		name = 'Saracens',
 		faction = 'saracens',
 	},
+	shu = {
+		index = 43,
+		name = 'Shu',
+		faction = 'shu',
+	},
 	sicilians = {
-		index = 41,
+		index = 44,
 		name = 'Sicilians',
 		faction = 'sicilians',
 	},
 	slavs = {
-		index = 42,
+		index = 45,
 		name = 'Slavs',
 		faction = 'slavs',
 	},
 	spanish = {
-		index = 43,
+		index = 46,
 		name = 'Spanish',
 		pageName = 'Spanish' .. AOE2_SUFFIX,
 		faction = 'spanish',
 	},
 	spartans = {
-		index = 44,
+		index = 47,
 		name = 'Spartans',
 		faction = 'spartans',
 	},
 	tatars = {
-		index = 45,
+		index = 48,
 		name = 'Tatars',
 		faction = 'tatars',
 	},
 	teutons = {
-		index = 46,
+		index = 49,
 		name = 'Teutons',
 		faction = 'teutons',
 	},
 	turks = {
-		index = 47,
+		index = 50,
 		name = 'Turks',
 		faction = 'turks',
 	},
 	vietnamese = {
-		index = 48,
+		index = 51,
 		name = 'Vietnamese',
 		faction = 'vietnamese',
 	},
 	vikings = {
-		index = 49,
+		index = 52,
 		name = 'Vikings',
 		pageName = 'Vikings' .. AOE2_SUFFIX,
 		faction = 'vikings',
 	},
-
+	wei = {
+		index = 53,
+		name = 'Wei',
+		faction = 'wei',
+	},
+	wu = {
+		index = 54,
+		name = 'Wu',
+		faction = 'wu',
+	},
 	unknown = {
-		index = 50,
+		index = 55,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
@@ -413,6 +439,7 @@ local factionPropsAoE3 = {
 	french = {
 		index = 6,
 		name = 'French',
+		pageName = 'French' .. AOE3_SUFFIX,
 		faction = 'french',
 	},
 	germans = {
@@ -560,53 +587,63 @@ local factionPropsAoE4 = {
 		name = 'Holy Roman Empire',
 		faction = 'holyromanempire',
 	},
-	japanese = {
+	houseoflancaster = {
 		index = 9,
+		name = 'House of Lancaster',
+		faction = 'houseoflancaster',
+	},
+	japanese = {
+		index = 10,
 		name = 'Japanese',
 		pageName = 'Japanese' .. AOE4_SUFFIX,
 		faction = 'japanese',
 	},
 	jeannedarc = {
-		index = 10,
+		index = 11,
 		name = 'Jeanne d\'Arc',
 		faction = 'jeannedarc',
 	},
+	knightstemplar = {
+		index = 12,
+		name = 'Knights Templar',
+		faction = 'knightstemplar',
+	},
 	malians = {
-		index = 11,
+		index = 13,
 		name = 'Malians',
 		pageName = 'Malians' .. AOE4_SUFFIX,
 		faction = 'malians',
 	},
 	mongols = {
-		index = 12,
+		index = 14,
 		name = 'Mongols',
 		pageName = 'Mongols' .. AOE4_SUFFIX,
 		faction = 'mongols',
 	},
 	ottomans = {
-		index = 13,
+		index = 15,
 		name = 'Ottomans',
 		pageName = 'Ottomans' .. AOE4_SUFFIX,
 		faction = 'ottomans',
 	},
 	orderofthedragon = {
-		index = 14,
+		index = 16,
 		name = 'Order of the Dragon',
 		faction = 'orderofthedragon',
 	},
 	rus = {
-		index = 15,
+		index = 17,
 		name = 'Rus',
 		faction = 'rus',
 	},
 	zhuxislegacy = {
-		index = 16,
+		index = 18,
 		name = 'Zhu Xi\'s Legacy',
 		faction = 'zhuxislegacy',
 	},
 
 	unknown = {
-		index = 17,
+		index = 19,
 		name = 'Unknown',
 		faction = 'unknown',
 	},
@@ -649,7 +686,7 @@ local factionPropsAoM = {
 	},
 	fuxi = {
 		index = 7,
-		name = 'Fu Xi',
+		name = 'Fuxi',
 		faction = 'fuxi',
 	},
 	gaia = {
@@ -680,7 +717,7 @@ local factionPropsAoM = {
 	},
 	nuwa = {
 		index = 13,
-		name = 'Nü Wa',
+		name = 'Nüwa',
 		faction = 'nuwa',
 	},
 	odin = {
@@ -871,11 +908,14 @@ return {
 			gur = 'gurjaras',
 			hin = 'hindustanis',
 			hun = 'huns',
-			inc = 'incas',
+			inc = 'inca',
+			incas = 'inca',
 			ind = 'indians',
 			ita = 'italians',
 			jap = 'japanese',
 			jpn = 'japanese',
+			jur = 'jurchens',
+			khi = 'khitans',
 			khm = 'khmer',
 			kor = 'koreans',
 			lit = 'lithuanians',
@@ -883,7 +923,8 @@ return {
 			mly = 'malay',
 			mal = 'malians',
 			mli = 'malians',
-			may = 'mayans',
+			may = 'maya',
+			mayans = 'maya',
 			mon = 'mongols',
 			per = 'persians',
 			pol = 'poles',
@@ -942,10 +983,12 @@ return {
 			eng = 'english',
 			fre = 'french',
 			hre = 'holyromanempire',
+			hol = 'houseoflancaster',
 			jap = 'japanese',
 			jpn = 'japanese',
 			jea = 'jeannedarc',
 			arc = 'jeannedarc',
+			knt = 'knightstemplar',
 			mal = 'malians',
 			mon = 'mongols',
 			ord = 'orderofthedragon',
@@ -960,6 +1003,7 @@ return {
 			egy = 'egyptians',
 			fre = 'freyr',
 			fux = 'fuxi',
+			['fu xi'] = 'fuxi',
 			gai = 'gaia',
 			gre = 'greeks',
 			had = 'hades',

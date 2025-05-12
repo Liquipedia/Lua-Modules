@@ -116,8 +116,8 @@ end
 ---@param secondaryDate string?
 ---@return string?
 function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
-	return String.nilIfEmpty(ReferenceCleaner.clean(primaryDate)) or
-		String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
+	return String.nilIfEmpty(ReferenceCleaner.clean{input = primaryDate}) or
+		String.nilIfEmpty(ReferenceCleaner.clean{input = secondaryDate})
 end
 
 ---Assigns the wiki Variables according to given input, wiki variable and queryResults
@@ -194,7 +194,7 @@ end
 ---Validates the provided tier, tierType pair
 ---@param tier string|number|nil
 ---@param tierType string?
----@return string|number|nil, string?, string[]
+---@return integer?, string?, string[]
 function HiddenDataBox.validateTier(tier, tierType)
 	local warnings = {}
 

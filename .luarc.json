@@ -3,6 +3,12 @@
 	"runtime.version": "Lua 5.1",
 	"runtime.plugin": "lua/plugins/sumneko_plugin.lua",
 	"completion.autoRequire": false,
+	"completion.requireSeparator": "/",
+	"runtime.path": [
+		"lua/wikis/commons/?.lua",
+		"?.lua"
+	],
+	"runtime.pathStrict": false,
 	"diagnostics.severity": {
 		"trailing-space": "Error"
 	},
