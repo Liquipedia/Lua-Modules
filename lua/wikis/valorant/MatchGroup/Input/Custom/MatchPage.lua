@@ -71,7 +71,8 @@ end
 ---@param opponentIndex integer
 ---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
-	local teamPlayers = map['players'][opponentIndex]
+	if not map.players then return nil end
+	local teamPlayers = map.players[opponentIndex]
 	if not teamPlayers then return end
 
 	local function fetchLpPlayer(playerId)
@@ -103,6 +104,7 @@ end
 ---@param phase 'normal'|'ot'
 ---@return 'atk'|'def'|nil
 function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, phase)
+	if not map.matchInfo then return nil end
 	if phase == 'normal' then
 		return map.matchInfo['t' .. opponentIndex .. 'firstside']
 	else
@@ -115,6 +117,7 @@ end
 ---@param opponentIndex integer
 ---@return integer?
 function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIndex)
+	if not map.matchInfo then return nil end
 	local teamColor = map.matchInfo['team' .. opponentIndex]
 	if not teamColor then
 		return nil
@@ -129,18 +132,21 @@ end
 ---@param map table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
+	if not map.matchInfo then return nil end
 	return map.matchInfo.mapId
 end
 
 ---@param map table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getLength(map)
+	if not map.matchInfo then return nil end
 	return map.matchInfo.gameLengthMillis -- It's called millis but is in MM:SS format
 end
 
 ---@param map table
 ---@return ValorantRoundData[]?
 function CustomMatchGroupInputMatchPage.getRounds(map)
+	if not map.matchInfo then return nil end
 	local function otherSide(side)
 		if side == 'atk' then
 			return 'def'
