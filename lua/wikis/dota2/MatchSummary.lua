@@ -31,7 +31,7 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	-- Original Match Id must be used link to match page if it exists.
+	-- Original Match Id must be used to link match page if it exists.
 	-- It can be different from the matchId when shortened brackets are used.
 	local matchId = match.extradata.originalmatchid or match.matchId
 
