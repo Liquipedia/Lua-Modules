@@ -80,7 +80,10 @@ function MatchPageRoundsOverview:render()
 					children = {
 						OpponentDisplay.InlineOpponent{opponent = self.props.opponent1, teamStyle = 'standard'},
 						Div{
-							classes = {'match-bm-rounds-overview-teams-score', 'match-bm-rounds-overview-teams-score--'.. sideInContainer(container, 1)},
+							classes = {
+								'match-bm-rounds-overview-teams-score',
+								'match-bm-rounds-overview-teams-score--'.. sideInContainer(container, 1)
+							},
 							children = scoreForContainer(container, 1)
 						},
 					}
@@ -90,7 +93,10 @@ function MatchPageRoundsOverview:render()
 					children = {
 						OpponentDisplay.InlineOpponent{opponent = self.props.opponent2, teamStyle = 'standard'},
 						Div{
-							classes = {'match-bm-rounds-overview-teams-score', 'match-bm-rounds-overview-teams-score--'.. sideInContainer(container, 2)},
+							classes = {
+								'match-bm-rounds-overview-teams-score',
+								'match-bm-rounds-overview-teams-score--'.. sideInContainer(container, 2)
+							},
 							children = scoreForContainer(container, 2)
 						},
 					}
