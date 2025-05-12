@@ -112,13 +112,9 @@ function MatchPage:_renderGameOverview(game)
 			return details
 		end
 
-		local firstHalf, startOvertime
-		if teamIndex == 1 then
-			firstHalf = team1FirstHalf
-			startOvertime = team1OtFirstHalf
-		else
-			firstHalf = otherSide(team1FirstHalf)
-			startOvertime = otherSide(team1OtFirstHalf)
+		local firstHalf, startOvertime = team1FirstHalf, team1OtFirstHalf
+		if teamIndex == 2 then
+			firstHalf, startOvertime = otherSide(firstHalf), otherSide(startOvertime)
 		end
 
 		table.insert(details, teamHalf[firstHalf])
