@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
@@ -36,16 +35,6 @@ local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
-local AVAILABLE_FOR_TIERS = {1}
-local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget

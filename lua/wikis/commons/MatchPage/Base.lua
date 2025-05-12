@@ -68,12 +68,6 @@ local BaseMatchPage = Class.new(
 BaseMatchPage.NOT_PLAYED = 'notplayed'
 BaseMatchPage.NO_CHARACTER = 'default'
 
----@param match table
----@return boolean
-function BaseMatchPage.isEnabledFor(match)
-	error('BaseMatchPage.isEnabledFor() cannot be called directly and must be overridden.')
-end
-
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
 function BaseMatchPage.getByMatchId(props)

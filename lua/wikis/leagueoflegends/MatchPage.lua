@@ -8,7 +8,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -69,21 +68,11 @@ end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '24px'
-local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
-local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
