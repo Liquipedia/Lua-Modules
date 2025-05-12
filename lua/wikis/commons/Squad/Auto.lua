@@ -171,11 +171,6 @@ function SquadAuto:parseConfig()
         error("SquadStatus 'FORMER_INACTIVE' is not supported by SquadAuto.")
     end
 
-    if self.config.status == SquadUtils.SquadStatus.INACTIVE then
-        table.insert(self.config.roles.included, 'Inactive')
-    else
-        table.insert(self.config.roles.excluded, 'Inactive')
-    end
 end
 
 ---@param entries SquadAutoPerson[]
