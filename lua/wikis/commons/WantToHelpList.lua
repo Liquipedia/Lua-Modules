@@ -18,8 +18,8 @@ local DEFAULT_LIMIT = 3
 ---Usage e.g. on main page
 ---@param args {limit: string|integer?}
 ---@return string
-function WantToHelpList.get(args)
-	local limit = tonumber(args.limit) or DEFAULT_LIMIT
+function WantToHelpList.get(frame)
+	local limit = tonumber(frame.args.limit) or DEFAULT_LIMIT
 
 	local listItems = {}
 	local todos = WantToHelpList._getTodos()
