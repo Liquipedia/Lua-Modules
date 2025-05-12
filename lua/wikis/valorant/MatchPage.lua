@@ -96,26 +96,67 @@ function MatchPage:_renderGameOverview(game)
 		return side == 'atk' and 'def' or 'atk'
 	end
 
-	local team1Halfs = game.extradata.t1halfs or {}
-	local team2Halfs = game.extradata.t2halfs or {}
 	local team1FirstHalf = game.extradata.t1firstside
 	local team1OtFirstHalf = game.extradata.t1firstsideot
 
+	local hasStart = team1FirstHalf ~= nil
 	local hasOvertime = team1OtFirstHalf ~= nil
 
-	local team1 = {
-		team1Halfs[team1FirstHalf],
-		team1Halfs[otherSide(team1FirstHalf)],
-		hasOvertime and team1Halfs['ot' .. team1OtFirstHalf] or nil,
-		hasOvertime and team1Halfs['ot' .. otherSide(team1OtFirstHalf)] or nil,
-	}
+	---@param teamIndex 1|2
+	---@return {score: number, side: string}[]
+	local makeTeamDetails = function(teamIndex)
+		local details = {}
 
-	local team2 = {
-		team2Halfs[otherSide(team1FirstHalf)],
-		team2Halfs[team1FirstHalf],
-		hasOvertime and team2Halfs['ot' .. otherSide(team1OtFirstHalf)] or nil,
-		hasOvertime and team2Halfs['ot' .. team1OtFirstHalf] or nil,
-	}
+		local teamHalf = game.extradata['t' .. teamIndex .. 'halfs']
+		if Table.isEmpty(teamHalf) or not hasStart then
+			return details
+		end
+
+		local firstHalf, startOvertime
+		if teamIndex == 1 then
+			firstHalf = team1FirstHalf
+			startOvertime = team1OtFirstHalf
+		else
+			firstHalf = otherSide(team1FirstHalf)
+			startOvertime = otherSide(team1OtFirstHalf)
+		end
+
+		table.insert(details, teamHalf[firstHalf])
+		table.insert(details, teamHalf[otherSide(firstHalf)])
+
+		if not hasOvertime then
+			return details
+		end
+
+		table.insert(details, teamHalf['ot' .. startOvertime])
+		table.insert(details, teamHalf['ot' .. otherSide(startOvertime)])
+
+		return details
+	end
+
+	local team1 = makeTeamDetails(1)
+	local team2 = makeTeamDetails(2)
+
+	local function makeTeamHalfScoreDisplay(half)
+		return Div{
+			classes = {
+				'match-bm-game-summary-team-halves-half',
+				'match-bm-game-summary-team-halves-half--' .. half.side
+			},
+			children = half.score
+		}
+	end
+
+	local function makeTeamHalvesDisplay(halves)
+		return Div{
+			classes = {
+				'match-bm-game-summary-team-halves',
+			},
+			children = Array.interleave(Array.map(halves, function(half)
+				return makeTeamHalfScoreDisplay(half)
+			end), SPAN_SLASH)
+		}
+	end
 
 	return Div{
 		classes = {'match-bm-lol-game-overview'},
@@ -127,10 +168,7 @@ function MatchPage:_renderGameOverview(game)
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
 							self.opponents[1].iconDisplay,
-							Div{
-								classes = {'match-bm-lol-game-summary-team-halves'},
-								children = Array.interleave(team1, SPAN_SLASH)
-							}
+							makeTeamHalvesDisplay(team1)
 						}
 					},
 					Div{
@@ -154,10 +192,7 @@ function MatchPage:_renderGameOverview(game)
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
 							self.opponents[2].iconDisplay,
-							Div{
-								classes = {'match-bm-lol-game-summary-team-halves'},
-								children = Array.interleave(team2, SPAN_SLASH)
-							}
+							makeTeamHalvesDisplay(team2)
 						}
 					},
 				}

@@ -2,6 +2,11 @@
 Template(s): Match Page
 Author(s): Rathoz
 *******************************************************************************/
+span.slash {
+	margin: 0 0.125rem;
+	opacity: 0.4;
+}
+
 .match-bm-match-header {
 	display: flex;
 	flex-direction: column;
@@ -700,11 +705,6 @@ Author(s): Rathoz
 				@media ( max-width: 413px ) {
 					font-size: 0.75rem;
 				}
-			}
-
-			.slash {
-				margin: 0 0.125rem;
-				opacity: 0.4;
 			}
 		}
 	}
@@ -1410,6 +1410,26 @@ Author(s): Rathoz
 					color: #ffffff;
 					background-color: #01654c;
 				}
+			}
+		}
+	}
+}
+
+.match-bm-game-summary-team-halves {
+	display: flex;
+
+	&-half {
+		font-weight: bold;
+
+		&--atk {
+			.wiki-valorant & {
+				color: #b20110;
+			}
+		}
+
+		&--def {
+			.wiki-valorant & {
+				color: #01654c;
 			}
 		}
 	}
