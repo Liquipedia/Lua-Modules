@@ -217,7 +217,7 @@ function BaseMatchPage:render()
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
 			},
-			self:renderMapVeto(self.matchData),
+			self:renderMapVeto(),
 			self:renderGames(),
 			self:footer()
 		)
@@ -264,9 +264,9 @@ function BaseMatchPage:renderGame(game)
 end
 
 ---@protected
----@param match MatchPageMatch
 ---@return Widget[]
-function BaseMatchPage:renderMapVeto(match)
+function BaseMatchPage:renderMapVeto()
+	local match = self.matchData
 	if not match.extradata or not match.extradata.mapveto then
 		return {}
 	end
