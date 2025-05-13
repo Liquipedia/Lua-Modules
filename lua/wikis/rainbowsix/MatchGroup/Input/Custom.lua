@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterNames = require('Module:CharacterNames')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -17,7 +18,8 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
-local MAX_NUM_BANS = 2
+local MAX_NUM_BANS = 6
+local VALID_BAN_TYPES = {'atk', 'def'}
 MatchFunctions.DEFAULT_MODE = 'team'
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
@@ -84,10 +86,18 @@ function MapFunctions.getExtraData(match, map, opponents)
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
-		extradata['t' .. opponentIndex .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function(banIndex)
-			local ban = map['t' .. opponentIndex .. 'ban' .. banIndex]
+		local prefix = 't' .. opponentIndex
+		extradata[prefix .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function(banIndex)
+			local ban = map[prefix .. 'ban' .. banIndex]
 			return getCharacterName(ban) or ''
 		end)
+		-- to be enabled after bot jobs:
+		-- assert(map[prefix .. 'bantypes'])
+
+		extradata[prefix .. 'bantypes'] = Array.parseCommaSeparatedString(map[prefix .. 'bantypes'])
+		assert(Array.all(extradata[prefix .. 'bantypes'], function(banType)
+			return Table.includes(VALID_BAN_TYPES, banType)
+		end))
 	end)
 
 	return extradata
