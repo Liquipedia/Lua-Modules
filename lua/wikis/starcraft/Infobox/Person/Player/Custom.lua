@@ -98,6 +98,7 @@ function CustomInjector:parse(id, widgets)
 				content = {CustomPlayer._getRaceDisplay(args.race)}
 			}
 		}
+	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
 	elseif
 		id == 'history' and

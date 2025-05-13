@@ -29,6 +29,7 @@ local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
 
+---@class StormgateInfoboxPlayer: Person
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -75,6 +76,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Faction', content = {caller:getFactionData(args.faction or 'unknown')}}
 		}
+	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
 	elseif id == 'achievements' then
 		local achievements = Achievements.player{

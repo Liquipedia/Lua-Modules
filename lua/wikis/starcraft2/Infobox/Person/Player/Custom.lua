@@ -131,6 +131,7 @@ function CustomInjector:parse(id, widgets)
 				content = {caller:getRaceData(args.race or 'unknown', RACE_FIELD_AS_CATEGORY_LINK)}
 			}
 		}
+	elseif id == 'role' then return {}
 	elseif id == 'region' then return {}
 	elseif id == 'achievements' and caller.shouldQueryData then
 		local allkills = caller:_getAllkills() or 0
