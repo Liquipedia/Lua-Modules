@@ -91,13 +91,15 @@ function MapFunctions.getExtraData(match, map, opponents)
 			local ban = map[prefix .. 'ban' .. banIndex]
 			return getCharacterName(ban) or ''
 		end)
-		-- to be enabled after bot jobs:
-		-- assert(Table.isEmpty(extradata[prefix .. 'bans']) or map[prefix .. 'bantypes'])
 
 		extradata[prefix .. 'bantypes'] = Array.parseCommaSeparatedString(map[prefix .. 'bantypes'])
 		assert(Array.all(extradata[prefix .. 'bantypes'], function(banType)
 			return Table.includes(VALID_BAN_TYPES, banType)
-		end))
+		end), 'Invalid ban type in "' .. map[prefix .. 'bantypes'] .. '"')
+		-- to be enabled after bot jobs:
+		--[[ assert(#extradata[prefix .. 'bans']) <= #extradata[prefix .. 'bantypes'],
+			'number of bans exceeds number of ban types')
+		]]
 	end)
 
 	return extradata
