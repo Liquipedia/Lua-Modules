@@ -30,6 +30,16 @@ local VETOES = {
 	[8] = 'pick,pick,pick,pick,ban',
 	[9] = 'pick,pick,pick,pick,decider',
 }
+local OPERATOR_BANS = {
+	[2] = {
+		'atk,def',
+		'atk,def',
+	},
+	[6] = {
+		'def,def,def,atk,atk,atk',
+		'atk,atk,atk,def,def,def',
+	},
+}
 
 --returns the Code for a Match, depending on the input
 ---@param bestof integer
@@ -48,6 +58,8 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mvps = Logic.readBool(args.mvp)
 	local showScore = Logic.readBool(args.score)
 	local streams = Logic.readBool(args.streams)
+	local numberOfOperatorBans = tonumber(args.operatorbans)
+	local banOrder = OPERATOR_BANS[numberOfOperatorBans]
 
 	---@param list string[]
 	---@param indents integer
@@ -95,6 +107,16 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		))
 	end
 
+	local operatorBanParams = function(opponentIndex)
+		if not banOrder then return end
+		return {
+			INDENT .. INDENT .. '|t' .. opponentIndex .. 'bantypes=' .. (banOrder[opponentIndex] or ''),
+			INDENT .. INDENT .. table.concat(Array.map(Array.rang(1, numberOfOperatorBans), function(banIndex)
+				return '|t' .. opponentIndex .. 'ban' .. banIndex .. '='
+			end))
+		}
+	end
+
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
 		local firstMapLine = INDENT .. '|map' .. mapIndex .. '={{Map|map=' .. score .. '|finished='
 		if not mapDetails then
@@ -102,10 +124,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return
 		end
 
-		Array.appendWith(lines,
+		Array.extendWith(lines,
 			firstMapLine,
-			INDENT .. INDENT .. '|t1ban1=|t1ban2=',
-			INDENT .. INDENT .. '|t2ban1=|t2ban2=',
+			operatorBanParams(1),
+			operatorBanParams(2),
 			INDENT .. INDENT .. '|t1firstside=' .. (mapDetailsOT and '|t1firstsideot=' or ''),
 			atkDefParams(1),
 			atkDefParams(2),
