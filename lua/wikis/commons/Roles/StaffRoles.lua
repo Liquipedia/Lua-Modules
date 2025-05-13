@@ -35,6 +35,11 @@ local staffRoles = {
 	['admin'] = {category = 'Admins', display = 'Admin'},
 	['commentator'] = {category = 'Casters', display = 'Caster'},
 	['organizer'] = {category = 'Tournament Organizer', display = 'Tournament Organizer'},
+	['map maker'] = {category = 'Map makers', display = 'Map maker'},
+	['photographer'] = {category = 'Photographers', display = 'Photographer'},
 }
+
+staffRoles['tournament organizer'] = staffRoles['organizer']
+staffRoles['content producer'] = staffRoles['content creator']
 
 return staffRoles
