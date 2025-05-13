@@ -17,7 +17,7 @@ local DEFAULT_LIMIT = 3
 
 ---Builds the Want to help display.
 ---Usage e.g. on main page
----@param frame Frame
+---@param frame Frame|{limit: string|integer?}
 ---@return string
 function WantToHelpList.get(frame)
 	local args = Arguments.getArgs(frame)
