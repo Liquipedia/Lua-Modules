@@ -30,15 +30,9 @@ local VETOES = {
 	[8] = 'pick,pick,pick,pick,ban',
 	[9] = 'pick,pick,pick,pick,decider',
 }
-local OPERATOR_BANS = {
-	[2] = {
-		'atk,def',
-		'atk,def',
-	},
-	[6] = {
-		'def,def,def,atk,atk,atk',
-		'atk,atk,atk,def,def,def',
-	},
+local OPERATOR_BANS_INFORMATION = {
+	siege = {format = 'atk,def', size = 2},
+	siegeX = {format = 'atk,atk,atk,def,def,def', size = 6},
 }
 
 --returns the Code for a Match, depending on the input
@@ -58,8 +52,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mvps = Logic.readBool(args.mvp)
 	local showScore = Logic.readBool(args.score)
 	local streams = Logic.readBool(args.streams)
-	local numberOfOperatorBans = tonumber(args.operatorbans)
-	local banOrder = OPERATOR_BANS[numberOfOperatorBans]
+	local operatorBanInformation = OPERATOR_BANS_INFORMATION[args.operatorbans]
+	assert(operatorBanInformation, 'invalid |operatorbans=')
+	local numberOfOperatorBans = operatorBanInformation.size
+	local operatorBanFormat = operatorBanInformation.format
 
 	---@param list string[]
 	---@param indents integer
@@ -108,13 +104,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	local operatorBanParams = function(opponentIndex)
-		if not banOrder then return end
-		return {
-			INDENT .. INDENT .. '|t' .. opponentIndex .. 'bantypes=' .. (banOrder[opponentIndex] or ''),
-			INDENT .. INDENT .. table.concat(Array.map(Array.rang(1, numberOfOperatorBans), function(banIndex)
-				return '|t' .. opponentIndex .. 'ban' .. banIndex .. '='
-			end))
-		}
+		return INDENT .. INDENT .. table.concat(Array.map(Array.rang(1, numberOfOperatorBans), function(banIndex)
+			return '|t' .. opponentIndex .. 'ban' .. banIndex .. '='
+		end))
 	end
 
 	Array.forEach(Array.range(1, bestof), function(mapIndex)
@@ -124,8 +116,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 			return
 		end
 
-		Array.extendWith(lines,
+		Array.appendWith(lines,
 			firstMapLine,
+			INDENT .. INDENT .. '|bantype=' .. operatorBanFormat,
 			operatorBanParams(1),
 			operatorBanParams(2),
 			INDENT .. INDENT .. '|t1firstside=' .. (mapDetailsOT and '|t1firstsideot=' or ''),

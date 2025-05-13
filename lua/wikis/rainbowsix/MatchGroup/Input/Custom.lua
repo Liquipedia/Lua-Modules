@@ -84,6 +84,12 @@ function MapFunctions.getExtraData(match, map, opponents)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
+	local banTypes = Array.parseCommaSeparatedString(map.bantype)
+	assert(Array.all(banTypes, function(banType)
+		return Table.includes(VALID_BAN_TYPES, banType)
+	end), 'Invalid ban type in "' .. (map.bantype or '') .. '"')
+	local banReverseIndex = map.t1firstside == 'atk' and 2 or 1
+
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
@@ -92,12 +98,10 @@ function MapFunctions.getExtraData(match, map, opponents)
 			return getCharacterName(ban) or ''
 		end)
 
-		extradata[prefix .. 'bantypes'] = Array.parseCommaSeparatedString(map[prefix .. 'bantypes'])
-		assert(Array.all(extradata[prefix .. 'bantypes'], function(banType)
-			return Table.includes(VALID_BAN_TYPES, banType)
-		end), 'Invalid ban type in "' .. (map[prefix .. 'bantypes'] or '') .. '"')
+		extradata[prefix .. 'bantypes'] = #banTypes > 2 and opponentIndex == banReverseIndex and Array.reverse(banTypes) or Table.copy(banTypes)
+
 		-- to be enabled after bot jobs:
-		--[[ assert(#extradata[prefix .. 'bans']) <= #extradata[prefix .. 'bantypes'],
+		--[[ assert(#extradata[prefix .. 'bans']) <= #banTypes,
 			'number of bans exceeds number of ban types')
 		]]
 	end)
