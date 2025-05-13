@@ -75,15 +75,9 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local teamPlayers = map.players[opponentIndex]
 	if not teamPlayers then return end
 
-	local function fetchLpPlayer(playerId)
-		--- TODO
-		return nil
-	end
 	local players = Array.map(teamPlayers.players, function(player)
-		local playerData = fetchLpPlayer(player.riot_id) or {}
 		return {
-			player = playerData.pagename or player.riot_id,
-			name = playerData.id or player.riot_id,
+			player = player.riot_id,
 			agent = player.agent,
 			acs = player.acs,
 			adr = nil,
@@ -132,7 +126,9 @@ end
 ---@param map table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
-	if not map.matchInfo then return nil end
+	if not map.matchInfo then
+		return map.map
+	end
 	return map.matchInfo.mapId
 end
 
@@ -158,7 +154,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 	local nextOvertimeSide = t1startot
 	return Array.map(map.roundDetails, function(round)
 		local roundNumber = round.round_no
-		-- TODO This is stupid, doesn't handle OT, but it works until the API is fixed
+		-- TODO This is stupid, but it works until the API is improved
 		local t1side, t2side
 		if roundNumber <= 12 then
 			t1side = t1start

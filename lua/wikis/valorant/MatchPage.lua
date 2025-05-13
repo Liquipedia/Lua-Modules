@@ -253,7 +253,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 		children = {
 			PlayerDisplay{
 				characterIcon = self:getCharacterIcon(player.agent),
-				characterName = player.character,
+				characterName = player.agent,
 				playerName = player.displayName or player.player,
 				playerLink = player.player,
 			},
@@ -262,7 +262,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = MathUtil.round(player.acs)
+						data = player.acs and MathUtil.round(player.acs) or nil,
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kda'}, 'KDA'},

@@ -373,6 +373,7 @@ function BaseMatchPage:getPatchLink()
 end
 
 ---@protected
+---@return string?
 function BaseMatchPage.getPoweredBy()
 	return nil
 end
