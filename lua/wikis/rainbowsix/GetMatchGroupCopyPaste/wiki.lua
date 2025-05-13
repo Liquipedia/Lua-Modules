@@ -30,9 +30,9 @@ local VETOES = {
 	[8] = 'pick,pick,pick,pick,ban',
 	[9] = 'pick,pick,pick,pick,decider',
 }
-local OPERATOR_BANS_INFORMATION = {
-	siege = {format = 'atk,def', size = 2},
-	siegeX = {format = 'atk,atk,atk,def,def,def', size = 6},
+local OPERATOR_BANS_SIZES = {
+	siege = 2,
+	siegeX = 6,
 }
 
 --returns the Code for a Match, depending on the input
@@ -52,10 +52,9 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	local mvps = Logic.readBool(args.mvp)
 	local showScore = Logic.readBool(args.score)
 	local streams = Logic.readBool(args.streams)
-	local operatorBanInformation = OPERATOR_BANS_INFORMATION[args.operatorbans]
-	assert(operatorBanInformation, 'invalid |operatorbans=')
-	local numberOfOperatorBans = operatorBanInformation.size
-	local operatorBanFormat = operatorBanInformation.format
+	local numberOfOperatorBans = OPERATOR_BANS_SIZES[args.operatorbans]
+	assert(numberOfOperatorBans, 'invalid |operatorbans=')
+	local operatorBanFormat = args.operatorbans
 
 	---@param list string[]
 	---@param indents integer

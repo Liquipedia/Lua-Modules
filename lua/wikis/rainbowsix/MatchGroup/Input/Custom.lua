@@ -10,7 +10,6 @@ local Array = require('Module:Array')
 local CharacterNames = require('Module:CharacterNames')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -18,10 +17,18 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
----@type table<string, {flipForDef: boolean, numberOfBansPerTeam: integer}>
+---@type table<string, {atk: string[], def: string[]}>
 local OPERATOR_BAN_FORMATS = {
-	['atk,def'] = {flipForDef = false, numberOfBansPerTeam = 2}, -- before siegeX
-	['atk,atk,atk,def,def,def'] = {flipForDef = true, numberOfBansPerTeam = 6}, -- since siegeX
+	-- before siegeX
+	siege = {
+		atk = {'atk', 'def'},
+		def = {'atk', 'def'},
+	},
+	-- since siegeX
+	siegeX = {
+		atk = {'def', 'def', 'def', 'atk', 'atk', 'atk'},
+		def = {'atk', 'atk', 'atk', 'def', 'def', 'def'},
+	},
 }
 
 MatchFunctions.DEFAULT_MODE = 'team'
@@ -89,27 +96,33 @@ function MapFunctions.getExtraData(match, map, opponents)
 	}
 
 	-- temp workaround until bot job is done
-	local banTypeInput = map.bantype or 'atk,def'
-	local operatorBanFormatInfo = OPERATOR_BAN_FORMATS[banTypeInput]
-	-- local operatorBanFormatInfo = OPERATOR_BAN_FORMATS[map.bantype]
-	assert(operatorBanFormatInfo, 'Invalid input: "|bantype=' .. (map.bantype or '') .. '"')
+	local banTypeInput = map.bantype or 'siege'
+	local banTypes = OPERATOR_BAN_FORMATS[banTypeInput]
+	-- local banTypes = OPERATOR_BAN_FORMATS[map.bantype]
+	assert(banTypes, 'Invalid input: "|bantype=' .. (map.bantype or '') .. '"')
 
-	local banTypes = Array.parseCommaSeparatedString(map.bantype)
-	local banReverseIndex = function(opponentIndex)
-		local indexToPotentiallyFlip = map.t1firstside == 'atk' and 2
-			or map.t1firstside == 'def' and 1
-		return operatorBanFormatInfo.flipForDef and opponentIndex == indexToPotentiallyFlip
+	---@param opponentIndex integer
+	---@return string?
+	local getFirstSide = function(opponentIndex)
+		if opponentIndex == 1 and map.t1firstside == 'atk' then
+			return 'atk'
+		elseif opponentIndex == 1 and map.t1firstside == 'def' then
+			return 'def'
+		elseif opponentIndex == 2 and map.t1firstside == 'atk' then
+			return 'def'
+		elseif opponentIndex == 2 and map.t1firstside == 'def' then
+			return 'atk'
+		end
 	end
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
-		extradata[prefix .. 'bans'] = Array.map(Array.range(1, operatorBanFormatInfo.numberOfBansPerTeam), function(banIndex)
-			local ban = map[prefix .. 'ban' .. banIndex]
-			return getCharacterName(ban) or ''
+		extradata[prefix .. 'bantypes'] = banTypes[getFirstSide(opponentIndex)] or {}
+		local maxNumberOfBans = #extradata[prefix .. 'bantypes']
+		extradata[prefix .. 'bans'] = Array.map(Array.range(1, maxNumberOfBans), function(banIndex)
+			return getCharacterName(map[prefix .. 'ban' .. banIndex]) or ''
 		end)
-
-		extradata[prefix .. 'bantypes'] = banReverseIndex(opponentIndex) and Array.reverse(banTypes) or Table.copy(banTypes)
 	end)
 
 	return extradata
