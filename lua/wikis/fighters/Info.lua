@@ -521,6 +521,19 @@ return {
 		},
 		ggxrd = {
 			abbreviation = 'GG XRD',
+			name = 'Guilty Gear Xrd',
+			link = 'Guilty Gear Xrd',
+			logo = {
+				darkMode = 'GGXrdSign Logo.png',
+				lightMode = 'GGXrdSign Logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'GGXrdSign Logo.png',
+				lightMode = 'GGXrdSign Logo.png',
+			},
+		},
+		ggxrds = {
+			abbreviation = 'GG XRD S',
 			name = 'Guilty Gear Xrd -SIGN-',
 			link = 'Guilty Gear Xrd -SIGN-',
 			logo = {

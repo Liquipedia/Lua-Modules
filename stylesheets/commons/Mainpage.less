@@ -94,6 +94,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	padding-left: 35px;
 	position: relative;
 	line-height: 21px;
+	flex-grow: 1;
 }
 
 .tournaments-list-name span.league-icon-small-image {
@@ -101,14 +102,22 @@ div.main-page-banner .main-page-banner-bottom-row {
 	position: absolute;
 }
 
+.tournaments-list-name span.tournament-game-icon {
+	margin-left: -50px;
+	padding-right: 25px;
+	position: absolute;
+}
+
 .dropdown-menu .league-icon-small-image img,
-.tournaments-list-name .league-icon-small-image img {
+.tournaments-list-name .league-icon-small-image img,
+.tournaments-list-name .icon-small img {
 	max-height: 21px;
 	max-width: 21px;
 }
 
 .dropdown-menu span.league-icon-small-image,
-.tournaments-list-name span.league-icon-small-image {
+.tournaments-list-name span.league-icon-small-image,
+.tournaments-list-name span.icon-small {
 	vertical-align: -4px;
 	min-height: 21px;
 	min-width: 21px;
@@ -415,6 +424,17 @@ table.infobox_matches_content {
 .infobox_matches_content td.match-filler > div {
 	display: flex;
 	justify-content: space-between;
+
+	div.tournament-span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 170px;
+		vertical-align: middle;
+		white-space: nowrap;
+		font-size: 11px;
+		height: 16px;
+		margin-top: 3px;
+	}
 }
 
 .infobox_matches_content:last-child {

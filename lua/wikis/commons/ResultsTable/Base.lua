@@ -376,6 +376,9 @@ function BaseResultsTable:build()
 			:tag('td'):attr('colspan', 42):wikitext('No recorded results found.'))
 	end
 
+	-- Hidden tr that contains a td to prevent the first yearHeader from being inside thead
+	displayTable:node(mw.html.create('tr'):css('display', 'none'):tag('td'):allDone())
+
 	for _, dataSet in ipairs(self.data) do
 		for _, row in ipairs(self:_buildRows(dataSet)) do
 			displayTable:node(row)
@@ -547,7 +550,7 @@ function BaseResultsTable:processVsData(placement)
 	local lastVs = placement.lastvsdata or {}
 
 	if Logic.isNotEmpty(lastVs.groupscore) then
-		return placement.groupscore, nil, Abbreviation.make('Grp S.', 'Group Stage')
+		return placement.groupscore, nil, Abbreviation.make{text = 'Grp S.', title = 'Group Stage'}
 	end
 
 	local score = ''

@@ -289,4 +289,4 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 	end
 end
 
-return Class.export(AgeCalculation)
+return AgeCalculation

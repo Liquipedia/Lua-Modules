@@ -8,18 +8,14 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
@@ -39,16 +35,6 @@ local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'dota2_kda', hover = 'KDA'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
-local AVAILABLE_FOR_TIERS = {1}
-local MATCH_PAGE_START_TIME = 1725148800 -- September 1st 2024 midnight
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
@@ -322,11 +308,11 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				characterIcon = self:getCharacterIcon(player.character),
 				characterName = player.character,
 				side = game.teams[teamIndex].side,
-				roleIcon = IconImage{
+				roleIcon = player.facet and IconImage{
 					imageLight = 'Dota2 ' .. player.facet .. ' facet icon darkmode.png',
 					caption = player.facet,
 					link = ''
-				},
+				} or nil,
 				playerName = player.displayName,
 				playerLink = player.link
 			},
@@ -409,20 +395,6 @@ end
 function MatchPage:getPatchLink()
 	if Logic.isEmpty(self.matchData.patch) then return end
 	return Link{ link = 'Version ' .. self.matchData.patch }
-end
-
----@return MatchPageComment[]
-function MatchPage:addComments()
-	local casters = Json.parseIfString(self.matchData.extradata.casters)
-	if Logic.isEmpty(casters) then return {} end
-	return {
-		Comment{
-			children = WidgetUtil.collect(
-				#casters > 1 and 'Casters: ' or 'Caster: ',
-				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
-			)
-		}
-	}
 end
 
 return MatchPage

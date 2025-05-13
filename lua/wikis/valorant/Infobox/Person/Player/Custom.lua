@@ -18,14 +18,15 @@ local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ROLES = {
 	-- Players
@@ -97,7 +98,10 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then
 		Array.appendWith(widgets,
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (' .. Abbreviation.make('Org', 'Organisation') .. ')', content = {args.years_active_org}},
+			Cell{
+				name = 'Years Active (' .. Abbreviation.make{text = 'Org', title = 'Organisation'} .. ')',
+				content = {args.years_active_org}
+			},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
 		)
@@ -185,13 +189,16 @@ function CustomPlayer:getPersonType(args)
 	return {store = 'player', category = 'Player'}
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		return
-			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.player{recentLimit = 3},
+				UpcomingTournaments{name = teamPage}
+			}
+		}
 	end
 end
 

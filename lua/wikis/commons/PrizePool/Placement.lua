@@ -49,7 +49,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dq)
 		end,
 		display = function ()
-			return Abbreviation.make('DQ', 'Disqualified')
+			return Abbreviation.make{text = 'DQ', title = 'Disqualified'}
 		end,
 		lpdb = 'DQ',
 	},
@@ -58,7 +58,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnf)
 		end,
 		display = function ()
-			return Abbreviation.make('DNF', 'Did not finish')
+			return Abbreviation.make{text = 'DNF', title = 'Did not finish'}
 		end,
 		lpdb = 'DNF',
 	},
@@ -67,7 +67,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.dnp)
 		end,
 		display = function ()
-			return Abbreviation.make('DNP', 'Did not participate')
+			return Abbreviation.make{text = 'DNP', title = 'Did not participate'}
 		end,
 		lpdb = 'DNP',
 	},
@@ -103,7 +103,7 @@ Placement.specialStatuses = {
 			return Logic.readBool(args.q)
 		end,
 		display = function ()
-			return Abbreviation.make('Q', 'Qualified Automatically')
+			return Abbreviation.make{text = 'Q', title = 'Qualified Automatically'}
 		end,
 		lpdb = 'Q',
 	},
@@ -331,11 +331,11 @@ end
 function Placement:getBackground()
 	for statusName, status in pairs(Placement.specialStatuses) do
 		if status.active(self.args) then
-			return PlacementInfo.getBgClass(statusName:lower())
+			return PlacementInfo.getBgClass{placement = statusName:lower()}
 		end
 	end
 
-	return PlacementInfo.getBgClass(self.placeStart)
+	return PlacementInfo.getBgClass{placement = self.placeStart}
 end
 
 ---@return string?

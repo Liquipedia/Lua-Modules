@@ -967,6 +967,20 @@ mw.uri = {}
 function mw.uri.localUrl(s, s2) return '' end
 function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
 
+---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
+
+---Percent-encodes a string with the specified encoding type.
+---@param str string
+---@param enctype UriEncodeType?
+---@return string
+function mw.uri.encode(str, enctype) end
+
+---Percent-decodes a string with the specified encoding type.
+---@param str string
+---@param enctype UriEncodeType?
+---@return string
+function mw.uri.decode(str, enctype) end
+
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
 

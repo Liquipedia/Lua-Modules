@@ -67,12 +67,6 @@ local BaseMatchPage = Class.new(
 BaseMatchPage.NOT_PLAYED = 'notplayed'
 BaseMatchPage.NO_CHARACTER = 'default'
 
----@param match table
----@return boolean
-function BaseMatchPage.isEnabledFor(match)
-	error('BaseMatchPage.isEnabledFor() cannot be called directly and must be overridden.')
-end
-
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
 function BaseMatchPage.getByMatchId(props)
@@ -300,8 +294,22 @@ function BaseMatchPage:_getComments()
 		Logic.isNotEmpty(substituteComments) and Comment{
 			children = Array.interleave(substituteComments, HtmlWidgets.Br{})
 		} or nil,
+		self:_getCasterComment(),
 		self:addComments()
 	)
+end
+
+---@private
+---@return MatchPageComment?
+function BaseMatchPage:_getCasterComment()
+	local casters = self.matchData.extradata.casters
+	if Logic.isEmpty(casters) then return end
+	return Comment{
+		children = WidgetUtil.collect(
+			#casters > 1 and 'Casters: ' or 'Caster: ',
+			Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
+		)
+	}
 end
 
 ---@protected
