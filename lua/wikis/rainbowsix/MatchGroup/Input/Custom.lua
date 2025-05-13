@@ -92,7 +92,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 			return getCharacterName(ban) or ''
 		end)
 		-- to be enabled after bot jobs:
-		-- assert(map[prefix .. 'bantypes'])
+		-- assert(Table.isEmpty(extradata[prefix .. 'bans']) or map[prefix .. 'bantypes'])
 
 		extradata[prefix .. 'bantypes'] = Array.parseCommaSeparatedString(map[prefix .. 'bantypes'])
 		assert(Array.all(extradata[prefix .. 'bantypes'], function(banType)
