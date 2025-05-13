@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterNames = require('Module:CharacterNames')
 local FnUtil = require('Module:FnUtil')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 
@@ -118,7 +119,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
-		extradata[prefix .. 'bantypes'] = banTypes[getFirstSide(opponentIndex)] or {}
+		extradata[prefix .. 'bantypes'] = Table.copy(banTypes[getFirstSide(opponentIndex)])
 		local maxNumberOfBans = #extradata[prefix .. 'bantypes']
 		extradata[prefix .. 'bans'] = Array.map(Array.range(1, maxNumberOfBans), function(banIndex)
 			return getCharacterName(map[prefix .. 'ban' .. banIndex]) or ''
