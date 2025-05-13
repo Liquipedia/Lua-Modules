@@ -13,18 +13,17 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Countdown = require('Module:Countdown')
 local DateExt = require('Module:Date/Ext')
-local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Timezone = require('Module:Timezone')
 local StreamLinks = require('Module:Links/Stream')
-local Page = require('Module:Page')
 local VodLink = require('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Title = Lua.import('Module:Widget/Tournament/Title')
+local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -128,23 +127,10 @@ function Details:create()
 	local matchBottomBar = mw.html.create('div'):addClass('match-bottom-bar')
 	matchBottomBar:node(self:countdown())
 
-	if self.match.match2bracketdata.matchpage then
-		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
-			:addClass('btn btn-secondary btn-new btn--match-details')
-			:attr('title', 'View Match Page')
-			:node(mw.html.create('i')
-				:addClass('fas fa-external-link')
-			)
-			:wikitext('  Details')
-		), self.match.match2bracketdata.matchpage))
-	elseif self.match.match2id and Info.config.match2.matchPage then
-		local link = 'Match:ID ' .. self.match.match2id
-		matchBottomBar:node(Page.makeInternalLink(tostring(mw.html.create('div')
-			:addClass('btn btn-new btn--add-match-details show-when-logged-in')
-			:attr('title', 'Add Match Page')
-			:wikitext('+ Add details')
-		), link))
-	end
+	matchBottomBar:node(MatchPageButton{
+		matchId = self.match.match2id,
+		hasMatchPage = Logic.isNotEmpty(self.match.match2bracketdata.matchpage),
+	})
 
 	return self.root
 		:node(mw.html.create('div'):addClass('match-links')

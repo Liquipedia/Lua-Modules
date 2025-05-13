@@ -8,9 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
@@ -18,10 +16,8 @@ local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
-local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Comment = Lua.import('Module:Widget/Match/Page/Comment')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
@@ -72,21 +68,11 @@ end)
 
 local DEFAULT_ITEM = 'EmptyIcon'
 local LOADOUT_ICON_SIZE = '24px'
-local AVAILABLE_FOR_TIERS = {1, 2, 3}
 local ITEMS_TO_SHOW = 6
 
 local KDA_ICON = IconFa{iconName = 'leagueoflegends_kda', hover = 'KDA'}
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
-
-local MATCH_PAGE_START_TIME = 1619827201 -- May 1st 2021 midnight
-
----@param match table
----@return boolean
-function MatchPage.isEnabledFor(match)
-	return Table.includes(AVAILABLE_FOR_TIERS, tonumber(match.liquipediatier))
-			and (match.timestamp == DateExt.defaultTimestamp or match.timestamp > MATCH_PAGE_START_TIME)
-end
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
@@ -615,20 +601,6 @@ function MatchPage._buildPlayerLoadout(player)
 					}
 				}
 			}
-		}
-	}
-end
-
----@return MatchPageComment[]
-function MatchPage:addComments()
-	local casters = Json.parseIfString(self.matchData.extradata.casters)
-	if Logic.isEmpty(casters) then return {} end
-	return {
-		Comment{
-			children = WidgetUtil.collect(
-				#casters > 1 and 'Casters: ' or 'Caster: ',
-				Array.interleave(DisplayHelper.createCastersDisplay(casters), ', ')
-			)
 		}
 	}
 end

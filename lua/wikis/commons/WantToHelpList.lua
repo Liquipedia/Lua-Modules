@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local Arguments = require('Module:Arguments')
 local Page = require('Module:Page')
 local Variables = require('Module:Variables')
 
@@ -17,10 +16,9 @@ local DEFAULT_LIMIT = 3
 
 ---Builds the Want to help display.
 ---Usage e.g. on main page
----@param frame Frame
+---@param args {limit: string|integer?}
 ---@return string
-function WantToHelpList.get(frame)
-	local args = Arguments.getArgs(frame)
+function WantToHelpList.get(args)
 	local limit = tonumber(args.limit) or DEFAULT_LIMIT
 
 	local listItems = {}

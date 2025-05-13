@@ -6,6 +6,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Lua = require('Module:Lua')
+
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
+
 local CONTENT = {
 	about = {
 		heading = 'About Wildcard',
@@ -31,7 +35,7 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
@@ -42,8 +46,8 @@ local CONTENT = {
 		boxid = 1501,
 	},
 	wildcards = {
-		heading = 'Wildcards',
-		body = '{{Liquipedia:Wildcards}}',
+		heading = 'Wild Cards',
+		body = '{{Liquipedia:Wild Cards}}',
 		padding = true,
 		boxid = 1513,
 	},
@@ -72,8 +76,8 @@ return {
 	navigation = {
 		{
 			file = 'Wildcard header Wildcards.webp',
-			title = 'Wildcards',
-			link = 'Portal:Wildcards',
+			title = 'Wild Cards',
+			link = 'Portal:Wild Cards',
 		},
 		{
 			file = 'Wildcard header Champions.webp',
