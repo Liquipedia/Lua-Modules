@@ -119,7 +119,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
-		extradata[prefix .. 'bantypes'] = Table.copy(banTypes[getFirstSide(opponentIndex)])
+		extradata[prefix .. 'bantypes'] = Table.copy(banTypes[getFirstSide(opponentIndex)] or {})
 		local maxNumberOfBans = #extradata[prefix .. 'bantypes']
 		extradata[prefix .. 'bans'] = Array.map(Array.range(1, maxNumberOfBans), function(banIndex)
 			return getCharacterName(map[prefix .. 'ban' .. banIndex]) or ''
