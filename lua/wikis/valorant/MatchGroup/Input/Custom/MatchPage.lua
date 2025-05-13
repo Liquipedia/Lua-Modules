@@ -16,6 +16,13 @@ local CustomMatchGroupInputMatchPage = {}
 ---@field vod string?
 ---@field finished boolean
 
+local function otherSide(side)
+	if side == 'atk' then
+		return 'def'
+	end
+	return 'atk'
+end
+
 ---@param mapInput {matchid: string?, reversed: string?, vod: string?, region: string?}
 ---@return dota2MatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
@@ -30,6 +37,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	assert(map and type(map) == 'table' and map.matchInfo, mapInput.matchid .. ' could not be retrieved.')
 
 	-- Let's shift the array to start from 1
+	-- This is a temporary workaround for the API returning 0-indexed arrays
 	if map.players and type(map.players) == 'table' and map.players[0] then
 		local newTeams = {}
 		for i, team in pairs(map.players) do
@@ -56,6 +64,21 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 			newTeams[i + 1] = team
 		end
 		map.teams = newTeams
+	end
+
+	-- Fix round winner
+	-- We are currently getting the side the team started the NEXT round on, but it should be THIS round.
+	-- This is a temporary fix until the API is fixed
+	if map.roundDetails and type(map.roundDetails) == 'table' then
+		Array.forEach(map.roundDetails, function(roundDetail)
+			if roundDetail.round_no % 12 == 0 or roundDetail.round_no > 24 then
+				-- In overtime, the winner is the opposite of the round number
+				-- Same with the last round of each side in normal time (12, 24)
+				roundDetail.round_winner = otherSide(roundDetail.round_winner)
+			else
+				roundDetail.round_winner = roundDetail.round_winner
+			end
+		end)
 	end
 
 	---@cast map valorantMatchDataExtended
@@ -142,12 +165,7 @@ end
 ---@return ValorantRoundData[]?
 function CustomMatchGroupInputMatchPage.getRounds(map)
 	if not map.matchInfo then return nil end
-	local function otherSide(side)
-		if side == 'atk' then
-			return 'def'
-		end
-		return 'atk'
-	end
+
 	local t1start = map.matchInfo.t1firstside
 	local t1startot = map.matchInfo.o1t1firstside
 	local nextOvertimeSide = t1startot
