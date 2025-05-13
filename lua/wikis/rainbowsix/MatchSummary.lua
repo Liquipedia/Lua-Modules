@@ -14,7 +14,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local FnUtil = require('Module:FnUtil')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local ROUND_ICONS = {
