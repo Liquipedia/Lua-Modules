@@ -18,8 +18,12 @@ local CustomMatchGroupInput = {}
 local MatchFunctions = {}
 local MapFunctions = {}
 
-local MAX_NUM_BANS = 6
-local VALID_BAN_TYPES = {'atk', 'def'}
+---@type table<string, {flipForDef: boolean, numberOfBansPerTeam: integer}>
+local OPERATOR_BAN_FORMATS = {
+	['atk,def'] = {flipForDef = false, numberOfBansPerTeam = 2}, -- before siegeX
+	['atk,atk,atk,def,def,def'] = {flipForDef = true, numberOfBansPerTeam = 6}, -- since siegeX
+}
+
 MatchFunctions.DEFAULT_MODE = 'team'
 MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 
@@ -84,26 +88,28 @@ function MapFunctions.getExtraData(match, map, opponents)
 		t2halfs = {atk = map.t2atk, def = map.t2def, otatk = map.t2otatk, otdef = map.t2otdef},
 	}
 
+	-- temp workaround until bot job is done
+	local banTypeInput = map.bantype or 'atk,def'
+	local operatorBanFormatInfo = OPERATOR_BAN_FORMATS[banTypeInput]
+	-- local operatorBanFormatInfo = OPERATOR_BAN_FORMATS[map.bantype]
+	assert(operatorBanFormatInfo, 'Invalid input: "|bantype=' .. (map.bantype or '') .. '"')
+
 	local banTypes = Array.parseCommaSeparatedString(map.bantype)
-	assert(Array.all(banTypes, function(banType)
-		return Table.includes(VALID_BAN_TYPES, banType)
-	end), 'Invalid ban type in "' .. (map.bantype or '') .. '"')
-	local banReverseIndex = map.t1firstside == 'atk' and 2 or 1
+	local banReverseIndex = function(opponentIndex)
+		local indexToPotentiallyFlip = map.t1firstside == 'atk' and 2
+			or map.t1firstside == 'def' and 1
+		return operatorBanFormatInfo.flipForDef and opponentIndex == indexToPotentiallyFlip
+	end
 
 	local getCharacterName = FnUtil.curry(MatchGroupInputUtil.getCharacterName, CharacterNames)
 	Array.forEach(opponents, function(_, opponentIndex)
 		local prefix = 't' .. opponentIndex
-		extradata[prefix .. 'bans'] = Array.map(Array.range(1, MAX_NUM_BANS), function(banIndex)
+		extradata[prefix .. 'bans'] = Array.map(Array.range(1, operatorBanFormatInfo.numberOfBansPerTeam), function(banIndex)
 			local ban = map[prefix .. 'ban' .. banIndex]
 			return getCharacterName(ban) or ''
 		end)
 
-		extradata[prefix .. 'bantypes'] = #banTypes > 2 and opponentIndex == banReverseIndex and Array.reverse(banTypes) or Table.copy(banTypes)
-
-		-- to be enabled after bot jobs:
-		--[[ assert(#extradata[prefix .. 'bans']) <= #banTypes,
-			'number of bans exceeds number of ban types')
-		]]
+		extradata[prefix .. 'bantypes'] = banReverseIndex(opponentIndex) and Array.reverse(banTypes) or Table.copy(banTypes)
 	end)
 
 	return extradata
