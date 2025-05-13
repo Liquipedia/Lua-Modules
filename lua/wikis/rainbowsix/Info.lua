@@ -7,13 +7,13 @@
 --
 
 return {
-	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; SiegeX from 2025
+	startYear = 2006, --vegas from 2006; vegas2 from 2008; siege from 2015; mobile from 2022; siegex from 2025
 	wikiName = 'rainbowsix',
 	name = 'Rainbow Six',
 	defaultGame = 'siege',
 	games = {
-    siegex = {
-			abbreviation = '',
+		siegex = {
+			abbreviation = 'R6X',
 			name = 'Tom Clancy\'s Rainbow Six Siege X',
 			link = 'Rainbow Six Siege X',
 			logo = {
