@@ -105,12 +105,14 @@ local function getTeamHalvesDetails(game, teamIndex)
 		return {}
 	end
 
+	local startOvertimeScore = teamHalf['ot' .. startOvertime]
+	local otherOvertimeScore = teamHalf['ot' .. otherOvertime]
 	---@type {score: number, side: string}[]
 	return {
 		{side = startNormal, score = teamHalf[startNormal]},
 		{side = otherNormal, score = teamHalf[otherNormal]},
-		startOvertime and {side = startOvertime, score = teamHalf['ot' .. startOvertime]} or nil,
-		startOvertime and {side = otherOvertime, score = teamHalf['ot' .. otherOvertime]} or nil
+		startOvertime and startOvertimeScore and {side = startOvertime, score = startOvertimeScore} or nil,
+		startOvertime and otherOvertimeScore and {side = otherOvertime, score = otherOvertimeScore} or nil,
 	}
 end
 
