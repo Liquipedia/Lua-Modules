@@ -95,7 +95,7 @@ function MapFunctions.getExtraData(match, map, opponents)
 		extradata[prefix .. 'bantypes'] = Array.parseCommaSeparatedString(map[prefix .. 'bantypes'])
 		assert(Array.all(extradata[prefix .. 'bantypes'], function(banType)
 			return Table.includes(VALID_BAN_TYPES, banType)
-		end), 'Invalid ban type in "' .. map[prefix .. 'bantypes'] .. '"')
+		end), 'Invalid ban type in "' .. (map[prefix .. 'bantypes'] or '') .. '"')
 		-- to be enabled after bot jobs:
 		--[[ assert(#extradata[prefix .. 'bans']) <= #extradata[prefix .. 'bantypes'],
 			'number of bans exceeds number of ban types')
