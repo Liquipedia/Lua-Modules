@@ -83,26 +83,11 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 
 	-- Temporary reverse logic until the API has this feature added
 	if Logic.readBool(mapInput.reversed) then
-		local function otherColor(color)
-			if color == 'Red' then
-				return 'Blue'
-			end
-			return 'Red'
-		end
-
 		map.matchInfo.team1, map.matchInfo.team2 = map.matchInfo.team2, map.matchInfo.team1
 		map.matchInfo.t1firstside = otherSide(map.matchInfo.t1firstside)
 		map.matchInfo.o1t1firstside = otherSide(map.matchInfo.o1t1firstside)
-		Array.forEach(map.players, function(team)
-			Array.forEach(team.players, function(player)
-				player.team = otherColor(player.team)
-			end)
-		end)
 		Array.forEach(map.roundDetails, function(roundDetail)
 			roundDetail.winningSide = otherSide(roundDetail.winningSide)
-		end)
-		Array.forEach(map.teams, function(team)
-			team.teamId = otherColor(team.teamId)
 		end)
 		map.teams[1], map.teams[2] = map.teams[2], map.teams[1]
 		map.players[1], map.players[2] = map.players[2], map.players[1]
