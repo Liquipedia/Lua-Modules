@@ -34,20 +34,6 @@ local Header = Class.new(MatchSummary.Header)
 
 ---@param content Html
 ---@return self
-function Header:leftOpponentTeam(content)
-	self.leftElementAdditional = content
-	return self
-end
-
----@param content Html
----@return self
-function Header:rightOpponentTeam(content)
-	self.rightElementAdditional = content
-	return self
-end
-
----@param content Html
----@return self
 function Header:scoreBoard(content)
 	self.scoreBoardElement = content
 	return self
@@ -121,43 +107,45 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 end
 
 ---@param opponent standardOpponent
----@param date string
----@return Html?
-function Header:soloOpponentTeam(opponent, date)
-	if opponent.type == 'solo' then
-		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-		local display = teamExists
-			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or TBD_ICON
-		return mw.html.create('div'):wikitext(display)
-			:addClass('brkts-popup-header-opponent-solo-team')
-		end
-end
-
----@param opponent standardOpponent
 ---@param opponentIndex integer
+---@param date string
 ---@return Html
-function Header:createOpponent(opponent, opponentIndex)
-	return OpponentDisplay.BlockOpponent({
+function Header:createOpponent(opponent, opponentIndex, date)
+	local opponentDisplay = OpponentDisplay.BlockOpponent({
 		flip = opponentIndex == 1,
 		opponent = opponent,
 		overflow = 'ellipsis',
 		teamStyle = 'short',
 	})
-		:addClass(opponent.type ~= 'solo'
-			and 'brkts-popup-header-opponent'
-			or 'brkts-popup-header-opponent-solo-with-team')
+	local playerTeam
+
+	if opponent.type == 'solo' then
+		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
+		local display = teamExists
+			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
+			or TBD_ICON
+		playerTeam = mw.html.create('div'):wikitext(display)
+			:addClass('brkts-popup-header-opponent-solo-team')
+	end
+
+	local cssClass = opponent.type == 'solo'
+		and 'brkts-popup-header-opponent-solo-with-team'
+		or 'brkts-popup-header-opponent'
+	local side = opponentIndex == 1 and 'left' or 'right'
+
+	return mw.html.create('div')
+		:addClass(cssClass)
+		:addClass('brkts-popup-header-opponent-' .. side)
+		:node(opponentIndex == 1 and playerTeam or opponentDisplay)
+		:node(opponentIndex == 2 and opponentDisplay or playerTeam)
 end
 
 ---@return Html
 function Header:create()
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-		:node(self.leftElementAdditional)
-		:node(self.leftElement)
+	self.root:node(self.leftElement)
 	self.root:node(self.scoreBoardElement)
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-		:node(self.rightElement)
-		:node(self.rightElementAdditional)
+	self.root:node(self.rightElement)
+
 	return self.root
 end
 
@@ -176,8 +164,7 @@ function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
-		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1], match.date))
-		:leftOpponent(header:createOpponent(match.opponents[1], 1))
+		:leftOpponent(header:createOpponent(match.opponents[1], 1, match.date))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -186,8 +173,7 @@ function CustomMatchSummary.createHeader(match, options)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 2))
-		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
+		:rightOpponent(header:createOpponent(match.opponents[2], 2, match.date))
 end
 
 ---@param date string
