@@ -128,6 +128,8 @@ end
 ---@param opponents table[]
 ---@return table<string, any>
 function MapFunctions.getExtraData(MapParser, match, map, opponents)
+  local publisherId, publisherRegion = MapParser.getMatchId(map)
+  
 	---@type table<string, any>
 	local extraData = {
 		t1firstside = MapParser.getFirstSide(map, 1, 'normal'),
@@ -145,7 +147,8 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 			otdef = MapParser.getScoreFromRounds(map, 'otdef', 2),
 		},
 		rounds = MapParser.getRounds(map),
-		publisherid = MapParser.getMatchId(map),
+		publisherid = publisherId,
+    publisherregion = publisherRegion,
 	}
 
 	for opponentIdx, opponent in ipairs(map.opponents) do
