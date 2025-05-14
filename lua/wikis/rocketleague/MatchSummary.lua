@@ -23,8 +23,6 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
 -- Custom Header Class
 ---@class RocketleagueMatchSummaryHeader: MatchSummaryHeader
 ---@field scoreBoardElement Html
