@@ -19,6 +19,12 @@ function CustomMatchGroupInputNormal.getMapName(mapInput)
 	return mapInput.map
 end
 
+---@param map table
+---@return string?
+function CustomMatchGroupInputNormal.getMatchId(map)
+	return map.matchid
+end
+
 function CustomMatchGroupInputNormal.getLength(mapInput)
 	return mapInput.length
 end

@@ -30,6 +30,7 @@ local MapFunctions = {}
 
 ---@class ValorantMapParserInterface
 ---@field getMap fun(mapInput: table): table
+---@field getMatchId fun(map: table): string?
 ---@field getFirstSide fun(map: table, opponentIndex: integer, phase: 'normal'|'ot'): string?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
 ---@field getScoreFromRounds fun(map: table, side: 'atk'|'def'|'otatk'|'otdef', opponentIndex: integer): integer?
@@ -144,6 +145,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 			otdef = MapParser.getScoreFromRounds(map, 'otdef', 2),
 		},
 		rounds = MapParser.getRounds(map),
+		publisherid = MapParser.getMatchId(map),
 	}
 
 	for opponentIdx, opponent in ipairs(map.opponents) do

@@ -156,6 +156,12 @@ end
 
 ---@param map table
 ---@return string?
+function CustomMatchGroupInputMatchPage.getMatchId(map)
+	return map.matchid
+end
+
+---@param map table
+---@return string?
 function CustomMatchGroupInputMatchPage.getLength(map)
 	if not map.matchInfo then return nil end
 	return map.matchInfo.gameLengthMillis -- It's called millis but is in MM:SS format
