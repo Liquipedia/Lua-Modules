@@ -104,45 +104,11 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	return scoreBoardNode:node(score)
 end
 
----@param opponent standardOpponent
----@param opponentIndex integer
----@param date string
----@return Html
-function Header:createOpponent(opponent, opponentIndex, date)
-	local opponentDisplay = OpponentDisplay.BlockOpponent({
-		flip = opponentIndex == 1,
-		opponent = opponent,
-		overflow = 'ellipsis',
-		teamStyle = 'short',
-	})
-	local playerTeam
-
-	if opponent.type == 'solo' then
-		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-		local display = teamExists
-			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or TBD_ICON
-		playerTeam = mw.html.create('div'):wikitext(display)
-			:addClass('brkts-popup-header-opponent-solo-team')
-	end
-
-	local cssClass = opponent.type == 'solo'
-		and 'brkts-popup-header-opponent-solo-with-team'
-		or 'brkts-popup-header-opponent'
-	local side = opponentIndex == 1 and 'left' or 'right'
-
-	return mw.html.create('div')
-		:addClass(cssClass)
-		:addClass('brkts-popup-header-opponent-' .. side)
-		:node(opponentIndex == 1 and playerTeam or opponentDisplay)
-		:node(opponentIndex == 2 and opponentDisplay or playerTeam)
-end
-
 ---@return Html
 function Header:create()
-	self.root:node(self.leftElement)
+	self.root:node(mw.html.create('div'):addClass('brkts-popup-header-opponent'):node(self.leftElement))
 	self.root:node(self.scoreBoardElement)
-	self.root:node(self.rightElement)
+	self.root:node(mw.html.create('div'):addClass('brkts-popup-header-opponent'):node(self.rightElement))
 
 	return self.root
 end
@@ -162,7 +128,7 @@ function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
-		:leftOpponent(header:createOpponent(match.opponents[1], 1, match.date))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left', match.date))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -171,7 +137,7 @@ function CustomMatchSummary.createHeader(match, options)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 2, match.date))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right', match.date))
 end
 
 ---@param date string
