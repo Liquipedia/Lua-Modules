@@ -20,9 +20,9 @@ function CustomMatchGroupInputNormal.getMapName(mapInput)
 end
 
 ---@param map table
----@return string?
+---@return string?, string?
 function CustomMatchGroupInputNormal.getMatchId(map)
-	return map.matchid
+	return map.matchid, map.region
 end
 
 function CustomMatchGroupInputNormal.getLength(mapInput)

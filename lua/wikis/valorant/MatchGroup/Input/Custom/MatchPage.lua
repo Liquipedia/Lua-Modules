@@ -155,9 +155,9 @@ function CustomMatchGroupInputMatchPage.getMapName(map)
 end
 
 ---@param map table
----@return string?
+---@return string?, string?
 function CustomMatchGroupInputMatchPage.getMatchId(map)
-	return map.matchid
+	return map.matchid, map.region
 end
 
 ---@param map table
