@@ -27,8 +27,6 @@ local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Header Class
 ---@class RocketleagueMatchSummaryHeader: MatchSummaryHeader
----@field leftElementAdditional Html
----@field rightElementAdditional Html
 ---@field scoreBoardElement Html
 local Header = Class.new(MatchSummary.Header)
 
