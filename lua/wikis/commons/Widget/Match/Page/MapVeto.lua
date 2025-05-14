@@ -65,7 +65,7 @@ function MatchPageMapVeto:render()
 				children = {
 					HtmlWidgets.Div{
 						classes = {'match-bm-map-veto-card-image'},
-						children = Image.display(vetoRound.name .. ' Map.png', nil, {size = 240, link = 'vetoRound.name'}),
+						children = Image.display(vetoRound.name .. ' Map.png', nil, {size = 240, link = vetoRound.name}),
 					},
 					HtmlWidgets.Div{
 						classes = {'match-bm-map-veto-card-title'},
