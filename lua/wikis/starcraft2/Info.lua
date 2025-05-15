@@ -63,6 +63,7 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		forceUnderscores = true, -- applies to several components
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
