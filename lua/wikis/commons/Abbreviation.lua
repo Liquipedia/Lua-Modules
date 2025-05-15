@@ -27,4 +27,4 @@ function Abbreviation.make(args)
 	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'
 end
 
-return Class.export(Abbreviation)
+return Class.export(Abbreviation, {exports = {'make'}})

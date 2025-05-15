@@ -228,4 +228,4 @@ function Earnings._determineValue(placement, aliases, isPlayerQuery)
 	return indivPrize * Table.size(Table.filter(playerData, function(team) return Table.includes(aliases, team) end))
 end
 
-return Class.export(Earnings)
+return Class.export(Earnings, {exports = {'calculateForPlayer', 'calculateForTeam'}})

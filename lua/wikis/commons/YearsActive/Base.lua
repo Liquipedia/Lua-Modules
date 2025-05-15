@@ -174,4 +174,4 @@ function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	return yearRanges
 end
 
-return Class.export(ActiveYears)
+return Class.export(ActiveYears, {exports = {'display'}})

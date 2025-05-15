@@ -35,4 +35,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

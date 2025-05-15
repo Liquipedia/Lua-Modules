@@ -106,4 +106,4 @@ function Region._toDisplay(regionValues, options)
 	return display .. Page.makeInternalLink({}, text, ':Category:' .. text)
 end
 
-return Class.export(Region, {frameOnly = true})
+return Class.export(Region, {frameOnly = true, exports = {'run', 'display', 'name'}})
