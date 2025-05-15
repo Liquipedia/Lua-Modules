@@ -43,7 +43,6 @@ function CustomMatchSummary.createBody(match)
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary.createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
 	)}
 end
