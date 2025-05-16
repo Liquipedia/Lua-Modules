@@ -122,8 +122,6 @@ end
 ---@param game MatchPageGame
 ---@return Widget?
 function MatchPage:_renderGameOverview(game)
-	if self:isBestOfOne() then return end
-
 	local team1 = getTeamHalvesDetails(game, 1)
 	local team2 = getTeamHalvesDetails(game, 2)
 
@@ -144,6 +142,26 @@ function MatchPage:_renderGameOverview(game)
 		}
 	end
 
+	local function createScoreHolder()
+		return Div{
+			classes = {'match-bm-lol-game-summary-score-holder'},
+			children = game.finished and WidgetUtil.collect(
+				not self:isBestOfOne() and Div{
+					classes = {'match-bm-lol-game-summary-score'},
+					children = {
+						DisplayHelper.MapScore(game.opponents[1], game.status),
+						'&#8209;', -- Non-breaking hyphen
+						DisplayHelper.MapScore(game.opponents[2], game.status)
+					}
+				} or nil,
+				Div{
+					classes = {'match-bm-lol-game-summary-length'},
+					children = game.length
+				}
+			) or nil
+		}
+	end
+
 	return Div{
 		classes = {'match-bm-lol-game-overview'},
 		children = {
@@ -157,23 +175,7 @@ function MatchPage:_renderGameOverview(game)
 							self.opponents[1].iconDisplay,
 						}
 					},
-					Div{
-						classes = {'match-bm-lol-game-summary-score-holder'},
-						children = game.finished and {
-							Div{
-								classes = {'match-bm-lol-game-summary-score'},
-								children = {
-									DisplayHelper.MapScore(game.opponents[1], game.status),
-									'&#8209;', -- Non-breaking hyphen
-									DisplayHelper.MapScore(game.opponents[2], game.status)
-							}
-							},
-							Div{
-								classes = {'match-bm-lol-game-summary-length'},
-								children = game.length
-							}
-						} or nil
-					},
+					createScoreHolder(),
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
