@@ -39,7 +39,7 @@ local MatchPageMapVeto = Class.new(Widget)
 function MatchPageMapVeto._getMapData(map)
 	local condition = ConditionTree(BooleanOperator.all)
 		:add(ConditionNode(ColumnName('type'), Comparator.eq, 'map'))
-		:add(ConditionNode(ColumnName('pagename'), Comparator.eq, map))
+		:add(ConditionNode(ColumnName('pagename'), Comparator.eq, string.gsub(map, ' ', '_')))
 
 	return mw.ext.LiquipediaDB.lpdb('datapoint', {
 		query = 'pagename, name, image',
