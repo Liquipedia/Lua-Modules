@@ -207,8 +207,8 @@ function MapFunctions.calculateMapScore(MapParser, map)
 		end
 		return (attackScore or 0)
 			+ (defenseScore or 0)
-			+ (MapParser.getScoreFromRounds(map, 'otatk', opponentIndex) or 0)
-			+ (MapParser.getScoreFromRounds(map, 'otdef', opponentIndex) or 0)
+			+ (MapParser.getScoreFromRounds(map, 'atk', opponentIndex, true) or 0)
+			+ (MapParser.getScoreFromRounds(map, 'def', opponentIndex, true) or 0)
 	end
 end
 
