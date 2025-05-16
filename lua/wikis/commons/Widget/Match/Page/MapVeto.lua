@@ -79,44 +79,46 @@ function MatchPageMapVeto:render()
 		)
 	end
 
-	return HtmlWidgets.Div{
-		classes = {'match-bm-map-veto-cards'},
-		children = Array.map(self.props.vetoRounds, function(vetoRound)
-			local mapData = MatchPageMapVeto._getMapData(vetoRound.name) or {}
-			local mapLink = mapData.pagename or vetoRound.name
+	local function createVetoCard(vetoRound)
+		local mapData = MatchPageMapVeto._getMapData(vetoRound.name) or {}
+		local mapLink = mapData.pagename or vetoRound.name
 
-			return HtmlWidgets.Div{
-				classes = {'match-bm-map-veto-card', 'match-bm-map-veto-card--' .. vetoRound.type},
-				children = {
-					HtmlWidgets.Div{
-						classes = {'match-bm-map-veto-card-image'},
-						children = Image.display(
-							mapData.image or vetoRound.name .. ' Map.png',
-							nil,
-							{size = 240, link = mapLink}
-						),
-					},
-					HtmlWidgets.Div{
-						classes = {'match-bm-map-veto-card-title'},
-						children = {
-							Link{
-								link = mapLink,
-								children = {
-									HtmlWidgets.Div{
-										classes = {'match-bm-map-veto-card-map-name'},
-										children = mapData.name or vetoRound.name
-									},
-								}
-							},
-							HtmlWidgets.Div{
-								classes = {'match-bm-map-veto-card-map-info'},
-								children = formatTitle(vetoRound)
-							},
-						}
+		return HtmlWidgets.Div{
+			classes = {'match-bm-map-veto-card', 'match-bm-map-veto-card--' .. vetoRound.type},
+			children = {
+				HtmlWidgets.Div{
+					classes = {'match-bm-map-veto-card-image'},
+					children = Image.display(
+						mapData.image or vetoRound.name .. ' Map.png',
+						nil,
+						{size = 240, link = mapLink}
+					),
+				},
+				HtmlWidgets.Div{
+					classes = {'match-bm-map-veto-card-title'},
+					children = {
+						Link{
+							link = mapLink,
+							children = {
+								HtmlWidgets.Div{
+									classes = {'match-bm-map-veto-card-map-name'},
+									children = mapData.name or vetoRound.name
+								},
+							}
+						},
+						HtmlWidgets.Div{
+							classes = {'match-bm-map-veto-card-map-info'},
+							children = formatTitle(vetoRound)
+						},
 					}
 				}
 			}
-		end)
+		}
+	end
+
+	return HtmlWidgets.Div{
+		classes = {'match-bm-map-veto-cards'},
+		children = Array.map(self.props.vetoRounds, createVetoCard)
 	}
 end
 
