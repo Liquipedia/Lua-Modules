@@ -23,8 +23,10 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
+---@alias VetoRound {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}
+
 ---@class MatchPageMapVetoParameters
----@field vetoRounds {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}[]
+---@field vetoRounds VetoRound[]
 
 ---@class MatchPageMapVeto: Widget
 ---@operator call(MatchPageMapVetoParameters): MatchPageMapVeto
@@ -48,6 +50,8 @@ end
 
 ---@return Widget
 function MatchPageMapVeto:render()
+	---@param vetoRound VetoRound
+	---@return (string|Widget)[]
 	local formatTitle = function(vetoRound)
 		local teamDisplay = function()
 			return mw.ext.TeamTemplate.teamicon(vetoRound.by.template)
@@ -79,6 +83,8 @@ function MatchPageMapVeto:render()
 		)
 	end
 
+	---@param vetoRound VetoRound
+	---@return Widget?
 	local function createVetoCard(vetoRound)
 		local mapData = MatchPageMapVeto._getMapData(vetoRound.name)
 		if not mapData then
