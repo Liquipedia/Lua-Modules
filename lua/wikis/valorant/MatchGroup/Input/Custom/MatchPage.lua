@@ -147,15 +147,25 @@ end
 ---@return integer?
 function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIndex, overtime)
 	if not map.matchInfo then return nil end
-	local teamColor = map.matchInfo['team' .. opponentIndex]
+	local matchInfo = map.matchInfo
+	local teamColor = matchInfo['team' .. opponentIndex]
 	if not teamColor then
 		return nil
 	end
-	local sideData = map.matchInfo[teamColor]
+	local sideData = matchInfo[teamColor]
 	if not sideData then
 		return nil
 	end
-	return sideData['team' .. side .. (overtime and 'ot' or '') .. 'wins']
+	if not overtime then
+		return sideData['team' .. side .. 'wins']
+	end
+	local sides = {matchInfo.Blue, matchInfo.Red}
+	if Array.any(sides, function (element)
+		return element.teamatkotwins > 0 or element.teamdefotwins > 0
+	end) then
+		return sideData['team' .. side .. 'otwins']
+	end
+	return nil
 end
 
 ---@param map table
