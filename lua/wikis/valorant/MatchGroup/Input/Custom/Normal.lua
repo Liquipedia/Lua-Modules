@@ -55,4 +55,8 @@ function CustomMatchGroupInputNormal.getRounds(map)
 	return nil
 end
 
+function CustomMatchGroupInputNormal.getPatch(map)
+	return map.patch
+end
+
 return CustomMatchGroupInputNormal

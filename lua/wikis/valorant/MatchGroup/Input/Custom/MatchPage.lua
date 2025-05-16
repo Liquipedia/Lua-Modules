@@ -215,4 +215,11 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 	end)
 end
 
+---@param map table
+---@return string?
+function CustomMatchGroupInputMatchPage.getPatch(map)
+	if not map.matchInfo then return nil end
+	return map.matchInfo.gameVersion
+end
+
 return CustomMatchGroupInputMatchPage

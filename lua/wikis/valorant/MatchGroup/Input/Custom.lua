@@ -37,6 +37,7 @@ local MapFunctions = {}
 ---@field getMapName fun(map: table): string?
 ---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
+---@field getPatch fun(map: table): string?
 
 ---@param match table
 ---@param options table?
@@ -80,6 +81,7 @@ function MatchFunctions.extractMaps(match, opponents, MapParser)
 		getMapName = MapParser.getMapName,
 		getLength = MapParser.getLength,
 		getPlayersOfMapOpponent = FnUtil.curry(MapFunctions.getPlayersOfMapOpponent, MapParser),
+		getPatch = MapParser.getPatch
 	}
 
 	return MatchGroupInputUtil.standardProcessMaps(match, opponents, mapParser)
