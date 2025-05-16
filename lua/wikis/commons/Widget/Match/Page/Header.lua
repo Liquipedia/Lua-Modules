@@ -49,7 +49,7 @@ function MatchPageHeader:_makeResultDisplay()
 
 	local o1Score, o2Score = opponent1.score, opponent2.score
 
-	if Info.config.match2.gameScoresIfBo1 then
+	if self.props.isBestOfOne and Info.config.match2.gameScoresIfBo1 then
 		o1Score, o2Score = gameOneScore[1], gameOneScore[2]
 	end
 
