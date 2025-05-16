@@ -218,7 +218,6 @@ function BaseMatchPage:render()
 				mvp = self.matchData.extradata.mvp,
 				opponent1 = self.matchData.opponents[1],
 				opponent2 = self.matchData.opponents[2],
-				gameOneScore = self.games[1].scores,
 				parent = self.matchData.parent,
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
 				tournamentName = self.matchData.tournament,
