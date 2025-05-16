@@ -80,8 +80,11 @@ function MatchPageMapVeto:render()
 	end
 
 	local function createVetoCard(vetoRound)
-		local mapData = MatchPageMapVeto._getMapData(vetoRound.name) or {}
-		local mapLink = mapData.pagename or vetoRound.name
+		local mapData = MatchPageMapVeto._getMapData(vetoRound.name)
+		if not mapData then
+			return
+		end
+		local mapLink = mapData.pagename
 
 		return HtmlWidgets.Div{
 			classes = {'match-bm-map-veto-card', 'match-bm-map-veto-card--' .. vetoRound.type},
@@ -102,7 +105,7 @@ function MatchPageMapVeto:render()
 							children = {
 								HtmlWidgets.Div{
 									classes = {'match-bm-map-veto-card-map-name'},
-									children = mapData.name or vetoRound.name
+									children = mapData.name
 								},
 							}
 						},
@@ -118,7 +121,7 @@ function MatchPageMapVeto:render()
 
 	return HtmlWidgets.Div{
 		classes = {'match-bm-map-veto-cards'},
-		children = Array.map(self.props.vetoRounds, createVetoCard)
+		children = WidgetUtil.collect(Array.map(self.props.vetoRounds, createVetoCard))
 	}
 end
 
