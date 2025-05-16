@@ -302,8 +302,8 @@ function BaseMatchPage:renderMapVeto()
 		local firstMap = vetoRound['team' .. firstVeto]
 		local secondMap = vetoRound['team' .. secondVeto]
 		return {
-			{name = firstMap, link = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
-			{name = secondMap, link = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
+			{map = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
+			{map = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
 		}
 	end)
 

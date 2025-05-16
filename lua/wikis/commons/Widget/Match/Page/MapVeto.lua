@@ -23,7 +23,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@alias VetoRound {name: string, link: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}
+---@alias VetoRound {map: string, type: 'pick'|'ban'|'decider', round: integer, by: standardOpponent}
 
 ---@class MatchPageMapVetoParameters
 ---@field vetoRounds VetoRound[]
@@ -86,7 +86,7 @@ function MatchPageMapVeto:render()
 	---@param vetoRound VetoRound
 	---@return Widget?
 	local function createVetoCard(vetoRound)
-		local mapData = MatchPageMapVeto._getMapData(vetoRound.name)
+		local mapData = MatchPageMapVeto._getMapData(vetoRound.map)
 		if not mapData then
 			return
 		end
