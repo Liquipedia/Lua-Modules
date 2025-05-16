@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
+local Logic = require('Module:Logic')
 
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
@@ -37,6 +38,7 @@ local MatchPageMapVeto = Class.new(Widget)
 ---@param map string
 ---@return datapoint?
 function MatchPageMapVeto._getMapData(map)
+	if Logic.isEmpty(map) then return end
 	local condition = ConditionTree(BooleanOperator.all)
 		:add(ConditionNode(ColumnName('type'), Comparator.eq, 'map'))
 		:add(ConditionNode(ColumnName('pagename'), Comparator.eq, string.gsub(map, ' ', '_')))
