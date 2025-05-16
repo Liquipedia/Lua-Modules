@@ -14,6 +14,9 @@ local Lua = require('Module:Lua')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -27,7 +30,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field mvp {players: {name: string, displayname: string}[]}?
 ---@field opponent1 MatchPageOpponent
 ---@field opponent2 MatchPageOpponent
----@field gameOneScore number[]?
 ---@field parent string?
 ---@field phase 'finished'|'ongoing'|'upcoming'
 ---@field tournamentName string?
@@ -45,25 +47,31 @@ function MatchPageHeader:_makeResultDisplay()
 	local opponent1 = self.props.opponent1
 	local opponent2 = self.props.opponent2
 	local phase = self.props.phase
-	local gameOneScore = Logic.emptyOr(self.props.gameOneScore, {0, 0})
-	---@cast gameOneScore -nil
-
-	local o1Score, o2Score = opponent1.score, opponent2.score
-
-	if self.props.isBestOfOne and Info.config.match2.gameScoresIfBo1 then
-		o1Score, o2Score = gameOneScore[1], gameOneScore[2]
-	end
 
 	return Div{
 		classes = { 'match-bm-match-header-result' },
 		children = WidgetUtil.collect(
-			phase == 'upcoming' and '' or (o1Score .. '&ndash;' .. o2Score),
+			self:_showScore() and (
+				OpponentDisplay.InlineScore(opponent1) .. '&ndash;' .. OpponentDisplay.InlineScore(opponent2)
+			) or '',
 			Div{
 				classes = { 'match-bm-match-header-result-text' },
 				children = { phase == 'ongoing' and 'live' or phase }
 			}
 		)
 	}
+end
+
+---@private
+---@return boolean
+function MatchPageHeader:_showScore()
+	if self.props.phase == 'upcoming' then
+		return false
+	end
+	if self.props.isBestOfOne then
+		return Info.config.match2.gameScoresIfBo1
+	end
+	return true
 end
 
 ---@private
