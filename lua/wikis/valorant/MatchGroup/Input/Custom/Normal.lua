@@ -47,8 +47,8 @@ function CustomMatchGroupInputNormal.getFirstSide(map, opponentIndex, phase)
 	end
 end
 
-function CustomMatchGroupInputNormal.getScoreFromRounds(map, side, opponentIndex)
-	return tonumber(map['t'.. opponentIndex .. side ])
+function CustomMatchGroupInputNormal.getScoreFromRounds(map, side, opponentIndex, overtime)
+	return tonumber(map['t'.. opponentIndex .. (overtime and 'ot' or '') .. side ])
 end
 
 function CustomMatchGroupInputNormal.getRounds(map)

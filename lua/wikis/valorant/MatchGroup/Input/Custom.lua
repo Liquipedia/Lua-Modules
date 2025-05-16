@@ -33,7 +33,7 @@ local MapFunctions = {}
 ---@field getMatchId fun(map: table): string?, string?
 ---@field getFirstSide fun(map: table, opponentIndex: integer, phase: 'normal'|'ot'): string?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
----@field getScoreFromRounds fun(map: table, side: 'atk'|'def'|'otatk'|'otdef', opponentIndex: integer): integer?
+---@field getScoreFromRounds fun(map: table, side: 'atk'|'def', opponentIndex: integer, overtime: boolean?): integer?
 ---@field getMapName fun(map: table): string?
 ---@field getLength fun(map: table): string?
 ---@field getRounds fun(map: table): ValorantRoundData[]?
@@ -137,14 +137,14 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 		t1halfs = {
 			atk = MapParser.getScoreFromRounds(map, 'atk', 1),
 			def = MapParser.getScoreFromRounds(map, 'def', 1),
-			otatk = MapParser.getScoreFromRounds(map, 'otatk', 1),
-			otdef = MapParser.getScoreFromRounds(map, 'otdef', 1),
+			otatk = MapParser.getScoreFromRounds(map, 'atk', 1, true),
+			otdef = MapParser.getScoreFromRounds(map, 'def', 1, true),
 		},
 		t2halfs = {
 			atk = MapParser.getScoreFromRounds(map, 'atk', 2),
 			def = MapParser.getScoreFromRounds(map, 'def', 2),
-			otatk = MapParser.getScoreFromRounds(map, 'otatk', 2),
-			otdef = MapParser.getScoreFromRounds(map, 'otdef', 2),
+			otatk = MapParser.getScoreFromRounds(map, 'atk', 2, true),
+			otdef = MapParser.getScoreFromRounds(map, 'def', 2, true),
 		},
 		rounds = MapParser.getRounds(map),
 		publisherid = publisherId,

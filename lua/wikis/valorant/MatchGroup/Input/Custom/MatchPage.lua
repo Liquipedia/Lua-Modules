@@ -143,8 +143,9 @@ end
 ---@param map table
 ---@param side 'atk'|'def'|'otatk'|'otdef'
 ---@param opponentIndex integer
+---@param overtime boolean?
 ---@return integer?
-function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIndex)
+function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIndex, overtime)
 	if not map.matchInfo then return nil end
 	local teamColor = map.matchInfo['team' .. opponentIndex]
 	if not teamColor then
@@ -154,7 +155,7 @@ function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIn
 	if not sideData then
 		return nil
 	end
-	return sideData['team' .. side .. 'wins']
+	return sideData['team' .. side .. (overtime and 'ot' or '') .. 'wins']
 end
 
 ---@param map table
