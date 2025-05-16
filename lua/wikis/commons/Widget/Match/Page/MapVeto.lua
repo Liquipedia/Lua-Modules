@@ -11,6 +11,13 @@ local Class = require('Module:Class')
 local Image = require('Module:Image')
 local Lua = require('Module:Lua')
 
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -23,6 +30,21 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 ---@operator call(MatchPageMapVetoParameters): MatchPageMapVeto
 ---@field props MatchPageMapVetoParameters
 local MatchPageMapVeto = Class.new(Widget)
+
+---@private
+---@param map string
+---@return datapoint?
+function MatchPageMapVeto._getMapData(map)
+	local condition = ConditionTree(BooleanOperator.all)
+		:add(ConditionNode(ColumnName('type'), Comparator.eq, 'map'))
+		:add(ConditionNode(ColumnName('name'), Comparator.eq, map))
+
+	return mw.ext.LiquipediaDB.lpdb('datapoint', {
+		query = 'pagename, name, image',
+		conditions = tostring(condition),
+		limit = 1
+	})[1]
+end
 
 ---@return Widget
 function MatchPageMapVeto:render()
@@ -60,22 +82,29 @@ function MatchPageMapVeto:render()
 	return HtmlWidgets.Div{
 		classes = {'match-bm-map-veto-cards'},
 		children = Array.map(self.props.vetoRounds, function(vetoRound)
+			local mapData = MatchPageMapVeto._getMapData(vetoRound.name) or {}
+			local mapLink = mapData.pagename or vetoRound.name
+
 			return HtmlWidgets.Div{
 				classes = {'match-bm-map-veto-card', 'match-bm-map-veto-card--' .. vetoRound.type},
 				children = {
 					HtmlWidgets.Div{
 						classes = {'match-bm-map-veto-card-image'},
-						children = Image.display(vetoRound.name .. ' Map.png', nil, {size = 240, link = vetoRound.name}),
+						children = Image.display(
+							mapData.image or vetoRound.name .. ' Map.png',
+							nil,
+							{size = 240, link = mapLink}
+						),
 					},
 					HtmlWidgets.Div{
 						classes = {'match-bm-map-veto-card-title'},
 						children = {
 							Link{
-								link = vetoRound.name,
+								link = mapLink,
 								children = {
 									HtmlWidgets.Div{
 										classes = {'match-bm-map-veto-card-map-name'},
-										children = vetoRound.name
+										children = mapData.name or vetoRound.name
 									},
 								}
 							},
