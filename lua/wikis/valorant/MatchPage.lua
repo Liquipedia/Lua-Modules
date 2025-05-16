@@ -120,7 +120,7 @@ end
 
 ---@private
 ---@param game MatchPageGame
----@return Widget?
+---@return Widget|Widget[]
 function MatchPage:_renderGameOverview(game)
 	local team1 = getTeamHalvesDetails(game, 1)
 	local team2 = getTeamHalvesDetails(game, 2)
@@ -162,7 +162,7 @@ function MatchPage:_renderGameOverview(game)
 		}
 	end
 
-	return Div{
+	local overview = Div{
 		classes = {'match-bm-lol-game-overview'},
 		children = {
 			Div{
@@ -187,6 +187,14 @@ function MatchPage:_renderGameOverview(game)
 			}
 		}
 	}
+
+	if self:isBestOfOne() then
+		return {
+			HtmlWidgets.H3{children = 'Game Overview'},
+			overview
+		}
+	end
+	return overview
 end
 
 ---@private
