@@ -12,6 +12,11 @@ local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
+local Info = Lua.import('Module:Info', {loadData = true})
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -45,14 +50,27 @@ function MatchPageHeader:_makeResultDisplay()
 	return Div{
 		classes = { 'match-bm-match-header-result' },
 		children = WidgetUtil.collect(
-			(self.props.isBestOfOne or phase == 'upcoming') and '' or (
-				opponent1.score .. '&ndash;' .. opponent2.score),
+			self:_showScore() and (
+				OpponentDisplay.InlineScore(opponent1) .. '&ndash;' .. OpponentDisplay.InlineScore(opponent2)
+			) or '',
 			Div{
 				classes = { 'match-bm-match-header-result-text' },
 				children = { phase == 'ongoing' and 'live' or phase }
 			}
 		)
 	}
+end
+
+---@private
+---@return boolean
+function MatchPageHeader:_showScore()
+	if self.props.phase == 'upcoming' then
+		return false
+	end
+	if self.props.isBestOfOne then
+		return Info.config.match2.gameScoresIfBo1
+	end
+	return true
 end
 
 ---@private
