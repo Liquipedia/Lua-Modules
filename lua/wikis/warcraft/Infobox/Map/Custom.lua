@@ -74,12 +74,9 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
-		creator = args.creator,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
-	}
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.height = args.height
+	lpdbData.extradata.width = args.width
 	return lpdbData
 end
 

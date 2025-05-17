@@ -21,6 +21,8 @@ local Cell = Widgets.Cell
 
 ---@class HaloMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class HaloMapInfoboxWidgetInjector: WidgetInjector
+---@field caller HaloMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -41,31 +43,20 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Max Players', content = {args.players}},
-			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
-			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
+			Cell{name = 'Game Version', content = {self.caller:getGame(args)}, options = {makeLink = true}},
+			Cell{
+				name = 'Game Modes',
+				content = Array.map(
+					self.caller:getGameModes(args),
+					function (gameMode)
+						local modeIcon = MapModes.get({mode = gameMode, date = args.releasedate, size = 15})
+						return modeIcon .. ' [[' .. gameMode .. ']]'
+					end
+				)
+			}
 		)
 	end
 	return widgets
-end
-
----@param args table
----@return string[]
-function CustomMap:_getGameMode(args)
-	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
-		return {}
-	end
-
-	local modes = self:getAllArgsForBase(args, 'mode')
-	local releasedate = args.releasedate
-
-	local modeDisplayTable = {}
-	for _, mode in ipairs(modes) do
-		local modeIcon = MapModes.get({mode = mode, date = releasedate, size = 15})
-		local mapModeDisplay = modeIcon .. ' [[' .. mode .. ']]'
-		table.insert(modeDisplayTable, mapModeDisplay)
-	end
-
-	return modeDisplayTable
 end
 
 ---@param lpdbData table
@@ -78,8 +69,6 @@ function CustomMap:addToLpdb(lpdbData, args)
 	end
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.players = args.players
-	lpdbData.extradata.game = Game.name{game = args.game}
-	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end
 

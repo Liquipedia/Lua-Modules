@@ -195,18 +195,16 @@ function CustomMap:addToLpdb(lpdbData, args)
 		return val and mw.ext.TeamLiquidIntegration.resolve_redirect(val) or nil
 	end
 
-	lpdbData.extradata = {
-		creator = resolveOrNil(args.creator),
-		creator2 = resolveOrNil(args.creator2),
-		spawns = args.players,
-		spawnpositions = args.positions,
-		height = args.height or 0,
-		width = args.width or 0,
-		rush = args.rushDistance,
-		luminite = args.luminite or 0,
-		therium = args.therium or 0,
-		closedtherium = args.closedTherium or 0,
-	}
+	lpdbData.extradata.creator = resolveOrNil(args.creator)
+	lpdbData.extradata.creator2 = resolveOrNil(args.creator2)
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.spawnpositions = args.positions
+	lpdbData.extradata.height = args.height or 0
+	lpdbData.extradata.width = args.width or 0
+	lpdbData.extradata.rush = args.rushDistance
+	lpdbData.extradata.luminite = args.luminite or 0
+	lpdbData.extradata.therium = args.therium or 0
+	lpdbData.extradata.closedtherium = args.closedTherium or 0
 
 	Array.forEach(LADDER_HISTORY, function(data)
 		lpdbData.extradata[data.key] = tostring(String.isNotEmpty(args[data.key]))
