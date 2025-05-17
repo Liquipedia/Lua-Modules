@@ -67,6 +67,7 @@ end
 
 --- Allows for overriding this functionality
 ---Builds the display Name for the header
+---@protected
 ---@param args table
 ---@return string
 function Map:getNameDisplay(args)
@@ -75,14 +76,16 @@ end
 
 --- Allows for overriding this functionality
 ---Add wikispecific categories
+---@protected
 ---@param args table
----@return table
+---@return string[]
 function Map:getWikiCategories(args)
 	return {}
 end
 
 --- Allows for overriding this functionality
 ---Adjust Lpdb data
+---@protected
 ---@param lpdbData table
 ---@param args table
 ---@return table
@@ -90,6 +93,7 @@ function Map:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+---@private
 function Map:_readCreators()
 	self.creators = {}
 	for _, creator in Table.iter.pairsByPrefix(self.args, {'creator', 'created-by'}, {requireIndex = false}) do
@@ -98,6 +102,7 @@ function Map:_readCreators()
 end
 
 ---Stores the lpdb data
+---@private
 ---@param args table
 function Map:_setLpdbData(args)
 	local lpdbData = {
