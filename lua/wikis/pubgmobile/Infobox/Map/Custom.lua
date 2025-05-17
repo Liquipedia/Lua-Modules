@@ -75,7 +75,6 @@ function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.span = args.span
 	lpdbData.extradata.mode = string.lower(args.mode or '')
 	lpdbData.extradata.perpective = string.lower(args.perspective or '')
-	lpdbData.extradata.game = Game.toIdentifier{game = args.game, useDefault = true}
 	return lpdbData
 end
 

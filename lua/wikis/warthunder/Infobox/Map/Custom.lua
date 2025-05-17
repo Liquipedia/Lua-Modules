@@ -76,9 +76,7 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata = Table.merge(lpdbData.extradata, {
-		location = args.country,
-	})
+	lpdbData.extradata.location = args.country
 	return lpdbData
 end
 

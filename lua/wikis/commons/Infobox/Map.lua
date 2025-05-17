@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
@@ -94,6 +95,14 @@ function Map:addToLpdb(lpdbData, args)
 	return lpdbData
 end
 
+--- Allows for overriding this functionality
+---Returns the respective game for this map
+---@param args table
+---@return string?
+function Map:getGame(args)
+	return Game.name{game = args.game}
+end
+
 ---@private
 function Map:_readCreators()
 	self.creators = {}
@@ -115,6 +124,7 @@ function Map:_setLpdbData(args)
 			return 'creator' .. index, value
 		end), {
 			creator = self.creators[1],
+			game = self:getGame(args),
 		})
 	}
 

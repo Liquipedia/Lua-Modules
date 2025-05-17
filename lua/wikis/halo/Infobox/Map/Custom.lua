@@ -21,6 +21,8 @@ local Cell = Widgets.Cell
 
 ---@class HaloMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class HaloMapInfoboxWidgetInjector: WidgetInjector
+---@field caller HaloMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -41,7 +43,7 @@ function CustomInjector:parse(id, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Type', content = {args.type}},
 			Cell{name = 'Max Players', content = {args.players}},
-			Cell{name = 'Game Version', content = {Game.name{game = self.caller.args.game}}, options = {makeLink = true}},
+			Cell{name = 'Game Version', content = {self.caller:getGame(args)}, options = {makeLink = true}},
 			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
 		)
 	end
@@ -78,7 +80,6 @@ function CustomMap:addToLpdb(lpdbData, args)
 	end
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.players = args.players
-	lpdbData.extradata.game = Game.name{game = args.game}
 	lpdbData.extradata.modes = table.concat(self:getAllArgsForBase(args, 'mode'), ',')
 	return lpdbData
 end

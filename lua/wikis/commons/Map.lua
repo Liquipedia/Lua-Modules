@@ -78,9 +78,11 @@ function Map.getMapByPageName(pageName)
 	}[1]
 end
 
+---@param config {game: string?}
 ---@return StandardMap?
-function Map.getLatestMap()
+function Map.getLatestMap(config)
 	return Map.queryMaps{
+		additionalConditions = config.game and ConditionNode(ColumnName('game'), Comparator.eq, config.game) or nil,
 		order = 'date desc, pagename desc',
 		limit = 1
 	}[1]
@@ -107,6 +109,7 @@ function Map.fromRecord(record)
 		releaseDate = releaseDate,
 		image = record.image,
 		creators = creators,
+		game = Table.extract(record.extradata, 'game'),
 		extradata = record.extradata
 	}
 

@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 local Template = require('Module:Template')
 local Variables = require('Module:Variables')
 
@@ -76,14 +77,14 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = self:getNameDisplay(args)
-	lpdbData.extradata = {
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		creator2 = args.creator2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2) or nil,
 		spawns = args.players,
 		height = args.height,
 		width = args.width,
 		rush = Variables.varDefault('rush_distance'),
-	}
+	})
 	return lpdbData
 end
 

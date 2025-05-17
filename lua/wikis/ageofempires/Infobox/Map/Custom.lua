@@ -12,6 +12,7 @@ local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
@@ -72,13 +73,12 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		creator = String.isNotEmpty(args.creator) and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
 		maptype = self:_getType(args.type),
 		icon = args.icon,
-		game = Game.name{game = args.game}
-	}
+	})
 	return lpdbData
 end
 
@@ -86,7 +86,7 @@ end
 ---@return string[]
 function CustomMap:getWikiCategories(args)
 	return {
-		Game.name{game = args.game} .. ' Maps',
+		self:getGame(args) .. ' Maps',
 		self:_getType(args.type) .. ' Maps',
 		self:_getType(args.type) .. ' Maps (' .. Game.abbreviation{game = args.game} .. ')'
 	}
