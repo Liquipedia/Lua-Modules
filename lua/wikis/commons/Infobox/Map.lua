@@ -103,6 +103,14 @@ function Map:getGame(args)
 	return Game.name{game = args.game}
 end
 
+--- Allows for overriding this functionality
+---Returns the respective game mode(s) for this map
+---@param args table
+---@return string[]
+function Map:getGameModes(args)
+	return self:getAllArgsForBase(args, 'mode')
+end
+
 ---@private
 function Map:_readCreators()
 	self.creators = {}
@@ -125,6 +133,7 @@ function Map:_setLpdbData(args)
 		end), {
 			creator = self.creators[1],
 			game = self:getGame(args),
+			modes = self:getGameModes(args),
 		})
 	}
 

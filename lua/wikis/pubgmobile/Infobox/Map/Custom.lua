@@ -19,6 +19,8 @@ local Cell = Widgets.Cell
 
 ---@class PubgMobileMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class PubgMobileMapInfoboxWidgetInjector: WidgetInjector
+---@field caller PubgMobileMapInfobox
 local CustomInjector = Class.new(Injector)
 
 local MODES = {
@@ -54,16 +56,21 @@ function CustomInjector:parse(id, widgets)
 				useDefault = true,
 				useAbbreviation = true,
 			}}},
-			Cell{name = 'Game Mode(s)',content = {self.caller:_getGameMode(args)}}
+			Cell{name = 'Game Mode(s)',content = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets
 end
 
 ---@param args table
----@return string?
-function CustomMap:_getGameMode(args)
-	return MODES[string.lower(args.mode or '')]
+---@return string[]
+function CustomMap:getGameModes(args)
+	return Array.map(
+		self:getAllArgsForBase(args, 'mode'),
+		function (gameMode)
+			return MODES[gameMode:lower()]
+		end
+	)
 end
 
 ---@param lpdbData table
@@ -73,7 +80,6 @@ function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.theme = args.theme
 	lpdbData.extradata.size = args.sizeabr
 	lpdbData.extradata.span = args.span
-	lpdbData.extradata.mode = string.lower(args.mode or '')
 	lpdbData.extradata.perpective = string.lower(args.perspective or '')
 	return lpdbData
 end

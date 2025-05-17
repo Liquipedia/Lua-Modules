@@ -18,6 +18,8 @@ local Cell = Widgets.Cell
 
 ---@class RocketLeagueMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class RocketLeagueMapInfoboxWidgetInjector: WidgetInjector
+---@field caller RocketLeagueMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -41,10 +43,16 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Layout', content = {args.layout}},
 			Cell{name = 'Versions', content = {args.versions}},
 			Cell{name = 'Playlists', content = {args.playlists}},
-			Cell{name = 'Gamemodes', content = {args.gamemodes}}
+			Cell{name = 'Gamemodes', content = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets
+end
+
+---@param args table
+---@return string[]
+function CustomMap:getGameModes(args)
+	return Array.parseCommaSeparatedString(args.gamemodes)
 end
 
 ---@param lpdbData table

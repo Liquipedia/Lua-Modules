@@ -35,6 +35,12 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
+---@param args table
+---@return string[]
+function CustomMap:getGameModes(args)
+	return {args.gamemode}
+end
+
 ---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
@@ -117,7 +123,6 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator or '')
-	lpdbData.extradata.gamemode = args.gamemode
 	lpdbData.extradata.competitive = String.isNotEmpty(args.spanstart) and String.isEmpty(args.spanend)
 	return lpdbData
 end

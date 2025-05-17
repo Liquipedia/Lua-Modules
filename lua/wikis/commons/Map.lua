@@ -110,6 +110,7 @@ function Map.fromRecord(record)
 		image = record.image,
 		creators = creators,
 		game = Table.extract(record.extradata, 'game'),
+		gameModes = Table.extract(record.extradata, 'modes'),
 		extradata = record.extradata
 	}
 
