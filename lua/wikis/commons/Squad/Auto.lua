@@ -15,6 +15,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Operator = require('Module:Operator')
+local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
 
@@ -40,14 +41,18 @@ end)
 ---@field position string?
 ---@field date string?
 
----TODO: Unify with SquadPerson
----@class SquadAutoPerson
+---@class SquadAutoBase
 ---@field id string
 ---@field flag string?
----@field idleavedate string?
 ---@field page string
 ---@field name string?
 ---@field localizedname string?
+---@field faction string?
+---@field captain boolean?
+
+---TODO: Unify with SquadPerson
+---@class SquadAutoPerson: SquadAutoBase
+---@field idleavedate string?
 ---@field thisTeam SquadAutoTeam
 ---@field oldTeam SquadAutoTeam?
 ---@field newTeam SquadAutoTeam?
@@ -57,8 +62,6 @@ end)
 ---@field leavedate string?
 ---@field leavedatedisplay string
 ---@field leavedateRef table<string, string>?
----@field faction string?
----@field captain boolean?
 
 ---@class SquadAutoConfig
 ---@field team string
@@ -129,7 +132,7 @@ function SquadAuto.run(frame)
 	autosquad:queryTransfers()
 
 	local entries = autosquad:selectEntries()
-	Array.forEach(entries, SquadAuto.enrichEntry)
+	Array.forEach(entries, FnUtil.curry(SquadAuto.enrichEntry, autosquad))
 
 	return autosquad:display(entries)
 end
@@ -152,7 +155,7 @@ function SquadAuto:parseConfig()
 		}
 	}
 
-	self.manualPlayers = self:readManualPlayers()
+	self.manualPlayers, self.enrichmentInfo = self:readManualRowInput()
 
 	-- Override default 'Former Squad' title
 	if status == SquadUtils.SquadStatus.FORMER
@@ -222,65 +225,93 @@ function SquadAuto:displayTabs(entries)
 end
 
 ---@param entry SquadAutoPerson
-function SquadAuto.enrichEntry(entry)
+function SquadAuto:enrichEntry(entry)
+	local pagename = Page.pageifyLink(entry.page)
+	local enrichment = self.enrichmentInfo[pagename]
+	if enrichment then
+		Table.mergeInto(entry, enrichment)
+	end
+
 	local personInfo = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = '[[pagename::' .. string.gsub(entry.page, ' ', '_') .. ']]',
+		conditions = '[[pagename::' .. pagename .. ']]',
 		limit = 1,
 		query = 'pagename, nationality, id, name, localizedname, extradata'
 	})[1]
 
 	if personInfo then
-		entry.id = personInfo.id
-		entry.flag = personInfo.nationality
-		entry.name = personInfo.name
-		entry.localizedname = personInfo.localizedname
+		entry.id = Logic.nilIfEmpty(entry.id) or personInfo.id
+		entry.flag = Logic.nilIfEmpty(entry.flag) or personInfo.nationality
+		entry.name = Logic.nilIfEmpty(entry.name) or personInfo.name
+		entry.localizedname = Logic.nilIfEmpty(entry.localizedname) or personInfo.localizedname
 	end
-	--TODO: Captain from pagevars?
+
+	--TODO: Captain from pagevar set in infobox?
 end
 
----@return SquadAutoPerson[]
-function SquadAuto:readManualPlayers()
+---@return SquadAutoPerson[] manualPersons
+---@return table<string, SquadAutoBase> enrichmentInfo
+function SquadAuto:readManualRowInput()
 	---@type SquadAutoPerson[]
-	local players = {}
+	local persons = {}
+	local enrichmentInfo = {}
 
-	-- TODO: Handle manual 'enrichments' for adding names
-	-- TODO: Readd limitations to specific roles?
 	Array.forEach(self.args, function (entry)
-		local player = Json.parseIfString(entry)
-		if Logic.isNotEmpty(player) then
-			table.insert(players, {
-				page = player.link or player.id or player.name,
-				id = player.id,
-				captain = Logic.readBoolOrNil(player.captain),
-				name = player.name,
-				localizedname = player.localizedname,
+		local person = Json.parseIfString(entry)
+
+		if Logic.isEmpty(person) then
+			return
+		end
+
+		local page = Page.pageifyLink(person.link or person.id or person.name)
+		assert(page, "Missing identifier or link for SquadAutoRow " .. entry)
+
+		if self.config.type == SquadUtils.SquadType.STAFF and Logic.isNotEmpty(person.role) then
+			-- Only allow manual entries for STAFF (organization) tables
+			table.insert(persons, {
+				page = page,
+				id = person.id,
+				captain = Logic.readBoolOrNil(person.captain),
+				name = person.name,
+				localizedname = person.localizedname,
 				thisTeam = {
 					team = self.config.team,
-					role = player.role,
-					position = player.position
+					role = person.role,
+					position = person.position
 				},
 				newTeam = {
-					team = player.newteam,
-					role = player.newteamrole,
-					player.newteamdate
+					team = person.newteam,
+					role = person.newteamrole,
+					person.newteamdate
 				},
-				flag = player.flag,
+				flag = person.flag,
 				oldTeam = {
-					team = player.oldteam
+					team = person.oldteam
 				},
-				joindate = (player.joindate or ''):gsub('%?%?','01'),
-				joindatedisplay = player.joindate,
+				joindate = (person.joindate or ''):gsub('%?%?','01'),
+				joindatedisplay = person.joindate,
 				joindateRef = {},
-				leavedate = (player.leavedate or ''):gsub('%?%?','01'),
-				leavedatedisplay = player.leavedate,
+				leavedate = (person.leavedate or ''):gsub('%?%?','01'),
+				leavedatedisplay = person.leavedate,
 				leavedateRef = {},
-				faction = player.faction or player.race,
-				race = player.faction or player.race,
+				faction = person.faction or person.race,
+				race = person.faction or person.race,
 			})
+		else
+			-- For PLAYER tables, or when no role is given: Treat as override
+			enrichmentInfo[page] = {
+				id = person.id,
+				captain = Logic.readBoolOrNil(person.captain),
+				name = person.name,
+				localizedname = person.localizedname,
+				flag = person.flag,
+				faction = person.faction or person.race,
+			}
 		end
 	end)
 
-	return players
+	mw.logObject(enrichmentInfo)
+
+	return persons, enrichmentInfo
 end
 
 function SquadAuto:queryTransfers()
