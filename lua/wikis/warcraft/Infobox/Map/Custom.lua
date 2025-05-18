@@ -20,7 +20,8 @@ local Cell = Widgets.Cell
 
 ---@class WarcraftMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class WarcraftMapInfoboxWidgetInjector: WidgetInjector
+---@field caller WarcraftMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

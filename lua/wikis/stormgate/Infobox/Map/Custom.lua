@@ -23,6 +23,8 @@ local Title = Widgets.Title
 
 ---@class StormgateMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class StormgateMapInfoboxWidgetInjector: WidgetInjector
+---@field caller StormgateMapInfobox
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {

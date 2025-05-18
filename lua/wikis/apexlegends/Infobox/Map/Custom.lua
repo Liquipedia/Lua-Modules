@@ -24,6 +24,8 @@ local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class ApexMapInfoboxWidgetInjector: WidgetInjector
+---@field caller ApexMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

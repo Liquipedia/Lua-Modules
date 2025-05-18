@@ -22,7 +22,8 @@ local Cell = Widgets.Cell
 
 ---@class Starcraft2MapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class Starcraft2MapInfoboxWidgetInjector: WidgetInjector
+---@field caller Starcraft2MapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

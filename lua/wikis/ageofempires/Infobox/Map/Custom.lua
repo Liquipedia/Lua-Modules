@@ -22,6 +22,8 @@ local Cell = Widgets.Cell
 
 ---@class AgeofEmpiresMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class AgeofEmpiresMapInfoboxWidgetInjector: WidgetInjector
+---@field caller AgeofEmpiresMapInfobox
 local CustomInjector = Class.new(Injector)
 
 local TYPES = {
