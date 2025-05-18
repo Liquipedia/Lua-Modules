@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 
@@ -38,10 +39,11 @@ function InMemoryOfWidget:_loadFromLPDB()
 		conditions = tostring(
 			ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(pageLink))
 		),
-		query = 'name, id, nationality, extradata',
+		query = 'name, id, nationality, extradata, deathdate',
 		limit = 1,
 	})[1]
 	assert(player, 'Player with pageLink="' .. pageLink .. '" not found')
+	assert(player.deathdate ~= DateExt.defaultDate, 'Widget cannot be used with people that are alive')
 
 	local extradata = player.extradata or {}
 	local nameArray = String.isNotEmpty(player.name)
