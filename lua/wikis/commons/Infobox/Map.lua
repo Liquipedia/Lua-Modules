@@ -13,6 +13,7 @@ local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
 local Namespace = Lua.import('Module:Namespace')
+local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -115,7 +116,7 @@ end
 function Map:_readCreators()
 	self.creators = {}
 	for _, creator in Table.iter.pairsByPrefix(self.args, {'creator', 'created-by'}, {requireIndex = false}) do
-		table.insert(self.creators, creator)
+		table.insert(self.creators, Page.pageifyLink(creator))
 	end
 end
 

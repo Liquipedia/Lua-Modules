@@ -70,12 +70,9 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = self:getNameDisplay(args)
-	lpdbData.extradata = Table.merge(lpdbData.extradata, {
-		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
-	})
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.height = args.height
+	lpdbData.extradata.width = args.width
 	return lpdbData
 end
 

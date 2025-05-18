@@ -191,14 +191,6 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	---@param val string?
-	---@return string?
-	local resolveOrNil = function(val)
-		return val and mw.ext.TeamLiquidIntegration.resolve_redirect(val) or nil
-	end
-
-	lpdbData.extradata.creator = resolveOrNil(args.creator)
-	lpdbData.extradata.creator2 = resolveOrNil(args.creator2)
 	lpdbData.extradata.spawns = args.players
 	lpdbData.extradata.spawnpositions = args.positions
 	lpdbData.extradata.height = args.height or 0

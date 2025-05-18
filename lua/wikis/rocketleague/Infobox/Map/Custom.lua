@@ -55,18 +55,4 @@ function CustomMap:getGameModes(args)
 	return Array.parseCommaSeparatedString(args.gamemodes)
 end
 
----@param lpdbData table
----@param args table
----@return table
-function CustomMap:addToLpdb(lpdbData, args)
-	local resolveIfExists = function(value)
-		if not value then return end
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(value)
-	end
-	lpdbData.extradata.creator = resolveIfExists(args.creator)
-	lpdbData.extradata.creator2 = resolveIfExists(args.creator2)
-
-	return lpdbData
-end
-
 return CustomMap

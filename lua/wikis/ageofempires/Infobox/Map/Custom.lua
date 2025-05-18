@@ -76,7 +76,6 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.extradata = Table.merge(lpdbData.extradata, {
-		creator = String.isNotEmpty(args.creator) and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
 		spawns = args.players,
 		maptype = self:_getType(args.type),
 		icon = args.icon,

@@ -63,10 +63,6 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator)
-	if String.isNotEmpty(args.creator2) then
-		lpdbData.extradata.creator2 = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2)
-	end
 	lpdbData.extradata.type = args.type
 	lpdbData.extradata.players = args.players
 	return lpdbData
