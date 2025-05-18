@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
