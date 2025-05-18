@@ -10,9 +10,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
-local String = require('Module:StringUtils')
 
-local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
