@@ -63,12 +63,6 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param args table
----@return string[]
-function CustomMap:getGameModes(args)
-	return {self:_getType(args.type)}
-end
-
 ---@param input string?
 ---@return string
 function CustomMap:_getType(input)
