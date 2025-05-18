@@ -56,10 +56,6 @@ function InMemoryOfWidget:render()
 
 	return HtmlWidgets.Div{
 		classes = { 'sadbox' },
-		css = {
-			['border-radius'] = '0.5em',
-			overflow = 'hidden'
-		},
 		children = {
 			Link {
 				link = self.props.pageLink,
