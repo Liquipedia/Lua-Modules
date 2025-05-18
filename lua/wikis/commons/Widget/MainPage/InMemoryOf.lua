@@ -6,72 +6,82 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local NameOrder = require('Module:NameOrder')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local ColumnName = Condition.ColumnName
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local Fragment = HtmlWidgets.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class InMemoryOfProperties
 ---@field pageLink string
----@field nameOrder ('eastern'|'western')?
----@field id string?
----@field nationality string?
----@field givenName string
----@field familyName string
 
 ---@class InMemoryOfWidget: Widget
 ---@field props InMemoryOfProperties
 ---@operator call(table): InMemoryOfWidget
 local InMemoryOfWidget = Class.new(Widget)
 
+---@private
+---@return {firstName: string?, lastName: string?, id: string?}
 function InMemoryOfWidget:_loadFromLPDB()
-	local data = mw.ext.LiquipediaDB.lpdb('player', {
-		conditions = '[[pagename::' .. self.props.pageLink .. ']]',
-		query = 'pagename, id, nationality',
+	local pageLink = self.props.pageLink
+	assert(String.isNotEmpty(pageLink), 'Empty page link')
+	local player = mw.ext.LiquipediaDB.lpdb('player', {
+		conditions = tostring(
+			ConditionNode(ColumnName('pagename'), Comparator.eq, Page.pageifyLink(pageLink))
+		),
+		query = 'name, id, nationality, extradata',
 		limit = 1,
-	})
-	if type(data) ~= 'table' then
-		return
-	end
-	self.props.id = Logic.emptyOr(self.props.id, data[1].id)
-	self.props.nationality = Logic.emptyOr(self.props.nationality, data[1].nationality)
+	})[1]
+	assert(player, 'Player with pageLink="' .. pageLink .. '" not found')
+
+	local extradata = player.extradata or {}
+	local nameArray = String.isNotEmpty(player.name)
+		and mw.text.split(player.name, ' ')
+		or {}
+
+	return {
+		firstName = extradata.firstname or nameArray[1],
+		lastName = extradata.lastname or (#nameArray > 1 and nameArray[#nameArray] or nil),
+		id = player.name ~= player.id and player.id or nil
+	}
 end
 
 function InMemoryOfWidget:render()
-	self:_loadFromLPDB()
-
-	local firstname, lastname = NameOrder.reorderNames(
-		self.props.givenName,
-		self.props.familyName,
-		{
-			forceEasternOrder = self.props.nameOrder == 'eastern',
-			forceWesternOrder = self.props.nameOrder == 'western',
-			country = self.props.nationality
-		}
-	)
+	local nameData = self:_loadFromLPDB()
 
 	return HtmlWidgets.Div{
 		classes = { 'sadbox' },
 		children = {
 			Link {
 				link = self.props.pageLink,
-				children = HtmlWidgets.Fragment{
-					children = {
-						'In memory of ',
-						firstname,
-						' "',
-						HtmlWidgets.Strong{
-							children = { self.props.id }
-						},
-						'" ',
-						lastname,
-						' 🖤'
-					}
-				}
+				children = Fragment{children = Array.interleave(
+					WidgetUtil.collect(
+						'In memory of',
+						nameData.firstName,
+						nameData.id and Fragment{children = {
+							'"',
+							HtmlWidgets.Strong{
+								children = { nameData.id }
+							},
+							'"'
+						}} or nil,
+						nameData.lastName,
+						'🖤'
+					),
+					' '
+				)}
 			}
 		}
 	}
