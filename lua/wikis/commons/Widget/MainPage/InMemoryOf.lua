@@ -24,11 +24,8 @@ local Fragment = HtmlWidgets.Fragment
 local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
----@class InMemoryOfProperties
----@field pageLink string
-
 ---@class InMemoryOfWidget: Widget
----@field props InMemoryOfProperties
+---@field props {pageLink: string}
 ---@operator call(table): InMemoryOfWidget
 local InMemoryOfWidget = Class.new(Widget)
 
@@ -58,6 +55,7 @@ function InMemoryOfWidget:_loadFromLPDB()
 	}
 end
 
+---@return Widget
 function InMemoryOfWidget:render()
 	local nameData = self:_loadFromLPDB()
 
