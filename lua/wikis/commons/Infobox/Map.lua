@@ -27,6 +27,7 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class MapInfobox:BasicInfobox
+---@field creators {page: string, displayName: string}[]
 local Map = Class.new(BasicInfobox)
 
 ---Entry point of map infobox
