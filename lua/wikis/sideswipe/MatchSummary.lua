@@ -15,7 +15,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 -- Custom Header Class
 ---@class SideswipeMatchSummaryHeader: MatchSummaryHeader
@@ -33,40 +32,14 @@ end
 ---@param opponent2 standardOpponent
 ---@return Html
 function Header:createScoreDisplay(opponent1, opponent2)
-	local function getScore(opponent)
-		local scoreText
-		local isWinner = opponent.placement == 1 or opponent.advances
-		if opponent.placement2 then
-			-- Bracket Reset, show W/L
-			if opponent.placement2 == 1 then
-				isWinner = true
-				scoreText = 'W'
-			else
-				isWinner = false
-				scoreText = 'L'
-			end
-		elseif opponent.extradata and opponent.extradata.additionalScores then
-			-- Match Series (Sets), show the series score
-			scoreText = (opponent.extradata.set1win and 1 or 0)
-					+ (opponent.extradata.set2win and 1 or 0)
-					+ (opponent.extradata.set3win and 1 or 0)
-		else
-			scoreText = OpponentDisplay.InlineScore(opponent)
-		end
-		return OpponentDisplay.BlockScore{
-			isWinner = isWinner,
-			scoreText = scoreText,
-		}
-	end
-
 	return mw.html.create('div')
 		:addClass('brkts-popup-spaced')
 		:node(
-			getScore(opponent1)
+			self:createScore(opponent1)
 				:css('margin-right', 0)
 		)
 		:node(' : ')
-		:node(getScore(opponent2))
+		:node(self:createScore(opponent2))
 end
 
 ---@param score number?
@@ -115,12 +88,12 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: boolean?, width: string?}?
----@return RocketleagueMatchSummaryHeader
+---@return SideswipeMatchSummaryHeader
 function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
-		:leftOpponent(header:createOpponent(match.opponents[1], 'left', match.date))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -129,7 +102,7 @@ function CustomMatchSummary.createHeader(match, options)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', match.date))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
 ---@param date string

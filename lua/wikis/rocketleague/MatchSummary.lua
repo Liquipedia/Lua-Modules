@@ -126,7 +126,7 @@ function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
-		:leftOpponent(header:createOpponent(match.opponents[1], 'left', match.date))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -135,7 +135,7 @@ function CustomMatchSummary.createHeader(match, options)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 'right', match.date))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
 ---@param date string
