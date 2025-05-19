@@ -19,4 +19,4 @@ function CustomMatchTable.results(args)
 	return MatchTable(args):readConfig():query():build()
 end
 
-return Class.export(CustomMatchTable)
+return Class.export(CustomMatchTable, {exports = {'results'}})

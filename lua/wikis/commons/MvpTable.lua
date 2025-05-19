@@ -339,4 +339,4 @@ function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
 	return playerData
 end
 
-return Class.export(MvpTable)
+return Class.export(MvpTable, {exports = {'run'}})

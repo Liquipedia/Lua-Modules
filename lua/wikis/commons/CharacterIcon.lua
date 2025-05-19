@@ -99,4 +99,4 @@ function CharacterIcon.raw(character, date)
 	return CharacterIcon._getCharacterIconInfo(characterIcons, date)
 end
 
-return Class.export(CharacterIcon)
+return Class.export(CharacterIcon, {exports = {'Icon'}})

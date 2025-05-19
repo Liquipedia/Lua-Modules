@@ -122,4 +122,8 @@ function PlayerDisplay.Flag(args)
 	return Flags.Icon{flag = args.flag, shouldLink = false}
 end
 
-return Class.export(PlayerDisplay)
+return Class.export(PlayerDisplay, {exports = {
+	'BlockPlayer',
+	'InlinePlayer',
+	'Flag',
+}})
