@@ -1263,13 +1263,11 @@ span.slash {
 				height: 100%;
 				transition: transform 0.2s linear;
 			}
+		}
 
-			@media ( hover: hover ) {
-				&:hover {
-					img {
-						transform: scale( 1.1 );
-					}
-				}
+		@media ( hover: hover ) {
+			&:hover &-image img {
+				transform: scale( 1.1 );
 			}
 		}
 
