@@ -15,7 +15,6 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 
 -- Custom Header Class
 ---@class SideswipeMatchSummaryHeader: MatchSummaryHeader
