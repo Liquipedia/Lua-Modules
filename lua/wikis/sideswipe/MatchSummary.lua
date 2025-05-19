@@ -88,7 +88,7 @@ end
 
 ---@param match MatchGroupUtilMatch
 ---@param options {teamStyle: boolean?, width: string?}?
----@return RocketleagueMatchSummaryHeader
+---@return SideswipeMatchSummaryHeader
 function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
