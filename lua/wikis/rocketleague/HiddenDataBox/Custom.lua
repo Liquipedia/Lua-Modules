@@ -35,4 +35,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('showh2h', CustomLeague.parseShowHeadToHead(args))
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

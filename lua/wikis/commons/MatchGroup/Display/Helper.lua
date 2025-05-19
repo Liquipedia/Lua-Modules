@@ -192,7 +192,7 @@ function DisplayHelper.createCastersDisplay(casters)
 		end
 
 		return HtmlWidgets.Fragment{children = {
-			Flags.Icon(caster.flag),
+			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,
 		}}

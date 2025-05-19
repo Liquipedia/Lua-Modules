@@ -21,7 +21,9 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ROLES = {
 	-- Players
@@ -171,12 +173,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(),self.args.team)
-		return tostring(MatchTicker.participant({team = teamPage}))
-			.. Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamPage},
+				UpcomingTournaments{name = teamPage}
+			}
+		}
 	end
 end
 

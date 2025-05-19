@@ -176,7 +176,7 @@ end
 
 ---@param args table
 ---@return string[]
-function Character:getRoles(args)
+function CustomCharacter:getRoles(args)
 	return {
 		args.primaryrole,
 		args.secondaryrole

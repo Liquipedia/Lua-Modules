@@ -158,7 +158,7 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	end
 
 	Array.forEach(games, function(_, subGroupIndex)
-		extradata['subGroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
+		extradata['subgroup' .. subGroupIndex .. 'header'] = Logic.nilIfEmpty(match['submatch' .. subGroupIndex .. 'header'])
 	end)
 
 	return extradata
@@ -527,7 +527,7 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
+		casters = MatchGroupInputUtil.readCasters(match),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

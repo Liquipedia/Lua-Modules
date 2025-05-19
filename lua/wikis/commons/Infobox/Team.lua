@@ -303,7 +303,7 @@ function Team:_createLocation(location)
 		self:categories(demonym .. ' Teams')
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) ..
+	return Flags.Icon{flag = location, shouldLink = true} ..
 			'&nbsp;' ..
 			(locationDisplay or '')
 end
@@ -362,10 +362,6 @@ function Team:_setLpdbData(args, links)
 		),
 		extradata = {}
 	}
-
-	for year, earningsOfYear in pairs(self.yearlyEarnings or {}) do
-		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 
