@@ -21,6 +21,7 @@ local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
+local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
 local Center = Widgets.Center
 local Customizable = Widgets.Customizable
@@ -51,7 +52,9 @@ function Map:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Map') .. ' Information'},
-		Cell{name = 'Creator', content = self.creators, options = {makeLink = true}},
+		Cell{name = 'Creator', content = Array.map(self.creators, function (creator)
+			return Link{link = creator.page, children = creator.displayName}
+		end)},
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}
 		}},
