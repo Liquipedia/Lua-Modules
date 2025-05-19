@@ -80,7 +80,7 @@ end
 
 ---@param config {game: string?}
 ---@return StandardMap?
-function Map.getLatestMap(config)
+function Map.getNewestMap(config)
 	return Map.queryMaps{
 		additionalConditions = config.game and ConditionNode(ColumnName('game'), Comparator.eq, config.game) or nil,
 		order = 'date desc, pagename desc',
