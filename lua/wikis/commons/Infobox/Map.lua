@@ -116,7 +116,7 @@ end
 function Map:_readCreators()
 	self.creators = {}
 	for _, creator in Table.iter.pairsByPrefix(self.args, {'creator', 'created-by'}, {requireIndex = false}) do
-		table.insert(self.creators, Page.pageifyLink(creator))
+		table.insert(self.creators, {page = Page.pageifyLink(creator), displayName = creator})
 	end
 end
 
@@ -129,13 +129,18 @@ function Map:_setLpdbData(args)
 		type = 'map',
 		image = args.image,
 		date = args.releasedate,
-		extradata = Table.merge(Table.map(Array.sub(self.creators, 2, #self.creators), function(index, value)
-			return 'creator' .. index, value
-		end), {
-			creator = self.creators[1],
-			game = self:getGame(args),
-			modes = self:getGameModes(args),
-		})
+		extradata = Table.merge(
+			Table.map(self.creators, function(index, value)
+				return 'creator' .. index, value.page
+			end),
+			Table.map(self.creators, function(index, value)
+				return 'creator' .. index .. 'dn', value.displayName
+			end),
+			{
+				game = self:getGame(args),
+				modes = self:getGameModes(args),
+			}
+		)
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)
