@@ -127,18 +127,22 @@ end
 ---@private
 ---@param args table
 function Map:_setLpdbData(args)
+	local function creatorsToLpdbData()
+		local ret = {}
+		Array.forEach(self.creators, function (creator, index)
+			ret['creator' .. index] = creator.page
+			ret['creator' .. index .. 'dn'] = creator.displayName
+		end)
+		return ret
+	end
+
 	local lpdbData = {
 		name = self.name,
 		type = 'map',
 		image = args.image,
 		date = args.releasedate,
 		extradata = Table.merge(
-			Table.map(self.creators, function(index, value)
-				return 'creator' .. index, value.page
-			end),
-			Table.map(self.creators, function(index, value)
-				return 'creator' .. index .. 'dn', value.displayName
-			end),
+			creatorsToLpdbData(),
 			{
 				game = self:getGame(args),
 				modes = self:getGameModes(args),
