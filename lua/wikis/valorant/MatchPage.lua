@@ -12,6 +12,7 @@ local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
 
 local BaseMatchPage = Lua.import('Module:MatchPage/Base')
+local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -145,7 +146,7 @@ function MatchPage:_renderGameOverview(game)
 	local function createScoreHolder()
 		return Div{
 			classes = {'match-bm-lol-game-summary-score-holder'},
-			children = game.finished and WidgetUtil.collect(
+			children = MatchGroupUtil.computeMatchPhase(game) ~= 'upcoming' and WidgetUtil.collect(
 				not self:isBestOfOne() and Div{
 					classes = {'match-bm-lol-game-summary-score'},
 					children = {
