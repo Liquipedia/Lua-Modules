@@ -15,18 +15,22 @@ local Lua = require('Module:Lua')
 local Namespace = require('Module:Namespace')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+local TeamTemplate = require('Module:TeamTemplate')
 local Variables = require('Module:Variables')
 local YearsActive = require('Module:YearsActive')
 
 local Flags = Lua.import('Module:Flags')
+local MatchTicker = Lua.import('Module:MatchTicker/Custom')
+
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
 local Center = Widgets.Center
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local BANNED = mw.loadData('Module:Banned')
 local ROLES = {
@@ -195,12 +199,14 @@ end
 
 ---@return string?
 function CustomPlayer:createBottomContent()
-	if Namespace.isMain() then
-		return tostring(Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_matches_of_player', {player = self.basePageName})
-			.. '<br>' .. Template.safeExpand(
-			mw.getCurrentFrame(), 'Upcoming_and_ongoing_tournaments_of_player', {player = self.basePageName})
-		)
+	if Namespace.isMain() and String.isNotEmpty(self.args.team) then
+		local teamData = TeamTemplate.getRawOrNil(self.args.team) or {}
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.participant{team = teamData.name},
+				UpcomingTournaments{name = teamData.name}
+			}
+		}
 	end
 end
 

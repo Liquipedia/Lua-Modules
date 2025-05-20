@@ -22,8 +22,10 @@ local Player = Lua.import('Module:Infobox/Person')
 local MatchTicker = Lua.import('Module:MatchTicker/Custom')
 
 local Widgets = Lua.import('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Cell = Widgets.Cell
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ROLES = {
 	-- Players
@@ -156,12 +158,17 @@ function CustomPlayer:_isPlayerOrStaff()
 	end
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if String.isEmpty(self.args.team) or not self:shouldStoreData(self.args) then return end
 	local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-	return tostring(MatchTicker.player{recentLimit = 3}) ..
-		Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+
+	return HtmlWidgets.Fragment{
+		children = {
+			MatchTicker.player{recentLimit = 3},
+			UpcomingTournaments{name = teamPage}
+		}
+	}
 end
 
 return CustomPlayer
