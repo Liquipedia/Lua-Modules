@@ -54,4 +54,4 @@ function RoleOf.get(args)
 	return table.concat(output, ' ')
 end
 
-return Class.export(RoleOf)
+return Class.export(RoleOf, {exports = {'get'}})

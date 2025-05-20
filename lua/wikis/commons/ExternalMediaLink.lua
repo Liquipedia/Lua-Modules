@@ -289,4 +289,4 @@ function ExternalMediaLink._cleanValue(value)
 	return String.nilIfEmpty(mw.text.trim(value))
 end
 
-return Class.export(ExternalMediaLink)
+return Class.export(ExternalMediaLink, {exports = {'run', 'wrapper'}})
