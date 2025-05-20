@@ -39,7 +39,7 @@ end
 
 ---@param args table
 function CustomTeam:defineCustomPageVariables(args)
-	Variables.varDefine('team_catain', args.captain)
+	Variables.varDefine('team_captain', args.captain)
 end
 
 return CustomTeam
