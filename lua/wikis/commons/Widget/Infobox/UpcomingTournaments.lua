@@ -32,6 +32,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class UpcomingTournamentsParameters
 ---@field name string
+---@field name2 string?
 ---@field type OpponentType
 ---@field options table?
 
@@ -60,10 +61,19 @@ end
 ---@return Widget|Widget[]
 function UpcomingTournaments:_getTournaments()
 	local conditions = ConditionTree(BooleanOperator.all)
-		:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name))
 		:add(ConditionNode(ColumnName('opponenttype'), Comparator.eq, self.props.type))
 		:add(ConditionNode(ColumnName('date'), Comparator.gt, DateExt.getCurrentTimestamp() - 86400))
 		:add(ConditionNode(ColumnName('placement'), Comparator.eq, ''))
+
+	if Logic.isEmpty(self.props.name2) then
+		conditions:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name))
+	else
+		conditions:add(
+			ConditionTree(BooleanOperator.any)
+				:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name))
+				:add(ConditionNode(ColumnName('opponentname'), Comparator.eq, self.props.name2))
+		)
+	end
 
 	local placements = mw.ext.LiquipediaDB.lpdb('placement', {
 		conditions = conditions:toString(),

@@ -23,8 +23,10 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ROLES = {
 	-- Players
@@ -179,18 +181,15 @@ function CustomPlayer:_isPlayerOrStaff()
 	end
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
 		local team2Page = String.isNotEmpty(self.args.team2) and Team.page(mw.getCurrentFrame(), self.args.team2) or nil
-		return
-			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(
-				mw.getCurrentFrame(),
-				'Upcoming and ongoing tournaments of',
-				{team = teamPage}, {team2 = team2Page}
-			)
+		return HtmlWidgets.Fragment{children = {
+			MatchTicker.player{recentLimit = 3},
+			UpcomingTournaments{name = teamPage, name2 = team2Page}
+		}}
 	end
 end
 
