@@ -143,11 +143,14 @@ function MatchPage:_renderGameOverview(game)
 		}
 	end
 
-	local function createScoreHolder()
+	---@param createContent boolean
+	---@param showScore boolean
+	---@return Widget
+	local function createScoreHolder(createContent, showScore)
 		return Div{
 			classes = {'match-bm-lol-game-summary-score-holder'},
-			children = MatchGroupUtil.computeMatchPhase(game) ~= 'upcoming' and WidgetUtil.collect(
-				not self:isBestOfOne() and Div{
+			children = createContent and WidgetUtil.collect(
+				showScore and Div{
 					classes = {'match-bm-lol-game-summary-score'},
 					children = {
 						DisplayHelper.MapScore(game.opponents[1], game.status),
@@ -176,7 +179,10 @@ function MatchPage:_renderGameOverview(game)
 							self.opponents[1].iconDisplay,
 						}
 					},
-					createScoreHolder(),
+					createScoreHolder(
+						MatchGroupUtil.computeMatchPhase(game) ~= 'upcoming',
+						not self:isBestOfOne()
+					),
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
