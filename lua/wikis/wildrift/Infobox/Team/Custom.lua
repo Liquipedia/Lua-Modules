@@ -10,7 +10,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
-local Template = require('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
