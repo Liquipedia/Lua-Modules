@@ -213,12 +213,12 @@ function SquadAuto:displayTabs(entries)
 	local idx = 1
 	for year, group in Table.iter.spairs(groupedEntries) do
 		tabs['name' .. idx] = year
-		tabs['content' .. idx] = tostring(SquadCustom.runAuto(
+		tabs['content' .. idx] = SquadCustom.runAuto(
 			SquadAuto._sortEntries(group),
 			self.config.status,
 			self.config.type,
 			self.config.title
-		))
+		)
 		idx = idx + 1
 	end
 
