@@ -13,6 +13,8 @@ local RoleOf = require('Module:RoleOf')
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Team = Lua.import('Module:Infobox/Team')
 
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
+
 local ACHIEVEMENTS_BASE_CONDITIONS = {
 	'[[liquipediatiertype::!Showmatch]]',
 	'[[liquipediatiertype::!Qualifier]]',
@@ -46,25 +48,11 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
---[[
-	if not _team.args.disbanded then
-		TODO:
-		Leaving this out for now, will be a follow-up PR,
-		as both the templates needs to be removed from team pages plus the templates also requires some div changes
-
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing matches of',
-			{team = _team.name or _team.pagename}
-		) .. Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = _team.name or _team.pagename}
-		)
+	if not self.args.disbanded then
+		return UpcomingTournaments{name = self.pagename}
 	end
---]]
 end
 
 ---@param lpdbData table

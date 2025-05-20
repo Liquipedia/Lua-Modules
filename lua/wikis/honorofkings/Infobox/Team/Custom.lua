@@ -11,10 +11,12 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local PlacementStats = require('Module:InfoboxPlacementStats')
 local RoleOf = require('Module:RoleOf')
-local Template = require('Module:Template')
 
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Infobox/Team')
+
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local REGION_REMAPPINGS = {
 	['latin america'] = 'south america',
@@ -61,14 +63,12 @@ function CustomTeam:createRegion(region)
 	return remappedRegion and self:createRegion(remappedRegion) or regionData
 end
 
----@return string?
+---@return Widget
 function CustomTeam:createBottomContent()
-	if not self.args.disbanded then
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of'
-		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
-	end
+	return HtmlWidgets.Fragment{children = {
+		UpcomingTournaments{},
+		PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
+	}}
 end
 
 return CustomTeam

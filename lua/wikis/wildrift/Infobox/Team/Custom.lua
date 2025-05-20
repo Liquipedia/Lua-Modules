@@ -16,7 +16,9 @@ local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 ---@class WildriftInfoboxTeam: InfoboxTeam
 local CustomTeam = Class.new(Team)
@@ -36,13 +38,13 @@ function CustomTeam.run(frame)
 	return team:createInfobox()
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of'
-		) .. tostring(PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}})
+		return HtmlWidgets.Fragment{children = {
+			UpcomingTournaments{},
+			PlacementStats.run{tiers = {'1', '2', '3', '4', '5'}}
+		}}
 	end
 end
 
