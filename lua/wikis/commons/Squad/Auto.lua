@@ -18,6 +18,7 @@ local Operator = require('Module:Operator')
 local Page = require('Module:Page')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
+local TeamTemplate = require('Module:TeamTemplate')
 
 local SquadUtils = require('Module:Squad/Utils')
 local SquadCustom = require('Module:Squad/Custom')
@@ -164,14 +165,14 @@ function SquadAuto:parseConfig()
 		self.config.title = 'Former Players'
 	end
 
-	local historicalTemplates = mw.ext.TeamTemplate.raw_historical(self.config.team)
+	local historicalTemplates = TeamTemplate.queryHistorical(self.config.team)
 	if not historicalTemplates then
-		error("Missing team template: " .. self.config.team)
+		error(TeamTemplate.noTeamMessage(self.config.team))
 	end
 	self.config.teams = Array.append(Array.extractValues(historicalTemplates), self.config.team)
 
 	if self.config.status == SquadUtils.SquadStatus.FORMER_INACTIVE then
-		error("SquadStatus 'FORMER_INACTIVE' is not supported by SquadAuto.")
+		error('SquadStatus \'FORMER_INACTIVE\' is not supported by SquadAuto.')
 	end
 
 end
@@ -263,7 +264,7 @@ function SquadAuto:readManualRowInput()
 		end
 
 		local page = Page.pageifyLink(person.link or person.id or person.name)
-		assert(page, "Missing identifier or link for SquadAutoRow " .. entry)
+		assert(page, 'Missing identifier or link for SquadAutoRow ' .. entry)
 
 		if self.config.type == SquadUtils.SquadType.STAFF and Logic.isNotEmpty(person.role) then
 			-- Only allow manual entries for STAFF (organization) tables
@@ -447,7 +448,7 @@ function SquadAuto:buildConditions()
 	local historicalTemplates = mw.ext.TeamTemplate.raw_historical(self.config.team)
 
 	if not historicalTemplates then
-		error("Missing team template: " .. self.config.team)
+		error('Missing team template: ' .. self.config.team)
 	end
 
 	local conditions = Condition.Tree(BooleanOperator.any)
@@ -530,15 +531,15 @@ function SquadAuto:_selectHistoryEntries(entries)
 				if entry.type == SquadAuto.TransferType.JOIN then
 					currentEntry = entry
 				else
-					mw.log("Invalid transfer history for player " .. entry.pagename)
-					mw.logObject(entry, "Invalid entry: Missing previous JOIN. Skipping")
+					mw.log('Invalid transfer history for player ' .. entry.pagename)
+					mw.logObject(entry, 'Invalid entry: Missing previous JOIN. Skipping')
 					mw.ext.TeamLiquidIntegration.add_category('SquadAuto with invalid player history')
 				end
 				return
 			end
 
 			table.insert(history, self:_mapToSquadAutoPerson(currentEntry, entry))
-			if entry.type == "CHANGE" then
+			if entry.type == 'CHANGE' then
 				currentEntry = entry
 			else
 				currentEntry = nil
@@ -604,9 +605,9 @@ function SquadAuto:_mapToSquadAutoPerson(joinEntry, leaveEntry)
 	-- Set thisTeam.role to inactive and remove newTeam.role,
 	-- otherwise Squad doesn't display the entries
 	if self.config.status == SquadUtils.SquadStatus.INACTIVE
-			and leaveEntry.toRole == "Inactive" then
+			and leaveEntry.toRole == 'Inactive' then
 		entry.thisTeam.role = entry.newTeam.role
-		entry.newTeam.role = ""
+		entry.newTeam.role = ''
 	end
 
 	return entry
@@ -642,7 +643,7 @@ end
 -- Active entries (no leavedate) sorted by joindate,
 -- Former entries sorted by leavedate
 ---@param entries SquadAutoPerson[]
----@return unknown[]
+---@return SquadAutoPerson[]
 function SquadAuto._sortEntries(entries)
 	return Array.sortBy(entries, function (element)
 		return {element.leavedate or element.joindate, element.id}
