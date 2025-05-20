@@ -46,7 +46,7 @@ function BasicInfobox:categories(...)
 end
 
 ---Adds bottom content
----@param content string|number|Html|nil
+---@param content string|number|Html|Widget|nil
 ---@return self
 function BasicInfobox:bottom(content)
 	table.insert(self.bottomContent, content)
@@ -62,7 +62,8 @@ end
 
 --- Allows for overriding this functionality
 ---Add bottom content below the infobox, e.g. matchtickers
----@return string?
+---@protected
+---@return string|Html|Widget?
 function BasicInfobox:createBottomContent()
 	return nil
 end
