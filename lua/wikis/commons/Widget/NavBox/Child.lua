@@ -15,14 +15,15 @@ local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local Tbl = HtmlWidgets.Table
 local Tr = HtmlWidgets.Tr
 local Th = HtmlWidgets.Th
 local Td = HtmlWidgets.Td
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxList = Lua.import('Module:Widget/NavBox/List')
 
@@ -85,7 +86,10 @@ function NavBoxChild:render()
 			(props.title or shouldCollapse) and Tr{children = {Th{
 				attributes = {colspan = colSpan},
 				classes = {'navbox-title'},
-				children = {props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'},
+				children = {
+					props.title and props.titleLink and Link{link = props.titleLink, children = {props.title}} or
+						props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'
+				},
 			}}} or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
