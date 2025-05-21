@@ -963,9 +963,32 @@ function mw.ustring.toNFKD(s) return tostring(s) end
 ---@return string
 function mw.ustring.upper(s) return string.upper(s) end
 
+---@class URI
+---@field protocol string?
+---@field user string?
+---@field password string?
+---@field host string?
+---@field port integer?
+---@field path string?
+---@field query table?
+---@field fragment string?
 mw.uri = {}
-function mw.uri.localUrl(s, s2) return '' end
-function mw.uri.fullUrl(s, s2) return 'https://liquipedia.net/' end
+
+---Returns a URI object for the local URL for a page, with optional query string/table
+---@param page string
+---@param query string|table?
+---@return URI
+function mw.uri.localUrl(page, query)
+	return ''
+end
+
+---Returns a URI object for the full URL for a page, with optional query string/table
+---@param page string
+---@param query string|table?
+---@return URI
+function mw.uri.fullUrl(page, query)
+	return 'https://liquipedia.net/'
+end
 
 ---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
 
@@ -980,6 +1003,24 @@ function mw.uri.encode(str, enctype) end
 ---@param enctype UriEncodeType?
 ---@return string
 function mw.uri.decode(str, enctype) end
+
+---Validates the specified table (or URI object).
+---@param arg table|URI
+---@return boolean result whether the argument was valid
+---@return string? desc explanation of the found problems (if any)
+function mw.uri.validate(arg) end
+
+---Parses a string into this URI object.
+---@param str string
+function mw.uri:parse(str) end
+
+---Creates a copy of this URI object.
+---@return URI
+function mw.uri:clone() end
+
+---Merges the parameters table into the query table of this URI object.
+---@param parameters table
+function mw.uri:extend(parameters) end
 
 mw.ext = {}
 mw.ext.LiquipediaDB = require('definitions.liquipedia_db')
