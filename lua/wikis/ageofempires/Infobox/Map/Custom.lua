@@ -74,7 +74,7 @@ end
 ---@return string
 function CustomMap:getGame(args)
 	local game = Game.name{game = args.game, useDefault = false}
-	assert('game', 'Missing or invalid game specified')
+	assert(game, 'Missing or invalid game specified')
 	---@cast game -nil
 	return game
 end
