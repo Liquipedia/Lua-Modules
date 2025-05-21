@@ -166,13 +166,13 @@ end
 ---@param args table
 ---@return string?
 function CustomUnit:subHeaderDisplay(args)
-	local subfactionData = Array.parseCommaSeparatedString(args.subfaction)
+	local subfactionData = Array.parseCommaSeparatedString(args.subfaction) or {}
 
 	if Table.includes(subfactionData, '1v1') then
 		return tostring(mw.html.create('span')
 			:css('font-size', '90%')
-			:wikitext(Abbreviation.make('Standard', 'This is part of Head to Head 1v1. '
-				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'))
+			:wikitext(Abbreviation.make{text = 'Standard', title = 'This is part of Head to Head 1v1. '
+				.. 'It might also be part of certain Hero rosters in Team Mayhem or Co-op.'})
 		)
 	end
 
@@ -193,8 +193,8 @@ function CustomUnit:subHeaderDisplay(args)
 	)
 end
 
----@param data table
----@return table?
+---@param data string[]
+---@return string[]
 function CustomUnit:_parseSubfactionData(data)
 	local parsedElements = Array.map(data, function(dataElement)
 		return Array.parseCommaSeparatedString(dataElement, ':')
@@ -213,9 +213,9 @@ function CustomUnit:_getHotkeys()
 	local display
 	if not String.isEmpty(self.args.hotkey) then
 		if not String.isEmpty(self.args.hotkey2) then
-			display = Hotkeys.hotkey2(self.args.hotkey, self.args.hotkey2, 'arrow')
+			display = Hotkeys.hotkey2{hotkey1 = self.args.hotkey, hotkey2 = self.args.hotkey2, seperator = 'arrow'}
 		else
-			display = Hotkeys.hotkey(self.args.hotkey)
+			display = Hotkeys.hotkey{hotkey = self.args.hotkey}
 		end
 	end
 
@@ -233,7 +233,7 @@ function CustomUnit:_energyDisplay()
 	return table.concat({
 		ICON_ENERGY .. ' ' .. energy,
 		'/' .. (maxEnergy == 0 and '?' or maxEnergy),
-		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make('+ varies', self.args.energy_desc),
+		gainRate and (' (+' .. gainRate .. '/s)') or Abbreviation.make{text = '+ varies', title = self.args.energy_desc},
 	})
 end
 
@@ -311,9 +311,9 @@ end
 function CustomUnit._hotkeys(hotkey1, hotkey2)
 	if String.isEmpty(hotkey1) then return end
 	if String.isEmpty(hotkey2) then
-		return Hotkeys.hotkey(hotkey1)
+		return Hotkeys.hotkey{hotkey = hotkey1}
 	end
-	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+	return Hotkeys.hotkey2{hotkey1 = hotkey1, hotkey2 = hotkey2, seperator = 'plus'}
 end
 
 ---@param inputString string?

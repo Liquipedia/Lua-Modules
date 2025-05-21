@@ -44,7 +44,7 @@ function UnofficialWorldChampion:createInfobox()
 	local args = self.args
 
 	args.currentChampOpponent = Opponent.readOpponentArgs(
-		Json.parseIfString(args['current champion'])
+		Json.parseIfString(args['current champion']) or Opponent.tbd()
 	)
 
 	local widgets = {
@@ -76,7 +76,7 @@ function UnofficialWorldChampion:createInfobox()
 								String.nilIfEmpty(args['gained against result']),
 								'vs',
 								OpponentDisplay.InlineOpponent{
-									opponent = Opponent.readOpponentArgs(Json.parseIfString(args['gained against'])),
+									opponent = self:_parseOpponentArg('gained against'),
 									teamStyle = 'short'
 								}
 							)
@@ -90,7 +90,7 @@ function UnofficialWorldChampion:createInfobox()
 			name = (args['most defences no'] or '?') .. ' Matches',
 			content = {
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most defences']))
+					opponent = self:_parseOpponentArg('most defences')
 				}
 			},
 		},
@@ -108,30 +108,41 @@ function UnofficialWorldChampion:createInfobox()
 		Title{children = 'Longest Consecutive Time as Champion'},
 		Cell{
 			name = (args['longest consecutive no'] or '?') .. ' days',
-			content = {
+			content = WidgetUtil.collect(
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest consecutive']))
-				}
-			},
+					opponent = self:_parseOpponentArg('longest consecutive')
+				},
+				String.nilIfEmpty(args['longest consecutive desc'])
+			),
 		},
 		Title{children = 'Longest Total Time as Champion'},
 		Cell{
 			name = (args['longest total no'] or '?') .. ' days',
 			content = {
 				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['longest total']))
+					opponent = self:_parseOpponentArg('longest total')
 				}
 			},
 		},
 		Title{children = 'Most Times Held'},
-		Cell{
-			name = (args['most times held no'] or '?') .. ' times',
-			content = {
-				OpponentDisplay.InlineOpponent{
-					opponent = Opponent.readOpponentArgs(Json.parseIfString(args['most times held']))
-				},
-				String.nilIfEmpty(args['most times held desc'])
-			},
+		Builder{
+			builder = function()
+				local opponents = {}
+				for defenseTeamKey, _ in Table.iter.pairsByPrefix(args, 'most times held', {requireIndex = false}) do
+					Array.appendWith(opponents,
+						self:_parseOpponentArg(defenseTeamKey)
+					)
+				end
+				return Cell{
+					name = (args['most times held no'] or '?') .. ' times',
+					content = WidgetUtil.collect(
+						Array.map(opponents, function (opponent)
+							return OpponentDisplay.InlineOpponent{ opponent = opponent }
+						end),
+						String.nilIfEmpty(args['most times held desc'])
+					),
+				}
+			end
 		},
 		Customizable{
 			id = 'regionaldistribution',
@@ -146,6 +157,14 @@ function UnofficialWorldChampion:createInfobox()
 
 	self:setLpdbData(args)
 	return self:build(widgets)
+end
+
+---@param key string
+---@return standardOpponent
+function UnofficialWorldChampion:_parseOpponentArg(key)
+	return Opponent.readOpponentArgs(
+		Json.parseIfString(self.args[key]) or Opponent.tbd()
+	)
 end
 
 ---@return Widget[]

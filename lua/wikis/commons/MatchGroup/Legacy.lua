@@ -240,7 +240,7 @@ function MatchGroupLegacy:_getMap(mapIndex)
 
 	local mapping = {}
 	Table.iter.forEachPair(self:getMap(), function (key, val)
-		val = val:gsub('%$1%$',mapIndex, 1)
+		val = val:gsub('%$1%$', mapIndex, 1)
 		mapping[key] = val
 	end)
 
@@ -325,19 +325,12 @@ end
 
 ---@param isReset boolean
 ---@param match table
-function MatchGroupLegacy:handleFinished(isReset, match)
-	if isReset then return end
-	match['finished'] = String.isNotEmpty(((match.opponent1 or {}).win or '') ..
-		((match.opponent2 or {}).win or ''))
-end
-
----@param isReset boolean
----@param match table
 function MatchGroupLegacy:handleOtherMatchParams(isReset, match)
 end
 
 ---@param match2key string
 ---@param match1params match1Keys
+---@return table?
 function MatchGroupLegacy:getMatch(match2key, match1params)
 	local isReset = match2key == RESET_MATCH
 	local isValidReset = false
@@ -345,7 +338,7 @@ function MatchGroupLegacy:getMatch(match2key, match1params)
 
 	self:handleOpponents(isReset, match1params, match)
 	self:handleDetails(isReset, match1params, match)
-	self:handleFinished(isReset, match)
+	match.finished = true
 	self:handleOtherMatchParams(isReset, match)
 	Array.forEach(Array.range(1, MAX_NUMBER_OF_OPPONENTS), function (opponentIndex)
 		local opponent = match['opponent' .. opponentIndex] or {}

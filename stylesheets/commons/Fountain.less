@@ -8,18 +8,23 @@ html.theme--dark .componentsinvert {
 	filter: invert( 1 );
 }
 
+// Default text-shadow
+.txtshd {
+	text-shadow: 0.0625em 0.0625em 0.125em var( --clr-moon-base ); // #000000
+}
+
 // Hero infobox-related
 .healthbar {
 	background: linear-gradient( to right, #286323, #7af03c );
 	color: #ffffff;
-	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
 	font-weight: bold;
 }
 
 .manabar {
 	background: linear-gradient( to right, #1056db, #73f5fe );
 	color: #ffffff;
-	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
 	font-weight: bold;
 }
 
@@ -52,7 +57,8 @@ html.theme--dark .componentsinvert {
 	border-radius: 50%;
 } // Circles the Secondary Attribute.
 
-.ib-tooltip {
+// Tooltip for all infoboxes
+.infobox-tooltip {
 	border-width: 0.1875rem 0.0625rem 0.0625rem 0.0625rem;
 	border-style: solid;
 	text-align: center;
@@ -62,7 +68,127 @@ html.theme--dark .componentsinvert {
 	&:hover {
 		background-color: rgba( 255, 215, 0, 0.5 );
 	}
-} // Mainly for Hero infobox tooltip. Can be expanded to other usage in the future.
+}
+
+// Item infobox-related
+.infobox_itm-title {
+	cursor: default;
+	font-size: 90%;
+	font-weight: bold;
+	color: #e2e2e6;
+	margin: -0.25em 0 0.125em 0;
+}
+
+.infobox_itm-icon {
+	margin: 0.125em 0 0.125em 0;
+	display: flex;
+	justify-content: center;
+	width: 18.75em;
+	max-height: 5.25em;
+}
+
+.infobox_itm-neg {
+	color: var( --clr-semantic-negative-base ); // #e93737
+}
+
+.infobox_itm-type {
+	&_neutral { // Neutral Items
+		&1 {
+			background-color: var( --clr-moon-40 ); // #666666
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+
+		&2 {
+			background-color: var( --clr-forestgreen-40 ); // #0dbf0d;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+
+		&3 {
+			background-color: var( --clr-gigas-base ); // #4d34a0;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+
+		&4 {
+			background-color: var( --clr-vividviolet-40 ); // #7e0dbf;
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+
+		&5 {
+			background-color: var( --clr-semantic-copper-40 ); // #cc7800
+			font-weight: bold;
+			color: #e2e2e6;
+		}
+	}
+
+	&_accessories {
+		background-color: var( --clr-forestgreen-base ); // #2cba2c
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_armor,
+	&_consumables {
+		background-color: var( --clr-california-40 ); // #cc6500;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_artifacts {
+		background-color: var( --clr-redviolet-20 ); // #66003e;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_attributes {
+		background-color: var( --clr-moon-base ); // #000000
+		font-weight: bold;
+		color: #ffe845;
+	}
+
+	&_collectible,
+	&_roshan,
+	&_tormentor {
+		background-color: var( --clr-elm-40 ); // #27a4a4;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_equipment,
+	&_weapons {
+		background-color: var( --clr-semantic-positive-30 ); // #1d7c1d;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_magical {
+		background-color: var( --clr-primary-base ); // #0b61a4;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_miscellaneous,
+	&_support {
+		background-color: var( --clr-primary-40 ); // #0d71bf;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_removed,
+	&_unreleased { // This includes unreleased Neutral Items.
+		background-color: var( --clr-redviolet-40 ); // #bf0d75;
+		font-weight: bold;
+		color: #e2e2e6;
+	}
+
+	&_stock { // Stock has no bold because it contain other traits.
+		background-color: var( --clr-primary-base ); // #0b61a4;
+		color: #e2e2e6;
+	}
+}
 
 /* Infobox Cosmetic */
 .infobox-cosmetic-tradeable,
@@ -73,7 +199,7 @@ html.theme--dark .componentsinvert {
 }
 
 .infobox-cosmetic-deletable {
-	background: radial-gradient( 50% 50% at 50% 50%, #262a30 0%, #000000 100% );
+	background: radial-gradient( 50% 50% at 50% 50%, #262a30 0%, var( --clr-moon-base ) 100% );
 	font-weight: bold;
 	color: #747b82; // TODO: Need support for both true and false, this is the false color, true is not defined
 }
@@ -87,7 +213,7 @@ html.theme--dark .componentsinvert {
 a.cf {
 	font-weight: bold;
 	color: #ffffff;
-	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
 }
 
 // Spellcard Ability Borders
@@ -157,7 +283,7 @@ a.cf {
 		height: 200%;
 		background-color: transparent;
 		background-repeat: no-repeat;
-		background-image: linear-gradient( #000000, #fbb300 );
+		background-image: linear-gradient( var( --clr-moon-base ), #fbb300 );
 		animation: rotate 1.2s cubic-bezier( 0.46, 0.03, 0.52, 0.96 ) infinite;
 	}
 
@@ -258,6 +384,10 @@ a.cf {
 	vertical-align: top;
 	width: 13%;
 	text-align: right;
+
+	&-ru {
+		width: 20%; // for dota2gameru
+	}
 } // Spellcard Target/Affect/Damage (TAD)
 
 .spelltad_value {
@@ -279,7 +409,7 @@ a.cf {
 .spellagh {
 	font-weight: bold;
 	color: #a885ff;
-	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+	text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
 }
 
 .spelltrait_value {
@@ -347,7 +477,7 @@ a.cf {
 .spellintern {
 	cursor: default;
 	padding: 0.1875rem;
-	font-size: 70%; // convert to rem
+	font-size: 80%; // convert to rem
 	border: 0.0625rem solid #7681968c;
 
 	&:hover {
@@ -385,7 +515,7 @@ a.cf {
 	&_link,
 	&_topage {
 		color: #e2e2e6;
-		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
 		font-weight: bold;
 	}
 
@@ -404,7 +534,7 @@ a.cf {
 		justify-content: center;
 		font-weight: bold;
 		font-size: 80%; // convert to rem
-		text-shadow: 0.7px 0.7px 1.2px #000000; //subpixel necessary?
+		text-shadow: 0.7px 0.7px 1.2px var( --clr-moon-base ); // #000000 subpixel necessary? (investigate this pls iris)
 		text-align: center;
 	}
 
@@ -481,38 +611,70 @@ a.cf {
 }
 
 // Facetcard-related
-.facetBox {
-	background: rgba( 35, 46, 52, 0.25 );
-	padding: 0.3125rem;
-	border: 0.0625rem solid #505050;
-	color: #ffffff;
-	transition: 0.35s;
+.facet {
+	&Box {
+		background: rgba( 35, 46, 52, 0.25 );
+		padding: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		color: var( --clr-on-background );
+		transition: 0.35s;
 
-	&:hover {
-		border: 0.0625rem solid var( --clr-elm-10 );
+		&:hover {
+			border: 0.0625rem solid var( --clr-elm-10 );
+
+			.theme--dark & {
+				border: 0.0625rem solid var( --clr-moon-90 );
+			}
+		}
 	}
 
-	.theme--dark &:hover {
-		border: 0.0625rem solid var( --clr-moon-90 );
+	&Cell {
+		background-color: #9fa1a3;
+		padding-top: 5px;
+
+		.theme--dark & {
+			background-color: #2c2f33;
+		}
 	}
-}
 
-.facetTitle {
-	cursor: help;
-}
+	&Title {
+		cursor: help;
+	}
 
-.facetLink {
-	font-weight: bold;
-	color: #e2e2e6;
-	text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
-}
+	&Link {
+		font-weight: bold;
+		color: var( --clr-moon-base ); // #000000
+		text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-30 );
 
-.facetDesc {
-	border-top: 0.125rem solid #505050;
-	padding-top: 0.3125rem;
+		&Title,
+		.theme--dark & {
+			color: #e2e2e6;
+			text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base );
+		}
+	}
 
-	&:hover {
-		border-top: 0.125rem solid var( --clr-moon-80 );
+	&Desc {
+		border-top: 0.125rem solid #505050;
+		padding-top: 0.3125rem;
+
+		&:hover {
+			border-top: 0.125rem solid var( --clr-moon-80 );
+		}
+	}
+
+	&Shadow {
+		display: inline-block;
+		background: rgba( 255, 255, 255, 0.7 );
+		text-align: left;
+		margin-top: 0;
+		margin-bottom: 0.3125rem;
+		padding: 0.3125rem;
+		border: 0.0625rem solid #505050;
+		width: 100%;
+
+		.theme--dark & {
+			background: rgba( 18, 26, 33, 0.7 );
+		}
 	}
 }
 
@@ -523,20 +685,29 @@ a.cf {
 		max-width: 28.75rem; // 460px
 		width: 100%;
 		font-size: 90%; // convert to rem
-		background: rgba( 35, 46, 52, 0.75 );
+		background: rgba( 212, 216, 222, 0.75 );
 		text-align: left;
 		padding-left: 0.3125rem;
 		padding-right: 0.3125rem;
 		padding-top: 0.3125rem;
 		border: 0.0625rem solid #505050;
-		color: #d9e0e8;
+		color: var( --clr-on-background );
+
+		.theme--dark & {
+			background: rgba( 35, 46, 52, 0.75 );
+		}
 	}
 
 	&Title {
 		font-weight: bold;
-		color: #a885ff;
-		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		color: #5b37b7;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-gigas-80 );
 		flex-grow: 1;
+
+		.theme--dark & {
+			color: #a885ff;
+			text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
+		}
 	}
 
 	&New {
@@ -546,7 +717,7 @@ a.cf {
 		text-transform: uppercase;
 		letter-spacing: 0.5px;
 		background-color: #1c2e50;
-		text-shadow: 0.0625rem 0.0625rem 0.125rem #000000;
+		text-shadow: 0.0625rem 0.0625rem 0.125rem var( --clr-moon-base ); // #000000
 		border: 0.125rem solid #505050;
 		padding-left: 0.125rem;
 		padding-right: 0.125rem;
@@ -554,7 +725,7 @@ a.cf {
 
 	&Shadow {
 		display: inline-block;
-		background: rgba( 18, 26, 33, 0.7 );
+		background: rgba( 255, 255, 255, 0.7 );
 		text-align: left;
 		margin-top: 0;
 		margin-bottom: 0.3125rem;
@@ -562,9 +733,17 @@ a.cf {
 		border: 0.0625rem solid #505050;
 		width: 100%;
 
+		.theme--dark & {
+			background: rgba( 18, 26, 33, 0.7 );
+		}
+
 		&:hover {
-			background-color: rgba( 9, 13, 17, 1 );
+			background-color: rgba( 142, 185, 229, 1 );
 			transition: 0.15s;
+
+			.theme--dark & {
+				background-color: rgba( 9, 13, 17, 1 );
+			}
 		}
 	}
 
@@ -830,7 +1009,7 @@ div.gameplay_nav ul li ul li {
 .tte-right-tal-slot {
 	height: 2.5rem; // 40px
 	padding: 0;
-	border-bottom: solid 0.125rem #000000;
+	border-bottom: solid 0.125rem var( --clr-moon-base ); // #000000
 	background: #eff5ff;
 }
 
@@ -869,7 +1048,7 @@ div.infostripe {
 	color: #ffffff;
 	vertical-align: top;
 	text-align: center;
-	text-shadow: 0 0 0.3125rem #000000;
+	text-shadow: 0 0 0.3125rem var( --clr-moon-base ); // #000000
 	font-size: 1.25rem;
 
 	a,
@@ -936,7 +1115,7 @@ div.heroentrytext {
 	height: 3.75rem; // 60px
 	color: #ffffff;
 	text-align: center;
-	text-shadow: -0.0625rem 0 0.2em #000000, 0 0.0625rem 0.2em #000000, 0.0625rem 0 0.2em #000000, 0 -0.0625rem 0.2em #000000;
+	text-shadow: -0.0625rem 0 0.2em var( --clr-moon-base ), 0 0.0625rem 0.2em var( --clr-moon-base ), 0.0625rem 0 0.2em var( --clr-moon-base ), 0 -0.0625rem 0.2em var( --clr-moon-base ); // #000000
 	font-size: 0.6875rem;
 	line-height: 0.9375rem;
 	pointer-events: none;
@@ -1044,7 +1223,7 @@ div.heroentrytext {
 #mp-layout .mp-block#battle-pass {
 	padding: 0;
 	border: 0;
-	background: #000000;
+	background: var( --clr-moon-base ); // #000000
 	text-align: center;
 }
 
@@ -1125,7 +1304,7 @@ div.skilllist {
 	&-title {
 		border: 0.0625rem solid #aaaaaa;
 		background-color: #ffaea3;
-		color: #000000;
+		color: var( --clr-moon-base ); // #000000
 		text-align: center;
 		font-weight: bold;
 		font-size: 100%;
@@ -1162,7 +1341,7 @@ li.skilllist-lite {
 div.skilllist-rich {
 	&-head {
 		padding: 0.1875rem 0.3125rem;
-		border-bottom: 0.0625rem solid #000000;
+		border-bottom: 0.0625rem solid var( --clr-moon-base ); // #000000
 		color: #ffffff;
 		text-decoration: none;
 		font-weight: bold;
@@ -1261,7 +1440,7 @@ div.skilllist-col5 ul li {
 	display: block;
 	padding: 0.125rem 0.3125rem;
 	text-decoration: none;
-	color: #000000;
+	color: var( --clr-moon-base ); // #000000
 	font-family: sans-serif;
 	font-size: 0.875em; // convert to rem
 
@@ -1289,7 +1468,7 @@ div.skilllist-col5 ul li {
 	display: inline-block;
 	vertical-align: top;
 	background-color: #151515;
-	box-shadow: 0.0625rem 0.0625rem 0.0625rem #000000;
+	box-shadow: 0.0625rem 0.0625rem 0.0625rem var( --clr-moon-base ); // #000000
 	border-width: 0.0625rem;
 	border-radius: 50%;
 	padding: 0 0;

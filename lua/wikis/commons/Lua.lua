@@ -34,6 +34,28 @@ function Lua.moduleExists(name)
 	end
 end
 
+---@param name string
+---@param options {requireDevIfEnabled: boolean?}?
+---@return any
+local getModuleName = function(name, options)
+	options = options or {}
+	if options.requireDevIfEnabled == false then
+		return name
+	end
+	if StringUtils.endsWith(name, '/dev') or StringUtils.contains(name, '/dev/') then
+		error('Lua.import: Direct import of dev modules is not allowed')
+	end
+	local devFlag = FeatureFlag.get('dev')
+	if not devFlag then
+		return name
+	end
+	local devName = name .. '/dev' .. (type(devFlag) == 'string' and ('/' .. devFlag) or '')
+	if require('Module:Namespace').isMain() then
+		mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
+	end
+	return Lua.moduleExists(devName) and devName or name
+end
+
 ---Imports a module if it exists by its name.
 ---
 ---By default it will include the /dev module if in dev mode activated. This can be turned off by setting
@@ -42,18 +64,10 @@ end
 ---@param options {requireDevIfEnabled: boolean, loadData: boolean?}?
 ---@return unknown?
 function Lua.requireIfExists(name, options)
-	if Lua.moduleExists(name) then
+	local moduleName = getModuleName(name, options)
+	if Lua.moduleExists(moduleName) then
 		return Lua.import(name, options)
 	end
-end
-
----Loads (mw.loadData) a data module if it exists by its name.
----@deprecated use `Lua.requireIfExists` with `loadData` option instead
----@param name string
----@return unknown?
-function Lua.loadDataIfExists(name)
-	mw.ext.TeamLiquidIntegration.add_category('Pages using deprecated Lua.loadDataIfExists function')
-	return Lua.requireIfExists(name, {loadData = true})
 end
 
 ---Imports a module by its name.
@@ -66,27 +80,8 @@ end
 function Lua.import(name, options)
 	options = options or {}
 	local importFunction = options.loadData and mw.loadData or require
-	if options.requireDevIfEnabled ~= false then
-		if StringUtils.endsWith(name, '/dev') then
-			error('Lua.import: Module name should not end in \'/dev\'')
-		end
-
-		local devFlag = FeatureFlag.get('dev')
-		if not devFlag then
-			return importFunction(name)
-		end
-		local devName = name .. '/dev' .. (type(devFlag) == 'string' and ('/' .. devFlag) or '')
-		if require('Module:Namespace').isMain() then
-			mw.ext.TeamLiquidIntegration.add_category('Pages using dev modules')
-		end
-		if Lua.moduleExists(devName) then
-			return importFunction(devName)
-		else
-			return importFunction(name)
-		end
-	else
-		return importFunction(name)
-	end
+	local moduleName = getModuleName(name, options)
+	return importFunction(moduleName)
 end
 
 --[[
@@ -126,8 +121,9 @@ function Lua.invoke(frame)
 		'Lua.invoke: Module name should not begin with \'Module:\''
 	)
 
-	frame.args.module = nil
-	frame.args.fn = nil
+	-- idealy would remove frame.args.module and frame.args.fn
+	-- but due to how frame.args behaves this is not possible without having negative impact on the performance
+	-- or causing other issues
 
 	local getDevFlag = function(startFrame)
 		local currentFrame = startFrame
@@ -200,94 +196,6 @@ function Lua.withPerfSetup(context, f)
 		return ...
 	end
 	return post(f())
-end
-
---[[
-Incorporates Lua.invoke functionality into an entry point. The resulting entry
-point can be #invoked directly, without needing Lua.invoke.
-
-Usage:
-
-function JayModule.TemplateJay(frame) ... end
-JayModule.TemplateJay = Lua.wrapAutoInvoke(JayModule, 'Module:JayModule', 'TemplateJay')
-
-]]
----@param module table
----@param baseModuleName string
----@param fnName string
----@return fun(frame: Frame|table): unknown
-function Lua.wrapAutoInvoke(module, baseModuleName, fnName)
-	assert(
-		not StringUtils.endsWith(baseModuleName, '/dev'),
-		'Lua.wrapAutoInvoke: Module name should not end in \'/dev\''
-	)
-	assert(
-		StringUtils.startsWith(baseModuleName, 'Module:'),
-		'Lua.wrapAutoInvoke: Module name must begin with \'Module:\''
-	)
-
-	local moduleFn = module[fnName]
-
-	return function(frame)
-		local dev
-		if type(frame.args) == 'table' then
-			dev = frame.args.dev
-		else
-			dev = frame.dev
-		end
-
-		local flags = {dev = Logic.readBoolOrNil(dev)}
-		return FeatureFlag.with(flags, function()
-			local variantModule = Lua.import(baseModuleName)
-			local fn = module == variantModule and moduleFn or variantModule[fnName]
-			return fn(frame)
-		end)
-	end
-end
-
---[[
-Incorporates Lua.invoke functionality into entry points of a module. The entry
-points can then be invoked directly, without needing Lua.invoke.
-
-This is intended for widely #invoked entry points where it is difficult to
-migrate existing wikicode calls to Lua.invoke. Avoid applying on entry points
-#invoked by a single template.
-
-Functions whose names begin with 'Template' are assumed to be the entry points.
-Specify fnNames to override this.
-
-Usage:
-local Jay = {}
-function Jay.TemplateJay(frame) ... end
-
-Lua.autoInvokeEntryPoints(JayModule, 'Module:JayModule')
-
-]]
----@param module table
----@param baseModuleName string
----@param fnNames string[]?
-function Lua.autoInvokeEntryPoints(module, baseModuleName, fnNames)
-	fnNames = fnNames or Lua.getDefaultEntryPoints(module)
-
-	for _, fnName in ipairs(fnNames) do
-		module[fnName] = Lua.wrapAutoInvoke(module, baseModuleName, fnName)
-	end
-end
-
---[[
-Returns the functions whose names begin with 'Template'. Functions that start
-with 'Template' are presumably entry points.
-]]
----@param module table
----@return string[]
-function Lua.getDefaultEntryPoints(module)
-	local fnNames = {}
-	for fnName, fn in pairs(module) do
-		if type(fn) == 'function' and StringUtils.startsWith(fnName, 'Template') then
-			table.insert(fnNames, fnName)
-		end
-	end
-	return fnNames
 end
 
 return Lua

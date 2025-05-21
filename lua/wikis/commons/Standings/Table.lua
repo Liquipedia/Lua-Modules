@@ -32,7 +32,8 @@ local StandingsTable = {}
 ---@field match {w: integer, d: integer, l: integer}
 
 ---@class StandingTableOpponentData
----@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?, matchId: string?}[]?
+---@field rounds {tiebreakerPoints: number?, specialstatus: string, scoreboard: Scoreboard?,
+---match: MatchGroupUtilMatch?, matches: MatchGroupUtilMatch[], matchId: string}[]?
 ---@field opponent standardOpponent
 ---@field startingPoints number?
 
@@ -54,15 +55,17 @@ function StandingsTable.fromTemplate(frame)
 	local bgs = parsedData.bgs
 	local matches = parsedData.matches
 
+	local tiebreakers = StandingsParseWiki.parseTiebreakers(args, tableType)
+
 	if not importScoreFromMatches then
-		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
+		return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 	end
 
 	local automaticScoreFunction = StandingsParseWiki.makeScoringFunction(tableType, args)
 
 	local importedOpponents = StandingsParseLpdb.importFromMatches(rounds, automaticScoreFunction)
 	opponents = StandingsTable.mergeOpponentsData(opponents, importedOpponents, importOpponentFromMatches)
-	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
+	return StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 end
 
 ---@param manualOpponents StandingTableOpponentData[]
@@ -99,9 +102,10 @@ end
 ---@param title any
 ---@param matches any
 ---@param tableType StandingsTableTypes
+---@param tiebreakers StandingsTiebreaker[]
 ---@return Widget
-function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType)
-	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType)
+function StandingsTable._make(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
+	local standingsTable = StandingsParser.parse(rounds, opponents, bgs, title, matches, tableType, tiebreakers)
 	StandingsStorage.run(standingsTable, {saveVars = true})
 	return Display{pageName = mw.title.getCurrentTitle().text, standingsIndex = standingsTable.standingsindex}
 end

@@ -25,6 +25,7 @@ return {
 				darkMode = 'Age of Empires default allmode.png',
 				lightMode = 'Age of Empires default allmode.png',
 			},
+			order = 1,
 		},
 		['Age of Empires II'] = {
 			abbreviation = 'AoE2',
@@ -38,6 +39,7 @@ return {
 				darkMode = 'Age of Empires default allmode.png',
 				lightMode = 'Age of Empires default allmode.png',
 			},
+			order = 2,
 		},
 		['Age of Empires III'] = {
 			abbreviation = 'AoE3',
@@ -51,6 +53,7 @@ return {
 				darkMode = 'Age of Empires default allmode.png',
 				lightMode = 'Age of Empires default allmode.png',
 			},
+			order = 3,
 		},
 		['Age of Empires IV'] = {
 			abbreviation = 'AoE4',
@@ -64,6 +67,7 @@ return {
 				darkMode = 'Age of Empires default allmode.png',
 				lightMode = 'Age of Empires default allmode.png',
 			},
+			order = 4,
 		},
 		['Age of Mythology'] = {
 			abbreviation = 'AoM',
@@ -77,6 +81,7 @@ return {
 				darkMode = 'Age of Empires default allmode.png',
 				lightMode = 'Age of Empires default allmode.png',
 			},
+			order = 5,
 		},
 		['Age of Empires Online'] = {
 			abbreviation = 'AoEO',
@@ -90,6 +95,7 @@ return {
 				darkMode = 'Age of Empires default allmode.png',
 				lightMode = 'Age of Empires default allmode.png',
 			},
+			order = 6,
 		},
 	},
 

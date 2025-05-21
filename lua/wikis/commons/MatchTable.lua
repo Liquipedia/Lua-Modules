@@ -46,6 +46,7 @@ local INVALID_TIER_SORT = 'ZZ'
 local SCORE_STATUS = 'S'
 local SCORE_CONCAT = '&nbsp;&#58;&nbsp;'
 local BO1_SCORE_CONCAT = '&nbsp;-&nbsp;'
+local SECONDS_ONE_DAY = 3600 * 24
 
 ---@alias MatchTableMode `Opponent.solo` | `Opponent.team`
 
@@ -258,7 +259,7 @@ function MatchTable:getOpponentAliases(mode, opponent)
 	Array.forEach(opponentNames, function(name)
 		name = name:gsub(' ', '_')
 		local nameWithSpaces = name:gsub('_', ' ')
-		local pagifiedName = Page.pageifyLink(name)
+		local pagifiedName = Page.pageifyLink(name) --[[@as string]]
 		local pagifiedNameWithSpaces = pagifiedName:gsub('_', ' ')
 		aliases[name] = true
 		aliases[nameWithSpaces] = true
@@ -312,7 +313,7 @@ function MatchTable:query()
 		table.insert(self.matches, self:matchFromRecord(match) or nil)
 	end, self.config.limit)
 
-	if self.config.limit and self.config.limit == #self.matches then
+	if self.config.limit and self.config.limit == #self.matches and not self.config.linkSubPage then
 		mw.ext.TeamLiquidIntegration.add_category('Limited match pages')
 	end
 
@@ -347,7 +348,8 @@ function MatchTable:buildDateConditions()
 	end
 
 	if timeRange.endDate ~= DateExt.maxTimestamp then
-		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt, DateExt.formatTimestamp('c', timeRange.endDate))}
+		conditions:add{ConditionNode(ColumnName('date'), Comparator.lt,
+			DateExt.formatTimestamp('c', timeRange.endDate + SECONDS_ONE_DAY))}
 	end
 
 	return conditions
@@ -381,12 +383,10 @@ function MatchTable:buildAdditionalConditions()
 	local args = self.args
 	local conditions = ConditionTree(BooleanOperator.all)
 		:add{ConditionNode(ColumnName('status'), Comparator.neq, 'notplayed')}
-	local hasAdditionalConditions = false
 
 	local getOrCondition = function(lpdbKey, input)
 		if Logic.isEmpty(input) then return end
 
-		hasAdditionalConditions = true
 		local orConditions = ConditionTree(BooleanOperator.any)
 		Array.forEach(mw.text.split(input, ','), function(value)
 			orConditions:add{ConditionNode(ColumnName(lpdbKey), Comparator.eq, String.trim(value))}
@@ -398,11 +398,12 @@ function MatchTable:buildAdditionalConditions()
 	getOrCondition('game', args.game)
 
 	if Logic.isNotEmpty(args.bestof) then
-		hasAdditionalConditions = true
 		conditions:add(ConditionNode(ColumnName('bestof'), Comparator.eq, args.bestof))
 	end
 
-	if not hasAdditionalConditions then return end
+	if Logic.isNotEmpty(args.type) then
+		conditions:add(ConditionNode(ColumnName('type'), Comparator.eq, args.type))
+	end
 
 	return conditions
 end
@@ -692,8 +693,8 @@ end
 ---@param timestamp number
 ---@return string
 function MatchTable._calculateDateTimeString(timezone, timestamp)
-	local offset = Timezone.getOffset(timezone) or 0
-	local tzstring = Timezone.getTimezoneString(timezone)
+	local offset = Timezone.getOffset{timezone = timezone} or 0
+	local tzstring = Timezone.getTimezoneString{timezone = timezone}
 	if not tzstring then
 		error('Unsupported timezone: ' .. timezone)
 	end
@@ -819,7 +820,7 @@ function MatchTable:_displayScore(match)
 	---@return Html|string
 	local toScore = function(opponentRecord, gameOpponents)
 		if Table.isEmpty(opponentRecord) or not opponentRecord.status then return 'Unkn' end
-		local score = opponentRecord.score
+		local score = OpponentDisplay.InlineScore(opponentRecord)
 		local status = opponentRecord.status
 
 		local game1Opponent = gameOpponents[1]

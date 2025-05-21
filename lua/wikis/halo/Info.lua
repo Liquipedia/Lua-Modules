@@ -114,6 +114,7 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 180,
+			sortCasters = true,
 		},
 	},
 }

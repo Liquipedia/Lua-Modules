@@ -37,7 +37,7 @@ function MedalStats:create()
 	self:_processData()
 
 	local nameDisplay = function(identifier)
-		return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName(identifier)
+		return Flags.Icon{flag = identifier, shouldLink = false} .. ' ' .. Flags.CountryName{flag = identifier}
 	end
 
 	return self:defaultBuild(nameDisplay, 'Country', 'Countries')

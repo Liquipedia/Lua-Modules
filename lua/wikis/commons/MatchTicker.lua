@@ -52,6 +52,7 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'match2bracketdata',
 	'match2games',
+	'game',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
@@ -59,7 +60,6 @@ local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
 local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
-local DEFAULT_LIVE_HOURS = 8
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
 --- Extract externally if it grows
@@ -80,7 +80,6 @@ end
 ---@field player string?
 ---@field teamPages string[]?
 ---@field hideTournament boolean
----@field maximumLiveHoursOfMatches integer
 ---@field queryColumns string[]
 ---@field additionalConditions string
 ---@field recent boolean
@@ -96,8 +95,10 @@ end
 ---@field tiers string[]?
 ---@field tierTypes string[]?
 ---@field regions string[]?
+---@field games string[]?
 ---@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
+---@field displayGameIcons boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -123,7 +124,6 @@ function MatchTicker:init(args)
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
 		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
-		maximumLiveHoursOfMatches = tonumber(args.maximumLiveHoursOfMatches) or DEFAULT_LIVE_HOURS,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
 		recent = Logic.readBool(args.recent),
@@ -143,8 +143,12 @@ function MatchTicker:init(args)
 				), function(tiertype)
 					return select(2, Tier.toValue(1, tiertype))
 				end) or nil,
+		games = args.games and Array.map(Array.parseCommaSeparatedString(args.games), function (game)
+					return Game.toIdentifier{game=game}
+				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
+		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set
@@ -294,6 +298,16 @@ function MatchTicker:buildQueryConditions()
 		conditions:add(tierTypeConditions)
 	end
 
+	if Table.isNotEmpty(config.games) then
+		local tierConditions = ConditionTree(BooleanOperator.any)
+
+		Array.forEach(config.games, function(game)
+			tierConditions:add { ConditionNode(ColumnName('game'), Comparator.eq, game) }
+		end)
+
+		conditions:add(tierConditions)
+	end
+
 	conditions:add(self:dateConditions())
 
 	return conditions:toString() .. config.additionalConditions
@@ -319,11 +333,7 @@ function MatchTicker:dateConditions()
 	dateConditions:add{ConditionNode(ColumnName('finished'), Comparator.eq, 0)}
 
 	if config.ongoing then
-		local secondsLive = config.maximumLiveHoursOfMatches * 3600
-		local timeStamp = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]) - secondsLive)
-
-		dateConditions:add{ConditionNode(ColumnName('date'), Comparator.gt, timeStamp)}
-
+		-- case ongoing and upcoming: no date restriction
 		if config.upcoming then return dateConditions end
 
 		return dateConditions:add{

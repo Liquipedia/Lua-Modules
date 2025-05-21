@@ -43,7 +43,7 @@ end
 
 ---CS tier display overwrite for results, achievements and awards tables
 ---@param placement table
----@return string
+---@return string?
 ---@return string
 function CustomResultsTable:tierDisplay(placement)
 	local tier, tierType, options = Tier.parseFromQueryData(placement)
@@ -58,4 +58,4 @@ function CustomResultsTable:tierDisplay(placement)
 	return Tier.display(tier, tierType, options), Tier.toSortValue(tier, tierType)
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})

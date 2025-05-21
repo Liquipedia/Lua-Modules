@@ -152,9 +152,9 @@ function CustomBuilding:_getHotkeys()
 	local display
 	if not String.isEmpty(self.args.shortcut) then
 		if not String.isEmpty(self.args.shortcut2) then
-			display = Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
+			display = Hotkeys.hotkey2{hotkey1 = self.args.shortcut, hotkey2 = self.args.shortcut2, seperator = 'arrow'}
 		else
-			display = Hotkeys.hotkey(self.args.shortcut)
+			display = Hotkeys.hotkey{hotkey = self.args.shortcut}
 		end
 	end
 

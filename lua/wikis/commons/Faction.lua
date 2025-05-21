@@ -168,6 +168,7 @@ end
 ---@field size string|number|nil
 ---@field title string?
 ---@field game string?
+---@field showName boolean?
 Faction.propTypes.Icon = TypeUtil.struct{
 	faction = 'string',
 	showLink = 'boolean?',
@@ -175,6 +176,7 @@ Faction.propTypes.Icon = TypeUtil.struct{
 	size = TypeUtil.union('string', 'number', 'nil'),
 	title = 'string?',
 	game = 'string?',
+	showName = 'boolean?',
 }
 
 local namedSizes = {
@@ -211,6 +213,7 @@ function Faction.Icon(props)
 		.. '|' .. size
 		.. (props.showTitle ~= false and '|' .. (props.title or factionProps.name) or '')
 		.. ']]'
+		.. (props.showName and ('&nbsp;' .. (props.title or factionProps.name)) or '')
 end
 
 
@@ -223,4 +226,4 @@ function Faction.bgClass(faction, options)
 	return factionProps and factionProps.bgClass or nil
 end
 
-return Class.export(Faction)
+return Class.export(Faction, {exports = {'Icon'}})

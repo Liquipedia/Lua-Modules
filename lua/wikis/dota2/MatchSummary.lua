@@ -14,13 +14,13 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
-local MatchPage = Lua.import('Module:MatchPage')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local MAX_NUM_BANS = 7
 local NUM_HEROES_PICK = 5
+local STATUS_NOT_PLAYED = 'notplayed'
 
 ---@param args table
 ---@return Html
@@ -31,28 +31,32 @@ end
 ---@param match MatchGroupUtilMatch
 ---@return MatchSummaryBody
 function CustomMatchSummary.createBody(match)
-	-- Original Match Id must be used to match page links if it exists.
+	-- Original Match Id must be used to link match page if it exists.
 	-- It can be different from the matchId when shortened brackets are used.
 	local matchId = match.extradata.originalmatchid or match.matchId
 
 	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
-	local showMatchPage = MatchPage.isEnabledFor(match)
 	local characterBansData = MatchSummary.buildCharacterBanData(match.games, MAX_NUM_BANS)
 
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		MatchSummaryWidgets.MatchPageLink{
+			matchId = matchId,
+			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
+		},
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
-		showMatchPage and MatchSummaryWidgets.MatchPageLink{matchId = matchId} or nil,
 		Array.map(match.games, CustomMatchSummary._createGame),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters}
+		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date}
 	)}
 end
 
 ---@param game MatchGroupUtilGame
 ---@param gameIndex integer
----@return MatchSummaryRow
+---@return MatchSummaryRow?
 function CustomMatchSummary._createGame(game, gameIndex)
+	if game.status == STATUS_NOT_PLAYED then
+		return
+	end
 	local extradata = game.extradata or {}
 
 	-- TODO: Change to use participant data

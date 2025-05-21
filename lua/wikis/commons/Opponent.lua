@@ -387,7 +387,7 @@ function Opponent.readOpponentArgs(args)
 	elseif partySize == 1 then
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
-			flag = String.nilIfEmpty(Flags.CountryName(args.flag or args.p1flag)),
+			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
 			pageName = args.link or args.p1link,
 			team = args.team or args.p1team,
 		}
@@ -398,7 +398,7 @@ function Opponent.readOpponentArgs(args)
 			local playerTeam = args['p' .. playerIndex .. 'team']
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
-				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
+				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 				pageName = args['p' .. playerIndex .. 'link'],
 				team = playerTeam,
 			}
@@ -431,7 +431,7 @@ function Opponent.fromMatch2Record(record)
 			players = Array.map(record.match2players, function(playerRecord)
 				return {
 					displayName = playerRecord.displayname,
-					flag = String.nilIfEmpty(Flags.CountryName(playerRecord.flag)),
+					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
 					pageName = String.nilIfEmpty(playerRecord.name),
 				}
 			end),
@@ -487,7 +487,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 
 			return {
 				displayName = players[prefix .. 'dn'],
-				flag = Flags.CountryName(players[prefix .. 'flag']),
+				flag = Flags.CountryName{flag = players[prefix .. 'flag']},
 				pageName = players[prefix],
 				team = players[prefix .. 'template'] or players[prefix .. 'team'],
 			}

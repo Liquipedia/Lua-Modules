@@ -166,7 +166,7 @@ function CustomSkill:_castersDisplay()
 		end
 
 		if casterUnit.type == 'Hero' then
-			local heroSubfactionData = Array.parseCommaSeparatedString(extraData.subfaction[1] or {}, ':')
+			local heroSubfactionData = Array.parseCommaSeparatedString((extraData.subfaction or {})[1], ':')
 			return GAME_MODE_ICON[heroSubfactionData[1]] and Page.makeInternalLink({},
 				Icon.makeIcon{iconName = GAME_MODE_ICON[string.lower(heroSubfactionData[1])], size = '100%'}
 				.. ' ' .. casterUnit.name, caster)
@@ -185,8 +185,8 @@ function CustomSkill:_castersDisplay()
 	end)
 end
 
----@param data table
----@return table?
+---@param data string[]
+---@return string[]
 function CustomSkill:_parseSubfactionData(data)
 	local parsedElements = Array.map(data, function(dataElement)
 		return Array.parseCommaSeparatedString(dataElement, ':')
@@ -331,9 +331,9 @@ end
 function CustomSkill._hotkeys(hotkey1, hotkey2)
 	if String.isEmpty(hotkey1) then return end
 	if String.isEmpty(hotkey2) then
-		return Hotkeys.hotkey(hotkey1)
+		return Hotkeys.hotkey{hotkey = hotkey1}
 	end
-	return Hotkeys.hotkey2(hotkey1, hotkey2, 'plus')
+	return Hotkeys.hotkey2{hotkey1 = hotkey1, hotkey2 = hotkey2, seperator = 'plus'}
 end
 
 ---@param key string

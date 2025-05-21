@@ -11,7 +11,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	margin-bottom: 15px;
 }
 
-@media ( max-width: 424px ) {
+@media ( max-width: 435px ) {
 	div.main-page-banner .main-page-banner-top-row {
 		font-size: 9vw;
 	}
@@ -56,6 +56,22 @@ div.main-page-banner .main-page-banner-bottom-row {
 	border-bottom: 1px solid var( --clr-border, #bbbbbb );
 }
 
+.mainpage-v2 .tournaments-list-heading {
+	background-color: ~"rgba( from var( --clr-wiki-theme-primary ) r g b / 0.12 )";
+	color: var( --clr-wiki-theme-primary );
+	padding: 0.5rem 0.75rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	line-height: 1.25rem;
+	margin-bottom: 0.5rem;
+	border: 0;
+
+	.theme--dark & {
+		background-color: ~"rgba( from #ffffff r g b / 0.12 )";
+		color: #ffffff;
+	}
+}
+
 .tournaments-list-type-list {
 	margin-bottom: 15px !important;
 	margin-left: 0 !important;
@@ -78,6 +94,7 @@ div.main-page-banner .main-page-banner-bottom-row {
 	padding-left: 35px;
 	position: relative;
 	line-height: 21px;
+	flex-grow: 1;
 }
 
 .tournaments-list-name span.league-icon-small-image {
@@ -85,14 +102,22 @@ div.main-page-banner .main-page-banner-bottom-row {
 	position: absolute;
 }
 
+.tournaments-list-name span.tournament-game-icon {
+	margin-left: -50px;
+	padding-right: 25px;
+	position: absolute;
+}
+
 .dropdown-menu .league-icon-small-image img,
-.tournaments-list-name .league-icon-small-image img {
+.tournaments-list-name .league-icon-small-image img,
+.tournaments-list-name .icon-small img {
 	max-height: 21px;
 	max-width: 21px;
 }
 
 .dropdown-menu span.league-icon-small-image,
-.tournaments-list-name span.league-icon-small-image {
+.tournaments-list-name span.league-icon-small-image,
+.tournaments-list-name span.icon-small {
 	vertical-align: -4px;
 	min-height: 21px;
 	min-width: 21px;
@@ -294,9 +319,12 @@ body.page-Main_Page .mainpage-transfer .divRow:nth-of-type( n + 17 ) {
 	overflow: hidden;
 }
 
-#this-day-facts > h3:first-child {
-	margin-top: 0;
-	padding-top: 0;
+.panel-box-body {
+	h3:first-child,
+	h4:first-child {
+		margin-top: 0;
+		padding-top: 0;
+	}
 }
 
 /* Matches box */
@@ -396,6 +424,17 @@ table.infobox_matches_content {
 .infobox_matches_content td.match-filler > div {
 	display: flex;
 	justify-content: space-between;
+
+	div.tournament-span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 170px;
+		vertical-align: middle;
+		white-space: nowrap;
+		font-size: 11px;
+		height: 16px;
+		margin-top: 3px;
+	}
 }
 
 .infobox_matches_content:last-child {

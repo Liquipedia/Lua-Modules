@@ -167,7 +167,7 @@ function PlacementStats._header()
 		:tag('th'):node(Medals.display{medal = 1}):done()
 		:tag('th'):node(Medals.display{medal = 2}):done()
 		:tag('th'):node(Medals.display{medal = 3}):done()
-		:tag('th'):wikitext(Abbreviation.make('Top3', 'Total of top 3')):done()
+		:tag('th'):wikitext(Abbreviation.make{text = 'Top3', title = 'Total of top 3'}):done()
 		:tag('th'):wikitext('All'):done()
 end
 
@@ -208,4 +208,4 @@ function PlacementStats._buildBottom(placementData)
 		:tag('th'):wikitext(placementData.totals.all):done()
 end
 
-return Class.export(PlacementStats, {frameOnly = true})
+return Class.export(PlacementStats, {frameOnly = true, exports = {'run'}})

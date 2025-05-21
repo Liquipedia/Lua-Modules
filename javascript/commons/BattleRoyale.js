@@ -599,8 +599,8 @@ liquipedia.battleRoyale = {
 		let valB = b.querySelector( `[data-sort-type='${ sortType }']` ).dataset.sortVal;
 
 		if ( sortType !== 'team' ) {
-			valA = parseInt( valA );
-			valB = parseInt( valB );
+			valA = parseFloat( valA );
+			valB = parseFloat( valB );
 		}
 
 		if ( dir === 'ascending' ) {

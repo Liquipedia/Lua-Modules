@@ -9,6 +9,7 @@
 local Abbreviation = require('Module:Abbreviation')
 local Class = require('Module:Class')
 local Currency = require('Module:Currency')
+local DateExt = require('Module:Date/Ext')
 local Game = require('Module:Game')
 local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
@@ -37,7 +38,7 @@ function ResultsTable:buildHeader()
 	end
 
 	if self.config.displayGameIcons then
-		header:tag('th'):node(Abbreviation.make('G.', 'Game'))
+		header:tag('th'):node(Abbreviation.make{text = 'G.', title = 'Game'})
 	end
 
 	header:tag('th'):css('width', '420px'):attr('colspan', 2):wikitext('Tournament')
@@ -66,7 +67,7 @@ function ResultsTable:buildRow(placement)
 
 	local row = mw.html.create('tr')
 		:addClass(self:rowHighlight(placement))
-		:tag('td'):wikitext(mw.getContentLanguage():formatDate('Y-m-d', placement.date)):done()
+		:tag('td'):wikitext(DateExt.toYmdInUtc(placement.date)):done()
 		:node(placementCell)
 
 	local tierDisplay, tierSortValue = self:tierDisplay(placement)

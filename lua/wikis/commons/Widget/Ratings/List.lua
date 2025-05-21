@@ -122,7 +122,7 @@ function RatingsList:render()
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
-				children = Flags.Icon(team.region) .. Flags.CountryName(team.region)
+				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
 			},
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'streak' },
@@ -204,7 +204,7 @@ function RatingsList:render()
 					HtmlWidgets.Div {
 						children = {
 							HtmlWidgets.Span {children = 'Data provided by '},
-							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=]]'}
+							HtmlWidgets.Div {children = '[[File:SAP_logo.svg|link=|SAP]]'}
 						},
 						classes = { 'ranking-table__top-row-logo-container' }
 					}

@@ -87,10 +87,7 @@ function ActiveYears._buildConditions(player, playerAsPageName, playerPositionLi
 	local conditionTree = ConditionTree(BooleanOperator.all):add({
 		playerConditionTree,
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
-		ConditionTree(BooleanOperator.any):add({
-			ConditionNode(ColumnName('date_year'), Comparator.gt, ActiveYears.startYear),
-			ConditionNode(ColumnName('date_year'), Comparator.eq, ActiveYears.startYear),
-		}),
+		ConditionNode(ColumnName('date_year'), Comparator.ge, ActiveYears.startYear),
 	})
 
 	if String.isNotEmpty(mode) then
@@ -177,4 +174,4 @@ function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	return yearRanges
 end
 
-return Class.export(ActiveYears)
+return Class.export(ActiveYears, {exports = {'display'}})

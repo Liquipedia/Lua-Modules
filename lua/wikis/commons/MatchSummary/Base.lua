@@ -13,8 +13,6 @@ local DateExt = require('Module:Date/Ext')
 local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local PlayerDisplay = require('Module:Player/Display')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local VodLink = require('Module:VodLink')
@@ -22,6 +20,7 @@ local VodLink = require('Module:VodLink')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -30,7 +29,7 @@ local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MATCH_LINK_PRIORITY = Lua.import('Module:Links/MatchPriorityGroups', {loadData = true})
-local TBD = Abbreviation.make('TBD', 'To Be Determined')
+local TBD = Abbreviation.make{text = 'TBD', title = 'To Be Determined'}
 
 ---@class MatchSummaryHeader
 ---@operator call: MatchSummaryHeader
@@ -363,7 +362,6 @@ function MatchSummary.createDefaultBody(match, createGame, options)
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {
 			game = match.game,
 			emptyMapDisplay = options.emptyVetoMapDisplay,
@@ -402,58 +400,6 @@ function MatchSummary.addVodsToFooter(match, footer)
 	return footer
 end
 
----Creates a match footer with vods if vods are set
----@param match table
----@return string?
-function MatchSummary.createSubstitutesComment(match)
-	local comment = {}
-	Array.forEach(match.opponents, function(opponent)
-		local substitutions = (opponent.extradata or {}).substitutions
-		if Logic.isEmpty(substitutions) then
-			return
-		end
-
-		Array.forEach(substitutions, function(substitution)
-			if Logic.isEmpty(substitution.substitute) then
-				return
-			end
-
-			local subString = {}
-			table.insert(subString, string.format('%s stands in',
-				tostring(PlayerDisplay.InlinePlayer{player = substitution.substitute})
-			))
-
-			if Logic.isNotEmpty(substitution.player) then
-				table.insert(subString, string.format('for %s',
-					tostring(PlayerDisplay.InlinePlayer{player = substitution.player})
-				))
-			end
-
-			if opponent.type == Opponent.team then
-				local team = require('Module:Team').queryRaw(opponent.template)
-				if team then
-					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
-				end
-			end
-
-			if Table.isNotEmpty(substitution.games) then
-				local gamesNoun = 'map' .. (#substitution.games > 1 and 's' or '')
-				table.insert(subString, string.format('on %s %s', gamesNoun, mw.text.listToText(substitution.games)))
-			end
-
-			if String.isNotEmpty(substitution.reason) then
-				table.insert(subString, string.format('due to %s', substitution.reason))
-			end
-
-			table.insert(comment, table.concat(subString, ' ') .. '.')
-		end)
-	end)
-
-	if Logic.isEmpty(comment) then return end
-
-	return table.concat(comment, tostring(MatchSummaryWidgets.Break{}))
-end
-
 ---Default createMatch function for usage in Custom MatchSummary
 ---@param matchData table?
 ---@param CustomMatchSummary table
@@ -472,10 +418,18 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 	local createBody = CustomMatchSummary.createBody or MatchSummary.createDefaultBody
 	match:body(createBody(matchData, CustomMatchSummary.createGame, options))
 
-	local substituteComment = MatchSummary.createSubstitutesComment(matchData)
+	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
 
-	match:comment(MatchSummaryWidgets.MatchComment{
-		children = WidgetUtil.collect(matchData.comment, substituteComment)
+	match:comment(HtmlWidgets.Fragment{
+		children = WidgetUtil.collect(
+			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
+			MatchSummaryWidgets.MatchComment{
+				children = WidgetUtil.collect(
+					matchData.comment,
+					substituteComment
+				)
+			}
+		)
 	})
 
 	local createFooter = CustomMatchSummary.addToFooter or MatchSummary.createDefaultFooter

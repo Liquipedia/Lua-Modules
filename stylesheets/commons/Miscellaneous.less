@@ -1204,7 +1204,7 @@ Author(s): iMarbot
 	}
 }
 
-@media ( max-width: 430px ) {
+@media ( max-width: 435px ) {
 	.showmatch-team-full {
 		display: none;
 	}
@@ -1271,7 +1271,7 @@ Author(s): iMarbot
 	}
 }
 
-@media ( max-width: 430px ) {
+@media ( max-width: 435px ) {
 	.wikitable.showmatch {
 		width: 100% !important;
 	}
@@ -1961,7 +1961,7 @@ div.battleground-banner {
 Template(s): Hiding Legend box for mobiles
 Author(s): Ricci
 *******************************************************************************/
-@media ( max-width: 415px ) {
+@media ( max-width: 435px ) {
 	.legend-box-mobile {
 		display: none !important;
 	}
@@ -2129,6 +2129,8 @@ Author(s): FO-nTTaX
 	font-size: 18px;
 	margin-bottom: 10px;
 	text-align: center;
+	border-radius: 0.5rem;
+	overflow: hidden;
 }
 
 .sadbox a {
@@ -2797,5 +2799,41 @@ Template(s): HeroIconTable
 	&:hover {
 		transform: scale( 1.05 );
 		cursor: pointer;
+	}
+}
+
+/*******************************************************************************
+Author(s): SlothyMan, Elisa
+Template(s): ChampionIconTable
+	     SummonIconTable
+*******************************************************************************/
+
+.wildcard-chronos-theme {
+	.theme--light & {
+		background-color: #ffc000;
+	}
+
+	.theme--dark & {
+		background-color: #fb8300;
+	}
+}
+
+.wildcard-lubabub-theme {
+	.theme--light & {
+		background-color: #35cd00;
+	}
+
+	.theme--dark & {
+		background-color: #008000;
+	}
+}
+
+.wildcard-malus-theme {
+	.theme--light & {
+		background-color: #e70015;
+	}
+
+	.theme--dark & {
+		background-color: #a90012;
 	}
 }
