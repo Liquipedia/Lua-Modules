@@ -17,6 +17,7 @@ local Logic = Lua.import('Module:Logic')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
 local Tr = HtmlWidgets.Tr
 local Th = HtmlWidgets.Th
@@ -60,7 +61,11 @@ function NavBoxChild:render()
 	end)
 
 	if props[1] then
-		table.insert(children, {name = props.name, child = NavBoxList{children = listElements, css = listCss}})
+		table.insert(children, {
+			name = props.name,
+			mobileName = props.mobileName,
+			child = NavBoxList{children = listElements, css = listCss}
+		})
 	end
 
 	self.rowSpan = #children
@@ -96,10 +101,8 @@ function NavBoxChild:render()
 	}
 end
 
---Click on the "Show" link on the right to see the full list
-
 ---@param childProps table|string?
----@return {name: string?, child: Widget}?
+---@return {name: string?, mobileName: string?, child: Widget}?
 function NavBoxChild._getChild(childProps)
 	if Logic.isEmpty(childProps) then return end
 	if type(childProps) ~= 'table' then
@@ -108,10 +111,10 @@ function NavBoxChild._getChild(childProps)
 	assert(Logic.isNotEmpty(childProps), EMPTY_CHILD_ERROR)
 	---@cast childProps -nil
 
-	return {name = childProps.name, child = NavBoxChild(childProps)}
+	return {name = childProps.name, mobileName = childProps.mobileName, child = NavBoxChild(childProps)}
 end
 
----@param child {name: string?, child: Widget}
+---@param child {name: string?, mobileName: string?, child: Widget}
 ---@param childIndex integer
 ---@return WidgetHtml
 function NavBoxChild:_toRow(child, childIndex)
@@ -120,7 +123,10 @@ function NavBoxChild:_toRow(child, childIndex)
 			self:_makeImage(childIndex, true),
 			child.name and Th{
 				classes = {'navbox-group'},
-				children = {child.name or ''},
+				children = {
+					child.mobileName and Span{children = child.name, classes = {'mobile-hide'}} or child.name or '',
+					child.mobileName and Span{children = child.mobileName, classes = {'mobile-only'}} or nil,
+				},
 				css = {width = '1%'},
 			} or nil,
 			Td{
