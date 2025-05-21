@@ -143,27 +143,27 @@ function MatchPage:_renderGameOverview(game)
 		}
 	end
 
-	---@param createContent boolean
 	---@param showScore boolean
-	---@return Widget
-	local function createScoreHolder(createContent, showScore)
-		return Div{
-			classes = {'match-bm-lol-game-summary-score-holder'},
-			children = createContent and WidgetUtil.collect(
-				showScore and Div{
+	---@return Widget|Widget[]
+	local function createScoreHolderContent(showScore)
+		local lengthDisplay = Div{
+			classes = {'match-bm-lol-game-summary-length'},
+			children = game.length
+		}
+		if showScore then
+			return {
+				Div{
 					classes = {'match-bm-lol-game-summary-score'},
 					children = {
 						DisplayHelper.MapScore(game.opponents[1], game.status),
 						'&#8209;', -- Non-breaking hyphen
 						DisplayHelper.MapScore(game.opponents[2], game.status)
 					}
-				} or nil,
-				Div{
-					classes = {'match-bm-lol-game-summary-length'},
-					children = game.length
-				}
-			) or nil
-		}
+				},
+				lengthDisplay
+			}
+		end
+		return lengthDisplay
 	end
 
 	local overview = Div{
@@ -179,10 +179,11 @@ function MatchPage:_renderGameOverview(game)
 							self.opponents[1].iconDisplay,
 						}
 					},
-					createScoreHolder(
-						MatchGroupUtil.computeMatchPhase(game) ~= 'upcoming',
-						not self:isBestOfOne()
-					),
+					Div{
+						classes = {'match-bm-lol-game-summary-score-holder'},
+						children = MatchGroupUtil.computeMatchPhase(game) ~= 'upcoming'
+							and createScoreHolderContent(not self:isBestOfOne()) or nil
+					},
 					Div{
 						classes = {'match-bm-lol-game-summary-team'},
 						children = {
