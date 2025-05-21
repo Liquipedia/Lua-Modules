@@ -36,6 +36,7 @@ NavBoxChild.defaultProps = {
 	imagelink = '',
 	imageleftsize = '30px',
 	imageleftlink = '',
+	center = false,
 }
 
 ---@return Widget?
@@ -43,10 +44,14 @@ function NavBoxChild:render()
 	local props = self.props
 
 	assert(props[1] or props.child1, EMPTY_CHILD_ERROR)
+
+	local listElements = Array.mapIndexes(function(index)
+		return self.props[index]
+	end)
+	local listCss = {['text-align'] = Logic.readBool(self.props.center) and 'center' or nil}
+
 	if not props.child1 then
-		return NavBoxList{children = Array.mapIndexes(function(index)
-			return self.props[index]
-		end)}
+		return NavBoxList{children = listElements, css = listCss}
 	end
 
 	local children = Array.mapIndexes(function(rowIndex)
@@ -54,9 +59,7 @@ function NavBoxChild:render()
 	end)
 
 	if props[1] then
-		table.insert(children, {name = props.name, child = NavBoxList{children = Array.mapIndexes(function(index)
-			return self.props[index]
-		end)}})
+		table.insert(children, {name = props.name, child = NavBoxList{children = listElements, css = listCss}})
 	end
 
 	self.rowSpan = #children

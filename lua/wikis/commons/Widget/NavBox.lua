@@ -46,9 +46,14 @@ function NavBox:render()
 	local title = Table.extract(self.props, 'title')
 	assert(title, 'Missing "|title="')
 
+	-- clean title for the aria-labelledby
+	local ariaTitle = title
+		:gsub(' ', '_') -- spaces to underscores
+		:gsub('['):gsub(']'):gsub('|') -- remove link stuff
+
 	return Collapsible{
 		attributes = {
-			['aria-labelledby'] = title:gsub(' ', '_'),
+			['aria-labelledby'] = ariaTitle,
 			role = 'navigation',
 			['data-nosnippet'] = 0,
 		},
