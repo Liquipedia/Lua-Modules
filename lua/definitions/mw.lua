@@ -978,13 +978,17 @@ mw.uri = {}
 ---@param page string
 ---@param query string|table?
 ---@return URI
-function mw.uri.localUrl(page, query) end
+function mw.uri.localUrl(page, query)
+	return ''
+end
 
 ---Returns a URI object for the full URL for a page, with optional query string/table
 ---@param page string
 ---@param query string|table?
 ---@return URI
-function mw.uri.fullUrl(page, query) end
+function mw.uri.fullUrl(page, query)
+	return 'https://liquipedia.net/'
+end
 
 ---@alias UriEncodeType 'QUERY'|'PATH'|'WIKI'
 
