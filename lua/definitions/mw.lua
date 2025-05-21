@@ -974,6 +974,7 @@ function mw.ustring.upper(s) return string.upper(s) end
 ---@field fragment string?
 mw.uri = {}
 
+---Returns a URI object for the local URL for a page, with optional query string/table
 ---@param page string
 ---@param query string|table?
 ---@return URI
