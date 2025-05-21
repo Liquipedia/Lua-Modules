@@ -424,6 +424,17 @@ table.infobox_matches_content {
 .infobox_matches_content td.match-filler > div {
 	display: flex;
 	justify-content: space-between;
+
+	div.tournament-span {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 170px;
+		vertical-align: middle;
+		white-space: nowrap;
+		font-size: 11px;
+		height: 16px;
+		margin-top: 3px;
+	}
 }
 
 .infobox_matches_content:last-child {

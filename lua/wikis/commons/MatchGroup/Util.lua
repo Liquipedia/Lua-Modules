@@ -72,6 +72,7 @@ MatchGroupUtil.types.AdvanceSpot = TypeUtil.struct({
 ---@field type 'bracket'
 ---@field upperMatchId string?
 ---@field matchId string?
+---@field matchPage string?
 ---@field qualifiedHeader boolean?
 MatchGroupUtil.types.BracketBracketData = TypeUtil.struct({
 	advanceSpots = TypeUtil.array(MatchGroupUtil.types.AdvanceSpot),
@@ -121,6 +122,7 @@ MatchGroupUtil.types.MatchCoordinates = TypeUtil.struct({
 ---@field dateHeader boolean?
 ---@field type 'matchlist'
 ---@field matchId string?
+---@field matchPage string?
 MatchGroupUtil.types.MatchlistBracketData = TypeUtil.struct({
 	header = 'string?',
 	title = 'string?',
@@ -562,6 +564,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			qualSkip = tonumber(data.qualskip) or data.qualskip == 'true' and 1 or 0,
 			qualWin = advanceSpots[1] and advanceSpots[1].type == 'qualify',
 			qualWinLiteral = nilIfEmpty(data.qualwinLiteral),
+			matchPage = nilIfEmpty(data.matchpage),
 			skipRound = tonumber(data.skipround) or data.skipround == 'true' and 1 or 0,
 			thirdPlaceMatchId = nilIfEmpty(data.thirdplace),
 			type = 'bracket',
@@ -573,6 +576,7 @@ function MatchGroupUtil.bracketDataFromRecord(data)
 			header = nilIfEmpty(data.header),
 			inheritedHeader = nilIfEmpty(data.inheritedheader),
 			matchIndex = nilIfEmpty(data.matchIndex),
+			matchPage = nilIfEmpty(data.matchpage),
 			title = nilIfEmpty(data.title),
 			type = 'matchlist',
 		}

@@ -14,6 +14,6 @@ local Opponent = Lua.import('Module:' .. (Info.opponentLibrary or 'Opponent'))
 local OpponentDisplay = Lua.import('Module:' .. (Info.opponentDisplayLibrary or 'OpponentDisplay'))
 
 return {
-	Opponent = Opponent, ---@module 'commons.Opponent'
-	OpponentDisplay = OpponentDisplay, ---@module 'commons.OpponentDisplay'
+	Opponent = Opponent, ---@module 'Opponent'
+	OpponentDisplay = OpponentDisplay, ---@module 'OpponentDisplay'
 }

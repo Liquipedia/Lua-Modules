@@ -65,7 +65,7 @@ local Standings = {}
 ---@return StandingsModel?
 function Standings.getStandingsTable(pagename, standingsIndex)
 	local pageNameInCorrectFormat = string.gsub(pagename, ' ', '_')
-	local myPageName = string.gsub(mw.title.getCurrentTitle().text , ' ', '_')
+	local myPageName = string.gsub(mw.title.getCurrentTitle().text, ' ', '_')
 
 	if pageNameInCorrectFormat == myPageName then
 		local varData = Variables.varDefault('standings2_' .. standingsIndex)
@@ -217,7 +217,8 @@ function Standings.makeRounds(standings)
 	---@diagnostic disable-next-line: invisible
 	local standingsEntries = standings.entryRecords
 
-	local roundCount = Array.maxBy(Array.map(standingsEntries, Operator.property('roundindex')), FnUtil.identity)
+	local roundCount = Array.maxBy(Array.map(standingsEntries, function(entry)
+		return tonumber(entry.roundindex) or 1 end), FnUtil.identity)
 
 	return Array.map(Array.range(1, roundCount or 1), function(roundIndex)
 		local roundEntries = Array.filter(standingsEntries, function(entry)

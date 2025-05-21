@@ -20,6 +20,7 @@ local VodLink = require('Module:VodLink')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local Links = Lua.import('Module:Links')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -359,7 +360,6 @@ function MatchSummary.createDefaultBody(match, createGame)
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, FnUtil.curry(createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
 	)}
 end
@@ -415,10 +415,15 @@ function MatchSummary.createMatch(matchData, CustomMatchSummary, options)
 
 	local substituteComment = DisplayHelper.createSubstitutesComment(matchData)
 
-	match:comment(MatchSummaryWidgets.MatchComment{
+	match:comment(HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(
-			matchData.comment,
-			Array.interleave(substituteComment, MatchSummaryWidgets.Break{})
+			MatchSummaryWidgets.Casters{casters = matchData.extradata.casters},
+			MatchSummaryWidgets.MatchComment{
+				children = WidgetUtil.collect(
+					matchData.comment,
+					substituteComment
+				)
+			}
 		)
 	})
 
@@ -431,7 +436,7 @@ end
 ---Default getByMatchId function for usage in Custom MatchSummary
 ---@param CustomMatchSummary table
 ---@param args table
----@param options {teamStyle: teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
+---@param options {teamStyle:teamStyle?, width: fun(MatchGroupUtilMatch):string?|string?, noScore:boolean?}?
 ---@return Html
 function MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, options)
 	assert(

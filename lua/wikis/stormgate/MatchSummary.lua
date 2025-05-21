@@ -70,8 +70,7 @@ function CustomMatchSummary.createBody(match)
 			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
 			children = {'Vetoes'},
 		} or nil,
-		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil,
-		MatchSummaryWidgets.Casters{casters = match.casters}
+		Array.map(match.vetoes or {}, CustomMatchSummary.Veto) or nil
 	)}
 end
 

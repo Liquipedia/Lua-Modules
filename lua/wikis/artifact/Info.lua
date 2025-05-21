@@ -33,7 +33,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
-			status = 1,
+			status = 2,
 		},
 	},
 }

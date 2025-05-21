@@ -40,7 +40,7 @@ function MatchSummaryFfaGameDetails:render()
 		},
 		game.map and {
 			icon = IconWidget{iconName = 'map'},
-			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.mapDisplayName or game.map, game.map)},
 		} or nil,
 		Logic.isNotEmpty(casters) and {
 			icon = IconWidget{

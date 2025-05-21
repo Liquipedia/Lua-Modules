@@ -37,6 +37,7 @@ local MapFunctions = {
 local FffMatchFunctions = {
 	OPPONENT_CONFIG = OPPONENT_CONFIG,
 }
+---@type FfaMapParserInterface
 local FfaMapFunctions = {}
 
 ---@param match table
@@ -324,6 +325,9 @@ function FffMatchFunctions.getExtraData(match, games, opponents, settings)
 		settings = settings.settings,
 	}
 end
+
+FfaMapFunctions.getMapName = MapFunctions.getMapName
+FfaMapFunctions.getGame = MapFunctions.getGame
 
 ---@param map table
 ---@param opponent table

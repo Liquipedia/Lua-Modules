@@ -17,6 +17,7 @@ local Operator = require('Module:Operator')
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local NameAliases = Lua.requireIfExists('Module:CharacterNames', {loadData = true})
+local Patch = Lua.import('Module:Patch')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -191,19 +192,15 @@ function CustomInjector:parse(id, widgets)
 		if Logic.isEmpty(args.releasedate) then
 			return {}
 		end
-		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '[[type::patch]] AND [[date::' .. args.releasedate .. ']]',
-			query = 'name, pagename, date',
-			limit = 1
-		})[1]
+		local patchData = Patch.getPatchByDate(args.releasedate) or {}
 
 		return {
 			Cell{
 				name = 'Released',
 				content = WidgetUtil.collect(
 					Logic.isNotEmpty(patchData) and Link{
-						link = patchData.pagename,
-						children = patchData.name
+						link = patchData.pageName,
+						children = patchData.displayName
 					} or 'Launch',
 					HtmlWidgets.Small{
 						children = { args.releasedate }
