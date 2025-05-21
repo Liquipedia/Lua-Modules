@@ -70,6 +70,15 @@ function CustomMap:_getType(input)
 	return TYPES[(input or ''):lower()] or 'Unknown Type'
 end
 
+---@param args table
+---@return string
+function CustomMap:getGame(args)
+	local game = Game.name{game = args.game, useDefault = false}
+	assert('game', 'Missing or invalid game specified')
+	---@cast game -nil
+	return game
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
