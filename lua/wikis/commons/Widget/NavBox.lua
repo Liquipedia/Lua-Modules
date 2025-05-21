@@ -49,7 +49,7 @@ function NavBox:render()
 	-- clean title for the aria-labelledby
 	local ariaTitle = title
 		:gsub(' ', '_') -- spaces to underscores
-		:gsub('['):gsub(']'):gsub('|') -- remove link stuff
+		:gsub('%[', ''):gsub('%]', ''):gsub('%|', '') -- remove link stuff
 
 	return Collapsible{
 		attributes = {
