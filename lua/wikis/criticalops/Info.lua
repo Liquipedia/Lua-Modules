@@ -37,5 +37,11 @@ return {
 			matchWidth = 180,
 			gameScoresIfBo1 = true,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'automatic',
+			},
+		},
+
 	},
 }

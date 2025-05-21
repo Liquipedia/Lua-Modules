@@ -245,5 +245,10 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 190,
 		},
+		infoboxPlayer = {
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
 	},
 }
