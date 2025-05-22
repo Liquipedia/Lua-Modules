@@ -22,6 +22,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
+local Slash = Lua.import('Module:Widget/Match/Page/Slash')
 local StatsList = Lua.import('Module:Widget/Match/Page/StatsList')
 local TeamVeto = Lua.import('Module:Widget/Match/Page/TeamVeto')
 local VetoItem = Lua.import('Module:Widget/Match/Page/VetoItem')
@@ -34,7 +35,6 @@ local MatchPage = Class.new(BaseMatchPage)
 local GOLD_ICON = IconFa{iconName = 'gold', hover = 'Gold'}
 local ITEM_IMAGE_SIZE = '64px'
 local KDA_ICON = IconFa{iconName = 'kda', hover = 'KDA'}
-local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 ---@param props {match: MatchGroupUtilMatch}
 ---@return Widget
@@ -189,12 +189,12 @@ function MatchPage:_renderTeamStats(game)
 										game.teams[1].kills,
 										game.teams[1].deaths,
 										game.teams[1].assists
-									}, SPAN_SLASH),
+									}, Slash{}),
 									team2Value = Array.interleave({
 										game.teams[2].kills,
 										game.teams[2].deaths,
 										game.teams[2].assists
-									}, SPAN_SLASH)
+									}, Slash{})
 								},
 								{
 									icon = GOLD_ICON,
@@ -368,7 +368,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						title = {KDA_ICON, 'KDA'},
 						data = Array.interleave({
 							player.kills, player.deaths, player.assists
-						}, SPAN_SLASH)
+						}, Slash{})
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'damage'}, 'DMG'},
@@ -376,7 +376,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'dota2_lhdn'}, 'LH/DN'},
-						data = Array.interleave({player.lasthits, player.denies}, SPAN_SLASH)
+						data = Array.interleave({player.lasthits, player.denies}, Slash{})
 					},
 					PlayerStat{
 						title = {GOLD_ICON, 'NET'},
