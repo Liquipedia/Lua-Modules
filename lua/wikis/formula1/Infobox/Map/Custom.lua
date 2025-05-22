@@ -18,6 +18,8 @@ local Cell = Widgets.Cell
 
 ---@class Formula1MapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class Formula1MapInfoboxWidgetInjector: WidgetInjector
+---@field caller Formula1MapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
