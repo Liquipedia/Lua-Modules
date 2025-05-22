@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Template = require('Module:Template')
 
 local Game = Lua.import('Module:Game')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -19,6 +18,7 @@ local Team = Lua.import('Module:Infobox/Team')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 ---@class CounterstrikeInfoboxTeam: InfoboxTeam
 ---@field gamesList string[]
@@ -64,16 +64,12 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded and mw.ext.TeamTemplate.teamexists(self.pagename) then
 		local teamPage = mw.ext.TeamTemplate.teampage(self.pagename)
 
-		return Template.expandTemplate(
-			mw.getCurrentFrame(),
-			'Upcoming and ongoing tournaments of',
-			{team = self.args.lpdbname or teamPage}
-		)
+		return UpcomingTournaments{name = self.args.lpdbname or teamPage}
 	end
 end
 

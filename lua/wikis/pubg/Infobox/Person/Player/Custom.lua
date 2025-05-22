@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
-local Template = require('Module:Template')
+local TeamTemplate = require('Module:TeamTemplate')
 local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -21,6 +21,7 @@ local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
 local Center = Widgets.Center
 local Title = Widgets.Title
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local ROLES = {
 	-- Playes
@@ -137,10 +138,11 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
-		return Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = self.pagename})
+		local teamData = TeamTemplate.getRawOrNil(self.args.team) or {}
+		return UpcomingTournaments{name = teamData.name}
 	end
 end
 
