@@ -37,6 +37,7 @@ local TYPES = {
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
+	map.args.useDefaultGame = false
 
 	return map:createInfobox()
 end
@@ -68,15 +69,6 @@ end
 ---@return string
 function CustomMap:_getType(input)
 	return TYPES[(input or ''):lower()] or 'Unknown Type'
-end
-
----@param args table
----@return string
-function CustomMap:getGame(args)
-	local game = Game.name{game = args.game, useDefault = false}
-	assert(game, 'Missing or invalid game specified')
-	---@cast game -nil
-	return game
 end
 
 ---@param lpdbData table

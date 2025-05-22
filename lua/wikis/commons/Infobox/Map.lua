@@ -12,6 +12,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
 local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Page = Lua.import('Module:Page')
 local Table = Lua.import('Module:Table')
@@ -105,7 +106,13 @@ end
 ---@param args table
 ---@return string?
 function Map:getGame(args)
-	return Game.name{game = args.game}
+	local game = Game.name{
+		game = args.game,
+		useDefault = Logic.nilOr(Logic.readBoolOrNil(args.useDefaultGame), true)
+	}
+	assert(game, 'Missing or invalid game specified')
+	---@cast game -nil
+	return game
 end
 
 --- Allows for overriding this functionality
