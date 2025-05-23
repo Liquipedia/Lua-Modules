@@ -30,6 +30,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field tournamentName string?
 ---@field poweredBy string?
 ---@field highlighted boolean?
+---@field leagueIcon string?
 
 ---@class MatchPageHeader: Widget
 ---@operator call(MatchPageHeaderParameters): MatchPageHeader
@@ -102,9 +103,11 @@ function MatchPageHeader:render()
 						'match-bm-match-header-tournament',
 						self.props.highlighted and 'valvepremier-highlighted' or nil
 					),
-					children = {
+					children = WidgetUtil.collect(
+						self.props.leagueIcon,
+						self.props.leagueIcon and '&nbsp;' or nil,
 						Link{ link = self.props.parent, children = self.props.tournamentName }
-					}
+					)
 				},
 				Div{
 					classes = { 'match-bm-match-header-date' },

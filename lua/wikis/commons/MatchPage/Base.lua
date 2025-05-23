@@ -21,6 +21,7 @@ local TeamTemplate = require('Module:TeamTemplate')
 local VodLink = require('Module:VodLink')
 
 local HighlightConditions = Lua.import('Module:HighlightConditions')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
@@ -220,6 +221,13 @@ function BaseMatchPage:render()
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
 				highlighted = HighlightConditions.tournament(tournamentContext),
+				leagueIcon = LeagueIcon.display{
+					icon = tournamentContext.icon,
+					iconDark = tournamentContext.icondark,
+					link = self.matchData.parent,
+					name = self.matchData.tournament,
+					options = {noTemplate = true},
+				}
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
