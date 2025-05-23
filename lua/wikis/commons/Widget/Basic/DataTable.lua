@@ -20,15 +20,17 @@ local DataTable = Class.new(Widget)
 DataTable.defaultProps = {
 	classes = {},
 	wrapperClasses = {},
+	sortable = false,
 }
 
 ---@return Widget
 function DataTable:render()
+	local isSortable = self.props.sortable == true
 	return Div{
 		children = {
 			Table{
 				children = self.props.children,
-				classes = WidgetUtil.collect('wikitable', unpack(self.props.classes)),
+				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, unpack(self.props.classes)),
 				css = self.props.tableCss,
 				attributes = self.props.tableAttributes,
 			},
