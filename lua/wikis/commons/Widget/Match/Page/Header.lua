@@ -124,7 +124,7 @@ function MatchPageHeader:render()
 				Div{
 					classes = Array.extend(
 						'match-bm-match-header-tournament',
-						self.props.highlighted and 'valvepremier-highlighted' or nil
+						self.props.highlighted and 'tournament-highlighted-bg' or nil
 					),
 					children = WidgetUtil.collect(
 						self:_makeLeagueIcon(),
