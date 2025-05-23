@@ -15,14 +15,16 @@ local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 
-local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local Span = HtmlWidgets.Span
 local Tbl = HtmlWidgets.Table
 local Tr = HtmlWidgets.Tr
 local Th = HtmlWidgets.Th
 local Td = HtmlWidgets.Td
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxList = Lua.import('Module:Widget/NavBox/List')
 
@@ -36,6 +38,7 @@ NavBoxChild.defaultProps = {
 	imagelink = '',
 	imageleftsize = '30px',
 	imageleftlink = '',
+	center = false,
 }
 
 ---@return Widget?
@@ -43,10 +46,14 @@ function NavBoxChild:render()
 	local props = self.props
 
 	assert(props[1] or props.child1, EMPTY_CHILD_ERROR)
+
+	local listElements = Array.mapIndexes(function(index)
+		return self.props[index]
+	end)
+	local listCss = {['text-align'] = Logic.readBool(self.props.center) and 'center' or nil}
+
 	if not props.child1 then
-		return NavBoxList{children = Array.mapIndexes(function(index)
-			return self.props[index]
-		end)}
+		return NavBoxList{children = listElements, css = listCss}
 	end
 
 	local children = Array.mapIndexes(function(rowIndex)
@@ -54,9 +61,11 @@ function NavBoxChild:render()
 	end)
 
 	if props[1] then
-		table.insert(children, {name = props.name, child = NavBoxList{children = Array.mapIndexes(function(index)
-			return self.props[index]
-		end)}})
+		table.insert(children, {
+			name = props.name,
+			mobileName = props.mobileName,
+			child = NavBoxList{children = listElements, css = listCss}
+		})
 	end
 
 	self.rowSpan = #children
@@ -82,17 +91,18 @@ function NavBoxChild:render()
 			(props.title or shouldCollapse) and Tr{children = {Th{
 				attributes = {colspan = colSpan},
 				classes = {'navbox-title'},
-				children = {props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'},
+				children = {
+					props.title and props.titleLink and Link{link = props.titleLink, children = {props.title}} or
+						props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'
+				},
 			}}} or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
 	}
 end
 
---Click on the "Show" link on the right to see the full list
-
 ---@param childProps table|string?
----@return {name: string?, child: Widget}?
+---@return {name: string?, mobileName: string?, child: Widget}?
 function NavBoxChild._getChild(childProps)
 	if Logic.isEmpty(childProps) then return end
 	if type(childProps) ~= 'table' then
@@ -101,10 +111,10 @@ function NavBoxChild._getChild(childProps)
 	assert(Logic.isNotEmpty(childProps), EMPTY_CHILD_ERROR)
 	---@cast childProps -nil
 
-	return {name = childProps.name, child = NavBoxChild(childProps)}
+	return {name = childProps.name, mobileName = childProps.mobileName, child = NavBoxChild(childProps)}
 end
 
----@param child {name: string?, child: Widget}
+---@param child {name: string?, mobileName: string?, child: Widget}
 ---@param childIndex integer
 ---@return WidgetHtml
 function NavBoxChild:_toRow(child, childIndex)
@@ -113,7 +123,10 @@ function NavBoxChild:_toRow(child, childIndex)
 			self:_makeImage(childIndex, true),
 			child.name and Th{
 				classes = {'navbox-group'},
-				children = {child.name or ''},
+				children = {
+					child.mobileName and Span{children = child.name, classes = {'mobile-hide'}} or child.name or '',
+					child.mobileName and Span{children = child.mobileName, classes = {'mobile-only'}} or nil,
+				},
 				css = {width = '1%'},
 			} or nil,
 			Td{
