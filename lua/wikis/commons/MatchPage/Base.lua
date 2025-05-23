@@ -275,6 +275,7 @@ function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
 end
 
+---@private
 ---@return table
 function BaseMatchPage:_getMatchContext()
 	return MatchGroupInputUtil.getTournamentContext(self.matchData)
