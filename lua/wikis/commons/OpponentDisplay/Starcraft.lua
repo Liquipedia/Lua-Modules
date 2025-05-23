@@ -6,14 +6,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Math = Lua.import('Module:MathUtil')
+local Table = Lua.import('Module:Table')
+
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
@@ -273,12 +275,12 @@ function StarcraftOpponentDisplay.InlineScore(opponent)
 		local advantage = tonumber(opponent.extradata.advantage) or 0
 		if advantage > 0 then
 			local title = 'Advantage of ' .. advantage .. ' game' .. (advantage > 1 and 's' or '')
-			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
+			return '<abbr title="' .. title .. '">' .. tostring(Math.round(opponent.score, 2)) .. '</abbr>'
 		end
 		local penalty = tonumber(opponent.extradata.penalty) or 0
 		if penalty > 0 then
 			local title = 'Penalty of ' .. penalty .. ' game' .. (penalty > 1 and 's' or '')
-			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
+			return '<abbr title="' .. title .. '">' .. tostring(Math.round(opponent.score, 2)) .. '</abbr>'
 		end
 	end
 
