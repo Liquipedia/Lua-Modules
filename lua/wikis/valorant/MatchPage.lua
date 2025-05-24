@@ -20,14 +20,13 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
+local Slash = Lua.import('Module:Widget/Match/Page/Slash')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
 ---@class ValorantMatchPage: BaseMatchPage
 ---@operator call(MatchPageMatch): ValorantMatchPage
 local MatchPage = Class.new(BaseMatchPage)
-
-local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local WIN_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
@@ -138,7 +137,7 @@ function MatchPage:_renderGameOverview(game)
 					},
 					children = half.score
 				}
-			end), SPAN_SLASH)
+			end), Slash{})
 		}
 	end
 
@@ -270,7 +269,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 						title = {IconFa{iconName = 'kda'}, 'KDA'},
 						data = Array.interleave({
 							player.kills, player.deaths, player.assists
-						}, SPAN_SLASH)
+						}, Slash{})
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kast'}, 'KAST'},
