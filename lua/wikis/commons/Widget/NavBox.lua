@@ -20,6 +20,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local B = HtmlWidgets.B
 local Div = HtmlWidgets.Div
 local Widget = Lua.import('Module:Widget')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
@@ -58,20 +59,23 @@ function NavBox:render()
 			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
 		},
 		shouldCollapse = shouldCollapse,
-		titleWidget = NavBox._title(title, self.props.template),
+		titleWidget = NavBox._title(title, self.props.titleLink, self.props.template),
 		children = {NavBoxChild(props)},
 	}
 end
 
 ---@param titleText string
+---@param titleLink string
 ---@param templateLink string?
 ---@return Widget
-function NavBox._title(titleText, templateLink)
+function NavBox._title(titleText, titleLink, templateLink)
 	return Div{
 		classes = {'navbox-title'},
 		children = WidgetUtil.collect(
 			EditButton{templateLink = templateLink},
-			B{children = {titleText}},
+			B{children = {
+				titleLink and Link{link = titleLink, children = titleText} or titleText
+			}},
 			CollapsibleToggle{css = {float = 'right'}}
 		)
 	}
