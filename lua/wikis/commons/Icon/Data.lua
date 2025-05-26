@@ -113,6 +113,12 @@ return {
 	kills = 'fas fa-skull',
 	matchpoint = 'fad fa-diamond',
 
+	-- Usage: qualification
+	qualified = 'fas fa-check-circle',
+	tobedetermined = 'fas fa-question',
+	notqualified = 'fas fa-times',
+	ineligible = 'fas fa-ban',
+
 	-- Usage: standings
 	standings_up = 'fas fa-chevron-double-up',
 	standings_stayup = 'fas fa-chevron-up',
