@@ -18,6 +18,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 local Widget = Lua.import('Module:Widget')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local Icon = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 ---@class EwcTeamsOverview: Widget
 ---@operator call(table): EwcTeamsOverview
@@ -54,10 +55,10 @@ local GAMES = {
 }
 
 local STATUSES = {
-	q = {icon = 'check-circle', order = 1},
-	tbd = {icon = 'question', order = 2},
-	nq = {icon = 'times', order = 3},
-	ineligible = {icon = 'ban', order = 4},
+	q = {icon = 'qualified', order = 1},
+	tbd = {icon = 'tobedetermined', order = 2},
+	nq = {icon = 'notqualified', order = 3},
+	ineligible = {icon = 'ineligible', order = 4},
 }
 
 local DEFAULT_ORDER_VALUE = 9
@@ -107,7 +108,7 @@ function EwcTeamsOverview:render()
 		if not icon then
 			return
 		end
-		return Link{children = '<i class="fas fa-'.. icon ..'"></i>', link = link}
+		return Link{children = Icon{iconName = icon}, link = link}
 	end
 
 	return DataTable{
@@ -121,8 +122,8 @@ function EwcTeamsOverview:render()
 				children = WidgetUtil.collect(
 					HtmlWidgets.Th{children = 'Team Name'},
 					HtmlWidgets.Th{children = ''},
-					HtmlWidgets.Th{children = '<abbr title="Qualified to X/25 Tournaments">Q#</abbr>'},
-					HtmlWidgets.Th{children = '<abbr title="Number of Teams">T#</abbr>'},
+					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Qualified to X/25 Tournaments', children = 'Q#'}},
+					HtmlWidgets.Th{children = HtmlWidgets.Abbr{title = 'Number of Teams', children = 'T#'}},
 					Array.map(gameData, function(game)
 						return HtmlWidgets.Th{
 							children = Template.expandTemplate(mw.getCurrentFrame(), 'LeagueIconSmall/' .. game.lis),

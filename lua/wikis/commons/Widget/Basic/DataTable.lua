@@ -7,6 +7,7 @@
 --
 
 local Class = require('Module:Class')
+local Logic = require('Modukle:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -25,17 +26,17 @@ DataTable.defaultProps = {
 
 ---@return Widget
 function DataTable:render()
-	local isSortable = self.props.sortable == true
+	local isSortable = Logic.readBool(self.props.sortable)
 	return Div{
 		children = {
 			Table{
 				children = self.props.children,
-				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, unpack(self.props.classes)),
+				classes = WidgetUtil.collect('wikitable', isSortable and 'sortable' or nil, self.props.classes),
 				css = self.props.tableCss,
 				attributes = self.props.tableAttributes,
 			},
 		},
-		classes = WidgetUtil.collect('table-responsive', unpack(self.props.wrapperClasses)),
+		classes = WidgetUtil.collect('table-responsive', self.props.wrapperClasses),
 		attributes = self.props.attributes,
 	}
 end
