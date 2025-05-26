@@ -7,7 +7,7 @@
 --
 
 local Class = require('Module:Class')
-local Logic = require('Modukle:Logic')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
