@@ -102,7 +102,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	-- Misc
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
-	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
 end
