@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Json = require('Module:Json')
+local Page = require('Module:Page')
 local Template = require('Module:Template')
 
 local DataTable = Lua.import('Module:Widget/Basic/DataTable')
@@ -72,7 +73,7 @@ local function storeClubs(clubs, gameData, season)
 			if not teams or type(teams) ~= 'table' then return end
 			return Array.map(teams, function(team)
 				return {
-					pagename = team.link,
+					pagename = Page.pageifyLink(team.link),
 					status = team.status,
 					wiki = game.wiki,
 				}
