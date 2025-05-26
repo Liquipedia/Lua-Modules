@@ -30,10 +30,10 @@ local MatchPage = Class.new(BaseMatchPage)
 local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local WIN_TYPE_TO_ICON = {
-	['elimination'] = 'elimination',
-	['explosion'] = 'explosion_valorant',
-	['defuse'] = 'defuse',
-	['time'] = 'outoftime'
+	['Elimination'] = 'elimination',
+	['Detonate'] = 'explosion_valorant',
+	['Defuse'] = 'defuse',
+	['Time'] = 'outoftime'
 }
 
 ---@param props {match: MatchGroupUtilMatch}
