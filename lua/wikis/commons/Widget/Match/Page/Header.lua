@@ -12,8 +12,6 @@ local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
-local LeagueIcon = Lua.import('Module:LeagueIcon')
-
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
