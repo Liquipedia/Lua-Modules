@@ -53,12 +53,11 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 
 	assert(map, mapInput.matchid .. ' could not be retrieved from API.')
 
-	local reverse = Logic.readBool(mapInput.reversed)
+	local shouldReverse = Logic.readBool(mapInput.reversed)
 
-	if reverse then
+	if shouldReverse then
 		map.teams[1], map.teams[2] = map.teams[2], map.teams[1]
 	end
-
 
 	---@cast map valorantMatchDataExtended
 	-- Attach players to their teams
