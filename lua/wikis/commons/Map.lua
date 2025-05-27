@@ -28,6 +28,8 @@ local Map = {}
 ---@field releaseDate {year: integer, month: integer, day: integer, timestamp: integer, string: string}
 ---@field image string?
 ---@field creators string[]
+---@field game string?
+---@field gameModes string[]?
 ---@field extradata table
 
 ---@param props {
