@@ -20,6 +20,8 @@ local Tabs = require('Module:Tabs')
 local TeamTemplate = require('Module:TeamTemplate')
 local VodLink = require('Module:VodLink')
 
+local HighlightConditions = Lua.import('Module:HighlightConditions')
+local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 
@@ -204,6 +206,7 @@ end
 ---@return Widget
 function BaseMatchPage:render()
 	self:makeDisplayTitle()
+	local tournamentContext = self:_getMatchContext()
 	return Div{
 		children = WidgetUtil.collect(
 			Header {
@@ -216,6 +219,7 @@ function BaseMatchPage:render()
 				phase = MatchGroupUtil.computeMatchPhase(self.matchData),
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
+				highlighted = HighlightConditions.tournament(tournamentContext),
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
@@ -261,6 +265,12 @@ end
 ---@return string|Html|Widget
 function BaseMatchPage:renderGame(game)
 	error('BaseMatchPage:renderGame() cannot be called directly and must be overridden.')
+end
+
+---@private
+---@return table
+function BaseMatchPage:_getMatchContext()
+	return MatchGroupInputUtil.getTournamentContext(self.matchData)
 end
 
 ---@protected

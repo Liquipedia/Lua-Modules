@@ -29,6 +29,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field phase 'finished'|'ongoing'|'upcoming'
 ---@field tournamentName string?
 ---@field poweredBy string?
+---@field highlighted boolean?
 
 ---@class MatchPageHeader: Widget
 ---@operator call(MatchPageHeaderParameters): MatchPageHeader
@@ -97,7 +98,10 @@ function MatchPageHeader:render()
 					}
 				},
 				Div{
-					classes = { 'match-bm-match-header-tournament' },
+					classes = Array.extend(
+						'match-bm-match-header-tournament',
+						self.props.highlighted and 'tournament-highlighted-bg' or nil
+					),
 					children = {
 						Link{ link = self.props.parent, children = self.props.tournamentName }
 					}
