@@ -1274,9 +1274,10 @@ mw.ext.valorantdb = {}
 
 ---@class valorantMatchApiRound
 ---@field round_num integer
----@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'time??'
----@field round_result_code 'Defuse'|'Elimination'|'Detonate'|'time??'
----@field round_ceremony 'CeremonyDefault'|'CeremonyClutch'|'CeremonyThrifty' # there's probably more
+---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
+---@field round_result_code 'Defuse'|'Elimination'|'Detonate'|'Surrendered'|'' #empty string is for 'time expired'
+---@field round_ceremony 'CeremonyDefault'|'CeremonyTeamAce'|'CeremonyFlawless'|'CeremonyCloser'|
+---'CeremonyClutch'|'CeremonyThrifty'|'CeremonyAce'| '';
 ---@field winning_team 'Blue'|'Red'
 ---@field winning_team_role 'Attacker'|'Defender'
 ---@field bomb_planter? string

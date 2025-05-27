@@ -179,6 +179,22 @@ end
 function CustomMatchGroupInputMatchPage.getRounds(map)
 	if not map.round_results then return nil end
 
+	local function mapResultCodes(resultCode)
+		if resultCode == 'Defuse' then
+			return 'defuse'
+		elseif resultCode == 'Elimination' then
+			return 'elimination'
+		elseif resultCode == 'Detonate' then
+			return 'detonate'
+		elseif resultCode == 'Surrendered' then
+			return 'surrendered'
+		elseif resultCode == '' then
+			return 'time'
+		else
+			return 'unknown'
+		end
+	end
+
 	local t1start = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'normal')
 	local t1startot = CustomMatchGroupInputMatchPage.getFirstSide(map, 1, 'ot')
 	local nextOvertimeSide = t1startot
@@ -212,7 +228,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 			t1side = t1side,
 			t2side = t2side,
 			winningSide = makeShortSideName(round.winning_team_role),
-			winBy = round.round_result_code,
+			winBy = mapResultCodes(round.round_result_code),
 		}
 	end)
 end
