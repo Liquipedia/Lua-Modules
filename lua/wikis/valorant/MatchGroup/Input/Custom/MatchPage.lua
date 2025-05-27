@@ -9,6 +9,8 @@
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
 
+local MapData = mw.loadJsonData('MediaWiki:Valorantdb-maps.json')
+
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class valorantMatchApiTeamExtended: valorantMatchApiTeam
@@ -57,8 +59,6 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 		map.teams[1], map.teams[2] = map.teams[2], map.teams[1]
 	end
 
-	local mapParts = Array.parseCommaSeparatedString(map.map_id, '/') -- /Game/Maps/Bonsai/Bonsai
-	local versionParts = Array.parseCommaSeparatedString(map.game_version, '-') -- "release-10.05-shipping-14-3367018"
 
 	---@cast map valorantMatchDataExtended
 	-- Attach players to their teams
@@ -67,8 +67,6 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 			return player.team_id == team.team_id
 		end)
 	end)
-	map.map_id = mapParts[#mapParts]
-	map.game_version = versionParts[2]
 	map.matchid = mapInput.matchid
 	map.vod = mapInput.vod
 	map.finished = true
@@ -160,7 +158,7 @@ end
 ---@param map valorantMatchDataExtended|table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
-	return map.map_id or map.map
+	return MapData[map.map_id]
 end
 
 ---@param map valorantMatchDataExtended|table
@@ -223,7 +221,9 @@ end
 ---@param map valorantMatchDataExtended|table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getPatch(map)
-	return map.game_version
+	--- input format is "release-10.05-shipping-14-3367018"
+	local versionParts = Array.parseCommaSeparatedString(map.game_version, '-')
+	return versionParts[2]
 end
 
 return CustomMatchGroupInputMatchPage
