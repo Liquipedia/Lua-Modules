@@ -429,7 +429,7 @@ function mw.language:convertGrammar(word, case) end
 ---@param case string
 ---@param word string
 ---@return string
-function mw.language:gammer(case, word) end
+function mw.language:grammar(case, word) end
 
 ---Returns a Unicode arrow character corresponding to direction:
 ---@param direction 'forwards'|'backwards'|'left'|'right'|'up'|'down'
