@@ -32,8 +32,6 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field tournamentName string?
 ---@field poweredBy string?
 ---@field highlighted boolean?
----@field icon string?
----@field iconDark string?
 
 ---@class MatchPageHeader: Widget
 ---@operator call(MatchPageHeaderParameters): MatchPageHeader
@@ -77,26 +75,6 @@ function MatchPageHeader:_showMvps()
 	}
 end
 
----@private
----@return string[]?
-function MatchPageHeader:_makeLeagueIcon()
-	local icon = self.props.icon
-	local iconDark = self.props.iconDark
-
-	if Logic.isEmpty(icon) then return end
-
-	return {
-		LeagueIcon.display{
-			icon = icon,
-			iconDark = iconDark,
-			link = self.props.parent,
-			name = self.props.tournamentName,
-			options = {noTemplate = true},
-		},
-		'&nbsp;'
-	}
-end
-
 ---@return Widget[]
 function MatchPageHeader:render()
 	local opponent1 = self.props.opponent1
@@ -126,10 +104,9 @@ function MatchPageHeader:render()
 						'match-bm-match-header-tournament',
 						self.props.highlighted and 'tournament-highlighted-bg' or nil
 					),
-					children = WidgetUtil.collect(
-						self:_makeLeagueIcon(),
+					children = {
 						Link{ link = self.props.parent, children = self.props.tournamentName }
-					)
+					}
 				},
 				Div{
 					classes = { 'match-bm-match-header-date' },

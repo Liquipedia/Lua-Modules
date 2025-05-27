@@ -220,8 +220,6 @@ function BaseMatchPage:render()
 				tournamentName = self.matchData.tournament,
 				poweredBy = self.getPoweredBy(),
 				highlighted = HighlightConditions.tournament(tournamentContext),
-				icon = tournamentContext.icon,
-				iconDark = tournamentContext.icondark,
 			},
 			self:renderMapVeto(),
 			self:renderGames(),
