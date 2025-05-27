@@ -21,7 +21,8 @@ local Cell = Widgets.Cell
 
 ---@class Starcraft2MapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class Starcraft2MapInfoboxWidgetInjector: WidgetInjector
+---@field caller Starcraft2MapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -76,14 +77,10 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = self:getNameDisplay(args)
-	lpdbData.extradata = {
-		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
-		creator2 = args.creator2 and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator2) or nil,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
-		rush = Variables.varDefault('rush_distance'),
-	}
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.height = args.height
+	lpdbData.extradata.width = args.width
+	lpdbData.extradata.rush = Variables.varDefault('rush_distance')
 	return lpdbData
 end
 
