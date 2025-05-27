@@ -157,7 +157,7 @@ end
 ---@param map valorantMatchDataExtended|table
 ---@return string?
 function CustomMatchGroupInputMatchPage.getMapName(map)
-	return MapData[map.map_id]
+	return MapData[map.map_id] or map.map
 end
 
 ---@param map valorantMatchDataExtended|table
