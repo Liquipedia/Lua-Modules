@@ -297,13 +297,13 @@ function BaseMatchPage:renderMapVeto()
 		local vetoRoundFirst = vetoRoundIdx * 2 - 1
 		local vetoRoundSecond = vetoRoundIdx * 2
 		if vetoRound.type == 'decider' then
-			return {{name = vetoRound.decider, link = vetoRound.decider, type = vetoRound.type, round = vetoRoundFirst}}
+			return {{map = vetoRound.decider, type = vetoRound.type, round = vetoRoundFirst}}
 		end
 		local firstMap = vetoRound['team' .. firstVeto]
 		local secondMap = vetoRound['team' .. secondVeto]
 		return {
-			{name = firstMap, link = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
-			{name = secondMap, link = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
+			{map = firstMap, type = vetoRound.type, round = vetoRoundFirst, by = opponent1},
+			{map = secondMap, type = vetoRound.type, round = vetoRoundSecond, by = opponent2},
 		}
 	end)
 
