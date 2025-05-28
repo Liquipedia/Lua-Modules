@@ -13,7 +13,6 @@ local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
 local Icon = Lua.import('Module:Icon')
 local Logic = Lua.import('Module:Logic')
-local Math = Lua.import('Module:MathUtil')
 local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
