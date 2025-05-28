@@ -10,12 +10,15 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flag = require('Module:Flags')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local PlayerExt = require('Module:Player/Ext/Custom')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 local Tabs = require('Module:Tabs')
-local Team = require('Module:Team')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local MediaList = {}
 
@@ -232,7 +235,7 @@ end
 function MediaList._row(item, args)
 	local row = mw.html.create('li')
 		:node(MediaList._editButton(item.pagename))
-		:wikitext(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
+		:node(args.showSubjectTeam and MediaList._displayTeam(args.subjects[1], item.date) or '')
 		:wikitext(item.date .. NON_BREAKING_SPACE .. '|' .. NON_BREAKING_SPACE)
 
 	if String.isNotEmpty(item.language) and item.language ~= 'en' and (item.language ~= 'usuk' or args.showUsUk) then
@@ -334,13 +337,13 @@ end
 ---Displays the subject's team for a given External Media Link
 ---@param subject string
 ---@param date string
----@return string?
+---@return Widget?
 function MediaList._displayTeam(subject, date)
 	local _, team = PlayerExt.syncTeam(subject, nil, {date = date})
 	if not team then
 		return
 	end
-	return Team.icon(nil, team, date)
+	return OpponentDisplay.InlineTeamContainer{template = team, date = date, style = 'icon'}
 end
 
 ---Displays the link to the Form with which External Media Links are to be created.
