@@ -67,7 +67,7 @@ end
 
 ---@return string
 function EmptyTeamPagePreview:_infobox()
-	local data = self:_getNationalitiesAndCoaches()
+	local data = self:_getNationalitiesAndCoachesFromLastPlacement()
 
 	local coaches
 	if Logic.isNotEmpty(data.coaches) then
@@ -279,7 +279,7 @@ function EmptyTeamPagePreview:_results()
 end
 
 ---@return {coaches: {flag: string?, pageName: string?, displayName: string?}[], nationalities: table<string, integer>}
-function EmptyTeamPagePreview:_getNationalitiesAndCoaches()
+function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
 	local latestResult = self:_fetchPlacements{limit = 1}[1]
 	if not latestResult then return {coaches = {}, nationalities = {}} end
 
