@@ -33,6 +33,13 @@ local NavBox = Class.new(Widget)
 function NavBox:render()
 	local props = self.props
 
+	-- if the NavBox is sometimes used as a child in another NavBox return the props as Json
+	if Logic.readBool(props.isChild) then
+		return Json.stringify(props)
+	end
+	-- invalid for NavBox, but valid for NavBoxChild
+	props.collapsed = nil
+
 	assert(props.title, 'Missing title input')
 	assert(props.child1, 'No children inputted')
 
