@@ -1244,4 +1244,75 @@ mw.ext.Dota2DB = {}
 ---@return dota2MatchData
 function mw.ext.Dota2DB.getBigMatch(matchId, reversed) end
 
+mw.ext.valorantdb = {}
+
+---@class valorantMatchApiPlayerStats
+---@field score integer
+---@field rounds_played integer
+---@field kills integer
+---@field deaths integer
+---@field assists integer
+---@field ability_casts {ability_1: integer, ability_2: integer, grenade_casts: integer, ultimate_casts: integer}
+---@field head_shot_percent number
+---@field acs number
+---@field adr number
+---@field kast number
+---@field playtime_millis integer
+
+---@class valorantMatchApiPlayer
+---@field puuid string
+---@field game_name string
+---@field tag_line string
+---@field team_id 'Blue'|'Red'|'Neutral'
+---@field competitive_tier integer
+---@field party_id string
+---@field is_observer boolean
+---@field account_level integer
+---@field stats valorantMatchApiPlayerStats
+---@field character {riot_id: string, name: string, icon_name: string, localized_names: table<string, string>}
+---@field lpdb_player? {page_name: string, publisher_id: string, wiki: string}
+
+---@class valorantMatchApiRound
+---@field round_num integer
+---@field round_result 'Bomb defused'|'Eliminated'|'Bomb detonated'|'Round timer expired'|'Surrendered'
+---@field round_result_code 'Defuse'|'Elimination'|'Detonate'|'Surrendered'|'' #empty string is for 'time expired'
+---@field round_ceremony 'CeremonyDefault'|'CeremonyTeamAce'|'CeremonyFlawless'|'CeremonyCloser'|
+---'CeremonyClutch'|'CeremonyThrifty'|'CeremonyAce'| '';
+---@field winning_team 'Blue'|'Red'
+---@field winning_team_role 'Attacker'|'Defender'
+---@field bomb_planter? string
+---@field bomb_defuser? string
+---@field plant_round_time integer # 0 is no plant
+---@field defuse_round_time integer # 0 is no defuse
+---@field plant_site? 'A'|'B'
+---@field player_stats table[]
+
+---@class valorantMatchApiTeam
+---@field team_id 'Blue'|'Red'
+---@field won boolean
+---@field rounds_played integer
+---@field rounds_won integer
+---@field num_points integer
+
+---@class valorantMatchData
+---@field match_id string
+---@field map_id string
+---@field game_version string
+---@field game_length_millis integer
+---@field region string
+---@field game_start_millis integer
+---@field provisioning_flow_id string
+---@field is_completed boolean
+---@field queue_id string
+---@field is_ranked boolean
+---@field season_id string
+---@field players valorantMatchApiPlayer[]
+---@field teams valorantMatchApiTeam[]
+---@field round_results valorantMatchApiRound[]
+
+---@param matchId string
+---@return valorantMatchData
+function mw.ext.valorantdb.getMatchDetails(matchId) end
+
+
 return mw

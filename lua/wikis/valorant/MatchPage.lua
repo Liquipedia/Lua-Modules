@@ -31,7 +31,7 @@ local SPAN_SLASH = HtmlWidgets.Span{classes = {'slash'}, children = '/'}
 
 local WIN_TYPE_TO_ICON = {
 	['elimination'] = 'elimination',
-	['explosion'] = 'explosion_valorant',
+	['detonate'] = 'explosion_valorant',
 	['defuse'] = 'defuse',
 	['time'] = 'outoftime'
 }
@@ -250,6 +250,15 @@ end
 ---@param player table
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
+	local formatNumbers = function(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		numberOfDecimals = numberOfDecimals or 0
+		local format = '%.'.. numberOfDecimals ..'f'
+		return string.format(format, MathUtil.round(value, numberOfDecimals))
+	end
+
 	return Div{
 		classes = {'match-bm-players-player match-bm-players-player--col-2'},
 		children = {
@@ -264,7 +273,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				children = {
 					PlayerStat{
 						title = {IconFa{iconName = 'acs'}, 'ACS'},
-						data = player.acs and MathUtil.round(player.acs) or nil,
+						data = player.acs and formatNumbers(player.acs) or nil,
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kda'}, 'KDA'},
@@ -274,15 +283,15 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'kast'}, 'KAST'},
-						data = player.kast and (player.kast .. '%') or nil
+						data = player.kast and (formatNumbers(player.kast, 1) .. '%') or nil
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'damage'}, 'ADR'},
-						data = player.adr
+						data = player.adr and formatNumbers(player.adr) or nil
 					},
 					PlayerStat{
 						title = {IconFa{iconName = 'headshot'}, 'HS%'},
-						data = player.hs and (player.hs .. '%') or nil
+						data = player.hs and (formatNumbers(player.hs, 1) .. '%') or nil
 					}
 				}
 			}
