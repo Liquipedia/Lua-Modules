@@ -57,7 +57,7 @@ function MatchPage:populateGames()
 			local team = {}
 
 			team.scoreDisplay = game.winner == teamIdx and 'winner' or game.finished and 'loser' or '-'
-			team.players = game.opponents[teamIdx].players or {}
+			team.players = Array.filter(game.opponents[teamIdx].players or {}, Table.isNotEmpty)
 
 			return team
 		end)
