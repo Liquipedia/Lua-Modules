@@ -103,22 +103,19 @@ local function getTeamHalvesDetails(game, teamIndex)
 	local teamHalf = game.extradata['t' .. teamIndex .. 'halfs']
 	if Table.isEmpty(teamHalf) then
 		return {}
-	end
-	if not startOvertime or not otherOvertime then
+	elseif not startOvertime or not otherOvertime then
 		return {
 			{side = startNormal, score = teamHalf[startNormal]},
 			{side = otherNormal, score = teamHalf[otherNormal]},
 		}
 	end
 
-	local startOvertimeScore = teamHalf['ot' .. startOvertime]
-	local otherOvertimeScore = teamHalf['ot' .. otherOvertime]
 	---@type {score: number, side: string}[]
 	return {
 		{side = startNormal, score = teamHalf[startNormal]},
 		{side = otherNormal, score = teamHalf[otherNormal]},
-		startOvertime and startOvertimeScore and {side = startOvertime, score = startOvertimeScore} or nil,
-		startOvertime and otherOvertimeScore and {side = otherOvertime, score = otherOvertimeScore} or nil,
+		{side = startOvertime, score = teamHalf['ot' .. startOvertime]},
+		{side = otherOvertime, score = teamHalf['ot' .. otherOvertime]},
 	}
 end
 
