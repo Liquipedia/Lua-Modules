@@ -44,7 +44,7 @@ function NavBox:render()
 
 	-- as a first step collapse at the top and uncollapse at the bottom
 	-- as heuristic assume we are at the bottom if an infobox or HDB is above
-	local shouldCollapse = Logic.readBool(Table.extract(props, 'collapsed')) not (
+	local shouldCollapse = Logic.readBool(Table.extract(props, 'collapsed')) or not (
 		Variables.varDefault('has_infobox') -- any page with an infobox
 		or Variables.varDefault('tournament_parent') -- any Page with a HDB
 	)
