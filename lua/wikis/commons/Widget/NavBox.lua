@@ -38,15 +38,13 @@ function NavBox:render()
 	if Logic.readBool(props.isChild) then
 		return Json.stringify(props)
 	end
-	-- invalid for NavBox, but valid for NavBoxChild
-	props.collapsed = nil
 
 	assert(props.title, 'Missing title input')
 	assert(props.child1, 'No children inputted')
 
 	-- as a first step collapse at the top and uncollapse at the bottom
 	-- as heuristic assume we are at the bottom if an infobox or HDB is above
-	local shouldCollapse = not (
+	local shouldCollapse = Logic.readBool(Table.extract(props, 'collapsed')) not (
 		Variables.varDefault('has_infobox') -- any page with an infobox
 		or Variables.varDefault('tournament_parent') -- any Page with a HDB
 	)
