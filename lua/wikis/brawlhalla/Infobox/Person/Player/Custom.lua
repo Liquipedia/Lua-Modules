@@ -14,21 +14,6 @@ local PlayersSignatureLegends = require('Module:PlayersSignatureLegends')
 
 local Player = Lua.import('Module:Infobox/Person')
 
---role stuff tables
-local ROLES = {
-	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
-	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
-	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
-	['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
-	['manager'] = 'Manager', ['map maker'] = 'Map maker',
-	['observer'] = 'Observer', ['photographer'] = 'Photographer',
-	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
-}
-local CLEAN_OTHER_ROLES = {
-	['coach'] = 'Coach', ['staff'] = 'false',
-	['content producer'] = 'Content producer', ['streamer'] = 'false',
-}
-
 local CURRENT_YEAR = tonumber(os.date('%Y'))
 
 local Widgets = require('Module:Widget/All')
@@ -74,28 +59,6 @@ function CustomInjector:parse(id, widgets)
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	end
 	return widgets
-end
-
----@param lpdbData table
----@param args table
----@param personType string
----@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = args.role
-	lpdbData.extradata.role2 = args.role2
-
-	return lpdbData
-end
-
----@param args table
----@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
-	local role = args.role or args.occupation or 'player'
-	role = string.lower(role)
-	local category = ROLES[role]
-	local store = category or CLEAN_OTHER_ROLES[role] or 'Player'
-
-	return {store = store, category = category or 'Player'}
 end
 
 return CustomPlayer
