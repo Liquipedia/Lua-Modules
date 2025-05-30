@@ -9,6 +9,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
@@ -33,12 +34,17 @@ local NavBox = Class.new(Widget)
 function NavBox:render()
 	local props = self.props
 
+	-- if the NavBox is sometimes used as a child in another NavBox return the props as Json
+	if Logic.readBool(props.isChild) then
+		return Json.stringify(props)
+	end
+
 	assert(props.title, 'Missing title input')
 	assert(props.child1, 'No children inputted')
 
 	-- as a first step collapse at the top and uncollapse at the bottom
 	-- as heuristic assume we are at the bottom if an infobox or HDB is above
-	local shouldCollapse = not (
+	local shouldCollapse = Logic.readBool(Table.extract(props, 'collapsed')) or not (
 		Variables.varDefault('has_infobox') -- any page with an infobox
 		or Variables.varDefault('tournament_parent') -- any Page with a HDB
 	)
