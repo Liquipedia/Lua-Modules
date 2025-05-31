@@ -49,6 +49,9 @@ return {
 			status = 1,
 			sortCasters = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

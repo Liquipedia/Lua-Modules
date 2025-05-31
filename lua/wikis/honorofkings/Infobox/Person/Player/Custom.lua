@@ -34,8 +34,6 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.autoTeam = true
-
 	player.role = Role.run{role = player.args.role}
 	player.role2 = Role.run{role = player.args.role2}
 
