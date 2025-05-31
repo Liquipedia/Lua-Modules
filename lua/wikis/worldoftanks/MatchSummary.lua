@@ -18,7 +18,7 @@ local CustomMatchSummary = {}
 ---@param args table
 ---@return Html
 function CustomMatchSummary.getByMatchId(args)
-	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args)
+	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {emptyVetoMapDisplay = ''})
 end
 
 ---@param date string
