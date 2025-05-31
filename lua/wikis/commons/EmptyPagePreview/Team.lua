@@ -21,7 +21,7 @@ local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Team') -- to be replaced by #5900 / #5649 / ...
 local Table = Lua.import('Module:Table')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local Infobox = Lua.import('Module:Infobox/Team/Custom')
