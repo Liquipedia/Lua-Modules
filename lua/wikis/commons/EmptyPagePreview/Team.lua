@@ -181,7 +181,7 @@ function EmptyTeamPagePreview:_fetchPlacements(options)
 	}
 
 	return mw.ext.LiquipediaDB.lpdb('placement', {
-		conditions = conditions:toString(),
+		conditions = tostring(conditions),
 		order = 'date desc, startdate desc',
 		groupby = options.groupBy,
 		query = options.query,
