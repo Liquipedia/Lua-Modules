@@ -17,6 +17,7 @@ local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
 local Region = Lua.import('Module:Region')
 local Team = Lua.import('Module:Team') -- to be replaced by #5900 / #5649 / ...
 local Table = Lua.import('Module:Table')
@@ -28,6 +29,9 @@ local Infobox = Lua.import('Module:Infobox/Team/Custom')
 local MatchTable = Lua.import('Module:MatchTable/Custom')
 local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
+local SquadCustom = Lua.import('Module:Squad/Custom')
+local SquadUtils = Lua.import('Module:Squad/Utils')
+local TransferRef = Lua.import('Module:Transfer/References')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -54,6 +58,8 @@ function EmptyTeamPagePreview:render()
 	self.team = Team.queryDB('teampage', mw.title.getCurrentTitle().prefixedText)
 
 	if not self.team then return end
+
+	self.teams = Team.queryHistoricalNames(self.team)
 
 	local rosterFromLastPlacement = Logic.readBool(self.props.rosterFromLastPlacement)
 
@@ -273,7 +279,7 @@ function EmptyTeamPagePreview:_results()
 	}
 end
 
----@return {coaches: {flag: string?, pageName: string?, displayName: string?}[], nationalities: table<string, integer>}
+---@return {coaches: {flag: string?, displayName: string, pageName: string}[], nationalities: table<string, integer>}
 function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
 	local data = self:_getPlayersAndCoachesFromLastPlacement()
 	local nationalities = {}
@@ -287,17 +293,34 @@ function EmptyTeamPagePreview:_getNationalitiesAndCoachesFromLastPlacement()
 	return {coaches = data.coaches, nationalities = nationalities}
 end
 
----@return {coaches: something[], players: something[]}
+---@return {coaches: {flag: string?, displayName: string, pageName: string, name: string?}[],
+---players: {flag: string?, displayName: string, pageName: string, name: string?}[], startDate: string?}
 function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 	local latestResult = self:_fetchPlacements{limit = 1}[1]
 	if not latestResult then return {coaches = {}, nationalities = {}} end
 
 	local parsePerson = function (prefix)
-		-- todo: add additional data for the roster stuff?!?!
+		local person = Page.pageifyLink(latestResult.opponentplayers[prefix])
+		---@type player|squadplayer
+		local personObject = mw.ext.LiquipediaDB.lpdb('player', {
+			conditions = tostring(ConditionNode(ColumnName('pagename'), Comparator.eq, person)),
+			query = 'name, id, nationality',
+		})[1] or {}
+
+		if Logic.isEmpty(personObject) then
+			personObject = mw.ext.LiquipediaDB.lpdb('squadplayer', {
+			conditions = '[[link::' .. person .. ']]',
+			query = 'name, id, nationality'
+		})[1] or {}
+		end
+
 		return {
-			flag = latestResult.opponentplayers[prefix .. 'flag'],
-			displayName = latestResult.opponentplayers[prefix .. 'dn'],
-			pageName = latestResult.opponentplayers[prefix],
+			flag = latestResult.opponentplayers[prefix .. 'flag'] or personObject.nationality,
+			displayName = latestResult.opponentplayers[prefix .. 'dn']
+				or personObject.id
+				or latestResult.opponentplayers[prefix],
+			pageName = person,
+			name = personObject.name,
 		}
 	end
 
@@ -311,13 +334,118 @@ function EmptyTeamPagePreview:_getPlayersAndCoachesFromLastPlacement()
 		table.insert(coaches, parsePerson(prefix))
 	end
 
-	return {coaches = coaches, players = players}
+	return {coaches = coaches, players = players, startDate = latestResult.startdate}
 end
 
 ---@return Widget[]
 function EmptyTeamPagePreview:_rosterFromLastPlacement()
-	-- todo
-	return nil
+	local data = self:_getPlayersAndCoachesFromLastPlacement()
+
+	local backFillPerson = FnUtil.curry(FnUtil.curry(EmptyTeamPagePreview._backFillForSquad, self), data.startDate)
+
+	local players = Array.map(data.players, backFillPerson)
+	local coaches = Array.map(data.coaches, backFillPerson)
+
+	local activePlayers = Array.filter(players, function(player)
+		return Logic.isEmpty(player.leavedate)
+	end)
+	local formerPlayers = Array.filter(players, function(player)
+		return Logic.isNotEmpty(player.leavedate)
+	end)
+	local activeCoaches = Array.filter(coaches, function(coach)
+		return Logic.isEmpty(coach.leavedate)
+	end)
+
+	local hasFormer = Logic.isNotEmpty(formerPlayers)
+	local hasCoaches = Logic.isNotEmpty(activeCoaches)
+
+	return WidgetUtil.collect(
+		HtmlWidgets.H3{children = 'Most Recent Roster'},
+		hasFormer and HtmlWidgets.H4{children = 'Active'} or nil,
+		SquadCustom.runAuto(activePlayers, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.PLAYER),
+		hasFormer and HtmlWidgets.H4{children = 'Former'} or nil,
+		hasFormer and SquadCustom.runAuto(formerPlayers, SquadUtils.SquadStatus.FORMER, SquadUtils.SquadType.PLAYER) or nil,
+		hasCoaches and HtmlWidgets.H3{children = 'Active Organization'} or nil,
+		hasCoaches and SquadCustom.runAuto(activeCoaches, SquadUtils.SquadStatus.ACTIVE, SquadUtils.SquadType.STAFF) or nil
+	)
+end
+
+---@param startDate string?
+---@param personData {flag: string?, displayName: string, pageName: string, name: string?}
+---@return table
+function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
+	local teams = self.teams
+
+	local pageName = personData.pageName
+	local pageNameWithSpaces = pageName:gsub('_', ' ')
+	local personCondition = ConditionTree(BooleanOperator.any):add{
+		ConditionNode(ColumnName('player'), Comparator.eq, pageName),
+		ConditionNode(ColumnName('player'), Comparator.eq, pageNameWithSpaces),
+	}
+
+	---@param direction 'to'|'from'
+	---@return ConditionTree
+	local makeTeamConditions = function(direction)
+		return ConditionTree(BooleanOperator.any):add{
+			Array.map(teams, function(team)
+				return ConditionNode(ColumnName(direction .. 'team'), Comparator.eq, team)
+			end),
+			Array.map(teams, function(team)
+				return ConditionNode(ColumnName(direction .. 'team_2'), Comparator.eq, team)
+			end),
+		}
+	end
+
+	local joinConditions = ConditionTree(BooleanOperator.all):add{
+		personCondition,
+		ConditionTree(BooleanOperator.any):add{
+			ConditionNode(ColumnName('role2'), Comparator.neq, '-'),
+			ConditionNode(ColumnName('role2_2'), Comparator.neq, '-'),
+		},
+		makeTeamConditions('to'),
+	}
+
+	local joinData = mw.ext.LiquipediaDB.lpdb('transfer', {
+		conditions = tostring(joinConditions),
+		order = 'date desc',
+		query = 'date, reference, extradata',
+		limit = 1,
+	})[1] or {extradata = {}}
+
+	local leaveData = {extradata = {}}
+	if startDate then
+		local leaveConditions = ConditionTree(BooleanOperator.all):add{
+			personCondition,
+			ConditionNode(ColumnName('date'), Comparator.gt, startDate),
+			ConditionTree(BooleanOperator.any):add{
+				ConditionNode(ColumnName('role1'), Comparator.neq, '-'),
+				ConditionNode(ColumnName('role1_2'), Comparator.neq, '-'),
+			},
+			makeTeamConditions('from'),
+		}
+		leaveData = mw.ext.LiquipediaDB.lpdb('transfer', {
+			conditions = tostring(leaveConditions),
+			order = 'date desc',
+			query = 'date, toteam, reference, extradata',
+			limit = 1,
+		})[1] or {extradata = {}}
+	end
+
+	return {
+		name = personData.name,
+		flag = personData.flag,
+		id = personData.displayName,
+		page = personData.pageName,
+		thisTeam = {team = self.team},
+		newTeam = {team = leaveData.toteam},
+		joindate = joinData.date or '',
+		joindatedisplay = joinData.extradata.displaydate,
+		joindateRef = TransferRef.fromStorageData(joinData.reference)[1] or '',
+		leavedate = leaveData.date or '',
+		leavedatedisplay = leaveData.extradata.displaydate,
+		leavedateRef = TransferRef.fromStorageData(leaveData.reference)[1] or '',
+		faction = leaveData.extradata.faction,
+	}
 end
 
 return EmptyTeamPagePreview
