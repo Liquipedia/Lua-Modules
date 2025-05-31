@@ -19,8 +19,9 @@ local Namespace = Lua.import('Module:Namespace')
 local Operator = Lua.import('Module:Operator')
 local Page = Lua.import('Module:Page')
 local Region = Lua.import('Module:Region')
-local Team = Lua.import('Module:Team') -- to be replaced by #5900 / #5649 / ...
 local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team') -- to be replaced by #5900 / #5649 / ...
+local Tournament = Lua.import('Module:Tournament')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -205,15 +206,8 @@ function EmptyTeamPagePreview:_determineRegionFromPlacements()
 	}
 
 	local regions = Array.map(placements, function(placement)
-		local tournament = mw.ext.LiquipediaDB.lpdb('tournament', {
-			conditions = '[[pagename::' .. placement.parent .. ']]',
-			query = 'locations',
-			limit = 1,
-		})[1]
-		if not tournament or type(tournament.locations) ~= 'table' then
-			return
-		end
-		return tournament.locations['region1']
+		local tournament = Tournament.getTournament(placement.parent) or {}
+		return tournament.region
 	end)
 	local regionGroups = Array.groupBy(regions, FnUtil.identity)
 	Array.sortInPlaceBy(regionGroups, function(regionGroup) return Table.size(regionGroup) end)
