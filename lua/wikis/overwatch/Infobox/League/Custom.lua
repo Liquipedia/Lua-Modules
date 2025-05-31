@@ -46,7 +46,6 @@ end
 ---@param args table
 function CustomLeague:customParseArguments(args)
 	self.data.publishertier = self:_validPublisherTier(args.publishertier) and args.publishertier:lower()
-	self.data.marginalizedgender = Logic.readBool(args.marginalized_gender)
 end
 
 ---@param id string
@@ -128,7 +127,7 @@ function CustomLeague:getWikiCategories(args)
 		table.insert(categories, Game.name{game = args.game} .. ' Competitions')
 	end
 
-	if self.data.marginalizedgender then
+	if self.data.marginalizedgender = Logic.readBool(args.marginalized_gender) then
 		table.insert(categories, 'Marginalized Gender Tournaments')
 	end
 
