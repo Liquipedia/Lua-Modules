@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Arguments = require('Module:Arguments')
 local Array = require('Module:Array')
 local Page = require('Module:Page')
 local Variables = require('Module:Variables')
@@ -16,9 +17,10 @@ local DEFAULT_LIMIT = 3
 
 ---Builds the Want to help display.
 ---Usage e.g. on main page
----@param args {limit: string|integer?}
+---@param frame Frame|{limit: string|integer?}
 ---@return string
-function WantToHelpList.get(args)
+function WantToHelpList.get(frame)
+	local args = Arguments.getArgs(frame)
 	local limit = tonumber(args.limit) or DEFAULT_LIMIT
 
 	local listItems = {}
