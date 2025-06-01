@@ -12,7 +12,6 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Page = Lua.import('Module:Page')
 local Variables = Lua.import('Module:Variables')
-local WantToHelpList = Lua.import('Module:WantToHelpList')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -23,6 +22,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local WantToHelpList = Lua.import('Module:Widget/WantToHelpList')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local GREEN_CHECK_CIRCLE = IconFa{
@@ -151,7 +151,7 @@ function WantToHelp:render()
 				['line-height'] = '2em',
 				['margin-top'] = '1em'
 			},
-			children = {'\n', WantToHelpList.get{}}
+			children = {'\n', WantToHelpList{}}
 		},
 		HtmlWidgets.Br{},
 		'In total there are ',
