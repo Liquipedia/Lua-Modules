@@ -155,16 +155,10 @@ function WantToHelp:render()
 		},
 		HtmlWidgets.Br{},
 		'In total there are ',
-		Builder{builder = function ()
-			local text = Variables.varDefault('total_number_of_todos', 0) .. ' pages'
-			if Page.exists('Liquipedia:Want to help/All') then
-				return Link{
-					link = 'Liquipedia:Want to help/All',
-					children = text
-				}
-			end
-			return text
-		end},
+		Link{
+			link = 'Liquipedia:Want to help/All',
+			children = {Variables.varDefault('total_number_of_todos', 0) .. ' pages'},
+		},
 		' listed needing help.'
 	}
 end
