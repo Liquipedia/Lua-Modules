@@ -6,6 +6,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+---@type PersonRoleData
 local contractRoles = {
 	['loan'] = {category = 'Players On Loan', display = 'On loan'},
 	['standard'] = {category = 'Standard Contracts', display = 'Standard'},
