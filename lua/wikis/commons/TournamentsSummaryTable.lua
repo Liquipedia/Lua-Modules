@@ -141,7 +141,7 @@ end
 ---@param sort string
 ---@param order string
 ---@param limit number
----@return table[]
+---@return tournament[]
 function TournamentsSummaryTable._getTournaments(conditionType, sort, order, limit)
 	local data = mw.ext.LiquipediaDB.lpdb('tournament', {
 		query = 'pagename, name, tickername, icon, icondark, startdate, enddate, series',
@@ -250,7 +250,7 @@ function TournamentsSummaryTable.additionalConditions(type)
 	return {}
 end
 
----@param eventInformation table
+---@param eventInformation tournament
 ---@param type conditionTypes
 ---@return string
 function TournamentsSummaryTable.row(eventInformation, type)
