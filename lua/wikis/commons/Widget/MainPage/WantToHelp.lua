@@ -16,7 +16,6 @@ local Variables = Lua.import('Module:Variables')
 local Info = Lua.import('Module:Info', {loadData = true})
 
 local Widget = Lua.import('Module:Widget')
-local Builder = Lua.import('Module:Widget/Builder')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
