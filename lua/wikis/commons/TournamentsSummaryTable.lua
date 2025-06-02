@@ -123,18 +123,17 @@ function TournamentsSummaryTable._parseArgsToSettings(args)
 	TournamentsSummaryTable.completedOffset = tonumber(args.completedOffset) or TournamentsSummaryTable.completedOffset
 
 	local parseTier = function(tier)
-		tier = String.trim(tier)
 		return tonumber(tier) or tier
 	end
 
 	TournamentsSummaryTable.tiers = args.tiers
-		and Array.map(mw.text.split(args.tiers, ','), parseTier)
+		and Array.map(Array.parseCommaSeparatedString(args.tiers), parseTier)
 		or TournamentsSummaryTable.tiers
 
 	TournamentsSummaryTable.disableLIS = Logic.readBool(args.disableLIS) or TournamentsSummaryTable.disableLIS
 
 	TournamentsSummaryTable.tierTypeExcluded = args.tierTypeExcluded
-		and Array.map(mw.text.split(args.tierTypeExcluded, ','), parseTier)
+		and Array.map(Array.parseCommaSeparatedString(args.tierTypeExcluded), parseTier)
 		or TournamentsSummaryTable.tierTypeExcluded
 end
 
