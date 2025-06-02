@@ -7,7 +7,6 @@
 --
 
 local Array = require('Module:Array')
-local FnUtil = require('Module:FnUtil')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
 local Lua = require('Module:Lua')
@@ -44,7 +43,7 @@ local Customizable = Widgets.Customizable
 ---@field role PersonRoleData? #deprecated
 ---@field role2 PersonRoleData? #deprecated
 ---@field role3 PersonRoleData? #deprecated
----@field roles PersonRoleData[]?
+---@field roles PersonRoleData[]
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -69,7 +68,6 @@ local STATUS_TRANSLATE = {
 
 local BANNED = 'banned' -- Temporary until conversion
 local Roles = Lua.import('Module:Roles')
-local ROLES = Roles.All
 
 ---@param frame Frame
 ---@return Html
@@ -81,70 +79,9 @@ end
 ---@return string
 function Person:createInfobox()
 	local args = self.args
-
-	self.locations = self:getLocations()
-
-	local lowerStatus = (args.status or ''):lower()
-	if lowerStatus == BANNED then
-		-- Temporary until conversion
-		args.banned = args.banned or true
-	end
-	args.status = STATUS_TRANSLATE[lowerStatus]
-
 	assert(String.isNotEmpty(args.id), 'You need to specify an "id"')
 
-	if Logic.readBool(args.autoTeam) then
-		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
-		args.team = Logic.emptyOr(args.team, team)
-		args.team2 = Logic.emptyOr(args.team2, team2)
-	end
-
-	-- check if non-representing is used and set an according value in self
-	-- so it can be accessed in the /Custom modules
-	args.country = self:getStandardNationalityValue(args.country or args.nationality)
-	if args.country == self:getStandardNationalityValue('non-representing') then
-		self.nonRepresenting = true
-	end
-
-	self.region = Region.run({region = args.region, country = args.country})
-
-	args.ids = args.ids or args.alternateids
-
-	args = self:_flipNameOrder(args)
-
-	--set those already here as they are needed in several functions below
-	local links = Links.transform(args)
-	local personType = self:getPersonType(args)
-	--make earnings values available in the /Custom modules
-	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
-
-	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
-			birthdate = args.birth_date,
-			birthlocation = args.birth_location,
-			deathdate = args.death_date,
-			deathlocation = args.death_location,
-		})
-	if not ageCalculationSuccess then
-		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
-	end
-
-	self.age = age
-
-	--- Backwards compatibility
-	if not args.roles then
-		args.roles = table.concat({
-			args.role,
-			args.role2,
-			args.role3,
-		}, ', ')
-	end
-
-	self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
-
-	-- Backwards compatibility for old roles
-	self.role = self.roles[1]
-	self.role2 = self.roles[2]
-	self.role3 = self.roles[3]
+	self:_parseArgs()
 
 	local widgets = {
 		Header{
@@ -166,8 +103,8 @@ function Person:createInfobox()
 				Cell{name = 'Nationality', content = self:displayLocations()}
 			}
 		},
-		Cell{name = 'Born', content = {age.birth}},
-		Cell{name = 'Died', content = {age.death}},
+		Cell{name = 'Born', content = {self.age.birth}},
+		Cell{name = 'Died', content = {self.age.death}},
 		Customizable{id = 'region', children = {
 				Cell{name = 'Region', content = {self.region.display}}
 			}
@@ -178,7 +115,7 @@ function Person:createInfobox()
 		},
 		Customizable{id = 'role', children = {
 			Builder{builder = function()
-				--- Backwards compatibility for the old role, role2, role3
+				-- Backwards compatibility for the old roles
 				if not self.roles or #self.roles == 0 then
 					local roles = {
 						self:_displayRole(self.role),
@@ -243,6 +180,7 @@ function Person:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
+				local links = Links.transform(args)
 				if Table.isNotEmpty(links) then
 					return {
 						Title{children = 'Links'},
@@ -284,23 +222,89 @@ function Person:createInfobox()
 	local statusToStore = self:getStatusToStore(args)
 	self:categories(unpack(self:getCategories(
 				args,
-				age.birth,
-				personType.category,
+				self.age.birth,
+				self:getPersonType(args).category,
 				statusToStore
 			)))
 
 	if self:shouldStoreData(args) then
 		self:_setLpdbData(
 			args,
-			links,
+			Links.transform(args),
 			statusToStore,
-			personType.store
+			self:getPersonType(args).store
 		)
 	end
 
 	self:_definePageVariables(args)
 
 	return self:build(widgets)
+end
+
+function Person:_parseArgs()
+	local args = self.args
+
+	-- STATUS and BANNED
+	local lowerStatus = (args.status or ''):lower()
+	if lowerStatus == BANNED then
+		-- Temporary until conversion
+		args.banned = args.banned or true
+	end
+	args.status = STATUS_TRANSLATE[lowerStatus]
+
+	-- ENRICH TEAM
+	if Logic.readBool(args.autoTeam) then
+		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
+		args.team = Logic.emptyOr(args.team, team)
+		args.team2 = Logic.emptyOr(args.team2, team2)
+	end
+
+	-- COUNTRY/REGION
+
+	self.locations = self:getLocations()
+	-- check if non-representing is used and set an according value in self
+	args.country = self:getStandardNationalityValue(args.country or args.nationality)
+	if args.country == self:getStandardNationalityValue('non-representing') then
+		self.nonRepresenting = true
+	end
+	self.region = Region.run({region = args.region, country = args.country})
+
+	-- NAME
+	args.ids = args.ids or args.alternateids
+	args.givenname, args.familyname = self:_flipNameOrder(args)
+
+	-- EARNINGS
+	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
+
+	-- AGE
+	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
+			birthdate = args.birth_date,
+			birthlocation = args.birth_location,
+			deathdate = args.death_date,
+			deathlocation = args.death_location,
+		})
+	if not ageCalculationSuccess then
+		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
+	end
+
+	self.age = age
+
+	-- ROLES
+	-- Backwards compatibility for the old roles
+	if not args.roles then
+		args.roles = table.concat({
+			args.role,
+			args.role2,
+			args.role3,
+		}, ', ')
+	end
+
+	self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
+
+	-- Backwards compatibility for the old roles
+	self.role = self.roles[1]
+	self.role2 = self.roles[2]
+	self.role3 = self.roles[3]
 end
 
 ---@param args table
@@ -321,6 +325,11 @@ function Person:_setLpdbData(args, links, status, personType)
 	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
+	end
+
+	local legacyRoleValue = function(roleData)
+		if not roleData then return end
+		return roleData.display or roleData.category or nil
 	end
 
 	local lpdbData = {
@@ -348,10 +357,9 @@ function Person:_setLpdbData(args, links, status, personType)
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
-			type = self:_isPlayerOrStaff(), -- Backwards compatibility
-			role = self.role, -- Backwards compatibility
-			role2 = self.role2, -- Backwards compatibility
-			role3 = self.role3, -- Backwards compatibility
+			role = legacyRoleValue(self.role), -- Backwards compatibility
+			role2 = legacyRoleValue(self.role2), -- Backwards compatibility
+			role3 = legacyRoleValue(self.role3), -- Backwards compatibility
 			roles = self.roles,
 		},
 	}
@@ -415,28 +423,22 @@ function Person:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@return string
-function Person:_isPlayerOrStaff()
-	local inGameRoles = Roles.InGameRoles
-
-	local roles = Logic.nilIfEmpty(self.roles) or {self.role, self.role2, self.role3}
-
-	if Logic.isEmpty(roles) then return 'player' end
-
-	local isPlayer = Array.any(roles, function(roleData)
-		return Table.any(ROLES, function(roleKey, data)
-			return data == roleData and inGameRoles and inGameRoles[roleKey]
-		end)
-	end)
-
-	return isPlayer and 'player' or 'staff'
-end
-
 --- Allows for overriding this functionality
 ---@param args table
 ---@return {store: string, category: string}
 function Person:getPersonType(args)
-	return {store = 'Player', category = 'Player'}
+	local playerValue = {store = 'player', category = 'Player'}
+	local staffValue = {store = 'staff', category = 'Staff'}
+	local inGameRoles = Roles.InGameRoles
+
+	local isStaff = Array.all(self.roles, function(roleData)
+		local lookUpKey = Table.uniqueKey(Table.filter(Roles.All, function(data)
+			return data == roleData
+		end))
+		return not inGameRoles or not inGameRoles[lookUpKey]
+	end)
+
+	return isStaff and staffValue or playerValue
 end
 
 --- Allows for overriding this functionality
@@ -534,7 +536,7 @@ end
 function Person._createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
 
-	local roleData = ROLES[roleKey:lower()]
+	local roleData = Roles.All[roleKey:lower()]
 
 	--- Backwards compatibility for old roles
 	if not roleData then
@@ -553,7 +555,7 @@ end
 function Person:_displayRole(roleData)
 	if not roleData then return end
 
-	return Page.makeInternalLink(roleData['display'], ':Category:' .. roleData['category'])
+	return Page.makeInternalLink(roleData.display, ':Category:' .. roleData.category)
 end
 
 ---@param team string?
@@ -581,12 +583,14 @@ end
 ---@param status PlayerStatus
 ---@return string[]
 function Person:getCategories(args, birthDisplay, personType, status)
+	local categories = {}
 	if not self:shouldStoreData(args) then
-		return {}
+		return categories
 	end
-
 	local team = args.teamlink or args.team
-	local categories = Array.append(self.age.categories,
+
+	categories = Array.extend(categories, self.age.categories)
+	categories = Array.extend(categories,
 		personType .. 's',
 		status .. ' ' .. personType .. 's'
 	)
@@ -654,12 +658,11 @@ function Person:_createAgeCalculationErrorMessage(text)
 end
 
 ---@param args table
----@return table
+---@return string, string
 function Person:_flipNameOrder(args)
-	args.givenname, args.familyname = NameOrder.reorderNames(
+	return NameOrder.reorderNames(
 		args.givenname, args.familyname, {country = args.country, forceWesternOrder = args.nonameflip}
 	)
-	return args
 end
 
 return Person
