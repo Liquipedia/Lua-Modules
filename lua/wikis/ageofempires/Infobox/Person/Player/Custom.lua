@@ -111,9 +111,9 @@ function CustomPlayer.run(frame)
 		args.status = mw.getContentLanguage():ucfirst(args.status)
 	end
 
-	args.roleList = args.roles and Array.map(mw.text.split(args.roles, ','), function(role)
-		return mw:getContentLanguage():ucfirst(mw.text.trim(role))
-	end) or {}
+	args.roleList = Array.map(Array.parseCommaSeparatedString(args.roles), function(role)
+		return mw:getContentLanguage():ucfirst(role)
+	end)
 	args.gameList = player:_getGames()
 
 	local builtInfobox = player:createInfobox()
