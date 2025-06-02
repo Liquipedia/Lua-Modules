@@ -16,6 +16,7 @@ local Variables = Lua.import('Module:Variables')
 local Info = Lua.import('Module:Info', {loadData = true})
 
 local Widget = Lua.import('Module:Widget')
+local Builder = Lua.import('Module:Widget/Builder')
 local Button = Lua.import('Module:Widget/Basic/Button')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -154,10 +155,12 @@ function WantToHelp:render()
 		},
 		HtmlWidgets.Br{},
 		'In total there are ',
-		Link{
-			link = 'Liquipedia:Want to help/All',
-			children = {Variables.varDefault('total_number_of_todos', 0) .. ' pages'},
-		},
+		Builder{builder = function () -- need the builder so the var is available when accessing it
+			return Link{
+				link = 'Liquipedia:Want to help/All',
+				children = {Variables.varDefault('total_number_of_todos', 0) .. ' pages'}
+			}
+		end},
 		' listed needing help.'
 	}
 end
