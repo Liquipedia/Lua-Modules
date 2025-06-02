@@ -228,14 +228,8 @@ function TournamentsSummaryTable.dateConditions(type)
 	elseif type == TournamentsSummaryTable.ongoingType then
 		conditions
 			:add({
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('startdate'), Comparator.lt, _today),
-					ConditionNode(ColumnName('startdate'), Comparator.eq, _today),
-				}),
-				ConditionTree(BooleanOperator.any):add({
-					ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
-					ConditionNode(ColumnName('enddate'), Comparator.eq, _today),
-				}),
+				ConditionNode(ColumnName('startdate'), Comparator.le, _today),
+				ConditionNode(ColumnName('enddate'), Comparator.ge, _today),
 				ConditionTree(BooleanOperator.any):add({
 					ConditionNode(ColumnName('status'), Comparator.neq, 'finished'),
 					ConditionNode(ColumnName('enddate'), Comparator.gt, _today),
