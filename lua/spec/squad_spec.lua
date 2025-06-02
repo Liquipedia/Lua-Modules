@@ -48,7 +48,6 @@ insulate('Squad', function()
 				newteamtemplate = '',
 				position = '',
 				role = '',
-				roles = {},
 				status = 'former',
 				teamtemplate = '',
 				extradata = {},
