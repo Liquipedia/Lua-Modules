@@ -173,9 +173,9 @@ end
 ---@return ConditionTree
 function TournamentsSummaryTable._tierConditions()
 	local conditions = ConditionTree(BooleanOperator.any)
-	for _, tier in pairs(TournamentsSummaryTable.tiers) do
-		conditions:add({ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)})
-	end
+	conditions:add(Array.map(TournamentsSummaryTable.tiers, function (tier)
+		return ConditionNode(ColumnName('liquipediatier'), Comparator.eq, tier)
+	end))
 
 	return conditions
 end
@@ -187,9 +187,9 @@ function TournamentsSummaryTable._tierTypeConditions()
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all)
-	for _, tierType in pairs(TournamentsSummaryTable.tierTypeExcluded) do
-		conditions:add({ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tierType)})
-	end
+	conditions:add(Array.map(TournamentsSummaryTable.tierTypeExcluded, function (tierType)
+		return ConditionNode(ColumnName('liquipediatiertype'), Comparator.neq, tierType)
+	end))
 
 	return conditions
 end
@@ -201,9 +201,9 @@ function TournamentsSummaryTable._statusConditions()
 	end
 
 	local conditions = ConditionTree(BooleanOperator.all)
-	for _, status in pairs(TournamentsSummaryTable.statusExcluded) do
-		conditions:add({ConditionNode(ColumnName('status'), Comparator.neq, status)})
-	end
+	conditions:add(Array.map(TournamentsSummaryTable.statusExcluded, function (status)
+		return ConditionNode(ColumnName('status'), Comparator.neq, status)
+	end))
 
 	return conditions
 end
