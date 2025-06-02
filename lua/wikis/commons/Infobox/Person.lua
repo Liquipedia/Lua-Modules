@@ -131,20 +131,20 @@ function Person:createInfobox()
 	self.age = age
 
 	--- Backwards compatibility
-	self.role = self:_createRoleData(args.role or '')
-	self.role2 = self:_createRoleData(args.role2 or '')
-	self.role3 = self:_createRoleData(args.role3 or '')
-
-	self.roles = {}
-	if args.roles then
-		Array.extendWith(
-			self.roles,
-			Array.map(
-				Array.parseCommaSeparatedString(args.roles),
-				FnUtil.curry(Person._createRoleData, self)
-			)
-		)
+	if not args.roles then
+		args.roles = table.concat({
+			args.role,
+			args.role2,
+			args.role3,
+		}, ', ')
 	end
+
+	self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
+
+	-- Backwards compatibility for old roles
+	self.role = self.roles[1]
+	self.role2 = self.roles[2]
+	self.role3 = self.roles[3]
 
 	local widgets = {
 		Header{
@@ -531,7 +531,7 @@ end
 
 ---@param roleKey string
 ---@return PersonRoleData?
-function Person:_createRoleData(roleKey)
+function Person._createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
 
 	local roleData = ROLES[roleKey:lower()]
