@@ -41,10 +41,10 @@ local Customizable = Widgets.Customizable
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
----@field role PersonRoleData?
----@field role2 PersonRoleData?
----@field role3 PersonRoleData?
----@field roles PersonRoleData?
+---@field role PersonRoleData? #deprecated
+---@field role2 PersonRoleData? #deprecated
+---@field role3 PersonRoleData? #deprecated
+---@field roles PersonRoleData[]?
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -130,6 +130,7 @@ function Person:createInfobox()
 
 	self.age = age
 
+	--- Backwards compatibility
 	self.role = self:_createRoleData(args.role or '')
 	self.role2 = self:_createRoleData(args.role2 or '')
 	self.role3 = self:_createRoleData(args.role3 or '')
@@ -177,52 +178,40 @@ function Person:createInfobox()
 		},
 		Customizable{id = 'role', children = {
 			Builder{builder = function()
-				local cells = {}
-
+				--- Backwards compatibility for the old role, role2, role3
 				if not self.roles or #self.roles == 0 then
-					local role = self:_displayRole(self.role)
-					local role2 = self:_displayRole(self.role2)
-					local role3 = self:_displayRole(self.role3)
-					table.insert(cells, Cell{name = (role2 and 'Roles' or 'Role'), content = {role, role2, role3}})
-
-					return cells
+					local roles = {
+						self:_displayRole(self.role),
+						self:_displayRole(self.role2),
+						self:_displayRole(self.role3),
+					}
+					return {
+						Cell{
+							name = (#roles > 1 and 'Roles' or 'Role'),
+							content = roles,
+						}
+					}
 				end
 
-				local inGameRoles = {}
-				local contracts = {}
-				local positions = {}
-
-				local OriginalInGameRoles = Roles.InGameRoles
-				local OriginalContractRoles = Roles.ContractRoles
-
-				Array.forEach(self.roles, function(roleData)
+				local roles = Array.map(self.roles, function(roleData)
 					local roleDisplay = self:_displayRole(roleData)
 
 					if not roleDisplay then
 						return
 					end
 
-					if OriginalInGameRoles and Table.includes(OriginalInGameRoles, roleData) then
-						table.insert(inGameRoles, roleDisplay)
-					elseif OriginalContractRoles and Table.includes(OriginalContractRoles, roleData) then
-						table.insert(contracts, roleDisplay)
-					else
-						table.insert(positions, roleDisplay)
+					if not Roles.All or not Table.includes(Roles.All, roleData) then
+						return
 					end
+					return roleDisplay
 				end)
 
-				---@param rolesArray string[]
-				---@param title string
-				---@return Widget
-				local makeRoleCell = function(rolesArray, title)
-					return Cell{name = title .. (#rolesArray > 0 and 's' or ''), children = rolesArray, separator = ', '}
-				end
-
-				return Array.append(cells,
-					makeRoleCell(inGameRoles, 'In-game Role'),
-					makeRoleCell(positions, 'Position'),
-					makeRoleCell(contracts, 'Contract')
-				)
+				return {
+					Cell{
+						name = (#roles > 1 and 'Roles' or 'Role'),
+						content = roles,
+					}
+				}
 			end}
 		}},
 		Customizable{id = 'teams', children = {
@@ -359,10 +348,10 @@ function Person:_setLpdbData(args, links, status, personType)
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
-			type = self:_isPlayerOrStaff(),
-			role = self.role,
-			role2 = self.role2,
-			role3 = self.role3,
+			type = self:_isPlayerOrStaff(), -- Backwards compatibility
+			role = self.role, -- Backwards compatibility
+			role2 = self.role2, -- Backwards compatibility
+			role3 = self.role3, -- Backwards compatibility
 			roles = self.roles,
 		},
 	}
@@ -545,16 +534,18 @@ end
 function Person:_createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
 
-	local key = roleKey:lower()
-	local roleData = ROLES[key]
+	local roleData = ROLES[roleKey:lower()]
 
-	if roleData then return roleData end
+	--- Backwards compatibility for old roles
+	if not roleData then
+		local display = String.upperCaseFirst(roleKey)
+		return {
+			display = display,
+			category = display .. 's'
+		}
+	end
 
-	local display = String.upperCaseFirst(roleKey)
-	return {
-		display = display,
-		category = display .. 's'
-	}
+	return roleData
 end
 
 ---@param roleData PersonRoleData?
@@ -562,25 +553,7 @@ end
 function Person:_displayRole(roleData)
 	if not roleData then return end
 
-	---@param postFix string|integer|nil
-	---@return string?
-	local toDisplay = function(postFix)
-		postFix = postFix or ''
-		if not roleData['category' .. postFix] then return end
-		return Page.makeInternalLink(roleData['display' .. postFix], ':Category:' .. roleData['category' .. postFix])
-	end
-
-	local displays = Array.append({},
-		toDisplay(),
-		toDisplay(2),
-		toDisplay(3)
-	)
-
-	local formattedDisplays = Array.map(displays, function(display, index)
-		return index == 1 and display or ('(' .. display .. ')')
-	end)
-
-	return #formattedDisplays > 0 and table.concat(formattedDisplays, ' ') or nil
+	return Page.makeInternalLink(roleData['display'], ':Category:' .. roleData['category'])
 end
 
 ---@param team string?
