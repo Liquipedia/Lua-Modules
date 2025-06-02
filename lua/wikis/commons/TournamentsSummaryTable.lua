@@ -86,11 +86,11 @@ function TournamentsSummaryTable.run(args)
 	TournamentsSummaryTable._parseArgsToSettings(args)
 
 	local type
-	if args.upcoming == 'true' then
+	if Logic.readBool(args.upcoming) then
 		type = TournamentsSummaryTable.upcomingType
-	elseif args.ongoing == 'true' then
+	elseif Logic.readBool(args.ongoing) then
 		type = TournamentsSummaryTable.ongoingType
-	elseif args.recent == 'true' then
+	elseif Logic.readBool(args.recent) then
 		type = TournamentsSummaryTable.recentType
 	else
 		error('No type parameter (upcoming, ongoing, recent) specified')
