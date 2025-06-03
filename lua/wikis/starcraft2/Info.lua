@@ -63,6 +63,10 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
+		teamSubPages = {
+			playedMatches = 'Matches',
+			playerResults = 'Player Results',
+		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',
