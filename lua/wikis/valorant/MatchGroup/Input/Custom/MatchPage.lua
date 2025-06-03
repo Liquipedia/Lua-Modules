@@ -109,7 +109,7 @@ function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, phase)
 	local teamSide = map.teams[opponentIndex] and map.teams[opponentIndex].team_id
 
 	local roundNumberOfFirstRound = phase == 'normal' and 1 or (ROUNDS_IN_GAME + 1)
-)	local firstRound = Array.find(map.round_results, function(round)
+	local firstRound = Array.find(map.round_results, function(round)
 		return round.round_num == roundNumberOfFirstRound
 	end)
 
