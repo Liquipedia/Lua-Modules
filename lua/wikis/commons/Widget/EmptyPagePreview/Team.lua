@@ -435,10 +435,10 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 		newTeam = {team = leaveData.toteam},
 		joindate = joinData.date or '',
 		joindatedisplay = joinData.extradata.displaydate,
-		joindateRef = TransferRef.fromStorageData(joinData.reference)[1] or '',
+		joindateRef = joinData.reference,
 		leavedate = leaveData.date or '',
 		leavedatedisplay = leaveData.extradata.displaydate,
-		leavedateRef = TransferRef.fromStorageData(leaveData.reference)[1] or '',
+		leavedateRef = leaveData.reference,
 		faction = leaveData.extradata.faction,
 	}
 end
