@@ -32,7 +32,6 @@ local ResultsTable = Lua.import('Module:ResultsTable/Custom')
 local SquadAuto = Lua.import('Module:SquadAuto') -- to be replaced by #5523
 local SquadCustom = Lua.import('Module:Squad/Custom')
 local SquadUtils = Lua.import('Module:Squad/Utils')
-local TransferRef = Lua.import('Module:Transfer/References')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
