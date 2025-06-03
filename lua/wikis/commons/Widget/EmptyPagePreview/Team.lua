@@ -265,6 +265,8 @@ function EmptyTeamPagePreview:_results()
 		HtmlWidgets.H3{children = 'Notable Results'},
 		ResultsTable.results{
 			team = self.team,
+			showType = true,
+			displayGameIcons = true,
 			awards = false,
 			achievements = true,
 			playerResultsOfTeam = false,
