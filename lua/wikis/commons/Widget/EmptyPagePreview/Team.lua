@@ -97,7 +97,10 @@ function EmptyTeamPagePreview:_infobox()
 	local regionCounts = {}
 	local location
 	local rosterRegion
-	local rosterSize = Table.size(data.nationalities or {})
+	local rosterSize = 0
+	for _, countryRosterSize in pairs(data.nationalities or {}) do
+		rosterSize = rosterSize + countryRosterSize
+	end
 	for country, countryCount in pairs(data.nationalities or {}) do
 		local region = Region.name{country = country}
 		if countryCount > (rosterSize / 2) then
@@ -210,7 +213,7 @@ function EmptyTeamPagePreview:_determineRegionFromPlacements()
 		return tournament.region
 	end)
 	local regionGroups = Array.groupBy(regions, FnUtil.identity)
-	Array.sortInPlaceBy(regionGroups, function(regionGroup) return Table.size(regionGroup) end)
+	Array.sortInPlaceBy(regionGroups, function(regionGroup) return - Table.size(regionGroup) end)
 	return (regionGroups[1] or {})[1]
 end
 
