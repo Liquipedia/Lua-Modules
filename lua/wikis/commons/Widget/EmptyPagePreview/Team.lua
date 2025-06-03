@@ -266,7 +266,7 @@ function EmptyTeamPagePreview:_results()
 		ResultsTable.results{
 			team = self.team,
 			showType = true,
-			displayGameIcons = true,
+			gameIcons = true,
 			awards = false,
 			achievements = true,
 			playerResultsOfTeam = false,
