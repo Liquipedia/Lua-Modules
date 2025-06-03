@@ -224,7 +224,7 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 
 		---@type ValorantRoundData
 		return {
-			round = roundNumber,
+			round = roundNumber + 1,
 			t1side = t1side,
 			t2side = t2side,
 			winningSide = makeShortSideName(round.winning_team_role),
