@@ -206,7 +206,7 @@ end
 function BaseMatchPage:render()
 	local displayTitle = self:makeDisplayTitle()
 	if String.isNotEmpty(displayTitle) then
-		mw.getCurrentFrame():preprocess('{{DISPLAYTITLE:' .. displayTitle .. '|noreplace}}')
+		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
 	end
 
 	local tournamentContext = self:_getMatchContext()
