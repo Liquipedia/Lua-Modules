@@ -97,7 +97,7 @@ function AutoTeamNavbox._makeLinksChild(pageName)
 	---@type table
 	local linksChild = Array.append({Link{link = pageName, children = 'Overview'}},
 		makeLink('results', 'Results'),
-		makeLink('playedMatches', 'Played Matches'),
+		not config.hidePlayedMatches and makeLink('playedMatches', 'Played Matches') or nil,
 		makeLink('playerResults', 'Player Results')
 	)
 	linksChild.name = 'Team'
