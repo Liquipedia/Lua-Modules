@@ -115,21 +115,6 @@ function Person:createInfobox()
 		},
 		Customizable{id = 'role', children = {
 			Builder{builder = function()
-				-- Backwards compatibility for the old roles
-				if not self.roles or #self.roles == 0 then
-					local roles = {
-						self:_displayRole(self.role),
-						self:_displayRole(self.role2),
-						self:_displayRole(self.role3),
-					}
-					return {
-						Cell{
-							name = (#roles > 1 and 'Roles' or 'Role'),
-							content = roles,
-						}
-					}
-				end
-
 				local roles = Array.map(self.roles, function(roleData)
 					local roleDisplay = self:_displayRole(roleData)
 

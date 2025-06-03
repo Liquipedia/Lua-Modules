@@ -28,10 +28,9 @@ local CustomInjector = Class.new(Injector)
 ---@param frame Frame
 ---@return Html
 function CustomPlayer.run(frame)
+	---@type BrawlstarsInfoboxPlayer
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
-
-	player.roles = player.args.roles or {}
 
 	local args = player.args
 
@@ -44,9 +43,9 @@ function CustomPlayer.run(frame)
 			name = Logic.emptyOr(args.romanized_name, args.name),
 			romanizedname = args.romanized_name,
 			status = args.status,
-			type = player.role.personType,
-			role = player.role1,
-			role2 = player.role2,
+			type = player:getPersonType(args).store,
+			role = (player.role or {}).display,
+			role2 = (player.role2 or {}).display,
 			id = args.id,
 			idIPA = args.idIPA,
 			idAudio = args.idAudio,

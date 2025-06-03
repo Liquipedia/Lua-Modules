@@ -81,24 +81,11 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param categories string[]
----@return string[]
-function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
-
 	Array.forEach(args.agents, function (agent, index)
 		lpdbData.extradata['agent' .. index] = agent
 	end)
