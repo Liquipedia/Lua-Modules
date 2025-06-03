@@ -407,7 +407,7 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 	local joinData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		conditions = tostring(joinConditions),
 		order = 'date desc',
-		query = 'date, reference, extradata',
+		query = 'date, reference, extradata, role2',
 		limit = 1,
 	})[1] or {extradata = {}}
 
@@ -435,7 +435,10 @@ function EmptyTeamPagePreview:_backFillForSquad(startDate, personData)
 		flag = personData.flag,
 		id = personData.displayName,
 		page = personData.pageName,
-		thisTeam = {team = self.team},
+		thisTeam = {
+			team = self.team,
+			role = joinData.role2,
+		},
 		newTeam = {team = leaveData.toteam},
 		joindate = joinData.date or '',
 		joindatedisplay = joinData.extradata.displaydate,
