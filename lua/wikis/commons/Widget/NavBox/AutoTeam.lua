@@ -59,59 +59,81 @@ function AutoTeamNavbox:render()
 		return member.type == 'staff'
 	end)
 
-	local makeNote = function(position, role)
-		local content = {position, role}
-		return table.concat(Array.filter(content, Logic.isNotEmpty), ' - ')
-	end
+	local showOrg = not (Info.config.teamRosterNavbox or {}).hideOrg
 
-	local makePersonDisplay = function(member)
-		local note = Logic.nilIfEmpty(makeNote(member.position, member.role))
-		return HtmlWidgets.Fragment{children = {
-			Link{
-				link = member.pageName,
-				children = member.displayName,
-			},
-			note and '&nbsp;' or nil,
-			note and HtmlWidgets.Small{children = HtmlWidgets.I{children = '(' .. note .. ')'}} or nil,
-		}}
-	end
+	local childrenArray = Array.append({},
+		AutoTeamNavbox._makeLinksChild(team.pageName),
+		AutoTeamNavbox._makeRosterRow(activePlayers, secondaryRosterActivePlayers and 'Main Roster' or 'Roster'),
+		AutoTeamNavbox._makeRosterRow(secondaryRosterActivePlayers, 'Additional Rosters'),
+		showOrg and (AutoTeamNavbox._makeRosterRow(activeStaff, 'Organization')) or nil
+	)
+	local children = Table.map(childrenArray, function(index, child) return 'child' .. index, child end)
 
-	local orgChild = #activeStaff > 0 and Table.merge({
-		name = 'Organization',
-	}, Array.map(activeStaff, makePersonDisplay)) or nil
+	return NavBox(Table.merge(children, {
+		image = team.image,
+		imagedark = team.imageDark,
+		imagelink = team.pageName,
+		imagesize = '50px',
+		title = (team.fullName or team.bracketName or team.shortName or team.pageName) .. ' Roster',
+	}))
+end
 
-	local linkConfig = Table.merge(DEFAULT_LINK_CONFIG, Info.config.teamSubPages)
+---@param pageName string
+---@return table?
+function AutoTeamNavbox._makeLinksChild(pageName)
+	local config = Info.config.teamRosterNavbox or {}
+	if config.hideOverview then return end
+
+	local linkConfig = Table.merge(DEFAULT_LINK_CONFIG, config.links)
 
 	---@param subPage string
 	---@param displayText string
 	---@return Widget?
 	local makeLink = function(subPage, displayText)
 		if not linkConfig[subPage] then return end
-		return Link{link = team.pageName .. '/' .. linkConfig[subPage], children = displayText}
+		return Link{link = pageName .. '/' .. linkConfig[subPage], children = displayText}
 	end
 
 	---@type table
-	local linksChild = Array.append({Link{link = team.pageName, children = 'Overview'}},
+	local linksChild = Array.append({Link{link = pageName, children = 'Overview'}},
 		makeLink('results', 'Results'),
 		makeLink('playedMatches', 'Played Matches'),
 		makeLink('playerResults', 'Player Results')
 	)
 	linksChild.name = 'Team'
 
-	return NavBox{
-		image = team.image,
-		imagedark = team.imageDark,
-		imagelink = team.pageName,
-		title = team.fullName or team.bracketName or team.shortName or team.pageName,
-		child1 = linksChild,
-		child2 = Table.merge({
-			name = secondaryRosterActivePlayers and 'Main Roster' or 'Roster',
-		}, Array.map(activePlayers, makePersonDisplay)),
-		child3 = secondaryRosterActivePlayers and Table.merge({
-			name = 'Additional Rosters',
-		}, Array.map(secondaryRosterActivePlayers, makePersonDisplay)) or orgChild,
-		child4 = secondaryRosterActivePlayers and orgChild,
-	}
+	return linksChild
+end
+
+---@param members table[]?
+---@param name string
+---@return table?
+function AutoTeamNavbox._makeRosterRow(members, name)
+	if Logic.isEmpty(members) then return end
+	---@cast members -nil
+	---@type table
+	local rosterRow = Array.map(members, AutoTeamNavbox._makePersonDisplay)
+	rosterRow.name = name
+	return rosterRow
+end
+
+---@param member table
+---@return Widget
+function AutoTeamNavbox._makePersonDisplay(member)
+	local makeNote = function(position, role)
+		local content = {position, role}
+		return table.concat(Array.filter(content, Logic.isNotEmpty), ' - ')
+	end
+
+	local note = Logic.nilIfEmpty(makeNote(member.position, member.role))
+	return HtmlWidgets.Fragment{children = {
+		Link{
+			link = member.pageName,
+			children = member.displayName,
+		},
+		note and '&nbsp;' or nil,
+		note and HtmlWidgets.Small{children = HtmlWidgets.I{children = '(' .. note .. ')'}} or nil,
+	}}
 end
 
 return AutoTeamNavbox

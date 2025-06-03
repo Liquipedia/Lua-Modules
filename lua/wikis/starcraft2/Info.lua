@@ -63,9 +63,12 @@ return {
 			matchWidthMobile = 110,
 			matchWidth = 150,
 		},
-		teamSubPages = {
-			playedMatches = 'Matches',
-			playerResults = 'Player Results',
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+				playerResults = 'Player Results',
+			},
+			hideOrg = true, -- still in discussion if we want to enable it in the future
 		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
