@@ -221,11 +221,13 @@ Abbr/WIB
 Abbr/WITA
 Abbr/YEKT
 Abbr/ZAR
+ApiMap
 Box
 Bracket
 BroadcasterCard
 Button
 Currency
+Deletion
 DuoOpponent
 DuoPrizePool
 ExternalMediaLinkWrapper
@@ -239,7 +241,9 @@ GetMatchPageCopyPaste
 HDB
 HiddenDataBox
 HiddenSort
+In_memory_of
 Json
+LiquipediaApp
 Literal
 LiteralOpponent
 Map
@@ -247,8 +251,12 @@ Match
 Matchlist
 MatchPage
 MatchSection
-Navbox
+NavBox
+NavBoxChild
 Opponent
+Patches_calendar
+Patches_list
+Placement
 QuadOpponent
 ShowBracket
 ShowSingleMatch
@@ -268,3 +276,5 @@ TRef
 TrioOpponent
 TrioPrizePool
 TVar
+Want_to_help
+WantToHelp/FullList
