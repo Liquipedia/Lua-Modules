@@ -56,7 +56,7 @@ function EmptyTeamPagePreview:render()
 		return
 	end
 
-	self.team = Team.queryDB('teampage', mw.title.getCurrentTitle().prefixedText)
+	self.team = Team.queryDB('teampage', self.props.pageName or mw.title.getCurrentTitle().prefixedText)
 
 	if not self.team then return end
 
