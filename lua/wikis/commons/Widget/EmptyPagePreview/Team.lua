@@ -70,7 +70,8 @@ function EmptyTeamPagePreview:render()
 			self:_infobox(),
 			rosterFromLastPlacement and self:_rosterFromLastPlacement() or self:_rosterFromTransfers(),
 			self:_matches(),
-			self:_results()
+			self:_results(),
+			HtmlWidgets.H2{children = {'References'}}
 		),
 	}
 end
