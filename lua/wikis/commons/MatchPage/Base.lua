@@ -181,31 +181,34 @@ function BaseMatchPage:getCharacterIcon(character)
 end
 
 ---@protected
+---@return string
 function BaseMatchPage:makeDisplayTitle()
 	local team1data = (self.opponents[1] or {}).teamTemplateData
 	local team2data = (self.opponents[2] or {}).teamTemplateData
+	local tournamentName = self.matchData.tickername
 
 	if Logic.isEmpty(team1data) and Logic.isEmpty(team2data) then
-		return table.concat({'Match in', self.matchData.tickername}, ' ')
+		return String.isNotEmpty(tournamentName) and 'Match in ' .. tournamentName or ''
 	end
 
 	local team1name = (team1data or {}).shortname or 'TBD'
 	local team2name = (team2data or {}).shortname or 'TBD'
 
-	local tournamentName = self.matchData.tickername
-	local displayTitle = team1name .. ' vs. ' .. team2name
-	if not tournamentName then
-		return displayTitle
+	local titleParts = {team1name, 'vs.', team2name}
+	if tournamentName then
+		Array.appendWith(titleParts, '@', tournamentName)
 	end
 
-	displayTitle = displayTitle .. ' @ ' .. tournamentName
-
-	mw.getCurrentFrame():preprocess(table.concat{'{{DISPLAYTITLE:', displayTitle, '|noreplace}}'})
+	return table.concat(titleParts, ' ')
 end
 
 ---@return Widget
 function BaseMatchPage:render()
-	self:makeDisplayTitle()
+	local displayTitle = self:makeDisplayTitle()
+	if String.isNotEmpty(displayTitle) then
+		mw.getCurrentFrame():callParserFunction('DISPLAYTITLE', displayTitle, 'noreplace')
+	end
+
 	local tournamentContext = self:_getMatchContext()
 	return Div{
 		children = WidgetUtil.collect(
