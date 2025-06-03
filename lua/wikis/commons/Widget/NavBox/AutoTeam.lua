@@ -58,8 +58,14 @@ function AutoTeamNavbox:render()
 	local activeStaff = Array.filter(activeMembers, function(member)
 		return member.type == 'staff'
 	end)
+	local config = Info.config.teamRosterNavbox or {}
+	if config.staffLimitedPositions then
+		activeStaff = Array.filter(activeStaff, function(member)
+			return Table.includes(config.staffLimitedPositions, member.position)
+		end)
+	end
 
-	local showOrg = not (Info.config.teamRosterNavbox or {}).hideOrg
+	local showOrg = not config.hideOrg
 
 	local childrenArray = Array.append({},
 		AutoTeamNavbox._makeLinksChild(team.pageName),

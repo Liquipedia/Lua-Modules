@@ -35,6 +35,11 @@ return {
 		match2 = {
 			status = 1,
 		},
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+			excludeStreamers = true,
+			staffLimitedPositions = {'manager', 'coach'},
+		},
 	},
 	defaultRoundPrecision = 0,
 }
