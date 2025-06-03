@@ -22,6 +22,8 @@ local CustomMatchGroupInputMatchPage = {}
 ---@field vod string?
 ---@field finished boolean
 
+local ROUNDS_PER_HALF = 12
+local ROUNDS_IN_GAME = 24
 
 ---@param side 'atk'|'def'
 ---@return 'atk'|'def'
@@ -106,8 +108,8 @@ function CustomMatchGroupInputMatchPage.getFirstSide(map, opponentIndex, phase)
 
 	local teamSide = map.teams[opponentIndex] and map.teams[opponentIndex].team_id
 
-	local roundNumberOfFirstRound = phase == 'normal' and 1 or 25
-	local firstRound = Array.find(map.round_results, function(round)
+	local roundNumberOfFirstRound = phase == 'normal' and 1 or (ROUNDS_IN_GAME + 1)
+)	local firstRound = Array.find(map.round_results, function(round)
 		return round.round_num == roundNumberOfFirstRound
 	end)
 
@@ -132,16 +134,16 @@ function CustomMatchGroupInputMatchPage.getScoreFromRounds(map, side, opponentIn
 	local condition
 	if firstSide then
 		if side == firstSide then
-			condition = function(round) return round.round_num <= 12 end
+			condition = function(round) return round.round_num <= ROUNDS_PER_HALF end
 		elseif side == otherSide(firstSide) then
-			condition = function(round) return round.round_num > 12 and round.round_num <= 24 end
+			condition = function(round) return round.round_num > ROUNDS_PER_HALF and round.round_num <= ROUNDS_IN_GAME end
 		end
 	end
 	if firstSideOt then
 		if side == 'ot' .. firstSideOt then
-			condition = function(round) return round.round_num > 24 and round.round_num % 2 == 1 end
+			condition = function(round) return round.round_num > ROUNDS_IN_GAME and round.round_num % 2 == 1 end
 		elseif side == 'ot' .. otherSide(firstSideOt) then
-			condition = function(round) return round.round_num > 24 and round.round_num % 2 == 0 end
+			condition = function(round) return round.round_num > ROUNDS_IN_GAME and round.round_num % 2 == 0 end
 		end
 	end
 	if not condition then
@@ -205,10 +207,10 @@ function CustomMatchGroupInputMatchPage.getRounds(map)
 	return Array.map(map.round_results, function(round)
 		local roundNumber = round.round_num
 		local t1side, t2side
-		if roundNumber <= 12 then
+		if roundNumber <= ROUNDS_PER_HALF then
 			t1side = t1start
 			t2side = otherSide(t1start)
-		elseif roundNumber <= 24 then
+		elseif roundNumber <= ROUNDS_IN_GAME then
 			t1side = otherSide(t1start)
 			t2side = t1start
 		elseif nextOvertimeSide then
