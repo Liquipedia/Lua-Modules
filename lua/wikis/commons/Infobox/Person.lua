@@ -230,66 +230,87 @@ function Person:_parseArgs()
 	local args = self.args
 
 	-- STATUS and BANNED
-	local lowerStatus = (args.status or ''):lower()
-	if lowerStatus == BANNED then
-		-- Temporary until conversion
-		args.banned = args.banned or true
+	local function parseStatusAndBanned()
+		local lowerStatus = (args.status or ''):lower()
+		if lowerStatus == BANNED then
+			-- Temporary until conversion
+			args.banned = args.banned or true
+		end
+		args.status = STATUS_TRANSLATE[lowerStatus]
 	end
-	args.status = STATUS_TRANSLATE[lowerStatus]
 
 	-- ENRICH TEAM
-	if Logic.readBool(args.autoTeam) then
-		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
-		args.team = Logic.emptyOr(args.team, team)
-		args.team2 = Logic.emptyOr(args.team2, team2)
+	local function enrichTeam()
+		if Logic.readBool(args.autoTeam) then
+			local team, team2 = PlayerIntroduction.playerTeamAuto{player = self.pagename}
+			args.team = Logic.emptyOr(args.team, team)
+			args.team2 = Logic.emptyOr(args.team2, team2)
+		end
 	end
 
 	-- COUNTRY/REGION
-
-	self.locations = self:getLocations()
-	-- check if non-representing is used and set an according value in self
-	args.country = self:getStandardNationalityValue(args.country or args.nationality)
-	if args.country == self:getStandardNationalityValue('non-representing') then
-		self.nonRepresenting = true
+	local function parseCountryAndRegion()
+		self.locations = self:getLocations()
+		-- check if non-representing is used and set an according value in self
+		args.country = self:getStandardNationalityValue(args.country or args.nationality)
+		if args.country == self:getStandardNationalityValue('non-representing') then
+			self.nonRepresenting = true
+		end
+		self.region = Region.run({region = args.region, country = args.country})
 	end
-	self.region = Region.run({region = args.region, country = args.country})
 
 	-- NAME
-	args.ids = args.ids or args.alternateids
-	args.givenname, args.familyname = self:_flipNameOrder(args)
+	local function parseName()
+		args.ids = args.ids or args.alternateids
+		args.givenname, args.familyname = self:_flipNameOrder(args)
+	end
 
 	-- EARNINGS
-	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
+	local function calculateEarnings()
+		self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
+	end
 
 	-- AGE
-	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
-			birthdate = args.birth_date,
-			birthlocation = args.birth_location,
-			deathdate = args.death_date,
-			deathlocation = args.death_location,
-		})
-	if not ageCalculationSuccess then
-		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
-	end
+	local function calculateAge()
+		local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
+				birthdate = args.birth_date,
+				birthlocation = args.birth_location,
+				deathdate = args.death_date,
+				deathlocation = args.death_location,
+			})
+		if not ageCalculationSuccess then
+			age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
+		end
 
-	self.age = age
+		self.age = age
+	end
 
 	-- ROLES
-	-- Backwards compatibility for the old roles
-	if not args.roles then
-		args.roles = table.concat({
-			args.role,
-			args.role2,
-			args.role3,
-		}, ', ')
+	local function parseRoles()
+		-- Backwards compatibility for the old roles input
+		if not args.roles then
+			args.roles = table.concat({
+				args.role,
+				args.role2,
+				args.role3,
+			}, ', ')
+		end
+
+		self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
+
+		-- Backwards compatibility for the old roles handling
+		self.role = self.roles[1]
+		self.role2 = self.roles[2]
+		self.role3 = self.roles[3]
 	end
 
-	self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
-
-	-- Backwards compatibility for the old roles
-	self.role = self.roles[1]
-	self.role2 = self.roles[2]
-	self.role3 = self.roles[3]
+	Logic.tryOrElseLog(parseStatusAndBanned)
+	Logic.tryOrElseLog(enrichTeam)
+	Logic.tryOrElseLog(parseCountryAndRegion, function() self.region = {} end)
+	Logic.tryOrElseLog(parseName)
+	Logic.tryOrElseLog(calculateEarnings)
+	Logic.tryOrElseLog(calculateAge, function() self.age = {} end)
+	Logic.tryOrElseLog(parseRoles, function() self.roles = {} end)
 end
 
 ---@param args table
@@ -358,10 +379,9 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
-	lpdbData = Json.stringifySubTables(lpdbData)
 	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. args.id, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. args.id, Json.stringifySubTables(lpdbData))
 end
 
 -- Allows this function to be used in /Custom

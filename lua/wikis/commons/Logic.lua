@@ -154,10 +154,10 @@ end
 ---Returns the result of a function if successful. Otherwise it returns the result of the second function.
 ---If the first function fails, its error is logged to the console and stashed away for display.
 ---@generic T
----@param f fun(): T
----@param other? fun(error: Error): any
+---@param f fun(): T?
+---@param other? fun(error: Error): T?
 ---@param makeError? fun(error: Error): Error function that allows customizing Error instance being logged and stashed.
----@return T
+---@return T?
 function Logic.tryOrElseLog(f, other, makeError)
 	return Logic.try(f)
 		:catch(function(error)
