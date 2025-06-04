@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -37,9 +38,11 @@ local VETOES = {
 ---@param args table
 ---@return string
 function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
+	if Logic.readBool(args.matchPage) then
+		return '{{Match}}'
+	end
+
 	local showScore = Logic.readBool(args.score)
-	local mapDetails = Logic.readBool(args.detailedMap)
-	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
 	local mapVeto = Logic.readBool(args.mapVeto)
 	local streams = Logic.readBool(args.streams)
 	local lines = Array.extend(
@@ -66,6 +69,33 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		)
 	end
 
+	Array.extendWith(lines, Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste._getMap, args)))
+
+	Array.appendWith(lines,'}}')
+
+	return table.concat(lines, '\n')
+end
+
+---@private
+---@param args table
+---@param mapIndex integer
+---@return string
+function WikiCopyPaste._getMap(args, mapIndex)
+	if Logic.readBool(args.generateMatchPage) then
+		return table.concat({
+			INDENT .. '|map' .. mapIndex .. '={{ApiMap',
+			INDENT .. INDENT .. '|matchid=',
+			INDENT .. INDENT .. '|reversed=',
+			INDENT .. INDENT .. '|vod=',
+			INDENT .. '}}'
+		}, '\n')
+	end
+	if not Logic.readBool(args.detailedMap) then
+		return INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=}}'
+	end
+
+	local mapDetailsOT = Logic.readBool(args.detailedMapOT)
+
 	local mapStats = '|t1atk=|t1def='
 	if mapDetailsOT then
 		mapStats = mapStats .. '|t1otatk=|t1otdef='
@@ -74,24 +104,12 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		mapStats = mapStats .. '|t2otatk=|t2otdef='
 	end
 
-
-	Array.forEach(Array.range(1, bestof), function(mapIndex)
-		if not mapDetails then
-			Array.appendWith(lines, INDENT .. '|map' .. mapIndex .. '={{Map|map=|score1=|score2=|finished=}}')
-			return
-		end
-
-		Array.appendWith(lines,
-			INDENT .. '|map' .. mapIndex .. '={{Map|map=|finished=',
-			INDENT .. INDENT .. '|t1firstside=',
-			INDENT .. INDENT .. mapStats,
-			INDENT .. '}}'
-		)
-	end)
-
-	Array.appendWith(lines,'}}')
-
-	return table.concat(lines, '\n')
+	return table.concat({
+		INDENT .. '|map' .. mapIndex .. '={{Map|map=|finished=',
+		INDENT .. INDENT .. '|t1firstside=',
+		INDENT .. INDENT .. mapStats,
+		INDENT .. '}}'
+	}, '\n')
 end
 
 return WikiCopyPaste
