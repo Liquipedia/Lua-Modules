@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
@@ -68,9 +69,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 		)
 	end
 
-	Array.extendWith(lines, Array.map(Array.range(1, bestof), function(mapIndex)
-			return WikiCopyPaste._getMap(mapIndex, args)
-	end))
+	Array.extendWith(lines, Array.map(Array.range(1, bestof), FnUtil.curry(WikiCopyPaste._getMap, args)))
 
 	Array.appendWith(lines,'}}')
 
@@ -78,10 +77,10 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 end
 
 ---@private
----@param mapIndex integer
 ---@param args table
+---@param mapIndex integer
 ---@return string
-function WikiCopyPaste._getMap(mapIndex, args)
+function WikiCopyPaste._getMap(args, mapIndex)
 	if Logic.readBool(args.generateMatchPage) then
 		return table.concat({
 			INDENT .. '|map' .. mapIndex .. '={{ApiMap',
