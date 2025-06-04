@@ -77,7 +77,7 @@ function StandingsFfaWidget:render()
 			HtmlWidgets.Tr{children = WidgetUtil.collect(
 				HtmlWidgets.Th{children = '#'},
 				HtmlWidgets.Th{children = 'Participant'},
-				HtmlWidgets.Th{children = ''},
+				showRoundColumns and HtmlWidgets.Th{children = ''} or nil,
 				HtmlWidgets.Th{children = 'Points'},
 				showRoundColumns and Array.map(standings.rounds, function(round)
 					return HtmlWidgets.Th{children = round.title}
@@ -111,10 +111,10 @@ function StandingsFfaWidget:render()
 									showPlayerTeam = true,
 								}
 							},
-							HtmlWidgets.Td{
+							showRoundColumns and HtmlWidgets.Td{
 								classes = {teamBackground},
 								children = PlacementChange{change = slot.positionChangeFromPreviousRound}
-							},
+							} or nil,
 							HtmlWidgets.Td{
 								classes = {teamBackground},
 								children = slot.points,
