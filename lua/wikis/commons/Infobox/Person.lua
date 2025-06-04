@@ -436,7 +436,7 @@ function Person:getPersonType(args)
 	local staffValue = {store = 'staff', category = 'Staff'}
 	local inGameRoles = Roles.InGameRoles
 
-	local isStaff = Array.all(self.roles, function(roleData)
+	local isStaff = #self.roles > 0 and Array.all(self.roles, function(roleData)
 		local lookUpKey = Table.uniqueKey(Table.filter(Roles.All, function(data)
 			return data == roleData
 		end))
