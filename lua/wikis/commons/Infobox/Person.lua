@@ -113,16 +113,7 @@ function Person:createInfobox()
 		Customizable{id = 'role', children = {
 			Builder{builder = function()
 				local roles = Array.map(self.roles, function(roleData)
-					local roleDisplay = self:_displayRole(roleData)
-
-					if not roleDisplay then
-						return
-					end
-
-					if not Roles.All or not Table.includes(Roles.All, roleData) then
-						return
-					end
-					return roleDisplay
+					return self:_displayRole(roleData)
 				end)
 
 				return {
@@ -327,7 +318,7 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	local legacyRoleValue = function(roleData)
 		if not roleData then return end
-		return roleData.display or roleData.category or nil
+		return string.lower(roleData.category or roleData.display or '')
 	end
 
 	local lpdbData = {
