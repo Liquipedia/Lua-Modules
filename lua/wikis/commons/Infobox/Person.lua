@@ -40,9 +40,6 @@ local Customizable = Widgets.Customizable
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
----@field role PersonRoleData? #deprecated
----@field role2 PersonRoleData? #deprecated
----@field role3 PersonRoleData? #deprecated
 ---@field roles PersonRoleData[]
 local Person = Class.new(BasicInfobox)
 
@@ -297,11 +294,6 @@ function Person:_parseArgs()
 		end
 
 		self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
-
-		-- Backwards compatibility for the old roles handling
-		self.role = self.roles[1]
-		self.role2 = self.roles[2]
-		self.role3 = self.roles[3]
 	end
 
 	Logic.tryOrElseLog(parseStatusAndBanned)
@@ -363,9 +355,9 @@ function Person:_setLpdbData(args, links, status, personType)
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
-			role = legacyRoleValue(self.role), -- Backwards compatibility
-			role2 = legacyRoleValue(self.role2), -- Backwards compatibility
-			role3 = legacyRoleValue(self.role3), -- Backwards compatibility
+			role = legacyRoleValue(self.roles[1]), -- Backwards compatibility
+			role2 = legacyRoleValue(self.roles[2]), -- Backwards compatibility
+			role3 = legacyRoleValue(self.roles[3]), -- Backwards compatibility
 			roles = self.roles,
 		},
 	}
@@ -436,7 +428,7 @@ function Person:getPersonType(args)
 	local staffValue = {store = 'staff', category = 'Staff'}
 	local inGameRoles = Roles.InGameRoles
 
-	local isStaff = #self.roles > 0 and Array.all(self.roles, function(roleData)
+	local isStaff = not Array.any(self.roles, function(roleData)
 		local lookUpKey = Table.uniqueKey(Table.filter(Roles.All, function(data)
 			return data == roleData
 		end))
