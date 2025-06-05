@@ -28,6 +28,8 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 ---@field parent string?
 ---@field phase 'finished'|'ongoing'|'upcoming'
 ---@field tournamentName string?
+---@field poweredBy string?
+---@field highlighted boolean?
 
 ---@class MatchPageHeader: Widget
 ---@operator call(MatchPageHeaderParameters): MatchPageHeader
@@ -79,14 +81,14 @@ function MatchPageHeader:render()
 	return WidgetUtil.collect(
 		Div{
 			classes = { 'match-bm-match-header' },
-			children = {
-				Div{
+			children = WidgetUtil.collect(
+				self.props.poweredBy and Div{
 					classes = { 'match-bm-match-header-powered-by' },
 					children = {
 						'Data provided by ',
-						Image.display('SAP logo.svg', nil, {link = '', alt = 'SAP'})
+						Image.display(self.props.poweredBy, nil, {link = '', alt = 'SAP'})
 					}
-				},
+				} or nil,
 				Div{
 					classes = { 'match-bm-match-header-overview' },
 					children = {
@@ -96,7 +98,10 @@ function MatchPageHeader:render()
 					}
 				},
 				Div{
-					classes = { 'match-bm-match-header-tournament' },
+					classes = Array.extend(
+						'match-bm-match-header-tournament',
+						self.props.highlighted and 'tournament-highlighted-bg' or nil
+					),
 					children = {
 						Link{ link = self.props.parent, children = self.props.tournamentName }
 					}
@@ -105,7 +110,7 @@ function MatchPageHeader:render()
 					classes = { 'match-bm-match-header-date' },
 					children = { self.props.countdownBlock }
 				}
-			},
+			),
 		},
 		self:_showMvps()
 	)

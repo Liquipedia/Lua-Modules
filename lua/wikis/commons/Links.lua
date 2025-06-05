@@ -712,4 +712,4 @@ function Links.getMatchIconData(key)
 	return MATCH_ICONS[Links.removeAppendedNumber(key)]
 end
 
-return Class.export(Links, {frameOnly = true})
+return Class.export(Links, {frameOnly = true, exports = {'makeFullLink'}})

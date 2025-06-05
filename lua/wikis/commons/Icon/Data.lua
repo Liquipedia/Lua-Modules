@@ -12,6 +12,7 @@ return {
 	loss = 'fas fa-times',
 
 	-- Usage: Other Match detail pop up icons
+	matchpagelink = 'fas fa-external-link', -- Should we really use external for this?
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
@@ -20,6 +21,10 @@ return {
 	mvp = 'fas fa-medal',
 	startleft = 'fas fa-chevron-left',
 	startright = 'fas fa-chevron-right',
+	elimination = 'fas fa-skull',
+	explosion_valorant = 'fas fa-fire-alt',
+	defuse = 'fas fa-wrench',
+	outoftime = 'fas fa-hourglass',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -55,6 +60,10 @@ return {
 	upcomingandongoing = 'far fa-clock',
 	concluded = 'fas fa-check',
 	transfers = 'fas fa-handshake-alt',
+	createaccount = 'fas fa-user-plus',
+	login = 'fas fa-sign-in-alt',
+	discord = 'fab fa-discord',
+	helparticles = 'far fa-life-ring',
 
 	-- Usage: To indicate different transfer type with icon difference not just background colour
 	transferbetween = 'fas fa-arrow-alt-right',
@@ -104,6 +113,12 @@ return {
 	kills = 'fas fa-skull',
 	matchpoint = 'fad fa-diamond',
 
+	-- Usage: qualification
+	qualified = 'fas fa-check-circle',
+	tobedetermined = 'fas fa-question',
+	notqualified = 'fas fa-times',
+	ineligible = 'fas fa-ban',
+
 	-- Usage: standings
 	standings_up = 'fas fa-chevron-double-up',
 	standings_stayup = 'fas fa-chevron-up',
@@ -114,21 +129,25 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
-	-- Usage: Dota2 Main Page
-	hub = 'fas fa-external-link-alt',
+	-- Usage: Lists
+	checkcircle = 'fas fa-check-circle',
 
-	-- Usage: Match Pages
+	-- Usage: Dota2 Main Page
+	hub = 'fas fa-external-link-alt',  -- Should we really use external for this?
+
+	-- Usage: Match Stats
 	damage = 'fas fa-sword',
 	gold = 'fas fa-coins',
+	kda = 'fas fa-skull-crossbones',
+	acs = 'far fa-abacus',
+	kast = 'fas fa-hands-helping',
+	headshot = 'far fa-crosshairs',
 
-	-- Usage: Dota2 Match Pages
 	dota2_gpm = 'fas fa-coin',
-	dota2_kda = 'fas fa-skull-crossbones',
 	dota2_lhdn = 'fas fa-swords',
 	dota2_tower = 'fas fa-chess-rook',
 	dota2_barrack = 'fas fa-warehouse',
 
-	-- Usage: LeagueOfLegends Match Pages
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
 
 	-- Usage: Indicate boolean info in Infobox
@@ -141,6 +160,11 @@ return {
 
 	-- Usage: Charts
 	chart = 'far fa-chart-line',
+
+	-- Usage: PatchList
+	patch = 'fas fa-file-alt',
+	calendar = 'fas fa-calendar-alt',
+	highlights = 'fas fa-star',
 
 	-- Usage: Chess
 	chesskingoutline = 'far fa-chess-king',

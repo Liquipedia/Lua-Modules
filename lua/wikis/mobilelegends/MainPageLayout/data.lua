@@ -14,9 +14,11 @@ local TournamentsTicker = Lua.import('Module:Widget/Tournaments/Ticker')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
+local LiquipediaApp = Lua.import('Module:Widget/MainPage/LiquipediaApp')
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	usefulArticles = {
@@ -27,23 +29,22 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
 	liquipediaApp = {
 		heading = 'Download the Liquipedia App',
 		padding = true,
-		body = '{{Liquipedia:App}}',
+		body = LiquipediaApp{},
 		boxid = 1505,
 	},
 	transfers = {
 		heading = 'Transfers',
 		body = TransfersList{
 			rumours = true,
-			transferPage = function ()
-				return 'Player Transfers/' .. os.date('%Y') .. '/' .. DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
-			end
+			transferPage = 'Player Transfers/' .. os.date('%Y') .. '/' ..
+				DateExt.quarterOf{ ordinalSuffix = true } .. ' Quarter'
 		},
 		boxid = 1509,
 	},

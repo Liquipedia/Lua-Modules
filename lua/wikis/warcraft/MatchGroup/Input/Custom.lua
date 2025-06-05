@@ -500,7 +500,6 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

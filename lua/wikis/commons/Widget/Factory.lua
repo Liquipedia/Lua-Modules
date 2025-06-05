@@ -21,4 +21,4 @@ function WidgetFactory.fromTemplate(args)
 	return WidgetClass(args)
 end
 
-return Class.export(WidgetFactory)
+return Class.export(WidgetFactory, {exports = {'fromTemplate'}})

@@ -2,6 +2,11 @@
 Template(s): Match Page
 Author(s): Rathoz
 *******************************************************************************/
+span.slash {
+	margin: 0 0.125rem;
+	opacity: 0.4;
+}
+
 .match-bm-match-header {
 	display: flex;
 	flex-direction: column;
@@ -40,6 +45,7 @@ Author(s): Rathoz
 		.match-bm-match-header-team-group {
 			@media ( min-width: 768px ) {
 				align-items: flex-end;
+				text-align: end;
 			}
 		}
 	}
@@ -412,26 +418,6 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-players-wrapper {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 16px;
-
-	/* >= 834 2 column player layout */
-	@media ( min-width: 834px ) {
-		flex-direction: row;
-	}
-
-	@media ( max-width: 435px ) {
-		font-size: 12px;
-	}
-
-	@media ( min-width: 414px ) {
-		font-size: 15px;
-	}
-}
-
 .match-bm-players-team {
 	display: flex;
 	flex-direction: column;
@@ -454,13 +440,6 @@ Author(s): Rathoz
 	}
 }
 
-.match-bm-lol-players-team {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	width: 100%;
-}
-
 .match-bm-players-player {
 	display: flex;
 	padding: 1rem;
@@ -475,8 +454,26 @@ Author(s): Rathoz
 
 	@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 		display: grid;
-		grid-template-columns: 9.375rem auto 9.5rem;
+		grid-template-columns: 9.375rem auto 9.5rem; /* set as default */
 		grid-gap: 1rem;
+	}
+
+	&.match-bm-players-player--col-1 {
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			grid-template-columns: minmax( 0, 1fr );
+		}
+	}
+
+	&.match-bm-players-player--col-2 {
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			grid-template-columns: 9.375rem 1fr;
+		}
+	}
+
+	&.match-bm-players-player--col-3 {
+		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
+			grid-template-columns: 9.375rem auto 9.5rem;
+		}
 	}
 
 	.theme--dark & {
@@ -557,6 +554,8 @@ Author(s): Rathoz
 		flex-direction: column;
 		align-items: flex-start;
 		font-size: 0.9375rem;
+		word-wrap: anywhere;
+		word-break: normal;
 
 		> a {
 			font-weight: bold;
@@ -707,18 +706,13 @@ Author(s): Rathoz
 					font-size: 0.75rem;
 				}
 			}
-
-			.slash {
-				margin: 0 0.125rem;
-				opacity: 0.4;
-			}
 		}
 	}
 
 	&-stats {
 		display: grid;
 		grid-gap: 0.5rem;
-		grid-template-columns: 1fr 1fr 1fr;
+		grid-template-columns: repeat( 3, minmax( 0, 1fr ) ); /* set as default */
 		grid-template-rows: 1fr 1fr;
 
 		@media ( max-width: 1199px ), ( min-width: 1320px ) {
@@ -729,6 +723,23 @@ Author(s): Rathoz
 		@media ( min-width: 1200px ) and ( max-width: 1319px ), ( min-width: 1510px ) {
 			order: 2;
 			margin-top: unset;
+		}
+
+		&.match-bm-players-player-stats--col-4 {
+			grid-template-columns: repeat( 4, minmax( 0, 1fr ) );
+			grid-template-rows: 1fr;
+			align-items: center;
+		}
+
+		&.match-bm-players-player-stats--col-5 {
+			grid-template-columns: repeat( 5, minmax( 0, 1fr ) );
+			grid-template-rows: 1fr;
+			align-items: center;
+
+			@media ( max-width: 1023px ) {
+				grid-template-columns: repeat( 3, minmax( 0, 1fr ) );
+				grid-template-rows: 1fr 1fr;
+			}
 		}
 	}
 }
@@ -850,21 +861,6 @@ Author(s): Rathoz
 }
 
 .match-bm-lol-players-player {
-	box-sizing: border-box;
-	display: flex;
-	flex-flow: row wrap;
-	align-items: center;
-	padding: 16px;
-	gap: 16px;
-	background: #ffffff;
-	border: 1px solid #bbbbbb;
-	align-self: stretch;
-
-	.theme--dark & {
-		background-color: var( --clr-secondary-7 );
-		border-color: var( --clr-secondary-25 );
-	}
-
 	&-details {
 		display: flex;
 		flex-direction: row;
@@ -921,29 +917,6 @@ Author(s): Rathoz
 			flex-direction: row;
 			align-items: flex-start;
 			gap: 2px;
-		}
-	}
-
-	&-stats {
-		display: flex;
-		flex-direction: row;
-		justify-content: space-around;
-		align-items: center;
-		gap: 16px;
-		align-self: stretch;
-		flex: 2 0 50%;
-	}
-
-	&-stat {
-		display: flex;
-		flex-direction: row;
-		justify-content: center;
-		flex: 1;
-		gap: 4px;
-		width: auto;
-
-		.theme--dark & > img {
-			filter: invert( 1 );
 		}
 	}
 }
@@ -1005,6 +978,7 @@ Author(s): Rathoz
 }
 
 .match-bm-lol-game-summary-length {
+	font-weight: normal;
 	line-height: 100%;
 }
 
@@ -1225,7 +1199,7 @@ Author(s): Rathoz
 .match-bm-lol-team-stats-header {
 	display: flex;
 	flex-direction: row;
-	align-items: flex-start;
+	align-items: center;
 	background: #eaecf0;
 	border: 1px solid #bbbbbb;
 	align-self: stretch;
@@ -1242,5 +1216,260 @@ Author(s): Rathoz
 	.theme--dark & {
 		background-color: var( --clr-secondary-16 );
 		border-color: var( --clr-secondary-25 );
+	}
+}
+
+.match-bm-map-veto {
+	&-cards {
+		display: flex;
+		gap: 1rem;
+
+		@media ( max-width: 767px ) {
+			flex-wrap: wrap;
+			justify-content: center;
+		}
+	}
+
+	&-card {
+		flex: 1 0 0;
+		box-shadow: 0 0.0625rem 0.25rem 0 rgba( 0, 0, 0, 0.12 );
+		border-radius: 0.5rem;
+		font-size: 0.875rem;
+		padding-bottom: 0.5rem;
+		min-width: 0;
+		position: relative;
+
+		@media ( max-width: 767px ) {
+			flex: 0 0 calc( 50% - 0.5rem );
+		}
+
+		.theme--dark & {
+			background-color: #26292d;
+		}
+
+		&--ban &-image {
+			opacity: 0.5;
+		}
+
+		&-image {
+			height: ~"max( 5rem, 5vw )";
+			overflow: hidden;
+			border-radius: 0.5rem 0.5rem 0 0;
+
+			img {
+				display: flex;
+				object-fit: cover;
+				width: 100%;
+				height: 100%;
+				transition: transform 0.2s linear;
+			}
+		}
+
+		@media ( hover: hover ) {
+			&:hover &-image img {
+				transform: scale( 1.1 );
+			}
+		}
+
+		&-title {
+			padding-top: 0.5rem;
+			text-align: center;
+
+			& > a {
+				color: inherit !important;
+			}
+		}
+
+		&-map-name {
+			font-weight: bold;
+		}
+
+		&-map-info {
+			display: flex;
+			flex-direction: column;
+			padding-top: 0.5rem;
+		}
+
+		&--ban &-map-action {
+			color: var( --clr-semantic-negative-40 );
+			font-weight: bold;
+		}
+
+		&--pick &-map-action {
+			color: var( --clr-semantic-positive-40 );
+			font-weight: bold;
+		}
+
+		&--decider &-map-action {
+			color: var( --clr-semantic-positive-40 );
+			font-weight: bold;
+		}
+	}
+}
+
+@valorant-atk: #b20110;
+@valorant-def: #01654c;
+
+.match-bm-rounds-overview {
+	@cell-height: 1.75rem;
+	@cell-radius: 0.25rem;
+	display: flex;
+	gap: 0.25rem;
+	overflow-y: auto;
+	margin-top: 1rem;
+
+	&-teams-container {
+		display: grid;
+		grid-template-columns: 5rem;
+		gap: 0.25rem;
+	}
+
+	&-teams {
+		overflow: hidden;
+		min-width: 5rem;
+		text-wrap: nowrap;
+		gap: 0.125rem;
+		display: flex;
+		flex-direction: column;
+
+		> * {
+			height: @cell-height;
+		}
+
+		> *:nth-child( 3n+4 ) {
+			margin-top: 1rem;
+		}
+
+		@media ( min-width: 768px ) {
+			&:not( :first-child ) {
+				display: none;
+			}
+		}
+
+		.team-template-text {
+			display: none;
+		}
+
+		&-team {
+			display: flex;
+			align-items: center;
+		}
+
+		&-score {
+			text-align: center;
+			width: 2rem;
+			height: 1.75rem;
+			font-weight: bolder;
+
+			@media ( min-width: 768px ) {
+				display: none;
+			}
+
+			&--atk {
+				.wiki-valorant & {
+					color: @valorant-atk;
+				}
+			}
+
+			&--def {
+				.wiki-valorant & {
+					color: @valorant-def;
+				}
+			}
+		}
+	}
+
+	&-round-container {
+		display: flex;
+		gap: 0.25rem;
+
+		@media ( max-width: 767px ) {
+			display: grid;
+			grid-template-columns: repeat( 12, 1fr );
+		}
+	}
+
+	&-round {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.125rem;
+
+		:nth-child( 13 of & ),
+		:nth-child( 25 of & ) {
+			@media ( min-width: 768px ) {
+				margin-left: 4rem;
+			}
+		}
+
+		&-title {
+			height: @cell-height;
+			display: flex;
+			align-items: center;
+		}
+
+		&-outcome {
+			height: @cell-height;
+			width: @cell-height;
+			border-radius: @cell-radius;
+
+			.theme--light & {
+				background-color: var( --clr-moon-90 );
+			}
+
+			.theme--dark & {
+				background-color: var( --clr-moon-20 );
+			}
+		}
+
+		&-outcome-icon {
+			border-radius: @cell-radius;
+			height: @cell-height;
+			width: @cell-height;
+			text-align: center;
+			font-size: 1rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&--atk {
+				.wiki-valorant & {
+					color: #ffffff;
+					background-color: @valorant-atk;
+				}
+			}
+
+			&--def {
+				.wiki-valorant & {
+					color: #ffffff;
+					background-color: @valorant-def;
+				}
+			}
+		}
+	}
+}
+
+.match-bm-game-summary-team-halves {
+	display: flex;
+
+	@media ( max-width: 767px ) {
+		display: none;
+	}
+
+	&-half {
+		font-weight: bold;
+
+		&--atk {
+			.wiki-valorant & {
+				color: @valorant-atk;
+			}
+		}
+
+		&--def {
+			.wiki-valorant & {
+				color: @valorant-def;
+			}
+		}
 	}
 }
