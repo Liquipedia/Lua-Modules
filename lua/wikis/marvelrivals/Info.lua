@@ -10,7 +10,7 @@ return {
 	startYear = 2024,
 	wikiName = 'marvelrivals',
 	name = 'Marvel Rivals',
-	defaultGame = 'Marvel Rivals',
+	defaultGame = 'marvelrivals',
 	games = {
 		marvelrivals = {
 			abbreviation = 'Marvel Rivals',

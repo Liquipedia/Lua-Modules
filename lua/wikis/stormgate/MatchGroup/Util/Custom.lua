@@ -108,9 +108,6 @@ function CustomMatchGroupUtil.matchFromRecord(record)
 		table.insert(match.vetoes, {map = map, by = by})
 	end
 
-	-- Misc
-	match.casters = Table.extract(extradata, 'casters')
-
 	return match
 end
 

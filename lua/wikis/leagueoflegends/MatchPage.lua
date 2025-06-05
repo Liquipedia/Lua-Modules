@@ -435,7 +435,7 @@ function MatchPage:_renderPlayersPerformance(game)
 	return {
 		HtmlWidgets.H3{children = 'Player Performance'},
 		Div{
-			classes = {'match-bm-lol-players-wrapper'},
+			classes = {'match-bm-players-wrapper'},
 			children = {
 				self:_renderTeamPerformance(game, 1),
 				self:_renderTeamPerformance(game, 2)
@@ -450,7 +450,7 @@ end
 ---@return Widget
 function MatchPage:_renderTeamPerformance(game, teamIndex)
 	return Div{
-		classes = {'match-bm-lol-players-team'},
+		classes = {'match-bm-players-team'},
 		children = WidgetUtil.collect(
 			Div{
 				classes = {'match-bm-players-team-header'},
@@ -470,7 +470,7 @@ end
 ---@return Widget
 function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 	return Div{
-		classes = {'match-bm-lol-players-player'},
+		classes = {'match-bm-players-player match-bm-players-player--col-1'},
 		children = {
 			Div{
 				classes = {'match-bm-lol-players-player-details'},
@@ -491,7 +491,7 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 				}
 			},
 			Div{
-				classes = {'match-bm-lol-players-player-stats'},
+				classes = {'match-bm-players-player-stats match-bm-players-player-stats--col-4'},
 				children = {
 					PlayerStat{
 						title = {KDA_ICON, 'KDA'},
@@ -603,6 +603,10 @@ function MatchPage._buildPlayerLoadout(player)
 			}
 		}
 	}
+end
+
+function MatchPage.getPoweredBy()
+	return 'SAP logo.svg'
 end
 
 return MatchPage
