@@ -68,6 +68,7 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 			return player.team_id == team.team_id
 		end)
 	end)
+	map.region = mapInput.region -- Region from the API is not what we want for region
 	map.matchid = mapInput.matchid
 	map.vod = mapInput.vod
 	map.finished = true
