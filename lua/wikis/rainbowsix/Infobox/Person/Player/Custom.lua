@@ -107,7 +107,7 @@ function CustomInjector:parse(id, widgets)
 
 		-- Active in Games
 		table.insert(widgets, Cell{
-			name = 'Game Appearances', 
+			name = 'Game Appearances',
 			content = GameAppearances.player{player = self.caller.pagename
 		}})
 	elseif id == 'status' then
