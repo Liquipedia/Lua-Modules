@@ -6,6 +6,8 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Image = require('Module:Image')
+
 local MatchPlacement = {}
 
 MatchPlacement.medalIcons = {
@@ -31,11 +33,11 @@ function MatchPlacement.MedalIcon(props)
 	if props.range and props.range[1] == 3 and props.range[2] == 4 then
 		return mw.html.create('span')
 			:attr('title', MatchPlacement.medalTitles.sf)
-			:wikitext('[[File:' .. MatchPlacement.medalIcons.sf .. '|alt=|link=]]')
+			:wikitext(Image.display(MatchPlacement.medalIcons.sf, nil, {link='', alt=MatchPlacement.medalTitles.sf}))
 	elseif 1 <= place and place <= 4 then
 		return mw.html.create('span')
 			:attr('title', MatchPlacement.medalTitles[place])
-			:wikitext('[[File:' .. MatchPlacement.medalIcons[place] .. '|alt=|link=]]')
+			:wikitext(Image.display(MatchPlacement.medalIcons[place], nil, {link='', alt=MatchPlacement.medalTitles[place]}))
 	else
 		return nil
 	end
