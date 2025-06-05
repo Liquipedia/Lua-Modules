@@ -68,7 +68,7 @@ return {
 				playedMatches = 'Matches',
 				playerResults = 'Player Results',
 			},
-			hideOrg = true, -- still in discussion if we want to enable it in the future
+			hideOrg = true,
 		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
