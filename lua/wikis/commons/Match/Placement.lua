@@ -33,11 +33,11 @@ function MatchPlacement.MedalIcon(props)
 	if props.range and props.range[1] == 3 and props.range[2] == 4 then
 		return mw.html.create('span')
 			:attr('title', MatchPlacement.medalTitles.sf)
-			:wikitext(Image.display(MatchPlacement.medalIcons.sf, nil, {link='', alt=MatchPlacement.medalTitles.sf}))
+			:wikitext(Image.display(MatchPlacement.medalIcons.sf, nil, {link=''}))
 	elseif 1 <= place and place <= 4 then
 		return mw.html.create('span')
 			:attr('title', MatchPlacement.medalTitles[place])
-			:wikitext(Image.display(MatchPlacement.medalIcons[place], nil, {link='', alt=MatchPlacement.medalTitles[place]}))
+			:wikitext(Image.display(MatchPlacement.medalIcons[place], nil, {link=''}))
 	else
 		return nil
 	end
