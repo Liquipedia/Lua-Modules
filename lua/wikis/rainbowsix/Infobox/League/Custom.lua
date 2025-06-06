@@ -38,6 +38,7 @@ local PLATFORM_ALIAS = {
 	playstation = 'Playstation',
 	ps = 'Playstation',
 	ps4 = 'Playstation',
+	mobile = 'Mobile',
 }
 
 local UBISOFT_TIERS = {

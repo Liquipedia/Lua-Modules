@@ -10,6 +10,7 @@ local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local CharacterNames = require('Module:CharacterNames')
 local Class = require('Module:Class')
+local GameAppearances = require('Module:Infobox/Extension/GameAppearances')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
@@ -58,12 +59,6 @@ local ROLES = {
 ROLES.entryfragger = ROLES.entry
 ROLES['assistant coach'] = ROLES.coach
 
-local GAMES = {
-	r6s = '[[Rainbow Six Siege|Siege]]',
-	vegas2 = '[[Rainbow Six Vegas 2|Vegas 2]]',
-}
-GAMES.siege = GAMES.r6s
-
 local SIZE_OPERATOR = '25x25px'
 
 ---@class RainbowsixInfoboxPlayer: Person
@@ -111,17 +106,10 @@ function CustomInjector:parse(id, widgets)
 		})
 
 		-- Active in Games
-		local activeInGames = {}
-		Table.iter.forEachPair(GAMES, function(key)
-			if args[key] then
-				table.insert(activeInGames, GAMES[key])
-			end
-		end)
 		table.insert(widgets, Cell{
-			name = #activeInGames > 1 and 'Games' or 'Game',
-			content = activeInGames,
+			name = 'Game Appearances',
+			content = GameAppearances.player{player = caller.pagename}
 		})
-
 	elseif id == 'status' then
 		return {
 			Cell{name = 'Status', content = caller:_getStatusContents()},
