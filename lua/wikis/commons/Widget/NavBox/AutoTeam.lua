@@ -10,8 +10,9 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Array = Lua.import('Module:Array')
-local Logic = Lua.import('Module:Logic')
 local Info = Lua.import('Module:Info', {loadData = true})
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -50,29 +51,26 @@ function AutoTeamNavbox:render()
 	end)
 
 	local activePlayers = Array.filter(activeMembers, function(member)
-		return member.type == 'player' and member.isMain
+		return member.type == 'player'
 	end)
-	local secondaryRosterActivePlayers = Logic.nilIfEmpty(Array.filter(activeMembers, function(member)
-		return member.type == 'player' and not member.isMain
-	end))
+	local activePlayersByGroup = Array.groupBy(activePlayers, Operator.property('group'))
+
 	local activeStaff = Array.filter(activeMembers, function(member)
 		return member.type == 'staff'
 	end)
 	local config = Info.config.teamRosterNavbox or {}
-	if config.staffLimitedPositions then
-		activeStaff = Array.filter(activeStaff, function(member)
-			return Table.includes(config.staffLimitedPositions, member.position)
-		end)
-	end
-
 	local showOrg = not config.hideOrg
 
-	local childrenArray = Array.append({},
-		AutoTeamNavbox._makeLinksChild(team.pageName),
-		AutoTeamNavbox._makeRosterRow(activePlayers, secondaryRosterActivePlayers and 'Main Roster' or 'Roster'),
-		AutoTeamNavbox._makeRosterRow(secondaryRosterActivePlayers, 'Additional Rosters'),
-		showOrg and (AutoTeamNavbox._makeRosterRow(activeStaff, 'Organization')) or nil
+	local childrenArray = Array.extend(
+		{AutoTeamNavbox._makeLinksChild(team.pageName)},
+		Array.map(activePlayersByGroup, function(playerGroup)
+			local name = #activePlayersByGroup == 1 and 'Roster' or (string.upper(playerGroup[1].group) .. ' Roster')
+			return AutoTeamNavbox._makeRosterRow(playerGroup, name)
+		end)
 	)
+	-- can not be added with the `Array.extend`, because it would try to append the items of the org row as children
+	table.insert(childrenArray, showOrg and (AutoTeamNavbox._makeRosterRow(activeStaff, 'Organization')) or nil)
+
 	local children = Table.map(childrenArray, function(index, child) return 'child' .. index, child end)
 
 	return NavBox(Table.merge(children, {

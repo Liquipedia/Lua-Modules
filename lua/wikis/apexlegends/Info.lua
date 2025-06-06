@@ -38,7 +38,6 @@ return {
 		teamRosterNavbox = {
 			hidePlayedMatches = true,
 			excludeStreamers = true,
-			staffLimitedPositions = {'manager', 'coach'},
 		},
 	},
 	defaultRoundPrecision = 0,

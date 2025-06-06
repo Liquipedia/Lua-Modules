@@ -50,6 +50,7 @@ function TeamService.getMembers(team)
 		limit = 5000,
 	})
 	return Array.map(records, function(record)
+		local extradata = record.extradata or {}
 		return {
 			displayName = record.id,
 			pageName = record.link,
@@ -59,8 +60,8 @@ function TeamService.getMembers(team)
 			role = record.role,
 			type = record.type,
 			status = record.status,
-			faction = (record.extradata or {}).faction,
-			isMain = (record.extradata or {}).ismain ~= 'false', -- empty is considered true
+			faction = extradata.faction,
+			isMain = extradata.group or 'main',
 		}
 	end)
 end
