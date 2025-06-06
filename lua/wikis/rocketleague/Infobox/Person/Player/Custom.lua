@@ -130,10 +130,6 @@ function CustomInjector:parse(id, widgets)
 			getHistoryCells('history_irc', '[[Italian Rocket Championship]] History'),
 			getHistoryCells('history_elite_series', '[[Elite Series]] History')
 		)
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Current Role', content = {args.role}},
-		}
 	elseif id == 'nationality' then
 		return {
 			Cell{name = 'Location', content = {args.location}},
@@ -240,8 +236,6 @@ end
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.status = lpdbData.status or 'Unknown'
-
-	lpdbData.extradata.role = args.role
 
 	local birthMonthAndDay = string.match(args.birth_date or '', '%-%d%d?%-%d%d?$')
 	birthMonthAndDay = string.gsub(birthMonthAndDay or '', '^%-', '')
