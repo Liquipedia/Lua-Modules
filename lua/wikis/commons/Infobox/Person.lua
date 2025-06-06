@@ -317,10 +317,14 @@ function Person:_setLpdbData(args, links, status, personType)
 		teamTemplate = teamRaw.templatename
 	end
 
-	local legacyRoleValue = function(roleData)
+	local roleStorageValue = function(roleData)
 		if not roleData then return end
-		return string.lower(roleData.category or roleData.display or '')
+		return Table.uniqueKey(Table.filter(Roles.All, function(role)
+			return role == roleData
+		end))
 	end
+
+	local rolesStorageKey = Array.map(self.roles, roleStorageValue)
 
 	local lpdbData = {
 		id = args.id,
@@ -347,10 +351,10 @@ function Person:_setLpdbData(args, links, status, personType)
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
-			role = legacyRoleValue(self.roles[1]), -- Backwards compatibility
-			role2 = legacyRoleValue(self.roles[2]), -- Backwards compatibility
-			role3 = legacyRoleValue(self.roles[3]), -- Backwards compatibility
-			roles = self.roles,
+			role = rolesStorageKey[1], -- Backwards compatibility
+			role2 = rolesStorageKey[2], -- Backwards compatibility
+			role3 = rolesStorageKey[3], -- Backwards compatibility
+			roles = rolesStorageKey,
 		},
 	}
 
