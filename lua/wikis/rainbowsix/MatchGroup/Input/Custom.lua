@@ -105,10 +105,8 @@ function MapFunctions.getExtraData(match, map, opponents)
 	---@param opponentIndex integer
 	---@return string?
 	local getFirstSide = function(opponentIndex)
-		if opponentIndex == 1 and map.t1firstside == 'atk' then
-			return 'atk'
-		elseif opponentIndex == 1 and map.t1firstside == 'def' then
-			return 'def'
+		if opponentIndex == 1 then
+			return map.t1firstside
 		elseif opponentIndex == 2 and map.t1firstside == 'atk' then
 			return 'def'
 		elseif opponentIndex == 2 and map.t1firstside == 'def' then
