@@ -319,9 +319,7 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	local roleStorageValue = function(roleData)
 		if not roleData then return end
-		return Table.uniqueKey(Table.filter(Roles.All, function(role)
-			return role == roleData
-		end))
+		return Table.getKeyOfValue(Roles.All, roleData)
 	end
 
 	local rolesStorageKey = Array.map(self.roles, roleStorageValue)
