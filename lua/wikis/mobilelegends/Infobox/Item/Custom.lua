@@ -156,9 +156,9 @@ function CustomItem:_getCostDisplay()
 	local recipeCost = Abbreviation.make{text = self.args.recipecost, title = 'Recipe cost'}
 
 	if String.isNotEmpty(recipeCost) then
-		return CostDisplay.display('gold', '15px', itemCost) .. ' (' .. recipeCost .. ')'
+		return CostDisplay.run('gold', itemCost) .. ' (' .. recipeCost .. ')'
 	end
-	return CostDisplay.display('gold', '15px', itemCost)
+	return CostDisplay.run('gold', itemCost)
 end
 
 ---@return string?
@@ -170,7 +170,7 @@ function CustomItem:_getSellValueDisplay()
 	if sellRate == 0 then
 		return 'Unsellable'
 	end
-	return CostDisplay.display('gold', '15px', sellValue)
+	return CostDisplay.run('gold', sellValue)
 end
 
 ---@param caller MobilelegendsItemInfobox
