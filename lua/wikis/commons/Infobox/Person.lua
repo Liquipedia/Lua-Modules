@@ -521,6 +521,7 @@ function Person._createRoleData(roleKey)
 
 	--- Backwards compatibility for old roles
 	if not roleData then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid role input')
 		local display = String.upperCaseFirst(roleKey)
 		return {
 			display = display,
