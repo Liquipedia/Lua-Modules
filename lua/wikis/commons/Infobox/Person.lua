@@ -26,6 +26,8 @@ local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
+local Roles = Lua.import('Module:Roles')
+
 local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -64,7 +66,6 @@ local STATUS_TRANSLATE = {
 }
 
 local BANNED = 'banned' -- Temporary until conversion
-local Roles = Lua.import('Module:Roles')
 
 ---@param frame Frame
 ---@return Html
@@ -137,7 +138,7 @@ function Person:createInfobox()
 			end}
 		}},
 		Cell{name = 'Alternate IDs', content = {
-				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
+				table.concat(Array.parseCommaSeparatedString(args.ids or ''), ', ')
 			}
 		},
 		Cell{name = 'Nickname(s)', content = {args.nicknames}},
@@ -310,7 +311,7 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	local teamRaw = team and mw.ext.TeamTemplate.raw(team)
+	local teamRaw = team and mw.ext.TeamTemplate.raw(team) or nil
 	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
@@ -362,9 +363,8 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
-	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. args.id, Json.stringifySubTables(lpdbData))
+	mw.ext.LiquipediaDB.lpdb_player(string.lower(personType) .. '_' .. args.id, Json.stringifySubTables(lpdbData))
 end
 
 -- Allows this function to be used in /Custom
@@ -394,15 +394,6 @@ function Person:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
----@param args table
----@param personType string
----@param status string
----@return string
-function Person:getStorageType(args, personType, status)
-	return string.lower(personType)
-end
-
---- Allows for overriding this functionality
 ---@param lpdbData table
 ---@param args table
 ---@param personType string
@@ -412,21 +403,17 @@ function Person:adjustLPDB(lpdbData, args, personType)
 end
 
 --- Allows for overriding this functionality
+--- Default implemenation determines the personType based on the first role.
 ---@param args table
 ---@return {store: string, category: string}
 function Person:getPersonType(args)
 	local playerValue = {store = 'player', category = 'Player'}
 	local staffValue = {store = 'staff', category = 'Staff'}
-	local inGameRoles = Roles.InGameRoles
 
-	local isStaff = not Array.any(self.roles, function(roleData)
-		local lookUpKey = Table.uniqueKey(Table.filter(Roles.All, function(data)
-			return data == roleData
-		end))
-		return not inGameRoles or not inGameRoles[lookUpKey]
-	end)
-
-	return isStaff and staffValue or playerValue
+	if self.roles[1] and Table.includes(Roles.StaffRoles, self.roles[1]) then
+		return staffValue
+	end
+	return playerValue
 end
 
 --- Allows for overriding this functionality
@@ -463,9 +450,11 @@ function Person:nameDisplay(args)
 	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
+
 	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
 	local icon2 = mw.ext.TeamTemplate.teamexists(team2)
 		and mw.ext.TeamTemplate.teamicon(team2) or ''
+
 	local name = args.id or mw.title.getCurrentTitle().text
 
 	local display = name
