@@ -288,14 +288,20 @@ function ParticipantTable:store()
 
 	local placements = self:getPlacements()
 
+	---@param section ParticipantTableSection
+	---@param opponent standardOpponent
+	---@return boolean
+	local shouldStoreOpponent = function(section, opponent)
+		return section.config.noStorage or
+			opponent.type == Opponent.team or
+			Opponent.isTbd(opponent) or
+			Opponent.isEmpty(opponent)
+	end
+
 	Array.forEach(self.sections, function(section) Array.forEach(section.entries, function(entry)
-		local opponent = entry.opponent
-		-- do not store team opponents
-		if opponent.type == Opponent.team then return end
-		local lpdbData = Opponent.toLpdbStruct(opponent)
+		if shouldStoreOpponent(section, entry.opponent) then return end
 
-		if section.config.noStorage or Opponent.isTbd(opponent) or Opponent.isEmpty(opponent) then return end
-
+		local lpdbData = Opponent.toLpdbStruct(entry.opponent)
 		local pageNameWithUnderscores = (lpdbData.opponentname or ''):gsub(' ', '_')
 		local pageNameWithSpaces = (lpdbData.opponentname or ''):gsub('_', ' ')
 		local placement = placements[pageNameWithUnderscores] or placements[pageNameWithSpaces]
