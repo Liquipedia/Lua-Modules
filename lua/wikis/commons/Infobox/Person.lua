@@ -580,6 +580,10 @@ function Person:getCategories(args, birthDisplay, personType, status)
 		status .. ' ' .. personType .. 's'
 	)
 
+	categories = Array.extend(categories, Array.map(self.roles, function(roleData)
+		return roleData.category
+	end))
+
 	if
 		not self.nonRepresenting and (args.country2 or args.nationality2)
 		or args.country3
