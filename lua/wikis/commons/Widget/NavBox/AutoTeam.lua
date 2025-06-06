@@ -13,9 +13,11 @@ local Array = Lua.import('Module:Array')
 local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
+local WidgetUtil = Lua.import('Module:Widget/Util')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
@@ -61,15 +63,14 @@ function AutoTeamNavbox:render()
 	local config = Info.config.teamRosterNavbox or {}
 	local showOrg = not config.hideOrg
 
-	local childrenArray = Array.extend(
+	local childrenArray = WidgetUtil.collect(
 		{AutoTeamNavbox._makeLinksChild(team.pageName)},
 		Array.map(activePlayersByGroup, function(playerGroup)
-			local name = #activePlayersByGroup == 1 and 'Roster' or (string.upper(playerGroup[1].group) .. ' Roster')
+			local name = #activePlayersByGroup == 1 and 'Roster' or (String.upperCaseFirst(playerGroup[1].group) .. ' Roster')
 			return AutoTeamNavbox._makeRosterRow(playerGroup, name)
-		end)
+		end),
+		showOrg and (AutoTeamNavbox._makeRosterRow(activeStaff, 'Organization')) or nil
 	)
-	-- can not be added with the `Array.extend`, because it would try to append the items of the org row as children
-	table.insert(childrenArray, showOrg and (AutoTeamNavbox._makeRosterRow(activeStaff, 'Organization')) or nil)
 
 	local children = Table.map(childrenArray, function(index, child) return 'child' .. index, child end)
 
