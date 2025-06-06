@@ -291,7 +291,7 @@ function ParticipantTable:store()
 	---@param section ParticipantTableSection
 	---@param opponent standardOpponent
 	---@return boolean
-	local shouldStoreOpponent = function(section, opponent)
+	local shouldNotStoreOpponent = function(section, opponent)
 		return section.config.noStorage or
 			opponent.type == Opponent.team or
 			Opponent.isTbd(opponent) or
@@ -299,7 +299,7 @@ function ParticipantTable:store()
 	end
 
 	Array.forEach(self.sections, function(section) Array.forEach(section.entries, function(entry)
-		if shouldStoreOpponent(section, entry.opponent) then return end
+		if shouldNotStoreOpponent(section, entry.opponent) then return end
 
 		local lpdbData = Opponent.toLpdbStruct(entry.opponent)
 		local pageNameWithUnderscores = (lpdbData.opponentname or ''):gsub(' ', '_')
