@@ -319,7 +319,12 @@ function Person:_setLpdbData(args, links, status, personType)
 
 	local roleStorageValue = function(roleData)
 		if not roleData then return end
-		return Table.getKeyOfValue(Roles.All, roleData)
+		local key = Table.getKeyOfValue(Roles.All, roleData)
+		if not key then
+			-- Backwards compatibility for old roles
+			return roleData.display or roleData.category or ''
+		end
+		return key
 	end
 
 	local rolesStorageKey = Array.map(self.roles, roleStorageValue)

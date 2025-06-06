@@ -9,9 +9,9 @@
 ---@type PersonRoleData
 local inGameRoles = {
 	['top'] = {category = 'Top Laners', display = 'Top Lane'},
-	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Lane'},
-	['mid'] = {category = 'Mid Laners', display = 'Mid Lane'},
-	['side lane'] = {category = 'Side Laners', display = 'Side Lane'},
+	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner'},
+	['mid'] = {category = 'Mid Laners', display = 'Mid Laner'},
+	['side lane'] = {category = 'Side Laners', display = 'Side Laner'},
 	['jungler'] = {category = 'Junglers', display = 'Jungler'},
 	['roamer'] = {category = 'Roamers', display = 'Roamer'},
 }
