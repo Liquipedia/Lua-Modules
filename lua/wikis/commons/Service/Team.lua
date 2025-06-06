@@ -61,7 +61,7 @@ function TeamService.getMembers(team)
 			type = record.type,
 			status = record.status,
 			faction = extradata.faction,
-			isMain = extradata.group or 'main',
+			group = extradata.group or 'main',
 		}
 	end)
 end
