@@ -172,10 +172,10 @@ function ParticipantTable:readSection(args)
 	local tbds = {}
 	Table.mapArgumentsByPrefix(args, {'p', 'player'}, function(key, index)
 		local entry = self:readEntry(args, key, index, config)
-		entry.sortName = Opponent.toName(entry.opponent) or entry.opponent.template
+		entry.sortName = Opponent.toName(entry.opponent)
 
 		if entry.opponent and Opponent.isTbd(entry.opponent) then
-			entry.name = Opponent.toName(entry.opponent) or entry.opponent.template
+			entry.name = Opponent.toName(entry.opponent)
 			table.insert(tbds, entry)
 			--needed so index is increased
 			return entry
@@ -186,7 +186,7 @@ function ParticipantTable:readSection(args)
 			overwritePageVars = true,
 		})
 		entry.isResolved = true
-		entry.name = Opponent.toName(entry.opponent) or entry.opponent.template
+		entry.name = Opponent.toName(entry.opponent)
 
 		if entriesByName[entry.name] then
 			error('Duplicate Input "|' .. key .. '=' .. args[key] .. '"')
@@ -199,12 +199,12 @@ function ParticipantTable:readSection(args)
 	end)
 
 	section.entries = Array.map(Import.importFromMatchGroupSpec(config, entriesByName), function(entry)
-		entry.sortName = entry.sortName or Opponent.toName(entry.opponent) or entry.opponent.template
+		entry.sortName = entry.sortName or Opponent.toName(entry.opponent)
 		entry.opponent = entry.isResolved and entry.opponent or Opponent.resolve(entry.opponent, config.resolveDate, {
 			syncPlayer = config.syncPlayers,
 			overwritePageVars = true,
 		})
-		entry.name = entry.name or Opponent.toName(entry.opponent) or entry.opponent.template
+		entry.name = entry.name or Opponent.toName(entry.opponent)
 		entry.isResolved = true
 		self:setCustomPageVariables(entry, config)
 		return entry
