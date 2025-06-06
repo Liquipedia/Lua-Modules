@@ -103,7 +103,7 @@ function WikiCopyPaste.getMatchCode(bestof, mode, index, opponents, args)
 	end
 
 	local operatorBanParams = function(opponentIndex)
-		return INDENT .. INDENT .. table.concat(Array.map(Array.rang(1, numberOfOperatorBans), function(banIndex)
+		return INDENT .. INDENT .. table.concat(Array.map(Array.range(1, numberOfOperatorBans), function(banIndex)
 			return '|t' .. opponentIndex .. 'ban' .. banIndex .. '='
 		end))
 	end
