@@ -410,7 +410,7 @@ function Person:adjustLPDB(lpdbData, args, personType)
 end
 
 --- Allows for overriding this functionality
---- Default implemenation determines the personType based on the first role.
+--- Default implementation determines the personType based on the first role.
 ---@param args table
 ---@return {store: string, category: string}
 function Person:getPersonType(args)

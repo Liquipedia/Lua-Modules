@@ -251,7 +251,7 @@ function CustomPlayer:getWikiCategories(categories)
 		if self:getPersonType(self.args).store == 'player' then
 			table.insert(categories, gameName .. ' Players')
 		end
-		-- TODO: Should seperate talent out of other staff
+		-- TODO: Should separate talent out of other staff
 		if self:getPersonType(self.args).store == 'staff' or #self.roles > 1 then
 			table.insert(categories, gameName .. ' Talent')
 		end
