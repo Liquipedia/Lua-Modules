@@ -8,6 +8,7 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
+local Table = require('Module:Table')
 
 local MatchGroupLegacy = Lua.import('Module:MatchGroup/Legacy')
 
@@ -50,6 +51,9 @@ end
 ---@param isReset boolean
 ---@param match table
 function MatchGroupLegacyDefault:handleOtherMatchParams(isReset, match)
+	for _, map in Table.iter.pairsByPrefix(match, 'map') do
+		map.bantype = 'siege'
+	end
 	local opp1score, opp2score = (match.opponent1 or {}).score, (match.opponent2 or {}).score
 	-- Legacy maps are Bo10 or Bo12, while >Bo5 in legacy matches are non existent
 	-- Let's assume that if the sum of the scores is less than 6, it's a match, otherwise it's a map
