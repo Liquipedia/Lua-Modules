@@ -10,6 +10,7 @@ local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
 local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
 local Namespace = Lua.import('Module:Namespace')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
@@ -56,7 +57,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 	local listsOfPageNames = {}
 	table.insert(listsOfPageNames, args.tournament)
 	for _, pageNamesInput in Table.iter.pairsByPrefix(args, 'tournament') do
-		table.insert(listsOfPageNames, Array.parseCommaSeparatedString(pageNamesInput, '||'))
+		table.insert(listsOfPageNames, Json.parseIfTable(pageNamesInput) or {pageNamesInput})
 	end
 
 	local function resolve(rawPageName)
@@ -117,7 +118,7 @@ end)
 function TournamentStructure.groupByStage(groupTables, brackets, spec)
 	local function getStageKey(recordGroup)
 		local calculatedStageIndex = recordGroup[1].calculatedStageIndex
-		local pageName = table.concat(spec.pageNames[calculatedStageIndex] or {recordGroup[1].pagename}, '||')
+		local pageName = table.concat(spec.pageNames[calculatedStageIndex] or {recordGroup[1].pagename})
 		return {
 			recordGroup[1].stageIndex or -1,
 			pageName,
