@@ -49,7 +49,7 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Widget?
 function CustomTeam:createBottomContent()
 	if not self.args.disbanded then
 		return UpcomingTournaments{name = self.pagename}
