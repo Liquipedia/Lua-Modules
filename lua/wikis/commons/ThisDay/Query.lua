@@ -9,6 +9,8 @@
 local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
+local Patch = Lua.import('Module:Patch')
+
 local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
@@ -46,22 +48,20 @@ end
 --- Queries patch data
 ---@param month integer
 ---@param day integer
----@return datapoint[]
+---@return StandardPatch[]
 function ThisDayQuery.patch(month, day)
-	local conditions = ConditionTree(BooleanOperator.all)
-		:add{
-			ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
-			ConditionNode(ColumnName('date_month'), Comparator.eq, month),
-			ConditionNode(ColumnName('date_day'), Comparator.eq, day),
-			ConditionNode(ColumnName('type'), Comparator.eq, 'patch'),
-		}
+	local conditions = {
+		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDate),
+		ConditionNode(ColumnName('month', 'date'), Comparator.eq, month),
+		ConditionNode(ColumnName('day', 'date'), Comparator.eq, day),
+	}
 
-	return mw.ext.LiquipediaDB.lpdb('datapoint', {
+	return Patch.queryPatches{
 		limit = 5000,
-		conditions = conditions:toString(),
+		conditions = conditions,
 		query = 'pagename, name, date',
 		order = 'date asc, name asc'
-	})
+	}
 end
 
 --- Queries tournament win data

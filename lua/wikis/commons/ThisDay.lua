@@ -131,13 +131,13 @@ function ThisDay.patch(args)
 		return
 	end
 	local lines = Array.map(patchData, function (patch)
-		local patchYear = patch.date:sub(1, 4)
+		local patchYear = patch.releaseDate.year
 		return {
 			HtmlWidgets.B{
 				children = {patchYear}
 			},
 			': ',
-			Link{link = patch.pagename, children = patch.name},
+			Link{link = patch.pageName, children = patch.displayName},
 			' released'
 		}
 	end)
