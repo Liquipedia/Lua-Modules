@@ -7,8 +7,8 @@
 
 local Lua = require('Module:Lua')
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
 local Info = Lua.import('Module:Info', {loadData = true})
 
 local Condition = Lua.import('Module:Condition')

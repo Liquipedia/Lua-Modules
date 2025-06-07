@@ -6,9 +6,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DateExt = require('Module:Date/Ext')
 local Lua = require('Module:Lua')
 
+local DateExt = Lua.import('Module:Date/Ext')
 local Patch = Lua.import('Module:Patch')
 
 local Condition = Lua.import('Module:Condition')
