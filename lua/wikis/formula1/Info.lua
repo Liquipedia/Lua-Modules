@@ -38,5 +38,8 @@ return {
 		transfers = {
 			showTeamName = true,
 		},
+		teamRosterNavbox = {
+			hideOverview = true,
+		},
 	},
 }

@@ -36,6 +36,11 @@ return {
 			status = 2,
 			matchWidth = 150,
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
 	},
 	defaultRoundPrecision = 0,
 }

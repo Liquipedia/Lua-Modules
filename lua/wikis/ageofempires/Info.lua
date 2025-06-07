@@ -109,5 +109,10 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
 	},
 }
