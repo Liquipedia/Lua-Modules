@@ -8,25 +8,15 @@
 
 local Lua = require('Module:Lua')
 
-local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
-local LeagueIcon = Lua.import('Module:LeagueIcon')
 local Logic = Lua.import('Module:Logic')
 local String = Lua.import('Module:StringUtils')
-local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 
-local ThisDayQuery = Lua.import('Module:ThisDay/Query')
-
-local OpponentLibraries = Lua.import('Module:OpponentLibraries')
-local Opponent = OpponentLibraries.Opponent
-local OpponentDisplay = OpponentLibraries.OpponentDisplay
-
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayBirthday = Lua.import('Module:Widget/ThisDay/Birthday')
 local ThisDayPatch = Lua.import('Module:Widget/ThisDay/Patch')
-local UnorderedList = Lua.import('Module:Widget/List/Unordered')
+local ThisDayTournament = Lua.import('Module:Widget/ThisDay/Tournament')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 ---@class ThisDayConfig
@@ -49,10 +39,7 @@ local ThisDay = {}
 ---@param args table
 ---@return Widget
 function ThisDay.run(args)
-	local tournaments = {
-		HtmlWidgets.H3{children = 'Tournaments'},
-		ThisDay.tournament(args)
-	}
+	local tournaments = ThisDay.tournament(args)
 	local birthdays = ThisDay.birthday(args)
 	local patches = ThisDay.patch(args)
 	local trivia = Config.showTrivia and ThisDay.trivia(args) or nil
@@ -93,63 +80,12 @@ end
 ---@param args ThisDayParameters
 ---@return string|Widget?
 function ThisDay.tournament(args)
-	local tournamentWinData = ThisDayQuery.tournament(ThisDay._readDate(args))
+	local month, day = ThisDay._readDate(args)
 
-	if Logic.isEmpty(tournamentWinData) then
-		return 'No tournament ended on this date'
-	end
-	local _, byYear = Array.groupBy(tournamentWinData, function(placement) return placement.date:sub(1, 4) end)
-
-	local display = {}
-	for year, yearData in Table.iter.spairs(byYear) do
-		Array.appendWith(display,
-			HtmlWidgets.H4{
-				children = { year }
-			},
-			'\n',
-			ThisDay._displayWins(yearData)
-		)
-	end
-	mw.logObject(display)
-	return HtmlWidgets.Fragment{children = display}
-end
-
---- Display win rows of a year
----@param yearData placement[]
----@return Widget?
-function ThisDay._displayWins(yearData)
-	local display = Array.map(yearData, function (placement)
-		local displayName = placement.shortname
-		if String.isEmpty(displayName) then
-			displayName = placement.tournament
-			if String.isEmpty(displayName) then
-				displayName = string.gsub(placement.pagename, '_', ' ')
-			end
-		end
-
-		local row = {
-			LeagueIcon.display{
-				icon = placement.icon,
-				iconDark = placement.icondark,
-				link = placement.pagename,
-				date = placement.date,
-				series = placement.series,
-				name = placement.shortname,
-			},
-			' ',
-			Link{ link = placement.pagename, children = displayName },
-			' won by '
-		}
-
-		local opponent = Opponent.fromLpdbStruct(placement)
-
-		if not opponent then
-			mw.logObject(placement)
-		end
-		return Array.append(row, OpponentDisplay.InlineOpponent{opponent = opponent})
-	end)
-
-	return UnorderedList{ children = display }
+	return ThisDayTournament{
+		month = month,
+		day = day
+	}
 end
 
 --- Reads trivia from subpages of 'Liquipedia:This day'
