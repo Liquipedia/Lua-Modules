@@ -16,7 +16,6 @@ local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Template = Lua.import('Module:Template')
 
-local AgeCalculation = Lua.import('Module:AgeCalculation')
 local ThisDayQuery = Lua.import('Module:ThisDay/Query')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
@@ -25,6 +24,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
+local ThisDayBirthday = Lua.import('Module:Widget/ThisDay/Birthday')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -40,24 +40,20 @@ local Config = Lua.import('Module:ThisDay/config', {loadData = true})
 
 ---@class ThisDayParameters
 ---@field date string?
----@field month string|integer|nil
----@field day string|integer|nil
+---@field month integer?
+---@field day integer?
 
 local ThisDay = {}
 
 ---@param args table
 ---@return Widget
 function ThisDay.run(args)
-	local birthdaysList = ThisDay.birthday(args)
 	local patchesList = ThisDay.patch(args)
 	local tournaments = {
 		HtmlWidgets.H3{children = 'Tournaments'},
 		ThisDay.tournament(args)
 	}
-	local birthdays = birthdaysList and {
-		HtmlWidgets.H3{children = 'Birthdays'},
-		ThisDay.birthday(args)
-	}
+	local birthdays = ThisDay.birthday(args)
 	local patches = patchesList and {
 		HtmlWidgets.H3{children = 'Patches'},
 		patchesList
@@ -68,56 +64,18 @@ function ThisDay.run(args)
 	}
 end
 
----@class ThisDayBirthdayParameters: ThisDayParameters
----@field noTwitter boolean?
-
 --- Get and display birthdays that happened on a given date (falls back to today)
 ---@param args ThisDayBirthdayParameters
 ---@return string|Widget?
 function ThisDay.birthday(args)
-	local birthdayData = ThisDayQuery.birthday(ThisDay._readDate(args))
+	local month, day = ThisDay._readDate(args)
 
-	if Logic.isEmpty(birthdayData) then
-		if Config.hideEmptyBirthdayList then return end
-		return 'There are no birthdays today'
-	end
-
-	local lines = Array.map(birthdayData, function (player)
-		local playerAge = AgeCalculation.raw{birthdate = player.birthdate}
-		local playerData = {
-			displayName = player.id,
-			flag = player.nationality,
-			pageName = player.pagename,
-			faction = (player.extradata or {}).faction,
-		}
-		local line = {
-			OpponentDisplay.InlineOpponent{
-				opponent = {players = {playerData}, type = Opponent.solo}
-			},
-			' - ',
-			playerAge.birthDate.year .. ' (age ' .. playerAge:calculate() .. ')'
-		}
-
-		if String.isNotEmpty((player.links or {}).twitter) and not Logic.readBool(args.noTwitter) then
-			Array.appendWith(
-				line,
-				' ',
-				HtmlWidgets.I{
-					classes = {'lp-icon', 'lp-icon-25', 'lp-twitter', 'share-birthday'},
-					attributes = {
-						['data-url'] = player.links.twitter,
-						['data-page'] = player.pagename,
-						title = 'Send a message to ' .. player.id .. ' about their birthday!'
-					},
-					css = {cursor = 'pointer'}
-				}
-			)
-		end
-
-		return line
-	end)
-
-	return UnorderedList{ children = lines }
+	return ThisDayBirthday{
+		month = month,
+		day = day,
+		hideIfEmpty = Config.hideEmptyBirthdayList,
+		noTwitter = args.noTwitter
+	}
 end
 
 --- Get and display patches that happened on a given date (falls back to today)
