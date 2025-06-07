@@ -25,6 +25,7 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local ThisDayBirthday = Lua.import('Module:Widget/ThisDay/Birthday')
+local ThisDayPatch = Lua.import('Module:Widget/ThisDay/Patch')
 local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -48,16 +49,12 @@ local ThisDay = {}
 ---@param args table
 ---@return Widget
 function ThisDay.run(args)
-	local patchesList = ThisDay.patch(args)
 	local tournaments = {
 		HtmlWidgets.H3{children = 'Tournaments'},
 		ThisDay.tournament(args)
 	}
 	local birthdays = ThisDay.birthday(args)
-	local patches = patchesList and {
-		HtmlWidgets.H3{children = 'Patches'},
-		patchesList
-	} or {}
+	local patches = ThisDay.patch(args)
 	local trivia = Config.showTrivia and ThisDay.trivia(args) or nil
 	return HtmlWidgets.Fragment{
 		children = WidgetUtil.collect(tournaments, birthdays, patches, trivia)
@@ -80,28 +77,16 @@ end
 
 --- Get and display patches that happened on a given date (falls back to today)
 ---@param args ThisDayParameters
----@return string|Widget?
+---@return Widget?
 function ThisDay.patch(args)
 	if not Config.showPatches then return end
-	local patchData = ThisDayQuery.patch(ThisDay._readDate(args))
+	local month, day = ThisDay._readDate(args)
 
-	if Logic.isEmpty(patchData) then
-		if Config.showEmptyPatchList then return 'There were no patches on this day' end
-		return
-	end
-	local lines = Array.map(patchData, function (patch)
-		local patchYear = patch.releaseDate.year
-		return {
-			HtmlWidgets.B{
-				children = {patchYear}
-			},
-			': ',
-			Link{link = patch.pageName, children = patch.displayName},
-			' released'
-		}
-	end)
-
-	return UnorderedList{ children = lines }
+	return ThisDayPatch{
+		month = month,
+		day = day,
+		hideIfEmpty = not Config.showEmptyPatchList
+	}
 end
 
 --- Get and display tournament wins that happened on a given date (falls back to today)
