@@ -25,6 +25,7 @@ local UnorderedList = Lua.import('Module:Widget/List/Unordered')
 local Widget = Lua.import('Module:Widget')
 
 local HEADER = HtmlWidgets.H3{children = 'Birthdays'}
+local TODAY = os.date("*t")
 
 ---@class ThisDayBirthdayParameters: ThisDayParameters
 ---@field hideIfEmpty boolean?
@@ -34,6 +35,10 @@ local HEADER = HtmlWidgets.H3{children = 'Birthdays'}
 ---@operator call(table): ThisDayBirthday
 ---@field props ThisDayBirthdayParameters
 local ThisDayBirthday = Class.new(Widget)
+ThisDayBirthday.defaultProps = {
+	month = TODAY.month,
+	day = TODAY.day
+}
 
 ---@return (string|Widget)[]?
 function ThisDayBirthday:render()
