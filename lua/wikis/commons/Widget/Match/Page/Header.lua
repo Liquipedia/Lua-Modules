@@ -12,6 +12,8 @@ local Image = require('Module:Image')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
+local OpponentDisplay = Lua.import('Module:OpponentLibraries').OpponentDisplay
+
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -47,7 +49,7 @@ function MatchPageHeader:_makeResultDisplay()
 		classes = { 'match-bm-match-header-result' },
 		children = WidgetUtil.collect(
 			(self.props.isBestOfOne or phase == 'upcoming') and '' or (
-				opponent1.score .. '&ndash;' .. opponent2.score),
+				OpponentDisplay.InlineScore(opponent1) .. '&ndash;' .. OpponentDisplay.InlineScore(opponent2)),
 			Div{
 				classes = { 'match-bm-match-header-result-text' },
 				children = { phase == 'ongoing' and 'live' or phase }
