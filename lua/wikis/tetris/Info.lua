@@ -3,7 +3,7 @@
 -- wiki=tetris
 -- page=Module:Info
 --
--- Please see https://github.com/Liquipedia/Lua-Modules/blob/main/lua/wikis/tetris/Info.lua to contribute
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 return {
