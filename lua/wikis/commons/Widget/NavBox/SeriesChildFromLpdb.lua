@@ -23,7 +23,6 @@ local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local Link = Lua.import('Module:Widget/Basic/Link')
 local Widget = Lua.import('Module:Widget')
 
 ---@class SeriesChildFromLpdb: Widget
@@ -40,7 +39,7 @@ function SeriesChildFromLpdb:render()
 	---@return integer?
 	local getSeriesNumber = function(tournament)
 		return tonumber((tournament.extradata or {}).seriesnumber)
-			or tonumber((tournament.pageName:gsub('/(%d+)$', '%1')))
+			or tonumber((tournament.pageName:gsub('.*/(%d+)$', '%1')))
 	end
 
 	---@param tournament StandardTournament
@@ -61,8 +60,13 @@ function SeriesChildFromLpdb:render()
 	local tournaments = Tournament.getAllTournaments(self:_makeConditions(), filterbyLimitAndOffSet)
 
 	local elements = Array.map(tournaments, function(tournament)
-		return Link{link = tournament.pageName, children = {'#' .. (getSeriesNumber(tournament))}}
+		-- can not use `Link` Widget due to `Json.stringify` below
+		return Page.makeInternalLink({}, '#' .. getSeriesNumber(tournament), tournament.pageName)
 	end)
+
+	if Logic.nilOr(Logic.readBool(props.newestFirst)) then
+		elements = Array.reverse(elements)
+	end
 
 	return Json.stringify(Table.merge(props, elements))
 end
