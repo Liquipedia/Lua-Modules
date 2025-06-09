@@ -33,6 +33,7 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field name string?
 ---@field mobileName string?
 ---@field title string?
+---@field mobileTitle string?
 ---@field titleLink string?
 ---@field collapsed boolean? # from wiki input string?
 ---@field center boolean? # from wiki input string?
@@ -45,6 +46,8 @@ local EMPTY_CHILD_ERROR = 'Empty child found'
 ---@field imageleftsize string?
 ---@field imagelink string?
 ---@field imagedarklink string?
+---@field imageHideOnMobile boolean? # from wiki input string?
+---@field imageleftHideOnMobile boolean? # from wiki input string?
 ---@field child1 string|NavBoxChildProps?
 ---@field child2 string|NavBoxChildProps?
 ---@field child3 string|NavBoxChildProps? # childX for X >=4 is supported too
@@ -111,13 +114,26 @@ function NavBoxChild:render()
 			(props.title or shouldCollapse) and Tr{children = {Th{
 				attributes = {colspan = colSpan},
 				classes = {'navbox-title'},
-				children = {
-					props.title and props.titleLink and Link{link = props.titleLink, children = {props.title}} or
-						props.title or 'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'
-				},
+				children = NavBoxChild.buildTitleText(props),
 			}}} or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
+	}
+end
+
+---@param props table
+---@return (string|Widget)[]
+function NavBoxChild.buildTitleText(props)
+	if not props.title then
+		return {'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'}
+	end
+	local titleLink = props.titleLink
+	local titleText = titleLink and Link{link = titleLink, children = {props.title}} or props.title
+	local mobileTitle = props.mobileTitle and titleLink and Link{link = titleLink, children = {props.mobileTitle}}
+		or props.mobileTitle
+	return {
+		mobileTitle and Span{children = titleText, classes = {'mobile-hide'}} or titleText,
+		mobileTitle and Span{children = mobileTitle, classes = {'mobile-only'}} or nil,
 	}
 end
 
@@ -170,6 +186,7 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 	local lightMode = props[prefix]
 	local darkMode = props[prefix .. 'dark']
 	local padding = isLeft and '0 2px 0 0' or '0 0 0 2px'
+	local hideOnMobile = Logic.readBool(props[prefix .. 'HideOnMobile'])
 
 	if childIndex ~= 1 or not (lightMode or darkMode) then
 		return
@@ -177,7 +194,10 @@ function NavBoxChild:_makeImage(childIndex, isLeft)
 
 	return Td{
 		attributes = {rowspan = self.rowSpan},
-		classes = {'navbox-image'},
+		classes = {
+			'navbox-image',
+			hideOnMobile and 'mobile-hide' or nil,
+		},
 		css = {width = '1px', padding = padding},
 		children = Div{children = {
 			Image.display(

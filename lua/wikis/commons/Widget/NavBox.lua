@@ -21,7 +21,6 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local B = HtmlWidgets.B
 local Div = HtmlWidgets.Div
 local Widget = Lua.import('Module:Widget')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
@@ -48,18 +47,19 @@ function NavBox:render()
 		return Json.stringify(props)
 	end
 
-	assert(props.title, 'Missing title input')
 	assert(props.child1, 'No children inputted')
 
 	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
 
+	local title = NavBoxChild.buildTitleText(props)
+
 	-- have to extract so the child doesn't add the header too ...
-	local title = Table.extract(self.props, 'title')
-	assert(title, 'Missing "|title="')
+	local titleInput = Table.extract(props, 'title')
+	assert(titleInput, 'Missing "|title="')
 
 	return Collapsible{
 		attributes = {
-			['aria-labelledby'] = title:gsub(' ', '_'),
+			['aria-labelledby'] = titleInput:gsub(' ', '_'),
 			role = 'navigation',
 			['data-nosnippet'] = 0,
 		},
@@ -69,23 +69,20 @@ function NavBox:render()
 			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
 		},
 		shouldCollapse = shouldCollapse,
-		titleWidget = NavBox._title(title, self.props.titleLink, self.props.template),
+		titleWidget = NavBox._title(title, self.props.template),
 		children = {NavBoxChild(props)},
 	}
 end
 
----@param titleText string
----@param titleLink string
----@param templateLink string?
+---@param titleText (string|Widget)[]
+---@param templateLink string
 ---@return Widget
-function NavBox._title(titleText, titleLink, templateLink)
+function NavBox._title(titleText, templateLink)
 	return Div{
 		classes = {'navbox-title'},
 		children = WidgetUtil.collect(
 			EditButton{templateLink = templateLink},
-			B{children = {
-				titleLink and Link{link = titleLink, children = titleText} or titleText
-			}},
+			B{children = titleText},
 			CollapsibleToggle{css = {float = 'right'}}
 		)
 	}
