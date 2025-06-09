@@ -27,6 +27,10 @@ local Widget = Lua.import('Module:Widget')
 
 ---@class SeriesChildFromLpdb: Widget
 local SeriesChildFromLpdb = Class.new(Widget)
+SeriesChildFromLpdb.defaultProps = {
+	newestFirst = true,
+	resolve = true
+}
 
 ---@return string
 function SeriesChildFromLpdb:render()
@@ -64,7 +68,7 @@ function SeriesChildFromLpdb:render()
 		return Page.makeInternalLink({}, '#' .. getSeriesNumber(tournament), tournament.pageName)
 	end)
 
-	if Logic.nilOr(Logic.readBool(props.newestFirst)) then
+	if Logic.readBool(props.newestFirst) then
 		elements = Array.reverse(elements)
 	end
 
@@ -79,7 +83,7 @@ function SeriesChildFromLpdb:_makeConditions()
 
 	assert(Logic.isNotEmpty(serieses), 'No series specified')
 
-	if Logic.nilOr(Logic.readBoolOrNil(props.resolve), true) then
+	if Logic.readBoolOrNil(props.resolve) then
 		serieses = Array.map(serieses, Page.pageifyLink)
 	end
 
