@@ -1,0 +1,107 @@
+---
+-- @Liquipedia
+-- wiki=commons
+-- page=Module:Widget/NavBox/SeriesChildFromLpdb
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local Table = Lua.import('Module:Table')
+local Tournament = Lua.import('Module:Tournament')
+
+local Condition = Lua.import('Module:Condition')
+local ConditionTree = Condition.Tree
+local ConditionNode = Condition.Node
+local Comparator = Condition.Comparator
+local BooleanOperator = Condition.BooleanOperator
+local ColumnName = Condition.ColumnName
+
+local Link = Lua.import('Module:Widget/Basic/Link')
+local Widget = Lua.import('Module:Widget')
+
+---@class SeriesChildFromLpdb: Widget
+local SeriesChildFromLpdb = Class.new(Widget)
+
+---@return string
+function SeriesChildFromLpdb:render()
+	local props = self.props
+
+	local limit = tonumber(props.limit)
+	local offset = tonumber(props.offset)
+
+	---@param tournament StandardTournament
+	---@return integer?
+	local getSeriesNumber = function(tournament)
+		return tonumber((tournament.extradata or {}).seriesnumber)
+			or tonumber((tournament.pageName:gsub('/(%d+)$', '%1')))
+	end
+
+	---@param tournament StandardTournament
+	---@return boolean
+	local filterbyLimitAndOffSet = function(tournament)
+		if not limit and not offset then return true end
+		local seriesNumber = getSeriesNumber(tournament)
+		if not seriesNumber then
+			return false
+		elseif limit and seriesNumber > limit then
+			return false
+		elseif offset and seriesNumber <= offset then
+			return false
+		end
+		return true
+	end
+
+	local tournaments = Tournament.getAllTournaments(self:_makeConditions(), filterbyLimitAndOffSet)
+
+	local elements = Array.map(tournaments, function(tournament)
+		return Link{link = tournament.pageName, children = {'#' .. (getSeriesNumber(tournament))}}
+	end)
+
+	return Json.stringify(Table.merge(props, elements))
+end
+
+---@return ConditionTree
+function SeriesChildFromLpdb:_makeConditions()
+	local props = self.props
+
+	local serieses = Json.parseIfTable(props.series) or {props.series}
+
+	assert(Logic.isNotEmpty(serieses), 'No series specified')
+
+	if Logic.nilOr(Logic.readBoolOrNil(props.resolve), true) then
+		serieses = Array.map(serieses, Page.pageifyLink)
+	end
+
+	---@param key string
+	---@param items string[]
+	---@return ConditionTree?
+	local multiValueCondition = function(key, items)
+		if Logic.isEmpty(items) then return end
+
+		return ConditionTree(BooleanOperator.any):add(
+			Array.map(items, function(item)
+				return ConditionNode(ColumnName(key), Comparator.eq, item)
+			end)
+		)
+	end
+
+	local year = tonumber(props.year)
+
+	return ConditionTree(BooleanOperator.all):add{
+		multiValueCondition('seriespage', serieses),
+		multiValueCondition('liquipediatier', Json.parseIfTable(props.tier) or {props.tier}),
+		multiValueCondition('liquipediatiertype', Json.parseIfTable(props.tierType) or {props.tierType}),
+		year and ConditionNode(ColumnName('enddate_year'), Comparator.eq, year) or nil,
+		props.edate and ConditionNode(ColumnName('enddate'), Comparator.le, props.edate) or nil,
+		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil,
+	}
+end
+
+return SeriesChildFromLpdb

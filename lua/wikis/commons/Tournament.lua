@@ -38,6 +38,7 @@ local TOURNAMENT_PHASE = {
 ---@field iconDark string?
 ---@field abbreviation string?
 ---@field series string?
+---@field extradata table
 
 ---@param conditions ConditionTree?
 ---@param filterTournament fun(tournament: StandardTournament): boolean
@@ -107,7 +108,8 @@ function Tournament.tournamentFromRecord(record)
 		iconDark = record.icondark,
 		abbreviation = record.abbreviation,
 		series = record.series,
-		game = record.game
+		game = record.game,
+		extradata = extradata,
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.
