@@ -3,7 +3,7 @@
 -- wiki=tetris
 -- page=Module:Info
 --
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+-- Please see https://github.com/Liquipedia/Lua-Modules/blob/main/lua/wikis/tetris/Info.lua to contribute
 --
 
 return {
@@ -218,6 +218,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Tetris The Grand Master 3 default allmode.png',
 				lightMode = 'Tetris The Grand Master 3 default allmode.png',
+			},
+		},
+		['tgm4'] = {
+			abbreviation = 'TGM 4',
+			name = 'The Grand Master 4',
+			link = 'The Grand Master 4',
+			logo = {
+				darkMode = 'Tetris The Grand Master 4 default allmode.png',
+				lightMode = 'Tetris The Grand Master 4 default allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Tetris The Grand Master 4 default allmode.png',
+				lightMode = 'Tetris The Grand Master 4 default allmode.png',
 			},
 		},
 		['tetrio'] = {
