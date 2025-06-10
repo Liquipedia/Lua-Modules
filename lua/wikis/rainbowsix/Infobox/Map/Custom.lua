@@ -66,7 +66,7 @@ function CustomInjector:parse(id, widgets)
 end
 
 ---@private
----@param patchData StandardPatch
+---@param patchData StandardPatch?
 ---@param placeholderText string?
 ---@return (string|Widget)[]
 function CustomMap._formatPatchInfoCell(patchData, placeholderText)
