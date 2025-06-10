@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Opponent/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

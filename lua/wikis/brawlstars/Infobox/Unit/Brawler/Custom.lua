@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
 -- page=Module:Infobox/Unit/Brawler/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

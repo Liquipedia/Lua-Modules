@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

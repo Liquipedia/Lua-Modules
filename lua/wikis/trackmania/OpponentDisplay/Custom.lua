@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

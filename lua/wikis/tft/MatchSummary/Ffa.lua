@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=tft
 -- page=Module:MatchSummary/Ffa
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

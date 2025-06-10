@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:YearsActive
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

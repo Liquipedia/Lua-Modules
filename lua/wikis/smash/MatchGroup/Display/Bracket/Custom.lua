@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=smash
 -- page=Module:MatchGroup/Display/Bracket/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

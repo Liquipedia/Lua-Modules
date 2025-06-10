@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Show/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

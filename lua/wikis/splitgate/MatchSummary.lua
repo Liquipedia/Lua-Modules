@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=splitgate
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

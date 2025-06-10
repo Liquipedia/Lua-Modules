@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=freefire
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Standings/Tiebreaker/Points
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

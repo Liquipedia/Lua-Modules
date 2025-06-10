@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=tarkovarena
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

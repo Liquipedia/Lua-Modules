@@ -1,7 +1,6 @@
 
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Cosmetic
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

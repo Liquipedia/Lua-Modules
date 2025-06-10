@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

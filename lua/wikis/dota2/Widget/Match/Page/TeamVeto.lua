@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Widget/Match/Page/TeamVeto
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
