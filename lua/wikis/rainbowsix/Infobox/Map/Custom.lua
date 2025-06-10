@@ -9,6 +9,7 @@
 local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Patch = Lua.import('Module:Patch')
 local Template = Lua.import('Module:Template')
@@ -64,13 +65,16 @@ end
 ---@param placeholderText string?
 ---@return (string|Widget)[]
 function CustomMap._formatPatchInfoCell(patchData, placeholderText)
+	if Logic.isEmpty(patchData) then
+		return {placeholderText}
+	end
 	return {
 		Link{
 			link = patchData.pageName,
 			children = patchData.displayName
-		} or placeholderText,
+		},
 		HtmlWidgets.Small{
-			children = {patchData.releaseDate.string}
+			children = {DateExt.toYmdInUtc(patchData.releaseDate)}
 		}
 	}
 end
@@ -83,10 +87,10 @@ function CustomMap:getReleaseCells(args)
 	end
 
 	local releasePatchData = Patch.getPatchByDate(args.releasedate) or {}
-	local reworkPatchData = Patch.getPatchByDate(args.reworkdate) or {}
+	local reworkPatchData = args.reworkdate and Patch.getPatchByDate(args.reworkdate) or {}
 
-	local mapBuffPatchData = Patch.getPatchByDate(args['map buff']) or {}
-	local mapBuff2PatchData = Patch.getPatchByDate(args['map buff 2']) or {}
+	local mapBuffPatchData = args['map buff'] and Patch.getPatchByDate(args['map buff']) or {}
+	local mapBuff2PatchData = args['map buff 2'] and Patch.getPatchByDate(args['map buff 2']) or {}
 
 	return {
 		Cell{
@@ -108,9 +112,10 @@ function CustomMap:getReleaseCells(args)
 	}
 end
 
+---@private
 ---@param teamType 'atk'|'def'
 ---@return Widget
-local function createTeamDisplayWidget(teamType)
+function CustomMap._createTeamDisplayWidget(teamType)
 	return HtmlWidgets.Fragment{
 		children = {
 			IconImageWidget{
@@ -137,11 +142,11 @@ function CustomMap:getStatsCells(args)
 			name = 'Win Rate',
 			content = {
 				HtmlWidgets.Fragment{children = {
-					createTeamDisplayWidget('atk'),
+					CustomMap._createTeamDisplayWidget('atk'),
 					total > 0 and (atk_wins .. '/' .. total) or '-'
 				}},
 				HtmlWidgets.Fragment{children = {
-					createTeamDisplayWidget('def'),
+					CustomMap._createTeamDisplayWidget('def'),
 					total > 0 and (def_wins .. '/' .. total) or '-'
 				}}
 			}
