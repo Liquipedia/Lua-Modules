@@ -25,10 +25,10 @@ jobs:
       - name: Setup dependencies
         run: |
           luarocks install --local --lua-version=5.1 luacheck
-          
+          echo "$HOME/.luarocks" >> $GITHUB_PATH
+
       - name: Run lint
         run: |
-          echo "$HOME/.luarocks" >> "$GITHUB_PATH"
           luacheck lua --config lua/.luacheckrc |
           luacheck lua --config lua/.luacheckrc --formatter=JUnit > report.xml
 
@@ -62,10 +62,10 @@ jobs:
       - name: Setup dependencies
         run: |
           luarocks install --local --lua-version=5.1 busted
-          
+          echo "$HOME/.luarocks" >> $GITHUB_PATH
+
       - name: Run test
         run: |
-          echo "$HOME/.luarocks" >> "$GITHUB_PATH"
           busted -C lua -v --run=ci --output=junit > busted.xml
 
       - name: Report test
