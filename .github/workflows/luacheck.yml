@@ -11,9 +11,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v11
-        with:
-          luaVersion: '5.1'
+        # uses: leafo/gh-actions-lua@v11
+        # with:
+        #   luaVersion: '5.1'
+        run: |
+          sudo apt-get update
+          apt-fast install lua5.1
 
       - name: Setup luarock
         uses: leafo/gh-actions-luarocks@v5
@@ -43,9 +46,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup lua
-        uses: leafo/gh-actions-lua@v11
-        with:
-          luaVersion: '5.1'
+        # uses: leafo/gh-actions-lua@v11
+        # with:
+        #   luaVersion: '5.1'
+        run: |
+          sudo apt-get update
+          apt-fast install lua5.1
 
       - name: Setup luarocks
         uses: leafo/gh-actions-luarocks@v5
