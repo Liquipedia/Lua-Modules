@@ -145,10 +145,12 @@ function CustomMap:getStatsCells(args)
 			content = {
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('atk'),
+					': ',
 					total > 0 and (atk_wins .. '/' .. total) or '-'
 				}},
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('def'),
+					': ',
 					total > 0 and (def_wins .. '/' .. total) or '-'
 				}}
 			}
