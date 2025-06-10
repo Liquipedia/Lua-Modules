@@ -6,19 +6,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
-local Injector = Lua.import('Module:Infobox/Widget/Injector')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+
+local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class RainbowsixMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class RainbowsixMapInfoboxWidgetInjector: WidgetInjector
+---@field caller RainbowsixMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -30,13 +32,13 @@ function CustomMap.run(frame)
 	return map:createInfobox()
 end
 
----@param widgetId string
+---@param id string
 ---@param widgets Widget[]
 ---@return Widget[]
-function CustomInjector:parse(widgetId, widgets)
+function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
-	if widgetId == 'custom' then
+	if id == 'custom' then
 		return Array.append(
 			widgets,
 			Cell{name = 'Game', content = {args.game}},
