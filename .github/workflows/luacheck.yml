@@ -16,10 +16,11 @@ jobs:
         #   luaVersion: '5.1'
         run: |
           sudo apt-get update
-          sudo apt-get install lua5.1
+          sudo apt-get install lua5.1 liblua5.1-dev
 
       - name: Setup luarock
-        uses: leafo/gh-actions-luarocks@v5
+        # uses: leafo/gh-actions-luarocks@v5
+        run: sudo apt-get install luarocks
 
       - name: Setup dependencies
         run: |
@@ -51,10 +52,11 @@ jobs:
         #   luaVersion: '5.1'
         run: |
           sudo apt-get update
-          sudo apt-get install lua5.1
+          sudo apt-get install lua5.1 liblua5.1-dev
 
       - name: Setup luarocks
-        uses: leafo/gh-actions-luarocks@v5
+        # uses: leafo/gh-actions-luarocks@v5
+        run: sudo apt-get install luarocks
 
       - name: Setup dependencies
         run: |
