@@ -16,7 +16,7 @@ jobs:
         #   luaVersion: '5.1'
         run: |
           sudo apt-get update
-          apt-fast install lua5.1
+          sudo apt-get install lua5.1
 
       - name: Setup luarock
         uses: leafo/gh-actions-luarocks@v5
@@ -51,7 +51,7 @@ jobs:
         #   luaVersion: '5.1'
         run: |
           sudo apt-get update
-          apt-fast install lua5.1
+          sudo apt-get install lua5.1
 
       - name: Setup luarocks
         uses: leafo/gh-actions-luarocks@v5
