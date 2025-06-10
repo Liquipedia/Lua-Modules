@@ -12,20 +12,18 @@ jobs:
 
       - name: Setup lua
         # uses: leafo/gh-actions-lua@v11
-        # with:
-        #   luaVersion: '5.1'
-        run: |
-          sudo apt-get update
-          sudo apt-get install lua5.1 liblua5.1-dev
+        uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
+        with:
+          luaVersion: '5.1'
 
       - name: Setup luarock
+        # See https://github.com/leafo/gh-actions-lua/issues/57
         # uses: leafo/gh-actions-luarocks@v5
         run: sudo apt-get install luarocks
 
       - name: Setup dependencies
         run: |
-          luarocks install --local --lua-version=5.1 luacheck
-          luarocks path --lr-bin >> $GITHUB_PATH
+          luarocks install --lua-version=5.1 luacheck
 
       - name: Run lint
         run: |
@@ -48,21 +46,18 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup lua
+        # See https://github.com/leafo/gh-actions-lua/issues/57
         # uses: leafo/gh-actions-lua@v11
-        # with:
-        #   luaVersion: '5.1'
-        run: |
-          sudo apt-get update
-          sudo apt-get install lua5.1 liblua5.1-dev
+        uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
+        with:
+          luaVersion: '5.1'
 
       - name: Setup luarocks
-        # uses: leafo/gh-actions-luarocks@v5
-        run: sudo apt-get install luarocks
+        uses: leafo/gh-actions-luarocks@v5
 
       - name: Setup dependencies
         run: |
-          luarocks install --local --lua-version=5.1 busted
-          luarocks path --lr-bin >> $GITHUB_PATH
+          luarocks install --lua-version=5.1 busted
 
       - name: Run test
         run: |
