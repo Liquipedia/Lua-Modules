@@ -8,6 +8,7 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
@@ -135,7 +136,7 @@ end
 
 ---@param args table
 function CustomMap:getStatsCells(args)
-	local wlData = mw.text.split(MapWL.create{map = self.name}, ';')
+	local wlData = Array.parseCommaSeparatedString(MapWL.create{map = self.name}, ';')
 	local attackWins = tonumber(wlData[1]) or 0
 	local defenseWins = tonumber(wlData[2]) or 0
 	local total = attackWins + defenseWins
