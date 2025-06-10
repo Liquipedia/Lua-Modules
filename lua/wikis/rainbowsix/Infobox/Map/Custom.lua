@@ -158,6 +158,7 @@ function CustomMap:getStatsCells(args)
 	}
 end
 
+---@return string
 function CustomMap:createBottomContent()
 	return Template.safeExpand(mw.getCurrentFrame(), 'Recent on map', {limit = 500, map = self.name})
 end
