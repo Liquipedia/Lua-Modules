@@ -136,9 +136,9 @@ end
 ---@param args table
 function CustomMap:getStatsCells(args)
 	local wlData = mw.text.split(MapWL.create{map = self.name}, ';')
-	local atk_wins = tonumber(wlData[1]) or 0
-	local def_wins = tonumber(wlData[2]) or 0
-	local total = atk_wins + def_wins
+	local attackWins = tonumber(wlData[1]) or 0
+	local defenseWins = tonumber(wlData[2]) or 0
+	local total = attackWins + defenseWins
 
 	---@param value number
 	---@param numberOfDecimals integer?
@@ -175,12 +175,12 @@ function CustomMap:getStatsCells(args)
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('atk'),
 					': ',
-					formatWinRateDisplay(atk_wins)
+					formatWinRateDisplay(attackWins)
 				}},
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('def'),
 					': ',
-					formatWinRateDisplay(def_wins)
+					formatWinRateDisplay(defenseWins)
 				}}
 			}
 		}
