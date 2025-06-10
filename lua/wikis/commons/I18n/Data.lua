@@ -52,5 +52,8 @@ return {
 
 		['brkts-header-q'] = 'Qualified,Qual.,Q',
 		['brkts-header-tp'] = 'Third Place Match,3rd Place,3rd',
+
+		-- MatchSummary Map Veto
+		['matchsummary-mapveto-start'] = 'Start Map Veto',
 	}
 }

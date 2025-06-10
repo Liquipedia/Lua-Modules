@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local I18n = require('Module:I18n')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -16,7 +17,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local ARROW_LEFT = IconFa{iconName = 'startleft', size = '110%'}
 local ARROW_RIGHT = IconFa{iconName = 'startright', size = '110%'}
-local START_MAP_VETO = HtmlWidgets.B{children = 'Start Map Veto'}
+local START_MAP_VETO = HtmlWidgets.B{children = I18n.translate('matchsummary-mapveto-start')}
 
 ---@class MatchSummaryMapVetoStart: Widget
 ---@operator call(table): MatchSummaryMapVetoStart
