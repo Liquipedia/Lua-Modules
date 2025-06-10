@@ -11,7 +11,9 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
 local Patch = Lua.import('Module:Patch')
+local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -134,9 +136,36 @@ end
 ---@param args table
 function CustomMap:getStatsCells(args)
 	local wlData = mw.text.split(MapWL.create{map = self.name}, ';')
-	local atk_wins = wlData[1]
-	local def_wins = wlData[2]
+	local atk_wins = tonumber(wlData[1]) or 0
+	local def_wins = tonumber(wlData[2]) or 0
 	local total = atk_wins + def_wins
+
+	---@param value number
+	---@param numberOfDecimals integer?
+	---@return nil
+	local function formatPercentage(value, numberOfDecimals)
+		if not value then
+			return nil
+		end
+		numberOfDecimals = numberOfDecimals or 0
+		local format = '%.'.. numberOfDecimals ..'f'
+		return string.format(format, MathUtil.round(value * 100, numberOfDecimals)) .. '%'
+	end
+
+	---@param wins number
+	---@return string
+	local function formatWinRateDisplay(wins)
+		if total <= 0 then
+			return '-'
+		end
+		return String.interpolate(
+			'${percentage} (${wins})',
+			{
+				percentage = formatPercentage(wins / total, 2),
+				wins = wins
+			}
+		)
+	end
 
 	return {
 		Title{children = 'Esports Statistics'},
@@ -146,12 +175,12 @@ function CustomMap:getStatsCells(args)
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('atk'),
 					': ',
-					total > 0 and (atk_wins .. '/' .. total) or '-'
+					formatWinRateDisplay(atk_wins)
 				}},
 				HtmlWidgets.Fragment{children = {
 					CustomMap._createTeamDisplayWidget('def'),
 					': ',
-					total > 0 and (def_wins .. '/' .. total) or '-'
+					formatWinRateDisplay(def_wins)
 				}}
 			}
 		}
