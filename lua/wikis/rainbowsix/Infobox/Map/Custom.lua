@@ -126,7 +126,7 @@ function CustomMap._createTeamDisplayWidget(teamType)
 			IconImageWidget{
 				imageLight = 'R6S Para Bellum ' .. teamType .. ' logo.png',
 				link = '',
-				size = '14px'
+				size = '16px'
 			},
 			' ',
 			string.upper(teamType)
