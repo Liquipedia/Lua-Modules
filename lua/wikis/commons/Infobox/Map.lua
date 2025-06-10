@@ -66,6 +66,8 @@ function Map:createInfobox()
 		Center{children = {args.footnotes}},
 	}
 
+	self:bottom(self:createBottomContent())
+
 	if Namespace.isMain() then
 		self:categories('Maps', unpack(self:getWikiCategories(args)))
 		self:_setLpdbData(args)
