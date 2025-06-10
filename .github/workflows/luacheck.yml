@@ -25,7 +25,7 @@ jobs:
       - name: Setup dependencies
         run: |
           luarocks install --local --lua-version=5.1 luacheck
-          luarocks path --lr-path >> $GITHUB_PATH
+          luarocks path --lr-bin >> $GITHUB_PATH
 
       - name: Run lint
         run: |
@@ -62,7 +62,7 @@ jobs:
       - name: Setup dependencies
         run: |
           luarocks install --local --lua-version=5.1 busted
-          luarocks path --lr-path >> $GITHUB_PATH
+          luarocks path --lr-bin >> $GITHUB_PATH
 
       - name: Run test
         run: |
