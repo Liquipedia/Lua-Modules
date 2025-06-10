@@ -44,7 +44,7 @@ local function makeShortSideName(longName)
 end
 
 ---@param mapInput {matchid: string?, reversed: string?, vod: string?, region: string?}
----@return dota2MatchDataExtended|table
+---@return valorantMatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
