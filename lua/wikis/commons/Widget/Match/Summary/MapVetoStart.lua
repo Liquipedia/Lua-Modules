@@ -16,6 +16,7 @@ local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 
 local ARROW_LEFT = IconFa{iconName = 'startleft', size = '110%'}
 local ARROW_RIGHT = IconFa{iconName = 'startright', size = '110%'}
+local START_MAP_VETO = HtmlWidgets.B{children = 'Start Map Veto'}
 
 ---@class MatchSummaryMapVetoStart: Widget
 ---@operator call(table): MatchSummaryMapVetoStart
@@ -31,7 +32,7 @@ function MatchSummaryMapVetoStart:render()
 	local children = {}
 	if self.props.firstVeto == 1 then
 		children = {
-			'<b>Start Map Veto</b>',
+			START_MAP_VETO,
 			ARROW_LEFT,
 			format,
 		}
@@ -39,7 +40,7 @@ function MatchSummaryMapVetoStart:render()
 		children = {
 			format,
 			ARROW_RIGHT,
-			'<b>Start Map Veto</b>',
+			START_MAP_VETO,
 		}
 	end
 
