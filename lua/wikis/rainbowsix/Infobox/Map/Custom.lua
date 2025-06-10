@@ -25,6 +25,8 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
+local MapWL = Lua.import('Module:MapWL')
+
 ---@class RainbowsixMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
 ---@class RainbowsixMapInfoboxWidgetInjector: WidgetInjector
@@ -131,7 +133,7 @@ end
 
 ---@param args table
 function CustomMap:getStatsCells(args)
-	local wlData = mw.text.split(Template.safeExpand(mw.getCurrentFrame(), 'MapWL', {map = self.name}), ';')
+	local wlData = mw.text.split(MapWL.create{map = self.name}, ';')
 	local atk_wins = wlData[1]
 	local def_wins = wlData[2]
 	local total = atk_wins + def_wins
