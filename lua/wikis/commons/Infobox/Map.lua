@@ -59,7 +59,9 @@ function Map:createInfobox()
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}
 		}},
-		Cell{name = 'Release Date', content = {args.releasedate}},
+		Customizable{id = 'release', children = {
+			Cell{name = 'Release Date', content = {args.releasedate}},
+		}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
