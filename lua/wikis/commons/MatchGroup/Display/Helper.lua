@@ -101,6 +101,7 @@ function DisplayHelper.defaultMatchHasDetails(match)
 		or not Table.isEmpty(match.links)
 		or Logic.isNotEmpty(match.comment)
 		or 0 < #match.games
+		or Info.config.match2.matchPage
 end
 
 -- Display component showing the streams, date, and countdown of a match.
