@@ -11,7 +11,9 @@ local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local RoleOf = require('Module:RoleOf')
 local String = require('Module:StringUtils')
-local TeamTemplate = require('Module:Team')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Achievements = Lua.import('Module:Infobox/Extension/Achievements')
 local Injector = Lua.import('Module:Widget/Injector')
@@ -81,7 +83,7 @@ function CustomInjector:parse(id, widgets)
 		return {
 			Cell{name = 'Abbreviation', content = {args.abbreviation}},
 			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
-				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
+				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end
 

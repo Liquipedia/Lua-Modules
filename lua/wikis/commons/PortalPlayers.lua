@@ -14,7 +14,6 @@ local Logic = require('Module:Logic')
 local Links = require('Module:Links')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -265,7 +264,9 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
+		template = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then
