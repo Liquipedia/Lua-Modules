@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=crossfire
 -- page=Module:Infobox/Extension/TeamHistoryAuto/RoleConvertData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
