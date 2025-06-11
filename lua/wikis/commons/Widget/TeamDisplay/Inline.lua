@@ -93,7 +93,7 @@ function TeamInlineWidget:render()
 			imageLight = Logic.emptyOr(self.teamTemplate.image, self.teamTemplate.legacyimage),
 			imageDark = Logic.emptyOr(self.teamTemplate.imagedark, self.teamTemplate.legacyimagedark),
 			page = self.teamTemplate.page,
-			legacy = Logic.isNotEmpty(self.teamTemplate.legacyimage)
+			legacy = Logic.isEmpty(self.teamTemplate.image) and Logic.isNotEmpty(self.teamTemplate.legacyimage)
 		},
 		self:_getNameComponent()
 	), ' ')
