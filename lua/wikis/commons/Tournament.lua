@@ -75,7 +75,7 @@ function Tournament.getTournament(pagename)
 	return Tournament.tournamentFromRecord(record)
 end
 
-local TouranmentMT = {
+local TournamentMT = {
 	__index = function(tournament, property)
 		if property == 'featured' then
 			tournament[property] = Tournament.isFeatured(tournament)
@@ -112,7 +112,7 @@ function Tournament.tournamentFromRecord(record)
 	}
 
 	-- Some properties are derived from other properies and we can calculate them when accessed.
-	setmetatable(tournament, TouranmentMT)
+	setmetatable(tournament, TournamentMT)
 
 	return tournament
 end
