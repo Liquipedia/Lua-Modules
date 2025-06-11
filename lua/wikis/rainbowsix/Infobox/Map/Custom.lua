@@ -93,7 +93,7 @@ function CustomMap:getReleaseCells(args)
 		return {}
 	end
 
-	local releasePatchData = Patch.getPatchByDate(args.releasedate) or {}
+	local releasePatchData = Patch.getPatchByDate(args.releasedate)
 	local reworkPatchData = args.reworkdate and Patch.getPatchByDate(args.reworkdate) or {}
 
 	local mapBuffPatchData = args['map buff'] and Patch.getPatchByDate(args['map buff']) or {}
