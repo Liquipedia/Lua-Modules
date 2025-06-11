@@ -54,8 +54,7 @@ function TournamentStructure.readMatchGroupsSpec(args)
 	end
 
 	local listsOfPageNames = {}
-	table.insert(listsOfPageNames, args.tournament)
-	for _, pageNamesInput in Table.iter.pairsByPrefix(args, 'tournament') do
+	for _, pageNamesInput in Table.iter.pairsByPrefix(args, 'tournament', {requireIndex = false}) do
 		table.insert(listsOfPageNames, Json.parseIfTable(pageNamesInput) or {pageNamesInput})
 	end
 
