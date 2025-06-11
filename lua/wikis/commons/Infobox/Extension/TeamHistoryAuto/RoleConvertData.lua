@@ -12,6 +12,7 @@ return {
 	['assistant coach'] = {title = 'Assistant Coach', children = {'AC.'}},
 	['coach/analyst'] = {title = 'Coach/Analyst', children = {'C./A.'}},
 	['coach and analyst'] = {title = 'Coach/Analyst', children = {'C./A.'}},
+	['overall coach'] = {title = 'Overall Coach', children = {'OC.'}},
 	['manager and analyst'] = {title = 'Manager/Analyst', children = {'M./A.'}},
 	['manager/analyst'] = {title = 'Manager/Analyst', children = {'M./A.'}},
 	manager = {title = 'Manager', children = {'M.'}},
@@ -25,4 +26,6 @@ return {
 	['content creator'] = {title = 'Content Creator', children = {'CC.'}},
 	inactive = {title = 'Inactive', children = {'Ia.'}},
 	loan = {title = 'Loan', children = {'L.'}},
+	['training advisor'] = {title = 'Training Advisor', children = {'TA.'}},
+	['founder & training director'] = {title = 'Founder & Training Director', children = {'F. & TD.'}},
 }
