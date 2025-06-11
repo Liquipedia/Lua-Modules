@@ -98,7 +98,7 @@ function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
 		or (match.timestamp and match.timestamp ~= Date.defaultTimestamp)
 		or Logic.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or Table.isNotEmpty(match.links)
 		or Logic.isNotEmpty(match.comment)
 		or 0 < #match.games
 		or Info.config.match2.matchPage
