@@ -76,5 +76,11 @@ return {
 			matchWidth = 200,
 			gameScoresIfBo1 = true,
 		},
+		infoboxPlayer = {
+			autoTeam = true,
+			automatedHistory = {
+				mode = 'merge',
+			},
+		},
 	},
 }
