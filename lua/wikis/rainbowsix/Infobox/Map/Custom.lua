@@ -17,13 +17,13 @@ local Patch = Lua.import('Module:Patch')
 local String = Lua.import('Module:StringUtils')
 local Template = Lua.import('Module:Template')
 
+local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = Lua.import('Module:Widget/All')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
-local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
@@ -123,13 +123,13 @@ end
 ---@param teamType 'atk'|'def'
 ---@return Widget
 function CustomMap._createTeamDisplayWidget(teamType)
+	local lookupKey = {
+		atk = 'attackTeam',
+		def = 'defenseTeam',
+	}
 	return HtmlWidgets.Fragment{
 		children = {
-			IconImageWidget{
-				imageLight = 'R6S Para Bellum ' .. teamType .. ' logo.png',
-				link = '',
-				size = '16px'
-			},
+			AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = lookupKey[teamType]},
 			' ',
 			string.upper(teamType)
 		}

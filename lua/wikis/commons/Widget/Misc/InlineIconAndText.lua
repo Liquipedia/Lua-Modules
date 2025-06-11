@@ -8,6 +8,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 
 local Widget = Lua.import('Module:Widget')
@@ -34,11 +35,11 @@ function InlineIconAndText:render()
 	local children = {
 		self.props.icon,
 		' ',
-		Link{
+		Logic.isNotEmpty(self.props.link) and Link{
 			link = self.props.link,
 			linktype = 'internal',
 			children = {self.props.text}
-		},
+		} or self.props.text,
 	}
 
 	return Span{
