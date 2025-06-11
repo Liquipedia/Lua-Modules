@@ -225,6 +225,7 @@ end
 ---It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
+---@return boolean
 function Opponent.same(opponent1, opponent2)
 	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
 end
@@ -349,7 +350,10 @@ Returns nil if the team template does not exist.
 ---@return string
 function Opponent.toName(opponent)
 	if opponent.type == Opponent.team then
-		return TeamTemplate.getPageName(opponent.template)
+		local name = TeamTemplate.getPageName(opponent.template)
+		-- annos expect a string return, so let it error if we get a nil return
+		assert(name, 'Invalid team template: ' .. (opponent.template or ''))
+		return name
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName
