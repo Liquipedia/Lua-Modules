@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=osu
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

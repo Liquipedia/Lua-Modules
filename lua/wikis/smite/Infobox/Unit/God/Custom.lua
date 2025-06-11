@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=smite
 -- page=Module:Infobox/Unit/God/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

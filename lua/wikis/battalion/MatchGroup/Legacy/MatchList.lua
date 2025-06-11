@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=battalion
 -- page=Module:MatchGroup/Legacy/MatchList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

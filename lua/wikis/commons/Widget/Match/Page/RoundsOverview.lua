@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Page/RoundsOverview
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

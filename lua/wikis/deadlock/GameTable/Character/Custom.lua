@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:GameTable/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

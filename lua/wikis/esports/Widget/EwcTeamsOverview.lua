@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=esports
 -- page=Module:Widget/EwcTeamsOverview
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

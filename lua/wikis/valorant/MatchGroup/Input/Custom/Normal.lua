@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MatchGroup/Input/Custom/Normal
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Helper
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

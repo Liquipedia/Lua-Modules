@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=halo
 -- page=Module:FilterButtons/Config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

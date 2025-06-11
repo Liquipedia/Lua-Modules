@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=teamfortress
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

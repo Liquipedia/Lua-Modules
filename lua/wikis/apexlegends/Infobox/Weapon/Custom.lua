@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Infobox/Weapon/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

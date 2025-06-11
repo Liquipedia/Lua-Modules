@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Ordinal
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

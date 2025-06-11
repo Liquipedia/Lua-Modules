@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Player/Display/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

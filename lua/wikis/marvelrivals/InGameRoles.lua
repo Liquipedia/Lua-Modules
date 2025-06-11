@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=marvelrivals
 -- page=Module:InGameRoles
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

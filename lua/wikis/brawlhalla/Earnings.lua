@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=brawlhalla
 -- page=Module:Earnings
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

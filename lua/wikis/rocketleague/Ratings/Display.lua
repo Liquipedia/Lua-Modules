@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Ratings/Display
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
