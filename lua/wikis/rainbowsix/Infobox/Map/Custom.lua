@@ -73,6 +73,8 @@ function CustomMap._formatPatchInfoCell(patchData, placeholderText)
 	if Logic.isEmpty(patchData) then
 		return {placeholderText}
 	end
+	---@cast patchData -nil
+
 	return {
 		Link{
 			link = patchData.pageName,
