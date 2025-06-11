@@ -148,23 +148,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 
 	local categories = {}
 
-	-- Collect all roles from role, role2, role3, etc., and roles (comma-separated)
-	local roles = {}
-	if String.isNotEmpty(args.role) then
-		table.insert(roles, string.lower(args.role))
-	end
-	local i = 2
-	while String.isNotEmpty(args['role' .. i]) do
-		table.insert(roles, string.lower(args['role' .. i]))
-		i = i + 1
-	end
-	if String.isNotEmpty(args.roles) then
-		local rolesFromList = Array.map(mw.text.split(args.roles, ','), function(role)
-			return string.lower(mw.text.trim(role))
-		end)
-		Array.extendWith(roles, rolesFromList)
-	end
-	roles = Array.unique(roles)
+	local roles = self.roles
 
 	---@param roleString string
 	---@param category string
