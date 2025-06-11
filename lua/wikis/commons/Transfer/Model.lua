@@ -25,6 +25,15 @@ local ColumnName = Condition.ColumnName
 
 local LOAN = 'Loan'
 
+---@enum transferType
+local TRANSFER_TYPES = {
+	NONE = 'NONE',
+	CLASSIC = 'CLASSIC',
+	TO_SECOND_TEAM = 'TO_SECOND_TEAM',
+	TO_FIRST_TEAM = 'TO_TEAM',
+	TO_BOTH_TEAMS = 'TO_BOTH_TEAMS',
+}
+
 local Transfer = {}
 
 ---@class TransferSpan
@@ -90,18 +99,46 @@ function Transfer.getTeamHistoryForPerson(config)
 end
 
 ---@param transfer transfer
+---@return transferType?
+function Transfer._getTransferType(transfer)
+	local extraData = transfer.extradata
+
+	local hasNoToTeamSec = Logic.isEmpty(extraData.toteamsec)
+	if hasNoToTeamSec and transfer.toteam == extraData.fromteamsec and transfer.role2 == extraData.role1sec then
+		return TRANSFER_TYPES.NONE
+	elseif hasNoToTeamSec then
+		return TRANSFER_TYPES.CLASSIC
+	end
+
+	-- case: transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
+
+	local toFirstTeam = (transfer.toteam ~= transfer.fromteam or transfer.role2 ~= transfer.role1) and
+		(transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec)
+	local toSecondTeam = (extraData.toteamsec ~= transfer.fromteam or extraData.role2sec ~= transfer.role1) and
+		(extraData.toteamsec ~= extraData.fromteamsec or extraData.role2sec ~= extraData.role1sec)
+
+	if toFirstTeam and toSecondTeam then
+		return TRANSFER_TYPES.TO_BOTH_TEAMS
+	elseif toFirstTeam then
+		return TRANSFER_TYPES.TO_FIRST_TEAM
+	elseif toSecondTeam then
+		return TRANSFER_TYPES.TO_SECOND_TEAM
+	end
+end
+
+---@param transfer transfer
 ---@return TransferSpan[]
 function Transfer._processTransfer(transfer)
 	local extraData = transfer.extradata
 	local transferDate = DateExt.toYmdInUtc(transfer.date)
 
-	if Logic.isEmpty(extraData.toteamsec) then
-		-- transfer does not include multiple teams that were joined
-		if transfer.toteam == extraData.fromteamsec and transfer.role2 == extraData.role1sec then
-			-- the joined team & role was already set before (as 2nd team + role)
-			return {}
-		end
-		-- classic transfer
+	local transfers = {}
+
+	local transferType = Transfer._getTransferType(transfer)
+
+	if transferType == TRANSFER_TYPES.NONE then
+		return transfers
+	elseif transferType == TRANSFER_TYPES.CLASSIC then
 		return {{
 			team = transfer.toteam,
 			role = transfer.role2,
@@ -112,15 +149,10 @@ function Transfer._processTransfer(transfer)
 		}}
 	end
 
-	-- case: transfer includes multiple teams (Tl:Transfer_row |team2_2, |role2_2)
-	local transfers = {}
-
-	if (extraData.toteamsec ~= transfer.fromteam or extraData.role2sec ~= transfer.role1) and
-		(extraData.toteamsec ~= extraData.fromteamsec or extraData.role2sec ~= extraData.role1sec) then
-		-- secondary transfer
+	if transferType == TRANSFER_TYPES.TO_BOTH_TEAMS or transferType == TRANSFER_TYPES.TO_FIRST_TEAM then
 		table.insert(transfers, {
-			team = extraData.toteamsec,
-			role = extraData.role2sec,
+			team = transfer.toteam,
+			role = transfer.role2,
 			position = extraData.icon2,
 			joinDate = transferDate,
 			joinDateDisplay = extraData.displaydate or transferDate,
@@ -128,12 +160,10 @@ function Transfer._processTransfer(transfer)
 		})
 	end
 
-	if (transfer.toteam ~= transfer.fromteam or transfer.role2 ~= transfer.role1) and
-		(transfer.toteam ~= extraData.fromteamsec or transfer.role2 ~= extraData.role1sec) then
-		-- primary transfer
+	if transferType == TRANSFER_TYPES.TO_BOTH_TEAMS or transferType == TRANSFER_TYPES.TO_SECOND_TEAM then
 		table.insert(transfers, {
-			team = transfer.toteam,
-			role = transfer.role2,
+			team = extraData.toteamsec,
+			role = extraData.role2sec,
 			position = extraData.icon2,
 			joinDate = transferDate,
 			joinDateDisplay = extraData.displaydate or transferDate,
