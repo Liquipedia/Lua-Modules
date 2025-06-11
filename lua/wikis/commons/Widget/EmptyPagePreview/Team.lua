@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/EmptyPagePreview/Team
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
