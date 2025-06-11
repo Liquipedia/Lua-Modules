@@ -1,3 +1,10 @@
+---
+-- @Liquipedia
+-- page=Module:Infobox/Person/Player/Custom
+--
+-- Please see https://github.com/Liquipedia/Lua-Modules to contribute
+--
+
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
