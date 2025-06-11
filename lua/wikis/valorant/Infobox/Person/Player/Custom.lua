@@ -9,8 +9,10 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Custom')
+local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local Region = require('Module:Region')
 local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
@@ -34,17 +36,47 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
+	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{
+	args.history = TeamHistoryAuto.results{
 		convertrole = true,
 		addlpdbdata = true,
-		specialRoles = player.args.historySpecialRoles
+		specialRoles = args.historySpecialRoles
 	}
-	player.args.autoTeam = true
-	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
+	args.autoTeam = true
+	args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 
-	return player:createInfobox()
+	local builtInfobox = player:createInfobox()
+
+	local autoPlayerIntro = ''
+	if Logic.readBool((args.autoPI or ''):lower()) then
+		autoPlayerIntro = PlayerIntroduction.run{
+			player = player.pagename,
+			team = args.team,
+			name = args.romanized_name or args.name,
+			first_name = args.first_name,
+			last_name = args.last_name,
+			status = args.status,
+			type = player:getPersonType(args).store,
+			role = (player.roles[1] or {}).display,
+			role2 = (player.roles[2] or {}).display,
+			id = args.id,
+			idIPA = args.idIPA,
+			idAudio = args.idAudio,
+			birthdate = player.age.birthDateIso,
+			deathdate = player.age.deathDateIso,
+			nationality = args.country,
+			nationality2 = args.country2,
+			nationality3 = args.country3,
+			subtext = args.subtext,
+			freetext = args.freetext,
+		}
+	end
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(autoPlayerIntro)
 end
 
 ---@param id string
