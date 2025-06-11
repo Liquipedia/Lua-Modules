@@ -25,7 +25,22 @@ local ColumnName = Condition.ColumnName
 
 local Widget = Lua.import('Module:Widget')
 
+---- technically from wiki input they will be all string representations
+---@alias SeriesChildFromLpdbProps {
+---limit: integer?,
+---offset: integer?,
+---newestFirst: boolean?,
+---series: string[]|string,
+---resolve: boolean?,
+---tier: string?,
+---tierType: string?,
+---year: integer,
+---edate: string|integer|osdate?,
+---sdate: string|integer|osdate? }
+
+
 ---@class SeriesChildFromLpdb: Widget
+---@field props SeriesChildFromLpdbProps
 local SeriesChildFromLpdb = Class.new(Widget)
 SeriesChildFromLpdb.defaultProps = {
 	newestFirst = true,
@@ -65,7 +80,7 @@ function SeriesChildFromLpdb:render()
 
 	local elements = Array.map(tournaments, function(tournament)
 		-- can not use `Link` Widget due to `Json.stringify` below
-		return Page.makeInternalLink({}, '#' .. getSeriesNumber(tournament), tournament.pageName)
+		return Page.makeInternalLink('#' .. getSeriesNumber(tournament), tournament.pageName)
 	end)
 
 	if Logic.readBool(props.newestFirst) then
@@ -75,11 +90,15 @@ function SeriesChildFromLpdb:render()
 	return Json.stringify(Table.merge(props, elements))
 end
 
+---@private
 ---@return ConditionTree
 function SeriesChildFromLpdb:_makeConditions()
 	local props = self.props
 
-	local serieses = Json.parseIfTable(props.series) or {props.series}
+	---@type string[]
+	local serieses = Json.parseIfTable(props.series)
+		or Array.isArray(props.series) and props.series --[[@as string[] ]]
+		or {props.series}
 
 	assert(Logic.isNotEmpty(serieses), 'No series specified')
 
