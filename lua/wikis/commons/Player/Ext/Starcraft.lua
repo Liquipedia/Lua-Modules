@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
 
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
 local PlayerExt = Lua.import('Module:Player/Ext')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local globalVars = PlayerExt.globalVars
 
@@ -187,7 +188,7 @@ function StarcraftPlayerExt.TemplateStorePlayerLink(frame)
 
 	StarcraftPlayerExt.saveToPageVars({
 		displayName = displayName,
-		pageName = args.link or pageName or displayName,
+		pageName = Page.applyUnderScoresIfEnforced(args.link or pageName or displayName),
 		flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag}),
 		faction = Faction.read(args.faction or args.race) or Faction.defaultFaction,
 	}, {overwritePageVars = true})
