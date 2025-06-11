@@ -1,10 +1,3 @@
----
--- @Liquipedia
--- page=Module:Infobox/Person/Player/Custom
---
--- Please see https://github.com/Liquipedia/Lua-Modules to contribute
---
-
 local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
@@ -77,7 +70,7 @@ function CustomInjector:parse(id, widgets)
 		if String.isNotEmpty(args.mmr) then
 			mmrDisplay = '[[Leaderboards|' .. args.mmr .. ']]'
 			if String.isNotEmpty(args.mmrdate) then
-				mmrDisplay = mmrDisplay .. '&nbsp;<small><i>('
+				mmrDisplay = mmrDisplay .. ' <small><i>('
 					.. args.mmrdate .. ')</i></small>'
 			end
 		end
@@ -148,24 +141,44 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 
 	local categories = {}
 
-	local role = string.lower(args.role or '')
+	-- Collect all roles from role, role2, role3, etc., and roles (comma-separated)
+	local roles = {}
+	if String.isNotEmpty(args.role) then
+		table.insert(roles, string.lower(args.role))
+	end
+	local i = 2
+	while String.isNotEmpty(args['role' .. i]) do
+		table.insert(roles, string.lower(args['role' .. i]))
+		i = i + 1
+	end
+	if String.isNotEmpty(args.roles) then
+		local rolesFromList = Array.map(mw.text.split(args.roles, ','), function(role)
+			return string.lower(mw.text.trim(role))
+		end)
+		Array.extendWith(roles, rolesFromList)
+	end
+	roles = Array.unique(roles)
 
 	---@param roleString string
 	---@param category string
 	---@return string?
 	local checkRole = function(roleString, category)
-		if not string.find(role, roleString) then return end
+		if not Array.any(roles, function(r) return string.find(r, roleString) end) then return end
 		return category
 	end
 
 	Array.appendWith(categories,
+		checkRole('observer', 'Observers'),
 		checkRole('coach', 'Coaches'),
 		checkRole('caster', 'Casters'),
-		checkRole('host', 'Casters'),
-		checkRole('player', 'Players')
+		checkRole('host', 'Hosts'),
+		checkRole('player', 'Players'),
+		checkRole('producer', 'Producers'),
+		checkRole('manager', 'Managers'),
+		checkRole('analyst', 'Analysts')
 	)
 
-	if string.match(role, 'player') then
+	if Array.any(roles, function(r) return string.match(r, 'player') end) then
 		if string.lower(args.status) == 'active' and not args.teamlink and not args.team then
 			table.insert(categories, 'Teamless Players')
 		end
@@ -218,10 +231,14 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		local demonym = Flags.getLocalisation(country)
 		if demonym then
 			Array.appendWith(categories,
+				checkRole('observer', demonym .. ' Observers'),
 				checkRole('coach', demonym .. ' Coaches'),
 				checkRole('caster', demonym .. ' Casters'),
 				checkRole('host', demonym .. ' Casters'),
-				checkRole('player', demonym .. ' Players')
+				checkRole('player', demonym .. ' Players'),
+				checkRole('producer', demonym .. ' Producers'),
+				checkRole('manager', demonym .. ' Managers'),
+				checkRole('analyst', demonym .. ' Analysts')
 			)
 		end
 	end)
@@ -286,7 +303,7 @@ end
 ---@return string[]
 function CustomPlayer:displayLocations()
 	return Array.map(self.locations, function(country)
-		return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' ..
+		return Flags.Icon{flag = country, shouldLink = true} .. ' ' ..
 			Page.makeInternalLink(country, ':Category:' .. country)
 	end)
 end
