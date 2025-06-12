@@ -19,6 +19,7 @@ local NavBox = Lua.import('Module:Widget/NavBox')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class SeriesChildFromLpdb: Widget
+---@field props {portalLink: string}
 local TransferNavBox = Class.new(Widget)
 TransferNavBox.defaultProps = {portalLink = 'Portal:Transfers'}
 
@@ -44,6 +45,9 @@ function TransferNavBox:render()
 	return NavBox(Table.merge(children, {title = 'Transfers', titleLink = self.props.portalLink}))
 end
 
+---@private
+---@param pageName string
+---@return Widget?
 function TransferNavBox._buildPageDisplay(pageName)
 	-- try to extract quarter
 	local quarter, _
@@ -74,6 +78,7 @@ function TransferNavBox._buildPageDisplay(pageName)
 	}
 end
 
+---@private
 ---@return table<integer, string[]>
 function TransferNavBox._getGroupedData()
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
