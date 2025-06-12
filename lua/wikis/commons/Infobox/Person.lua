@@ -36,12 +36,15 @@ local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
 ---@class PersonRoleData
----@field category string?
----@field display string?
+---@field category string
+---@field display string
+
+---@class PersonRoleDataExtended: PersonRoleData
+---@field key string?
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
----@field roles PersonRoleData[]
+---@field roles PersonRoleDataExtended[]
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -316,17 +319,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		teamTemplate = teamRaw.templatename
 	end
 
-	local roleStorageValue = function(roleData)
-		if not roleData then return end
-		local key = Table.getKeyOfValue(Roles.All, roleData)
-		if not key then
-			-- Backwards compatibility for old roles
-			return roleData.display or roleData.category or ''
-		end
-		return key
-	end
-
-	local rolesStorageKey = Array.map(self.roles, roleStorageValue)
+	local rolesStorageKey = Person._getKeysOfRoles(self.roles)
 
 	local lpdbData = {
 		id = args.id,
@@ -514,12 +507,22 @@ function Person:displayLocations()
 	end)
 end
 
+---@param roles PersonRoleDataExtended[]
+---@return string[]
+function Person._getKeysOfRoles(roles)
+	return Array.map(roles, function(roleData)
+		-- With backwards compatibility for old roles, otherwise only key would be needed
+		return roleData.key or roleData.display or roleData.category or ''
+	end)
+end
+
 ---@param roleKey string
----@return PersonRoleData?
+---@return PersonRoleDataExtended?
 function Person._createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
 
-	local roleData = Roles.All[roleKey:lower()]
+	local key = roleKey:lower()
+	local roleData = Roles.All[key]
 
 	--- Backwards compatibility for old roles
 	if not roleData then
@@ -531,7 +534,11 @@ function Person._createRoleData(roleKey)
 		}
 	end
 
-	return roleData
+	return {
+		display = roleData.display,
+		category = roleData.category,
+		key = key,
+	}
 end
 
 ---@param roleData PersonRoleData?

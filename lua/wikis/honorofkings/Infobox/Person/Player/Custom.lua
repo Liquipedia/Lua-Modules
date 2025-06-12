@@ -11,6 +11,7 @@ local Class = require('Module:Class')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+local Operator = Lua.import('Module:Operator')
 local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local Table = require('Module:Table')
 
@@ -46,8 +47,7 @@ function CustomPlayer.run(frame)
 			last_name = args.last_name,
 			status = args.status,
 			type = player:getPersonType(args).store,
-			role = (player.roles[1] or {}).display,
-			role2 = (player.roles[2] or {}).display,
+			roles = player._getKeysOfRoles(player.roles),
 			id = args.id,
 			idIPA = args.idIPA,
 			idAudio = args.idAudio,

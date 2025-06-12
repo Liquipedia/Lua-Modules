@@ -15,6 +15,8 @@ local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Roles = Lua.import('Module:Roles')
+
 local SHOULD_QUERY_KEYWORD = 'query'
 local DEFAULT_DATAPOINT_LEAVE_DATE = '2999-01-01'
 local TRANSFER_STATUS_FORMER = 'former'
@@ -43,8 +45,7 @@ local INACTIVE_ROLE = 'inactive'
 ---@field nationality string?
 ---@field nationality2 string?
 ---@field nationality3 string?
----@field role string?
----@field role2 string?
+---@field roles? string[]
 ---@field status string?
 ---@field subtext string?
 ---@field team string?
@@ -183,11 +184,11 @@ end
 function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 	playerInfo.extradata = playerInfo.extradata or {}
 
-	local role = (args.role or playerInfo.extradata.role or ''):lower()
+	local roles = args.roles or playerInfo.extradata.roles or {}
 
-	local personType = Logic.emptyOr(args.type, playerInfo.type, TYPE_PLAYER):lower()
-	if personType ~= TYPE_PLAYER and String.isNotEmpty(role) then
-		personType = role
+	local personType = (Logic.emptyOr(args.type, playerInfo.type) or TYPE_PLAYER):lower()
+	if personType ~= TYPE_PLAYER and Roles[roles[1]] then
+		personType = Roles[roles[1]].display or TYPE_PLAYER
 	end
 
 	local name = args.name or playerInfo.name
@@ -220,8 +221,7 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 		faction3 = Logic.emptyOr(args.faction3, playerInfo.extradata.faction3),
 		subText = args.subtext,
 		freeText = args.freetext,
-		role = role,
-		role2 = (args.role2 or playerInfo.extradata.role2 or ''):lower(),
+		roles = roles,
 		firstName = Logic.emptyOr(args.firstname, playerInfo.extradata.firstname, table.remove(nameArray, 1)),
 		lastName = Logic.emptyOr(args.lastname, playerInfo.extradata.lastname, nameArray[#nameArray]),
 		formerlyKnownAs = readNames('formername'),
