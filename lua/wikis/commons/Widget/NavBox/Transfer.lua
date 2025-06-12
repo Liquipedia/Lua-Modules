@@ -33,6 +33,8 @@ function TransferNavBox:render()
 		return year2 < year1
 	end
 
+	local miscPages = Table.extract(pagesByYear, 'misc')
+
 	for year, pages in Table.iter.spairs(pagesByYear, sort) do
 		---@type table
 		local childData = Array.map(pages, TransferNavBox._buildPageDisplay)
@@ -42,6 +44,17 @@ function TransferNavBox:render()
 			childIndex = childIndex + 1
 		end
 	end
+
+	if Logic.isNotEmpty(miscPages) then
+		---@type table
+		local childData = Array.map(miscPages, function(pageName, index) return Link{
+			link = pageName,
+			children = {'#' .. index}
+		} end)
+		childData.name = 'Misc'
+		children['child' .. childIndex] = childData
+	end
+
 	return NavBox(Table.merge(children, {title = 'Transfers', titleLink = self.props.portalLink}))
 end
 
@@ -79,7 +92,7 @@ function TransferNavBox._buildPageDisplay(pageName)
 end
 
 ---@private
----@return table<integer, string[]>
+---@return table<integer|'misc', string[]>
 function TransferNavBox._getGroupedData()
 	local queryData = mw.ext.LiquipediaDB.lpdb('transfer', {
 		query = 'pagename',
@@ -88,13 +101,9 @@ function TransferNavBox._getGroupedData()
 		limit = 5000,
 	})
 	local pages = Array.map(queryData, Operator.property('pagename'))
-	-- throw away all pages that do not contain a year
-	pages = Array.filter(pages, function(pageName)
-		return pageName:find('%d%d%d%d') ~= nil
-	end)
 	local _, pagesByYear = Array.groupBy(pages, function(pageName)
 		local year = tonumber((pageName:gsub('.*(%d%d%d%d).*', '%1')))
-		return year
+		return year or 'misc'
 	end)
 	return pagesByYear
 end
