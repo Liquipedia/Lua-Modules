@@ -20,7 +20,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class SeriesChildFromLpdb: Widget
 local TransferNavBox = Class.new(Widget)
-TransferNavBox.defaultProps = {portalLink = Portal:Transfers}
+TransferNavBox.defaultProps = {portalLink = 'Portal:Transfers'}
 
 ---@return Widget
 function TransferNavBox:render()
