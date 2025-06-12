@@ -58,10 +58,14 @@ function Map:createInfobox()
 		Customizable{id = 'location', children = {
 			Cell{name = 'Location', content = {args.location}}
 		}},
-		Cell{name = 'Release Date', content = {args.releasedate}},
+		Customizable{id = 'release', children = {
+			Cell{name = 'Release Date', content = {args.releasedate}},
+		}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}
+
+	self:bottom(self:createBottomContent())
 
 	if Namespace.isMain() then
 		self:categories('Maps', unpack(self:getWikiCategories(args)))
