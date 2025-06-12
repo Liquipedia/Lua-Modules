@@ -58,7 +58,7 @@ function TransferNavBox._buildPageDisplay(pageName)
 	_, _, month = string.find(pageName, '.*[tT]ransfers/%d%d%d%d/(.*)')
 	if Logic.isEmpty(month) then return end
 
-	-- we have to account fo transfer pages not fitting the format we will ignore those and throw them away
+	-- we have to account for transfer pages not fitting the format we will ignore those and throw them away
 	-- but since the date functions would error on them rather pcall the date functions
 	local formatMonth = function()
 		local timestamp = DateExt.readTimestamp(month .. ' 1970')
