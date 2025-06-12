@@ -11,7 +11,6 @@ local Class = require('Module:Class')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = Lua.import('Module:Operator')
 local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local Table = require('Module:Table')
 
