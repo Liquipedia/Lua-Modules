@@ -20,6 +20,7 @@ local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class SeriesChildFromLpdb: Widget
 local TransferNavBox = Class.new(Widget)
+TransferNavBox.defaultProps = {portalLink = Portal:Transfers}
 
 ---@return Widget
 function TransferNavBox:render()
@@ -40,7 +41,7 @@ function TransferNavBox:render()
 			childIndex = childIndex + 1
 		end
 	end
-	return NavBox(Table.merge(children, {title = 'Transfers', titleLink = 'Portal:Transfers'}))
+	return NavBox(Table.merge(children, {title = 'Transfers', titleLink = self.props.portalLink}))
 end
 
 function TransferNavBox._buildPageDisplay(pageName)
