@@ -409,7 +409,8 @@ function Person:getPersonType(args)
 	local playerValue = {store = 'player', category = 'Player'}
 	local staffValue = {store = 'staff', category = 'Staff'}
 
-	if self.roles[1] and Table.includes(Roles.StaffRoles, self.roles[1]) then
+	local roles = Person._getKeysOfRoles(self.roles)
+	if Roles.StaffRoles[roles[1]] then
 		return staffValue
 	end
 	return playerValue
