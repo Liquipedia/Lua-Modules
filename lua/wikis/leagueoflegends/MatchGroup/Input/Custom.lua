@@ -16,6 +16,7 @@ local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 
 local CustomMatchGroupInput = {}
+---@class LeagueOfLegendsMatchParser: MatchParserInterface
 local MatchFunctions = {}
 local MapFunctions = {}
 
@@ -31,11 +32,11 @@ MatchFunctions.getBestOf = MatchGroupInputUtil.getBestOf
 ---@field getMap fun(mapInput: table): table
 ---@field getLength fun(map: table): string?
 ---@field getSide fun(map: table, opponentIndex: integer): string?
----@field getObjectives fun(map: table, opponentIndex: integer): string?
+---@field getObjectives fun(map: table, opponentIndex: integer): table<string, integer>?
 ---@field getHeroPicks fun(map: table, opponentIndex: integer): string[]?
 ---@field getHeroBans fun(map: table, opponentIndex: integer): string[]?
 ---@field getParticipants fun(map: table, opponentIndex: integer): table[]?
----@field getVetoPhase fun(map: table): table?
+---@field getVetoPhase fun(map: table): table[]?
 
 ---@param match table
 ---@param options? {isMatchPage: boolean?}
@@ -59,13 +60,6 @@ function CustomMatchGroupInput.processMatch(match, options)
 		MapParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
 	end
 
-	return CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
-end
-
----@param MapParser LeagueOfLegendsMapParserInterface
----@param match table
----@return table
-function CustomMatchGroupInput.processMatchWithoutStandalone(MapParser, match)
 	return MatchGroupInputUtil.standardProcessMatch(match, MatchFunctions, nil, MapParser)
 end
 
@@ -125,7 +119,7 @@ function MapFunctions.getExtraData(MapParser, match, map, opponents)
 
 	for opponentIndex = 1, #opponents do
 		local opponentData = {
-			objectives = MapParser.getObjectives(map, opponentIndex),
+			objectives = MapParser.getObjectives(map, opponentIndex) or {},
 			side = MapParser.getSide(map, opponentIndex),
 		}
 		opponentData = Table.merge(opponentData,
