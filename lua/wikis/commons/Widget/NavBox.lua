@@ -7,9 +7,11 @@
 
 local Lua = require('Module:Lua')
 
+local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -41,12 +43,7 @@ function NavBox:render()
 	assert(props.title, 'Missing title input')
 	assert(props.child1, 'No children inputted')
 
-	-- as a first step collapse at the top and uncollapse at the bottom
-	-- as heuristic assume we are at the bottom if an infobox or HDB is above
-	local shouldCollapse = Logic.readBool(Table.extract(props, 'collapsed')) or not (
-		Variables.varDefault('has_infobox') -- any page with an infobox
-		or Variables.varDefault('tournament_parent') -- any Page with a HDB
-	)
+	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
 
 	-- have to extract so the child doesn't add the header too ...
 	local title = Table.extract(self.props, 'title')
@@ -84,6 +81,57 @@ function NavBox._title(titleText, titleLink, templateLink)
 			CollapsibleToggle{css = {float = 'right'}}
 		)
 	}
+end
+
+---@private
+---@param collapsedInput string|boolean?
+---@return boolean
+function NavBox:_determineCollapsedState(collapsedInput)
+	collapsedInput = Logic.readBoolOrNil(collapsedInput)
+
+	-- case manually inputted true
+	if collapsedInput then
+		return collapsedInput
+	end
+
+	-- as a first step collapse at the top and uncollapse at the bottom
+	-- as heuristic assume we are at the bottom if an infobox or HDB is above
+	local uncollapseHeuristic = Variables.varDefault('has_infobox') -- any page with an infobox
+		or Variables.varDefault('tournament_parent') -- any Page with a HDB
+
+	-- case heuristic says to uncollapse and manual input doesn't say to collapse
+	if uncollapseHeuristic then
+		return false
+	end
+	if collapsedInput ~= false then
+		return true
+	end
+
+	return NavBox._getNumberOfChildren(self.props) > 3
+end
+
+---@private
+---@param props table
+---@return integer
+function NavBox._getNumberOfChildren(props)
+	local numberOfChildren = 0
+	if props[1] or Logic.readBool(props.allowEmpty) then
+		numberOfChildren = numberOfChildren + 1
+	end
+
+	---@type table[]
+	local currentChildren = Array.mapIndexes(function(rowIndex) return Json.parseIfTable(props['child' .. rowIndex]) end)
+
+	Array.forEach(currentChildren, function(childProps)
+		-- if the child is collapsed do not consider subchildren anymore
+		if Logic.readBool(childProps.collapsed) then
+			numberOfChildren = numberOfChildren + 1
+			return
+		end
+		numberOfChildren = numberOfChildren + NavBox._getNumberOfChildren(childProps)
+	end)
+
+	return numberOfChildren
 end
 
 return NavBox
