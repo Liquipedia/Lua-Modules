@@ -48,6 +48,9 @@ return {
 			status = 1,
 			sortCasters = true,
 		},
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }
