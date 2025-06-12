@@ -11,6 +11,7 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local DateExt = require('Module:Date/Ext')
 local Flags = require('Module:Flags')
+local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -45,7 +46,7 @@ local INACTIVE_ROLE = 'inactive'
 ---@field nationality string?
 ---@field nationality2 string?
 ---@field nationality3 string?
----@field roles? string[]
+---@field roles string[]|string|nil
 ---@field status string?
 ---@field subtext string?
 ---@field team string?
@@ -185,6 +186,9 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 	playerInfo.extradata = playerInfo.extradata or {}
 
 	local roles = args.roles or playerInfo.extradata.roles or {}
+	if type(roles) == 'string' then
+		roles = Array.parseCommaSeparatedString(roles)
+	end
 
 	local personType = (Logic.emptyOr(args.type, playerInfo.type) or TYPE_PLAYER):lower()
 	if personType ~= TYPE_PLAYER and Roles[roles[1]] then
@@ -365,21 +369,21 @@ end
 
 ---@param args playerIntroArgsValues
 function PlayerIntroduction:_roleAdjusts(args)
-	local roleAdjust = Logic.readBool(args.convert_role) and mw.loadData('Module:PlayerIntroduction/role') or {}
-
-	local manualRoleInput = args.role
+	local skipRole = Array.any(self.playerInfo.roles, function (role)
+		return role == SKIP_ROLE
+	end)
 	local transferInfo = self.transferInfo
 
 	local role
-	if manualRoleInput ~= SKIP_ROLE and String.isNotEmpty(transferInfo.role) and
+	if not skipRole and String.isNotEmpty(transferInfo.role) and
 		transferInfo.role ~= INACTIVE_ROLE and transferInfo.role ~= 'loan' and transferInfo.role ~= 'substitute' then
 
 		role = transferInfo.role
-	elseif manualRoleInput ~= SKIP_ROLE then
-		role = self.playerInfo.role
+	elseif not skipRole then
+		role = self.playerInfo.roles[1]
 	end
 
-	role = roleAdjust[role] or role
+	role = Roles[role] or role
 
 	if transferInfo.role == 'substitute' then
 		role = 'substitute ' .. role
@@ -409,7 +413,7 @@ function PlayerIntroduction:create()
 			born = self:_bornDisplay(isDeceased),
 			tense = isDeceased and 'was' or 'is',
 			a = AnOrA._main{
-				statusDisplay or nationalityDisplay or gameDisplay or factionDisplay or typeDisplay ,
+				statusDisplay or nationalityDisplay or gameDisplay or factionDisplay or typeDisplay,
 				origStr = 'false' -- hate it, but has to be like this
 			},
 			status = statusDisplay or '',
@@ -528,10 +532,13 @@ end
 --- builds the type display
 ---@return string?
 function PlayerIntroduction:typeDisplay()
-	return self._addConcatText(self.playerInfo.type)
-		.. self._addConcatText(
-			self.playerInfo.type ~= TYPE_PLAYER and String.isNotEmpty(self.playerInfo.role2) and self.playerInfo.role2 or nil,
-		' and ')
+	if self.playerInfo.type == TYPE_PLAYER then
+		return self._addConcatText(self.playerInfo.type)
+	end
+	local function roleDisplay(role)
+		return Roles[role] and Roles[role].display or role
+	end
+	return self._addConcatText(mw.text.listToText(Array.map(self.playerInfo.roles, roleDisplay), ', ', ' and '))
 end
 
 --- builds the team and role display
