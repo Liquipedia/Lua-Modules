@@ -191,8 +191,8 @@ function PlayerIntroduction:_parsePlayerInfo(args, playerInfo)
 	end
 
 	local personType = (Logic.emptyOr(args.type, playerInfo.type) or TYPE_PLAYER):lower()
-	if personType ~= TYPE_PLAYER and Roles[roles[1]] then
-		personType = Roles[roles[1]].display or TYPE_PLAYER
+	if personType ~= TYPE_PLAYER and Roles.All[roles[1]] then
+		personType = Roles.All[roles[1]].display or TYPE_PLAYER
 	end
 
 	local name = args.name or playerInfo.name
@@ -383,7 +383,7 @@ function PlayerIntroduction:_roleAdjusts(args)
 		role = self.playerInfo.roles[1]
 	end
 
-	role = Roles[role] or role
+	role = Roles.All[role] and Roles.All[role].display or role
 
 	if transferInfo.role == 'substitute' then
 		role = 'substitute ' .. role
@@ -536,7 +536,7 @@ function PlayerIntroduction:typeDisplay()
 		return self._addConcatText(self.playerInfo.type)
 	end
 	local function roleDisplay(role)
-		return Roles[role] and Roles[role].display or role
+		return Roles.All[role] and Roles.All[role].display or role
 	end
 	return self._addConcatText(mw.text.listToText(Array.map(self.playerInfo.roles, roleDisplay), ', ', ' and '))
 end
