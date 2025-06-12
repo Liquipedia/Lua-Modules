@@ -86,7 +86,17 @@ does not exist.
 ---@return teamTemplateData?
 function TeamTemplate.getRawOrNil(team, date)
 	team = team:gsub('_', ' '):lower()
-	return mw.ext.TeamTemplate.raw(team, date)
+
+	-- return mw.ext.TeamTemplate.raw(team, date)
+	-- below is a temp fix to re-allow team templates with underscores
+	-- should be removed once team template extension is restricted and existing team templates are converted
+	local teamTemplateData = mw.ext.TeamTemplate.raw(team, date)
+	if teamTemplateData then
+		return teamTemplateData
+	end
+	mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+	local teamWithUnderscores = team:gsub(' ', '_'):lower()
+	return mw.ext.TeamTemplate.raw(teamWithUnderscores, date)
 end
 
 ---Creates error message for missing team templates.
