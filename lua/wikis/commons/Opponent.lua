@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
