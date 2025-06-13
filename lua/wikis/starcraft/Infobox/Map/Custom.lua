@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -20,6 +19,8 @@ local Cell = Widgets.Cell
 
 ---@class StarcraftMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class StarcraftMapInfoboxWidgetInjector: WidgetInjector
+---@field caller StarcraftMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -67,12 +68,9 @@ end
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
 	lpdbData.name = self:getNameDisplay(args)
-	lpdbData.extradata = {
-		creator = args.creator and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
-		spawns = args.players,
-		height = args.height,
-		width = args.width,
-	}
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.height = args.height
+	lpdbData.extradata.width = args.width
 	return lpdbData
 end
 

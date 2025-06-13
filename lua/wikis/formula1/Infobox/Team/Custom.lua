@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,7 +9,9 @@ local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
-local TeamTemplates = require('Module:Team')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -58,7 +59,7 @@ function CustomInjector:parse(id, widgets)
 
 		if args.academy then
 			local academyTeams = Array.map(self.caller:getAllArgsForBase(args, 'academy'), function(team)
-				return TeamTemplates.team(nil, team)
+				return OpponentDisplay.InlineTeamContainer{template = team, displayType = 'standard' }
 			end)
 			Array.extendWith(widgets,
 				{Title{children = 'Academy Team' .. (Table.size(academyTeams) > 1 and 's' or '')}},

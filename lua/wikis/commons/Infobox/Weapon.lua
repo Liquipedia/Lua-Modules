@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Weapon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -146,7 +145,7 @@ function Weapon:_createLocation(location)
 		return ''
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 

@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Opponent
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -226,6 +226,7 @@ end
 ---It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
+---@return boolean
 function Opponent.same(opponent1, opponent2)
 	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
 end
@@ -350,7 +351,10 @@ Returns nil if the team template does not exist.
 ---@return string
 function Opponent.toName(opponent)
 	if opponent.type == Opponent.team then
-		return TeamTemplate.getPageName(opponent.template)
+		local name = TeamTemplate.getPageName(opponent.template)
+		-- annos expect a string return, so let it error if we get a nil return
+		assert(name, 'Invalid team template: ' .. (opponent.template or ''))
+		return name
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName
@@ -387,7 +391,7 @@ function Opponent.readOpponentArgs(args)
 	elseif partySize == 1 then
 		local player = {
 			displayName = args[1] or args.p1 or args.name or '',
-			flag = String.nilIfEmpty(Flags.CountryName(args.flag or args.p1flag)),
+			flag = String.nilIfEmpty(Flags.CountryName{flag = args.flag or args.p1flag}),
 			pageName = args.link or args.p1link,
 			team = args.team or args.p1team,
 		}
@@ -398,7 +402,7 @@ function Opponent.readOpponentArgs(args)
 			local playerTeam = args['p' .. playerIndex .. 'team']
 			return {
 				displayName = args[playerIndex] or args['p' .. playerIndex] or '',
-				flag = String.nilIfEmpty(Flags.CountryName(args['p' .. playerIndex .. 'flag'])),
+				flag = String.nilIfEmpty(Flags.CountryName{flag = args['p' .. playerIndex .. 'flag']}),
 				pageName = args['p' .. playerIndex .. 'link'],
 				team = playerTeam,
 			}
@@ -431,7 +435,7 @@ function Opponent.fromMatch2Record(record)
 			players = Array.map(record.match2players, function(playerRecord)
 				return {
 					displayName = playerRecord.displayname,
-					flag = String.nilIfEmpty(Flags.CountryName(playerRecord.flag)),
+					flag = String.nilIfEmpty(Flags.CountryName{flag = playerRecord.flag}),
 					pageName = String.nilIfEmpty(playerRecord.name),
 				}
 			end),
@@ -487,7 +491,7 @@ function Opponent.fromLpdbStruct(storageStruct)
 
 			return {
 				displayName = players[prefix .. 'dn'],
-				flag = Flags.CountryName(players[prefix .. 'flag']),
+				flag = Flags.CountryName{flag = players[prefix .. 'flag']},
 				pageName = players[prefix],
 				team = players[prefix .. 'template'] or players[prefix .. 'team'],
 			}

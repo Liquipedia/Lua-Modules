@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:YearsActive/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -174,4 +173,4 @@ function ActiveYears._insertYears(startYear, endYear, yearRanges)
 	return yearRanges
 end
 
-return Class.export(ActiveYears)
+return Class.export(ActiveYears, {exports = {'display'}})

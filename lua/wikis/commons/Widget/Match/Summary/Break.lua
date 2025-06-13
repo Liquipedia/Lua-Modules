@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Break
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -18,6 +17,8 @@ local Cell = Widgets.Cell
 
 ---@class RocketLeagueMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class RocketLeagueMapInfoboxWidgetInjector: WidgetInjector
+---@field caller RocketLeagueMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -41,24 +42,16 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Layout', content = {args.layout}},
 			Cell{name = 'Versions', content = {args.versions}},
 			Cell{name = 'Playlists', content = {args.playlists}},
-			Cell{name = 'Gamemodes', content = {args.gamemodes}}
+			Cell{name = 'Gamemodes', content = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets
 end
 
----@param lpdbData table
 ---@param args table
----@return table
-function CustomMap:addToLpdb(lpdbData, args)
-	local resolveIfExists = function(value)
-		if not value then return end
-		return mw.ext.TeamLiquidIntegration.resolve_redirect(value)
-	end
-	lpdbData.extradata.creator = resolveIfExists(args.creator)
-	lpdbData.extradata.creator2 = resolveIfExists(args.creator2)
-
-	return lpdbData
+---@return string[]
+function CustomMap:getGameModes(args)
+	return Array.parseCommaSeparatedString(args.gamemodes)
 end
 
 return CustomMap

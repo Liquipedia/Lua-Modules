@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Infobox/UnofficialWorldChampion/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,12 +1,10 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Page
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local String = require('Module:StringUtils')
 
 local Page = {}
@@ -75,4 +73,4 @@ function Page.pageifyLink(link)
 	return (mw.ext.TeamLiquidIntegration.resolve_redirect(link):gsub(' ', '_'))
 end
 
-return Class.export(Page)
+return Page

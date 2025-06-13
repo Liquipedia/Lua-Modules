@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -27,4 +26,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_edate', Variables.varDefault('tournament_enddate'))
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

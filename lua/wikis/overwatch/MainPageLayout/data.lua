@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,6 +15,7 @@ local Div = HtmlWidgets.Div
 local MatchTicker = Lua.import('Module:Widget/MainPage/MatchTicker')
 local ThisDayWidgets = Lua.import('Module:Widget/MainPage/ThisDay')
 local TransfersList = Lua.import('Module:Widget/MainPage/TransfersList')
+local WantToHelp = Lua.import('Module:Widget/MainPage/WantToHelp')
 
 local CONTENT = {
 	usefulArticles = {
@@ -26,7 +26,7 @@ local CONTENT = {
 	},
 	wantToHelp = {
 		heading = 'Want To Help?',
-		body = '{{Liquipedia:Want_to_help}}',
+		body = WantToHelp{},
 		padding = true,
 		boxid = 1504,
 	},
@@ -44,7 +44,7 @@ local CONTENT = {
 	specialEvents = {
 		noPanel = true,
 		body = '{{Liquipedia:Special Event}}',
-		boxid = 1510,
+		boxid = 1516,
 	},
 	filterButtons = {
 		noPanel = true,
@@ -75,8 +75,8 @@ local CONTENT = {
 
 return {
 	banner = {
-		lightmode = 'Overwatch 2 full lightmode.png',
-		darkmode = 'Overwatch 2 full darkmode.png',
+		lightmode = 'Overwatch 2 wordmark lightmode.png',
+		darkmode = 'Overwatch 2 wordmark darkmode.png',
 	},
 	metadesc = 'Comprehensive Overwatch wiki with articles covering everything from heroes, to tournaments, ' ..
 		'to competitive players and teams.',

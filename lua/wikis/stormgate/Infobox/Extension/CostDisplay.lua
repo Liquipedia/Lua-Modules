@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Extension/CostDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,10 +16,10 @@ local CostDisplay = {}
 --use placeholders until ingame icons are final and we get them
 local ICONS = {
 	luminite = {
-		default = Abbreviation.make('Lum', 'Luminite'),
+		default = Abbreviation.make{text = 'Lum', title = 'Luminite'},
 	},
 	therium = {
-		default = Abbreviation.make('The', 'Therium'),
+		default = Abbreviation.make{text = 'The', title = 'Therium'},
 	},
 	buildTime = {
 		default = Icon.makeIcon{iconName = 'time', size = '100%'},
@@ -30,10 +29,10 @@ local ICONS = {
 		default = '[[File:Supply-terran.gif|baseline|link=Supply]]',
 	},
 	animus = {
-		default = Abbreviation.make('Ani', 'Animus'),
+		default = Abbreviation.make{text = 'Ani', title = 'Animus'},
 	},
 	power = {
-		default = Abbreviation.make('Pow', 'Power'),
+		default = Abbreviation.make{text = 'Pow', title = 'Power'},
 	},
 }
 local ORDER = {

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Skill/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -57,7 +56,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Move Speed', content = {args.movespeed}},
 			Cell{name = 'Researched from', content = {self.caller:getResearchFrom()}},
 			Cell{name = 'Research Cost', content = {self.caller:getResearchCost()}},
-			Cell{name = 'Research Hotkey', content = {Hotkeys.hotkey(args.rhotkey)}},
+			Cell{name = 'Research Hotkey', content = {Hotkeys.hotkey{hotkey = args.rhotkey}}},
 		}
 	end
 
@@ -106,9 +105,9 @@ end
 function CustomSkill:getHotkeys()
 	if not String.isEmpty(self.args.hotkey) then
 		if not String.isEmpty(self.args.hotkey2) then
-			return Hotkeys.hotkey2(self.args.hotkey, self.args.hotkey2, 'slash')
+			return Hotkeys.hotkey2{hotkey1 = self.args.hotkey, hotkey2 = self.args.hotkey2, seperator = 'slash'}
 		else
-			return Hotkeys.hotkey(self.args.hotkey)
+			return Hotkeys.hotkey{hotkey = self.args.hotkey}
 		end
 	end
 end

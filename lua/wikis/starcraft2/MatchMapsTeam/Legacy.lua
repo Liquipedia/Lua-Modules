@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:MatchMapsTeam/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

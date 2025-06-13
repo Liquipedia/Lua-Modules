@@ -1,12 +1,14 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
+local DateExt = require('Module:Date/Ext')
+local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
@@ -22,6 +24,29 @@ local CustomMatchSummary = {}
 function CustomMatchSummary.getByMatchId(args)
 	return MatchSummary.defaultGetByMatchId(CustomMatchSummary, args, {width = '500px', teamStyle = 'bracket'})
 end
+
+---@param match MatchGroupUtilMatch
+---@return MatchSummaryBody
+function CustomMatchSummary.createBody(match)
+	-- Original Match Id must be used to link match page if it exists.
+	-- It can be different from the matchId when shortened brackets are used.
+	local matchId = match.extradata.originalmatchid or match.matchId
+
+	local showCountdown = match.timestamp ~= DateExt.defaultTimestamp
+
+	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
+		MatchSummaryWidgets.MatchPageLink{
+			matchId = matchId,
+			hasMatchPage = Logic.isNotEmpty(match.bracketData.matchPage),
+		},
+		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
+		Array.map(match.games, FnUtil.curry(CustomMatchSummary.createGame, match.date)),
+		MatchSummaryWidgets.Mvp(match.extradata.mvp),
+		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {game = match.game}))
+	)}
+end
+
+
 
 ---@param date string
 ---@param game MatchGroupUtilGame

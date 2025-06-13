@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -36,6 +35,7 @@ return {
 			status = 2,
 			matchWidthMobile = 110,
 			matchWidth = 190,
+			sortCasters = true,
 		},
 	},
 	defaultRoundPrecision = 0,

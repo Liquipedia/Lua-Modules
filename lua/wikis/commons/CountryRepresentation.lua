@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:CountryRepresentation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -145,7 +144,7 @@ function CountryRepresentation:create()
 		table.insert(rows, Tr{
 			children = {
 				Td{css = {['text-align'] = 'right'}, children = {cache.rank}},
-				Td{children = {Flags.Icon(country), '&nbsp;', country}},
+				Td{children = {Flags.Icon{flag = country}, '&nbsp;', country}},
 				Td{css = {['text-align'] = 'right'}, children = {self:_ratioDisplay(#players)}},
 				Td{children = {table.concat(Array.map(players, function(player)
 					return Page.makeInternalLink({}, player.displayName or player.page, player.page)

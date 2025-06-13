@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=osu
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -48,6 +47,7 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 180,
+			sortCasters = true,
 		},
 	},
 	defaultRoundPrecision = 0,

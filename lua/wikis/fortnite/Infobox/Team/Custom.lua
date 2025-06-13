@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -81,7 +80,7 @@ function CustomTeam:calculateEarnings()
 	local playerTeamConditions = ConditionTree(BooleanOperator.any)
 	for playerIndex = 1, MAXIMUM_NUMBER_OF_PLAYERS_IN_PLACEMENTS do
 		playerTeamConditions:add{
-			ConditionNode(ColumnName('players_p' .. playerIndex .. 'team'), Comparator.eq, team),
+			ConditionNode(ColumnName('opponentplayers_p' .. playerIndex .. 'team'), Comparator.eq, team),
 		}
 	end
 
@@ -89,7 +88,7 @@ function CustomTeam:calculateEarnings()
 		ConditionNode(ColumnName('date'), Comparator.neq, DateExt.defaultDateTime),
 		ConditionNode(ColumnName('prizemoney'), Comparator.gt, '0'),
 		ConditionTree(BooleanOperator.any):add{
-			ConditionNode(ColumnName('participantlink'), Comparator.eq, team),
+			ConditionNode(ColumnName('opponentname'), Comparator.eq, team),
 			ConditionTree(BooleanOperator.all):add{
 				ConditionNode(ColumnName('mode'), Comparator.neq, 'team'),
 				playerTeamConditions

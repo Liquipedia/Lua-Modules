@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -73,27 +72,22 @@ end
 ---@param lpdbData table
 ---@param args table
 function CustomHero:addToLpdb(lpdbData, args)
-	lpdbData.information = args.name
-	lpdbData.image = args.image
-	lpdbData.date = args.released
-	lpdbData.extradata = {
-		name = args.name,
-		resistancebullet = args.resistancebullet,
-		resistancespirit = args.resistancespirit,
-		basehealth = args.basehealth,
-		basehealthregen = args.basehealthregen,
-		speedmove = args.speedmove,
-		speedsprint = args.speedsprint,
-		stamina = args.stamina,
-		dps = args.dps,
-		bps = args.bps,
-		ammo = args.ammo,
-		damagebullet = args.damagebullet,
-		damagemeleelight = args.damagemeleelight,
-		damagemeleeheavy = args.damagemeleeheavy,
-		playable = tostring(Logic.nilOr(Logic.readBoolOrNil(args.playable), true)),
-		removed = tostring(Logic.readBool(args.removed))
-	}
+	lpdbData.extradata.name = args.name
+	lpdbData.extradata.resistancebullet = args.resistancebullet
+	lpdbData.extradata.resistancespirit = args.resistancespirit
+	lpdbData.extradata.basehealth = args.basehealth
+	lpdbData.extradata.basehealthregen = args.basehealthregen
+	lpdbData.extradata.speedmove = args.speedmove
+	lpdbData.extradata.speedsprint = args.speedsprint
+	lpdbData.extradata.stamina = args.stamina
+	lpdbData.extradata.dps = args.dps
+	lpdbData.extradata.bps = args.bps
+	lpdbData.extradata.ammo = args.ammo
+	lpdbData.extradata.damagebullet = args.damagebullet
+	lpdbData.extradata.damagemeleelight = args.damagemeleelight
+	lpdbData.extradata.damagemeleeheavy = args.damagemeleeheavy
+	lpdbData.extradata.playable = tostring(Logic.nilOr(Logic.readBoolOrNil(args.playable), true))
+	lpdbData.extradata.removed = tostring(Logic.readBool(args.removed))
 
 	return lpdbData
 end

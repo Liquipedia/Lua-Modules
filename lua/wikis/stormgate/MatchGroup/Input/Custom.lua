@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -142,9 +141,7 @@ end
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
 	---@type table<string, string|table|nil>
-	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
+	local extradata = {}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
 		extradata[prefix] = mapVeto and mw.ext.TeamLiquidIntegration.resolve_redirect(mapVeto) or nil
@@ -224,7 +221,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			return {
 				faction = faction,
 				player = link,
-				flag = Flags.CountryName(playerIdData.flag),
+				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				random = Logic.readBool(mapInput[prefix .. 'random']),
 				heroes = MapFunctions.readHeroes(

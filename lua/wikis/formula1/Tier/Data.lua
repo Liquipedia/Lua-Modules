@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:Tier/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -68,7 +67,7 @@ return {
 			value = '-1',
 			sort = 'A8',
 			name = 'Misc',
-			short = 'Misc',
+			short = 'M.',
 			link = 'Miscellaneous Events',
 			category = 'Miscellaneous Events',
 		},

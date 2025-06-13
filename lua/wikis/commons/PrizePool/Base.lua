@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PrizePool/Base
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -329,7 +328,7 @@ BasePrizePool.prizeTypes = {
 			if String.isNotEmpty(data.title) then
 				local text
 				if String.isNotEmpty(data.titleLong) then
-					text = Abbreviation.make(data.title, data.titleLong)
+					text = Abbreviation.make{text = data.title, title = data.titleLong}
 				elseif String.isNotEmpty(data.title) then
 					text = data.title
 				end
@@ -717,7 +716,7 @@ end
 
 ---@return string
 function BasePrizePool:_getPrizeSummaryText()
-	local tba = Abbreviation.make('TBA', 'To Be Announced')
+	local tba = Abbreviation.make{text = 'TBA', title = 'To Be Announced'}
 	local tournamentCurrency = Variables.varDefault('tournament_currency')
 	local baseMoneyRaw = Variables.varDefault('tournament_prizepool' .. BASE_CURRENCY:lower(), tba)
 	local baseMoneyDisplay = Currency.display(BASE_CURRENCY, baseMoneyRaw, {formatValue = true})
@@ -743,7 +742,8 @@ end
 function BasePrizePool:_currencyExchangeInfo()
 	if self.usedAutoConvertedCurrency then
 		local currencyText = Currency.display(BASE_CURRENCY)
-		local exchangeProvider = Abbreviation.make('exchange rate', Variables.varDefault('tournament_currency_text'))
+		local exchangeProvider = Abbreviation.make{text = 'exchange rate',
+			title = Variables.varDefault('tournament_currency_text')}
 
 		if not exchangeProvider then
 			return

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TypeUtil
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

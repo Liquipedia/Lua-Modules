@@ -1,12 +1,10 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Matchlist
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
@@ -241,4 +239,4 @@ function MatchlistDisplay.Score(props)
 		:node(contentNode)
 end
 
-return Class.export(MatchlistDisplay)
+return MatchlistDisplay

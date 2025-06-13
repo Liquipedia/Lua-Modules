@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AgeCalculation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -289,4 +288,4 @@ function AgeCalculation._showErrorForDateIfNeeded(date, dateType)
 	end
 end
 
-return Class.export(AgeCalculation)
+return AgeCalculation

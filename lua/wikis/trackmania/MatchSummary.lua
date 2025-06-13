@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -92,10 +91,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 			)
 			:node(mw.html.create('span')
 				:wikitext('(')
-				:node(Abbreviation.make(
-					'Bo' .. bestof,
-					'Best of ' .. bestof
-				))
+				:node(Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof})
 				:wikitext(')')
 			)
 	end

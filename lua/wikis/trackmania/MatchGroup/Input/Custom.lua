@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -113,7 +112,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 
 	return {
 		isfeatured = MatchFunctions.isFeatured(match),
-		casters = MatchGroupInputUtil.readCasters(match),
 		hasopponent1 = Logic.isNotEmpty(opponent1.name) and opponent1.type ~= Opponent.literal,
 		hasopponent2 = Logic.isNotEmpty(opponent2.name) and opponent2.type ~= Opponent.literal,
 	}

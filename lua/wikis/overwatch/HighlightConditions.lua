@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:HighlightConditions
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

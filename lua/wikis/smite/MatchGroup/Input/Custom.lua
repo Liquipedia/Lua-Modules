@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=smite
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -67,14 +66,6 @@ function MatchFunctions.calculateMatchScore(maps)
 	return function(opponentIndex)
 		return MatchGroupInputUtil.computeMatchScoreFromMapWinners(maps, opponentIndex)
 	end
-end
-
----@param match table
----@return table
-function MatchFunctions.getExtraData(match)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
 end
 
 --

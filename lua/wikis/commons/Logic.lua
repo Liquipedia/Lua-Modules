@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Logic
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -70,6 +69,7 @@ function Logic.isNotEmpty(val)
 	end
 end
 
+---Returns nil if argument is empty; otherwise returns the argument itself.
 ---@generic V
 ---@param val V?
 ---@return V?
@@ -119,8 +119,9 @@ function Logic.readBoolOrNil(val)
 end
 
 ---Throws an error if the supplied value is nil
----@param val any?
----@return any
+---@generic T
+---@param val T?
+---@return T
 function Logic.nilThrows(val)
 	if val == nil then
 		error('Unexpected nil', 2)
@@ -128,7 +129,7 @@ function Logic.nilThrows(val)
 	return val
 end
 
----Trys to execute a function.
+---Tries to execute a function.
 ---If it fails executes a catch function
 ---@param try function
 ---@param catch function
@@ -151,11 +152,11 @@ end
 
 ---Returns the result of a function if successful. Otherwise it returns the result of the second function.
 ---If the first function fails, its error is logged to the console and stashed away for display.
----@generic T
----@param f fun(): T
----@param other? fun(error: Error): any
+---@generic T, V
+---@param f fun(): T?
+---@param other? fun(error: Error): V?
 ---@param makeError? fun(error: Error): Error function that allows customizing Error instance being logged and stashed.
----@return T
+---@return T|V
 function Logic.tryOrElseLog(f, other, makeError)
 	return Logic.try(f)
 		:catch(function(error)

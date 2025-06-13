@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchTicker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,12 +51,13 @@ local DEFAULT_QUERY_COLUMNS = {
 	'match2id',
 	'match2bracketdata',
 	'match2games',
+	'game',
 }
 local NONE = 'none'
 local INFOBOX_DEFAULT_CLASS = 'fo-nttax-infobox panel'
 local INFOBOX_WRAPPER_CLASS = 'fo-nttax-infobox-wrapper'
 local DEFAULT_LIMIT = 20
-local DEFAULT_ODER = 'date asc, liquipediatier asc, tournament asc'
+local DEFAULT_ORDER = 'date asc, liquipediatier asc, tournament asc'
 local DEFAULT_RECENT_ORDER = 'date desc, liquipediatier asc, tournament asc'
 local NOW = os.date('%Y-%m-%d %H:%M', os.time(os.date('!*t') --[[@as osdateparam]]))
 
@@ -97,6 +97,7 @@ end
 ---@field games string[]?
 ---@field newStyle boolean?
 ---@field featuredTournamentsOnly boolean?
+---@field displayGameIcons boolean?
 
 ---@class MatchTicker
 ---@operator call(table): MatchTicker
@@ -120,7 +121,7 @@ function MatchTicker:init(args)
 		end)),
 		queryByParent = Logic.readBool(args.queryByParent),
 		limit = tonumber(args.limit) or DEFAULT_LIMIT,
-		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ODER),
+		order = args.order or (Logic.readBool(args.recent) and DEFAULT_RECENT_ORDER or DEFAULT_ORDER),
 		player = args.player and mw.ext.TeamLiquidIntegration.resolve_redirect(args.player):gsub(' ', '_') or nil,
 		queryColumns = args.queryColumns or DEFAULT_QUERY_COLUMNS,
 		additionalConditions = args.additionalConditions or '',
@@ -146,6 +147,7 @@ function MatchTicker:init(args)
 				end) or nil,
 		newStyle = Logic.readBool(args.newStyle),
 		featuredTournamentsOnly = Logic.readBool(args.featuredTournamentsOnly),
+		displayGameIcons = Logic.readBool(args.displayGameIcons)
 	}
 
 	--min 1 of them has to be set; recent can not be set while any of the others is set

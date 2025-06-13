@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/GameCountdown
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -36,7 +35,7 @@ function MatchSummaryFfaGameCountdown:render()
 	if game.dateIsExact then
 		-- TODO: Use game-TZ
 		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. Timezone.getTimezoneString('UTC')
+				.. Timezone.getTimezoneString{timezone = 'UTC'}
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', game.date)
 	end

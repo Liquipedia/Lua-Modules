@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchGroup/Legacy/ConvertMapData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -212,4 +211,4 @@ function ConvertMapData._readSubmatchPlayers(args, players, opponentPlayers, pre
 	table.insert(players[opponentIndex], Table.copy(opponentPlayers[opponentIndex][name2] or {}))
 end
 
-return Class.export(ConvertMapData)
+return Class.export(ConvertMapData, {exports = {'solo', 'team', 'teamMulti'}})

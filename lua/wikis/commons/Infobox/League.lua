@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/League
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -260,7 +259,7 @@ function League:createInfobox()
 				-- Only add the venue if there is exactly one venue, otherwise we'll only use the city + country
 				table.insert(addressParts, not locations.venue2 and locations.venue1 or nil)
 				table.insert(addressParts, locations.city1)
-				table.insert(addressParts, Flags.CountryName(locations.country1 or locations.region1))
+				table.insert(addressParts, Flags.CountryName{flag = locations.country1 or locations.region1})
 
 				-- Start date for the accommodation should be the day before the event, but at most 4 days before the event
 				-- End date for the accommodation should be 1 day after the event
@@ -693,7 +692,7 @@ function League:_createLocation(args)
 
 		else
 			local location = args['city' .. index] or args['location' .. index]
-			local countryName = Flags.CountryName(country)
+			local countryName = Flags.CountryName{flag = country}
 			local displayText = location or countryName
 			if String.isEmpty(displayText) then
 				displayText = country
@@ -833,7 +832,7 @@ function League:_cleanDate(date)
 	if self:_isUnknownDate(date) then
 		return nil
 	end
-	return ReferenceCleaner.clean(date)
+	return ReferenceCleaner.clean{input = date}
 end
 
 ---@param date string?

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -693,8 +692,8 @@ end
 ---@param timestamp number
 ---@return string
 function MatchTable._calculateDateTimeString(timezone, timestamp)
-	local offset = Timezone.getOffset(timezone) or 0
-	local tzstring = Timezone.getTimezoneString(timezone)
+	local offset = Timezone.getOffset{timezone = timezone} or 0
+	local tzstring = Timezone.getTimezoneString{timezone = timezone}
 	if not tzstring then
 		error('Unsupported timezone: ' .. timezone)
 	end

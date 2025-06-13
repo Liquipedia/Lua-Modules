@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Skill/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -87,7 +86,7 @@ end
 ---@return string?
 function CustomSkill:getResearchHotkey()
 	if String.isNotEmpty(self.args.from) then
-		return Hotkeys.hotkey(self.args.rhotkey)
+		return Hotkeys.hotkey{hotkey = self.args.rhotkey}
 	end
 end
 
@@ -147,9 +146,9 @@ end
 function CustomSkill:getHotkeys()
 	local args = self.args
 	if String.isNotEmpty(args.hotkey) and String.isNotEmpty(args.hotkey2) then
-		return Hotkeys.hotkey2(args.hotkey, args.hotkey2, 'slash')
+		return Hotkeys.hotkey2{hotkey1 = args.hotkey, hotkey2 = args.hotkey2, seperator = 'slash'}
 	elseif String.isNotEmpty(args.hotkey) then
-		return Hotkeys.hotkey(args.hotkey)
+		return Hotkeys.hotkey{hotkey = args.hotkey}
 	end
 end
 

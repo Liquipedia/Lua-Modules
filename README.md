@@ -88,13 +88,12 @@ Modules start with a header like:
 ```
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:$NameOfModule
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 ```
 
-The header is important, it is used by our automation to place a module in the correct wiki (commons here, other values are dota2, deadlock, rainbowsix etc. See the [Api Docs](https://api.liquipedia.net/documentation/api/v3) under Available Wikis for all wikis).
+The header is important, it is used by our automation to place a module in the correct location on the wikis.
 The page is like the path. It determines where within the wiki the file is deployed/hosted. Other files refer to each other based on this path.
 
 ## Project

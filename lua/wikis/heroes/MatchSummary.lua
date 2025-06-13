@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -23,7 +22,7 @@ local WidgetUtil = Lua.import('Module:Widget/Util')
 local MAX_NUM_BANS = 3
 local NUM_CHAMPIONS_PICK = 5
 
-local FP = Abbreviation.make('First Pick', 'First Pick for Heroes on this map')
+local FP = Abbreviation.make{text = 'First Pick', title = 'First Pick for Heroes on this map'}
 
 ---@param args table
 ---@return Html
@@ -42,7 +41,6 @@ function CustomMatchSummary.createBody(match)
 		Array.map(match.games, FnUtil.curry(CustomMatchSummary._createGame, match.date)),
 		MatchSummaryWidgets.Mvp(match.extradata.mvp),
 		MatchSummaryWidgets.CharacterBanTable{bans = characterBansData, date = match.date},
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		MatchSummaryWidgets.MapVeto(MatchSummary.preProcessMapVeto(match.extradata.mapveto, {emptyMapDisplay = FP}))
 	)}
 end

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -23,6 +22,8 @@ local Title = Widgets.Title
 
 ---@class StormgateMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class StormgateMapInfoboxWidgetInjector: WidgetInjector
+---@field caller StormgateMapInfobox
 local CustomInjector = Class.new(Injector)
 
 local CAMPS = {
@@ -37,8 +38,8 @@ local CAMPS = {
 --currently the ingame icons are still temporary
 --use placeholders until ingame icons are final and we get them
 local RESOURCE_ICONS = {
-	luminite = Abbreviation.make('Lum', 'Luminite'),
-	therium = Abbreviation.make('The', 'Therium'),
+	luminite = Abbreviation.make{text = 'Lum', title = 'Luminite'},
+	therium = Abbreviation.make{text = 'The', title = 'Therium'},
 }
 local LADDER_HISTORY = {
 	{key = '1v1history', name = '1v1 Ladder'},
@@ -189,24 +190,14 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	---@param val string?
-	---@return string?
-	local resolveOrNil = function(val)
-		return val and mw.ext.TeamLiquidIntegration.resolve_redirect(val) or nil
-	end
-
-	lpdbData.extradata = {
-		creator = resolveOrNil(args.creator),
-		creator2 = resolveOrNil(args.creator2),
-		spawns = args.players,
-		spawnpositions = args.positions,
-		height = args.height or 0,
-		width = args.width or 0,
-		rush = args.rushDistance,
-		luminite = args.luminite or 0,
-		therium = args.therium or 0,
-		closedtherium = args.closedTherium or 0,
-	}
+	lpdbData.extradata.spawns = args.players
+	lpdbData.extradata.spawnpositions = args.positions
+	lpdbData.extradata.height = args.height or 0
+	lpdbData.extradata.width = args.width or 0
+	lpdbData.extradata.rush = args.rushDistance
+	lpdbData.extradata.luminite = args.luminite or 0
+	lpdbData.extradata.therium = args.therium or 0
+	lpdbData.extradata.closedtherium = args.closedTherium or 0
 
 	Array.forEach(LADDER_HISTORY, function(data)
 		lpdbData.extradata[data.key] = tostring(String.isNotEmpty(args[data.key]))

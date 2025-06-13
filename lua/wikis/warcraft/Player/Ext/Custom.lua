@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Player/Ext/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -39,7 +38,7 @@ CustomPlayerExt.fetchPlayer = FnUtil.memoize(function(resolvedPageName)
 			or nil
 
 		return {
-			flag = String.nilIfEmpty(Flags.CountryName(record.nationality)),
+			flag = String.nilIfEmpty(Flags.CountryName{flag = record.nationality}),
 			faction = Faction.read(record.extradata.faction),
 			factionHistory = factionHistory,
 		}
@@ -68,7 +67,7 @@ end
 ---@return string?
 function CustomPlayerExt.fetchPlayerFlag(resolvedPageName)
 	local lpdbPlayer = CustomPlayerExt.fetchPlayer(resolvedPageName)
-	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName(lpdbPlayer.flag))
+	return lpdbPlayer and String.nilIfEmpty(Flags.CountryName{flag = lpdbPlayer.flag})
 end
 
 ---@param resolvedPageName string

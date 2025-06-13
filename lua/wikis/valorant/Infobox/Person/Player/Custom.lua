@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,54 +9,26 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local CharacterIcon = require('Module:CharacterIcon')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MatchTicker = require('Module:MatchTicker/Custom')
-local Page = require('Module:Page')
+local PlayerIntroduction = require('Module:PlayerIntroduction/Custom')
 local Region = require('Module:Region')
 local SignaturePlayerAgents = require('Module:SignaturePlayerAgents')
 local String = require('Module:StringUtils')
 local Team = require('Module:Team')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
 local Widgets = require('Module:Widget/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Cell = Widgets.Cell
-
-local ROLES = {
-	-- Players
-	['igl'] = {category = 'In-game leaders', variable = 'In-game leader'},
-
-	-- Staff
-	['analyst'] = {category = 'Analysts', variable = 'Analyst', staff = true},
-	['coach'] = {category = 'Coaches', variable = 'Coach', staff = true},
-	['manager'] = {category = 'Managers', variable = 'Manager', staff = true},
-	-- Talents
-	['broadcast analyst'] = {category = 'Broadcast Analysts', variable = 'Broadcast Analyst', talent = true},
-	['observer'] = {category = 'Observers', variable = 'Observer', talent = true},
-	['host'] = {category = 'Host', variable = 'Host', talent = true},
-	['journalist'] = {category = 'Journalists', variable = 'Journalist', talent = true},
-	['expert'] = {category = 'Experts', variable = 'Expert', talent = true},
-	['caster'] = {category = 'Casters', variable = 'Caster', talent = true},
-	['streamer'] = {category = 'Content Creators', variable = 'Streamer', talent = true},
-	['content creator'] = {category = 'Content Creators', variable = 'Content Creator', talent = true},
-	['producer'] = {category = 'Production Staff', variable = 'Producer', talent = true},
-	['stats producer'] = {category = 'Production Staff', variable = 'Stats Producer', talent = true},
-	['director'] = {category = 'Production Staff', variable = 'Director', talent = true},
-	['interviewer'] = {category = 'Interviewers', variable = 'Interviewer', talent = true},
-	['translator'] = {category = 'Production Staff', variable = 'Translator', talent = true},
-	['interpreter'] = {category = 'Production Staff', variable = 'Interpreter', talent = true},
-}
-ROLES['in-game leader'] = ROLES.igl
+local UpcomingTournaments = Lua.import('Module:Widget/Infobox/UpcomingTournaments')
 
 local SIZE_AGENT = '20px'
 
----@class ValorantInfoboxPlayer: Person
----@field role {category: string, variable: string, talent: boolean?, staff: boolean?}?
----@field role2 {category: string, variable: string, talent: boolean?, staff: boolean?}?
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -65,19 +36,46 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
+	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{
+	args.history = TeamHistoryAuto.results{
 		convertrole = true,
 		addlpdbdata = true,
-		specialRoles = player.args.historySpecialRoles
+		specialRoles = args.historySpecialRoles
 	}
-	player.args.autoTeam = true
-	player.args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
-	player.role = player:_getRoleData(player.args.role)
-	player.role2 = player:_getRoleData(player.args.role2)
+	args.autoTeam = true
+	args.agents = SignaturePlayerAgents.get{player = player.pagename, top = 3}
 
-	return player:createInfobox()
+	local builtInfobox = player:createInfobox()
+
+	local autoPlayerIntro = ''
+	if Logic.readBool((args.autoPI or ''):lower()) then
+		autoPlayerIntro = PlayerIntroduction.run{
+			player = player.pagename,
+			team = args.team,
+			name = args.romanized_name or args.name,
+			first_name = args.first_name,
+			last_name = args.last_name,
+			status = args.status,
+			type = player:getPersonType(args).store,
+			roles = player._getKeysOfRoles(player.roles),
+			id = args.id,
+			idIPA = args.idIPA,
+			idAudio = args.idAudio,
+			birthdate = player.age.birthDateIso,
+			deathdate = player.age.deathDateIso,
+			nationality = args.country,
+			nationality2 = args.country2,
+			nationality3 = args.country3,
+			subtext = args.subtext,
+			freetext = args.freetext,
+		}
+	end
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(autoPlayerIntro)
 end
 
 ---@param id string
@@ -97,18 +95,14 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'status' then
 		Array.appendWith(widgets,
 			Cell{name = 'Years Active (Player)', content = {args.years_active}},
-			Cell{name = 'Years Active (' .. Abbreviation.make('Org', 'Organisation') .. ')', content = {args.years_active_org}},
+			Cell{
+				name = 'Years Active (' .. Abbreviation.make{text = 'Org', title = 'Organisation'} .. ')',
+				content = {args.years_active_org}
+			},
 			Cell{name = 'Years Active (Coach)', content = {args.years_active_coach}},
 			Cell{name = 'Years Active (Talent)', content = {args.years_active_talent}}
 		)
 
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role', content = {
-				caller:_displayRole(caller.role),
-				caller:_displayRole(caller.role2),
-			}},
-		}
 	elseif id == 'history' then
 		table.insert(widgets, Cell{name = 'Retired', content = {args.retired}})
 	elseif id == 'region' then
@@ -117,44 +111,11 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@param role string?
----@return {category: string, variable: string, talent: boolean?, staff: boolean?}?
-function CustomPlayer:_getRoleData(role)
-	return ROLES[(role or ''):lower()]
-end
-
----@param roleData {category: string, variable: string, talent: boolean?, staff: boolean?}?
----@return string?
-function CustomPlayer:_displayRole(roleData)
-	if not roleData then return end
-
-	return Page.makeInternalLink(roleData.variable, ':Category:' .. roleData.category)
-end
-
----@param args table
-function CustomPlayer:defineCustomPageVariables(args)
-	Variables.varDefine('role', (self.role or {}).variable)
-	Variables.varDefine('role2', (self.role2 or {}).variable)
-end
-
----@param categories string[]
----@return string[]
-function CustomPlayer:getWikiCategories(categories)
-	return Array.append(categories,
-		(self.role or {}).category,
-		(self.role2 or {}).category
-	)
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@param personType string
 ---@return table
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.role = (self.role or {}).variable
-	lpdbData.extradata.role2 = (self.role2 or {}).variable
-	lpdbData.extradata.isplayer = CustomPlayer._isNotPlayer(args.role) and 'false' or 'true'
-
 	Array.forEach(args.agents, function (agent, index)
 		lpdbData.extradata['agent' .. index] = agent
 	end)
@@ -164,34 +125,16 @@ function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	return lpdbData
 end
 
----@param role string?
----@return boolean?
-function CustomPlayer._isNotPlayer(role)
-	local roleData = ROLES[(role or ''):lower()]
-	return roleData and (roleData.talent or roleData.staff)
-end
-
----@param args table
----@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
-	local roleData = ROLES[(args.role or ''):lower()]
-	if roleData then
-		if roleData.staff then
-			return {store = 'staff', category = 'Staff'}
-		elseif roleData.talent then
-			return {store = 'talent', category = 'Talent'}
-		end
-	end
-	return {store = 'player', category = 'Player'}
-end
-
----@return string?
+---@return Widget?
 function CustomPlayer:createBottomContent()
 	if self:shouldStoreData(self.args) and String.isNotEmpty(self.args.team) then
 		local teamPage = Team.page(mw.getCurrentFrame(), self.args.team)
-		return
-			tostring(MatchTicker.player{recentLimit = 3}) ..
-			Template.safeExpand(mw.getCurrentFrame(), 'Upcoming and ongoing tournaments of', {team = teamPage})
+		return HtmlWidgets.Fragment{
+			children = {
+				MatchTicker.player{recentLimit = 3},
+				UpcomingTournaments{name = teamPage}
+			}
+		}
 	end
 end
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
 -- page=Module:Infobox/Unit/Hero/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

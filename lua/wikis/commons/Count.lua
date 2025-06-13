@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Count
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -312,4 +311,13 @@ function Count._tierConditions(args, lpdbConditions)
 end
 
 
-return Class.export(Count)
+return Class.export(Count, {exports = {
+	'match2',
+	'match2game',
+	'match2gamesData',
+	'games',
+	'matches',
+	'tournaments',
+	'tournamentsByTier',
+	'placements',
+}})

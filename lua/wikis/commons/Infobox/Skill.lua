@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Skill
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -141,9 +140,9 @@ function Skill:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.hotkey) then
 		if not String.isEmpty(args.hotkey2) then
-			display = Hotkey.hotkey2(args.hotkey, args.hotkey2, 'slash')
+			display = Hotkey.hotkey2{hotkey1 = args.hotkey, hotkey2 = args.hotkey2, seperator = 'slash'}
 		else
-			display = Hotkey.hotkey(args.hotkey)
+			display = Hotkey.hotkey{hotkey = args.hotkey}
 		end
 	end
 

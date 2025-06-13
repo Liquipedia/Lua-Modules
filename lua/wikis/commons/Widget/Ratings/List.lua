@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Ratings/List
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -122,7 +121,7 @@ function RatingsList:render()
 			HtmlWidgets.Td { attributes = { ['data-ranking-table-cell'] = 'rating' }, children = team.rating },
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'region' },
-				children = Flags.Icon(team.region) .. Flags.CountryName(team.region)
+				children = Flags.Icon{flag = team.region} .. Flags.CountryName{flag = team.region}
 			},
 			HtmlWidgets.Td {
 				attributes = { ['data-ranking-table-cell'] = 'streak' },

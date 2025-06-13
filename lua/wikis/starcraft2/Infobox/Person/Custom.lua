@@ -1,12 +1,9 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Person/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
---Extends the Infobox/Person class with shared functions between SC2 person infoboxes
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
@@ -25,22 +22,6 @@ local STATUS_ACTIVE = 'Active'
 local RACE_ALL = 'All'
 local RACE_ALL_SHORT = 'a'
 local RACE_ALL_ICON = '[[File:RaceIcon All.png|30px|link=]]'
-
---role stuff tables
-local ROLES = {
-	['admin'] = 'Admin', ['analyst'] = 'Analyst', ['coach'] = 'Coach',
-	['commentator'] = 'Commentator', ['caster'] = 'Commentator',
-	['expert'] = 'Analyst', ['host'] = 'Host', ['streamer'] = 'Streamer',
-	['interviewer'] = 'Interviewer', ['journalist'] = 'Journalist',
-	['manager'] = 'Manager', ['player'] = 'Player',
-	['map maker'] = 'Map maker', ['mapmaker'] = 'Map maker',
-	['observer'] = 'Observer', ['photographer'] = 'Photographer',
-	['tournament organizer'] = 'Organizer', ['organizer'] = 'Organizer',
-}
-local CLEAN_OTHER_ROLES = {
-	['blizzard'] = 'Blizzard', ['coach'] = 'Coach', ['staff'] = 'false',
-	['content producer'] = 'Content producer', ['streamer'] = 'false',
-}
 
 local MILITARY_DATA = {
 	starting = {category = 'Persons waiting for Military Duty', storeValue = 'pending'},
@@ -133,8 +114,6 @@ function CustomPerson:adjustLPDB(lpdbData, args, personType)
 	extradata.faction2 = (not raceData.isAll) and raceData.factions[2] or nil
 	extradata.lc_id = string.lower(self.pagename)
 	extradata.teamname = args.team
-	extradata.role = args.role
-	extradata.role2 = args.role2
 	extradata.militaryservice = self:military(args.military).storeValue
 	extradata.activeplayer = CustomPerson:getStatusToStore(args) == STATUS_ACTIVE
 		and CustomPerson._isPlayer(args)
@@ -169,24 +148,6 @@ function CustomPerson:military(military)
 	end
 
 	return {}
-end
-
----@param args table
----@return {store: string, category: string}
-function CustomPerson:getPersonType(args)
-	if args.isplayer == 'true' then
-		return {store = 'Player', category = 'Player'}
-	end
-
-	local role = args.role or args.occupation or args.defaultPersonType
-	role = string.lower(role or '')
-	local category = ROLES[role]
-	local store = category or CLEAN_OTHER_ROLES[role] or args.defaultPersonType
-	if category == ROLES['map maker'] then
-		category = 'Mapmaker'
-	end
-
-	return {store = store, category = category or args.defaultPersonType}
 end
 
 return CustomPerson

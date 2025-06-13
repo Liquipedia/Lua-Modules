@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -11,7 +10,7 @@ local Class = require('Module:Class')
 local Game = require('Module:Game')
 local Lua = require('Module:Lua')
 local Page = require('Module:Page')
-local String = require('Module:StringUtils')
+local Table = require('Module:Table')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
@@ -21,6 +20,8 @@ local Cell = Widgets.Cell
 
 ---@class AgeofEmpiresMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class AgeofEmpiresMapInfoboxWidgetInjector: WidgetInjector
+---@field caller AgeofEmpiresMapInfobox
 local CustomInjector = Class.new(Injector)
 
 local TYPES = {
@@ -35,6 +36,7 @@ local TYPES = {
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
 	map:setWidgetInjector(CustomInjector(map))
+	map.args.useDefaultGame = false
 
 	return map:createInfobox()
 end
@@ -72,13 +74,11 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata = {
-		creator = String.isNotEmpty(args.creator) and mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator) or nil,
+	lpdbData.extradata = Table.merge(lpdbData.extradata, {
 		spawns = args.players,
 		maptype = self:_getType(args.type),
 		icon = args.icon,
-		game = Game.name{game = args.game}
-	}
+	})
 	return lpdbData
 end
 
@@ -86,7 +86,7 @@ end
 ---@return string[]
 function CustomMap:getWikiCategories(args)
 	return {
-		Game.name{game = args.game} .. ' Maps',
+		self:getGame(args) .. ' Maps',
 		self:_getType(args.type) .. ' Maps',
 		self:_getType(args.type) .. ' Maps (' .. Game.abbreviation{game = args.game} .. ')'
 	}

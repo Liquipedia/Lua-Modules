@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TournamentsSummaryTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -374,4 +373,4 @@ function TournamentsSummaryTable.manualUpcomingRow(args)
 	return ''
 end
 
-return Class.export(TournamentsSummaryTable)
+return Class.export(TournamentsSummaryTable, {exports = {'run'}})

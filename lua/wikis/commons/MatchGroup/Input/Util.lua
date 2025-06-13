@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Input/Util
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -21,6 +20,7 @@ local Streams = require('Module:Links/Stream')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
 
+local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
 -- can not use /Custom here to avoid dependency loop on sc(2)
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
@@ -432,7 +432,7 @@ function MatchGroupInputUtil.readPlayersOfTeam(teamName, manualPlayersInput, opt
 		playersIndex = playersIndex + 1
 		players[normalizedPageName] = Table.merge(players[normalizedPageName] or {}, {
 			pageName = pageName,
-			flag = Flags.CountryName(player.flag),
+			flag = Flags.CountryName{flag = player.flag},
 			displayName = player.displayName,
 			faction = player.faction and Faction.read(player.faction) or nil,
 			index = playersIndex,
@@ -504,7 +504,7 @@ end
 
 ---reads the caster input of a match
 ---@param match table
----@param options {noSort: boolean?}?
+---@param options {sortCasters: boolean?}?
 ---@return table[]?
 function MatchGroupInputUtil.readCasters(match, options)
 	options = options or {}
@@ -517,7 +517,7 @@ function MatchGroupInputUtil.readCasters(match, options)
 		))
 	end
 
-	if not options.noSort then
+	if options.sortCasters then
 		table.sort(casters, function(c1, c2) return c1.displayName:lower() < c2.displayName:lower() end)
 	end
 
@@ -1170,7 +1170,10 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)
-	match.extradata = Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	match.extradata = Table.merge(
+		{casters = MatchGroupInputUtil.readCasters(match, {sortCasters = Info.config.match2.sortCasters})},
+		Parser.getExtraData and Parser.getExtraData(match, games, opponents) or {}
+	)
 
 	match.games = games
 	match.opponents = opponents
@@ -1407,7 +1410,7 @@ function MatchGroupInputUtil.standardProcessFfaMatch(match, Parser, mapProps)
 	match.links = MatchGroupInputUtil.getLinks(match)
 	match.extradata = Table.merge({
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true})
+		casters = MatchGroupInputUtil.readCasters(match)
 	}, Parser.getExtraData and Parser.getExtraData(match, games, opponents, settings) or {
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,
@@ -1428,6 +1431,7 @@ end
 ---@field readMapOpponent? fun(map: table, matchOpponent: table, opponentIndex: integer): table
 ---@field getMapWinner? fun(status: string?, winnerInput: integer|string?, mapOpponents: table[]): integer?
 ---@field mapIsFinished? fun(match: table, map: table): boolean
+---@field getGame? fun(match: table, map:table): string?
 
 --- The standard way to process a ffa map input.
 ---
@@ -1459,6 +1463,10 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 			map.patch = Parser.getPatch(map)
 		end
 
+		if Parser.getGame then
+			map.game = Parser.getGame(match, map)
+		end
+
 		local dateToUse = map.date or match.date
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
@@ -1488,8 +1496,9 @@ function MatchGroupInputUtil.standardProcessFfaMaps(match, opponents, scoreSetti
 		end
 
 		map.extradata = Table.merge({
+			displayname = map.mapDisplayName,
 			mvp = MatchGroupInputUtil.readMvp(map, opponents),
-			casters = MatchGroupInputUtil.readCasters(map, {noSort = true})
+			casters = MatchGroupInputUtil.readCasters(map)
 		}, Parser.getExtraData and Parser.getExtraData(match, map, opponents) or nil)
 
 		table.insert(maps, map)

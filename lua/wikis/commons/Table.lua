@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Table
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -37,6 +36,21 @@ function Table.includes(tbl, value, isPattern)
 		end
 	end
 	return false
+end
+
+---Gets the key for a value in a table. If there's multiple keys for the value,
+---the first one (without any ordering) is returned. If the value is not found, nil is returned.
+---@generic K, V
+---@param tbl {[K]: V}
+---@param value V
+---@return K
+function Table.getKeyOfValue(tbl, value)
+	for key, entry in pairs(tbl) do
+		if entry == value then
+			return key
+		end
+	end
+	return nil
 end
 
 ---@generic K, V, T

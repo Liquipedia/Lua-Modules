@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:GameSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

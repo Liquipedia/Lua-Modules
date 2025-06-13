@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -116,19 +115,22 @@ function CustomInjector:parse(id, widgets)
 				gold = SELL_FACTOR * (tonumber(args.gold) or 0),
 				lumber = SELL_FACTOR * (tonumber(args.lumber) or 0)
 			}}},
-			Cell{name = 'Purchase Hotkey', content = {args.hotkey and Hotkey.hotkey(args.hotkey) or nil}},
+			Cell{name = 'Purchase Hotkey', content = {args.hotkey and Hotkey.hotkey{hotkey = args.hotkey} or nil}},
 			Cell{name = 'Stock Max', content = {args.stock}},
 			Cell{name = 'Stock Start Delay', content = {args.stockstart and (
-				Abbreviation.make(args.stockstart .. 's', 'First available at ' .. GameClock.run(args.stockstart))
+				Abbreviation.make{text = args.stockstart .. 's', title = 'First available at ' .. GameClock.run(args.stockstart)}
 			) or nil}},
-			Cell{name = Abbreviation.make('Stock Repl. Interval', 'Stock Replenish Interval'), content = {args.stockreplenish}}
+			Cell{
+				name = Abbreviation.make{text = 'Stock Repl. Interval',title = 'Stock Replenish Interval'},
+				content = {args.stockreplenish}
+			}
 		)
 	elseif id == 'ability' then
 		return Array.append(widgets,
 			Cell{name = 'Cast Time', content = {args.cast}},
 			Cell{name = 'Cooldown', content = {args.cooldown}},
 			Cell{name = 'Cooldown Group', content = {args.cooldown and (args.coolgroup or
-				Abbreviation.make('Custom', 'This item has its own cooldown group.')
+				Abbreviation.make{text = 'Custom', title = 'This item has its own cooldown group.'}
 			) or nil}},
 			Cell{name = 'Duration', content = {args.duration}}
 		)

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Series
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -207,9 +206,9 @@ function Series:_setLpdbData(args, links)
 		liquipediatier = tier,
 		liquipediatiertype = tierType,
 		publishertier = args.publishertier,
-		launcheddate = ReferenceCleaner.clean(args.launcheddate or args.sdate or args.inaugurated),
-		defunctdate = ReferenceCleaner.clean(args.defunctdate or args.edate),
-		defunctfate = ReferenceCleaner.clean(args.defunctfate),
+		launcheddate = ReferenceCleaner.clean{input = args.launcheddate or args.sdate or args.inaugurated},
+		defunctdate = ReferenceCleaner.clean{input = args.defunctdate or args.edate},
+		defunctfate = ReferenceCleaner.clean{input = args.defunctfate},
 		organizers = mw.ext.LiquipediaDB.lpdb_create_json({
 			organizer1 = args.organizer or args.organizer1,
 			organizer2 = args.organizer2,
@@ -312,7 +311,7 @@ function Series:_createLocation(country, city)
 		return ''
 	end
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' .. (city or country)
+	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' .. (city or country)
 end
 
 ---@param id string?

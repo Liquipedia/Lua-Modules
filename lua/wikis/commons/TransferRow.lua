@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TransferRow
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -240,7 +239,7 @@ function TransferRow:_convertToTransferStructure(data)
 
 	return Table.merge(self.baseData, {
 		player = player.pageIsResolved and player.pageName or mw.ext.TeamLiquidIntegration.resolve_redirect(player.pageName),
-		nationality = Flags.CountryName(player.flag),
+		nationality = Flags.CountryName{flag = player.flag},
 		role1 = self.baseData.role1 or self.baseData.fromteam and subs[1] and 'Substitute' or nil,
 		role2 = self.baseData.role2 or self.baseData.toteam and subs[2] and 'Substitute' or nil,
 		reference = self.references[data.index] or self.references.all or {reference1 = ''},

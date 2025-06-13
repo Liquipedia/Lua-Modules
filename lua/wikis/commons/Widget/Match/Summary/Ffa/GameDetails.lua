@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/GameDetails
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -31,7 +30,7 @@ function MatchSummaryFfaGameDetails:render()
 	local game = self.props.game
 	assert(game, 'No game provided')
 
-	local casters = DisplayHelper.createCastersDisplay(game.extradata.casters)
+	local casters = game.extradata.casters and DisplayHelper.createCastersDisplay(game.extradata.casters) or nil
 
 	return ContentItemContainer{contentClass = 'panel-content__game-schedule', items = WidgetUtil.collect(
 		{
@@ -40,7 +39,7 @@ function MatchSummaryFfaGameDetails:render()
 		},
 		game.map and {
 			icon = IconWidget{iconName = 'map'},
-			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.map)},
+			content = HtmlWidgets.Span{children = Page.makeInternalLink(game.mapDisplayName or game.map, game.map)},
 		} or nil,
 		Logic.isNotEmpty(casters) and {
 			icon = IconWidget{

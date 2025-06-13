@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=deadlock
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -129,7 +128,8 @@ end
 ---@return string
 function CustomItem:_getCostDisplay()
 	return tostring(mw.html.create('div')
-		:node(AutoInlineIcon.display({onlyicon = true}, 'M', 'Souls')):wikitext(' '):wikitext(self.args.itemcost))
+		:node(AutoInlineIcon.display{onlyicon = true, category = 'M', lookup = 'Souls'})
+		:wikitext(' '):wikitext(self.args.itemcost))
 end
 
 ---@param text string|number|nil

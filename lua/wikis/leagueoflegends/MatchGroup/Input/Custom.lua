@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -108,7 +107,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 	}
 end
 
@@ -168,8 +166,10 @@ function MapFunctions.getPlayersOfMapOpponent(MapParser, map, opponent, opponent
 			local participant = participantList[playerIndex]
 			return participant and {name = participant.player} or nil
 		end,
-		function(playerIndex)
+		function(playerIndex, playerIdData, playerInputData)
 			local participant = participantList[playerIndex]
+			participant.player = playerIdData.name or playerInputData.link or playerInputData.name
+			participant.displayName = playerIdData.displayname or playerInputData.name
 			participant.character = getCharacterName(participant.character)
 			return participant
 		end

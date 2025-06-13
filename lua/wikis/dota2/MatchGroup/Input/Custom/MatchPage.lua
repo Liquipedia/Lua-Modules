@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MatchGroup/Input/Custom/MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

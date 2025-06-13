@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Infobox/Links
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -68,7 +67,11 @@ function Links:_makeLink(key, value)
 	key = UtilLinks.removeAppendedNumber(key)
 	return Link{
 		linktype = 'external',
-		link = UtilLinks.makeFullLink(key, value, self.props.variant),
+		link = UtilLinks.makeFullLink{
+			platform = key,
+			id = value,
+			variant = self.props.variant,
+		},
 		children = {UtilLinks.makeIcon(key)},
 	}
 end

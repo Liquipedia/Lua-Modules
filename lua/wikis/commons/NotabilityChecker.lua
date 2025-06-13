@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:NotabilityChecker
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -97,7 +96,7 @@ end
 function NotabilityChecker._calculateTeamNotability(team)
 	local data = mw.ext.LiquipediaDB.lpdb('placement', {
 		limit = Config.PLACEMENT_LIMIT,
-		conditions = '[[participant::' .. team .. ']]',
+		conditions = '[[opponentname::' .. team .. ']]',
 		query = 'pagename, tournament, date, placement, liquipediatier, liquipediatiertype, extradata, mode',
 	})
 
@@ -111,7 +110,7 @@ function NotabilityChecker._calculatePersonNotability(person)
 	-- We check for names with spaces, then names with underscores.
 	local conditions = {}
 	for _, name in pairs({person, (person:gsub(' ', '_'))}) do
-		table.insert(conditions, '[[participant::' .. name .. ']]')
+		table.insert(conditions, '[[opponentname::' .. name .. ']]')
 		for i = 1, Config.MAX_NUMBER_OF_PARTICIPANTS do
 			table.insert(conditions, '[[opponentplayers_p' .. tostring(i) .. '::' .. name .. ']]')
 		end
@@ -272,4 +271,4 @@ function NotabilityChecker._calculateDateLoss(date)
 	return math.floor(differenceSeconds / SECONDS_IN_YEAR) + 1
 end
 
-return Class.export(NotabilityChecker)
+return Class.export(NotabilityChecker, {exports = {'run'}})

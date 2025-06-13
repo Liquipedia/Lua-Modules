@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +11,7 @@ local Game = require('Module:Game')
 local Info = require('Module:Info')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchTicker = require('Module:Matches Player')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Namespace = require('Module:Namespace')
 local Operator = require('Module:Operator')
 local Page = require('Module:Page')
@@ -56,7 +55,7 @@ local RATINGCONFIG = {
 		{text = 'Supremacy', id = 'aoe3_elo'},
 	},
 	aoe4 = {
-		{text = 'QM', id = 'aoe4net_id', game = 'aoe4'},
+		{text = 'MMR', id = 'aoe4net_id', game = 'aoe4'},
 	},
 	aom = {
 		{text = '[[Age of Mythology/Retold|Retold]]', id = 'aomr_id', game = 'aomr'},
@@ -65,8 +64,6 @@ local RATINGCONFIG = {
 	}
 }
 
-local TALENT_ROLES = {'caster', 'analyst', 'host', 'expert', 'producer', 'director', 'journalist', 'observer'}
-
 local MAX_NUMBER_OF_PLAYERS = 10
 local INACTIVITY_THRESHOLD_PLAYER = {year = 1}
 local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
@@ -74,6 +71,7 @@ local INACTIVITY_THRESHOLD_BROADCAST = {month = 6}
 ---@param frame Frame
 ---@return Html
 function CustomPlayer.run(frame)
+	---@type AgeofempiresInfoboxPlayer
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
@@ -111,17 +109,12 @@ function CustomPlayer.run(frame)
 		args.status = mw.getContentLanguage():ucfirst(args.status)
 	end
 
-	args.roleList = args.roles and Array.map(mw.text.split(args.roles, ','), function(role)
-		return mw:getContentLanguage():ucfirst(mw.text.trim(role))
-	end) or {}
 	args.gameList = player:_getGames()
 
 	local builtInfobox = player:createInfobox()
 
 	local autoPlayerIntro = ''
 	if Logic.readBool((args.autoPI or ''):lower()) then
-		local _, roleType = CustomPlayer._getRoleType(args.roleList)
-
 		autoPlayerIntro = PlayerIntroduction.run{
 			player = player.pagename,
 			transferquery = 'datapoint',
@@ -134,9 +127,8 @@ function CustomPlayer.run(frame)
 			game = mw.text.listToText(Array.map(args.gameList, function(game)
 					return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')
 				end)),
-			type = roleType,
-			role = args.roleList[1],
-			role2 = args.roleList[2],
+			type = player:getPersonType(args).store,
+			roles = player._getKeysOfRoles(player.roles),
 			id = args.id,
 			idIPA = args.idIPA,
 			idAudio = args.idAudio,
@@ -203,23 +195,15 @@ function CustomInjector:parse(id, widgets)
 			name = 'Years Active',
 			content = args.years_active and mw.text.split(args.years_active, ',') or {}
 		})
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Roles', content =
-				Array.map(args.roleList, function(role)
-					return Page.makeInternalLink(role, ':Category:' .. role .. 's')
-				end)
-			}
-		}
 	elseif id == 'region' then
 		return {}
 	end
 	return widgets
 end
 
----@return string?
+---@return Html?
 function CustomPlayer:createBottomContent()
-	return MatchTicker.get{args = {self.pagename}}
+	return MatchTicker.participant{player = self.pagename}
 end
 
 ---@param id string
@@ -231,30 +215,6 @@ function CustomPlayer:_getRating(id, game)
 	return mw.ext.aoedb.currentrating(self.args[id], game), mw.ext.aoedb.highestrating(self.args[id], game)
 end
 
----@param roles string[]
----@return {player: boolean, coach: boolean, manager: boolean, talent: boolean}
----@return string?
-function CustomPlayer._getRoleType(roles)
-	local roleType = {
-		player = Table.includes(roles, 'Player') or Table.isEmpty(roles),
-		coach = Table.includes(roles, 'Coach'),
-		manager = Table.includes(roles, 'Manager'),
-		talent = false,
-	}
-	local primaryRole
-
-	if roleType.manager or roleType.coach then
-		primaryRole = 'staff'
-	elseif roleType.player and Table.size(roles) == 1 then
-		primaryRole = 'player'
-	elseif Table.isNotEmpty(roles) then
-		primaryRole = 'talent'
-		roleType.talent = true
-	end
-
-	return roleType, primaryRole
-end
-
 ---@param lpdbData table
 ---@param args table
 ---@param personType string
@@ -262,10 +222,6 @@ end
 function CustomPlayer:adjustLPDB(lpdbData, args, personType)
 	lpdbData.region = Region.name{country = args.country}
 
-	lpdbData.extradata.role = args.roleList[1]
-	lpdbData.extradata.role2 = args.roleList[2]
-	lpdbData.extradata.roles = mw.text.listToText(args.roleList)
-	lpdbData.extradata.isplayer = CustomPlayer._getRoleType(args.roleList).player
 	lpdbData.extradata.game = mw.text.listToText(Array.map(args.gameList, Operator.property('name')))
 	Array.forEach(args.gameList,
 		function(game, index)
@@ -284,46 +240,22 @@ end
 ---@param categories string[]
 ---@return string[]
 function CustomPlayer:getWikiCategories(categories)
-	local roles = CustomPlayer._getRoleType(self.args.roleList)
-
 	Array.forEach(self.args.gameList, function(game)
 		local gameName = game.name
 		if not gameName then
 			return
 		end
 
-		if roles.player then
+		if self:getPersonType(self.args).store == 'player' then
 			table.insert(categories, gameName .. ' Players')
 		end
-		if roles.talent then
+		-- TODO: Should separate talent out of other staff
+		if self:getPersonType(self.args).store == 'staff' or #self.roles > 1 then
 			table.insert(categories, gameName .. ' Talent')
 		end
 	end)
 
-	Array.forEach(self.args.roleList, function(role)
-		if Table.includes(TALENT_ROLES, role:lower()) then
-			table.insert(categories, mw.getContentLanguage():ucfirst(role) .. 's')
-		end
-	end)
-
 	return categories
-end
-
----@param args table
----@return {store: string, category: string}
-function CustomPlayer:getPersonType(args)
-	local rolesType = CustomPlayer._getRoleType(args.roleList)
-	if rolesType.player then
-		return {store = 'Player', category = 'Player'}
-	elseif rolesType.coach then
-		return {store = 'Staff', category = 'Coache'}
-	elseif rolesType.talent then
-		return {store = 'Talent', category = 'Talent'}
-	elseif rolesType.manager then
-		return {store = 'Staff', category = 'Staff'}
-	end
-
-	return {store = 'Player', category = 'Player'}
 end
 
 ---@return {name: string, active: boolean}[]

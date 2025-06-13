@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -86,14 +85,15 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Base Stats'},
 			Cell{name = '[[Movement Speed]]', content = {args.basespeed}},
 			Cell{name = '[[Sight Range]]', content = {args.sightrange or (
-				Abbreviation.make(args.daysight or 1800, 'Day') .. ' / ' .. Abbreviation.make(args.nightsight or 800, 'Night')
+				Abbreviation.make{text = args.daysight or 1800, title = 'Day'} .. ' / ' ..
+				Abbreviation.make{text = args.nightsight or 800, title = 'Night'}
 			)}},
 			Cell{name = '[[Attack Range]]', content = {args.attackrange}},
 			Cell{name = 'Missile Speed', content = {args.missilespeed}},
 			Cell{name = 'Attack Duration', content = {args.attackduration}},
 			Cell{name = 'Base Attack Time', content = {args.attacktime}},
 			Cell{name = 'Turn Rate', content = {args.turnrate}},
-			Cell{name = 'Hotkey', content = {Hotkeys.hotkey(args.hotkey)}},
+			Cell{name = 'Hotkey', content = {Hotkeys.hotkey{hotkey = args.hotkey}}},
 			args.icon and Title{children = 'Icon'} or nil,
 			Center{children = {self.caller:_displayIcon()}},
 			Title{children = 'Level Changes'},
@@ -150,7 +150,7 @@ function CustomCharacter:_getArmorAttribute()
 		- 2 + (tonumber(self.args.basearmor) or 0)
 
 	return ATTRIBUTE_ICONS.armor
-		.. '<br>' .. Abbreviation.make(Math.round(armorValue, 0), armorValue)
+		.. '<br>' .. Abbreviation.make{text = Math.round(armorValue, 0), title = armorValue}
 end
 
 ---@return string
@@ -197,7 +197,7 @@ function CustomCharacter:_calculateArmor(gainFactor, abbreviate)
 		- 2 + (tonumber(self.args.basearmor) or 0)
 
 	if abbreviate then
-		return Abbreviation.make(Math.round(armor, 0), armor)
+		return Abbreviation.make{text = Math.round(armor, 0), title = armor}
 	end
 
 	return armor
@@ -290,29 +290,28 @@ end
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	return {
-		type = 'hero',
-		name = self.pagename,
-		image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil,
-		information = Faction.toName(Faction.read(args.race)) or 'Neutral',
-		extradata = {
-			['primary attribute'] = ATTRIBUTES[args.mainattribute],
-			baseint = args.baseint,
-			intgain = args.intgain,
-			baseagi = args.baseagi,
-			agigain = args.agigain,
-			basestr = args.basestr,
-			strgain = args.strgain,
-			basehp = args.basehp or 100,
-			basearmor = args.basearmor or 0,
-			numdice = args.numdice,
-			sidesdie = args.sidesdie,
-			basecd = args.basecd,
-			race = Faction.read(args.race),
-			dps = self:_calculateDps(args),
-			ehp = self:_calculateEhp(args),
-		}
-	}
+	lpdbData.type = 'hero'
+	lpdbData.name = self.pagename
+	lpdbData.image = args.icon and ('Wc3BTN' .. args.icon .. '.png') or nil
+	lpdbData.information = Faction.toName(Faction.read(args.race)) or 'Neutral'
+
+	lpdbData.extradata['primary attribute'] = ATTRIBUTES[args.mainattribute]
+	lpdbData.extradata.baseint = args.baseint
+	lpdbData.extradata.intgain = args.intgain
+	lpdbData.extradata.baseagi = args.baseagi
+	lpdbData.extradata.agigain = args.agigain
+	lpdbData.extradata.basestr = args.basestr
+	lpdbData.extradata.strgain = args.strgain
+	lpdbData.extradata.basehp = args.basehp or 100
+	lpdbData.extradata.basearmor = args.basearmor or 0
+	lpdbData.extradata.numdice = args.numdice
+	lpdbData.extradata.sidesdie = args.sidesdie
+	lpdbData.extradata.basecd = args.basecd
+	lpdbData.extradata.race = Faction.read(args.race)
+	lpdbData.extradata.dps = self:_calculateDps(args)
+	lpdbData.extradata.ehp = self:_calculateEhp(args)
+
+	return lpdbData
 end
 
 ---@param args table

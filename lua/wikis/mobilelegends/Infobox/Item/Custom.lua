@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
 -- page=Module:Infobox/Item/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -153,7 +152,7 @@ end
 ---@return string?
 function CustomItem:_getCostDisplay()
 	local itemCost = self.args.itemcost
-	local recipeCost = Abbreviation.make(self.args.recipecost, 'Recipe cost')
+	local recipeCost = Abbreviation.make{text = self.args.recipecost, title = 'Recipe cost'}
 
 	if String.isNotEmpty(recipeCost) then
 		return CostDisplay.display('gold', '15px', itemCost) .. ' (' .. recipeCost .. ')'

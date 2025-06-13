@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -125,6 +124,11 @@ local infoData = {
 			matchWidth = 200,
 			gameScoresIfBo1 = true,
 			gameNoun = 'map',
+		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
 		},
 	},
 }

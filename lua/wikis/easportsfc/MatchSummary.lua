@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=easportsfc
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -122,10 +121,10 @@ function CustomMatchSummary._subMatchPenaltyScore(game, opponentIndex)
 
 	if not scores then return NO_CHECK end
 
-	return Abbreviation.make(
-		'(' .. (scores[opponentIndex] or 0) .. ')',
-		'Penalty shoot-out'
-	)--[[@as string]]
+	return Abbreviation.make{
+		text = '(' .. (scores[opponentIndex] or 0) .. ')',
+		title = 'Penalty shoot-out',
+	}
 end
 
 ---@param players table[]

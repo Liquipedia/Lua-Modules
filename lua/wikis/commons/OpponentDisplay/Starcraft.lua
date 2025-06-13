@@ -1,19 +1,19 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:OpponentDisplay/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Icon = require('Module:Icon')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
 
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
 local Faction = Lua.import('Module:Faction')
+local Icon = Lua.import('Module:Icon')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+
 local Opponent = Lua.import('Module:Opponent')
 local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local StarcraftPlayerDisplay = Lua.import('Module:Player/Display/Starcraft')
@@ -269,18 +269,7 @@ StarcraftOpponentDisplay.CheckMark =
 ---@param opponent StarcraftStandardOpponent
 ---@return string
 function StarcraftOpponentDisplay.InlineScore(opponent)
-	if opponent.status == 'S' then
-		local advantage = tonumber(opponent.extradata.advantage) or 0
-		if advantage > 0 then
-			local title = 'Advantage of ' .. advantage .. ' game' .. (advantage > 1 and 's' or '')
-			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
-		end
-		local penalty = tonumber(opponent.extradata.penalty) or 0
-		if penalty > 0 then
-			local title = 'Penalty of ' .. penalty .. ' game' .. (penalty > 1 and 's' or '')
-			return '<abbr title="' .. title .. '">' .. opponent.score .. '</abbr>'
-		end
-	end
+	local scoreDisplay = OpponentDisplay.InlineScore(opponent)
 
 	if Logic.readBool(opponent.extradata.noscore) then
 		return (opponent.placement == 1 or opponent.advances)
@@ -288,7 +277,19 @@ function StarcraftOpponentDisplay.InlineScore(opponent)
 			or ''
 	end
 
-	return OpponentDisplay.InlineScore(opponent)
+	---@param value number
+	---@param TitleStart string
+	---@return string?
+	local makeAbbrScoreInfo = function(value, TitleStart)
+		if opponent.status ~= 'S' or value <= 0 then
+			return
+		end
+		local title = TitleStart .. ' of ' .. value .. ' game' .. (value > 1 and 's' or '')
+		return '<abbr title="' .. title .. '">' .. scoreDisplay .. '</abbr>'
+	end
+	local advantage = tonumber(opponent.extradata.advantage) or 0
+	local penalty = tonumber(opponent.extradata.penalty) or 0
+	return makeAbbrScoreInfo(advantage, 'Advantage') or makeAbbrScoreInfo(penalty, 'Penalty') or scoreDisplay
 end
 
 return StarcraftOpponentDisplay
