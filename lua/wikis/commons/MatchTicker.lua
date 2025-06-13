@@ -12,6 +12,7 @@ local Game = require('Module:Game')
 local Logic = require('Module:Logic')
 local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
+local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 local Team = require('Module:Team')
 local Tier = require('Module:Tier/Utils')
@@ -421,7 +422,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		return {match}
 	end
 
-	return Array.map(match.match2games, function(game, gameIndex)
+	local expandedGames = Array.map(match.match2games, function(game, gameIndex)
 		if config.recent and Logic.isEmpty(game.winner) then
 			return
 		end
@@ -441,7 +442,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		local gameMatch = Table.copy(match)
 		gameMatch.match2games = nil
 		gameMatch.asGame = true
-		gameMatch.asGameIdx = gameIndex
+		gameMatch.asGameIdx = {gameIndex}
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
@@ -451,6 +452,14 @@ function MatchTicker:expandGamesOfMatch(match)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
 		return gameMatch
+	end)
+
+	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
+		if #gameGroup > 1 then
+			table.insert(gameGroup[1].asGameIdx, gameGroup[#gameGroup].asGameIdx)
+		end
+
+		return gameGroup[1]
 	end)
 end
 
@@ -469,7 +478,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return (a.asGameIdx or 0) < (b.asGameIdx or 0)
+		return ((a.asGameIdx or {})[1] or 0) < ((b.asGameIdx or {})[1] or 0)
 	end)
 end
 
