@@ -154,7 +154,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	---@param category string
 	---@return string?
 	local checkRole = function(roleString, category)
-		if not Array.any(roles, function(r) return string.find(r, roleString) end) then return end
+		if not Array.any(roles, function(role) return string.find(role, roleString) ~= nil end) then return end
 		return category
 	end
 
