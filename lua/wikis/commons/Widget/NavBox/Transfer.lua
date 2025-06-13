@@ -69,7 +69,9 @@ function TransferNavBox:render()
 		titleLink = self.props.portalLink,
 		child1 = firstChild,
 		collapsed = false, -- is used on pages without navbox / HDB, hence would always collapse else
-		child2 = Table.merge({collapsed = true, title = 'Further Transfers'}, collapsedChildren),
+		child2 = Logic.isNotEmpty(collapsedChildren)
+			and Table.merge({collapsed = true, title = 'Further Transfers'}, collapsedChildren)
+			or nil,
 	}
 end
 
