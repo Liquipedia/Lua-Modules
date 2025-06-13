@@ -94,9 +94,13 @@ function TeamTemplate.getRawOrNil(team, date)
 	if teamTemplateData then
 		return teamTemplateData
 	end
-	mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+
 	local teamWithUnderscores = team:gsub(' ', '_'):lower()
-	return mw.ext.TeamTemplate.raw(teamWithUnderscores, date)
+	teamTemplateData = mw.ext.TeamTemplate.raw(teamWithUnderscores, date)
+	if teamTemplateData then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with underscore team templates')
+	end
+	return teamTemplateData
 end
 
 ---Creates error message for missing team templates.
@@ -126,7 +130,7 @@ An empty array is returned if the specified team template does not exist.
 ---@param name string
 ---@return string[]
 function TeamTemplate.queryHistoricalNames(name)
-    local resolvedName = TeamTemplate.resolve(name)
+	local resolvedName = TeamTemplate.resolve(name)
 	if resolvedName then
 		local historical = TeamTemplate.queryHistorical(resolvedName) or {}
 		if Logic.isNotEmpty(historical) then
