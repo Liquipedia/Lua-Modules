@@ -51,6 +51,7 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
+	blasttv = {'http://www.blast.tv/'},,
 	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
@@ -388,6 +389,10 @@ local MATCH_ICONS = {
 	ballchasing = {
 		icon = 'File:Ballchasing icon.png',
 		text = 'Ballchasing replays'
+	},
+	blasttv = {
+		icon = 'File:BLAST icon allmode.png',
+		text = 'BLAST.tv matchpage'
 	},
 	breakingpoint = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
