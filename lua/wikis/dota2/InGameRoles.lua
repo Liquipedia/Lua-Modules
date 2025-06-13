@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type PersonRoleData
+---@type PersonRoleData[]
 local inGameRoles = {
 	['carry'] = {category = 'Carry players', display = 'Carry'},
 	['mid'] = {category = 'Solo middle players', display = 'Solo Middle'},
