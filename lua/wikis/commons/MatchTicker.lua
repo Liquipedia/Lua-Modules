@@ -457,6 +457,7 @@ function MatchTicker:expandGamesOfMatch(match)
 	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
 		if #gameGroup > 1 then
 			table.insert(gameGroup[1].asGameIdx, gameGroup[#gameGroup].asGameIdx)
+			gameGroup[1].asGameIdx = Array.flatten(gameGroup[1].asGameIdx)
 		end
 
 		return gameGroup[1]
