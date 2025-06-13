@@ -19,9 +19,7 @@ local NavBox = Lua.import('Module:Widget/NavBox')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
 ---@class SeriesChildFromLpdb: Widget
----@field props {portalLink: string}
 local TransferNavBox = Class.new(Widget)
-TransferNavBox.defaultProps = {portalLink = 'Portal:Transfers'}
 
 ---@return Widget
 function TransferNavBox:render()
@@ -66,7 +64,7 @@ function TransferNavBox:render()
 
 	return NavBox{
 		title = 'Transfers',
-		titleLink = self.props.portalLink,
+		titleLink = 'Portal:Transfers',
 		child1 = firstChild,
 		collapsed = false, -- is used on pages without navbox / HDB, hence would always collapse else
 		child2 = Logic.isNotEmpty(collapsedChildren)
