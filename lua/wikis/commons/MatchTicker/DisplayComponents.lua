@@ -132,7 +132,7 @@ function Versus:gameTitle()
 	if not self.match.asGameIdx then
 		return ''
 	end
-	return 'Game #' .. (self.match.asGameIdx)
+	return 'Game #' .. (table.concat(self.match.asGameIdx, '-'))
 end
 
 ---@return string
