@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=battalion
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -33,7 +32,7 @@ return {
 			allowManual = true,
 		},
 		match2 = {
-			status = 1,
+			status = 2,
 		},
 	},
 }

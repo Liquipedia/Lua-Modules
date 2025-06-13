@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=clashroyale
 -- page=Module:MatchGroup/Legacy/BMS
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

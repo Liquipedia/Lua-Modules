@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Lpdb
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -282,6 +281,18 @@ Lpdb.SquadPlayer = Model('squadplayer', {
 	{name = 'joindate', fieldType = 'string', default = ''},
 	{name = 'leavedate', fieldType = 'string', default = ''},
 	{name = 'inactivedate', fieldType = 'string', default = ''},
+	{name = 'extradata', fieldType = 'struct', default = {}},
+})
+
+---@class DataPoint:Model
+Lpdb.DataPoint = Model('datapoint', {
+	{name = 'objectname', fieldType = 'string'},
+	{name = 'type', fieldType = 'string', default = ''},
+	{name = 'name', fieldType = 'string', default = ''},
+	{name = 'information', fieldType = 'string', default = ''},
+	{name = 'image', fieldType = 'string', default = ''},
+	{name = 'imagedark', fieldType = 'string', default = ''},
+	{name = 'date', fieldType = 'string', default = 0},
 	{name = 'extradata', fieldType = 'struct', default = {}},
 })
 

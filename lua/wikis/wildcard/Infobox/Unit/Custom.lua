@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=wildcard
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -16,6 +15,7 @@ local Unit = Lua.import('Module:Infobox/Unit')
 
 local Widgets = require('Module:Widget/All')
 local Cell = Widgets.Cell
+local Title = Widgets.Title
 
 ---@class WildcardUnitInfobox: UnitInfobox
 local CustomUnit = Class.new(Unit)
@@ -40,11 +40,18 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Pronouns', content = {args.pronouns}},
 			Cell{name = 'House', content = {args.house}},
 			Cell{name = 'Rarity', content = {args.rarity}},
-			Cell{name = 'Mana Cost', content = {args.cost}},
 			Cell{name = 'Quantity', content = {args.quantity}},
+			Cell{name = 'Mana Cost', content = {args.cost}},
 			Cell{name = 'Health', content = {args.health}},
 			Cell{name = 'Movement Speed', content = {args.movement}},
-			Cell{name = 'Key Words', content = {args.keywords}}
+			Cell{name = 'Sight Range', content = {args.sightrange}},
+			Cell{name = 'Key Words', content = {args.keywords}},
+			Title{children = 'Basic Stats'},
+			Cell{name = 'Healing', content = {args.healing}},
+			Cell{name = 'Mobility', content = {args.mobility}},
+			Cell{name = 'Offense', content = {args.offense}},
+			Cell{name = 'Defense', content = {args.defense}},
+			Cell{name = 'Utility', content = {args.utility}}
 		)
 	end
 	return widgets

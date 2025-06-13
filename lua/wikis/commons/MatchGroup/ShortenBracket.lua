@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/ShortenBracket
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -114,7 +113,7 @@ function ShortenBracket._processMatches(matches, idLength, skipRounds, newBracke
 
 		local newMatchId = 'R' .. string.format('%02d', round - skipRounds) .. '-M' .. string.sub(matchId, -3)
 
-		assert(bracketDatasById[newMatchId], 'bracket <--> short bracket missmatch: No bracket data found for '
+		assert(bracketDatasById[newMatchId], 'bracket <--> short bracket mismatch: No bracket data found for '
 			.. newMatchId .. ' (calculated from ' .. matchId .. ')')
 
 		match.match2id = newBracketId .. '_' .. newMatchId

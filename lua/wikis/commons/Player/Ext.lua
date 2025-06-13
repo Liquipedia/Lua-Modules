@@ -1,21 +1,22 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Player/Ext
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local globalVars = PageVariableNamespace({cached = true})
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
@@ -29,7 +30,6 @@ local PlayerExt = {globalVars = globalVars}
 
 ---@class PlayerExtPopulateOptions
 ---@field fetchPlayer boolean?
----@field fetchMatch2Player boolean?
 ---@field date string|number|osdate?
 
 ---@class PlayerExtSyncTeamOptions
@@ -75,39 +75,8 @@ PlayerExt.fetchPlayerFlag = FnUtil.memoize(function(resolvedPageName)
 
 	local record = rows[1]
 	if record then
-		return String.nilIfEmpty(Flags.CountryName(record.nationality))
+		return String.nilIfEmpty(Flags.CountryName{flag = record.nationality})
 	end
-end)
-
----Asks LPDB for the flag of a player using an arbitary sample of match2player records.
----
----For specific uses only.
----@param resolvedPageName string
----@return {flag: string?}
-PlayerExt.fetchMatch2Player = FnUtil.memoize(function(resolvedPageName)
-	local conditions = {
-		'[[name::' .. resolvedPageName .. ']]',
-	}
-	local records = mw.ext.LiquipediaDB.lpdb('match2player', {
-		conditions = table.concat(conditions, ' and '),
-		limit = 30,
-		query = 'flag, extradata',
-	})
-	local flags = Array.map(records, function(record) return record.flag end)
-
-	local function majority(xs)
-		local groups = Array.groupBy(xs, FnUtil.identity)
-		local largest = Array.maxBy(groups, function(group) return #group end)
-		if largest and 0.5 < #largest / #records then
-			return largest[1]
-		else
-			return nil
-		end
-	end
-
-	return {
-		flag = String.nilIfEmpty(Flags.CountryName(majority(flags))),
-	}
 end)
 
 --Asks LPDB for the team a player belonged to on a particular date, using the teamhistory data point.
@@ -168,7 +137,6 @@ player.pageIsResolved: Indicates that the pageName is resolved (not a redirect)
 so it does not need to be resolved again.
 
 options.fetchPlayer: Whether to use the LPDB player record. Enabled by default.
-options.fetchMatch2Player: Whether to use the player's recent matches. Disabled by default.
 options.savePageVar: Whether to save results to page variables. Enabled by default.
 ]]
 ---@param player standardPlayer
@@ -177,18 +145,12 @@ options.savePageVar: Whether to save results to page variables. Enabled by defau
 function PlayerExt.syncPlayer(player, options)
 	options = options or {}
 
-	local function match2Player()
-		return options.fetchMatch2Player
-			and PlayerExt.fetchMatch2Player(player.pageName)
-			or nil
-	end
-
 	PlayerExt.populatePageName(player)
 
 	player.flag = player.flag
-		or String.nilIfEmpty(Flags.CountryName(globalVars:get(player.displayName .. '_flag')))
+		or String.nilIfEmpty(Flags.CountryName{flag = globalVars:get(player.displayName .. '_flag')})
 		or options.fetchPlayer ~= false and PlayerExt.fetchPlayerFlag(player.pageName)
-		or match2Player() and match2Player().flag
+		or nil
 
 	if options.savePageVar ~= false then
 		PlayerExt.saveToPageVars(player, {overwritePageVars = options.overwritePageVars})

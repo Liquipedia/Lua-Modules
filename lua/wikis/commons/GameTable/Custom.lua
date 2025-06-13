@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:GameTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -19,4 +18,4 @@ function CustomGameTable.results(args)
 	return GameTable(args):readConfig():query():build()
 end
 
-return Class.export(CustomGameTable)
+return Class.export(CustomGameTable, {exports = {'results'}})

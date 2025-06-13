@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:NotabilityChecker/config
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

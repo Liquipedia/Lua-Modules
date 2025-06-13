@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=arenafps
 -- page=Module:LegacyBracketMatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

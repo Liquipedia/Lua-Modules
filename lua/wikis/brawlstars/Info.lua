@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -35,6 +34,11 @@ return {
 		match2 = {
 			status = 2,
 			matchWidth = 150,
+		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
 		},
 	},
 	defaultRoundPrecision = 0,

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Squad/Utils
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -140,7 +139,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		id = id,
 		link = mw.ext.TeamLiquidIntegration.resolve_redirect(args.link or id),
 		name = name,
-		nationality = Flags.CountryName(args.flag),
+		nationality = Flags.CountryName{flag = args.flag},
 
 		position = String.nilIfEmpty(args.position),
 		role = (String.nilIfEmpty(args.role) and mw.getContentLanguage():ucfirst(args.role))
@@ -152,9 +151,9 @@ function SquadUtils.readSquadPersonArgs(args)
 		newteamrole = String.nilIfEmpty(args.newteamrole) or String.nilIfEmpty(args.newrole),
 		newteamtemplate = getTeamInfo(args.newteam, 'templatename'),
 
-		joindate = ReferenceCleaner.clean(args.joindate),
-		leavedate = ReferenceCleaner.clean(args.leavedate),
-		inactivedate = ReferenceCleaner.clean(args.inactivedate),
+		joindate = ReferenceCleaner.clean{input = args.joindate},
+		leavedate = ReferenceCleaner.clean{input = args.leavedate},
+		inactivedate = ReferenceCleaner.clean{input = args.inactivedate},
 
 		status = SquadUtils.SquadStatusToStorageValue[args.status],
 		type = SquadUtils.SquadTypeToStorageValue[args.type],
@@ -162,7 +161,7 @@ function SquadUtils.readSquadPersonArgs(args)
 		extradata = {
 			loanedto = args.team,
 			loanedtorole = args.teamrole,
-			newteamdate = String.nilIfEmpty(ReferenceCleaner.clean(args.newteamdate)),
+			newteamdate = String.nilIfEmpty(ReferenceCleaner.clean{input = args.newteamdate}),
 			faction = Faction.read(args.faction or args.race),
 		},
 	}

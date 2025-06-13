@@ -1,12 +1,10 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/MatchPage
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local DisplayUtil = require('Module:DisplayUtil')
 local Lua = require('Module:Lua')
 
@@ -66,4 +64,4 @@ function MatchPageDisplay.Match(props)
 	}, require('Module:Error/Display').ErrorList)
 end
 
-return Class.export(MatchPageDisplay)
+return MatchPageDisplay

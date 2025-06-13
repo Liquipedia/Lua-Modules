@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Match/Legacy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

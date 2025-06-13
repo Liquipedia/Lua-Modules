@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=tetris
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -62,14 +61,6 @@ function CustomMatchGroupInput.getBestOf(bestofInput)
 	local bestOf = tonumber(Logic.emptyOr(bestofInput, Variables.varDefault('match_bestof')))
 	Variables.varDefine('match_bestof', bestOf)
 	return bestOf or DEFAULT_BESTOF
-end
-
----@param match table
----@return table
-function CustomMatchGroupInput.getExtraData(match)
-	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
 end
 
 ---@param match table

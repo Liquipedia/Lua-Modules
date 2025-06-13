@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MainPageLayout
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -41,7 +40,7 @@ function MainPageLayout.make(frame)
 		children = {
 			NO_TABLE_OF_CONTENTS,
 			frame:preprocess(String.interpolate(METADESC, {metadesc = WikiData.metadesc})),
-			frame:preprocess('{{DISPLAYTITLE:' .. WikiData.title .. '}}'),
+			frame:callParserFunction('DISPLAYTITLE', WikiData.title),
 			HtmlWidgets.Div{
 				classes = {'header-banner'},
 				children = {
@@ -58,7 +57,7 @@ function MainPageLayout.make(frame)
 							}
 						},
 					},
-					frame:preprocess('{{#searchbox:}}'),
+					frame:callParserFunction('#searchbox', ''),
 				}
 			},
 			HtmlWidgets.Div{

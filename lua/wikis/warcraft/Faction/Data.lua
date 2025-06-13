@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Faction/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

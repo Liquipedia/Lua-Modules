@@ -1,7 +1,6 @@
 
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Lore
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

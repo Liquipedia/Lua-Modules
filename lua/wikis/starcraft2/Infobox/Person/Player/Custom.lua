@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -116,11 +115,11 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = ranks[2].name or 'Rank', content = {ranks[2].rank}},
 			Cell{name = 'Military Service', content = {args.military}},
 			Cell{
-				name = Abbreviation.make('Years Active', 'Years active as a player'),
+				name = Abbreviation.make{text = 'Years Active', title = 'Years active as a player'},
 				content = {caller.yearsActive}
 			},
 			Cell{
-				name = Abbreviation.make('Years Active (caster)', 'Years active as a caster'),
+				name = Abbreviation.make{text = 'Years Active (caster)', title = 'Years active as a caster'},
 				content = {self.caller:_getActiveCasterYears()}
 			},
 		}

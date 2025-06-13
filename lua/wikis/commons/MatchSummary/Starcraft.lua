@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchSummary/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -66,8 +65,7 @@ function StarcraftMatchSummary.createBody(match)
 			classes = {'brkts-popup-sc-game-header brkts-popup-sc-veto-center'},
 			children = {'Vetoes'},
 		} or nil,
-		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil,
-		MatchSummaryWidgets.Casters{casters = match.casters}
+		Array.map(match.vetoes or {}, StarcraftMatchSummary.Veto) or nil
 	)}
 end
 

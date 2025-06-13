@@ -65,6 +65,7 @@ local lpdb = {}
 ---@field localizedname string
 ---@field iamge string
 ---@field type string
+-- ---@field roles table # TODO: Create in DB
 ---@field nationality string
 ---@field nationality2 string
 ---@field nationality3 string
@@ -76,7 +77,7 @@ local lpdb = {}
 ---@field links table
 ---@field status string
 ---@field earnings integer
----@field earningsbyyear table
+---@field earningsbyyear table<integer, number>
 
 ---@class squadplayer:LpdbBaseData
 ---@field id string
@@ -85,6 +86,7 @@ local lpdb = {}
 ---@field nationality string
 ---@field position string
 ---@field role string
+-- ---@field roles table # TODO: Create in DB
 ---@field type 'player'|'staff'
 ---@field newteam string
 ---@field teamtemplate string
@@ -233,6 +235,7 @@ local lpdb = {}
 ---@field toteamtemplate string
 ---@field role1 string
 ---@field role2 string
+-- ---@field roles table # TODO: Create in DB
 ---@field reference table
 ---@field date string
 ---@field wholeteam integer

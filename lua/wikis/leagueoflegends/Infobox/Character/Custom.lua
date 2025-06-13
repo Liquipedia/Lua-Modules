@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -174,16 +173,23 @@ function CustomCharacter:getWikiCategories(args)
 	)
 end
 
+---@param args table
+---@return string[]
+function CustomCharacter:getRoles(args)
+	return {
+		args.primaryrole,
+		args.secondaryrole
+	}
+end
+
 ---@param lpdbData table
 ---@param args table
 ---@return table
 function CustomCharacter:addToLpdb(lpdbData, args)
-	lpdbData.information = args.primaryrole
-	lpdbData.extradata = {
-		region = args.region,
-		costbe = args.costbe,
-		costrp = args.costrp,
-	}
+	lpdbData.extradata.region = args.region
+	lpdbData.extradata.costbe = args.costbe
+	lpdbData.extradata.costrp = args.costrp
+
 	return lpdbData
 end
 

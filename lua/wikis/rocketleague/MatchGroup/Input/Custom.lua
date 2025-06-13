@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -145,7 +144,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		isfeatured = MatchFunctions.isFeatured(opponents, tonumber(match.liquipediatier)),
-		casters = MatchGroupInputUtil.readCasters(match),
 		hasopponent1 = MatchFunctions._checkForNonEmptyOpponent(opponents[1]),
 		hasopponent2 = MatchFunctions._checkForNonEmptyOpponent(opponents[2]),
 		liquipediatiertype2 = Variables.varDefault('tournament_tiertype2'),
@@ -196,15 +194,14 @@ function MatchFunctions.currentEarnings(name)
 	end
 	local data = mw.ext.LiquipediaDB.lpdb('team', {
 		conditions = '[[name::' .. name .. ']]',
-		query = 'extradata'
+		query = 'earningsbyyear'
 	})[1]
 
 	if not data then
 		return 0
 	end
 
-	local currentEarnings = (data.extradata or {})['earningsin' .. CURRENT_YEAR]
-	return tonumber(currentEarnings) or 0
+	return data.earningsbyyear[tonumber(CURRENT_YEAR)] or 0
 end
 
 --

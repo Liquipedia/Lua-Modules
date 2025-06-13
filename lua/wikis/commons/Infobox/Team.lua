@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Team
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -125,10 +124,10 @@ function Team:createInfobox()
 			id = 'earnings',
 			children = {
 				Cell{
-					name = not Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make(
-						'Approx. Total Winnings',
-						'Includes individual player winnings&#10;while representing this team'
-					) or 'Approx. Total Winnings',
+					name = not Logic.readBool(args.doNotIncludePlayerEarnings) and Abbreviation.make{
+						text = 'Approx. Total Winnings',
+						title = 'Includes individual player winnings&#10;while representing this team',
+					} or 'Approx. Total Winnings',
 					content = {self.totalEarnings > 0 and '$' .. Language:formatNum(self.totalEarnings) or nil}
 				}
 			}
@@ -210,7 +209,7 @@ end
 ---@return string|number|nil # storage date
 ---@return string[] # display elements
 function Team:processCreateDates()
-	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean(self.args.created)) or Date.maxTimestamp
+	local earliestGameTimestamp = Team._parseDate(ReferenceCleaner.clean{input = self.args.created}) or Date.maxTimestamp
 
 	local created = Array.map(self:getAllArgsForBase(self.args, 'created'), function (creation)
 		local splitInput = Array.map(mw.text.split(creation, ':'), String.trim)
@@ -221,7 +220,7 @@ function Team:processCreateDates()
 
 		local icon
 		local game, date = unpack(splitInput)
-		local cleanDate = ReferenceCleaner.clean(date)
+		local cleanDate = ReferenceCleaner.clean{input = date}
 
 		if game:lower() == 'org' then
 			icon = Image.display(self:_getTeamIcon(cleanDate))
@@ -303,7 +302,7 @@ function Team:_createLocation(location)
 		self:categories(demonym .. ' Teams')
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) ..
+	return Flags.Icon{flag = location, shouldLink = true} ..
 			'&nbsp;' ..
 			(locationDisplay or '')
 end
@@ -323,7 +322,7 @@ function Team:getStandardLocationValue(location)
 		return
 	end
 
-	local locationToStore = Flags.CountryName(location)
+	local locationToStore = Flags.CountryName{flag = location}
 
 	if String.isEmpty(locationToStore) then
 		table.insert(
@@ -354,7 +353,7 @@ function Team:_setLpdbData(args, links)
 		earnings = self.totalEarnings,
 		earningsbyyear = self.yearlyEarnings or {},
 		createdate = args.created,
-		disbanddate = ReferenceCleaner.clean(args.disbanded),
+		disbanddate = ReferenceCleaner.clean{input = args.disbanded},
 		template = self.teamTemplate.historicaltemplate or self.teamTemplate.templatename,
 		status = args.disbanded and Status.DISBANDED or Status.ACTIVE,
 		links = mw.ext.LiquipediaDB.lpdb_create_json(
@@ -362,10 +361,6 @@ function Team:_setLpdbData(args, links)
 		),
 		extradata = {}
 	}
-
-	for year, earningsOfYear in pairs(self.yearlyEarnings or {}) do
-		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-	end
 
 	lpdbData = self:addToLpdb(lpdbData, args)
 

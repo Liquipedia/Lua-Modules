@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -55,4 +54,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	Variables.varDefine('tournament_subpage', 'true')
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

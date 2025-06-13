@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,7 +14,7 @@ local Json = require('Module:Json')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MapMode = require('Module:MapMode')
-local MatchTicker = require('Module:Matches Tournament')
+local MatchTicker = require('Module:MatchTicker/Custom')
 local Page = require('Module:Page')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
@@ -117,16 +116,18 @@ function CustomInjector:parse(id, widgets)
 	return widgets
 end
 
----@return string?
+---@return Html?
 function CustomLeague:createBottomContent()
 	local yesterday = os.date('%Y-%m-%d', os.time() - SECONDS_PER_DAY)
 
 	if self.data.endDate and yesterday <= self.data.endDate then
-		return MatchTicker.get{args={
-			parent = self.pagename,
+		local matchtickerArgs = {
+			tournament = self.pagename,
 			limit = tonumber(self.args.matchtickerlimit) or 7,
-			noInfoboxWrapper = true
-		}}
+			infoboxWrapperClass = 'false',
+			infoboxClass = true
+		}
+		return MatchTicker.tournament(matchtickerArgs)
 	end
 end
 
@@ -147,9 +148,9 @@ function CustomLeague:defineCustomPageVariables(args)
 	Variables.varDefine('tournament_sponsors', args.sponsors)
 
 
-	local dateclean = ReferenceCleaner.clean(args.date)
-	local edateclean = ReferenceCleaner.clean(args.edate)
-	local sdateclean = ReferenceCleaner.clean(args.sdate)
+	local dateclean = ReferenceCleaner.clean{input = args.date}
+	local edateclean = ReferenceCleaner.clean{input = args.edate}
+	local sdateclean = ReferenceCleaner.clean{input = args.sdate}
 	local date = (not String.isEmpty(args.date)) and dateclean
 					or edateclean
 	local startdate = (not String.isEmpty(args.sdate)) and sdateclean

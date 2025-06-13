@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft
 -- page=Module:Infobox/Unit/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -170,9 +169,9 @@ function CustomUnit:_getHotkeys(args)
 	local display
 	if not String.isEmpty(args.shortcut) then
 		if not String.isEmpty(args.shortcut2) then
-			display = Hotkeys.hotkey2(args.shortcut, args.shortcut2, 'arrow')
+			display = Hotkeys.hotkey2{hotkey1 = args.shortcut, hotkey2 = args.shortcut2, seperator = 'arrow'}
 		else
-			display = Hotkeys.hotkey(args.shortcut)
+			display = Hotkeys.hotkey{hotkey = args.shortcut}
 		end
 	end
 

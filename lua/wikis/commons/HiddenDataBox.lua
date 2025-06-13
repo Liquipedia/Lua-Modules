@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:HiddenDataBox
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -116,8 +115,8 @@ end
 ---@param secondaryDate string?
 ---@return string?
 function HiddenDataBox.cleanDate(primaryDate, secondaryDate)
-	return String.nilIfEmpty(ReferenceCleaner.clean(primaryDate)) or
-		String.nilIfEmpty(ReferenceCleaner.clean(secondaryDate))
+	return String.nilIfEmpty(ReferenceCleaner.clean{input = primaryDate}) or
+		String.nilIfEmpty(ReferenceCleaner.clean{input = secondaryDate})
 end
 
 ---Assigns the wiki Variables according to given input, wiki variable and queryResults
@@ -215,4 +214,4 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
-return Class.export(HiddenDataBox)
+return Class.export(HiddenDataBox, {exports = {'run'}})

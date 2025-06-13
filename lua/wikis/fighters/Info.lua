@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -218,6 +217,19 @@ return {
 			defaultTeamLogo = {
 				darkMode = 'Bloody Roar Extreme logo.png',
 				lightMode = 'Bloody Roar Extreme logo.png',
+			},
+		},
+		cotw = {
+			abbreviation = 'CotW',
+			name = 'Fatal Fury: City of the Wolves',
+			link = 'Fatal Fury: City of the Wolves',
+			logo = {
+				darkMode = 'Fatal Fury City of the Wolves allmode.png',
+				lightMode = 'Fatal Fury City of the Wolves allmode.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'Fatal Fury City of the Wolves allmode.png',
+				lightMode = 'Fatal Fury City of the Wolves allmode.png',
 			},
 		},
 		cvs = {
@@ -508,6 +520,19 @@ return {
 		},
 		ggxrd = {
 			abbreviation = 'GG XRD',
+			name = 'Guilty Gear Xrd',
+			link = 'Guilty Gear Xrd',
+			logo = {
+				darkMode = 'GGXrdSign Logo.png',
+				lightMode = 'GGXrdSign Logo.png',
+			},
+			defaultTeamLogo = {
+				darkMode = 'GGXrdSign Logo.png',
+				lightMode = 'GGXrdSign Logo.png',
+			},
+		},
+		ggxrds = {
+			abbreviation = 'GG XRD S',
 			name = 'Guilty Gear Xrd -SIGN-',
 			link = 'Guilty Gear Xrd -SIGN-',
 			logo = {
@@ -1685,6 +1710,10 @@ return {
 		},
 		match2 = {
 			status = 1,
+		},
+		teamRosterNavbox = {
+			hideOrg = true,
+			hideOverview = true,
 		},
 	},
 	opponentLibrary = 'Opponent/Custom',

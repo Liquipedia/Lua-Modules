@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:Infobox/Building/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -191,7 +190,7 @@ function CustomBuilding:_defenseDisplay()
 
 	local display = ICON_HP .. ' ' .. (self.args.hp or 0)
 	if (tonumber(self.args.hitpoint_bonus) or 0) > 0 then
-		return display .. ' (' .. self.args.hp + self.args.hitpoint_bonus .. ')'
+		return display .. ' (' .. (tonumber(self.args.hp) + tonumber(self.args.hitpoint_bonus)) .. ')'
 	end
 	return display
 end
@@ -208,7 +207,7 @@ function CustomBuilding:_armorDisplay()
 	end
 	display = display .. ' ' .. (self.args.armor or 0)
 	if self.args.armor_upgrades then
-		display = display.. ' (' .. (self.args.armor + self.args.armor_upgrades) .. ')'
+		display = display.. ' (' .. (tonumber(self.args.armor or 0) + tonumber(self.args.armor_upgrades)) .. ')'
 	end
 	return display
 end
@@ -227,9 +226,9 @@ end
 function CustomBuilding:_getHotkeys()
 	if not String.isEmpty(self.args.shortcut) then
 		if not String.isEmpty(self.args.shortcut2) then
-			return Hotkeys.hotkey2(self.args.shortcut, self.args.shortcut2, 'arrow')
+			return Hotkeys.hotkey2{hotkey1 = self.args.shortcut, hotkey2 = self.args.shortcut2, seperator = 'arrow'}
 		else
-			return Hotkeys.hotkey(self.args.shortcut)
+			return Hotkeys.hotkey{hotkey = self.args.shortcut}
 		end
 	end
 end

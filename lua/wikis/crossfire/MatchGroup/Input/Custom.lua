@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=crossfire
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -78,7 +77,6 @@ end
 function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 	}
 end

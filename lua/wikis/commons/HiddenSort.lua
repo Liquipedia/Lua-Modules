@@ -1,12 +1,9 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:HiddenSort
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
-
-local Class = require('Module:Class')
 
 local HiddenSort = {}
 
@@ -19,4 +16,4 @@ function HiddenSort.run(sortText)
 		:wikitext(sortText)
 end
 
-return Class.export(HiddenSort)
+return HiddenSort

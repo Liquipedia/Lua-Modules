@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchExternalLinks
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

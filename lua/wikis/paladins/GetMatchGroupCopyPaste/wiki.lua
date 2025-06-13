@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=paladins
 -- page=Module:GetMatchGroupCopyPaste/wiki
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

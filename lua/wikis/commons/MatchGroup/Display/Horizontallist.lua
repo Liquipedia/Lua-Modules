@@ -1,13 +1,11 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Horizontallist
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Date = require('Module:Date/Ext')
 local DisplayUtil = require('Module:DisplayUtil')
 local FnUtil = require('Module:FnUtil')
@@ -241,4 +239,4 @@ function HorizontallistDisplay.Match(props)
 	return matchNode
 end
 
-return Class.export(HorizontallistDisplay)
+return HorizontallistDisplay

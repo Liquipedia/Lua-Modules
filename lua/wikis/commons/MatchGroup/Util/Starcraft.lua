@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Util/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -102,7 +101,6 @@ function StarcraftMatchGroupUtil.matchFromRecord(record)
 
 	-- Misc
 	match.isFfa = Logic.readBool(Table.extract(extradata, 'ffa'))
-	match.casters = String.nilIfEmpty(Table.extract(extradata, 'casters'))
 
 	return match
 end

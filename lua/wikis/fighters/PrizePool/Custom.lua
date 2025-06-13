@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:PrizePool/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -10,6 +9,8 @@ local Array = require('Module:Array')
 local Arguments = require('Module:Arguments')
 local Class = require('Module:Class')
 local Json = require('Module:Json')
+local Lpdb = require('Module:Lpdb')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Variables = require('Module:Variables')
 
@@ -119,26 +120,32 @@ end
 ---@param data placement
 ---@param prize string|number|boolean?
 function CustomPrizePool.addPointsDatapoint(data, prize)
-	mw.ext.LiquipediaDB.lpdb_datapoint('Points_' .. data.participant, {
+	local opponentData = Opponent.fromLpdbStruct(data)
+	if opponentData.type ~= Opponent.solo then return
+	elseif Logic.isEmpty(prize) then return end
+	local player = opponentData.players[1]
+	local pointsDataPoint = Lpdb.DataPoint:new{
+		objectname = 'Points_' .. player.pageName,
 		type = 'points',
 		name = mw.ext.TeamLiquidIntegration.resolve_redirect(data.extradata.circuit),
-		information = data.participant,
+		information = player.pageName,
 		date = data.date,
-		extradata = mw.ext.LiquipediaDB.lpdb_create_json({
+		extradata = {
 			points = prize,
 			placement = data.placement,
 			tournament = Variables.varDefault('tournament_link'),
 			parent = Variables.varDefault('tournament_parent'),
 			shortname = Variables.varDefault('tournament_name'),
-			participant = data.participant,
+			participant = player.pageName,
 			game = Variables.varDefault('tournament_game'),
 			type = Variables.varDefault('tournament_type'),
-			participantname = data.participant,
-			participantflag = data.participantflag,
+			participantname = player.displayName,
+			participantflag = player.flag,
 			publishertier = data.extradata.circuit_tier or Variables.varDefault('circuittier'),
 			region = Variables.varDefault('circuitregion'),
-		})
-	})
+		}
+	}
+	pointsDataPoint:save()
 end
 
 return CustomPrizePool

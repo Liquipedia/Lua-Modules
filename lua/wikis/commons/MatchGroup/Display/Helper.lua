@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Display/Helper
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -26,7 +25,7 @@ local Opponent = OpponentLibraries.Opponent
 
 local DisplayHelper = {}
 local NONBREAKING_SPACE = '&nbsp;'
-local UTC = Timezone.getTimezoneString('UTC')
+local UTC = Timezone.getTimezoneString{timezone = 'UTC'}
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
@@ -98,9 +97,10 @@ function DisplayHelper.defaultMatchHasDetails(match)
 	return match.dateIsExact
 		or (match.timestamp and match.timestamp ~= Date.defaultTimestamp)
 		or Logic.isNotEmpty(match.vod)
-		or not Table.isEmpty(match.links)
+		or Table.isNotEmpty(match.links)
 		or Logic.isNotEmpty(match.comment)
 		or 0 < #match.games
+		or Info.config.match2.matchPage
 end
 
 -- Display component showing the streams, date, and countdown of a match.
@@ -109,9 +109,9 @@ end
 function DisplayHelper.MatchCountdownBlock(match)
 	local dateString
 	if match.dateIsExact == true then
-		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset(match.extradata.timezoneid) or 0)
+		local timestamp = Date.readTimestamp(match.date) + (Timezone.getOffset{timezone = match.extradata.timezoneid} or 0)
 		dateString = Date.formatTimestamp('F j, Y - H:i', timestamp) .. ' '
-				.. (Timezone.getTimezoneString(match.extradata.timezoneid) or UTC)
+				.. (Timezone.getTimezoneString{timezone = match.extradata.timezoneid} or UTC)
 	else
 		dateString = mw.getContentLanguage():formatDate('F j, Y', match.date)
 	end
@@ -192,7 +192,7 @@ function DisplayHelper.createCastersDisplay(casters)
 		end
 
 		return HtmlWidgets.Fragment{children = {
-			Flags.Icon(caster.flag),
+			Flags.Icon{flag = caster.flag},
 			NONBREAKING_SPACE,
 			casterLink,
 		}}

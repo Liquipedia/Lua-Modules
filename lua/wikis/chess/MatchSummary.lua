@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=chess
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -69,7 +68,6 @@ function CustomMatchSummary.createBody(match, createGame)
 	return MatchSummaryWidgets.Body{children = WidgetUtil.collect(
 		showCountdown and MatchSummaryWidgets.Row{children = DisplayHelper.MatchCountdownBlock(match)} or nil,
 		Array.map(match.games, createGame),
-		MatchSummaryWidgets.Casters{casters = match.extradata.casters},
 		CustomMatchSummary._linksTable(match)
 	)}
 end

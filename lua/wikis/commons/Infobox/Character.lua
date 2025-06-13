@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Character
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -106,7 +105,7 @@ function Character:_createLocation(location)
 		return ''
 	end
 
-	return Flags.Icon({flag = location, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = location, shouldLink = true} .. '&nbsp;' ..
 		'[[:Category:' .. location .. '|' .. location .. ']]'
 end
 
@@ -129,13 +128,22 @@ function Character:nameDisplay(args)
 end
 
 ---@param args table
+---@return string[]
+function Character:getRoles(args)
+	return self:getAllArgsForBase(args, 'role')
+end
+
+---@param args table
 function Character:setLpdbData(args)
 	local lpdbData = {
 		name = self.name,
 		image = args.image,
+		imagedark = args.imagedark or args.imagedarkmode,
 		type = 'character',
 		date = args.releasedate,
-		extradata = {},
+		extradata = {
+			roles = self:getRoles(args),
+		},
 	}
 
 	lpdbData = self:addToLpdb(lpdbData, args)

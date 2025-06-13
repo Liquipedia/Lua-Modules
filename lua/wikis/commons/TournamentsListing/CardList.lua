@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TournamentsListing/CardList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -173,9 +172,9 @@ function BaseTournamentsListing:_header()
 
 	local gameHeader = header:tag('div'):addClass('gridCell')
 	if config.showGameIcon then
-		gameHeader:addClass('GameSeries'):wikitext(Abbreviation.make('G & S', 'Game and Series'))
+		gameHeader:addClass('GameSeries'):wikitext(Abbreviation.make{text = 'G & S', title = 'Game and Series'})
 	else
-		gameHeader:addClass('Series'):wikitext(Abbreviation.make('S', 'Series'))
+		gameHeader:addClass('Series'):wikitext(Abbreviation.make{text = 'S', title = 'Series'})
 	end
 
 	header:tag('div'):addClass('gridCell'):wikitext('Tournament'):done()
@@ -188,7 +187,7 @@ function BaseTournamentsListing:_header()
 		:tag('div'):addClass('gridCell'):wikitext('Date'):done()
 		:tag('div'):addClass('gridCell Prize'):wikitext('Prize' .. NONBREAKING_SPACE .. 'Pool'):done()
 		:tag('div'):addClass('gridCell'):wikitext('Location'):done()
-		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make('P#', 'Number of Participants'))
+		:tag('div'):addClass('gridCell'):wikitext(Abbreviation.make{text = 'P#', title = 'Number of Participants'})
 
 	if config.showQualifierColumnOverWinnerRunnerup then
 		header:tag('div'):addClass('gridCell'):wikitext('Qualified')
@@ -416,7 +415,7 @@ function BaseTournamentsListing._displayLocation(locationData, locationIndex)
 		return Region.display{region = region}
 	end
 
-	return String.nilIfEmpty(display .. (city or Flags.CountryName(country)))
+	return String.nilIfEmpty(display .. (city or Flags.CountryName{flag = country}))
 end
 
 ---@param startDate string

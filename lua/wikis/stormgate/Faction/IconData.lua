@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Faction/IconData
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

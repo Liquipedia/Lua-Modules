@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:LeagueIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -287,4 +286,10 @@ function LeagueIcon._buildLinkToTemplate(args)
 		':Template:LeagueIconSmall/' .. args.templateName:lower() .. ']]'
 end
 
-return Class.export(LeagueIcon, { frameOnly = true })
+return Class.export(LeagueIcon, {frameOnly = true, exports = {
+	'display',
+	'getIconFromTemplate',
+	'getTemplate',
+	'generate',
+	'generateHistorical',
+}})

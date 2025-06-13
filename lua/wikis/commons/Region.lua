@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Region
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -55,7 +54,7 @@ function Region._raw(args)
 
 	--determine region from country if region is empty
 	if String.isEmpty(regionInput) then
-		local country = Flag.CountryName(args.country) or ''
+		local country = Flag.CountryName{flag = args.country} or ''
 		regionInput = COUNTRY_TO_REGION_DATA[string.lower(country)]
 		if String.isEmpty(regionInput) then
 			return {}
@@ -106,4 +105,4 @@ function Region._toDisplay(regionValues, options)
 	return display .. Page.makeInternalLink({}, text, ':Category:' .. text)
 end
 
-return Class.export(Region, {frameOnly = true})
+return Class.export(Region, {frameOnly = true, exports = {'run', 'display', 'name'}})

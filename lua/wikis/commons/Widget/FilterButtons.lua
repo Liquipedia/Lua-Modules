@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/FilterButtons
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -32,7 +31,7 @@ local FilterButtons = Class.new(Widget)
 ---@field defaultItem string?
 ---@field itemToPropertyValues? fun(item: string): string?
 ---@field itemIsValid? fun(item: string): boolean
----@field transform? fun(item: string): string?
+---@field transform? fun(item: string): string|Widget|Html|nil
 ---@field expandKey string?
 ---@field expandable boolean?
 ---@field order? fun(a: string, b: string): boolean

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=warcraft
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -171,9 +170,7 @@ end
 ---@param opponents table[]
 ---@return table
 function MatchFunctions.getExtraData(match, games, opponents)
-	local extradata = {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
-	}
+	local extradata = {}
 
 	for prefix, mapVeto in Table.iter.pairsByPrefix(match, 'veto') do
 		extradata[prefix] = (MapsData[mapVeto:lower()] or {}).name or mapVeto
@@ -265,7 +262,7 @@ function MapFunctions.getTeamMapPlayers(mapInput, opponent, opponentIndex)
 			return {
 				faction = faction,
 				player = link,
-				flag = Flags.CountryName(playerIdData.flag),
+				flag = Flags.CountryName{flag = playerIdData.flag},
 				position = playerIndex,
 				random = Logic.readBool(mapInput[prefix .. 'random']),
 				heroes = MapFunctions.readHeroes(
@@ -502,7 +499,6 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match, {noSort = true}),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

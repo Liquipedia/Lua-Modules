@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:OpponentDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -87,4 +86,4 @@ function CustomOpponentDisplay.InlineScoreSpecial(props)
 	return tostring(props.score)
 end
 
-return Class.export(CustomOpponentDisplay)
+return CustomOpponentDisplay

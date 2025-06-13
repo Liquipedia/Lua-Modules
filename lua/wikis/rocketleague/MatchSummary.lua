@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -23,28 +22,10 @@ local OpponentDisplay = Lua.import('Module:OpponentDisplay')
 local NO_CHECK = '[[File:NoCheck.png|link=]]'
 local TIMEOUT = '[[File:Cooldown_Clock.png|14x14px|link=]]'
 
-local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
-
 -- Custom Header Class
 ---@class RocketleagueMatchSummaryHeader: MatchSummaryHeader
----@field leftElementAdditional Html
----@field rightElementAdditional Html
 ---@field scoreBoardElement Html
 local Header = Class.new(MatchSummary.Header)
-
----@param content Html
----@return self
-function Header:leftOpponentTeam(content)
-	self.leftElementAdditional = content
-	return self
-end
-
----@param content Html
----@return self
-function Header:rightOpponentTeam(content)
-	self.rightElementAdditional = content
-	return self
-end
 
 ---@param content Html
 ---@return self
@@ -112,10 +93,7 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 			:node('<br>')
 			:node(mw.html.create('span')
 				:wikitext('(')
-				:node(Abbreviation.make(
-					'Bo' .. bestof,
-					'Best of ' .. bestof
-				))
+				:node(Abbreviation.make{text = 'Bo' .. bestof, title = 'Best of ' .. bestof})
 				:wikitext(')')
 			)
 	end
@@ -123,44 +101,12 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	return scoreBoardNode:node(score)
 end
 
----@param opponent standardOpponent
----@param date string
----@return Html?
-function Header:soloOpponentTeam(opponent, date)
-	if opponent.type == 'solo' then
-		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-		local display = teamExists
-			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or TBD_ICON
-		return mw.html.create('div'):wikitext(display)
-			:addClass('brkts-popup-header-opponent-solo-team')
-		end
-end
-
----@param opponent standardOpponent
----@param opponentIndex integer
----@return Html
-function Header:createOpponent(opponent, opponentIndex)
-	return OpponentDisplay.BlockOpponent({
-		flip = opponentIndex == 1,
-		opponent = opponent,
-		overflow = 'ellipsis',
-		teamStyle = 'short',
-	})
-		:addClass(opponent.type ~= 'solo'
-			and 'brkts-popup-header-opponent'
-			or 'brkts-popup-header-opponent-solo-with-team')
-end
-
 ---@return Html
 function Header:create()
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-		:node(self.leftElementAdditional)
-		:node(self.leftElement)
+	self.root:node(mw.html.create('div'):addClass('brkts-popup-header-opponent'):node(self.leftElement))
 	self.root:node(self.scoreBoardElement)
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-		:node(self.rightElement)
-		:node(self.rightElementAdditional)
+	self.root:node(mw.html.create('div'):addClass('brkts-popup-header-opponent'):node(self.rightElement))
+
 	return self.root
 end
 
@@ -179,8 +125,7 @@ function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
-		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1], match.date))
-		:leftOpponent(header:createOpponent(match.opponents[1], 1))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -189,8 +134,7 @@ function CustomMatchSummary.createHeader(match, options)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 2))
-		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
 ---@param date string
@@ -233,11 +177,11 @@ function CustomMatchSummary.createGame(date, game, gameIndex)
 		children = WidgetUtil.collect(
 			header,
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(1)},
-			MatchSummaryWidgets.GameCenter{children = {
+			MatchSummaryWidgets.GameCenter{children = WidgetUtil.collect(
 				DisplayHelper.Map(game),
 				Logic.readBool(extradata.ot) and ' - OT' or nil,
 				Logic.isNotEmpty(extradata.otlength) and ' (' .. extradata.otlength .. ')' or nil
-			}},
+			)},
 			MatchSummaryWidgets.GameTeamWrapper{children = makeTeamSection(2), flipped = true},
 			CustomMatchSummary._timeoutDisplay(extradata.timeout),
 			MatchSummaryWidgets.GameComment{children = comments}
@@ -270,10 +214,7 @@ function CustomMatchSummary._goalDisaplay(goalesValue, side)
 
 	local goalsDisplay = mw.html.create('div')
 		:cssText(side == 2 and 'float:right; margin-right:10px;' or nil)
-		:node(Abbreviation.make(
-			goalesValue,
-			'Team ' .. side .. ' Goaltimes')
-		)
+		:node(Abbreviation.make{text = goalesValue, title = 'Team ' .. side .. ' Goaltimes'})
 
 	return mw.html.create('div')
 			:css('max-width', '50%')

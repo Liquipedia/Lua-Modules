@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PortalPlayers
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -14,7 +13,6 @@ local Logic = require('Module:Logic')
 local Links = require('Module:Links')
 local String = require('Module:StringUtils')
 local Table = require('Module:Table')
-local Team = require('Module:Team')
 
 local OpponentLibraries = require('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
@@ -22,8 +20,8 @@ local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local DEFAULT_PLAYER_TYPE = 'Players'
 local NONBREAKING_SPACE = '&nbsp;'
-local NON_PLAYER_HEADER = Abbreviation.make('Staff', 'Coaches, Managers, Analysts and more')
-	.. ' & ' .. Abbreviation.make('Talents', 'Commentators, Observers, Hosts and more')
+local NON_PLAYER_HEADER = Abbreviation.make{text = 'Staff', title = 'Coaches, Managers, Analysts and more'}
+	.. ' & ' .. Abbreviation.make{text = 'Talents', title = 'Commentators, Observers, Hosts and more'}
 local BACKGROUND_CLASSES = {
 	inactive = 'sapphire-bg',
 	retired = 'bg-neutral',
@@ -67,7 +65,7 @@ function PortalPlayers:create()
 	local wrapper = mw.html.create('div'):css('overflow-x', 'auto')
 
 	for country, playerData in Table.iter.spairs(self:_getPlayers()) do
-		local flag = Flags.Icon({flag = country, shouldLink = true})
+		local flag = Flags.Icon{flag = country, shouldLink = true}
 
 		wrapper:tag('h3')
 			:tag('span')
@@ -265,7 +263,9 @@ function PortalPlayers:row(player, isPlayer)
 		:wikitext(self.showLocalizedName and (' (' .. player.localizedname .. ')') or nil)
 
 	local role = not isPlayer and mw.language.getContentLanguage():ucfirst((player.extradata or {}).role or '') or ''
-	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and Team.team(nil, player.team) or ''
+	local teamText = mw.ext.TeamTemplate.teamexists(player.team) and tostring(OpponentDisplay.InlineTeamContainer{
+		template = player.team, displayType = 'standard'
+	}) or ''
 	if String.isNotEmpty(role) and String.isEmpty(teamText) then
 		teamText = role
 	elseif String.isNotEmpty(role) then

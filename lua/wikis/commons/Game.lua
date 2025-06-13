@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Game
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -201,7 +200,8 @@ function Game.text(options)
 	local useAbbreviation = Logic.readBool(options.useAbbreviation)
 	local gameData = Game.raw(options)
 	if Table.isEmpty(gameData) then
-		return Abbreviation.make(useAbbreviation and 'Unkwn.' or 'Unknown Game', 'The specified game input is not recognized')
+		return Abbreviation.make{text = useAbbreviation and 'Unkwn.' or 'Unknown Game',
+			title = 'The specified game input is not recognized'}
 	end
 
 	if Logic.readBool(options.noLink) then
@@ -248,4 +248,12 @@ function Game.isDefaultTeamLogo(options)
 	return Table.includes(defaultLogos, logo)
 end
 
-return Class.export(Game)
+return Class.export(Game, {exports = {
+	'toIdentifier',
+	'abbreviation',
+	'name',
+	'link',
+	'icon',
+	'text',
+	'isDefaultTeamLogo',
+}})

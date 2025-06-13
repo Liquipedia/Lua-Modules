@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=wildrift
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

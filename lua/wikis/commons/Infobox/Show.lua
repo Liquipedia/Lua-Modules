@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Show
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -91,9 +90,9 @@ function Show:_createLocation(country, city)
 		return ''
 	end
 
-	local countryDisplay = Flags.CountryName(country)
+	local countryDisplay = Flags.CountryName{flag = country}
 
-	return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+	return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' ..
 		'[[:Category:' .. countryDisplay .. '|' .. (city or countryDisplay) .. ']]'
 end
 

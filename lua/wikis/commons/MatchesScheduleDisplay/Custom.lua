@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchesScheduleDisplay/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -17,4 +16,4 @@ function CustomMatchesTable.run(args)
 	return MatchesTable(args):create()
 end
 
-return Class.export(CustomMatchesTable)
+return Class.export(CustomMatchesTable, {exports = {'run'}})

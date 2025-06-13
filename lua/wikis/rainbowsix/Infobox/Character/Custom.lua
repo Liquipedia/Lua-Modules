@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Infobox/Character/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,8 +14,10 @@ local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
+local AutoInlineIcon = Lua.import('Module:AutoInlineIcon')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local NameAliases = Lua.requireIfExists('Module:CharacterNames', {loadData = true})
+local Patch = Lua.import('Module:Patch')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Character = Lua.import('Module:Infobox/Character')
@@ -29,23 +30,6 @@ local IconImageWidget = Lua.import('Module:Widget/Image/Icon/Image')
 local Link = Lua.import('Module:Widget/Basic/Link')
 local Title = Widgets.Title
 local WidgetUtil = Lua.import('Module:Widget/Util')
-
----@param teamType 'atk'|'def'
----@param displayName 'Attack'|'Defense'
----@return Widget
-local function createTeamDisplayWidget(teamType, displayName)
-	return HtmlWidgets.Fragment{
-		children = {
-			IconImageWidget{
-				imageLight = 'R6S Para Bellum ' .. teamType .. ' logo.png',
-				link = '',
-				size = '14px'
-			},
-			' ',
-			displayName
-		}
-	}
-end
 
 ---@param label string
 ---@return Widget
@@ -67,8 +51,8 @@ end
 
 local STANDARD_EDITION_LABEL = createPriceLabel('SE')
 local SEASON_PASS_LABEL = createPriceLabel('SP')
-local TEAM_ATTACK = createTeamDisplayWidget('atk','Attack')
-local TEAM_DEFENSE = createTeamDisplayWidget('def', 'Defense')
+local TEAM_ATTACK = AutoInlineIcon.display{category = 'M', lookup = 'attackTeam'}
+local TEAM_DEFENSE = AutoInlineIcon.display{category = 'M', lookup = 'defenseTeam'}
 
 local OPERATOR_PRICES = {
 	launch = {
@@ -191,19 +175,15 @@ function CustomInjector:parse(id, widgets)
 		if Logic.isEmpty(args.releasedate) then
 			return {}
 		end
-		local patchData = mw.ext.LiquipediaDB.lpdb('datapoint', {
-			conditions = '[[type::patch]] AND [[date::' .. args.releasedate .. ']]',
-			query = 'name, pagename, date',
-			limit = 1
-		})[1]
+		local patchData = Patch.getPatchByDate(args.releasedate) or {}
 
 		return {
 			Cell{
 				name = 'Released',
 				content = WidgetUtil.collect(
 					Logic.isNotEmpty(patchData) and Link{
-						link = patchData.pagename,
-						children = patchData.name
+						link = patchData.pageName,
+						children = patchData.displayName
 					} or 'Launch',
 					HtmlWidgets.Small{
 						children = { args.releasedate }

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=ageofempires
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -108,6 +107,11 @@ return {
 		match2 = {
 			status = 2,
 			matchWidthMobile = 110,
+		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
 		},
 	},
 }

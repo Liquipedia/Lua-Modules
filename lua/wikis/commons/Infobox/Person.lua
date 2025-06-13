@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Person
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -26,6 +25,8 @@ local Links = Lua.import('Module:Links')
 local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
 local Region = Lua.import('Module:Region')
 
+local Roles = Lua.import('Module:Roles')
+
 local Widgets = require('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
@@ -34,8 +35,16 @@ local Center = Widgets.Center
 local Builder = Widgets.Builder
 local Customizable = Widgets.Customizable
 
+---@class PersonRoleData
+---@field category string
+---@field display string
+
+---@class PersonRoleDataExtended: PersonRoleData
+---@field key string?
+
 ---@class Person: BasicInfobox
 ---@field locations string[]
+---@field roles PersonRoleDataExtended[]
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -70,54 +79,9 @@ end
 ---@return string
 function Person:createInfobox()
 	local args = self.args
-
-	self.locations = self:getLocations()
-
-	local lowerStatus = (args.status or ''):lower()
-	if lowerStatus == BANNED then
-		-- Temporary until conversion
-		args.banned = args.banned or true
-	end
-	args.status = STATUS_TRANSLATE[lowerStatus]
-
 	assert(String.isNotEmpty(args.id), 'You need to specify an "id"')
 
-	if Logic.readBool(args.autoTeam) then
-		local team, team2 = PlayerIntroduction.playerTeamAuto{player=self.pagename}
-		args.team = Logic.emptyOr(args.team, team)
-		args.team2 = Logic.emptyOr(args.team2, team2)
-	end
-
-	-- check if non-representing is used and set an according value in self
-	-- so it can be accessed in the /Custom modules
-	args.country = self:getStandardNationalityValue(args.country or args.nationality)
-	if args.country == self:getStandardNationalityValue('non-representing') then
-		self.nonRepresenting = true
-	end
-
-	self.region = Region.run({region = args.region, country = args.country})
-
-	args.ids = args.ids or args.alternateids
-
-	args = self:_flipNameOrder(args)
-
-	--set those already here as they are needed in several functions below
-	local links = Links.transform(args)
-	local personType = self:getPersonType(args)
-	--make earnings values available in the /Custom modules
-	self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
-
-	local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
-			birthdate = args.birth_date,
-			birthlocation = args.birth_location,
-			deathdate = args.death_date,
-			deathlocation = args.death_location,
-		})
-	if not ageCalculationSuccess then
-		age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
-	end
-
-	self.age = age
+	self:_parseArgs()
 
 	local widgets = {
 		Header{
@@ -139,8 +103,8 @@ function Person:createInfobox()
 				Cell{name = 'Nationality', content = self:displayLocations()}
 			}
 		},
-		Cell{name = 'Born', content = {age.birth}},
-		Cell{name = 'Died', content = {age.death}},
+		Cell{name = 'Born', content = {self.age.birth}},
+		Cell{name = 'Died', content = {self.age.death}},
 		Customizable{id = 'region', children = {
 				Cell{name = 'Region', content = {self.region.display}}
 			}
@@ -150,9 +114,19 @@ function Person:createInfobox()
 			}
 		},
 		Customizable{id = 'role', children = {
-			Cell{name = 'Role', content = {args.role}}
-			}
-		},
+			Builder{builder = function()
+				local roles = Array.map(self.roles, function(roleData)
+					return self:_displayRole(roleData)
+				end)
+
+				return {
+					Cell{
+						name = (#roles > 1 and 'Roles' or 'Role'),
+						content = roles,
+					}
+				}
+			end}
+		}},
 		Customizable{id = 'teams', children = {
 			Builder{builder = function()
 				local teams = Array.mapIndexes(function (integerIndex)
@@ -166,7 +140,7 @@ function Person:createInfobox()
 			end}
 		}},
 		Cell{name = 'Alternate IDs', content = {
-				table.concat(Array.map(mw.text.split(args.ids or '', ',', true), String.trim), ', ')
+				table.concat(Array.parseCommaSeparatedString(args.ids or ''), ', ')
 			}
 		},
 		Cell{name = 'Nickname(s)', content = {args.nicknames}},
@@ -182,6 +156,7 @@ function Person:createInfobox()
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
+				local links = Links.transform(args)
 				if Table.isNotEmpty(links) then
 					return {
 						Title{children = 'Links'},
@@ -223,23 +198,105 @@ function Person:createInfobox()
 	local statusToStore = self:getStatusToStore(args)
 	self:categories(unpack(self:getCategories(
 				args,
-				age.birth,
-				personType.category,
+				self.age.birth,
+				self:getPersonType(args).category,
 				statusToStore
 			)))
 
 	if self:shouldStoreData(args) then
 		self:_setLpdbData(
 			args,
-			links,
+			Links.transform(args),
 			statusToStore,
-			personType.store
+			self:getPersonType(args).store
 		)
 	end
 
 	self:_definePageVariables(args)
 
 	return self:build(widgets)
+end
+
+function Person:_parseArgs()
+	local args = self.args
+
+	-- STATUS and BANNED
+	local function parseStatusAndBanned()
+		local lowerStatus = (args.status or ''):lower()
+		if lowerStatus == BANNED then
+			-- Temporary until conversion
+			args.banned = args.banned or true
+		end
+		args.status = STATUS_TRANSLATE[lowerStatus]
+	end
+
+	-- ENRICH TEAM
+	local function enrichTeam()
+		if Logic.readBool(args.autoTeam) then
+			local team, team2 = PlayerIntroduction.playerTeamAuto{player = self.pagename}
+			args.team = Logic.emptyOr(args.team, team)
+			args.team2 = Logic.emptyOr(args.team2, team2)
+		end
+	end
+
+	-- COUNTRY/REGION
+	local function parseCountryAndRegion()
+		self.locations = self:getLocations()
+		-- check if non-representing is used and set an according value in self
+		args.country = self:getStandardNationalityValue(args.country or args.nationality)
+		if args.country == self:getStandardNationalityValue('non-representing') then
+			self.nonRepresenting = true
+		end
+		self.region = Region.run({region = args.region, country = args.country})
+	end
+
+	-- NAME
+	local function parseName()
+		args.ids = args.ids or args.alternateids
+		args.givenname, args.familyname = self:_flipNameOrder(args)
+	end
+
+	-- EARNINGS
+	local function calculateEarnings()
+		self.totalEarnings, self.earningsPerYear = self:calculateEarnings(args)
+	end
+
+	-- AGE
+	local function calculateAge()
+		local ageCalculationSuccess, age = pcall(AgeCalculation.run, {
+				birthdate = args.birth_date,
+				birthlocation = args.birth_location,
+				deathdate = args.death_date,
+				deathlocation = args.death_location,
+			})
+		if not ageCalculationSuccess then
+			age = self:_createAgeCalculationErrorMessage(age --[[@as string]])
+		end
+
+		self.age = age
+	end
+
+	-- ROLES
+	local function parseRoles()
+		-- Backwards compatibility for the old roles input
+		if not args.roles then
+			args.roles = table.concat({
+				args.role,
+				args.role2,
+				args.role3,
+			}, ', ')
+		end
+
+		self.roles = Array.map(Array.parseCommaSeparatedString(args.roles), Person._createRoleData)
+	end
+
+	Logic.tryOrElseLog(parseStatusAndBanned)
+	Logic.tryOrElseLog(enrichTeam)
+	Logic.tryOrElseLog(parseCountryAndRegion, function() self.region = {} end)
+	Logic.tryOrElseLog(parseName)
+	Logic.tryOrElseLog(calculateEarnings)
+	Logic.tryOrElseLog(calculateAge, function() self.age = {} end)
+	Logic.tryOrElseLog(parseRoles, function() self.roles = {} end)
 end
 
 ---@param args table
@@ -256,11 +313,13 @@ end
 function Person:_setLpdbData(args, links, status, personType)
 	local teamLink, teamTemplate
 	local team = args.teamlink or args.team
-	local teamRaw = team and mw.ext.TeamTemplate.raw(team)
+	local teamRaw = team and mw.ext.TeamTemplate.raw(team) or nil
 	if teamRaw then
 		teamLink = teamRaw.page
 		teamTemplate = teamRaw.templatename
 	end
+
+	local rolesStorageKey = Person._getKeysOfRoles(self.roles)
 
 	local lpdbData = {
 		id = args.id,
@@ -281,19 +340,18 @@ function Person:_setLpdbData(args, links, status, personType)
 		status = status,
 		type = personType,
 		earnings = self.totalEarnings,
-		earningsbyyear = {},
+		earningsbyyear = self.earningsPerYear or {},
 		links = Links.makeFullLinksForTableItems(links, LINK_VARIANT),
 		extradata = {
 			firstname = args.givenname,
 			lastname = args.familyname,
 			banned = args.banned,
+			role = rolesStorageKey[1], -- Backwards compatibility
+			role2 = rolesStorageKey[2], -- Backwards compatibility
+			role3 = rolesStorageKey[3], -- Backwards compatibility
+			roles = rolesStorageKey,
 		},
 	}
-
-	for year, earningsOfYear in pairs(self.earningsPerYear or {}) do
-		lpdbData.extradata['earningsin' .. year] = earningsOfYear
-		lpdbData.earningsbyyear[year] = earningsOfYear
-	end
 
 	-- Store additional team-templates in extradata
 	for teamKey, otherTeam, teamIndex in Table.iter.pairsByPrefix(args, 'team', {requireIndex = false}) do
@@ -304,10 +362,8 @@ function Person:_setLpdbData(args, links, status, personType)
 	end
 
 	lpdbData = self:adjustLPDB(lpdbData, args, personType)
-	lpdbData = Json.stringifySubTables(lpdbData)
-	local storageType = self:getStorageType(args, personType, status)
 
-	mw.ext.LiquipediaDB.lpdb_player(storageType .. '_' .. args.id, lpdbData)
+	mw.ext.LiquipediaDB.lpdb_player(string.lower(personType) .. '_' .. args.id, Json.stringifySubTables(lpdbData))
 end
 
 -- Allows this function to be used in /Custom
@@ -318,7 +374,7 @@ function Person:getStandardNationalityValue(nationality)
 		return nil
 	end
 
-	local nationalityToStore = Flags.CountryName(nationality)
+	local nationalityToStore = Flags.CountryName{flag = nationality}
 
 	if String.isEmpty(nationalityToStore) then
 		table.insert(
@@ -337,15 +393,6 @@ function Person:defineCustomPageVariables(args)
 end
 
 --- Allows for overriding this functionality
----@param args table
----@param personType string
----@param status string
----@return string
-function Person:getStorageType(args, personType, status)
-	return string.lower(personType)
-end
-
---- Allows for overriding this functionality
 ---@param lpdbData table
 ---@param args table
 ---@param personType string
@@ -355,10 +402,18 @@ function Person:adjustLPDB(lpdbData, args, personType)
 end
 
 --- Allows for overriding this functionality
+--- Default implementation determines the personType based on the first role.
 ---@param args table
 ---@return {store: string, category: string}
 function Person:getPersonType(args)
-	return {store = 'Player', category = 'Player'}
+	local playerValue = {store = 'player', category = 'Player'}
+	local staffValue = {store = 'staff', category = 'Staff'}
+
+	local roles = Person._getKeysOfRoles(self.roles)
+	if Roles.StaffRoles[roles[1]] then
+		return staffValue
+	end
+	return playerValue
 end
 
 --- Allows for overriding this functionality
@@ -395,9 +450,11 @@ function Person:nameDisplay(args)
 	local team = string.lower(args.teamicon or args.ttlink or args.teamlink or args.team or '')
 	local icon = mw.ext.TeamTemplate.teamexists(team)
 		and mw.ext.TeamTemplate.teamicon(team) or ''
+
 	local team2 = string.lower(args.team2icon or args.ttlink2 or args.team2link or args.team2 or '')
 	local icon2 = mw.ext.TeamTemplate.teamexists(team2)
 		and mw.ext.TeamTemplate.teamicon(team2) or ''
+
 	local name = args.id or mw.title.getCurrentTitle().text
 
 	local display = name
@@ -437,7 +494,7 @@ function Person:getLocations()
 	end
 
 	return Array.map(locations, function(country)
-		return Flags.CountryName(country)
+		return Flags.CountryName{flag = country}
 	end)
 end
 
@@ -445,10 +502,52 @@ end
 function Person:displayLocations()
 	return Array.map(self.locations, function(country, locationIndex)
 		local location = self.args['location' .. locationIndex]
-		return Flags.Icon({flag = country, shouldLink = true}) .. '&nbsp;' ..
+		return Flags.Icon{flag = country, shouldLink = true} .. '&nbsp;' ..
 			Page.makeInternalLink(country, ':Category:' .. country) ..
 			(location and (',&nbsp;' .. location) or '')
 	end)
+end
+
+---@param roles PersonRoleDataExtended[]
+---@return string[]
+function Person._getKeysOfRoles(roles)
+	return Array.map(roles, function(roleData)
+		-- With backwards compatibility for old roles, otherwise only key would be needed
+		return roleData.key or roleData.display or roleData.category or ''
+	end)
+end
+
+---@param roleKey string
+---@return PersonRoleDataExtended?
+function Person._createRoleData(roleKey)
+	if String.isEmpty(roleKey) then return nil end
+
+	local key = roleKey:lower()
+	local roleData = Roles.All[key]
+
+	--- Backwards compatibility for old roles
+	if not roleData then
+		mw.ext.TeamLiquidIntegration.add_category('Pages with invalid role input')
+		local display = String.upperCaseFirst(roleKey)
+		return {
+			display = display,
+			category = display .. 's'
+		}
+	end
+
+	return {
+		display = roleData.display,
+		category = roleData.category,
+		key = key,
+	}
+end
+
+---@param roleData PersonRoleData?
+---@return string?
+function Person:_displayRole(roleData)
+	if not roleData then return end
+
+	return Page.makeInternalLink(roleData.display, ':Category:' .. roleData.category)
 end
 
 ---@param team string?
@@ -476,15 +575,21 @@ end
 ---@param status PlayerStatus
 ---@return string[]
 function Person:getCategories(args, birthDisplay, personType, status)
+	local categories = {}
 	if not self:shouldStoreData(args) then
-		return {}
+		return categories
 	end
-
 	local team = args.teamlink or args.team
-	local categories = Array.append(self.age.categories,
+
+	categories = Array.extend(categories, self.age.categories)
+	categories = Array.extend(categories,
 		personType .. 's',
 		status .. ' ' .. personType .. 's'
 	)
+
+	categories = Array.extend(categories, Array.map(self.roles, function(roleData)
+		return roleData.category
+	end))
 
 	if
 		not self.nonRepresenting and (args.country2 or args.nationality2)
@@ -549,12 +654,11 @@ function Person:_createAgeCalculationErrorMessage(text)
 end
 
 ---@param args table
----@return table
+---@return string, string
 function Person:_flipNameOrder(args)
-	args.givenname, args.familyname = NameOrder.reorderNames(
+	return NameOrder.reorderNames(
 		args.givenname, args.familyname, {country = args.country, forceWesternOrder = args.nonameflip}
 	)
-	return args
 end
 
 return Person

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -22,4 +21,4 @@ function CustomHiddenDataBox.run(args)
 	return BasicHiddenDataBox.run(args)
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

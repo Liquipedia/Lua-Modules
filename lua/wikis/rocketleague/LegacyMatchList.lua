@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:LegacyMatchList
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

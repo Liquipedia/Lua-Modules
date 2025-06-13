@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:HiddenDataBox/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -46,4 +45,4 @@ function CustomHiddenDataBox.addCustomVariables(args, queryResult)
 	BasicHiddenDataBox.checkAndAssign('tournament_riot_premier', queryResult.tournament_riot_premier, args.riotpremier)
 end
 
-return Class.export(CustomHiddenDataBox)
+return Class.export(CustomHiddenDataBox, {exports = {'run'}})

@@ -1,24 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MvpTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
 
-local Condition = require('Module:Condition')
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator
 local BooleanOperator = Condition.BooleanOperator
 local ColumnName = Condition.ColumnName
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -190,7 +193,7 @@ function MvpTable._row(item, args)
 				displayName = item.displayName,
 				flag = item.flag,
 				pageName = item.name,
-				team = item.team and (item.team:gsub('_', ' '):lower()) or nil,
+				team = item.team and TeamTemplate.resolve(item.team, DateExt.getContextualDateOrNow()) or nil,
 			}}},
 			showLink = true,
 			overflow = 'ellipsis',
@@ -335,4 +338,4 @@ function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
 	return playerData
 end
 
-return Class.export(MvpTable)
+return Class.export(MvpTable, {exports = {'run'}})

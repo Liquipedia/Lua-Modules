@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Locale
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -68,7 +67,7 @@ function Locale.formatLocations(args)
 		local unresolvedCountry = location.country
 		-- Convert country to alpha2
 		if location.country then
-			location.country = String.nilIfEmpty(Flags.CountryCode(location.country))
+			location.country = String.nilIfEmpty(Flags.CountryCode{flag = location.country})
 		end
 
 		-- Remove country if it is actually a region
@@ -106,4 +105,4 @@ function Locale.formatLocations(args)
 end
 
 
-return Class.export(Locale, {frameOnly = true})
+return Class.export(Locale, {frameOnly = true, exports = {'formatLocation', 'formatLocations'}})

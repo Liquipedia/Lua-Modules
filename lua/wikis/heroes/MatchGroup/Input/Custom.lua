@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=heroes
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -69,7 +68,6 @@ function MatchFunctions.getExtraData(match, games, opponents)
 	return {
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
-		casters = MatchGroupInputUtil.readCasters(match),
 	}
 end
 

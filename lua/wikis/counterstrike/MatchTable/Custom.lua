@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=counterstrike
 -- page=Module:MatchTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -52,4 +51,4 @@ function CustomMatchTable:_displayTier(match)
 		:wikitext(Tier.display(tier, tierType, options))
 end
 
-return Class.export(CustomMatchTable)
+return Class.export(CustomMatchTable, {exports = {'results'}})
