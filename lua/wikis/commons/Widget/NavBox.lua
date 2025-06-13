@@ -117,6 +117,10 @@ function NavBox._getNumberOfChildren(props)
 	if props[1] or Logic.readBool(props.allowEmpty) then
 		numberOfChildren = numberOfChildren + 1
 	end
+	-- if there are > 4 items in the list it will likely wrap as 2 lines on mobile, hence consider it as 2 lines
+	if props[4] then
+		numberOfChildren = numberOfChildren + 1
+	end
 
 	---@type table[]
 	local currentChildren = Array.mapIndexes(function(rowIndex) return Json.parseIfTable(props['child' .. rowIndex]) end)
