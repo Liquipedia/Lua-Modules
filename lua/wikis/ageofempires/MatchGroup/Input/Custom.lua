@@ -31,6 +31,7 @@ local MatchFunctions = {
 }
 local MapFunctions = {
 	BREAK_ON_EMPTY = true,
+	INHERIT_MAPDATES = true,
 }
 
 local FffMatchFunctions = {
