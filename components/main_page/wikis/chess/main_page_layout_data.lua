@@ -1,5 +1,4 @@
 -- @Liquipedia
--- wiki=chess
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
