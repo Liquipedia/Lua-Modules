@@ -26,23 +26,30 @@ TransferNavBox.defaultProps = {portalLink = 'Portal:Transfers'}
 ---@return Widget
 function TransferNavBox:render()
 	local pagesByYear = TransferNavBox._getGroupedData()
-	local children = {}
-	local childIndex = 1
-
-	local sort = function(tbl, year1, year2)
-		return year2 < year1
-	end
+	local collapsedChildren = {}
+	local childIndex = 0
 
 	local miscPages = Table.extract(pagesByYear, 'misc')
+	---@cast pagesByYear table<integer, string[]>
 
-	for year, pages in Table.iter.spairs(pagesByYear, sort) do
+	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		---@type table
 		local childData = Array.map(pages, TransferNavBox._buildPageDisplay)
 		if Logic.isNotEmpty(childData) then
 			childData.name = year
-			children['child' .. childIndex] = childData
+			collapsedChildren['child' .. childIndex] = childData
 			childIndex = childIndex + 1
 		end
+	end
+
+	local unsorted, unsourced = TransferNavBox._getUnsortedAndUnsourced(pagesByYear)
+	if Logic.isNotEmpty(unsorted) then
+		collapsedChildren['child' .. childIndex] = Table.merge(unsorted, {name = 'Unsorted'})
+		childIndex = childIndex + 1
+	end
+	if Logic.isNotEmpty(unsourced) then
+		collapsedChildren['child' .. childIndex] = Table.merge(unsourced, {name = 'Unsourced'})
+		childIndex = childIndex + 1
 	end
 
 	if Logic.isNotEmpty(miscPages) then
@@ -52,10 +59,53 @@ function TransferNavBox:render()
 			children = {'#' .. index}
 		} end)
 		childData.name = 'Misc'
-		children['child' .. childIndex] = childData
+		collapsedChildren['child' .. childIndex] = childData
 	end
 
-	return NavBox(Table.merge(children, {title = 'Transfers', titleLink = self.props.portalLink}))
+	local firstChild = Table.extract(collapsedChildren, 'child0')
+
+	return NavBox{
+		title = 'Transfers',
+		titleLink = self.props.portalLink,
+		child1 = firstChild,
+		collapsed = false, -- is used on pages without navbox / HDB, hence would always collapse else
+		child2 = Table.merge({collapsed = true, title = 'Further Transfers'}, collapsedChildren),
+	}
+end
+
+---@private
+---@param tbl table
+---@param year1 integer
+---@param year2 integer
+---@return boolean
+function TransferNavBox._sortByYear(tbl, year1, year2)
+	return year2 < year1
+end
+
+---@private
+---@param pagesByYear table<integer, string[]>
+---@return Widget[]
+---@return Widget[]
+function TransferNavBox._getUnsortedAndUnsourced(pagesByYear)
+	local toDisplay = function(pageName, year)
+		return Link{link = pageName, children = {year}}
+	end
+
+	local unsorted, unsourced = {}, {}
+	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
+		Array.forEach(pages, function(pageName)
+			local name, _
+			_, _, name = string.find(pageName, '.*/' .. year .. '/(.*)')
+			name = (name or ''):lower()
+			if name == 'unsorted' then
+				table.insert(unsorted, toDisplay(pageName, year))
+			elseif name == 'unsourced' then
+				table.insert(unsourced, toDisplay(pageName, year))
+			end
+		end)
+	end
+
+	return unsorted, unsourced
 end
 
 ---@private
