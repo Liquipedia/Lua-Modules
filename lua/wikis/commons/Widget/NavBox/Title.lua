@@ -37,7 +37,6 @@ NavBoxTitle.defaultProps = {
 
 ---@return Widget
 function NavBoxTitle:render()
-	local props = self.props
 	local titleText = self:_getTitleText()
 
 	if self.props.isWrapper then
@@ -54,7 +53,7 @@ function NavBoxTitle:render()
 	return Tr{
 		children = {
 			Th{
-				attributes = {colspan = props.colSpan},
+				attributes = {colspan = self.props.colSpan},
 				classes = {'navbox-title'},
 				children = titleText,
 			}

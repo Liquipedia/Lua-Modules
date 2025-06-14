@@ -46,7 +46,7 @@ function NavBox:render()
 
 	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
 
-	local title = NavBoxTitle(Table.merge(props), {isWrapper = true})
+	local title = NavBoxTitle(Table.merge(props, {isWrapper = true}))
 	-- have to extract so the child doesn't add the header too ...
 	local titleInput = Table.extract(props, 'title')
 	assert(titleInput, 'Missing "|title="')
