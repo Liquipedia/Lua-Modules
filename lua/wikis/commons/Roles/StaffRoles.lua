@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type PersonRoleData
+---@type PersonRoleData[]
 local staffRoles = {
 	['admin'] = {category = 'Admins', display = 'Admin'},
 	['analyst'] = {category = 'Analysts', display = 'Analyst'},

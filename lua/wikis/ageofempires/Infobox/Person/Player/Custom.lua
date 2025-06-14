@@ -128,8 +128,7 @@ function CustomPlayer.run(frame)
 					return game.name .. (game.active and '' or '&nbsp;<small>(inactive)</small>')
 				end)),
 			type = player:getPersonType(args).store,
-			role = (player.roles[1] or {}).display,
-			role2 = (player.roles[2] or {}).display,
+			roles = player._getKeysOfRoles(player.roles),
 			id = args.id,
 			idIPA = args.idIPA,
 			idAudio = args.idAudio,

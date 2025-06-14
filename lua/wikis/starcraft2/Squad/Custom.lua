@@ -57,7 +57,7 @@ function CustomSquad._playerRow(person, squadStatus, squadType)
 
 	if squadStatus == SquadUtils.SquadStatus.ACTIVE then
 		local isMain = Logic.readBool(squadArgs.main) or Logic.isEmpty(squadArgs.squad)
-		squadPerson.extradata = Table.merge({ismain = tostring(isMain)}, squadPerson.extradata)
+		squadPerson.extradata = Table.merge({group = isMain and 'main' or 'additional'}, squadPerson.extradata)
 	end
 	squadPerson.newteamspecial = Logic.emptyOr(squadPerson.newteamspecial,
 		Logic.readBool(person.retired) and 'retired' or nil,

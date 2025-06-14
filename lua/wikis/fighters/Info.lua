@@ -1711,6 +1711,10 @@ return {
 		match2 = {
 			status = 1,
 		},
+		teamRosterNavbox = {
+			hideOrg = true,
+			hideOverview = true,
+		},
 	},
 	opponentLibrary = 'Opponent/Custom',
 }
