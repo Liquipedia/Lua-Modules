@@ -110,8 +110,7 @@ function SeriesChildFromLpdb:_makeConditions()
 	assert(Logic.isNotEmpty(serieses), 'No series specified')
 
 	local prepPageName = Logic.nilOr(Logic.readBoolOrNil(props.resolve), true) and Page.pageifyLink or function(pageName)
-		pageName = pageName:gsub(' ', '_')
-		return pageName
+		return (pageName:gsub(' ', '_'))
 	end
 
 	serieses = Array.map(serieses, prepPageName)
