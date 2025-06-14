@@ -15,13 +15,8 @@ local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
 local Collapsible = Lua.import('Module:Widget/GeneralCollapsible/Default')
-local CollapsibleToggle = Lua.import('Module:Widget/GeneralCollapsible/Toggle')
-local EditButton = Lua.import('Module:Widget/NavBox/EditButton')
-local HtmlWidgets = Lua.import('Module:Widget/Html/All')
-local B = HtmlWidgets.B
-local Div = HtmlWidgets.Div
+local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
 local Widget = Lua.import('Module:Widget')
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local NavBoxChild = Lua.import('Module:Widget/NavBox/Child')
 
@@ -42,7 +37,7 @@ local NavBox = Class.new(Widget)
 function NavBox:render()
 	local props = self.props
 
-	-- if the NavBox is sometimes used as a child in another NavBox return the props as Json
+	-- if the NavBox is used as a child in another NavBox return the props as Json
 	if Logic.readBool(props.isChild) then
 		return Json.stringify(props)
 	end
@@ -51,8 +46,7 @@ function NavBox:render()
 
 	local shouldCollapse = self:_determineCollapsedState(Table.extract(props, 'collapsed'))
 
-	local title = NavBoxChild.buildTitleText(props)
-
+	local title = NavBoxTitle(Table.merge(props), {isWrapper = true})
 	-- have to extract so the child doesn't add the header too ...
 	local titleInput = Table.extract(props, 'title')
 	assert(titleInput, 'Missing "|title="')
@@ -69,22 +63,8 @@ function NavBox:render()
 			Logic.readBool(props.hideonmobile) and 'mobile-hide' or nil
 		},
 		shouldCollapse = shouldCollapse,
-		titleWidget = NavBox._title(title, self.props.template),
+		titleWidget = title,
 		children = {NavBoxChild(props)},
-	}
-end
-
----@param titleText (string|Widget)[]
----@param templateLink string
----@return Widget
-function NavBox._title(titleText, templateLink)
-	return Div{
-		classes = {'navbox-title'},
-		children = WidgetUtil.collect(
-			EditButton{templateLink = templateLink},
-			B{children = titleText},
-			CollapsibleToggle{css = {float = 'right'}}
-		)
 	}
 end
 

@@ -13,6 +13,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Image = Lua.import('Module:Image')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
@@ -21,7 +22,8 @@ local Tbl = HtmlWidgets.Table
 local Tr = HtmlWidgets.Tr
 local Th = HtmlWidgets.Th
 local Td = HtmlWidgets.Td
-local Link = Lua.import('Module:Widget/Basic/Link')
+
+local NavBoxTitle = Lua.import('Module:Widget/NavBox/Title')
 local Widget = Lua.import('Module:Widget')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -111,29 +113,9 @@ function NavBoxChild:render()
 			shouldCollapse and 'collapsed' or nil,
 		},
 		children = WidgetUtil.collect(
-			(props.title or shouldCollapse) and Tr{children = {Th{
-				attributes = {colspan = colSpan},
-				classes = {'navbox-title'},
-				children = NavBoxChild.buildTitleText(props),
-			}}} or nil,
+			(props.title or shouldCollapse) and NavBoxTitle(Table.merge(props, {colSpan = colSpan})) or nil,
 			Array.map(children, FnUtil.curry(NavBoxChild._toRow, self))
 		)
-	}
-end
-
----@param props table
----@return (string|Widget)[]
-function NavBoxChild.buildTitleText(props)
-	if not props.title then
-		return {'Click on the "show"/"hide" link on the right to collapse/uncollapse the full list'}
-	end
-	local titleLink = props.titleLink
-	local titleText = titleLink and Link{link = titleLink, children = {props.title}} or props.title
-	local mobileTitle = props.mobileTitle and titleLink and Link{link = titleLink, children = {props.mobileTitle}}
-		or props.mobileTitle
-	return {
-		mobileTitle and Span{children = titleText, classes = {'mobile-hide'}} or titleText,
-		mobileTitle and Span{children = mobileTitle, classes = {'mobile-only'}} or nil,
 	}
 end
 
