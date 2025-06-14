@@ -22,7 +22,12 @@ function NavBoxEditButton:render()
 	if not self.props.templateLink then return end
 	local editLink = HtmlWidgets.Fragment{children = {
 		mw.text.nowiki('['),
-		Link{link = 'Template:' .. self.props.templateLink, children = {'e'}},
+		Link{
+			linktype = 'external',
+			link = mw.site.server ..
+				tostring(mw.uri.localUrl( 'Template:' .. self.props.templateLink, 'action=edit' )),
+			children = {'e'},
+		},
 		mw.text.nowiki(']'),
 	}}
 
