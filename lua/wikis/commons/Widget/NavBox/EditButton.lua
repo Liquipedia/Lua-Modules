@@ -24,8 +24,7 @@ function NavBoxEditButton:render()
 		mw.text.nowiki('['),
 		Link{
 			linktype = 'external',
-			link = mw.site.server ..
-				tostring(mw.uri.localUrl( 'Template:' .. self.props.templateLink, 'action=edit' )),
+			link = tostring(mw.uri.fullUrl( 'Template:' .. self.props.templateLink, 'action=edit' )),
 			children = {'e'},
 		},
 		mw.text.nowiki(']'),
