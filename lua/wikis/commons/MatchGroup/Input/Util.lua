@@ -1197,7 +1197,7 @@ end
 ---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
----@field INHERIT_MAPDATES? boolean
+---@field INHERIT_MAP_DATES? boolean
 
 --- The standard way to process a map input.
 ---
@@ -1237,7 +1237,7 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local winnerInput = map.winner --[[@as string?]]
 
 		local dateToUse = map.date or match.date
-		if Parser.INHERIT_MAPDATES then
+		if Parser.INHERIT_MAP_DATES then
 			dateToUse = map.date or lastDate
 			lastDate = dateToUse
 		end
