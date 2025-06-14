@@ -25,25 +25,25 @@ local ColumnName = Condition.ColumnName
 local Widget = Lua.import('Module:Widget')
 
 ---- technically from wiki input they will be all string representations
----@alias SeriesChildFromLpdbProps {
----limit: integer?,
----offset: integer?,
----newestFirst: boolean?,
----series: string[]|string,
----resolve: boolean?,
----tier: string?,
----tierType: string?,
----year: integer,
----edate: string|integer|osdate?,
----sdate: string|integer|osdate? }
-
+---@class SeriesChildFromLpdbProps: NavBoxChildProps
+---@field limit integer?
+---@field offset integer?
+---@field newestFirst boolean?
+---@field series string[]|string
+---@field resolve boolean?
+---@field tier string?
+---@field tierType string?
+---@field mode string?
+---@field year integer
+---@field edate string|integer|osdate?
+---@field sdate string|integer|osdate?
 
 ---@class SeriesChildFromLpdb: Widget
 ---@field props SeriesChildFromLpdbProps
 local SeriesChildFromLpdb = Class.new(Widget)
 SeriesChildFromLpdb.defaultProps = {
 	newestFirst = true,
-	resolve = true
+	resolve = true,
 }
 
 ---@return string
@@ -124,6 +124,7 @@ function SeriesChildFromLpdb:_makeConditions()
 		multiValueCondition('seriespage', serieses),
 		multiValueCondition('liquipediatier', Json.parseIfTable(props.tier) or {props.tier}),
 		multiValueCondition('liquipediatiertype', Json.parseIfTable(props.tierType) or {props.tierType}),
+		multiValueCondition('mode', Json.parseIfTable(props.mode) or {props.mode}),
 		year and ConditionNode(ColumnName('enddate_year'), Comparator.eq, year) or nil,
 		props.edate and ConditionNode(ColumnName('enddate'), Comparator.le, props.edate) or nil,
 		props.sdate and ConditionNode(ColumnName('startdate'), Comparator.ge, props.sdate) or nil,
