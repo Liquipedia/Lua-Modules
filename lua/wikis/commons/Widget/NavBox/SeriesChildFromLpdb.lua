@@ -29,6 +29,7 @@ local Widget = Lua.import('Module:Widget')
 ---@field limit integer?
 ---@field offset integer?
 ---@field newestFirst boolean?
+---@field prependManualChildren boolean?
 ---@field series string[]|string
 ---@field resolve boolean?
 ---@field tier string?
@@ -84,6 +85,13 @@ function SeriesChildFromLpdb:render()
 
 	if Logic.readBool(props.newestFirst) then
 		elements = Array.reverse(elements)
+	end
+
+	local manualElements = Array.mapIndexes(function(index) return props[index] end)
+	if Logic.readBool(props.prependManualChildren) then
+		elements = Array.extend(manualElements, elements)
+	else
+		Array.extendWith(elements, manualElements)
 	end
 
 	return Json.stringify(Table.merge(props, elements))
