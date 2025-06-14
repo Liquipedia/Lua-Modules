@@ -29,8 +29,29 @@ local NavBoxList = Lua.import('Module:Widget/NavBox/List')
 
 local EMPTY_CHILD_ERROR = 'Empty child found'
 
+---@class NavBoxChildProps: table<integer, string?>
+---@field name string?
+---@field mobileName string?
+---@field title string?
+---@field titleLink string?
+---@field collapsed boolean? # from wiki input string?
+---@field center boolean? # from wiki input string?
+---@field allowEmpty boolean? # from wiki input string?
+---@field image string?
+---@field imageleft string?
+---@field imagedark string?
+---@field imageleftdark string?
+---@field imagesize string?
+---@field imageleftsize string?
+---@field imagelink string?
+---@field imagedarklink string?
+---@field child1 string|NavBoxChildProps?
+---@field child2 string|NavBoxChildProps?
+---@field child3 string|NavBoxChildProps? # childX for X >=4 is supported too
+
 ---@class NavBoxChild: Widget
 ---@operator call(table): NavBoxChild
+---@field props NavBoxChildProps
 local NavBoxChild = Class.new(Widget)
 NavBoxChild.defaultProps = {
 	imagesize = '30px',
