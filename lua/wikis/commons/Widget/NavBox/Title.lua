@@ -1,6 +1,6 @@
 ---
 -- @Liquipedia
--- page=Module:Widget/NavBox/Child
+-- page=Module:Widget/NavBox/Title
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
