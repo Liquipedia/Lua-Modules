@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:Infobox/Cosmetic/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

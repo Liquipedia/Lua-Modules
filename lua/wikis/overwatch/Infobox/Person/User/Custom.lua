@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=overwatch
 -- page=Module:Infobox/Person/User/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

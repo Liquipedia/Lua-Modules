@@ -1,15 +1,15 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Page/TeamDisplay
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local TeamTemplate = require('Module:TeamTemplate')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent

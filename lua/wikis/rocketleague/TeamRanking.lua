@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:TeamRanking
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -48,4 +47,4 @@ function TeamRanking.run(args)
 end
 
 
-return Class.export(TeamRanking)
+return Class.export(TeamRanking, {exports = {'run'}})

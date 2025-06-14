@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Timezone
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -72,4 +71,4 @@ function Timezone.getOffset(args)
 	return timezoneData.offset[1] * 60 * 60 + timezoneData.offset[2] * 60
 end
 
-return Class.export(Timezone)
+return Class.export(Timezone, {exports = {'getTimezoneString', 'getOffset'}})

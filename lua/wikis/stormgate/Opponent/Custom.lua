@@ -1,17 +1,17 @@
 ---
 -- @Liquipedia
--- wiki=stormgate
 -- page=Module:Opponent/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Faction = require('Module:Faction')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
+
+local Faction = Lua.import('Module:Faction')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')

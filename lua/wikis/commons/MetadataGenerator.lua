@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MetadataGenerator
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -229,4 +228,4 @@ function MetadataGenerator._getDateFormat(startTime, endTime)
 	return formatStart, formatEnd
 end
 
-return Class.export(MetadataGenerator)
+return Class.export(MetadataGenerator, {exports = {'tournament'}})

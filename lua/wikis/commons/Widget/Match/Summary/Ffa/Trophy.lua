@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Match/Summary/Ffa/Trophy
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

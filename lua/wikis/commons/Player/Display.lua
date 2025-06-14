@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Player/Display
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -122,4 +121,8 @@ function PlayerDisplay.Flag(args)
 	return Flags.Icon{flag = args.flag, shouldLink = false}
 end
 
-return Class.export(PlayerDisplay)
+return Class.export(PlayerDisplay, {exports = {
+	'BlockPlayer',
+	'InlinePlayer',
+	'Flag',
+}})

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Links
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -712,4 +711,4 @@ function Links.getMatchIconData(key)
 	return MATCH_ICONS[Links.removeAppendedNumber(key)]
 end
 
-return Class.export(Links, {frameOnly = true})
+return Class.export(Links, {frameOnly = true, exports = {'makeFullLink'}})

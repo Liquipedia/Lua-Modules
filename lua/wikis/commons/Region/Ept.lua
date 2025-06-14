@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Region/Ept
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

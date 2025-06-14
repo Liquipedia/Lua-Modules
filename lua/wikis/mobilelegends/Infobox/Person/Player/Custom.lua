@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=mobilelegends
 -- page=Module:Infobox/Person/Player/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,7 +11,6 @@ local Class = require('Module:Class')
 local HeroNames = mw.loadData('Module:HeroNames')
 local Lua = require('Module:Lua')
 local Region = require('Module:Region')
-local Role = require('Module:Role')
 local String = require('Module:StringUtils')
 local TeamHistoryAuto = require('Module:TeamHistoryAuto')
 
@@ -26,9 +24,6 @@ local Center = Widgets.Center
 
 local SIZE_HERO = '25x25px'
 
----@class MobilelegendsInfoboxPlayer: Person
----@field role table
----@field role2 table
 local CustomPlayer = Class.new(Player)
 local CustomInjector = Class.new(Injector)
 
@@ -39,8 +34,6 @@ function CustomPlayer.run(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
 	player.args.autoTeam = true
-	player.role = Role.run{role = player.args.role}
-	player.role2 = Role.run{role = player.args.role2}
 
 	return player:createInfobox()
 end
@@ -87,23 +80,14 @@ function CustomInjector:parse(id, widgets)
 			}
 		end
 	elseif id == 'region' then return {}
-	elseif id == 'role' then
-		return {
-			Cell{name = 'Role(s)', content = {caller.role.display, caller.role2.display}}
-		}
 	end
 	return widgets
 end
 
 ---@param lpdbData table
 ---@param args table
----@param personType string
 ---@return table
-function CustomPlayer:adjustLPDB(lpdbData, args, personType)
-	lpdbData.extradata.isplayer = self.role.isPlayer or 'true'
-	lpdbData.extradata.role = self.role.role
-	lpdbData.extradata.role2 = self.role2.role
-
+function CustomPlayer:adjustLPDB(lpdbData, args)
 	-- store signature heroes with standardized name
 	for heroIndex, hero in ipairs(self:getAllArgsForBase(args, 'hero')) do
 		lpdbData.extradata['signatureHero' .. heroIndex] = HeroNames[hero:lower()]

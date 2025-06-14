@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:AutoInlineIcon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -110,4 +109,4 @@ function AutoInlineIcon._queryCharacterData(name)
 	}
 end
 
-return Class.export(AutoInlineIcon)
+return Class.export(AutoInlineIcon, {exports = {'display'}})

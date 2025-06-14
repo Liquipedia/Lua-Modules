@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:TeamLogoGallery
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -120,4 +119,4 @@ function TeamLogoGallery._makeCaptionAndBelow(imageData, index, finalName)
 	return caption, below
 end
 
-return Class.export(TeamLogoGallery)
+return Class.export(TeamLogoGallery, {exports = {'run'}})

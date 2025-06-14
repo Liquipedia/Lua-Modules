@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=formula1
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

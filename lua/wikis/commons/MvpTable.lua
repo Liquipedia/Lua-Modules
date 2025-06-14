@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MvpTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -339,4 +338,4 @@ function MvpTable._findPlayerInfo(match, lookupTable, link, displayName)
 	return playerData
 end
 
-return Class.export(MvpTable)
+return Class.export(MvpTable, {exports = {'run'}})

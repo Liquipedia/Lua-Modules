@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=dota2
 -- page=Module:MatchGroup/Input/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -138,10 +137,15 @@ function MatchFunctions.getHeadToHeadLink(match, opponents)
 		return opponent.type == Opponent.team
 	end)
 	if Logic.readBool(Logic.emptyOr(match.headtohead, Variables.varDefault('headtohead'))) and isTeamGame then
-		local team1, team2 = string.gsub(opponents[1].name, ' ', '_'), string.gsub(opponents[2].name, ' ', '_')
-		return tostring(mw.uri.fullUrl('Special:RunQuery/Match_history')) ..
-			'?pfRunQueryFormName=Match+history&Head_to_head_query%5Bplayer%5D=' .. team1 ..
-			'&Head_to_head_query%5Bopponent%5D=' .. team2 .. '&wpRunQuery=Run+query'
+		return tostring(mw.uri.fullUrl(
+			'Special:RunQuery/Match history',
+			{
+				pfRunQueryFormName = 'Match history',
+				['Head to head query[player]'] = string.gsub(opponents[1].name, ' ', '_'),
+				['Head to head query[opponent]'] = string.gsub(opponents[2].name, ' ', '_'),
+				wpRunQuery = 'Run query'
+			}
+		))
 	end
 end
 

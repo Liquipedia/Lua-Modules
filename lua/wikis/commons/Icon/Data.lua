@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Icon/Data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -12,6 +11,7 @@ return {
 	loss = 'fas fa-times',
 
 	-- Usage: Other Match detail pop up icons
+	matchpagelink = 'fas fa-external-link', -- Should we really use external for this?
 	matchpopup = 'fas fa-info-circle',
 	timeout = 'far fa-clock',
 	veto = 'fas fa-times',
@@ -20,6 +20,10 @@ return {
 	mvp = 'fas fa-medal',
 	startleft = 'fas fa-chevron-left',
 	startright = 'fas fa-chevron-right',
+	elimination = 'fas fa-skull',
+	explosion_valorant = 'fas fa-fire-alt',
+	defuse = 'fas fa-wrench',
+	outoftime = 'fas fa-hourglass',
 
 	-- Usage: Rumors, Predictions, etc.
 	correct = 'fas fa-check',
@@ -108,6 +112,12 @@ return {
 	kills = 'fas fa-skull',
 	matchpoint = 'fad fa-diamond',
 
+	-- Usage: qualification
+	qualified = 'fas fa-check-circle',
+	tobedetermined = 'fas fa-question',
+	notqualified = 'fas fa-times',
+	ineligible = 'fas fa-ban',
+
 	-- Usage: standings
 	standings_up = 'fas fa-chevron-double-up',
 	standings_stayup = 'fas fa-chevron-up',
@@ -118,24 +128,25 @@ return {
 	-- Usage: sorting
 	sort = 'far fa-arrows-alt-v',
 
-	-- Usage: Main Page
+	-- Usage: Lists
 	checkcircle = 'fas fa-check-circle',
 
 	-- Usage: Dota2 Main Page
-	hub = 'fas fa-external-link-alt',
+	hub = 'fas fa-external-link-alt',  -- Should we really use external for this?
 
-	-- Usage: Match Pages
+	-- Usage: Match Stats
 	damage = 'fas fa-sword',
 	gold = 'fas fa-coins',
+	kda = 'fas fa-skull-crossbones',
+	acs = 'far fa-abacus',
+	kast = 'fas fa-hands-helping',
+	headshot = 'far fa-crosshairs',
 
-	-- Usage: Dota2 Match Pages
 	dota2_gpm = 'fas fa-coin',
-	dota2_kda = 'fas fa-skull-crossbones',
 	dota2_lhdn = 'fas fa-swords',
 	dota2_tower = 'fas fa-chess-rook',
 	dota2_barrack = 'fas fa-warehouse',
 
-	-- Usage: LeagueOfLegends Match Pages
 	leagueoflegends_kda = 'fas fa-swords fa-flip-vertical',
 
 	-- Usage: Indicate boolean info in Infobox

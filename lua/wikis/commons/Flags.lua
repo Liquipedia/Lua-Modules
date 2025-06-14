@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Flags
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -233,8 +232,16 @@ function Flags._convertToLangKey(langName)
 		or langName
 end
 
+---@param flagInput string
+---@return boolean
 function Flags.isValidFlagInput(flagInput)
 	return String.isNotEmpty(Flags._convertToKey(flagInput))
 end
 
-return Class.export(Flags)
+return Class.export(Flags, {exports = {
+	'Icon',
+	'CountryCode',
+	'CountryName',
+	'localisationTemplate',
+	'languageIcon'
+}})

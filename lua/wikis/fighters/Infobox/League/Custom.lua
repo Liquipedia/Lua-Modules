@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -182,6 +181,7 @@ function CustomLeague:addToLpdb(lpdbData, args)
 	lpdbData.extradata.circuit_tier = args.circuittier
 	lpdbData.extradata.circuit2 = args.circuit2
 	lpdbData.extradata.circuit2_tier = args.circuit2tier
+	lpdbData.extradata.region = args.region
 
 	Variables.varDefine('tournament_extradata', Json.stringify(lpdbData.extradata))
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -19,6 +18,8 @@ local Cell = Widgets.Cell
 
 ---@class ValorantMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class ValorantMapInfoboxWidgetInjector: WidgetInjector
+---@field caller ValorantMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -51,19 +52,10 @@ function CustomInjector:parse(id, widgets)
 			widgets,
 			Cell{name = 'Bomb Sites', content = {args.bombsites}},
 			Cell{name = 'Teleporters', content = {args.teleporters}},
-			Cell{name = 'Game Mode', content = {args.mode}}
+			Cell{name = 'Game Mode', content = self.caller:getGameModes(args)}
 		)
 	end
 	return widgets
-end
-
----@param lpdbData table
----@param args table
----@return table
-function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.mode = args.mode
-
-	return lpdbData
 end
 
 return CustomMap

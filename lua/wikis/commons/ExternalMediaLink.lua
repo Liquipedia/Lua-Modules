@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ExternalMediaLink
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -289,4 +288,4 @@ function ExternalMediaLink._cleanValue(value)
 	return String.nilIfEmpty(mw.text.trim(value))
 end
 
-return Class.export(ExternalMediaLink)
+return Class.export(ExternalMediaLink, {exports = {'run', 'wrapper'}})

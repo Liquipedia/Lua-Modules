@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:HiddenDataBox
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -215,4 +214,4 @@ function HiddenDataBox.validateTier(tier, tierType)
 	return tierValue, tierTypeValue, warnings
 end
 
-return Class.export(HiddenDataBox)
+return Class.export(HiddenDataBox, {exports = {'run'}})

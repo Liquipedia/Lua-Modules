@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=trackmania
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -25,4 +24,4 @@ function CustomResultsTable.awards(args)
 	return AwardsTable(args):create():build()
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})

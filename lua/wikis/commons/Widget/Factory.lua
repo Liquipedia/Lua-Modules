@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Widget/Factory
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -21,4 +20,4 @@ function WidgetFactory.fromTemplate(args)
 	return WidgetClass(args)
 end
 
-return Class.export(WidgetFactory)
+return Class.export(WidgetFactory, {exports = {'fromTemplate'}})

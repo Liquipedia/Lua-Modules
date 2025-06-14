@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Icon
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -51,4 +50,5 @@ function Icon.makeIcon(props)
 	return tostring(iconHtml)
 end
 
-return Class.export(Icon)
+return Class.export(Icon, {exports = {'makeIcon'}}
+)

@@ -1,18 +1,18 @@
 ---
 -- @Liquipedia
--- wiki=rocketleague
 -- page=Module:Player/Ext/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
+
+local Array = Lua.import('Module:Array')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
 
 local playerVars = PageVariableNamespace({namespace = 'Player', cached = true})
 

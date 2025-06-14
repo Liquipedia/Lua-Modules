@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=geoguessr
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -108,7 +107,7 @@ return {
 			},
 		},
 		{
-			file = 'Hardecki at the ALGS Stockholm Playoffs.jpg',
+			file = 'Feneb & Eamonn at GeoGuessr World Cup 2025 - APAC Major.jpg',
 			title = 'Transfers',
 			link = 'Portal:Transfers',
 			count = {
@@ -126,7 +125,7 @@ return {
 			},
 		},
 		{
-			file = 'NRG hodsic at the ALGS Mannheim Split 2 Playoffs.jpg',
+			file = 'Feneb at GeoGuessr World Cup 2025 - APAC Major.jpg',
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},

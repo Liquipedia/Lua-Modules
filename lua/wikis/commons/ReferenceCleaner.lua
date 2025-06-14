@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:ReferenceCleaner
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -47,4 +46,4 @@ function ReferenceCleaner.cleanNumber(args)
 	return ''
 end
 
-return Class.export(ReferenceCleaner, {frameOnly = true})
+return Class.export(ReferenceCleaner, {frameOnly = true, exports = {'clean', 'cleanNumber'}})

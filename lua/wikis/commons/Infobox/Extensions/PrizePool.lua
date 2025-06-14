@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Infobox/Extensions/PrizePool
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -183,4 +182,4 @@ function PrizePoolCurrency._errorMessage(message)
 		:wikitext(category))
 end
 
-return Class.export(PrizePoolCurrency)
+return Class.export(PrizePoolCurrency, {exports = {'display'}})

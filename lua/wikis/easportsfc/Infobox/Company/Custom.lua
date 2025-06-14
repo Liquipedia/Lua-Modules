@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=easportsfc
 -- page=Module:Infobox/Company/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

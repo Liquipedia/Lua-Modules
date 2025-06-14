@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:InfoboxPlacementStats
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -208,4 +207,4 @@ function PlacementStats._buildBottom(placementData)
 		:tag('th'):wikitext(placementData.totals.all):done()
 end
 
-return Class.export(PlacementStats, {frameOnly = true})
+return Class.export(PlacementStats, {frameOnly = true, exports = {'run'}})

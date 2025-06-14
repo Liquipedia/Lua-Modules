@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:PortalStatistics
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -1487,4 +1486,15 @@ function StatisticsPortal._addArrays(arrays)
 	end)
 end
 
-return Class.export(StatisticsPortal)
+return Class.export(StatisticsPortal, {exports = {
+	'gameEarningsChart',
+	'modeEarningsChart',
+	'topEarningsChart',
+	'coverageStatistics',
+	'coverageMatchTable',
+	'coverageTournamentTable',
+	'prizepoolBreakdown',
+	'pieChartBreakdown',
+	'earningsTable',
+	'playerAgeTable',
+}})

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -198,4 +197,4 @@ function Placement.get(args)
 		'|<b' .. (raw.blackText and '' or ' class="placement-text"') .. '>' .. (args.customText or raw.display) .. '</b>'
 end
 
-return Class.export(Placement)
+return Class.export(Placement, {exports = {'getBgClass', 'get', 'RangeLabel'}})

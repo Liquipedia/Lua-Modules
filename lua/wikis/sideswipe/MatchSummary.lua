@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=sideswipe
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -15,30 +14,11 @@ local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchSummary = Lua.import('Module:MatchSummary/Base')
 local MatchSummaryWidgets = Lua.import('Module:Widget/Match/Summary/All')
 local WidgetUtil = Lua.import('Module:Widget/Util')
-local OpponentDisplay = Lua.import('Module:OpponentDisplay')
-
-local TBD_ICON = mw.ext.TeamTemplate.teamicon('tbd')
 
 -- Custom Header Class
 ---@class SideswipeMatchSummaryHeader: MatchSummaryHeader
----@field leftElementAdditional Html
----@field rightElementAdditional Html
 ---@field scoreBoardElement Html
 local Header = Class.new(MatchSummary.Header)
-
----@param content Html
----@return self
-function Header:leftOpponentTeam(content)
-	self.leftElementAdditional = content
-	return self
-end
-
----@param content Html
----@return self
-function Header:rightOpponentTeam(content)
-	self.rightElementAdditional = content
-	return self
-end
 
 ---@param content Html
 ---@return self
@@ -88,44 +68,12 @@ function Header:createScoreBoard(score, bestof, isNotFinished)
 	return scoreBoardNode:node(score)
 end
 
----@param opponent standardOpponent
----@param date string
----@return Html?
-function Header:soloOpponentTeam(opponent, date)
-	if opponent.type == 'solo' then
-		local teamExists = mw.ext.TeamTemplate.teamexists(opponent.template or '')
-		local display = teamExists
-			and mw.ext.TeamTemplate.teamicon(opponent.template, date)
-			or TBD_ICON
-		return mw.html.create('div'):wikitext(display)
-			:addClass('brkts-popup-header-opponent-solo-team')
-		end
-end
-
----@param opponent standardOpponent
----@param opponentIndex integer
----@return Html
-function Header:createOpponent(opponent, opponentIndex)
-	return OpponentDisplay.BlockOpponent({
-		flip = opponentIndex == 1,
-		opponent = opponent,
-		overflow = 'ellipsis',
-		teamStyle = 'short',
-	})
-		:addClass(opponent.type ~= 'solo'
-			and 'brkts-popup-header-opponent'
-			or 'brkts-popup-header-opponent-solo-with-team')
-end
-
 ---@return Html
 function Header:create()
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-left')
-		:node(self.leftElementAdditional)
-		:node(self.leftElement)
+	self.root:node(mw.html.create('div'):addClass('brkts-popup-header-opponent'):node(self.leftElement))
 	self.root:node(self.scoreBoardElement)
-	self.root:tag('div'):addClass('brkts-popup-header-opponent'):addClass('brkts-popup-header-opponent-right')
-		:node(self.rightElement)
-		:node(self.rightElementAdditional)
+	self.root:node(mw.html.create('div'):addClass('brkts-popup-header-opponent'):node(self.rightElement))
+
 	return self.root
 end
 
@@ -144,8 +92,7 @@ function CustomMatchSummary.createHeader(match, options)
 	local header = Header()
 
 	return header
-		:leftOpponentTeam(header:soloOpponentTeam(match.opponents[1], match.date))
-		:leftOpponent(header:createOpponent(match.opponents[1], 1))
+		:leftOpponent(header:createOpponent(match.opponents[1], 'left'))
 		:scoreBoard(header:createScoreBoard(
 			header:createScoreDisplay(
 				match.opponents[1],
@@ -154,8 +101,7 @@ function CustomMatchSummary.createHeader(match, options)
 			match.bestof,
 			not match.finished
 		))
-		:rightOpponent(header:createOpponent(match.opponents[2], 2))
-		:rightOpponentTeam(header:soloOpponentTeam(match.opponents[2], match.date))
+		:rightOpponent(header:createOpponent(match.opponents[2], 'right'))
 end
 
 ---@param date string

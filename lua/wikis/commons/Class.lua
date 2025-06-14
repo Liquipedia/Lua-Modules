@@ -1,12 +1,27 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Class
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
 local Arguments = require('Module:Arguments')
+
+---@class ArgumentsOptions
+---@field translate table?
+---@field backtranslate table?
+---@field wrappers string[]?
+---@field frameOnly boolean?
+---@field parentOnly boolean?
+---@field parentFirst boolean?
+---@field valueFunc ?fun(key: string, val: string):string
+---@field removeBlanks boolean?
+---@field trim boolean?
+---@field readOnly boolean?
+---@field noOverwrite boolean?
+
+---@class ClassExportOptions: ArgumentsOptions
+---@field exports string[]
 
 local Class = {}
 
@@ -61,17 +76,30 @@ end
 
 ---@generic T:table
 ---@param class T
----@param options ?table
+---@param options ClassExportOptions
 ---@return T
 function Class.export(class, options)
-	for name, f in pairs(class) do
+	--- nil check needed for non-git usage
+	options = options or {}
+
+	local checkFunction = function(functionName)
+		local f = class[functionName]
 		-- We only want to export functions, and only functions which are public (no underscore)
-		if (
-			type(f) == 'function' and
-				(not string.find(name, Class.PRIVATE_FUNCTION_SPECIFIER))
-		) then
-			class[name] = Class._wrapFunction(class[name], options)
+		if type(f) ~= 'function' or string.find(functionName, Class.PRIVATE_FUNCTION_SPECIFIER) then
+			return
 		end
+		class[functionName] = Class._wrapFunction(f, options)
+	end
+
+	--- need to catch missing `exports` option for non-git usages
+	if type(options.exports) == 'table' and #options.exports > 0 then
+		for _, functionName in ipairs(options.exports) do
+			checkFunction(functionName)
+		end
+		return class
+	end
+	for name in pairs(class) do
+		checkFunction(name)
 	end
 	return class
 end

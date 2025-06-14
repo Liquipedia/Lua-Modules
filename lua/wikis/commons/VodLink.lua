@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:VodLink
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -51,4 +50,4 @@ function VodLink.display(args)
 		:wikitext('[[File:' .. fileName .. '|32px|link=' .. link .. ']]')
 end
 
-return Class.export(VodLink, {frameOnly = true})
+return Class.export(VodLink, {frameOnly = true, exports = {'display'}})

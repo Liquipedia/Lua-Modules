@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Locale
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -106,4 +105,4 @@ function Locale.formatLocations(args)
 end
 
 
-return Class.export(Locale, {frameOnly = true})
+return Class.export(Locale, {frameOnly = true, exports = {'formatLocation', 'formatLocations'}})

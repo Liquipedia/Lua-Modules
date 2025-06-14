@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=starcraft2
 -- page=Module:TournamentsListing/CardList/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -72,4 +71,4 @@ function CustomTournamentsListing.byYear(args)
 	return display
 end
 
-return Class.export(CustomTournamentsListing)
+return Class.export(CustomTournamentsListing, {exports = {'run', 'byYear'}})

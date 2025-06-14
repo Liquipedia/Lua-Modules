@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=apexlegends
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -24,6 +23,8 @@ local WidgetTable = Widgets.TableOld
 
 ---@class ApexMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class ApexMapInfoboxWidgetInjector: WidgetInjector
+---@field caller ApexMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -33,6 +34,12 @@ function CustomMap.run(frame)
 
 	map:setWidgetInjector(CustomInjector(map))
 	return map:createInfobox()
+end
+
+---@param args table
+---@return string[]
+function CustomMap:getGameModes(args)
+	return {args.gamemode}
 end
 
 ---@param id string
@@ -116,8 +123,6 @@ end
 ---@param args table
 ---@return table
 function CustomMap:addToLpdb(lpdbData, args)
-	lpdbData.extradata.creator = mw.ext.TeamLiquidIntegration.resolve_redirect(args.creator or '')
-	lpdbData.extradata.gamemode = args.gamemode
 	lpdbData.extradata.competitive = String.isNotEmpty(args.spanstart) and String.isEmpty(args.spanend)
 	return lpdbData
 end

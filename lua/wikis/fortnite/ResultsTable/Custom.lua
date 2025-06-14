@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fortnite
 -- page=Module:ResultsTable/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -68,4 +67,4 @@ function CustomResultsTable:processVsData(placement)
 	return '', ''
 end
 
-return Class.export(CustomResultsTable)
+return Class.export(CustomResultsTable, {exports = {'results', 'awards'}})

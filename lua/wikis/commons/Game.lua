@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Game
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -249,4 +248,12 @@ function Game.isDefaultTeamLogo(options)
 	return Table.includes(defaultLogos, logo)
 end
 
-return Class.export(Game)
+return Class.export(Game, {exports = {
+	'toIdentifier',
+	'abbreviation',
+	'name',
+	'link',
+	'icon',
+	'text',
+	'isDefaultTeamLogo',
+}})

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchGroup/Input/Starcraft
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -527,7 +526,6 @@ end
 ---@return table
 function FfaMatchFunctions.getExtraData(match, games, opponents, settings)
 	return {
-		casters = MatchGroupInputUtil.readCasters(match),
 		ffa = 'true',
 		placementinfo = settings.placementInfo,
 		settings = settings.settings,

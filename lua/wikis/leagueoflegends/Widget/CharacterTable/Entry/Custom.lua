@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=leagueoflegends
 -- page=Module:Widget/CharacterTable/Entry/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

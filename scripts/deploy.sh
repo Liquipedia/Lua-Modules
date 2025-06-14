@@ -3,8 +3,6 @@
 userAgent="GitHub Autodeploy Bot/1.1.0 (${WIKI_UA_EMAIL})"
 pat='\-\-\-\
 \-\- @Liquipedia\
-\-\- wiki=([^
-]*)\
 \-\- page=([^
 ]*)\
 '
@@ -33,8 +31,9 @@ for luaFile in $luaFiles; do
     echo '...skipping - no magic comment found'
     echo "${luaFile} skipped" >> $GITHUB_STEP_SUMMARY
   else
-    wiki="${BASH_REMATCH[1]}"
-    page="${BASH_REMATCH[2]}${LUA_DEV_ENV_NAME}"
+    # Extract wiki name from path, e.g. ./lua/wikis/commons/Widget/Match/Page/Header.lua -> commons
+    wiki=$(echo "$luaFile" | awk -F'/' '{for(i=1;i<=NF;i++) if($i=="wikis") print $(i+1)}')
+    page="${BASH_REMATCH[1]}${LUA_DEV_ENV_NAME}"
 
     echo '...magic comment found - updating wiki...'
 

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=fighters
 -- page=Module:Info
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -1711,6 +1710,10 @@ return {
 		},
 		match2 = {
 			status = 1,
+		},
+		teamRosterNavbox = {
+			hideOrg = true,
+			hideOverview = true,
 		},
 	},
 	opponentLibrary = 'Opponent/Custom',

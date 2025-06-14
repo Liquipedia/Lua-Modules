@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=brawlstars
 -- page=Module:MainPageLayout/data
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -165,10 +164,6 @@ return {
 						mobileOrder = 3,
 						content = CONTENT.transfers,
 					},
-					{
-						mobileOrder = 6,
-						content = CONTENT.wantToHelp,
-					},
 				}
 			},
 			{ -- Right
@@ -206,11 +201,15 @@ return {
 						},
 					},
 					{
+						mobileOrder = 4,
+						content = CONTENT.wantToHelp,
+					},
+					{
 						mobileOrder = 5,
 						content = CONTENT.thisDay,
 					},
 					{
-						mobileOrder = 4,
+						mobileOrder = 6,
 						content = CONTENT.usefulArticles,
 					},
 				},

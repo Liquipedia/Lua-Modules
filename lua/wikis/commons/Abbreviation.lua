@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Abbreviation
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -27,4 +26,4 @@ function Abbreviation.make(args)
 	return '<abbr title="' .. title .. '">' .. text .. '</abbr>'
 end
 
-return Class.export(Abbreviation)
+return Class.export(Abbreviation, {exports = {'make'}})

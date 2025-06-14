@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:MatchTable
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

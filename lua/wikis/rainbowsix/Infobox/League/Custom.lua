@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=rainbowsix
 -- page=Module:Infobox/League/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -38,6 +37,7 @@ local PLATFORM_ALIAS = {
 	playstation = 'Playstation',
 	ps = 'Playstation',
 	ps4 = 'Playstation',
+	mobile = 'Mobile',
 }
 
 local UBISOFT_TIERS = {

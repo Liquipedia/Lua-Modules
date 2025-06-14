@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldoftanks
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +7,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
 local MapModes = require('Module:MapModes')
 local String = require('Module:StringUtils')
@@ -23,6 +21,8 @@ local Cell = Widgets.Cell
 
 ---@class WorldoftanksMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
+---@class WorldoftanksMapInfoboxWidgetInjector: WidgetInjector
+---@field caller WorldoftanksMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
@@ -53,26 +53,19 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Battle Tier', content = {String.isNotEmpty(args.btmin) and
 				String.isNotEmpty(args.btmax) and (args.btmin .. ' - ' .. args.btmax) or nil}
 			},
-			Cell{name = 'Game Modes', content = self.caller:_getGameMode(args)}
+			Cell{
+				name = 'Game Modes',
+				content = Array.map(
+					self.caller:getGameModes(args),
+					function (gameMode)
+						local modeIcon = MapModes.get{mode = gameMode, date = args.releasedate, size = 15}
+						return modeIcon .. ' [[' .. gameMode .. ']]'
+					end
+				)
+			}
 		)
 	end
 	return widgets
-end
-
----@param args table
----@return string[]
-function CustomMap:_getGameMode(args)
-	if String.isEmpty(args.mode) and String.isEmpty(args.mode1) then
-		return {}
-	end
-
-	local modes = self:getAllArgsForBase(args, 'mode')
-	local releasedate = args.releasedate
-
-	return Array.map(modes, function(mode)
-		local modeIcon = MapModes.get{mode = mode, date = releasedate, size = 15}
-		return modeIcon .. ' [[' .. mode .. ']]'
-	end)
 end
 
 ---@param lpdbData table
@@ -86,7 +79,6 @@ function CustomMap:addToLpdb(lpdbData, args)
 		battletiermin = args.btmin,
 		battletiermax = args.btmax,
 		season = args.season,
-		modes = Json.stringify(self:getAllArgsForBase(args, 'mode'))
 	})
 
 	return lpdbData

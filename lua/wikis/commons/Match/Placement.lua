@@ -1,10 +1,11 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Match/Placement
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
+
+local Image = require('Module:Image')
 
 local MatchPlacement = {}
 
@@ -31,11 +32,11 @@ function MatchPlacement.MedalIcon(props)
 	if props.range and props.range[1] == 3 and props.range[2] == 4 then
 		return mw.html.create('span')
 			:attr('title', MatchPlacement.medalTitles.sf)
-			:wikitext('[[File:' .. MatchPlacement.medalIcons.sf .. '|alt=]]')
+			:wikitext(Image.display(MatchPlacement.medalIcons.sf, nil, {link=''}))
 	elseif 1 <= place and place <= 4 then
 		return mw.html.create('span')
 			:attr('title', MatchPlacement.medalTitles[place])
-			:wikitext('[[File:' .. MatchPlacement.medalIcons[place] .. '|alt=]]')
+			:wikitext(Image.display(MatchPlacement.medalIcons[place], nil, {link=''}))
 	else
 		return nil
 	end

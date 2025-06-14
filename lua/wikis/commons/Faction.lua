@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:Faction
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -226,4 +225,4 @@ function Faction.bgClass(faction, options)
 	return factionProps and factionProps.bgClass or nil
 end
 
-return Class.export(Faction)
+return Class.export(Faction, {exports = {'Icon'}})

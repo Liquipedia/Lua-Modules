@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=pubg
 -- page=Module:Infobox/Map/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -18,7 +17,8 @@ local Cell = Widgets.Cell
 
 ---@class PUBGMapInfobox: MapInfobox
 local CustomMap = Class.new(Map)
-
+---@class PUBGMapInfoboxWidgetInjector: WidgetInjector
+---@field caller PUBGMapInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame

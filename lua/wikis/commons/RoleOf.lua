@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=commons
 -- page=Module:RoleOf
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -54,4 +53,4 @@ function RoleOf.get(args)
 	return table.concat(output, ' ')
 end
 
-return Class.export(RoleOf)
+return Class.export(RoleOf, {exports = {'get'}})

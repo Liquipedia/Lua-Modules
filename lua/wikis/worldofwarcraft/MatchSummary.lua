@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=worldofwarcraft
 -- page=Module:MatchSummary
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute

@@ -1,6 +1,5 @@
 ---
 -- @Liquipedia
--- wiki=valorant
 -- page=Module:Infobox/Team/Custom
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
@@ -8,7 +7,9 @@
 
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local TeamTemplate = require('Module:Team')
+
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
+local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Team = Lua.import('Module:Infobox/Team')
@@ -43,7 +44,7 @@ function CustomInjector:parse(id, widgets)
 	elseif id == 'custom' then
 		return {
 			Cell{name = '[[Affiliate_Partnerships|Affiliate]]', content = {
-				args.affiliate and TeamTemplate.team(nil, args.affiliate) or nil}}
+				args.affiliate and OpponentDisplay.InlineTeamContainer{template = args.affiliate, displayType = 'standard'} or nil}}
 		}
 	end
 	return widgets
