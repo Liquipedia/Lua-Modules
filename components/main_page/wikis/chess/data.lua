@@ -122,6 +122,11 @@ return {
 			title = 'Statistics',
 			link = 'Portal:Statistics',
 		},
+		{
+			file = 'Grischuk at FIDE World Blitz Chess Championship 2019.jpg',
+			title = 'Help Portal',
+			link = 'Help:Contents',
+		},
 	},
 	layouts = {
 		main = {
