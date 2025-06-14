@@ -18,7 +18,7 @@ local Widget = Lua.import('Module:Widget')
 local NavBox = Lua.import('Module:Widget/NavBox')
 local Link = Lua.import('Module:Widget/Basic/Link')
 
----@class SeriesChildFromLpdb: Widget
+---@class TransferNavBox: Widget
 local TransferNavBox = Class.new(Widget)
 
 ---@return Widget
