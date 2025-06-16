@@ -55,18 +55,17 @@ function SeriesChildFromLpdb:render()
 	local offset = tonumber(props.offset)
 
 	---@param tournament StandardTournament
-	---@return integer|string
+	---@return integer?
 	local getSeriesNumber = function(tournament)
 		return tonumber((tournament.extradata or {}).seriesnumber)
 			or tonumber((tournament.pageName:gsub('.*/([%d%.]+)$', '%1')))
-			or tournament.displayName
 	end
 
 	---@param tournament StandardTournament
 	---@return boolean
 	local filterbyLimitAndOffSet = function(tournament)
 		if not limit and not offset then return true end
-		local seriesNumber = tonumber(getSeriesNumber(tournament))
+		local seriesNumber = getSeriesNumber(tournament)
 		if not seriesNumber then
 			return false
 		elseif limit and seriesNumber > limit then
@@ -80,8 +79,10 @@ function SeriesChildFromLpdb:render()
 	local tournaments = Tournament.getAllTournaments(self:_makeConditions(), filterbyLimitAndOffSet)
 
 	local elements = Array.map(tournaments, function(tournament)
+		local seriesNumber = getSeriesNumber(tournament)
+		local display = seriesNumber and ('#' .. seriesNumber) or (tournament.displayName)
 		-- can not use `Link` Widget due to `Json.stringify` below
-		return Page.makeInternalLink('#' .. getSeriesNumber(tournament), tournament.pageName)
+		return Page.makeInternalLink(display, tournament.pageName)
 	end)
 
 	if Logic.readBool(props.newestFirst) then
