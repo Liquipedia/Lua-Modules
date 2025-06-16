@@ -55,7 +55,7 @@ function TransferNavBox:render()
 		childIndex = childIndex + 1
 	end
 
-	Array.extendWith(miscPages, additionalMisc)
+	Array.extendWith(miscPages or {}, additionalMisc)
 	if Logic.isNotEmpty(miscPages) then
 		---@type table
 		local childData = Array.map(miscPages, function(pageName)
