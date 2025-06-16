@@ -41,7 +41,7 @@ function TransferNavBox:render()
 	end
 
 
-	local unsorted, unsourced, yearly = TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
+	local unsorted, unsourced, yearly, additionalMisc = TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	if Logic.isNotEmpty(unsorted) then
 		collapsedChildren['child' .. childIndex] = Table.merge(unsorted, {name = 'Unsorted'})
 		childIndex = childIndex + 1
@@ -55,6 +55,7 @@ function TransferNavBox:render()
 		childIndex = childIndex + 1
 	end
 
+	Array.extendWith(miscPages, additionalMisc)
 	if Logic.isNotEmpty(miscPages) then
 		---@type table
 		local childData = Array.map(miscPages, function(pageName, index) return Link{
@@ -92,12 +93,13 @@ end
 ---@return Widget[]
 ---@return Widget[]
 ---@return Widget[]
+---@return Widget[]
 function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	local toDisplay = function(pageName, year)
 		return Link{link = pageName, children = {year}}
 	end
 
-	local unsorted, unsourced, yearly = {}, {}, {}
+	local unsorted, unsourced, yearly, misc = {}, {}, {}, {}
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		Array.forEach(pages, function(pageName)
 			local name, name2, _
@@ -110,11 +112,13 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 				table.insert(unsourced, toDisplay(pageName, year))
 			elseif pageName:match('[tT]ransfers/' .. year .. '$') then
 				table.insert(yearly, toDisplay(pageName, year))
+			else
+				table.insert(misc, pageName)
 			end
 		end)
 	end
 
-	return unsorted, unsourced, yearly
+	return unsorted, unsourced, yearly, misc
 end
 
 ---@private
