@@ -99,7 +99,7 @@ function TransferNavBox._getUnsortedAndUnsourced(pagesByYear)
 			name = (name or ''):lower()
 			if name == 'unsorted' then
 				table.insert(unsorted, toDisplay(pageName, year))
-			elseif name == 'unsourced' then
+			elseif name == 'unsourced' or name == 'nosource' then
 				table.insert(unsourced, toDisplay(pageName, year))
 			end
 		end)
