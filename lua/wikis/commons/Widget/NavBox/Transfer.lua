@@ -94,9 +94,10 @@ function TransferNavBox._getUnsortedAndUnsourced(pagesByYear)
 	local unsorted, unsourced = {}, {}
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		Array.forEach(pages, function(pageName)
-			local name, _
+			local name, name2, _
 			_, _, name = string.find(pageName, '.*/' .. year .. '/(.*)')
-			name = (name or ''):lower()
+			_, _, name2 = string.find(pageName, '.*/(.*)/' .. year)
+			name = (name or name2 or ''):lower()
 			if name == 'unsorted' then
 				table.insert(unsorted, toDisplay(pageName, year))
 			elseif name == 'unsourced' or name == 'nosource' then
