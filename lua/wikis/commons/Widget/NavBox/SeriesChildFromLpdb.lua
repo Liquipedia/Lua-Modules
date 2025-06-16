@@ -55,17 +55,18 @@ function SeriesChildFromLpdb:render()
 	local offset = tonumber(props.offset)
 
 	---@param tournament StandardTournament
-	---@return integer?
+	---@return integer|string
 	local getSeriesNumber = function(tournament)
 		return tonumber((tournament.extradata or {}).seriesnumber)
-			or tonumber((tournament.pageName:gsub('.*/(%d+)$', '%1')))
+			or tonumber((tournament.pageName:gsub('.*/([%d%.]+)$', '%1')))
+			or 'invalid number'
 	end
 
 	---@param tournament StandardTournament
 	---@return boolean
 	local filterbyLimitAndOffSet = function(tournament)
 		if not limit and not offset then return true end
-		local seriesNumber = getSeriesNumber(tournament)
+		local seriesNumber = tonumber(getSeriesNumber(tournament))
 		if not seriesNumber then
 			return false
 		elseif limit and seriesNumber > limit then
