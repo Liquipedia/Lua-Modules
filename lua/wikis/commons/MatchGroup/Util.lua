@@ -206,6 +206,7 @@ MatchGroupUtil.types.Status = TypeUtil.optional(TypeUtil.literalUnion('notplayed
 ---@field mapDisplayName string?
 ---@field mode string?
 ---@field opponents {players: table[], score: number?, status: string?}[]
+---@field patch string?
 ---@field scores number[]
 ---@field subgroup number?
 ---@field type string?
@@ -222,6 +223,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 	map = 'string?',
 	mapDisplayName = 'string?',
 	mode = 'string?',
+	patch = 'string?',
 	scores = TypeUtil.array('number'),
 	subgroup = 'number?',
 	type = 'string?',
@@ -496,7 +498,7 @@ end
 ---
 ---This is the implementation used on wikis by default. Wikis may specify a different conversion by setting
 ---WikiSpecific.matchFromRecord. Refer to the starcraft2 wiki as an example.
----@param record table
+---@param record match2
 ---@return MatchGroupUtilMatch
 function MatchGroupUtil.matchFromRecord(record)
 	local extradata = MatchGroupUtil.parseOrCopyExtradata(record.extradata)
@@ -673,7 +675,7 @@ function MatchGroupUtil.playerFromRecord(record)
 	}
 end
 
----@param record table
+---@param record match2game
 ---@param opponentCount integer?
 ---@return MatchGroupUtilGame
 function MatchGroupUtil.gameFromRecord(record, opponentCount)
@@ -691,6 +693,7 @@ function MatchGroupUtil.gameFromRecord(record, opponentCount)
 		mapDisplayName = nilIfEmpty(Table.extract(extradata, 'displayname')),
 		mode = nilIfEmpty(record.mode),
 		opponents = record.opponents,
+		patch = record.patch,
 		resultType = nilIfEmpty(record.resulttype),
 		status = nilIfEmpty(record.status),
 		scores = Json.parseIfString(record.scores) or {},

@@ -7,6 +7,7 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
@@ -16,6 +17,7 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
+local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
@@ -299,6 +301,13 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 			}
 		}
 	}
+end
+
+---@return Widget?
+function MatchPage:getPatchLink()
+	local patchVersion = Logic.emptyOr(#self.games > 0 and self.games[1].patch or nil, self.matchData.patch)
+	if Logic.isEmpty(patchVersion) then return end
+	return Link{ link = 'Patch ' .. patchVersion }
 end
 
 return MatchPage
