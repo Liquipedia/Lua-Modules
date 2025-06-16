@@ -17,7 +17,6 @@ local BaseMatchPage = Lua.import('Module:MatchPage/Base')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Div = HtmlWidgets.Div
 local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
-local Link = Lua.import('Module:Widget/Basic/Link')
 local PlayerDisplay = Lua.import('Module:Widget/Match/Page/PlayerDisplay')
 local PlayerStat = Lua.import('Module:Widget/Match/Page/PlayerStat')
 local RoundsOverview = Lua.import('Module:Widget/Match/Page/RoundsOverview')
@@ -47,6 +46,8 @@ function MatchPage.getByMatchId(props)
 
 	-- Add more opponent data field
 	matchPage:populateOpponents()
+
+	matchPage.matchData.patch = Logic.emptyOr(#matchPage.games > 0 and matchPage.games[1].patch or nil, matchPage.matchData.patch)
 
 	return matchPage:render()
 end
@@ -301,13 +302,6 @@ function MatchPage:_renderPlayerPerformance(game, teamIndex, player)
 			}
 		}
 	}
-end
-
----@return Widget?
-function MatchPage:getPatchLink()
-	local patchVersion = Logic.emptyOr(#self.games > 0 and self.games[1].patch or nil, self.matchData.patch)
-	if Logic.isEmpty(patchVersion) then return end
-	return Link{ link = 'Patch ' .. patchVersion }
 end
 
 return MatchPage
