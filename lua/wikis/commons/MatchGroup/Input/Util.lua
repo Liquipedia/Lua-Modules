@@ -1075,6 +1075,7 @@ end
 ---@field adjustOpponent? fun(opponent: MGIParsedOpponent, opponentIndex: integer)
 ---@field getLinks? fun(match: table, games: table[]): table
 ---@field getHeadToHeadLink? fun(match: table, opponents: table[]): string?
+---@field getPatch? fun(match: table, games: table[]): string?
 ---@field readDate? readDateFunction
 ---@field getMode? fun(opponents: table[]): string
 ---@field readOpponent? fun(match: table, opponentIndex: integer, opponentConfig: readOpponentOptions?):
@@ -1097,6 +1098,7 @@ end
 --- - adjustOpponent(opponent, opponentIndex)
 --- - getLinks(match, games): table?
 --- - getHeadToHeadLink(match, opponents): string?
+--- - getPatch(match, games): string?
 --- - readDate(match): table
 --- - getMode(opponents): string?
 --- - readOpponent(match, opponentIndex, opponentConfig): MGIParsedOpponent
@@ -1167,6 +1169,9 @@ function MatchGroupInputUtil.standardProcessMatch(match, Parser, FfaParser, mapP
 
 	match.mode = Parser.getMode and Parser.getMode(opponents)
 		or Logic.emptyOr(match.mode, globalVars:get('tournament_mode'), Parser.DEFAULT_MODE)
+	if Parser.getPatch then
+		match.patch = Parser.getPatch(match, games)
+	end
 	Table.mergeInto(match, MatchGroupInputUtil.getTournamentContext(match))
 
 	match.stream = Streams.processStreams(match)

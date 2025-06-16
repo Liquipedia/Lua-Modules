@@ -7,7 +7,6 @@
 
 local Array = require('Module:Array')
 local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local MathUtil = require('Module:MathUtil')
 local Table = require('Module:Table')
@@ -46,11 +45,6 @@ function MatchPage.getByMatchId(props)
 
 	-- Add more opponent data field
 	matchPage:populateOpponents()
-
-	matchPage.matchData.patch = Logic.emptyOr(
-		#matchPage.games > 0 and matchPage.games[1].patch or nil,
-		matchPage.matchData.patch
-	)
 
 	return matchPage:render()
 end
