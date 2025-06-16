@@ -58,10 +58,13 @@ function TransferNavBox:render()
 	Array.extendWith(miscPages, additionalMisc)
 	if Logic.isNotEmpty(miscPages) then
 		---@type table
-		local childData = Array.map(miscPages, function(pageName, index) return Link{
-			link = pageName,
-			children = {'#' .. index}
-		} end)
+		local childData = Array.map(miscPages, function(pageName)
+			local subPageName = pageName:gsub('.*[tT]ransfers/', ''):gsub('_', ' ')
+			return Link{
+				link = pageName,
+				children = {subPageName}
+			}
+		end)
 		childData.name = 'Misc'
 		collapsedChildren['child' .. childIndex] = childData
 	end
