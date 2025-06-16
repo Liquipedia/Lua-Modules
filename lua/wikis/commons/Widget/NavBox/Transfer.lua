@@ -40,7 +40,8 @@ function TransferNavBox:render()
 		end
 	end
 
-	local unsorted, unsourced = TransferNavBox._getUnsortedAndUnsourced(pagesByYear)
+
+	local unsorted, unsourced, yearly, additionalMisc = TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	if Logic.isNotEmpty(unsorted) then
 		collapsedChildren['child' .. childIndex] = Table.merge(unsorted, {name = 'Unsorted'})
 		childIndex = childIndex + 1
@@ -49,13 +50,21 @@ function TransferNavBox:render()
 		collapsedChildren['child' .. childIndex] = Table.merge(unsourced, {name = 'Unsourced'})
 		childIndex = childIndex + 1
 	end
+	if Logic.isNotEmpty(yearly) then
+		collapsedChildren['child' .. childIndex] = Table.merge(yearly, {name = 'Year'})
+		childIndex = childIndex + 1
+	end
 
+	Array.extendWith(miscPages, additionalMisc)
 	if Logic.isNotEmpty(miscPages) then
 		---@type table
-		local childData = Array.map(miscPages, function(pageName, index) return Link{
-			link = pageName,
-			children = {'#' .. index}
-		} end)
+		local childData = Array.map(miscPages, function(pageName)
+			local subPageName = pageName:gsub('.*[tT]ransfers/', ''):gsub('_', ' ')
+			return Link{
+				link = pageName,
+				children = {subPageName}
+			}
+		end)
 		childData.name = 'Misc'
 		collapsedChildren['child' .. childIndex] = childData
 	end
@@ -84,28 +93,35 @@ end
 
 ---@private
 ---@param pagesByYear table<integer, string[]>
----@return Widget[]
----@return Widget[]
-function TransferNavBox._getUnsortedAndUnsourced(pagesByYear)
+---@return Widget[] unsorted
+---@return Widget[] unsourced
+---@return Widget[] yearly
+---@return Widget[] misc
+function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	local toDisplay = function(pageName, year)
 		return Link{link = pageName, children = {year}}
 	end
 
-	local unsorted, unsourced = {}, {}
+	local unsorted, unsourced, yearly, misc = {}, {}, {}, {}
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		Array.forEach(pages, function(pageName)
-			local name, _
+			local name, name2, _
 			_, _, name = string.find(pageName, '.*/' .. year .. '/(.*)')
-			name = (name or ''):lower()
+			_, _, name2 = string.find(pageName, '.*/(.*)/' .. year)
+			name = (name or name2 or ''):lower()
 			if name == 'unsorted' then
 				table.insert(unsorted, toDisplay(pageName, year))
-			elseif name == 'unsourced' then
+			elseif name == 'unsourced' or name == 'nosource' then
 				table.insert(unsourced, toDisplay(pageName, year))
+			elseif pageName:match('[tT]ransfers/' .. year .. '$') then
+				table.insert(yearly, toDisplay(pageName, year))
+			else
+				table.insert(misc, pageName)
 			end
 		end)
 	end
 
-	return unsorted, unsourced
+	return unsorted, unsourced, yearly, misc
 end
 
 ---@private
