@@ -9,6 +9,7 @@ local Abbreviation = require('Module:Abbreviation')
 local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Flags = require('Module:Flags')
+local FnUtil = require('Module:FnUtil')
 local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Matches = require('Module:Matches_Player')
@@ -151,10 +152,17 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 	local roles = self.roles
 
 	---@param roleString string
+	---@param role PersonRoleDataExtended
+	---@return boolean
+	local roleIsContained = function(roleString, role)
+		return (role.key or role.display or ''):lower():find(roleString) ~= nil
+	end
+
+	---@param roleString string
 	---@param category string
 	---@return string?
 	local checkRole = function(roleString, category)
-		if not Array.any(roles, function(role) return string.find(role, roleString) ~= nil end) then return end
+		if not Array.any(roles, FnUtil.curry(roleIsContained, roleString)) then return end
 		return category
 	end
 
@@ -169,7 +177,7 @@ function CustomPlayer:getCategories(args, birthDisplay, personType, status)
 		checkRole('analyst', 'Analysts')
 	)
 
-	if Array.any(roles, function(r) return string.match(r, 'player') end) then
+	if Array.any(roles, FnUtil.curry(roleIsContained, 'player')) then
 		if string.lower(args.status) == 'active' and not args.teamlink and not args.team then
 			table.insert(categories, 'Teamless Players')
 		end
