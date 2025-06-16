@@ -93,10 +93,10 @@ end
 
 ---@private
 ---@param pagesByYear table<integer, string[]>
----@return Widget[]
----@return Widget[]
----@return Widget[]
----@return Widget[]
+---@return Widget[] unsorted
+---@return Widget[] unsourced
+---@return Widget[] yearly
+---@return Widget[] misc
 function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	local toDisplay = function(pageName, year)
 		return Link{link = pageName, children = {year}}
