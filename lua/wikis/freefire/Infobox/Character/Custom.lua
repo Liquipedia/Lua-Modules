@@ -18,6 +18,8 @@ local Title = Widgets.Title
 
 ---@class FreefireCharacterInfobox: CharacterInfobox
 local CustomCharacter = Class.new(Character)
+---@class FreefireCharacterInfoboxWidgetInjector: WidgetInjector
+---@field caller FreefireCharacterInfobox
 local CustomInjector = Class.new(Injector)
 
 ---@param frame Frame
