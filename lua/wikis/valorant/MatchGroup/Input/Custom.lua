@@ -122,8 +122,8 @@ end
 ---@return string?
 function MatchFunctions.getPatch(match, games)
 	return Logic.emptyOr(
-		#games > 0 and games[1].patch or nil,
-		match.patch
+		match.patch,
+		#games > 0 and games[1].patch or nil
 	)
 end
 
