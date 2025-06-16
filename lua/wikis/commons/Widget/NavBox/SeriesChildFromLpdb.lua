@@ -59,7 +59,7 @@ function SeriesChildFromLpdb:render()
 	local getSeriesNumber = function(tournament)
 		return tonumber((tournament.extradata or {}).seriesnumber)
 			or tonumber((tournament.pageName:gsub('.*/([%d%.]+)$', '%1')))
-			or tournament.shortName
+			or tournament.displayName
 	end
 
 	---@param tournament StandardTournament
