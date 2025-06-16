@@ -47,7 +47,10 @@ function MatchPage.getByMatchId(props)
 	-- Add more opponent data field
 	matchPage:populateOpponents()
 
-	matchPage.matchData.patch = Logic.emptyOr(#matchPage.games > 0 and matchPage.games[1].patch or nil, matchPage.matchData.patch)
+	matchPage.matchData.patch = Logic.emptyOr(
+		#matchPage.games > 0 and matchPage.games[1].patch or nil,
+		matchPage.matchData.patch
+	)
 
 	return matchPage:render()
 end
