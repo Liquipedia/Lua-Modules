@@ -46,9 +46,9 @@ function CustomInjector:parse(id, widgets)
 		local deckType = self.caller:getAllArgsForBase(args, 'decktype', {makeLinks = true})
 
 		Array.appendWith(widgets,
-			Cell{name = 'Default Hero', content = Page.makeInternalLink(args.hero)},
+			Cell{name = 'Default Hero', content = {Page.makeInternalLink(args.hero)}},
 			Cell{name = 'Alternative Heroes', content = alternativeHeroes},
-			Cell{name = 'Hero Power', content = Page.makeInternalLink(args.power)},
+			Cell{name = 'Hero Power', content = {Page.makeInternalLink(args.power)}},
 			Cell{name = 'Abilities', content = abilities},
 			Cell{name = 'Deck types', content = deckType}
 		)
