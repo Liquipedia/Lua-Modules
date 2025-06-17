@@ -15,11 +15,13 @@ local Character  = Lua.import('Module:Character')
 
 local AutoInlineIcon = {}
 
----@param options {onlyicon: boolean?, category: string, lookup: string}
+---onlyicon default false, link default true
+---@param options {onlyicon: boolean?, link: boolean?, category: string, lookup: string}
 ---@return Widget
 function AutoInlineIcon.display(options)
 	local category = options.category
 	local lookup = options.lookup
+	local skipLink = not Logic.readBool(options.link)
 	assert(category, 'Category parameter is required.')
 	assert(lookup, 'Lookup parameter is required.')
 
@@ -35,7 +37,7 @@ function AutoInlineIcon.display(options)
 	return InlineIconAndText{
 		icon = icon,
 		text = data.text,
-		link = data.link,
+		link = skipLink and '' or data.link,
 	}
 end
 

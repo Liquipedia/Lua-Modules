@@ -47,9 +47,9 @@ function NavBoxChild:render()
 	assert(Logic.readBool(props.allowEmpty) or props[1] or props.child1, EMPTY_CHILD_ERROR)
 
 	local listElements = Array.mapIndexes(function(index)
-		return self.props[index]
+		return props[index]
 	end)
-	local listCss = {['text-align'] = Logic.readBool(self.props.center) and 'center' or nil}
+	local listCss = {['text-align'] = Logic.readBool(props.center) and 'center' or nil}
 
 	if not props.child1 then
 		return NavBoxList{children = listElements, css = listCss}
