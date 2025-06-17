@@ -23,8 +23,6 @@ local VERSION_DEFINITE_EDITION = 'Definitive Edition'
 local GAME_AOE2 = 'aoe2'
 
 ---@class AoePatchInfobox: PatchInfobox
----@field gameIdentifier string?
----@field gameData GameData?
 local CustomPatch = Class.new(Patch)
 
 ---@class AoePatchInfoboxWidgetInjector: WidgetInjector
