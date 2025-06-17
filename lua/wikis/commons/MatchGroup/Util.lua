@@ -250,7 +250,7 @@ MatchGroupUtil.types.Game = TypeUtil.struct({
 ---@field tournament string?
 ---@field type string?
 ---@field vod string?
----@field winner string?
+---@field winner number?
 ---@field extradata table?
 ---@field timestamp number
 ---@field bestof number?
