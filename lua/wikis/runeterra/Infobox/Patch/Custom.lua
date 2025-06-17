@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Patch = Lua.import('Module:Infobox/Patch')
 
----@class WildriftPatchInfobox: PatchInfobox
+---@class RuneterraPatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
@@ -23,12 +23,14 @@ end
 ---@param args table
 ---@return {previous: string?, next: string?}
 function Patch:getChronologyData(args)
-	---@param input string?
+	---@param prefix string
 	---@return string?
-	local prefixIfExists = function(input)
-		return input and ('Patch ' .. input) or nil
+	local buildLink = function(prefix)
+		if not args[prefix] then return end
+		local link = args[prefix .. ' link'] or (args[prefix] .. ' Patch')
+		return link .. '|' .. args[prefix]
 	end
-	return {previous = prefixIfExists(args.previous), next = prefixIfExists(args.next)}
+	return {previous = buildLink('previous'), next = buildLink('next')}
 end
 
 return CustomPatch
