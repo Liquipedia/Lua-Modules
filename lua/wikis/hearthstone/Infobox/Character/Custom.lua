@@ -41,22 +41,16 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		local makeLinksOfContent = function(content)
-			return Array.map(content, function(item)
-				return Page.makeInternalLink(item)
-			end)
-		end
-
-		local alternativeHeroes = self.caller:getAllArgsForBase(args, 'althero')
-		local abilities = self.caller:getAllArgsForBase(args, 'ability')
-		local deckType = self.caller:getAllArgsForBase(args, 'decktype')
+		local alternativeHeroes = self.caller:getAllArgsForBase(args, 'althero', {makeLinks = true})
+		local abilities = self.caller:getAllArgsForBase(args, 'ability', {makeLinks = true})
+		local deckType = self.caller:getAllArgsForBase(args, 'decktype', {makeLinks = true})
 
 		Array.appendWith(widgets,
-			Cell{name = 'Default Hero', content = makeLinksOfContent({args.hero})},
-			Cell{name = 'Alternative Heroes', content = makeLinksOfContent(alternativeHeroes)},
-			Cell{name = 'Hero Power', content = makeLinksOfContent({args.power})},
-			Cell{name = 'Abilities', content = makeLinksOfContent(abilities)},
-			Cell{name = 'Deck types', content = makeLinksOfContent(deckType)}
+			Cell{name = 'Default Hero', content = Page.makeInternalLink(args.hero)},
+			Cell{name = 'Alternative Heroes', content = alternativeHeroes},
+			Cell{name = 'Hero Power', content = Page.makeInternalLink(args.power)},
+			Cell{name = 'Abilities', content = abilities},
+			Cell{name = 'Deck types', content = deckType}
 		)
 	end
 
