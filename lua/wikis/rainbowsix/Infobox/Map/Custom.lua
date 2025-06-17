@@ -136,6 +136,7 @@ function CustomMap._createTeamDisplayWidget(teamType)
 end
 
 ---@param args table
+---@return Widget
 function CustomMap:getStatsCells(args)
 	local wlData = Array.parseCommaSeparatedString(MapWL.create{map = self.name}, ';')
 	local attackWins = tonumber(wlData[1]) or 0
