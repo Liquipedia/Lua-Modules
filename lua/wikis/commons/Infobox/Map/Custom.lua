@@ -18,3 +18,5 @@ local CustomMap = Class.new(Map)
 function CustomMap.run(frame)
 	return CustomMap(frame):createInfobox()
 end
+
+return CustomMap
