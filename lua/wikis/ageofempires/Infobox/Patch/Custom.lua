@@ -46,7 +46,7 @@ function CustomInjector:parse(id, widgets)
 	if id == 'version' then
 		return WidgetUtil.collect(
 			Cell{name = 'Game', children = {Game.name{game = args.game, useDefault = false}}, options = {makeLink = true}},
-			Cell{name = 'Version', children = {args.version}},
+			Cell{name = 'Version', children = {args.version}, options = {makeLink = true}},
 			Cell{name = 'Expansion Set', children = {args.expansion}, options = {makeLink = true}}
 		)
 	end
