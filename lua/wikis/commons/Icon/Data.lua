@@ -131,8 +131,10 @@ return {
 	-- Usage: Lists
 	checkcircle = 'fas fa-check-circle',
 
-	-- Usage: Dota2 Main Page
-	hub = 'fas fa-external-link-alt',  -- Should we really use external for this?
+	-- Usage: "Hubs" (additional Main Pages)
+	esports_hub = 'far fa-trophy',
+	game_hub = 'far fa-swords',
+	main_hub = 'far fa-user-chart',
 
 	-- Usage: Match Stats
 	damage = 'fas fa-sword',
