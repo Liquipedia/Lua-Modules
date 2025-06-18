@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Template = require('Module:Template')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Template = Lua.import('Module:Template')
+local Variables = Lua.import('Module:Variables')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 ---@class Starcraft2MapInfobox: MapInfobox
@@ -48,7 +49,6 @@ function CustomInjector:parse(widgetId, widgets)
 		Cell{name = 'Size', content = {self.caller:_getSize(id)}},
 		Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id)}},
 		Cell{name = 'Versions', content = {args.versions}},
-		Cell{name = 'Competition Span', content = {args.span}},
 		Cell{name = 'Leagues Featured', content = {args.leagues}},
 		Cell{name = '[[Rush distance]]', content = {self.caller:_getRushDistance()}},
 		Cell{name = '1v1 Ladder', content = {args['1v1history']}},
