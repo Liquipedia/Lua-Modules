@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Lua = Lua.import('Module:Lua')
+local Lua = require('Module:Lua')
 
 local AllowedServers = Lua.import('Module:Server')
 local Array = Lua.import('Module:Array')
