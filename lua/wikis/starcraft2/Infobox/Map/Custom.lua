@@ -48,7 +48,6 @@ function CustomInjector:parse(widgetId, widgets)
 		Cell{name = 'Size', content = {self.caller:_getSize(id)}},
 		Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id)}},
 		Cell{name = 'Versions', content = {args.versions}},
-		Cell{name = 'Competition Span', content = {args.span}},
 		Cell{name = 'Leagues Featured', content = {args.leagues}},
 		Cell{name = '[[Rush distance]]', content = {self.caller:_getRushDistance()}},
 		Cell{name = '1v1 Ladder', content = {args['1v1history']}},

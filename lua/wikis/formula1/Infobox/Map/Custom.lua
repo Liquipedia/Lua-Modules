@@ -50,8 +50,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Last Race', content = {args.lastrace}},
 			Cell{name = 'Most wins (drivers)', content = {args.driverwin}},
 			Cell{name = 'Most wins (teams)', content = {args.teamwin}},
-			Cell{name = 'Lap Record', content = {args.laprecord}},
-			Cell{name = 'Span', content = {args.span}}
+			Cell{name = 'Lap Record', content = {args.laprecord}}
 		)
 	end
 

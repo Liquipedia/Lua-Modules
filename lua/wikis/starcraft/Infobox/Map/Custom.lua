@@ -45,7 +45,6 @@ function CustomInjector:parse(widgetId, widgets)
 			Cell{name = 'Size', content = {self.caller:_getSize(id, args)}},
 			Cell{name = 'Spawn Positions', content = {self.caller:_getSpawn(id, args)}},
 			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-			Cell{name = 'Competition Span', content = {args.span}},
 			Cell{name = 'Leagues Featured', content = {args.leagues}}
 		)
 	end

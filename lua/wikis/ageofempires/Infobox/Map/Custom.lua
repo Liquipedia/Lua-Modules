@@ -57,8 +57,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{
 				name = 'First Appearance',
 				content = {Page.makeInternalLink({onlyIfExists = true}, args.appearance) or args.appearance}
-			},
-			Cell{name = 'Competition Span', content = {args.span}}
+			}
 		)
 	end
 	return widgets

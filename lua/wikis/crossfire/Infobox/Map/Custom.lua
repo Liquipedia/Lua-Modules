@@ -42,8 +42,7 @@ function CustomInjector:parse(widgetId, widgets)
 		Array.appendWith(widgets,
 			Cell{name = 'Scenario', content = {args.scenario}},
 			Cell{name = 'Terrorists', content = {args.t}},
-			Cell{name = 'Counter Terrorists', content = {args.ct}},
-			Cell{name = 'Theme', content = {args.theme}}
+			Cell{name = 'Counter Terrorists', content = {args.ct}}
 		)
 	end
 	return widgets

@@ -65,7 +65,6 @@ function CustomInjector:parse(widgetId, widgets)
 			Cell{name = 'Scenario', content = {args.scenario}},
 			Cell{name = 'Terrorists', content = {args.t}},
 			Cell{name = 'Counter Terrorists', content = {args.ct}},
-			Cell{name = 'Theme', content = {args.theme}},
 			caller:_getAchievements()
 		)
 	end

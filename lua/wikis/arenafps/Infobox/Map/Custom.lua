@@ -43,7 +43,6 @@ function CustomInjector:parse(widgetId, widgets)
 	if widgetId == 'custom' then
 		Array.appendWith(widgets,
 			Cell{name = 'Game', content = {args.game}},
-			Cell{name = 'Filename', content = {args.filename}},
 			Cell{name = 'Health Items', content = {args['health-items']}},
 			Cell{name = 'Armor Items', content = {args['armor-items']}},
 			Cell{name = 'Cooldown Items', content = {args['cooldown-items']}},

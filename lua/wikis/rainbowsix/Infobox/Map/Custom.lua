@@ -53,7 +53,6 @@ function CustomInjector:parse(id, widgets)
 		return self.caller:getReleaseCells(args)
 	elseif id == 'custom' then
 		return WidgetUtil.collect(
-			Cell{name = 'Theme', content = {args.theme}},
 			Cell{name = 'Versions', content = {args.versions}},
 			Cell{name = 'Layout', content = {args.layout}},
 			Cell{name = 'Playlists', content = {args.playlists}},

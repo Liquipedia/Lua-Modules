@@ -5,7 +5,6 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 
@@ -25,6 +24,8 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
+	-- temp for bot job after merge, to be removed with follow up PR
+	map.args.releasedate = map.args.releasedate or map.args.release
 	map:setWidgetInjector(CustomInjector(map))
 
 	return map:createInfobox()
@@ -37,14 +38,7 @@ function CustomInjector:parse(widgetId, widgets)
 	local args = self.caller.args
 
 	if widgetId == 'custom' then
-		return Array.append(
-			widgets,
-			Cell{name = 'Theme', content = {args.theme}},
-			Cell{name = 'Size', content = {args.size}},
-			Cell{name = 'Competition Span', content = {args.span}},
-			Cell{name = 'Release Date', content = {args.release}},
-			Cell{name = 'Versions', content = {args.versions}}
-		)
+		table.insert(widgets, Cell{name = 'Versions', content = {args.versions}})
 	end
 
 	return widgets

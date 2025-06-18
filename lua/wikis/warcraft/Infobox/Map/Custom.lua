@@ -44,7 +44,6 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Size', content = {(args.width or '') .. 'x' .. (args.height or '')}},
 			Cell{name = 'Spawn Positions', content = {(args.players or '') .. ' at ' .. (args.positions or '')}},
 			Cell{name = 'Versions', content = {String.convertWikiListToHtmlList(args.versions)}},
-			Cell{name = 'Competition Span', content = {args.span}},
 			Cell{name = 'Leagues Featured', content = {args.leagues}},
 			Cell{name = 'Mercenary Camps', content = {
 				self.caller:_mercenaryCamp(),
