@@ -16,9 +16,9 @@ local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
 local Widgets = require('Module:Infobox/Widget/All')
+local Center = Widgets.Center
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local HtmlWidgets = require('Module:Widget/Html/All')
 local WidgetImage = Lua.import('Module:Widget/Image/Icon/Image')
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
@@ -88,7 +88,7 @@ function CustomMap:_getAchievements()
 	if Logic.isEmpty(achievements) then return {} end
 	return {
 		Title{children = {'Achievements'}},
-		HtmlWidgets.Div{children = Array.interleave(achievements, ' ')}, --should we make this use center widget?
+		Center{children = Array.interleave(achievements, ' ')},
 	}
 end
 
