@@ -80,7 +80,7 @@ end
 function CustomPatch:getChronologyData(args)
 	local game = Game.name{game = args.game, useDefault = false} or ''
 	local version = args.version or ''
-	local prefix = version == VERSION_DEFINITIVE_EDITION and '/Update ' or '/Patch '
+	local prefix = version == VERSION_DEFINITIVE_EDITION and '/Update' or '/Patch'
 
 	---@param input string?
 	---@return string?
@@ -88,7 +88,7 @@ function CustomPatch:getChronologyData(args)
 		if Logic.isEmpty(input) then return end
 		return game .. '/' .. version
 			.. (args.expansion and ('/' .. args.expansion) or '')
-			.. prefix .. input .. '|' .. input
+			.. prefix ' ' .. input .. '|' .. input
 	end
 
 	return {
