@@ -45,7 +45,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 5,
+				points = 3,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -81,7 +81,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 2,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
@@ -117,7 +117,7 @@ Config.weights = {
 			},
 			{
 				name = Config.TIER_TYPE_QUALIFIER,
-				points = 0,
+				points = 1,
 			},
 			{
 				name = Config.TIER_TYPE_SHOW_MATCH,
