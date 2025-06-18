@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local DisplayUtil = require('Module:DisplayUtil')
-local Faction = require('Module:Faction')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Faction = Lua.import('Module:Faction')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Opponent = Lua.import('Module:Opponent')
 local PlayerDisplay = Lua.import('Module:Player/Display')
@@ -92,7 +93,7 @@ end
 ---@param frame Frame
 ---@return string
 function StarcraftPlayerDisplay.TemplatePlayer(frame)
-	local args = require('Module:Arguments').getArgs(frame)
+	local args = Lua.import('Module:Arguments').getArgs(frame)
 
 	local pageName
 	local displayName
@@ -140,7 +141,7 @@ end
 ---@param frame Frame
 ---@return Html
 function StarcraftPlayerDisplay.TemplateInlinePlayer(frame)
-	local args = require('Module:Arguments').getArgs(frame)
+	local args = Lua.import('Module:Arguments').getArgs(frame)
 
 	local player = {
 		displayName = args[1],

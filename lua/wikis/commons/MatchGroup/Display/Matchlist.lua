@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local DisplayUtil = require('Module:DisplayUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local Logic = Lua.import('Module:Logic')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
 local MatchlistDisplay = {propTypes = {}, types = {}}
@@ -150,7 +151,7 @@ function MatchlistDisplay.Match(props)
 		matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = bracketId,
 			matchId = props.match.matchId,
-		}, require('Module:Error/Display').ErrorDetails)
+		}, Lua.import('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
 	else
 		matchInfoIconNode = mw.html.create('div'):addClass('brkts-matchlist-placeholder-cell')

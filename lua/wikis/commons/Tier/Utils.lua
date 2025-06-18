@@ -7,11 +7,13 @@
 
 -- module intended to be moved to `Module:Tier` after the old ones usage has been eliminated
 
-local Logic = require('Module:Logic')
-local FnUtil = require('Module:FnUtil')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
+local FnUtil = Lua.import('Module:FnUtil')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local TierData = mw.loadData('Module:Tier/Data')
 

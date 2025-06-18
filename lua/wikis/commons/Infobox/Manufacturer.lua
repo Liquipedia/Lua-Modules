@@ -5,15 +5,16 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
+
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Namespace = Lua.import('Module:Namespace')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Locale = Lua.import('Module:Locale')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title
