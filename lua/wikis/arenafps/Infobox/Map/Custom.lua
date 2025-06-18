@@ -13,10 +13,10 @@ local Class = Lua.import('Module:Class')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 local Title = Widgets.Title
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local WidgetImage = Lua.import('Module:Widget/Image/Icon/Image')
 
 ---@class ArenafpsMapInfobox: MapInfobox

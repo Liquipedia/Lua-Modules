@@ -13,7 +13,7 @@ local Class = Lua.import('Module:Class')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Map = Lua.import('Module:Infobox/Map')
 
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 ---@class SideswipeMapInfobox: MapInfobox
