@@ -5,6 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
+local Array = require('Module:Array')
 local Class = require('Module:Class')
 local Lua = require('Module:Lua')
 local Logic = require('Module:Logic')
@@ -44,17 +45,13 @@ function Cell:render()
 
 	local options = self.props.options
 
-	local mappedChildren = {}
-	for i, child in ipairs(self.props.children) do
-		if i > 1 then
-			table.insert(mappedChildren, options.separator)
-		end
+	local mappedChildren = Array.map(self.props.children, function(child)
 		if options.makeLink then
-			table.insert(mappedChildren, Link{children = {child}, link = child})
+			return Link{children = {child}, link = child}
 		else
-			table.insert(mappedChildren, child)
+			return child
 		end
-	end
+	end)
 
 	if Logic.isEmpty(mappedChildren[1]) then
 		return
@@ -69,7 +66,7 @@ function Cell:render()
 			},
 			HtmlWidgets.Div{
 				css = {width = (100 * (options.columns - 1) / options.columns) .. '%'}, -- 66.66% for col = 3
-				children = mappedChildren,
+				children = Array.interleave(mappedChildren, options.separator)
 			}
 		}
 	}

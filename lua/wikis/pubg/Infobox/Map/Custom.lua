@@ -25,8 +25,6 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomMap.run(frame)
 	local map = CustomMap(frame)
-	-- temp for bot job after merge, to be removed with follow up PR
-	map.args.releasedate = map.args.releasedate or map.args.release
 	map:setWidgetInjector(CustomInjector(map))
 
 	return map:createInfobox()
