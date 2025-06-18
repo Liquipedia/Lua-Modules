@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local DateExt = Lua.import('Module:Date/Ext')
 local FnUtil = Lua.import('Module:FnUtil')
 local Logic = Lua.import('Module:Logic')
-local Lua = Lua.import('Module:Lua')
 local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')

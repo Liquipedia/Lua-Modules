@@ -10,7 +10,6 @@ local Lua = require('Module:Lua')
 local Array = Lua.import('Module:Array')
 local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
 local FnUtil = Lua.import('Module:FnUtil')
-local Lua = Lua.import('Module:Lua')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 

@@ -11,7 +11,6 @@ local Array = Lua.import('Module:Array')
 local CharacterIcon = Lua.import('Module:CharacterIcon')
 local CharacterNames = Lua.import('Module:CharacterNames', {loadData = true})
 local Class = Lua.import('Module:Class')
-local Lua = Lua.import('Module:Lua')
 local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')

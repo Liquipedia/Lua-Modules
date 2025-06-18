@@ -9,7 +9,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Game = Lua.import('Module:Game')
-local Lua = Lua.import('Module:Lua')
 local String = Lua.import('Module:StringUtils')
 local Variables = Lua.import('Module:Variables')
 

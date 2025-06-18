@@ -15,7 +15,6 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local Logic = Lua.import('Module:Logic')
-local Lua = Lua.import('Module:Lua')
 local Lpdb = Lua.import('Module:Lpdb')
 local MathUtils = Lua.import('Module:MathUtil')
 local String = Lua.import('Module:StringUtils')
