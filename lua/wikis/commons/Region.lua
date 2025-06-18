@@ -15,7 +15,7 @@ local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local REGION_DATA = mw.loadData('Module:Region/Data')
+local REGION_DATA = Lua.import('Module:Region/Data', {loadData = true})
 local COUNTRY_TO_REGION_DATA = Lua.requireIfExists('Module:Region/CountryData', {loadData = true}) or {}
 
 local NO_ENTRY_FOUND_CATEGORY = 'Pages using unsupported region values'

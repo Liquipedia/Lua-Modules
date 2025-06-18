@@ -15,7 +15,7 @@ local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 
-local TierData = mw.loadData('Module:Tier/Data')
+local TierData = Lua.import('Module:Tier/Data', {loadData = true})
 
 local NON_BREAKING_SPACE = '&nbsp;'
 local DEFAULT_TIER_TYPE = 'General'

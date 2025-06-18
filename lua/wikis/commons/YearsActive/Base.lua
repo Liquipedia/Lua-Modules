@@ -11,7 +11,7 @@ local Lua = require('Module:Lua')
 
 local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
-local Info = mw.loadData('Module:Info')
+local Info = Lua.import('Module:Info', {loadData = true})
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
 local Set = Lua.import('Module:Set')

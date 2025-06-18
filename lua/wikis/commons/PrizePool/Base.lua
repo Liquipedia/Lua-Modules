@@ -306,7 +306,7 @@ BasePrizePool.prizeTypes = {
 
 		header = 'points',
 		headerParse = function (prizePool, input, context, index)
-			local pointsData = Table.copy(mw.loadData('Module:Points/data')[input] or {})
+			local pointsData = Table.copy(Lua.import('Module:Points/data', {loadData = true})[input] or {})
 			pointsData.title = pointsData.title or 'Points'
 
 			-- Manual overrides

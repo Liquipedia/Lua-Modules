@@ -8,7 +8,7 @@
 local Lua = require('Module:Lua')
 
 local Array = Lua.import('Module:Array')
-local EptRegionData = mw.loadData('Module:Region/Ept/Data')
+local EptRegionData = Lua.import('Module:Region/Ept/Data', {loadData = true})
 local FnUtil = Lua.import('Module:FnUtil')
 
 --[[

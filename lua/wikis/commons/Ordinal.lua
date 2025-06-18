@@ -9,7 +9,7 @@ local Lua = require('Module:Lua')
 
 local Arguments = Lua.import('Module:Arguments')
 local Logic = Lua.import('Module:Logic')
-local OrdinalData = mw.loadData('Module:Ordinal/Data')
+local OrdinalData = Lua.import('Module:Ordinal/Data', {loadData = true})
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 

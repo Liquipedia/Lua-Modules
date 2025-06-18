@@ -7,7 +7,7 @@
 
 local Lua = require('Module:Lua')
 
-local MasterData = mw.loadData('Module:Flags/MasterData')
+local MasterData = Lua.import('Module:Flags/MasterData', {loadData = true})
 local Template = Lua.import('Module:Template')
 local Logic = Lua.import('Module:Logic')
 local Table = Lua.import('Module:Table')
