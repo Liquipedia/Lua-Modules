@@ -50,10 +50,10 @@ local RESTRICTIONS = {
 		link = 'Senior Tournaments',
 		data = 'senior',
 	},
-	computer = {
-		name = 'Computers Only',
-		link = 'Computer Tournaments',
-		data = 'computer',
+	engine = {
+		name = 'Chess Engines Only',
+		link = 'Computer Chess Tournaments',
+		data = 'engine',
 	},
 }
 
