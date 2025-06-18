@@ -88,7 +88,7 @@ function CustomPatch:getChronologyData(args)
 		if Logic.isEmpty(input) then return end
 		return game .. '/' .. version
 			.. (args.expansion and ('/' .. args.expansion) or '')
-			.. prefix ' ' .. input .. '|' .. input
+			.. prefix .. ' ' .. input .. '|' .. input
 	end
 
 	return {
