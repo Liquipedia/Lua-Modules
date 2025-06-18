@@ -51,7 +51,10 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
-	blasttv = {'https://www.blast.tv/'},
+	blasttv = {
+		'https://blast.tv/',
+		match = 'https://blast.tv/',
+	},
 	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
