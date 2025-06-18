@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local DateExt = require('Module:Date/Ext')
-local I18n = require('Module:I18n')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local DateExt = Lua.import('Module:Date/Ext')
+local I18n = Lua.import('Module:I18n')
 
 local Widget = Lua.import('Module:Widget')
 
