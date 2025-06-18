@@ -4,9 +4,10 @@
 --
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
 
 local InlineIconAndText = Lua.import('Module:Widget/Misc/InlineIconAndText')
 local ManualData = Lua.requireIfExists('Module:InlineIcon/ManualData', {loadData = true})
@@ -62,7 +63,7 @@ end
 ---@return IconWidget
 function AutoInlineIcon._iconCreator(data)
 	if data.iconType == 'image' then
-		local IconImage = require('Module:Widget/Image/Icon/Image')
+		local IconImage = Lua.import('Module:Widget/Image/Icon/Image')
 		return IconImage{
 			imageLight = data.iconLight,
 			imageDark = data.iconDark,
@@ -70,7 +71,7 @@ function AutoInlineIcon._iconCreator(data)
 			size = Logic.emptyOr(data.size),
 		}
 	elseif data.iconType == 'fa' then
-		local IconFa = require('Module:Widget/Image/Icon/Fontawesome')
+		local IconFa = Lua.import('Module:Widget/Image/Icon/Fontawesome')
 		return IconFa{
 			iconName = data.icon,
 			link = data.link,

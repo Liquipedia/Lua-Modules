@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local LeagueIcon = require('Module:LeagueIcon')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
 
 local Widget = Lua.import('Module:Widget')
 local HtmlWidgets = Lua.import('Module:Widget/Html/All')

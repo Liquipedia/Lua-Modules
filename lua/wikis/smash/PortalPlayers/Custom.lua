@@ -5,19 +5,20 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Arguments = require('Module:Arguments')
-local Array = require('Module:Array')
-local Links = require('Module:Links')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Team = require('Module:Team')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Arguments = Lua.import('Module:Arguments')
+local Array = Lua.import('Module:Array')
+local Links = Lua.import('Module:Links')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Team = Lua.import('Module:Team')
+
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local OpponentDisplay = OpponentLibrary.OpponentDisplay
 
-local Characters = require('Module:Characters')
+local Characters = Lua.import('Module:Characters')
 
 local NON_PLAYER_HEADER = Abbreviation.make{text = 'Staff', title = 'Coaches, Managers, Analysts and more'}
 	.. ' & ' .. Abbreviation.make{text = 'Talents', title = 'Commentators, Observers, Hosts and more'}
@@ -124,7 +125,7 @@ function CustomPortalPlayers._getMainCharIcons(player)
 		return
 	end
 
-	local CharacterIcons = mw.loadData('Module:CharacterIcons/' .. activeGame)
+	local CharacterIcons = Lua.import('Module:CharacterIcons/' .. activeGame, {loadData = true})
 
 	local display = mw.html.create()
 	for _, character in ipairs(mw.text.split(player.extradata['main' .. activeGame], ',', true)) do

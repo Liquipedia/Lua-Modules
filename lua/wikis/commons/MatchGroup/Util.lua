@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local FnUtil = require('Module:FnUtil')
-local Info = require('Module:Info')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TypeUtil = require('Module:TypeUtil')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local FnUtil = Lua.import('Module:FnUtil')
+local Info = Lua.import('Module:Info')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TypeUtil = Lua.import('Module:TypeUtil')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupCoordinates = Lua.import('Module:MatchGroup/Coordinates')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')

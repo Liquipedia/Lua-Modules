@@ -5,11 +5,13 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local FnUtil = require('Module:FnUtil')
-local Table = require('Module:Table')
-local TextSanitizer = require('Module:TextSanitizer')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local FnUtil = Lua.import('Module:FnUtil')
+local Table = Lua.import('Module:Table')
+local TextSanitizer = Lua.import('Module:TextSanitizer')
 
 local Lpdb = {}
 

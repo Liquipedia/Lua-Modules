@@ -6,7 +6,8 @@
 --
 
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
+
+local String = Lua.import('Module:StringUtils')
 
 local TiebreakerFactory = {}
 

@@ -5,10 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local FnUtil = require('Module:FnUtil')
-local OpponentLibraries = require('Module:OpponentLibraries')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local FnUtil = Lua.import('Module:FnUtil')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local RatingsStorageExtension = {}

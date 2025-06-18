@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Date = require('Module:Date/Ext')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local I18n = require('Module:I18n')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local PlayerDisplay = require('Module:Player/Display')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
+
+local Array = Lua.import('Module:Array')
+local Date = Lua.import('Module:Date/Ext')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local I18n = Lua.import('Module:I18n')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerDisplay = Lua.import('Module:Player/Display')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Timezone = Lua.import('Module:Timezone')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 
@@ -124,7 +125,7 @@ function DisplayHelper.MatchCountdownBlock(match)
 		:css('text-align', 'center')
 		-- Workaround for .brkts-popup-body-element > * selector
 		:css('display', 'block')
-		:node(require('Module:Countdown')._create(stream))
+		:node(Lua.import('Module:Countdown')._create(stream))
 end
 
 ---Creates comments that describe substitute player(s) of the match.
@@ -155,7 +156,7 @@ function DisplayHelper.createSubstitutesComment(match)
 			end
 
 			if opponent.type == Opponent.team then
-				local team = require('Module:Team').queryRaw(opponent.template)
+				local team = Lua.import('Module:Team').queryRaw(opponent.template)
 				if team then
 					table.insert(subString, string.format('on <b>%s</b>', Page.makeInternalLink(team.shortname, team.page)))
 				end
@@ -232,7 +233,7 @@ end
 ---@param config {noLink: boolean?}?
 ---@return string
 function DisplayHelper.MapAndMode(game, config)
-	local MapModes = require('Module:MapModes')
+	local MapModes = Lua.import('Module:MapModes')
 
 	local mapText = DisplayHelper.Map(game, config)
 

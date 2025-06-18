@@ -5,20 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DateExt = require('Module:Date/Ext')
-local Faction = require('Module:Faction')
-local Flags = require('Module:Flags')
-local FnUtil = require('Module:FnUtil')
-local Json = require('Module:Json')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local PageVariableNamespace = require('Module:PageVariableNamespace')
-local Streams = require('Module:Links/Stream')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local DateExt = Lua.import('Module:Date/Ext')
+local Faction = Lua.import('Module:Faction')
+local Flags = Lua.import('Module:Flags')
+local FnUtil = Lua.import('Module:FnUtil')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local PageVariableNamespace = Lua.import('Module:PageVariableNamespace')
+local Streams = Lua.import('Module:Links/Stream')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local Info = Lua.import('Module:Info', {loadData = true})
 local Links = Lua.import('Module:Links')
@@ -26,7 +27,7 @@ local Links = Lua.import('Module:Links')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util')
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 
 local globalVars = PageVariableNamespace{cached = true}

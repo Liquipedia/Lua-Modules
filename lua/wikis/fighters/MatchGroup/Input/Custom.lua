@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Game = require('Module:Game')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Game = Lua.import('Module:Game')
+local Json = Lua.import('Module:Json')
+local Variables = Lua.import('Module:Variables')
 
 local MatchGroupInputUtil = Lua.import('Module:MatchGroup/Input/Util')
 local Opponent = Lua.import('Module:Opponent')
@@ -75,7 +76,7 @@ end
 ---@return table[]
 function MapFunctions._processPlayerMapData(map, opponent, opponentIndex)
 	local game = Game.toIdentifier{game = Variables.varDefault('tournament_game')}
-	local CharacterStandardizationData = mw.loadData('Module:CharacterStandardization/' .. game)
+	local CharacterStandardizationData = Lua.import('Module:CharacterStandardization/' .. game, {loadData = true})
 
 	local players = Array.mapIndexes(function(playerIndex)
 		return map['t' .. opponentIndex .. 'p' .. playerIndex] or map['o' .. opponentIndex .. 'p' .. playerIndex]
