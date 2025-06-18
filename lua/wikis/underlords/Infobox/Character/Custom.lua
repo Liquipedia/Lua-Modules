@@ -35,14 +35,15 @@ function CustomCharacter.run(frame)
 	character:setWidgetInjector(CustomInjector(character))
 
 	character.alliances = character:getAllArgsForBase(character.args, 'alliance')
-	character.statsByLevel = character:getStatsByLevel(character.args)
+	character.statsByLevel = character:_getStatsByLevel(character.args)
 
 	return character:createInfobox()
 end
 
+---@private
 ---@param args table
 ---@return table[]
-function CustomCharacter:getStatsByLevel(args)
+function CustomCharacter:_getStatsByLevel(args)
 	return Array.map(Array.range(1, 3), function(level)
 		return {
 			health = args['health' .. level],
