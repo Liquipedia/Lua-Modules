@@ -5,11 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local Logic = Lua.import('Module:Logic')
 
 local TournamentsListing = Lua.import('Module:TournamentsListing/CardList')
 
