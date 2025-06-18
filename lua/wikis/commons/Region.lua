@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Region = {}
-local Class = require('Module:Class')
-local Flag = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Region = {}
+local Class = Lua.import('Module:Class')
+local Flag = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local REGION_DATA = mw.loadData('Module:Region/Data')
 local COUNTRY_TO_REGION_DATA = Lua.requireIfExists('Module:Region/CountryData', {loadData = true}) or {}

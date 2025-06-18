@@ -5,10 +5,12 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
-local Ordinal = require('Module:Ordinal')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local Ordinal = Lua.import('Module:Ordinal')
+local Table = Lua.import('Module:Table')
 
 local Placement = {}
 

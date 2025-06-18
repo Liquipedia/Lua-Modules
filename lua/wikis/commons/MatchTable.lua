@@ -5,25 +5,26 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local Game = require('Module:Game')
-local Info = require('Module:Info')
-local LeagueIcon = require('Module:LeagueIcon')
-local Logic = require('Module:Logic')
-local Lpdb = require('Module:Lpdb')
 local Lua = require('Module:Lua')
-local Math = require('Module:MathUtil')
-local Operator = require('Module:Operator')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Timezone = require('Module:Timezone')
-local Team = require('Module:Team')
-local Tier = require('Module:Tier/Custom')
-local VodLink = require('Module:VodLink')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Game = Lua.import('Module:Game')
+local Info = Lua.import('Module:Info')
+local LeagueIcon = Lua.import('Module:LeagueIcon')
+local Logic = Lua.import('Module:Logic')
+local Lpdb = Lua.import('Module:Lpdb')
+local Math = Lua.import('Module:MathUtil')
+local Operator = Lua.import('Module:Operator')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Timezone = Lua.import('Module:Timezone')
+local Team = Lua.import('Module:Team')
+local Tier = Lua.import('Module:Tier/Custom')
+local VodLink = Lua.import('Module:VodLink')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -31,7 +32,7 @@ local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
-local Condition = require('Module:Condition')
+local Condition = Lua.import('Module:Condition')
 local ConditionTree = Condition.Tree
 local ConditionNode = Condition.Node
 local Comparator = Condition.Comparator

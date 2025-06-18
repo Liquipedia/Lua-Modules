@@ -5,7 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
 
 local Operator = {}
 

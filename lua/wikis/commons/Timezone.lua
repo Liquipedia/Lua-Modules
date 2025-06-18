@@ -5,9 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 local TimezoneData = mw.loadData('Module:Timezone/Data')
 
 local OUTPUT_FORMAT = '<abbr data-tz="${tzDataLong}" title="${tzTitle} (UTC${tzDataShort})">${tzNameShort}</abbr>'
