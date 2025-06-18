@@ -19,8 +19,7 @@ local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local WidgetUtil = Lua.import('Module:Widget/Util')
 
-local VERSION_DEFINITE_EDITION = 'Definitive Edition'
-local GAME_AOE2 = 'aoe2'
+local VERSION_DEFINITIVE_EDITION = 'Definitive Edition'
 
 ---@class AoePatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
@@ -79,20 +78,17 @@ end
 ---@param args table
 ---@return {previous: string?, next: string?}
 function CustomPatch:getChronologyData(args)
-	local game = Game.name{game = args.game, useDefault = false}
+	local game = Game.name{game = args.game, useDefault = false} or ''
 	local version = args.version or ''
+	local prefix = version == VERSION_DEFINITIVE_EDITION and '/Update ' or '/Patch '
 
 	---@param input string?
 	---@return string?
 	local buildChronolgyLink = function(input)
-		if Logic.isEmpty(input) then
-			return
-		elseif version ~= VERSION_DEFINITE_EDITION then
-			return (game or '') .. version .. '/Patch ' .. input .. '|' .. version
-		end
-		return (game or Game.name{game = GAME_AOE2}) .. '/' .. version
+		if Logic.isEmpty(input) then return end
+		return game .. '/' .. version
 			.. (args.expansion and ('/' .. args.expansion) or '')
-			.. '/Update ' .. input .. '|' .. input
+			.. prefix .. input .. '|' .. input
 	end
 
 	return {
