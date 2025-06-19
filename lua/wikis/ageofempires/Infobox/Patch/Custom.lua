@@ -17,7 +17,6 @@ local Injector = Lua.import('Module:Widget/Injector')
 
 local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
-local WidgetUtil = Lua.import('Module:Widget/Util')
 
 local VERSION_DEFINITIVE_EDITION = 'Definitive Edition'
 
@@ -43,11 +42,11 @@ function CustomInjector:parse(id, widgets)
 	local caller = self.caller
 	local args  = caller.args
 	if id == 'version' then
-		return WidgetUtil.collect(
+		return {
 			Cell{name = 'Game', children = {Game.name{game = args.game, useDefault = false}}, options = {makeLink = true}},
 			Cell{name = 'Version', children = {args.version}, options = {makeLink = true}},
-			Cell{name = 'Expansion Set', children = {args.expansion}, options = {makeLink = true}}
-		)
+			Cell{name = 'Expansion Set', children = {args.expansion}, options = {makeLink = true}},
+		}
 	end
 
 	return widgets
