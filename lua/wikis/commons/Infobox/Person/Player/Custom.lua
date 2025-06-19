@@ -20,4 +20,3 @@ function CustomPlayer.run(frame)
 end
 
 return CustomPlayer
-  
