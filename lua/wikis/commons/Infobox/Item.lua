@@ -19,7 +19,6 @@ local Center = Widgets.Center
 local Customizable = Widgets.Customizable
 
 ---@class ItemInfobox: BasicInfobox
----@field rarities string[]?
 local Item = Class.new(BasicInfobox)
 
 ---@param frame Frame
@@ -58,7 +57,7 @@ function Item:createInfobox()
 			children = {
 				Title{children = 'Item Information'},
 				Cell{name = 'Type', content = {args.type}},
-				Cell{name = 'Rarity', content = self.rarities or {args.rarity}},
+				Cell{name = 'Rarity', content = self:getAllArgsForBase(args, 'rarity')},
 				Cell{name = 'Level', content = {args.level}},
 				Cell{name = 'Class', content = {args.class}},
 				Cell{name = 'Cost', content = {args.cost}},
