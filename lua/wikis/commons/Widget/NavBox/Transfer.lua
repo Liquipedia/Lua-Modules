@@ -97,12 +97,14 @@ end
 ---@return Widget[] unsourced
 ---@return Widget[] yearly
 ---@return Widget[] misc
+---@return integer? latestYear
 function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 	local toDisplay = function(pageName, year)
 		return Link{link = pageName, children = {year}}
 	end
 
 	local unsorted, unsourced, yearly, misc = {}, {}, {}, {}
+	local latestYear
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		Array.forEach(pages, function(pageName)
 			local name, name2, _
@@ -115,10 +117,19 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 				table.insert(unsourced, toDisplay(pageName, year))
 			elseif pageName:match('[tT]ransfers/' .. year .. '$') then
 				table.insert(yearly, toDisplay(pageName, year))
+				if not latestYear then
+					latestYear = {year = year, pageName = pageName}
+				end
 			else
 				table.insert(misc, pageName)
 			end
 		end)
+	end
+
+	local currentYear = DateExt. -- get current year
+	if latestYear and currentYear == (latestYear.year + 1) then
+		local pageName = latestYear.pageName:gsub(latestYear.year, currentYear)
+		table.insert(yearly, 1, toDisplay(pageName, currentYear))
 	end
 
 	return unsorted, unsourced, yearly, misc
