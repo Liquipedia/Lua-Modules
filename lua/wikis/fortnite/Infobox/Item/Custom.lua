@@ -69,6 +69,11 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 	if id == 'custom' then
 		table.insert(widgets, Cell{name = 'Removed', children = {CustomItem._getVersionDisplay(args.removed)}})
+	elseif id == 'attributes' then return {}
+	elseif id == 'ability' then return {}
+	elseif id == 'availability' then return {}
+	elseif id == 'maps' then return {}
+	elseif id == 'recipe' then return {}
 	end
 
 	return widgets
