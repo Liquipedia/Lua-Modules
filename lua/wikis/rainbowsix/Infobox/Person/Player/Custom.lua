@@ -16,7 +16,6 @@ local Page = Lua.import('Module:Page')
 local String = Lua.import('Module:StringUtils')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
-local TeamHistoryAuto = Lua.import('Module:TeamHistoryAuto')
 local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
@@ -47,15 +46,12 @@ function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
 	player:setWidgetInjector(CustomInjector(player))
 
-	player.args.history = TeamHistoryAuto.results{addlpdbdata = true, specialRoles = true}
 	-- Automatic achievements
 	player.args.achievements = Achievements.player{
 		baseConditions = ACHIEVEMENTS_BASE_CONDITIONS
 	}
 
 	player.args.banned = tostring(player.args.banned or '')
-
-	player.args.autoTeam = true
 
 	return player:createInfobox()
 end
