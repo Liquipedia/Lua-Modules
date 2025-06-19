@@ -1203,6 +1203,7 @@ end
 ---@field getGame? fun(match: table, map:table): string?
 ---@field ADD_SUB_GROUP? boolean
 ---@field BREAK_ON_EMPTY? boolean
+---@field INHERIT_MAP_DATES? boolean
 
 --- The standard way to process a map input.
 ---
@@ -1231,6 +1232,8 @@ end
 function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 	local maps = {}
 	local subGroup = 0
+	local lastDate = match.date
+
 	for key, mapInput, mapIndex in Table.iter.pairsByPrefix(match, 'map', {requireIndex = true}) do
 		local map = Parser.getMap and Parser.getMap(mapInput) or mapInput
 		if Parser.BREAK_ON_EMPTY and Logic.isDeepEmpty(map) then
@@ -1240,6 +1243,11 @@ function MatchGroupInputUtil.standardProcessMaps(match, opponents, Parser)
 		local winnerInput = map.winner --[[@as string?]]
 
 		local dateToUse = map.date or match.date
+		if Parser.INHERIT_MAP_DATES then
+			dateToUse = map.date or lastDate
+			lastDate = dateToUse
+		end
+
 		Table.mergeInto(map, MatchGroupInputUtil.readDate(dateToUse))
 
 		if Parser.ADD_SUB_GROUP then
