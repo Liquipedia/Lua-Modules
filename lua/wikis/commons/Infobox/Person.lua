@@ -41,6 +41,8 @@ local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 ---@class PersonRoleData
 ---@field category string
 ---@field display string
+---@field doNotShowInHistory boolean?
+---@field abbreviation string?
 
 ---@class PersonRoleDataExtended: PersonRoleData
 ---@field key string?
