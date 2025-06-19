@@ -61,39 +61,19 @@ function Item:createInfobox()
 				Cell{name = 'Level', content = {args.level}},
 				Cell{name = 'Class', content = {args.class}},
 				Cell{name = 'Cost', content = {args.cost}},
-				Cell{name = 'Released', content = {args.release}},
 			}
 		},
 		Customizable{
-			id = 'attributes',
+			id = 'released',
 			children = {
-				Title{children = 'Attributes'},
-			}
+				Cell{name = 'Released', content = {args.release}}
+			},
 		},
-		Customizable{
-			id = 'ability',
-			children = {
-				Title{children = 'Ability'},
-			}
-		},
-		Customizable{
-			id = 'availability',
-			children = {
-				Title{children = 'Availability'},
-			}
-		},
-		Customizable{
-			id = 'maps',
-			children = {
-				Title{children = 'Maps'},
-			}
-		},
-		Customizable{
-			id = 'recipe',
-			children = {
-				Title{children = 'Recipe'},
-			}
-		},
+		Customizable{id = 'attributes', children = {}},
+		Customizable{id = 'ability', children = {}},
+		Customizable{id = 'availability', children = {}},
+		Customizable{id = 'maps', children = {}},
+		Customizable{id = 'recipe', children = {}},
 		Customizable{id = 'custom', children = {}},
 		Center{children = {args.footnotes}},
 	}

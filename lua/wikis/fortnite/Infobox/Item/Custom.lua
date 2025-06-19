@@ -15,9 +15,9 @@ local Variables = Lua.import('Module:Variables')
 local Injector = Lua.import('Module:Infobox/Widget/Injector')
 local Item = Lua.import('Module:Infobox/Item')
 
-local HtmlWidgets = require('Module:Widget/Html/All')
+local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Link = Lua.import('Module:Widget/Basic/Link')
-local Widgets = require('Module:Infobox/Widget/All')
+local Widgets = Lua.import('Module:Infobox/Widget/All')
 local Cell = Widgets.Cell
 
 local VERSION_DATA = {
@@ -52,9 +52,8 @@ local CustomInjector = Class.new(Injector)
 function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	local args = item.args
-	args.release = CustomItem._getVersionDisplay(args.release --[[@as string?]])
 	if Logic.readBool(args['generate description']) then
-		item:_description()
+		item:_createDescription()
 	end
 
 	item:setWidgetInjector(CustomInjector(item))
@@ -67,13 +66,11 @@ end
 ---@return Widget[]
 function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
-	if id == 'custom' then
-		table.insert(widgets, Cell{name = 'Removed', children = {CustomItem._getVersionDisplay(args.removed)}})
-	elseif id == 'attributes' then return {}
-	elseif id == 'ability' then return {}
-	elseif id == 'availability' then return {}
-	elseif id == 'maps' then return {}
-	elseif id == 'recipe' then return {}
+	if id == 'released' then
+		return {
+			Cell{name = 'Released', content = {CustomItem._getVersionDisplay(args.release)}},
+			Cell{name = 'Removed', children = {CustomItem._getVersionDisplay(args.removed)}},
+		}
 	end
 
 	return widgets
@@ -107,7 +104,7 @@ function CustomItem._getVersionDisplay(input)
 end
 
 ---@private
-function CustomItem:_description()
+function CustomItem:_createDescription()
 	local rarities = self:getAllArgsForBase(self.args, 'rarity')
 	local description = '<b>' .. self.name .. '</b> is an item that is available in  '
 		.. mw.text.listToText(rarities, ', ', ' and ')
