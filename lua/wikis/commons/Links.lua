@@ -366,6 +366,7 @@ local ALIASES = {
 local ICON_KEYS_TO_RENAME = {
 	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
+	blasttv = 'blast',
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
