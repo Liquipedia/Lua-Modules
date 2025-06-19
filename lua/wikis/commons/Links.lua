@@ -52,6 +52,10 @@ local PREFIXES = {
 		stream = 'https://live.bilibili.com/',
 	},
 	['bilibili-stream'] = {'https://live.bilibili.com/'},
+	blasttv = {
+		'https://blast.tv/',
+		match = 'https://blast.tv/',
+	},
 	bluesky = {'https://bsky.app/profile/'},
 	booyah = {'https://booyah.live/'},
 	bracket = {''},
@@ -363,6 +367,7 @@ local ALIASES = {
 local ICON_KEYS_TO_RENAME = {
 	['bilibili-stream'] = 'bilibili',
 	daumcafe = 'cafe-daum',
+	blasttv = 'blast',
 	['esea-d'] = 'esea-league',
 	['faceit-c'] = 'faceit',
 	['faceit-c2'] = 'faceit',
@@ -389,6 +394,10 @@ local MATCH_ICONS = {
 	ballchasing = {
 		icon = 'File:Ballchasing icon.png',
 		text = 'Ballchasing replays'
+	},
+	blasttv = {
+		icon = 'File:BLAST icon allmode.png',
+		text = 'BLAST.tv matchpage'
 	},
 	breakingpoint = {
 		icon = 'File:Breaking Point GG icon lightmode.png',
