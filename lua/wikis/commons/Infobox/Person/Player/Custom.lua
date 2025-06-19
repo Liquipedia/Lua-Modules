@@ -11,7 +11,7 @@ local Class = require('Module:Class')
 local Player = Lua.import('Module:Infobox/Person')
 
 ---@class CustomInfoboxPlayer: Person
-local CustomPlayer = Class.new(Player
+local CustomPlayer = Class.new(Player)
 
 ---@param frame Frame
 ---@return Html
