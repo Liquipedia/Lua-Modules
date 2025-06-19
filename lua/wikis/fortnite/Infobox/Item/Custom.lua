@@ -103,7 +103,7 @@ end
 
 ---@private
 function CustomItem:_description()
-	local rarities = self:getAllArgsForBase(args, 'rarity')
+	local rarities = self:getAllArgsForBase(self.args, 'rarity')
 	local description = '<b>' .. self.name .. '</b> is an item that is available in  '
 		.. mw.text.listToText(rarities, ', ', ' and ')
 		.. (#rarities > 1 and 'rarities' or 'rarity')
@@ -114,7 +114,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomItem:getWikiCategories(args)
-	return Array.map(self:getAllArgsForBase(args, 'rarity'), function(rarity)
+	return Array.map(self:getAllArgsForBase(self.args, 'rarity'), function(rarity)
 		return rarity .. ' Items'
 	end)
 end
