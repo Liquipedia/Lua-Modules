@@ -443,7 +443,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		local gameMatch = Table.copy(match)
 		gameMatch.match2games = nil
 		gameMatch.asGame = true
-		gameMatch.asGameIdx = {gameIndex}
+		gameMatch.asGameIndexes = {gameIndex}
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
@@ -457,8 +457,8 @@ function MatchTicker:expandGamesOfMatch(match)
 
 	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
 		if #gameGroup > 1 then
-			table.insert(gameGroup[1].asGameIdx, gameGroup[#gameGroup].asGameIdx)
-			gameGroup[1].asGameIdx = Array.flatten(gameGroup[1].asGameIdx)
+			local lastIndexes = gameGroup[#gameGroup].asGameIndexes
+			table.insert(gameGroup[1].asGameIndexes, lastIndexes[#lastIndexes])
 		end
 
 		return gameGroup[1]
@@ -480,7 +480,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return ((a.asGameIdx or {})[1] or 0) < ((b.asGameIdx or {})[1] or 0)
+		return ((a.asGameIndexes or {})[1] or 0) < ((b.asGameIndexes or {})[1] or 0)
 	end)
 end
 
