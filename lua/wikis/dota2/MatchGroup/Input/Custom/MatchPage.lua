@@ -7,19 +7,23 @@
 
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 
+local NormalParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
+
+---@class Dota2MatchPageMapParser: Dota2MapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 ---@class dota2MatchDataExtended: dota2MatchData
 ---@field matchid integer
 ---@field vod string?
 
----@param mapInput {matchid: string?, reversed: string?, vod: string?}
+---@param mapInput {manual: boolean?, matchid: string?, reversed: string?, vod: string?}
 ---@return dota2MatchDataExtended|table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
-	if not mapInput or not mapInput.matchid then
+	if not mapInput or Logic.readBool(mapInput.manual) or not mapInput.matchid then
 		return mapInput
 	end
 	local matchId = tonumber(mapInput.matchid)
@@ -53,7 +57,7 @@ end
 ---@return string|nil
 function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
 	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
-	return (team or {}).side
+	return type(team) == 'table' and team.side or NormalParser.getSide(map, opponentIndex)
 end
 
 ---@param map dota2MatchDataExtended
@@ -61,7 +65,7 @@ end
 ---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
-	if not team then return end
+	if type(team) ~= 'table' then return end
 	if not team.players then return end
 
 	local function mapItem(item)
@@ -111,7 +115,9 @@ end
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
-	if not map.heroVeto then return end
+	if not map.heroVeto then
+		return NormalParser.getHeroPicks(map, opponentIndex)
+	end
 	local teamVeto = map.heroVeto['team' .. opponentIndex] ---@type dota2TeamVeto?
 	if not teamVeto then return end
 	return Array.map(teamVeto.picks or {}, Operator.property('hero'))
@@ -121,14 +127,16 @@ end
 ---@param opponentIndex integer
 ---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
-	if not map.heroVeto then return end
+	if not map.heroVeto then
+		return NormalParser.getHeroBans(map, opponentIndex)
+	end
 	local teamVeto = map.heroVeto['team' .. opponentIndex] ---@type dota2TeamVeto?
 	if not teamVeto then return end
 	return Array.map(teamVeto.bans or {}, Operator.property('hero'))
 end
 
 ---@param map dota2MatchDataExtended
----@return {character: string?, team: integer, type: 'pick'|'ban', vetoNumber: integer}[]|nil
+---@return {character: string?, team: integer, type: 'pick'|'ban', vetoNumber: integer}[]?
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	if not map.heroVeto then return end
 
@@ -161,7 +169,7 @@ end
 ---@return {towers: integer?, barracks: integer?, roshans: integer?}?
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	local team = map['team' .. opponentIndex] ---@type dota2MatchTeam?
-	if not team then return end
+	if type(team) ~= 'table' then return end
 	return {
 		towers = team.towersDestroyed,
 		barracks = team.barracksDestroyed,

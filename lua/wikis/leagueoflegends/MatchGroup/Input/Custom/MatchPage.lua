@@ -7,9 +7,13 @@
 
 local Array = require('Module:Array')
 local Logic = require('Module:Logic')
+local Lua = require('Module:Lua')
 local Operator = require('Module:Operator')
 local Table = require('Module:Table')
 
+local NormalParser = Lua.import('Module:MatchGroup/Input/Custom/Normal')
+
+---@class LeagueOfLegendsMatchPageMapParser: LeagueOfLegendsMapParserInterface
 local CustomMatchGroupInputMatchPage = {}
 
 local ROLE_ORDER = Table.map({
@@ -22,6 +26,8 @@ local ROLE_ORDER = Table.map({
 	return value, idx
 end)
 
+---@param mapInput table
+---@return table
 function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	-- If no matchid is provided, assume this as a normal map
 	if not mapInput or not mapInput.matchid then
@@ -46,22 +52,32 @@ function CustomMatchGroupInputMatchPage.getMap(mapInput)
 	return map
 end
 
+---@param map table
+---@return string?
 function CustomMatchGroupInputMatchPage.getLength(map)
-	if not map.length or not Logic.isNumeric(map.length) then
-		return
+	if not Logic.isNumeric(map.length) then
+		return map.length
 	end
 	-- Convert seconds to minutes and seconds
 	return math.floor(map.length / 60) .. ':' .. string.format('%02d', map.length % 60)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string?
 function CustomMatchGroupInputMatchPage.getSide(map, opponentIndex)
-	return (map['team' .. opponentIndex] or {}).color
+	if type(map['team' .. opponentIndex]) == 'table' then
+		return map['team' .. opponentIndex].color
+	end
+	return NormalParser.getSide(map, opponentIndex)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table[]?
 function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
-	if not team then return end
-	if not team.players then return end
+	if type(team) ~= 'table' then return end
 	return Array.map(team.players, function(player)
 		return {
 			player = player.id,
@@ -80,14 +96,24 @@ function CustomMatchGroupInputMatchPage.getParticipants(map, opponentIndex)
 	end)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroPicks(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
-	if not team then return end
+	if type(team) ~= 'table' then
+		return NormalParser.getHeroPicks(map, opponentIndex)
+	end
 	return Array.map(team.players or {}, Operator.property('champion'))
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return string[]?
 function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
-	if not map.championVeto then return end
+	if not Array.isArray(map.championVeto) then
+		return NormalParser.getHeroBans(map, opponentIndex)
+	end
 
 	local bans = Array.filter(map.championVeto, function(veto)
 		return veto.type == 'ban' and veto.team == opponentIndex
@@ -96,8 +122,10 @@ function CustomMatchGroupInputMatchPage.getHeroBans(map, opponentIndex)
 	return Array.map(bans, Operator.property('champion'))
 end
 
+---@param map table
+---@return table[]?
 function CustomMatchGroupInputMatchPage.getVetoPhase(map)
-	if not map.championVeto then return end
+	if not Array.isArray(map.championVeto) then return end
 	return Array.map(map.championVeto, function(veto)
 		veto.character = veto.champion
 		veto.champion = nil
@@ -105,9 +133,12 @@ function CustomMatchGroupInputMatchPage.getVetoPhase(map)
 	end)
 end
 
+---@param map table
+---@param opponentIndex integer
+---@return table<string, integer>?
 function CustomMatchGroupInputMatchPage.getObjectives(map, opponentIndex)
 	local team = map['team' .. opponentIndex]
-	if not team then return end
+	if type(team) ~= 'table' then return end
 	return {
 		towers = team.towerKills,
 		inhibitors = team.inhibitorKills,
