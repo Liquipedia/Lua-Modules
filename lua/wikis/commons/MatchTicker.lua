@@ -13,6 +13,7 @@ local FnUtil = Lua.import('Module:FnUtil')
 local Game = Lua.import('Module:Game')
 local Logic = Lua.import('Module:Logic')
 local Lpdb = Lua.import('Module:Lpdb')
+local Operator = Lua.import('Module:Operator')
 local Table = Lua.import('Module:Table')
 local Team = Lua.import('Module:Team')
 local Tier = Lua.import('Module:Tier/Utils')
@@ -422,7 +423,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		return {match}
 	end
 
-	return Array.map(match.match2games, function(game, gameIndex)
+	local expandedGames = Array.map(match.match2games, function(game, gameIndex)
 		if config.recent and Logic.isEmpty(game.winner) then
 			return
 		end
@@ -442,7 +443,7 @@ function MatchTicker:expandGamesOfMatch(match)
 		local gameMatch = Table.copy(match)
 		gameMatch.match2games = nil
 		gameMatch.asGame = true
-		gameMatch.asGameIdx = gameIndex
+		gameMatch.asGameIndexes = {gameIndex}
 
 		gameMatch.winner = game.winner
 		gameMatch.date = game.date
@@ -452,6 +453,15 @@ function MatchTicker:expandGamesOfMatch(match)
 			return MatchUtil.enrichGameOpponentFromMatchOpponent(opponent, game.opponents[opponentIndex])
 		end)
 		return gameMatch
+	end)
+
+	return Array.map(Array.groupAdjacentBy(expandedGames, Operator.property('date')), function (gameGroup)
+		if #gameGroup > 1 then
+			local lastIndexes = gameGroup[#gameGroup].asGameIndexes
+			table.insert(gameGroup[1].asGameIndexes, lastIndexes[#lastIndexes])
+		end
+
+		return gameGroup[1]
 	end)
 end
 
@@ -470,7 +480,7 @@ function MatchTicker:sortMatches(matches)
 		if a.match2id ~= b.match2id then
 			return a.match2id < b.match2id
 		end
-		return (a.asGameIdx or 0) < (b.asGameIdx or 0)
+		return ((a.asGameIndexes or {})[1] or 0) < ((b.asGameIndexes or {})[1] or 0)
 	end)
 end
 
