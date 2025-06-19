@@ -5,18 +5,19 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local WeaponIcon = require('Module:WeaponIconPlayer')
-local WeaponNames = mw.loadData('Module:WeaponNames')
 local Lua = require('Module:Lua')
-local Region = require('Module:Region')
-local String = require('Module:StringUtils')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local WeaponIcon = Lua.import('Module:WeaponIconPlayer')
+local WeaponNames = Lua.import('Module:WeaponNames', {loadData = true})
+local Region = Lua.import('Module:Region')
+local String = Lua.import('Module:StringUtils')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_WEAPON = '25x25px'

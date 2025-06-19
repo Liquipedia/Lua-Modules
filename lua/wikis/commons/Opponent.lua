@@ -5,14 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Flags = require('Module:Flags')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local TeamTemplate = require('Module:TeamTemplate')
-local TypeUtil = require('Module:TypeUtil')
+
+local Array = Lua.import('Module:Array')
+local Flags = Lua.import('Module:Flags')
+local Logic = Lua.import('Module:Logic')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local TeamTemplate = Lua.import('Module:TeamTemplate')
+local TypeUtil = Lua.import('Module:TypeUtil')
 
 local PlayerExt = Lua.import('Module:Player/Ext/Custom')
 
@@ -225,6 +226,7 @@ end
 ---It's still a work in progress, it's not fully implemented all cases
 ---@param opponent1 standardOpponent
 ---@param opponent2 standardOpponent
+---@return boolean
 function Opponent.same(opponent1, opponent2)
 	return Opponent.toName(opponent1) == Opponent.toName(opponent2)
 end
@@ -349,7 +351,10 @@ Returns nil if the team template does not exist.
 ---@return string
 function Opponent.toName(opponent)
 	if opponent.type == Opponent.team then
-		return TeamTemplate.getPageName(opponent.template)
+		local name = TeamTemplate.getPageName(opponent.template)
+		-- annos expect a string return, so let it error if we get a nil return
+		assert(name, 'Invalid team template: ' .. (opponent.template or ''))
+		return name
 	elseif Opponent.typeIsParty(opponent.type) then
 		local pageNames = Array.map(opponent.players, function(player)
 			return player.pageName or player.displayName

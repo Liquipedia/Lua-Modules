@@ -37,6 +37,10 @@ return {
 		infoboxPlayer = {
 			autoTeam = true,
 		},
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+			excludeStreamers = true,
+		},
 	},
 	defaultRoundPrecision = 0,
 }

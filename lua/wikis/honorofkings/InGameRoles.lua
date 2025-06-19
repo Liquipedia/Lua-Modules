@@ -5,7 +5,7 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
----@type PersonRoleData
+---@type PersonRoleData[]
 local inGameRoles = {
 	['top'] = {category = 'Top Laners', display = 'Top Lane'},
 	['bottom'] = {category = 'Bottom Laners', display = 'Bottom Laner'},

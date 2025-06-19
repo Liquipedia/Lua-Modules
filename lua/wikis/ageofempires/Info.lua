@@ -114,5 +114,10 @@ return {
 				mode = 'cleanup',
 			},
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
 	},
 }

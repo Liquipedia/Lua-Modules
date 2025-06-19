@@ -43,5 +43,8 @@ return {
 				mode = 'automatic',
 			},
 		},
+		teamRosterNavbox = {
+			hideOverview = true,
+		},
 	},
 }

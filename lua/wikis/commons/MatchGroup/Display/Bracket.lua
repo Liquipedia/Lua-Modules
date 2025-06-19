@@ -5,20 +5,21 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local DisplayUtil = require('Module:DisplayUtil')
-local FnUtil = require('Module:FnUtil')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MathUtil = require('Module:MathUtil')
-local StringUtils = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local DisplayUtil = Lua.import('Module:DisplayUtil')
+local FnUtil = Lua.import('Module:FnUtil')
+local Logic = Lua.import('Module:Logic')
+local MathUtil = Lua.import('Module:MathUtil')
+local StringUtils = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 local DisplayHelper = Lua.import('Module:MatchGroup/Display/Helper')
 local MatchGroupUtil = Lua.import('Module:MatchGroup/Util/Custom')
 local WikiSpecific = Lua.import('Module:Brkts/WikiSpecific')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 
@@ -587,7 +588,7 @@ function BracketDisplay.Match(props)
 		local matchSummaryNode = DisplayUtil.TryPureComponent(props.MatchSummaryContainer, {
 			bracketId = bracketId,
 			matchId = props.match.matchId,
-		}, require('Module:Error/Display').ErrorDetails)
+		}, Lua.import('Module:Error/Display').ErrorDetails)
 			:addClass('brkts-match-info-popup')
 
 		local matchInfoIconNode = mw.html.create('div'):addClass('brkts-match-info-icon')

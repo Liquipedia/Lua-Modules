@@ -5,7 +5,9 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Image = require('Module:Image')
+local Lua = require('Module:Lua')
+
+local Image = Lua.import('Module:Image')
 
 local MatchPlacement = {}
 

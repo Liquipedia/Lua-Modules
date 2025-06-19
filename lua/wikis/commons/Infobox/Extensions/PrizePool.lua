@@ -5,13 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Currency = require('Module:Currency')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local Math = require('Module:MathUtil')
-local String = require('Module:StringUtils')
-local Variables = require('Module:Variables')
+local Lua = require('Module:Lua')
+
+local Class = Lua.import('Module:Class')
+local Currency = Lua.import('Module:Currency')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local Math = Lua.import('Module:MathUtil')
+local String = Lua.import('Module:StringUtils')
+local Variables = Lua.import('Module:Variables')
 
 local PrizePoolCurrency = {}
 

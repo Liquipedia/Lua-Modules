@@ -5,20 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local ChampionNames = mw.loadData('Module:ChampionNames')
-local CharacterIcon = require('Module:CharacterIcon')
 local Lua = require('Module:Lua')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Team = require('Module:Team')
-local Template = require('Module:Template')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local ChampionNames = Lua.import('Module:ChampionNames', {loadData = true})
+local CharacterIcon = Lua.import('Module:CharacterIcon')
+local Logic = Lua.import('Module:Logic')
+local Page = Lua.import('Module:Page')
+local PlayerIntroduction = Lua.import('Module:PlayerIntroduction/Custom')
+local String = Lua.import('Module:StringUtils')
+local Team = Lua.import('Module:Team')
+local Template = Lua.import('Module:Template')
 
 local Injector = Lua.import('Module:Widget/Injector')
 local Player = Lua.import('Module:Infobox/Person')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 
 local SIZE_CHAMPION = '25x25px'
@@ -30,9 +33,40 @@ local CustomInjector = Class.new(Injector)
 ---@return Html
 function CustomPlayer.run(frame)
 	local player = CustomPlayer(frame)
+	local args = player.args
 	player:setWidgetInjector(CustomInjector(player))
 
-	return player:createInfobox()
+	local builtInfobox = player:createInfobox()
+
+	local autoPlayerIntro = ''
+	if Logic.readBool((args.autoPI or ''):lower()) then
+		autoPlayerIntro = PlayerIntroduction.run{
+			player = player.pagename,
+			team = args.team,
+			name = args.romanized_name or args.name,
+			first_name = args.first_name,
+			last_name = args.last_name,
+			status = args.status,
+			type = player:getPersonType(args).store,
+			roles = player._getKeysOfRoles(player.roles),
+			id = args.id,
+			idIPA = args.idIPA,
+			idAudio = args.idAudio,
+			birthdate = player.age.birthDateIso,
+			deathdate = player.age.deathDateIso,
+			nationality = args.country,
+			nationality2 = args.country2,
+			nationality3 = args.country3,
+			subtext = args.subtext,
+			freetext = args.freetext,
+			convert_role = true,
+			show_role = true,
+		}
+	end
+
+	return mw.html.create()
+		:node(builtInfobox)
+		:node(autoPlayerIntro)
 end
 
 ---@param id string

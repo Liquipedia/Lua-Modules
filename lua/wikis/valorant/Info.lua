@@ -51,5 +51,10 @@ return {
 				mode = 'automatic',
 			},
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
 	},
 }

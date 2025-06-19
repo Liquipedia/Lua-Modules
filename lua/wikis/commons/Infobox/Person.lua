@@ -5,17 +5,18 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Json = require('Module:Json')
 local Lua = require('Module:Lua')
-local Logic = require('Module:Logic')
-local Namespace = require('Module:Namespace')
-local NameOrder = require('Module:NameOrder')
-local Page = require('Module:Page')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
-local Variables = require('Module:Variables')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Json = Lua.import('Module:Json')
+local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
+local NameOrder = Lua.import('Module:NameOrder')
+local Page = Lua.import('Module:Page')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
+local Variables = Lua.import('Module:Variables')
 
 local AgeCalculation = Lua.import('Module:AgeCalculation')
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
@@ -28,7 +29,7 @@ local Region = Lua.import('Module:Region')
 
 local Roles = Lua.import('Module:Roles')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Header = Widgets.Header
 local Title = Widgets.Title
 local Cell = Widgets.Cell
@@ -38,12 +39,15 @@ local Customizable = Widgets.Customizable
 local TeamHistoryWidget = Lua.import('Module:Widget/Infobox/TeamHistory')
 
 ---@class PersonRoleData
----@field category string?
----@field display string?
+---@field category string
+---@field display string
+
+---@class PersonRoleDataExtended: PersonRoleData
+---@field key string?
 
 ---@class Person: BasicInfobox
 ---@field locations string[]
----@field roles PersonRoleData[]
+---@field roles PersonRoleDataExtended[]
 local Person = Class.new(BasicInfobox)
 
 local Language = mw.getContentLanguage()
@@ -311,17 +315,7 @@ function Person:_setLpdbData(args, links, status, personType)
 		teamTemplate = teamRaw.templatename
 	end
 
-	local roleStorageValue = function(roleData)
-		if not roleData then return end
-		local key = Table.getKeyOfValue(Roles.All, roleData)
-		if not key then
-			-- Backwards compatibility for old roles
-			return roleData.display or roleData.category or ''
-		end
-		return key
-	end
-
-	local rolesStorageKey = Array.map(self.roles, roleStorageValue)
+	local rolesStorageKey = Person._getKeysOfRoles(self.roles)
 
 	local lpdbData = {
 		id = args.id,
@@ -411,7 +405,8 @@ function Person:getPersonType(args)
 	local playerValue = {store = 'player', category = 'Player'}
 	local staffValue = {store = 'staff', category = 'Staff'}
 
-	if self.roles[1] and Table.includes(Roles.StaffRoles, self.roles[1]) then
+	local roles = Person._getKeysOfRoles(self.roles)
+	if Roles.StaffRoles[roles[1]] then
 		return staffValue
 	end
 	return playerValue
@@ -509,12 +504,22 @@ function Person:displayLocations()
 	end)
 end
 
+---@param roles PersonRoleDataExtended[]
+---@return string[]
+function Person._getKeysOfRoles(roles)
+	return Array.map(roles, function(roleData)
+		-- With backwards compatibility for old roles, otherwise only key would be needed
+		return roleData.key or roleData.display or roleData.category or ''
+	end)
+end
+
 ---@param roleKey string
----@return PersonRoleData?
+---@return PersonRoleDataExtended?
 function Person._createRoleData(roleKey)
 	if String.isEmpty(roleKey) then return nil end
 
-	local roleData = Roles.All[roleKey:lower()]
+	local key = roleKey:lower()
+	local roleData = Roles.All[key]
 
 	--- Backwards compatibility for old roles
 	if not roleData then
@@ -526,7 +531,11 @@ function Person._createRoleData(roleKey)
 		}
 	end
 
-	return roleData
+	return {
+		display = roleData.display,
+		category = roleData.category,
+		key = key,
+	}
 end
 
 ---@param roleData PersonRoleData?

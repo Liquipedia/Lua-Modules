@@ -5,16 +5,17 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
-local Links = require('Module:Links')
 local Lua = require('Module:Lua')
-local Namespace = require('Module:Namespace')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Links = Lua.import('Module:Links')
+local Namespace = Lua.import('Module:Namespace')
+local Table = Lua.import('Module:Table')
 
 local BasicInfobox = Lua.import('Module:Infobox/Basic')
 local Flags = Lua.import('Module:Flags')
 
-local Widgets = require('Module:Widget/All')
+local Widgets = Lua.import('Module:Widget/All')
 local Cell = Widgets.Cell
 local Header = Widgets.Header
 local Title = Widgets.Title

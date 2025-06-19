@@ -68,6 +68,13 @@ return {
 				mode = 'manualPrio',
 			},
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+				playerResults = 'Player Results',
+			},
+			hideOrg = true,
+		},
 	},
 	opponentLibrary = 'Opponent/Starcraft',
 	opponentDisplayLibrary = 'OpponentDisplay/Starcraft',

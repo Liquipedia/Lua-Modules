@@ -5,22 +5,23 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Abbreviation = require('Module:Abbreviation')
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local MatchPlacement = require('Module:Match/Placement')
-local Ordinal = require('Module:Ordinal')
-local PlacementInfo = require('Module:Placement')
-local String = require('Module:StringUtils')
-local Table = require('Module:Table')
+
+local Abbreviation = Lua.import('Module:Abbreviation')
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Logic = Lua.import('Module:Logic')
+local MatchPlacement = Lua.import('Module:Match/Placement')
+local Ordinal = Lua.import('Module:Ordinal')
+local PlacementInfo = Lua.import('Module:Placement')
+local String = Lua.import('Module:StringUtils')
+local Table = Lua.import('Module:Table')
 
 ---@class PrizePoolPlacement: BasePlacement
 ---@field opponents BasePlacementOpponent[]
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local DASH = '&#045;'

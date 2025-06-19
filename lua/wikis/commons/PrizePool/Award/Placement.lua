@@ -5,13 +5,14 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local BasePlacement = Lua.import('Module:PrizePool/Placement/Base')
 
-local OpponentLibrary = require('Module:OpponentLibraries')
+local OpponentLibrary = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibrary.Opponent
 
 local _tbd_index = 0

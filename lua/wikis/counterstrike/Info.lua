@@ -125,6 +125,11 @@ local infoData = {
 			gameScoresIfBo1 = true,
 			gameNoun = 'map',
 		},
+		teamRosterNavbox = {
+			links = {
+				playedMatches = 'Matches',
+			},
+		},
 	},
 }
 

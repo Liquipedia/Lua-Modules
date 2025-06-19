@@ -40,5 +40,8 @@ return {
 				mode = 'merge',
 			},
 		},
+		teamRosterNavbox = {
+			hidePlayedMatches = true,
+		},
 	},
 }
