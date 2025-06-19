@@ -53,7 +53,6 @@ function CustomItem.run(frame)
 	local item = CustomItem(frame)
 	local args = item.args
 	args.release = CustomItem._getVersionDisplay(args.release --[[@as string?]])
-	item.rarities = item:getAllArgsForBase(args, 'rarity')
 	if Logic.readBool(args['generate description']) then
 		item:_description()
 	end
@@ -114,7 +113,7 @@ end
 ---@param args table
 ---@return string[]
 function CustomItem:getWikiCategories(args)
-	return Array.map(self.rarities, function(rarity)
+	return Array.map(self:getAllArgsForBase(args, 'rarity'), function(rarity)
 		return rarity .. ' Items'
 	end)
 end
