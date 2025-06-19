@@ -5,13 +5,15 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local MasterData = mw.loadData('Module:Flags/MasterData')
-local Template = require('Module:Template')
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
-local String = require('Module:StringUtils')
-local FnUtil = require('Module:FnUtil')
-local Class = require('Module:Class')
+local Lua = require('Module:Lua')
+
+local MasterData = Lua.import('Module:Flags/MasterData', {loadData = true})
+local Template = Lua.import('Module:Template')
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
+local String = Lua.import('Module:StringUtils')
+local FnUtil = Lua.import('Module:FnUtil')
+local Class = Lua.import('Module:Class')
 
 local Flags = {}
 

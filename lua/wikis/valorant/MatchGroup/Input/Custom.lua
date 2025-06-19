@@ -8,6 +8,7 @@
 local Array = require('Module:Array')
 local AgentNames = require('Module:AgentNames')
 local FnUtil = require('Module:FnUtil')
+local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
 local Table = require('Module:Table')
 
@@ -114,6 +115,16 @@ function MatchFunctions.getExtraData(match, games, opponents)
 		mapveto = MatchGroupInputUtil.getMapVeto(match),
 		mvp = MatchGroupInputUtil.readMvp(match, opponents),
 	}
+end
+
+---@param match table
+---@param games table[]
+---@return string?
+function MatchFunctions.getPatch(match, games)
+	return Logic.emptyOr(
+		match.patch,
+		#games > 0 and games[1].patch or nil
+	)
 end
 
 --

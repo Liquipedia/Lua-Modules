@@ -8,15 +8,16 @@
 -- Holds DisplayComponents for the MatchTicker module
 -- It contains the new html structure intented to be use for the new Main Page
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
-local Countdown = require('Module:Countdown')
-local DateExt = require('Module:Date/Ext')
-local Logic = require('Module:Logic')
 local Lua = require('Module:Lua')
-local Timezone = require('Module:Timezone')
-local StreamLinks = require('Module:Links/Stream')
-local VodLink = require('Module:VodLink')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Countdown = Lua.import('Module:Countdown')
+local DateExt = Lua.import('Module:Date/Ext')
+local Logic = Lua.import('Module:Logic')
+local Timezone = Lua.import('Module:Timezone')
+local StreamLinks = Lua.import('Module:Links/Stream')
+local VodLink = Lua.import('Module:VodLink')
 
 local DefaultMatchTickerDisplayComponents = Lua.import('Module:MatchTicker/DisplayComponents')
 local HighlightConditions = Lua.import('Module:HighlightConditions')
@@ -24,7 +25,7 @@ local HtmlWidgets = Lua.import('Module:Widget/Html/All')
 local Title = Lua.import('Module:Widget/Tournament/Title')
 local MatchPageButton = Lua.import('Module:Widget/Match/PageButton')
 
-local OpponentLibraries = require('Module:OpponentLibraries')
+local OpponentLibraries = Lua.import('Module:OpponentLibraries')
 local Opponent = OpponentLibraries.Opponent
 local OpponentDisplay = OpponentLibraries.OpponentDisplay
 

@@ -5,10 +5,11 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Array = require('Module:Array')
-local Class = require('Module:Class')
 local Lua = require('Module:Lua')
-local Table = require('Module:Table')
+
+local Array = Lua.import('Module:Array')
+local Class = Lua.import('Module:Class')
+local Table = Lua.import('Module:Table')
 
 local CustomData = Lua.requireIfExists('Module:Links/CustomData', {loadData = true}) or {}
 
@@ -688,7 +689,7 @@ function Links.makeFullLinksForTableItems(links, variant, fallbackToBase)
 end
 
 --remove appended number
---needed because the link icons require e.g. 'esl' instead of 'esl2'
+--needed because the link icons Lua.import e.g. 'esl' instead of 'esl2'
 ---@param key string
 ---@return string
 function Links.removeAppendedNumber(key)

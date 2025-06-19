@@ -5,8 +5,10 @@
 -- Please see https://github.com/Liquipedia/Lua-Modules to contribute
 --
 
-local Logic = require('Module:Logic')
-local Table = require('Module:Table')
+local Lua = require('Module:Lua')
+
+local Logic = Lua.import('Module:Logic')
+local Table = Lua.import('Module:Table')
 
 local TableFormatter = {}
 

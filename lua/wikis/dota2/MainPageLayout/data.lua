@@ -30,8 +30,9 @@ local ABOUT_BODY = 'We are the largest Dota 2 wiki that anyone can edit, maintai
 
 ---@param link string
 ---@param displayName string
+---@param hubIcon string
 ---@return Widget
-local function createHubButton(link, displayName)
+local function createHubButton(link, displayName, hubIcon)
 	return Button{
 		link = link,
 		title = 'Click here to get to the ' .. displayName:lower(),
@@ -39,16 +40,16 @@ local function createHubButton(link, displayName)
 		children = {
 			IconFa{
 				additionalClasses = { 'wiki-color-dark' },
-				iconName = 'hub'
+				iconName = hubIcon,
 			},
 			' View ' .. displayName
 		}
 	}
 end
 
-local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page')
-local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub')
-local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub')
+local MAIN_PAGE_BUTTON = createHubButton('Main Page', 'Main Page', 'main_hub')
+local ESPORTS_HUB_BUTTON = createHubButton('Portal:Esports', 'Esports Hub', 'esports_hub')
+local GAME_HUB_BUTTON = createHubButton('Portal:Game', 'Game Hub', 'game_hub')
 
 local CONTENT = {
 	aboutMain = {

@@ -7,7 +7,9 @@
 
 local WarningBox = {}
 
-local Array = require('Module:Array')
+local Lua = require('Module:Lua')
+
+local Array = Lua.import('Module:Array')
 
 ---@param text string|number
 ---@return Html
