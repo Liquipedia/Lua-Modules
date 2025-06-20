@@ -11,6 +11,7 @@ local Array = Lua.import('Module:Array')
 local Class = Lua.import('Module:Class')
 local Json = Lua.import('Module:Json')
 local Logic = Lua.import('Module:Logic')
+local Namespace = Lua.import('Module:Namespace')
 local Table = Lua.import('Module:Table')
 local Variables = Lua.import('Module:Variables')
 
@@ -106,7 +107,8 @@ function NavBox:_determineCollapsedState(collapsedInput)
 		return true
 	end
 
-	return NavBox._getNumberOfChildren(self.props) > 3
+	return (not Namespace.isMain() and not Namespace.isUser())
+		or NavBox._getNumberOfChildren(self.props) > 3
 end
 
 ---@private
