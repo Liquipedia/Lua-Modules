@@ -124,16 +124,18 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 				link = pageName,
 				children = {'Q' .. currentQuarter},
 			})
+			return children
 		end
 
-		local timestamp = DateExt.readTimestamp(currentMonth .. ' 1970') --[[@as integer]]
-		local monthAbbreviation = DateExt.formatTimestamp('M', timestamp)
+		local monthAbbreviation = TransferNavBox._getMonthAbbreviation(month)
+		if not monthAbbreviation then return children end
+
 		pageName = pageName:gsub('/[^/]*', '/' .. monthAbbreviation)
 		table.insert(children.child0, 1, Link{
 			link = pageName,
 			children = {monthAbbreviation},
 		})
-
+		return children
 	end
 
 	if currentYear == firstEntry.year then
@@ -215,6 +217,14 @@ function TransferNavBox._readQuarterOrMonth(pageName)
 	end
 	-- try to extract month
 	local month = pageName:match('.*[tT]ransfers/%d%d%d%d/(.*)')
+
+	return TransferNavBox._getMonthAbbreviation(month)
+end
+
+---@private
+---@param month string?
+---@return string?
+function TransferNavBox._getMonthAbbreviation(month)
 	if Logic.isEmpty(month) then return end
 
 	-- we have to account for transfer pages not fitting the format we will ignore those and throw them away
