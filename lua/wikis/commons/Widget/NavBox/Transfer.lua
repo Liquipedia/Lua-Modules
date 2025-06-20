@@ -12,6 +12,7 @@ local Class = Lua.import('Module:Class')
 local DateExt = Lua.import('Module:Date/Ext')
 local Logic = Lua.import('Module:Logic')
 local Operator = Lua.import('Module:Operator')
+local Ordinal = Lua.import('Module:Ordinal')
 local Table = Lua.import('Module:Table')
 
 local Widget = Lua.import('Module:Widget')
@@ -46,7 +47,7 @@ function TransferNavBox:render()
 				children = {abbreviation}
 			}
 		end)
-				
+
 		if Logic.isNotEmpty(childData) then
 			childData.name = year
 			collapsedChildren['child' .. childIndex] = childData
@@ -100,27 +101,39 @@ function TransferNavBox:render()
 end
 
 ---@private
----@param children table<string, table<string|integer, string|Widget>>
+---@param children table<string, table<string|integer, string|Widget|integer>>
 ---@param firstEntry {pageName: string, year: integer, abbreviation: string}
+---@return table<string, table<string|integer, string|Widget|integer>>
 function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
-	local currentYear = DateExt. -- get current year
-	local currentQuarter = DateExt. -- get current quarter
-	local currentMonth -- get it
+	local currentYear = DateExt.getYearOf() --[[@as integer]]
+	local currentQuarter = DateExt.quarterOf{}
+	local currentMonth = DateExt.getMonthOf()
 	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
-	local month -- get it
+	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(firstEntry.abbreviation .. ' 1970') or nil
+	local month = monthTimeStamp and DateExt.formatTimestamp('n', monthTimeStamp) or nil
 
 	local addCurrent = function()
+		if not month and not quarter then return children end
+		local pageName = firstEntry.pageName
+			:gsub(firstEntry.year, currentYear)
+
 		if quarter then
-			local ordinal = --get ordinal of currentQuarter
-			local pageName = firstEntry.pageName
-				:gsub(firstEntry.year, currentYear)
-				:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%1')
-			return Link{
+			local ordinal = currentQuarter .. Ordinal.suffix(currentQuarter)
+			pageName = pageName:gsub('(%d)%a%a(_[qQ]uarter)', ordinal .. '%1')
+			table.insert(children.child0, 1, Link{
 				link = pageName,
 				children = {'Q' .. currentQuarter},
-			}
+			})
 		end
-		-- todo: month case handling
+
+		local timestamp = DateExt.readTimestamp(currentMonth .. ' 1970') --[[@as integer]]
+		local monthAbbreviation = DateExt.formatTimestamp('M', timestamp)
+		pageName = pageName:gsub('/[^/]*', '/' .. monthAbbreviation)
+		table.insert(children.child0, 1, Link{
+			link = pageName,
+			children = {monthAbbreviation},
+		})
+
 	end
 
 	if currentYear == firstEntry.year then
@@ -173,7 +186,7 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 			elseif pageName:match('[tT]ransfers/' .. year .. '$') then
 				table.insert(yearly, toDisplay(pageName, year))
 				if not latestYear then
-					latestYear = {year = year, pageName = pageName}
+					latestYear = {year = tonumber(year), pageName = pageName}
 				end
 			else
 				table.insert(misc, pageName)
@@ -181,7 +194,7 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 		end)
 	end
 
-	local currentYear = DateExt. -- get current year
+	local currentYear = DateExt.getYearOf() --[[@as integer]]
 	if latestYear and currentYear == (latestYear.year + 1) then
 		local pageName = latestYear.pageName:gsub(latestYear.year, currentYear)
 		table.insert(yearly, 1, toDisplay(pageName, currentYear))
