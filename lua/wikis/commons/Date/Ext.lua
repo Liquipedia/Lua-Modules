@@ -183,17 +183,17 @@ function DateExt.quarterOf(props)
 end
 
 ---@param date string|integer|osdateparam?
----@return integer?
+---@return integer
 function DateExt.getYearOf(date)
 	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
-	return tonumber(DateExt.formatTimestamp('Y', timestamp))
+	return tonumber(DateExt.formatTimestamp('Y', timestamp)) --[[@as integer]]
 end
 
 ---@param date string|integer|osdateparam?
----@return integer?
+---@return integer
 function DateExt.getMonthOf(date)
 	local timestamp = DateExt.readTimestamp(date) or DateExt.getCurrentTimestamp()
-	return tonumber(DateExt.formatTimestamp('n', timestamp))
+	return tonumber(DateExt.formatTimestamp('n', timestamp)) --[[@as integer]]
 end
 
 return DateExt

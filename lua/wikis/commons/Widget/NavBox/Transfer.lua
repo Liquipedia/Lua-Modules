@@ -105,7 +105,7 @@ end
 ---@param firstEntry {pageName: string, year: integer, abbreviation: string}
 ---@return table<string, table<string|integer, string|Widget|integer>>
 function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
-	local currentYear = DateExt.getYearOf() --[[@as integer]]
+	local currentYear = DateExt.getYearOf()
 	local currentQuarter = DateExt.quarterOf{}
 	local currentMonth = DateExt.getMonthOf()
 	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
@@ -196,7 +196,7 @@ function TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
 		end)
 	end
 
-	local currentYear = DateExt.getYearOf() --[[@as integer]]
+	local currentYear = DateExt.getYearOf()
 	if latestYear and currentYear == (latestYear.year + 1) then
 		local pageName = latestYear.pageName:gsub(latestYear.year, currentYear)
 		table.insert(yearly, 1, toDisplay(pageName, currentYear))
