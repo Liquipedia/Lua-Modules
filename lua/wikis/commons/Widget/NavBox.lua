@@ -107,8 +107,8 @@ function NavBox:_determineCollapsedState(collapsedInput)
 		return true
 	end
 
-	return (not Namespace.isMain() and not Namespace.isUser())
-		or NavBox._getNumberOfChildren(self.props) > 3
+	return (Namespace.isMain() or Namespace.isUser())
+		and NavBox._getNumberOfChildren(self.props) > 3
 end
 
 ---@private
