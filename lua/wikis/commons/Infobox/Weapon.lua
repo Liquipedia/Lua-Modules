@@ -91,6 +91,9 @@ function Weapon:createInfobox()
 				Cell{name = 'Rate of Fire', content = {args.rateoffire}}
 			}
 		},
+		Cell{name = 'Accuracy', content = {args.accuracy}},
+		Cell{name = 'Range', content = {args.range}},
+		Cell{name = 'Unique Characteristics', content = {args.charact}},
 		Cell{name = 'Firing Mode', content = {args.firemode}},
 		Cell{name = 'Movement Speed', content = {args['movement speed']}},
 		Customizable{
