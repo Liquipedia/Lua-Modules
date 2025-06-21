@@ -78,8 +78,6 @@ function CustomInjector:parse(id, widgets)
 			Title{children = 'Tags'},
 			Center{children = {CustomItem._getTagsDisplay(args.tags)}}
 		}
-	elseif Table.includes({'attributes', 'ability', 'maps', 'recipe'}, id) then
-		return {}
 	end
 
 	return widgets
