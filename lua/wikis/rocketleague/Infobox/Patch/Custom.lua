@@ -10,7 +10,7 @@ local Lua = require('Module:Lua')
 local Class = Lua.import('Module:Class')
 local Patch = Lua.import('Module:Infobox/Patch')
 
----@class SquadronsPatchInfobox: PatchInfobox
+---@class RockatleaguePatchInfobox: PatchInfobox
 local CustomPatch = Class.new(Patch)
 
 ---@param frame Frame
@@ -23,14 +23,24 @@ end
 ---@param args table
 ---@return {previous: string?, next: string?}
 function CustomPatch:getChronologyData(args)
-	---@param prefix string
+	---@param input string?
 	---@return string?
-	local buildLink = function(prefix)
-		if not args[prefix] then return end
-		local link = args[prefix .. ' link'] or (args[prefix] .. ' Patch')
-		return link .. '|' .. args[prefix]
+	local makeLink = function(input)
+		return input and ('Version ' .. input .. '|V' .. input) or nil
 	end
-	return {previous = buildLink('previous'), next = buildLink('next')}
+	return {previous = makeLink(args.previous), next = makeLink(args.next)}
+end
+
+---@param args table
+---@return string[]
+function CustomPatch:getWikiCategories(args)
+	return {'Versions'}
+end
+
+---@param args table
+---@return string
+function Patch:getInformationType(args)
+	return 'Version'
 end
 
 return CustomPatch

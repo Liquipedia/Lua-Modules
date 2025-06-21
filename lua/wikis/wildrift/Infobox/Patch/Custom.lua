@@ -22,7 +22,7 @@ end
 
 ---@param args table
 ---@return {previous: string?, next: string?}
-function Patch:getChronologyData(args)
+function CustomPatch:getChronologyData(args)
 	---@param input string?
 	---@return string?
 	local prefixIfExists = function(input)

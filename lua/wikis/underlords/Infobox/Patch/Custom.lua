@@ -22,7 +22,7 @@ end
 
 ---@param args table
 ---@return {previous: string?, next: string?}
-function Patch:getChronologyData(args)
+function CustomPatch:getChronologyData(args)
 	---@param prefix string
 	---@return string?
 	local buildLink = function(prefix)
