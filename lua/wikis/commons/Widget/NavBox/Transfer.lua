@@ -109,6 +109,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 	local currentQuarter = DateExt.quarterOf{}
 	local currentMonth = DateExt.getMonthOf()
 	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
+	local monthAbbreviation = firstEntry.abbreviation:match('^(.*?) ?#?%d?$')
 	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(firstEntry.abbreviation .. ' 1970') or nil
 	local month = monthTimeStamp and DateExt.formatTimestamp('n', monthTimeStamp) or nil
 
@@ -216,9 +217,10 @@ function TransferNavBox._readQuarterOrMonth(pageName)
 		return 'Q' .. quarter
 	end
 	-- try to extract month
-	local month = pageName:match('.*[tT]ransfers/%d%d%d%d/(.*)')
+	local month, appendix = pageName:match('.*[tT]ransfers/%d%d%d%d/(.*?)/?(%d?)$')
 
-	return TransferNavBox._getMonthAbbreviation(month)
+	local abbreviation = TransferNavBox._getMonthAbbreviation(month)
+	return abbreviation and (abbreviation .. '#' .. (appendix or '')) or nil
 end
 
 ---@private
