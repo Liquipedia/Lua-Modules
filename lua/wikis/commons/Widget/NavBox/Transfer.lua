@@ -109,8 +109,8 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 	local currentQuarter = DateExt.quarterOf{}
 	local currentMonth = DateExt.getMonthOf()
 	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
-	local monthAbbreviation = firstEntry.abbreviation:match('^(.*?) ?#?%d?$')
-	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(monthAbbreviation .. ' 1970') or nil
+	local origMonthAbbreviation = firstEntry.abbreviation:match('^(.*?) ?#?%d?$')
+	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(origMonthAbbreviation .. ' 1970') or nil
 	local month = monthTimeStamp and DateExt.formatTimestamp('n', monthTimeStamp) or nil
 
 	local addCurrent = function()
