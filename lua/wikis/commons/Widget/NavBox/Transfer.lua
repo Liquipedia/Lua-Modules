@@ -109,7 +109,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 	local currentQuarter = DateExt.quarterOf{}
 	local currentMonth = DateExt.getMonthOf()
 	local quarter = tonumber((firstEntry.abbreviation:match('Q(%d)')))
-	local origMonthAbbreviation = firstEntry.abbreviation:match('^(.*?) ?#?%d?$')
+	local origMonthAbbreviation = firstEntry.abbreviation:gsub('#.*', '')
 	local monthTimeStamp = (not quarter) and DateExt.readTimestamp(origMonthAbbreviation .. ' 1970') or nil
 	local month = monthTimeStamp and DateExt.formatTimestamp('n', monthTimeStamp) or nil
 
@@ -131,7 +131,7 @@ function TransferNavBox._checkForCurrentQuarterOrMonth(children, firstEntry)
 		local monthAbbreviation = TransferNavBox._getMonthAbbreviation(month)
 		if not monthAbbreviation then return children end
 
-		pageName = pageName:gsub('/[^/]*', '/' .. monthAbbreviation)
+		pageName = pageName:gsub('/[^/]*/?%d?$', '/' .. monthAbbreviation)
 		table.insert(children.child0, 1, Link{
 			link = pageName,
 			children = {monthAbbreviation},
@@ -217,10 +217,14 @@ function TransferNavBox._readQuarterOrMonth(pageName)
 		return 'Q' .. quarter
 	end
 	-- try to extract month
-	local month, appendix = pageName:match('.*[tT]ransfers/%d%d%d%d/(.*?)/?(%d?)$')
+	local month = pageName:match('.*[tT]ransfers/%d%d%d%d/(.*)$')
+	if not month then return end
+	local appendix = month:match('/(%d)$')
+	month = month:gsub('/%d$', '')
 
 	local abbreviation = TransferNavBox._getMonthAbbreviation(month)
-	return abbreviation and (abbreviation .. '#' .. (appendix or '')) or nil
+	if not abbreviation then return end
+	return table.concat({abbreviation, appendix}, '#')
 end
 
 ---@private
