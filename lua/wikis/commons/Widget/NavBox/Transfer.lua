@@ -31,13 +31,21 @@ function TransferNavBox:render()
 	local miscPages = Table.extract(pagesByYear, 'misc')
 	---@cast pagesByYear table<integer, string[]>
 
+	local remainingPagesByYear = {}
+
 	local firstEntry
 
 	for year, pages in Table.iter.spairs(pagesByYear, TransferNavBox._sortByYear) do
 		---@type table
 		local childData = Array.map(pages, function(pageName)
 			local abbreviation = TransferNavBox._readQuarterOrMonth(pageName)
-			if not abbreviation then return end
+			if not abbreviation then
+				if not remainingPagesByYear[year] then
+					remainingPagesByYear[year] = {}
+				end
+				table.insert(remainingPagesByYear[year], pageName)
+				return
+			end
 			if not firstEntry then
 				firstEntry = {pageName = pageName, year = year, abbreviation = abbreviation}
 			end
@@ -59,7 +67,7 @@ function TransferNavBox:render()
 		collapsedChildren = TransferNavBox._checkForCurrentQuarterOrMonth(collapsedChildren, firstEntry)
 	end
 
-	local unsorted, unsourced, yearly, additionalMisc = TransferNavBox._getUnsortedUnsourcedYearly(pagesByYear)
+	local unsorted, unsourced, yearly, additionalMisc = TransferNavBox._getUnsortedUnsourcedYearly(remainingPagesByYear)
 	if Logic.isNotEmpty(unsorted) then
 		collapsedChildren['child' .. childIndex] = Table.merge(unsorted, {name = 'Unsorted'})
 		childIndex = childIndex + 1
