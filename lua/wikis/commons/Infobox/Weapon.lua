@@ -49,7 +49,7 @@ function Weapon:createInfobox()
 		},
 		Center{children = {args.caption}},
 		Title{children = (args.informationType or 'Weapon') .. ' Information'},
-		Cell{name = 'Other', children = {args['other names']}},
+		Cell{name = 'Other', children = {args.othernames}},
 		Cell{
 			name = 'Class',
 			children = self:getAllArgsForBase(args, 'class', {makeLink = not Logic.readBool(args.disableClassLink)}),
@@ -74,7 +74,7 @@ function Weapon:createInfobox()
 			id = 'damage',
 			children = {
 				Cell{name = 'Base Damage', children = {args.damage}},
-				Cell{name = 'Armor penetration', children = {args['armor penetration']}},
+				Cell{name = 'Armor penetration', children = {args.armorpenetration}},
 			},
 		},
 		Customizable{
@@ -101,7 +101,7 @@ function Weapon:createInfobox()
 		Cell{name = 'Range', children = {args.range}},
 		Cell{name = 'Unique Characteristics', children = {args.charact}},
 		Cell{name = 'Firing Mode', children = self:getAllArgsForBase(args, 'firemode')},
-		Cell{name = 'Movement Speed', children = {args['movement speed']}},
+		Cell{name = 'Movement Speed', children = {args.movementspeed}},
 		Customizable{
 			id = 'side',
 			children = {
