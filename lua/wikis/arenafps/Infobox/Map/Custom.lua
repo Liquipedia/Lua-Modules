@@ -53,7 +53,7 @@ function CustomInjector:parse(widgetId, widgets)
 				classes = {'infobox-image'},
 				children = {WidgetImage{
 					imageLight = args.minimap,
-					size = '600px',
+					size = '350px',
 					alignment = 'center',
 				}}
 			} or nil
