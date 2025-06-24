@@ -48,7 +48,7 @@ function CustomInjector:parse(id, widgets)
 			Cell{name = 'Tag', children = {args.tag}},
 			Cell{name = 'Tag', children = Array.map(caller:getAllArgsForBase(args, 'color'), function(color)
 				return Template.safeExpand(mw.getCurrentFrame(), 'Color box', {color})
-			end)},
+			end), options = {separator = ' '}},
 		}
 	end
 	return widgets
