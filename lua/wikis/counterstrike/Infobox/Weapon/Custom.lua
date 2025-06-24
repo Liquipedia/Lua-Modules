@@ -44,7 +44,7 @@ function CustomInjector:parse(id, widgets)
 	local args = caller.args
 
 	if id == 'custom' then
-		WidgetUtil.collect(
+		return WidgetUtil.collect(
 			widgets,
 			Cell{name = 'Recoil control', content = {args['recoil control']}},
 			Cell{name = 'Accurate range', content = {args['accurate range'] and (args['accurate range'] .. 'm') or nil}},
@@ -64,13 +64,12 @@ function CustomWeapon:_achievementsDisplay()
 	local args = self.args
 	local achievements = Array.mapIndexes(function(index)
 		local prefix = 'achievement'  .. index
-		if (not args[prefix]) or (not args[prefix .. 'image']) then
-			return WidgetImage{
-				imageLight = args[prefix .. 'image'],
-				link = args[prefix .. 'link'] or '',
-				size = '35px',
-			}
-		end
+		if (not args[prefix]) or (not args[prefix .. 'image']) then return end
+		return WidgetImage{
+			imageLight = args[prefix .. 'image'],
+			link = args[prefix .. 'link'] or '',
+			size = '35px',
+		}
 	end)
 
 	if Logic.isEmpty(achievements) then return end
