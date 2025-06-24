@@ -62,7 +62,6 @@ function CustomInjector:parse(id, widgets)
 	local args = self.caller.args
 
 	if id == 'custom' then
-		local slotText = ((args.slot == 'Persona' and '[[Persona]]') or (args.slot and String.upperCaseFirst(args.slot)))
 		Array.appendWith(widgets,
 			Title{children = 'Information'},
 			Builder{builder = function()
