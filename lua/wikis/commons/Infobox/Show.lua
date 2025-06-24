@@ -51,9 +51,12 @@ function Show:createInfobox()
 		Cell{name = 'Format', content = {args.format}},
 		Cell{name = 'Airs', content = {args.airs}},
 		Cell{name = 'Location', content = {
-				self:_createLocation(args.country, args.city),
-				self:_createLocation(args.country2, args.city2)
-			}},
+			self:_createLocation(args.country, args.city),
+			self:_createLocation(args.country2, args.city2)
+		}},
+		Cell{name = 'Status', content = {args.status}},
+		Cell{name = 'Start', content = {args.sdate}},
+		Cell{name = 'End', content = {args.edate}},
 		Customizable{id = 'custom', children = {}},
 		Builder{
 			builder = function()
